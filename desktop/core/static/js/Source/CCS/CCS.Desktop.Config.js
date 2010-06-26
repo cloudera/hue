@@ -132,3 +132,5 @@ window.addEvent('domready', function(){
 		else if(window.getSelection) window.getSelection().removeAllRanges();
 	});
 });
+
+Selectors.Pseudo.widget = function() { return !! this.get("widget"); }; 

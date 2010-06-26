@@ -57,6 +57,9 @@ CCS.JFrame.addGlobalRenderers({
 				this.getWindow().hide();
 			} else {
 				var alert = this.alert(content.title, target);
+                                target.getElements(":widget").each(function(widget) {
+                                        widget.get("widget").register(widget.getParent(":widget").get("widget"));
+                                });
 				if (options) {
 					if (options.blankWindowWithError) {
 						alert.addEvent('destroy', function(){

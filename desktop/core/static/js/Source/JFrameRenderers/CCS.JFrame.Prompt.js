@@ -33,7 +33,7 @@ CCS.JFrame.addGlobalRenderers({
 
 		var target = new Element('div', {'class': 'jframe_prompt'}).hide().inject($(this));
 		this.fill(target, content);
-		target.show();
+                target.show();
 		var toolbar = target.getElements('.toolbar');
 		if (toolbar.length) toolbar.hide();
 
@@ -44,6 +44,9 @@ CCS.JFrame.addGlobalRenderers({
 		}, {
 			resizable: true
 		});
+                target.getElements(":widget").each(function(widget) {
+                        widget.get("widget").register(widget.getParent(":widget").get("widget"));
+                });
 		if (form) {
 			form.addEvent('submit', function(){
 				prompt.hide();
