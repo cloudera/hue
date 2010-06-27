@@ -79,6 +79,7 @@ class ExceptionMiddleware(object):
     # Note that exception may actually be an Http404 or similar.
     if request.ajax:
       err = "An error occurred: " + str(exception)
+      logging.exception("Middleware caught an exception")
       return PopupException(err, detail=None).response(request)
 
     return None
