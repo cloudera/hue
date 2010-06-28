@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Tests and Examples</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="programming-guidelines.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="index.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="tests.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="tests-and-examples">
+<h1 class="title">Tests and Examples</h1>
+<p><tt class="docutils literal"><span class="pre">processing</span></tt> contains a <tt class="docutils literal"><span class="pre">test</span></tt> sub-package which contains unit tests
+for the package.  You can do a test run by doing</p>
+<pre class="literal-block">
+python -m processing.tests
+</pre>
+<p>on Python 2.5 or</p>
+<pre class="literal-block">
+python -c &quot;from processing.tests import main; main()&quot;
+</pre>
+<p>on Python 2.4.  This will run many of the tests using processes,
+threads, and processes with a manager.</p>
+<p>The <tt class="docutils literal"><span class="pre">example</span></tt> sub-package contains the following modules:</p>
+<blockquote>
+<dl class="docutils">
+<dt><a class="reference" href="../examples/ex_newtype.py">ex_newtype.py</a></dt>
+<dd>Demonstration of how to create and use customized managers
+and proxies.</dd>
+<dt><a class="reference" href="../examples/ex_pool.py">ex_pool.py</a></dt>
+<dd>Test of the <tt class="docutils literal"><span class="pre">Pool</span></tt> class which represents a process pool.</dd>
+<dt><a class="reference" href="../examples/ex_synchronize.py">ex_synchronize.py</a></dt>
+<dd>Test of synchronization types like locks, conditions and queues.</dd>
+<dt><a class="reference" href="../examples/ex_workers.py">ex_workers.py</a></dt>
+<dd>A test showing how to use queues to feed tasks to a
+collection of worker process and collect the results.</dd>
+<dt><a class="reference" href="../examples/ex_webserver.py">ex_webserver.py</a></dt>
+<dd>An example of how a pool of worker processes can each
+run a <tt class="docutils literal"><span class="pre">SimpleHTTPServer.HttpServer</span></tt> instance
+while sharing a single listening socket.</dd>
+<dt><a class="reference" href="../examples/benchmarks.py">benchmarks.py</a></dt>
+<dd>Some simple benchmarks comparing <tt class="docutils literal"><span class="pre">processing</span></tt> with <tt class="docutils literal"><span class="pre">threading</span></tt>.</dd>
+</dl>
+</blockquote>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="programming-guidelines.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="index.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="tests.html">Next</a>
+</div>
+</body>
+</html>

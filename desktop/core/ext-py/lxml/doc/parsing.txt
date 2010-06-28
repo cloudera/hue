@@ -1,0 +1,757 @@
+==============================
+Parsing XML and HTML with lxml
+==============================
+
+lxml provides a very simple and powerful API for parsing XML and HTML.  It
+supports one-step parsing as well as step-by-step parsing using an
+event-driven API (currently only for XML).
+
+.. contents::
+.. 
+   1  Parsers
+     1.1  Parser options
+     1.2  Error log
+     1.3  Parsing HTML
+     1.4  Doctype information
+   2  The target parser interface
+   3  The feed parser interface
+   4  iterparse and iterwalk
+     4.1  Selective tag events
+     4.2  Comments and PIs
+     4.3  Modifying the tree
+     4.4  iterwalk
+   5  Python unicode strings
+     5.1  Serialising to Unicode strings
+
+
+The usual setup procedure:
+
+.. sourcecode:: pycon
+
+  >>> from lxml import etree
+
+..
+  >>> from lxml import usedoctest
+
+  >>> try: from StringIO import StringIO
+  ... except ImportError:
+  ...    from io import BytesIO
+  ...    def StringIO(s):
+  ...        if isinstance(s, str): s = s.encode("UTF-8")
+  ...        return BytesIO(s)
+
+  >>> try: unicode = __builtins__["unicode"]
+  ... except (NameError, KeyError): unicode = str
+
+  >>> import sys
+  >>> from lxml import etree as _etree
+  >>> if sys.version_info[0] >= 3:
+  ...   class etree_mock(object):
+  ...     def __getattr__(self, name): return getattr(_etree, name)
+  ...     def tostring(self, *args, **kwargs):
+  ...       s = _etree.tostring(*args, **kwargs)
+  ...       if isinstance(s, bytes) and bytes([10]) in s: s = s.decode("utf-8") # CR
+  ...       if s[-1] == '\n': s = s[:-1]
+  ...       return s
+  ... else:
+  ...   class etree_mock(object):
+  ...     def __getattr__(self, name): return getattr(_etree, name)
+  ...     def tostring(self, *args, **kwargs):
+  ...       s = _etree.tostring(*args, **kwargs)
+  ...       if s[-1] == '\n': s = s[:-1]
+  ...       return s
+  >>> etree = etree_mock()
+
+
+Parsers
+=======
+
+Parsers are represented by parser objects.  There is support for parsing both
+XML and (broken) HTML.  Note that XHTML is best parsed as XML, parsing it with
+the HTML parser can lead to unexpected results.  Here is a simple example for
+parsing XML from an in-memory string:
+
+.. sourcecode:: pycon
+
+  >>> xml = '<a xmlns="test"><b xmlns="test"/></a>'
+
+  >>> root = etree.fromstring(xml)
+  >>> etree.tostring(root)
+  b'<a xmlns="test"><b xmlns="test"/></a>'
+
+To read from a file or file-like object, you can use the ``parse()`` function,
+which returns an ``ElementTree`` object:
+
+.. sourcecode:: pycon
+
+  >>> tree = etree.parse(StringIO(xml))
+  >>> etree.tostring(tree.getroot())
+  b'<a xmlns="test"><b xmlns="test"/></a>'
+
+Note how the ``parse()`` function reads from a file-like object here.  If
+parsing is done from a real file, it is more common (and also somewhat more
+efficient) to pass a filename:
+
+.. sourcecode:: pycon
+
+  >>> tree = etree.parse("doc/test.xml")
+
+lxml can parse from a local file, an HTTP URL or an FTP URL.  It also
+auto-detects and reads gzip-compressed XML files (.gz).
+
+If you want to parse from memory and still provide a base URL for the document
+(e.g. to support relative paths in an XInclude), you can pass the ``base_url``
+keyword argument:
+
+.. sourcecode:: pycon
+
+  >>> root = etree.fromstring(xml, base_url="http://where.it/is/from.xml")
+
+
+Parser options
+--------------
+
+The parsers accept a number of setup options as keyword arguments.  The above
+example is easily extended to clean up namespaces during parsing:
+
+.. sourcecode:: pycon
+
+  >>> parser = etree.XMLParser(ns_clean=True)
+  >>> tree   = etree.parse(StringIO(xml), parser)
+  >>> etree.tostring(tree.getroot())
+  b'<a xmlns="test"><b/></a>'
+
+The keyword arguments in the constructor are mainly based on the libxml2
+parser configuration.  A DTD will also be loaded if validation or attribute
+default values are requested.
+
+Available boolean keyword arguments:
+
+* attribute_defaults - read the DTD (if referenced by the document) and add
+  the default attributes from it
+
+* dtd_validation - validate while parsing (if a DTD was referenced)
+
+* load_dtd - load and parse the DTD while parsing (no validation is performed)
+
+* no_network - prevent network access when looking up external
+  documents (on by default)
+
+* ns_clean - try to clean up redundant namespace declarations
+
+* recover - try hard to parse through broken XML
+
+* remove_blank_text - discard blank text nodes between tags
+
+* remove_comments - discard comments
+
+* remove_pis - discard processing instructions
+
+* strip_cdata - replace CDATA sections by normal text content (on by
+  default)
+
+* resolve_entities - replace entities by their text value (on by
+  default)
+
+* huge_tree - disable security restrictions and support very deep trees
+  and very long text content (only affects libxml2 2.7+)
+
+* compact - use compact storage for short text content (on by default)
+
+
+Error log
+---------
+
+Parsers have an ``error_log`` property that lists the errors of the
+last parser run:
+
+.. sourcecode:: pycon
+
+  >>> parser = etree.XMLParser()
+  >>> print(len(parser.error_log))
+  0
+
+  >>> tree = etree.XML("<root></b>", parser)
+  Traceback (most recent call last):
+    ...
+  lxml.etree.XMLSyntaxError: Opening and ending tag mismatch: root line 1 and b, line 1, column 11
+
+  >>> print(len(parser.error_log))
+  1
+
+  >>> error = parser.error_log[0]
+  >>> print(error.message)
+  Opening and ending tag mismatch: root line 1 and b
+  >>> print(error.line)
+  1
+  >>> print(error.column)
+  11
+
+
+Parsing HTML
+------------
+
+HTML parsing is similarly simple.  The parsers have a ``recover``
+keyword argument that the HTMLParser sets by default.  It lets libxml2
+try its best to return a valid HTML tree with all content it can
+manage to parse.  It will not raise an exception on parser errors.
+You should use libxml2 version 2.6.21 or newer to take advantage of
+this feature.
+
+.. sourcecode:: pycon
+
+  >>> broken_html = "<html><head><title>test<body><h1>page title</h3>"
+
+  >>> parser = etree.HTMLParser()
+  >>> tree   = etree.parse(StringIO(broken_html), parser)
+
+  >>> result = etree.tostring(tree.getroot(),
+  ...                         pretty_print=True, method="html")
+  >>> print(result)
+  <html>
+    <head>
+      <title>test</title>
+    </head>
+    <body>
+      <h1>page title</h1>
+    </body>
+  </html>
+
+Lxml has an HTML function, similar to the XML shortcut known from
+ElementTree:
+
+.. sourcecode:: pycon
+
+  >>> html = etree.HTML(broken_html)
+  >>> result = etree.tostring(html, pretty_print=True, method="html")
+  >>> print(result)
+  <html>
+    <head>
+      <title>test</title>
+    </head>
+    <body>
+      <h1>page title</h1>
+    </body>
+  </html>
+
+The support for parsing broken HTML depends entirely on libxml2's recovery
+algorithm.  It is *not* the fault of lxml if you find documents that are so
+heavily broken that the parser cannot handle them.  There is also no guarantee
+that the resulting tree will contain all data from the original document.  The
+parser may have to drop seriously broken parts when struggling to keep
+parsing.  Especially misplaced meta tags can suffer from this, which may lead
+to encoding problems.
+
+Note that the result is a valid HTML tree, but it may not be a
+well-formed XML tree.  For example, XML forbids double hyphens in
+comments, which the HTML parser will happily accept in recovery mode.
+Therefore, if your goal is to serialise an HTML document as an
+XML/XHTML document after parsing, you may have to apply some manual
+preprocessing first.
+
+
+Doctype information
+-------------------
+
+The use of the libxml2 parsers makes some additional information available at
+the API level.  Currently, ElementTree objects can access the DOCTYPE
+information provided by a parsed document, as well as the XML version and the
+original encoding:
+
+.. sourcecode:: pycon
+
+  >>> pub_id  = "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  >>> sys_url = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+  >>> doctype_string = '<!DOCTYPE html PUBLIC "%s" "%s">' % (pub_id, sys_url)
+  >>> xml_header = '<?xml version="1.0" encoding="ascii"?>'
+  >>> xhtml = xml_header + doctype_string + '<html><body></body></html>'
+
+  >>> tree = etree.parse(StringIO(xhtml))
+  >>> docinfo = tree.docinfo
+  >>> print(docinfo.public_id)
+  -//W3C//DTD XHTML 1.0 Transitional//EN
+  >>> print(docinfo.system_url)
+  http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd
+  >>> docinfo.doctype == doctype_string
+  True
+
+  >>> print(docinfo.xml_version)
+  1.0
+  >>> print(docinfo.encoding)
+  ascii
+
+
+The target parser interface
+===========================
+
+.. _`As in ElementTree`: http://effbot.org/elementtree/elementtree-xmlparser.htm
+
+`As in ElementTree`_, and similar to a SAX event handler, you can pass
+a target object to the parser:
+
+.. sourcecode:: pycon
+
+  >>> class EchoTarget:
+  ...     def start(self, tag, attrib):
+  ...         print("start %s %s" % (tag, attrib))
+  ...     def end(self, tag):
+  ...         print("end %s" % tag)
+  ...     def data(self, data):
+  ...         print("data %r" % data)
+  ...     def comment(self, text):
+  ...         print("comment %s" % text)
+  ...     def close(self):
+  ...         print("close")
+  ...         return "closed!"
+
+  >>> parser = etree.XMLParser(target = EchoTarget())
+
+  >>> result = etree.XML("<element>some<!--comment-->text</element>",
+  ...                    parser)
+  start element {}
+  data u'some'
+  comment comment
+  data u'text'
+  end element
+  close
+
+  >>> print(result)
+  closed!
+
+It is important for the ``.close()`` method to reset the parser target
+to a usable state, so that you can reuse the parser as often as you
+like:
+
+.. sourcecode:: pycon
+
+  >>> result = etree.XML("<element>some<!--comment-->text</element>",
+  ...                    parser)
+  start element {}
+  data u'some'
+  comment comment
+  data u'text'
+  end element
+  close
+
+  >>> print(result)
+  closed!
+
+Note that the parser does *not* build a tree when using a parser
+target.  The result of the parser run is whatever the target object
+returns from its ``.close()`` method.  If you want to return an XML
+tree here, you have to create it programmatically in the target
+object.  An example for a parser target that builds a tree is the
+``TreeBuilder``.
+
+  >>> parser = etree.XMLParser(target = etree.TreeBuilder())
+
+  >>> result = etree.XML("<element>some<!--comment-->text</element>",
+  ...                    parser)
+
+  >>> print(result.tag)
+  element
+  >>> print(result[0].text)
+  comment
+
+
+The feed parser interface
+=========================
+
+Since lxml 2.0, the parsers have a feed parser interface that is
+compatible to the `ElementTree parsers`_.  You can use it to feed data
+into the parser in a controlled step-by-step way.
+
+In lxml.etree, you can use both interfaces to a parser at the same
+time: the ``parse()`` or ``XML()`` functions, and the feed parser
+interface.  Both are independent and will not conflict (except if used
+in conjunction with a parser target object as described above).
+
+.. _`ElementTree parsers`: http://effbot.org/elementtree/elementtree-xmlparser.htm
+
+To start parsing with a feed parser, just call its ``feed()`` method
+to feed it some data.
+
+.. sourcecode:: pycon
+
+  >>> parser = etree.XMLParser()
+
+  >>> for data in ('<?xml versio', 'n="1.0"?', '><roo', 't><a', '/></root>'):
+  ...     parser.feed(data)
+
+When you are done parsing, you **must** call the ``close()`` method to
+retrieve the root Element of the parse result document, and to unlock the
+parser:
+
+.. sourcecode:: pycon
+
+  >>> root = parser.close()
+
+  >>> print(root.tag)
+  root
+  >>> print(root[0].tag)
+  a
+
+If you do not call ``close()``, the parser will stay locked and
+subsequent feeds will keep appending data, usually resulting in a non
+well-formed document and an unexpected parser error.  So make sure you
+always close the parser after use, also in the exception case.
+
+Another way of achieving the same step-by-step parsing is by writing your own
+file-like object that returns a chunk of data on each ``read()`` call.  Where
+the feed parser interface allows you to actively pass data chunks into the
+parser, a file-like object passively responds to ``read()`` requests of the
+parser itself.  Depending on the data source, either way may be more natural.
+
+Note that the feed parser has its own error log called
+``feed_error_log``.  Errors in the feed parser do not show up in the
+normal ``error_log`` and vice versa.
+
+You can also combine the feed parser interface with the target parser:
+
+.. sourcecode:: pycon
+
+  >>> parser = etree.XMLParser(target = EchoTarget())
+
+  >>> parser.feed("<eleme")
+  >>> parser.feed("nt>some text</elem")
+  start element {}
+  data u'some text'
+  >>> parser.feed("ent>")
+  end element
+
+  >>> result = parser.close()
+  close
+  >>> print(result)
+  closed!
+
+Again, this prevents the automatic creation of an XML tree and leaves
+all the event handling to the target object.  The ``close()`` method
+of the parser forwards the return value of the target's ``close()``
+method.
+
+
+iterparse and iterwalk
+======================
+
+As known from ElementTree, the ``iterparse()`` utility function
+returns an iterator that generates parser events for an XML file (or
+file-like object), while building the tree.  The values are tuples
+``(event-type, object)``.  The event types supported by ElementTree
+and lxml.etree are the strings 'start', 'end', 'start-ns' and
+'end-ns'.
+
+The 'start' and 'end' events represent opening and closing elements.
+They are accompanied by the respective Element instance.  By default,
+only 'end' events are generated:
+
+.. sourcecode:: pycon
+
+  >>> xml = '''\
+  ... <root>
+  ...   <element key='value'>text</element>
+  ...   <element>text</element>tail
+  ...   <empty-element xmlns="http://testns/" />
+  ... </root>
+  ... '''
+
+  >>> context = etree.iterparse(StringIO(xml))
+  >>> for action, elem in context:
+  ...     print("%s: %s" % (action, elem.tag))
+  end: element
+  end: element
+  end: {http://testns/}empty-element
+  end: root
+
+The resulting tree is available through the ``root`` property of the iterator:
+
+.. sourcecode:: pycon
+
+  >>> context.root.tag
+  'root'
+
+The other event types can be activated with the ``events`` keyword argument:
+
+.. sourcecode:: pycon
+
+  >>> events = ("start", "end")
+  >>> context = etree.iterparse(StringIO(xml), events=events)
+  >>> for action, elem in context:
+  ...     print("%s: %s" % (action, elem.tag))
+  start: root
+  start: element
+  end: element
+  start: element
+  end: element
+  start: {http://testns/}empty-element
+  end: {http://testns/}empty-element
+  end: root
+
+The 'start-ns' and 'end-ns' events notify about namespace
+declarations.  They do not come with Elements.  Instead, the value of
+the 'start-ns' event is a tuple ``(prefix, namespaceURI)`` that
+designates the beginning of a prefix-namespace mapping.  The
+corresponding ``end-ns`` event does not have a value (None).  It is
+common practice to use a list as namespace stack and pop the last
+entry on the 'end-ns' event.
+
+.. sourcecode:: pycon
+
+  >>> print(xml[:-1])
+  <root>
+    <element key='value'>text</element>
+    <element>text</element>tail
+    <empty-element xmlns="http://testns/" />
+  </root>
+
+  >>> events = ("start", "end", "start-ns", "end-ns")
+  >>> context = etree.iterparse(StringIO(xml), events=events)
+  >>> for action, elem in context:
+  ...     if action in ('start', 'end'):
+  ...         print("%s: %s" % (action, elem.tag))
+  ...     elif action == 'start-ns':
+  ...         print("%s: %s" % (action, elem))
+  ...     else:
+  ...         print(action)
+  start: root
+  start: element
+  end: element
+  start: element
+  end: element
+  start-ns: ('', 'http://testns/')
+  start: {http://testns/}empty-element
+  end: {http://testns/}empty-element
+  end-ns
+  end: root
+
+
+Selective tag events
+--------------------
+
+As an extension over ElementTree, lxml.etree accepts a ``tag`` keyword
+argument just like ``element.iter(tag)``.  This restricts events to a
+specific tag or namespace:
+
+.. sourcecode:: pycon
+
+  >>> context = etree.iterparse(StringIO(xml), tag="element")
+  >>> for action, elem in context:
+  ...     print("%s: %s" % (action, elem.tag))
+  end: element
+  end: element
+
+  >>> events = ("start", "end")
+  >>> context = etree.iterparse(
+  ...             StringIO(xml), events=events, tag="{http://testns/}*")
+  >>> for action, elem in context:
+  ...     print("%s: %s" % (action, elem.tag))
+  start: {http://testns/}empty-element
+  end: {http://testns/}empty-element
+
+
+Comments and PIs
+----------------
+
+As an extension over ElementTree, the ``iterparse()`` function in
+lxml.etree also supports the event types 'comment' and 'pi' for the
+respective XML structures.
+
+.. sourcecode:: pycon
+
+  >>> commented_xml = '''\
+  ... <?some pi ?>
+  ... <!-- a comment -->
+  ... <root>
+  ...   <element key='value'>text</element>
+  ...   <!-- another comment -->
+  ...   <element>text</element>tail
+  ...   <empty-element xmlns="http://testns/" />
+  ... </root>
+  ... '''
+
+  >>> events = ("start", "end", "comment", "pi")
+  >>> context = etree.iterparse(StringIO(commented_xml), events=events)
+  >>> for action, elem in context:
+  ...     if action in ('start', 'end'):
+  ...         print("%s: %s" % (action, elem.tag))
+  ...     elif action == 'pi':
+  ...         print("%s: -%s=%s-" % (action, elem.target, elem.text))
+  ...     else: # 'comment'
+  ...         print("%s: -%s-" % (action, elem.text))
+  pi: -some=pi -
+  comment: - a comment -
+  start: root
+  start: element
+  end: element
+  comment: - another comment -
+  start: element
+  end: element
+  start: {http://testns/}empty-element
+  end: {http://testns/}empty-element
+  end: root
+
+  >>> print(context.root.tag)
+  root
+
+
+Modifying the tree
+------------------
+
+You can modify the element and its descendants when handling the 'end' event.
+To save memory, for example, you can remove subtrees that are no longer
+needed:
+
+.. sourcecode:: pycon
+
+  >>> context = etree.iterparse(StringIO(xml))
+  >>> for action, elem in context:
+  ...     print(len(elem))
+  ...     elem.clear()
+  0
+  0
+  0
+  3
+  >>> context.root.getchildren()
+  []
+
+**WARNING**: During the 'start' event, the descendants and following siblings
+are not yet available and should not be accessed.  During the 'end' event, the
+element and its descendants can be freely modified, but its following siblings
+should not be accessed.  During either of the two events, you **must not**
+modify or move the ancestors (parents) of the current element.  You should
+also avoid moving or discarding the element itself.  The golden rule is: do
+not touch anything that will have to be touched again by the parser later on.
+
+If you have elements with a long list of children in your XML file and want to
+save more memory during parsing, you can clean up the preceding siblings of
+the current element:
+
+.. sourcecode:: pycon
+
+  >>> for event, element in etree.iterparse(StringIO(xml)):
+  ...     # ... do something with the element
+  ...     element.clear()                 # clean up children
+  ...     while element.getprevious() is not None: 
+  ...         del element.getparent()[0]  # clean up preceding siblings
+
+The ``while`` loop deletes multiple siblings in a row.  This is only necessary
+if you skipped over some of them using the ``tag`` keyword argument.
+Otherwise, a simple ``if`` should do.  The more selective your tag is,
+however, the more thought you will have to put into finding the right way to
+clean up the elements that were skipped.  Therefore, it is sometimes easier to
+traverse all elements and do the tag selection by hand in the event handler
+code.
+
+
+iterwalk
+--------
+
+A second extension over ElementTree is the ``iterwalk()`` function.  It
+behaves exactly like ``iterparse()``, but works on Elements and ElementTrees:
+
+.. sourcecode:: pycon
+
+
+  >>> root = etree.XML(xml)
+  >>> context = etree.iterwalk(
+  ...             root, events=("start", "end"), tag="element")
+  >>> for action, elem in context:
+  ...     print("%s: %s" % (action, elem.tag))
+  start: element
+  end: element
+  start: element
+  end: element
+
+  >>> f = StringIO(xml)
+  >>> context = etree.iterparse(
+  ...             f, events=("start", "end"), tag="element")
+
+  >>> for action, elem in context:
+  ...     print("%s: %s" % (action, elem.tag))
+  start: element
+  end: element
+  start: element
+  end: element
+
+
+Python unicode strings
+======================
+
+lxml.etree has broader support for Python unicode strings than the ElementTree
+library.  First of all, where ElementTree would raise an exception, the
+parsers in lxml.etree can handle unicode strings straight away.  This is most
+helpful for XML snippets embedded in source code using the ``XML()``
+function:
+
+.. sourcecode:: pycon
+
+  >>> uxml = u'<test> \uf8d1 + \uf8d2 </test>'
+  >>> uxml
+  u'<test> \uf8d1 + \uf8d2 </test>'
+  >>> root = etree.XML(uxml)
+
+This requires, however, that unicode strings do not specify a conflicting
+encoding themselves and thus lie about their real encoding:
+
+.. sourcecode:: pycon
+
+  >>> etree.XML( u'<?xml version="1.0" encoding="ASCII"?>\n' + uxml )
+  Traceback (most recent call last):
+    ...
+  ValueError: Unicode strings with encoding declaration are not supported.
+
+Similarly, you will get errors when you try the same with HTML data in a
+unicode string that specifies a charset in a meta tag of the header.  You
+should generally avoid converting XML/HTML data to unicode before passing it
+into the parsers.  It is both slower and error prone.
+
+
+Serialising to Unicode strings
+------------------------------
+
+To serialize the result, you would normally use the ``tostring()``
+module function, which serializes to plain ASCII by default or a
+number of other byte encodings if asked for:
+
+.. sourcecode:: pycon
+
+  >>> etree.tostring(root)
+  b'<test> &#63697; + &#63698; </test>'
+
+  >>> etree.tostring(root, encoding='UTF-8', xml_declaration=False)
+  b'<test> \xef\xa3\x91 + \xef\xa3\x92 </test>'
+
+As an extension, lxml.etree recognises the unicode type as an argument to the
+encoding parameter to build a Python unicode representation of a tree:
+
+.. sourcecode:: pycon
+
+  >>> etree.tostring(root, encoding=unicode)
+  u'<test> \uf8d1 + \uf8d2 </test>'
+
+  >>> el = etree.Element("test")
+  >>> etree.tostring(el, encoding=unicode)
+  u'<test/>'
+
+  >>> subel = etree.SubElement(el, "subtest")
+  >>> etree.tostring(el, encoding=unicode)
+  u'<test><subtest/></test>'
+
+  >>> tree = etree.ElementTree(el)
+  >>> etree.tostring(tree, encoding=unicode)
+  u'<test><subtest/></test>'
+
+The result of ``tostring(encoding=unicode)`` can be treated like any
+other Python unicode string and then passed back into the parsers.
+However, if you want to save the result to a file or pass it over the
+network, you should use ``write()`` or ``tostring()`` with a byte
+encoding (typically UTF-8) to serialize the XML.  The main reason is
+that unicode strings returned by ``tostring(encoding=unicode)`` are
+not byte streams and they never have an XML declaration to specify
+their encoding.  These strings are most likely not parsable by other
+XML libraries.
+
+For normal byte encodings, the ``tostring()`` function automatically
+adds a declaration as needed that reflects the encoding of the
+returned string.  This makes it possible for other parsers to
+correctly parse the XML byte stream.  Note that using ``tostring()``
+with UTF-8 is also considerably faster in most cases.

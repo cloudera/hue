@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="Windows-1251"?>
+<!DOCTYPE hrc SYSTEM "../hrc.dtd">
+<?xml-stylesheet type="text/xsl" href="../hrc.xsl"?>
+<!--
+    Python Defs
+With help of:
+    Grzegorz Makarewicz <mak@mikroplan.com.pl>
+-->
+
+<!--
+    Updated by Roman V. Kiseliov <roman@kiseliov.ru>
+    for Python 2.4
+-->
+<hrc>
+
+<define name="pyString"   value="dString"/>
+<define name="pyComment"  value="dComment"/>
+<define name="pySymb"     value="dSymbol"/>
+<define name="pyWord"     value="dKeyword"/>
+<define name="pyBuiltins" value="dLabel"/>
+<define name="pyOctNumb"  value="dNumOct"/>
+
+<define name="pyException" value="dLabel"/>
+
+<scheme name="python">
+   <regexp match="/(\#.*$)/" region0="pyComment"/>
+   <block start='/\"\"\"/' end='/\"\"\"/' scheme="Comment"
+          region="pyComment" region00="dpOpenStruct" region10="dpCloseStruct"/>
+   <block start="/'''/" end="/'''/" scheme="Comment"
+          region="pyComment" region00="dpOpenStruct" region10="dpCloseStruct"/>
+   <!-- Strings -->
+   <regexp match='/("((\\.)|[^\\"])*?")/' region0="pyString"/>
+   <regexp match="/('((\\.)|[^\\'])*?')/" region0="pyString"/>
+
+   <!-- Numbers -->
+   <inherit scheme="mFloatNumb"/>
+   <inherit scheme="mcHexNumb"/>
+   <inherit scheme="mDecNumb"/>
+   <regexp match="/\b(0[0-7]*[Ll]?)\B/" region0="pyOctNumb"/>
+   <regexp match="/(`.*`)/" region0="pyBuiltins"/>
+
+   <keywords region="pySymb">
+      <symb name=";"/><symb name="="/><symb name="+"/><symb name="-"/>
+      <symb name="/"/><symb name="*"/><symb name="&amp;"/><symb name="|"/>
+      <symb name="^"/><symb name="("/><symb name=")"/><symb name="["/>
+      <symb name="]"/><symb name=","/><symb name="."/><symb name=":"/>
+      <symb name="!"/><symb name="~"/><symb name="&lt;"/><symb name="&gt;"/>
+      <symb name="%"/><symb name="{"/><symb name="}"/><symb name="?"/>
+      <symb name="@"/>
+   </keywords>
+   <keywords region="pyWord">
+       <word name="and"/>
+       <word name="assert"/>
+       <word name="break"/>
+       <word name="class"/>
+       <word name="continue"/>
+       <word name="def"/>
+       <word name="del"/>
+       <word name="elif"/>
+       <word name="else"/>
+       <word name="except"/>
+       <word name="exec"/>
+       <word name="finally"/>
+       <word name="for"/>
+       <word name="from"/>
+       <word name="global"/>
+       <word name="if"/>
+       <word name="import"/>
+       <word name="in"/>
+       <word name="is"/>
+       <word name="lambda"/>
+       <word name="not"/>
+       <word name="or"/>
+       <word name="pass"/>
+       <word name="print"/>
+       <word name="raise"/>
+       <word name="return"/>
+       <word name="try"/>
+       <word name="while"/>
+       <word name="yield"/>
+   </keywords>
+   <keywords region="pyException">
+       <word name="ArithmeticError"/>
+       <word name="AssertionError"/>
+       <word name="AttributeError"/>
+       <word name="DeprecationWarning"/>
+       <word name="EOFError"/>
+       <word name="EnvironmentError"/>
+       <word name="Exception"/>
+       <word name="FloatingPointError"/>
+       <word name="FutureWarning"/>
+       <word name="IOError"/>
+       <word name="ImportError"/>
+       <word name="IndentationError"/>
+       <word name="IndexError"/>
+       <word name="KeyError"/>
+       <word name="KeyboardInterrupt"/>
+       <word name="LookupError"/>
+       <word name="MemoryError"/>
+       <word name="NameError"/>
+       <word name="NotImplementedError"/>
+       <word name="OSError"/>
+       <word name="OverflowError"/>
+       <word name="OverflowWarning"/>
+       <word name="PendingDeprecationWarning"/>
+       <word name="ReferenceError"/>
+       <word name="RuntimeError"/>
+       <word name="RuntimeWarning"/>
+       <word name="StandardError"/>
+       <word name="StopIteration"/>
+       <word name="SyntaxError"/>
+       <word name="SyntaxWarning"/>
+       <word name="SystemError"/>
+       <word name="SystemExit"/>
+       <word name="TabError"/>
+       <word name="TypeError"/>
+       <word name="UnboundLocalError"/>
+       <word name="UnicodeDecodeError"/>
+       <word name="UnicodeEncodeError"/>
+       <word name="UnicodeError"/>
+       <word name="UnicodeTranslateError"/>
+       <word name="UserWarning"/>
+       <word name="ValueError"/>
+       <word name="Warning"/>
+       <word name="WindowsError"/>
+       <word name="ZeroDivisionError"/>
+   </keywords>
+   <keywords region="pyBuiltins">
+       <word name="Ellipsis"/>
+       <word name="False"/>
+       <word name="None"/>
+       <word name="NotImplemented"/>
+       <word name="True"/>
+       <word name="__abs__"/>
+       <word name="__add__"/>
+       <word name="__and__"/>
+       <word name="__base__"/>
+       <word name="__bases__"/>
+       <word name="__basicsize__"/>
+       <word name="__builtins__"/>
+       <word name="__call__"/>
+       <word name="__class__"/>
+       <word name="__cmp__"/>
+       <word name="__coerce__"/>
+       <word name="__contains__"/>
+       <word name="__debug__"/>
+       <word name="__del__"/>
+       <word name="__delattr__"/>
+       <word name="__delete__"/>
+       <word name="__delitem__"/>
+       <word name="__delslice__"/>
+       <word name="__dict__"/>
+       <word name="__dictoffset__"/>
+       <word name="__div__"/>
+       <word name="__divmod__"/>
+       <word name="__doc__"/>
+       <word name="__eq__"/>
+       <word name="__flags__"/>
+       <word name="__float__"/>
+       <word name="__floordiv__"/>
+       <word name="__ge__"/>
+       <word name="__get__"/>
+       <word name="__getattr__"/>
+       <word name="__getattribute__"/>
+       <word name="__getitem__"/>
+       <word name="__getnewargs__"/>
+       <word name="__getslice__"/>
+       <word name="__gt__"/>
+       <word name="__hash__"/>
+       <word name="__hex__"/>
+       <word name="__iadd__"/>
+       <word name="__iand__"/>
+       <word name="__idiv__"/>
+       <word name="__ifloordiv__"/>
+       <word name="__ilshift__"/>
+       <word name="__imod__"/>
+       <word name="__import__"/>
+       <word name="__imul__"/>
+       <word name="__init__"/>
+       <word name="__int__"/>
+       <word name="__invert__"/>
+       <word name="__ior__"/>
+       <word name="__ipow__"/>
+       <word name="__irshift__"/>
+       <word name="__isub__"/>
+       <word name="__itemsize__"/>
+       <word name="__iter__"/>
+       <word name="__itruediv__"/>
+       <word name="__ixor__"/>
+       <word name="__le__"/>
+       <word name="__len__"/>
+       <word name="__long__"/>
+       <word name="__lshift__"/>
+       <word name="__lt__"/>
+       <word name="__main__"/>
+       <word name="__mod__"/>
+       <word name="__module__"/>
+       <word name="__mro__"/>
+       <word name="__mul__"/>
+       <word name="__name__"/>
+       <word name="__ne__"/>
+       <word name="__neg__"/>
+       <word name="__new__"/>
+       <word name="__nonzero__"/>
+       <word name="__oct__"/>
+       <word name="__or__"/>
+       <word name="__pos__"/>
+       <word name="__pow__"/>
+       <word name="__radd__"/>
+       <word name="__rand__"/>
+       <word name="__rdiv__"/>
+       <word name="__rdivmod__"/>
+       <word name="__reduce__"/>
+       <word name="__reduce_ex__"/>
+       <word name="__repr__"/>
+       <word name="__rfloordiv__"/>
+       <word name="__rlshift__"/>
+       <word name="__rmod__"/>
+       <word name="__rmul__"/>
+       <word name="__ror__"/>
+       <word name="__rpow__"/>
+       <word name="__rrshift__"/>
+       <word name="__rshift__"/>
+       <word name="__rsub__"/>
+       <word name="__rtruediv__"/>
+       <word name="__rxor__"/>
+       <word name="__set__"/>
+       <word name="__setattr__"/>
+       <word name="__setitem__"/>
+       <word name="__setslice__"/>
+       <word name="__str__"/>
+       <word name="__sub__"/>
+       <word name="__truediv__"/>
+       <word name="__weakrefoffset__"/>
+       <word name="__xor__"/>
+       <word name="abs"/>
+       <word name="apply"/>
+       <word name="basestring"/>
+       <word name="bool"/>
+       <word name="buffer"/>
+       <word name="callable"/>
+       <word name="capitalize"/>
+       <word name="center"/>
+       <word name="chr"/>
+       <word name="classmethod"/>
+       <word name="cmp"/>
+       <word name="coerce"/>
+       <word name="compile"/>
+       <word name="complex"/>
+       <word name="count"/>
+       <word name="decode"/>
+       <word name="delattr"/>
+       <word name="dict"/>
+       <word name="dir"/>
+       <word name="divmod"/>
+       <word name="encode"/>
+       <word name="endswith"/>
+       <word name="enumerate"/>
+       <word name="eval"/>
+       <word name="execfile"/>
+       <word name="exit"/>
+       <word name="expandtabs"/>
+       <word name="file"/>
+       <word name="filter"/>
+       <word name="find"/>
+       <word name="float"/>
+       <word name="frozenset"/>
+       <word name="getattr"/>
+       <word name="globals"/>
+       <word name="hasattr"/>
+       <word name="hash"/>
+       <word name="hex"/>
+       <word name="id"/>
+       <word name="index"/>
+       <word name="input"/>
+       <word name="int"/>
+       <word name="intern"/>
+       <word name="isalnum"/>
+       <word name="isalpha"/>
+       <word name="isdigit"/>
+       <word name="isinstance"/>
+       <word name="islower"/>
+       <word name="isspace"/>
+       <word name="issubclass"/>
+       <word name="istitle"/>
+       <word name="isupper"/>
+       <word name="iter"/>
+       <word name="join"/>
+       <word name="len"/>
+       <word name="list"/>
+       <word name="ljust"/>
+       <word name="locals"/>
+       <word name="long"/>
+       <word name="lower"/>
+       <word name="lstrip"/>
+       <word name="map"/>
+       <word name="max"/>
+       <word name="min"/>
+       <word name="next"/>
+       <word name="object"/>
+       <word name="oct"/>
+       <word name="open"/>
+       <word name="ord"/>
+       <word name="pow"/>
+       <word name="property"/>
+       <word name="quit"/>
+       <word name="range"/>
+       <word name="raw_input"/>
+       <word name="reduce"/>
+       <word name="reload"/>
+       <word name="replace"/>
+       <word name="repr"/>
+       <word name="reversed"/>
+       <word name="rfind"/>
+       <word name="rindex"/>
+       <word name="rjust"/>
+       <word name="round"/>
+       <word name="rsplit"/>
+       <word name="rstrip"/>
+       <word name="set"/>
+       <word name="setattr"/>
+       <word name="slice"/>
+       <word name="sorted"/>
+       <word name="split"/>
+       <word name="splitlines"/>
+       <word name="startswith"/>
+       <word name="staticmethod"/>
+       <word name="str"/>
+       <word name="strip"/>
+       <word name="sum"/>
+       <word name="super"/>
+       <word name="swapcase"/>
+       <word name="title"/>
+       <word name="translate"/>
+       <word name="tuple"/>
+       <word name="type"/>
+       <word name="unichr"/>
+       <word name="unicode"/>
+       <word name="upper"/>
+       <word name="vars"/>
+       <word name="xrange"/>
+       <word name="zfill"/>
+       <word name="zip"/>
+   </keywords>
+</scheme>
+
+</hrc>

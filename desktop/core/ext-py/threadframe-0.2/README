@@ -1,0 +1,25 @@
+Obtaining tracebacks on other threads in Python
+===============================================
+by Fazal Majid (www.majid.info), 2004-06-10
+
+David Beazley added advanced debugging functions to the Python interpreter,
+and they have been folded into the 2.2 release. Guido van Rossum added in
+Python 2.3 the thread ID to the interpreter state structure, and this allows
+us to produce a dictionary mapping thread IDs to frames.
+
+I used these hooks to build a debugging module that is useful when you
+are looking for deadlocks in a multithreaded application. I've built
+and tested this only on Solaris 8/x86, but the code should be pretty
+portable.
+
+Of course, I disclaim any liability if this code should crash your system,
+erase your homework, eat your dog (who also ate your homework) or otherwise
+have any undesirable effect.
+
+Building and installing
+=======================
+
+Download threadframe-0.2.tar.gz. You can use the Makefile or the setup.py
+script. There is a small test program test.py that illustrates how to use this
+module to dump stack frames of all the Python interpreter threads. A sample
+run is available for your perusal.

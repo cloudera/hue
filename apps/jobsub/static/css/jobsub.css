@@ -1,0 +1,297 @@
+.jobsub .jframe_contents {
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+}
+.jobsub .toolbar {
+	position: absolute;
+	top: 29px;
+	width: 100%;
+}
+.jobsub .toolbar a {
+	display: block;
+	float: right;
+	height: 52px;
+	width: 20px;
+	margin: 0px 12px;
+	background-position: 0 100% !important;
+	text-indent: -99999px;
+}
+.jobsub .toolbar a:hover {
+	background-position: 0 0 !important;
+}
+.jobsub .toolbar a.jobsub_joblist {
+	background: url('../art/kill_bill.png') no-repeat;
+	width: 104px;
+	float: left;
+}
+.jobsub .toolbar a.jobsub_history {
+	background: url('../art/history.png') no-repeat;
+	width: 48px;
+	margin-right: 20px;
+}
+.jobsub h1 {
+	display: none;
+}
+
+.jobsub table.ccs-data_table {
+	border: #B2B2B2 solid;
+	border-width: 1px 0px;
+}
+
+.jobsub_joblist .jobsub_topsection {
+	margin: 0;
+	background: #B2B2B2;
+	padding: 4px;
+}
+.jobsub_joblist .jobsub_topsection form {
+	float: right;
+}
+.jobsub_joblist form span, .jobsub_joblist form input.submit {
+	display: none;
+}
+.jobsub_joblist td.jobsub_listing_actions a {
+	display: block;
+	float: right;
+	width: 18px;
+	height: 18px;
+	overflow: hidden;
+	text-indent: -9999999px;
+	margin-left: 6px;
+}
+.jobsub_joblist td a.copy {
+	background: url('../art/line_icons.png') no-repeat;	
+}
+.jobsub_joblist td a.edit {
+	background: url('../art/line_icons.png') no-repeat 0 -23px;
+}
+.jobsub_joblist td a.delete {
+	background: url('../art/line_icons.png') no-repeat 0 -70px;
+}
+.jobsub_joblist td a.run {
+	background: url('../art/line_icons.png') no-repeat 0 -47px;
+}
+.jobsub_left_col {
+	padding: 8px;
+}
+
+ul.jobsub_new {
+	padding: 4px 0px 0px 11px;
+}
+ul.jobsub_new li {
+	list-style: none !important;
+	padding: 4px 4px 4px 0px;
+}
+ul.jobsub_new li a {
+	background: url('../art/line_icons.png') no-repeat 0 -113px;
+	height: 18px;
+	padding-left: 22px;
+	position: relative;
+	top: 1px;
+	color: #000;
+	display: block;
+}
+ul.jobsub_new li a:hover {
+	background: url('../art/line_icons.png') no-repeat 0 -91px;
+	text-decoration: none;
+}
+.jobsub h2 {
+	text-transform: capitalize;
+	font-size: 14px;
+	margin: 10px 0px 0px;
+}
+
+.jobsub_edit .art-splitview-right {
+	background: #a9a9a9 url(../art/edit_back.png);
+}
+.jobsub_edit dl {
+	padding: 10px;
+}
+.jobsub_edit dl dt, .jobsub_parameterize dl dt {
+	text-transform: capitalize;
+	float: left;
+	width: 30%;
+	clear:both;
+	position: relative;
+	margin-bottom: 5px;
+}
+.jobsub_edit dl dd, .jobsub_parameterize dl dd {
+	float: left;
+	font-size: 10px;
+	width: 70%;
+	margin-bottom: 5px;
+}
+.jobsub .jobsub_parameterize_description {
+	margin-bottom: 10px;
+}
+.jobsub_parameterize {
+	min-width: 400px;
+}
+.jobsub .jobsub_parameterize_description dd {
+	font-size: 12px;
+}
+.jobsub_edit dl dd input, .jobsub_edit dl dd select,
+ .jobsub_parameterize dl dd input, .jobsub_parameterize dl dd select {
+	margin-bottom: 2px;
+}
+.jobsub_parameterize dl dd textarea, .jobsub_edit dl dd textarea {
+	width: 304px;
+	margin-bottom: 2px;
+}
+.jobsub_edit .jobsub_advanced {
+	display: none;
+}
+.jobsub_edit .jobsub_edit_tip {
+	background: #c6d8e2;
+	color: #000;
+	margin: 10px;
+	padding: 10px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}
+.jobsub_edit .jobsub_edit_tip p {
+	margin-bottom: 4px;
+	font-size: 11px;
+}
+.jobsub_edit .jobsub_edit_tip dl {
+	margin: 0;
+	padding: 0;
+}
+.jobsub_edit .jobsub_edit_tip dl dt {
+	top: 0;
+}
+.jobsub_edit .jobsub_edit_tip dl dd {
+	position: relative;
+	top: 2px;
+	color: #333;
+}
+.jobsub_edit_save {
+	width: 70%;
+	margin-left: 10%;
+}
+.jobsub_edit_save input {
+	width: auto !important;
+}
+.jobsub_edit_save .ccs-submit {
+	float:right;
+}
+.jobsub_edit .jobsub_toggler a {
+	display: block;
+	text-align: right;
+	width: 305px;
+	position: relative;
+	border: 1px solid #333;
+	background: #d0dbe2;
+	padding: 2px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}
+.jobsub_edit .jobsub_toggler a:hover {
+	text-decoration: none;
+	background: #fff;
+}
+
+.jobsub .jframe_prompt {
+	text-align: left;
+}
+.jobsub_history .jobsub_more {
+	display: block;
+	background: #3E528C;
+	color: #fff;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	padding: 4px;
+	margin: 4px;
+	text-align: center;
+}
+.jobsub_history .jobsub_more:hover {
+	background: #4c62a1;
+	text-decoration: none;
+}
+.jobsub_history a.jobsub_watch {
+	display: block;
+	width: 14px;
+	height: 14px;
+	background: url(/static/art/info.png);
+	text-indent: -999999px;
+}
+
+.jobsub_output h1 {
+	display: block;
+	background: #333;
+	color: #fff;
+	padding: 12px 8px !important;
+}
+.jobsub_output .view {
+	background: #94abbe url(../art/watch_back.png);
+}
+
+.jobsub_output b.state {
+	position: absolute;
+	top: 8px;
+	right: 10px;
+	color: #fff;
+	text-align: right;
+}
+.jobsub_output b.state span.jobsub_autorefresh_note {
+	display: block;
+}
+.jobsub_output b.state span {
+	font-size: 9px;
+	font-weight: normal;
+	
+}
+.jobsub_output b.complete {
+	top: 12px;
+}
+.jobsub_output li, .jobsub_output ul {
+	list-style: none !important;
+	float: left;
+	margin: 0;
+	padding: 0;
+}
+.jobsub_output ul.jobsub_output_links {
+	margin-left: 8px;
+	padding: 0px;
+}
+.jobsub_output li a {
+	display: block;
+	padding: 4px;
+	margin: 4px;
+	background: #3E528C;
+	color: #fff;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	padding: 4px 8px;
+	margin: 4px;
+	text-align: center;
+}
+.jobsub_output li a:hover {
+	background: #4c62a1;
+	text-decoration: none;
+}
+
+.jobsub_output_jobtracker_header {
+	display: none;
+}
+.jobsub_output h2 {
+	clear:both;
+}
+
+.jobsub_output pre {
+	background: #bbb;
+	border: 1px solid #333;
+	padding: 8px;
+	white-space: pre-wrap;
+}
+.jobsub h2.jobsub_output_stout_header, .jobsub h2.jobsub_output_sterr_header {
+	text-transform: none;
+}
+
+.jobsub_errors {
+	color: #ff0000; 
+}

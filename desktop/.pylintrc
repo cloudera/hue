@@ -1,0 +1,23 @@
+# pylintrc for Desktop.
+#
+# "pylint --generate-rcfile" generates the defaults;
+# this file encodes deviations from those defaults.
+
+[FORMAT]
+
+# String used as indentation unit. This is usually " " (4 spaces) or "\t" (1
+# tab).
+indent-string='  '
+
+# Maximum number of characters on a single line.
+max-line-length=100
+
+# Good variable names which should always be accepted, separated by a comma
+# Defaults + "f,x,k,v"
+good-names=i,j,k,ex,Run,_,f,x,k,v
+
+# Regular expression which should only match correct list comprehension /
+# generator expression variable names
+inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
+
+ignored-classes=SQLObject,Config,BoundConfig,ConfigSection

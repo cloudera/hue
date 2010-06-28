@@ -1,0 +1,35 @@
+# standard files
+include ACKS ANNOUNCE BUGS ChangeLog MANIFEST MANIFEST.in LICENSE.txt NEWS.txt README*
+
+# support files for development
+include ctypes-dev.el
+include ctypes/.CTYPES_DEVEL
+include setup.py
+
+# libffi build files
+include source/libffi/aclocal.m4
+include source/libffi/config.guess
+include source/libffi/config.sub
+include source/libffi/configure
+include source/libffi/configure.ac
+include source/libffi/fficonfig.h.in
+include source/libffi/fficonfig.py.in
+include source/libffi/install-sh
+include source/libffi/LICENSE
+include source/libffi/README
+
+# all source files
+recursive-include source *.c *.h *.S *.asm *.in
+
+# windows CE project files
+include wince/_ctypes.vcw wince/_ctypes.vcp
+include wince/_ctypes_test/_ctypes_test.vcp
+
+# docs/manual
+include docs/anatomy.txt
+include docs/manual/tutorial.txt
+include docs/manual/tutorial.html
+include docs/manual/reference.txt
+include docs/manual/reference.html
+include docs/manual/mkpydoc.py
+include docs/manual/markup.py

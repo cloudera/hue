@@ -1,0 +1,32 @@
+{
+	"mootools-core": {
+		"scripts": "/static/js/ThirdParty/mootools-core/Source"
+	},
+	"mootools-more": {
+		"scripts": "/static/js/ThirdParty/mootools-more/Source"
+	},
+	"clientcide": {
+		"scripts": "/static/js/ThirdParty/clientcide/Source"
+	},
+	"ccs-shared": {
+		"scripts": "/static/js/Source"
+	},
+	"subtletemplates": {
+		"scripts": "/subtletemplates/static/js/Source"
+	},
+	"mootools-art": {
+		"scripts": "/static/js/ThirdParty/art/Source"
+	},
+	"mootools-color": {
+		"scripts": "/mootools-color/static/js/Source"
+	},
+	"mootools-touch": {
+		"scripts": "/mootools-touch/static/js/Source"
+	},
+	"slick": {
+		"scripts": "/static/js/ThirdParty/art/assets/slick/Source"
+	},	
+	"jobbrowser": {
+		"scripts": "/jobbrowser/static/js/Source"
+	}
+}

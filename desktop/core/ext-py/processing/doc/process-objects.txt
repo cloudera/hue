@@ -1,0 +1,176 @@
+.. include:: header.txt
+
+=================
+ Process objects
+=================
+
+Process objects represent activity that is run in a separate process.
+
+
+Process
+=======
+
+The `Process` class has equivalents of all the methods of
+`threading.Thread`:
+
+    `__init__(group=None, target=None, name=None, args=(), kwargs={})`
+        This constructor should always be called with keyword
+        arguments. Arguments are: 
+
+        `group`
+            should be `None`; exists for compatibility with 
+            `threading.Thread`.
+
+        `target` 
+            is the callable object to be invoked by the `run()`
+            method.  Defaults to None, meaning nothing is called.
+
+        `name` 
+            is the process name. By default, a unique name is
+            constructed of the form 
+            'Process-N\ :sub:`1`:N\ :sub:`2`:...:N\ :sub:`k`' 
+            where 
+            N\ :sub:`1`,N\ :sub:`2`,...,N\ :sub:`k` 
+            is a sequence of integers whose length is determined by
+            the *generation* of the process.
+
+        `args` 
+            is the argument tuple for the target invocation.
+            Defaults to `()`.
+
+        `kwargs` 
+            is a dictionary of keyword arguments for the target
+            invocation. Defaults to `{}`.
+
+        If a subclass overrides the constructor, it must make sure it
+        invokes the base class constructor (`Process.__init__()`)
+        before doing anything else to the process.
+
+    `run()`
+         Method representing the process's activity.  
+
+         You may override this method in a subclass. The standard
+         `run()` method invokes the callable object passed to the
+         object's constructor as the target argument, if any, with
+         sequential and keyword arguments taken from the `args` and
+         `kwargs` arguments, respectively.
+
+    `start()`
+        Start the process's activity.  
+
+        This must be called at most once per process object. It
+        arranges for the object's `run()` method to be invoked in a
+        separate process.
+
+    `join(timeout=None)`
+        This blocks the calling thread until the process whose
+        `join()` method is called terminates or until the optional
+        timeout occurs.
+
+        If `timeout` is `None` then there is no timeout.
+
+        A process can be joined many times. 
+
+        A process cannot join itself because this would cause a
+        deadlock.
+
+        It is an error to attempt to join a process before it has 
+        been started.
+
+    `getName()`
+        Return the process's name.
+
+    `setName(name)` 
+        Set the process's name.
+        
+        The name is a string used for identification purposes only. 
+        It has no semantics. Multiple processes may be given the same 
+        name. The initial name is set by the constructor.
+
+    `isAlive()`
+        Return whether the process is alive. 
+
+        Roughly, a process object is alive from the moment the `start()`
+        method returns until the child process terminates.
+
+    `isDaemon()`
+        Return the process's daemon flag. 
+
+    `setDaemon(daemonic)`
+        Set the process's daemon flag to the Boolean value
+        `daemonic`. This must be called before `start()` is called.  
+
+        The initial value is inherited from the creating process.
+
+        When a parent process finishes it attempts to stop all of its
+        daemonic child processes and then tries to join each of its
+        non-daemonic child processes.
+
+In addition process objects also support the following methods.
+
+    `getPid()`
+        Return the process ID.  Before the process is spawned this 
+        will be `None`.  
+
+    `getExitCode()`
+        Return the child's exit code.  This will be `None` if the
+        process has not yet terminated.  A negative value *-N*
+        indicates that the child was terminated by signal *N*.
+
+    `getAuthKey()`
+        Return the process's authentication key (a string).
+
+        When the `processing` package is initialized the main process
+        is assigned a random hexadecimal string.
+
+        When a `Process` object is created it will inherit the
+        authentication key of its parent process, although this may be
+        changed using `setAuthKey()` below.
+
+        See `Authentication Keys <connection-ref.html#authentication-keys>`_.
+
+    `setAuthKey(authkey)`
+        Set the process's authentication key which must be a string.
+
+    `terminate()`
+        Terminate the process.  On Unix this is done using the
+        `SIGTERM` signal and on Windows `TerminateProcess()` is used.
+        Note that exit handlers and finally clauses etc will not be
+        executed.  Also note that descendants of the process will
+        *not* be terminates.
+
+        .. warning::
+
+            If this method is used when the associated process is
+            using a pipe or queue then the pipe or queue is liable to
+            become corrupted and may become unusable by other process.
+            Similarly, if the process has acquired a lock or semaphore
+            etc. then terminating it is liable to cause other
+            processes to deadlock.
+
+Note that the `start()`, `join()`, `isAlive()` and `getExitCode()`
+methods should only be called by the process that created the process
+object.
+
+
+Example
+=======
+
+Example usage of some of the methods of `Process`::
+
+    >>> import processing, time, signal
+    >>> p = processing.Process(target=time.sleep, args=(1000,))
+    >>> print p, p.isAlive()
+    <Process(Process-1, initial)> False
+    >>> p.start()
+    >>> print p, p.isAlive()
+    <Process(Process-1, started)> True
+    >>> p.terminate()
+    >>> print p, p.isAlive()
+    <Process(Process-1, stopped[SIGTERM])> False
+    >>> p.getExitCode() == -signal.SIGTERM
+    True
+
+.. _Prev: processing-ref.html
+.. _Up: processing-ref.html
+.. _Next: queue-objects.html

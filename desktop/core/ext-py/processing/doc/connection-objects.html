@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Connection objects</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="queue-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="manager-objects.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="connection-objects">
+<h1 class="title">Connection objects</h1>
+<p>Connection objects allow the sending and receiving of picklable
+objects or strings.  They can be thought of as message oriented
+connected sockets.</p>
+<p>Connection objects usually created using <tt class="docutils literal"><span class="pre">processing.Pipe()</span></tt> -- see
+also <a class="reference" href="connection-ref.html">Listener and Clients</a>.</p>
+<p>Connection objects have the following methods:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">send(obj)</span></tt></dt>
+<dd><p class="first">Send an object to the other end of the connection which should
+be read using <tt class="docutils literal"><span class="pre">recv()</span></tt>.</p>
+<p class="last">The object must be picklable.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">recv()</span></tt></dt>
+<dd>Return an object sent from the other end of the connection
+using <tt class="docutils literal"><span class="pre">send()</span></tt>.  Raises <tt class="docutils literal"><span class="pre">EOFError</span></tt> if there is nothing left to
+receive and the other end was closed.</dd>
+<dt><tt class="docutils literal"><span class="pre">fileno()</span></tt></dt>
+<dd>Returns the file descriptor or handle used by the connection.</dd>
+<dt><tt class="docutils literal"><span class="pre">close()</span></tt></dt>
+<dd><p class="first">Close the connection.</p>
+<p class="last">This is called automatically when the connection is garbage
+collected.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">poll(timeout=0.0)</span></tt></dt>
+<dd><p class="first">Return whether there is any data available to be read within
+<tt class="docutils literal"><span class="pre">timeout</span></tt> seconds.</p>
+<p>If <tt class="docutils literal"><span class="pre">timeout</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> then an infinite timeout is used.</p>
+<p class="last">Unlike the other blocking methods on Windows this method can
+be interrupted by Ctrl-C.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">sendBytes(buffer)</span></tt></dt>
+<dd><p class="first">Send byte data from an object supporting the buffer interface
+as a complete message.</p>
+<p class="last">Can be used to send strings or a view returned by <tt class="docutils literal"><span class="pre">buffer()</span></tt>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">recvBytes()</span></tt></dt>
+<dd>Return a complete message of byte data sent from the other end
+of the connection as a string.  Raises <tt class="docutils literal"><span class="pre">EOFError</span></tt> if there is
+nothing left to receive and the other end was closed.</dd>
+<dt><tt class="docutils literal"><span class="pre">recvBytesInto(buffer,</span> <span class="pre">offset=0)</span></tt></dt>
+<dd><p class="first">Read into <tt class="docutils literal"><span class="pre">buffer</span></tt> at position <tt class="docutils literal"><span class="pre">offset</span></tt> a complete message of
+byte data sent from the other end of the connection and return
+the number of bytes in the message.  Raises <tt class="docutils literal"><span class="pre">EOFError</span></tt> if
+there is nothing left to receive and the other end was closed.</p>
+<p><tt class="docutils literal"><span class="pre">buffer</span></tt> must be an object satisfying the writable buffer
+interface and <tt class="docutils literal"><span class="pre">offset</span></tt> must be non-negative and less than
+the length of <tt class="docutils literal"><span class="pre">buffer</span></tt> (in bytes).</p>
+<p class="last">If the buffer is too short then a <tt class="docutils literal"><span class="pre">BufferTooShort</span></tt> exception
+is raised and the complete message is available as <tt class="docutils literal"><span class="pre">e.args[0]</span></tt>
+where <tt class="docutils literal"><span class="pre">e</span></tt> is the exception instance.</p>
+</dd>
+</dl>
+</blockquote>
+<p>For example:</p>
+<blockquote>
+<pre class="doctest-block">
+&gt;&gt;&gt; from processing import Pipe
+&gt;&gt;&gt; a, b = Pipe()
+&gt;&gt;&gt; a.send([1, 'hello', None])
+&gt;&gt;&gt; b.recv()
+[1, 'hello', None]
+&gt;&gt;&gt; b.sendBytes('thank you')
+&gt;&gt;&gt; a.recvBytes()
+'thank you'
+&gt;&gt;&gt; import array
+&gt;&gt;&gt; arr1 = array.array('i', range(5))
+&gt;&gt;&gt; arr2 = array.array('i', [0] * 10)
+&gt;&gt;&gt; a.sendBytes(arr1)
+&gt;&gt;&gt; count = b.recvBytesInto(arr2)
+&gt;&gt;&gt; assert count == len(arr1) * arr1.itemsize
+&gt;&gt;&gt; arr2
+array('i', [0, 1, 2, 3, 4, 0, 0, 0, 0, 0])
+</pre>
+</blockquote>
+<div class="warning">
+<p class="first admonition-title">Warning</p>
+<p>The <tt class="docutils literal"><span class="pre">recv()</span></tt> method automatically unpickles the data it receives
+which can be a security risk unless you can trust the process
+which sent the message.</p>
+<p class="last">Therefore, unless the connection object was produced using
+<tt class="docutils literal"><span class="pre">Pipe()</span></tt> you should only use the <tt class="docutils literal"><span class="pre">recv()</span></tt> and <tt class="docutils literal"><span class="pre">send()</span></tt> methods
+after performing some sort of authentication.  See <a class="reference" href="connection-ref.html#authentication-keys">Authentication
+keys</a>.</p>
+</div>
+<div class="warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If a process is killed while it is trying to read or write to a
+pipe then the data in the pipe is likely to become corrupted
+because it may become impossible to be sure where the message
+boundaries lie.</p>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="queue-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="manager-objects.html">Next</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Queue objects</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="process-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="connection-objects.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="queue-objects">
+<h1 class="title">Queue objects</h1>
+<p>The queue type provided by <tt class="docutils literal"><span class="pre">processing</span></tt> is a multi-producer,
+multi-consumer FIFO queue modelled on the <tt class="docutils literal"><span class="pre">Queue.Queue</span></tt> class in the
+standard library.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Queue(maxsize=0)</span></tt></dt>
+<dd><p class="first">Returns a process shared queue implemented using a pipe and a few
+locks/semaphores.  When a process first puts an item on the queue
+a feeder thread is started which transfers objects from a
+buffer into the pipe.</p>
+<p><tt class="docutils literal"><span class="pre">Queue.Queue</span></tt> implements all the methods of <tt class="docutils literal"><span class="pre">Queue.Queue</span></tt> except for
+<tt class="docutils literal"><span class="pre">qsize()</span></tt>, <tt class="docutils literal"><span class="pre">task_done()</span></tt> and <tt class="docutils literal"><span class="pre">join()</span></tt>.</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">empty()</span></tt></dt>
+<dd>Return <tt class="docutils literal"><span class="pre">True</span></tt> if the queue is empty, <tt class="docutils literal"><span class="pre">False</span></tt>
+otherwise. Because of multithreading/multiprocessing
+semantics, this is not reliable.</dd>
+<dt><tt class="docutils literal"><span class="pre">full()</span></tt></dt>
+<dd>Return <tt class="docutils literal"><span class="pre">True</span></tt> if the queue is full, <tt class="docutils literal"><span class="pre">False</span></tt> otherwise. Because
+of multithreading/multiprocessing semantics, this is not
+reliable.</dd>
+<dt><tt class="docutils literal"><span class="pre">put(item,</span> <span class="pre">block=True,</span> <span class="pre">timeout=None)</span></tt></dt>
+<dd>Put item into the queue. If optional args <tt class="docutils literal"><span class="pre">block</span></tt> is true
+and <tt class="docutils literal"><span class="pre">timeout</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> (the default), block if necessary
+until a free slot is available. If <tt class="docutils literal"><span class="pre">timeout</span></tt> is a positive
+number, it blocks at most <tt class="docutils literal"><span class="pre">timeout</span></tt> seconds and raises the
+<tt class="docutils literal"><span class="pre">Full</span></tt> exception if no free slot was available within that
+time. Otherwise (<tt class="docutils literal"><span class="pre">block</span></tt> is false), put an item on the queue
+if a free slot is immediately available, else raise the
+<tt class="docutils literal"><span class="pre">Full</span></tt> exception (<tt class="docutils literal"><span class="pre">timeout</span></tt> is ignored in that case).</dd>
+<dt><tt class="docutils literal"><span class="pre">put_nowait(item)</span></tt>, <tt class="docutils literal"><span class="pre">putNoWait(item)</span></tt></dt>
+<dd>Equivalent to <tt class="docutils literal"><span class="pre">put(item,</span> <span class="pre">False)</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">get(block=True,</span> <span class="pre">timeout=None)</span></tt></dt>
+<dd>Remove and return an item from the queue. If optional args
+<tt class="docutils literal"><span class="pre">block</span></tt> is true and <tt class="docutils literal"><span class="pre">timeout</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> (the default),
+block if necessary until an item is available. If
+<tt class="docutils literal"><span class="pre">timeout</span></tt> is a positive number, it blocks at most
+<tt class="docutils literal"><span class="pre">timeout</span></tt> seconds and raises the <tt class="docutils literal"><span class="pre">Empty</span></tt> exception if no
+item was available within that time. Otherwise (block is
+false), return an item if one is immediately available,
+else raise the <tt class="docutils literal"><span class="pre">Empty</span></tt> exception (<tt class="docutils literal"><span class="pre">timeout</span></tt> is ignored in
+that case).</dd>
+<dt><tt class="docutils literal"><span class="pre">get_nowait()</span></tt>, <tt class="docutils literal"><span class="pre">getNoWait()</span></tt></dt>
+<dd>Equivalent to <tt class="docutils literal"><span class="pre">get(False)</span></tt>.</dd>
+</dl>
+</blockquote>
+<p><tt class="docutils literal"><span class="pre">processing.Queue</span></tt> has a few additional methods not found in
+<tt class="docutils literal"><span class="pre">Queue.Queue</span></tt> which are usually unnecessary:</p>
+<blockquote class="last">
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">putMany(iterable)</span></tt></dt>
+<dd>If the queue has infinite size then this adds all
+items in the iterable to the queue's buffer.  So
+<tt class="docutils literal"><span class="pre">q.putMany(X)</span></tt> is a faster alternative to <tt class="docutils literal"><span class="pre">for</span> <span class="pre">x</span> <span class="pre">in</span> <span class="pre">X:</span>
+<span class="pre">q.put(x)</span></tt>.  Raises an error if the queue has finite
+size.</dd>
+<dt><tt class="docutils literal"><span class="pre">close()</span></tt></dt>
+<dd>Indicates that no more data will be put on this queue by
+the current process.  The background thread will quit once
+it has flushed all buffered data to the pipe.  This is
+called automatically when the queue is garbage collected.</dd>
+<dt><tt class="docutils literal"><span class="pre">joinThread()</span></tt></dt>
+<dd><p class="first">This joins the background thread and can only be used
+after <tt class="docutils literal"><span class="pre">close()</span></tt> has been called.  This blocks until
+the background thread exits, ensuring that all data in
+the buffer has been flushed to the pipe.</p>
+<p class="last">By default if a process is not the creator of the
+queue then on exit it will attempt to join the queue's
+background thread.  The process can call
+<tt class="docutils literal"><span class="pre">cancelJoin()</span></tt> to prevent this behaviour.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">cancelJoin()</span></tt></dt>
+<dd>Prevents the background thread from being joined
+automatically when the process exits.  Unnecessary if
+the current process created the queue.</dd>
+</dl>
+</blockquote>
+</dd>
+</dl>
+<div class="admonition-empty-and-full admonition">
+<p class="first admonition-title"><tt class="docutils literal"><span class="pre">Empty</span></tt> and <tt class="docutils literal"><span class="pre">Full</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">processing</span></tt> uses the usual <tt class="docutils literal"><span class="pre">Queue.Empty</span></tt> and <tt class="docutils literal"><span class="pre">Queue.Full</span></tt>
+exceptions to signal a timeout.  They are not available in the
+<tt class="docutils literal"><span class="pre">processing</span></tt> namespace so you need to import them from <tt class="docutils literal"><span class="pre">Queue</span></tt>.</p>
+</div>
+<div class="warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If a process is killed using the <tt class="docutils literal"><span class="pre">terminate()</span></tt> method or
+<tt class="docutils literal"><span class="pre">os.kill()</span></tt> while it is trying to use a <tt class="docutils literal"><span class="pre">Queue</span></tt> then the data in
+the queue is likely to become corrupted.  This may cause any other
+processes to get an exception when it tries to use the queue later
+on.</p>
+</div>
+<div class="warning">
+<p class="first admonition-title">Warning</p>
+<p>As mentioned above, if a child process has put items on a queue
+(and it has not used <tt class="docutils literal"><span class="pre">cancelJoin()</span></tt>) then that process will not
+terminate until all buffered items have been flushed to the pipe.</p>
+<p>This means that if you try joining that process you may get a
+deadlock unless you are sure that all items which have been put on
+the queue have been consumed.  Similarly, if the child process is
+non-daemonic then the parent process may hang on exit when it tries
+to join all it non-daemonic children.</p>
+<p class="last">Note that a queue created using a manager does not have this issue.
+See <a class="reference" href="programming-guidelines.html">Programming Guidelines</a>.</p>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="process-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="connection-objects.html">Next</a>
+</div>
+</body>
+</html>

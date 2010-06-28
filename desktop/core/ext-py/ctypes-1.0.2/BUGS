@@ -1,0 +1,2 @@
+- Memory leak in the _pointer_type_cache dictionary since types are
+  made immortal.

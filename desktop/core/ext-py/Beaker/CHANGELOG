@@ -1,0 +1,381 @@
+Release 1.4.2 (9/25/2009)
+=========================
+
+* Fix bug where memcached may yank a value after the has_value but before
+  the value can be fetched.
+* Fix properties for setting the path. Fixes #15.
+* Fix the 'TypeError: argument must be an int, or have a fileno()
+  method' erorr sporadically emitted by FileSynchronizer under moderate
+  load.
+
+Release 1.4.1 (9/10/2009)
+=========================
+
+* Fix verification of options to throw an error if a beaker param is an
+  empty string.
+* Add CacheManager.invalidate function to easily invalidate cache
+  spaces created by the use of the cache decorator.
+* Add CacheManager.region_invalidate function to easily invalidate cache
+  spaces created by the use of the cache_region decorator.
+* Fix the InvalidCryptoBackendError exception triggering a TypeError. Patch
+  from dz, fixes #13.
+
+Release 1.4 (7/24/2009)
+=======================
+
+* Fix bug with hmac on Python 2.4. Patch from toshio, closes ticket #2133
+  from the TurboGears2 Trac.
+* Fix bug with occasional ValueError from FileNamespaceManager.do_open.
+  Fixes #10.
+* Fixed bug with session files being saved despite being new and not
+  saved.
+* Fixed bug with CacheMiddleware overwriting configuration with default
+  arguments despite prior setting.
+* Fixed bug with SyntaxError not being caught properly in entry point
+  discovery.
+* Changed to using BlobProperty for Google Datastore.
+* Added domain/path properties to the session. This allows one to
+  dynamically set the cookie's domain and/or path on the fly, which
+  will then be set on the cookie for the session.
+* Added support for cookie-based sessions in Jython via the JCE (Java
+  Cryptography Extensions). Patch from Alex Grönholm.
+* Update Beaker database extensions to work with SQLAlchemy 0.6
+  PostgreSQL, and Jython.
+
+Release 1.3.1 (5/5/2009)
+========================
+
+* Added a whole bunch of Sphinx documentation for the updated site.
+* Added corresponding remove as an alias to the caches remove_value.
+* Fixed cookie session not having an invalidate function.
+* Fix bug with CacheMiddleware not using proper function to load
+  configuration options, missing the cache regions.
+
+Release 1.3 (4/6/2009)
+======================
+
+* Added last_accessed attribute to session to indicate the previous time the
+  session was last accessed.
+* Added setuptools entry points to dynamically discover additional namespace
+  backends.
+* Fixed bug with invalidate and locks, fixes #594.
+* Added cache.cache decorator for arbitrary caching.
+* Added cache.region decorator to the CacheManager object.
+* Added cache regions. Can be provided in a configuration INI type, or
+  by adding in a cache_regions arg to the CacheManager.
+* Fix bug with timeout not being saved properly.
+* Fix bug with cookie-only sessions sending cookies for new sessions even
+  if they weren't supposed to be saved.
+* Fix bug that caused a non-auto accessed session to not record the time it
+  was previously accessed resulting in session timeouts.
+* Add function to parse configuration dicts as appropriate for use with the
+  CacheManager.
+* The "expiretime" is no longer passed to the memcached backend - since
+  if memcached makes the expired item unavailable at the same time the
+  container expires it, then all actors must block until the new value
+  is available (i.e. breaks the anti-dogpile logic).
+
+
+Release 1.2.3 (3/2/2009)
+========================
+
+* Fix accessed increment to take place *after* the accessed time is checked
+  to see if it has expired. Fixes #580.
+* data_dir/lock_dir parameters are optional to most backends; if not
+  present, mutex-based locking will be used for creation functions
+* Adjustments to Container to better account for backends which
+  don't provide read/write locks, such as memcached.  As a result,
+  the plain "memory" cache no longer requires read/write mutexing.
+
+
+Release 1.2.2 (2/14/2009)
+=========================
+
+* Fix delete bug reported by andres with session not being deleted.
+
+
+Release 1.2.1 (2/09/2009)
+=========================
+
+* Fix memcached behavior as memcached returns None on nonexistent key
+  fetch which broke invalid session checking.
+
+
+Release 1.2 (1/22/2009)
+=======================
+
+* Updated session to only save to the storage *once* no under any/all
+  conditions rather than every time save() is called.
+* Added session.revert() function that reverts the session to the state at
+  the beginning of the request.
+* Updated session to store entire session data in a single namespace key,
+  this lets memcached work properly, and makes for more efficient use of the
+  storage system for sessions.
+
+
+Release 1.1.3 (12/29/2008)
+==========================
+
+* Fix the 1.1.2 old cache/session upgrader to handle the has_current_value
+  method.
+* Make InvalidCacheBackendError an ImportError.
+
+
+Release 1.1.2 (11/24/2008)
+==========================
+
+* Upgrade Beaker pre-1.1 cache/session values to the new format rather than
+  throwing an exception.
+
+
+Release 1.1.1 (11/24/2008)
+==========================
+
+* Fixed bug in Google extension which passed arguments it should no longer
+  pass to NamespaceManager.
+* Fixed bug involving lockfiles left open during cache "value creation"
+  step.
+
+
+Release 1.1 (11/16/2008)
+========================
+
+* file-based cache will not hold onto cached value once read from file;
+  will create new value if the file is deleted as opposed to re-using
+  what was last read.  This allows external removal of files to be
+  used as a cache-invalidation mechanism.
+* file-based locking will not unlink lockfiles; this can interfere
+  with the flock() mechanism in the event that a concurrent process
+  is accessing the files.  
+* Sending "type" and other namespace config arguments to cache.get()/
+  cache.put()/cache.remove_value() is deprecated.   The namespace
+  configuration is now preferred at the Cache level, i.e. when you construct
+  a Cache or call cache_manager.get_cache().  This removes the ambiguity
+  of Cache's dictionary interface and has_key() methods, which have
+  no awareness of those arguments.
+* the "expiretime" in use is stored in the cache itself, so that it is 
+  always available when calling has_key() and other methods.  Between
+  this change and the deprecation of 'type', the Cache no longer has
+  any need to store cache configuration in memory per cache key, which in a 
+  dynamically-generated key scenario stores an arbitrarily large number 
+  of configurations - essentially a memory leak.
+* memcache caching has been vastly improved, no longer stores a list of
+  all keys, which along the same theme prevented efficient usage for an 
+  arbitrarily large number of keys.  The keys() method is now unimplemented, 
+  and cache.remove() clears the entire memcache cache across all namespaces.  
+  This is what the memcache API provides so it's the best we can do. 
+* memcache caching passes along "expiretime" to the memcached "time"
+  parameter, so that the cache itself can reduce its size for elements which
+  are expired (memcache seems to manage its size in any case, this is just a
+  hint to improve its operation).
+* replaced homegrown ThreadLocal implementation with threading.local, falls
+  back to a 2.3 compat one for python<2.4
+
+
+Release 1.0.3 (10/14/2008)
+==========================
+
+* Fixed os.getpid issue on GAE.
+* CookieSession will add '_expires' value to data when an expire time is set, 
+  and uses it
+
+
+Release 1.0.2 (9/22/2008)
+=========================
+
+* Fixed bug caused when attempting to invalidate a session that hadn't
+  previously been created.
+
+
+Release 1.0.1 (8/19/2008)
+=========================
+
+* Bug fix for cookie sessions to retain id before clearing values.
+
+
+Release 1.0 (8/13/2008)
+=======================
+
+* Added cookie delete to both cookie only sessions and normal sessions, to
+  help with proxies and such that may determine whether a user is logged in
+  via a cookie. (cookie varies, etc.). Suggested by Felix Schwarz.
+* cache.get_value() now uses the given **kwargs in all cases in the same
+  manner as cache.set_value().  This way you can send a new createfunc
+  to cache.get_value() each time and it will be used.
+
+  
+Release 0.9.5 (6/19/2008)
+=========================
+
+* Fixed bug in memcached to be tolerant of keys disappearing when memcached
+  expires them.
+* Fixed the cache functionality to actually work, previously set_value was
+  ignored if there was already a value set.
+
+
+Release 0.9.4 (4/13/2008)
+=========================
+
+* Adding 'google' backend datastore, available by specifying 'google' as the
+  cache/session type. Note that this takes an optional table_name used to name
+  the model class used.
+* SECURITY BUG: Fixed security issue with Beaker not properly removing
+  directory escaping characters from the session ID when un-signed sessions
+  are used. Reported with patch by Felix Schwarz.
+* Fixed bug with Beaker not playing well with Registry when its placed above
+  it in the stack. Thanks Wichert Akkerman.
+
+
+Release 0.9.3 (2/28/2008)
+=========================
+
+* Adding 'id' to cookie-based sessions for better compatibility.
+* Fixed error with exception still raised for PyCrypto missing.
+* WARNING: Session middleware no longer catches Paste HTTP Exceptions, apps
+  are now expected to capture and handle Paste HTTP Exceptions themselves.
+* Fixed Python 2.4 compatibility bug in hmac.
+* Fixed key lookup bug on cache object to only use the settings for the key
+  lookup. Found by Andrew Stromnov.
+
+
+Release 0.9.2 (2/13/2008)
+=========================
+
+* Added option to make Beaker use a secure cookie.
+* Removed CTRCipher as pycryptopp doesn't need it.
+* Changed AES to use 256 bit.
+* Fixed signing code to use hmac with sha for better signing security.
+* Fixed memcached code to use delete_multi on clearing the keys for efficiency
+  and updated key retrieval to properly store and retrieve None values.
+* Removing cookie.py and signed cookie middleware, as the environ_key option
+  for session middleware provides a close enough setting.
+* Added option to use just cookie-based sessions without requiring
+  encryption.
+* Switched encryption requirement from PyCrypto to pycryptopp which uses a 
+  proper AES in Counter Mode.
+
+
+Release 0.9.1 (2/4/2008)
+========================
+
+* Fixed bug in middleware using module that wasn't imported.
+
+
+Release 0.9 (12/17/07)
+======================
+
+* Fixed bug in memcached replace to actually replace spaces properly.
+* Fixed md5 cookie signature to use SHA-1 when available.
+* Updated cookie-based session storage to use 256-bit AES-CTR mode with a
+  SHA-1 HMAC signature. Now requires PyCrypto to use for AES scheme.
+* WARNING: Moved session and cache middleware to middleware, as per the old
+  deprecation warnings had said was going to happen for 0.8.
+* Added cookie-only session storage with RC4 ciphered encryption, requires 
+  Python 2.4.
+* Add the ability to specify the cookie's domain for sessions.
+
+
+Release 0.8.1 (11/15/07)
+========================
+
+* Fixed bug in database.py not properly handling missing sqlalchemy library.
+
+
+Release 0.8 (10/17/07)
+======================
+
+* Fixed bug in prior db update causing session to occasionally not be written
+  back to the db.
+* Fixed memcached key error with keys containing spaces. Thanks Jim Musil.
+* WARNING: Major change to ext:database to use a single row per namespace.
+  Additionally, there's an accessed and created column present to support 
+  easier deletion of old cache/session data. You *will* need to drop any
+  existing tables being used by the ext:database backend.
+* Streamline ext:database backend to avoid unnecessary database selects for
+  repeat data.
+* Added SQLAlchemy 0.4 support to ext:database backend.
+
+
+Release 0.7.5 (08/18/07)
+========================
+
+* Fixed data_dir parsing for session string coercions, no longer picks up None
+  as a data_dir.
+* Fixed session.get_by_id to lookup recently saved sessions properly, also
+  updates session with creation/access time upon save.
+* Add unit tests for get_by_id function. Updated get_by_id to not result in
+  additional session files.
+* Added session.get_by_id function to retrieve a session of the given id.
+
+
+Release 0.7.4 (07/09/07)
+========================
+
+* Fixed issue with Beaker not properly handling arguments as Pylons may pass
+  them in.
+* Fixed unit test to catch file removal exception.
+* Fixed another bug in synchronization, this one involving reentrant
+  conditions with file synchronization
+* If a file open fails due to pickling errors, locks just opened
+  are released unconditionally
+
+
+Release 0.7.3 (06/08/07)
+========================
+
+* Beaker was not properly parsing input options to session middleware. Thanks
+  to Yannick Gingras and Timothy S for spotting the issue.
+* Changed session to only send the cookie header if its a new session and
+  save() was called. Also only creates the session file under these 
+  conditions.
+
+
+Release 0.7.2 (05/19/07)
+========================
+
+* Added deprecation warning for middleware move, relocated middleware to cache
+  and session modules for backwards compatibility.
+
+
+Release 0.7.1 05/18/07)
+=======================
+
+* adjusted synchronization logic to account for Mako/new Cache object's 
+  multithreaded usage of Container.
+
+
+Release 0.7 (05/18/07)
+======================
+
+* WARNING: Cleaned up Cache object based on Mako cache object, this changes
+  the call interface slightly for creating a Cache object directly. The
+  middleware cache object is unaffected from an end-user view. This change
+  also avoids duplicate creations of Cache objects.
+* Adding database backend and unit tests.
+* Added memcached test, fixed memcached namespace arg passing.
+* Fixed session and cache tests, still failing syncdict test. Added doctests
+  for Cache and Session middleware.
+* Cleanup of container/cache/container_test
+* Namespaces no longer require a context, removed NamespaceContext?
+* Logging in container.py uses logging module
+* Cleanup of argument passing, use name **kwargs instead of **params for 
+  generic kwargs
+* Container classes contain a static create_namespace() method, namespaces are 
+  accessed from the ContainerContext? via string name + container class alone
+* Implemented (but not yet tested) clear() method on Cache, locates all 
+  Namespaces used thus far and clears each one based on its keys() collection
+* Fixed Cache.clear() method to actually clear the Cache namespace.
+* Updated memcached backend to split servers on ';' for multiple memcached
+  backends.
+* Merging MyghtyUtils code into Beaker.
+
+
+Release 0.6.3 (03/18/2007)
+==========================
+
+* Added api with customized Session that doesn't require a Myghty request 
+  object, just a dict. Updated session to use the new version.
+* Removing unicode keys as some dbm backends can't handle unicode keys.
+* Adding core files that should've been here.
+* More stringent checking for existence of a session.
+* Avoid recreating the session object when it's empty.

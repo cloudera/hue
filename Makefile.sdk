@@ -1,0 +1,256 @@
+#
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# A Makefile to be (optionally) included by any SDK applications.
+#
+# This Makefile assumes the following environment variables:
+#   ROOT
+#   	Points to the root of the Hue installation. From here, we
+#   	can include $(ROOT)/Makefile.vars to access various variables.
+#
+# This Makefile (or any custom application Makefile) MUST provide the following
+# targets:
+#   egg-info
+#   	Responsible for creating the egg-info directory for the application.
+#
+#   ext-eggs
+#   	Responsible for creating a Python egg for each external Python
+#   	dependency. These eggs should be placed in the
+#   	$(APP_ROOT)/ext-py/<package>/dist directory.
+#
+#   clean
+#   	Remove build products.
+#
+#   sdist
+#   	Responsible for making a source distribution directory at
+#   	$(APP_ROOT)/build/sdist/$(APP_NAME).
+#
+#   install-bdist
+#   	Responsible for installing a built distribution to a target directory,
+#   	as specified by $(INSTALL_DIR) and $(INSTALL_CONF_DIR).
+#
+
+include $(ROOT)/Makefile.vars
+
+APP_ROOT := $(realpath .)
+APP_NAME ?= $(notdir $(APP_ROOT))
+APP_VERSION ?= $(shell python setup.py --version)
+APP_FULL_NAME ?= $(APP_NAME)-$(APP_VERSION)
+
+BUILD_DIR := $(APP_ROOT)/build
+
+.PHONY: default
+default::
+	@echo 'The build targets for $(APP_NAME) are: (*) is required'
+	@echo '  compile        : Compile $(APP_NAME)'
+	@echo '  egg-info *     : Create a python egg for $(APP_NAME)'
+	@echo '  ext-eggs *     : Create python eggs for external dependencies'
+	@echo '  sdist *        : Create a source distribution tree and tarball'
+	@echo '  bdist          : Create a built distribution tree'
+	@echo '  install-bdist *: Install a built distribution to a target location'
+	@echo '  env-install    : Install into virtual-env'
+	@echo '  ext-env-install: Install external dependencies into virtual-env'
+	@echo '  ext-clean      : Clean external dependencies'
+	@echo '  clean *        : Clean $(APP_NAME). Requires ext-clean'
+	@echo '  distclean      : Dist clean $(APP_NAME). Requires clean'
+
+.PHONY: egg
+egg-info: compile
+	@echo '--- Making egg-info for $(APP_NAME)'
+	@$(ENV_PYTHON) setup.py -q egg_info
+
+#
+# env-install
+# 	Install app into the virtual environment. Used by desktop core.
+#
+.PHONY: env-install
+env-install: compile ext-env-install
+	@echo '--- Installing $(APP_NAME) into virtual-env'
+	@$(ENV_PYTHON) setup.py develop -N -q
+
+# Hook to allow extra build steps (eg java builds)
+.PHONY: compile
+compile:
+
+
+##############################
+# The following installs the external Python dependencies under the ext-py/
+# directory.
+
+EXT_PY_DIRS := $(wildcard ext-py/*)
+EXT_PYS := $(notdir $(EXT_PY_DIRS))
+
+ext_py_stamp = $(BUILD_DIR)/$(1)/$(2).stamp
+
+
+##############################
+# Macros
+##############################
+EXT_PY_EGG_TARGETS := $(EXT_PYS:%=$(call ext_py_stamp,%,egg))
+EXT_PY_CLEAN_TARGETS := $(EXT_PYS:%=$(call ext_py_stamp,%,clean))
+EXT_PY_ENV_INSTALL_TARGETS := $(EXT_PYS:%=$(call ext_py_stamp,%,env-install))
+
+$(EXT_PY_EGG_TARGETS): CUR_EXT_PY=$(notdir $(@D))
+$(EXT_PY_CLEAN_TARGETS): CUR_EXT_PY=$(notdir $(@D))
+$(EXT_PY_ENV_INSTALL_TARGETS): CUR_EXT_PY=$(notdir $(@D))
+
+#
+# ext-eggs
+#   	Builds a binary egg for any 3rd party package that are based on the
+#   	earlier distutils (rather than setuptools).
+#
+.PHONY: ext-eggs
+ext-eggs: $(EXT_PY_EGG_TARGETS)
+$(EXT_PY_EGG_TARGETS):
+	@echo '--- Building egg for $(CUR_EXT_PY)'
+	@cd ext-py/$(CUR_EXT_PY) && $(ENV_PYTHON) \
+	  -c '__import__("setuptools.sandbox").sandbox.run_setup("setup.py", __import__("sys").argv[1:])' \
+	  bdist_egg
+	@mkdir -p $(BUILD_DIR)/$(CUR_EXT_PY) && touch $@
+
+#
+# ext-clean
+# 	Clean the 3rd party package. This will NOT uninstall it from Desktop.
+#
+.PHONY: ext-clean
+ext-clean: $(EXT_PY_CLEAN_TARGETS)
+$(EXT_PY_CLEAN_TARGETS):
+	@echo '--- Cleaning $(CUR_EXT_PY)'
+	@rm -Rf $(BUILD_DIR)/$(CUR_EXT_PY)
+	@cd ext-py/$(CUR_EXT_PY) && rm -Rf dist build temp *.egg-info
+	@find ext-py/$(CUR_EXT_PY) -name \*.egg-info -o -name \*.py[co] -prune -exec rm -Rf {} \;
+
+#
+# ext-env-install
+# 	Install all 3rd party packages into the Desktop environment. Used by
+# 	desktop core. We look for egg files in two locations:
+# 	(1) ext-py/<pkg>/dist/*.egg
+# 	(2) ext-eggs/*.egg
+#
+.PHONY: ext-env-install
+ext-env-install: ext-eggs $(EXT_PY_ENV_INSTALL_TARGETS)
+	@for i in $(wildcard ext-eggs/*.egg) ; do \
+	  echo "--- Installing $$i into virtual environment" ; \
+	  $(ENV_EASY_INSTALL) -N $$i 2> /dev/null ; \
+	done
+
+$(EXT_PY_ENV_INSTALL_TARGETS):
+	@echo '--- Installing $(CUR_EXT_PY) into virtual environment'
+	@# If there are no binary eggs, maybe this package decided
+	@# it wasn't necessary.  If the build had failed, the command that produced
+	@# the egg should have thrown an error.
+	@cd ext-py/$(CUR_EXT_PY) && [ ! -e dist ] || $(ENV_EASY_INSTALL) -N dist/*egg 2>/dev/null
+
+.PHONY: clean
+clean:: ext-clean
+	@echo --- Cleaning $(APP_NAME)
+	@# Use SYS_PYTHON because ENV_PYTHON may not be available.
+	@$(SYS_PYTHON) setup.py clean || :
+	@rm -Rf $(BUILD_DIR) dist
+	@find . -name \*.egg-info -prune -exec rm -Rf {} \;
+	@find . -name \*.py[co] -exec rm -f {} \;
+
+.PHONY: distclean
+distclean:: clean
+
+
+#####################################
+# Distribution builds
+#####################################
+
+# Items that should not be included in the source/built distribution.
+# Apps can list this in their own Makefile before including this file
+# in order to exclude their own sources, non-distributables, etc.
+# This list is rsync friendly.
+COMMON_EXCLUDES := \
+	  --exclude=build \
+	  --exclude=\*.py[co] \
+	  --exclude=.\*.sw[op] \
+	  --exclude=~\* \
+	  --exclude=.gitignore \
+	  --exclude=tag
+
+SDIST_EXCLUDES += $(COMMON_EXCLUDES)
+BDIST_EXCLUDES += $(COMMON_EXCLUDES) --exclude=ext-py
+
+SDIST_DIR := $(BUILD_DIR)/sdist/$(APP_FULL_NAME)
+BDIST_DIR := $(BUILD_DIR)/bdist/$(APP_FULL_NAME)
+SDIST_TGZ := $(BUILD_DIR)/sdist/$(APP_FULL_NAME).tgz
+
+#
+# sdist
+# 	Simply copy the essential sources to the target directory.
+#
+.PHONY: sdist
+sdist:
+	@echo '--- Making source distribution at $(SDIST_DIR)'
+	@rm -rf $(SDIST_DIR)
+	@mkdir -p $(SDIST_DIR)
+	@# Copy sources of our app
+	@rsync -a ./ $(SDIST_DIR)/ $(SDIST_EXCLUDES)
+	@$(MAKE) -C $(SDIST_DIR) clean
+	@# Also make a tarball
+	@tar -C $(SDIST_DIR)/.. -czf $(SDIST_TGZ) $(APP_FULL_NAME)
+	@echo "--- Created $(SDIST_TGZ)"
+
+#
+# bdist
+# 	Like sdist. For ext-py, we copy the eggs only (into a separate ext-eggs
+# 	directory). Apps with non-python source (e.g. Java, C) should also
+# 	exclude the source files.
+#
+.PHONY: bdist
+bdist: ext-eggs compile
+	@echo '--- Making built distribution at $(BDIST_DIR)'
+	@rm -rf $(BDIST_DIR)
+	@mkdir -p $(BDIST_DIR)
+	@# Copy built sources of our app
+	@rsync -a ./ $(BDIST_DIR)/ $(BDIST_EXCLUDES)
+	@# Copy thirdparty eggs into the ext-eggs dir
+	@mkdir -p $(BDIST_DIR)/ext-eggs
+	@if test -n '$(wildcard ext-py/*/dist)' ; then \
+	  find ext-py/*/dist -type f -name '*.egg' -exec cp {} $(BDIST_DIR)/ext-eggs \; ; \
+	fi
+
+#
+# install-bdist
+# 	Install the built distribution in $(INSTALL_DIR), and any conf file in
+# 	$(INSTALL_CONF_DIR). NOTE that this does NOT install the app into the
+# 	virtual environment.
+#
+.PHONY: install-bdist
+install-bdist: bdist
+	@echo "--- Install built distribution for $(APP_NAME) at $(INSTALL_DIR)"
+	@mkdir -p $(INSTALL_DIR)
+	@rsync -a $(BDIST_DIR)/ $(INSTALL_DIR)
+ifneq ($(wildcard conf),) # if there are conf files
+	@echo "--- Installing $(APP_NAME) configuration into $(INSTALL_CONF_DIR)"
+	@mkdir -p $(INSTALL_CONF_DIR)
+	for conffile in $(INSTALL_DIR)/conf/* ; do \
+	  filename=$$(basename $$conffile) ; \
+	  if [ -f $(INSTALL_CONF_DIR)/$$filename ]; then \
+	    echo "Moving aside old config $(INSTALL_CONF_DIR)/$$filename" ; \
+	    mv $(INSTALL_CONF_DIR)/$$filename{,.save.$(shell date +"%Y%m%d.%H%M%S")} ; \
+	  fi ; \
+	  mv $$conffile $(INSTALL_CONF_DIR)/$$filename ; \
+	done
+	@# Remove the conf dir from the install location since we've placed the confs in the
+	@# right spot
+	@rmdir $(INSTALL_DIR)/conf
+endif

@@ -1,0 +1,44 @@
+.. include:: header.txt
+
+Tests and Examples
+==================
+
+`processing` contains a `test` sub-package which contains unit tests
+for the package.  You can do a test run by doing ::
+
+    python -m processing.tests
+
+on Python 2.5 or ::
+
+    python -c "from processing.tests import main; main()"
+ 
+on Python 2.4.  This will run many of the tests using processes,
+threads, and processes with a manager.
+
+The `example` sub-package contains the following modules:
+
+     `ex_newtype.py <../examples/ex_newtype.py>`_
+         Demonstration of how to create and use customized managers
+         and proxies.
+
+     `ex_pool.py <../examples/ex_pool.py>`_
+         Test of the `Pool` class which represents a process pool.
+      
+     `ex_synchronize.py <../examples/ex_synchronize.py>`_
+         Test of synchronization types like locks, conditions and queues.
+
+     `ex_workers.py <../examples/ex_workers.py>`_
+         A test showing how to use queues to feed tasks to a
+         collection of worker process and collect the results.
+
+     `ex_webserver.py <../examples/ex_webserver.py>`_
+         An example of how a pool of worker processes can each 
+         run a `SimpleHTTPServer.HttpServer` instance
+         while sharing a single listening socket.
+
+     `benchmarks.py <../examples/benchmarks.py>`_
+         Some simple benchmarks comparing `processing` with `threading`.
+
+.. _Prev: programming-guidelines.html
+.. _Up: index.html
+.. _Next: tests.html

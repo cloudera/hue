@@ -1,0 +1,233 @@
+ctypes objects anatomy
+======================
+
+This article describes some of the internals of ctypes types and
+ctypes instances.
+
+The object structure
+--------------------
+
+Definition of the structure that each ctypes instance has::
+
+    struct tagCDataObject {
+            PyObject_HEAD               /* Standard Python object fields */
+            char *b_ptr;                /* pointer to memory block */
+            int b_needsfree;            /* does the object own its memory block? */
+            CDataObject *b_base;        /* pointer to base object or NULL */
+            Py_ssize_t b_size;          /* size of memory block in bytes */
+            Py_ssize_t b_length;        /* number of fields of this object */
+            Py_ssize_t b_index;         /* index of this object into the base
+                                           objects b_object list */
+            PyObject *b_objects;        /* references we need to keep */
+            union value b_value;        /* a small default buffer */
+    };
+
+Here is what the fields contain:
+
+- ``PyObject_HEAD``
+
+    Standard for every Python object.
+
+- ``b_ptr``
+
+    Pointer to the memory block that the object uses.
+
+- ``b_needsfree``
+
+    A flag which is nonzero if the object does owns the memory block,
+    nonzero otherwise.
+
+- ``b_base``
+
+    If the object does not own the memory block, this is the 'root' object
+    that owns the memory block.  Otherwise it is NULL.
+
+- ``b_size``
+
+    Size of memory block in bytes.
+
+- ``b_length``
+
+    ...
+
+- ``b_index``
+
+    If b_base is not NULL, this is the index of this object in the
+    'root' object.
+
+- ``b_objects``
+
+    This is a pointer containing a Python object which contains other
+    objects that have to be kept alive as long as this object lives.
+    Either ``None``, or a dictionary.
+
+- ``b_value``
+
+    A default memory block which can be used by small objects to avoid
+    a PyMem_Malloc calls.
+
+The memory block
+----------------
+
+Basically, a ctypes object instance has a memory block containing C
+compatible data, plus the ``b_objects`` Python object pointer.  The
+latter is used to keep referenced objects alive that are referenced by
+pointers in the memory block.
+
+Consider an array of 4 string pointers, defined by this C code::
+
+    char *string_array[4];
+
+The ctypes definition is::
+
+    >>> from ctypes import *
+    >>> string_array = (c_char_p * 4)()
+    >>>
+
+The memory block of ``string_array`` is initialized to all zeros,
+and retrieving items returns 4 ``None`` objects::
+
+    >>> string_array[:]
+    [None, None, None, None]
+    >>>
+
+We can assign Python strings to the items, and get them back::
+
+    >>> string_array[0] = "foo bar"; string_array[1] = "spam, spam, spam"
+    >>> string_array[0:2]
+    ['foo bar', 'spam, spam, spam']
+    >>>
+
+The memory block contains the *pointers* to the strings (ctypes
+objects implement the buffer interface, so we can use the following
+snippet to examine the buffer contents)::
+
+    >>> print repr(str(buffer(string_array)))  # doctest: +SKIP
+    '\x94\xb7\xbd\x00\xfc\x80\xbf\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    >>>
+
+The strings themselves must also be kept in memory, otherwise the
+pointers in the memory block would access invalid or freed memory.
+The are stored in a dictionary in the``b_objects`` field of the
+``tagCDataObject`` structure defined above.  This field is exposed as
+attribute named ``_objects`` to Python, but you should be aware that
+this object is only exposed for debugging (and understanding) of
+ctypes objects, you should *never* modify it::
+
+    >>> string_array._objects
+    {'1': 'spam, spam, spam', '0': 'foo bar'}
+    >>>
+
+The ``b_objects`` dictionary stores these needed objects as values, at
+a key that is calculated from the item index or field index.
+
+Not all ctypes objects have to keep references, simple types like
+integers or floats for example can happily live in the memory block,
+without any other needs.  In this case ``b_objects`` contains
+``Py_None``, and the dictionary is never created::
+
+    >>> int_array = (c_int * 3)()
+    >>> int_array[:] = 1, 2, 3
+    >>> print int_array._objects
+    None
+    >>>
+
+XXX remove this?
+
+    >>> s_a = (c_char_p * 5210)()
+    >>> s_a[0] = "zero"
+    >>> s_a[255] = "ali baba"
+    >>> s_a[257] = "forty robbers"
+    >>> s_a[1] = "spam and eggs"
+    >>> s_a._objects
+    {'1': 'spam and eggs', '0': 'zero', '101': 'forty robbers', 'ff': 'ali baba'}
+    >>>
+
+The important thing to keep in mind is that it must be possible to
+'reconstruct' the whole ctypes object from the memory block and the
+``b_objects`` pointer.
+
+
+What happens if a ctypes object is stored in another ctypes object
+field?  Define a structure which has a field storing a string array::
+
+    >>> class Container(Structure):
+    ...     _fields_ = [("count", c_uint),
+    ...                 ("strings", c_char_p * 4)]
+    ...
+    >>>
+    >>> container = Container()
+    >>> container.strings = string_array
+    >>> container._objects
+    {'1': {'1': 'spam, spam, spam', '0': 'foo bar'}}
+    >>>
+
+As we can see, the ``string_array`` ``b_objects`` dictionary has been
+inserted into the ``container`` ``b_objects`` dictionary at index 1,
+because 1 is the index of the ``strings`` field.  The contents of the
+``string_array`` memory block has been copied into the ``container``
+memory block as well.
+
+Again, things get slighlty more complicated when we use a structure
+containing a pointer field instead of an array field.  In this case,
+the memory block of the pointer object must be kept alive in addition
+to the pointer ``b_object`` dictionary.  Here is what ctypes does::
+
+    >>> class PointerContainer(Structure):
+    ...     _fields_ = [("count", c_uint),
+    ...                 ("string_p", POINTER(c_char_p))]
+    ...
+    >>> pc = PointerContainer()
+    >>> pc.string_p = string_array
+    >>> pc._objects
+    {'1': ({'1': 'spam, spam, spam', '0': 'foo bar'}, <c_char_p_Array_4 object at 0x...>)}
+    >>>
+
+So, assigning an array instance to a pointer type field stores a tuple
+containing the arrays ``b_objects`` dictionary plus the array object
+itself.  Of course, in this case the memory block of ``string_array``
+is NOT copied into the ``PointerContainer`` memory block, only the
+address is copied.
+
+What happens if we retrieve the string pointer from the
+PointerContainer instance?  ctypes doesn't do OOR (original object
+return), ctypes returns a new object on each attribute access::
+
+    >>> pc.string_p is pc.string_p
+    False
+    >>>
+
+    >>> print pc.string_p._objects
+    None
+    >>> print pc.string_p._b_base_
+    <PointerContainer object at 0x...>
+    >>>
+
+    >>> other = PointerContainer()
+    >>> other.string_p = pc.string_p
+    >>> print other._objects
+    {'1': {'1': ({'1': 'spam, spam, spam', '0': 'foo bar'}, <c_char_p_Array_4 object at 0x...>)}}
+    >>>
+
+    >>> x = Container()
+    >>> x.strings = (c_char_p * 4)()
+    >>> print x._objects
+    {'1': {}}
+    >>> x.strings[2] = "python ctypes"
+    >>> print x._objects
+    {'1': {}, '2:1': 'python ctypes'}
+    >>>
+
+    >>> class X(Structure):
+    ...     _fields_ = [("a", c_int),
+    ...                 ("b", c_int),
+    ...                 ("c", c_int),
+    ...                 ("d", c_int),
+    ...                 ("container", Container)]
+    ...
+    >>> x = X()
+    >>> x.container.strings = (c_char_p * 4)()
+    >>> x.container.strings[1] = "foobar.org"
+    >>> x._objects
+    {'1:4': {}, '1:1:4': 'foobar.org'}
+    >>>

@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>Depender - A MooTools Dependency Builder</title>
+		<link rel="stylesheet" href="/depender/static/reset.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<link rel="stylesheet" href="/depender/static/depender.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<script src="/depender/build?client=true"></script>
+	</head>
+	<body>
+		<style>
+		#success {
+			width: 200px;
+			height: 64px;
+			border: 1px solid #000;
+			background: #fff;
+			font-size: 16px;
+			line-height: 16px;
+			padding: 80px 0px 40px;
+			text-align: center;
+			visibility: hidden;
+		}
+		</style>
+		<script>
+		Depender.enableLog().require({
+			scripts: ['Element.Position', 'Fx.Tween'],
+			callback: function(){
+				console.log('loaded!');
+				$('success').position({
+					relative: document.body,
+					position: 'top',
+					edge: 'center',
+					offset: {y: 200}
+				}).setStyles({
+					opacity: 0,
+					visibility: 'visibile'
+				}).tween('opacity', 1);
+			}
+		});
+		</script>
+		<div id="success">
+			Woot! It works!
+		</div>
+	</body>
+</html>

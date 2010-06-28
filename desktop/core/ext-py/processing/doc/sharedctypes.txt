@@ -1,0 +1,166 @@
+.. include:: header.txt
+
+========================
+ Shared ctypes objects
+========================
+
+The `processing.sharedctypes` module provides functions for allocating
+ctypes objects from shared memory which can be inherited by child
+processes.  (See the standard library's documentation for details of
+the `ctypes` package.)  
+
+The functions in the module are
+
+    `RawArray(typecode_or_type, size_or_initializer)`
+        Returns a ctypes array allocated from shared memory.
+
+        `typecode_or_type` determines the type of the elements of the
+        returned array: it is either a ctypes type or a one character
+        typecode of the kind used by the `array` module.  If
+        `size_or_initializer` is an integer then it determines the
+        length of the array, and the array will be initially zeroed.
+        Otherwise `size_or_initializer` is a sequence which is used to
+        initialize the array and whose length determines the length of
+        the array.
+
+        Note that setting and getting an element is potentially
+        non-atomic -- use Array() instead to make sure that access is
+        automatically synchronized using a lock.
+
+    `RawValue(typecode_or_type, *args)`
+        Returns a ctypes object allocated from shared memory.
+
+        `typecode_or_type` determines the type of the returned object:
+        it is either a ctypes type or a one character typecode of the
+        kind used by the `array` module.  `*args` is passed on to the
+        constructor for the type.
+
+        Note that setting and getting the value is potentially
+        non-atomic -- use Value() instead to make sure that access is
+        automatically synchronized using a lock.
+
+        Note that an array of `ctypes.c_char` has `value` and
+        `rawvalue` attributes which allow one to use it to store and
+        retrieve strings -- see documentation for `ctypes`.
+
+    `Array(typecode_or_type, size_or_initializer, **, lock=True)`
+        The same as `RawArray()` except that depending on the value of
+        `lock` a process-safe synchronization wrapper may be returned
+        instead of a raw ctypes array.
+
+        If `lock` is true (the default) then a new lock object is
+        created to synchronize access to the value.  If `lock` is a
+        `Lock` or `RLock` object then that will be used to synchronize
+        access to the value.  If `lock` is false then access to the
+        returned object will not be automatically protected by a lock,
+        so it will not necessarily be "process-safe".
+
+        Note that `lock` is a keyword only argument.
+
+    `Value(typecode_or_type, *args, **, lock=True)`
+        The same as `RawValue()` except that depending on the value of
+        `lock` a process-safe synchronization wrapper may be returned
+        instead of a raw ctypes object.
+
+        If `lock` is true (the default) then a new lock object is
+        created to synchronize access to the value.  If `lock` is a
+        `Lock` or `RLock` object then that will be used to synchronize
+        access to the value.  If `lock` is false then access to the
+        returned object will not be automatically protected by a lock,
+        so it will not necessarily be "process-safe".
+
+        Note that `lock` is a keyword only argument.
+
+    `copy(obj)`
+        Returns a ctypes object allocated from shared memory which is
+        a copy of the ctypes object `obj`.
+
+    `synchronized(obj, lock=None)`
+        Returns a process-safe wrapper object for a ctypes object
+        which uses `lock` to synchronize access.  If `lock` is `None`
+        then a `processing.RLock` object is created automatically.
+
+        A synchronized wrapper will have two methods in addition to
+        those of the object it wraps: `getobj()` returns the wrapped
+        object and `getlock()` returns the lock object used for
+        synchronization.
+
+        Note that accessing the ctypes object through the wrapper can
+        be a lot slower than accessing the raw ctypes object.
+
+
+
+Equivalences
+============
+
+The table below compares the syntax for creating shared ctypes objects
+from shared memory with the normal ctypes syntax.  (In the table
+`MyStruct` is some subclass of `ctypes.Structure`.)
+
+==================== ========================== ===========================
+ctypes               sharedctypes using type    sharedctypes using typecode
+==================== ========================== ===========================
+c_double(2.4)        RawValue(c_double, 2.4)    RawValue('d', 2.4)
+MyStruct(4, 6)       RawValue(MyStruct, 4, 6)
+(c_short * 7)()      RawArray(c_short, 7)       RawArray('h', 7)
+(c_int * 3)(9, 2, 8) RawArray(c_int, (9, 2, 8)) RawArray('i', (9, 2, 8))
+==================== ========================== ===========================
+
+
+Example
+=======
+
+Below is an example where a number of ctypes objects are modified by a
+child process ::
+
+    from processing import Process, Lock
+    from processing.sharedctypes import Value, Array
+    from ctypes import Structure, c_double
+    
+    class Point(Structure):
+        _fields_ = [('x', c_double), ('y', c_double)]
+
+    def modify(n, x, s, A):
+        n.value **= 2
+        x.value **= 2
+        s.value = s.value.upper()
+        for p in A:
+            p.x **= 2
+            p.y **= 2
+    
+    if __name__ == '__main__':
+        lock = Lock()
+
+        n = Value('i', 7)
+        x = Value(ctypes.c_double, 1.0/3.0, lock=False)
+        s = Array('c', 'hello world', lock=lock)
+        A = Array(Point, [(1.875,-6.25), (-5.75,2.0), (2.375,9.5)], lock=lock)
+
+        p = Process(target=modify, args=(n, x, s, A))
+        p.start()
+        p.join()
+
+        print n.value
+        print x.value
+        print s.value
+        print [(p.x, p.y) for p in A]
+
+The results printed are ::
+
+    49
+    0.1111111111111111
+    HELLO WORLD
+    [(3.515625, 39.0625), (33.0625, 4.0), (5.640625, 90.25)]
+
+
+.. admonition:: Avoid sharing pointers
+
+    Although it is posible to store a pointer in shared memory
+    remember that this will refer to a location in the address space
+    of a specific process.  However, the pointer is quite likely to be
+    invalid in the context of a second process and trying to
+    dereference the pointer from the second process may cause a crash.
+
+.. _Prev: pool-objects.html
+.. _Up: processing-ref.html
+.. _Next: connection-ref.html

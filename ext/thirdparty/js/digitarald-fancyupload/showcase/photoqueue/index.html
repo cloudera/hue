@@ -1,0 +1,34 @@
+<form action="../script.php" method="post" enctype="multipart/form-data" id="form-demo">
+
+	<fieldset id="demo-fallback">
+		<legend>File Upload</legend>
+		<p>
+			This form is just an example fallback for the unobtrusive behaviour of FancyUpload.
+			If this part is not changed, something must be wrong with your code.
+		</p>
+		<label for="demo-photoupload">
+			Upload a Photo:
+			<input type="file" name="Filedata" />
+		</label>
+	</fieldset>
+
+	<div id="demo-status" class="hide">
+		<p>
+			<a href="#" id="demo-browse">Browse Files</a> |
+			<a href="#" id="demo-clear">Clear List</a> |
+			<a href="#" id="demo-upload">Start Upload</a>
+		</p>
+		<div>
+			<strong class="overall-title"></strong><br />
+			<img src="../../assets/progress-bar/bar.gif" class="progress overall-progress" />
+		</div>
+		<div>
+			<strong class="current-title"></strong><br />
+			<img src="../../assets/progress-bar/bar.gif" class="progress current-progress" />
+		</div>
+		<div class="current-text"></div>
+	</div>
+
+	<ul id="demo-list"></ul>
+
+</form>

@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% comment %}
+Licensed to Cloudera, Inc. under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  Cloudera, Inc. licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% block title %}Job Design Editor{% endblock %}
+{% block content %}
+	<div id="jobsub_edit" class="view">
+		
+		<div class="jobsub_col_wrapper splitview">
+			<div class="jobsub_left_col left_col">
+				{% include "types.html" %}
+			</div>
+			<div class="jobsub_right_col right_col clearfix jframe_padded">
+		
+				<h1>Job Design Editor</h1>
+
+				{% if message %}
+				<div align="center" class="ccs-error">{{message}}</div>
+				{% endif %}
+
+				<h2>Job Design Editor: {{form.name}} Job</h2>
+				<form method="POST" action="{{ edit_url }}" enctype="multipart/form-data">
+
+					<div class="jobsub_edit_tip">
+						<p><b>Tip</b>:
+							Job Designs allow you to rudimentarily parameterize your jobs by using variables.
+							At submission time, you'll be prompted to specify the values of any variables 
+							of the form <i>$variable_name</i>.
+							<!--
+							TODO(philip): Put this in if the file chooser is hooked up.
+
+							The following variables are treated specially, prompting a "file chooser"
+							tool.
+
+							<dl class="jobsub_notes clearfix">
+							<dt><tt>$input</tt></dt><dd>Input for your job.</dd>
+							<dt><tt>$output</tt></dt><dd>Output directory (must not already exist) for your job.</dd>
+							</dl>
+							-->
+					</div>
+
+
+					<input type="hidden" name="type" value="{{ form.type_str }}"/>
+					<dl class="jobsub_meta clearfix">
+						<dt>{{ metadata_form.name.html_name }}</dt>
+						<dd>{{ metadata_form.name|safe }}</dd>
+
+						<dt>{{ metadata_form.description.html_name }}</dt>
+						<dd>{{ metadata_form.description|safe }}</dd>
+
+					</dl>
+					{{ form.render_edit }}
+					<div class="jobsub_edit_save">
+							<input type="submit" name="submit" value="Save" class="ccs-submit"/>
+							<label><input type="checkbox" name="save_submit" class="ccs-checkbox"/> Submit upon save.</label>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -1,0 +1,646 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Mako Documentation - Namespaces</title>
+	
+    <link rel="stylesheet" href="docs.css"></link>
+    <link rel="stylesheet" href="highlight.css"></link>
+    
+
+
+
+
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+<div id="topanchor"><a name="top">&nbsp;</a></div>
+
+<div id="pagecontrol"><a href="index.html">Multiple Pages</a> | <a href="documentation.html">One Page</a></div>
+
+<h1>Mako Documentation</h1>
+
+<div class="versionheader">Version: 0.3.3   Last Updated: 05/31/10 16:21:29</div>
+
+
+
+
+
+
+
+<A name=""></a>
+
+
+    <div class="topnav">
+
+    
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="runtime.html">The Mako Runtime Environment</a>
+
+            |
+            Next: <a href="inheritance.html">Inheritance</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+    <br/>
+	<a href="#namespaces">Namespaces</a>
+	
+	
+    <ul>
+        <li><A style="" href="namespaces.html#namespaces_howtocall">Ways to Call Namespaces</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_frommodules">Namespaces from Regular Python Modules</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_declaring">Declaring defs in namespaces.</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_body">The "body()" method</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_properties">Namespace methods and properties</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_builtin">Built-in Namespaces</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="namespaces.html#namespaces_builtin_local">local</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_builtin_self">self</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_inheritable">Inheritable Namespaces</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+    
+    <A name="namespaces"></a>
+    
+    <div class="section">
+    
+
+    <h3>Namespaces</h3>
+    
+    
+
+<p>Namespaces are used to organize groups of components into categories, and also to "import" components from other files.
+</p>
+<p>If the file <code>components.html</code> defines these two components:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">## components.html</span>
+<span class="cp">&lt;%</span><span class="nb">def</span> <span class="na">name=</span><span class="s">&quot;comp1()&quot;</span><span class="cp">&gt;</span>
+    this is comp1
+<span class="cp">&lt;/%</span><span class="nb">def</span><span class="cp">&gt;</span>
+
+<span class="cp">&lt;%</span><span class="nb">def</span> <span class="na">name=</span><span class="s">&quot;comp2(x)&quot;</span><span class="cp">&gt;</span>
+    this is comp2, x is <span class="cp">${</span><span class="n">x</span><span class="cp">}</span>
+<span class="cp">&lt;/%</span><span class="nb">def</span><span class="cp">&gt;</span>
+</pre></div>
+
+    </div>
+<p>You can make another file, for example <code>index.html</code>, that pulls those two components into a namespace called <code>comp</code>:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">## index.html</span>
+<span class="cp">&lt;%</span><span class="nb">namespace</span> <span class="na">name=</span><span class="s">&quot;comp&quot;</span> <span class="na">file=</span><span class="s">&quot;components.html&quot;</span><span class="cp">/&gt;</span>
+
+Heres comp1:  <span class="cp">${</span><span class="n">comp</span><span class="o">.</span><span class="n">comp1</span><span class="p">()</span><span class="cp">}</span>
+Heres comp2:  <span class="cp">${</span><span class="n">comp</span><span class="o">.</span><span class="n">comp2</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">5</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>The <code>comp</code> variable above is an instance of <code>mako.runtime.Namespace</code>, a <strong>proxy object</strong> which delivers method calls to the underlying template callable using the current context.
+</p>
+<p><code>&lt;%namespace&gt;</code> also provides an <code>import</code> attribute which can be used to pull the names into the local namespace, removing the need to call it via the ".".  When <code>import</code> is used, the <code>name</code> attribute is optional.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">namespace</span> <span class="na">file=</span><span class="s">&quot;components.html&quot;</span> <span class="na">import=</span><span class="s">&quot;comp1, comp2&quot;</span><span class="cp">/&gt;</span>
+
+Heres comp1:  <span class="cp">${</span><span class="n">comp1</span><span class="p">()</span><span class="cp">}</span>
+Heres comp2:  <span class="cp">${</span><span class="n">comp2</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">5</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p><code>import</code> also supports the "*" operator:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">namespace</span> <span class="na">file=</span><span class="s">&quot;components.html&quot;</span> <span class="na">import=</span><span class="s">&quot;*&quot;</span><span class="cp">/&gt;</span>
+
+Heres comp1:  <span class="cp">${</span><span class="n">comp1</span><span class="p">()</span><span class="cp">}</span>
+Heres comp2:  <span class="cp">${</span><span class="n">comp2</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">5</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>The names imported by the <code>import</code> attribute take precedence over any names that exist within the current context.
+</p>
+<p><strong>Note</strong> - in current versions of Mako, usage of "import='*'" is known to decrease performance of the template.  This will be fixed in a future release.
+</p>
+
+
+    
+    <A name="namespaces_howtocall"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Ways to Call Namespaces</h3>
+    
+    
+
+<p>There are essentially four ways to call a function from a namespace.
+</p>
+<p>The "expression" format, as described previously.  Namespaces are just Python objects with functions on them, and can
+   be used in expressions like any other function:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">${</span><span class="n">mynamespace</span><span class="o">.</span><span class="n">somefunction</span><span class="p">(</span><span class="s">&#39;some arg1&#39;</span><span class="p">,</span> <span class="s">&#39;some arg2&#39;</span><span class="p">,</span> <span class="n">arg3</span><span class="o">=</span><span class="s">&#39;some arg3&#39;</span><span class="p">,</span> <span class="n">arg4</span><span class="o">=</span><span class="s">&#39;some arg4&#39;</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>Synonymous with the "expression" format is the "custom tag" format, when a "closed" tag is used.  This format, introduced in Mako 0.2.3, allows the usage of a "custom" Mako tag, with the function arguments passed in using named attributes:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">mynamespace:somefunction</span> <span class="na">arg1=</span><span class="s">&quot;some arg1&quot;</span> <span class="na">arg2=</span><span class="s">&quot;some arg2&quot;</span> <span class="na">arg3=</span><span class="s">&quot;some arg3&quot;</span> <span class="na">arg4=</span><span class="s">&quot;some arg4&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+<p>When using tags, the values of the arguments are taken as literal strings by default.  To embed Python expressions as arguments, use the embedded expression format:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">mynamespace:somefunction</span> <span class="na">arg1=</span><span class="s">&quot;${someobject.format()}&quot;</span> <span class="na">arg2=</span><span class="s">&quot;${somedef(5, 12)}&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+<p>The "custom tag" format is intended mainly for namespace functions which recognize body content, which in Mako is known as a "def with embedded content":
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">mynamespace:somefunction</span> <span class="na">arg1=</span><span class="s">&quot;some argument&quot;</span> <span class="na">args=</span><span class="s">&quot;x, y&quot;</span><span class="cp">&gt;</span>
+    Some record: <span class="cp">${</span><span class="n">x</span><span class="cp">}</span>, <span class="cp">${</span><span class="n">y</span><span class="cp">}</span>
+<span class="cp">&lt;/%</span><span class="nb">mynamespace:somefunction</span><span class="cp">&gt;</span>
+</pre></div>
+
+    </div>
+<p>The "classic" way to call defs with embedded content is the <code>&lt;%call&gt;</code> tag:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">call</span> <span class="na">expr=</span><span class="s">&quot;mynamespace.somefunction(arg1=&#39;some argument&#39;)&quot;</span> <span class="na">args=</span><span class="s">&quot;x, y&quot;</span><span class="cp">&gt;</span>
+    Some record: <span class="cp">${</span><span class="n">x</span><span class="cp">}</span>, <span class="cp">${</span><span class="n">y</span><span class="cp">}</span>
+<span class="cp">&lt;/%</span><span class="nb">call</span><span class="cp">&gt;</span>
+</pre></div>
+
+    </div>
+<p>For information on how to construct defs that embed content from the caller, see <a href="defs.html#defs_defswithcontent">Calling a def with embedded content and/or other defs</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="namespaces_frommodules"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Namespaces from Regular Python Modules</h3>
+    
+    
+
+<p>Namespaces can also import regular Python functions from modules.  These callables need to take at least one argument, <code>context</code>:
+</p>
+<p>A module file <code>some/module.py</code> might contain the callable:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="k">def</span> <span class="nf">my_tag</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;hello world&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s">&#39;&#39;</span>
+</pre></div>
+
+    </div>
+<p>A template can use this module via:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">namespace</span> <span class="na">name=</span><span class="s">&quot;hw&quot;</span> <span class="na">module=</span><span class="s">&quot;some.module&quot;</span><span class="cp">/&gt;</span>
+
+<span class="cp">${</span><span class="n">hw</span><span class="o">.</span><span class="n">my_tag</span><span class="p">()</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>Note that the <code>context</code> argument is not needed in the call; the <code>namespace</code> tag creates a locally-scoped callable which takes care of it.   The <code>return ''</code> is so that the def does not dump a <code>None</code> into the output stream - the return value of any def is rendered after the def completes, in addition to whatever was passed to <code>context.write()</code> within its body.
+</p>
+<p>If your def is to be called in an "embedded content" context, that is as described in <a href="defs.html#defs_defswithcontent">Calling a def with embedded content and/or other defs</a>, you should use the <code>@supports_caller</code> decorator, which will ensure that Mako will ensure the correct "caller" variable is available when your def is called, supporting embedded content:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.runtime</span> <span class="kn">import</span> <span class="n">supports_caller</span>
+
+<span class="nd">@supports_caller</span>
+<span class="k">def</span> <span class="nf">my_tag</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;&lt;div&gt;&quot;</span><span class="p">)</span>
+    <span class="n">context</span><span class="p">[</span><span class="s">&#39;caller&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">body</span><span class="p">()</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s">&#39;&#39;</span>
+</pre></div>
+
+    </div>
+<p>Capturing of output is available as well, using the outside-of-templates version of the <code>capture()</code> function, which accepts the "context" as its first argument:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.runtime</span> <span class="kn">import</span> <span class="n">supports_caller</span><span class="p">,</span> <span class="n">capture</span>
+
+<span class="nd">@supports_caller</span>
+<span class="k">def</span> <span class="nf">my_tag</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;&lt;div&gt;</span><span class="si">%s</span><span class="s">&lt;/div&gt;&quot;</span> <span class="o">%</span> \
+            <span class="n">capture</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">context</span><span class="p">[</span><span class="s">&#39;caller&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&quot;bar&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="namespaces_declaring"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Declaring defs in namespaces.</h3>
+    
+    
+
+<p>The <code>&lt;%namespace&gt;</code> tag supports the definition of <code>&lt;%defs&gt;</code> directly inside the tag.  These defs become part of the namespace like any other function, and will override the definitions pulled in from a remote template or module:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">## define a namespace</span>
+<span class="cp">&lt;%</span><span class="nb">namespace</span> <span class="na">name=</span><span class="s">&quot;stuff&quot;</span><span class="cp">&gt;</span>
+    <span class="cp">&lt;%</span><span class="nb">def</span> <span class="na">name=</span><span class="s">&quot;comp1()&quot;</span><span class="cp">&gt;</span>
+        comp1
+    <span class="cp">&lt;/%</span><span class="nb">def</span><span class="cp">&gt;</span>
+<span class="cp">&lt;/%</span><span class="nb">namespace</span><span class="cp">&gt;</span>
+
+<span class="cp">## then call it</span>
+<span class="cp">${</span><span class="n">stuff</span><span class="o">.</span><span class="n">comp1</span><span class="p">()</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="namespaces_body"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>The "body()" method</h3>
+    
+    
+
+<p>Every namespace that is generated from a template contains a method called <code>body()</code>.  This method corresponds to the main body of the template, and plays its most important roles when using inheritance relationships as well as def-calls-with-content.
+</p>
+<p>Since the <code>body()</code> method is available from a namespace just like all the other defs defined in a template, what happens if you send arguments to it ?  By default, the <code>body()</code> method accepts no positional arguments, and for usefulness in inheritance scenarios will by default dump all keyword arguments into a dictionary called <code>pageargs</code>.  But if you actually want to get at the keyword arguments, Mako recommends you define your own argument signature explicitly.  You do this via using the <code>&lt;%page&gt;</code> tag:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">page</span> <span class="na">args=</span><span class="s">&quot;x, y, someval=8, scope=&#39;foo&#39;, **kwargs&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+<p>A template which defines the above signature requires that the variables <code>x</code> and <code>y</code> are defined, defines default values for <code>someval</code> and <code>scope</code>, and sets up <code>**kwargs</code> to receive all other keyword arguments.  If <code>**kwargs</code> or similar is not present, the argument <code>**pageargs</code> gets tacked on by Mako.  When the template is called as a top-level template (i.e. via <code>template.render()</code>) or via the <code>&lt;%include&gt;</code> tag, the values for these arguments will be pulled from the <code>Context</code>.  In all other cases, i.e. via calling the <code>body()</code> method, the arguments are taken as ordinary arguments from the method call.  So above, the body might be called as:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">${</span><span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="mf">5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">10</span><span class="p">,</span> <span class="n">someval</span><span class="o">=</span><span class="mf">15</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">7</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>The <code>Context</code> object also supplies a <code>kwargs</code> accessor, for cases when youd like to pass along whatever is in the context to a <code>body()</code> callable:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">${</span><span class="n">next</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="o">**</span><span class="n">context</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>The usefulness of calls like the above become more apparent when one works with inheriting templates.  For more information on this, as well as the meanings of the names <code>self</code> and <code>next</code>, see <a href="inheritance.html">Inheritance</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="namespaces_properties"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Namespace methods and properties</h3>
+    
+    
+
+<p>The <code>Namespace</code> class includes helpful accessors and methods:
+</p>
+<ul>
+ <li>
+     <code>attr</code> - allows access module level attributes by name.  This accessor allows templates to supply "scalar" attributes which are particularly handy in inheritance relationships.  See the example in <a href="inheritance.html">Inheritance</a>.
+ </li>
+
+ <li>
+     <code>module</code> - the Python module referenced by this Namespace.  If the namespace references a <code>Template</code>, then this module is the equivalent of <code>template.module</code>, i.e. the generated module for the template.
+ </li>
+
+ <li>
+     <code>filename</code> - the path of the filesystem file used for this Namespace's module or template.  If this is a pure module-based Namespace, this evaluates to <code>module.__file__</code>.  If a template-based namespace, it evaluates to the original template file location.
+ </li>
+
+ <li>
+     <code>template</code> - the <code>Template</code> object referenced by this Namespace, if any.
+ </li>
+
+ <li>
+     <code>uri</code> - the uri for this Namespace's template (i.e. whatever was sent to <code>lookup.get_template()</code>).  This is the equivalent of <code>template.uri</code>.
+ </li>
+
+ <li>
+     <code>context</code> - the <code>Context</code> object for this namespace.  Namespaces are often created with copies of contexts that contain slightly different data, particularly in inheritance scenarios.  Using the <code>Context</code> off of a <code>Namespace</code> one can traverse an entire chain of templates that inherit from one-another.
+ </li>
+
+ <li>
+     <code>get_namespace(uri)</code> - this method returns a <code>Namespace</code> at the given <code>uri</code>.  If the given uri is a relative uri (i.e. it does not contain ia leading slash <code>/</code>), the uri is adjusted to be relative to the uri <strong>of the namespace itself</strong>.  This method is therefore mostly useful off of the built-in <code>local</code> namespace, described in the next section.  In most cases, a template wouldn't need this function, and should instead use the <code>&lt;%namespace&gt;</code> tag to load namespaces.  However, since all <code>&lt;%namespace&gt;</code> tags are evaulated before the body of the template ever runs, this method can be used to locate namespaces using expressions that were generated within the body code of the template, or to conditionally use a particular namespace.
+ </li>
+</ul>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="namespaces_builtin"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Built-in Namespaces</h3>
+    
+    
+
+<p>The namespace is so great that Mako gives your template one (or two) for free.  The names of these namespaces are <code>local</code> and <code>self</code>.  Other built-in namespaces include <code>parent</code> and <code>next</code>, which are optional and are described in <a href="inheritance.html">Inheritance</a>.
+</p>
+
+
+    
+    <A name="namespaces_builtin_local"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>local</h3>
+    
+    
+
+<p>The <code>local</code> namespace is basically the namespace for the currently executing template.  This means that all of the top level defs defined in your template, as well as your template's <code>body()</code> function, are also available off of the <code>local</code> namespace.
+</p>
+<p>The <code>local</code> namespace is also where properties like <code>uri</code>, <code>filename</code>, and <code>module</code> and the <code>get_namespace</code> method can be particularly useful.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="namespaces_builtin_self"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>self</h3>
+    
+    
+
+<p>The <code>self</code> namespace, in the case of a template that does not use inheritance, is synonomous with <code>local</code>.  If inheritance is used, then <code>self</code> references the topmost template in the inheritance chain, where it is most useful for providing the ultimate form of various "method" calls which may have been overridden at various points in an inheritance chain.  See <a href="inheritance.html">Inheritance</a>.
+</p>
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="namespaces_inheritable"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Inheritable Namespaces</h3>
+    
+    
+
+<p>The <code>&lt;%namespace&gt;</code> tag includes an optional attribute <code>inheritable=&quot;True&quot;</code>, which will cause the namespace to be attached to the <code>self</code> namespace.  Since <code>self</code> is globally available throughout an inheritance chain (described in the next section), all the templates in an inheritance chain can get at the namespace imported in a super-template via <code>self</code>.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">## base.html</span>
+<span class="cp">&lt;%</span><span class="nb">namespace</span> <span class="na">name=</span><span class="s">&quot;foo&quot;</span> <span class="na">file=</span><span class="s">&quot;foo.html&quot;</span> <span class="na">inheritable=</span><span class="s">&quot;True&quot;</span><span class="cp">/&gt;</span>
+
+<span class="cp">${</span><span class="n">next</span><span class="o">.</span><span class="n">body</span><span class="p">()</span><span class="cp">}</span>
+
+<span class="cp">## somefile.html</span>
+<span class="cp">&lt;%</span><span class="nb">inherit</span> <span class="na">file=</span><span class="s">&quot;base.html&quot;</span><span class="cp">/&gt;</span>
+
+<span class="cp">${</span><span class="bp">self</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>This allows a super-template to load a whole bunch of namespaces that its inheriting templates can get to, without them having to explicitly load those namespaces themselves.
+</p>
+<p>The <code>import=&quot;*&quot;</code> part of the <code>&lt;%namespace&gt;</code> tag doesn't yet interact with the <code>inheritable</code> flag, so currently you have to use the explicit namespace name off of <code>self</code>, followed by the desired function name.  But more on this in a future release.
+</p>
+
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+</html>
+
+
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="runtime.html">The Mako Runtime Environment</a>
+
+            |
+            Next: <a href="inheritance.html">Inheritance</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+

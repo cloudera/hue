@@ -1,0 +1,370 @@
+img.jt_icon {
+	width: 54px;
+	height: 55px;
+	position: absolute;
+	top: 27px;
+	left: 3px;
+}
+/* welcome screen */
+div.jt-welcome {
+	background: url(../art/icon_huge.png) no-repeat top left;
+	width: 500px;
+	height: 168px;
+	margin: 20px auto;
+	padding-left: 130px;
+}
+div.jt-welcome h2 {
+	font-size: 28px;
+	margin: 0px 0px 5px 17px;
+	position: relative;
+	padding-top: 10px;
+}
+div.jt-welcome p {
+	margin-left: 17px;
+}
+div.jt-welcome a {
+	float: left;
+	display: block;
+	width: 239px;
+	height: 75px;
+	overflow: hidden;
+	text-indent: -240px;
+	margin-top: 10px;
+}
+div.jt-welcome a.jt-jobdesigner-button {
+	margin-right: 10px;
+	margin-left: 5px;
+	background: url(../art/job_designer_button.png) no-repeat;
+}
+div.jt-welcome a.jt-beeswax-button {
+	background: url(../art/beeswax_button.png) no-repeat;
+}
+div.jt-show_trackers {
+	text-align: right;
+	margin: 10px;
+}
+div.jt-show_trackers a {
+	color: #777;;
+}
+/* job list filters */
+ul.jt_filters {
+	bottom: 6px;
+	margin:	 0;
+	padding: 6px;
+	position: absolute;
+	right: 12px;
+	text-align: right;
+	top: 49px;
+}
+ul.jt_filters li {
+	list-style: none;
+	padding: 0px 4px 0px 0px;
+	margin: 0px;
+}
+ul.jt_filters li select {
+	width: 150px;
+	margin: 0px 4px;
+}
+ul.jt_filters li input {
+	width: 150px;
+}
+
+.jobbrowser td .status_link {
+	width: 16px;
+	height: 16px;
+	display: block;
+	overflow: hidden;
+	text-indent: 20px;
+	margin: 0 auto;
+}
+.jobbrowser .failed {
+	background: url(/jobbrowser/static/art/failed.png);
+}
+.jobbrowser .killed {
+	background: url(/jobbrowser/static/art/killed.png);
+}
+.jobbrowser .pending {
+	background: url(/jobbrowser/static/art/pending.png);
+}
+.jobbrowser .running {
+	background: url(/jobbrowser/static/art/running.png);
+}
+.jobbrowser .succeeded {
+	background: url(/jobbrowser/static/art/succeeded.png);
+}
+
+.jobbrowser .task_tracker_link {
+	background: url(/static/art/icons/computer.png) no-repeat;
+	width: 16px;
+	height: 16px;
+	display: block;
+	overflow: hidden;
+	text-indent: 20px;
+	margin: 0 auto;
+}
+
+.job_browser_list table.ccs-data_table {
+	border-bottom: 1px solid #B2B2B2;
+}
+.job_browser_list td div.jt_jobid {
+	color: #999;
+	font-size: 9px;
+}
+
+/* maps/reduces display */
+.job_browser_list div.jt_mr_display {
+	width: 156px;
+}
+div.jt_mr_display {
+	background: #fff;
+	border: 1px solid #5a5a5a;
+	color: #fff;
+	height: 14px;
+	padding: 0 1px;
+	margin: 2px 0;
+}
+div.jt_mr_display .jt_maps {
+	position: relative;
+	text-align: left;
+	height: 14px;
+	background: url(/jobbrowser/static/art/mr_stripes.gif);
+	width: 48%;
+	border-right: 1px dotted #5a5a5a;
+	float: left;
+	overflow: hidden;
+}
+div.jt_mr_display .jt_reduces {
+	text-align: left;
+	height: 14px;
+	background: url(/jobbrowser/static/art/mr_stripes.gif) 0px 42px;
+	width: 80px;
+	float: left;
+	overflow: hidden;
+}
+div.jt_mr_display span {
+	overflow: visible;
+	display:block;
+	font-size: 8px;
+	line-height: 15px;
+	height: 14px;
+	padding-left: 2px;
+	white-space:nowrap;
+}
+div.jt_mr_display .jt_reduces span.jt_reduces_complete {
+	background: url(/jobbrowser/static/art/mr_stripes.gif) 0px 56px;
+	border-left: 1px solid #fff;
+	width: 0%;
+}
+div.jt_mr_display .jt_maps span.jt_maps_complete {
+	background: url(/jobbrowser/static/art/mr_stripes.gif) 0px 70px;
+	width: 0%;
+}
+span.jt_white_border {
+	height: 14px;
+	display:block;
+	position: absolute;
+	right: -2px;
+	top: 0px;
+	border-left: 1px solid #fff;
+	margin: 0;
+	padding: 0;
+}
+td.jt_slider img.jt_slide_right {
+	position: relative;
+	top: 3px;
+}
+.job_browser_list td.jt_mrs {
+	width: 160px;
+	text-align: center;
+}
+
+
+.jobbrowser a.jt_kill {
+	display: block;
+	width: 16px;
+	height: 16px;
+	text-indent: 20px;
+	overflow: hidden;
+	background: url(/static/art/icons/stop.png) no-repeat;
+}
+
+.jobbrowser .jt_slide_right {
+	background: url(/static/art/slide_right_shadowed.png) no-repeat;
+	display: block;
+	width: 16px;
+	height: 16px;
+	text-indent: 20px;
+	overflow: hidden;
+}
+
+div.job_browser_job .jtv_meta_top dl {
+	float: left;
+	width: 235px;
+}
+div.job_browser_job dt {
+	font-weight: bold;
+	float: left;
+	clear:both;
+	width: 65px;
+}
+div.job_browser_job dd {
+	margin: 0px 0px 3px;
+}
+div.job_browser_job a.jt-output_dir {
+	display: inline-block;
+	background: url(/static/art/icons/folder_go.png) no-repeat 0px -1px;
+	height: 18px;
+	padding-left: 18px;
+}
+span.jtv_jid {
+	font-size: 12px;
+	font-weight: normal;
+}
+div.job_browser_job div.jt_mr_display {
+	border: none;
+	margin: 8px 0px 0px;
+	padding: none;
+	height: auto;
+}
+div.job_browser_job dl.jtv_graph dt {
+	color: #000;
+}
+div.job_browser_job div.jt_mr_display .jt_maps, div.job_browser_job div.jt_mr_display .jt_reduces {
+	float: none;
+	border: 1px solid #000;
+	margin: 2px;
+	width: auto;
+}
+div.job_browser_job span.jt_reduces_complete, div.job_browser_job span.jt_maps_complete {
+	border-left: 1px solid #fff;
+}
+div.job_browser_job div.ccs-tab_ui {
+/*	width: 50%;*/
+}
+div.job_browser_job div.ccs-tab_ui ul.ccs-tab_sections {
+	border-top: 1px solid #666;
+}
+div.job_browser_job div.ccs-tab_ui ul.ccs-tab_sections .ccs-data_table {
+	border-top: none;
+	
+}
+div.job_browser_job .task_table_type {
+	width: 100px;
+}
+div.job_browser_job .jt_task_list_container {
+	border: 1px solid #666; 
+}
+div.job_browser_job .jtask_view_col {
+	width: 30px;
+}
+div.job_browser_job .task_table_id {
+	padding-left: 25px;
+}
+div.job_browser_job .jt_failed_tasks .task_table_id {
+	background-image: url(/jobbrowser/static/art/failed.png);
+	background-repeat: no-repeat;
+	background-position: 4px 2px;
+}
+div.job_browser_job .jt_task_list {
+	vertical-align: top;
+}
+div.job_browser_job .jt_task_list h3 {
+	font-weight: bold;
+	margin: 4px 0px 2px;
+}
+
+table.jt_counter_table td.jt_counter_maps_total, table.jt_counter_table td.jt_counter_reduces_total, table.jt_counter_table td.jt_counter_total {
+	text-align: right;
+}
+table.jt_counter_table td.jt_counter_group_name {
+	font-weight: bold;
+	text-align: left;
+}
+table.jt_counter_table td.jt_counter_display_name {
+	padding-left: 20px;
+}
+table.jt_counter_table, table.jt_meta_table {
+	border: 1px solid #aaa;
+}
+
+
+.jtv_offset_controls div {
+	float: left;
+}
+.jtv_offset_controls a {
+	display: block;
+	width: 20px;
+	height: 30px;
+	cursor: pointer;
+	float: left;
+	background: url(/filebrowser/static/art/fb_offset_begin.png) no-repeat center center;
+	outline: 0;
+	overflow: hidden;
+	text-indent: -100px;
+}
+
+.jtv_nav {
+	position: absolute;
+	left: 63px;
+	top: 52px;
+}
+.jtv_nav_pages {
+	padding: 0px 3px; 
+	line-height: 28px;
+}
+
+.jtv_offset_controls a.jtv_offset_begin {
+	/*background-image: url(/filebrowser/static/art/fb_offset_begin.png);*/
+}
+
+.jtv_offset_controls a.jtv_offset_previous {
+	background-image: url(/filebrowser/static/art/fb_offset_previous.png);
+}
+
+.jtv_offset_controls a.jtv_offset_next {
+	background-image: url(/filebrowser/static/art/fb_offset_next.png);
+}
+
+.jtv_offset_controls a.jtv_offset_end {
+	background-image: url(/filebrowser/static/art/fb_offset_end.png);
+}
+
+.job_browser_tracker h1, .job_browser_tracker h2 {
+	font-weight: bold;
+	font-size: 16px;
+	padding: 6px 8px;
+	background: #444;
+	color: #fff;
+}
+.job_browser_tracker h2 {
+	background: #777;
+	font-size: 14px;
+}
+.job_browser_tracker dl.tracker_meta dt {
+	float: left;
+	width: 200px;
+	clear: both;
+	font-weight: bold;
+}
+.jt-logs h2 {
+	text-shadow: 1px 1px #D0E6F7;
+	background: #ccc;
+	padding: 4px 8px;
+	border-radius: 2px 2px 0px 0px;
+	-moz-border-radius: 2px 2px 0px 0px;
+	-webkit-border-radius: 2px 2px 0px 0px;
+	text-align:right;
+	color: #666;
+	font-size: 12px;
+	margin: 8px 0px 0px;
+}
+.jt-logs pre {
+	border: 1px solid #ccc;
+	border-radius: 0px 0px 2px 2px;
+	-moz-border-radius: 0px 0px 2px 2px;
+	-webkit-border-radius: 0px 0px 2px 2px;
+	padding: 8px;
+}
+.jobbrowser table.ccs-data_table .jt-raw_delimiter {
+	background: #bbb;
+}

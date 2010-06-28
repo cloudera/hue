@@ -1,0 +1,303 @@
+.. include:: header.txt
+
+=================
+ Manager objects
+=================
+
+A manager object controls a server process which manages *shared
+objects*.  Other processes can access the shared objects by using
+proxies.  
+
+Manager processes will be shutdown as soon as they are garbage
+collected or their parent process exits.  The manager classes are
+defined in the `processing.managers` module.
+
+
+BaseManager
+===========
+
+`BaseManager` is the base class for all manager classes which use a
+server process.  It does not possess any methods which create shared
+objects.
+
+The public methods of `BaseManager` are the following:
+
+    `__init__(self, address=None, authkey=None)`
+        Creates a manager object.
+
+        Once created one should call `start()` or `serveForever()` to
+        ensure that the manager object refers to a started manager
+        process.
+
+        The arguments to the constructor are as follows:
+
+        `address`
+            The address on which the manager process listens for
+            new connections.  If `address` is `None` then an arbitrary
+            one is chosen.
+
+            See `Listener objects <connection-ref.html#listener-objects>`_.
+
+        `authkey`
+            The authentication key which will be used to check the
+            validity of incoming connections to the server process.
+
+            If `authkey` is `None` then `currentProcess().getAuthKey()`.  
+            Otherwise `authkey` is used and it must be a string.
+
+            See `Authentication keys
+            <connection-ref.html#authentication-keys>`_.
+
+    `start()`
+        Spawn or fork a subprocess to start the manager.
+
+    `serveForever()`
+        Start the manager in the current process.  See `Using a remote
+        manager`_.
+
+    `fromAddress(address, authkey)`
+        A class method which returns a manager object referring to a
+        pre-existing server process which is using the given address and
+        authentication key.  See `Using a remote manager`_.
+
+    `shutdown()`
+        Stop the process used by the manager.  This is only available
+        if `start()` has been used to start the server process.  
+
+        This can be called multiple times.
+
+`BaseManager` instances also have one read-only property:
+
+    `address`
+        The address used by the manager.
+
+
+The creation of managers which support arbitrary types is discussed
+below in `Customized managers`_.
+
+
+SyncManager
+===========
+
+`SyncManager` is a subclass of `BaseManager` which can be used for
+the synchronization of processes.  Objects of this type are returned
+by `processing.Manager()`.
+
+It also supports creation of shared lists and dictionaries.  The
+instance methods defined by `SyncManager` are
+
+    `BoundedSemaphore(value=1)`
+        Creates a shared `threading.BoundedSemaphore` object and
+        returns a proxy for it.
+ 
+    `Condition(lock=None)`
+        Creates a shared `threading.Condition` object and returns a
+        proxy for it.  
+
+        If `lock` is supplied then it should be a proxy for a
+        `threading.Lock` or `threading.RLock` object.
+
+    `Event()`
+        Creates a shared `threading.Event` object and returns a proxy
+        for it.
+ 
+    `Lock()`
+        Creates a shared `threading.Lock` object and returns a proxy
+        for it.
+ 
+    `Namespace()`
+        Creates a shared `Namespace` object and returns a
+        proxy for it.
+
+        See `Namespace objects`_.
+
+    `Queue(maxsize=0)`
+        Creates a shared `Queue.Queue` object and returns a proxy for
+        it.
+ 
+    `RLock()`
+        Creates a shared `threading.RLock` object and returns a proxy
+        for it.
+ 
+    `Semaphore(value=1)`
+        Creates a shared `threading.Semaphore` object and returns a
+        proxy for it.
+ 
+    `Array(typecode, sequence)`
+        Create an array and returns a proxy for
+        it.  (`format` is ignored.)
+
+    `Value(typecode, value)`
+        Create an object with a writable `value` attribute and returns
+        a proxy for it.
+
+    `dict()`, `dict(mapping)`, `dict(sequence)`
+        Creates a shared `dict` object and returns a proxy for it.
+        
+    `list()`, `list(sequence)`
+        Creates a shared `list` object and returns a proxy for it.
+
+
+Namespace objects
+-----------------
+
+A namespace object has no public methods but does have writable
+attributes.  Its representation shows the values of its attributes.
+
+However, when using a proxy for a namespace object, an attribute
+beginning with `'_'` will be an attribute of the proxy and not an
+attribute of the referent::
+
+    >>> manager = processing.Manager()
+    >>> Global = manager.Namespace()
+    >>> Global.x = 10
+    >>> Global.y = 'hello'
+    >>> Global._z = 12.3    # this is an attribute of the proxy
+    >>> print Global
+    Namespace(x=10, y='hello')
+
+
+Customized managers
+===================
+
+To create one's own manager one creates a subclass of `BaseManager`.
+
+To create a method of the subclass which will create new shared
+objects one uses the following function:
+
+    `CreatorMethod(callable=None, proxytype=None, exposed=None, typeid=None)`
+        Returns a function with signature `func(self, *args, **kwds)` 
+        which will create a shared object using the manager `self` 
+        and return a proxy for it.  
+
+        The shared objects will be created by evaluating
+        `callable(*args, **kwds)` in the manager process.
+
+        The arguments are:
+
+        `callable`
+            The callable used to create a shared object.  If the
+            manager will connect to a remote manager then this is ignored.
+
+        `proxytype`
+            The type of proxy which will be used for object returned
+            by `callable`.
+
+            If `proxytype` is `None` then each time an object is
+            returned by `callable` either a new proxy type is created
+            or a cached one is reused.  The methods of the shared
+            object which will be exposed via the proxy will then be
+            determined by the `exposed` argument, see below.
+            
+        `exposed`
+            Given a shared object returned by `callable`, the
+            `exposed` argument is the list of those method names which
+            should be exposed via |callmethod|_. [#]_ [#]_
+
+            If `exposed` is `None` and `callable.__exposed__` exists then 
+            `callable.__exposed__` is used instead.
+
+            If `exposed` is `None` and `callable.__exposed__` does not
+            exist then all methods of the shared object which do not
+            start with `'_'` will be exposed.
+
+            An attempt to use |callmethod| with a method name which is
+            not exposed will raise an exception.
+
+        `typeid`
+            If `typeid` is a string then it is used as an identifier
+            for the callable.  Otherwise, `typeid` must be `None` and
+            a string prefixed by `callable.__name__` is used as the
+            identifier.
+
+
+.. |callmethod| replace:: ``BaseProxy._callMethod()``
+
+.. _callmethod: proxy-objects.html#methods-of-baseproxy
+
+.. [#] A method here means any attribute which has a `__call__`
+   attribute.
+
+.. [#] The method names `__repr__`, `__str__`, and `__cmp__` of a
+   shared object are always exposed by the manager.  However, instead
+   of invoking the `__repr__()`, `__str__()`, `__cmp__()` instance
+   methods (none of which are guaranteed to exist) they invoke the
+   builtin functions `repr()`, `str()` and `cmp()`.
+
+   Note that one should generally avoid exposing rich comparison
+   methods like `__eq__()`, `__ne__()`, `__le__()`.  To make the proxy
+   type support comparison by value one can just expose `__cmp__()`
+   instead (even if the referent does not have such a method).
+
+Example
+-------
+
+::
+
+    from processing.managers import BaseManager, CreatorMethod
+
+    class FooClass(object):
+        def bar(self):
+            print 'BAR'
+        def baz(self):
+            print 'BAZ'
+
+    class NewManager(BaseManager):
+        Foo = CreatorMethod(FooClass)
+
+    if __name__ == '__main__':
+        manager = NewManager()
+        manager.start()
+        foo = manager.Foo()
+        foo.bar()               # prints 'BAR'
+        foo.baz()               # prints 'BAZ'
+        manager.shutdown()
+
+
+See `ex_newtype.py <../examples/ex_newtype.py>`_ for more examples.
+
+
+Using a remote manager
+======================
+
+It is possible to run a manager server on one machine and have clients
+use it from other machines (assuming that the firewalls involved allow
+it).
+
+Running the following commands creates a server for a shared queue which
+remote clients can use::
+
+    >>> from processing.managers import BaseManager, CreatorMethod
+    >>> import Queue
+    >>> queue = Queue.Queue()
+    >>> class QueueManager(BaseManager):
+    ...     get_proxy = CreatorMethod(callable=lambda:queue, typeid='get_proxy')
+    ...
+    >>> m = QueueManager(address=('foo.bar.org', 50000), authkey='none')
+    >>> m.serveForever()
+        
+One client can access the server as follows::
+    
+    >>> from processing.managers import BaseManager, CreatorMethod
+    >>> class QueueManager(BaseManager):
+    ...     get_proxy = CreatorMethod(typeid='get_proxy')
+    ...
+    >>> m = QueueManager.fromAddress(address=('foo.bar.org', 50000), authkey='none')
+    >>> queue = m.get_proxy()
+    >>> queue.put('hello')
+    
+Another client can also use it::
+    
+    >>> from processing.managers import BaseManager, CreatorMethod
+    >>> class QueueManager(BaseManager):
+    ...     get_proxy = CreatorMethod(typeid='get_proxy')
+    ...
+    >>> m = QueueManager.fromAddress(address=('foo.bar.org', 50000), authkey='none')
+    >>> queue = m.get_proxy()
+    >>> queue.get()
+    'hello'
+
+.. _Prev: connection-objects.html
+.. _Up: processing-ref.html
+.. _Next: proxy-objects.html
+

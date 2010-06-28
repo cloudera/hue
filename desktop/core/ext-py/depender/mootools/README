@@ -1,0 +1,3 @@
+This is a minimal django project to serve the MooTools depender.
+You may use this as a template to include depender in your own
+projects as well.

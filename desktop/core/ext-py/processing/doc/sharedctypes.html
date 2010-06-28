@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Shared ctypes objects</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="pool-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="connection-ref.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="shared-ctypes-objects">
+<h1 class="title">Shared ctypes objects</h1>
+<p>The <tt class="docutils literal"><span class="pre">processing.sharedctypes</span></tt> module provides functions for allocating
+ctypes objects from shared memory which can be inherited by child
+processes.  (See the standard library's documentation for details of
+the <tt class="docutils literal"><span class="pre">ctypes</span></tt> package.)</p>
+<p>The functions in the module are</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">RawArray(typecode_or_type,</span> <span class="pre">size_or_initializer)</span></tt></dt>
+<dd><p class="first">Returns a ctypes array allocated from shared memory.</p>
+<p><tt class="docutils literal"><span class="pre">typecode_or_type</span></tt> determines the type of the elements of the
+returned array: it is either a ctypes type or a one character
+typecode of the kind used by the <tt class="docutils literal"><span class="pre">array</span></tt> module.  If
+<tt class="docutils literal"><span class="pre">size_or_initializer</span></tt> is an integer then it determines the
+length of the array, and the array will be initially zeroed.
+Otherwise <tt class="docutils literal"><span class="pre">size_or_initializer</span></tt> is a sequence which is used to
+initialize the array and whose length determines the length of
+the array.</p>
+<p class="last">Note that setting and getting an element is potentially
+non-atomic -- use Array() instead to make sure that access is
+automatically synchronized using a lock.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">RawValue(typecode_or_type,</span> <span class="pre">*args)</span></tt></dt>
+<dd><p class="first">Returns a ctypes object allocated from shared memory.</p>
+<p><tt class="docutils literal"><span class="pre">typecode_or_type</span></tt> determines the type of the returned object:
+it is either a ctypes type or a one character typecode of the
+kind used by the <tt class="docutils literal"><span class="pre">array</span></tt> module.  <tt class="docutils literal"><span class="pre">*args</span></tt> is passed on to the
+constructor for the type.</p>
+<p>Note that setting and getting the value is potentially
+non-atomic -- use Value() instead to make sure that access is
+automatically synchronized using a lock.</p>
+<p class="last">Note that an array of <tt class="docutils literal"><span class="pre">ctypes.c_char</span></tt> has <tt class="docutils literal"><span class="pre">value</span></tt> and
+<tt class="docutils literal"><span class="pre">rawvalue</span></tt> attributes which allow one to use it to store and
+retrieve strings -- see documentation for <tt class="docutils literal"><span class="pre">ctypes</span></tt>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">Array(typecode_or_type,</span> <span class="pre">size_or_initializer,</span> <span class="pre">**,</span> <span class="pre">lock=True)</span></tt></dt>
+<dd><p class="first">The same as <tt class="docutils literal"><span class="pre">RawArray()</span></tt> except that depending on the value of
+<tt class="docutils literal"><span class="pre">lock</span></tt> a process-safe synchronization wrapper may be returned
+instead of a raw ctypes array.</p>
+<p>If <tt class="docutils literal"><span class="pre">lock</span></tt> is true (the default) then a new lock object is
+created to synchronize access to the value.  If <tt class="docutils literal"><span class="pre">lock</span></tt> is a
+<tt class="docutils literal"><span class="pre">Lock</span></tt> or <tt class="docutils literal"><span class="pre">RLock</span></tt> object then that will be used to synchronize
+access to the value.  If <tt class="docutils literal"><span class="pre">lock</span></tt> is false then access to the
+returned object will not be automatically protected by a lock,
+so it will not necessarily be &quot;process-safe&quot;.</p>
+<p class="last">Note that <tt class="docutils literal"><span class="pre">lock</span></tt> is a keyword only argument.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">Value(typecode_or_type,</span> <span class="pre">*args,</span> <span class="pre">**,</span> <span class="pre">lock=True)</span></tt></dt>
+<dd><p class="first">The same as <tt class="docutils literal"><span class="pre">RawValue()</span></tt> except that depending on the value of
+<tt class="docutils literal"><span class="pre">lock</span></tt> a process-safe synchronization wrapper may be returned
+instead of a raw ctypes object.</p>
+<p>If <tt class="docutils literal"><span class="pre">lock</span></tt> is true (the default) then a new lock object is
+created to synchronize access to the value.  If <tt class="docutils literal"><span class="pre">lock</span></tt> is a
+<tt class="docutils literal"><span class="pre">Lock</span></tt> or <tt class="docutils literal"><span class="pre">RLock</span></tt> object then that will be used to synchronize
+access to the value.  If <tt class="docutils literal"><span class="pre">lock</span></tt> is false then access to the
+returned object will not be automatically protected by a lock,
+so it will not necessarily be &quot;process-safe&quot;.</p>
+<p class="last">Note that <tt class="docutils literal"><span class="pre">lock</span></tt> is a keyword only argument.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">copy(obj)</span></tt></dt>
+<dd>Returns a ctypes object allocated from shared memory which is
+a copy of the ctypes object <tt class="docutils literal"><span class="pre">obj</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">synchronized(obj,</span> <span class="pre">lock=None)</span></tt></dt>
+<dd><p class="first">Returns a process-safe wrapper object for a ctypes object
+which uses <tt class="docutils literal"><span class="pre">lock</span></tt> to synchronize access.  If <tt class="docutils literal"><span class="pre">lock</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt>
+then a <tt class="docutils literal"><span class="pre">processing.RLock</span></tt> object is created automatically.</p>
+<p>A synchronized wrapper will have two methods in addition to
+those of the object it wraps: <tt class="docutils literal"><span class="pre">getobj()</span></tt> returns the wrapped
+object and <tt class="docutils literal"><span class="pre">getlock()</span></tt> returns the lock object used for
+synchronization.</p>
+<p class="last">Note that accessing the ctypes object through the wrapper can
+be a lot slower than accessing the raw ctypes object.</p>
+</dd>
+</dl>
+</blockquote>
+<div class="section">
+<h1><a id="equivalences" name="equivalences">Equivalences</a></h1>
+<p>The table below compares the syntax for creating shared ctypes objects
+from shared memory with the normal ctypes syntax.  (In the table
+<tt class="docutils literal"><span class="pre">MyStruct</span></tt> is some subclass of <tt class="docutils literal"><span class="pre">ctypes.Structure</span></tt>.)</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="36%" />
+<col width="37%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">ctypes</th>
+<th class="head">sharedctypes using type</th>
+<th class="head">sharedctypes using typecode</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>c_double(2.4)</td>
+<td>RawValue(c_double, 2.4)</td>
+<td>RawValue('d', 2.4)</td>
+</tr>
+<tr><td>MyStruct(4, 6)</td>
+<td>RawValue(MyStruct, 4, 6)</td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>(c_short * 7)()</td>
+<td>RawArray(c_short, 7)</td>
+<td>RawArray('h', 7)</td>
+</tr>
+<tr><td>(c_int * 3)(9, 2, 8)</td>
+<td>RawArray(c_int, (9, 2, 8))</td>
+<td>RawArray('i', (9, 2, 8))</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section">
+<h1><a id="example" name="example">Example</a></h1>
+<p>Below is an example where a number of ctypes objects are modified by a
+child process</p>
+<pre class="literal-block">
+from processing import Process, Lock
+from processing.sharedctypes import Value, Array
+from ctypes import Structure, c_double
+
+class Point(Structure):
+    _fields_ = [('x', c_double), ('y', c_double)]
+
+def modify(n, x, s, A):
+    n.value **= 2
+    x.value **= 2
+    s.value = s.value.upper()
+    for p in A:
+        p.x **= 2
+        p.y **= 2
+
+if __name__ == '__main__':
+    lock = Lock()
+
+    n = Value('i', 7)
+    x = Value(ctypes.c_double, 1.0/3.0, lock=False)
+    s = Array('c', 'hello world', lock=lock)
+    A = Array(Point, [(1.875,-6.25), (-5.75,2.0), (2.375,9.5)], lock=lock)
+
+    p = Process(target=modify, args=(n, x, s, A))
+    p.start()
+    p.join()
+
+    print n.value
+    print x.value
+    print s.value
+    print [(p.x, p.y) for p in A]
+</pre>
+<p>The results printed are</p>
+<pre class="literal-block">
+49
+0.1111111111111111
+HELLO WORLD
+[(3.515625, 39.0625), (33.0625, 4.0), (5.640625, 90.25)]
+</pre>
+<div class="admonition-avoid-sharing-pointers admonition">
+<p class="first admonition-title">Avoid sharing pointers</p>
+<p class="last">Although it is posible to store a pointer in shared memory
+remember that this will refer to a location in the address space
+of a specific process.  However, the pointer is quite likely to be
+invalid in the context of a second process and trying to
+dereference the pointer from the second process may cause a crash.</p>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="pool-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="connection-ref.html">Next</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Introduction</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="index.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="index.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="introduction">
+<h1 class="title">Introduction</h1>
+<div class="section">
+<h1><a id="threads-processes-and-the-gil" name="threads-processes-and-the-gil">Threads, processes and the GIL</a></h1>
+<p>To run more than one piece of code at the same time on the same
+computer one has the choice of either using multiple processes or
+multiple threads.</p>
+<p>Although a program can be made up of multiple processes, these
+processes are in effect completely independent of one another:
+different processes are not able to cooperate with one another unless
+one sets up some means of communication between them (such as by using
+sockets).  If a lot of data must be transferred between processes then
+this can be inefficient.</p>
+<p>On the other hand, multiple threads within a single process are
+intimately connected: they share their data but often can interfere
+badly with one another.  It is often argued that the only way to make
+multithreaded programming &quot;easy&quot; is to avoid relying on any shared
+state and for the threads to only communicate by passing messages to
+each other.</p>
+<p>CPython has a <em>Global Interpreter Lock</em> (GIL) which in many ways makes
+threading easier than it is in most languages by making sure that only
+one thread can manipulate the interpreter's objects at a time.  As a
+result, it is often safe to let multiple threads access data without
+using any additional locking as one would need to in a language such
+as C.</p>
+<p>One downside of the GIL is that on multi-processor (or multi-core)
+systems a multithreaded Python program can only make use of one
+processor at a time.  This is a problem that can be overcome by using
+multiple processes instead.</p>
+<p>Python gives little direct support for writing programs using multiple
+process.  This package allows one to write multi-process programs
+using much the same API that one uses for writing threaded programs.</p>
+</div>
+<div class="section">
+<h1><a id="forking-and-spawning" name="forking-and-spawning">Forking and spawning</a></h1>
+<p>There are two ways of creating a new process in Python:</p>
+<ul>
+<li><p class="first">The current process can <em>fork</em> a new child process by using the
+<tt class="docutils literal"><span class="pre">os.fork()</span></tt> function.  This effectively creates an identical copy
+of the current process which is now able to go off and perform some
+task set by the parent process.  This means that the child process
+inherits <em>copies</em> of all variables that the parent process had.</p>
+<p>However, <tt class="docutils literal"><span class="pre">os.fork()</span></tt> is not available on every platform: in
+particular Windows does not support it.</p>
+</li>
+<li><p class="first">Alternatively, the current process can spawn a completely new Python
+interpreter by using the <tt class="docutils literal"><span class="pre">subprocess</span></tt> module or one of the
+<tt class="docutils literal"><span class="pre">os.spawn*()</span></tt> functions.</p>
+<p>Getting this new interpreter in to a fit state to perform the task
+set for it by its parent process is, however, a bit of a challenge.</p>
+</li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">processing</span></tt> package uses <tt class="docutils literal"><span class="pre">os.fork()</span></tt> if it is available since
+it makes life a lot simpler.  Forking the process is also more
+efficient in terms of memory usage and the time needed to create the
+new process.</p>
+</div>
+<div class="section">
+<h1><a id="the-process-class" name="the-process-class">The Process class</a></h1>
+<p>In the <tt class="docutils literal"><span class="pre">processing</span></tt> package processes are spawned by creating a
+<tt class="docutils literal"><span class="pre">Process</span></tt> object and then calling its <tt class="docutils literal"><span class="pre">start()</span></tt> method.
+<tt class="docutils literal"><span class="pre">processing.Process</span></tt> follows the API of <tt class="docutils literal"><span class="pre">threading.Thread</span></tt>.  A
+trivial example of a multiprocess program is</p>
+<pre class="literal-block">
+from processing import Process
+
+def f(name):
+    print 'hello', name
+
+if __name__ == '__main__':
+    p = Process(target=f, args=('bob',))
+    p.start()
+    p.join()
+</pre>
+<p>Here the function <tt class="docutils literal"><span class="pre">f</span></tt> is run in a child process.</p>
+<p>For an explanation of why (on Windows) the <tt class="docutils literal"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">'__main__'</span></tt>
+part is necessary see <a class="reference" href="programming-guidelines.html">Programming guidelines</a>.</p>
+</div>
+<div class="section">
+<h1><a id="exchanging-objects-between-processes" name="exchanging-objects-between-processes">Exchanging objects between processes</a></h1>
+<p><tt class="docutils literal"><span class="pre">processing</span></tt> supports two types of communication channel between
+processes:</p>
+<dl class="docutils">
+<dt><strong>Queues</strong>:</dt>
+<dd><p class="first">The function <tt class="docutils literal"><span class="pre">Queue()</span></tt> returns a near clone of <tt class="docutils literal"><span class="pre">Queue.Queue</span></tt>
+-- see the Python standard documentation.  For example</p>
+<pre class="literal-block">
+from processing import Process, Queue
+
+def f(q):
+    q.put([42, None, 'hello'])
+
+if __name__ == '__main__':
+    q = Queue()
+    p = Process(target=f, args=(q,))
+    p.start()
+    print q.get()    # prints &quot;[42, None, 'hello']&quot;
+    p.join()
+</pre>
+<p class="last">Queues are thread and process safe.  See <a class="reference" href="processing-ref.html#pipes-and-queues">Queues</a>.</p>
+</dd>
+<dt><strong>Pipes</strong>:</dt>
+<dd><p class="first">The <tt class="docutils literal"><span class="pre">Pipe()</span></tt> function returns a pair of connection objects
+connected by a pipe which by default is duplex (two-way).  For
+example</p>
+<pre class="literal-block">
+from processing import Process, Pipe
+
+def f(conn):
+    conn.send([42, None, 'hello'])
+    conn.close()
+
+if __name__ == '__main__':
+    parent_conn, child_conn = Pipe()
+    p = Process(target=f, args=(child_conn,))
+    p.start()
+    print parent_conn.recv()   # prints &quot;[42, None, 'hello']&quot;
+    p.join()
+</pre>
+<p class="last">The two connection objects returned by <tt class="docutils literal"><span class="pre">Pipe()</span></tt> represent the two
+ends of the pipe.  Each connection object has <tt class="docutils literal"><span class="pre">send()</span></tt> and
+<tt class="docutils literal"><span class="pre">recv()</span></tt> methods (among others).  Note that data in a pipe may
+become corrupted if two processes (or threads) try to read from or
+write to the <em>same</em> end of the pipe at the same time.  Of course
+there is no risk of corruption from processes using different ends
+of the pipe at the same time.  See <a class="reference" href="processing-ref.html#pipes-and-queues">Pipes</a>.</p>
+</dd>
+</dl>
+</div>
+<div class="section">
+<h1><a id="synchronization-between-processes" name="synchronization-between-processes">Synchronization between processes</a></h1>
+<p><tt class="docutils literal"><span class="pre">processing</span></tt> contains equivalents of all the synchronization
+primitives from <tt class="docutils literal"><span class="pre">threading</span></tt>.  For instance one can use a lock to
+ensure that only one process prints to standard output at a time:</p>
+<pre class="literal-block">
+from processing import Process, Lock
+
+def f(l, i):
+    l.acquire()
+    print 'hello world', i
+    l.release()
+
+if __name__ == '__main__':
+    lock = Lock()
+
+    for num in range(10):
+        Process(target=f, args=(lock, num)).start()
+</pre>
+<p>Without using the lock output from the different processes is liable
+to get all mixed up.</p>
+</div>
+<div class="section">
+<h1><a id="sharing-state-between-processes" name="sharing-state-between-processes">Sharing state between processes</a></h1>
+<p>As mentioned above, when doing concurrent programming it is usually
+best to avoid using shared state as far as possible.  This is
+particularly true when using multiple processes.</p>
+<p>However, if you really do need to use some shared data then
+<tt class="docutils literal"><span class="pre">processing</span></tt> provides a couple of ways of doing so.</p>
+<dl class="docutils">
+<dt><strong>Shared memory</strong>:</dt>
+<dd><p class="first">Data can be stored in a shared memory map using <tt class="docutils literal"><span class="pre">Value</span></tt> or <tt class="docutils literal"><span class="pre">Array</span></tt>.
+For example the following code</p>
+<pre class="literal-block">
+from processing import Process, Value, Array
+
+def f(n, a):
+    n.value = 3.1415927
+    for i in range(len(a)):
+        a[i] = -a[i]
+
+if __name__ == '__main__':
+    num = Value('d', 0.0)
+    arr = Array('i', range(10))
+
+    p = Process(target=f, args=(num, arr))
+    p.start()
+    p.join()
+
+    print num.value
+    print arr[:]
+</pre>
+<p>will print</p>
+<pre class="literal-block">
+3.1415927
+[0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
+</pre>
+<p>The <tt class="docutils literal"><span class="pre">'d'</span></tt> and <tt class="docutils literal"><span class="pre">'i'</span></tt> arguments used when creating <tt class="docutils literal"><span class="pre">num</span></tt> and <tt class="docutils literal"><span class="pre">arr</span></tt>
+are typecodes of the kind used by the <tt class="docutils literal"><span class="pre">array</span></tt> module: <tt class="docutils literal"><span class="pre">'d'</span></tt>
+indicates a double precision float and <tt class="docutils literal"><span class="pre">'i'</span></tt> inidicates a signed
+integer.  These shared objects will be process and thread safe.</p>
+<p class="last">For more flexibility in using shared memory one can use the
+<tt class="docutils literal"><span class="pre">processing.sharedctypes</span></tt> module which supports the creation of
+arbitrary <a class="reference" href="sharedctypes.html">ctypes objects allocated from shared memory</a>.</p>
+</dd>
+<dt><strong>Server process</strong>:</dt>
+<dd><p class="first">A manager object returned by <tt class="docutils literal"><span class="pre">Manager()</span></tt> controls a server process
+which holds python objects and allows other processes to manipulate
+them using proxies.</p>
+<p>A manager returned by <tt class="docutils literal"><span class="pre">Manager()</span></tt> will support types <tt class="docutils literal"><span class="pre">list</span></tt>,
+<tt class="docutils literal"><span class="pre">dict</span></tt>, <tt class="docutils literal"><span class="pre">Namespace</span></tt>, <tt class="docutils literal"><span class="pre">Lock</span></tt>, <tt class="docutils literal"><span class="pre">RLock</span></tt>, <tt class="docutils literal"><span class="pre">Semaphore</span></tt>,
+<tt class="docutils literal"><span class="pre">BoundedSemaphore</span></tt>, <tt class="docutils literal"><span class="pre">Condition</span></tt>, <tt class="docutils literal"><span class="pre">Event</span></tt>, <tt class="docutils literal"><span class="pre">Queue</span></tt>, <tt class="docutils literal"><span class="pre">Value</span></tt>
+and <tt class="docutils literal"><span class="pre">Array</span></tt>.  For example:</p>
+<pre class="literal-block">
+from processing import Process, Manager
+
+def f(d, l):
+    d[1] = '1'
+    d['2'] = 2
+    d[0.25] = None
+    l.reverse()
+
+if __name__ == '__main__':
+    manager = Manager()
+
+    d = manager.dict()
+    l = manager.list(range(10))
+
+    p = Process(target=f, args=(d, l))
+    p.start()
+    p.join()
+
+    print d
+    print l
+</pre>
+<p>will print</p>
+<pre class="literal-block">
+{0.25: None, 1: '1', '2': 2}
+[9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+</pre>
+<p>Creating managers which support other types is not hard --- see
+<a class="reference" href="manager-objects.html#customized-managers">Customized managers</a>.</p>
+<p class="last">Server process managers are more flexible than using shared memory
+objects because they can be made to support arbitrary object types.
+Also, a single manager can be shared by processes on different
+computers over a network.  They are, however, slower than using
+shared memory.  See <a class="reference" href="manager-objects.html#server-process-managers">Server process managers</a>.</p>
+</dd>
+</dl>
+</div>
+<div class="section">
+<h1><a id="using-a-pool-of-workers" name="using-a-pool-of-workers">Using a pool of workers</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">Pool()</span></tt> function returns an object representing a pool of worker
+processes.  It has methods which allows tasks to be offloaded to the
+worker processes in a few different ways.</p>
+<p>For example:</p>
+<pre class="literal-block">
+from processing import Pool
+
+def f(x):
+    return x*x
+
+if __name__ == '__main__':
+    pool = Pool(processes=4)              # start 4 worker processes
+    result = pool.applyAsync(f, [10])     # evaluate &quot;f(10)&quot; asynchronously
+    print result.get(timeout=1)           # prints &quot;100&quot; unless your computer is *very* slow
+    print pool.map(f, range(10))          # prints &quot;[0, 1, 4,..., 81]&quot;
+</pre>
+<p>See <a class="reference" href="pool-objects.html">Process pools</a>.</p>
+</div>
+<div class="section">
+<h1><a id="speed" name="speed">Speed</a></h1>
+<p>The following benchmarks were performed on a single core Pentium 4,
+2.5Ghz laptop running Windows XP and Ubuntu Linux 6.10 --- see
+<a class="reference" href="../examples/benchmarks.py">benchmarks.py</a>.</p>
+<p><em>Number of 256 byte string objects passed between processes/threads per sec</em>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="55%" />
+<col width="16%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Connection type</th>
+<th class="head">Windows</th>
+<th class="head">Linux</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Queue.Queue</td>
+<td>49,000</td>
+<td>17,000-50,000 <a class="footnote-reference" href="#id2" id="id1" name="id1">[1]</a></td>
+</tr>
+<tr><td>processing.Queue</td>
+<td>22,000</td>
+<td>21,000</td>
+</tr>
+<tr><td>Queue managed by server</td>
+<td>6,900</td>
+<td>6,500</td>
+</tr>
+<tr><td>processing.Pipe</td>
+<td>52,000</td>
+<td>57,000</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1" name="id2">[1]</a></td><td>For some reason the performance of <tt class="docutils literal"><span class="pre">Queue.Queue</span></tt> is very
+variable on Linux.</td></tr>
+</tbody>
+</table>
+<p><em>Number of acquires/releases of a lock per sec</em>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Lock type</th>
+<th class="head">Windows</th>
+<th class="head">Linux</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>threading.Lock</td>
+<td>850,000</td>
+<td>560,000</td>
+</tr>
+<tr><td>processing.Lock</td>
+<td>420,000</td>
+<td>510,000</td>
+</tr>
+<tr><td>Lock managed by server</td>
+<td>10,000</td>
+<td>8,400</td>
+</tr>
+<tr><td>threading.RLock</td>
+<td>93,000</td>
+<td>76,000</td>
+</tr>
+<tr><td>processing.RLock</td>
+<td>420,000</td>
+<td>500,000</td>
+</tr>
+<tr><td>RLock managed by server</td>
+<td>8,800</td>
+<td>7,400</td>
+</tr>
+</tbody>
+</table>
+<p><em>Number of interleaved waits/notifies per sec on a
+condition variable by two processes</em>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Condition type</th>
+<th class="head">Windows</th>
+<th class="head">Linux</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>threading.Condition</td>
+<td>27,000</td>
+<td>31,000</td>
+</tr>
+<tr><td>processing.Condition</td>
+<td>26,000</td>
+<td>25,000</td>
+</tr>
+<tr><td>Condition managed by server</td>
+<td>6,600</td>
+<td>6,000</td>
+</tr>
+</tbody>
+</table>
+<p><em>Number of integers retrieved from a sequence per sec</em>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Sequence type</th>
+<th class="head">Windows</th>
+<th class="head">Linux</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>list</td>
+<td>6,400,000</td>
+<td>5,100,000</td>
+</tr>
+<tr><td>unsynchornized shared array</td>
+<td>3,900,000</td>
+<td>3,100,000</td>
+</tr>
+<tr><td>synchronized shared array</td>
+<td>200,000</td>
+<td>220,000</td>
+</tr>
+<tr><td>list managed by server</td>
+<td>20,000</td>
+<td>17,000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="index.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="index.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Next</a>
+</div>
+</body>
+</html>

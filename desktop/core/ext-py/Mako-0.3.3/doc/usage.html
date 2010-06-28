@@ -1,0 +1,736 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Mako Documentation - Basic Usage</title>
+	
+    <link rel="stylesheet" href="docs.css"></link>
+    <link rel="stylesheet" href="highlight.css"></link>
+    
+
+
+
+
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+<div id="topanchor"><a name="top">&nbsp;</a></div>
+
+<div id="pagecontrol"><a href="index.html">Multiple Pages</a> | <a href="documentation.html">One Page</a></div>
+
+<h1>Mako Documentation</h1>
+
+<div class="versionheader">Version: 0.3.3   Last Updated: 05/31/10 16:21:29</div>
+
+
+
+
+
+
+
+<A name=""></a>
+
+
+    <div class="topnav">
+
+    
+    <div class="toolbar">
+        <div class="prevnext">
+
+            
+            Next: <a href="syntax.html">Syntax</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+    <br/>
+	<a href="#usage">Basic Usage</a>
+	
+	
+    <ul>
+        <li><A style="" href="usage.html#usage_file">Using File-Based Templates</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_lookup">Using TemplateLookup</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="usage.html#usage_lookup_size">Setting the Collection Size</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_lookup_checks">Setting Filesystem Checks</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="usage.html#usage_using">Using Unicode and Encoding</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_handling">Handling Exceptions</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_common">Common Framework Integrations</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="usage.html#usage_common_turbogears/pylons">Turbogears/Pylons Plugin</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_common_wsgi">WSGI</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_common_pygments">Pygments</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_common_babel">Babel (Internationalization)</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+    </ul>
+
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+    
+    <A name="usage"></a>
+    
+    <div class="section">
+    
+
+    <h3>Basic Usage</h3>
+    
+    
+
+<p>This section describes the Python API for Mako templates.  If you are using Mako within a web framework such as Pylons, the work of integrating Mako's API is already done for you, in which case you can skip to the next section, <a href="syntax.html">Syntax</a>.
+</p>
+<p>The most basic way to create a template and render it is through the <code>Template</code> class:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+
+<span class="n">mytemplate</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="s">&quot;hello world!&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>Above, the text argument to <code>Template</code> is <strong>compiled</strong> into a Python module representation. This module contains a function called <code>render_body()</code>, which produces the output of the template. When <code>mytemplate.render()</code> is called, Mako sets up a runtime environment for the template and calls the <code>render_body()</code> function, capturing the output into a buffer and returning its string contents.
+</p>
+<p>The code inside the <code>render_body()</code> function has access to a namespace of variables.  You can specify these variables by sending them as additional keyword arguments to the <code>render()</code> method:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+
+<span class="n">mytemplate</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="s">&quot;hello, ${name}!&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;jack&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+<p>The <code>template.render()</code> method calls upon Mako to create a <code>Context</code> object, which stores all the variable names accessible to the template and also stores a buffer used to capture output.  You can create this <code>Context</code> yourself and have the template render with it, using the <code>render_context</code> method:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">mako.runtime</span> <span class="kn">import</span> <span class="n">Context</span>
+<span class="kn">from</span> <span class="nn">StringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
+<span class="n">mytemplate</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="s">&quot;hello, ${name}!&quot;</span><span class="p">)</span>
+<span class="n">buf</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+<span class="n">ctx</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;jack&quot;</span><span class="p">)</span>
+<span class="n">mytemplate</span><span class="o">.</span><span class="n">render_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+
+
+    
+    <A name="usage_file"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Using File-Based Templates</h3>
+    
+    
+
+<p>A <code>Template</code> can also load its template source code from a file, using the <code>filename</code> keyword argument:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+
+<span class="n">mytemplate</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;/docs/mytmpl.txt&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>For improved performance, a <code>Template</code> which is loaded from a file can also cache the source code to its generated module on the filesystem as a regular Python module file (i.e. a .py file).  To do this, just add the <code>module_directory</code> argument to the template:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+
+<span class="n">mytemplate</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;/docs/mytmpl.txt&#39;</span><span class="p">,</span> <span class="n">module_directory</span><span class="o">=</span><span class="s">&#39;/tmp/mako_modules&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>When the above code is rendered, a file <code>/tmp/mako_modules/docs/mytmpl.txt.py</code> is created containing the source code for the module.  The next time a <code>Template</code> with the same arguments is created, this module file will be automatically re-used.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="usage_lookup"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Using TemplateLookup</h3>
+    
+    
+
+<p>All of the examples thus far have dealt with the usage of a single <code>Template</code> object.  If the code within those templates tries to locate another template resource, it will need some way to find them, using simple URI strings.  For this need, the resolution of other templates from within a template is accomplished by the <code>TemplateLookup</code> class.   This class is constructed given a list of directories in which to search for templates, as well as keyword arguments that will be passed to the <code>Template</code> objects it creates.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">mako.lookup</span> <span class="kn">import</span> <span class="n">TemplateLookup</span>
+
+<span class="n">mylookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span><span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;/docs&#39;</span><span class="p">])</span>
+<span class="n">mytemplate</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="s">&quot;&quot;&quot;&lt;</span><span class="si">%i</span><span class="s">nclude file=&quot;header.txt&quot;/&gt; hello world!&quot;&quot;&quot;</span><span class="p">,</span> <span class="n">lookup</span><span class="o">=</span><span class="n">mylookup</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+<p>Above, we created a textual template which includes the file <code>header.txt</code>.  In order for it to have somewhere to look for <code>header.txt</code>, we passed a <code>TemplateLookup</code> object to it, which will search in the directory <code>/docs</code> for the file <code>header.txt</code>.
+</p>
+<p>Usually, an application will store most or all of its templates as text files on the filesystem.  So far, all of our examples have been a little bit contrived in order to illustrate the basic concepts.  But a real application would get most or all of its templates directly from the <code>TemplateLookup</code>, using the aptly named <code>get_template</code> method, which accepts the URI of the desired template:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">mako.lookup</span> <span class="kn">import</span> <span class="n">TemplateLookup</span>
+
+<span class="n">mylookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span><span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;/docs&#39;</span><span class="p">],</span> <span class="n">module_directory</span><span class="o">=</span><span class="s">&#39;/tmp/mako_modules&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">serve_template</span><span class="p">(</span><span class="n">templatename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">mytemplate</span> <span class="o">=</span> <span class="n">mylookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">templatename</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+<p>In the example above, we create a <code>TemplateLookup</code> which will look for templates in the <code>/docs</code> directory, and will store generated module files in the <code>/tmp/mako_modules</code> directory.  The lookup locates templates by appending the given URI to each of its search directories; so if you gave it a URI of <code>/etc/beans/info.txt</code>, it would search for the file <code>/docs/etc/beans/info.txt</code>, else raise a <code>TopLevelNotFound</code> exception, which is a custom Mako exception.
+</p>
+<p>When the lookup locates templates, it will also assign a <code>uri</code> property to the <code>Template</code> which is the uri passed to the <code>get_template()</code> call.  <code>Template</code> uses this uri to calculate the name of its module file.  So in the above example, a <code>templatename</code> argument of <code>/etc/beans/info.txt</code> will create a module file <code>/tmp/mako_modules/etc/beans/info.txt.py</code>.
+</p>
+
+
+    
+    <A name="usage_lookup_size"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Setting the Collection Size</h3>
+    
+    
+
+<p>The <code>TemplateLookup</code> also serves the important need of caching a fixed set of templates in memory at a given time, so that successive uri lookups do not result in full template compilations and/or module reloads on each request.  By default, the <code>TemplateLookup</code> size is unbounded.  You can specify a fixed size using the <code>collection_size</code> argument:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="n">mylookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span><span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;/docs&#39;</span><span class="p">],</span> 
+                <span class="n">module_directory</span><span class="o">=</span><span class="s">&#39;/tmp/mako_modules&#39;</span><span class="p">,</span> <span class="n">collection_size</span><span class="o">=</span><span class="mf">500</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+<p>The above lookup will continue to load templates into memory until it reaches a count of around 500.  At that point, it will clean out a certain percentage of templates using a <strong>least recently used</strong> scheme.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="usage_lookup_checks"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Setting Filesystem Checks</h3>
+    
+    
+
+<p>Another important flag on <code>TemplateLookup</code> is <code>filesystem_checks</code>. This defaults to <code>True</code>, and says that each time a template is returned by the <code>get_template()</code> method, the revision time of the original template file is checked against the last time the template was loaded, and if the file is newer will reload its contents and recompile the template. On a production system, setting <code>filesystem_checks</code> to <code>False</code> can afford a small to moderate performance increase (depending on the type of filesystem used).
+</p>
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="usage_using"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Using Unicode and Encoding</h3>
+    
+    
+
+<p>Both <code>Template</code> and <code>TemplateLookup</code> accept <code>output_encoding</code> and <code>encoding_errors</code> parameters which can be used to encode the output in any Python supported codec:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">mako.lookup</span> <span class="kn">import</span> <span class="n">TemplateLookup</span>
+
+<span class="n">mylookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span><span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;/docs&#39;</span><span class="p">],</span> <span class="n">output_encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">encoding_errors</span><span class="o">=</span><span class="s">&#39;replace&#39;</span><span class="p">)</span>
+
+<span class="n">mytemplate</span> <span class="o">=</span> <span class="n">mylookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s">&quot;foo.txt&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>When using Python 3, the <code>render()</code> method will return a <code>bytes</code> object, <strong>if</strong> <code>output_encoding</code> is set.  Otherwise it returns a <code>string</code>.
+</p>
+<p>Additionally, the <code>render_unicode()</code> method exists which will return the template output as a Python <code>unicode</code> object, or in Python 3 a <code>string</code>:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render_unicode</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>The above method disregards the output encoding keyword argument; you can encode yourself by saying:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render_unicode</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;replace&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+<p>Note that Mako's ability to return data in any encoding and/or <code>unicode</code> implies that the underlying output stream of the template is a Python unicode object.  This behavior is described fully in <a href="unicode.html">The Unicode Chapter</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="usage_handling"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Handling Exceptions</h3>
+    
+    
+
+<p>Template exceptions can occur in two distinct places.  One is when you <strong>lookup, parse and compile</strong> the template, the other is when you <strong>run</strong> the template.  Within the running of a template, exceptions are thrown normally from whatever Python code originated the issue.  Mako has its own set of exception classes which mostly apply to the lookup and lexer/compiler stages of template construction.  Mako provides some library routines that can be used to help provide Mako-specific information about any exception's stack trace, as well as formatting the exception within textual or HTML format.  In all cases, the main value of these handlers is that of converting Python filenames, line numbers, and code samples into Mako template filenames, line numbers, and code samples.  All lines within a stack trace which correspond to a Mako template module will be converted to be against the originating template file.
+</p>
+<p>To format exception traces, the <code>text_error_template</code> and <code>html_error_template</code> functions are provided.  They make usage of <code>sys.exc_info()</code> to get at the most recently thrown exception.  Usage of these handlers usually looks like:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako</span> <span class="kn">import</span> <span class="n">exceptions</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">text_error_template</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>Or for the HTML render function:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako</span> <span class="kn">import</span> <span class="n">exceptions</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">html_error_template</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>The <code>html_error_template</code> template accepts two options: specifying <code>full=False</code> causes only a section of an HTML document to be rendered. Specifying <code>css=False</code> will disable the default stylesheet from being rendered.
+</p>
+<p>E.g.:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre>    print exceptions.html_error_template().render(full=False)
+</pre></div>
+
+    </div>
+<p>The HTML render function is also available built-in to <code>Template</code> using the <code>format_exceptions</code> flag.  In this case, any exceptions raised within the <strong>render</strong> stage of the template will result in the output being substituted with the output of <code>html_error_template</code>.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s">&quot;/foo/bar&quot;</span><span class="p">,</span> <span class="n">format_exceptions</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>Note that the compile stage of the above template occurs when you construct the <code>Template</code> itself, and no output stream is defined.  Therefore exceptions which occur within the lookup/parse/compile stage will not be handled and will propagate normally.   While the pre-render traceback usually will not include any Mako-specific lines anyway, it will mean that exceptions which occur previous to rendering and those which occur within rendering will be handled differently...so the <code>try/except</code> patterns described previously are probably of more general use.
+</p>
+<p>The underlying object used by the error template functions is the <code>RichTraceback</code> object.  This object can also be used directly to provide custom error views.  Here's an example usage which describes its general API:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.exceptions</span> <span class="kn">import</span> <span class="n">RichTraceback</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">traceback</span> <span class="o">=</span> <span class="n">RichTraceback</span><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">lineno</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">in</span> <span class="n">traceback</span><span class="o">.</span><span class="n">traceback</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;File </span><span class="si">%s</span><span class="s">, line </span><span class="si">%s</span><span class="s">, in </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">lineno</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">line</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">),</span> <span class="n">traceback</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+<p>Further information about <code>RichTraceback</code> is available within the module-level documentation for <code>mako.exceptions</code>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="usage_common"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Common Framework Integrations</h3>
+    
+    
+
+<p>The Mako distribution includes a little bit of helper code for the purpose of using Mako in some popular web framework scenarios.  This is a brief description of whats included.
+</p>
+
+
+    
+    <A name="usage_common_turbogears/pylons"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Turbogears/Pylons Plugin</h3>
+    
+    
+
+<p>The standard plugin methodology used by <a href='http://www.turbogears.org'>Turbogears</a> as well as <a href='http://www.pylonshq.com'>Pylons</a> is included in the module <code>mako.ext.turbogears</code>, using the <code>TGPlugin</code> class.  This is also a setuptools entrypoint under the heading <code>python.templating.engines</code> with the name <code>mako</code>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="usage_common_wsgi"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>WSGI</h3>
+    
+    
+
+<p>A sample WSGI application is included in the distrubution in the file <code>examples/wsgi/run_wsgi.py</code>.  This runner is set up to pull files from a <code>templates</code> as well as an <code>htdocs</code> directory and includes a rudimental two-file layout.  The WSGI runner acts as a fully functional standalone web server, using <code>wsgiutils</code> to run itself, and propagates GET and POST arguments from the request into the <code>Context</code>, can serve images, css files and other kinds of files, and also displays errors using Mako's included exception-handling utilities.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="usage_common_pygments"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Pygments</h3>
+    
+    
+
+<p>A <a href='http://pygments.pocoo.org'>Pygments</a>-compatible syntax highlighting module is included under <code>mako.ext.pygmentplugin</code>.  This module is used in the generation of Mako documentation and also contains various setuptools entry points under the heading <code>pygments.lexers</code>, including <code>mako</code>, <code>html+mako</code>, <code>xml+mako</code> (see the <code>setup.py</code> file for all the entry points).
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="usage_common_babel"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Babel (Internationalization)</h3>
+    
+    
+
+<p>Mako provides support for extracting gettext messages from templates via a <a href='http://babel.edgewall.org/'>Babel</a> extractor entry point under <code>mako.ext.babelplugin</code>.
+</p>
+<p>Gettext messages are extracted from all Python code sections, even the more obscure ones such as <a href="syntax.html#syntax_control">control structures</a>, <a href="defs.html">def tag function declarations</a>, <a href="defs.html#defs_defswithcontent">call tag exprs</a> and even <a href="syntax.html#syntax_tags_page">page tag args</a>.
+</p>
+<p><a href='http://babel.edgewall.org/wiki/Documentation/messages.html#comments-tags-and-translator-comments-explanation'>Translator comments</a> may also be extracted from Mako templates when a comment tag is specified to <a href='http://babel.edgewall.org/'>Babel</a> (such as with the -c option).
+</p>
+<p>For example, a project '<code>myproj</code>' contains the following Mako template at myproj/myproj/templates/name.html:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>
+  Name:
+  ## TRANSLATORS: This is a proper name. See the gettext
+  ## manual, section Names.
+  <span class="cp">${</span><span class="n">_</span><span class="p">(</span><span class="s">&#39;Francois Pinard&#39;</span><span class="p">)</span><span class="cp">}</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+
+    </div>
+<p>To extract gettext messages from this template the project needs a Mako section in its <a href='http://babel.edgewall.org/wiki/Documentation/messages.html#extraction-method-mapping-and-configuration'>Babel Extraction Method Mapping file</a> (typically located at myproj/babel.cfg):
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="c"># Extraction from Python source files</span>
+
+<span class="k">[python: myproj/**.py]</span>
+
+<span class="c"># Extraction from Mako templates</span>
+
+<span class="k">[mako: myproj/templates/**.html]</span>
+<span class="na">input_encoding</span> <span class="o">=</span> <span class="s">utf-8</span>
+</pre></div>
+
+    </div>
+<p>The Mako extractor supports an optional <code>input_encoding</code> parameter specifying the encoding of the templates (identical to <code>Template</code>/<code>TemplateLookup</code>'s <code>input_encoding</code> parameter).
+</p>
+<p>Invoking <a href='http://babel.edgewall.org/'>Babel</a>'s extractor at the command line in the project's root directory:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre>myproj$ pybabel extract -F babel.cfg -c &quot;TRANSLATORS:&quot; .
+</pre></div>
+
+    </div>
+<p>Will output a gettext catalog to stdout including the following:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre>#. TRANSLATORS: This is a proper name. See the gettext
+#. manual, section Names.
+#: myproj/templates/name.html:5
+msgid &quot;Francois Pinard&quot;
+msgstr &quot;&quot;
+</pre></div>
+
+    </div>
+<p>This is only a basic example: <a href='http://babel.edgewall.org/'>Babel</a> can be invoked from setup.py and its command line options specified in the accompanying setup.cfg via <a href='http://babel.edgewall.org/wiki/Documentation/setup.html'>Babel Distutils/Setuptools Integration</a>.
+</p>
+<p>Comments must immediately precede a gettext message to be extracted. In the following case the TRANSLATORS: comment would not have been extracted:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>
+  ## TRANSLATORS: This is a proper name. See the gettext
+  ## manual, section Names.
+  Name: <span class="cp">${</span><span class="n">_</span><span class="p">(</span><span class="s">&#39;Francois Pinard&#39;</span><span class="p">)</span><span class="cp">}</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+
+    </div>
+<p>See the <a href='http://babel.edgewall.org/wiki/Documentation/index.html'>Babel User Guide</a> for more information.
+</p>
+
+
+
+
+    </div>
+
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+</html>
+
+
+    <div class="toolbar">
+        <div class="prevnext">
+
+            
+            Next: <a href="syntax.html">Syntax</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+  <!-- Sample User -->
+  <object pk="1" model="auth.user">
+    <field type="CharField" name="username">sample</field>
+    <field type="CharField" name="first_name"></field>
+    <field type="CharField" name="last_name"></field>
+    <field type="CharField" name="email"></field>
+    <field type="CharField" name="password">!</field>
+    <field type="BooleanField" name="is_staff">False</field>
+    <field type="BooleanField" name="is_active">False</field>
+    <field type="BooleanField" name="is_superuser">False</field>
+    <field type="DateTimeField" name="last_login">2009-09-18 22:27:14</field>
+    <field type="DateTimeField" name="date_joined">2009-09-18 22:06:38</field>
+    <field to="auth.group" name="groups" rel="ManyToManyRel"></field>
+    <field to="auth.permission" name="user_permissions" rel="ManyToManyRel"></field>
+  </object>
+  <object pk="1" model="jobsub.jobdesign">
+    <field to="auth.user" name="owner" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="name">Example: Pi Calculator</field>
+    <field type="CharField" name="description">Hadoop's built-in Pi example.  This job commonly fails because /user/&lt;your-user-name&gt; is not writable.  iterations_per_mapper is how many random samples to take per-mapper.  number_of_mappers is how many mappers to launch.</field>
+    <field type="DateField" name="last_modified">2009-09-21</field>
+    <field type="CharField" name="type">jar</field>
+    <field type="CharField" name="data">{"arguments": "pi $num_of_mappers $iterations_per_mapper", "jarfile": "/user/hue/jobsub/examples/hadoop-examples.jar"}</field>
+  </object>
+  <object pk="2" model="jobsub.jobdesign">
+    <field to="auth.user" name="owner" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="name">Example: Streaming Wordcount</field>
+    <field type="CharField" name="description">Runs wordcount, implemented in python, via streaming.</field>
+    <field type="DateField" name="last_modified">2009-09-21</field>
+    <field type="CharField" name="type">streaming</field>
+    <field type="CharField" name="data">{"mapper_cmd": "python wordcount.py map", "inputformat_class": "org.apache.hadoop.mapred.TextInputFormat", "cache_archives": [], "reducer_class": "", "num_reduce_tasks": 1, "cache_files": ["/user/hue/jobsub/examples/wordcount.py"], "inputreader": "", "combiner_class": "", "outputformat_class": "org.apache.hadoop.mapred.TextOutputFormat", "mapper_class": "", "output": "$output", "input": ["/user/hue/jobsub/sample_data/sonnets.txt", "/user/hue/jobsub/sample_data/midsummer.txt"], "hadoop_properties": {}, "reducer_cmd": "python wordcount.py reduce", "partitioner_class": ""}</field>
+  </object>
+  <object pk="3" model="jobsub.jobdesign">
+    <field to="auth.user" name="owner" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="name">Example: Sleep Job</field>
+    <field type="CharField" name="description">MapReduce's sleep example</field>
+    <field type="DateTimeField" name="last_modified">2009-09-26 20:32:03</field>
+    <field type="CharField" name="type">jar</field>
+    <field type="CharField" name="data">{"arguments": "sleep -m $num_mappers -r $num_reducers -mt $map_sleep_time_millis -rt $reduce_sleep_time_millis", "jarfile": "/user/hue/jobsub/examples/hadoop-examples.jar"}</field>
+  </object>
+</django-objects>

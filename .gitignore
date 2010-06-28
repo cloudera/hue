@@ -1,0 +1,60 @@
+# OS X nonsense
+.DS_Store
+
+# Python compiled files
+*.pyc
+*.pyo
+
+# vim tmp files
+.*.swp
+.*.swo
+
+# emacs backup files
+.*~
+
+# Build directory and environment
+build
+env
+metastore_db
+VERSION_INFO
+
+# Generated configuration
+desktop/conf/pseudo-distributed.ini
+
+# ctags file
+tags
+TAGS
+
+# Third party build files
+*.egg-info/
+dist/
+
+# Crepo fetched them
+ext/thirdparty/js/art-widgets/
+ext/thirdparty/js/mootools-table/
+
+# Make product
+desktop/core/ext-py/lxml/src/lxml/lxml-version.h
+/VERSION_DATA
+
+# Common "beeswaxd" product
+/metastore_db
+/derby.log
+
+# Nose --with-id's file
+/.noseids
+
+# Coverage product
+/.coverage
+/coverage.xml
+
+# Common utility alias
+/d
+
+# Database of running server
+desktop/desktop.db
+app.reg
+
+# logs
+/logs
+desktop/logs

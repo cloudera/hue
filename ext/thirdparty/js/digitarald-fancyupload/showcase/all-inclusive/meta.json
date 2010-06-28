@@ -1,0 +1,9 @@
+{
+	"title": "All Inclusive",
+	"locked": true,
+	"script_php": "../script.php",
+	"files": [
+		"http://ajax.googleapis.com/ajax/libs/mootools/1.2.2/mootools.js",
+		"../../source/Swiff.Uploader.js"
+	]
+}

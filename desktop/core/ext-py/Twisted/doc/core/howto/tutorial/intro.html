@@ -1,0 +1,226 @@
+<?xml version="1.0"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Twisted Documentation: The Evolution of Finger: building a simple finger service</title><link href="../stylesheet.css" type="text/css" rel="stylesheet" /></head><body bgcolor="white"><h1 class="title">The Evolution of Finger: building a simple finger service</h1><div class="toc"><ol><li><a href="#auto0">Introduction</a></li><li><a href="#auto1">Refuse Connections</a></li><ul><li><a href="#auto2">The Reactor</a></li></ul><li><a href="#auto3">Do Nothing</a></li><li><a href="#auto4">Drop Connections</a></li><li><a href="#auto5">Read Username, Drop Connections</a></li><li><a href="#auto6">Read Username, Output Error, Drop Connections</a></li><li><a href="#auto7">Output From Empty Factory</a></li><li><a href="#auto8">Output from Non-empty Factory</a></li><li><a href="#auto9">Use Deferreds</a></li><li><a href="#auto10">Run 'finger' Locally</a></li><li><a href="#auto11">Read Status from the Web</a></li><li><a href="#auto12">Use Application</a></li><li><a href="#auto13">twistd</a></li></ol></div><div class="content"><span></span><h2>Introduction<a name="auto0"></a></h2><p>This is the first part of the Twisted tutorial <a href="index.html">Twisted from Scratch, or The Evolution of Finger</a>.</p><p>By the end of this section of the tutorial, our finger server will answer
+TCP finger requests on port 1079, and will read data from the web.</p><h2>Refuse Connections<a name="auto1"></a></h2><div class="py-listing"><pre>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">reactor</span>
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger01.py"><span class="filename">listings/finger/finger01.py</span></a></div></div><p>This example only runs the reactor. Nothing at all will happen until we
+interrupt the program.  It will consume almost no CPU resources. Not very
+useful, perhaps &mdash; but this is the skeleton inside which the Twisted program
+will grow.
+</p><h3>The Reactor<a name="auto2"></a></h3><p>
+You don't call Twisted, Twisted calls you. The <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.internet.reactor.html" title="twisted.internet.reactor">reactor</a></code>
+is Twisted's main event loop, similar to the main loop in other toolkits available
+in Python (Qt, wx, and Gtk). There is exactly one reactor in any running Twisted
+application. Once started it loops over and over again, responding to network
+events, and making scheduled calls to code.</p><h2>Do Nothing<a name="auto3"></a></h2><div class="py-listing"><pre>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">Protocol</span>):
+    <span class="py-src-keyword">pass</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">1079</span>, <span class="py-src-variable">FingerFactory</span>())
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger02.py"><span class="filename">listings/finger/finger02.py</span></a></div></div><p>Here, we start listening on port 1079. The 1079 is a reminder that
+eventually, we want to run on port 79, the standard port for finger servers.
+We define a protocol which does not respond to any events. Thus, connections to
+1079 will be accepted, but the input ignored.</p><p>A new Protocol instance is created for every connection and defines what you
+want to do in response to events. A Factory produces new Protocol instances,
+and is the proper place for data that you want to make available to the protocol
+instances, since they are garbage collected when the connection is closed.</p><h2>Drop Connections<a name="auto4"></a></h2><div class="py-listing"><pre>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">Protocol</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">connectionMade</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">loseConnection</span>()
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">1079</span>, <span class="py-src-variable">FingerFactory</span>())
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger03.py"><span class="filename">listings/finger/finger03.py</span></a></div></div><p>Here we add to the protocol the ability to respond to the event of beginning
+a connection &mdash; by terminating it.  Perhaps not an interesting behavior, but
+it is already close to behaving according to the letter of the protocol. After
+all, there is no requirement to send any data to the remote connection in the
+standard.  The only problem, as far as the standard is concerned, is that we
+terminate the connection too soon. A client which is slow enough will see his
+send() of the username result in an error.</p><h2>Read Username, Drop Connections<a name="auto5"></a></h2><div class="py-listing"><pre>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">protocols</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">basic</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">basic</span>.<span class="py-src-parameter">LineReceiver</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">lineReceived</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">loseConnection</span>()
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">1079</span>, <span class="py-src-variable">FingerFactory</span>())
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger04.py"><span class="filename">listings/finger/finger04.py</span></a></div></div><p>Here we make <code>FingerProtocol</code> inherit from <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.protocols.basic.LineReceiver.html" title="twisted.protocols.basic.LineReceiver">LineReceiver</a></code>, so that we get data-based
+events on a line-by-line basis. We respond to the event of receiving the line
+with shutting down the connection.</p><p>Congratulations, this is the first standard-compliant version of the code.
+However, usually people actually expect some data about users to be
+transmitted.</p><h2>Read Username, Output Error, Drop Connections<a name="auto6"></a></h2><div class="py-listing"><pre>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">protocols</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">basic</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">basic</span>.<span class="py-src-parameter">LineReceiver</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">lineReceived</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">write</span>(<span class="py-src-string">&quot;No such user\r\n&quot;</span>)
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">loseConnection</span>()
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">1079</span>, <span class="py-src-variable">FingerFactory</span>())
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger05.py"><span class="filename">listings/finger/finger05.py</span></a></div></div><p>Finally, a useful version. Granted, the usefulness is somewhat
+limited by the fact that this version only prints out a <q>No such user</q>
+message. It could be used for devastating effect in honey-pots,
+of course.</p><h2>Output From Empty Factory<a name="auto7"></a></h2><div class="py-listing"><pre>
+<span class="py-src-comment"># Read username, output from empty factory, drop connections
+</span><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">protocols</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">basic</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">basic</span>.<span class="py-src-parameter">LineReceiver</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">lineReceived</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">write</span>(<span class="py-src-variable">self</span>.<span class="py-src-variable">factory</span>.<span class="py-src-variable">getUser</span>(<span class="py-src-variable">user</span>)+<span class="py-src-string">&quot;\r\n&quot;</span>)
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">loseConnection</span>()
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">getUser</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>): <span class="py-src-keyword">return</span> <span class="py-src-string">&quot;No such user&quot;</span>
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">1079</span>, <span class="py-src-variable">FingerFactory</span>())
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger06.py"><span class="filename">listings/finger/finger06.py</span></a></div></div><p>The same behavior, but finally we see what usefulness the
+factory has: as something that does not get constructed for
+every connection, it can be in charge of the user database.
+In particular, we won't have to change the protocol if
+the user database back-end changes.</p><h2>Output from Non-empty Factory<a name="auto8"></a></h2><div class="py-listing"><pre>
+<span class="py-src-comment"># Read username, output from non-empty factory, drop connections
+</span><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">protocols</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">basic</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">basic</span>.<span class="py-src-parameter">LineReceiver</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">lineReceived</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">write</span>(<span class="py-src-variable">self</span>.<span class="py-src-variable">factory</span>.<span class="py-src-variable">getUser</span>(<span class="py-src-variable">user</span>)+<span class="py-src-string">&quot;\r\n&quot;</span>)
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">loseConnection</span>()
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>, **<span class="py-src-parameter">kwargs</span>): <span class="py-src-variable">self</span>.<span class="py-src-variable">users</span> = <span class="py-src-variable">kwargs</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">getUser</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">self</span>.<span class="py-src-variable">users</span>.<span class="py-src-variable">get</span>(<span class="py-src-variable">user</span>, <span class="py-src-string">&quot;No such user&quot;</span>)
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">1079</span>, <span class="py-src-variable">FingerFactory</span>(<span class="py-src-variable">moshez</span>=<span class="py-src-string">'Happy and well'</span>))
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger07.py"><span class="filename">listings/finger/finger07.py</span></a></div></div><p>Finally, a really useful finger database. While it does not
+supply information about logged in users, it could be used to
+distribute things like office locations and internal office
+numbers. As hinted above, the factory is in charge of keeping
+the user database: note that the protocol instance has not
+changed. This is starting to look good: we really won't have
+to keep tweaking our protocol.</p><h2>Use Deferreds<a name="auto9"></a></h2><div class="py-listing"><pre>
+<span class="py-src-comment"># Read username, output from non-empty factory, drop connections
+</span><span class="py-src-comment"># Use deferreds, to minimize synchronicity assumptions
+</span><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>, <span class="py-src-variable">defer</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">protocols</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">basic</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">basic</span>.<span class="py-src-parameter">LineReceiver</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">lineReceived</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">factory</span>.<span class="py-src-variable">getUser</span>(<span class="py-src-variable">user</span>
+        ).<span class="py-src-variable">addErrback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">_</span>: <span class="py-src-string">&quot;Internal error in server&quot;</span>
+        ).<span class="py-src-variable">addCallback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">m</span>:
+                      (<span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">write</span>(<span class="py-src-variable">m</span>+<span class="py-src-string">&quot;\r\n&quot;</span>),
+                       <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">loseConnection</span>()))
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>, **<span class="py-src-parameter">kwargs</span>): <span class="py-src-variable">self</span>.<span class="py-src-variable">users</span> = <span class="py-src-variable">kwargs</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">getUser</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">defer</span>.<span class="py-src-variable">succeed</span>(<span class="py-src-variable">self</span>.<span class="py-src-variable">users</span>.<span class="py-src-variable">get</span>(<span class="py-src-variable">user</span>, <span class="py-src-string">&quot;No such user&quot;</span>))
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">1079</span>, <span class="py-src-variable">FingerFactory</span>(<span class="py-src-variable">moshez</span>=<span class="py-src-string">'Happy and well'</span>))
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger08.py"><span class="filename">listings/finger/finger08.py</span></a></div></div><p>But, here we tweak it just for the hell of it. Yes, while the
+previous version worked, it did assume the result of getUser is
+always immediately available. But what if instead of an in memory
+database, we would have to fetch result from a remote Oracle?
+Or from the web? Or, or...</p><h2>Run 'finger' Locally<a name="auto10"></a></h2><div class="py-listing"><pre>
+<span class="py-src-comment"># Read username, output from factory interfacing to OS, drop connections
+</span><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>, <span class="py-src-variable">defer</span>, <span class="py-src-variable">utils</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">protocols</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">basic</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">basic</span>.<span class="py-src-parameter">LineReceiver</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">lineReceived</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">factory</span>.<span class="py-src-variable">getUser</span>(<span class="py-src-variable">user</span>
+        ).<span class="py-src-variable">addErrback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">_</span>: <span class="py-src-string">&quot;Internal error in server&quot;</span>
+        ).<span class="py-src-variable">addCallback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">m</span>:
+                      (<span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">write</span>(<span class="py-src-variable">m</span>+<span class="py-src-string">&quot;\r\n&quot;</span>),
+                       <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">loseConnection</span>()))
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">getUser</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">utils</span>.<span class="py-src-variable">getProcessOutput</span>(<span class="py-src-string">&quot;finger&quot;</span>, [<span class="py-src-variable">user</span>])
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">1079</span>, <span class="py-src-variable">FingerFactory</span>())
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger09.py"><span class="filename">listings/finger/finger09.py</span></a></div></div><p>...from running a local command? Yes, this version runs
+finger locally with whatever arguments it is given, and returns the
+standard output. This is probably insecure, so you probably don't
+want a real server to do this without a lot more validation of the
+user input. This will do exactly what the standard version
+of the finger server does.</p><h2>Read Status from the Web<a name="auto11"></a></h2><p>The web. That invention which has infiltrated homes around the
+world finally gets through to our invention. Here we use the built-in
+Twisted web client, which also returns a deferred. Finally, we manage
+to have examples of three different database back-ends, which do
+not change the protocol class. In fact, we will not have to change
+the protocol again until the end of this tutorial: we have achieved,
+here, one truly usable class.</p><div class="py-listing"><pre>
+<span class="py-src-comment"># Read username, output from factory interfacing to web, drop connections
+</span><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>, <span class="py-src-variable">defer</span>, <span class="py-src-variable">utils</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">protocols</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">basic</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">client</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">basic</span>.<span class="py-src-parameter">LineReceiver</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">lineReceived</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">factory</span>.<span class="py-src-variable">getUser</span>(<span class="py-src-variable">user</span>
+        ).<span class="py-src-variable">addErrback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">_</span>: <span class="py-src-string">&quot;Internal error in server&quot;</span>
+        ).<span class="py-src-variable">addCallback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">m</span>:
+                      (<span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">write</span>(<span class="py-src-variable">m</span>+<span class="py-src-string">&quot;\r\n&quot;</span>),
+                       <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">loseConnection</span>()))
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">prefix</span>): <span class="py-src-variable">self</span>.<span class="py-src-variable">prefix</span>=<span class="py-src-variable">prefix</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">getUser</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">client</span>.<span class="py-src-variable">getPage</span>(<span class="py-src-variable">self</span>.<span class="py-src-variable">prefix</span>+<span class="py-src-variable">user</span>)
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">1079</span>, <span class="py-src-variable">FingerFactory</span>(<span class="py-src-variable">prefix</span>=<span class="py-src-string">'http://livejournal.com/~'</span>))
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><div class="caption">Source listing - <a href="listings/finger/finger10.py"><span class="filename">listings/finger/finger10.py</span></a></div></div><h2>Use Application<a name="auto12"></a></h2><p>Up until now, we faked. We kept using port 1079, because really,
+who wants to run a finger server with root privileges? Well, the
+common solution is <q>privilege shedding</q>: after binding to the
+network, become a different, less privileged user. We could have done
+it ourselves, but Twisted has a built-in way to do it. We will create
+a snippet as above, but now we will define an application object. That
+object will have uid and gid attributes. When running it (later we
+will see how) it will bind to ports, shed privileges and then run.</p><p>Read on to find out how to run this code using the twistd utility.</p><h2>twistd<a name="auto13"></a></h2><p>This is how to run <q>Twisted Applications</q>&mdash; files which define an
+'application'. twistd (TWISTed Daemonizer) does everything a daemon
+can be expected to &mdash; shuts down stdin/stdout/stderr, disconnects
+from the terminal and can even change runtime directory, or even
+the root filesystems. In short, it does everything so the Twisted
+application developer can concentrate on writing his networking code.
+</p><div class="py-listing"><pre>
+<span class="py-src-comment"># Read username, output from non-empty factory, drop connections
+</span><span class="py-src-comment"># Use deferreds, to minimize synchronicity assumptions
+</span><span class="py-src-comment"># Write application. Save in 'finger.tpy'
+</span><span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">application</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">internet</span>, <span class="py-src-variable">service</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>, <span class="py-src-variable">defer</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">protocols</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">basic</span>
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerProtocol</span>(<span class="py-src-parameter">basic</span>.<span class="py-src-parameter">LineReceiver</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">lineReceived</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">factory</span>.<span class="py-src-variable">getUser</span>(<span class="py-src-variable">user</span>
+        ).<span class="py-src-variable">addErrback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">_</span>: <span class="py-src-string">&quot;Internal error in server&quot;</span>
+        ).<span class="py-src-variable">addCallback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">m</span>:
+                      (<span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">write</span>(<span class="py-src-variable">m</span>+<span class="py-src-string">&quot;\r\n&quot;</span>),
+                       <span class="py-src-variable">self</span>.<span class="py-src-variable">transport</span>.<span class="py-src-variable">loseConnection</span>()))
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FingerFactory</span>(<span class="py-src-parameter">protocol</span>.<span class="py-src-parameter">ServerFactory</span>):
+    <span class="py-src-variable">protocol</span> = <span class="py-src-variable">FingerProtocol</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>, **<span class="py-src-parameter">kwargs</span>): <span class="py-src-variable">self</span>.<span class="py-src-variable">users</span> = <span class="py-src-variable">kwargs</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">getUser</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">user</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">defer</span>.<span class="py-src-variable">succeed</span>(<span class="py-src-variable">self</span>.<span class="py-src-variable">users</span>.<span class="py-src-variable">get</span>(<span class="py-src-variable">user</span>, <span class="py-src-string">&quot;No such user&quot;</span>))
+
+<span class="py-src-variable">application</span> = <span class="py-src-variable">service</span>.<span class="py-src-variable">Application</span>(<span class="py-src-string">'finger'</span>, <span class="py-src-variable">uid</span>=<span class="py-src-number">1</span>, <span class="py-src-variable">gid</span>=<span class="py-src-number">1</span>)
+<span class="py-src-variable">factory</span> = <span class="py-src-variable">FingerFactory</span>(<span class="py-src-variable">moshez</span>=<span class="py-src-string">'Happy and well'</span>)
+<span class="py-src-variable">internet</span>.<span class="py-src-variable">TCPServer</span>(<span class="py-src-number">79</span>, <span class="py-src-variable">factory</span>).<span class="py-src-variable">setServiceParent</span>(
+    <span class="py-src-variable">service</span>.<span class="py-src-variable">IServiceCollection</span>(<span class="py-src-variable">application</span>))
+</pre><div class="caption">Source listing - <a href="listings/finger/finger11.tac"><span class="filename">listings/finger/finger11.tac</span></a></div></div><pre class="shell">
+root% twistd -ny finger11.tac # just like before
+root% twistd -y finger11.tac # daemonize, keep pid in twistd.pid
+root% twistd -y finger11.tac --pidfile=finger.pid
+root% twistd -y finger11.tac --rundir=/
+root% twistd -y finger11.tac --chroot=/var
+root% twistd -y finger11.tac -l /var/log/finger.log
+root% twistd -y finger11.tac --syslog # just log to syslog
+root% twistd -y finger11.tac --syslog --prefix=twistedfinger # use given prefix
+</pre></div><p><a href="../index.html">Index</a></p><span class="version">Version: 8.2.0</span></body></html>

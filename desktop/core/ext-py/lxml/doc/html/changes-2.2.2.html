@@ -1,0 +1,1727 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>lxml changelog</title>
+
+</head>
+<body>
+<div class="document" id="lxml-changelog">
+<h1 class="title">lxml changelog</h1>
+
+<div class="section" id="id1">
+<h1>2.2.2 (2009-06-21)</h1>
+<div class="section" id="features-added">
+<h2>Features added</h2>
+<ul class="simple">
+<li>New helper functions <tt class="docutils literal"><span class="pre">strip_attributes()</span></tt>, <tt class="docutils literal"><span class="pre">strip_elements()</span></tt>,
+<tt class="docutils literal"><span class="pre">strip_tags()</span></tt> in lxml.etree to remove attributes/subtrees/tags
+from a subtree.</li>
+</ul>
+</div>
+<div class="section" id="bugs-fixed">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Namespace cleanup on subtree insertions could result in missing
+namespace declarations (and potentially crashes) if the element
+defining a namespace was deleted and the namespace was not used by
+the top element of the inserted subtree but only in deeper subtrees.</li>
+<li>Raising an exception from a parser target callback didn't always
+terminate the parser.</li>
+<li>Only {true, false, 1, 0} are accepted as the lexical representation for
+BoolElement ({True, False, T, F, t, f} not any more), restoring lxml &lt;= 2.0
+behaviour.</li>
+</ul>
+</div>
+<div class="section" id="other-changes">
+<h2>Other changes</h2>
+</div>
+</div>
+<div class="section" id="id2">
+<h1>2.2.1 (2009-06-02)</h1>
+<div class="section" id="id3">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Injecting default attributes into a document during XML Schema
+validation (also at parse time).</li>
+<li>Pass <tt class="docutils literal"><span class="pre">huge_tree</span></tt> parser option to disable parser security
+restrictions imposed by libxml2 2.7.</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>The script for statically building libxml2 and libxslt didn't work
+in Py3.</li>
+<li><tt class="docutils literal"><span class="pre">XMLSchema()</span></tt> also passes invalid schema documents on to libxml2
+for parsing (which could lead to a crash before release 2.6.24).</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h2>Other changes</h2>
+</div>
+</div>
+<div class="section" id="id6">
+<h1>2.2 (2009-03-21)</h1>
+<div class="section" id="id7">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Support for <tt class="docutils literal"><span class="pre">standalone</span></tt> flag in XML declaration through
+<tt class="docutils literal"><span class="pre">tree.docinfo.standalone</span></tt> and by passing <tt class="docutils literal"><span class="pre">standalone=True/False</span></tt>
+on serialisation.</li>
+</ul>
+</div>
+<div class="section" id="id8">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Crash when parsing an XML Schema with external imports from a
+filename.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="beta4-2009-02-27">
+<h1>2.2beta4 (2009-02-27)</h1>
+<div class="section" id="id9">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Support strings and instantiable Element classes as child arguments
+to the constructor of custom Element classes.</li>
+<li>GZip compression support for serialisation to files and file-like
+objects.</li>
+</ul>
+</div>
+<div class="section" id="id10">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Deep-copying an ElementTree copied neither its sibling PIs and
+comments nor its internal/external DTD subsets.</li>
+<li>Soupparser failed on broken attributes without values.</li>
+<li>Crash in XSLT when overwriting an already defined attribute using
+<tt class="docutils literal"><span class="pre">xsl:attribute</span></tt>.</li>
+<li>Crash bug in exception handling code under Python 3.  This was due
+to a problem in Cython, not lxml itself.</li>
+<li><tt class="docutils literal"><span class="pre">lxml.html.FormElement._name()</span></tt> failed for non top-level forms.</li>
+<li><tt class="docutils literal"><span class="pre">TAG</span></tt> special attribute in constructor of custom Element classes
+was evaluated incorrectly.</li>
+</ul>
+</div>
+<div class="section" id="id11">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>Official support for Python 3.0.1.</li>
+<li><tt class="docutils literal"><span class="pre">Element.findtext()</span></tt> now returns an empty string instead of None
+for Elements without text content.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="beta3-2009-02-17">
+<h1>2.2beta3 (2009-02-17)</h1>
+<div class="section" id="id12">
+<h2>Features added</h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">XSLT.strparam()</span></tt> class method to wrap quoted string parameters
+that require escaping.</li>
+</ul>
+</div>
+<div class="section" id="id13">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Memory leak in XPath evaluators.</li>
+<li>Crash when parsing indented XML in one thread and merging it with
+other documents parsed in another thread.</li>
+<li>Setting the <tt class="docutils literal"><span class="pre">base</span></tt> attribute in <tt class="docutils literal"><span class="pre">lxml.objectify</span></tt> from a unicode
+string failed.</li>
+<li>Fixes following changes in Python 3.0.1.</li>
+<li>Minor fixes for Python 3.</li>
+</ul>
+</div>
+<div class="section" id="id14">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>The global error log (which is copied into the exception log) is now
+local to a thread, which fixes some race conditions.</li>
+<li>More robust error handling on serialisation.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="beta2-2009-01-25">
+<h1>2.2beta2 (2009-01-25)</h1>
+<div class="section" id="id15">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Potential memory leak on exception handling.  This was due to a
+problem in Cython, not lxml itself.</li>
+<li><tt class="docutils literal"><span class="pre">iter_links</span></tt> (and related link-rewriting functions) in
+<tt class="docutils literal"><span class="pre">lxml.html</span></tt> would interpret CSS like <tt class="docutils literal"><span class="pre">url(&quot;link&quot;)</span></tt> incorrectly
+(treating the quotation marks as part of the link).</li>
+<li>Failing import on systems that have an <tt class="docutils literal"><span class="pre">io</span></tt> module.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id16">
+<h1>2.1.5 (2009-01-06)</h1>
+<div class="section" id="id17">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Potential memory leak on exception handling.  This was due to a
+problem in Cython, not lxml itself.</li>
+<li>Failing import on systems that have an <tt class="docutils literal"><span class="pre">io</span></tt> module.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="beta1-2008-12-12">
+<h1>2.2beta1 (2008-12-12)</h1>
+<div class="section" id="id18">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Allow <tt class="docutils literal"><span class="pre">lxml.html.diff.htmldiff</span></tt> to accept Element objects, not
+just HTML strings.</li>
+</ul>
+</div>
+<div class="section" id="id19">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Crash when using an XPath evaluator in multiple threads.</li>
+<li>Fixed missing whitespace before <tt class="docutils literal"><span class="pre">Link:...</span></tt> in <tt class="docutils literal"><span class="pre">lxml.html.diff</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="id20">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>Export <tt class="docutils literal"><span class="pre">lxml.html.parse</span></tt>.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id21">
+<h1>2.1.4 (2008-12-12)</h1>
+<div class="section" id="id22">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Crash when using an XPath evaluator in multiple threads.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id23">
+<h1>2.0.11 (2008-12-12)</h1>
+<div class="section" id="id24">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Crash when using an XPath evaluator in multiple threads.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="alpha1-2008-11-23">
+<h1>2.2alpha1 (2008-11-23)</h1>
+<div class="section" id="id25">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Support for XSLT result tree fragments in XPath/XSLT extension
+functions.</li>
+<li>QName objects have new properties <tt class="docutils literal"><span class="pre">namespace</span></tt> and <tt class="docutils literal"><span class="pre">localname</span></tt>.</li>
+<li>New options for exclusive C14N and C14N without comments.</li>
+<li>Instantiating a custom Element classes creates a new Element.</li>
+</ul>
+</div>
+<div class="section" id="id26">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>XSLT didn't inherit the parse options of the input document.</li>
+<li>0-bytes could slip through the API when used inside of Unicode
+strings.</li>
+<li>With <tt class="docutils literal"><span class="pre">lxml.html.clean.autolink</span></tt>, links with balanced parenthesis,
+that end in a parenthesis, will be linked in their entirety (typical
+with Wikipedia links).</li>
+</ul>
+</div>
+<div class="section" id="id27">
+<h2>Other changes</h2>
+</div>
+</div>
+<div class="section" id="id28">
+<h1>2.1.3 (2008-11-17)</h1>
+<div class="section" id="id29">
+<h2>Features added</h2>
+</div>
+<div class="section" id="id30">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Ref-count leaks when lxml enters a try-except statement while an
+outside exception lives in sys.exc_*(). This was due to a problem in
+Cython, not lxml itself.</li>
+<li>Parser Unicode decoding errors could get swallowed by other
+exceptions.</li>
+<li>Name/import errors in some Python modules.</li>
+<li>Internal DTD subsets that did not specify a system or public ID were
+not serialised and did not appear in the docinfo property of
+ElementTrees.</li>
+<li>Fix a pre-Py3k warning when parsing from a gzip file in Py2.6.</li>
+<li>Test suite fixes for libxml2 2.7.</li>
+<li>Resolver.resolve_string() did not work for non-ASCII byte strings.</li>
+<li>Resolver.resolve_file() was broken.</li>
+<li>Overriding the parser encoding didn't work for many encodings.</li>
+</ul>
+</div>
+<div class="section" id="id31">
+<h2>Other changes</h2>
+</div>
+</div>
+<div class="section" id="id32">
+<h1>2.0.10 (2008-11-17)</h1>
+<div class="section" id="id33">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Ref-count leaks when lxml enters a try-except statement while an
+outside exception lives in sys.exc_*(). This was due to a problem in
+Cython, not lxml itself.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id34">
+<h1>2.1.2 (2008-09-05)</h1>
+<div class="section" id="id35">
+<h2>Features added</h2>
+<ul class="simple">
+<li>lxml.etree now tries to find the absolute path name of files when
+parsing from a file-like object.  This helps custom resolvers when
+resolving relative URLs, as lixbml2 can prepend them with the path
+of the source document.</li>
+</ul>
+</div>
+<div class="section" id="id36">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Memory problem when passing documents between threads.</li>
+<li>Target parser did not honour the <tt class="docutils literal"><span class="pre">recover</span></tt> option and raised an
+exception instead of calling <tt class="docutils literal"><span class="pre">.close()</span></tt> on the target.</li>
+</ul>
+</div>
+<div class="section" id="id37">
+<h2>Other changes</h2>
+</div>
+</div>
+<div class="section" id="id38">
+<h1>2.0.9 (2008-09-05)</h1>
+<div class="section" id="id39">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Memory problem when passing documents between threads.</li>
+<li>Target parser did not honour the <tt class="docutils literal"><span class="pre">recover</span></tt> option and raised an
+exception instead of calling <tt class="docutils literal"><span class="pre">.close()</span></tt> on the target.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id40">
+<h1>2.1.1 (2008-07-24)</h1>
+<div class="section" id="id41">
+<h2>Features added</h2>
+</div>
+<div class="section" id="id42">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Crash when parsing XSLT stylesheets in a thread and using them in
+another.</li>
+<li>Encoding problem when including text with ElementInclude under
+Python 3.</li>
+</ul>
+</div>
+<div class="section" id="id43">
+<h2>Other changes</h2>
+</div>
+</div>
+<div class="section" id="id44">
+<h1>2.0.8 (2008-07-24)</h1>
+<div class="section" id="id45">
+<h2>Features added</h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">lxml.html.rewrite_links()</span></tt> strips links to work around documents
+with whitespace in URL attributes.</li>
+</ul>
+</div>
+<div class="section" id="id46">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Crash when parsing XSLT stylesheets in a thread and using them in
+another.</li>
+<li>CSS selector parser dropped remaining expression after a function
+with parameters.</li>
+</ul>
+</div>
+<div class="section" id="id47">
+<h2>Other changes</h2>
+</div>
+</div>
+<div class="section" id="id48">
+<h1>2.1 (2008-07-09)</h1>
+<div class="section" id="id49">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Smart strings can be switched off in XPath (<tt class="docutils literal"><span class="pre">smart_strings</span></tt>
+keyword option).</li>
+<li><tt class="docutils literal"><span class="pre">lxml.html.rewrite_links()</span></tt> strips links to work around documents
+with whitespace in URL attributes.</li>
+</ul>
+</div>
+<div class="section" id="id50">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Custom resolvers were not used for XMLSchema includes/imports and
+XInclude processing.</li>
+<li>CSS selector parser dropped remaining expression after a function
+with parameters.</li>
+</ul>
+</div>
+<div class="section" id="id51">
+<h2>Other changes</h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">objectify.enableRecursiveStr()</span></tt> was removed, use
+<tt class="docutils literal"><span class="pre">objectify.enable_recursive_str()</span></tt> instead</li>
+<li>Speed-up when running XSLTs on documents from other threads</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id52">
+<h1>2.0.7 (2008-06-20)</h1>
+<div class="section" id="id53">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Pickling <tt class="docutils literal"><span class="pre">ElementTree</span></tt> objects in lxml.objectify.</li>
+</ul>
+</div>
+<div class="section" id="id54">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Descending dot-separated classes in CSS selectors were not resolved
+correctly.</li>
+<li><tt class="docutils literal"><span class="pre">ElementTree.parse()</span></tt> didn't handle target parser result.</li>
+<li>Potential threading problem in XInclude.</li>
+<li>Crash in Element class lookup classes when the __init__() method of
+the super class is not called from Python subclasses.</li>
+</ul>
+</div>
+<div class="section" id="id55">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>Non-ASCII characters in attribute values are no longer escaped on
+serialisation.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="beta3-2008-06-19">
+<h1>2.1beta3 (2008-06-19)</h1>
+<div class="section" id="id56">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Major overhaul of <tt class="docutils literal"><span class="pre">tools/xpathgrep.py</span></tt> script.</li>
+<li>Pickling <tt class="docutils literal"><span class="pre">ElementTree</span></tt> objects in lxml.objectify.</li>
+<li>Support for parsing from file-like objects that return unicode
+strings.</li>
+<li>New function <tt class="docutils literal"><span class="pre">etree.cleanup_namespaces(el)</span></tt> that removes unused
+namespace declarations from a (sub)tree (experimental).</li>
+<li>XSLT results support the buffer protocol in Python 3.</li>
+<li>Polymorphic functions in <tt class="docutils literal"><span class="pre">lxml.html</span></tt> that accept either a tree or
+a parsable string will return either a UTF-8 encoded byte string, a
+unicode string or a tree, based on the type of the input.
+Previously, the result was always a byte string or a tree.</li>
+<li>Support for Python 2.6 and 3.0 beta.</li>
+<li>File name handling now uses a heuristic to convert between byte
+strings (usually filenames) and unicode strings (usually URLs).</li>
+<li>Parsing from a plain file object frees the GIL under Python 2.x.</li>
+<li>Running <tt class="docutils literal"><span class="pre">iterparse()</span></tt> on a plain file (or filename) frees the GIL
+on reading under Python 2.x.</li>
+<li>Conversion functions <tt class="docutils literal"><span class="pre">html_to_xhtml()</span></tt> and <tt class="docutils literal"><span class="pre">xhtml_to_html()</span></tt> in
+lxml.html (experimental).</li>
+<li>Most features in lxml.html work for XHTML namespaced tag names
+(experimental).</li>
+</ul>
+</div>
+<div class="section" id="id57">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">ElementTree.parse()</span></tt> didn't handle target parser result.</li>
+<li>Crash in Element class lookup classes when the __init__() method of
+the super class is not called from Python subclasses.</li>
+<li>A number of problems related to unicode/byte string conversion of
+filenames and error messages were fixed.</li>
+<li>Building on MacOS-X now passes the &quot;flat_namespace&quot; option to the C
+compiler, which reportedly prevents build quirks and crashes on this
+platform.</li>
+<li>Windows build was broken.</li>
+<li>Rare crash when serialising to a file object with certain encodings.</li>
+</ul>
+</div>
+<div class="section" id="id58">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>Non-ASCII characters in attribute values are no longer escaped on
+serialisation.</li>
+<li>Passing non-ASCII byte strings or invalid unicode strings as .tag,
+namespaces, etc. will result in a ValueError instead of an
+AssertionError (just like the tag well-formedness check).</li>
+<li>Up to several times faster attribute access (i.e. tree traversal) in
+lxml.objectify.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id59">
+<h1>2.0.6 (2008-05-31)</h1>
+<div class="section" id="id60">
+<h2>Features added</h2>
+</div>
+<div class="section" id="id61">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Incorrect evaluation of <tt class="docutils literal"><span class="pre">el.find(&quot;tag[child]&quot;)</span></tt>.</li>
+<li>Windows build was broken.</li>
+<li>Moving a subtree from a document created in one thread into a
+document of another thread could crash when the rest of the source
+document is deleted while the subtree is still in use.</li>
+<li>Rare crash when serialising to a file object with certain encodings.</li>
+</ul>
+</div>
+<div class="section" id="id62">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>lxml should now build without problems on MacOS-X.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="beta2-2008-05-02">
+<h1>2.1beta2 (2008-05-02)</h1>
+<div class="section" id="id63">
+<h2>Features added</h2>
+<ul class="simple">
+<li>All parse functions in lxml.html take a <tt class="docutils literal"><span class="pre">parser</span></tt> keyword argument.</li>
+<li>lxml.html has a new parser class <tt class="docutils literal"><span class="pre">XHTMLParser</span></tt> and a module
+attribute <tt class="docutils literal"><span class="pre">xhtml_parser</span></tt> that provide XML parsers that are
+pre-configured for the lxml.html package.</li>
+</ul>
+</div>
+<div class="section" id="id64">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Moving a subtree from a document created in one thread into a
+document of another thread could crash when the rest of the source
+document is deleted while the subtree is still in use.</li>
+<li>Passing an nsmap when creating an Element will no longer strip
+redundantly defined namespace URIs.  This prevented the definition
+of more than one prefix for a namespace on the same Element.</li>
+</ul>
+</div>
+<div class="section" id="id65">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>If the default namespace is redundantly defined with a prefix on the
+same Element, the prefix will now be preferred for subelements and
+attributes.  This allows users to work around a problem in libxml2
+where attributes from the default namespace could serialise without
+a prefix even when they appear on an Element with a different
+namespace (i.e. they would end up in the wrong namespace).</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id66">
+<h1>2.0.5 (2008-05-01)</h1>
+<div class="section" id="id67">
+<h2>Features added</h2>
+</div>
+<div class="section" id="id68">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Resolving to a filename in custom resolvers didn't work.</li>
+<li>lxml did not honour libxslt's second error state &quot;STOPPED&quot;, which
+let some XSLT errors pass silently.</li>
+<li>Memory leak in Schematron with libxml2 &gt;= 2.6.31.</li>
+</ul>
+</div>
+<div class="section" id="id69">
+<h2>Other changes</h2>
+</div>
+</div>
+<div class="section" id="beta1-2008-04-15">
+<h1>2.1beta1 (2008-04-15)</h1>
+<div class="section" id="id70">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Error logging in Schematron (requires libxml2 2.6.32 or later).</li>
+<li>Parser option <tt class="docutils literal"><span class="pre">strip_cdata</span></tt> for normalising or keeping CDATA
+sections.  Defaults to <tt class="docutils literal"><span class="pre">True</span></tt> as before, thus replacing CDATA
+sections by their text content.</li>
+<li><tt class="docutils literal"><span class="pre">CDATA()</span></tt> factory to wrap string content as CDATA section.</li>
+</ul>
+</div>
+<div class="section" id="id71">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Resolving to a filename in custom resolvers didn't work.</li>
+<li>lxml did not honour libxslt's second error state &quot;STOPPED&quot;, which
+let some XSLT errors pass silently.</li>
+<li>Memory leak in Schematron with libxml2 &gt;= 2.6.31.</li>
+<li>lxml.etree accepted non well-formed namespace prefix names.</li>
+</ul>
+</div>
+<div class="section" id="id72">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>Major cleanup in internal <tt class="docutils literal"><span class="pre">moveNodeToDocument()</span></tt> function, which
+takes care of namespace cleanup when moving elements between
+different namespace contexts.</li>
+<li>New Elements created through the <tt class="docutils literal"><span class="pre">makeelement()</span></tt> method of an HTML
+parser or through lxml.html now end up in a new HTML document
+(doctype HTML 4.01 Transitional) instead of a generic XML document.
+This mostly impacts the serialisation and the availability of a DTD
+context.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id73">
+<h1>2.0.4 (2008-04-13)</h1>
+<div class="section" id="id74">
+<h2>Features added</h2>
+</div>
+<div class="section" id="id75">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Hanging thread in conjunction with GTK threading.</li>
+<li>Crash bug in iterparse when moving elements into other documents.</li>
+<li>HTML elements' <tt class="docutils literal"><span class="pre">.cssselect()</span></tt> method was broken.</li>
+<li><tt class="docutils literal"><span class="pre">ElementTree.find*()</span></tt> didn't accept QName objects.</li>
+</ul>
+</div>
+<div class="section" id="id76">
+<h2>Other changes</h2>
+</div>
+</div>
+<div class="section" id="alpha1-2008-03-27">
+<h1>2.1alpha1 (2008-03-27)</h1>
+<div class="section" id="id77">
+<h2>Features added</h2>
+<ul class="simple">
+<li>New event types 'comment' and 'pi' in <tt class="docutils literal"><span class="pre">iterparse()</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">XSLTAccessControl</span></tt> instances have a property <tt class="docutils literal"><span class="pre">options</span></tt> that
+returns a dict of access configuration options.</li>
+<li>Constant instances <tt class="docutils literal"><span class="pre">DENY_ALL</span></tt> and <tt class="docutils literal"><span class="pre">DENY_WRITE</span></tt> on
+<tt class="docutils literal"><span class="pre">XSLTAccessControl</span></tt> class.</li>
+<li>Extension elements for XSLT (experimental!)</li>
+<li><tt class="docutils literal"><span class="pre">Element.base</span></tt> property returns the xml:base or HTML base URL of
+an Element.</li>
+<li><tt class="docutils literal"><span class="pre">docinfo.URL</span></tt> property is writable.</li>
+</ul>
+</div>
+<div class="section" id="id78">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Default encoding for plain text serialisation was different from
+that of XML serialisation (UTF-8 instead of ASCII).</li>
+</ul>
+</div>
+<div class="section" id="id79">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>Minor API speed-ups.</li>
+<li>The benchmark suite now uses tail text in the trees, which makes the
+absolute numbers incomparable to previous results.</li>
+<li>Generating the HTML documentation now requires <a class="reference external" href="http://pygments.org/">Pygments</a>, which is
+used to enable syntax highlighting for the doctest examples.</li>
+</ul>
+<p>Most long-time deprecated functions and methods were removed:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.clearErrorLog()</span></tt>, use <tt class="docutils literal"><span class="pre">etree.clear_error_log()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.useGlobalPythonLog()</span></tt>, use
+<tt class="docutils literal"><span class="pre">etree.use_global_python_log()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.ElementClassLookup.setFallback()</span></tt>, use
+<tt class="docutils literal"><span class="pre">etree.ElementClassLookup.set_fallback()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.getDefaultParser()</span></tt>, use <tt class="docutils literal"><span class="pre">etree.get_default_parser()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.setDefaultParser()</span></tt>, use <tt class="docutils literal"><span class="pre">etree.set_default_parser()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.setElementClassLookup()</span></tt>, use
+<tt class="docutils literal"><span class="pre">etree.set_element_class_lookup()</span></tt></p>
+<p>Note that <tt class="docutils literal"><span class="pre">parser.setElementClassLookup()</span></tt> has not been removed
+yet, although <tt class="docutils literal"><span class="pre">parser.set_element_class_lookup()</span></tt> should be used
+instead.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">xpath_evaluator.registerNamespace()</span></tt>, use
+<tt class="docutils literal"><span class="pre">xpath_evaluator.register_namespace()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">xpath_evaluator.registerNamespaces()</span></tt>, use
+<tt class="docutils literal"><span class="pre">xpath_evaluator.register_namespaces()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">objectify.setPytypeAttributeTag</span></tt>, use
+<tt class="docutils literal"><span class="pre">objectify.set_pytype_attribute_tag</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">objectify.setDefaultParser()</span></tt>, use
+<tt class="docutils literal"><span class="pre">objectify.set_default_parser()</span></tt></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id80">
+<h1>2.0.3 (2008-03-26)</h1>
+<div class="section" id="id81">
+<h2>Features added</h2>
+<ul class="simple">
+<li>soupparser.parse() allows passing keyword arguments on to
+BeautifulSoup.</li>
+<li><tt class="docutils literal"><span class="pre">fromstring()</span></tt> method in <tt class="docutils literal"><span class="pre">lxml.html.soupparser</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="id82">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">lxml.html.diff</span></tt> didn't treat empty tags properly (e.g.,
+<tt class="docutils literal"><span class="pre">&lt;br&gt;</span></tt>).</li>
+<li>Handle entity replacements correctly in target parser.</li>
+<li>Crash when using <tt class="docutils literal"><span class="pre">iterparse()</span></tt> with XML Schema validation.</li>
+<li>The BeautifulSoup parser (soupparser.py) did not replace entities,
+which made them turn up in text content.</li>
+<li>Attribute assignment of custom PyTypes in objectify could fail to
+correctly serialise the value to a string.</li>
+</ul>
+</div>
+<div class="section" id="id83">
+<h2>Other changes</h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">lxml.html.ElementSoup</span></tt> was replaced by a new module
+<tt class="docutils literal"><span class="pre">lxml.html.soupparser</span></tt> with a more consistent API.  The old module
+remains for compatibility with ElementTree's own ElementSoup module.</li>
+<li>Setting the XSLT_CONFIG and XML2_CONFIG environment variables at
+build time will let setup.py pick up the <tt class="docutils literal"><span class="pre">xml2-config</span></tt> and
+<tt class="docutils literal"><span class="pre">xslt-config</span></tt> scripts from the supplied path name.</li>
+<li>Passing <tt class="docutils literal"><span class="pre">--with-xml2-config=/path/to/xml2-config</span></tt> to setup.py will
+override the <tt class="docutils literal"><span class="pre">xml2-config</span></tt> script that is used to determine the C
+compiler options.  The same applies for the <tt class="docutils literal"><span class="pre">--with-xslt-config</span></tt>
+option.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id84">
+<h1>2.0.2 (2008-02-22)</h1>
+<div class="section" id="id85">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Support passing <tt class="docutils literal"><span class="pre">base_url</span></tt> to file parser functions to override
+the filename of the file(-like) object.</li>
+</ul>
+</div>
+<div class="section" id="id86">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>The prefix for objectify's pytype namespace was missing from the set
+of default prefixes.</li>
+<li>Memory leak in Schematron (fixed only for libxml2 2.6.31+).</li>
+<li>Error type names in RelaxNG were reported incorrectly.</li>
+<li>Slice deletion bug fixed in objectify.</li>
+</ul>
+</div>
+<div class="section" id="id87">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>Enabled doctests for some Python modules (especially <tt class="docutils literal"><span class="pre">lxml.html</span></tt>).</li>
+<li>Add a <tt class="docutils literal"><span class="pre">method</span></tt> argument to <tt class="docutils literal"><span class="pre">lxml.html.tostring()</span></tt>
+(<tt class="docutils literal"><span class="pre">method=&quot;xml&quot;</span></tt> for XHTML output).</li>
+<li>Make it clearer that methods like <tt class="docutils literal"><span class="pre">lxml.html.fromstring()</span></tt> take a
+<tt class="docutils literal"><span class="pre">base_url</span></tt> argument.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id88">
+<h1>2.0.1 (2008-02-13)</h1>
+<div class="section" id="id89">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Child iteration in <tt class="docutils literal"><span class="pre">lxml.pyclasslookup</span></tt>.</li>
+<li>Loads of new docstrings reflect the signature of functions and
+methods to make them visible in API docs and <tt class="docutils literal"><span class="pre">help()</span></tt></li>
+</ul>
+</div>
+<div class="section" id="id90">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>The module <tt class="docutils literal"><span class="pre">lxml.html.builder</span></tt> was duplicated as
+<tt class="docutils literal"><span class="pre">lxml.htmlbuilder</span></tt></li>
+<li>Form elements would return None for <tt class="docutils literal"><span class="pre">form.fields.keys()</span></tt> if there
+was an unnamed input field.  Now unnamed input fields are completely
+ignored.</li>
+<li>Setting an element slice in objectify could insert slice-overlapping
+elements at the wrong position.</li>
+</ul>
+</div>
+<div class="section" id="id91">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>The generated API documentation was cleaned up and disburdened from
+non-public classes etc.</li>
+<li>The previously public module <tt class="docutils literal"><span class="pre">lxml.html.setmixin</span></tt> was renamed to
+<tt class="docutils literal"><span class="pre">lxml.html._setmixin</span></tt> as it is not an official part of lxml.  If
+you want to use it, feel free to copy it over to your own source
+base.</li>
+<li>Passing <tt class="docutils literal"><span class="pre">--with-xslt-config=/path/to/xslt-config</span></tt> to setup.py will
+override the <tt class="docutils literal"><span class="pre">xslt-config</span></tt> script that is used to determine the C
+compiler options.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id92">
+<h1>2.0 (2008-02-01)</h1>
+<div class="section" id="id93">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Passing the <tt class="docutils literal"><span class="pre">unicode</span></tt> type as <tt class="docutils literal"><span class="pre">encoding</span></tt> to <tt class="docutils literal"><span class="pre">tostring()</span></tt> will
+serialise to unicode.  The <tt class="docutils literal"><span class="pre">tounicode()</span></tt> function is now
+deprecated.</li>
+<li><tt class="docutils literal"><span class="pre">XMLSchema()</span></tt> and <tt class="docutils literal"><span class="pre">RelaxNG()</span></tt> can parse from StringIO.</li>
+<li><tt class="docutils literal"><span class="pre">makeparser()</span></tt> function in <tt class="docutils literal"><span class="pre">lxml.objectify</span></tt> to create a new
+parser with the usual objectify setup.</li>
+<li>Plain ASCII XPath string results are no longer forced into unicode
+objects as in 2.0beta1, but are returned as plain strings as before.</li>
+<li>All XPath string results are 'smart' objects that have a
+<tt class="docutils literal"><span class="pre">getparent()</span></tt> method to retrieve their parent Element.</li>
+<li><tt class="docutils literal"><span class="pre">with_tail</span></tt> option in serialiser functions.</li>
+<li>More accurate exception messages in validator creation.</li>
+<li>Parse-time XML schema validation (<tt class="docutils literal"><span class="pre">schema</span></tt> parser keyword).</li>
+<li>XPath string results of the <tt class="docutils literal"><span class="pre">text()</span></tt> function and attribute
+selection make their Element container accessible through a
+<tt class="docutils literal"><span class="pre">getparent()</span></tt> method.  As a side-effect, they are now always
+unicode objects (even ASCII strings).</li>
+<li><tt class="docutils literal"><span class="pre">XSLT</span></tt> objects are usable in any thread - at the cost of a deep
+copy if they were not created in that thread.</li>
+<li>Invalid entity names and character references will be rejected by
+the <tt class="docutils literal"><span class="pre">Entity()</span></tt> factory.</li>
+<li><tt class="docutils literal"><span class="pre">entity.text</span></tt> returns the textual representation of the entity,
+e.g. <tt class="docutils literal"><span class="pre">&amp;amp;</span></tt>.</li>
+<li>New properties <tt class="docutils literal"><span class="pre">position</span></tt> and <tt class="docutils literal"><span class="pre">code</span></tt> on ParseError exception (as
+in ET 1.3)</li>
+<li>Rich comparison of <tt class="docutils literal"><span class="pre">element.attrib</span></tt> proxies.</li>
+<li>ElementTree compatible TreeBuilder class.</li>
+<li>Use default prefixes for some common XML namespaces.</li>
+<li><tt class="docutils literal"><span class="pre">lxml.html.clean.Cleaner</span></tt> now allows for a <tt class="docutils literal"><span class="pre">host_whitelist</span></tt>, and
+two overridable methods: <tt class="docutils literal"><span class="pre">allow_embedded_url(el,</span> <span class="pre">url)</span></tt> and the
+more general <tt class="docutils literal"><span class="pre">allow_element(el)</span></tt>.</li>
+<li>Extended slicing of Elements as in <tt class="docutils literal"><span class="pre">element[1:-1:2]</span></tt>, both in
+etree and in objectify</li>
+<li>Resolvers can now provide a <tt class="docutils literal"><span class="pre">base_url</span></tt> keyword argument when
+resolving a document as string data.</li>
+<li>When using <tt class="docutils literal"><span class="pre">lxml.doctestcompare</span></tt> you can give the doctest option
+<tt class="docutils literal"><span class="pre">NOPARSE_MARKUP</span></tt> (like <tt class="docutils literal"><span class="pre">#</span> <span class="pre">doctest:</span> <span class="pre">+NOPARSE_MARKUP</span></tt>) to suppress
+the special checking for one test.</li>
+<li>Separate <tt class="docutils literal"><span class="pre">feed_error_log</span></tt> property for the feed parser interface.
+The normal parser interface and <tt class="docutils literal"><span class="pre">iterparse</span></tt> continue to use
+<tt class="docutils literal"><span class="pre">error_log</span></tt>.</li>
+<li>The normal parsers and the feed parser interface are now separated
+and can be used concurrently on the same parser instance.</li>
+<li><tt class="docutils literal"><span class="pre">fromstringlist()</span></tt> and <tt class="docutils literal"><span class="pre">tostringlist()</span></tt> functions as in
+ElementTree 1.3</li>
+<li><tt class="docutils literal"><span class="pre">iterparse()</span></tt> accepts an <tt class="docutils literal"><span class="pre">html</span></tt> boolean keyword argument for
+parsing with the HTML parser (note that this interface may be
+subject to change)</li>
+<li>Parsers accept an <tt class="docutils literal"><span class="pre">encoding</span></tt> keyword argument that overrides the encoding
+of the parsed documents.</li>
+<li>New C-API function <tt class="docutils literal"><span class="pre">hasChild()</span></tt> to test for children</li>
+<li><tt class="docutils literal"><span class="pre">annotate()</span></tt> function in objectify can annotate with Python types and XSI
+types in one step.  Accompanied by <tt class="docutils literal"><span class="pre">xsiannotate()</span></tt> and <tt class="docutils literal"><span class="pre">pyannotate()</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">ET.write()</span></tt>, <tt class="docutils literal"><span class="pre">tostring()</span></tt> and <tt class="docutils literal"><span class="pre">tounicode()</span></tt> now accept a keyword
+argument <tt class="docutils literal"><span class="pre">method</span></tt> that can be one of 'xml' (or None), 'html' or 'text' to
+serialise as XML, HTML or plain text content.</li>
+<li><tt class="docutils literal"><span class="pre">iterfind()</span></tt> method on Elements returns an iterator equivalent to
+<tt class="docutils literal"><span class="pre">findall()</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">itertext()</span></tt> method on Elements</li>
+<li>Setting a QName object as value of the .text property or as an attribute
+will resolve its prefix in the respective context</li>
+<li>ElementTree-like parser target interface as described in
+<a class="reference external" href="http://effbot.org/elementtree/elementtree-xmlparser.htm">http://effbot.org/elementtree/elementtree-xmlparser.htm</a></li>
+<li>ElementTree-like feed parser interface on XMLParser and HTMLParser
+(<tt class="docutils literal"><span class="pre">feed()</span></tt> and <tt class="docutils literal"><span class="pre">close()</span></tt> methods)</li>
+<li>Reimplemented <tt class="docutils literal"><span class="pre">objectify.E</span></tt> for better performance and improved
+integration with objectify.  Provides extended type support based on
+registered PyTypes.</li>
+<li>XSLT objects now support deep copying</li>
+<li>New <tt class="docutils literal"><span class="pre">makeSubElement()</span></tt> C-API function that allows creating a new
+subelement straight with text, tail and attributes.</li>
+<li>XPath extension functions can now access the current context node
+(<tt class="docutils literal"><span class="pre">context.context_node</span></tt>) and use a context dictionary
+(<tt class="docutils literal"><span class="pre">context.eval_context</span></tt>) from the context provided in their first
+parameter</li>
+<li>HTML tag soup parser based on BeautifulSoup in <tt class="docutils literal"><span class="pre">lxml.html.ElementSoup</span></tt></li>
+<li>New module <tt class="docutils literal"><span class="pre">lxml.doctestcompare</span></tt> by Ian Bicking for writing simplified
+doctests based on XML/HTML output.  Use by importing <tt class="docutils literal"><span class="pre">lxml.usedoctest</span></tt> or
+<tt class="docutils literal"><span class="pre">lxml.html.usedoctest</span></tt> from within a doctest.</li>
+<li>New module <tt class="docutils literal"><span class="pre">lxml.cssselect</span></tt> by Ian Bicking for selecting Elements with CSS
+selectors.</li>
+<li>New package <tt class="docutils literal"><span class="pre">lxml.html</span></tt> written by Ian Bicking for advanced HTML
+treatment.</li>
+<li>Namespace class setup is now local to the <tt class="docutils literal"><span class="pre">ElementNamespaceClassLookup</span></tt>
+instance and no longer global.</li>
+<li>Schematron validation (incomplete in libxml2)</li>
+<li>Additional <tt class="docutils literal"><span class="pre">stringify</span></tt> argument to <tt class="docutils literal"><span class="pre">objectify.PyType()</span></tt> takes a
+conversion function to strings to support setting text values from arbitrary
+types.</li>
+<li>Entity support through an <tt class="docutils literal"><span class="pre">Entity</span></tt> factory and element classes.  XML
+parsers now have a <tt class="docutils literal"><span class="pre">resolve_entities</span></tt> keyword argument that can be set to
+False to keep entities in the document.</li>
+<li><tt class="docutils literal"><span class="pre">column</span></tt> field on error log entries to accompany the <tt class="docutils literal"><span class="pre">line</span></tt> field</li>
+<li>Error specific messages in XPath parsing and evaluation
+NOTE: for evaluation errors, you will now get an XPathEvalError instead of
+an XPathSyntaxError.  To catch both, you can except on <tt class="docutils literal"><span class="pre">XPathError</span></tt></li>
+<li>The regular expression functions in XPath now support passing a node-set
+instead of a string</li>
+<li>Extended type annotation in objectify: new <tt class="docutils literal"><span class="pre">xsiannotate()</span></tt> function</li>
+<li>EXSLT RegExp support in standard XPath (not only XSLT)</li>
+</ul>
+</div>
+<div class="section" id="id94">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Missing import in <tt class="docutils literal"><span class="pre">lxml.html.clean</span></tt>.</li>
+<li>Some Python 2.4-isms prevented lxml from building/running under
+Python 2.3.</li>
+<li>XPath on ElementTrees could crash when selecting the virtual root
+node of the ElementTree.</li>
+<li>Compilation <tt class="docutils literal"><span class="pre">--without-threading</span></tt> was buggy in alpha5/6.</li>
+<li>Memory leak in the <tt class="docutils literal"><span class="pre">parse()</span></tt> function.</li>
+<li>Minor bugs in XSLT error message formatting.</li>
+<li>Result document memory leak in target parser.</li>
+<li>Target parser failed to report comments.</li>
+<li>In the <tt class="docutils literal"><span class="pre">lxml.html</span></tt> <tt class="docutils literal"><span class="pre">iter_links</span></tt> method, links in <tt class="docutils literal"><span class="pre">&lt;object&gt;</span></tt>
+tags weren't recognized.  (Note: plugin-specific link parameters
+still aren't recognized.)  Also, the <tt class="docutils literal"><span class="pre">&lt;embed&gt;</span></tt> tag, though not
+standard, is now included in <tt class="docutils literal"><span class="pre">lxml.html.defs.special_inline_tags</span></tt>.</li>
+<li>Using custom resolvers on XSLT stylesheets parsed from a string
+could request ill-formed URLs.</li>
+<li>With <tt class="docutils literal"><span class="pre">lxml.doctestcompare</span></tt> if you do <tt class="docutils literal"><span class="pre">&lt;tag</span> <span class="pre">xmlns=&quot;...&quot;&gt;</span></tt> in your
+output, it will then be namespace-neutral (before the ellipsis was
+treated as a real namespace).</li>
+<li>AttributeError in feed parser on parse errors</li>
+<li>XML feed parser setup problem</li>
+<li>Type annotation for unicode strings in <tt class="docutils literal"><span class="pre">DataElement()</span></tt></li>
+<li>lxml failed to serialise namespace declarations of elements other than the
+root node of a tree</li>
+<li>Race condition in XSLT where the resolver context leaked between concurrent
+XSLT calls</li>
+<li>lxml.etree did not check tag/attribute names</li>
+<li>The XML parser did not report undefined entities as error</li>
+<li>The text in exceptions raised by XML parsers, validators and XPath
+evaluators now reports the first error that occurred instead of the last</li>
+<li>Passing '' as XPath namespace prefix did not raise an error</li>
+<li>Thread safety in XPath evaluators</li>
+</ul>
+</div>
+<div class="section" id="id95">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>Exceptions carry only the part of the error log that is related to
+the operation that caused the error.</li>
+<li><tt class="docutils literal"><span class="pre">XMLSchema()</span></tt> and <tt class="docutils literal"><span class="pre">RelaxNG()</span></tt> now enforce passing the source
+file/filename through the <tt class="docutils literal"><span class="pre">file</span></tt> keyword argument.</li>
+<li>The test suite now skips most doctests under Python 2.3.</li>
+<li><tt class="docutils literal"><span class="pre">make</span> <span class="pre">clean</span></tt> no longer removes the .c files (use <tt class="docutils literal"><span class="pre">make</span>
+<span class="pre">realclean</span></tt> instead)</li>
+<li>Minor performance tweaks for Element instantiation and subelement
+creation</li>
+<li>Various places in the XPath, XSLT and iteration APIs now require
+keyword-only arguments.</li>
+<li>The argument order in <tt class="docutils literal"><span class="pre">element.itersiblings()</span></tt> was changed to
+match the order used in all other iteration methods.  The second
+argument ('preceding') is now a keyword-only argument.</li>
+<li>The <tt class="docutils literal"><span class="pre">getiterator()</span></tt> method on Elements and ElementTrees was
+reverted to return an iterator as it did in lxml 1.x.  The ET API
+specification allows it to return either a sequence or an iterator,
+and it traditionally returned a sequence in ET and an iterator in
+lxml.  However, it is now deprecated in favour of the <tt class="docutils literal"><span class="pre">iter()</span></tt>
+method, which should be used in new code wherever possible.</li>
+<li>The 'pretty printed' serialisation of ElementTree objects now
+inserts newlines at the root level between processing instructions,
+comments and the root tag.</li>
+<li>A 'pretty printed' serialisation is now terminated with a newline.</li>
+<li>Second argument to <tt class="docutils literal"><span class="pre">lxml.etree.Extension()</span></tt> helper is no longer
+required, third argument is now a keyword-only argument <tt class="docutils literal"><span class="pre">ns</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">lxml.html.tostring</span></tt> takes an <tt class="docutils literal"><span class="pre">encoding</span></tt> argument.</li>
+<li>The module source files were renamed to &quot;lxml.*.pyx&quot;, such as
+&quot;lxml.etree.pyx&quot;.  This was changed for consistency with the way
+Pyrex commonly handles package imports.  The main effect is that
+classes now know about their fully qualified class name, including
+the package name of their module.</li>
+<li>Keyword-only arguments in some API functions, especially in the
+parsers and serialisers.</li>
+<li>Tag name validation in lxml.etree (and lxml.html) now distinguishes
+between HTML tags and XML tags based on the parser that was used to
+parse or create them.  HTML tags no longer reject any non-ASCII
+characters in tag names but only spaces and the special characters
+<tt class="docutils literal"><span class="pre">&lt;&gt;&amp;/&quot;'</span></tt>.</li>
+<li>lxml.etree now emits a warning if you use XPath with libxml2 2.6.27
+(which can crash on certain XPath errors)</li>
+<li>Type annotation in objectify now preserves the already annotated type by
+default to prevent loosing type information that is already there.</li>
+<li><tt class="docutils literal"><span class="pre">element.getiterator()</span></tt> returns a list, use <tt class="docutils literal"><span class="pre">element.iter()</span></tt> to retrieve
+an iterator (ElementTree 1.3 compatible behaviour)</li>
+<li>objectify.PyType for None is now called &quot;NoneType&quot;</li>
+<li><tt class="docutils literal"><span class="pre">el.getiterator()</span></tt> renamed to <tt class="docutils literal"><span class="pre">el.iter()</span></tt>, following ElementTree 1.3 -
+original name is still available as alias</li>
+<li>In the public C-API, <tt class="docutils literal"><span class="pre">findOrBuildNodeNs()</span></tt> was replaced by the more
+generic <tt class="docutils literal"><span class="pre">findOrBuildNodeNsPrefix</span></tt></li>
+<li>Major refactoring in XPath/XSLT extension function code</li>
+<li>Network access in parsers disabled by default</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id96">
+<h1>1.3.6 (2007-10-29)</h1>
+<div class="section" id="id97">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Backported decref crash fix from 2.0</li>
+<li>Well hidden free-while-in-use crash bug in ObjectPath</li>
+</ul>
+</div>
+<div class="section" id="id98">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>The test suites now run <tt class="docutils literal"><span class="pre">gc.collect()</span></tt> in the <tt class="docutils literal"><span class="pre">tearDown()</span></tt>
+methods.  While this makes them take a lot longer to run, it also
+makes it easier to link a specific test to garbage collection
+problems that would otherwise appear in later tests.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id99">
+<h1>1.3.5 (2007-10-22)</h1>
+<div class="section" id="id100">
+<h2>Features added</h2>
+</div>
+<div class="section" id="id101">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>lxml.etree could crash when adding more than 10000 namespaces to a
+document</li>
+<li>lxml failed to serialise namespace declarations of elements other
+than the root node of a tree</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id102">
+<h1>1.3.4 (2007-08-30)</h1>
+<div class="section" id="id103">
+<h2>Features added</h2>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">ElementMaker</span></tt> in <tt class="docutils literal"><span class="pre">lxml.builder</span></tt> now accepts the keyword arguments
+<tt class="docutils literal"><span class="pre">namespace</span></tt> and <tt class="docutils literal"><span class="pre">nsmap</span></tt> to set a namespace and nsmap for the Elements it
+creates.</li>
+<li>The <tt class="docutils literal"><span class="pre">docinfo</span></tt> on ElementTree objects has new properties <tt class="docutils literal"><span class="pre">internalDTD</span></tt>
+and <tt class="docutils literal"><span class="pre">externalDTD</span></tt> that return a DTD object for the internal or external
+subset of the document respectively.</li>
+<li>Serialising an ElementTree now includes any internal DTD subsets that are
+part of the document, as well as comments and PIs that are siblings of the
+root node.</li>
+</ul>
+</div>
+<div class="section" id="id104">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Parsing with the <tt class="docutils literal"><span class="pre">no_network</span></tt> option could fail</li>
+</ul>
+</div>
+<div class="section" id="id105">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>lxml now raises a TagNameWarning about tag names containing ':' instead of
+an Error as 1.3.3 did.  The reason is that a number of projects currently
+misuse the previous lack of tag name validation to generate namespace
+prefixes without declaring namespaces.  Apart from the danger of generating
+broken XML this way, it also breaks most of the namespace-aware tools in
+XML, including XPath, XSLT and validation.  lxml 1.3.x will continue to
+support this bug with a Warning, while lxml 2.0 will be strict about
+well-formed tag names (not only regarding ':').</li>
+<li>Serialising an Element no longer includes its comment and PI siblings (only
+ElementTree serialisation includes them).</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id106">
+<h1>1.3.3 (2007-07-26)</h1>
+<div class="section" id="id107">
+<h2>Features added</h2>
+<ul class="simple">
+<li>ElementTree compatible parser <tt class="docutils literal"><span class="pre">ETCompatXMLParser</span></tt> strips processing
+instructions and comments while parsing XML</li>
+<li>Parsers now support stripping PIs (keyword argument 'remove_pis')</li>
+<li><tt class="docutils literal"><span class="pre">etree.fromstring()</span></tt> now supports parsing both HTML and XML, depending on
+the parser you pass.</li>
+<li>Support <tt class="docutils literal"><span class="pre">base_url</span></tt> keyword argument in <tt class="docutils literal"><span class="pre">HTML()</span></tt> and <tt class="docutils literal"><span class="pre">XML()</span></tt></li>
+</ul>
+</div>
+<div class="section" id="id108">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Parsing from Python Unicode strings failed on some platforms</li>
+<li><tt class="docutils literal"><span class="pre">Element()</span></tt> did not raise an exception on tag names containing ':'</li>
+<li><tt class="docutils literal"><span class="pre">Element.getiterator(tag)</span></tt> did not accept <tt class="docutils literal"><span class="pre">Comment</span></tt> and
+<tt class="docutils literal"><span class="pre">ProcessingInstruction</span></tt> as tags. It also accepts <tt class="docutils literal"><span class="pre">Element</span></tt> now.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id109">
+<h1>1.3.2 (2007-07-03)</h1>
+<div class="section" id="id110">
+<h2>Features added</h2>
+</div>
+<div class="section" id="id111">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>&quot;deallocating None&quot; crash bug</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id112">
+<h1>1.3.1 (2007-07-02)</h1>
+<div class="section" id="id113">
+<h2>Features added</h2>
+<ul class="simple">
+<li>objectify.DataElement now supports setting values from existing data
+elements (not just plain Python types) and reuses defined namespaces etc.</li>
+<li>E-factory support for lxml.objectify (<tt class="docutils literal"><span class="pre">objectify.E</span></tt>)</li>
+</ul>
+</div>
+<div class="section" id="id114">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Better way to prevent crashes in Element proxy cleanup code</li>
+<li>objectify.DataElement didn't set up None value correctly</li>
+<li>objectify.DataElement didn't check the value against the provided type hints</li>
+<li>Reference-counting bug in <tt class="docutils literal"><span class="pre">Element.attrib.pop()</span></tt></li>
+</ul>
+</div>
+</div>
+<div class="section" id="id115">
+<h1>1.3 (2007-06-24)</h1>
+<div class="section" id="id116">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Module <tt class="docutils literal"><span class="pre">lxml.pyclasslookup</span></tt> module implements an Element class lookup
+scheme that can access the entire tree in read-only mode to help determining
+a suitable Element class</li>
+<li>Parsers take a <tt class="docutils literal"><span class="pre">remove_comments</span></tt> keyword argument that skips over comments</li>
+<li><tt class="docutils literal"><span class="pre">parse()</span></tt> function in <tt class="docutils literal"><span class="pre">objectify</span></tt>, corresponding to <tt class="docutils literal"><span class="pre">XML()</span></tt> etc.</li>
+<li><tt class="docutils literal"><span class="pre">Element.addnext(el)</span></tt> and <tt class="docutils literal"><span class="pre">Element.addprevious(el)</span></tt> methods to support
+adding processing instructions and comments around the root node</li>
+<li><tt class="docutils literal"><span class="pre">Element.attrib</span></tt> was missing <tt class="docutils literal"><span class="pre">clear()</span></tt> and <tt class="docutils literal"><span class="pre">pop()</span></tt> methods</li>
+<li>Extended type annotation in objectify: cleaner annotation namespace setup
+plus new <tt class="docutils literal"><span class="pre">deannotate()</span></tt> function</li>
+<li>Support for custom Element class instantiation in lxml.sax: passing a
+<tt class="docutils literal"><span class="pre">makeelement</span></tt> function to the ElementTreeContentHandler will reuse the
+lookup context of that function</li>
+<li>'.' represents empty ObjectPath (identity)</li>
+<li><tt class="docutils literal"><span class="pre">Element.values()</span></tt> to accompany the existing <tt class="docutils literal"><span class="pre">.keys()</span></tt> and <tt class="docutils literal"><span class="pre">.items()</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">collectAttributes()</span></tt> C-function to build a list of attribute
+keys/values/items for a libxml2 node</li>
+<li><tt class="docutils literal"><span class="pre">DTD</span></tt> validator class (like <tt class="docutils literal"><span class="pre">RelaxNG</span></tt> and <tt class="docutils literal"><span class="pre">XMLSchema</span></tt>)</li>
+<li>HTML generator helpers by Fredrik Lundh in <tt class="docutils literal"><span class="pre">lxml.htmlbuilder</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ElementMaker</span></tt> XML generator by Fredrik Lundh in <tt class="docutils literal"><span class="pre">lxml.builder.E</span></tt></li>
+<li>Support for pickeling <tt class="docutils literal"><span class="pre">objectify.ObjectifiedElement</span></tt> objects to XML</li>
+<li><tt class="docutils literal"><span class="pre">update()</span></tt> method on Element.attrib</li>
+<li>Optimised replacement for libxml2's _xmlReconsiliateNs(). This allows lxml
+a better handling of namespaces when moving elements between documents.</li>
+</ul>
+</div>
+<div class="section" id="id117">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Removing Elements from a tree could make them loose their namespace
+declarations</li>
+<li><tt class="docutils literal"><span class="pre">ElementInclude</span></tt> didn't honour base URL of original document</li>
+<li>Replacing the children slice of an Element would cut off the tails of the
+original children</li>
+<li><tt class="docutils literal"><span class="pre">Element.getiterator(tag)</span></tt> did not accept <tt class="docutils literal"><span class="pre">Comment</span></tt> and
+<tt class="docutils literal"><span class="pre">ProcessingInstruction</span></tt> as tags</li>
+<li>API functions now check incoming strings for XML conformity.  Zero bytes or
+low ASCII characters are no longer accepted (AssertionError).</li>
+<li>XSLT parsing failed to pass resolver context on to imported documents</li>
+<li>passing '' as namespace prefix in nsmap could be passed through to libxml2</li>
+<li>Objectify couldn't handle prefixed XSD type names in <tt class="docutils literal"><span class="pre">xsi:type</span></tt></li>
+<li>More ET compatible behaviour when writing out XML declarations or not</li>
+<li>More robust error handling in <tt class="docutils literal"><span class="pre">iterparse()</span></tt></li>
+<li>Documents lost their top-level PIs and comments on serialisation</li>
+<li>lxml.sax failed on comments and PIs. Comments are now properly ignored and
+PIs are copied.</li>
+<li>Possible memory leaks in namespace handling when moving elements between
+documents</li>
+</ul>
+</div>
+<div class="section" id="id118">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>major restructuring in the documentation</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id119">
+<h1>1.2.1 (2007-02-27)</h1>
+<div class="section" id="id120">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Build fixes for MS compiler</li>
+<li>Item assignments to special names like <tt class="docutils literal"><span class="pre">element[&quot;text&quot;]</span></tt> failed</li>
+<li>Renamed ObjectifiedDataElement.__setText() to _setText() to make it easier
+to access</li>
+<li>The pattern for attribute names in ObjectPath was too restrictive</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id121">
+<h1>1.2 (2007-02-20)</h1>
+<div class="section" id="id122">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Rich comparison of QName objects</li>
+<li>Support for regular expressions in benchmark selection</li>
+<li>get/set emulation (not .attrib!) for attributes on processing instructions</li>
+<li>ElementInclude Python module for ElementTree compatible XInclude processing
+that honours custom resolvers registered with the source document</li>
+<li>ElementTree.parser property holds the parser used to parse the document</li>
+<li>setup.py has been refactored for greater readability and flexibility</li>
+<li>--rpath flag to setup.py to induce automatic linking-in of dynamic library
+runtime search paths has been renamed to --auto-rpath. This makes it
+possible to pass an --rpath directly to distutils; previously this was being
+shadowed.</li>
+</ul>
+</div>
+<div class="section" id="id123">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Element instantiation now uses locks to prevent race conditions with threads</li>
+<li>ElementTree.write() did not raise an exception when the file was not writable</li>
+<li>Error handling could crash under Python &lt;= 2.4.1 - fixed by disabling thread
+support in these environments</li>
+<li>Element.find*() did not accept QName objects as path</li>
+</ul>
+</div>
+<div class="section" id="id124">
+<h2>Other changes</h2>
+<ul class="simple">
+<li>code cleanup: redundant _NodeBase super class merged into _Element class
+Note: although the impact should be zero in most cases, this change breaks
+the compatibiliy of the public C-API</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id125">
+<h1>1.1.2 (2006-10-30)</h1>
+<div class="section" id="id126">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Data elements in objectify support repr(), which is now used by dump()</li>
+<li>Source distribution now ships with a patched Pyrex</li>
+<li>New C-API function makeElement() to create new elements with text,
+tail, attributes and namespaces</li>
+<li>Reuse original parser flags for XInclude</li>
+<li>Simplified support for handling XSLT processing instructions</li>
+</ul>
+</div>
+<div class="section" id="id127">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Parser resources were not freed before the next parser run</li>
+<li>Open files and XML strings returned by Python resolvers were not
+closed/freed</li>
+<li>Crash in the IDDict returned by XMLDTDID</li>
+<li>Copying Comments and ProcessingInstructions failed</li>
+<li>Memory leak for external URLs in _XSLTProcessingInstruction.parseXSL()</li>
+<li>Memory leak when garbage collecting tailed root elements</li>
+<li>HTML script/style content was not propagated to .text</li>
+<li>Show text xincluded between text nodes correctly in .text and .tail</li>
+<li>'integer * objectify.StringElement' operation was not supported</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id128">
+<h1>1.1.1 (2006-09-21)</h1>
+<div class="section" id="id129">
+<h2>Features added</h2>
+<ul class="simple">
+<li>XSLT profiling support (<tt class="docutils literal"><span class="pre">profile_run</span></tt> keyword)</li>
+<li>countchildren() method on objectify.ObjectifiedElement</li>
+<li>Support custom elements for tree nodes in lxml.objectify</li>
+</ul>
+</div>
+<div class="section" id="id130">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>lxml.objectify failed to support long data values (e.g., &quot;123L&quot;)</li>
+<li>Error messages from XSLT did not reach <tt class="docutils literal"><span class="pre">XSLT.error_log</span></tt></li>
+<li>Factories objectify.Element() and objectify.DataElement() were missing
+<tt class="docutils literal"><span class="pre">attrib</span></tt> and <tt class="docutils literal"><span class="pre">nsmap</span></tt> keyword arguments</li>
+<li>Changing the default parser in lxml.objectify did not update the factories
+Element() and DataElement()</li>
+<li>Let lxml.objectify.Element() always generate tree elements (not data
+elements)</li>
+<li>Build under Windows failed ('0' bug in patched Pyrex version)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id131">
+<h1>1.1 (2006-09-13)</h1>
+<div class="section" id="id132">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Comments and processing instructions return '&lt;!-- coment --&gt;' and
+'&lt;?pi-target content?&gt;' for repr()</li>
+<li>Parsers are now the preferred (and default) place where element class lookup
+schemes should be registered.  Namespace lookup is no longer supported by
+default.</li>
+<li>Support for Python 2.5 beta</li>
+<li>Unlock the GIL for deep copying documents and for XPath()</li>
+<li>New <tt class="docutils literal"><span class="pre">compact</span></tt> keyword argument for parsing read-only documents</li>
+<li>Support for parser options in iterparse()</li>
+<li>The <tt class="docutils literal"><span class="pre">namespace</span></tt> axis is supported in XPath and returns (prefix, URI)
+tuples</li>
+<li>The XPath expression &quot;/&quot; now returns an empty list instead of raising an
+exception</li>
+<li>XML-Object API on top of lxml (lxml.objectify)</li>
+<li>Customizable Element class lookup:<ul>
+<li>different pre-implemented lookup mechanisms</li>
+<li>support for externally provided lookup functions</li>
+</ul>
+</li>
+<li>Support for processing instructions (ET-like, not compatible)</li>
+<li>Public C-level API for independent extension modules</li>
+<li>Module level <tt class="docutils literal"><span class="pre">iterwalk()</span></tt> function as 'iterparse' for trees</li>
+<li>Module level <tt class="docutils literal"><span class="pre">iterparse()</span></tt> function similar to ElementTree (see
+documentation for differences)</li>
+<li>Element.nsmap property returns a mapping of all namespace prefixes known at
+the Element to their namespace URI</li>
+<li>Reentrant threading support in RelaxNG, XMLSchema and XSLT</li>
+<li>Threading support in parsers and serializers:<ul>
+<li>All in-memory operations (tostring, parse(StringIO), etc.) free the GIL</li>
+<li>File operations (on file names) free the GIL</li>
+<li>Reading from file-like objects frees the GIL and reacquires it for reading</li>
+<li>Serialisation to file-like objects is single-threaded (high lock overhead)</li>
+</ul>
+</li>
+<li>Element iteration over XPath axes:<ul>
+<li>Element.iterdescendants() iterates over the descendants of an element</li>
+<li>Element.iterancestors() iterates over the ancestors of an element (from
+parent to parent)</li>
+<li>Element.itersiblings() iterates over either the following or preceding
+siblings of an element</li>
+<li>Element.iterchildren() iterates over the children of an element in either
+direction</li>
+<li>All iterators support the <tt class="docutils literal"><span class="pre">tag</span></tt> keyword argument to restrict the
+generated elements</li>
+</ul>
+</li>
+<li>Element.getnext() and Element.getprevious() return the direct siblings of an
+element</li>
+</ul>
+</div>
+<div class="section" id="id133">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>filenames with local 8-bit encoding were not supported</li>
+<li>1.1beta did not compile under Python 2.3</li>
+<li>ignore unknown 'pyval' attribute values in objectify</li>
+<li>objectify.ObjectifiedElement.addattr() failed to accept Elements and Lists</li>
+<li>objectify.ObjectPath.setattr() failed to accept Elements and Lists</li>
+<li>XPathSyntaxError now inherits from XPathError</li>
+<li>Threading race conditions in RelaxNG and XMLSchema</li>
+<li>Crash when mixing elements from XSLT results into other trees, concurrent
+XSLT is only allowed when the stylesheet was parsed in the main thread</li>
+<li>The EXSLT <tt class="docutils literal"><span class="pre">regexp:match</span></tt> function now works as defined (except for some
+differences in the regular expression syntax)</li>
+<li>Setting element.text to '' returned None on request, not the empty string</li>
+<li><tt class="docutils literal"><span class="pre">iterparse()</span></tt> could crash on long XML files</li>
+<li>Creating documents no longer copies the parser for later URL resolving.  For
+performance reasons, only a reference is kept.  Resolver updates on the
+parser will now be reflected by documents that were parsed before the
+change.  Although this should rarely become visible, it is a behavioral
+change from 1.0.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id134">
+<h1>1.0.4 (2006-09-09)</h1>
+<div class="section" id="id135">
+<h2>Features added</h2>
+<ul class="simple">
+<li>List-like <tt class="docutils literal"><span class="pre">Element.extend()</span></tt> method</li>
+</ul>
+</div>
+<div class="section" id="id136">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Crash in tail handling in <tt class="docutils literal"><span class="pre">Element.replace()</span></tt></li>
+</ul>
+</div>
+</div>
+<div class="section" id="id137">
+<h1>1.0.3 (2006-08-08)</h1>
+<div class="section" id="id138">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Element.replace(old, new) method to replace a subelement by another one</li>
+</ul>
+</div>
+<div class="section" id="id139">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Crash when mixing elements from XSLT results into other trees</li>
+<li>Copying/deepcopying did not work for ElementTree objects</li>
+<li>Setting an attribute to a non-string value did not raise an exception</li>
+<li>Element.remove() deleted the tail text from the removed Element</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id140">
+<h1>1.0.2 (2006-06-27)</h1>
+<div class="section" id="id141">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Support for setting a custom default Element class as opposed to namespace
+specific classes (which still override the default class)</li>
+</ul>
+</div>
+<div class="section" id="id142">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Rare exceptions in Python list functions were not handled</li>
+<li>Parsing accepted unicode strings with XML encoding declaration in certain
+cases</li>
+<li>Parsing 8-bit encoded strings from StringIO objects raised an exception</li>
+<li>Module function <tt class="docutils literal"><span class="pre">initThread()</span></tt> was removed - useless (and never worked)</li>
+<li>XSLT and parser exception messages include the error line number</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id143">
+<h1>1.0.1 (2006-06-09)</h1>
+<div class="section" id="id144">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Repeated calls to Element.attrib now efficiently return the same instance</li>
+</ul>
+</div>
+<div class="section" id="id145">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Document deallocation could crash in certain garbage collection scenarios</li>
+<li>Extension function calls in XSLT variable declarations could break the
+stylesheet and crash on repeated calls</li>
+<li>Deep copying Elements could loose namespaces declared in parents</li>
+<li>Deep copying Elements did not copy tail</li>
+<li>Parsing file(-like) objects failed to load external entities</li>
+<li>Parsing 8-bit strings from file(-like) objects raised an exception</li>
+<li>xsl:include failed when the stylesheet was parsed from a file-like object</li>
+<li>lxml.sax.ElementTreeProducer did not call startDocument() / endDocument()</li>
+<li>MSVC compiler complained about long strings (supports only 2048 bytes)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id146">
+<h1>1.0 (2006-06-01)</h1>
+<div class="section" id="id147">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Element.getiterator() and the findall() methods support finding arbitrary
+elements from a namespace (pattern <tt class="docutils literal"><span class="pre">{namespace}*</span></tt>)</li>
+<li>Another speedup in tree iteration code</li>
+<li>General speedup of Python Element object creation and deallocation</li>
+<li>Writing C14N no longer serializes in memory (reduced memory footprint)</li>
+<li>PyErrorLog for error logging through the Python <tt class="docutils literal"><span class="pre">logging</span></tt> module</li>
+<li><tt class="docutils literal"><span class="pre">Element.getroottree()</span></tt> returns an ElementTree for the root node of the
+document that contains the element.</li>
+<li>ElementTree.getpath(element) returns a simple, absolute XPath expression to
+find the element in the tree structure</li>
+<li>Error logs have a <tt class="docutils literal"><span class="pre">last_error</span></tt> attribute for convenience</li>
+<li>Comment texts can be changed through the API</li>
+<li>Formatted output via <tt class="docutils literal"><span class="pre">pretty_print</span></tt> keyword in serialization functions</li>
+<li>XSLT can block access to file system and network via <tt class="docutils literal"><span class="pre">XSLTAccessControl</span></tt></li>
+<li>ElementTree.write() no longer serializes in memory (reduced memory
+footprint)</li>
+<li>Speedup of Element.findall(tag) and Element.getiterator(tag)</li>
+<li>Support for writing the XML representation of Elements and ElementTrees to
+Python unicode strings via <tt class="docutils literal"><span class="pre">etree.tounicode()</span></tt></li>
+<li>Support for writing XSLT results to Python unicode strings via <tt class="docutils literal"><span class="pre">unicode()</span></tt></li>
+<li>Parsing a unicode string no longer copies the string (reduced memory
+footprint)</li>
+<li>Parsing file-like objects reads chunks rather than the whole file (reduced
+memory footprint)</li>
+<li>Parsing StringIO objects from the start avoids copying the string (reduced
+memory footprint)</li>
+<li>Read-only 'docinfo' attribute in ElementTree class holds DOCTYPE
+information, original encoding and XML version as seen by the parser</li>
+<li>etree module can be compiled without libxslt by commenting out the line
+<tt class="docutils literal"><span class="pre">include</span> <span class="pre">&quot;xslt.pxi&quot;</span></tt> near the end of the etree.pyx source file</li>
+<li>Better error messages in parser exceptions</li>
+<li>Error reporting also works in XSLT</li>
+<li>Support for custom document loaders (URI resolvers) in parsers and XSLT,
+resolvers are registered at parser level</li>
+<li>Implementation of exslt:regexp for XSLT based on the Python 're' module,
+enabled by default, can be switched off with 'regexp=False' keyword argument</li>
+<li>Support for exslt extensions (libexslt) and libxslt extra functions
+(node-set, document, write, output)</li>
+<li>Substantial speedup in XPath.evaluate()</li>
+<li>HTMLParser for parsing (broken) HTML</li>
+<li>XMLDTDID function parses XML into tuple (root node, ID dict) based on xml:id
+implementation of libxml2 (as opposed to ET compatible XMLID)</li>
+</ul>
+</div>
+<div class="section" id="id148">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Memory leak in Element.__setitem__</li>
+<li>Memory leak in Element.attrib.items() and Element.attrib.values()</li>
+<li>Memory leak in XPath extension functions</li>
+<li>Memory leak in unicode related setup code</li>
+<li>Element now raises ValueError on empty tag names</li>
+<li>Namespace fixing after moving elements between documents could fail if the
+source document was freed too early</li>
+<li>Setting namespace-less tag names on namespaced elements ('{ns}t' -&gt; 't')
+didn't reset the namespace</li>
+<li>Unknown constants from newer libxml2 versions could raise exceptions in the
+error handlers</li>
+<li>lxml.etree compiles much faster</li>
+<li>On libxml2 &lt;= 2.6.22, parsing strings with encoding declaration could fail
+in certain cases</li>
+<li>Document reference in ElementTree objects was not updated when the root
+element was moved to a different document</li>
+<li>Running absolute XPath expressions on an Element now evaluates against the
+root tree</li>
+<li>Evaluating absolute XPath expressions (<tt class="docutils literal"><span class="pre">/*</span></tt>) on an ElementTree could fail</li>
+<li>Crashes when calling XSLT, RelaxNG, etc. with uninitialized ElementTree
+objects</li>
+<li>Removed public function <tt class="docutils literal"><span class="pre">initThreadLogging()</span></tt>, replaced by more general
+<tt class="docutils literal"><span class="pre">initThread()</span></tt> which fixes a number of setup problems in threads</li>
+<li>Memory leak when using iconv encoders in tostring/write</li>
+<li>Deep copying Elements and ElementTrees maintains the document information</li>
+<li>Serialization functions raise LookupError for unknown encodings</li>
+<li>Memory deallocation crash resulting from deep copying elements</li>
+<li>Some ElementTree methods could crash if the root node was not initialized
+(neither file nor element passed to the constructor)</li>
+<li>Element/SubElement failed to set attribute namespaces from passed <tt class="docutils literal"><span class="pre">attrib</span></tt>
+dictionary</li>
+<li><tt class="docutils literal"><span class="pre">tostring()</span></tt> adds an XML declaration for non-ASCII encodings</li>
+<li><tt class="docutils literal"><span class="pre">tostring()</span></tt> failed to serialize encodings that contain 0-bytes</li>
+<li>ElementTree.xpath() and XPathDocumentEvaluator were not using the
+ElementTree root node as reference point</li>
+<li>Calling <tt class="docutils literal"><span class="pre">document('')</span></tt> in XSLT failed to return the stylesheet</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id149">
+<h1>0.9.2 (2006-05-10)</h1>
+<div class="section" id="id150">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Speedup for Element.makeelement(): the new element reuses the original
+libxml2 document instead of creating a new empty one</li>
+<li>Speedup for reversed() iteration over element children (Py2.4+ only)</li>
+<li>ElementTree compatible QName class</li>
+<li>RelaxNG and XMLSchema accept any Element, not only ElementTrees</li>
+</ul>
+</div>
+<div class="section" id="id151">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>str(xslt_result) was broken for XSLT output other than UTF-8</li>
+<li>Memory leak if write_c14n fails to write the file after conversion</li>
+<li>Crash in XMLSchema and RelaxNG when passing non-schema documents</li>
+<li>Memory leak in RelaxNG() when RelaxNGParseError is raised</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id152">
+<h1>0.9.1 (2006-03-30)</h1>
+<div class="section" id="id153">
+<h2>Features added</h2>
+<ul class="simple">
+<li>lxml.sax.ElementTreeContentHandler checks closing elements and raises
+SaxError on mismatch</li>
+<li>lxml.sax.ElementTreeContentHandler supports namespace-less SAX events
+(startElement, endElement) and defaults to empty attributes (keyword
+argument)</li>
+<li>Speedup for repeatedly accessing element tag names</li>
+<li>Minor API performance improvements</li>
+</ul>
+</div>
+<div class="section" id="id154">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Memory deallocation bug when using XSLT output method &quot;html&quot;</li>
+<li>sax.py was handling UTF-8 encoded tag names where it shouldn't</li>
+<li>lxml.tests package will no longer be installed (is still in source tar)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id155">
+<h1>0.9 (2006-03-20)</h1>
+<div class="section" id="id156">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Error logging API for libxml2 error messages</li>
+<li>Various performance improvements</li>
+<li>Benchmark script for lxml, ElementTree and cElementTree</li>
+<li>Support for registering extension functions through new FunctionNamespace
+class (see doc/extensions.txt)</li>
+<li>ETXPath class for XPath expressions in ElementTree notation ('//{ns}tag')</li>
+<li>Support for variables in XPath expressions (also in XPath class)</li>
+<li>XPath class for compiled XPath expressions</li>
+<li>XMLID module level function (ElementTree compatible)</li>
+<li>XMLParser API for customized libxml2 parser configuration</li>
+<li>Support for custom Element classes through new Namespace API (see
+doc/namespace_extensions.txt)</li>
+<li>Common exception base class LxmlError for module exceptions</li>
+<li>real iterator support in iter(Element), Element.getiterator()</li>
+<li>XSLT objects are callable, result trees support str()</li>
+<li>Added MANIFEST.in for easier creation of RPM files.</li>
+<li>'getparent' method on elements allows navigation to an element's
+parent element.</li>
+<li>Python core compatible SAX tree builder and SAX event generator. See
+doc/sax.txt for more information.</li>
+</ul>
+</div>
+<div class="section" id="id157">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Segfaults and memory leaks in various API functions of Element</li>
+<li>Segfault in XSLT.tostring()</li>
+<li>ElementTree objects no longer interfere, Elements can be root of different
+ElementTrees at the same time</li>
+<li>document('') works in XSLT documents read from files (in-memory documents
+cannot support this due to libxslt deficiencies)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id158">
+<h1>0.8 (2005-11-03)</h1>
+<div class="section" id="id159">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Support for copy.deepcopy() on elements. copy.copy() works also, but
+does the same thing, and does <em>not</em> create a shallow copy, as that
+makes no sense in the context of libxml2 trees. This means a
+potential incompatibility with ElementTree, but there's more chance
+that it works than if copy.copy() isn't supported at all.</li>
+<li>Increased compatibility with (c)ElementTree; .parse() on ElementTree is
+supported and parsing of gzipped XML files works.</li>
+<li>implemented index() on elements, allowing one to find the index of a
+SubElement.</li>
+</ul>
+</div>
+<div class="section" id="id160">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Use xslt-config instead of xml2-config to find out libxml2
+directories to take into account a case where libxslt is installed
+in a different directory than libxslt.</li>
+<li>Eliminate crash condition in iteration when text nodes are changed.</li>
+<li>Passing 'None' to tostring() does not result in a segfault anymore,
+but an AssertionError.</li>
+<li>Some test fixes for Windows.</li>
+<li>Raise XMLSyntaxError and XPathSyntaxError instead of plain python
+syntax errors. This should be less confusing.</li>
+<li>Fixed error with uncaught exception in Pyrex code.</li>
+<li>Calling lxml.etree.fromstring('') throws XMLSyntaxError instead of a
+segfault.</li>
+<li>has_key() works on attrib. 'in' tests also work correctly on attrib.</li>
+<li>INSTALL.txt was saying 2.2.16 instead of 2.6.16 as a supported
+libxml2 version, as it should.</li>
+<li>Passing a UTF-8 encoded string to the XML() function would fail;
+fixed.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id161">
+<h1>0.7 (2005-06-15)</h1>
+<div class="section" id="id162">
+<h2>Features added</h2>
+<ul class="simple">
+<li>parameters (XPath expressions) can be passed to XSLT using keyword
+parameters.</li>
+<li>Simple XInclude support. Calling the xinclude() method on a tree
+will process any XInclude statements in the document.</li>
+<li>XMLSchema support. Use the XMLSchema class or the convenience
+xmlschema() method on a tree to do XML Schema (XSD) validation.</li>
+<li>Added convenience xslt() method on tree. This is less efficient
+than the XSLT object, but makes it easier to write quick code.</li>
+<li>Added convenience relaxng() method on tree. This is less efficient
+than the RelaxNG object, but makes it easier to write quick code.</li>
+<li>Make it possible to use XPathEvaluator with elements as well. The
+XPathEvaluator in this case will retain the element so multiple
+XPath queries can be made against one element efficiently. This
+replaces the second argument to the .evaluate() method that existed
+previously.</li>
+<li>Allow registerNamespace() to be called on an XPathEvaluator, after
+creation, to add additional namespaces. Also allow registerNamespaces(),
+which does the same for a namespace dictionary.</li>
+<li>Add 'prefix' attribute to element to be able to read prefix information.
+This is entirely read-only.</li>
+<li>It is possible to supply an extra nsmap keyword parameter to
+the Element() and SubElement() constructors, which supplies a
+prefix to namespace URI mapping. This will create namespace
+prefix declarations on these elements and these prefixes will show up
+in XML serialization.</li>
+</ul>
+</div>
+<div class="section" id="id163">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Killed yet another memory management related bug: trees created
+using newDoc would not get a libxml2-level dictionary, which caused
+problems when deallocating these documents later if they contained a
+node that came from a document with a dictionary.</li>
+<li>Moving namespaced elements between documents was problematic as
+references to the original document would remain. This has been fixed
+by applying xmlReconciliateNs() after each move operation.</li>
+<li>Can pass None to 'dump()' without segfaults.</li>
+<li>tostring() works properly for non-root elements as well.</li>
+<li>Cleaned out the tostring() method so it should handle encoding
+correctly.</li>
+<li>Cleaned out the ElementTree.write() method so it should handle encoding
+correctly. Writing directly to a file should also be faster, as there is no
+need to go through a Python string in that case. Made sure the test cases
+test both serializing to StringIO as well as serializing to a real file.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id164">
+<h1>0.6 (2005-05-14)</h1>
+<div class="section" id="id165">
+<h2>Features added</h2>
+<ul class="simple">
+<li>Changed setup.py so that library_dirs is also guessed. This should
+help with compilation on the Mac OS X platform, where otherwise the
+wrong library (shipping with the OS) could be picked up.</li>
+<li>Tweaked setup.py so that it picks up the version from version.txt.</li>
+</ul>
+</div>
+<div class="section" id="id166">
+<h2>Bugs fixed</h2>
+<ul class="simple">
+<li>Do the right thing when handling namespaced attributes.</li>
+<li>fix bug where tostring() moved nodes into new documents. tostring()
+had very nasty side-effects before this fix, sorry!</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id167">
+<h1>0.5.1 (2005-04-09)</h1>
+<ul class="simple">
+<li>Python 2.2 compatibility fixes.</li>
+<li>unicode fixes in Element() and Comment() as well as XML(); unicode
+input wasn't properly being UTF-8 encoded.</li>
+</ul>
+</div>
+<div class="section" id="id168">
+<h1>0.5 (2005-04-08)</h1>
+<p>Initial public release.</p>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+Generated on: 2009-06-21.
+
+</div>
+</body>
+</html>

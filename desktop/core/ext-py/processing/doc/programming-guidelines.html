@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Programming guidelines</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="connection-ref.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="index.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="tests.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="programming-guidelines">
+<h1 class="title">Programming guidelines</h1>
+<p>There are certain guidelines and idioms which should be adhered to
+when using the <tt class="docutils literal"><span class="pre">processing</span></tt> package.</p>
+<div class="section">
+<h1><a id="all-platforms" name="all-platforms">All platforms</a></h1>
+<dl class="docutils">
+<dt><em>Avoid shared state</em></dt>
+<dd><p class="first">As far as possible one should try to avoid shifting large amounts
+of data between processes.</p>
+<p class="last">It is probably best to stick to using queues or pipes for
+communication between processes rather than using the lower level
+synchronization primitives from the <tt class="docutils literal"><span class="pre">threading</span></tt> module.</p>
+</dd>
+<dt><em>Picklability</em>:</dt>
+<dd>Ensure that the arguments to the methods of proxies are
+picklable.</dd>
+<dt><em>Thread safety of proxies</em>:</dt>
+<dd><p class="first">Do not use a proxy object from more than one thread unless you
+protect it with a lock.</p>
+<p class="last">(There is never a problem with different processes using the
+'same' proxy.)</p>
+</dd>
+<dt><em>Joining zombie processes</em></dt>
+<dd>On Unix when a process finishes but has not been joined it becomes
+a zombie.  There should never be very many because each time a new
+process starts (or <tt class="docutils literal"><span class="pre">activeChildren()</span></tt> is called) all completed
+processes which have not yet been joined will be joined.  Also
+calling a finished process's <tt class="docutils literal"><span class="pre">isAlive()</span></tt> will join the process.
+Even so it is probably good practice to explicitly join all the
+processes that you start.</dd>
+<dt><em>Better to inherit than pickle/unpickle</em></dt>
+<dd>On Windows many of types from the <tt class="docutils literal"><span class="pre">processing</span></tt> package need to be
+picklable so that child processes can use them.  However, one
+should generally avoid sending shared objects to other processes
+using pipes or queues.  Instead you should arrange the program so
+that a process which need access to a shared resource created
+elsewhere can inherit it from an ancestor process.</dd>
+<dt><em>Avoid terminating processes</em></dt>
+<dd><p class="first">Using the <tt class="docutils literal"><span class="pre">terminate()</span></tt> method to stop a process is liable to
+cause any shared resources (such as locks, semaphores, pipes and
+queues) currently being used by the process to become broken or
+unavailable to other processes.</p>
+<p class="last">Therefore it is probably best to only consider using <tt class="docutils literal"><span class="pre">terminate()</span></tt>
+on processes which never use any shared resources.</p>
+</dd>
+<dt><em>Joining processes that use queues</em></dt>
+<dd><p class="first">Bear in mind that a process that has put items in a queue will
+wait before terminating until all the buffered items are fed by
+the &quot;feeder&quot; thread to the underlying pipe.  (The child process
+can call the <tt class="docutils literal"><span class="pre">cancelJoin()</span></tt> method of the queue to avoid this
+behaviour.)</p>
+<p>This means that whenever you use a queue you need to make sure
+that all items which have been put on the queue will eventually be
+removed before the process is joined.  Otherwise you cannot be
+sure that processes which have put items on the queue will
+terminate.  Remember also that non-daemonic processes will be
+automatically be joined.</p>
+<p>An example which will deadlock is the following:</p>
+<pre class="literal-block">
+from processing import Process, Queue
+
+def f(q):
+    q.put('X' * 1000000)
+
+if __name__ == '__main__':
+    queue = Queue()
+    p = Process(target=f, args=(queue,))
+    p.start()
+    p.join()                    # this deadlocks
+    obj = queue.get()
+</pre>
+<p class="last">A fix here would be to swap the last two lines round (or simply
+remove the <tt class="docutils literal"><span class="pre">p.join()</span></tt> line).</p>
+</dd>
+<dt><em>Explicity pass resources to child processes</em></dt>
+<dd><p class="first">On Unix a child process can make use of a shared resource created
+in a parent process using a global resource.  However, it is
+better to pass the object as an argument to the constructor for
+the child process.</p>
+<p>Apart from making the code (potentially) compatible with Windows
+this also ensures that as long as the child process is still alive
+the object will not be garbage collected in the parent process.
+This might be important if some resource is freed when the object
+is garbage collected in the parent process.</p>
+<p>So for instance</p>
+<pre class="literal-block">
+from processing import Process, Lock
+
+def f():
+    ... do something using &quot;lock&quot; ...
+
+if __name__ == '__main__':
+   lock = Lock()
+   for i in range(10):
+        Process(target=f).start()
+</pre>
+<p>should be rewritten as</p>
+<pre class="last literal-block">
+from processing import Process, Lock
+
+def f(l):
+    ... do something using &quot;l&quot; ...
+
+if __name__ == '__main__':
+   lock = Lock()
+   for i in range(10):
+        Process(target=f, args=(lock,)).start()
+</pre>
+</dd>
+</dl>
+</div>
+<div class="section">
+<h1><a id="windows" name="windows">Windows</a></h1>
+<p>Since Windows lacks <tt class="docutils literal"><span class="pre">os.fork()</span></tt> it has a few extra restrictions:</p>
+<p><em>More picklability</em>:</p>
+<blockquote>
+<p>Ensure that all arguments to <tt class="docutils literal"><span class="pre">Process.__init__()</span></tt> are picklable.
+This means, in particular, that bound or unbound methods cannot be
+used directly as the <tt class="docutils literal"><span class="pre">target</span></tt> argument on Windows --- just define
+a function and use that instead.</p>
+<p>Also, if you subclass <tt class="docutils literal"><span class="pre">Process</span></tt> then make sure that instances
+will be picklable when the <tt class="docutils literal"><span class="pre">start()</span></tt> method is called.</p>
+</blockquote>
+<dl class="docutils">
+<dt><em>Global variables</em>:</dt>
+<dd><p class="first">Bear in mind that if code run in a child process tries to access a
+global variable, then the value it sees (if any) may not be the
+same as the value in the parent process at the time that
+<tt class="docutils literal"><span class="pre">start()</span></tt> was called.</p>
+<p class="last">However, global variables which are just module level constants
+cause no problems.</p>
+</dd>
+<dt><em>Safe importing of main module</em>:</dt>
+<dd><p class="first">Make sure that the main module can be safely imported by a new
+Python interpreter without causing unintended side effects (such a
+starting a new process).</p>
+<p>For example, under Windows running the following module would
+fail with a <tt class="docutils literal"><span class="pre">RuntimeError</span></tt>:</p>
+<pre class="literal-block">
+from processing import Process
+
+def foo():
+    print 'hello'
+
+p = Process(target=foo)
+p.start()
+</pre>
+<p>Instead one should protect the &quot;entry point&quot; of the program by
+using <tt class="docutils literal"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">'__main__':</span></tt> as follows:</p>
+<pre class="literal-block">
+from processing import Process
+
+def foo():
+    print 'hello'
+
+if __name__ == '__main__':
+    freezeSupport()
+    p = Process(target=foo)
+    p.start()
+</pre>
+<p>(The <tt class="docutils literal"><span class="pre">freezeSupport()</span></tt> line can be ommitted if the program will
+be run normally instead of frozen.)</p>
+<p>This allows the newly spawned Python interpreter to safely import
+the module and then run the module's <tt class="docutils literal"><span class="pre">foo()</span></tt> function.</p>
+<p class="last">Similar restrictions apply if a pool or manager is created in the
+main module.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="connection-ref.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="index.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="tests.html">Next</a>
+</div>
+</body>
+</html>

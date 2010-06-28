@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Process objects</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="processing-ref.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="queue-objects.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="process-objects">
+<h1 class="title">Process objects</h1>
+<p>Process objects represent activity that is run in a separate process.</p>
+<div class="section">
+<h1><a id="process" name="process">Process</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">Process</span></tt> class has equivalents of all the methods of
+<tt class="docutils literal"><span class="pre">threading.Thread</span></tt>:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">__init__(group=None,</span> <span class="pre">target=None,</span> <span class="pre">name=None,</span> <span class="pre">args=(),</span> <span class="pre">kwargs={})</span></tt></dt>
+<dd><p class="first">This constructor should always be called with keyword
+arguments. Arguments are:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">group</span></tt></dt>
+<dd>should be <tt class="docutils literal"><span class="pre">None</span></tt>; exists for compatibility with
+<tt class="docutils literal"><span class="pre">threading.Thread</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">target</span></tt></dt>
+<dd>is the callable object to be invoked by the <tt class="docutils literal"><span class="pre">run()</span></tt>
+method.  Defaults to None, meaning nothing is called.</dd>
+<dt><tt class="docutils literal"><span class="pre">name</span></tt></dt>
+<dd>is the process name. By default, a unique name is
+constructed of the form
+'Process-N<sub>1</sub>:N<sub>2</sub>:...:N<sub>k</sub>'
+where
+N<sub>1</sub>,N<sub>2</sub>,...,N<sub>k</sub>
+is a sequence of integers whose length is determined by
+the <em>generation</em> of the process.</dd>
+<dt><tt class="docutils literal"><span class="pre">args</span></tt></dt>
+<dd>is the argument tuple for the target invocation.
+Defaults to <tt class="docutils literal"><span class="pre">()</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">kwargs</span></tt></dt>
+<dd>is a dictionary of keyword arguments for the target
+invocation. Defaults to <tt class="docutils literal"><span class="pre">{}</span></tt>.</dd>
+</dl>
+<p class="last">If a subclass overrides the constructor, it must make sure it
+invokes the base class constructor (<tt class="docutils literal"><span class="pre">Process.__init__()</span></tt>)
+before doing anything else to the process.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">run()</span></tt></dt>
+<dd><p class="first">Method representing the process's activity.</p>
+<p class="last">You may override this method in a subclass. The standard
+<tt class="docutils literal"><span class="pre">run()</span></tt> method invokes the callable object passed to the
+object's constructor as the target argument, if any, with
+sequential and keyword arguments taken from the <tt class="docutils literal"><span class="pre">args</span></tt> and
+<tt class="docutils literal"><span class="pre">kwargs</span></tt> arguments, respectively.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">start()</span></tt></dt>
+<dd><p class="first">Start the process's activity.</p>
+<p class="last">This must be called at most once per process object. It
+arranges for the object's <tt class="docutils literal"><span class="pre">run()</span></tt> method to be invoked in a
+separate process.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">join(timeout=None)</span></tt></dt>
+<dd><p class="first">This blocks the calling thread until the process whose
+<tt class="docutils literal"><span class="pre">join()</span></tt> method is called terminates or until the optional
+timeout occurs.</p>
+<p>If <tt class="docutils literal"><span class="pre">timeout</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> then there is no timeout.</p>
+<p>A process can be joined many times.</p>
+<p>A process cannot join itself because this would cause a
+deadlock.</p>
+<p class="last">It is an error to attempt to join a process before it has
+been started.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">getName()</span></tt></dt>
+<dd>Return the process's name.</dd>
+<dt><tt class="docutils literal"><span class="pre">setName(name)</span></tt></dt>
+<dd><p class="first">Set the process's name.</p>
+<p class="last">The name is a string used for identification purposes only.
+It has no semantics. Multiple processes may be given the same
+name. The initial name is set by the constructor.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">isAlive()</span></tt></dt>
+<dd><p class="first">Return whether the process is alive.</p>
+<p class="last">Roughly, a process object is alive from the moment the <tt class="docutils literal"><span class="pre">start()</span></tt>
+method returns until the child process terminates.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">isDaemon()</span></tt></dt>
+<dd>Return the process's daemon flag.</dd>
+<dt><tt class="docutils literal"><span class="pre">setDaemon(daemonic)</span></tt></dt>
+<dd><p class="first">Set the process's daemon flag to the Boolean value
+<tt class="docutils literal"><span class="pre">daemonic</span></tt>. This must be called before <tt class="docutils literal"><span class="pre">start()</span></tt> is called.</p>
+<p>The initial value is inherited from the creating process.</p>
+<p class="last">When a parent process finishes it attempts to stop all of its
+daemonic child processes and then tries to join each of its
+non-daemonic child processes.</p>
+</dd>
+</dl>
+</blockquote>
+<p>In addition process objects also support the following methods.</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">getPid()</span></tt></dt>
+<dd>Return the process ID.  Before the process is spawned this
+will be <tt class="docutils literal"><span class="pre">None</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">getExitCode()</span></tt></dt>
+<dd>Return the child's exit code.  This will be <tt class="docutils literal"><span class="pre">None</span></tt> if the
+process has not yet terminated.  A negative value <em>-N</em>
+indicates that the child was terminated by signal <em>N</em>.</dd>
+<dt><tt class="docutils literal"><span class="pre">getAuthKey()</span></tt></dt>
+<dd><p class="first">Return the process's authentication key (a string).</p>
+<p>When the <tt class="docutils literal"><span class="pre">processing</span></tt> package is initialized the main process
+is assigned a random hexadecimal string.</p>
+<p>When a <tt class="docutils literal"><span class="pre">Process</span></tt> object is created it will inherit the
+authentication key of its parent process, although this may be
+changed using <tt class="docutils literal"><span class="pre">setAuthKey()</span></tt> below.</p>
+<p class="last">See <a class="reference" href="connection-ref.html#authentication-keys">Authentication Keys</a>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">setAuthKey(authkey)</span></tt></dt>
+<dd>Set the process's authentication key which must be a string.</dd>
+<dt><tt class="docutils literal"><span class="pre">terminate()</span></tt></dt>
+<dd><p class="first">Terminate the process.  On Unix this is done using the
+<tt class="docutils literal"><span class="pre">SIGTERM</span></tt> signal and on Windows <tt class="docutils literal"><span class="pre">TerminateProcess()</span></tt> is used.
+Note that exit handlers and finally clauses etc will not be
+executed.  Also note that descendants of the process will
+<em>not</em> be terminates.</p>
+<div class="last warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If this method is used when the associated process is
+using a pipe or queue then the pipe or queue is liable to
+become corrupted and may become unusable by other process.
+Similarly, if the process has acquired a lock or semaphore
+etc. then terminating it is liable to cause other
+processes to deadlock.</p>
+</div>
+</dd>
+</dl>
+</blockquote>
+<p>Note that the <tt class="docutils literal"><span class="pre">start()</span></tt>, <tt class="docutils literal"><span class="pre">join()</span></tt>, <tt class="docutils literal"><span class="pre">isAlive()</span></tt> and <tt class="docutils literal"><span class="pre">getExitCode()</span></tt>
+methods should only be called by the process that created the process
+object.</p>
+</div>
+<div class="section">
+<h1><a id="example" name="example">Example</a></h1>
+<p>Example usage of some of the methods of <tt class="docutils literal"><span class="pre">Process</span></tt>:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; import processing, time, signal
+&gt;&gt;&gt; p = processing.Process(target=time.sleep, args=(1000,))
+&gt;&gt;&gt; print p, p.isAlive()
+&lt;Process(Process-1, initial)&gt; False
+&gt;&gt;&gt; p.start()
+&gt;&gt;&gt; print p, p.isAlive()
+&lt;Process(Process-1, started)&gt; True
+&gt;&gt;&gt; p.terminate()
+&gt;&gt;&gt; print p, p.isAlive()
+&lt;Process(Process-1, stopped[SIGTERM])&gt; False
+&gt;&gt;&gt; p.getExitCode() == -signal.SIGTERM
+True
+</pre>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="processing-ref.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="queue-objects.html">Next</a>
+</div>
+</body>
+</html>

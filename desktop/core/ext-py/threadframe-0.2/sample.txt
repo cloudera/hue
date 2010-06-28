@@ -1,0 +1,37 @@
+Script started on Thu 10 Jun 2004 07:23:38 PM PDT
+bayazid ~/threadframe-0.2>python test.py
+ident of main thread is: 1
+
+launching daemon thread... done
+launching self-deadlocking thread... done
+launching thread that will die before the end... done
+[4] Spam spam spam spam. Lovely spam! Wonderful spam!
+[4] Spam spam spam spam. Lovely spam! Wonderful spam!
+[4] Spam spam spam spam. Lovely spam! Wonderful spam!
+[4] Spam spam spam spam. Lovely spam! Wonderful spam!
+------------------------------------------------------------------------
+[1] 4
+  File "test.py", line 56, in ?
+    traceback.print_stack(frame)
+------------------------------------------------------------------------
+[4] 4
+  File "/usr/local/lib/python2.3/threading.py", line 436, in __bootstrap
+    self.run()
+  File "test.py", line 6, in run
+    time.sleep(1)
+------------------------------------------------------------------------
+[5] 4
+  File "/usr/local/lib/python2.3/threading.py", line 436, in __bootstrap
+    self.run()
+  File "test.py", line 13, in run
+    U_lock.acquire()
+------------------------------------------------------------------------
+[6] 3
+  File "/usr/local/lib/python2.3/threading.py", line 455, in __bootstrap
+    pass
+  File "test.py", line 20, in run
+    V_event.wait()
+  File "/usr/local/lib/python2.3/threading.py", line 352, in wait
+    self.__cond.release()
+  File "/usr/local/lib/python2.3/threading.py", line 235, in wait
+    self._acquire_restore(saved_state)

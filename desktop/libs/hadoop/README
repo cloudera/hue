@@ -1,0 +1,5 @@
+If you modified any of the thrift files you need to regenerate
+the generated code by running regenerate-thrift.sh, in this
+directory.  Finally, checkin any files that were generated during the previous
+steps.
+

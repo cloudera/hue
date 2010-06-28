@@ -1,0 +1,823 @@
+00-0000	All Occupations	135185230	42270
+11-0000	Management occupations	6152650	100310
+11-1011	Chief executives	301930	160440
+11-1021	General and operations managers	1697690	107970
+11-1031	Legislators	64650	37980
+11-2011	Advertising and promotions managers	36100	94720
+11-2021	Marketing managers	166790	118160
+11-2022	Sales managers	333910	110390
+11-2031	Public relations managers	51730	101220
+11-3011	Administrative services managers	246930	79500
+11-3021	Computer and information systems managers	276820	118710
+11-3031	Financial managers	500590	110640
+11-3041	Compensation and benefits managers	38810	93410
+11-3042	Training and development managers	29350	93830
+11-3049	Human resources managers, all other	60980	103920
+11-3051	Industrial production managers	154030	91200
+11-3061	Purchasing managers	67150	94300
+11-3071	Transportation, storage, and distribution managers	96300	84520
+11-9011	Farm, ranch, and other agricultural managers	3410	62400
+11-9012	Farmers and ranchers	490	49140
+11-9021	Construction managers	220550	89770
+11-9031	Education administrators, preschool and child care center/program	49630	46370
+11-9032	Education administrators, elementary and secondary school	219100	86060
+11-9033	Education administrators, postsecondary	97410	92920
+11-9039	Education administrators, all other	28090	77220
+11-9041	Engineering managers	182300	120580
+11-9051	Food service managers	196080	50320
+11-9061	Funeral directors	25680	58810
+11-9071	Gaming managers	3790	73480
+11-9081	Lodging managers	32460	52550
+11-9111	Medical and health services managers	258130	88750
+11-9121	Natural sciences managers	43060	123140
+11-9131	Postmasters and mail superintendents	26410	59150
+11-9141	Property, real estate, and community association managers	159700	56250
+11-9151	Social and community service managers	117150	60570
+11-9199	Managers, all other	365460	95890
+13-0000	Business and financial operations occupations	6135520	64720
+13-1011	Agents and business managers of artists, performers, and athletes	12110	81550
+13-1021	Purchasing agents and buyers, farm products	13010	58760
+13-1022	Wholesale and retail buyers, except farm products	132420	55540
+13-1023	Purchasing agents, except wholesale, retail, and farm products	286990	57630
+13-1031	Claims adjusters, examiners, and investigators	277230	57550
+13-1032	Insurance appraisers, auto damage	11280	53980
+13-1041	Compliance officers, except agriculture, construction, health and safety, and transportation	242270	53760
+13-1051	Cost estimators	218400	60320
+13-1061	Emergency management specialists	12260	53460
+13-1071	Employment, recruitment, and placement specialists	205800	53870
+13-1072	Compensation, benefits, and job analysis specialists	116250	57060
+13-1073	Training and development specialists	206890	54830
+13-1079	Human resources, training, and labor relations specialists, all other	217440	58230
+13-1081	Logisticians	98590	68600
+13-1111	Management analysts	535850	82920
+13-1121	Meeting and convention planners	47960	47500
+13-1199	Business operations specialists, all other	1030320	64990
+13-2011	Accountants and auditors	1133580	65840
+13-2021	Appraisers and assessors of real estate	66260	53410
+13-2031	Budget analysts	62630	68140
+13-2041	Credit analysts	74400	64580
+13-2051	Financial analysts	236720	84780
+13-2052	Personal financial advisors	146690	92970
+13-2053	Insurance underwriters	98690	62600
+13-2061	Financial examiners	26020	78180
+13-2071	Loan counselors	29430	41970
+13-2072	Loan officers	321850	63540
+13-2081	Tax examiners, collectors, and revenue agents	66030	53090
+13-2082	Tax preparers	63030	35520
+13-2099	Financial specialists, all other	145110	63880
+15-0000	Computer and mathematical science occupations	3308260	74500
+15-1011	Computer and information scientists, research	26610	100900
+15-1021	Computer programmers	394230	73470
+15-1031	Computer software engineers, applications	494160	87900
+15-1032	Computer software engineers, systems software	381830	94520
+15-1041	Computer support specialists	545520	46370
+15-1051	Computer systems analysts	489890	78830
+15-1061	Database administrators	115770	72900
+15-1071	Network and computer systems administrators	327850	69570
+15-1081	Network systems and data communications analysts	230410	73830
+15-1099	Computer specialists, all other	191780	76000
+15-2011	Actuaries	18220	95980
+15-2021	Mathematicians	2770	94960
+15-2031	Operations research analysts	60860	74220
+15-2041	Statisticians	20680	74790
+15-2091	Mathematical technicians	1100	42100
+15-2099	Mathematical scientists, all other	6600	65630
+17-0000	Architecture and engineering occupations	2521630	71430
+17-1011	Architects, except landscape and naval	110990	76750
+17-1012	Landscape architects	21130	64000
+17-1021	Cartographers and photogrammetrists	11690	57980
+17-1022	Surveyors	55780	55980
+17-2011	Aerospace engineers	67800	93980
+17-2021	Agricultural engineers	2640	72850
+17-2031	Biomedical engineers	15220	81120
+17-2041	Chemical engineers	30970	88760
+17-2051	Civil engineers	261360	78560
+17-2061	Computer hardware engineers	73370	100180
+17-2071	Electrical engineers	154670	85350
+17-2072	Electronics engineers, except computer	139930	88670
+17-2081	Environmental engineers	52590	77970
+17-2111	Health and safety engineers, except mining safety engineers and inspectors	25190	73830
+17-2112	Industrial engineers	214580	75740
+17-2121	Marine engineers and naval architects	6480	77920
+17-2131	Materials engineers	24160	84200
+17-2141	Mechanical engineers	233610	78200
+17-2151	Mining and geological engineers, including mining safety engineers	6900	79910
+17-2161	Nuclear engineers	16640	99750
+17-2171	Petroleum engineers	20880	119140
+17-2199	Engineers, all other	169240	89080
+17-3011	Architectural and civil drafters	114910	46390
+17-3012	Electrical and electronics drafters	32710	53770
+17-3013	Mechanical drafters	77070	48600
+17-3019	Drafters, all other	20720	47290
+17-3021	Aerospace engineering and operations technicians	8540	56280
+17-3022	Civil engineering technicians	88140	45730
+17-3023	Electrical and electronic engineering technicians	162330	53990
+17-3024	Electro-mechanical technicians	16290	48110
+17-3025	Environmental engineering technicians	20740	44440
+17-3026	Industrial engineering technicians	72820	50070
+17-3027	Mechanical engineering technicians	45770	50040
+17-3029	Engineering technicians, except drafters, all other	73870	56560
+17-3031	Surveying and mapping technicians	71920	37500
+19-0000	Life, physical, and social science occupations	1296840	64280
+19-1011	Animal scientists	2760	61640
+19-1012	Food scientists and technologists	10510	64610
+19-1013	Soil and plant scientists	10790	64110
+19-1021	Biochemists and biophysicists	22230	88450
+19-1022	Microbiologists	15750	70150
+19-1023	Zoologists and wildlife biologists	17780	58820
+19-1029	Biological scientists, all other	28290	68030
+19-1031	Conservation scientists	15830	60170
+19-1032	Foresters	10160	55040
+19-1041	Epidemiologists	4370	64500
+19-1042	Medical scientists, except epidemiologists	99750	81870
+19-1099	Life scientists, all other	12030	69020
+19-2011	Astronomers	1280	99730
+19-2012	Physicists	14810	106440
+19-2021	Atmospheric and space scientists	8860	82080
+19-2031	Chemists	83080	71070
+19-2032	Materials scientists	9650	81600
+19-2041	Environmental scientists and specialists, including health	80120	65280
+19-2042	Geoscientists, except hydrologists and geographers	31260	89300
+19-2043	Hydrologists	7590	73540
+19-2099	Physical scientists, all other	22900	91850
+19-3011	Economists	12600	90830
+19-3021	Market research analysts	230070	67340
+19-3022	Survey researchers	21100	42060
+19-3031	Clinical, counseling, and school psychologists	97880	70190
+19-3032	Industrial-organizational psychologists	1460	86460
+19-3039	Psychologists, all other	9870	90460
+19-3041	Sociologists	4390	75460
+19-3051	Urban and regional planners	37120	62400
+19-3091	Anthropologists and archeologists	5230	57300
+19-3092	Geographers	1120	66830
+19-3093	Historians	3700	57180
+19-3094	Political scientists	3530	99320
+19-3099	Social scientists and related workers, all other	28680	71730
+19-4011	Agricultural and food science technicians	18930	36470
+19-4021	Biological technicians	72200	40900
+19-4031	Chemical technicians	65830	43710
+19-4041	Geological and petroleum technicians	14570	57080
+19-4051	Nuclear technicians	6360	66910
+19-4061	Social science research assistants	18120	37920
+19-4091	Environmental science and protection technicians, including health	33370	43180
+19-4092	Forensic science technicians	11990	52960
+19-4093	Forest and conservation technicians	30850	35320
+19-4099	Life, physical, and social science technicians, all other	58070	42910
+21-0000	Community and social services occupations	1861750	41790
+21-1011	Substance abuse and behavioral disorder counselors	79180	39670
+21-1012	Educational, vocational, and school counselors	243100	53540
+21-1013	Marriage and family therapists	24520	46930
+21-1014	Mental health counselors	104650	40270
+21-1015	Rehabilitation counselors	112700	34600
+21-1019	Counselors, all other	29980	42240
+21-1021	Child, family, and school social workers	274140	43120
+21-1022	Medical and public health social workers	131730	47560
+21-1023	Mental health and substance abuse social workers	131010	39630
+21-1029	Social workers, all other	68230	48180
+21-1091	Health educators	62120	48590
+21-1092	Probation officers and correctional treatment specialists	97130	49520
+21-1093	Social and human service assistants	332880	29170
+21-1099	Community and social service specialists, all other	107910	39950
+21-2011	Clergy	42040	45440
+21-2021	Directors, religious activities and education	14790	40260
+21-2099	Religious workers, all other	5640	32360
+23-0000	Legal occupations	1003270	92270
+23-1011	Lawyers	553690	124750
+23-1021	Administrative law judges, adjudicators, and hearing officers	13370	80870
+23-1022	Arbitrators, mediators, and conciliators	9570	59650
+23-1023	Judges, magistrate judges, and magistrates	25470	100450
+23-2011	Paralegals and legal assistants	253040	48790
+23-2091	Court reporters	17930	51960
+23-2092	Law clerks	31500	40580
+23-2093	Title examiners, abstractors, and searchers	59390	42090
+23-2099	Legal support workers, all other	39310	56660
+25-0000	Education, training, and library occupations	8451250	48460
+25-1011	Business teachers, postsecondary	69690	77340
+25-1021	Computer science teachers, postsecondary	32520	74050
+25-1022	Mathematical science teachers, postsecondary	45710	68130
+25-1031	Architecture teachers, postsecondary	6430	75450
+25-1032	Engineering teachers, postsecondary	32070	90070
+25-1041	Agricultural sciences teachers, postsecondary	10000	77770
+25-1042	Biological science teachers, postsecondary	51930	83270
+25-1043	Forestry and conservation science teachers, postsecondary	2450	67400
+25-1051	Atmospheric, earth, marine, and space sciences teachers, postsecondary	9650	81470
+25-1052	Chemistry teachers, postsecondary	19950	76310
+25-1053	Environmental science teachers, postsecondary	4870	74610
+25-1054	Physics teachers, postsecondary	12350	81880
+25-1061	Anthropology and archeology teachers, postsecondary	5500	73410
+25-1062	Area, ethnic, and cultural studies teachers, postsecondary	7570	70560
+25-1063	Economics teachers, postsecondary	12540	88330
+25-1064	Geography teachers, postsecondary	4030	67480
+25-1065	Political science teachers, postsecondary	14340	75960
+25-1066	Psychology teachers, postsecondary	31420	69560
+25-1067	Sociology teachers, postsecondary	16440	68900
+25-1069	Social sciences teachers, postsecondary, all other	5720	74720
+25-1071	Health specialties teachers, postsecondary	125100	102000
+25-1072	Nursing instructors and teachers, postsecondary	46890	62660
+25-1081	Education teachers, postsecondary	55880	60080
+25-1082	Library science teachers, postsecondary	3960	61630
+25-1111	Criminal justice and law enforcement teachers, postsecondary	11630	59830
+25-1112	Law teachers, postsecondary	12490	101170
+25-1113	Social work teachers, postsecondary	7930	64680
+25-1121	Art, drama, and music teachers, postsecondary	76810	65030
+25-1122	Communications teachers, postsecondary	24360	63330
+25-1123	English language and literature teachers, postsecondary	62230	63610
+25-1124	Foreign language and literature teachers, postsecondary	26400	65280
+25-1125	History teachers, postsecondary	21020	68360
+25-1126	Philosophy and religion teachers, postsecondary	18370	65140
+25-1191	Graduate teaching assistants	124380	31710
+25-1192	Home economics teachers, postsecondary	4820	70420
+25-1193	Recreation and fitness studies teachers, postsecondary	17410	60700
+25-1194	Vocational education teachers, postsecondary	112940	50870
+25-1199	Postsecondary teachers, all other	242780	71320
+25-2011	Preschool teachers, except special education	392170	26610
+25-2012	Kindergarten teachers, except special education	174530	49770
+25-2021	Elementary school teachers, except special education	1544270	52240
+25-2022	Middle school teachers, except special and vocational education	661820	52570
+25-2023	Vocational education teachers, middle school	15720	50150
+25-2031	Secondary school teachers, except special and vocational education	1090490	54390
+25-2032	Vocational education teachers, secondary school	99800	53700
+25-2041	Special education teachers, preschool, kindergarten, and elementary school	226250	52970
+25-2042	Special education teachers, middle school	100650	53540
+25-2043	Special education teachers, secondary school	147210	55050
+25-3011	Adult literacy, remedial education, and GED teachers and instructors	73050	49830
+25-3021	Self-enrichment education teachers	163190	40920
+25-3099	Teachers and instructors, all other	574540	40770
+25-4011	Archivists	5330	48220
+25-4012	Curators	10820	51540
+25-4013	Museum technicians and conservators	10200	40750
+25-4021	Librarians	151170	54700
+25-4031	Library technicians	113510	30130
+25-9011	Audio-visual collections specialists	6160	45540
+25-9021	Farm and home management advisors	10760	44630
+25-9031	Instructional coordinators	122180	59780
+25-9041	Teacher assistants	1266900	23560
+25-9099	Education, training, and library workers, all other	99900	40560
+27-0000	Arts, design, entertainment, sports, and media occupations	1804940	50670
+27-1011	Art directors	33670	88510
+27-1012	Craft artists	5440	32570
+27-1013	Fine artists, including painters, sculptors, and illustrators	9380	48300
+27-1014	Multi-media artists and animators	31500	62380
+27-1019	Artists and related workers, all other	8470	55140
+27-1021	Commercial and industrial designers	32940	61580
+27-1022	Fashion designers	16920	71400
+27-1023	Floral designers	57500	24510
+27-1024	Graphic designers	209290	46750
+27-1025	Interior designers	53290	51020
+27-1026	Merchandise displayers and window trimmers	63320	28560
+27-1027	Set and exhibit designers	7940	48660
+27-1029	Designers, all other	11160	50130
+27-2011	Actors	44360	*
+27-2012	Producers and directors	78060	83030
+27-2021	Athletes and sports competitors	13960	79460
+27-2022	Coaches and scouts	175720	35580
+27-2023	Umpires, referees, and other sports officials	12970	28330
+27-2031	Dancers	11370	*
+27-2032	Choreographers	13860	41870
+27-2041	Music directors and composers	9120	54840
+27-2042	Musicians and singers	47030	*
+27-2099	Entertainers and performers, sports and related workers, all other	36190	*
+27-3011	Radio and television announcers	37290	40410
+27-3012	Public address system and other announcers	8280	37530
+27-3021	Broadcast news analysts	6310	70730
+27-3022	Reporters and correspondents	50690	44030
+27-3031	Public relations specialists	240610	58960
+27-3041	Editors	110010	57180
+27-3042	Technical writers	47460	64210
+27-3043	Writers and authors	44170	64560
+27-3091	Interpreters and translators	36610	43130
+27-3099	Media and communication workers, all other	24470	47770
+27-4011	Audio and video equipment technicians	45200	41310
+27-4012	Broadcast technicians	33550	38070
+27-4013	Radio operators	820	38520
+27-4014	Sound engineering technicians	16600	53110
+27-4021	Photographers	61670	35640
+27-4031	Camera operators, television, video, and motion picture	19270	47710
+27-4032	Film and video editors	18720	62500
+27-4099	Media and communication equipment workers, all other	19770	56120
+29-0000	Healthcare practitioners and technical occupations	7076800	67890
+29-1011	Chiropractors	27050	81340
+29-1021	Dentists, general	85910	154270
+29-1022	Oral and maxillofacial surgeons	4760	190420
+29-1023	Orthodontists	5500	194930
+29-1024	Prosthodontists	370	169810
+29-1029	Dentists, all other specialists	4770	142070
+29-1031	Dietitians and nutritionists	53630	51470
+29-1041	Optometrists	25970	105200
+29-1051	Pharmacists	266410	104260
+29-1061	Anesthesiologists	34230	197570
+29-1062	Family and general practitioners	106210	161490
+29-1063	Internists, general	46980	176740
+29-1064	Obstetricians and gynecologists	19750	192780
+29-1065	Pediatricians, general	29170	153370
+29-1066	Psychiatrists	22140	154050
+29-1067	Surgeons	47070	206770
+29-1069	Physicians and surgeons, all other	262850	165000
+29-1071	Physician assistants	71950	81610
+29-1081	Podiatrists	9670	125760
+29-1111	Registered nurses	2542760	65130
+29-1121	Audiologists	12480	65500
+29-1122	Occupational therapists	94800	67920
+29-1123	Physical therapists	167300	74410
+29-1124	Radiation therapists	14850	75450
+29-1125	Recreational therapists	22510	39930
+29-1126	Respiratory therapists	103870	53150
+29-1127	Speech-language pathologists	107340	66130
+29-1129	Therapists, all other	12960	54750
+29-1131	Veterinarians	53110	89450
+29-1199	Health diagnosing and treating practitioners, all other	34890	78540
+29-2011	Medical and clinical laboratory technologists	166510	54050
+29-2012	Medical and clinical laboratory technicians	149670	37150
+29-2021	Dental hygienists	173090	66950
+29-2031	Cardiovascular technologists and technicians	48040	48640
+29-2032	Diagnostic medical sonographers	48920	62660
+29-2033	Nuclear medicine technologists	21200	67480
+29-2034	Radiologic technologists and technicians	208570	53230
+29-2041	Emergency medical technicians and paramedics	207610	31980
+29-2051	Dietetic technicians	24620	27580
+29-2052	Pharmacy technicians	324110	28500
+29-2053	Psychiatric technicians	54800	32190
+29-2054	Respiratory therapy technicians	16210	43670
+29-2055	Surgical technologists	89600	40070
+29-2056	Veterinary technologists and technicians	78920	29850
+29-2061	Licensed practical and licensed vocational nurses	730500	40110
+29-2071	Medical records and health information technicians	168650	32960
+29-2081	Opticians, dispensing	59470	35060
+29-2091	Orthotists and prosthetists	5490	66060
+29-2099	Health technologists and technicians, all other	74990	41380
+29-9011	Occupational health and safety specialists	53250	63030
+29-9012	Occupational health and safety technicians	10540	47410
+29-9091	Athletic trainers	15070	41620
+29-9099	Healthcare practitioners and technical workers, all other	55750	50510
+31-0000	Healthcare support occupations	3779280	26340
+31-1011	Home health aides	892410	21440
+31-1012	Nursing aides, orderlies, and attendants	1422720	24620
+31-1013	Psychiatric aides	59050	27260
+31-2011	Occupational therapist assistants	25610	48440
+31-2012	Occupational therapist aides	7410	29580
+31-2021	Physical therapist assistants	61820	46300
+31-2022	Physical therapist aides	44410	24770
+31-9011	Massage therapists	51250	39850
+31-9091	Dental assistants	293090	33170
+31-9092	Medical assistants	475950	29060
+31-9093	Medical equipment preparers	44340	29290
+31-9094	Medical transcriptionists	86200	32960
+31-9095	Pharmacy aides	53190	21500
+31-9096	Veterinary assistants and laboratory animal caretakers	71950	22790
+31-9099	Healthcare support workers, all other	189890	30650
+33-0000	Protective service occupations	3128960	40200
+33-1011	First-line supervisors/managers of correctional officers	40840	58380
+33-1012	First-line supervisors/managers of police and detectives	92840	76820
+33-1021	First-line supervisors/managers of fire fighting and prevention workers	53300	70860
+33-1099	First-line supervisors/managers, protective service workers, all other	49310	47700
+33-2011	Fire fighters	298900	45700
+33-2021	Fire inspectors and investigators	12920	54840
+33-2022	Forest fire inspectors and prevention specialists	1580	36400
+33-3011	Bailiffs	19290	39090
+33-3012	Correctional officers and jailers	428040	41340
+33-3021	Detectives and criminal investigators	104480	63840
+33-3031	Fish and game wardens	7720	56030
+33-3041	Parking enforcement workers	9530	34020
+33-3051	Police and sheriff's patrol officers	633710	52810
+33-3052	Transit and railroad police	3830	48540
+33-9011	Animal control workers	15480	31990
+33-9021	Private detectives and investigators	35820	46480
+33-9031	Gaming surveillance officers and gaming investigators	9100	31550
+33-9032	Security guards	1046760	25840
+33-9091	Crossing guards	68530	24290
+33-9092	Lifeguards, ski patrol, and other recreational protective service workers	111560	19930
+33-9099	Protective service workers, all other	85440	32580
+35-0000	Food preparation and serving related occupations	11438550	20220
+35-1011	Chefs and head cooks	98040	42410
+35-1012	First-line supervisors/managers of food preparation and serving workers	805360	30810
+35-2011	Cooks, fast food	559160	17620
+35-2012	Cooks, institution and cafeteria	370920	23260
+35-2013	Cooks, private household	960	31020
+35-2014	Cooks, restaurant	899620	22750
+35-2015	Cooks, short order	168770	20230
+35-2019	Cooks, all other	17340	24770
+35-2021	Food preparation workers	880480	19850
+35-3011	Bartenders	503420	20460
+35-3021	Combined food preparation and serving workers, including fast food	2708840	17400
+35-3022	Counter attendants, cafeteria, food concession, and coffee shop	527530	18520
+35-3031	Waiters and waitresses	2371750	19580
+35-3041	Food servers, nonrestaurant	188390	21190
+35-9011	Dining room and cafeteria attendants and bartender helpers	416410	18140
+35-9021	Dishwashers	521150	17750
+35-9031	Hosts and hostesses, restaurant, lounge, and coffee shop	349990	18570
+35-9099	Food preparation and serving related workers, all other	50420	21460
+37-0000	Building and grounds cleaning and maintenance occupations	4429870	24370
+37-1011	First-line supervisors/managers of housekeeping and janitorial workers	183560	36310
+37-1012	First-line supervisors/managers of landscaping, lawn service, and groundskeeping workers	108940	42990
+37-2011	Janitors and cleaners, except maids and housekeeping cleaners	2145320	23500
+37-2012	Maids and housekeeping cleaners	917120	20290
+37-2019	Building cleaning workers, all other	13580	28660
+37-2021	Pest control workers	63180	31040
+37-3011	Landscaping and groundskeeping workers	921900	24860
+37-3012	Pesticide handlers, sprayers, and applicators, vegetation	25060	31210
+37-3013	Tree trimmers and pruners	35420	31450
+37-3019	Grounds maintenance workers, all other	15790	27180
+39-0000	Personal care and service occupations	3437520	24120
+39-1011	Gaming supervisors	26110	46600
+39-1012	Slot key persons	15390	28460
+39-1021	First-line supervisors/managers of personal service workers	129070	38230
+39-2011	Animal trainers	10030	31190
+39-2021	Nonfarm animal caretakers	126740	21550
+39-3011	Gaming dealers	91130	19890
+39-3012	Gaming and sports book writers and runners	16140	22800
+39-3019	Gaming service workers, all other	13910	25290
+39-3021	Motion picture projectionists	10200	22700
+39-3031	Ushers, lobby attendants, and ticket takers	106570	19100
+39-3091	Amusement and recreation attendants	258820	18930
+39-3092	Costume attendants	5120	32150
+39-3093	Locker room, coatroom, and dressing room attendants	18170	21490
+39-3099	Entertainment attendants and related workers, all other	43930	20920
+39-4011	Embalmers	8090	39320
+39-4021	Funeral attendants	33060	23270
+39-5011	Barbers	10330	26610
+39-5012	Hairdressers, hairstylists, and cosmetologists	355990	26660
+39-5091	Makeup artists, theatrical and performance	1930	39020
+39-5092	Manicurists and pedicurists	51590	22040
+39-5093	Shampooers	15570	18300
+39-5094	Skin care specialists	26300	32040
+39-6011	Baggage porters and bellhops	49770	23170
+39-6012	Concierges	20380	28120
+39-6021	Tour guides and escorts	31760	25150
+39-6022	Travel guides	4510	33660
+39-6031	Flight attendants	99480	39840
+39-6032	Transportation attendants, except flight attendants and baggage porters	21870	22370
+39-9011	Child care workers	581670	20350
+39-9021	Personal and home care aides	614190	19690
+39-9031	Fitness trainers and aerobics instructors	229030	34310
+39-9032	Recreation workers	282680	24570
+39-9041	Residential advisors	52240	25320
+39-9099	Personal care and service workers, all other	75780	22630
+41-0000	Sales and related occupations	14336430	36080
+41-1011	First-line supervisors/managers of retail sales workers	1186270	39910
+41-1012	First-line supervisors/managers of non-retail sales workers	275390	79870
+41-2011	Cashiers	3545610	18880
+41-2012	Gaming change persons and booth cashiers	22280	22890
+41-2021	Counter and rental clerks	448480	24430
+41-2022	Parts salespersons	226530	30850
+41-2031	Retail salespersons	4426280	25050
+41-3011	Advertising sales agents	161550	53170
+41-3021	Insurance sales agents	327780	60440
+41-3031	Securities, commodities, and financial services sales agents	271900	92050
+41-3041	Travel agents	86420	32470
+41-3099	Sales representatives, services, all other	569130	59030
+41-4011	Sales representatives, wholesale and manufacturing, technical and scientific products	415120	79260
+41-4012	Sales representatives, wholesale and manufacturing, except technical and scientific products	1493760	61470
+41-9011	Demonstrators and product promoters	83540	27150
+41-9012	Models	1660	30160
+41-9021	Real estate brokers	51390	77240
+41-9022	Real estate sales agents	164080	54410
+41-9031	Sales engineers	78030	89770
+41-9041	Telemarketers	345220	24770
+41-9091	Door-to-door sales workers, news and street vendors, and related workers	9520	27600
+41-9099	Sales and related workers, all other	146480	41810
+43-0000	Office and administrative support occupations	23231750	32220
+43-1011	First-line supervisors/managers of office and administrative support workers	1404330	48700
+43-2011	Switchboard operators, including answering service	153860	25250
+43-2021	Telephone operators	22820	33800
+43-2099	Communications equipment operators, all other	3500	37000
+43-3011	Bill and account collectors	408760	32180
+43-3021	Billing and posting clerks and machine operators	512120	32120
+43-3031	Bookkeeping, accounting, and auditing clerks	1855010	33800
+43-3041	Gaming cage workers	17060	25970
+43-3051	Payroll and timekeeping clerks	203210	35500
+43-3061	Procurement clerks	79610	35280
+43-3071	Tellers	600380	24250
+43-4011	Brokerage clerks	68430	41370
+43-4021	Correspondence clerks	13450	31280
+43-4031	Court, municipal, and license clerks	115070	35120
+43-4041	Credit authorizers, checkers, and clerks	65020	31980
+43-4051	Customer service representatives	2233270	31790
+43-4061	Eligibility interviewers, government programs	112510	39850
+43-4071	File clerks	204760	25290
+43-4081	Hotel, motel, and resort desk clerks	230230	20630
+43-4111	Interviewers, except eligibility and loan	224690	29040
+43-4121	Library assistants, clerical	114740	24290
+43-4131	Loan interviewers and clerks	212340	33890
+43-4141	New accounts clerks	87300	30990
+43-4151	Order clerks	248030	29300
+43-4161	Human resources assistants, except payroll and timekeeping	164340	36810
+43-4171	Receptionists and information clerks	1097610	25400
+43-4181	Reservation and transportation ticket agents and travel clerks	163880	32060
+43-4199	All other information and record clerks	215780	34910
+43-5011	Cargo and freight agents	85950	38830
+43-5021	Couriers and messengers	96110	25100
+43-5031	Police, fire, and ambulance dispatchers	96360	35340
+43-5032	Dispatchers, except police, fire, and ambulance	193210	36560
+43-5041	Meter readers, utilities	44730	34890
+43-5051	Postal service clerks	78250	50150
+43-5052	Postal service mail carriers	354570	46970
+43-5053	Postal service mail sorters, processors, and processing machine operators	185770	45490
+43-5061	Production, planning, and expediting clerks	281660	42150
+43-5071	Shipping, receiving, and traffic clerks	760950	29180
+43-5081	Stock clerks and order fillers	1873390	23140
+43-5111	Weighers, measurers, checkers, and samplers, recordkeeping	72720	28500
+43-6011	Executive secretaries and administrative assistants	1491520	42340
+43-6012	Legal secretaries	257810	41640
+43-6013	Medical secretaries	454500	30800
+43-6014	Secretaries, except legal, medical, and executive	1872070	29990
+43-9011	Computer operators	107450	37070
+43-9021	Data entry keyers	272810	27110
+43-9022	Word processors and typists	128010	32710
+43-9031	Desktop publishers	26210	38740
+43-9041	Insurance claims and policy processing clerks	237800	34830
+43-9051	Mail clerks and mail machine operators, except postal service	137350	26420
+43-9061	Office clerks, general	2906600	26830
+43-9071	Office machine operators, except computer	79470	27310
+43-9081	Proofreaders and copy markers	15300	32240
+43-9111	Statistical assistants	16900	36020
+43-9199	Office and administrative support workers, all other	272190	31510
+45-0000	Farming, fishing, and forestry occupations	438490	23560
+45-1011	First-line supervisors/managers of farming, fishing, and forestry workers	20800	42740
+45-1012	Farm labor contractors	1110	36640
+45-2011	Agricultural inspectors	14340	41330
+45-2021	Animal breeders	2080	33070
+45-2041	Graders and sorters, agricultural products	37500	20490
+45-2091	Agricultural equipment operators	22110	24490
+45-2092	Farmworkers and laborers, crop, nursery, and greenhouse	242390	19280
+45-2093	Farmworkers, farm and ranch animals	38110	22920
+45-2099	Agricultural workers, all other	7680	27310
+45-3011	Fishers and related fishing workers	1110	28460
+45-4011	Forest and conservation workers	8280	26110
+45-4021	Fallers	7120	34180
+45-4022	Logging equipment operators	27010	32780
+45-4023	Log graders and scalers	3610	34330
+45-4029	Logging workers, all other	5180	32900
+47-0000	Construction and extraction occupations	6548760	42350
+47-1011	First-line supervisors/managers of construction trades and extraction workers	577390	61280
+47-2011	Boilermakers	20400	53100
+47-2021	Brickmasons and blockmasons	106270	47740
+47-2022	Stonemasons	18910	40930
+47-2031	Carpenters	899920	42940
+47-2041	Carpet installers	34390	41330
+47-2042	Floor layers, except carpet, wood, and hard tiles	14250	39580
+47-2043	Floor sanders and finishers	8220	35220
+47-2044	Tile and marble setters	51210	41870
+47-2051	Cement masons and concrete finishers	201730	39000
+47-2053	Terrazzo workers and finishers	5550	39300
+47-2061	Construction laborers	1020290	32250
+47-2071	Paving, surfacing, and tamping equipment operators	61230	36490
+47-2072	Pile-driver operators	4790	51640
+47-2073	Operating engineers and other construction equipment operators	398910	43630
+47-2081	Drywall and ceiling tile installers	128740	40940
+47-2082	Tapers	31850	45900
+47-2111	Electricians	633010	49890
+47-2121	Glaziers	51730	38990
+47-2131	Insulation workers, floor, ceiling, and wall	28390	34920
+47-2132	Insulation workers, mechanical	30150	41570
+47-2141	Painters, construction and maintenance	250310	36510
+47-2142	Paperhangers	4610	39520
+47-2151	Pipelayers	54440	36300
+47-2152	Plumbers, pipefitters, and steamfitters	437540	49200
+47-2161	Plasterers and stucco masons	43290	40070
+47-2171	Reinforcing iron and rebar workers	28620	44380
+47-2181	Roofers	120200	37430
+47-2211	Sheet metal workers	163480	44310
+47-2221	Structural iron and steel workers	68670	47170
+47-3011	Helpers--brickmasons, blockmasons, stonemasons, and tile and marble setters	53300	29610
+47-3012	Helpers--carpenters	81260	26390
+47-3013	Helpers--electricians	104050	27450
+47-3014	Helpers--painters, paperhangers, plasterers, and stucco masons	19900	24330
+47-3015	Helpers--pipelayers, plumbers, pipefitters, and steamfitters	79870	27260
+47-3016	Helpers--roofers	18730	24660
+47-3019	Helpers, construction trades, all other	27210	27130
+47-4011	Construction and building inspectors	96000	52160
+47-4021	Elevator installers and repairers	25070	67750
+47-4031	Fence erectors	25710	30130
+47-4041	Hazardous materials removal workers	42500	40290
+47-4051	Highway maintenance workers	136420	35040
+47-4061	Rail-track laying and maintenance equipment operators	15020	44870
+47-4071	Septic tank servicers and sewer pipe cleaners	24730	35550
+47-4091	Segmental pavers	1170	28450
+47-4099	Construction and related workers, all other	55820	35170
+47-5011	Derrick operators, oil and gas	23590	41980
+47-5012	Rotary drill operators, oil and gas	27020	54370
+47-5013	Service unit operators, oil, gas, and mining	36850	41320
+47-5021	Earth drillers, except oil and gas	20220	41360
+47-5031	Explosives workers, ordnance handling experts, and blasters	6060	44490
+47-5041	Continuous mining machine operators	10920	45570
+47-5042	Mine cutting and channeling machine operators	9190	41510
+47-5049	Mining machine operators, all other	4650	43240
+47-5051	Rock splitters, quarry	4210	30160
+47-5061	Roof bolters, mining	4950	45690
+47-5071	Roustabouts, oil and gas	62540	32660
+47-5081	Helpers--extraction workers	25550	34030
+47-5099	Extraction workers, all other	7800	41370
+49-0000	Installation, maintenance, and repair occupations	5374850	41230
+49-1011	First-line supervisors/managers of mechanics, installers, and repairers	443840	59160
+49-2011	Computer, automated teller, and office machine repairers	122400	39420
+49-2021	Radio mechanics	5440	42530
+49-2022	Telecommunications equipment installers and repairers, except line installers	195170	52650
+49-2091	Avionics technicians	18360	49360
+49-2092	Electric motor, power tool, and related repairers	23400	37110
+49-2093	Electrical and electronics installers and repairers, transportation equipment	15860	44940
+49-2094	Electrical and electronics repairers, commercial and industrial equipment	77270	49260
+49-2095	Electrical and electronics repairers, powerhouse, substation, and relay	23180	60700
+49-2096	Electronic equipment installers and repairers, motor vehicles	19980	29770
+49-2097	Electronic home entertainment equipment installers and repairers	38680	33830
+49-2098	Security and fire alarm systems installers	62720	38630
+49-3011	Aircraft mechanics and service technicians	116310	51650
+49-3021	Automotive body and related repairers	147200	39950
+49-3022	Automotive glass installers and repairers	18330	33180
+49-3023	Automotive service technicians and mechanics	649460	37540
+49-3031	Bus and truck mechanics and diesel engine specialists	248620	40710
+49-3041	Farm equipment mechanics	30240	32850
+49-3042	Mobile heavy equipment mechanics, except engines	125930	44300
+49-3043	Rail car repairers	20780	44920
+49-3051	Motorboat mechanics	19640	36080
+49-3052	Motorcycle mechanics	16850	33490
+49-3053	Outdoor power equipment and other small engine mechanics	26440	29970
+49-3091	Bicycle repairers	9690	24140
+49-3092	Recreational vehicle service technicians	13400	33380
+49-3093	Tire repairers and changers	98520	23830
+49-9011	Mechanical door repairers	17530	35360
+49-9012	Control and valve installers and repairers, except mechanical door	43900	47260
+49-9021	Heating, air conditioning, and refrigeration mechanics and installers	261610	42240
+49-9031	Home appliance repairers	37300	35690
+49-9041	Industrial machinery mechanics	280620	45280
+49-9042	Maintenance and repair workers, general	1305170	35630
+49-9043	Maintenance workers, machinery	73650	38610
+49-9044	Millwrights	46250	50030
+49-9045	Refractory materials repairers, except brickmasons	2450	41750
+49-9051	Electrical power-line installers and repairers	111580	54300
+49-9052	Telecommunications line installers and repairers	168050	47330
+49-9061	Camera and photographic equipment repairers	3820	37990
+49-9062	Medical equipment repairers	34260	44030
+49-9063	Musical instrument repairers and tuners	5310	35950
+49-9064	Watch repairers	2770	37600
+49-9069	Precision instrument and equipment repairers, all other	12990	50400
+49-9091	Coin, vending, and amusement machine servicers and repairers	41280	30970
+49-9092	Commercial divers	2370	54940
+49-9093	Fabric menders, except garment	960	27920
+49-9094	Locksmiths and safe repairers	18500	35900
+49-9095	Manufactured building and mobile home installers	8290	29460
+49-9096	Riggers	13490	42620
+49-9097	Signal and track switch repairers	6570	49060
+49-9098	Helpers--installation, maintenance, and repair workers	149350	25670
+49-9099	Installation, maintenance, and repair workers, all other	139100	37220
+51-0000	Production occupations	9919120	32320
+51-1011	First-line supervisors/managers of production and operating workers	658500	53500
+51-2011	Aircraft structure, surfaces, rigging, and systems assemblers	43330	43600
+51-2021	Coil winders, tapers, and finishers	22160	28720
+51-2022	Electrical and electronic equipment assemblers	215230	29410
+51-2023	Electromechanical equipment assemblers	62310	30520
+51-2031	Engine and other machine assemblers	39270	34900
+51-2041	Structural metal fabricators and fitters	111620	33860
+51-2091	Fiberglass laminators and fabricators	30890	28680
+51-2092	Team assemblers	1131060	27630
+51-2093	Timing device assemblers, adjusters, and calibrators	2700	30710
+51-2099	Assemblers and fabricators, all other	318060	32840
+51-3011	Bakers	141130	25020
+51-3021	Butchers and meat cutters	128210	29700
+51-3022	Meat, poultry, and fish cutters and trimmers	166150	22400
+51-3023	Slaughterers and meat packers	97000	23270
+51-3091	Food and tobacco roasting, baking, and drying machine operators and tenders	17870	28610
+51-3092	Food batchmakers	99170	26290
+51-3093	Food cooking machine operators and tenders	39300	24110
+51-4011	Computer-controlled machine tool operators, metal and plastic	143030	34520
+51-4012	Numerical tool and process control programmers	16990	46360
+51-4021	Extruding and drawing machine setters, operators, and tenders, metal and plastic	92160	31030
+51-4022	Forging machine setters, operators, and tenders, metal and plastic	28800	32370
+51-4023	Rolling machine setters, operators, and tenders, metal and plastic	34970	35410
+51-4031	Cutting, punching, and press machine setters, operators, and tenders, metal and plastic	242970	29420
+51-4032	Drilling and boring machine tool setters, operators, and tenders, metal and plastic	33550	32520
+51-4033	Grinding, lapping, polishing, and buffing machine tool setters, operators, and tenders, metal and plastic	91990	31230
+51-4034	Lathe and turning machine tool setters, operators, and tenders, metal and plastic	56500	34070
+51-4035	Milling and planing machine setters, operators, and tenders, metal and plastic	26220	34450
+51-4041	Machinists	419070	37490
+51-4051	Metal-refining furnace operators and tenders	19280	37310
+51-4052	Pourers and casters, metal	15320	33510
+51-4061	Model makers, metal and plastic	8990	44700
+51-4062	Patternmakers, metal and plastic	6220	39490
+51-4071	Foundry mold and coremakers	15240	30390
+51-4072	Molding, coremaking, and casting machine setters, operators, and tenders, metal and plastic	145760	29270
+51-4081	Multiple machine tool setters, operators, and tenders, metal and plastic	87800	32780
+51-4111	Tool and die makers	85610	48180
+51-4121	Welders, cutters, solderers, and brazers	392520	35370
+51-4122	Welding, soldering, and brazing machine setters, operators, and tenders	51840	33700
+51-4191	Heat treating equipment setters, operators, and tenders, metal and plastic	23630	33140
+51-4192	Lay-out workers, metal and plastic	8340	37170
+51-4193	Plating and coating machine setters, operators, and tenders, metal and plastic	40300	30090
+51-4194	Tool grinders, filers, and sharpeners	16410	33880
+51-4199	Metal workers and plastic workers, all other	43690	35570
+51-5011	Bindery workers	60560	29100
+51-5012	Bookbinders	6150	33970
+51-5021	Job printers	42640	35330
+51-5022	Prepress technicians and workers	61170	36440
+51-5023	Printing machine operators	193510	34150
+51-6011	Laundry and dry-cleaning workers	221230	20230
+51-6021	Pressers, textile, garment, and related materials	67500	19860
+51-6031	Sewing machine operators	190440	21690
+51-6041	Shoe and leather workers and repairers	8170	24130
+51-6042	Shoe machine operators and tenders	4910	25420
+51-6051	Sewers, hand	7050	23170
+51-6052	Tailors, dressmakers, and custom sewers	31700	26920
+51-6061	Textile bleaching and dyeing machine operators and tenders	16180	24480
+51-6062	Textile cutting machine setters, operators, and tenders	20170	23810
+51-6063	Textile knitting and weaving machine setters, operators, and tenders	30250	25650
+51-6064	Textile winding, twisting, and drawing out machine setters, operators, and tenders	36540	24600
+51-6091	Extruding and forming machine setters, operators, and tenders, synthetic and glass fibers	14440	31800
+51-6092	Fabric and apparel patternmakers	7500	42190
+51-6093	Upholsterers	39090	30560
+51-6099	Textile, apparel, and furnishings workers, all other	17430	27450
+51-7011	Cabinetmakers and bench carpenters	120960	30620
+51-7021	Furniture finishers	21630	28410
+51-7031	Model makers, wood	1740	35690
+51-7032	Patternmakers, wood	1930	38720
+51-7041	Sawing machine setters, operators, and tenders, wood	51830	27070
+51-7042	Woodworking machine setters, operators, and tenders, except sawing	88510	25880
+51-7099	Woodworkers, all other	11260	26570
+51-8011	Nuclear power reactor operators	4970	73510
+51-8012	Power distributors and dispatchers	9820	66070
+51-8013	Power plant operators	34700	58340
+51-8021	Stationary engineers and boiler operators	39000	50660
+51-8031	Water and liquid waste treatment plant and system operators	110300	39950
+51-8091	Chemical plant and system operators	44600	52150
+51-8092	Gas plant operators	14500	55350
+51-8093	Petroleum pump system operators, refinery operators, and gaugers	45710	54950
+51-8099	Plant and system operators, all other	12370	48590
+51-9011	Chemical equipment operators and tenders	52890	45580
+51-9012	Separating, filtering, clarifying, precipitating, and still machine setters, operators, and tenders	41200	38010
+51-9021	Crushing, grinding, and polishing machine setters, operators, and tenders	41270	31360
+51-9022	Grinding and polishing workers, hand	40290	27100
+51-9023	Mixing and blending machine setters, operators, and tenders	140120	32650
+51-9031	Cutters and trimmers, hand	24700	25540
+51-9032	Cutting and slicing machine setters, operators, and tenders	76500	30020
+51-9041	Extruding, forming, pressing, and compacting machine setters, operators, and tenders	85130	30430
+51-9051	Furnace, kiln, oven, drier, and kettle operators and tenders	22950	32950
+51-9061	Inspectors, testers, sorters, samplers, and weighers	467010	33890
+51-9071	Jewelers and precious stone and metal workers	24780	35360
+51-9081	Dental laboratory technicians	42640	36990
+51-9082	Medical appliance technicians	12930	38640
+51-9083	Ophthalmic laboratory technicians	32930	29130
+51-9111	Packaging and filling machine operators and tenders	357480	26550
+51-9121	Coating, painting, and spraying machine setters, operators, and tenders	103310	29680
+51-9122	Painters, transportation equipment	50310	40300
+51-9123	Painting, coating, and decorating workers	31200	26090
+51-9131	Photographic process workers	21040	29410
+51-9132	Photographic processing machine operators	49550	22740
+51-9141	Semiconductor processors	32230	34170
+51-9191	Cementing and gluing machine operators and tenders	19640	29030
+51-9192	Cleaning, washing, and metal pickling equipment operators and tenders	18870	26140
+51-9193	Cooling and freezing equipment operators and tenders	9940	27260
+51-9194	Etchers and engravers	10760	29400
+51-9195	Molders, shapers, and casters, except metal and plastic	41900	29090
+51-9196	Paper goods machine setters, operators, and tenders	104170	34010
+51-9197	Tire builders	21740	38080
+51-9198	Helpers--production workers	499870	23320
+51-9199	Production workers, all other	280160	30310
+53-0000	Transportation and material moving occupations	9508750	31450
+53-1011	Aircraft cargo handling supervisors	4950	46660
+53-1021	First-line supervisors/managers of helpers, laborers, and material movers, hand	186230	44380
+53-1031	First-line supervisors/managers of transportation and material-moving machine and vehicle operators	218480	53960
+53-2011	Airline pilots, copilots, and flight engineers	77090	119750
+53-2012	Commercial pilots	31250	75500
+53-2021	Air traffic controllers	24260	108090
+53-2022	Airfield operations specialists	8050	42550
+53-3011	Ambulance drivers and attendants, except emergency medical technicians	21790	23400
+53-3021	Bus drivers, transit and intercity	184160	35700
+53-3022	Bus drivers, school	460100	27060
+53-3031	Driver/sales workers	372720	26050
+53-3032	Truck drivers, heavy and tractor-trailer	1672580	38720
+53-3033	Truck drivers, light or delivery services	908960	30260
+53-3041	Taxi drivers and chauffeurs	170520	23540
+53-3099	Motor vehicle operators, all other	78610	29650
+53-4011	Locomotive engineers	42760	53470
+53-4012	Locomotive firers	970	52950
+53-4013	Rail yard engineers, dinkey operators, and hostlers	5480	34850
+53-4021	Railroad brake, signal, and switch operators	24610	49400
+53-4031	Railroad conductors and yardmasters	39580	54120
+53-4041	Subway and streetcar operators	7430	49330
+53-4099	Rail transportation workers, all other	4660	44200
+53-5011	Sailors and marine oilers	32420	35880
+53-5021	Captains, mates, and pilots of water vessels	30600	67730
+53-5022	Motorboat operators	3380	36480
+53-5031	Ship engineers	11190	66140
+53-6011	Bridge and lock tenders	4490	39930
+53-6021	Parking lot attendants	136470	20120
+53-6031	Service station attendants	84480	20340
+53-6041	Traffic technicians	7030	41810
+53-6051	Transportation inspectors	24940	59200
+53-6099	Transportation workers, all other	43330	35590
+53-7011	Conveyor operators and tenders	41920	30090
+53-7021	Crane and tower operators	44490	45430
+53-7031	Dredge operators	1910	39040
+53-7032	Excavating and loading machine and dragline operators	65160	38180
+53-7033	Loading machine operators, underground mining	3670	44230
+53-7041	Hoist and winch operators	2810	41340
+53-7051	Industrial truck and tractor operators	620450	30750
+53-7061	Cleaners of vehicles and equipment	330850	21700
+53-7062	Laborers and freight, stock, and material movers, hand	2335510	24690
+53-7063	Machine feeders and offbearers	144820	26880
+53-7064	Packers and packagers, hand	777630	21100
+53-7071	Gas compressor and gas pumping station operators	4050	44410
+53-7072	Pump operators, except wellhead pumpers	9280	41020
+53-7073	Wellhead pumpers	17050	39430
+53-7081	Refuse and recyclable material collectors	129080	32790
+53-7111	Shuttle car operators	3050	42700
+53-7121	Tank car, truck, and ship loaders	12330	39510
+53-7199	Material moving workers, all other	41140	34700

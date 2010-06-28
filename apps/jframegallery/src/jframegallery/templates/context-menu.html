@@ -1,0 +1,33 @@
+{% comment %}
+Licensed to Cloudera, Inc. under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  Cloudera, Inc. licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+	<head>
+		<title>Context Menu</title>
+	</head>
+	<body>
+		<div class="ccs-shared context-menu-delegate" data-context-menu-actions="[{'events':['contextmenu','click:relay(a.show-options)'],'menu':'ul.context-menu'}]" style="width: 200px; height: 100px; padding: 40px; background: #ccc; border: 1px solid #000; margin: 10px auto;">
+			I show a menu if you right click anywhere in me. Or you can click <a class="show-options">this link</a> to show it.
+			<ul class="context-menu ccs-hidden">
+				<li class="cm-one">Item 1</li>
+				<li class="cm-two">Item 1</li>
+				<li class="cm-three">Item 1</li>
+			</ul>
+		</div>
+	</body>
+</html>

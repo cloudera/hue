@@ -1,0 +1,1574 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<meta name="version" content="S5 1.1" />
+<title>Implementing XML languages with lxml</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 5196 2007-06-03 20:25:28Z wiemann $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left {
+  clear: left }
+
+img.align-right {
+  clear: right }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font-family: serif ;
+  font-size: 100% }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+<!-- configuration parameters -->
+<meta name="defaultView" content="slideshow" />
+<meta name="controlVis" content="hidden" />
+<!-- style sheet links -->
+<script src="ui/default/slides.js" type="text/javascript"></script>
+<link rel="stylesheet" href="ui/default/slides.css"
+      type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/default/outline.css"
+      type="text/css" media="screen" id="outlineStyle" />
+<link rel="stylesheet" href="ui/default/print.css"
+      type="text/css" media="print" id="slidePrint" />
+<link rel="stylesheet" href="ui/default/opera.css"
+      type="text/css" media="projection" id="operaFix" />
+</head>
+<body>
+<div class="layout">
+<div id="controls"></div>
+<div id="currentSlide"></div>
+<div id="header">
+
+</div>
+<div id="footer">
+<h1>Implementing XML languages with lxml</h1>
+<h2>Dr. Stefan Behnel, EuroPython 2008, Vilnius/Lietuva</h2>
+</div>
+</div>
+<div class="presentation">
+<div class="slide" id="slide0">
+<h1 class="title">Implementing XML languages with lxml</h1>
+<h2 class="subtitle" id="dr-stefan-behnel">Dr. Stefan Behnel</h2>
+
+<p class="center"><a class="reference external" href="http://codespeak.net/lxml/">http://codespeak.net/lxml/</a></p>
+<p class="center"><a class="reference external" href="mailto:lxml-dev&#64;codespeak.net">lxml-dev&#64;codespeak.net</a></p>
+<img alt="tagpython.png" class="center" src="tagpython.png" />
+<!-- Definitions of interpreted text roles (classes) for S5/HTML data. -->
+<!-- This data file has been placed in the public domain. -->
+<!-- Colours
+======= -->
+<!-- Text Sizes
+========== -->
+<!-- Display in Slides (Presentation Mode) Only
+========================================== -->
+<!-- Display in Outline Mode Only
+============================ -->
+<!-- Display in Print Only
+===================== -->
+<!-- Display in Handout Mode Only
+============================ -->
+<!-- Incremental Display
+=================== -->
+
+</div>
+<div class="slide" id="what-is-an-xml-language">
+<h1>What is an »XML language«?</h1>
+<ul class="simple">
+<li>a language in XML notation</li>
+<li>aka »XML dialect«<ul>
+<li>except that it's not a dialect</li>
+</ul>
+</li>
+<li>Examples:<ul>
+<li>XML Schema</li>
+<li>Atom/RSS</li>
+<li>(X)HTML</li>
+<li>Open Document Format</li>
+<li>SOAP</li>
+<li>... add your own one here</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="popular-mistakes-to-avoid-1">
+<h1>Popular mistakes to avoid (1)</h1>
+<p>&quot;That's easy, I can use regular expressions!&quot;</p>
+<p class="incremental center">No, you can't.</p>
+</div>
+<div class="slide" id="popular-mistakes-to-avoid-2">
+<h1>Popular mistakes to avoid (2)</h1>
+<p>&quot;This is tree data, I'll take the DOM!&quot;</p>
+</div>
+<div class="slide" id="id1">
+<h1>Popular mistakes to avoid (2)</h1>
+<p>&quot;This is tree data, I'll take the DOM!&quot;</p>
+<ul class="simple">
+<li>DOM is ubiquitous, but it's as complicated as Java</li>
+<li>uglify your application with tons of DOM code to<ul>
+<li>walk over non-element nodes to find the data you need</li>
+<li>convert text content to other data types</li>
+<li>modify the XML tree in memory</li>
+</ul>
+</li>
+</ul>
+<p>=&gt; write verbose, redundant, hard-to-maintain code</p>
+</div>
+<div class="slide" id="popular-mistakes-to-avoid-3">
+<h1>Popular mistakes to avoid (3)</h1>
+<p>&quot;SAX is <em>so</em> fast and consumes <em>no</em> memory!&quot;</p>
+</div>
+<div class="slide" id="id2">
+<h1>Popular mistakes to avoid (3)</h1>
+<p>&quot;SAX is <em>so</em> fast and consumes <em>no</em> memory!&quot;</p>
+<ul class="simple">
+<li>but <em>writing</em> SAX code is <em>not</em> fast!</li>
+<li>write error-prone, state-keeping SAX code to<ul>
+<li>figure out where you are</li>
+<li>find the sections you need</li>
+<li>convert text content to other data types</li>
+<li>copy the XML data into custom data classes</li>
+<li>... and don't forget the way back into XML!</li>
+</ul>
+</li>
+</ul>
+<p>=&gt; write confusing state-machine code</p>
+<p>=&gt; debugging into existence</p>
+</div>
+<div class="slide" id="working-with-xml">
+<h1>Working with XML</h1>
+<blockquote>
+<p><strong>Getting XML work done</strong></p>
+<p>(instead of getting time wasted)</p>
+</blockquote>
+</div>
+<div class="slide" id="how-can-you-work-with-xml">
+<h1>How can you work with XML?</h1>
+<ul class="simple">
+<li>Preparation:<ul>
+<li>Implement usable data classes as an abstraction layer</li>
+<li>Implement a mapping from XML to the data classes</li>
+<li>Implement a mapping from the data classes to XML</li>
+</ul>
+</li>
+<li>Workflow:<ul>
+<li>parse XML data</li>
+<li>map XML data to data classes</li>
+<li>work with data classes</li>
+<li>map data classes to XML</li>
+<li>serialise XML</li>
+</ul>
+</li>
+</ul>
+<ul class="incremental simple">
+<li>Approach:<ul>
+<li>get rid of XML and do everything in your own code</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="what-if-you-could-simplify-this">
+<h1>What if you could simplify this?</h1>
+<ul class="simple">
+<li>Preparation:<ul>
+<li>Extend usable XML API classes into an abstraction layer</li>
+</ul>
+</li>
+<li>Workflow:<ul>
+<li>parse XML data into XML API classes</li>
+<li>work with XML API classes</li>
+<li>serialise XML</li>
+</ul>
+</li>
+</ul>
+<ul class="incremental simple">
+<li>Approach:<ul>
+<li>cover only the quirks of XML and make it work <em>for</em> you</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="id3">
+<h1>What if you could simplify this ...</h1>
+<ul class="simple">
+<li>... without sacrificing usability or flexibility?</li>
+<li>... using a high-speed, full-featured, pythonic XML toolkit?</li>
+<li>... with the power of XPath, XSLT and XML validation?</li>
+</ul>
+<p class="incremental center">... then »lxml« is your friend!</p>
+</div>
+<div class="slide" id="overview">
+<h1>Overview</h1>
+<ul class="simple">
+<li>What is lxml?<ul>
+<li>what &amp; who</li>
+</ul>
+</li>
+<li>How do you use it?<ul>
+<li>Lesson 0: quick API overview<ul>
+<li>ElementTree concepts and lxml features</li>
+</ul>
+</li>
+<li>Lesson 1: parse XML<ul>
+<li>how to get XML data into memory</li>
+</ul>
+</li>
+<li>Lesson 2: generate XML<ul>
+<li>how to write an XML generator for a language</li>
+</ul>
+</li>
+<li>Lesson 3: working with XML trees made easy<ul>
+<li>how to write an XML API for a language</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="what-is-lxml">
+<h1>What is lxml?</h1>
+<ul class="simple">
+<li>a fast, full-featured toolkit for XML and HTML handling<ul>
+<li><a class="reference external" href="http://codespeak.net/lxml/">http://codespeak.net/lxml/</a></li>
+<li><a class="reference external" href="mailto:lxml-dev&#64;codespeak.net">lxml-dev&#64;codespeak.net</a></li>
+</ul>
+</li>
+<li>based on and inspired by<ul>
+<li>the C libraries libxml2 and libxslt (by Daniel Veillard)</li>
+<li>the ElementTree API (by Fredrik Lundh)</li>
+<li>the Cython compiler (by Robert Bradshaw, Greg Ewing &amp; me)</li>
+<li>the Python language (by Guido &amp; [<em>paste Misc/ACKS here</em>])</li>
+<li>user feedback, ideas and patches (by you!)<ul>
+<li>keep doing that, we love you all!</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>maintained (and major parts) written by myself<ul>
+<li>initial design and implementation by Martijn Faassen</li>
+<li>extensive HTML API and tools by Ian Bicking</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="what-do-you-get-for-your-money">
+<h1>What do you get for your money?</h1>
+<ul class="simple">
+<li>many tools in one:<ul>
+<li>Generic, ElementTree compatible XML API: <strong>lxml.etree</strong><ul>
+<li>but faster for many tasks and much more feature-rich</li>
+</ul>
+</li>
+<li>Special tool set for HTML handling: <strong>lxml.html</strong></li>
+<li>Special API for pythonic data binding: <strong>lxml.objectify</strong></li>
+<li>General purpose path languages: XPath and CSS selectors</li>
+<li>Validation: DTD, XML Schema, RelaxNG, Schematron</li>
+<li>XSLT, XInclude, C14N, ...</li>
+<li>Fast tree iteration, event-driven parsing, ...</li>
+</ul>
+</li>
+<li>it's free, but it's worth every €-Cent!<ul>
+<li>what users say:<ul>
+<li>»no qualification, I would recommend lxml for just about any
+HTML task«</li>
+<li>»THE tool [...] for newbies and experienced developers«</li>
+<li>»you can do pretty much anything with an intuitive API«</li>
+<li>»lxml takes all the pain out of XML«</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="lesson-0-a-quick-overview">
+<h1>Lesson 0: a quick overview</h1>
+<blockquote>
+<p>why <strong>»lxml takes all the pain out of XML«</strong></p>
+<p>(a quick overview of lxml features and ElementTree concepts)</p>
+</blockquote>
+<!-- >>> from lxml import etree, cssselect, html
+>>> some_xml_data  = "<root><speech class='dialog'><p>So be it!</p></speech><p>stuff</p></root>"
+>>> some_html_data = "<p>Just a quick note<br>next line</p>"
+>>> xml_tree = etree.XML(some_xml_data)
+>>> html_tree = html.fragment_fromstring(some_html_data) -->
+</div>
+<div class="slide" id="namespaces-in-elementtree">
+<h1>Namespaces in ElementTree</h1>
+<ul>
+<li><p class="first">uses Clark notation:</p>
+<ul class="simple">
+<li>wrap namespace URI in <tt class="docutils literal"><span class="pre">{...}</span></tt></li>
+<li>append the tag name</li>
+</ul>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 368)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; tag = &quot;{http://www.w3.org/the/namespace}tagname&quot;
+  &gt;&gt;&gt; element = etree.Element(tag)
+
+</pre>
+</div>
+</li>
+<li><p class="first">no prefixes!</p>
+</li>
+<li><p class="first">a single, self-containing tag identifier</p>
+</li>
+</ul>
+</div>
+<div class="slide" id="text-content-in-elementtree">
+<h1>Text content in ElementTree</h1>
+<ul>
+<li><p class="first">uses <tt class="docutils literal"><span class="pre">.text</span></tt> and <tt class="docutils literal"><span class="pre">.tail</span></tt> attributes:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 383)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; div = html.fragment_fromstring(
+  ...     &quot;&lt;div&gt;&lt;p&gt;a paragraph&lt;br&gt;split in two&lt;/p&gt; parts&lt;/div&gt;&quot;)
+  &gt;&gt;&gt; p = div[0]
+  &gt;&gt;&gt; br = p[0]
+
+  &gt;&gt;&gt; p.text
+  'a paragraph'
+  &gt;&gt;&gt; br.text
+  &gt;&gt;&gt; br.tail
+  'split in two'
+  &gt;&gt;&gt; p.tail
+  ' parts'
+
+</pre>
+</div>
+</li>
+<li><p class="first">no text nodes!</p>
+<ul class="simple">
+<li>simplifies tree traversal a lot</li>
+<li>simplifies many XML algorithms</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="attributes-in-elementtree">
+<h1>Attributes in ElementTree</h1>
+<ul>
+<li><p class="first">uses <tt class="docutils literal"><span class="pre">.get()</span></tt> and <tt class="docutils literal"><span class="pre">.set()</span></tt> methods:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 410)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; root = etree.fromstring(
+  ...     '&lt;root a=&quot;the value&quot; b=&quot;of an&quot; c=&quot;attribute&quot;/&gt;')
+
+  &gt;&gt;&gt; root.get('a')
+  'the value'
+
+  &gt;&gt;&gt; root.set('a', &quot;THE value&quot;)
+  &gt;&gt;&gt; root.get('a')
+  'THE value'
+
+</pre>
+</div>
+</li>
+<li><p class="first">or the <tt class="docutils literal"><span class="pre">.attrib</span></tt> dictionary property:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 424)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; d = root.attrib
+
+  &gt;&gt;&gt; list(sorted(d.keys()))
+  ['a', 'b', 'c']
+  &gt;&gt;&gt; list(sorted(d.values()))
+  ['THE value', 'attribute', 'of an']
+
+
+</pre>
+</div>
+</li>
+</ul>
+</div>
+<div class="slide" id="tree-iteration-in-lxml-etree-1">
+<h1>Tree iteration in lxml.etree (1)</h1>
+<!-- >>> import collections -->
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 440)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+    &gt;&gt;&gt; root = etree.fromstring(
+    ...   &quot;&lt;root&gt; &lt;a&gt;&lt;b/&gt;&lt;b/&gt;&lt;/a&gt; &lt;c&gt;&lt;d/&gt;&lt;e&gt;&lt;f/&gt;&lt;/e&gt;&lt;g/&gt;&lt;/c&gt; &lt;/root&gt;&quot;)
+
+    &gt;&gt;&gt; print([child.tag for child in root])   # children
+    ['a', 'c']
+
+    &gt;&gt;&gt; print([el.tag for el in root.iter()])  # self and descendants
+    ['root', 'a', 'b', 'b', 'c', 'd', 'e', 'f', 'g']
+
+    &gt;&gt;&gt; print([el.tag for el in root.iterdescendants()])
+    ['a', 'b', 'b', 'c', 'd', 'e', 'f', 'g']
+
+
+    &gt;&gt;&gt; def iter_breadth_first(root):
+    ...     bfs_queue = collections.deque([root])
+    ...     while bfs_queue:
+    ...         el = bfs_queue.popleft()  # pop next element
+    ...         bfs_queue.extend(el)      # append its children
+    ...         yield el
+
+    &gt;&gt;&gt; print([el.tag for el in iter_breadth_first(root)])
+    ['root', 'a', 'c', 'b', 'b', 'd', 'e', 'g', 'f']
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="tree-iteration-in-lxml-etree-2">
+<h1>Tree iteration in lxml.etree (2)</h1>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 469)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+    &gt;&gt;&gt; root = etree.fromstring(
+    ...   &quot;&lt;root&gt; &lt;a&gt;&lt;b/&gt;&lt;b/&gt;&lt;/a&gt; &lt;c&gt;&lt;d/&gt;&lt;e&gt;&lt;f/&gt;&lt;/e&gt;&lt;g/&gt;&lt;/c&gt; &lt;/root&gt;&quot;)
+
+    &gt;&gt;&gt; tree_walker = etree.iterwalk(root, events=('start', 'end'))
+
+    &gt;&gt;&gt; for (event, element) in tree_walker:
+    ...     print(&quot;%s (%s)&quot; % (element.tag, event))
+    root (start)
+    a (start)
+    b (start)
+    b (end)
+    b (start)
+    b (end)
+    a (end)
+    c (start)
+    d (start)
+    d (end)
+    e (start)
+    f (start)
+    f (end)
+    e (end)
+    g (start)
+    g (end)
+    c (end)
+    root (end)
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="path-languages-in-lxml">
+<h1>Path languages in lxml</h1>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 501)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: xml
+
+    &lt;root&gt;
+      &lt;speech class='dialog'&gt;&lt;p&gt;So be it!&lt;/p&gt;&lt;/speech&gt;
+      &lt;p&gt;stuff&lt;/p&gt;
+    &lt;/root&gt;
+
+</pre>
+</div>
+<ul>
+<li><p class="first">search it with XPath</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 510)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; find_paragraphs = etree.XPath(&quot;//p&quot;)
+  &gt;&gt;&gt; paragraphs = find_paragraphs(xml_tree)
+
+  &gt;&gt;&gt; print([ p.text for p in paragraphs ])
+  ['So be it!', 'stuff']
+
+</pre>
+</div>
+</li>
+<li><p class="first">search it with CSS selectors</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 520)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; find_dialogs = cssselect.CSSSelector(&quot;speech.dialog p&quot;)
+  &gt;&gt;&gt; paragraphs = find_dialogs(xml_tree)
+
+  &gt;&gt;&gt; print([ p.text for p in paragraphs ])
+  ['So be it!']
+
+
+</pre>
+</div>
+</li>
+</ul>
+</div>
+<div class="slide" id="summary-of-lesson-0">
+<h1>Summary of lesson 0</h1>
+<ul class="simple">
+<li>lxml comes with various tools<ul>
+<li>that aim to hide the quirks of XML</li>
+<li>that simplify finding and handling data</li>
+<li>that make XML a pythonic tool by itself</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="lesson-1-parsing-xml-html">
+<h1>Lesson 1: parsing XML/HTML</h1>
+<blockquote>
+<p><strong>The input side</strong></p>
+<p>(a quick overview)</p>
+</blockquote>
+</div>
+<div class="slide" id="parsing-xml-and-html-from">
+<h1>Parsing XML and HTML from ...</h1>
+<ul class="simple">
+<li>strings: <tt class="docutils literal"><span class="pre">fromstring(xml_data)</span></tt><ul>
+<li>byte strings, but also unicode strings</li>
+</ul>
+</li>
+<li>filenames: <tt class="docutils literal"><span class="pre">parse(filename)</span></tt></li>
+<li>HTTP/FTP URLs: <tt class="docutils literal"><span class="pre">parse(url)</span></tt></li>
+<li>file objects: <tt class="docutils literal"><span class="pre">parse(f)</span></tt><ul>
+<li><tt class="docutils literal"><span class="pre">f</span> <span class="pre">=</span> <span class="pre">open(filename,</span> <span class="pre">'rb')</span></tt> !</li>
+</ul>
+</li>
+<li>file-like objects: <tt class="docutils literal"><span class="pre">parse(f)</span></tt><ul>
+<li>only need a <tt class="docutils literal"><span class="pre">f.read(size)</span></tt> method</li>
+</ul>
+</li>
+<li>data chunks: <tt class="docutils literal"><span class="pre">parser.feed(xml_chunk)</span></tt><ul>
+<li><tt class="docutils literal"><span class="pre">result</span> <span class="pre">=</span> <span class="pre">parser.close()</span></tt></li>
+</ul>
+</li>
+</ul>
+<p class="small right">(parsing from strings and filenames/URLs frees the GIL)</p>
+</div>
+<div class="slide" id="example-parsing-from-a-string">
+<h1>Example: parsing from a string</h1>
+<ul>
+<li><p class="first">using the <tt class="docutils literal"><span class="pre">fromstring()</span></tt> function:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 582)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; root_element = etree.fromstring(some_xml_data)
+
+</pre>
+</div>
+</li>
+<li><p class="first">using the <tt class="docutils literal"><span class="pre">fromstring()</span></tt> function with a specific parser:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 588)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; parser = etree.HTMLParser(remove_comments=True)
+  &gt;&gt;&gt; root_element = etree.fromstring(some_html_data, parser)
+
+</pre>
+</div>
+</li>
+<li><p class="first">or the <tt class="docutils literal"><span class="pre">XML()</span></tt> and <tt class="docutils literal"><span class="pre">HTML()</span></tt> aliases for literals in code:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 595)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; root_element = etree.XML(&quot;&lt;root&gt;&lt;child/&gt;&lt;/root&gt;&quot;)
+  &gt;&gt;&gt; root_element = etree.HTML(&quot;&lt;p&gt;some&lt;br&gt;paragraph&lt;/p&gt;&quot;)
+
+
+</pre>
+</div>
+</li>
+</ul>
+</div>
+<div class="slide" id="parsing-xml-into">
+<h1>Parsing XML into ...</h1>
+<ul class="simple">
+<li>a tree in memory<ul>
+<li><tt class="docutils literal"><span class="pre">parse()</span></tt> and <tt class="docutils literal"><span class="pre">fromstring()</span></tt> functions</li>
+</ul>
+</li>
+<li>a tree in memory, but step-by-step with a generator<ul>
+<li><tt class="docutils literal"><span class="pre">iterparse()</span></tt> generates <tt class="docutils literal"><span class="pre">(start/end,</span> <span class="pre">element)</span></tt> events</li>
+<li>tree can be cleaned up to save space</li>
+</ul>
+</li>
+<li>SAX-like callbacks without building a tree<ul>
+<li><tt class="docutils literal"><span class="pre">parse()</span></tt> and <tt class="docutils literal"><span class="pre">fromstring()</span></tt> functions</li>
+<li>pass a <tt class="docutils literal"><span class="pre">target</span></tt> object into the parser</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="summary-of-lesson-1">
+<h1>Summary of lesson 1</h1>
+<ul class="simple">
+<li>parsing XML/HTML in lxml is mostly straight forward<ul>
+<li>simple functions that do the job</li>
+</ul>
+</li>
+<li>advanced use cases are pretty simple<ul>
+<li>event-driven parsing using <tt class="docutils literal"><span class="pre">iterparse()</span></tt></li>
+<li>special parser configuration with keyword arguments<ul>
+<li>configuration is generally local to a parser</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>BTW: parsing is <em>very</em> fast, as is serialising<ul>
+<li>don't hesitate to do parse-serialise-parse cycles</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="lesson-2-generating-xml">
+<h1>Lesson 2: generating XML</h1>
+<blockquote>
+<p><strong>The output side</strong></p>
+<p>(and how to make it safe and simple)</p>
+</blockquote>
+</div>
+<div class="slide" id="the-example-language-atom">
+<h1>The example language: Atom</h1>
+<p>The Atom XML format</p>
+<ul class="simple">
+<li>Namespace: <a class="reference external" href="http://www.w3.org/2005/Atom">http://www.w3.org/2005/Atom</a></li>
+<li>W3C recommendation derived from RSS and friends</li>
+<li>Atom feeds describe news entries and annotated links<ul>
+<li>a <tt class="docutils literal"><span class="pre">feed</span></tt> contains one or more <tt class="docutils literal"><span class="pre">entry</span></tt> elements</li>
+<li>an <tt class="docutils literal"><span class="pre">entry</span></tt> contains <tt class="docutils literal"><span class="pre">author</span></tt>, <tt class="docutils literal"><span class="pre">link</span></tt>, <tt class="docutils literal"><span class="pre">summary</span></tt> and/or <tt class="docutils literal"><span class="pre">content</span></tt></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="example-generate-xml-1">
+<h1>Example: generate XML (1)</h1>
+<p>The ElementMaker (or <em>E-factory</em>)</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 670)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; from lxml.builder import ElementMaker
+  &gt;&gt;&gt; A = ElementMaker(namespace=&quot;http://www.w3.org/2005/Atom&quot;,
+  ...                  nsmap={None : &quot;http://www.w3.org/2005/Atom&quot;})
+
+</pre>
+</div>
+<div class="incremental system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 678)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+ &gt;&gt;&gt; atom = A.feed(
+ ...   A.author( A.name(&quot;Stefan Behnel&quot;) ),
+ ...   A.entry(
+ ...     A.title(&quot;News from lxml&quot;),
+ ...     A.link(href=&quot;http://codespeak.net/lxml/&quot;),
+ ...     A.summary(&quot;See what's &lt;b&gt;fun&lt;/b&gt; about lxml...&quot;,
+ ...               type=&quot;html&quot;),
+ ...   )
+ ... )
+
+</pre>
+</div>
+<div class="incremental system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 690)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+ &gt;&gt;&gt; from lxml.etree import tostring
+ &gt;&gt;&gt; print( tostring(atom, pretty_print=True) )
+</pre>
+</div>
+</div>
+<div class="slide" id="example-generate-xml-2">
+<h1>Example: generate XML (2)</h1>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 699)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; atom = A.feed(
+  ...   A.author( A.name(&quot;Stefan Behnel&quot;) ),
+  ...   A.entry(
+  ...     A.title(&quot;News from lxml&quot;),
+  ...     A.link(href=&quot;http://codespeak.net/lxml/&quot;),
+  ...     A.summary(&quot;See what's &lt;b&gt;fun&lt;/b&gt; about lxml...&quot;,
+  ...               type=&quot;html&quot;),
+  ...   )
+  ... )
+
+</pre>
+</div>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 711)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: xml
+
+  &lt;feed xmlns=&quot;http://www.w3.org/2005/Atom&quot;&gt;
+    &lt;author&gt;
+      &lt;name&gt;Stefan Behnel&lt;/name&gt;
+    &lt;/author&gt;
+    &lt;entry&gt;
+      &lt;title&gt;News from lxml&lt;/title&gt;
+      &lt;link href=&quot;http://codespeak.net/lxml/&quot;/&gt;
+      &lt;summary type=&quot;html&quot;&gt;See what's &amp;lt;b&amp;gt;fun&amp;lt;/b&amp;gt;
+                           about lxml...&lt;/summary&gt;
+    &lt;/entry&gt;
+  &lt;/feed&gt;
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="be-careful-what-you-type">
+<h1>Be careful what you type!</h1>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 729)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; atom = A.feed(
+  ...   A.author( A.name(&quot;Stefan Behnel&quot;) ),
+  ...   A.entry(
+  ...     A.titel(&quot;News from lxml&quot;),
+  ...     A.link(href=&quot;http://codespeak.net/lxml/&quot;),
+  ...     A.summary(&quot;See what's &lt;b&gt;fun&lt;/b&gt; about lxml...&quot;,
+  ...               type=&quot;html&quot;),
+  ...   )
+  ... )
+
+</pre>
+</div>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 741)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: xml
+
+  &lt;feed xmlns=&quot;http://www.w3.org/2005/Atom&quot;&gt;
+    &lt;author&gt;
+      &lt;name&gt;Stefan Behnel&lt;/name&gt;
+    &lt;/author&gt;
+    &lt;entry&gt;
+      &lt;titel&gt;News from lxml&lt;/titel&gt;
+      &lt;link href=&quot;http://codespeak.net/lxml/&quot;/&gt;
+      &lt;summary type=&quot;html&quot;&gt;See what's &amp;lt;b&amp;gt;fun&amp;lt;/b&amp;gt;
+                           about lxml...&lt;/summary&gt;
+    &lt;/entry&gt;
+  &lt;/feed&gt;
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="want-more-type-safety">
+<h1>Want more 'type safety'?</h1>
+<p>Write an XML generator <em>module</em> instead:</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 761)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: python
+
+  # atomgen.py
+
+  from lxml import etree
+  from lxml.builder import ElementMaker
+
+  ATOM_NAMESPACE = &quot;http://www.w3.org/2005/Atom&quot;
+
+  A = ElementMaker(namespace=ATOM_NAMESPACE,
+                   nsmap={None : ATOM_NAMESPACE})
+
+  feed = A.feed
+  entry = A.entry
+  title = A.title
+  # ... and so on and so forth ...
+
+
+  # plus a little validation function: isvalid()
+  isvalid = etree.RelaxNG(file=&quot;atom.rng&quot;)
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="the-atom-generator-module">
+<h1>The Atom generator module</h1>
+<!-- >>> import sys
+>>> sys.path.insert(0, "ep2008") -->
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 790)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; import atomgen as A
+
+  &gt;&gt;&gt; atom = A.feed(
+  ...   A.author( A.name(&quot;Stefan Behnel&quot;) ),
+  ...   A.entry(
+  ...     A.link(href=&quot;http://codespeak.net/lxml/&quot;),
+  ...     A.title(&quot;News from lxml&quot;),
+  ...     A.summary(&quot;See what's &lt;b&gt;fun&lt;/b&gt; about lxml...&quot;,
+  ...               type=&quot;html&quot;),
+  ...   )
+  ... )
+
+  &gt;&gt;&gt; A.isvalid(atom) # ok, forgot the ID's =&gt; invalid XML ...
+  False
+
+  &gt;&gt;&gt; title = A.titel(&quot;News from lxml&quot;)
+  Traceback (most recent call last):
+    ...
+  AttributeError: 'module' object has no attribute 'titel'
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="mixing-languages-1">
+<h1>Mixing languages (1)</h1>
+<p>Atom can embed <em>serialised</em> HTML</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 818)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+    &gt;&gt;&gt; import lxml.html.builder as h
+
+    &gt;&gt;&gt; html_fragment = h.DIV(
+    ...   &quot;this is some\n&quot;,
+    ...   h.A(&quot;HTML&quot;, href=&quot;http://w3.org/MarkUp/&quot;),
+    ...   &quot;\ncontent&quot;)
+
+</pre>
+</div>
+<div class="incremental system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 829)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; serialised_html = etree.tostring(html_fragment, method=&quot;html&quot;)
+
+  &gt;&gt;&gt; summary = A.summary(serialised_html, type=&quot;html&quot;)
+
+</pre>
+</div>
+<div class="incremental system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 835)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; print(etree.tostring(summary))
+  &lt;summary xmlns=&quot;http://www.w3.org/2005/Atom&quot; type=&quot;html&quot;&gt;
+     &amp;lt;div&amp;gt;this is some
+     &amp;lt;a href=&quot;http://w3.org/MarkUp/&quot;&amp;gt;HTML&amp;lt;/a&amp;gt;
+     content&amp;lt;/div&amp;gt;
+  &lt;/summary&gt;
+</pre>
+</div>
+</div>
+<div class="slide" id="mixing-languages-2">
+<h1>Mixing languages (2)</h1>
+<p>Atom can also embed non-escaped XHTML</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 850)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+    &gt;&gt;&gt; from copy import deepcopy
+    &gt;&gt;&gt; xhtml_fragment = deepcopy(html_fragment)
+
+    &gt;&gt;&gt; from lxml.html import html_to_xhtml
+    &gt;&gt;&gt; html_to_xhtml(xhtml_fragment)
+
+    &gt;&gt;&gt; summary = A.summary(xhtml_fragment, type=&quot;xhtml&quot;)
+
+</pre>
+</div>
+<div class="incremental system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 862)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; print(etree.tostring(summary, pretty_print=True))
+  &lt;summary xmlns=&quot;http://www.w3.org/2005/Atom&quot; type=&quot;xhtml&quot;&gt;
+    &lt;html:div xmlns:html=&quot;http://www.w3.org/1999/xhtml&quot;&gt;this is some
+    &lt;html:a href=&quot;http://w3.org/MarkUp/&quot;&gt;HTML&lt;/html:a&gt;
+    content&lt;/html:div&gt;
+  &lt;/summary&gt;
+</pre>
+</div>
+</div>
+<div class="slide" id="summary-of-lesson-2">
+<h1>Summary of lesson 2</h1>
+<ul class="simple">
+<li>generating XML is easy<ul>
+<li>use the ElementMaker</li>
+</ul>
+</li>
+<li>wrap it in a module that provides<ul>
+<li>the target namespace</li>
+<li>an ElementMaker name for each language element</li>
+<li>a validator</li>
+<li>maybe additional helper functions</li>
+</ul>
+</li>
+<li>mixing languages is easy<ul>
+<li>define a generator module for each</li>
+</ul>
+</li>
+</ul>
+<p>... this is all you need for the <em>output</em> side of XML languages</p>
+</div>
+<div class="slide" id="lesson-3-designing-xml-apis">
+<h1>Lesson 3: Designing XML APIs</h1>
+<blockquote>
+<p><strong>The Element API</strong></p>
+<p>(and how to make it the way <em>you</em> want)</p>
+</blockquote>
+</div>
+<div class="slide" id="trees-in-c-and-in-python">
+<h1>Trees in C and in Python</h1>
+<ul class="simple">
+<li>Trees have two representations:<ul>
+<li>a plain, complete, low-level C tree provided by libxml2</li>
+<li>a set of Python Element proxies, each representing one element</li>
+</ul>
+</li>
+<li>Proxies are created on-the-fly:<ul>
+<li>lxml creates an Element object for a C node on request</li>
+<li>proxies are garbage collected when going out of scope</li>
+<li>XML trees are garbage collected when deleting the last proxy</li>
+</ul>
+</li>
+</ul>
+<img alt="ep2008/proxies.png" class="center" src="ep2008/proxies.png" />
+</div>
+<div class="slide" id="mapping-python-classes-to-nodes">
+<h1>Mapping Python classes to nodes</h1>
+<ul class="simple">
+<li>Proxies can be assigned to XML nodes <em>by user code</em><ul>
+<li>lxml tells you about a node, you return a class</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="example-a-simple-element-class-1">
+<h1>Example: a simple Element class (1)</h1>
+<ul>
+<li><p class="first">define a subclass of ElementBase</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 939)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; class HonkElement(etree.ElementBase):
+  ...    &#64;property
+  ...    def honking(self):
+  ...       return self.get('honking') == 'true'
+
+</pre>
+</div>
+</li>
+<li><p class="first">let it replace the default Element class</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 948)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; lookup = etree.ElementDefaultClassLookup(
+  ...                             element=HonkElement)
+
+  &gt;&gt;&gt; parser = etree.XMLParser()
+  &gt;&gt;&gt; parser.set_element_class_lookup(lookup)
+
+
+</pre>
+</div>
+</li>
+</ul>
+</div>
+<div class="slide" id="example-a-simple-element-class-2">
+<h1>Example: a simple Element class (2)</h1>
+<ul>
+<li><p class="first">use the new Element class</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 962)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+  &gt;&gt;&gt; root = etree.XML('&lt;root&gt;&lt;honk honking=&quot;true&quot;/&gt;&lt;/root&gt;',
+  ...                  parser)
+
+  &gt;&gt;&gt; root.honking
+  False
+  &gt;&gt;&gt; root[0].honking
+  True
+
+
+</pre>
+</div>
+</li>
+</ul>
+</div>
+<div class="slide" id="id4">
+<h1>Mapping Python classes to nodes</h1>
+<ul class="simple">
+<li>The Element class lookup<ul>
+<li>lxml tells you about a node, you return a class</li>
+<li>no restrictions on lookup algorithm</li>
+<li>each parser can use a different class lookup scheme</li>
+<li>lookup schemes can be chained through fallbacks</li>
+</ul>
+</li>
+<li>Classes can be selected based on<ul>
+<li>the node type (element, comment or processing instruction)<ul>
+<li><tt class="docutils literal"><span class="pre">ElementDefaultClassLookup()</span></tt></li>
+</ul>
+</li>
+<li>the namespaced node name<ul>
+<li><tt class="docutils literal"><span class="pre">CustomElementClassLookup()</span></tt> + a fallback</li>
+<li><tt class="docutils literal"><span class="pre">ElementNamespaceClassLookup()</span></tt> + a fallback</li>
+</ul>
+</li>
+<li>the value of an attribute (e.g. <tt class="docutils literal"><span class="pre">id</span></tt> or <tt class="docutils literal"><span class="pre">class</span></tt>)<ul>
+<li><tt class="docutils literal"><span class="pre">AttributeBasedElementClassLookup()</span></tt> + a fallback</li>
+</ul>
+</li>
+<li>read-only inspection of the tree<ul>
+<li><tt class="docutils literal"><span class="pre">PythonElementClassLookup()</span></tt> + a fallback</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="designing-an-atom-api">
+<h1>Designing an Atom API</h1>
+<ul>
+<li><p class="first">a feed is a container for entries</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 1012)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: python
+
+  # atom.py
+
+  ATOM_NAMESPACE = &quot;http://www.w3.org/2005/Atom&quot;
+  _ATOM_NS = &quot;{%s}&quot; % ATOM_NAMESPACE
+
+  class FeedElement(etree.ElementBase):
+      &#64;property
+      def entries(self):
+         return self.findall(_ATOM_NS + &quot;entry&quot;)
+
+</pre>
+</div>
+</li>
+<li><p class="first">it also has a couple of meta-data children, e.g. <tt class="docutils literal"><span class="pre">title</span></tt></p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 1026)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: python
+
+  class FeedElement(etree.ElementBase):
+      # ...
+      &#64;property
+      def title(self):
+          &quot;return the title or None&quot;
+          return self.find(&quot;title&quot;)
+
+
+</pre>
+</div>
+</li>
+</ul>
+</div>
+<div class="slide" id="consider-lxml-objectify">
+<h1>Consider lxml.objectify</h1>
+<ul class="simple">
+<li>ready-to-use, generic Python object API for XML</li>
+</ul>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 1041)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: python
+
+    &gt;&gt;&gt; from lxml import objectify
+
+    &gt;&gt;&gt; feed = objectify.parse(&quot;atom-example.xml&quot;)
+    &gt;&gt;&gt; print(feed.title)
+    Example Feed
+
+    &gt;&gt;&gt; print([entry.title for entry in feed.entry])
+    ['Atom-Powered Robots Run Amok']
+
+    &gt;&gt;&gt; print(feed.entry[0].title)
+    Atom-Powered Robots Run Amok
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="still-room-for-more-convenience">
+<h1>Still room for more convenience</h1>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 1059)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: python
+
+    from itertools import chain
+
+    class FeedElement(objectify.ObjectifiedElement):
+
+        def addIDs(self):
+            &quot;initialise the IDs of feed and entries&quot;
+
+            for element in chain([self], self.entry):
+                if element.find(_ATOM_NS + &quot;id&quot;) is None:
+                    id = etree.SubElement(self, _ATOM_NS + &quot;id&quot;)
+                    id.text = make_guid()
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="incremental-api-design">
+<h1>Incremental API design</h1>
+<ul class="simple">
+<li>choose an XML API to start with<ul>
+<li>lxml.etree is general purpose</li>
+<li>lxml.objectify is nice for document-style XML</li>
+</ul>
+</li>
+<li>fix Elements that really need some API sugar<ul>
+<li>dict-mappings to children with specific content/attributes</li>
+<li>properties for specially typed attributes or child values</li>
+<li>simplified access to varying content types of an element</li>
+<li>shortcuts for unnecessarily deep subtrees</li>
+</ul>
+</li>
+<li>ignore what works well enough with the Element API<ul>
+<li>lists of homogeneous children -&gt; Element iteration</li>
+<li>string attributes -&gt; .get()/.set()</li>
+</ul>
+</li>
+<li>let the API grow at your fingertips<ul>
+<li>play with it and test use cases</li>
+<li>avoid &quot;I want because I can&quot; feature explosion!</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="slide" id="setting-up-the-element-mapping">
+<h1>Setting up the Element mapping</h1>
+<p>Atom has a namespace =&gt; leave the mapping to lxml</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 1111)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: python
+
+    # ...
+    _atom_lookup = etree.ElementNamespaceClassLookup(
+                      objectify.ObjectifyElementClassLookup())
+
+    # map the classes to tag names
+    ns = _atom_lookup.get_namespace(ATOM_NAMESPACE)
+    ns[&quot;feed&quot;]  = FeedElement
+    ns[&quot;entry&quot;] = EntryElement
+    # ... and so on
+    # or use ns.update(vars()) with appropriate class names
+
+    # create a parser that does some whitespace cleanup
+    atom_parser = etree.XMLParser(remove_blank_text=True)
+
+    # make it use our Atom classes
+    atom_parser.set_element_class_lookup(_atom_lookup)
+
+    # and help users in using our parser setup
+    def parse(input):
+        return etree.parse(input, atom_parser)
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="using-your-new-atom-api">
+<h1>Using your new Atom API</h1>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">lxml-ep2008.txt</tt>, line 1138)</p>
+<p>Unknown directive type &quot;sourcecode&quot;.</p>
+<pre class="literal-block">
+.. sourcecode:: pycon
+
+    &gt;&gt;&gt; import atom
+    &gt;&gt;&gt; feed = atom.parse(&quot;ep2008/atom-example.xml&quot;).getroot()
+
+    &gt;&gt;&gt; print(len(feed.entry))
+    1
+    &gt;&gt;&gt; print([entry.title for entry in feed.entry])
+    ['Atom-Powered Robots Run Amok']
+
+    &gt;&gt;&gt; link_tag = &quot;{%s}link&quot; % atom.ATOM_NAMESPACE
+    &gt;&gt;&gt; print([link.get(&quot;href&quot;) for link in feed.iter(link_tag)])
+    ['http://example.org/', 'http://example.org/2003/12/13/atom03']
+
+
+</pre>
+</div>
+</div>
+<div class="slide" id="summary-of-lesson-3">
+<h1>Summary of lesson 3</h1>
+<p>To implement an XML API ...</p>
+<ol class="arabic simple">
+<li>start off with lxml's Element API<ul>
+<li>or take a look at the object API of lxml.objectify</li>
+</ul>
+</li>
+<li>specialise it into a set of custom Element classes</li>
+<li>map them to XML tags using one of the lookup schemes</li>
+<li>improve the API incrementally while using it<ul>
+<li>discover inconveniences and beautify them</li>
+<li>avoid putting work into things that work</li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="slide" id="conclusion">
+<h1>Conclusion</h1>
+<p>lxml ...</p>
+<ul class="simple">
+<li>provides a convenient set of tools for XML and HTML<ul>
+<li>parsing</li>
+<li>generating</li>
+<li>working with in-memory trees</li>
+</ul>
+</li>
+<li>follows Python idioms wherever possible<ul>
+<li>highly extensible through wrapping and subclassing</li>
+<li>callable objects for XPath, CSS selectors, XSLT, schemas</li>
+<li>iteration for tree traversal (even while parsing)</li>
+<li>list-/dict-like APIs, properties, keyword arguments, ...</li>
+</ul>
+</li>
+<li>makes extension and specialisation easy<ul>
+<li>write a special XML generator module in trivial code</li>
+<li>write your own XML API incrementally on-the-fly</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</body>
+</html>

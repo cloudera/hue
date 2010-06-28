@@ -1,0 +1,25 @@
+Mako is licensed under an MIT-style license (see LICENSE).
+Other incorporated projects may be licensed under different licenses.
+All licenses allow for non-commercial and commercial use.
+
+To install:
+
+    python setup.py install
+
+SVN checkouts also inlcude setup.cfg file allowing setuptools to create 
+an svn-tagged build.  
+
+Documentation is available in HTML format in the ./doc/ directory.
+
+Unit tests run via nose, and are available via setup.py:
+
+    python setup.py test
+        
+Or direct nose usage:
+
+    nosetests -v
+
+For Python 3 information, see README.py3k.
+
+good luck !
+

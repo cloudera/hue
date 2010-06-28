@@ -1,0 +1,5 @@
+Hue v0.9.0, released June 29, 2010
+==================================
+
+Hue 0.9 is the first open source release of Hue, previously known
+as Cloudera Desktop.

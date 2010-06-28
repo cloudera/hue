@@ -1,0 +1,274 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Mako Documentation - Caching</title>
+	
+    <link rel="stylesheet" href="docs.css"></link>
+    <link rel="stylesheet" href="highlight.css"></link>
+    
+
+
+
+
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+<div id="topanchor"><a name="top">&nbsp;</a></div>
+
+<div id="pagecontrol"><a href="index.html">Multiple Pages</a> | <a href="documentation.html">One Page</a></div>
+
+<h1>Mako Documentation</h1>
+
+<div class="versionheader">Version: 0.3.3   Last Updated: 05/31/10 16:21:29</div>
+
+
+
+
+
+
+
+<A name=""></a>
+
+
+    <div class="topnav">
+
+    
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="unicode.html">The Unicode Chapter</a>
+
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+    <br/>
+	<a href="#caching">Caching</a>
+	
+	
+    <ul>
+        <li><A style="" href="caching.html#caching_arguments">Cache arguments</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="caching.html#caching_accessing">Accessing the Cache</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+    
+    <A name="caching"></a>
+    
+    <div class="section">
+    
+
+    <h3>Caching</h3>
+    
+    
+
+<p>Any template or component can be cached using the <code>cache</code> argument to the <code>&lt;%page&gt;</code> or <code>&lt;%def&gt;</code> directives:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">page</span> <span class="na">cached=</span><span class="s">&quot;True&quot;</span><span class="cp">/&gt;</span>
+
+template text
+</pre></div>
+
+    </div>
+<p>The above template, after being executed the first time, will store its content within a cache that by default is scoped within memory.  Subsequent calls to the template's <code>render()</code> method will return content directly from the cache.  When the <code>Template</code> object itself falls out of scope, its corresponding cache is garbage collected along with the template.
+</p>
+<p>Caching requires that the <code>beaker</code> package be installed on the system.
+</p>
+<p>The caching flag and all its options can be used with the <code>&lt;%def&gt;</code> tag.  <br></br>
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">def</span> <span class="na">name=</span><span class="s">&quot;mycomp&quot;</span> <span class="na">cached=</span><span class="s">&quot;True&quot;</span> <span class="na">cache_timeout=</span><span class="s">&quot;30&quot;</span> <span class="na">cache_type=</span><span class="s">&quot;memory&quot;</span><span class="cp">&gt;</span>
+    other text
+<span class="cp">&lt;/%</span><span class="nb">def</span><span class="cp">&gt;</span>
+</pre></div>
+
+    </div>
+
+
+    
+    <A name="caching_arguments"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Cache arguments</h3>
+    
+    
+
+<p>The various cache arguments are cascaded from their default values, to the arguments specified programmatically to the <code>Template</code> or its originating <code>TemplateLookup</code>, then to those defined in the <code>&lt;%page&gt;</code> tag of an individual template, and finally to an individual <code>&lt;%def&gt;</code> tag within the template.  This means you can define, for example, a cache type of <code>dbm</code> on your <code>TemplateLookup</code>, a cache timeout of 60 seconds in a particular template's <code>&lt;%page&gt;</code> tag, and within one of that template's <code>&lt;%def&gt;</code> tags <code>cache=True</code>, and that one particular def will then cache its data using a <code>dbm</code> cache and a data timeout of 60 seconds.
+</p>
+<p>The options available are:
+</p>
+<ul>
+ <li><p>cached="False|True" - turn caching on
+</p>
+
+ </li>
+
+ <li><p>cache_timeout - number of seconds in which to invalidate the cached data.  after this timeout, the content is re-generated on the next call.
+</p>
+
+ </li>
+
+ <li><p>cache_type - type of caching.  <code>memory</code>, <code>file</code>, <code>dbm</code>, or <code>memcached</code>.
+</p>
+
+ </li>
+
+ <li><p>cache_url - (only used for <code>memcached</code> but required) a single IP address or a semi-colon separated list of IP address of memcache servers to use.
+</p>
+
+ </li>
+
+ <li><p>cache_dir  - In the case of the <code>file</code> and <code>dbm</code> cache types, this is the filesystem directory with which to store data files.  If this option is not present, the value of <code>module_directory</code> is used (i.e. the directory where compiled template modules are stored).  If neither option is available an exception is thrown.
+   In the case of the <code>memcached</code> type, this attribute is required and it's used to store the lock files.
+</p>
+
+ </li>
+
+ <li><p>cache_key - the "key" used to uniquely identify this content in the cache.  the total namespace of keys within the cache is local to the current template, and the default value of "key" is the name of the def which is storing its data.  It is an evaluable tag, so you can put a Python expression to calculate the value of the key on the fly.  For example, heres a page that caches any page which inherits from it, based on the filename of the calling template:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">page</span> <span class="na">cached=</span><span class="s">&quot;True&quot;</span> <span class="na">cache_key=</span><span class="s">&quot;${self.filename}&quot;</span><span class="cp">/&gt;</span>
+
+<span class="cp">${</span><span class="n">next</span><span class="o">.</span><span class="n">body</span><span class="p">()</span><span class="cp">}</span>
+
+<span class="cp">## rest of template</span>
+</pre></div>
+
+    </div>
+
+ </li>
+</ul>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="caching_accessing"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Accessing the Cache</h3>
+    
+    
+
+<p>The <code>Template</code>, as well as any template-derived namespace, has an accessor called <code>cache</code> which returns the <code>Cache</code> object for that template.   This object is a facade on top of the Beaker internal cache object, and provides some very rudimental capabilities, such as the ability to get and put arbitrary values:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span>
+    <span class="n">local</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&quot;somekey&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;memory&quot;</span><span class="p">,</span> <span class="s">&quot;somevalue&quot;</span><span class="p">)</span>
+<span class="cp">%&gt;</span>
+</pre></div>
+
+    </div>
+<p>Above, the cache associated with the <code>local</code> namespace is accessed and a key is placed within a memory cache.
+</p>
+<p>More commonly the <code>cache</code> object is used to invalidate cached sections programmatically:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="n">template</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s">&#39;/sometemplate.html&#39;</span><span class="p">)</span>
+
+<span class="c"># invalidate the &quot;body&quot; of the template</span>
+<span class="n">template</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">invalidate_body</span><span class="p">()</span>
+
+<span class="c"># invalidate an individual def</span>
+<span class="n">template</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">invalidate_def</span><span class="p">(</span><span class="s">&#39;somedef&#39;</span><span class="p">)</span>
+
+<span class="c"># invalidate an arbitrary key</span>
+<span class="n">template</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">(</span><span class="s">&#39;somekey&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+</html>
+
+
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="unicode.html">The Unicode Chapter</a>
+
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+

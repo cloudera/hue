@@ -1,0 +1,504 @@
+<?xml version="1.0"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Twisted Documentation: Cooperative Data Flows (via generators)</title><link href="stylesheet.css" type="text/css" rel="stylesheet" /></head><body bgcolor="white"><h1 class="title">Cooperative Data Flows (via generators)</h1><div class="toc"><ol><li><a href="#auto0">Background</a></li><ul><li><a href="#auto1">Handling more than one Request</a></li><li><a href="#auto2">Deferred Callbacks</a></li></ul><li><a href="#auto3">Iterators and generators</a></li><ul><li><a href="#auto4">State pattern</a></li><li><a href="#auto5">Generators</a></li><li><a href="#auto6">Chaining Generators</a></li></ul><li><a href="#auto7">Introducing Flow</a></li><ul><li><a href="#auto8">Equivalent Forms</a></li><li><a href="#auto9">Handling failures</a></li><li><a href="#auto10">Cooperate</a></li><li><a href="#auto11">Merge and Zip</a></li></ul><li><a href="#auto12">Integrating with Twisted</a></li><ul><li><a href="#auto13">Deferred Flow</a></li><li><a href="#auto14">Flow Resources</a></li><li><a href="#auto15">Flow Protocols</a></li></ul><li><a href="#auto16">Threading</a></li><ul><li><a href="#auto17">Using database connections</a></li></ul></ol></div><div class="content"><span></span><h2>Background<a name="auto0"></a></h2><h3>Handling more than one Request<a name="auto1"></a></h3><p>When creating services to handle simultaneous requests, processing state
+must be managed.  A common approach, threading, applies the method used 
+for single user operations:  keeping processing state within local variables 
+and function arguments.  In this case, the operating environment handles 
+variable allocation and cleanup.   Unfortunately, threading requires much
+preemption and locking magic to keep each thread's execution independent,
+yet allowing data to be shared between threads.  This magic can lead to 
+subtle programming errors, and, in the case of Python, slowness as every
+changes to a mutable object must be synchronized with the global 
+interpreter lock.</p><p>An alternative is to use a event-driven approach, where each operation
+is broken down into distinct steps, each step scheduled for operation in 
+an delayed execution queue.  In this approach, an object is often used 
+used to maintain state information between each step, allowing other 
+operations to be performed.  Often each step is a member function, queued
+within Twisted using <code>reactor.CallLater</code>.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">reactor</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">Request</span>:
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">name</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">name</span> = <span class="py-src-variable">name</span>
+        <span class="py-src-variable">reactor</span>.<span class="py-src-variable">callLater</span>(<span class="py-src-number">0</span>, <span class="py-src-variable">self</span>.<span class="py-src-variable">step_one</span>)
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">step_one</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-keyword">print</span> <span class="py-src-variable">self</span>.<span class="py-src-variable">name</span>, <span class="py-src-string">&quot;: Step One&quot;</span>
+        <span class="py-src-variable">reactor</span>.<span class="py-src-variable">callLater</span>(<span class="py-src-number">0</span>, <span class="py-src-variable">self</span>.<span class="py-src-variable">step_two</span>)
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">step_two</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-keyword">print</span> <span class="py-src-variable">self</span>.<span class="py-src-variable">name</span>, <span class="py-src-string">&quot;: Step Two&quot;</span>
+        <span class="py-src-variable">reactor</span>.<span class="py-src-variable">callLater</span>(<span class="py-src-number">0</span>, <span class="py-src-variable">self</span>.<span class="py-src-variable">step_done</span>)
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">step_done</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-comment"># cleanup, and don't call reactor again.
+</span>        <span class="py-src-keyword">pass</span>
+
+<span class="py-src-variable">Request</span>(<span class="py-src-string">&quot;James&quot;</span>)
+<span class="py-src-variable">Request</span>(<span class="py-src-string">&quot;Wendy&quot;</span>)
+
+<span class="py-src-comment"># start and shut down the event loop
+</span><span class="py-src-variable">reactor</span>.<span class="py-src-variable">callLater</span>(<span class="py-src-number">1</span>, <span class="py-src-variable">reactor</span>.<span class="py-src-variable">stop</span>) 
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><p>In the output of this example, one can see that execution alternates
+between steps for James and Wendy's request.  In effect, the requests
+are done in a parallel, cooperative manner.   While this is a good start,
+it isn't perfect as the event loop is stopped with a hard-coded timeout.
+It would be better for each Request object to signal when it is completed 
+so that the event loop can be shut down sooner.</p><h3>Deferred Callbacks<a name="auto2"></a></h3><p>In Twisted, communication between operations is often accomplished with 
+<code>defer.Deferred</code>.  The Deferred object decouples an asyncronous 
+operation by providing a temporary storage location for its result.  Instead 
+of calling the operation and waiting for a return value, an operation 
+schedules itself to be executed with <code>reactor.callLater</code>and then
+returns a <code>defer.Deferred</code> object.   At this point, the caller 
+can register a callback function to be executed when the operation has
+completed.  In the example below, <code>defer.DeferredList</code> is used 
+to merge the result of each request into a single notification, which is
+used to stop the main event loop.
+</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">reactor</span>, <span class="py-src-variable">defer</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">Request</span>:
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">name</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">name</span> = <span class="py-src-variable">name</span>
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">d</span>    = <span class="py-src-variable">defer</span>.<span class="py-src-variable">Deferred</span>()
+        <span class="py-src-variable">reactor</span>.<span class="py-src-variable">callLater</span>(<span class="py-src-number">0</span>, <span class="py-src-variable">self</span>.<span class="py-src-variable">step_one</span>)
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">step_one</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-keyword">print</span> <span class="py-src-variable">self</span>.<span class="py-src-variable">name</span>, <span class="py-src-string">&quot;: Step One&quot;</span>
+        <span class="py-src-variable">reactor</span>.<span class="py-src-variable">callLater</span>(<span class="py-src-number">0</span>, <span class="py-src-variable">self</span>.<span class="py-src-variable">step_two</span>)
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">step_two</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-keyword">print</span> <span class="py-src-variable">self</span>.<span class="py-src-variable">name</span>, <span class="py-src-string">&quot;: Step Two&quot;</span>
+        <span class="py-src-variable">reactor</span>.<span class="py-src-variable">callLater</span>(<span class="py-src-number">0</span>, <span class="py-src-variable">self</span>.<span class="py-src-variable">step_done</span>)
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">step_done</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">callback</span>(<span class="py-src-variable">None</span>) <span class="py-src-comment"># notify callback that we are done</span>
+
+<span class="py-src-variable">james</span> = <span class="py-src-variable">Request</span>(<span class="py-src-string">&quot;James&quot;</span>)
+<span class="py-src-variable">wendy</span> = <span class="py-src-variable">Request</span>(<span class="py-src-string">&quot;Wendy&quot;</span>)
+
+<span class="py-src-comment"># start and shut down the event loop
+</span><span class="py-src-variable">d</span> = <span class="py-src-variable">defer</span>.<span class="py-src-variable">DeferredList</span>([<span class="py-src-variable">james</span>.<span class="py-src-variable">d</span>, <span class="py-src-variable">wendy</span>.<span class="py-src-variable">d</span>])
+<span class="py-src-variable">d</span>.<span class="py-src-variable">addCallback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">_</span>: <span class="py-src-variable">reactor</span>.<span class="py-src-variable">stop</span>())
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><p>While this <code>Deferred</code> approach is very good, it can get
+quickly complicated, especially if the request is not a simple linear
+sequence of steps, or when results must flow between steps incrementally.
+The flow module addresses these shortcomings using python generators.</p><h2>Iterators and generators<a name="auto3"></a></h2><p>An iterator is basically an object which produces a sequence of values.
+Python's iterators are simply objects with an <code>__iter__()</code> 
+member function which returns an object (usually itself) which has a
+<code>next()</code> member function.   The <code>next()</code> method is
+then invoked till it raises a <code>StopIteration</code> exception.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">python</span>.<span class="py-src-variable">compat</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">iter</span>, <span class="py-src-variable">StopIteration</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">Counter</span>:
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">count</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">count</span> = <span class="py-src-variable">count</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__iter__</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">self</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">next</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-variable">ret</span> = <span class="py-src-variable">self</span>.<span class="py-src-variable">count</span>
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">count</span> -= <span class="py-src-number">1</span>
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">ret</span>: <span class="py-src-keyword">return</span> <span class="py-src-variable">ret</span>
+        <span class="py-src-keyword">raise</span> <span class="py-src-variable">StopIteration</span>
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">ret</span>
+
+<span class="py-src-keyword">import</span> <span class="py-src-variable">sys</span>
+<span class="py-src-keyword">if</span> <span class="py-src-variable">sys</span>.<span class="py-src-variable">version_info</span> &lt; (<span class="py-src-number">2</span>,<span class="py-src-number">2</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">list</span>(<span class="py-src-parameter">it</span>):
+        <span class="py-src-variable">ret</span> = []
+        <span class="py-src-variable">it</span> = <span class="py-src-variable">iter</span>(<span class="py-src-variable">it</span>)
+        <span class="py-src-keyword">try</span>:
+            <span class="py-src-keyword">while</span> <span class="py-src-number">1</span>:
+                <span class="py-src-variable">ret</span>.<span class="py-src-variable">append</span>(<span class="py-src-variable">it</span>.<span class="py-src-variable">next</span>())
+        <span class="py-src-keyword">except</span> <span class="py-src-variable">StopIteration</span>: <span class="py-src-keyword">pass</span>
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">ret</span>
+
+<span class="py-src-keyword">print</span> <span class="py-src-variable">list</span>(<span class="py-src-variable">Counter</span>(<span class="py-src-number">3</span>))
+
+<span class="py-src-comment"># prints: [3, 2, 1]
+</span></pre><h3>State pattern<a name="auto4"></a></h3><p>Often times it is useful for an iterator to change state during its 
+production of values.  This can be done nicely with the 'state' pattern.</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">States</span>:
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__iter__</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">next</span> = <span class="py-src-variable">self</span>.<span class="py-src-variable">state_one</span>
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">self</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">state_one</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">next</span> = <span class="py-src-variable">self</span>.<span class="py-src-variable">state_two</span>
+        <span class="py-src-keyword">return</span> <span class="py-src-string">&quot;one&quot;</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">state_two</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">next</span> = <span class="py-src-variable">self</span>.<span class="py-src-variable">state_stop</span>
+        <span class="py-src-keyword">return</span> <span class="py-src-string">&quot;two&quot;</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">state_stop</span>(<span class="py-src-parameter">self</span>):
+        <span class="py-src-keyword">raise</span> <span class="py-src-variable">StopIteration</span>
+
+<span class="py-src-keyword">print</span> <span class="py-src-variable">list</span>(<span class="py-src-variable">States</span>())
+
+<span class="py-src-comment"># prints: ['one', 'two']
+</span></pre><h3>Generators<a name="auto5"></a></h3><p>With Python 2.2, there is a wonderful syntax sugar for creating
+iterators... generators.   When a generator is first executed, an iterator
+is returned.  And from there on, each invocation of <code>next()</code>
+gives the subsequent value produced by the <code>yield</code> statement.
+With generators, the two iterators above become very easy to express.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span> 
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Counter</span>(<span class="py-src-parameter">count</span>):
+    <span class="py-src-keyword">while</span> <span class="py-src-variable">count</span> &gt; <span class="py-src-number">0</span>:
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">count</span>
+        <span class="py-src-variable">count</span> -= <span class="py-src-number">1</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">States</span>():
+    <span class="py-src-keyword">yield</span> <span class="py-src-string">&quot;one&quot;</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-string">&quot;two&quot;</span>
+
+<span class="py-src-keyword">print</span> <span class="py-src-variable">list</span>(<span class="py-src-variable">Counter</span>(<span class="py-src-number">3</span>))
+<span class="py-src-keyword">print</span> <span class="py-src-variable">list</span>(<span class="py-src-variable">States</span>())
+
+<span class="py-src-comment"># prints:
+</span><span class="py-src-comment">#    [3, 2, 1]
+</span><span class="py-src-comment">#    ['one', 'two']
+</span></pre><p>One technical difference between iterators and generators, is that raising 
+an exception from a generator permanently halts the generator, while raising 
+an exception from an iterator's <code>next()</code> method does not
+invalidate the iterator, that is, one could call the <code>next()</code> 
+method again and possibly get results.   From here on, we use the generator 
+syntax for building iterators.</p><h3>Chaining Generators<a name="auto6"></a></h3><p>It is often useful to view an operation information as a flow between 
+stages, where each stage may have several states or steps.  This can be
+coded where the output of one generator is consumed by another.  In this
+view, the last generator in the chain 'pulls' data from previous stages.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span> 
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Counter</span>(<span class="py-src-parameter">count</span>):
+    <span class="py-src-keyword">while</span> <span class="py-src-variable">count</span> &gt; <span class="py-src-number">0</span>:
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">count</span>
+        <span class="py-src-variable">count</span> -= <span class="py-src-number">1</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Consumer</span>():
+    <span class="py-src-variable">producer</span> = <span class="py-src-variable">Counter</span>(<span class="py-src-number">3</span>)
+    <span class="py-src-keyword">for</span> <span class="py-src-variable">result</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">producer</span>:
+        <span class="py-src-keyword">if</span> <span class="py-src-number">2</span> != <span class="py-src-variable">result</span>:
+            <span class="py-src-keyword">yield</span> <span class="py-src-variable">result</span>
+
+<span class="py-src-keyword">print</span> <span class="py-src-variable">list</span>(<span class="py-src-variable">Consumer</span>())
+
+<span class="py-src-comment"># prints: [3, 1]
+</span></pre><p>While this is a very clean syntax for creating a multi-stage operation,
+it would block all other operations.   Therefore, some mechanism for pausing
+the generator and resuming it later is required.</p><h2>Introducing Flow<a name="auto7"></a></h2><p>The flow module provides this ability to cooperate with other tasks.
+This is accomplished by wrapping iterables in a flow stage object and 
+following an alternating yield pattern.  That is, before each value pulled
+from the stage, the operation must yield the wrapper object.  During this
+yield bookkeeping is done to prepare the next value, or, if the next value
+is not available, re-scheduling the operation to be executed later.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flow</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Counter</span>(<span class="py-src-parameter">count</span>):
+    <span class="py-src-keyword">while</span> <span class="py-src-variable">count</span> &gt; <span class="py-src-number">0</span>:
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">count</span>
+        <span class="py-src-variable">count</span> -= <span class="py-src-number">1</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Consumer</span>():
+    <span class="py-src-variable">producer</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">wrap</span>(<span class="py-src-variable">Counter</span>(<span class="py-src-number">3</span>))
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">producer</span>
+    <span class="py-src-keyword">for</span> <span class="py-src-variable">result</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">producer</span>:
+        <span class="py-src-keyword">if</span> <span class="py-src-number">2</span> != <span class="py-src-variable">result</span>:
+            <span class="py-src-keyword">yield</span> <span class="py-src-variable">result</span>
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">producer</span>
+
+<span class="py-src-keyword">print</span> <span class="py-src-variable">list</span>(<span class="py-src-variable">flow</span>.<span class="py-src-variable">Block</span>(<span class="py-src-variable">Consumer</span>))
+
+<span class="py-src-comment"># prints: [3, 1]
+</span></pre><h3>Equivalent Forms<a name="auto8"></a></h3><p>In the above code, <code>producer.next()</code> is called
+implicitly, and thus the generator above is equivalent to...</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Consumer</span>():
+    <span class="py-src-variable">producer</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">wrap</span>(<span class="py-src-variable">Counter</span>(<span class="py-src-number">3</span>))
+    <span class="py-src-keyword">while</span> <span class="py-src-variable">True</span>:
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">producer</span>
+        <span class="py-src-variable">result</span> = <span class="py-src-variable">producer</span>.<span class="py-src-variable">next</span>()
+        <span class="py-src-keyword">if</span> <span class="py-src-number">2</span> != <span class="py-src-variable">result</span>:
+            <span class="py-src-keyword">yield</span> <span class="py-src-variable">result</span>
+</pre><p>The <code>next()</code> method of the wrapper object does several
+things.  First, it checks to see if there are results ready, if so it
+returns the next one.  If not, it looks for a failure, raising it.
+And finally, checking to see if the end of the input has been reached.
+More concretely...
+</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Consumer</span>():
+    <span class="py-src-variable">producer</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">wrap</span>(<span class="py-src-variable">Counter</span>(<span class="py-src-number">3</span>))
+    <span class="py-src-keyword">while</span> <span class="py-src-variable">True</span>:
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">producer</span>
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">producer</span>.<span class="py-src-variable">results</span>:
+            <span class="py-src-variable">result</span> = <span class="py-src-variable">producer</span>.<span class="py-src-variable">results</span>.<span class="py-src-variable">pop</span>(<span class="py-src-number">0</span>)
+            <span class="py-src-keyword">yield</span> <span class="py-src-variable">result</span>
+            <span class="py-src-keyword">continue</span>
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">producer</span>.<span class="py-src-variable">failure</span>:
+            <span class="py-src-variable">producer</span>.<span class="py-src-variable">stop</span> = <span class="py-src-number">1</span>
+            <span class="py-src-variable">producer</span>.<span class="py-src-variable">failure</span>.<span class="py-src-variable">trap</span>()
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">producer</span>.<span class="py-src-variable">stop</span>:
+            <span class="py-src-keyword">break</span>
+</pre><h3>Handling failures<a name="auto9"></a></h3><p>Another difference between plain old iterables and one wrapped with
+the flow module is that exceptions caught are wrapped with a
+<code>twisted.python.failure.Failure</code> object for later delivery.
+There are two basic ways to recover from exceptions.  One way is to list
+expected exceptions in the call to <code>flow.wrap</code>.  Alternatively, 
+a try/except block can be used, catching <code>flow.Failure</code> objects.
+</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flow</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Producer</span>(<span class="py-src-parameter">throw</span>):
+    <span class="py-src-keyword">yield</span> <span class="py-src-number">1</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-number">2</span>
+    <span class="py-src-keyword">raise</span> <span class="py-src-variable">throw</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-number">3</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Consumer</span>(<span class="py-src-parameter">producer</span>):
+    <span class="py-src-variable">producer</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">wrap</span>(<span class="py-src-variable">producer</span>, <span class="py-src-variable">IOError</span>)
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">producer</span>
+    <span class="py-src-keyword">try</span>:
+        <span class="py-src-keyword">for</span> <span class="py-src-variable">result</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">producer</span>:
+            <span class="py-src-keyword">if</span> <span class="py-src-variable">result</span> <span class="py-src-keyword">is</span> <span class="py-src-variable">IOError</span>:
+                <span class="py-src-comment"># handle trapped error
+</span>                <span class="py-src-keyword">yield</span> <span class="py-src-string">&quot;trapped&quot;</span>
+            <span class="py-src-keyword">else</span>:
+                <span class="py-src-keyword">yield</span> <span class="py-src-variable">result</span>
+            <span class="py-src-keyword">yield</span> <span class="py-src-variable">producer</span>
+    <span class="py-src-keyword">except</span> <span class="py-src-variable">AssertionError</span>, <span class="py-src-variable">err</span>:
+        <span class="py-src-comment"># handle assertion error
+</span>        <span class="py-src-keyword">yield</span> <span class="py-src-variable">str</span>(<span class="py-src-variable">err</span>)
+
+<span class="py-src-keyword">print</span> <span class="py-src-variable">list</span>(<span class="py-src-variable">flow</span>.<span class="py-src-variable">Block</span>(<span class="py-src-variable">Consumer</span>(<span class="py-src-variable">Producer</span>(<span class="py-src-variable">IOError</span>(<span class="py-src-string">&quot;trap&quot;</span>)))))
+<span class="py-src-keyword">print</span> <span class="py-src-variable">list</span>(<span class="py-src-variable">flow</span>.<span class="py-src-variable">Block</span>(<span class="py-src-variable">Consumer</span>(<span class="py-src-variable">Producer</span>(<span class="py-src-variable">AssertionError</span>(<span class="py-src-string">&quot;notrap&quot;</span>)))))
+
+<span class="py-src-comment"># prints: [1, 2, 'trapped']
+</span><span class="py-src-comment"># prints: [1, 2, 'notrap']
+</span></pre><h3>Cooperate<a name="auto10"></a></h3><p>This seems like quite the effort, wrapping each iterator and then 
+having to alter the calling sequence.  Why?  The answer is that it
+allows for a <code>flow.Cooperate</code> object to be returned.   When 
+this happens, the entire call chain can be paused so that other flows
+can use the call stack.   For flow.Block, the implementation of Cooperate
+simply puts the call chain to sleep.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flow</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">gen</span>():
+    <span class="py-src-keyword">yield</span> <span class="py-src-string">'immediate'</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">flow</span>.<span class="py-src-variable">Cooperate</span>(<span class="py-src-number">2</span>)
+    <span class="py-src-keyword">yield</span> <span class="py-src-string">'delayed'</span>
+
+<span class="py-src-keyword">for</span> <span class="py-src-variable">x</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">flow</span>.<span class="py-src-variable">Block</span>(<span class="py-src-variable">gen</span>):
+   <span class="py-src-keyword">print</span> <span class="py-src-variable">x</span>
+
+<span class="py-src-comment"># prints:
+</span><span class="py-src-comment">#  immediate
+</span><span class="py-src-comment">#  delayed
+</span></pre><h3>Merge and Zip<a name="auto11"></a></h3><p>Cooperate can be demonstrated with <code>flow.Merge</code> and 
+<code>flow.Zip</code> components.  These two stages join two or more
+generators into a single stream.  The Merge operation does this by
+rotating between any of its input streams which are available.  The
+Zip operation, on the other hand, waits for a result from each stream
+before it produces a result.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flow</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Right</span>():
+    <span class="py-src-keyword">yield</span> <span class="py-src-string">&quot;one&quot;</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-string">&quot;two&quot;</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">flow</span>.<span class="py-src-variable">Cooperate</span>()
+    <span class="py-src-keyword">yield</span> <span class="py-src-string">&quot;three&quot;</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">Left</span>():
+    <span class="py-src-keyword">yield</span> <span class="py-src-number">1</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-number">2</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-number">3</span>
+
+<span class="py-src-keyword">print</span> <span class="py-src-string">&quot;Zip&quot;</span>, <span class="py-src-variable">list</span>(<span class="py-src-variable">flow</span>.<span class="py-src-variable">Block</span>(<span class="py-src-variable">flow</span>.<span class="py-src-variable">Zip</span>(<span class="py-src-variable">Right</span>,<span class="py-src-variable">Left</span>)))
+<span class="py-src-keyword">print</span> <span class="py-src-string">&quot;Merge&quot;</span>, <span class="py-src-variable">list</span>(<span class="py-src-variable">flow</span>.<span class="py-src-variable">Block</span>(<span class="py-src-variable">flow</span>.<span class="py-src-variable">Merge</span>(<span class="py-src-variable">Right</span>,<span class="py-src-variable">Left</span>)))
+
+<span class="py-src-comment"># Zip [('one', 1), ('two', 2), ('three', 3)]
+</span><span class="py-src-comment"># Merge ['one', 1, 'two', 2, 3, 'three']
+</span></pre><h2>Integrating with Twisted<a name="auto12"></a></h2><p>While <code>flow.Block</code> is useful for understanding how flow
+works, it undermines the whole purpose by sleeping during Cooperate
+and blocking other operations.   Following are numerous examples of how
+to integrate flow with the Twisted framework in a non-blocking manner.</p><h3>Deferred Flow<a name="auto13"></a></h3><p>For starters, the long example of Wendy and James, with its numerous
+calls to <code>reactor.callLater</code> to schedule each step of the 
+operation can be rewritten using flow.Deferred.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">reactor</span>, <span class="py-src-variable">defer</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flow</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">request</span>(<span class="py-src-parameter">name</span>):
+    <span class="py-src-keyword">print</span> <span class="py-src-variable">name</span>, <span class="py-src-string">&quot;: Step One&quot;</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">flow</span>.<span class="py-src-variable">Cooperate</span>()
+    <span class="py-src-keyword">print</span> <span class="py-src-variable">name</span>, <span class="py-src-string">&quot;: Step Two&quot;</span>
+
+<span class="py-src-variable">james</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">Deferred</span>(<span class="py-src-variable">request</span>(<span class="py-src-string">&quot;James&quot;</span>))
+<span class="py-src-variable">wendy</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">Deferred</span>(<span class="py-src-variable">request</span>(<span class="py-src-string">&quot;Wendy&quot;</span>))
+
+<span class="py-src-comment"># start and shut down the event loop
+</span><span class="py-src-variable">d</span> = <span class="py-src-variable">defer</span>.<span class="py-src-variable">DeferredList</span>([<span class="py-src-variable">wendy</span>, <span class="py-src-variable">james</span>])
+<span class="py-src-variable">d</span>.<span class="py-src-variable">addCallback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">_</span>: <span class="py-src-variable">reactor</span>.<span class="py-src-variable">stop</span>())
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><p>Under the sheets, when <code>flow.Deferred</code> encounters a
+<code>flow.Cooperate</code> event, it reschedules itself to be resumed
+at a later time, allowing other asyncronous operations to proceed. Once
+again, <code>defer.DeferredList</code> is only used here to stop the
+reactor after all operations are completed.</p><h3>Flow Resources<a name="auto14"></a></h3><p>By using <code>flow.Deferred</code> it is easy to make up a web
+resource which is both long running, but also can serve more than
+one customer at a time.   Run the example below, and with two
+browsers, view the webpage.  Notice that both web pages are 
+being created at the same time.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">reactor</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">server</span>, <span class="py-src-variable">resource</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flow</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">cooperative</span>(<span class="py-src-parameter">count</span>):
+    <span class="py-src-string">&quot;&quot;&quot; simulate a cooperative resource, that not block &quot;&quot;&quot;</span>
+    <span class="py-src-keyword">from</span> <span class="py-src-variable">random</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">random</span>
+    <span class="py-src-variable">idx</span> = <span class="py-src-number">0</span>
+    <span class="py-src-keyword">while</span> <span class="py-src-variable">idx</span> &lt; <span class="py-src-variable">count</span>:
+        <span class="py-src-variable">val</span> = <span class="py-src-variable">random</span>()
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">flow</span>.<span class="py-src-variable">Cooperate</span>(<span class="py-src-variable">val</span>)
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">str</span>(<span class="py-src-variable">val</span>)[-<span class="py-src-number">5</span>:]
+        <span class="py-src-variable">idx</span> += <span class="py-src-number">1</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">flowRender</span>(<span class="py-src-parameter">req</span>):
+    <span class="py-src-variable">count</span> = <span class="py-src-variable">int</span>(<span class="py-src-variable">req</span>.<span class="py-src-variable">args</span>.<span class="py-src-variable">get</span>(<span class="py-src-string">&quot;count&quot;</span>,[<span class="py-src-string">&quot;30&quot;</span>])[<span class="py-src-number">0</span>])
+    <span class="py-src-variable">req</span>.<span class="py-src-variable">write</span>(<span class="py-src-string">&quot;&lt;html&gt;&lt;body&gt;&quot;</span>)
+    <span class="py-src-variable">req</span>.<span class="py-src-variable">write</span>(<span class="py-src-string">&quot; %s Random numbers: &lt;ol&gt;\n&quot;</span> % <span class="py-src-variable">count</span>)
+    <span class="py-src-variable">source</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">wrap</span>(<span class="py-src-variable">cooperative</span>(<span class="py-src-variable">count</span>))
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">source</span>
+    <span class="py-src-keyword">for</span> <span class="py-src-variable">itm</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">source</span>:
+        <span class="py-src-variable">req</span>.<span class="py-src-variable">write</span>(<span class="py-src-string">&quot;&lt;li&gt;%s&lt;/li&gt;\n&quot;</span> % <span class="py-src-variable">itm</span>)
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">source</span>
+    <span class="py-src-variable">req</span>.<span class="py-src-variable">write</span>(<span class="py-src-string">&quot;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;\n&quot;</span>)
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">FlowResource</span>(<span class="py-src-parameter">resource</span>.<span class="py-src-parameter">Resource</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">gen</span>):
+        <span class="py-src-variable">resource</span>.<span class="py-src-variable">Resource</span>.<span class="py-src-variable">__init__</span>(<span class="py-src-variable">self</span>)
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">gen</span> = <span class="py-src-variable">gen</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">isLeaf</span>(<span class="py-src-parameter">self</span>): <span class="py-src-keyword">return</span> <span class="py-src-variable">true</span>
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">render</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">req</span>):
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">d</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">Deferred</span>(<span class="py-src-variable">self</span>.<span class="py-src-variable">gen</span>(<span class="py-src-variable">req</span>))
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">addCallback</span>(<span class="py-src-keyword">lambda</span> <span class="py-src-variable">_</span>: <span class="py-src-variable">req</span>.<span class="py-src-variable">finish</span>())
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">server</span>.<span class="py-src-variable">NOT_DONE_YET</span>
+
+<span class="py-src-keyword">print</span> <span class="py-src-string">&quot;visit http://localhost:8081/ to view the example&quot;</span>
+<span class="py-src-variable">root</span> = <span class="py-src-variable">FlowResource</span>(<span class="py-src-variable">flowRender</span>)
+<span class="py-src-variable">site</span> = <span class="py-src-variable">server</span>.<span class="py-src-variable">Site</span>(<span class="py-src-variable">root</span>)
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-number">8081</span>,<span class="py-src-variable">site</span>)
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><h3>Flow Protocols<a name="auto15"></a></h3><p>The flow module can also be used to construct protocols easily, 
+following is an echo client and server.   For each protocol, one
+must yield the connection before reading from it.  When the generator 
+finishes, the connection is automatically closed.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flow</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">protocol</span>, <span class="py-src-variable">reactor</span>
+<span class="py-src-variable">PORT</span> = <span class="py-src-number">8392</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">echoServer</span>(<span class="py-src-parameter">conn</span>):
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">conn</span>
+    <span class="py-src-keyword">for</span> <span class="py-src-variable">data</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">conn</span>:
+        <span class="py-src-variable">conn</span>.<span class="py-src-variable">write</span>(<span class="py-src-variable">data</span>)
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">conn</span>                                   
+    <span class="py-src-variable">reactor</span>.<span class="py-src-variable">callLater</span>(<span class="py-src-number">0</span>,<span class="py-src-variable">reactor</span>.<span class="py-src-variable">stop</span>)
+
+<span class="py-src-variable">server</span> = <span class="py-src-variable">protocol</span>.<span class="py-src-variable">ServerFactory</span>()
+<span class="py-src-variable">server</span>.<span class="py-src-variable">protocol</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">makeProtocol</span>(<span class="py-src-variable">echoServer</span>)
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">listenTCP</span>(<span class="py-src-variable">PORT</span>,<span class="py-src-variable">server</span>)
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">echoClient</span>(<span class="py-src-parameter">conn</span>):
+    <span class="py-src-variable">conn</span>.<span class="py-src-variable">write</span>(<span class="py-src-string">&quot;Hello World&quot;</span>)
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">conn</span>
+    <span class="py-src-keyword">print</span> <span class="py-src-variable">conn</span>.<span class="py-src-variable">next</span>()
+    <span class="py-src-variable">conn</span>.<span class="py-src-variable">write</span>(<span class="py-src-string">&quot;Another Line&quot;</span>)
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">conn</span>
+    <span class="py-src-keyword">print</span> <span class="py-src-variable">conn</span>.<span class="py-src-variable">next</span>()
+
+<span class="py-src-variable">client</span> = <span class="py-src-variable">protocol</span>.<span class="py-src-variable">ClientFactory</span>()
+<span class="py-src-variable">client</span>.<span class="py-src-variable">protocol</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">makeProtocol</span>(<span class="py-src-variable">echoClient</span>)
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">connectTCP</span>(<span class="py-src-string">&quot;localhost&quot;</span>, <span class="py-src-variable">PORT</span>, <span class="py-src-variable">client</span>)
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><h2>Threading<a name="auto16"></a></h2><p>While the Flow module allows for multiple cooperative tasks
+to work in a single thread, sometimes it is necessary to have
+the output of another thread be consumed within a flow.  This
+can be done with <code>twisted.flow.threads.Threaded</code>, which 
+takes an iterable object and executes it in another thread.   
+Following is a sample iterable, countSleep which simulates a blocking
+producer which must be put into a thread.  To show that
+<code>twisted.flow.threads.Threaded</code> does not block other operations,
+a similar, cooperative count is included.
+</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">reactor</span>, <span class="py-src-variable">defer</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flow</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span>.<span class="py-src-variable">threads</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">Threaded</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">countSleep</span>(<span class="py-src-parameter">index</span>):
+    <span class="py-src-keyword">from</span> <span class="py-src-variable">time</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">sleep</span>
+    <span class="py-src-keyword">for</span> <span class="py-src-variable">index</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">range</span>(<span class="py-src-variable">index</span>):
+        <span class="py-src-variable">sleep</span>(<span class="py-src-number">.3</span>)
+        <span class="py-src-keyword">print</span> <span class="py-src-string">&quot;sleep&quot;</span>, <span class="py-src-variable">index</span>
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">index</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">countCooperate</span>(<span class="py-src-parameter">index</span>):
+    <span class="py-src-keyword">for</span> <span class="py-src-variable">index</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">range</span>(<span class="py-src-variable">index</span>):
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">flow</span>.<span class="py-src-variable">Cooperate</span>(<span class="py-src-number">.1</span>)
+        <span class="py-src-keyword">print</span> <span class="py-src-string">&quot;cooperate&quot;</span>, <span class="py-src-variable">index</span>
+        <span class="py-src-keyword">yield</span> <span class="py-src-string">&quot;coop %s&quot;</span> % <span class="py-src-variable">index</span>
+
+<span class="py-src-variable">d</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">Deferred</span>( <span class="py-src-variable">flow</span>.<span class="py-src-variable">Merge</span>(
+        <span class="py-src-variable">Threaded</span>(<span class="py-src-variable">countSleep</span>(<span class="py-src-number">5</span>)),
+        <span class="py-src-variable">countCooperate</span>(<span class="py-src-number">5</span>)))
+
+<span class="py-src-comment"># # alternatively
+</span><span class="py-src-comment"># d1 = flow.Deferred(Threaded(countSleep(5)))
+</span><span class="py-src-comment"># d2 = flow.Deferred(countCooperate(10))
+</span><span class="py-src-comment"># d = defer.DeferredList([d1,d2])
+</span>
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">prn</span>(<span class="py-src-parameter">x</span>):
+    <span class="py-src-keyword">print</span> <span class="py-src-variable">x</span>
+    <span class="py-src-variable">reactor</span>.<span class="py-src-variable">stop</span>()
+<span class="py-src-variable">d</span>.<span class="py-src-variable">addCallback</span>(<span class="py-src-variable">prn</span>)
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre><h3>Using database connections<a name="auto17"></a></h3><p>Since most standard database drivers are thread based, 
+the flow builds on the <code>twisted.flow.threads.Threaded</code> by 
+providing a <code>QueryIterator</code>, which takes an sql
+query and a <code>ConnectionPool</code>.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">__future__</span>         <span class="py-src-keyword">import</span> <span class="py-src-variable">generators</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">enterprise</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">adbapi</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span>   <span class="py-src-keyword">import</span> <span class="py-src-variable">reactor</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">flow</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">flow</span>.<span class="py-src-variable">threads</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">QueryIterator</span>, <span class="py-src-variable">Threaded</span>
+
+<span class="py-src-variable">dbpool</span> = <span class="py-src-variable">adbapi</span>.<span class="py-src-variable">ConnectionPool</span>(<span class="py-src-string">&quot;SomeDriver&quot;</span>,<span class="py-src-variable">host</span>=<span class="py-src-string">'localhost'</span>, 
+             <span class="py-src-variable">db</span>=<span class="py-src-string">'Database'</span>,<span class="py-src-variable">user</span>=<span class="py-src-string">'User'</span>,<span class="py-src-variable">passwd</span>=<span class="py-src-string">'Password'</span>)
+
+<span class="py-src-comment"># # I test with...
+</span><span class="py-src-comment"># from pyPgSQL import PgSQL
+</span><span class="py-src-comment"># dbpool = PgSQL
+</span>
+<span class="py-src-variable">sql</span> = <span class="py-src-string">&quot;&quot;&quot;
+  (SELECT 'one')
+UNION ALL
+  (SELECT 'two')
+UNION ALL
+  (SELECT 'three')
+&quot;&quot;&quot;</span>
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">consumer</span>():
+    <span class="py-src-keyword">print</span> <span class="py-src-string">&quot;executing&quot;</span>
+    <span class="py-src-variable">query</span> = <span class="py-src-variable">Threaded</span>(<span class="py-src-variable">QueryIterator</span>(<span class="py-src-variable">dbpool</span>, <span class="py-src-variable">sql</span>))
+    <span class="py-src-keyword">print</span> <span class="py-src-string">&quot;yielding&quot;</span>
+    <span class="py-src-keyword">yield</span> <span class="py-src-variable">query</span>
+    <span class="py-src-keyword">print</span> <span class="py-src-string">&quot;done yeilding&quot;</span>
+    <span class="py-src-keyword">for</span> <span class="py-src-variable">row</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">query</span>:
+        <span class="py-src-keyword">print</span> <span class="py-src-string">&quot;Processed result : &quot;</span>, <span class="py-src-variable">row</span>
+        <span class="py-src-keyword">yield</span> <span class="py-src-variable">query</span>
+
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">internet</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">reactor</span>
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">finish</span>(<span class="py-src-parameter">result</span>): 
+    <span class="py-src-keyword">print</span> <span class="py-src-string">&quot;Deferred Complete : &quot;</span>, <span class="py-src-variable">result</span>
+    <span class="py-src-variable">reactor</span>.<span class="py-src-variable">stop</span>()
+<span class="py-src-variable">f</span> = <span class="py-src-variable">flow</span>.<span class="py-src-variable">Deferred</span>(<span class="py-src-variable">consumer</span>())
+<span class="py-src-variable">f</span>.<span class="py-src-variable">addBoth</span>(<span class="py-src-variable">finish</span>)
+<span class="py-src-variable">reactor</span>.<span class="py-src-variable">run</span>()
+</pre></div><p><a href="index.html">Index</a></p><span class="version">Version: 8.2.0</span></body></html>

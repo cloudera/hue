@@ -1,0 +1,183 @@
+<?xml version="1.0"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Twisted Documentation: Guard In Depth</title><link href="stylesheet.css" type="text/css" rel="stylesheet" /></head><body bgcolor="white"><h1 class="title">Guard In Depth</h1><div class="toc"><ol></ol></div><div class="content"><span></span><div class="note"><strong>Note: </strong><p>
+This HOWTO documents Woven Guard, part of the Woven framework. The Woven framework should not be used for new projects. The newer <a href="http://www.divmod.org/projects/nevow">Nevow</a> framework, available as part of the <a href="http://www.divmod.org/projects/quotient">Quotient</a> project, is a simpler framework with consistent semantics and better testing and is strongly recommended over Woven.
+</p></div><p>Woven guard is founded on the <a href="cred.html">twisted.cred</a>
+framework, and it is important to be somewhat familiar with cred to work with
+guard. As always, when using this framework, start by writing a
+<code>IRealm</code>. The guard module expects the realm to respond to the
+<code>resource.IResource</code> interace.</p><p>Here is an example of a simple realm which generates different
+resources for logged-in and non-logged-in users:</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">zope</span>.<span class="py-src-variable">interface</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">implements</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">cred</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">portal</span>, <span class="py-src-variable">checkers</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">resource</span>, <span class="py-src-variable">static</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">noLogout</span>():
+    <span class="py-src-keyword">pass</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">Realm</span>:
+    <span class="py-src-variable">implements</span>(<span class="py-src-variable">portal</span>.<span class="py-src-variable">IRealm</span>)
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">requestAvatar</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">avatarId</span>, <span class="py-src-parameter">mind</span>, *<span class="py-src-parameter">interfaces</span>):
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">resource</span>.<span class="py-src-variable">IResource</span> <span class="py-src-keyword">not</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">interfaces</span>:
+            <span class="py-src-keyword">raise</span> <span class="py-src-variable">NotImplementedError</span>
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">avatarId</span> <span class="py-src-keyword">is</span> <span class="py-src-variable">checkers</span>.<span class="py-src-variable">ANONYMOUS</span>:
+            <span class="py-src-variable">avatar</span> = <span class="py-src-variable">static</span>.<span class="py-src-variable">Data</span>(<span class="py-src-string">&quot;Who are you?&quot;</span>, <span class="py-src-string">'text/html'</span>)
+        <span class="py-src-keyword">else</span>:
+            <span class="py-src-variable">avatar</span> = <span class="py-src-variable">static</span>.<span class="py-src-variable">Data</span>(<span class="py-src-string">&quot;The answer is 42&quot;</span>, <span class="py-src-string">'text/html'</span>)
+        <span class="py-src-keyword">return</span> (<span class="py-src-variable">resource</span>.<span class="py-src-variable">IResource</span>, <span class="py-src-variable">avatar</span>, <span class="py-src-variable">noLogout</span>)
+</pre><p>This realm makes sure that only non-anonymous users will know
+the answer to life, the universe and everything.</p><p>Usually, one or more custom resource classes will be written
+when using guard, but it is not necessary. For example, a guard
+intended to protect a certain directory can use a
+<code>static.File</code> resource. Note that the <code>IRealm</code>
+should be prepared to get the <code>ANONYMOUS</code> avatar ID,
+and handle it correctly. From whatever resource the anonymous
+avatar gets, a link should point to <code>guard.INIT_PERSPECTIVE</code>
+relative to the guard root. This is the only way users can
+log in. From whatever resources the
+non-anonymous avatars get it is strongly recommended to link to
+<code>guard.DESTROY_PERSPECTIVE</code>. This is the only way
+users can log out.</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">zope</span>.<span class="py-src-variable">interface</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">implements</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">cred</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">portal</span>, <span class="py-src-variable">checkers</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">resource</span>, <span class="py-src-variable">static</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">woven</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">guard</span>
+
+<span class="py-src-variable">login</span>=<span class="py-src-string">'&lt;a href=&quot;%s&quot;&gt;login&lt;/a&gt;'</span> % <span class="py-src-variable">guard</span>.<span class="py-src-variable">PERSPECTIVE_INIT</span>
+<span class="py-src-variable">logout</span>=<span class="py-src-string">'&lt;a href=&quot;%s&quot;&gt;logout&lt;/a&gt;'</span> % <span class="py-src-variable">guard</span>.<span class="py-src-variable">PERSPECTIVE_DESTROY</span>
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">noLogout</span>():
+    <span class="py-src-keyword">pass</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">Realm</span>:
+    <span class="py-src-variable">implements</span>(<span class="py-src-variable">portal</span>.<span class="py-src-variable">IRealm</span>)
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">requestAvatar</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">avatarId</span>, <span class="py-src-parameter">mind</span>, *<span class="py-src-parameter">interfaces</span>):
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">resource</span>.<span class="py-src-variable">IResource</span> <span class="py-src-keyword">not</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">interfaces</span>:
+            <span class="py-src-keyword">raise</span> <span class="py-src-variable">NotImplementedError</span>
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">avatarId</span> <span class="py-src-keyword">is</span> <span class="py-src-variable">checkers</span>.<span class="py-src-variable">ANONYMOUS</span>:
+            <span class="py-src-variable">avatar</span> = <span class="py-src-variable">static</span>.<span class="py-src-variable">Data</span>(<span class="py-src-string">&quot;Who are you?&lt;br&gt;&quot;</span>+<span class="py-src-variable">login</span>, <span class="py-src-string">'text/html'</span>)
+        <span class="py-src-keyword">else</span>:
+            <span class="py-src-variable">avatar</span> = <span class="py-src-variable">static</span>.<span class="py-src-variable">Data</span>(<span class="py-src-string">&quot;The answer is 42, %s&lt;br&gt;%s&quot;</span> % (<span class="py-src-variable">avatarId</span>,
+                                 <span class="py-src-variable">logout</span>), <span class="py-src-string">'text/html'</span>)
+        <span class="py-src-keyword">return</span> (<span class="py-src-variable">resource</span>.<span class="py-src-variable">IResource</span>, <span class="py-src-variable">avatar</span>, <span class="py-src-variable">noLogout</span>)
+</pre><p>Once the realm is written, it is possible to generate a resource
+which will wrap it with appropriate code to manage users, sessions
+and authentication. But, as always, nothing deals with the realm
+directly -- all the rest of the code deals with a <code>Portal</code>
+which wraps the realm.</p><div class="note"><strong>Note: </strong>
+You will almost always want to put <code>checkers.AllowAnonymousAccess</code>
+in the checkers registered for the <code>Portal</code>, otherwise it
+will be impossible to log in.
+</div><p>The canonical thing is to use
+<code>resource=guard.SessionWrapper(guard.UsernamePasswordWrapper(portal,
+                 callback=callback)</code>.
+The <code>callback</code> is used to redirect the request to
+the appropriate place after a successful login. Usually, you
+will want to redirect to the parent:</p><pre class="python">
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">parentRedirect</span>(<span class="py-src-parameter">_</span>):
+    <span class="py-src-keyword">return</span> <span class="py-src-variable">util</span>.<span class="py-src-variable">ParentRedirect</span>()
+</pre><p>When a client first reaches a guarded resource, it is redirected
+to <code>session-init/</code>. From there, it will be redirected
+to a URL containing a long magic hex string, where a cookie will
+be set, and then to the original URL with
+<code>?__session_just_started__=1</code> tucked at the end. The
+addition is to guarantee that the client will not think it is in
+a redirection loop (wget, for example, has that problem).</p><p>Note that in resources which are children of the guarded resources,
+<code>request.getSession</code> automatically returns the Woven session.
+Since it is a <code>Componentized</code>, it is possible to use
+<code>getComponent</code> and <code>setComponent</code> to keep
+state related to a user in the session.</p><p>For simple cases, the approach described here leads to quite a bit
+of boiler-plate code (about 30 lines or so). If a web application has
+simple authentication needs, it is possible to use <code>simpleguard</code>,
+which allows you to skip implementing a realm yourself.</p><p>The important function in <code>simpleguard</code> is
+<code>resource=guardResource(resource, checkers, nonauthenticated=None)</code>.
+<code>checkers</code> should be a list of <code>ICredentialChecker</code>s.
+It is not necessary to put <code>AllowAnonymousAccess</code> here --
+it will be added automatically. This allow you to differentiate in resources
+only based on authenticated/anonymous users, without finer distinction.
+However, in the given resources, and their children, it is possible
+to use <code>request.getComponent(simpleguard.Authenticated)</code>. This
+will return <code>None</code> if the request is anonymous, or an instance
+with a <code>.name</code> attribute, which is the avatar ID. This can
+allow the application to personalize parts of it.</p><p>The way the login page and error-on-login page look can be customized
+when creating the guarded resource. Here is an example:</p><div class="py-listing"><pre>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">woven</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">simpleguard</span>, <span class="py-src-variable">page</span>, <span class="py-src-variable">guard</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">resource</span>, <span class="py-src-variable">util</span>, <span class="py-src-variable">microdom</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">cred</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">checkers</span>, <span class="py-src-variable">portal</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">Authenticated</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+
+    <span class="py-src-variable">template</span>=<span class="py-src-string">'&lt;html&gt;Hello &lt;span model=&quot;name&quot;/&gt;!&lt;/html&gt;'</span>
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wmfactory_name</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">request</span>.<span class="py-src-variable">getComponent</span>(<span class="py-src-variable">simpleguard</span>.<span class="py-src-variable">Authenticated</span>).<span class="py-src-variable">name</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">LoginPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-string">&quot;&quot;&quot;This is the page that is shown to non-logged in users.&quot;&quot;&quot;</span>
+
+    <span class="py-src-variable">isLeaf</span> = <span class="py-src-variable">True</span>
+    <span class="py-src-variable">addSlash</span> = <span class="py-src-number">0</span>
+    <span class="py-src-variable">template</span> = <span class="py-src-string">'''&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Login&lt;/title&gt;
+        &lt;style type=&quot;text/css&quot;&gt;
+.formDescription, .formError {
+    /* fixme - inherit */
+    font-size: smaller;
+    font-family: sans-serif;
+    margin-bottom: 1em;
+}
+
+.formDescription {
+    color: green;
+}
+
+.formError {
+    color: red;
+}
+&lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+    &lt;h1&gt;Please Log In&lt;/h1&gt;
+    &lt;div class=&quot;shell&quot;&gt;
+    &lt;div class=&quot;loginform&quot; view=&quot;loginform&quot; /&gt;
+    &lt;/div&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;'''</span>
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">formModel</span>=<span class="py-src-parameter">None</span>):
+        <span class="py-src-variable">page</span>.<span class="py-src-variable">Page</span>.<span class="py-src-variable">__init__</span>(<span class="py-src-variable">self</span>)
+        <span class="py-src-variable">self</span>.<span class="py-src-variable">formModel</span> = <span class="py-src-variable">formModel</span>
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvupdate_loginform</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">widget</span>, <span class="py-src-parameter">model</span>):
+        <span class="py-src-variable">microdom</span>.<span class="py-src-variable">lmx</span>(<span class="py-src-variable">widget</span>.<span class="py-src-variable">node</span>).<span class="py-src-variable">form</span>(<span class="py-src-variable">action</span>=<span class="py-src-variable">guard</span>.<span class="py-src-variable">INIT_PERSPECTIVE</span>,
+                                       <span class="py-src-variable">model</span>=<span class="py-src-string">&quot;form&quot;</span>)
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wmfactory_form</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>):
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">self</span>.<span class="py-src-variable">formModel</span>:
+            <span class="py-src-keyword">return</span> <span class="py-src-variable">self</span>.<span class="py-src-variable">formModel</span>
+        <span class="py-src-keyword">else</span>:
+            <span class="py-src-keyword">return</span> <span class="py-src-variable">guard</span>.<span class="py-src-variable">newLoginSignature</span>.<span class="py-src-variable">method</span>(<span class="py-src-variable">None</span>)
+
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">callback</span>(<span class="py-src-parameter">_</span>):
+    <span class="py-src-keyword">return</span> <span class="py-src-variable">util</span>.<span class="py-src-variable">Redirect</span>(<span class="py-src-string">&quot;.&quot;</span>)
+
+<span class="py-src-keyword">def</span> <span class="py-src-identifier">buildGuardedResource</span>():
+    <span class="py-src-keyword">return</span> <span class="py-src-variable">simpleguard</span>.<span class="py-src-variable">guardResource</span>(
+               <span class="py-src-variable">Authenticated</span>(),
+               [<span class="py-src-variable">checkers</span>.<span class="py-src-variable">InMemoryUsernamePasswordDatabaseDontUse</span>(<span class="py-src-variable">bob</span>=<span class="py-src-string">&quot;12345&quot;</span>)],
+               <span class="py-src-variable">nonauthenticated</span>=<span class="py-src-variable">LoginPage</span>(),
+               <span class="py-src-variable">callback</span>=<span class="py-src-variable">callback</span>, <span class="py-src-variable">errback</span>=<span class="py-src-variable">LoginPage</span>)
+</pre><div class="caption">listings/guard/login.py - <a href="listings/guard/login.py"><span class="filename">listings/guard/login.py</span></a></div></div><p>The trick here is that, of course, we define the <em>original</em> login
+page: while <code>guard.PERSPECTIVE_INIT</code> gives a default form, it
+is quite all right to use a different one. In this example, we just use
+the home page of non-authenticated users to show the login form. There
+is one other case where the default form will be shown: if the attempt
+to login did not succeed. However, this is only what happens by default:
+we can override this by supplying an <code>errback</code>. This will
+be called with a model describing the form, and all we have to do is
+to use woven to display it.</p><p>Note that this example uses <code>simpleguard</code>, but equivalent
+code can be developed using <code>guard</code> -- the errback should
+be passed to the <code>UsernamePasswordWrapper</code> constructor
+in that case.</p></div><p><a href="index.html">Index</a></p><span class="version">Version: 8.2.0</span></body></html>

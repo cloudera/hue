@@ -1,0 +1,11 @@
+{
+
+	"color": {
+
+		"mootools-color": {
+			"deps": ["Number", "Array"]
+		}
+
+	}
+
+}

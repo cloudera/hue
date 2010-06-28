@@ -1,0 +1,45 @@
+Metadata-Version: 1.0
+Name: MySQL-python
+Version: 1.2.3c1
+Summary: Python interface to MySQL
+Home-page: http://sourceforge.net/projects/mysql-python
+Author: Andy Dustman
+Author-email: adustman@users.sourceforge.net
+License: GPL
+Download-URL: http://osdn.dl.sourceforge.net/sourceforge/mysql-python/MySQL-python-1.2.3c1.tar.gz
+Description: 
+        =========================
+        Python interface to MySQL
+        =========================
+        
+        MySQLdb is an interface to the popular MySQL_ database server for
+        Python.  The design goals are:
+        
+        - Compliance with Python database API version 2.0 [PEP-0249]_
+        
+        - Thread-safety
+        
+        - Thread-friendliness (threads will not block each other)
+        
+        MySQL-3.23 through 5.0 and Python-2.3 through 2.6 are currently
+        supported. Python-3.0 will be supported in a future release.
+        
+        MySQLdb is `Free Software`_.
+        
+        .. _MySQL: http://www.mysql.com/
+        .. _`Free Software`: http://www.gnu.org/
+        .. [PEP-0249] http://www.python.org/peps/pep-0249.html
+Platform: ALL
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Other Environment
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows :: Windows NT/2000
+Classifier: Operating System :: OS Independent
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: C
+Classifier: Programming Language :: Python
+Classifier: Topic :: Database
+Classifier: Topic :: Database :: Database Engines/Servers

@@ -1,0 +1,18 @@
+PYTHON:= $(shell python -c "import sys;print '%%d%%d' %% sys.version_info[:2]")
+
+threadframe.pyd: threadframe.o libpython$(PYTHON).a
+	dllwrap --dllname threadframe.pyd --driver-name=gcc --def threadframe.def -o threadframe.pyd threadframe.o -s --entry _DllMain@12 --target=i386-mingw32 -L. -lpython$(PYTHON)
+
+threadframe.o: threadframemodule.c
+	gcc -I"C:\Program Files\Python$(PYTHON)\include" -O3 -c -o $@ -DNDEBUG $<
+libpython$(PYTHON).a: python$(PYTHON).def C:\WINNT\system32\python$(PYTHON).dll
+	dlltool --dllname python$(PYTHON).dll --def python$(PYTHON).def --output-lib libpython$(PYTHON).a
+
+python$(PYTHON).def: C:\WINNT\system32\python$(PYTHON).dll
+	pexports C:\WINNT\system32\python$(PYTHON).dll > python$(PYTHON).def
+
+clean:
+	-del threadframe.pyd
+	-del libpython$(PYTHON).a
+	-del threadframe.o
+	-del python$(PYTHON).def

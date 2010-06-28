@@ -1,0 +1,12 @@
+.. default-role:: literal
+
+.. header::
+    Prev_ |spaces| Up_ |spaces| Next_
+
+.. footer::
+    Prev_ |spaces| Up_ |spaces| Next_
+
+.. |nbsp| unicode:: U+000A0 
+
+.. |spaces| replace::
+   |nbsp| |nbsp| |nbsp| |nbsp|

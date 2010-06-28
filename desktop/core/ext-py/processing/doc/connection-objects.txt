@@ -1,0 +1,112 @@
+.. include:: header.txt
+
+====================
+ Connection objects
+====================
+
+Connection objects allow the sending and receiving of picklable
+objects or strings.  They can be thought of as message oriented
+connected sockets.
+
+Connection objects usually created using `processing.Pipe()` -- see
+also `Listener and Clients <connection-ref.html>`_.
+
+Connection objects have the following methods:
+
+    `send(obj)`
+        Send an object to the other end of the connection which should
+        be read using `recv()`.
+
+        The object must be picklable.
+
+    `recv()`
+        Return an object sent from the other end of the connection
+        using `send()`.  Raises `EOFError` if there is nothing left to
+        receive and the other end was closed.
+
+    `fileno()`
+        Returns the file descriptor or handle used by the connection.
+
+    `close()`
+        Close the connection.
+
+        This is called automatically when the connection is garbage
+        collected.
+
+    `poll(timeout=0.0)`
+        Return whether there is any data available to be read within
+        `timeout` seconds.  
+
+        If `timeout` is `None` then an infinite timeout is used.
+        
+        Unlike the other blocking methods on Windows this method can
+        be interrupted by Ctrl-C.
+
+    `sendBytes(buffer)`
+        Send byte data from an object supporting the buffer interface
+        as a complete message.
+
+        Can be used to send strings or a view returned by `buffer()`.
+
+    `recvBytes()` 
+        Return a complete message of byte data sent from the other end
+        of the connection as a string.  Raises `EOFError` if there is
+        nothing left to receive and the other end was closed.
+
+    `recvBytesInto(buffer, offset=0)`
+        Read into `buffer` at position `offset` a complete message of
+        byte data sent from the other end of the connection and return
+        the number of bytes in the message.  Raises `EOFError` if
+        there is nothing left to receive and the other end was closed.
+
+        `buffer` must be an object satisfying the writable buffer
+        interface and `offset` must be non-negative and less than
+        the length of `buffer` (in bytes).
+    
+        If the buffer is too short then a `BufferTooShort` exception
+        is raised and the complete message is available as `e.args[0]`
+        where `e` is the exception instance.
+
+
+For example:
+
+    >>> from processing import Pipe
+    >>> a, b = Pipe()
+    >>> a.send([1, 'hello', None])
+    >>> b.recv()
+    [1, 'hello', None]
+    >>> b.sendBytes('thank you')
+    >>> a.recvBytes()
+    'thank you'
+    >>> import array
+    >>> arr1 = array.array('i', range(5))
+    >>> arr2 = array.array('i', [0] * 10)
+    >>> a.sendBytes(arr1)
+    >>> count = b.recvBytesInto(arr2)
+    >>> assert count == len(arr1) * arr1.itemsize
+    >>> arr2
+    array('i', [0, 1, 2, 3, 4, 0, 0, 0, 0, 0])
+
+
+.. warning::
+    
+    The `recv()` method automatically unpickles the data it receives
+    which can be a security risk unless you can trust the process
+    which sent the message.
+    
+    Therefore, unless the connection object was produced using
+    `Pipe()` you should only use the `recv()` and `send()` methods
+    after performing some sort of authentication.  See `Authentication
+    keys <connection-ref.html#authentication-keys>`_.
+    
+    
+.. warning::
+    
+    If a process is killed while it is trying to read or write to a
+    pipe then the data in the pipe is likely to become corrupted
+    because it may become impossible to be sure where the message
+    boundaries lie.
+
+.. _Prev: queue-objects.html
+.. _Up: processing-ref.html
+.. _Next: manager-objects.html

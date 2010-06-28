@@ -1,0 +1,243 @@
+.. include:: header.txt
+
+=======================
+ Listeners and Clients
+=======================
+
+Usually message passing between processes is done using queues or by
+using connection objects returned by `Pipe()`.
+
+However, the `processing.connection` module allows some extra
+flexibility.  It basically gives a high level API for dealing with
+sockets or Windows named pipes, and also has support for *digest
+authentication* using the `hmac` module from the standard library.
+
+
+Classes and functions
+=====================
+
+The module defines the following functions:
+    
+    `Listener(address=None, family=None, backlog=1, authenticate=False, authkey=None)`
+       Returns a wrapper for a bound socket or Windows named pipe
+       which is 'listening' for connections.
+
+    `Client(address, family=None, authenticate=False, authkey=None)`
+        Attempts to set up a connection to the listener which is using
+        address `address`, returning a `connection object
+        <connection-object.html>`_.
+
+        The type of the connection is determined by `family`
+        argument, but this can generally be omitted since it can
+        usually be inferred from the format of `address`.
+
+        If `authentication` or `authkey` is a string then digest
+        authentication is used.  The key used for authentication will
+        be either `authkey` or `currentProcess.getAuthKey()` if
+        `authkey` is `None`.  If authentication fails then
+        `AuthenticationError` is raised.  See `Authentication keys`_.
+
+..
+    `deliverChallenge(connection, authkey)`
+        Sends a randomly generated message to the other end of the
+        connection and waits for a reply.
+
+        If the reply matches the digest of the message using `authkey`
+        as the key then a welcome message is sent to the other end of
+        the connection.  Otherwise `AuthenticationError` is raised.
+
+    `answerChallenge(connection, authkey)`
+        Receives a message, calculates the digest of the message using
+        `authkey` as the key, and then sends the digest back.
+
+        If a welcome message is not received then
+        `AuthenticationError` is raised.
+
+
+The module exports two exception types:
+
+   **exception** `AuthenticationError`
+       Exception raised when there is an authentication error.
+
+   **exception** `BufferTooShort`
+       Exception raise by the `recvBytesInto()` method of a
+       connection object when the supplied buffer object is too small
+       for the message read.
+
+       If `e` is an instance of `BufferTooShort` then `e.args[0]` will
+       give the message as a byte string.
+       
+
+Listener objects
+================
+
+Instances of `Listener` have the following methods:
+
+    `__init__(address=None, family=None, backlog=1, authenticate=False, authkey=None)`
+        `address`
+           The address to be used by the bound socket
+           or named pipe of the listener object.
+
+        `family`
+           The type of the socket (or named pipe) to use.
+
+           This can be one of the strings `'AF_INET'` (for a TCP
+           socket), `'AF_UNIX'` (for a Unix domain socket) or
+           `'AF_PIPE'` (for a Windows named pipe).  Of these only
+           the first is guaranteed to be available.
+
+           If `family` is `None` than the family is inferred from the
+           format of `address`.  If `address` is also `None` then a
+           default is chosen.  This default is the family which is
+           assumed to be the fastest available.  See `Address
+           formats`_.
+        
+           Note that if `family` is `'AF_UNIX'` then the associated
+           file will have only be readable/writable by the user
+           running the current process -- use `os.chmod()` is you need
+           to let other users access the socket.
+
+        `backlog`
+           If the listener object uses a socket then `backlog` is
+           passed to the `listen()` method of the socket once it has
+           been bound.
+
+        `authenticate`
+           If `authenticate` is true or `authkey` is not `None` then
+           digest authentication is used.
+
+        `authkey`
+           If `authkey` is a string then it will be used as the
+           authentication key; otherwise it must be `None`.
+
+           If `authkey` is `None` and `authenticate` is true then
+           `currentProcess.getAuthKey()` is used as the authentication
+           key.
+
+           If `authkey` is `None` and `authentication` is false then
+           no authentication is done.
+
+           If authentication fails then `AuthenticationError` is
+           raised.  See `Authentication keys`_.
+
+
+    `accept()`
+        Accept a connection on the bound socket or named pipe of the
+        listener object.  If authentication is attempted and fails
+        then `AuthenticationError` is raised.
+
+        Returns a `connection object <connection-object.html>` object.
+
+    `close()`
+        Close the bound socket or named pipe of the listener object.
+
+        This is called automatically when the listener is garbage
+        collected.  However it is advisable to call it explicitly.
+
+
+Listener objects have the following read-only properties:
+
+    `address`
+        The address which is being used by the listener object.
+
+    `last_accepted`
+        The address from which the last accepted connection came.
+
+        If this is unavailable then `None` is returned.
+
+
+Address formats
+===============
+
+* An `'AF_INET'` address is a tuple of the form `(hostname, port)`
+  where `hostname` is a string and `port` is an integer
+
+* An `'AF_UNIX'` address is a string representing a filename on the
+  filesystem.
+
+* An `'AF_PIPE'` address is a string of the form
+  `r'\\\\.\\pipe\\PipeName'`.
+  
+  To use `Client` to connect to a named pipe on a remote computer
+  called `ServerName` one should use an address of the form
+  `r'\\\\ServerName\\pipe\\PipeName'` instead.
+
+Note that any string beginning with two backslashes is assumed by
+default to be an `'AF_PIPE'` address rather than an `'AF_UNIX'`
+address.
+
+
+Authentication keys
+===================
+
+When one uses the `recv()` method of a connection object, the data
+received is automatically unpickled.  Unfortunately unpickling data
+from an untrusted source is a security risk.  Therefore `Listener` and
+`Client` use the `hmac` module to provide digest authentication.
+
+An authentication key is a string which can be thought of as a
+password: once a connection is established both ends will demand proof
+that the other knows the authentication key.  (Demonstrating that both
+ends are using the same key does *not* involve sending the key over
+the connection.)
+
+If authentication is requested but do authentication key is specified
+then the return value of `currentProcess().getAuthKey()` is used (see
+`Process objects <process-objects.html>`_).  This value will
+automatically inherited by any `Process` object that the current
+process creates.  This means that (by default) all processes of a
+multi-process program will share a single authentication key which can
+be used when setting up connections between the themselves.
+
+Suitable authentication keys can also be generated by using
+`os.urandom()`.
+
+
+Example
+=======
+
+The following server code creates a listener which uses `'secret
+password'` as an authentication key.  It then waits for a connection
+and sends some data to the client::
+
+    from processing.connection import Listener
+    from array import array
+
+    address = ('localhost', 6000)     # family is deduced to be 'AF_INET'
+    listener = Listener(address, authkey='secret password')
+
+    conn = listener.accept()
+    print 'connection accepted from', listener.last_accepted
+
+    conn.send([2.25, None, 'junk', float])
+
+    conn.sendBytes('hello')
+
+    conn.sendBytes(array('i', [42, 1729]))
+
+    conn.close()
+    listener.close()
+
+The following code connects to the server and receives some data from
+the server::
+
+    from processing.connection import Client
+    from array import array
+
+    address = ('localhost', 6000)
+    conn = Client(address, authkey='secret password')
+
+    print conn.recv()                 # => [2.25, None, 'junk', float]
+
+    print conn.recvBytes()            # => 'hello'
+
+    arr = array('i', [0, 0, 0, 0, 0])
+    print conn.recvBytesInto(arr)    # => 8
+    print arr                         # => array('i', [42, 1729, 0, 0, 0])
+
+    conn.close()
+
+.. _Prev: sharedctypes.html
+.. _Up: processing-ref.html
+.. _Next: programming-guidelines.html
+

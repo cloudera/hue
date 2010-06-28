@@ -1,0 +1,48 @@
+/* Basic layout */
+
+h4 {
+	margin-top: 1.25em;
+}
+
+a {
+	padding: 1px;
+}
+
+a:hover, a.hover {
+	color: red;
+}
+
+.error {
+	cursor: pointer;
+}
+
+#select-more-0 {
+	display: none;
+}
+
+.file-list {
+	padding: 0;
+	list-style: none;
+	margin: 0;
+}
+
+.file {
+	line-height: 2em;
+	padding-left: 21px;
+	background: url(../../assets/attach.png) no-repeat 1px 50%;
+}
+
+.file span {
+	padding: 0 5px 0 0;
+}
+.file a {
+	padding: 0 0 0 5px;
+}
+
+.file .file-size {
+	color: #666;
+}
+
+.file-running {
+	background-image: url(../../assets/progress.gif);
+}

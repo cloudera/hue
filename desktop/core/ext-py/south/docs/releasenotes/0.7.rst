@@ -1,0 +1,126 @@
+
+.. _0-7-release-notes:
+
+=========
+South 0.7
+=========
+
+This is a major new release of South. A lot of work has been done to the
+internals, and a few annoying remnants from South's history have
+finally been eradicated.
+
+
+Backwards incompatible changes
+==============================
+
+Tests now run with migrations by default, not using syncdb for everything as in
+0.6. This is the behaviour most people expect; to turn it off again,
+set ``SOUTH_TESTS_MIGRATE`` to False (migrating everything can be slow).
+
+In addition, you may note that some or all of your custom fields don't work when
+you upgrade; read more about this at :ref:`custom-fields`. You may also wish to
+change your old migration files and insert the full path to custom field classes
+in the ``models`` dictionary entries, to prevent future issues.
+
+
+Major changes
+=============
+
+Core Refactoring
+----------------
+
+The entire migration and dependency engine has been refactored to be
+class-based, rather than the mess of functions and variables it was before,
+and will now be a lot easier to maintain, as well as being nice and quick.
+
+Much thanks to Simon Law for doing a lot of the legwork on this one.
+
+Command Changes
+---------------
+ 
+The ``startmigration`` command (which used to be one massive file) has been
+removed, and refactored into new commands:
+
+ - ``schemamigration``, which is very similar to the old ``startmigration``
+ - ``datamigration``, which should be used to create new data migrations
+
+In addition, the ``--model`` argument to ``startmigration`` is now
+``--add-model`` on ``schemamigration``, for consistency with the other
+arguments, and ``schemamigration`` no longer requires a migration name; if you
+don't provide one, it will autogenerate a reasonably sensible one.
+
+Finally, South now detects when you're adding a column that needs a default
+value, and prompts you for it, rather than crashing when you tried to apply
+the migration, like before.
+
+Django Support
+--------------
+
+This version of South fully supports Django 1.2 (as well as 1.1 and 1.0),
+and has some limited multi-db functionality (migrate has gained a --database
+option) [#]_.
+
+.. [#] Note that multi-db functionality is unavailable if using South 0.7 with
+       earlier versions of Django.
+
+Custom Fields
+-------------
+
+Custom fields are no longer parsed if they don't introspect; instead, an
+error is raised every time. This is because parsing was causing scenarios where
+migrations sometimes worked, and then failed mysteriously later; the new
+solution means they'll always work or fail.
+
+This does have the unfortunate side-effect of making South not "magically" make
+your simpler custom fields work any more; we're trying to help by shipping
+introspection modules for the more common third-party apps with South, but you
+may also want to read the new 
+:ref:`reference for your own introspection rules <extending-introspection>`, or
+:ref:`our new tutorial chapter on it <tutorial-part-4>`.
+
+Migration Directories
+---------------------
+
+You can now set custom migration directories (actually done as Python modules)
+if you need per-project migrations for an app, or if you are using third-party
+apps and don't want to store the migrations with the app.
+
+You simply need to set the new :ref:`setting-south-migration-modules` setting.
+
+Supported Databases
+-------------------
+
+SQLite now has full, near-bulletproof support for altering columns,
+deleting columns, and other basic operations SQLite doesn't support natively.
+
+Oracle now has alpha support.
+
+Migrations Files
+----------------
+
+Migrations files no longer import from appname.models; model classes are now
+referred to by their full path, and retrieved using ``Migration.gf`` - this
+means a field now looks like::
+
+ self.gf('django.db.models.fields.TextField')(blank=True)
+
+Also, migration classes should now inherit from ``south.v2.SchemaMigration`` or
+``south.v2.DataMigration``. This doesn't do much at the moment, but is designed
+so we can easily change the migration API in future and keep backwards
+compatability.
+
+Bugfixes and minor changes
+--------------------------
+
+There's also an assorted array of bugfixes; see the `milestone status page
+<http://south.aeracode.org/query?status=accepted&status=assigned&status=closed&status=new&status=reopened&group=status&order=priority&milestone=0.7>`_ for details.
+
+Thanks
+======
+
+This release wouldn't have been possible without:
+
+ - Simon Law, who wrote most of the migration refactor and now knows too much about how our dependencies work
+ - `Torchbox <http://www.torchbox.com>`_, who sponsored Andrew's work on the startmigration refactor, the rest of the migration refactor, and a lot of other small things.
+ - Ilya Roitburg, who contributed the Oracle database module.
+ 

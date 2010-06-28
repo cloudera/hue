@@ -1,0 +1,497 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>
+Documentation
+</title>
+	
+    <link rel="stylesheet" href="docs.css"></link>
+    <link rel="stylesheet" href="highlight.css"></link>
+    
+
+
+
+
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+<div id="topanchor"><a name="top">&nbsp;</a></div>
+
+<div id="pagecontrol"><a href="index.html">Multiple Pages</a> | <a href="documentation.html">One Page</a></div>
+
+<h1>Mako Documentation</h1>
+
+<div class="versionheader">Version: 0.3.3   Last Updated: 05/31/10 16:21:29</div>
+
+
+
+
+
+
+
+	<div class="topnav">
+
+	<a name="full_index"></a>
+	<h3>Table of Contents</h3>
+	
+	
+    <ul>
+        <li><A style="" href="usage.html">Basic Usage</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="usage.html#usage_file">Using File-Based Templates</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_lookup">Using TemplateLookup</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="usage.html#usage_lookup_size">Setting the Collection Size</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_lookup_checks">Setting Filesystem Checks</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="usage.html#usage_using">Using Unicode and Encoding</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_handling">Handling Exceptions</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_common">Common Framework Integrations</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="usage.html#usage_common_turbogears/pylons">Turbogears/Pylons Plugin</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_common_wsgi">WSGI</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_common_pygments">Pygments</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="usage.html#usage_common_babel">Babel (Internationalization)</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="syntax.html">Syntax</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="syntax.html#syntax_expression">Expression Substitution</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="syntax.html#syntax_expression_expression">Expression Escaping</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_control">Control Structures</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_comments">Comments</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_newline">Newline Filters</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_python">Python Blocks</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="syntax.html#syntax_python_module-level">Module-level Blocks</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags">Tags</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="syntax.html#syntax_tags_page"><%page></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_include"><%include></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_def"><%def></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_namespace"><%namespace></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_inherit"><%inherit></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_namespacename:defname"><%namespacename:defname></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_call"><%call></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_doc"><%doc></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_text"><%text></a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_returning">Returning early from a template</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="defs.html">Defs</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="defs.html#defs_remotedefs">Calling defs from Other Files</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="defs.html#defs_programmatic">Calling defs programmatically</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="defs.html#defs_nesteddefs">Defs within Defs</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="defs.html#defs_defswithcontent">Calling a def with embedded content and/or other defs</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="runtime.html">The Mako Runtime Environment</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="runtime.html#runtime_context">Context</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="runtime.html#runtime_context_buffer">The Buffer</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="runtime.html#runtime_context_variables">Context Variables</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="runtime.html#runtime_context_accessors">Context Methods and Accessors</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="runtime.html#runtime_builtins">All the built-in names</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="namespaces.html">Namespaces</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="namespaces.html#namespaces_howtocall">Ways to Call Namespaces</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_frommodules">Namespaces from Regular Python Modules</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_declaring">Declaring defs in namespaces.</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_body">The "body()" method</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_properties">Namespace methods and properties</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_builtin">Built-in Namespaces</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="namespaces.html#namespaces_builtin_local">local</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_builtin_self">self</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="namespaces.html#namespaces_inheritable">Inheritable Namespaces</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="inheritance.html">Inheritance</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="inheritance.html#inheritance_next">Using the "next" namespace to produce content wrapping</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="inheritance.html#inheritance_parent">Using the "parent" namespace to augment defs</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="inheritance.html#inheritance_inheritable">Inheritable Attributes</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="filtering.html">Filtering and Buffering</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="filtering.html#filtering_expression">Expression Filtering</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="filtering.html#filtering_expression_defaultfilters">The default_filters Argument</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="filtering.html#filtering_expression_turning">Turning off Filtering with the "n" filter</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="filtering.html#filtering_filtering">Filtering Defs</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="filtering.html#filtering_buffering">Buffering</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="filtering.html#filtering_decorating">Decorating</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="unicode.html">The Unicode Chapter</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="unicode.html#unicode_specifying">Specifying the Encoding of a Template File</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="unicode.html#unicode_handling">Handling Expressions</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="unicode.html#unicode_defining">Defining Output Encoding</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="unicode.html#unicode_defining_buffer">Buffer Selection</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="unicode.html#unicode_saying">Saying to Heck with it:  Disabling the usage of Unicode entirely</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="caching.html">Caching</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="caching.html#caching_arguments">Cache arguments</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="caching.html#caching_accessing">Accessing the Cache</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+    </ul>
+
+
+	</div>
+
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+

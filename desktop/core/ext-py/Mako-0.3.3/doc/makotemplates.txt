@@ -1,0 +1,663 @@
+<html>
+
+<head>
+
+<style>
+        body {
+            font-family:arial,helvetica;
+        }
+</style>
+
+</head>
+
+<body>
+
+# Mako Templates for Python
+
+## Slogan
+Hyperfast and Lightweight Templating for the Python Platform
+
+## Features
+- Python Server Pages.  Templates compile into Python modules for maximum performance.
+<li> <p>Insanely Fast.  An included bench suite, adapted from a suite included with Genshi, has these results for a simple three-sectioned layout:</p>
+<table>
+<tr><td>Mako:</td><td>0.66 ms</td></tr>
+<tr><td>Cheetah:</td><td>0.74 ms</td></tr>
+<tr><td>Django:</td><td>5.43 ms</td></tr>
+<tr><td>Myghty:</td><td>5.25 ms</td></tr>
+<tr><td>Genshi:</td><td>12.53 ms</td></tr>
+<tr><td>Kid:</td><td>19.12 ms</td></tr>
+</table>
+</li>
+
+- Super-simple API.  For basic usage, just one class, `Template` is needed:
+
+        from mako.template import Template
+        print Template("hello ${data}!").render(data="world")
+
+- To manage many templates, leveraging industrial strength module generation and management code adapted from Myghty, use the `TemplateLookup` class:
+
+        from mako.lookup import TemplateLookup
+        lookup = TemplateLookup(directories=['/my/htmlfiles'])
+        template = lookup.get_template('index.html')
+        print template.render(data="foo")
+
+- Mako's syntax borrows from the best ideas of many others, including:
+
+    - Django Templates
+    - Myghty / Mason
+    - Cheetah
+    - Genshi
+    - Java Server Pages
+    - Struts Tiles
+    
+- Standard template features:
+    - control structures
+    
+            % if len(v) > 5:
+                % for x in range(1,5):
+                    hi ${x}
+                % endfor
+            % endif
+    
+    - straight python code:
+    
+            <%
+                data = handle.lookup()
+                view = [d.name for d in data]
+            %>
+
+    - callable blocks, with or without arguments, which also pull names from the enclosing scope:
+    
+            # define:
+            <%def name="foo(x, y)">
+                hi im foo ${x} ${y} ${z}
+            </%def>
+        
+            # then call:
+            ${foo(4,5)}
+    
+    - multi-zoned page inheritance
+    - "component-calls-with-content" - call any def, nesting any number locally-defined blocks of text as arguments.  This is the basis for creating custom tags:
+    
+            # define:
+            <%def name="foo(x, y)">
+                ${head()}
+                foo ${x} {$y}
+                ${body()}
+            </%def>
+            
+            # then call, defining two more blocks
+            <%call expr="foo(3, 4)">
+                <%def name="head">
+                    the header
+                </%def>
+                main body
+            </%call>
+            
+    - filters, either the standard builtins or custom functions, applicable to any expression or `<%def>` definition:
+    
+            ${"some text" | h}
+
+            <%def name="foo" filter="filter1, x">
+                ...
+            </%def>
+            
+    - custom tags can be created as templated components, or Python modules containing callables.  Whole sets of custom tags can be imported into the current template's namespace using the `<%namespace>` tag.
+    - caching built in from the ground up.  any template or block of text within can be cached using memory, file, DBM or memcached backends.
+
+## Language
+
+### Control Structures
+
+Control structures use the % operator.  % can start anywhere on the line, preceded by only whitespace.  Blocks are terminated by name-qualified terminators.  
+
+    % for item in items: 
+        % if foo:
+        ${item}
+        some text
+        % endif
+    % endfor
+
+The amount of whitespace before the % and after the % before the code starts is not significant.
+
+Myghty style:
+
+    % if x:
+    %   if y:
+    %   endif
+    % endif
+
+"Cheetah" style:
+
+    %if x:
+        %if y:
+        %endif
+    %endif
+    
+Messy style (you probably wouldn't want to code this way for readablity):
+
+      %if x:
+        %if y:
+        % endif
+          %      endif
+
+### Comments
+
+Work similarly to %, using the # tag:
+
+    <html>
+        # this is a comment.
+    </html>
+
+### Truncating Newlines
+
+End any line with a backslash (\\) to suppress the newline at the end:
+
+    % for x in [1,2,3]:\
+        ${x} \
+    % endfor
+    
+Produces the output:
+
+    1 2 3
+
+The newline truncator is particularly important for producing plaintext documents such as emails, as well as preformatted sections of HTML (i.e. using `<pre>`).
+    
+### Expressions
+
+Expressions usually use ${expr} syntax, and compile into literal Python.
+
+    ${someexpression}
+    
+    ${"foo" + "bar"}
+    
+### Variable Namespace
+
+A template executes with a single contextual dictionary.  This dictionary is completely transparent in the template itself.  AST parsing of all embedded Python is performed in order to locate all referenced variable names, which are pre-declared from the dictionary at runtime (or a special "undefined" value if not present) before template-generated Python is executed.  So when a variable "x" is referenced, the searched hierarchy is:
+
+- Variables declared locally, or as part of a control structure (like say, a for loop)
+- Variables declared in an enclosing scope. 
+- Variables declared in the template at the module-level.
+- Names within the current context object.
+
+Notice that the context is the lowest priority for scope.  This is to allow the most predictable behavior; when you create a template or component, the variables that are explicitly present regardless of the context's contents form part of the construction of that component.  It should not be possible to place a name into the context that causes code which was written against an explicit scope to suddenly function differently.
+
+When variables from the context are what's specifically needed, just call them from the context explicitly:
+
+    ${context['some key']}
+
+A convenience object `args` is also available which provides attribute-style access:
+
+    args.mykey
+    
+### Embedding Python
+#### Inline
+
+Inline Python is embedded via the <% %> tags.  This is straight python so the whitespace is significant.  You can emit text via the `write()` method on the context.
+
+    <table>
+        <tr><td>some table</td></tr>
+        <tr>
+        <%
+            for x in ["one", "two", "three"]:
+                context.write("<td>%s</td>" % x)
+        %>
+        </tr>
+    </table>    
+
+Remember that you can reference any variable name from the template's context, and it will be pulled from the context automatically.  
+
+Context:
+
+    {'x':'one', 'y':'two'}
+    
+Template:
+
+    <% 
+        context.write("X is " + x + "\n")
+        y = "hi there"
+        context.write("Y is " + y + "\n")
+    %>
+
+Produces:
+
+    X is one
+    Y is hi there
+
+The scoping rules for variable assignment within blocks of Python are the same as that for Python callables; if you assign to a variable name, that variable becomes bound to the local scope, and you cannot access it in the block before that assignment, even if it is part of the context that was sent to the template.  (We tried different combinations in this area, trying to allow a reference to the enclosing scope which can be overridden through assignment; but it quickly leads to inconsistent behaviors...Python has got it right !).  If you *do* want to use a variable from the context, then reassign to it locally, just assign it from the context first:
+
+    <%
+        # pull y from the context.
+        y = context['y']
+    %>
+    y is ${y}
+    <% 
+        # now assign something different to y.
+        y = "hi there"
+    %>
+    y is ${y}
+    
+#### Module Level
+
+Module level Python is declared by the <%! %> tags.  Python in these blocks occurs at module import time (i.e. global scope)
+
+    <%!
+        import mystuff
+        def writefoo(text):
+            return "foo is " +text
+    %>
+    
+    hello ${writefoo('jack')}
+    
+    
+### File Includes
+
+Use the <%include> tag.
+
+    <%include file="somefile.txt"/>
+    
+This tag also can handle expressions:
+
+    <%include file="${filename}"/>
+
+In fact every <%tag> can use expressions (i.e. ${}) inside of their quoted sections.
+
+The include tag requires that the template being called has a `TemplateLookup` available with which to locate the included template.
+
+Add the `import="true"` flag to the `<%include>` tag and when you include the file, all the `<%def>` and `<%namespace>` sections declared in that file (described later) are pulled into the local namespace of the template, as though they were declared locally:
+
+    <%include file="somefile.html" import="true"/>
+    
+### Components
+
+The component is the single tag used to demarcate any block of text and/or code.  It exists within generated Python as a callable function. 
+
+    <%def name="hello">
+        hello world
+    </%def>
+
+They are normally called as expressions.
+
+    the component:  ${hello()}
+
+A `<%def>` can be declared anywhere inside a template, and becomes available throughout the template, including above where it was declared.  The callable generated by `<%def>` gets generated outside of the enclosing template's callable.  The name of the callable is then placed in the variable namespace of the parent component.
+    
+Components have access to the current contextual namespace in exactly the same way their parent template does.  
+
+    Hello there ${username}, how are ya.  Lets see what your account says:
+    
+    ${account()}
+
+    <%def name="account">
+        Account for ${username}:<br/>
+    
+        % for row in accountdata:
+            Value: ${row}<br/>
+        % endfor
+    </%def>
+
+You can also pass arguments to a component, which show up in the component's variable namespace overriding whatever is in the enclosing namespace:
+
+    ${account(name='john')}
+    
+    <%def name="account">
+        Hi ${name}
+    </%def>
+
+If you want your component to have positional arguments, you can declare them:
+
+    <%def name="account(accountname, type)">
+        account name: ${accountname}, type ${type}
+    </%def>
+
+As well as keyword arguments explicitly declared, using normal Python conventions:
+
+    <%def name="account(accountname, type='personal')">
+        account name: ${accountname}, type ${type}
+    </%def>
+
+When you declare explicit arguments in your component signature, they are required following normal Python conventions.  This is in contrast to using variable names implicitly from the template's context, which produces `None` if the name doesn't exist.  Additionally, explicitly declared arguments are handy in case you have the same names declared at the module level, and you'd like to insure that you get those arguments from the component call itself.
+
+#### Calling Components from Other Files
+
+Calling a component from another file differs from a regular `<%include>`, in that you are calling a specific component declared in that template, not the template body itself.
+
+First, load the file you want into a "namespace":
+
+    <%namespace name="mystuff" file="mystuff.html"/>
+
+The namespace tag is declared once per template, and adds a local variable "mystuff" to the current scope.
+
+Then, just call the components off of `mystuff`:
+
+    ${mystuff.somecomponent(x=5,y=7)}
+
+#### Components within Components
+
+The component model is totally recursive.  Declaring `<%def>` inside another `<%def>` leads it to be local to its parent:
+
+    <%def name="mycomponent">
+        <%def name="subcomponent">
+            a sub component
+        </%def>
+        
+        im the component, and the subcomopnent is ${subcomponent()}
+    </%def>
+
+The recursive component model becomes very handy for doing layouts, including usage within inheriting templates.
+
+#### Calling a component with embedded content and/or other components
+
+A flip-side to component within component is a component call with content.  This is where you call a component, and at the same time declare a block of content that can be used by the component being called.  This is the basic method used to declare "custom tags".   To achieve this, use the `<%call>` tag instead of the regular expression syntax.  By default, the body of content is assigned to the name `body`:
+
+    <%def name="buildtable">
+        <table>
+            <tr><td>
+                ${body()}
+            </td></tr>
+        </table>
+    </%def>
+    
+    <%call expr="buildtable">
+        I am the table body.
+    </%call>
+    
+This produces the output:
+
+    <table>
+        <tr><td>
+            I am the table body.
+        </td></tr>
+    </table>
+
+The `body` name is executed each time its referenced.  This means you can use component-call-with-content to build iterators, conditionals, etc:
+
+    <%def name="lister(count)">
+        % for x in range(1,count):
+            ${body()}
+        % endfor
+    </%def>
+    
+    <%call expr="lister(3)">
+        hi
+    </%call>
+    
+Produces:
+    
+    hi
+    hi
+    hi
+
+A custom "conditional" tag:
+    
+    <%def name="conditional(expr)">
+        % if expr:
+            ${body()}
+        %
+    </%def>
+
+    <%call expr="conditional(4==4)">
+        im the result
+    </%call>
+
+Produces:
+
+    im the result
+
+Since `body` is a callable, the hosting component can pass arguments:
+
+    <%def name="layoutdata(somedata)">
+        <table>
+        % for item in somedata:
+            <tr>
+            % for col in item:
+                <td>${body(col=col)}</td>\
+            % endfor
+            </tr>
+        % endfor
+        </table>
+    </%def>
+    
+    <%call expr="layoutdata([[1,2,3],[4,5,6],[7,8,9]])">
+        Body data: ${col}
+    </%call>
+    
+Produces:
+
+    <table>
+        <tr>
+            <td>Body data: 1</td><td>Body data: 2</td><td>Body data: 3</td>
+            <td>Body data: 2</td><td>Body data: 5</td><td>Body data: 6</td>
+            <td>Body data: 3</td><td>Body data: 8</td><td>Body data: 9</td>
+        </tr>
+    </table>
+    
+If you combine nested components with the component call with content, you can build whole layouts quite easily:
+
+    <%def name="layout">
+        # a layout component
+        <div class="mainlayout">
+            <div class="header">
+                ${header()}
+            </div>
+            <div class="sidebar">
+                ${sidebar()}
+            </div>
+            <div class="content">
+                ${body()}
+            </div>
+        </div>
+    </%def>
+
+    # calls the layout component
+    <%call expr="layout">
+        <%def name="header">
+            I am the header
+        </%def>
+        <%def name="sidebar">
+            <ul>
+                <li>sidebar 1</li>
+                <li>sidebar 2</li>
+            </ul>
+        </%def>
+        
+            this is the body
+    </%call>
+    
+The above layout would produce:
+
+    <div class="mainlayout">
+        <div class="header">
+            I am the header
+        </div>
+        <div class="sidebar">
+            <ul>
+                <li>sidebar 1</li>
+                <li>sidebar 2</li>
+            </ul>
+        </div>
+        <div class="content">
+            this is the body
+        </div>
+    </div>
+    
+### Inheritance
+
+Inheritance allows you to specify another template file that should take control of execution, using the current template's namespace.  This is provided via the <%inherit> tag.  This works similarly to the component call with content example above, where `body` is the main body of the template and you can also define other `<%def>` sections:
+
+    # page.html:
+    
+    <%inherit name="base.html"/>
+    <%def name="header">
+        this is the header
+    </%def>
+    
+    I am the body
+
+    <%def name="footer">
+        this is the footer
+    </%def>
+
+    # base.html:
+    
+    <html>
+        <body>
+            <div class="top">
+                ${header()}
+            </div>
+            
+            ${body()}
+            
+            ${footer()}
+        </body>
+    </html>
+
+Which produces:
+
+    <html>
+        <body>
+            <div class="top">
+                this is the header
+            </div>
+        
+            I am the body
+        
+            this is the footer
+        </body>
+    </html>
+
+The inheritance of the parent template occurs *where you put the inherit tag.*  This means whatever content is above the inherit tag gets executed normally, without any inheritance.  It also means you can inherit *dynamically!*
+
+    <%
+        if layout=='green':
+            inheritfrom = 'greentmpl.html'
+        else:
+            inheritfrom = 'normaltmpl.html'
+    %>
+    <%inherit name="${inheritfrom}"/>
+    
+### Page-level arguments
+
+As components can declare optinally explicit argument signatures, so can your template, using the `<%page>` tag:
+
+    <%page arguments="(arg1, arg2, arg3=None)"/>
+
+The named arguments are pulled from the incoming context dictionary, overriding any module-level declared arguments.  It also serves as a way to declare certain context arguments as required.
+    
+### Filters
+
+Filters are callable functions that receive a single textual argument as a string, and return a new textual string as output.  They are called using the `|` operator in expressions:
+
+    ${"this is some text" | html}
+    
+Or using the `filter` keyword for a `<%def>` or `<%call>` directive:
+
+    <%def name="mycomp" filter="html">
+    </%def>
+
+Standard built-in filters are included: `html`, `xml`, `url`.
+    
+Creating your own filters is easy.  Any callable that is in the template's namespace can be used, or you can declare functions:
+
+    <%|
+        def myfilter(text):
+            return "text" + text + "filtered"
+    %>
+    
+        ${"hiya" | myfilter}
+        
+Filters can also be defined using the `<%def>` tag.   The text to be filtered is placed into the name 'text':
+
+    <%def myfilter>
+        text${text}filtered
+    </%def>
+    
+    ${"hiya" | myfilter}
+
+Filters can take arguments !  Using a python function:
+
+    <%|
+        def pythonfilter(text, arg1, arg2='foo'):
+            return "text" + text + "filtered"
+    %>
+    ${"hiya" | pythonfilter('hello', 'world')}
+
+Or a `<%def>`:
+
+    <%def componentfilter(arg1, arg2='foo')>
+        text${text}filtered
+    </%def>
+
+    ${"hiya" | componentfilter('hello', 'world')}
+    
+### Caching
+
+Any template or component can be cached using the `cache` argument to the `%page` or `%def` directives:
+
+    <%page cache="true"/>
+    
+        template text
+        
+    <%def name="mycomp" cache="true" cache_timeout="30" cache_type="memory">
+        other text
+    </%def>
+
+Cache arguments:
+- cache="false|true" - turn caching on
+- cache_timeout - number of seconds in which to invalidate the cached data
+- cache_type - type of caching.  `memory`, `file`, `dbm`, or `memcached`.
+
+### Namespaces
+
+Namespaces are used to organize groups of components into categories, and also to "import" components from other files so that you don't have to type the full filename of the remote component file.
+
+If the file `components.html` defines these two components:
+
+    # components.html
+    <%def name="comp1">
+        this is comp1
+    </%def>
+    
+    <%def name="comp2">
+        this is comp2
+    </%def>
+    
+You can make another file, for example `index.html`, that pulls those two components into a namespace called `comp`:
+
+    # index.html
+    <%namespace name="comp" file="components.html"/>
+    
+    Heres comp1:  ${comp.comp1()}
+    Heres comp2:  ${comp.comp2()}
+    
+The `<%namespace>` tag is more powerful than that.  You can also declare `<%defs>` within the namespace:
+
+    # define a namespace
+    <%namespace name="stuff">
+        <%def name="comp1">
+            comp1
+        </%def>
+    </%namespace>
+    
+    # then call it
+    ${stuff:comp1()}
+
+Namespaces can also import modules containing regular Python callables.  These callables need to take at least one argument, `context`:
+
+A module file `some/module.py` might contain the callable:
+
+    def my_tag(context):
+        context.write("hello world")
+
+A template can use this module via:
+    
+    <%namespace name="hw" module="some.module"/>
+
+    ${hw.my_tag()}
+    
+Note that the `context` argument is not needed in the call; the `namespace` tag creates a locally-scoped callable which takes care of it.
+    
+</body>
+
+</html>

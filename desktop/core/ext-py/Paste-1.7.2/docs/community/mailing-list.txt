@@ -1,0 +1,35 @@
+Mailing Lists
+=============
+
+General discussion and questions should go to: 
+
+`paste-users@pythonpaste.org <http://pythonpaste.org/mailman/listinfo/paste-users>`_:
+    `Subscribe <http://pythonpaste.org/mailman/listinfo/paste-users>`__,
+    `Archives <http://pythonpaste.org/archives/list/paste-users.en.html>`__
+
+To receive announcements:
+
+`paste-news@pythonpaste.org <http://pythonpaste.org/mailman/listinfo/paste-news>`_:
+    `Subscribe <http://pythonpaste.org/mailman/listinfo/paste-news>`__,
+    `Archives <http://pythonpaste.org/archives/list/paste-news.en.html>`__
+
+To receive notification of new checkins:
+
+`paste-checkins@pythonpaste.org <http://pythonpaste.org/mailman/listinfo/paste-checkins>`_:
+    `Subscribe <http://pythonpaste.org/mailman/listinfo/paste-checkins>`__,
+    `RSS feed <http://pythonpaste.org/trac/timeline/?daysback=90&max=50&wiki=on&ticket=on&changeset=on&milestone=on&format=rss>`_
+
+Bug reports should be added to the tracker, but you can be notified of
+new bugs on the list:
+
+`paste-bugs@pythonpaste.org <http://pythonpaste.org/mailman/listinfo/paste-bugs>`_:
+    `Subscribe <http://pythonpaste.org/mailman/listinfo/paste-bugs>`__,
+    `View bug reports <http://pythonpaste.org/trac/report>`__,
+    `Submit bug report <http://pythonpaste.org/trac/newticket>`_
+
+More abstract discussion of Python web programming should go to:
+
+`web-sig@python.org <http://mail.python.org/mailman/listinfo/web-sig>`_:
+    `Subscribe <http://mail.python.org/mailman/listinfo/web-sig>`__,
+    `Archives <http://www.python.org/pipermail/web-sig/>`__
+

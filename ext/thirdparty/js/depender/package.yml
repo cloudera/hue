@@ -1,0 +1,6 @@
+copyright: Unknown
+license: MIT
+description: A dependency loader for the MooTools library that integrates with the server side Depender library.
+name: depender_client
+sources: [Source/Depender/Depender.Client.js]
+version: Unknown

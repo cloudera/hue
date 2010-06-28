@@ -1,0 +1,12 @@
+{
+	"title": "Queued Photo Uploader",
+	"description": "Showcase with converted FancyUpload.",
+	"script_php": "../script.php",
+	"files": [
+		"http://ajax.googleapis.com/ajax/libs/mootools/1.2.2/mootools.js",
+		"../../source/Swiff.Uploader.js",
+		"../../source/Fx.ProgressBar.js",
+		"http://github.com/mootools/mootools-more/raw/master/Source/Core/Lang.js",
+		"../../source/FancyUpload2.js"
+	]
+}

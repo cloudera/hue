@@ -1,0 +1,535 @@
+img.fb_icon {
+	width: 54px;
+	height: 55px;
+	position: absolute;
+	top: 27px;
+	left: 3px;
+}
+.toolbar .fb-actions {
+	position: absolute;
+	top: 58px;
+	text-align: right;
+	right: 12px;
+}
+
+div.filebrowser .fb-actions a {
+	padding: 6px 8px 6px 22px;
+	height: 24px;
+}
+
+div.filebrowser .fb-home {
+	background: url(/static/art/icons/house.png);
+}
+
+div.filebrowser .fb-upload {
+	background: url(/static/art/led-icons/page_white_get.png);
+}
+
+div.filebrowser .fb-mkdir {
+	background: url(/static/art/icons/folder.png);
+}
+
+
+.filebrowser .fb-date {
+	width: 170px !important;
+}
+.filebrowser .fb-name, .filebrowser .fb-date, .filebrowser .fb-filesize {
+	line-height: 16px;
+}
+.filebrowser .fb-filesize {
+	min-width: 60px;
+}
+.filebrowser .fb-name-container {
+	position: relative;
+}
+.filebrowser a {
+	color: #000;
+}
+.filebrowser a:hover {
+	text-decoration: none;
+}
+.filebrowser a.fb-dir {
+	background: url(/static/art/icons/folder.png) no-repeat 1px 0px;	
+	display: block;
+	height: 18px;
+	padding-left: 22px;
+}
+.filebrowser a.fb-file {
+	background: url(/static/art/icons/page_white_text.png) no-repeat 1px 1px !important;
+	display: block;
+	min-height: 18px;
+	padding: 2px 22px;
+}
+.filebrowser .fb-item-options {
+	background: url(/static/art/led-icons/ui_combo_box.png) no-repeat;
+	display: block;
+	width: 16px;
+	height: 16px;
+	text-indent: -500px;
+	overflow: hidden;
+	float: right;
+}
+.filebrowser .fb-item-actions a {
+	display: block;
+	height: 18px;
+	padding-left: 22px;
+	top: 18px;
+}
+.filebrowser .fb-item-actions .fb-rmdir-container {
+	display: none;
+}
+.filebrowser .fb-item-actions a.fb-rmtree {
+	background: url(/static/art/icons/folder_delete.png) no-repeat 1px 1px !important;
+}
+.filebrowser .fb-item-actions a.fb-rm {
+	background: url(/static/art/icons/page_white_delete.png) no-repeat 1px 1px !important;
+}
+.filebrowser .fb-item-actions a.fb-rename {
+	background: url(/static/art/icons/textfield_rename.png) no-repeat 1px 1px !important;
+}
+.filebrowser .fb-item-actions a.fb-chown {
+	background: url(/static/art/icons/group_edit.png) no-repeat 1px 1px !important;
+}
+.filebrowser .fb-item-actions a.fb-chmod {
+	background: url(/static/art/icons/lock_edit.png) no-repeat 1px 1px !important;
+}
+.filebrowser .fb-item-actions a.fb-move-file {
+	background: url(/static/art/icons/page_white_go.png) no-repeat 1px 1px !important;
+}
+.filebrowser .fb-item-actions a.fb-move-dir {
+	background: url(/static/art/icons/folder_go.png) no-repeat 1px 1px !important;
+}
+.filebrowser .fb-item-actions a.fb-viewfile {
+	background: url(/static/art/icons/page_white_magnify.png) no-repeat 1px 1px !important;
+}
+
+.filebrowser .fb-item-actions a.fb-editfile {
+	background: url(/static/art/icons/page_white_edit.png) no-repeat 1px 1px !important;
+}
+
+.filebrowser .context-menu {
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	background: #fff;
+	border: solid #777;
+	border-width: 1px;
+	position: absolute;
+	z-index: 1;
+	display: none;
+	overflow: visible;
+}
+.filebrowser .context-menu * {
+	white-space: nowrap;
+} 
+.filebrowser .context-menu li {
+	border-bottom: 1px solid #ccc;
+	padding: 3px;
+}
+.filebrowser table.ccs-data_table tr.table-tr-selected td .context-menu li a {
+	color: #000;
+	text-decoration: none;
+}
+.filebrowser .context-menu li:hover, .filebrowser .context-menu li:hover a {
+	text-decoration: none;
+	background-color: #3875D7 !important;
+	color: #fff !important;
+}
+.filebrowser .context-menu li:last-child {
+	border: none;
+}
+.filebrowser .jframe_prompt dl.fb-side-by-side {
+	width: 400px;
+}
+.filebrowser .jframe_prompt dl.fb-side-by-side dt {
+	float: left;
+	width: 120px;
+	text-align: left;
+	line-height: 16px;
+}
+.filebrowser .jframe_prompt dl.fb-side-by-side dd {
+	text-align: left;
+	line-height: 16px;
+	padding-bottom: 4px;
+}
+.filebrowser .jframe_prompt dl.fb-side-by-side dd input {
+	line-height: 16px;
+}
+
+.filebrowser .fb-chmod th, .filebrowser .fb-chmod td {
+	padding: 2px 8px;
+	border-bottom: 1px solid #ccc;
+}
+.filebrowser .fb-chmod td {
+	border-right: 1px solid #ccc;
+}
+.filebrowser .fb-chmod .fb-label {
+	text-align: right;
+	border-bottom: none;
+}
+.filebrowser .fb-chmod .fb-empty {
+	border: none;
+}
+.fb-upload {
+	display:block;
+	float:left;
+}
+.fb-noflash {
+	color:#666666;
+	padding-right:12px;
+	text-align:right;
+}
+.fb-noflash a {
+	color: #3e528c;
+}
+.fb-uploader {
+	width: 80%;
+	background: #fff;
+	border: 1px solid #000;
+	position: absolute;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-box-shadow: 0 1px 2px #999;
+	-webkit-box-shadow: 0 1px 2px #999;
+	padding: 4px;
+	z-index: 10003;
+	overflow: auto;
+}
+.fb-uploader .fb-cancel-upload {
+	z-index: 1;
+	cursor: pointer;
+	display: block;
+	height: 13px;
+	overflow: hidden;
+	position: absolute;
+	right: 2px;
+	text-indent: 300px;
+	width: 13px;
+	background: url(/static/art/close.png);
+}
+
+
+.fb-uploader a.hover {
+	color: red;
+}
+ 
+.fb-uploader .fb-upload-list {
+	height: 100px;
+	overflow: auto;
+	padding: 0;
+	list-style: none;
+	margin: 0 14px 0 0;
+}
+ 
+.fb-uploader .fb-upload-list .file-invalid {
+	cursor: pointer;
+	color: #514721;
+	padding-left: 48px;
+	line-height: 24px;
+	background: url(/static/js/ThirdParty/digitarald-fancyupload/assets/error.png) no-repeat 24px 5px;
+	margin-bottom: 1px;
+}
+.fb-uploader .fb-upload-list .file-invalid span {
+	background-color: #fff6bf;
+	padding: 1px;
+}
+ 
+.fb-uploader .fb-upload-list .file {
+	line-height: 2em;
+	padding-left: 22px;
+	background: url(/static/js/ThirdParty/digitarald-fancyupload/assets/attach.png) no-repeat 1px 50%;
+}
+ 
+.fb-uploader .fb-upload-list .file span,
+.fb-uploader .fb-upload-list .file a {
+	padding: 0 4px;
+}
+ 
+.fb-uploader .fb-upload-list .file .file-size {
+	color: #666;
+}
+ 
+.fb-uploader .fb-upload-list .file .file-error {
+	color: #8a1f11;
+}
+ 
+.fb-uploader .fb-upload-list .file .file-progress {
+	width: 125px;
+	height: 12px;
+	vertical-align: middle;
+	background-image: url(/static/js/ThirdParty/digitarald-fancyupload/assets/progress-bar/progress.gif);
+}
+
+
+/*
+	chooser
+*/
+.filechooser .fb-actions {
+	right: 10px;
+	top: 24px;
+}
+.filechooser .jframe_contents {
+	text-align: left;
+}
+.filechooser .fb-item-options {
+	display: none;
+}
+.filechooser .fb-file-list .not-selectable {
+	opacity: 0.7;
+	filter: alpha(opacity=70);
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+}
+.filechooser .fb-file-list .not-selectable.table-tr-selected td, .filechooser .fb-file-list .not-selectable.table-tr-selected td a {
+	background-color: red !important;
+}
+
+.filechooser .toolbar .fb_icon {
+	display: none;
+}
+
+/*
+			fileviewer
+*/
+
+.fileviewer .toolbar {
+	height: 0px;
+	overflow: visible;
+}
+
+.toolbar .fv-controls {
+	position: absolute;
+	top: 49px;
+	left: 10px;
+}
+
+.toolbar .fv-path, .toolbar .fe-path {
+	position: absolute;
+	top: 25px;
+	left: 10px;
+	line-height: 16px;
+	background: transparent url(/static/art/icons/page.png) no-repeat scroll;
+	text-indent: 20px;
+}
+.toolbar .fe-buttons {
+	position: absolute;
+}
+
+.fv-status, .fv-changeStatus {
+	padding-right: 6px;
+}
+
+.fv-actions {
+	position: absolute;
+	left: 10px;
+	top: 49px;
+}
+
+.fv-navigation a {
+	float: left;
+	text-indent: -500px;
+	overflow: hidden;
+	width: 16px;
+	height: 16px;
+	padding: 3px;
+	display: block;
+}
+
+.fv-navigation .fv-firstBlock {
+	background: transparent url(../art/fb_offset_begin.png) no-repeat scroll 
+}
+
+.fv-navigation .fv-prevBlock {
+	background: transparent url(../art/fb_offset_previous.png) no-repeat scroll 
+}
+
+.fv-navigation .fv-nextBlock {
+	background: transparent url(../art/fb_offset_next.png) no-repeat scroll	
+}
+
+.fv-navigation .fv-lastBlock {
+	background: transparent url(../art/fb_offset_end.png) no-repeat scroll	
+}
+
+.fv-status, .fv-changeStatus, .fv-navigation, .fv-fileInfo {
+	float: left;
+}
+
+.fv-navigation {
+	padding-top: 5px;
+}
+
+.fv-stepInfo {
+	display: block;
+	float: left;
+}
+
+.fv-controlInfo {
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-webkit-border-radius-topleft: 5px;
+	-webkit-border-radius-bottomleft: 5px;
+}
+
+.fv-controlInfo a {
+	height: 16px;
+	width: 16px;
+	margin-left: 5px;
+}
+
+.fv-editBytes {
+	background: url(/static/art/led-icons/pencil.png) left 50% no-repeat;
+}
+
+.fv-changeBytes {
+	background: url(/static/art/led-icons/accept.png) left 50% no-repeat;
+}
+
+.fv-cancelChangeBytes {
+	background: url(/static/art/led-icons/cross.png) left 50% no-repeat;
+}
+
+.fv-fileInfo dt {
+	font-weight: bold;
+	padding:2px 0px;
+}
+
+div.fileviewer .fv-actions a {
+	padding: 6px 8px 6px 25px;
+}
+
+div.fileviewer .fv-download {
+	background: url(/static/art/led-icons/page_white_put.png) left 50%;
+}
+
+div.fileviewer .fv-viewLocation {
+	background: url(/static/art/icons/folder_go.png) left 50%;
+}
+
+div.fileviewer .fv-viewGzip {
+	background: url(/static/art/icons/view_gzip.png) left 50%;
+}
+
+div.fileviewer .fv-viewBinary {
+	background: url(/static/art/icons/view_binary.png) left 50%;
+}
+
+div.fileviewer .fv-viewText {
+	background: url(/static/art/icons/view_text.png) left 50%;
+}
+
+div.fileviewer .fv-editFile {
+	background: url(/static/art/icons/page_edit.png) left 50%;
+}
+	
+.fv-bold {
+	font-weight: bold;
+}
+
+.fv-italic {
+	font-style: italic;
+}
+
+.fv-byteInfo {
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	background:#CCCCCC none repeat scroll 0 0;
+	border:1px solid #333333;
+	margin:0 3px;
+	padding:1px 5px !important;
+	font-weight: bold;
+}
+
+.fv-byteInfo input {
+	font-size: 12px;
+	font-family:"Lucida Grande","Lucida Sans Unicode","Trebuchet MS",Helvetica,Arial,sans-serif;
+	background:#CCCCCC none repeat scroll 0 0;
+	border: 1px solid #333;
+	color: black;
+	height: 12px;
+	vertical-align: top;
+}
+
+.fv-byteInfo label.overTxtLabel {
+	color: black;
+	font-size: 12px;
+	display: none; 
+	margin-top: 0px;
+}
+
+.fv-controls .fv-changeBytesForm {
+	display: inline;
+}
+
+.fv-binaryWarning {
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+	background-color: lightYellow;
+	border-bottom: 1px solid black;
+	font-weight: bold;
+	padding: 5px 10px;
+}
+
+.fe-editForm textarea {
+	width: 100%;
+	margin: 0px auto;
+	border: none;
+	font-family: monaco, courier;
+	font-size: 12px;
+	color: #fff;
+	background: #333;
+	padding: 0;
+}
+
+.fe-divResize {
+	text-align: right;
+	background: #333;
+	border: 1px solid #333;
+}
+
+div.fileeditor .fe-saveButton {
+	background: url(/static/art/icons/disk.png) left 50%;
+}
+
+div.fileeditor .fe-saveAsButton {
+	background: url(/static/art/icons/disk.png) left 50%;
+}
+
+div.fileeditor .fe-viewLocation {
+	background: url(/static/art/icons/folder_go.png) left 50%;
+}
+
+div.fileeditor .fe-buttons a {
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	padding: 6px 10px 6px 25px;
+	height: 27px;
+}
+
+div.fileeditor .fe-buttons {
+	top: 52px;
+	left: 10px;
+}
+
+.fs-location {
+	margin: 4px 200px 0px 10px;
+	position: absolute;
+}
+
+.fs-locationInput {
+	width: 400px;
+	margin-left: 5px;
+}
+
+div.fb-search {
+	position: absolute;
+	left: 70px;
+	padding: 2px;
+	top: 55px;
+}
+
+div.fb-search select {
+	position:relative;
+	top:3px;
+	vertical-align:top;
+}

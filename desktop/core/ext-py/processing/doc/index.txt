@@ -1,0 +1,43 @@
+.. include:: header.txt
+.. include:: version.txt
+
+========================================
+ Documentation for processing-|version|
+========================================
+
+:Author:  R Oudkerk
+:Contact: roudkerk at users.berlios.de
+:Url:     http://developer.berlios.de/projects/pyprocessing
+:Licence: BSD Licence
+
+
+Contents
+========
+
+* `Introduction <intro.html>`_
+* `Package reference <processing-ref.html>`_
+   + `Process objects <process-objects.html>`_
+   + `Queue objects <queue-objects.html>`_
+   + `Connection objects <connection-objects.html>`_
+   + `Manager objects <manager-objects.html>`_
+   + `Proxy objects <proxy-objects.html>`_
+   + `Pool objects <pool-objects.html>`_
+   + `Shared ctypes objects <sharedctypes.html>`_
+   + `Listeners and Clients <connection-ref.html>`_
+
+* `Programming guidelines <programming-guidelines.html>`_
+
+* `Tests and examples <tests.html>`_
+
+
+See also
+========
+
+* `Installation instructions <INSTALL.html>`_
+* `Changelog <CHANGES.html>`_
+* `Acknowledgments <THANKS.html>`_
+* `Licence <COPYING.html>`_
+
+.. _Next: intro.html
+.. _Up: index.html
+.. _Prev: index.html

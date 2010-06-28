@@ -1,0 +1,11 @@
+{
+
+	"touch": {
+
+		"touch": {
+			"deps": ["Class.Extras", "Element"]
+		}
+
+	}
+
+}

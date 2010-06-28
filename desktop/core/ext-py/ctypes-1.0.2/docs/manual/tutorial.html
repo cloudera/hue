@@ -1,0 +1,1536 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>ctypes tutorial</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger
+:Contact: goodger@users.sourceforge.net
+:Date: $Date$
+:Revision: $Revision$
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin-left: 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left {
+  clear: left }
+
+img.align-right {
+  clear: right }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font-family: serif ;
+  font-size: 100% }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em ;
+  background-color: #eeeeee }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+tt.docutils {
+  background-color: #eeeeee }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="ctypes-tutorial">
+<h1 class="title">ctypes tutorial</h1>
+
+<div class="contents topic">
+<p class="topic-title first"><a id="contents" name="contents">Contents</a></p>
+<ul class="simple">
+<li><a class="reference" href="#loading-dynamic-link-libraries" id="id1" name="id1">Loading dynamic link libraries</a></li>
+<li><a class="reference" href="#accessing-functions-from-loaded-dlls" id="id2" name="id2">Accessing functions from loaded dlls</a></li>
+<li><a class="reference" href="#calling-functions" id="id3" name="id3">Calling functions</a></li>
+<li><a class="reference" href="#fundamental-data-types" id="id4" name="id4">Fundamental data types</a></li>
+<li><a class="reference" href="#calling-functions-continued" id="id5" name="id5">Calling functions, continued</a></li>
+<li><a class="reference" href="#calling-functions-with-your-own-custom-data-types" id="id6" name="id6">Calling functions with your own custom data types</a></li>
+<li><a class="reference" href="#specifying-the-required-argument-types-function-prototypes" id="id7" name="id7">Specifying the required argument types (function prototypes)</a></li>
+<li><a class="reference" href="#return-types" id="id8" name="id8">Return types</a></li>
+<li><a class="reference" href="#passing-pointers-or-passing-parameters-by-reference" id="id9" name="id9">Passing pointers (or: passing parameters by reference)</a></li>
+<li><a class="reference" href="#structures-and-unions" id="id10" name="id10">Structures and unions</a></li>
+<li><a class="reference" href="#structure-union-alignment-and-byte-order" id="id11" name="id11">Structure/union alignment and byte order</a></li>
+<li><a class="reference" href="#bit-fields-in-structures-and-unions" id="id12" name="id12">Bit fields in structures and unions</a></li>
+<li><a class="reference" href="#arrays" id="id13" name="id13">Arrays</a></li>
+<li><a class="reference" href="#pointers" id="id14" name="id14">Pointers</a></li>
+<li><a class="reference" href="#type-conversions" id="id15" name="id15">Type conversions</a></li>
+<li><a class="reference" href="#incomplete-types" id="id16" name="id16">Incomplete Types</a></li>
+<li><a class="reference" href="#callback-functions" id="id17" name="id17">Callback functions</a></li>
+<li><a class="reference" href="#accessing-values-exported-from-dlls" id="id18" name="id18">Accessing values exported from dlls</a></li>
+<li><a class="reference" href="#surprises" id="id19" name="id19">Surprises</a></li>
+<li><a class="reference" href="#variable-sized-data-types" id="id20" name="id20">Variable-sized data types</a></li>
+<li><a class="reference" href="#bugs-todo-and-non-implemented-things" id="id21" name="id21">Bugs, ToDo and non-implemented things</a></li>
+</ul>
+</div>
+<p>Note: The code samples in this tutorial uses <tt class="docutils literal"><span class="pre">doctest</span></tt> to make sure
+that they actually work.  Since some code samples behave differently
+under Linux, Windows, or Mac OS X, they contain doctest directives in
+comments.</p>
+<p>Note: Quite some code samples references the ctypes <tt class="docutils literal"><span class="pre">c_int</span></tt> type.
+This type is an alias to the <tt class="docutils literal"><span class="pre">c_long</span></tt> type on 32-bit systems.  So,
+you should not be confused if <tt class="docutils literal"><span class="pre">c_long</span></tt> is printed if you would
+expect <tt class="docutils literal"><span class="pre">c_int</span></tt> - they are actually the same type.</p>
+<div class="section">
+<h1><a class="toc-backref" href="#id1" id="loading-dynamic-link-libraries" name="loading-dynamic-link-libraries">Loading dynamic link libraries</a></h1>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> exports the <tt class="docutils literal"><span class="pre">cdll</span></tt>, and on Windows also <tt class="docutils literal"><span class="pre">windll</span></tt> and
+<tt class="docutils literal"><span class="pre">oledll</span></tt> objects to load dynamic link libraries.</p>
+<p>You load libraries by accessing them as attributes of these objects.
+<tt class="docutils literal"><span class="pre">cdll</span></tt> loads libraries which export functions using the standard
+<tt class="docutils literal"><span class="pre">cdecl</span></tt> calling convention, while <tt class="docutils literal"><span class="pre">windll</span></tt> libraries call
+functions using the <tt class="docutils literal"><span class="pre">stdcall</span></tt> calling convention. <tt class="docutils literal"><span class="pre">oledll</span></tt> also
+uses the <tt class="docutils literal"><span class="pre">stdcall</span></tt> calling convention, and assumes the functions
+return a Windows <tt class="docutils literal"><span class="pre">HRESULT</span></tt> error code. The error code is used to
+automatically raise <tt class="docutils literal"><span class="pre">WindowsError</span></tt> Python exceptions when the
+function call fails.</p>
+<p>Here are some examples for Windows, note that <tt class="docutils literal"><span class="pre">msvcrt</span></tt> is the MS
+standard C library containing most standard C functions, and uses the
+cdecl calling convention:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; print windll.kernel32 # doctest: +WINDOWS
+&lt;WinDLL 'kernel32', handle ... at ...&gt;
+&gt;&gt;&gt; print cdll.msvcrt # doctest: +WINDOWS
+&lt;CDLL 'msvcrt', handle ... at ...&gt;
+&gt;&gt;&gt; libc = cdll.msvcrt # doctest: +WINDOWS
+&gt;&gt;&gt;
+</pre>
+<p>Windows appends the usual '.dll' file suffix automatically.</p>
+<p>On Linux, it is required to specify the filename <em>including</em> the
+extension to load a library, so attribute access does not work.
+Either the <tt class="docutils literal"><span class="pre">LoadLibrary</span></tt> method of the dll loaders should be used,
+or you should load the library by creating an instance of CDLL by
+calling the constructor:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; cdll.LoadLibrary(&quot;libc.so.6&quot;) # doctest: +LINUX
+&lt;CDLL 'libc.so.6', handle ... at ...&gt;
+&gt;&gt;&gt; libc = CDLL(&quot;libc.so.6&quot;)     # doctest: +LINUX
+&gt;&gt;&gt; libc                         # doctest: +LINUX
+&lt;CDLL 'libc.so.6', handle ... at ...&gt;
+&gt;&gt;&gt;
+</pre>
+<!-- XXX Add section for Mac OS X. -->
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id2" id="accessing-functions-from-loaded-dlls" name="accessing-functions-from-loaded-dlls">Accessing functions from loaded dlls</a></h1>
+<p>Functions are accessed as attributes of dll objects:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; libc.printf
+&lt;_FuncPtr object at 0x...&gt;
+&gt;&gt;&gt; print windll.kernel32.GetModuleHandleA # doctest: +WINDOWS
+&lt;_FuncPtr object at 0x...&gt;
+&gt;&gt;&gt; print windll.kernel32.MyOwnFunction # doctest: +WINDOWS
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+  File &quot;ctypes.py&quot;, line 239, in __getattr__
+    func = _StdcallFuncPtr(name, self)
+AttributeError: function 'MyOwnFunction' not found
+&gt;&gt;&gt;
+</pre>
+<p>Note that win32 system dlls like <tt class="docutils literal"><span class="pre">kernel32</span></tt> and <tt class="docutils literal"><span class="pre">user32</span></tt> often
+export ANSI as well as UNICODE versions of a function. The UNICODE
+version is exported with an <tt class="docutils literal"><span class="pre">W</span></tt> appended to the name, while the ANSI
+version is exported with an <tt class="docutils literal"><span class="pre">A</span></tt> appended to the name. The win32
+<tt class="docutils literal"><span class="pre">GetModuleHandle</span></tt> function, which returns a <em>module handle</em> for a
+given module name, has the following C prototype, and a macro is used
+to expose one of them as <tt class="docutils literal"><span class="pre">GetModuleHandle</span></tt> depending on whether
+UNICODE is defined or not:</p>
+<pre class="literal-block">
+/* ANSI version */
+HMODULE GetModuleHandleA(LPCSTR lpModuleName);
+/* UNICODE version */
+HMODULE GetModuleHandleW(LPCWSTR lpModuleName);
+</pre>
+<p><tt class="docutils literal"><span class="pre">windll</span></tt> does not try to select one of them by magic, you must
+access the version you need by specifying <tt class="docutils literal"><span class="pre">GetModuleHandleA</span></tt> or
+<tt class="docutils literal"><span class="pre">GetModuleHandleW</span></tt> explicitely, and then call it with normal strings
+or unicode strings respectively.</p>
+<p>Sometimes, dlls export functions with names which aren't valid Python
+identifiers, like <tt class="docutils literal"><span class="pre">&quot;??2&#64;YAPAXI&#64;Z&quot;</span></tt>. In this case you have to use
+<tt class="docutils literal"><span class="pre">getattr</span></tt> to retrieve the function:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; getattr(cdll.msvcrt, &quot;??2&#64;YAPAXI&#64;Z&quot;) # doctest: +WINDOWS
+&lt;_FuncPtr object at 0x...&gt;
+&gt;&gt;&gt;
+</pre>
+<p>On Windows, some dlls export functions not by name but by ordinal.
+These functions can be accessed by indexing the dll object with the
+ordinal number:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; cdll.kernel32[1] # doctest: +WINDOWS
+&lt;_FuncPtr object at 0x...&gt;
+&gt;&gt;&gt; cdll.kernel32[0] # doctest: +WINDOWS
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+  File &quot;ctypes.py&quot;, line 310, in __getitem__
+    func = _StdcallFuncPtr(name, self)
+AttributeError: function ordinal 0 not found
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id3" id="calling-functions" name="calling-functions">Calling functions</a></h1>
+<p>You can call these functions like any other Python callable. This
+example uses the <tt class="docutils literal"><span class="pre">time()</span></tt> function, which returns system time in
+seconds since the UNIX epoch, and the <tt class="docutils literal"><span class="pre">GetModuleHandleA()</span></tt> function,
+which returns a win32 module handle.</p>
+<p>This example calls both functions with a NULL pointer (<tt class="docutils literal"><span class="pre">None</span></tt> should
+be used as the NULL pointer):</p>
+<pre class="literal-block">
+&gt;&gt;&gt; print libc.time(None) # doctest: +SKIP
+1150640792
+&gt;&gt;&gt; print hex(windll.kernel32.GetModuleHandleA(None)) # doctest: +WINDOWS
+0x1d000000
+&gt;&gt;&gt;
+</pre>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> tries to protect you from calling functions with the wrong
+number of arguments or the wrong calling convention.  Unfortunately
+this only works on Windows.  It does this by examining the stack after
+the function returns, so although an error is raised the function
+<em>has</em> been called:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; windll.kernel32.GetModuleHandleA() # doctest: +WINDOWS
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+ValueError: Procedure probably called with not enough arguments (4 bytes missing)
+&gt;&gt;&gt; windll.kernel32.GetModuleHandleA(0, 0) # doctest: +WINDOWS
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+ValueError: Procedure probably called with too many arguments (4 bytes in excess)
+&gt;&gt;&gt;
+</pre>
+<p>The same exception is raised when you call an <tt class="docutils literal"><span class="pre">stdcall</span></tt> function
+with the <tt class="docutils literal"><span class="pre">cdecl</span></tt> calling convention, or vice versa:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; cdll.kernel32.GetModuleHandleA(None) # doctest: +WINDOWS
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+ValueError: Procedure probably called with not enough arguments (4 bytes missing)
+&gt;&gt;&gt;
+
+&gt;&gt;&gt; windll.msvcrt.printf(&quot;spam&quot;) # doctest: +WINDOWS
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+ValueError: Procedure probably called with too many arguments (4 bytes in excess)
+&gt;&gt;&gt;
+</pre>
+<p>To find out the correct calling convention you have to look into the C
+header file or the documentation for the function you want to call.</p>
+<p>On Windows, <tt class="docutils literal"><span class="pre">ctypes</span></tt> uses win32 structured exception handling to
+prevent crashes from general protection faults when functions are
+called with invalid argument values:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; windll.kernel32.GetModuleHandleA(32) # doctest: +WINDOWS
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+WindowsError: exception: access violation reading 0x00000020
+&gt;&gt;&gt;
+</pre>
+<p>There are, however, enough ways to crash Python with <tt class="docutils literal"><span class="pre">ctypes</span></tt>, so
+you should be careful anyway.</p>
+<p><tt class="docutils literal"><span class="pre">None</span></tt>, integers, longs, byte strings and unicode strings are the
+only native Python objects that can directly be used as parameters in
+these function calls.  <tt class="docutils literal"><span class="pre">None</span></tt> is passed as a C <tt class="docutils literal"><span class="pre">NULL</span></tt> pointer,
+byte strings and unicode strings are passed as pointer to the memory
+block that contains their data (<tt class="docutils literal"><span class="pre">char</span> <span class="pre">*</span></tt> or <tt class="docutils literal"><span class="pre">wchar_t</span> <span class="pre">*</span></tt>).  Python
+integers and Python longs are passed as the platforms default C
+<tt class="docutils literal"><span class="pre">int</span></tt> type, their value is masked to fit into the C type.</p>
+<p>Before we move on calling functions with other parameter types, we
+have to learn more about <tt class="docutils literal"><span class="pre">ctypes</span></tt> data types.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id4" id="fundamental-data-types" name="fundamental-data-types">Fundamental data types</a></h1>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> defines a number of primitive C compatible data types :</p>
+<blockquote>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="44%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">ctypes type</th>
+<th class="head">C type</th>
+<th class="head">Python type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">c_char</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">char</span></tt></td>
+<td>1-character
+string</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_wchar</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">wchar_t</span></tt></td>
+<td>1-character
+unicode string</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_byte</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">char</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_ubyte</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">char</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_short</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">short</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_ushort</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">short</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_int</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">int</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_uint</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">int</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_long</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">long</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_ulong</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_longlong</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">__int64</span></tt> or
+<tt class="docutils literal"><span class="pre">long</span> <span class="pre">long</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_ulonglong</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">__int64</span></tt> or
+<tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">long</span></tt></td>
+<td>int/long</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_float</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">float</span></tt></td>
+<td>float</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_double</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">double</span></tt></td>
+<td>float</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_char_p</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">char</span> <span class="pre">*</span></tt>
+(NUL terminated)</td>
+<td>string or
+<tt class="docutils literal"><span class="pre">None</span></tt></td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_wchar_p</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">wchar_t</span> <span class="pre">*</span></tt>
+(NUL terminated)</td>
+<td>unicode or
+<tt class="docutils literal"><span class="pre">None</span></tt></td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">c_void_p</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">void</span> <span class="pre">*</span></tt></td>
+<td>int/long
+or <tt class="docutils literal"><span class="pre">None</span></tt></td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>All these types can be created by calling them with an optional
+initializer of the correct type and value:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; c_int()
+c_long(0)
+&gt;&gt;&gt; c_char_p(&quot;Hello, World&quot;)
+c_char_p('Hello, World')
+&gt;&gt;&gt; c_ushort(-3)
+c_ushort(65533)
+&gt;&gt;&gt;
+</pre>
+<p>Since these types are mutable, their value can also be changed
+afterwards:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; i = c_int(42)
+&gt;&gt;&gt; print i
+c_long(42)
+&gt;&gt;&gt; print i.value
+42
+&gt;&gt;&gt; i.value = -99
+&gt;&gt;&gt; print i.value
+-99
+&gt;&gt;&gt;
+</pre>
+<p>Assigning a new value to instances of the pointer types <tt class="docutils literal"><span class="pre">c_char_p</span></tt>,
+<tt class="docutils literal"><span class="pre">c_wchar_p</span></tt>, and <tt class="docutils literal"><span class="pre">c_void_p</span></tt> changes the <em>memory location</em> they
+point to, <em>not the contents</em> of the memory block (of course not,
+because Python strings are immutable):</p>
+<pre class="literal-block">
+&gt;&gt;&gt; s = &quot;Hello, World&quot;
+&gt;&gt;&gt; c_s = c_char_p(s)
+&gt;&gt;&gt; print c_s
+c_char_p('Hello, World')
+&gt;&gt;&gt; c_s.value = &quot;Hi, there&quot;
+&gt;&gt;&gt; print c_s
+c_char_p('Hi, there')
+&gt;&gt;&gt; print s                 # first string is unchanged
+Hello, World
+&gt;&gt;&gt;
+</pre>
+<p>You should be careful, however, not to pass them to functions
+expecting pointers to mutable memory. If you need mutable memory
+blocks, ctypes has a <tt class="docutils literal"><span class="pre">create_string_buffer</span></tt> function which creates
+these in various ways.  The current memory block contents can be
+accessed (or changed) with the <tt class="docutils literal"><span class="pre">raw</span></tt> property, if you want to access
+it as NUL terminated string, use the <tt class="docutils literal"><span class="pre">string</span></tt> property:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; p = create_string_buffer(3)      # create a 3 byte buffer, initialized to NUL bytes
+&gt;&gt;&gt; print sizeof(p), repr(p.raw)
+3 '\x00\x00\x00'
+&gt;&gt;&gt; p = create_string_buffer(&quot;Hello&quot;)      # create a buffer containing a NUL terminated string
+&gt;&gt;&gt; print sizeof(p), repr(p.raw)
+6 'Hello\x00'
+&gt;&gt;&gt; print repr(p.value)
+'Hello'
+&gt;&gt;&gt; p = create_string_buffer(&quot;Hello&quot;, 10)  # create a 10 byte buffer
+&gt;&gt;&gt; print sizeof(p), repr(p.raw)
+10 'Hello\x00\x00\x00\x00\x00'
+&gt;&gt;&gt; p.value = &quot;Hi&quot;
+&gt;&gt;&gt; print sizeof(p), repr(p.raw)
+10 'Hi\x00lo\x00\x00\x00\x00\x00'
+&gt;&gt;&gt;
+</pre>
+<p>The <tt class="docutils literal"><span class="pre">create_string_buffer</span></tt> function replaces the <tt class="docutils literal"><span class="pre">c_buffer</span></tt>
+function (which is still available as an alias), as well as the
+<tt class="docutils literal"><span class="pre">c_string</span></tt> function from earlier ctypes releases.  To create a
+mutable memory block containing unicode characters of the C type
+<tt class="docutils literal"><span class="pre">wchar_t</span></tt> use the <tt class="docutils literal"><span class="pre">create_unicode_buffer</span></tt> function.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id5" id="calling-functions-continued" name="calling-functions-continued">Calling functions, continued</a></h1>
+<p>Note that printf prints to the real standard output channel, <em>not</em> to
+<tt class="docutils literal"><span class="pre">sys.stdout</span></tt>, so these examples will only work at the console
+prompt, not from within <em>IDLE</em> or <em>PythonWin</em>:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; printf = libc.printf
+&gt;&gt;&gt; printf(&quot;Hello, %s\n&quot;, &quot;World!&quot;)
+Hello, World!
+14
+&gt;&gt;&gt; printf(&quot;Hello, %S&quot;, u&quot;World!&quot;)
+Hello, World!
+13
+&gt;&gt;&gt; printf(&quot;%d bottles of beer\n&quot;, 42)
+42 bottles of beer
+19
+&gt;&gt;&gt; printf(&quot;%f bottles of beer\n&quot;, 42.5)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+ArgumentError: argument 2: exceptions.TypeError: Don't know how to convert parameter 2
+&gt;&gt;&gt;
+</pre>
+<p>As has been mentioned before, all Python types except integers,
+strings, and unicode strings have to be wrapped in their corresponding
+<tt class="docutils literal"><span class="pre">ctypes</span></tt> type, so that they can be converted to the required C data
+type:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; printf(&quot;An int %d, a double %f\n&quot;, 1234, c_double(3.14))
+Integer 1234, double 3.1400001049
+31
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id6" id="calling-functions-with-your-own-custom-data-types" name="calling-functions-with-your-own-custom-data-types">Calling functions with your own custom data types</a></h1>
+<p>You can also customize <tt class="docutils literal"><span class="pre">ctypes</span></tt> argument conversion to allow
+instances of your own classes be used as function arguments.
+<tt class="docutils literal"><span class="pre">ctypes</span></tt> looks for an <tt class="docutils literal"><span class="pre">_as_parameter_</span></tt> attribute and uses this as
+the function argument. Of course, it must be one of integer, string,
+or unicode:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; class Bottles(object):
+...     def __init__(self, number):
+...         self._as_parameter_ = number
+...
+&gt;&gt;&gt; bottles = Bottles(42)
+&gt;&gt;&gt; printf(&quot;%d bottles of beer\n&quot;, bottles)
+42 bottles of beer
+19
+&gt;&gt;&gt;
+</pre>
+<p>If you don't want to store the instance's data in the
+<tt class="docutils literal"><span class="pre">_as_parameter_</span></tt> instance variable, you could define a <tt class="docutils literal"><span class="pre">property</span></tt>
+which makes the data avaiblable.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id7" id="specifying-the-required-argument-types-function-prototypes" name="specifying-the-required-argument-types-function-prototypes">Specifying the required argument types (function prototypes)</a></h1>
+<p>It is possible to specify the required argument types of functions
+exported from DLLs by setting the <tt class="docutils literal"><span class="pre">argtypes</span></tt> attribute.</p>
+<p><tt class="docutils literal"><span class="pre">argtypes</span></tt> must be a sequence of C data types (the <tt class="docutils literal"><span class="pre">printf</span></tt>
+function is probably not a good example here, because it takes a
+variable number and different types of parameters depending on the
+format string, on the other hand this is quite handy to experiment
+with this feature):</p>
+<pre class="literal-block">
+&gt;&gt;&gt; printf.argtypes = [c_char_p, c_char_p, c_int, c_double]
+&gt;&gt;&gt; printf(&quot;String '%s', Int %d, Double %f\n&quot;, &quot;Hi&quot;, 10, 2.2)
+String 'Hi', Int 10, Double 2.200000
+37
+&gt;&gt;&gt;
+</pre>
+<p>Specifying a format protects against incompatible argument types (just
+as a prototype for a C function), and tries to convert the arguments
+to valid types:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; printf(&quot;%d %d %d&quot;, 1, 2, 3)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+ArgumentError: argument 2: exceptions.TypeError: wrong type
+&gt;&gt;&gt; printf(&quot;%s %d %f&quot;, &quot;X&quot;, 2, 3)
+X 2 3.00000012
+12
+&gt;&gt;&gt;
+</pre>
+<p>If you have defined your own classes which you pass to function calls,
+you have to implement a <tt class="docutils literal"><span class="pre">from_param</span></tt> class method for them to be
+able to use them in the <tt class="docutils literal"><span class="pre">argtypes</span></tt> sequence. The <tt class="docutils literal"><span class="pre">from_param</span></tt>
+class method receives the Python object passed to the function call,
+it should do a typecheck or whatever is needed to make sure this
+object is acceptable, and then return the object itself, it's
+<tt class="docutils literal"><span class="pre">_as_parameter_</span></tt> attribute, or whatever you want to pass as the C
+function argument in this case. Again, the result should be an
+integer, string, unicode, a <tt class="docutils literal"><span class="pre">ctypes</span></tt> instance, or something having
+the <tt class="docutils literal"><span class="pre">_as_parameter_</span></tt> attribute.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id8" id="return-types" name="return-types">Return types</a></h1>
+<p>By default functions are assumed to return the C <tt class="docutils literal"><span class="pre">int</span></tt> type.  Other
+return types can be specified by setting the <tt class="docutils literal"><span class="pre">restype</span></tt> attribute of
+the function object.</p>
+<p>Here is a more advanced example, it uses the <tt class="docutils literal"><span class="pre">strchr</span></tt> function, which
+expects a string pointer and a char, and returns a pointer to a
+string:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; strchr = libc.strchr
+&gt;&gt;&gt; strchr(&quot;abcdef&quot;, ord(&quot;d&quot;)) # doctest: +SKIP
+8059983
+&gt;&gt;&gt; strchr.restype = c_char_p # c_char_p is a pointer to a string
+&gt;&gt;&gt; strchr(&quot;abcdef&quot;, ord(&quot;d&quot;))
+'def'
+&gt;&gt;&gt; print strchr(&quot;abcdef&quot;, ord(&quot;x&quot;))
+None
+&gt;&gt;&gt;
+</pre>
+<p>If you want to avoid the <tt class="docutils literal"><span class="pre">ord(&quot;x&quot;)</span></tt> calls above, you can set the
+<tt class="docutils literal"><span class="pre">argtypes</span></tt> attribute, and the second argument will be converted from
+a single character Python string into a C char:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; strchr.restype = c_char_p
+&gt;&gt;&gt; strchr.argtypes = [c_char_p, c_char]
+&gt;&gt;&gt; strchr(&quot;abcdef&quot;, &quot;d&quot;)
+'def'
+&gt;&gt;&gt; strchr(&quot;abcdef&quot;, &quot;def&quot;)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+ArgumentError: argument 2: exceptions.TypeError: one character string expected
+&gt;&gt;&gt; print strchr(&quot;abcdef&quot;, &quot;x&quot;)
+None
+&gt;&gt;&gt; strchr(&quot;abcdef&quot;, &quot;d&quot;)
+'def'
+&gt;&gt;&gt;
+</pre>
+<p>You can also use a callable Python object (a function or a class for
+example) as the <tt class="docutils literal"><span class="pre">restype</span></tt> attribute, if the foreign function returns
+an integer.  The callable will be called with the <tt class="docutils literal"><span class="pre">integer</span></tt> the C
+function returns, and the result of this call will be used as the
+result of your function call. This is useful to check for error return
+values and automatically raise an exception:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; GetModuleHandle = windll.kernel32.GetModuleHandleA # doctest: +WINDOWS
+&gt;&gt;&gt; def ValidHandle(value):
+...     if value == 0:
+...         raise WinError()
+...     return value
+...
+&gt;&gt;&gt;
+&gt;&gt;&gt; GetModuleHandle.restype = ValidHandle # doctest: +WINDOWS
+&gt;&gt;&gt; GetModuleHandle(None) # doctest: +WINDOWS
+486539264
+&gt;&gt;&gt; GetModuleHandle(&quot;something silly&quot;) # doctest: +WINDOWS
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+  File &quot;&lt;stdin&gt;&quot;, line 3, in ValidHandle
+WindowsError: [Errno 126] The specified module could not be found.
+&gt;&gt;&gt;
+</pre>
+<p><tt class="docutils literal"><span class="pre">WinError</span></tt> is a function which will call Windows <tt class="docutils literal"><span class="pre">FormatMessage()</span></tt>
+api to get the string representation of an error code, and <em>returns</em>
+an exception.  <tt class="docutils literal"><span class="pre">WinError</span></tt> takes an optional error code parameter, if
+no one is used, it calls <tt class="docutils literal"><span class="pre">GetLastError()</span></tt> to retrieve it.</p>
+<p>Please note that a much more powerful error checking mechanism is
+available through the <tt class="docutils literal"><span class="pre">errcheck</span></tt> attribute; see the reference manual
+for details.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id9" id="passing-pointers-or-passing-parameters-by-reference" name="passing-pointers-or-passing-parameters-by-reference">Passing pointers (or: passing parameters by reference)</a></h1>
+<p>Sometimes a C api function expects a <em>pointer</em> to a data type as
+parameter, probably to write into the corresponding location, or if
+the data is too large to be passed by value. This is also known as
+<em>passing parameters by reference</em>.</p>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> exports the <tt class="docutils literal"><span class="pre">byref</span></tt> function which is used to pass
+parameters by reference.  The same effect can be achieved with the
+<tt class="docutils literal"><span class="pre">pointer</span></tt> function, although <tt class="docutils literal"><span class="pre">pointer</span></tt> does a lot more work since
+it constructs a real pointer object, so it is faster to use <tt class="docutils literal"><span class="pre">byref</span></tt>
+if you don't need the pointer object in Python itself:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; i = c_int()
+&gt;&gt;&gt; f = c_float()
+&gt;&gt;&gt; s = create_string_buffer('\000' * 32)
+&gt;&gt;&gt; print i.value, f.value, repr(s.value)
+0 0.0 ''
+&gt;&gt;&gt; libc.sscanf(&quot;1 3.14 Hello&quot;, &quot;%d %f %s&quot;,
+...             byref(i), byref(f), s)
+3
+&gt;&gt;&gt; print i.value, f.value, repr(s.value)
+1 3.1400001049 'Hello'
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id10" id="structures-and-unions" name="structures-and-unions">Structures and unions</a></h1>
+<p>Structures and unions must derive from the <tt class="docutils literal"><span class="pre">Structure</span></tt> and <tt class="docutils literal"><span class="pre">Union</span></tt>
+base classes which are defined in the <tt class="docutils literal"><span class="pre">ctypes</span></tt> module. Each subclass
+must define a <tt class="docutils literal"><span class="pre">_fields_</span></tt> attribute.  <tt class="docutils literal"><span class="pre">_fields_</span></tt> must be a list of
+<em>2-tuples</em>, containing a <em>field name</em> and a <em>field type</em>.</p>
+<p>The field type must be a <tt class="docutils literal"><span class="pre">ctypes</span></tt> type like <tt class="docutils literal"><span class="pre">c_int</span></tt>, or any other
+derived <tt class="docutils literal"><span class="pre">ctypes</span></tt> type: structure, union, array, pointer.</p>
+<p>Here is a simple example of a POINT structure, which contains two
+integers named <tt class="docutils literal"><span class="pre">x</span></tt> and <tt class="docutils literal"><span class="pre">y</span></tt>, and also shows how to initialize a
+structure in the constructor:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; class POINT(Structure):
+...     _fields_ = [(&quot;x&quot;, c_int),
+...                 (&quot;y&quot;, c_int)]
+...
+&gt;&gt;&gt; point = POINT(10, 20)
+&gt;&gt;&gt; print point.x, point.y
+10 20
+&gt;&gt;&gt; point = POINT(y=5)
+&gt;&gt;&gt; print point.x, point.y
+0 5
+&gt;&gt;&gt; POINT(1, 2, 3)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+ValueError: too many initializers
+&gt;&gt;&gt;
+</pre>
+<p>You can, however, build much more complicated structures. Structures
+can itself contain other structures by using a structure as a field
+type.</p>
+<p>Here is a RECT structure which contains two POINTs named <tt class="docutils literal"><span class="pre">upperleft</span></tt>
+and <tt class="docutils literal"><span class="pre">lowerright</span></tt></p>
+<pre class="literal-block">
+&gt;&gt;&gt; class RECT(Structure):
+...     _fields_ = [(&quot;upperleft&quot;, POINT),
+...                 (&quot;lowerright&quot;, POINT)]
+...
+&gt;&gt;&gt; rc = RECT(point)
+&gt;&gt;&gt; print rc.upperleft.x, rc.upperleft.y
+0 5
+&gt;&gt;&gt; print rc.lowerright.x, rc.lowerright.y
+0 0
+&gt;&gt;&gt;
+</pre>
+<p>Nested structures can also be initialized in the constructor in
+several ways:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; r = RECT(POINT(1, 2), POINT(3, 4))
+&gt;&gt;&gt; r = RECT((1, 2), (3, 4))
+</pre>
+<p>Fields descriptors can be retrieved from the <em>class</em>, they are useful
+for debugging because they can provide useful information:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; print POINT.x
+&lt;Field type=c_long, ofs=0, size=4&gt;
+&gt;&gt;&gt; print POINT.y
+&lt;Field type=c_long, ofs=4, size=4&gt;
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id11" id="structure-union-alignment-and-byte-order" name="structure-union-alignment-and-byte-order">Structure/union alignment and byte order</a></h1>
+<p>By default, Structure and Union fields are aligned in the same way the
+C compiler does it. It is possible to override this behaviour be
+specifying a <tt class="docutils literal"><span class="pre">_pack_</span></tt> class attribute in the subclass
+definition. This must be set to a positive integer and specifies the
+maximum alignment for the fields. This is what <tt class="docutils literal"><span class="pre">#pragma</span> <span class="pre">pack(n)</span></tt>
+also does in MSVC.</p>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> uses the native byte order for Structures and Unions.  To
+build structures with non-native byte order, you can use one of the
+BigEndianStructure, LittleEndianStructure, BigEndianUnion, and
+LittleEndianUnion base classes.  These classes cannot contain pointer
+fields.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id12" id="bit-fields-in-structures-and-unions" name="bit-fields-in-structures-and-unions">Bit fields in structures and unions</a></h1>
+<p>It is possible to create structures and unions containing bit fields.
+Bit fields are only possible for integer fields, the bit width is
+specified as the third item in the <tt class="docutils literal"><span class="pre">_fields_</span></tt> tuples:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; class Int(Structure):
+...     _fields_ = [(&quot;first_16&quot;, c_int, 16),
+...                 (&quot;second_16&quot;, c_int, 16)]
+...
+&gt;&gt;&gt; print Int.first_16
+&lt;Field type=c_long, ofs=0:0, bits=16&gt;
+&gt;&gt;&gt; print Int.second_16
+&lt;Field type=c_long, ofs=0:16, bits=16&gt;
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id13" id="arrays" name="arrays">Arrays</a></h1>
+<p>Arrays are sequences, containing a fixed number of instances of the
+same type.</p>
+<p>The recommended way to create array types is by multiplying a data
+type with a positive integer:</p>
+<pre class="literal-block">
+TenPointsArrayType = POINT * 10
+</pre>
+<p>Here is an example of an somewhat artifical data type, a structure
+containing 4 POINTs among other stuff:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; class POINT(Structure):
+...    _fields_ = (&quot;x&quot;, c_int), (&quot;y&quot;, c_int)
+...
+&gt;&gt;&gt; class MyStruct(Structure):
+...    _fields_ = [(&quot;a&quot;, c_int),
+...                (&quot;b&quot;, c_float),
+...                (&quot;point_array&quot;, POINT * 4)]
+&gt;&gt;&gt;
+&gt;&gt;&gt; print len(MyStruct().point_array)
+4
+&gt;&gt;&gt;
+</pre>
+<p>Instances are created in the usual way, by calling the class:</p>
+<pre class="literal-block">
+arr = TenPointsArrayType()
+for pt in arr:
+    print pt.x, pt.y
+</pre>
+<p>The above code print a series of <tt class="docutils literal"><span class="pre">0</span> <span class="pre">0</span></tt> lines, because the array
+contents is initialized to zeros.</p>
+<p>Initializers of the correct type can also be specified:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; TenIntegers = c_int * 10
+&gt;&gt;&gt; ii = TenIntegers(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+&gt;&gt;&gt; print ii
+&lt;c_long_Array_10 object at 0x...&gt;
+&gt;&gt;&gt; for i in ii: print i,
+...
+1 2 3 4 5 6 7 8 9 10
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id14" id="pointers" name="pointers">Pointers</a></h1>
+<p>Pointer instances are created by calling the <tt class="docutils literal"><span class="pre">pointer</span></tt> function on a
+<tt class="docutils literal"><span class="pre">ctypes</span></tt> type:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; i = c_int(42)
+&gt;&gt;&gt; pi = pointer(i)
+&gt;&gt;&gt;
+</pre>
+<p>Pointer instances have a <tt class="docutils literal"><span class="pre">contents</span></tt> attribute which returns the
+object to which the pointer points, the <tt class="docutils literal"><span class="pre">i</span></tt> object above:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; pi.contents
+c_long(42)
+&gt;&gt;&gt;
+</pre>
+<p>Note that <tt class="docutils literal"><span class="pre">ctypes</span></tt> does not have OOR (original object return), it
+constructs a new, equivalent object each time you retrieve an
+attribute:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; pi.contents is i
+False
+&gt;&gt;&gt; pi.contents is pi.contents
+False
+&gt;&gt;&gt;
+</pre>
+<p>Assigning another <tt class="docutils literal"><span class="pre">c_int</span></tt> instance to the pointer's contents
+attribute would cause the pointer to point to the memory location
+where this is stored:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; i = c_int(99)
+&gt;&gt;&gt; pi.contents = i
+&gt;&gt;&gt; pi.contents
+c_long(99)
+&gt;&gt;&gt;
+</pre>
+<p>Pointer instances can also be indexed with integers:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; pi[0]
+99
+&gt;&gt;&gt;
+</pre>
+<p>Assigning to an integer index changes the pointed to value:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; print i
+c_long(99)
+&gt;&gt;&gt; pi[0] = 22
+&gt;&gt;&gt; print i
+c_long(22)
+&gt;&gt;&gt;
+</pre>
+<p>It is also possible to use indexes different from 0, but you must know
+what you're doing, just as in C: You can access or change arbitrary
+memory locations. Generally you only use this feature if you receive a
+pointer from a C function, and you <em>know</em> that the pointer actually
+points to an array instead of a single item.</p>
+<p>Behind the scenes, the <tt class="docutils literal"><span class="pre">pointer</span></tt> function does more than simply
+create pointer instances, it has to create pointer <em>types</em> first.
+This is done with the <tt class="docutils literal"><span class="pre">POINTER</span></tt> function, which accepts any
+<tt class="docutils literal"><span class="pre">ctypes</span></tt> type, and returns a new type:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; PI = POINTER(c_int)
+&gt;&gt;&gt; PI
+&lt;class 'ctypes.LP_c_long'&gt;
+&gt;&gt;&gt; PI(42)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+TypeError: expected c_long instead of int
+&gt;&gt;&gt; PI(c_int(42))
+&lt;ctypes.LP_c_long object at 0x...&gt;
+&gt;&gt;&gt;
+</pre>
+<p>Calling the pointer type without an argument creates a <tt class="docutils literal"><span class="pre">NULL</span></tt>
+pointer.  <tt class="docutils literal"><span class="pre">NULL</span></tt> pointers have a <tt class="docutils literal"><span class="pre">False</span></tt> boolean value:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; null_ptr = POINTER(c_int)()
+&gt;&gt;&gt; print bool(null_ptr)
+False
+&gt;&gt;&gt;
+</pre>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> checks for <tt class="docutils literal"><span class="pre">NULL</span></tt> when dereferencing pointers (but
+dereferencing non-<tt class="docutils literal"><span class="pre">NULL</span></tt> pointers would crash Python):</p>
+<pre class="literal-block">
+&gt;&gt;&gt; null_ptr[0]
+Traceback (most recent call last):
+    ....
+ValueError: NULL pointer access
+&gt;&gt;&gt;
+
+&gt;&gt;&gt; null_ptr[0] = 1234
+Traceback (most recent call last):
+    ....
+ValueError: NULL pointer access
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id15" id="type-conversions" name="type-conversions">Type conversions</a></h1>
+<p>Usually, ctypes does strict type checking.  This means, if you have
+<tt class="docutils literal"><span class="pre">POINTER(c_int)</span></tt> in the <tt class="docutils literal"><span class="pre">argtypes</span></tt> list of a function or as the
+type of a member field in a structure definition, only instances of
+exactly the same type are accepted.  There are some exceptions to this
+rule, where ctypes accepts other objects.  For example, you can pass
+compatible array instances instead of pointer types.  So, for
+<tt class="docutils literal"><span class="pre">POINTER(c_int)</span></tt>, ctypes accepts an array of c_int:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; class Bar(Structure):
+...     _fields_ = [(&quot;count&quot;, c_int), (&quot;values&quot;, POINTER(c_int))]
+...
+&gt;&gt;&gt; bar = Bar()
+&gt;&gt;&gt; bar.values = (c_int * 3)(1, 2, 3)
+&gt;&gt;&gt; bar.count = 3
+&gt;&gt;&gt; for i in range(bar.count):
+...     print bar.values[i]
+...
+1
+2
+3
+&gt;&gt;&gt;
+</pre>
+<p>To set a POINTER type field to <tt class="docutils literal"><span class="pre">NULL</span></tt>, you can assign <tt class="docutils literal"><span class="pre">None</span></tt>:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; bar.values = None
+&gt;&gt;&gt;
+</pre>
+<p>XXX list other conversions...</p>
+<p>Sometimes you have instances of incompatible types.  In <tt class="docutils literal"><span class="pre">C</span></tt>, you can
+cast one type into another type.  <tt class="docutils literal"><span class="pre">ctypes</span></tt> provides a <tt class="docutils literal"><span class="pre">cast</span></tt>
+function which can be used in the same way.  The <tt class="docutils literal"><span class="pre">Bar</span></tt> structure
+defined above accepts <tt class="docutils literal"><span class="pre">POINTER(c_int)</span></tt> pointers or <tt class="docutils literal"><span class="pre">c_int</span></tt> arrays
+for its <tt class="docutils literal"><span class="pre">values</span></tt> field, but not instances of other types:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; bar.values = (c_byte * 4)()
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+TypeError: incompatible types, c_byte_Array_4 instance instead of LP_c_long instance
+&gt;&gt;&gt;
+</pre>
+<p>For these cases, the <tt class="docutils literal"><span class="pre">cast</span></tt> function is handy.</p>
+<p>The <tt class="docutils literal"><span class="pre">cast</span></tt> function can be used to cast a ctypes instance into a
+pointer to a different ctypes data type.  <tt class="docutils literal"><span class="pre">cast</span></tt> takes two
+parameters, a ctypes object that is or can be converted to a pointer
+of some kind, and a ctypes pointer type.  It returns an instance of
+the second argument, which references the same memory block as the
+first argument:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; a = (c_byte * 4)()
+&gt;&gt;&gt; cast(a, POINTER(c_int))
+&lt;ctypes.LP_c_long object at ...&gt;
+&gt;&gt;&gt;
+</pre>
+<p>So, <tt class="docutils literal"><span class="pre">cast</span></tt> can be used to assign to the <tt class="docutils literal"><span class="pre">values</span></tt> field of <tt class="docutils literal"><span class="pre">Bar</span></tt>
+the structure:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; bar = Bar()
+&gt;&gt;&gt; bar.values = cast((c_byte * 4)(), POINTER(c_int))
+&gt;&gt;&gt; print bar.values[0]
+0
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id16" id="incomplete-types" name="incomplete-types">Incomplete Types</a></h1>
+<p><em>Incomplete Types</em> are structures, unions or arrays whose members are
+not yet specified. In C, they are specified by forward declarations, which
+are defined later:</p>
+<pre class="literal-block">
+struct cell; /* forward declaration */
+
+struct {
+    char *name;
+    struct cell *next;
+} cell;
+</pre>
+<p>The straightforward translation into ctypes code would be this, but it
+does not work:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; class cell(Structure):
+...     _fields_ = [(&quot;name&quot;, c_char_p),
+...                 (&quot;next&quot;, POINTER(cell))]
+...
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+  File &quot;&lt;stdin&gt;&quot;, line 2, in cell
+NameError: name 'cell' is not defined
+&gt;&gt;&gt;
+</pre>
+<p>because the new <tt class="docutils literal"><span class="pre">class</span> <span class="pre">cell</span></tt> is not available in the class statement
+itself.  In <tt class="docutils literal"><span class="pre">ctypes</span></tt>, we can define the <tt class="docutils literal"><span class="pre">cell</span></tt> class and set the
+<tt class="docutils literal"><span class="pre">_fields_</span></tt> attribute later, after the class statement:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; class cell(Structure):
+...     pass
+...
+&gt;&gt;&gt; cell._fields_ = [(&quot;name&quot;, c_char_p),
+...                  (&quot;next&quot;, POINTER(cell))]
+&gt;&gt;&gt;
+</pre>
+<p>Lets try it. We create two instances of <tt class="docutils literal"><span class="pre">cell</span></tt>, and let them point
+to each other, and finally follow the pointer chain a few times:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; c1 = cell()
+&gt;&gt;&gt; c1.name = &quot;foo&quot;
+&gt;&gt;&gt; c2 = cell()
+&gt;&gt;&gt; c2.name = &quot;bar&quot;
+&gt;&gt;&gt; c1.next = pointer(c2)
+&gt;&gt;&gt; c2.next = pointer(c1)
+&gt;&gt;&gt; p = c1
+&gt;&gt;&gt; for i in range(8):
+...     print p.name,
+...     p = p.next[0]
+...
+foo bar foo bar foo bar foo bar
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id17" id="callback-functions" name="callback-functions">Callback functions</a></h1>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> allows to create C callable function pointers from Python
+callables. These are sometimes called <em>callback functions</em>.</p>
+<p>First, you must create a class for the callback function, the class
+knows the calling convention, the return type, and the number and
+types of arguments this function will receive.</p>
+<p>The CFUNCTYPE factory function creates types for callback functions
+using the normal cdecl calling convention, and, on Windows, the
+WINFUNCTYPE factory function creates types for callback functions
+using the stdcall calling convention.</p>
+<p>Both of these factory functions are called with the result type as
+first argument, and the callback functions expected argument types as
+the remaining arguments.</p>
+<p>I will present an example here which uses the standard C library's
+<tt class="docutils literal"><span class="pre">qsort</span></tt> function, this is used to sort items with the help of a
+callback function. <tt class="docutils literal"><span class="pre">qsort</span></tt> will be used to sort an array of
+integers:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; IntArray5 = c_int * 5
+&gt;&gt;&gt; ia = IntArray5(5, 1, 7, 33, 99)
+&gt;&gt;&gt; qsort = libc.qsort
+&gt;&gt;&gt; qsort.restype = None
+&gt;&gt;&gt;
+</pre>
+<p><tt class="docutils literal"><span class="pre">qsort</span></tt> must be called with a pointer to the data to sort, the
+number of items in the data array, the size of one item, and a pointer
+to the comparison function, the callback. The callback will then be
+called with two pointers to items, and it must return a negative
+integer if the first item is smaller than the second, a zero if they
+are equal, and a positive integer else.</p>
+<p>So our callback function receives pointers to integers, and must
+return an integer. First we create the <tt class="docutils literal"><span class="pre">type</span></tt> for the callback
+function:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; CMPFUNC = CFUNCTYPE(c_int, POINTER(c_int), POINTER(c_int))
+&gt;&gt;&gt;
+</pre>
+<p>For the first implementation of the callback function, we simply print
+the arguments we get, and return 0 (incremental development ;-):</p>
+<pre class="literal-block">
+&gt;&gt;&gt; def py_cmp_func(a, b):
+...     print &quot;py_cmp_func&quot;, a, b
+...     return 0
+...
+&gt;&gt;&gt;
+</pre>
+<p>Create the C callable callback:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; cmp_func = CMPFUNC(py_cmp_func)
+&gt;&gt;&gt;
+</pre>
+<p>And we're ready to go:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), cmp_func) # doctest: +WINDOWS
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+py_cmp_func &lt;ctypes.LP_c_long object at 0x00...&gt; &lt;ctypes.LP_c_long object at 0x00...&gt;
+&gt;&gt;&gt;
+</pre>
+<p>We know how to access the contents of a pointer, so lets redefine our callback:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; def py_cmp_func(a, b):
+...     print &quot;py_cmp_func&quot;, a[0], b[0]
+...     return 0
+...
+&gt;&gt;&gt; cmp_func = CMPFUNC(py_cmp_func)
+&gt;&gt;&gt;
+</pre>
+<p>Here is what we get on Windows:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), cmp_func) # doctest: +WINDOWS
+py_cmp_func 7 1
+py_cmp_func 33 1
+py_cmp_func 99 1
+py_cmp_func 5 1
+py_cmp_func 7 5
+py_cmp_func 33 5
+py_cmp_func 99 5
+py_cmp_func 7 99
+py_cmp_func 33 99
+py_cmp_func 7 33
+&gt;&gt;&gt;
+</pre>
+<p>It is funny to see that on linux the sort function seems to work much
+more efficient, it is doing less comparisons:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), cmp_func) # doctest: +LINUX
+py_cmp_func 5 1
+py_cmp_func 33 99
+py_cmp_func 7 33
+py_cmp_func 5 7
+py_cmp_func 1 7
+&gt;&gt;&gt;
+</pre>
+<p>Ah, we're nearly done! The last step is to actually compare the two
+items and return a useful result:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; def py_cmp_func(a, b):
+...     print &quot;py_cmp_func&quot;, a[0], b[0]
+...     return a[0] - b[0]
+...
+&gt;&gt;&gt;
+</pre>
+<p>Final run on Windows:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), CMPFUNC(py_cmp_func)) # doctest: +WINDOWS
+py_cmp_func 33 7
+py_cmp_func 99 33
+py_cmp_func 5 99
+py_cmp_func 1 99
+py_cmp_func 33 7
+py_cmp_func 1 33
+py_cmp_func 5 33
+py_cmp_func 5 7
+py_cmp_func 1 7
+py_cmp_func 5 1
+&gt;&gt;&gt;
+</pre>
+<p>and on Linux:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; qsort(ia, len(ia), sizeof(c_int), CMPFUNC(py_cmp_func)) # doctest: +LINUX
+py_cmp_func 5 1
+py_cmp_func 33 99
+py_cmp_func 7 33
+py_cmp_func 1 7
+py_cmp_func 5 7
+&gt;&gt;&gt;
+</pre>
+<p>It is quite interesting to see that the Windows <tt class="docutils literal"><span class="pre">qsort</span></tt> function
+needs more comparisons than the linux version!</p>
+<p>As we can easily check, our array sorted now:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; for i in ia: print i,
+...
+1 5 7 33 99
+&gt;&gt;&gt;
+</pre>
+<p><strong>Important note for callback functions:</strong></p>
+<p>Make sure you keep references to CFUNCTYPE objects as long as they are
+used from C code. <tt class="docutils literal"><span class="pre">ctypes</span></tt> doesn't, and if you don't, they may be
+garbage collected, crashing your program when a callback is made.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id18" id="accessing-values-exported-from-dlls" name="accessing-values-exported-from-dlls">Accessing values exported from dlls</a></h1>
+<p>Sometimes, a dll not only exports functions, it also exports
+variables. An example in the Python library itself is the
+<tt class="docutils literal"><span class="pre">Py_OptimizeFlag</span></tt>, an integer set to 0, 1, or 2, depending on the
+<tt class="docutils literal"><span class="pre">-O</span></tt> or <tt class="docutils literal"><span class="pre">-OO</span></tt> flag given on startup.</p>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> can access values like this with the <tt class="docutils literal"><span class="pre">in_dll</span></tt> class
+methods of the type.  <tt class="docutils literal"><span class="pre">pythonapi</span></tt> ìs a predefined symbol giving
+access to the Python C api:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; opt_flag = c_int.in_dll(pythonapi, &quot;Py_OptimizeFlag&quot;)
+&gt;&gt;&gt; print opt_flag
+c_long(0)
+&gt;&gt;&gt;
+</pre>
+<p>If the interpreter would have been started with <tt class="docutils literal"><span class="pre">-O</span></tt>, the sample
+would have printed <tt class="docutils literal"><span class="pre">c_long(1)</span></tt>, or <tt class="docutils literal"><span class="pre">c_long(2)</span></tt> if <tt class="docutils literal"><span class="pre">-OO</span></tt> would have
+been specified.</p>
+<p>An extended example which also demonstrates the use of pointers
+accesses the <tt class="docutils literal"><span class="pre">PyImport_FrozenModules</span></tt> pointer exported by Python.</p>
+<p>Quoting the Python docs: <em>This pointer is initialized to point to an
+array of ``struct _frozen`` records, terminated by one whose members
+are all NULL or zero. When a frozen module is imported, it is searched
+in this table. Third-party code could play tricks with this to provide
+a dynamically created collection of frozen modules.</em></p>
+<p>So manipulating this pointer could even prove useful. To restrict the
+example size, we show only how this table can be read with
+<tt class="docutils literal"><span class="pre">ctypes</span></tt>:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt;
+&gt;&gt;&gt; class struct_frozen(Structure):
+...     _fields_ = [(&quot;name&quot;, c_char_p),
+...                 (&quot;code&quot;, POINTER(c_ubyte)),
+...                 (&quot;size&quot;, c_int)]
+...
+&gt;&gt;&gt;
+</pre>
+<p>We have defined the <tt class="docutils literal"><span class="pre">struct</span> <span class="pre">_frozen</span></tt> data type, so we can get the
+pointer to the table:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; FrozenTable = POINTER(struct_frozen)
+&gt;&gt;&gt; table = FrozenTable.in_dll(pythonapi, &quot;PyImport_FrozenModules&quot;)
+&gt;&gt;&gt;
+</pre>
+<p>Since <tt class="docutils literal"><span class="pre">table</span></tt> is a <tt class="docutils literal"><span class="pre">pointer</span></tt> to the array of <tt class="docutils literal"><span class="pre">struct_frozen</span></tt>
+records, we can iterate over it, but we just have to make sure that
+our loop terminates, because pointers have no size. Sooner or later it
+would probably crash with an access violation or whatever, so it's
+better to break out of the loop when we hit the NULL entry:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; for item in table:
+...    print item.name, item.size
+...    if item.name is None:
+...        break
+...
+__hello__ 104
+__phello__ -104
+__phello__.spam 104
+None 0
+&gt;&gt;&gt;
+</pre>
+<p>The fact that standard Python has a frozen module and a frozen package
+(indicated by the negative size member) is not wellknown, it is only
+used for testing. Try it out with <tt class="docutils literal"><span class="pre">import</span> <span class="pre">__hello__</span></tt> for example.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id19" id="surprises" name="surprises">Surprises</a></h1>
+<p>There are some edges in <tt class="docutils literal"><span class="pre">ctypes</span></tt> where you may be expect something
+else than what actually happens.</p>
+<p>Consider the following example:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes import *
+&gt;&gt;&gt; class POINT(Structure):
+...     _fields_ = (&quot;x&quot;, c_int), (&quot;y&quot;, c_int)
+...
+&gt;&gt;&gt; class RECT(Structure):
+...     _fields_ = (&quot;a&quot;, POINT), (&quot;b&quot;, POINT)
+...
+&gt;&gt;&gt; p1 = POINT(1, 2)
+&gt;&gt;&gt; p2 = POINT(3, 4)
+&gt;&gt;&gt; rc = RECT(p1, p2)
+&gt;&gt;&gt; print rc.a.x, rc.a.y, rc.b.x, rc.b.y
+1 2 3 4
+&gt;&gt;&gt; # now swap the two points
+&gt;&gt;&gt; rc.a, rc.b = rc.b, rc.a
+&gt;&gt;&gt; print rc.a.x, rc.a.y, rc.b.x, rc.b.y
+3 4 3 4
+&gt;&gt;&gt;
+</pre>
+<p>Hm. We certainly expected the last statement to print <tt class="docutils literal"><span class="pre">3</span> <span class="pre">4</span> <span class="pre">1</span> <span class="pre">2</span></tt>.
+What happended? Here are the steps of the <tt class="docutils literal"><span class="pre">rc.a,</span> <span class="pre">rc.b</span> <span class="pre">=</span> <span class="pre">rc.b,</span> <span class="pre">rc.a</span></tt>
+line above:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; temp0, temp1 = rc.b, rc.a
+&gt;&gt;&gt; rc.a = temp0
+&gt;&gt;&gt; rc.b = temp1
+&gt;&gt;&gt;
+</pre>
+<p>Note that <tt class="docutils literal"><span class="pre">temp0</span></tt> and <tt class="docutils literal"><span class="pre">temp1</span></tt> are objects still using the internal
+buffer of the <tt class="docutils literal"><span class="pre">rc</span></tt> object above. So executing <tt class="docutils literal"><span class="pre">rc.a</span> <span class="pre">=</span> <span class="pre">temp0</span></tt>
+copies the buffer contents of <tt class="docutils literal"><span class="pre">temp0</span></tt> into <tt class="docutils literal"><span class="pre">rc</span></tt> 's buffer.  This,
+in turn, changes the contents of <tt class="docutils literal"><span class="pre">temp1</span></tt>. So, the last assignment
+<tt class="docutils literal"><span class="pre">rc.b</span> <span class="pre">=</span> <span class="pre">temp1</span></tt>, doesn't have the expected effect.</p>
+<p>Keep in mind that retrieving subobjects from Structure, Unions, and
+Arrays doesn't <em>copy</em> the subobject, instead it retrieves a wrapper
+object accessing the root-object's underlying buffer.</p>
+<p>Another example that may behave different from what one would expect is this:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; s = c_char_p()
+&gt;&gt;&gt; s.value = &quot;abc def ghi&quot;
+&gt;&gt;&gt; s.value
+'abc def ghi'
+&gt;&gt;&gt; s.value is s.value
+False
+&gt;&gt;&gt;
+</pre>
+<p>Why is it printing <tt class="docutils literal"><span class="pre">False</span></tt>?  ctypes instances are objects containing
+a memory block plus some descriptors accessing the contents of the
+memory.  Storing a Python object in the memory block does not store
+the object itself, instead the <tt class="docutils literal"><span class="pre">contents</span></tt> of the object is stored.
+Accessing the contents again constructs a new Python each time!</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id20" id="variable-sized-data-types" name="variable-sized-data-types">Variable-sized data types</a></h1>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> provides some support for variable-sized arrays and
+structures (this was added in version 0.9.9.7).</p>
+<p>The <tt class="docutils literal"><span class="pre">resize</span></tt> function can be used to resize the memory buffer of an
+existing ctypes object.  The function takes the object as first
+argument, and the requested size in bytes as the second argument.  The
+memory block cannot be made smaller than the natural memory block
+specified by the objects type, a <tt class="docutils literal"><span class="pre">ValueError</span></tt> is raised if this is
+tried:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; short_array = (c_short * 4)()
+&gt;&gt;&gt; print sizeof(short_array)
+8
+&gt;&gt;&gt; resize(short_array, 4)
+Traceback (most recent call last):
+    ...
+ValueError: minimum size is 8
+&gt;&gt;&gt; resize(short_array, 32)
+&gt;&gt;&gt; sizeof(short_array)
+32
+&gt;&gt;&gt; sizeof(type(short_array))
+8
+&gt;&gt;&gt;
+</pre>
+<p>This is nice and fine, but how would one access the additional
+elements contained in this array?  Since the type still only knows
+about 4 elements, we get errors accessing other elements:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; short_array[:]
+[0, 0, 0, 0]
+&gt;&gt;&gt; short_array[7]
+Traceback (most recent call last):
+    ...
+IndexError: invalid index
+&gt;&gt;&gt;
+</pre>
+<p>Another way to use variable-sized data types with <tt class="docutils literal"><span class="pre">ctypes</span></tt> is to use
+the dynamic nature of Python, and (re-)define the data type after the
+required size is already known, on a case by case basis.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id21" id="bugs-todo-and-non-implemented-things" name="bugs-todo-and-non-implemented-things">Bugs, ToDo and non-implemented things</a></h1>
+<p>Enumeration types are not implemented. You can do it easily yourself,
+using <tt class="docutils literal"><span class="pre">c_int</span></tt> as the base class.</p>
+<p><tt class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></tt> is not implemented.</p>
+<!-- Local Variables:
+compile-command: "make.bat"
+End: -->
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>ctypes reference</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger
+:Contact: goodger@users.sourceforge.net
+:Date: $Date$
+:Revision: $Revision$
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin-left: 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left {
+  clear: left }
+
+img.align-right {
+  clear: right }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font-family: serif ;
+  font-size: 100% }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em ;
+  background-color: #eeeeee }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+tt.docutils {
+  background-color: #eeeeee }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="ctypes-reference">
+<h1 class="title">ctypes reference</h1>
+
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> is a foreign function library for Python.  It provides C
+compatible data types, and allows to call functions in dlls/shared
+libraries.  It can be used to wrap these libraries in pure Python.</p>
+<div class="contents topic">
+<p class="topic-title first"><a id="contents" name="contents">Contents</a></p>
+<ul class="simple">
+<li><a class="reference" href="#finding-shared-libraries" id="id1" name="id1">Finding shared libraries</a></li>
+<li><a class="reference" href="#loading-shared-libraries" id="id2" name="id2">Loading shared libraries</a></li>
+<li><a class="reference" href="#foreign-functions" id="id3" name="id3">Foreign functions</a></li>
+<li><a class="reference" href="#function-prototypes" id="id4" name="id4">Function prototypes</a></li>
+<li><a class="reference" href="#utility-functions" id="id5" name="id5">Utility functions</a></li>
+<li><a class="reference" href="#data-types" id="id6" name="id6">Data types</a></li>
+<li><a class="reference" href="#fundamental-data-types" id="id7" name="id7">Fundamental data types</a></li>
+<li><a class="reference" href="#structured-data-types" id="id8" name="id8">Structured data types</a></li>
+<li><a class="reference" href="#arrays-and-pointers" id="id9" name="id9">Arrays and pointers</a></li>
+</ul>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id1" id="finding-shared-libraries" name="finding-shared-libraries">Finding shared libraries</a></h1>
+<p>When programming in a compiled language, shared libraries are accessed
+when compiling/linking a program, and when the program is run.</p>
+<p>The purpose of the <tt class="docutils literal"><span class="pre">find_library</span></tt> function is to locate a library in
+a way similar to what the compiler does (on platforms with several
+versions of a shared library the most recent should be loaded), while
+the ctypes library loaders act like when a program is run, and call
+the runtime loader directly.</p>
+<p>The <tt class="docutils literal"><span class="pre">ctypes.util</span></tt> module provides a function which can help to
+determine the library to load.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">find_library(name)</span></tt></dt>
+<dd>Try to find a library and return a pathname.  <tt class="docutils literal"><span class="pre">name</span></tt> is the
+library name without any prefix like <tt class="docutils literal"><span class="pre">lib</span></tt>, suffix like <tt class="docutils literal"><span class="pre">.so</span></tt>,
+<tt class="docutils literal"><span class="pre">.dylib</span></tt> or version number (this is the form used for the posix
+linker option <tt class="docutils literal"><span class="pre">-l</span></tt>).  If no library can be found, returns
+<tt class="docutils literal"><span class="pre">None</span></tt>.</dd>
+</dl>
+<p>The exact functionality is system dependend.</p>
+<p>On Linux, <tt class="docutils literal"><span class="pre">find_library</span></tt> tries to run external programs
+(/sbin/ldconfig, gcc, and objdump) to find the library file.  It
+returns the filename of the library file.  Here are sone examples:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes.util import find_library
+&gt;&gt;&gt; find_library(&quot;m&quot;)
+'libm.so.6'
+&gt;&gt;&gt; find_library(&quot;c&quot;)
+'libc.so.6'
+&gt;&gt;&gt; find_library(&quot;bz2&quot;)
+'libbz2.so.1.0'
+&gt;&gt;&gt;
+</pre>
+<p>On OS X, <tt class="docutils literal"><span class="pre">find_library</span></tt> tries several predefined naming schemes and
+paths to locate the library, and returns a full pathname if successfull:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from ctypes.util import find_library
+&gt;&gt;&gt; find_library(&quot;c&quot;)
+'/usr/lib/libc.dylib'
+&gt;&gt;&gt; find_library(&quot;m&quot;)
+'/usr/lib/libm.dylib'
+&gt;&gt;&gt; find_library(&quot;bz2&quot;)
+'/usr/lib/libbz2.dylib'
+&gt;&gt;&gt; find_library(&quot;AGL&quot;)
+'/System/Library/Frameworks/AGL.framework/AGL'
+&gt;&gt;&gt;
+</pre>
+<p>On Windows, <tt class="docutils literal"><span class="pre">find_library</span></tt> searches along the system search path,
+and returns the full pathname, but since there is no predefined naming
+scheme a call like <tt class="docutils literal"><span class="pre">find_library(&quot;c&quot;)</span></tt> will fail and return
+<tt class="docutils literal"><span class="pre">None</span></tt>.</p>
+<p>If wrapping a shared library with <tt class="docutils literal"><span class="pre">ctypes</span></tt>, it <em>may</em> be better to
+determine the shared library name at development type, and hardcode
+that into the wrapper module instead of using <tt class="docutils literal"><span class="pre">find_library</span></tt> to
+locate the library at runtime.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id2" id="loading-shared-libraries" name="loading-shared-libraries">Loading shared libraries</a></h1>
+<p>There are several ways to loaded shared libraries into the Python
+process.  One way is to instantiate one of the following classes:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">CDLL(name,</span> <span class="pre">mode=DEFAULT_MODE,</span> <span class="pre">handle=None)</span></tt></dt>
+<dd>Instances of this class represent loaded shared libraries.
+Functions in these libraries use the standard C calling
+convention, and are assumed to return <tt class="docutils literal"><span class="pre">int</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">OleDLL(name,</span> <span class="pre">mode=DEFAULT_MODE,</span> <span class="pre">handle=None)</span></tt></dt>
+<dd>Windows only: Instances of this class represent loaded shared
+libraries, functions in these libraries use the <tt class="docutils literal"><span class="pre">stdcall</span></tt>
+calling convention, and are assumed to return the windows specific
+<tt class="docutils literal"><span class="pre">HRESULT</span></tt> code.  <tt class="docutils literal"><span class="pre">HRESULT</span></tt> values contain information
+specifying whether the function call failed or succeeded, together
+with additional error code.  If the return value signals a
+failure, an <tt class="docutils literal"><span class="pre">WindowsError</span></tt> is automatically raised.</dd>
+<dt><tt class="docutils literal"><span class="pre">WinDLL(name,</span> <span class="pre">mode=DEFAULT_MODE,</span> <span class="pre">handle=None)</span></tt></dt>
+<dd><p class="first">Windows only: Instances of this class represent loaded shared
+libraries, functions in these libraries use the <tt class="docutils literal"><span class="pre">stdcall</span></tt>
+calling convention, and are assumed to return <tt class="docutils literal"><span class="pre">int</span></tt> by default.</p>
+<p class="last">On Windows CE only the standard calling convention is used, for
+convenience the <tt class="docutils literal"><span class="pre">WinDLL</span></tt> and <tt class="docutils literal"><span class="pre">OleDLL</span></tt> use the standard calling
+convention on this platform.</p>
+</dd>
+</dl>
+<p>The Python GIL is released before calling any function exported by
+these libraries, and reaquired afterwards.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">PyDLL(name,</span> <span class="pre">mode=DEFAULT_MODE,</span> <span class="pre">handle=None)</span></tt></dt>
+<dd><p class="first">Instances of this class behave like <tt class="docutils literal"><span class="pre">CDLL</span></tt> instances, except
+that the Python GIL is <em>not</em> released during the function call,
+and after the function execution the Python error flag is checked.
+If the error flag is set, a Python exception is raised.</p>
+<p class="last">Thus, this is only useful to call Python C api functions directly.</p>
+</dd>
+</dl>
+<p>All these classes can be instantiated by calling them with at least
+one argument, the pathname of the shared library.  If you have an
+existing handle to an already loaded shard library, it can be passed
+as the <tt class="docutils literal"><span class="pre">handle</span></tt> named parameter, otherwise the underlying platforms
+<tt class="docutils literal"><span class="pre">dlopen</span></tt> or <tt class="docutils literal"><span class="pre">LoadLibrary</span></tt> function is used to load the library
+into the process, and to get a handle to it.</p>
+<p>The <tt class="docutils literal"><span class="pre">mode</span></tt> parameter can be used to specify how the library is
+loaded.  For details, consult the <tt class="docutils literal"><span class="pre">dlopen(3)</span></tt> manpage, on Windows,
+<tt class="docutils literal"><span class="pre">mode</span></tt> is ignored.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">RTLD_GLOBAL</span></tt></dt>
+<dd>Flag to use as <tt class="docutils literal"><span class="pre">mode</span></tt> parameter.  On platforms where this flag
+is not available, it is defined as the integer zero.</dd>
+<dt><tt class="docutils literal"><span class="pre">RTLD_LOCAL</span></tt></dt>
+<dd>Flag to use as <tt class="docutils literal"><span class="pre">mode</span></tt> parameter.  On platforms where this is not
+available, it is the same as <tt class="docutils literal"><span class="pre">RTLD_GLOBAL</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">DEFAULT_MODE</span></tt></dt>
+<dd>The default mode which is used to load shared libraries.  On OSX
+10.3, this is <tt class="docutils literal"><span class="pre">RTLD_GLOBAL</span></tt>, otherwise it is the same as
+<tt class="docutils literal"><span class="pre">RTLD_LOCAL</span></tt>.</dd>
+</dl>
+<p>Instances of these classes have no public methods, however
+<tt class="docutils literal"><span class="pre">__getattr__</span></tt> and <tt class="docutils literal"><span class="pre">__getitem__</span></tt> have special behaviour: functions
+exported by the shared library can be accessed as attributes of by
+index.  Please note that both <tt class="docutils literal"><span class="pre">__getattr__</span></tt> and <tt class="docutils literal"><span class="pre">__getitem__</span></tt>
+cache their result, so calling them repeatedly returns the same object
+each time.</p>
+<p>The following public attributes are available, their name starts with
+an underscore to not clash with exported function names:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">_handle</span></tt></dt>
+<dd>The system handle used to access the library.</dd>
+<dt><tt class="docutils literal"><span class="pre">_name</span></tt></dt>
+<dd>The name of the library passed in the contructor.</dd>
+</dl>
+<p>Shared libraries can also be loaded by using one of the prefabricated
+objects, which are instances of the <tt class="docutils literal"><span class="pre">LibraryLoader</span></tt> class, either by
+calling the <tt class="docutils literal"><span class="pre">LoadLibrary</span></tt> method, or by retrieving the library as
+attribute of the loader instance.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">LibraryLoader(dlltype)</span></tt></dt>
+<dd><p class="first">Class which loads shared libraries.  <tt class="docutils literal"><span class="pre">dlltype</span></tt> should be one
+of the <tt class="docutils literal"><span class="pre">CDLL</span></tt>, <tt class="docutils literal"><span class="pre">PyDLL</span></tt>, <tt class="docutils literal"><span class="pre">WinDLL</span></tt>, or <tt class="docutils literal"><span class="pre">OleDLL</span></tt> types.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">__getattr__</span></tt> has special behaviour: It allows to load a shared
+library by accessing it as attribute of a library loader
+instance.  The result is cached, so repeated attribute accesses
+return the same library each time.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">LoadLibrary(name)</span></tt></dt>
+<dd>Load a shared library into the process and return it.  This method
+always returns a new instance of the library.</dd>
+</dl>
+<p>These prefabricated library loaders are available:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">cdll</span></tt></dt>
+<dd>Creates <tt class="docutils literal"><span class="pre">CDLL</span></tt> instances.</dd>
+<dt><tt class="docutils literal"><span class="pre">windll</span></tt></dt>
+<dd>Windows only: Creates <tt class="docutils literal"><span class="pre">WinDLL</span></tt> instances.</dd>
+<dt><tt class="docutils literal"><span class="pre">oledll</span></tt></dt>
+<dd>Windows only: Creates <tt class="docutils literal"><span class="pre">OleDLL</span></tt> instances.</dd>
+<dt><tt class="docutils literal"><span class="pre">pydll</span></tt></dt>
+<dd>Creates <tt class="docutils literal"><span class="pre">PyDLL</span></tt> instances.</dd>
+</dl>
+<p>For accessing the C Python api directly, a ready-to-use Python shared
+library object is available:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">pythonapi</span></tt></dt>
+<dd>An instance of <tt class="docutils literal"><span class="pre">PyDLL</span></tt> that exposes Python C api functions as
+attributes.  Note that all these functions are assumed to return C
+<tt class="docutils literal"><span class="pre">int</span></tt>, which is of course not always the truth, so you have to
+assign the correct <tt class="docutils literal"><span class="pre">restype</span></tt> attribute to use these functions.</dd>
+</dl>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id3" id="foreign-functions" name="foreign-functions">Foreign functions</a></h1>
+<p>As explained in the previous section, foreign functions can be
+accessed as attributes of loaded shared libraries.  The function
+objects created in this way by default accept any number of arguments,
+accept any ctypes data instances as arguments, and return the default
+result type specified by the library loader.  They are instances of a
+private class:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">_FuncPtr</span></tt></dt>
+<dd>Base class for C callable foreign functions.</dd>
+</dl>
+<p>Instances of foreign functions are also C compatible data types; they
+represent C function pointers.</p>
+<p>This behaviour can be customized by assigning to special attributes of
+the foreign function object.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">restype</span></tt></dt>
+<dd><p class="first">Assign a ctypes type to specify the result type of the foreign
+function.  Use <tt class="docutils literal"><span class="pre">None</span></tt> for <tt class="docutils literal"><span class="pre">void</span></tt> a function not returning
+anything.</p>
+<p class="last">It is possible to assign a callable Python object that is not a
+ctypes type, in this case the function is assumed to return a
+C <tt class="docutils literal"><span class="pre">int</span></tt>, and the callable will be called with this integer,
+allowing to do further processing or error checking.  Using this
+is deprecated, for more flexible postprocessing or error checking
+use a ctypes data type as <tt class="docutils literal"><span class="pre">restype</span></tt> and assign a callable to the
+<tt class="docutils literal"><span class="pre">errcheck</span></tt> attribute.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">argtypes</span></tt></dt>
+<dd><p class="first">Assign a tuple of ctypes types to specify the argument types that
+the function accepts.  Functions using the <tt class="docutils literal"><span class="pre">stdcall</span></tt> calling
+convention can only be called with the same number of arguments as
+the length of this tuple; functions using the C calling convention
+accept additional, unspecified arguments as well.</p>
+<p>When a foreign function is called, each actual argument is passed
+to the <tt class="docutils literal"><span class="pre">from_param</span></tt> class method of the items in the
+<tt class="docutils literal"><span class="pre">argtypes</span></tt> tuple, this method allows to adapt the actual
+argument to an object that the foreign function accepts.  For
+example, a <tt class="docutils literal"><span class="pre">c_char_p</span></tt> item in the <tt class="docutils literal"><span class="pre">argtypes</span></tt> tuple will
+convert a unicode string passed as argument into an byte string
+using ctypes conversion rules.</p>
+<p class="last">New: It is now possible to put items in argtypes which are not
+ctypes types, but each item must have a <tt class="docutils literal"><span class="pre">from_param</span></tt> method
+which returns a value usable as argument (integer, string, ctypes
+instance).  This allows to define adapters that can adapt custom
+objects as function parameters.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">errcheck</span></tt></dt>
+<dd>Assign a Python function or another callable to this attribute.
+The callable will be called with three or more arguments:</dd>
+<dt><tt class="docutils literal"><span class="pre">callable(result,</span> <span class="pre">func,</span> <span class="pre">arguments)</span></tt></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">result</span></tt> is what the foreign function returns, as specified by the
+<tt class="docutils literal"><span class="pre">restype</span></tt> attribute.</p>
+<p><tt class="docutils literal"><span class="pre">func</span></tt> is the foreign function object itself, this allows to
+reuse the same callable object to check or postprocess the results
+of several functions.</p>
+<p><tt class="docutils literal"><span class="pre">arguments</span></tt> is a tuple containing the parameters originally
+passed to the function call, this allows to specialize the
+behaviour on the arguments used.</p>
+<p class="last">The object that this function returns will be returned from the
+foreign function call, but it can also check the result value and
+raise an exception if the foreign function call failed.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">ArgumentError()</span></tt></dt>
+<dd>This exception is raised when a foreign function call cannot
+convert one of the passed arguments.</dd>
+</dl>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id4" id="function-prototypes" name="function-prototypes">Function prototypes</a></h1>
+<p>Foreign functions can also be created by instantiating function
+prototypes.  Function prototypes are similar to function prototypes in
+C; they describe a function (return type, argument types, calling
+convention) without defining an implementation.  The factory
+functions must be called with the desired result type and the argument
+types of the function.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">CFUNCTYPE(restype,</span> <span class="pre">*argtypes)</span></tt></dt>
+<dd>The returned function prototype creates functions that use the
+standard C calling convention.  The function will release the GIL
+during the call.</dd>
+<dt><tt class="docutils literal"><span class="pre">WINFUNCTYPE(restype,</span> <span class="pre">*argtypes)</span></tt></dt>
+<dd>Windows only: The returned function prototype creates functions
+that use the <tt class="docutils literal"><span class="pre">stdcall</span></tt> calling convention, except on Windows CE
+where <tt class="docutils literal"><span class="pre">WINFUNCTYPE</span></tt> is the same as <tt class="docutils literal"><span class="pre">CFUNCTYPE</span></tt>.  The function
+will release the GIL during the call.</dd>
+<dt><tt class="docutils literal"><span class="pre">PYFUNCTYPE(restype,</span> <span class="pre">*argtypes)</span></tt></dt>
+<dd>The returned function prototype creates functions that use the
+Python calling convention.  The function will <em>not</em> release the
+GIL during the call.</dd>
+</dl>
+<p>Function prototypes created by the factory functions can be
+instantiated in different ways, depending on the type and number of
+the parameters in the call.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">prototype(address)</span></tt></dt>
+<dd>Returns a foreign function at the specified address.</dd>
+<dt><tt class="docutils literal"><span class="pre">prototype(callable)</span></tt></dt>
+<dd>Create a C callable function (a callback function) from a Python
+<tt class="docutils literal"><span class="pre">callable</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">prototype(func_spec[,</span> <span class="pre">paramflags])</span></tt></dt>
+<dd>Returns a foreign function exported by a shared library.
+<tt class="docutils literal"><span class="pre">func_spec</span></tt> must be a 2-tuple <tt class="docutils literal"><span class="pre">(name_or_ordinal,</span> <span class="pre">library)</span></tt>.
+The first item is the name of the exported function as string, or
+the ordinal of the exported function as small integer.  The second
+item is the shared library instance.</dd>
+<dt><tt class="docutils literal"><span class="pre">prototype(vtbl_index,</span> <span class="pre">name[,</span> <span class="pre">paramflags[,</span> <span class="pre">iid]])</span></tt></dt>
+<dd><p class="first">Returns a foreign function that will call a COM method.
+<tt class="docutils literal"><span class="pre">vtbl_index</span></tt> is the index into the virtual function table, a
+small nonnegative integer. <tt class="docutils literal"><span class="pre">name</span></tt> is name of the COM method.
+<tt class="docutils literal"><span class="pre">iid</span></tt> is an optional pointer to the interface identifier which
+is used in extended error reporting.</p>
+<p class="last">COM methods use a special calling convention: They require a
+pointer to the COM interface as first argument, in addition to
+those parameters that are specified in the <tt class="docutils literal"><span class="pre">argtypes</span></tt> tuple.</p>
+</dd>
+</dl>
+<p>The optional <tt class="docutils literal"><span class="pre">paramflags</span></tt> parameter creates foreign function
+wrappers with much more functionality than the features described
+above.</p>
+<p><tt class="docutils literal"><span class="pre">paramflags</span></tt> must be a tuple of the same length as <tt class="docutils literal"><span class="pre">argtypes</span></tt>.</p>
+<p>Each item in this tuple contains further information about a
+parameter, it must be a tuple containing 1, 2, or 3 items.</p>
+<p>The first item is an integer containing flags for the parameter:</p>
+<dl class="docutils">
+<dt>1</dt>
+<dd>Specifies an input parameter to the function.</dd>
+<dt>2</dt>
+<dd>Output parameter.  The foreign function fills in a value.</dd>
+<dt>4</dt>
+<dd>Input parameter which defaults to the integer zero.</dd>
+</dl>
+<p>The optional second item is the parameter name as string.  If this is
+specified, the foreign function can be called with named parameters.</p>
+<p>The optional third item is the default value for this parameter.</p>
+<p>This example demonstrates how to wrap the Windows <tt class="docutils literal"><span class="pre">MessageBoxA</span></tt>
+function so that it supports default parameters and named arguments.
+The C declaration from the windows header file is this:</p>
+<pre class="literal-block">
+WINUSERAPI int WINAPI
+MessageBoxA(
+    HWND hWnd ,
+    LPCSTR lpText,
+    LPCSTR lpCaption,
+    UINT uType);
+</pre>
+<p>Here is the wrapping with <tt class="docutils literal"><span class="pre">ctypes</span></tt>:</p>
+<blockquote>
+<pre class="doctest-block">
+&gt;&gt;&gt; from ctypes import c_int, WINFUNCTYPE, windll
+&gt;&gt;&gt; from ctypes.wintypes import HWND, LPCSTR, UINT
+&gt;&gt;&gt; prototype = WINFUNCTYPE(c_int, HWND, LPCSTR, LPCSTR, UINT)
+&gt;&gt;&gt; paramflags = (1, &quot;hwnd&quot;, 0), (1, &quot;text&quot;, &quot;Hi&quot;), (1, &quot;caption&quot;, None), (1, &quot;flags&quot;, 0)
+&gt;&gt;&gt; MessageBox = prototype((&quot;MessageBoxA&quot;, windll.user32), paramflags)
+&gt;&gt;&gt;
+</pre>
+</blockquote>
+<p>The MessageBox foreign function can now be called in these ways:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; MessageBox()
+&gt;&gt;&gt; MessageBox(text=&quot;Spam, spam, spam&quot;)
+&gt;&gt;&gt; MessageBox(flags=2, text=&quot;foo bar&quot;)
+&gt;&gt;&gt;
+</pre>
+<p>A second example demonstrates output parameters.  The win32
+<tt class="docutils literal"><span class="pre">GetWindowRect</span></tt> function retrieves the dimensions of a specified
+window by copying them into <tt class="docutils literal"><span class="pre">RECT</span></tt> structure that the caller has to
+supply.  Here is the C declaration:</p>
+<pre class="literal-block">
+WINUSERAPI BOOL WINAPI
+GetWindowRect(
+     HWND hWnd,
+     LPRECT lpRect);
+</pre>
+<p>Here is the wrapping with <tt class="docutils literal"><span class="pre">ctypes</span></tt>:</p>
+<blockquote>
+<pre class="doctest-block">
+&gt;&gt;&gt; from ctypes import POINTER, WINFUNCTYPE, windll, WinError
+&gt;&gt;&gt; from ctypes.wintypes import BOOL, HWND, RECT
+&gt;&gt;&gt; prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
+&gt;&gt;&gt; paramflags = (1, &quot;hwnd&quot;), (2, &quot;lprect&quot;)
+&gt;&gt;&gt; GetWindowRect = prototype((&quot;GetWindowRect&quot;, windll.user32), paramflags)
+&gt;&gt;&gt;
+</pre>
+</blockquote>
+<p>Functions with output parameters will automatically return the output
+parameter value if there is a single one, or a tuple containing the
+output parameter values when there are more than one, so the
+GetWindowRect function now returns a RECT instance, when called.</p>
+<p>Output parameters can be combined with the <tt class="docutils literal"><span class="pre">errcheck</span></tt> protocol to do
+further output processing and error checking.  The win32
+<tt class="docutils literal"><span class="pre">GetWindowRect</span></tt> api function returns a <tt class="docutils literal"><span class="pre">BOOL</span></tt> to signal success or
+failure, so this function could do the error checking, and raises an
+exception when the api call failed:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; def errcheck(result, func, args):
+...     if not result:
+...         raise WinError()
+...     return args
+&gt;&gt;&gt; GetWindowRect.errcheck = errcheck
+&gt;&gt;&gt;
+</pre>
+<p>If the <tt class="docutils literal"><span class="pre">errcheck</span></tt> function returns the argument tuple it receives
+unchanged, <tt class="docutils literal"><span class="pre">ctypes</span></tt> continues the normal processing it does on the
+output parameters.  If you want to return a tuple of window
+coordinates instead of a <tt class="docutils literal"><span class="pre">RECT</span></tt> instance, you can retrieve the
+fields in the function and return them instead, the normal processing
+will no longer take place:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; def errcheck(result, func, args):
+...     if not result:
+...         raise WinError()
+...     rc = args[1]
+...     return rc.left, rc.top, rc.bottom, rc.right
+&gt;&gt;&gt;
+&gt;&gt;&gt; GetWindowRect.errcheck = errcheck
+&gt;&gt;&gt;
+</pre>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id5" id="utility-functions" name="utility-functions">Utility functions</a></h1>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">addressof(obj)</span></tt></dt>
+<dd>Returns the address of the memory buffer as integer.  <tt class="docutils literal"><span class="pre">obj</span></tt> must
+be an instance of a ctypes type.</dd>
+<dt><tt class="docutils literal"><span class="pre">alignment(obj_or_type)</span></tt></dt>
+<dd>Returns the alignment requirements of a ctypes type.
+<tt class="docutils literal"><span class="pre">obj_or_type</span></tt> must be a ctypes type or instance.</dd>
+<dt><tt class="docutils literal"><span class="pre">byref(obj)</span></tt></dt>
+<dd>Returns a light-weight pointer to <tt class="docutils literal"><span class="pre">obj</span></tt>, which must be an
+instance of a ctypes type. The returned object can only be used as
+a foreign function call parameter. It behaves similar to
+<tt class="docutils literal"><span class="pre">pointer(obj)</span></tt>, but the construction is a lot faster.</dd>
+<dt><tt class="docutils literal"><span class="pre">cast(obj,</span> <span class="pre">type)</span></tt></dt>
+<dd>This function is similar to the cast operator in C. It returns a
+new instance of <tt class="docutils literal"><span class="pre">type</span></tt> which points to the same memory block as
+<tt class="docutils literal"><span class="pre">obj</span></tt>. <tt class="docutils literal"><span class="pre">type</span></tt> must be a pointer type, and <tt class="docutils literal"><span class="pre">obj</span></tt> must be an
+object that can be interpreted as a pointer.</dd>
+<dt><tt class="docutils literal"><span class="pre">create_string_buffer(init_or_size[,</span> <span class="pre">size])</span></tt></dt>
+<dd><p class="first">This function creates a mutable character buffer. The returned
+object is a ctypes array of <tt class="docutils literal"><span class="pre">c_char</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">init_or_size</span></tt> must be an integer which specifies the size of
+the array, or a string which will be used to initialize the array
+items.</p>
+<p>If a string is specified as first argument, the buffer is made one
+item larger than the length of the string so that the last element
+in the array is a NUL termination character. An integer can be
+passed as second argument which allows to specify the size of the
+array if the length of the string should not be used.</p>
+<p class="last">If the first parameter is a unicode string, it is converted into
+an 8-bit string according to ctypes conversion rules.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">create_unicode_buffer(init_or_size[,</span> <span class="pre">size])</span></tt></dt>
+<dd><p class="first">This function creates a mutable unicode character buffer. The
+returned object is a ctypes array of <tt class="docutils literal"><span class="pre">c_wchar</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">init_or_size</span></tt> must be an integer which specifies the size of
+the array, or a unicode string which will be used to initialize
+the array items.</p>
+<p>If a unicode string is specified as first argument, the buffer is
+made one item larger than the length of the string so that the
+last element in the array is a NUL termination character. An
+integer can be passed as second argument which allows to specify
+the size of the array if the length of the string should not be
+used.</p>
+<p class="last">If the first parameter is a 8-bit string, it is converted into an
+unicode string according to ctypes conversion rules.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">DllCanUnloadNow()</span></tt></dt>
+<dd>Windows only: This function is a hook which allows to implement
+inprocess COM servers with ctypes. It is called from the
+DllCanUnloadNow function that the _ctypes extension dll exports.</dd>
+<dt><tt class="docutils literal"><span class="pre">DllGetClassObject()</span></tt></dt>
+<dd>Windows only: This function is a hook which allows to implement
+inprocess COM servers with ctypes. It is called from the
+DllGetClassObject function that the <tt class="docutils literal"><span class="pre">_ctypes</span></tt> extension dll exports.</dd>
+<dt><tt class="docutils literal"><span class="pre">FormatError([code])</span></tt></dt>
+<dd>Windows only: Returns a textual description of the error code. If
+no error code is specified, the last error code is used by calling
+the Windows api function GetLastError.</dd>
+<dt><tt class="docutils literal"><span class="pre">GetLastError()</span></tt></dt>
+<dd>Windows only: Returns the last error code set by Windows in the
+calling thread.</dd>
+<dt><tt class="docutils literal"><span class="pre">memmove(dst,</span> <span class="pre">src,</span> <span class="pre">count)</span></tt></dt>
+<dd>Same as the standard C memmove library function: copies <tt class="docutils literal"><span class="pre">count</span></tt>
+bytes from <tt class="docutils literal"><span class="pre">src</span></tt> to <tt class="docutils literal"><span class="pre">dst</span></tt>. <tt class="docutils literal"><span class="pre">dst</span></tt> and <tt class="docutils literal"><span class="pre">src</span></tt> must be
+integers or ctypes instances that can be converted to pointers.</dd>
+<dt><tt class="docutils literal"><span class="pre">memset(dst,</span> <span class="pre">c,</span> <span class="pre">count)</span></tt></dt>
+<dd>Same as the standard C memset library function: fills the memory
+block at address <tt class="docutils literal"><span class="pre">dst</span></tt> with <tt class="docutils literal"><span class="pre">count</span></tt> bytes of value
+<tt class="docutils literal"><span class="pre">c</span></tt>. <tt class="docutils literal"><span class="pre">dst</span></tt> must be an integer specifying an address, or a
+ctypes instance.</dd>
+<dt><tt class="docutils literal"><span class="pre">POINTER(type)</span></tt></dt>
+<dd>This factory function creates and returns a new ctypes pointer
+type. Pointer types are cached an reused internally, so calling
+this function repeatedly is cheap. type must be a ctypes type.</dd>
+<dt><tt class="docutils literal"><span class="pre">pointer(obj)</span></tt></dt>
+<dd><p class="first">This function creates a new pointer instance, pointing to
+<tt class="docutils literal"><span class="pre">obj</span></tt>. The returned object is of the type POINTER(type(obj)).</p>
+<p class="last">Note: If you just want to pass a pointer to an object to a foreign
+function call, you should use <tt class="docutils literal"><span class="pre">byref(obj)</span></tt> which is much faster.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">resize(obj,</span> <span class="pre">size)</span></tt></dt>
+<dd>This function resizes the internal memory buffer of obj, which
+must be an instance of a ctypes type. It is not possible to make
+the buffer smaller than the native size of the objects type, as
+given by sizeof(type(obj)), but it is possible to enlarge the
+buffer.</dd>
+<dt><tt class="docutils literal"><span class="pre">set_conversion_mode(encoding,</span> <span class="pre">errors)</span></tt></dt>
+<dd><p class="first">This function sets the rules that ctypes objects use when
+converting between 8-bit strings and unicode strings. encoding
+must be a string specifying an encoding, like <tt class="docutils literal"><span class="pre">'utf-8'</span></tt> or
+<tt class="docutils literal"><span class="pre">'mbcs'</span></tt>, errors must be a string specifying the error handling
+on encoding/decoding errors. Examples of possible values are
+<tt class="docutils literal"><span class="pre">&quot;strict&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;replace&quot;</span></tt>, or <tt class="docutils literal"><span class="pre">&quot;ignore&quot;</span></tt>.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">set_conversion_mode</span></tt> returns a 2-tuple containing the previous
+conversion rules. On windows, the initial conversion rules are
+<tt class="docutils literal"><span class="pre">('mbcs',</span> <span class="pre">'ignore')</span></tt>, on other systems <tt class="docutils literal"><span class="pre">('ascii',</span> <span class="pre">'strict')</span></tt>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">sizeof(obj_or_type)</span></tt></dt>
+<dd>Returns the size in bytes of a ctypes type or instance memory
+buffer. Does the same as the C <tt class="docutils literal"><span class="pre">sizeof()</span></tt> function.</dd>
+<dt><tt class="docutils literal"><span class="pre">string_at(address[,</span> <span class="pre">size])</span></tt></dt>
+<dd>This function returns the string starting at memory address
+address. If size is specified, it is used as size, otherwise the
+string is assumed to be zero-terminated.</dd>
+<dt><tt class="docutils literal"><span class="pre">WinError(code=None,</span> <span class="pre">descr=None)</span></tt></dt>
+<dd>Windows only: this function is probably the worst-named thing in
+ctypes. It creates an instance of WindowsError. If <tt class="docutils literal"><span class="pre">code</span></tt> is not
+specified, <tt class="docutils literal"><span class="pre">GetLastError</span></tt> is called to determine the error
+code. If <tt class="docutils literal"><span class="pre">descr</span></tt> is not spcified, <tt class="docutils literal"><span class="pre">FormatError</span></tt> is called to
+get a textual description of the error.</dd>
+<dt><tt class="docutils literal"><span class="pre">wstring_at(address)</span></tt></dt>
+<dd>This function returns the wide character string starting at memory
+address <tt class="docutils literal"><span class="pre">address</span></tt> as unicode string. If <tt class="docutils literal"><span class="pre">size</span></tt> is specified,
+it is used as the number of characters of the string, otherwise
+the string is assumed to be zero-terminated.</dd>
+</dl>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id6" id="data-types" name="data-types">Data types</a></h1>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">_CData</span></tt></dt>
+<dd>This non-public class is the common base class of all ctypes data
+types.  Among other things, all ctypes type instances contain a
+memory block that hold C compatible data; the address of the
+memory block is returned by the <tt class="docutils literal"><span class="pre">addressof()</span></tt> helper function.
+Another instance variable is exposed as <tt class="docutils literal"><span class="pre">_objects</span></tt>; this
+contains other Python objects that need to be kept alive in case
+the memory block contains pointers.</dd>
+</dl>
+<p>Common methods of ctypes data types, these are all class methods (to
+be exact, they are methods of the metaclass):</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">from_address(address)</span></tt></dt>
+<dd>This method returns a ctypes type instance using the memory
+specified by address which must be an integer.</dd>
+<dt><tt class="docutils literal"><span class="pre">from_param(obj)</span></tt></dt>
+<dd><p class="first">This method adapts obj to a ctypes type.  It is called with the
+actual object used in a foreign function call, when the type is
+present in the foreign functions <tt class="docutils literal"><span class="pre">argtypes</span></tt> tuple; it must
+return an object that can be used as function call parameter.</p>
+<p class="last">All ctypes data types have a default implementation of this
+classmethod, normally it returns <tt class="docutils literal"><span class="pre">obj</span></tt> if that is an instance of
+the type.  Some types accept other objects as well.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">in_dll(name,</span> <span class="pre">library)</span></tt></dt>
+<dd>This method returns a ctypes type instance exported by a shared
+library. <tt class="docutils literal"><span class="pre">name</span></tt> is the name of the symbol that exports the data,
+<tt class="docutils literal"><span class="pre">library</span></tt> is the loaded shared library.</dd>
+</dl>
+<p>Common instance variables of ctypes data types:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">_b_base_</span></tt></dt>
+<dd>Sometimes ctypes data instances do not own the memory block they
+contain, instead they share part of the memory block of a base
+object.  The <tt class="docutils literal"><span class="pre">_b_base_</span></tt> readonly member is the root ctypes
+object that owns the memory block.</dd>
+<dt><tt class="docutils literal"><span class="pre">_b_needsfree_</span></tt></dt>
+<dd>This readonly variable is true when the ctypes data instance has
+allocated the memory block itself, false otherwise.</dd>
+<dt><tt class="docutils literal"><span class="pre">_objects</span></tt></dt>
+<dd>This member is either <tt class="docutils literal"><span class="pre">None</span></tt> or a dictionary containing Python
+objects that need to be kept alive so that the memory block
+contents is kept valid.  This object is only exposed for
+debugging; never modify the contents of this dictionary.</dd>
+</dl>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id7" id="fundamental-data-types" name="fundamental-data-types">Fundamental data types</a></h1>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">_SimpleCData</span></tt></dt>
+<dd>This non-public class is the base class of all fundamental ctypes
+data types. It is mentioned here because it contains the common
+attributes of the fundamental ctypes data types.  <tt class="docutils literal"><span class="pre">_SimpleCData</span></tt>
+is a subclass of <tt class="docutils literal"><span class="pre">_CData</span></tt>, so it inherits their methods and
+attributes.</dd>
+</dl>
+<p>Instances have a single attribute:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">value</span></tt></dt>
+<dd><p class="first">This attribute contains the actual value of the instance. For
+integer and pointer types, it is an integer, for character types,
+it is a single character string, for character pointer types it
+is a Python string or unicode string.</p>
+<p class="last">When the <tt class="docutils literal"><span class="pre">value</span></tt> attribute is retrieved from a ctypes instance,
+usually a new object is returned each time.  <tt class="docutils literal"><span class="pre">ctypes</span></tt> does <em>not</em>
+implement original object return, always a new object is
+constructed.  The same is true for all other ctypes object
+instances.</p>
+</dd>
+</dl>
+<p>Fundamental data types, when returned as foreign function call
+results, or, for example, by retrieving structure field members or
+array items, are transparently converted to native Python types.  In
+other words, if a foreign function has a <tt class="docutils literal"><span class="pre">restype</span></tt> of <tt class="docutils literal"><span class="pre">c_char_p</span></tt>,
+you will always receive a Python string, <em>not</em> a <tt class="docutils literal"><span class="pre">c_char_p</span></tt>
+instance.</p>
+<p>Subclasses of fundamental data types do <em>not</em> inherit this behaviour.
+So, if a foreign functions <tt class="docutils literal"><span class="pre">restype</span></tt> is a subclass of <tt class="docutils literal"><span class="pre">c_void_p</span></tt>,
+you will receive an instance of this subclass from the function call.
+Of course, you can get the value of the pointer by accessing the
+<tt class="docutils literal"><span class="pre">value</span></tt> attribute.</p>
+<p>These are the fundamental ctypes data types:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">c_byte</span></tt></dt>
+<dd>Represents the C signed char datatype, and interprets the value as
+small integer. The constructor accepts an optional integer
+initializer; no overflow checking is done.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_char</span></tt></dt>
+<dd>Represents the C char datatype, and interprets the value as a single
+character. The constructor accepts an optional string initializer,
+the length of the string must be exactly one character.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_char_p</span></tt></dt>
+<dd>Represents the C char * datatype, which must be a pointer to a
+zero-terminated string. The constructor accepts an integer
+address, or a string.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_double</span></tt></dt>
+<dd>Represents the C double datatype. The constructor accepts an
+optional float initializer.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_float</span></tt></dt>
+<dd>Represents the C double datatype. The constructor accepts an
+optional float initializer.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_int</span></tt></dt>
+<dd>Represents the C signed int datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done. On
+platforms where <tt class="docutils literal"><span class="pre">sizeof(int)</span> <span class="pre">==</span> <span class="pre">sizeof(long)</span></tt> it is an alias to
+<tt class="docutils literal"><span class="pre">c_long</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_int8</span></tt></dt>
+<dd>Represents the C 8-bit <tt class="docutils literal"><span class="pre">signed</span> <span class="pre">int</span></tt> datatype. Usually an alias for
+<tt class="docutils literal"><span class="pre">c_byte</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_int16</span></tt></dt>
+<dd>Represents the C 16-bit signed int datatype. Usually an alias for
+<tt class="docutils literal"><span class="pre">c_short</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_int32</span></tt></dt>
+<dd>Represents the C 32-bit signed int datatype. Usually an alias for
+<tt class="docutils literal"><span class="pre">c_int</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_int64</span></tt></dt>
+<dd>Represents the C 64-bit <tt class="docutils literal"><span class="pre">signed</span> <span class="pre">int</span></tt> datatype. Usually an alias
+for <tt class="docutils literal"><span class="pre">c_longlong</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_long</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">signed</span> <span class="pre">long</span></tt> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_longlong</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">signed</span> <span class="pre">long</span> <span class="pre">long</span></tt> datatype. The constructor accepts
+an optional integer initializer; no overflow checking is done.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_short</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">signed</span> <span class="pre">short</span></tt> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_size_t</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">size_t</span></tt> datatype.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_ubyte</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">char</span></tt> datatype, it interprets the
+value as small integer. The constructor accepts an optional
+integer initializer; no overflow checking is done.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_uint</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">int</span></tt> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done. On
+platforms where <tt class="docutils literal"><span class="pre">sizeof(int)</span> <span class="pre">==</span> <span class="pre">sizeof(long)</span></tt> it is an alias for
+<tt class="docutils literal"><span class="pre">c_ulong</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_uint8</span></tt></dt>
+<dd>Represents the C 8-bit unsigned int datatype. Usually an alias for
+<tt class="docutils literal"><span class="pre">c_ubyte</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_uint16</span></tt></dt>
+<dd>Represents the C 16-bit unsigned int datatype. Usually an alias for
+<tt class="docutils literal"><span class="pre">c_ushort</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_uint32</span></tt></dt>
+<dd>Represents the C 32-bit unsigned int datatype. Usually an alias for
+<tt class="docutils literal"><span class="pre">c_uint</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_uint64</span></tt></dt>
+<dd>Represents the C 64-bit unsigned int datatype. Usually an alias for
+<tt class="docutils literal"><span class="pre">c_ulonglong</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_ulong</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span></tt> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_ulonglong</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">long</span></tt> datatype. The constructor
+accepts an optional integer initializer; no overflow checking is
+done.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_ushort</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">short</span></tt> datatype. The constructor accepts an
+optional integer initializer; no overflow checking is done.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_void_p</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">void</span> <span class="pre">*</span></tt> type. The value is represented as
+integer. The constructor accepts an optional integer initializer.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_wchar</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">wchar_t</span></tt> datatype, and interprets the value as a
+single character unicode string. The constructor accepts an
+optional string initializer, the length of the string must be
+exactly one character.</dd>
+<dt><tt class="docutils literal"><span class="pre">c_wchar_p</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">wchar_t</span> <span class="pre">*</span></tt> datatype, which must be a pointer to
+a zero-terminated wide character string. The constructor accepts
+an integer address, or a string.</dd>
+<dt><tt class="docutils literal"><span class="pre">HRESULT</span></tt></dt>
+<dd>Windows only: Represents a <tt class="docutils literal"><span class="pre">HRESULT</span></tt> value, which contains success
+or error information for a function or method call.</dd>
+<dt><tt class="docutils literal"><span class="pre">py_object</span></tt></dt>
+<dd>Represents the C <tt class="docutils literal"><span class="pre">PyObject</span> <span class="pre">*</span></tt> datatype.  Calling this without an
+argument creates a <tt class="docutils literal"><span class="pre">NULL</span></tt> <tt class="docutils literal"><span class="pre">PyObject</span> <span class="pre">*</span></tt> pointer.</dd>
+</dl>
+<p>The <tt class="docutils literal"><span class="pre">ctypes.wintypes</span></tt> module provides quite some other Windows
+specific data types, for example <tt class="docutils literal"><span class="pre">HWND</span></tt>, <tt class="docutils literal"><span class="pre">WPARAM</span></tt>, or <tt class="docutils literal"><span class="pre">DWORD</span></tt>.
+Some useful structures like <tt class="docutils literal"><span class="pre">MSG</span></tt> or <tt class="docutils literal"><span class="pre">RECT</span></tt> are also defined.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id8" id="structured-data-types" name="structured-data-types">Structured data types</a></h1>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Union(*args,</span> <span class="pre">**kw)</span></tt></dt>
+<dd>Abstract base class for unions in native byte order.</dd>
+<dt><tt class="docutils literal"><span class="pre">BigEndianStructure(*args,</span> <span class="pre">**kw)</span></tt></dt>
+<dd>Abstract base class for structures in <em>big endian</em> byte order.</dd>
+<dt><tt class="docutils literal"><span class="pre">LittleEndianStructure(*args,</span> <span class="pre">**kw)</span></tt></dt>
+<dd>Abstract base class for structures in <em>little endian</em> byte order.</dd>
+</dl>
+<p>Structures with non-native byte order cannot contain pointer type
+fields, or any other data types containing pointer type fields.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Structure(*args,</span> <span class="pre">**kw)</span></tt></dt>
+<dd>Abstract base class for structures in <em>native</em> byte order.</dd>
+</dl>
+<p>Concrete structure and union types must be created by subclassing one
+of these types, and at least define a <tt class="docutils literal"><span class="pre">_fields_</span></tt> class variable.
+<tt class="docutils literal"><span class="pre">ctypes</span></tt> will create descriptors which allow reading and writing the
+fields by direct attribute accesses.  These are the</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">_fields_</span></tt></dt>
+<dd><p class="first">A sequence defining the structure fields.  The items must be
+2-tuples or 3-tuples.  The first item is the name of the field,
+the second item specifies the type of the field; it can be any
+ctypes data type.</p>
+<p>For integer type fields like <tt class="docutils literal"><span class="pre">c_int</span></tt>, a third optional item can
+be given.  It must be a small positive integer defining the bit
+width of the field.</p>
+<p>Field names must be unique within one structure or union.  This is
+not checked, only one field can be accessed when names are
+repeated.</p>
+<p>It is possible to define the <tt class="docutils literal"><span class="pre">_fields_</span></tt> class variable <em>after</em>
+the class statement that defines the Structure subclass, this
+allows to create data types that directly or indirectly reference
+themselves:</p>
+<pre class="literal-block">
+class List(Structure):
+    pass
+List._fields_ = [(&quot;pnext&quot;, POINTER(List)),
+                 ...
+                ]
+</pre>
+<p>The <tt class="docutils literal"><span class="pre">_fields_</span></tt> class variable must, however, be defined before
+the type is first used (an instance is created, <tt class="docutils literal"><span class="pre">sizeof()</span></tt> is
+called on it, and so on).  Later assignments to the <tt class="docutils literal"><span class="pre">_fields_</span></tt>
+class variable will raise an AttributeError.</p>
+<p>Structure and union subclass constructors accept both positional
+and named arguments.  Positional arguments are used to initialize
+the fields in the same order as they appear in the <tt class="docutils literal"><span class="pre">_fields_</span></tt>
+definition, named arguments are used to initialize the fields with
+the corresponding name.</p>
+<p class="last">It is possible to defined sub-subclasses of structure types, they
+inherit the fields of the base class plus the <tt class="docutils literal"><span class="pre">_fields_</span></tt> defined
+in the sub-subclass, if any.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">_pack_</span></tt></dt>
+<dd>An optional small integer that allows to override the alignment of
+structure fields in the instance.  <tt class="docutils literal"><span class="pre">_pack_</span></tt> must already be
+defined when <tt class="docutils literal"><span class="pre">_fields_</span></tt> is assigned, otherwise it will have no
+effect.</dd>
+<dt><tt class="docutils literal"><span class="pre">_anonymous_</span></tt></dt>
+<dd><p class="first">An optional sequence that lists the names of unnamed (anonymous)
+fields.  <tt class="docutils literal"><span class="pre">_anonymous_</span></tt> must be already defined when <tt class="docutils literal"><span class="pre">_fields_</span></tt>
+is assigned, otherwise it will have no effect.</p>
+<p>The fields listed in this variable must be structure or union type
+fields.  <tt class="docutils literal"><span class="pre">ctypes</span></tt> will create descriptors in the structure type
+that allows to access the nested fields directly, without the need
+to create the structure or union field.</p>
+<p>Here is an example type (Windows):</p>
+<pre class="literal-block">
+class _U(Union):
+    _fields_ = [(&quot;lptdesc&quot;, POINTER(TYPEDESC)),
+                (&quot;lpadesc&quot;, POINTER(ARRAYDESC)),
+                (&quot;hreftype&quot;, HREFTYPE)]
+
+class TYPEDESC(Structure):
+    _fields_ = [(&quot;u&quot;, _U),
+                (&quot;vt&quot;, VARTYPE)]
+
+    _anonymous_ = (&quot;u&quot;,)
+</pre>
+<p>The <tt class="docutils literal"><span class="pre">TYPEDESC</span></tt> structure describes a COM data type, the <tt class="docutils literal"><span class="pre">vt</span></tt>
+field specifies which one of the union fields is valid.  Since the
+<tt class="docutils literal"><span class="pre">u</span></tt> field is defined as anonymous field, it is now possible to
+access the members directly off the TYPEDESC instance.
+<tt class="docutils literal"><span class="pre">td.lptdesc</span></tt> and <tt class="docutils literal"><span class="pre">td.u.lptdesc</span></tt> are equivalent, but the former
+is faster since it does not need to create a temporary union
+instance:</p>
+<pre class="last literal-block">
+td = TYPEDESC()
+td.vt = VT_PTR
+td.lptdesc = POINTER(some_type)
+td.u.lptdesc = POINTER(some_type)
+</pre>
+</dd>
+</dl>
+<p>It is possible to defined sub-subclasses of structures, they inherit
+the fields of the base class.  If the subclass definition has a
+separate <tt class="docutils literal"><span class="pre">_fields_</span></tt> variable, the fields specified in this are
+appended to the fields of the base class.</p>
+<p>Structure and union constructors accept both positional and
+keyword arguments.  Positional arguments are used to initialize member
+fields in the same order as they are appear in <tt class="docutils literal"><span class="pre">_fields_</span></tt>.  Keyword
+arguments in the constructor are interpreted as attribute assignments,
+so they will initialize <tt class="docutils literal"><span class="pre">_fields_</span></tt> with the same name, or create new
+attributes for names not present in <tt class="docutils literal"><span class="pre">_fields_</span></tt>.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id9" id="arrays-and-pointers" name="arrays-and-pointers">Arrays and pointers</a></h1>
+<p>Not yet written - please see <a class="reference" href="tutorial.html#pointers">pointers</a> and
+<a class="reference" href="tutorial.html#arrays">arrays</a> in the tutorial.</p>
+</div>
+</div>
+</body>
+</html>

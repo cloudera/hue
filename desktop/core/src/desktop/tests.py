@@ -1,0 +1,196 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+from desktop.lib import django_mako
+
+from nose.tools import assert_true, assert_equal
+from desktop.lib.django_test_util import make_logged_in_client
+from django.http import HttpResponse
+from django.db.models import query, CharField, SmallIntegerField
+from desktop.lib.paginator import Paginator
+import desktop
+import desktop.urls
+import desktop.conf
+from desktop.lib.django_util import TruncatingModel
+import desktop.views as views
+
+def setup_test_environment():
+  """
+  Sets up mako to signal template rendering.
+  """
+  django_mako.render_to_string = django_mako.render_to_string_test
+setup_test_environment.__test__ = False
+
+def teardown_test_environment():
+  """
+  This method is called by nose_runner when
+  the tests all finish.  This helps track
+  down when tests aren't cleaning up after
+  themselves and leaving threads hanging around.
+  """
+  import threading
+  # We should shut down all relevant threads by test completion.
+  threads = list(threading.enumerate())
+
+  try:
+    import threadframe
+    import traceback
+    if len(threads) > 1:
+      for v in threadframe.dict().values():
+        traceback.print_stack(v)
+  finally:
+    # threadframe is only available in the dev build.
+    pass
+
+  assert 1 == len(threads), threads
+
+  django_mako.render_to_string = django_mako.render_to_string_normal
+teardown_test_environment.__test__ = False
+
+def test_dump_config():
+  c = make_logged_in_client()
+
+  CANARY = "abracadabra"
+  clear = desktop.conf.HTTP_HOST.set_for_testing(CANARY)
+
+  response1 = c.get('/dump_config')
+  assert_true(CANARY in response1.content)
+
+  response2 = c.get('/dump_config', dict(private="true"))
+  assert_true(CANARY in response2.content)
+
+  # There are more private variables...
+  assert_true(len(response1.content) < len(response2.content))
+
+  clear()
+
+def test_prefs():
+  c = make_logged_in_client()
+
+  # Get everything
+  response = c.get('/prefs/')
+  assert_equal('{}', response.content)
+
+  # Set and get
+  response = c.get('/prefs/foo', dict(set="bar"))
+  assert_equal('true', response.content)
+  response = c.get('/prefs/foo')
+  assert_equal('"bar"', response.content)
+
+  # Reset (use post this time)
+  c.post('/prefs/foo', dict(set="baz"))
+  response = c.get('/prefs/foo')
+  assert_equal('"baz"', response.content)
+
+  # Check multiple values
+  c.post('/prefs/elephant', dict(set="room"))
+  response = c.get('/prefs/')
+  assert_true("baz" in response.content)
+  assert_true("room" in response.content)
+
+  # Delete everything
+  c.get('/prefs/elephant', dict(delete=""))
+  c.get('/prefs/foo', dict(delete=""))
+  response = c.get('/prefs/')
+  assert_equal('{}', response.content)
+
+  # Check non-existent value
+  response = c.get('/prefs/doesNotExist')
+  assert_equal('null', response.content)
+
+def test_status_bar():
+  """
+  Subs out the status_bar_views registry with temporary examples.
+  Tests handling of errors on view functions.
+  """
+  backup = views._status_bar_views
+  views._status_bar_views = []
+
+  c = make_logged_in_client()
+  views.register_status_bar_view(lambda _: HttpResponse("foo", status=200))
+  views.register_status_bar_view(lambda _: HttpResponse("bar"))
+  views.register_status_bar_view(lambda _: None)
+  def f(r):
+    raise Exception()
+  views.register_status_bar_view(f)
+
+  response = c.get("/status_bar")
+  assert_equal("foobar", response.content)
+
+  views._status_bar_views = backup
+
+
+def test_paginator():
+  """
+  Test that the paginator works with partial list.
+  """
+  def assert_page(page, data, start, end):
+    assert_equal(page.object_list, data)
+    assert_equal(page.start_index(), start)
+    assert_equal(page.end_index(), end)
+
+  # First page 1-20
+  obj = range(20)
+  pgn = Paginator(obj, per_page=20, total=25)
+  assert_page(pgn.page(1), obj, 1, 20)
+
+  # Second page 21-25
+  obj = range(5)
+  pgn = Paginator(obj, per_page=20, total=25)
+  assert_page(pgn.page(2), obj, 21, 25)
+
+  # Handle extra data on first page (22 items on a 20-page)
+  obj = range(22)
+  pgn = Paginator(obj, per_page=20, total=25)
+  assert_page(pgn.page(1), range(20), 1, 20)
+
+  # Handle extra data on second page (22 items on a 20-page)
+  obj = range(22)
+  pgn = Paginator(obj, per_page=20, total=25)
+  assert_page(pgn.page(2), range(5), 21, 25)
+
+  # Handle total < len(obj). Only works for QuerySet.
+  obj = query.QuerySet()
+  obj._result_cache = range(10)
+  pgn = Paginator(obj, per_page=10, total=9)
+  assert_page(pgn.page(1), range(10), 1, 10)
+
+  # Still works with a normal complete list
+  obj = range(25)
+  pgn = Paginator(obj, per_page=20)
+  assert_page(pgn.page(1), range(20), 1, 20)
+  assert_page(pgn.page(2), range(20, 25), 21, 25)
+
+def test_thread_dump():
+  c = make_logged_in_client()
+  response = c.get("/debug/threads")
+  assert_true("test_thread_dump" in response.content)
+
+def test_truncating_model():
+  class TinyModel(TruncatingModel):
+    short_field = CharField(max_length=10)
+    non_string_field = SmallIntegerField()
+
+  a = TinyModel()
+
+  a.short_field = 'a' * 9 # One less than it's max length
+  assert_true(a.short_field == 'a' * 9, 'Short-enough field does not get truncated')
+
+  a.short_field = 'a' * 11 # One more than it's max_length
+  assert_true(a.short_field == 'a' * 10, 'Too-long field gets truncated')
+
+  a.non_string_field = 10**10
+  assert_true(a.non_string_field == 10**10, 'non-string fields are not truncated')

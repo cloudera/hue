@@ -1,0 +1,13 @@
+========
+ Thanks
+========
+
+Thanks to everyone who has offered bug reports, patches, suggestions:
+
+    Alexey Akimov, Michele Bertoldi, Josiah Carlson, C Cazabon, 
+    Tim Couper, Lisandro Dalcin, Markus Gritsch, Doug Hellmann, 
+    Mikael Hogqvist, Charlie Hull, Richard Jones, Alexy Khrabrov, 
+    Gerald Manipon, Kevin Manley, Skip Montanaro, Robert Morgan, 
+    Paul Rudin, Sandro Tosi, Dominique Wahli, Corey Wright.
+
+Sorry if I have forgotten anyone.

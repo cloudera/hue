@@ -1,0 +1,24 @@
+{
+	"protovis": {
+		"protovis-d3.1": {
+			"deps": []
+		}
+	},
+	"moovis" : {
+		"MooVis" : {
+			"deps" : ["Protovis","Protovis.Line","Protovis.Bar","Protovis.Pie"]
+		},
+		"Protovis" : {
+			"deps" : ["protovis-d3.1"]
+		},
+		"Protovis.Line" : {
+			"deps" : ["Protovis"]
+		},
+		"Protovis.Bar" : {
+			"deps" : ["Protovis"]
+		},
+		"Protovis.Pie" : {
+			"deps" : ["Protovis"]
+		}
+	}
+}

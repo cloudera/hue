@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: configobj
+Version: 4.6.0
+Summary: Config file reading, writing, and validation.
+Home-page: http://www.voidspace.org.uk/python/configobj.html
+Author: Michael Foord & Nicola Larosa
+Author-email: fuzzyman@voidspace.org.uk
+License: BSD
+Description: UNKNOWN
+Platform: Platform Independent

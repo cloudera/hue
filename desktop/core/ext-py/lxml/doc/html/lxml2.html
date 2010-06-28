@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>What's new in lxml 2.0?</title>
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="what-s-new-in-lxml-2-0">
+<div class="sidemenu"><ul id="lxml-section"><li><span class="section title">lxml</span><ul class="menu foreign" id="index-menu"><li class="menu title"><a href="index.html">lxml</a><ul class="submenu"><li class="menu item"><a href="index.html#introduction">Introduction</a></li><li class="menu item"><a href="index.html#documentation">Documentation</a></li><li class="menu item"><a href="index.html#download">Download</a></li><li class="menu item"><a href="index.html#mailing-list">Mailing list</a></li><li class="menu item"><a href="index.html#bug-tracker">Bug tracker</a></li><li class="menu item"><a href="index.html#license">License</a></li><li class="menu item"><a href="index.html#old-versions">Old Versions</a></li></ul></li></ul><ul class="menu foreign" id="intro-menu"><li class="menu title"><a href="intro.html">Why lxml?</a><ul class="submenu"><li class="menu item"><a href="intro.html#motto">Motto</a></li><li class="menu item"><a href="intro.html#aims">Aims</a></li></ul></li></ul><ul class="menu foreign" id="installation-menu"><li class="menu title"><a href="installation.html">Installing lxml</a><ul class="submenu"><li class="menu item"><a href="installation.html#requirements">Requirements</a></li><li class="menu item"><a href="installation.html#installation">Installation</a></li><li class="menu item"><a href="installation.html#building-lxml-from-sources">Building lxml from sources</a></li><li class="menu item"><a href="installation.html#ms-windows">MS Windows</a></li><li class="menu item"><a href="installation.html#macos-x">MacOS-X</a></li></ul></li></ul><ul class="menu current" id="lxml2-menu"><li class="menu title"><a href="lxml2.html">What's new in lxml 2.0?</a><ul class="submenu"><li class="menu item"><a href="lxml2.html#changes-in-etree-and-objectify">Changes in etree and objectify</a></li><li class="menu item"><a href="lxml2.html#new-modules">New modules</a></li></ul></li></ul><ul class="menu foreign" id="performance-menu"><li class="menu title"><a href="performance.html">Benchmarks and Speed</a><ul class="submenu"><li class="menu item"><a href="performance.html#general-notes">General notes</a></li><li class="menu item"><a href="performance.html#how-to-read-the-timings">How to read the timings</a></li><li class="menu item"><a href="performance.html#parsing-and-serialising">Parsing and Serialising</a></li><li class="menu item"><a href="performance.html#the-elementtree-api">The ElementTree API</a></li><li class="menu item"><a href="performance.html#xpath">XPath</a></li><li class="menu item"><a href="performance.html#a-longer-example">A longer example</a></li><li class="menu item"><a href="performance.html#lxml-objectify">lxml.objectify</a></li></ul></li></ul><ul class="menu foreign" id="compatibility-menu"><li class="menu title"><a href="compatibility.html">ElementTree compatibility of lxml.etree</a></li></ul><ul class="menu foreign" id="FAQ-menu"><li class="menu title"><a href="FAQ.html">lxml FAQ - Frequently Asked Questions</a><ul class="submenu"><li class="menu item"><a href="FAQ.html#general-questions">General Questions</a></li><li class="menu item"><a href="FAQ.html#installation">Installation</a></li><li class="menu item"><a href="FAQ.html#contributing">Contributing</a></li><li class="menu item"><a href="FAQ.html#bugs">Bugs</a></li><li class="menu item"><a href="FAQ.html#threading">Threading</a></li><li class="menu item"><a href="FAQ.html#parsing-and-serialisation">Parsing and Serialisation</a></li><li class="menu item"><a href="FAQ.html#xpath-and-document-traversal">XPath and Document Traversal</a></li></ul></li></ul></li></ul><ul id="Developing with lxml-section"><li><span class="section title">Developing with lxml</span><ul class="menu foreign" id="tutorial-menu"><li class="menu title"><a href="tutorial.html">The lxml.etree Tutorial</a><ul class="submenu"><li class="menu item"><a href="tutorial.html#the-element-class">The Element class</a></li><li class="menu item"><a href="tutorial.html#the-elementtree-class">The ElementTree class</a></li><li class="menu item"><a href="tutorial.html#parsing-from-strings-and-files">Parsing from strings and files</a></li><li class="menu item"><a href="tutorial.html#namespaces">Namespaces</a></li><li class="menu item"><a href="tutorial.html#the-e-factory">The E-factory</a></li><li class="menu item"><a href="tutorial.html#elementpath">ElementPath</a></li></ul></li></ul><ul class="menu foreign" id="api index-menu"><li class="menu title"><a href="api/index.html">API reference</a></li></ul><ul class="menu foreign" id="api-menu"><li class="menu title"><a href="api.html">APIs specific to lxml.etree</a><ul class="submenu"><li class="menu item"><a href="api.html#lxml-etree">lxml.etree</a></li><li class="menu item"><a href="api.html#other-element-apis">Other Element APIs</a></li><li class="menu item"><a href="api.html#trees-and-documents">Trees and Documents</a></li><li class="menu item"><a href="api.html#iteration">Iteration</a></li><li class="menu item"><a href="api.html#error-handling-on-exceptions">Error handling on exceptions</a></li><li class="menu item"><a href="api.html#error-logging">Error logging</a></li><li class="menu item"><a href="api.html#serialisation">Serialisation</a></li><li class="menu item"><a href="api.html#cdata">CDATA</a></li><li class="menu item"><a href="api.html#xinclude-and-elementinclude">XInclude and ElementInclude</a></li><li class="menu item"><a href="api.html#write-c14n-on-elementtree">write_c14n on ElementTree</a></li></ul></li></ul><ul class="menu foreign" id="parsing-menu"><li class="menu title"><a href="parsing.html">Parsing XML and HTML with lxml</a><ul class="submenu"><li class="menu item"><a href="parsing.html#parsers">Parsers</a></li><li class="menu item"><a href="parsing.html#the-target-parser-interface">The target parser interface</a></li><li class="menu item"><a href="parsing.html#the-feed-parser-interface">The feed parser interface</a></li><li class="menu item"><a href="parsing.html#iterparse-and-iterwalk">iterparse and iterwalk</a></li><li class="menu item"><a href="parsing.html#python-unicode-strings">Python unicode strings</a></li></ul></li></ul><ul class="menu foreign" id="validation-menu"><li class="menu title"><a href="validation.html">Validation with lxml</a><ul class="submenu"><li class="menu item"><a href="validation.html#validation-at-parse-time">Validation at parse time</a></li><li class="menu item"><a href="validation.html#dtd">DTD</a></li><li class="menu item"><a href="validation.html#relaxng">RelaxNG</a></li><li class="menu item"><a href="validation.html#xmlschema">XMLSchema</a></li><li class="menu item"><a href="validation.html#schematron">Schematron</a></li></ul></li></ul><ul class="menu foreign" id="xpathxslt-menu"><li class="menu title"><a href="xpathxslt.html">XPath and XSLT with lxml</a><ul class="submenu"><li class="menu item"><a href="xpathxslt.html#xpath">XPath</a></li><li class="menu item"><a href="xpathxslt.html#xslt">XSLT</a></li></ul></li></ul><ul class="menu foreign" id="objectify-menu"><li class="menu title"><a href="objectify.html">lxml.objectify</a><ul class="submenu"><li class="menu item"><a href="objectify.html#the-lxml-objectify-api">The lxml.objectify API</a></li><li class="menu item"><a href="objectify.html#asserting-a-schema">Asserting a Schema</a></li><li class="menu item"><a href="objectify.html#objectpath">ObjectPath</a></li><li class="menu item"><a href="objectify.html#python-data-types">Python data types</a></li><li class="menu item"><a href="objectify.html#how-data-types-are-matched">How data types are matched</a></li><li class="menu item"><a href="objectify.html#what-is-different-from-lxml-etree">What is different from lxml.etree?</a></li></ul></li></ul><ul class="menu foreign" id="lxmlhtml-menu"><li class="menu title"><a href="lxmlhtml.html">lxml.html</a><ul class="submenu"><li class="menu item"><a href="lxmlhtml.html#parsing-html">Parsing HTML</a></li><li class="menu item"><a href="lxmlhtml.html#html-element-methods">HTML Element Methods</a></li><li class="menu item"><a href="lxmlhtml.html#running-html-doctests">Running HTML doctests</a></li><li class="menu item"><a href="lxmlhtml.html#creating-html-with-the-e-factory">Creating HTML with the E-factory</a></li><li class="menu item"><a href="lxmlhtml.html#working-with-links">Working with links</a></li><li class="menu item"><a href="lxmlhtml.html#forms">Forms</a></li><li class="menu item"><a href="lxmlhtml.html#cleaning-up-html">Cleaning up HTML</a></li><li class="menu item"><a href="lxmlhtml.html#html-diff">HTML Diff</a></li><li class="menu item"><a href="lxmlhtml.html#examples">Examples</a></li></ul></li></ul><ul class="menu foreign" id="cssselect-menu"><li class="menu title"><a href="cssselect.html">lxml.cssselect</a><ul class="submenu"><li class="menu item"><a href="cssselect.html#the-cssselector-class">The CSSSelector class</a></li><li class="menu item"><a href="cssselect.html#css-selectors">CSS Selectors</a></li><li class="menu item"><a href="cssselect.html#namespaces">Namespaces</a></li><li class="menu item"><a href="cssselect.html#limitations">Limitations</a></li></ul></li></ul><ul class="menu foreign" id="elementsoup-menu"><li class="menu title"><a href="elementsoup.html">BeautifulSoup Parser</a><ul class="submenu"><li class="menu item"><a href="elementsoup.html#parsing-with-the-soupparser">Parsing with the soupparser</a></li><li class="menu item"><a href="elementsoup.html#entity-handling">Entity handling</a></li><li class="menu item"><a href="elementsoup.html#using-soupparser-as-a-fallback">Using soupparser as a fallback</a></li></ul></li></ul><ul class="menu foreign" id="html5parser-menu"><li class="menu title"><a href="html5parser.html">html5lib Parser</a><ul class="submenu"><li class="menu item"><a href="html5parser.html#differences-to-regular-html-parsing">Differences to regular HTML parsing</a></li><li class="menu item"><a href="html5parser.html#function-reference">Function Reference</a></li></ul></li></ul></li></ul><ul id="Extending lxml-section"><li><span class="section title">Extending lxml</span><ul class="menu foreign" id="resolvers-menu"><li class="menu title"><a href="resolvers.html">Document loading and URL resolving</a><ul class="submenu"><li class="menu item"><a href="resolvers.html#uri-resolvers">URI Resolvers</a></li><li class="menu item"><a href="resolvers.html#document-loading-in-context">Document loading in context</a></li><li class="menu item"><a href="resolvers.html#i-o-access-control-in-xslt">I/O access control in XSLT</a></li></ul></li></ul><ul class="menu foreign" id="extensions-menu"><li class="menu title"><a href="extensions.html">Python extensions for XPath and XSLT</a><ul class="submenu"><li class="menu item"><a href="extensions.html#xpath-extension-functions">XPath Extension functions</a></li><li class="menu item"><a href="extensions.html#xslt-extension-elements">XSLT extension elements</a></li></ul></li></ul><ul class="menu foreign" id="element classes-menu"><li class="menu title"><a href="element_classes.html">Using custom Element classes in lxml</a><ul class="submenu"><li class="menu item"><a href="element_classes.html#background-on-element-proxies">Background on Element proxies</a></li><li class="menu item"><a href="element_classes.html#element-initialization">Element initialization</a></li><li class="menu item"><a href="element_classes.html#setting-up-a-class-lookup-scheme">Setting up a class lookup scheme</a></li><li class="menu item"><a href="element_classes.html#generating-xml-with-custom-classes">Generating XML with custom classes</a></li><li class="menu item"><a href="element_classes.html#implementing-namespaces">Implementing namespaces</a></li></ul></li></ul><ul class="menu foreign" id="sax-menu"><li class="menu title"><a href="sax.html">Sax support</a><ul class="submenu"><li class="menu item"><a href="sax.html#building-a-tree-from-sax-events">Building a tree from SAX events</a></li><li class="menu item"><a href="sax.html#producing-sax-events-from-an-elementtree-or-element">Producing SAX events from an ElementTree or Element</a></li><li class="menu item"><a href="sax.html#interfacing-with-pulldom-minidom">Interfacing with pulldom/minidom</a></li></ul></li></ul><ul class="menu foreign" id="capi-menu"><li class="menu title"><a href="capi.html">The public C-API of lxml.etree</a><ul class="submenu"><li class="menu item"><a href="capi.html#writing-external-modules-in-cython">Writing external modules in Cython</a></li><li class="menu item"><a href="capi.html#writing-external-modules-in-c">Writing external modules in C</a></li></ul></li></ul></li></ul><ul id="Developing lxml-section"><li><span class="section title">Developing lxml</span><ul class="menu foreign" id="build-menu"><li class="menu title"><a href="build.html">How to build lxml from source</a><ul class="submenu"><li class="menu item"><a href="build.html#cython">Cython</a></li><li class="menu item"><a href="build.html#subversion">Subversion</a></li><li class="menu item"><a href="build.html#setuptools">Setuptools</a></li><li class="menu item"><a href="build.html#running-the-tests-and-reporting-errors">Running the tests and reporting errors</a></li><li class="menu item"><a href="build.html#building-an-egg">Building an egg</a></li><li class="menu item"><a href="build.html#building-lxml-on-macos-x">Building lxml on MacOS-X</a></li><li class="menu item"><a href="build.html#static-linking-on-windows">Static linking on Windows</a></li><li class="menu item"><a href="build.html#building-debian-packages-from-svn-sources">Building Debian packages from SVN sources</a></li></ul></li></ul><ul class="menu foreign" id="lxml source howto-menu"><li class="menu title"><a href="lxml-source-howto.html">How to read the source of lxml</a><ul class="submenu"><li class="menu item"><a href="lxml-source-howto.html#what-is-cython">What is Cython?</a></li><li class="menu item"><a href="lxml-source-howto.html#where-to-start">Where to start?</a></li><li class="menu item"><a href="lxml-source-howto.html#lxml-etree">lxml.etree</a></li><li class="menu item"><a href="lxml-source-howto.html#python-modules">Python modules</a></li><li class="menu item"><a href="lxml-source-howto.html#lxml-objectify">lxml.objectify</a></li><li class="menu item"><a href="lxml-source-howto.html#lxml-html">lxml.html</a></li></ul></li></ul><ul class="menu foreign" id="changes 2 2 2-menu"><li class="menu title"><a href="changes-2.2.2.html">Release Changelog</a></li></ul><ul class="menu foreign" id="credits-menu"><li class="menu title"><a href="credits.html">Credits</a><ul class="submenu"><li class="menu item"><a href="credits.html#main-contributors">Main contributors</a></li><li class="menu item"><a href="credits.html#special-thanks-goes-to">Special thanks goes to:</a></li></ul></li></ul></li></ul></div><h1 class="title">What's new in lxml 2.0?</h1>
+
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#changes-in-etree-and-objectify" id="id3">Changes in etree and objectify</a><ul>
+<li><a class="reference internal" href="#incompatible-changes" id="id4">Incompatible changes</a></li>
+<li><a class="reference internal" href="#enhancements" id="id5">Enhancements</a></li>
+<li><a class="reference internal" href="#deprecation" id="id6">Deprecation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#new-modules" id="id7">New modules</a><ul>
+<li><a class="reference internal" href="#lxml-usedoctest" id="id8">lxml.usedoctest</a></li>
+<li><a class="reference internal" href="#lxml-html" id="id9">lxml.html</a></li>
+<li><a class="reference internal" href="#lxml-cssselect" id="id10">lxml.cssselect</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>During the development of the lxml 1.x series, a couple of quirks were
+discovered in the design that made the API less obvious and its future
+extensions harder than necessary. lxml 2.0 is a soft evolution of lxml 1.x
+towards a simpler, more consistent and more powerful API - with some major
+extensions.  Wherever possible, lxml 1.3 comes close to the semantics of lxml
+2.0, so that migrating should be easier for code that currently runs with 1.3.</p>
+<p>One of the important internal changes was the switch from the <a class="reference external" href="http://www.cosc.canterbury.ac.nz/~greg/python/Pyrex/">Pyrex</a>
+compiler to <a class="reference external" href="http://www.cython.org/">Cython</a>, which provides better optimisation and improved
+support for newer Python language features.  This allows the code of
+lxml to become more Python-like again, while the performance improves
+as Cython continues its own development.  The code simplification,
+which will continue throughout the 2.x series, will hopefully make it
+even easier for users to contribute.</p>
+<div class="section" id="changes-in-etree-and-objectify">
+<h1>Changes in etree and objectify</h1>
+<p>A graduation towards a more consistent API cannot go without a certain amount
+of incompatible changes.  The following is a list of those differences that
+applications need to take into account when migrating from lxml 1.x to lxml
+2.0.</p>
+<div class="section" id="incompatible-changes">
+<h2>Incompatible changes</h2>
+<ul class="simple">
+<li>lxml 0.9 introduced a feature called <a class="reference external" href="element_classes.html#implementing-namespaces">namespace implementation</a>.  The
+global <tt class="docutils literal"><span class="pre">Namespace</span></tt> factory was added to register custom element classes
+and have lxml.etree look them up automatically.  However, the later
+development of further class lookup mechanisms made it appear less and less
+adequate to register this mapping at a global level, so lxml 1.1 first
+removed the namespace based lookup from the default setup and lxml 2.0
+finally removes the global namespace registry completely.  As all other
+lookup mechanisms, the namespace lookup is now local to a parser, including
+the registry itself.  Applications that use a module-level parser can easily
+map its <tt class="docutils literal"><span class="pre">get_namespace()</span></tt> method to a global <tt class="docutils literal"><span class="pre">Namespace</span></tt> function to
+mimic the old behaviour.</li>
+<li>Some API functions now require passing options as keyword arguments,
+as opposed to positional arguments.  This restriction was introduced
+to make the API usage independent of future extensions such as the
+addition of new positional arguments.  Users should not rely on the
+position of an optional argument in function signatures and instead
+pass it explicitly named.  This also improves code readability - it
+is common good practice to pass options in a consistent way
+independent of their position, so many people may not even notice
+the change in their code.  Another important reason is compatibility
+with cElementTree, which also enforces keyword-only arguments in a
+couple of places.</li>
+<li>XML tag names are validated when creating an Element.  This does not
+apply to HTML tags, where only HTML special characters are
+forbidden.  The distinction is made by the <tt class="docutils literal"><span class="pre">SubElement()</span></tt> factory,
+which tests if the tree it works on is an HTML tree, and by the
+<tt class="docutils literal"><span class="pre">.makeelement()</span></tt> methods of parsers, which behave differently for
+the <tt class="docutils literal"><span class="pre">XMLParser()</span></tt> and the <tt class="docutils literal"><span class="pre">HTMLParser()</span></tt>.</li>
+<li>XPath now raises exceptions specific to the part of the execution that
+failed: <tt class="docutils literal"><span class="pre">XPathSyntaxError</span></tt> for parser errors and <tt class="docutils literal"><span class="pre">XPathEvalError</span></tt> for
+errors that occurred during the evaluation.  Note that the distinction only
+works for the <tt class="docutils literal"><span class="pre">XPath()</span></tt> class.  The other two evaluators only have a
+single evaluation call that includes the parsing step, and will therefore
+only raise an <tt class="docutils literal"><span class="pre">XPathEvalError</span></tt>.  Applications can catch both exceptions
+through the common base class <tt class="docutils literal"><span class="pre">XPathError</span></tt> (which also exists in earlier
+lxml versions).</li>
+<li>Network access in parsers is now disabled by default, i.e. the
+<tt class="docutils literal"><span class="pre">no_network</span></tt> option defaults to True.  Due to a somewhat 'interesting'
+implementation in libxml2, this does not affect the first document (i.e. the
+URL that is parsed), but only subsequent documents, such as a DTD when
+parsing with validation.  This means that you will have to check the URL you
+pass, instead of relying on lxml to prevent <em>any</em> access to external
+resources.  As this can be helpful in some use cases, lxml does not work
+around it.</li>
+<li>The type annotations in lxml.objectify (the <tt class="docutils literal"><span class="pre">pytype</span></tt> attribute) now use
+<tt class="docutils literal"><span class="pre">NoneType</span></tt> for the None value as this is the correct Python type name.
+Previously, lxml 1.x used a lower case <tt class="docutils literal"><span class="pre">none</span></tt>.</li>
+<li>Another change in objectify regards the way it deals with ambiguous types.
+Previously, setting a value like the string <tt class="docutils literal"><span class="pre">"3"</span></tt> through normal attribute
+access would let it come back as an integer when reading the object
+attribute.  lxml 2.0 prevents this by always setting the <tt class="docutils literal"><span class="pre">pytype</span></tt>
+attribute to the type the user passed in, so <tt class="docutils literal"><span class="pre">"3"</span></tt> will come back as a
+string, while the number <tt class="docutils literal"><span class="pre">3</span></tt> will come back as a number.  To remove the
+type annotation on serialisation, you can use the <tt class="docutils literal"><span class="pre">deannotate()</span></tt> function.</li>
+<li>The C-API function <tt class="docutils literal"><span class="pre">findOrBuildNodeNs()</span></tt> was replaced by the more generic
+<tt class="docutils literal"><span class="pre">findOrBuildNodeNsPrefix()</span></tt> that accepts an additional default prefix.</li>
+</ul>
+</div>
+<div class="section" id="enhancements">
+<h2>Enhancements</h2>
+<p>Most of the enhancements of lxml 2.0 were made under the hood.  Most people
+won't even notice them, but they make the maintenance of lxml easier and thus
+facilitate further enhancements and an improved integration between lxml's
+features.</p>
+<ul class="simple">
+<li>lxml.objectify now has its own implementation of the <a class="reference external" href="objectify.html#tree-generation-with-the-e-factory">E factory</a>.  It uses
+the built-in type lookup mechanism of lxml.objectify, thus removing the need
+for an additional type registry mechanism (as previously available through
+the <tt class="docutils literal"><span class="pre">typemap</span></tt> parameter).</li>
+<li>XML entities are supported through the <tt class="docutils literal"><span class="pre">Entity()</span></tt> factory, an Entity
+element class and a parser option <tt class="docutils literal"><span class="pre">resolve_entities</span></tt> that allows to keep
+entities in the element tree when set to False.  Also, the parser will now
+report undefined entities as errors if it needs to resolve them (which is
+still the default, as in lxml 1.x).</li>
+<li>A major part of the XPath code was rewritten and can now benefit from a
+bigger overlap with the XSLT code.  The main benefits are improved thread
+safety in the XPath evaluators and Python RegExp support in standard XPath.</li>
+<li>The string results of an XPath evaluation have become 'smart' string
+subclasses.  Formerly, there was no easy way to find out where a
+string originated from.  In lxml 2.0, you can call its
+<tt class="docutils literal"><span class="pre">getparent()</span></tt> method to <a class="reference external" href="tutorial.html#using-xpath-to-find-text">find the Element that carries it</a>.  This
+works for attributes (<tt class="docutils literal"><span class="pre">//@attribute</span></tt>) and for <tt class="docutils literal"><span class="pre">text()</span></tt> nodes,
+i.e. Element text and tails.  Strings that were constructed in the
+path expression, e.g. by the <tt class="docutils literal"><span class="pre">string()</span></tt> function or extension
+functions, will return None as their parent.</li>
+<li>Setting a <tt class="docutils literal"><span class="pre">QName</span></tt> object as value of the <tt class="docutils literal"><span class="pre">.text</span></tt> property or as
+an attribute value will resolve its prefix in the respective context</li>
+<li>Following ElementTree 1.3, the <tt class="docutils literal"><span class="pre">iterfind()</span></tt> method supports
+efficient iteration based on XPath-like expressions.</li>
+</ul>
+<p>The parsers also received some major enhancements:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">iterparse()</span></tt> can parse HTML when passing the boolean <tt class="docutils literal"><span class="pre">html</span></tt>
+keyword.</li>
+<li>Parse time XML Schema validation by passing an
+XMLSchema object to the <tt class="docutils literal"><span class="pre">schema</span></tt> keyword argument of a parser.</li>
+<li>Support for a <tt class="docutils literal"><span class="pre">target</span></tt> object that implements ElementTree's
+<a class="reference external" href="http://effbot.org/elementtree/elementtree-treebuilder.htm">TreeBuilder interface</a>.</li>
+<li>The <tt class="docutils literal"><span class="pre">encoding</span></tt> keyword allows overriding the document encoding.</li>
+</ul>
+</div>
+<div class="section" id="deprecation">
+<h2>Deprecation</h2>
+<p>The following functions and methods are now deprecated.  They are
+still available in lxml 2.0 and will be removed in lxml 2.1:</p>
+<ul>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">tounicode()</span></tt> function was replaced by the call
+<tt class="docutils literal"><span class="pre">tostring(encoding=unicode)</span></tt>.</p>
+</li>
+<li><p class="first">CamelCaseNamed module functions and methods were renamed to their
+underscore equivalents to follow <a class="reference external" href="http://www.python.org/dev/peps/pep-0008/">PEP 8</a> in naming.</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.clearErrorLog()</span></tt>, use <tt class="docutils literal"><span class="pre">etree.clear_error_log()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.useGlobalPythonLog()</span></tt>, use
+<tt class="docutils literal"><span class="pre">etree.use_global_python_log()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.ElementClassLookup.setFallback()</span></tt>, use
+<tt class="docutils literal"><span class="pre">etree.ElementClassLookup.set_fallback()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.getDefaultParser()</span></tt>, use <tt class="docutils literal"><span class="pre">etree.get_default_parser()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.setDefaultParser()</span></tt>, use <tt class="docutils literal"><span class="pre">etree.set_default_parser()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">etree.setElementClassLookup()</span></tt>, use
+<tt class="docutils literal"><span class="pre">etree.set_element_class_lookup()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">XMLParser.setElementClassLookup()</span></tt>, use <tt class="docutils literal"><span class="pre">.set_element_class_lookup()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">HTMLParser.setElementClassLookup()</span></tt>, use <tt class="docutils literal"><span class="pre">.set_element_class_lookup()</span></tt></p>
+<p>Note that <tt class="docutils literal"><span class="pre">parser.setElementClassLookup()</span></tt> has not been removed
+yet, although <tt class="docutils literal"><span class="pre">parser.set_element_class_lookup()</span></tt> should be used
+instead.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">xpath_evaluator.registerNamespace()</span></tt>, use
+<tt class="docutils literal"><span class="pre">xpath_evaluator.register_namespace()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">xpath_evaluator.registerNamespaces()</span></tt>, use
+<tt class="docutils literal"><span class="pre">xpath_evaluator.register_namespaces()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">objectify.setPytypeAttributeTag</span></tt>, use
+<tt class="docutils literal"><span class="pre">objectify.set_pytype_attribute_tag</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">objectify.setDefaultParser()</span></tt>, use
+<tt class="docutils literal"><span class="pre">objectify.set_default_parser()</span></tt></p>
+</li>
+</ul>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">.getiterator()</span></tt> method on Elements and ElementTrees was
+renamed to <tt class="docutils literal"><span class="pre">.iter()</span></tt> to follow ElementTree 1.3.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="new-modules">
+<h1>New modules</h1>
+<p>The most visible changes in lxml 2.0 regard the new modules that were added.</p>
+<div class="section" id="lxml-usedoctest">
+<h2>lxml.usedoctest</h2>
+<p>A very useful module for doctests based on XML or HTML is
+<tt class="docutils literal"><span class="pre">lxml.doctestcompare</span></tt>.  It provides a relaxed comparison mechanism
+for XML and HTML in doctests.  Using it for XML comparisons is as
+simple as:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">lxml.usedoctest</span>
+</pre></div>
+<p>and for HTML comparisons:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">lxml.html.usedoctest</span>
+</pre></div>
+</div>
+<div class="section" id="lxml-html">
+<h2>lxml.html</h2>
+<p>The largest new package that was added to lxml 2.0 is <a class="reference external" href="lxmlhtml.html">lxml.html</a>.  It
+contains various tools and modules for HTML handling.  The major features
+include support for cleaning up HTML (removing unwanted content), a readable
+HTML diff and various tools for working with links.</p>
+</div>
+<div class="section" id="lxml-cssselect">
+<h2>lxml.cssselect</h2>
+<p>The Cascading Stylesheet Language (<a class="reference external" href="http://www.w3.org/Style/CSS/">CSS</a>) has a very short and generic path
+language for pointing at elements in XML/HTML trees (<a class="reference external" href="http://www.w3.org/TR/CSS21/selector.html">CSS selectors</a>).  The module
+<a class="reference external" href="cssselect.html">lxml.cssselect</a> provides an implementation based on XPath.</p>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+Generated on: 2009-06-21.
+
+</div>
+</body>
+</html>

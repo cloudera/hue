@@ -1,0 +1,12 @@
+# any kind of "*" pulls in __init__.pyc files,
+# so all extensions are explicit.
+
+recursive-include doc *.html *.css *.txt *.js *.jpg *.png *.py Makefile *.rst *.mako *.sty autohandler
+recursive-include examples *.py *.xml *.mako *.myt *.kid *.tmpl
+recursive-include test *.py *.dat *.html
+
+include README* LICENSE distribute_setup.py ez_setup.py CHANGES*
+
+# when we go to sphinx
+#prune doc/build/output
+

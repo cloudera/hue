@@ -1,0 +1,124 @@
+.. include:: header.txt
+
+===============
+ Queue objects
+===============
+
+The queue type provided by `processing` is a multi-producer,
+multi-consumer FIFO queue modelled on the `Queue.Queue` class in the
+standard library.
+
+`Queue(maxsize=0)`
+    Returns a process shared queue implemented using a pipe and a few
+    locks/semaphores.  When a process first puts an item on the queue
+    a feeder thread is started which transfers objects from a
+    buffer into the pipe.
+
+    `Queue.Queue` implements all the methods of `Queue.Queue` except for
+    `qsize()`, `task_done()` and `join()`.
+
+        `empty()` 
+            Return `True` if the queue is empty, `False`
+            otherwise. Because of multithreading/multiprocessing
+            semantics, this is not reliable.
+
+        `full()`
+            Return `True` if the queue is full, `False` otherwise. Because
+            of multithreading/multiprocessing semantics, this is not
+            reliable.
+
+        `put(item, block=True, timeout=None)`
+            Put item into the queue. If optional args `block` is true
+            and `timeout` is `None` (the default), block if necessary
+            until a free slot is available. If `timeout` is a positive
+            number, it blocks at most `timeout` seconds and raises the
+            `Full` exception if no free slot was available within that
+            time. Otherwise (`block` is false), put an item on the queue
+            if a free slot is immediately available, else raise the
+            `Full` exception (`timeout` is ignored in that case).
+
+        `put_nowait(item)`, `putNoWait(item)`
+            Equivalent to `put(item, False)`. 
+
+        `get(block=True, timeout=None)`
+            Remove and return an item from the queue. If optional args
+            `block` is true and `timeout` is `None` (the default),
+            block if necessary until an item is available. If
+            `timeout` is a positive number, it blocks at most
+            `timeout` seconds and raises the `Empty` exception if no
+            item was available within that time. Otherwise (block is
+            false), return an item if one is immediately available,
+            else raise the `Empty` exception (`timeout` is ignored in
+            that case).
+
+        `get_nowait()`, `getNoWait()`
+            Equivalent to `get(False)`. 
+
+    `processing.Queue` has a few additional methods not found in
+    `Queue.Queue` which are usually unnecessary:
+
+        `putMany(iterable)` 
+            If the queue has infinite size then this adds all
+            items in the iterable to the queue's buffer.  So
+            `q.putMany(X)` is a faster alternative to `for x in X:
+            q.put(x)`.  Raises an error if the queue has finite
+            size.
+
+        `close()`
+            Indicates that no more data will be put on this queue by
+            the current process.  The background thread will quit once
+            it has flushed all buffered data to the pipe.  This is
+            called automatically when the queue is garbage collected.
+
+        `joinThread()`
+            This joins the background thread and can only be used
+            after `close()` has been called.  This blocks until
+            the background thread exits, ensuring that all data in
+            the buffer has been flushed to the pipe.  
+
+            By default if a process is not the creator of the
+            queue then on exit it will attempt to join the queue's
+            background thread.  The process can call
+            `cancelJoin()` to prevent this behaviour.
+
+        `cancelJoin()`
+            Prevents the background thread from being joined
+            automatically when the process exits.  Unnecessary if
+            the current process created the queue.
+
+.. admonition:: `Empty` and `Full`
+
+    `processing` uses the usual `Queue.Empty` and `Queue.Full` 
+    exceptions to signal a timeout.  They are not available in the 
+    `processing` namespace so you need to import them from `Queue`.
+
+
+.. warning::    
+
+    If a process is killed using the `terminate()` method or
+    `os.kill()` while it is trying to use a `Queue` then the data in
+    the queue is likely to become corrupted.  This may cause any other
+    processes to get an exception when it tries to use the queue later
+    on.
+
+
+.. warning::
+
+   As mentioned above, if a child process has put items on a queue
+   (and it has not used `cancelJoin()`) then that process will not
+   terminate until all buffered items have been flushed to the pipe.
+
+   This means that if you try joining that process you may get a
+   deadlock unless you are sure that all items which have been put on
+   the queue have been consumed.  Similarly, if the child process is
+   non-daemonic then the parent process may hang on exit when it tries
+   to join all it non-daemonic children.
+
+   Note that a queue created using a manager does not have this issue.
+   See `Programming Guidelines <programming-guidelines.html>`_.
+   
+
+
+.. _Prev: process-objects.html
+.. _Up: processing-ref.html
+.. _Next: connection-objects.html

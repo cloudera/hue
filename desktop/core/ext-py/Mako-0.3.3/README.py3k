@@ -1,0 +1,56 @@
+=================
+PYTHON 3 SUPPORT
+=================
+
+Python 3 support in Mako is provided by the Python 2to3 script.
+
+Installing Distribute
+---------------------
+
+Distribute should be installed with the Python3 installation.  The
+distribute bootloader is included.
+
+Running as a user with permission to modify the Python distribution,
+install Distribute:
+
+    python3 distribute_setup.py
+
+Installing Mako in Python 3
+---------------------------------
+
+Once Distribute is installed, Mako can be installed directly.  
+The 2to3 process will kick in which takes several minutes:
+
+    python3 setup.py install
+
+Converting Tests, Examples, Source to Python 3
+----------------------------------------------
+
+To convert all files in the source distribution, run 
+the 2to3 script:
+
+    2to3 -w mako test
+
+If using 3.1's 2to3 tool, the --no-diffs flag might help 
+with unicode issues:
+
+    2to3-3.1 -w --no-diffs mako test
+    
+The above will rewrite all files in-place in Python 3 format.
+
+Running Tests
+-------------
+
+To run the unit tests, ensure Distribute is installed as above,
+and also that at least the ./mako/ and ./test/ directories have been converted
+to Python 3 using the source tool above.   A Python 3 version of Nose
+can be acquired from Bitbucket using Mercurial:
+
+    hg clone http://bitbucket.org/jpellerin/nose3/
+    cd nose3
+    python3 setup.py install
+
+The tests can then be run using the "nosetests3" script installed 
+by the above (python3 setup.py test doesn't seem to be working with 
+nose3).
+

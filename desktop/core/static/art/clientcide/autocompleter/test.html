@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<title>digitarald.de » Playground - Widget Birthplace</title>
+	<link rel="stylesheet" href="css/common.css" type="text/css" media="screen" />
+<script src="../../../js/global/cat/redball.common.full.dev.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="Autocompleter.css" type="text/css" media="screen" />
+<script src="../../../js/global/cnet.global.framework/common/3rdParty/Autocomplete/Observer.js" type="text/javascript"></script>
+	
+<script src="../../../js/global/cnet.global.framework/common/3rdParty/Autocomplete/Autocompleter.js" type="text/javascript"></script>
+	<style type="text/css">
+
+		input
+		{
+			border:				1px solid #aaa;
+			float:				left;
+		}
+
+		fieldset
+		{
+			padding:			2em;
+		}
+
+		legend
+		{
+			font-weight:		bold;
+		}
+
+		.example-info
+		{
+			position:			absolute;
+			top:				2px;
+			right:				4px;
+			padding:			1px 2px;
+			font-size:			0.9em;
+			color:				#888;
+		}
+
+		.example-dropdown
+		{
+			background:			url(images/dropd.png) no-repeat center;
+			width:				17px;
+			height:				17px;
+			float:				left;
+			clear:				right;
+			margin-left:		-17px;
+			cursor:				pointer;
+			z-index:			2;
+
+		}
+
+	</style>
+
+	<script type="text/javascript">
+		//<![CDATA[
+
+		/**
+		 * Example part
+		 */
+
+		window.addEvent('domready', function(){
+
+			var el = $ES('input');
+
+			/**
+			 * Local
+			 */
+
+			var tokens = [['12314','Aaron Newton'], ['2342351','Linda Tan']];
+
+			var completer1 = new Autocompleter.Local(el[0], tokens, {
+				'delay': 100,
+				'filterTokens': function() {
+					var regex = new RegExp('^' + this.queryValue.escapeRegExp(), 'i');
+					return this.tokens.filter(function(token){
+						return (regex.test(token[0]) || regex.test(token[1]));
+					});
+				},
+				'injectChoice': function(choice) {
+					var el = new Element('li')
+						.setHTML(this.markQueryValue(choice[1]));
+					el.inputValue = choice[0];
+					this.addChoiceEvents(el).injectInside(this.choices);
+				}
+			});
+
+			/**
+			 * Json
+			 */
+
+			var indicator2 = new Element('div', {'class': 'autocompleter-loading', 'styles': {'display': 'none'}}).setHTML('').injectAfter(el[1]);
+
+
+			var completer2 = new Autocompleter.Ajax.Json(el[1], 'server/auto.php', {
+				'onRequest': function(el) {
+					indicator2.setStyle('display', '');
+				},
+				'onComplete': function(el) {
+					indicator2.setStyle('display', 'none');
+				}
+			});
+
+			/**
+			 * Ajax
+			 */
+
+			var indicator3 = new Element('div').addClass('autocompleter-loading').setHTML('').setStyle('display', 'none').injectAfter(el[2]);
+
+			var completer3 = new Autocompleter.Ajax.Xhtml(el[2], 'server/auto.php', {
+				'postData': {html: 1},
+				'onRequest': function(el) {
+					indicator3.setStyle('display', '');
+				},
+				'onComplete': function(el) {
+					indicator3.setStyle('display', 'none');
+				},
+				'parseChoices': function(el) {
+					var value = el.getFirst().innerHTML;
+					el.inputValue = value;
+					this.addChoiceEvents(el).getFirst().setHTML(this.markQueryValue(value));
+				}
+			});
+
+		});
+
+		//]]>
+	</script>
+
+</head>
+<body>
+
+	<div id="container">
+		<h1>
+			<a href="/playground/" title="Playground Index">moo.Playground</a>
+		</h1>
+
+		<h2>
+			<a href="project/autocompleter/">Autocomplete <small>(Released)</small></a>
+		</h2>
+
+		<p>Json and Xhtml Version - Backend is a flatfile database with 6Mb spanish dictonary. So its maybe too slow sometimes ;)</p>
+
+
+		<form action="#" method="post">
+
+			<fieldset>
+				<legend>Local</legend>
+
+				<input type="text" name="search" /><br />
+
+			</fieldset>
+
+			<fieldset>
+				<legend>Ajax.Json</legend>
+
+				<input type="text" name="search" />
+				<br />
+
+				<select name="select-1">
+
+					<option>Spanish Dictionary</option>
+					<option disabled="disabled">Debugging SelectBox</option>
+					<option disabled="disabled">To Check IE bug.</option>
+				</select>
+
+			</fieldset>
+
+			<fieldset>
+
+				<legend>Ajax.Xhtml</legend>
+
+				<input type="text" name="search" /><br />
+
+				<select name="select-1">
+					<option>Spanish Dictionary</option>
+					<option disabled="disabled">Debugging SelectBox</option>
+					<option disabled="disabled">To Check IE bug.</option>
+
+				</select>
+
+			</fieldset>
+
+
+		</form>
+
+		<div style="text-align: center; margin-top: 100px;">
+			&copy; 2006 by <a href="../about/">Harald Kirschner</a> aka <a href="../">digitarald</a><br />
+
+			The contents of this website are licensed under <a href="http://www.opensource.org/licenses/mit-license.php">MIT-License</a>
+		</div>
+
+	</div>
+	<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+	<script type="text/javascript">
+	_uacct = "UA-601848-2";
+	urchinTracker();
+	</script>
+</body>
+</html>

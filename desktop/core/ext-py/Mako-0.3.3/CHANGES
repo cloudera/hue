@@ -1,0 +1,501 @@
+
+0.3.3
+- Added conditional to RichTraceback
+  such that if no traceback is passed
+  and sys.exc_info() has been reset,
+  the formatter just returns blank
+  for the "traceback" portion.
+  [ticket:135]
+  
+- Fixed sometimes incorrect usage of 
+  exc.__class__.__name__
+  in html/text error templates when using 
+  Python 2.4 [ticket:131]
+
+- Fixed broken @property decorator on 
+  template.last_modified
+
+- Fixed error formatting when a stacktrace
+  line contains no line number, as in when
+  inside an eval/exec-generated function.
+  [ticket:132]
+
+- When a .py is being created, the tempfile
+  where the source is stored temporarily is
+  now made in the same directory as that of
+  the .py file.  This ensures that the two
+  files share the same filesystem, thus 
+  avoiding cross-filesystem synchronization
+  issues.  Thanks to Charles Cazabon.
+  
+0.3.2
+- Calling a def from the top, via 
+  template.get_def(...).render() now checks the 
+  argument signature the same way as it did in 
+  0.2.5, so that TypeError is not raised.
+  reopen of [ticket:116]
+  
+  
+0.3.1
+- Fixed incorrect dir name in setup.py
+  [ticket:129]
+
+0.3
+- Python 2.3 support is dropped. [ticket:123]
+
+- Python 3 support is added ! See README.py3k
+  for installation and testing notes.
+  [ticket:119]
+  
+- Unit tests now run with nose.  [ticket:127]
+
+- Source code escaping has been simplified.
+  In particular, module source files are now 
+  generated with the Python "magic encoding 
+  comment", and source code is passed through 
+  mostly unescaped, except for that code which
+  is regenerated from parsed Python source.
+  This fixes usage of unicode in 
+  <%namespace:defname> tags.  [ticket:99]
+
+- RichTraceback(), html_error_template().render(),
+  text_error_template().render() now accept "error"
+  and "traceback" as optional arguments, and 
+  these are now actually used.  [ticket:122]
+  
+- The exception output generated when 
+  format_exceptions=True will now be as a Python
+  unicode if it occurred during render_unicode(),
+  or an encoded string if during render().
+
+- A percent sign can be emitted as the first
+  non-whitespace character on a line by escaping
+  it as in "%%". [ticket:112]
+ 
+- Template accepts empty control structure, i.e.
+  % if: %endif, etc. [ticket:94]
+
+- The <%page args> tag can now be used in a base 
+  inheriting template - the full set of render()
+  arguments are passed down through the inherits
+  chain.  Undeclared arguments go into **pageargs
+  as usual.  [ticket:116]
+
+- defs declared within a <%namespace> section, an
+  uncommon feature, have been improved.  The defs
+  no longer get doubly-rendered in the body() scope,
+  and now allow local variable assignment without
+  breakage.  [ticket:109]
+
+- Windows paths are handled correctly if a Template
+  is passed only an absolute filename (i.e. with c: 
+  drive etc.)  and no URI - the URI is converted
+  to a forward-slash path and module_directory
+  is treated as a windows path.  [ticket:128]
+
+- TemplateLookup raises TopLevelLookupException for
+  a given path that is a directory, not a filename,
+  instead of passing through to the template to 
+  generate IOError.  [ticket:73]
+  
+0.2.6
+
+- Fix mako function decorators to preserve the
+  original function's name in all cases. Patch
+  from Scott Torborg.
+
+- Support the <%namespacename:defname> syntax in
+  the babel extractor. [ticket:118]
+
+- Further fixes to unicode handling of .py files with the
+  html_error_template. [ticket:88]
+
+0.2.5
+- Added a "decorator" kw argument to <%def>,
+  allows custom decoration functions to wrap
+  rendering callables.  Mainly intended for
+  custom caching algorithms, not sure what
+  other uses there may be (but there may be).
+  Examples are in the "filtering" docs.
+
+- When Mako creates subdirectories in which
+  to store templates, it uses the more
+  permissive mode of 0775 instead of 0750,
+  helping out with certain multi-process 
+  scenarios. Note that the mode is always
+  subject to the restrictions of the existing
+  umask. [ticket:101]
+  
+- Fixed namespace.__getattr__() to raise 
+  AttributeError on attribute not found 
+  instead of RuntimeError.  [ticket:104]
+  
+- Added last_modified accessor to Template,
+  returns the time.time() when the module
+  was created. [ticket:97]
+
+- Fixed lexing support for whitespace
+  around '=' sign in defs. [ticket:102]
+
+- Removed errant "lower()" in the lexer which
+  was causing tags to compile with 
+  case-insensitive names, thus messing up
+  custom <%call> names. [ticket:108]
+
+- added "mako.__version__" attribute to
+  the base module.  [ticket:110]
+  
+0.2.4
+- Fixed compatibility with Jython 2.5b1.
+
+0.2.3
+- the <%namespacename:defname> syntax described at
+  http://techspot.zzzeek.org/?p=28 has now 
+  been added as a built in syntax, and is recommended
+  as a more modern syntax versus <%call expr="expression">.
+  The %call tag itself will always remain, 
+  with <%namespacename:defname> presenting a more HTML-like
+  alternative to calling defs, both plain and 
+  nested.  Many examples of the new syntax are in the
+  "Calling a def with embedded content" section
+  of the docs.
+  
+- added support for Jython 2.5.
+
+- cache module now uses Beaker's CacheManager
+  object directly, so that all cache types are included.
+  memcached is available as both "ext:memcached" and
+  "memcached", the latter for backwards compatibility.
+
+- added "cache" accessor to Template, Namespace.
+  e.g.  ${local.cache.get('somekey')} or
+  template.cache.invalidate_body()
+
+- added "cache_enabled=True" flag to Template, 
+  TemplateLookup.  Setting this to False causes cache
+  operations to "pass through" and execute every time;
+  this flag should be integrated in Pylons with its own
+  cache_enabled configuration setting.
+  
+- the Cache object now supports invalidate_def(name),
+  invalidate_body(), invalidate_closure(name), 
+  invalidate(key), which will remove the given key 
+  from the cache, if it exists.  The cache arguments
+  (i.e. storage type) are derived from whatever has
+  been already persisted for that template.
+  [ticket:92]
+
+- For cache changes to work fully, Beaker 1.1 is required.
+  1.0.1 and up will work as well with the exception of 
+  cache expiry.  Note that Beaker 1.1 is **required**
+  for applications which use dynamically generated keys,
+  since previous versions will permanently store state in memory 
+  for each individual key, thus consuming all available 
+  memory for an arbitrarily large number of distinct 
+  keys.
+
+- fixed bug whereby an <%included> template with 
+  <%page> args named the same as a __builtin__ would not
+  honor the default value specified in <%page> [ticket:93]
+  
+- fixed the html_error_template not handling tracebacks from
+  normal .py files with a magic encoding comment [ticket:88]
+
+- RichTraceback() now accepts an optional traceback object
+  to be used in place of sys.exc_info()[2].  html_error_template() 
+  and text_error_template() accept an optional
+  render()-time argument "traceback" which is passed to the
+  RichTraceback object.
+  
+- added ModuleTemplate class, which allows the construction
+  of a Template given a Python module generated by a previous
+  Template.   This allows Python modules alone to be used
+  as templates with no compilation step.   Source code
+  and template source are optional but allow error reporting
+  to work correctly.
+
+- fixed Python 2.3 compat. in mako.pyparser [ticket:90]
+
+- fix Babel 0.9.3 compatibility; stripping comment tags is now
+  optional (and enabled by default).
+
+
+0.2.2
+- cached blocks now use the current context when rendering
+an expired section, instead of the original context
+passed in [ticket:87]
+- fixed a critical issue regarding caching, whereby 
+a cached block would raise an error when called within a
+cache-refresh operation that was initiated after the 
+initiating template had completed rendering.
+
+0.2.1
+- fixed bug where 'output_encoding' parameter would prevent 
+render_unicode() from returning a unicode object.
+- bumped magic number, which forces template recompile for 
+this version (fixes incompatible compile symbols from 0.1 
+series).
+- added a few docs for cache options, specifically those that
+help with memcached.
+
+0.2.0
+- Speed improvements (as though we needed them, but people
+  contributed and there you go):
+
+  - added "bytestring passthru" mode, via
+    `disable_unicode=True` argument passed to Template or
+    TemplateLookup. All unicode-awareness and filtering is
+    turned off, and template modules are generated with
+    the appropriate magic encoding comment. In this mode,
+    template expressions can only receive raw bytestrings
+    or Unicode objects which represent straight ASCII, and
+    render_unicode() may not be used if multibyte
+    characters are present. When enabled, speed
+    improvement around 10-20%. [ticket:77] (courtesy
+    anonymous guest)
+
+  - inlined the "write" function of Context into a local
+    template variable. This affords a 12-30% speedup in
+    template render time. (idea courtesy same anonymous
+    guest) [ticket:76]
+  
+- New Features, API changes: 
+ 
+  - added "attr" accessor to namespaces. Returns
+    attributes configured as module level attributes, i.e.
+    within <%! %> sections.  [ticket:62] i.e.:
+    
+    # somefile.html
+    <%! 
+        foo = 27
+    %>
+    
+    # some other template
+    <%namespace name="myns" file="somefile.html"/>
+    ${myns.attr.foo}
+
+    The slight backwards incompatibility here is, you
+    can't have namespace defs named "attr" since the
+    "attr" descriptor will occlude it.
+    
+  - cache_key argument can now render arguments passed
+    directly to the %page or %def, i.e. <%def
+    name="foo(x)" cached="True" cache_key="${x}"/>
+    [ticket:78]
+
+  - some functions on Context are now private:
+    _push_buffer(), _pop_buffer(),
+    caller_stack._push_frame(), caller_stack._pop_frame().
+
+  - added a runner script "mako-render" which renders 
+    standard input as a template to stdout [ticket:81] 
+    [ticket:56]
+    
+- Bugfixes:
+  - can now use most names from __builtins__ as variable
+    names without explicit declaration (i.e. 'id', 
+    'exception', 'range', etc.) [ticket:83] [ticket:84]
+    
+  - can also use builtin names as local variable names 
+    (i.e. dict, locals) (came from fix for [ticket:84])
+    
+  - fixed bug in python generation when variable names are
+    used with identifiers like "else", "finally", etc.
+    inside them [ticket:68]
+
+  - fixed codegen bug which occured when using <%page>
+    level caching, combined with an expression-based
+    cache_key, combined with the usage of <%namespace
+    import="*"/> - fixed lexer exceptions not cleaning up
+    temporary files, which could lead to a maximum number
+    of file descriptors used in the process [ticket:69]
+
+  - fixed issue with inline format_exceptions that was
+    producing blank exception pages when an inheriting
+    template is present [ticket:71]
+  
+  - format_exceptions will apply the encoding options of
+    html_error_template() to the buffered output
+  
+  - rewrote the "whitespace adjuster" function to work
+    with more elaborate combinations of quotes and
+    comments [ticket:75]
+
+0.1.10
+- fixed propagation of 'caller' such that nested %def calls
+  within a <%call> tag's argument list propigates 'caller'
+  to the %call function itself (propigates to the inner
+  calls too, this is a slight side effect which previously
+  existed anyway)
+- fixed bug where local.get_namespace() could put an 
+  incorrect "self" in the current context
+- fixed another namespace bug where the namespace functions
+  did not have access to the correct context containing
+  their 'self' and 'parent'
+  
+0.1.9
+- filters.Decode filter can also accept a non-basestring
+object and will call str() + unicode() on it [ticket:47]
+- comments can be placed at the end of control lines,
+i.e. if foo: # a comment, [ticket:53], thanks to 
+Paul Colomiets
+- fixed expressions and page tag arguments and with embedded
+newlines in CRLF templates, follow up to [ticket:16], thanks
+Eric Woroshow
+- added an IOError catch for source file not found in RichTraceback
+exception reporter [ticket:51]
+
+0.1.8
+- variable names declared in render methods by internal 
+codegen prefixed by "__M_" to prevent name collisions
+with user code
+- added a Babel (http://babel.edgewall.org/) extractor entry
+point, allowing extraction of gettext messages directly from
+mako templates via Babel [ticket:45]
+- fix to turbogears plugin to work with dot-separated names
+(i.e. load_template('foo.bar')).  also takes file extension
+as a keyword argument (default is 'mak').
+- more tg fix:  fixed [ticket:35], allowing string-based
+templates with tgplugin even if non-compatible args were sent
+
+0.1.7
+- one small fix to the unit tests to support python 2.3
+- a slight hack to how cache.py detects Beaker's memcached, 
+works around unexplained import behavior observed on some 
+python 2.3 installations
+
+0.1.6 
+- caching is now supplied directly by Beaker, which has 
+  all of MyghtyUtils merged into it now.  The latest Beaker
+  (0.7.1) also fixes a bug related to how Mako was using the 
+  cache API.
+- fix to module_directory path generation when the path is "./"
+  [ticket:34]
+- TGPlugin passes options to string-based templates [ticket:35]
+- added an explicit stack frame step to template runtime, which
+  allows much simpler and hopefully bug-free tracking of 'caller',
+  fixes #28
+- if plain Python defs are used with <%call>, a decorator
+  @runtime.supports_callable exists to ensure that the "caller"
+  stack is properly handled for the def.
+- fix to RichTraceback and exception reporting to get template
+  source code as a unicode object #37
+- html_error_template includes options "full=True", "css=True"
+  which control generation of HTML tags, CSS [ticket:39]
+- added the 'encoding_errors' parameter to Template/TemplateLookup
+  for specifying the error handler associated with encoding to
+  'output_encoding' [ticket:40]
+- the Template returned by html_error_template now defaults to
+  output_encoding=sys.getdefaultencoding(),
+  encoding_errors='htmlentityreplace' [ticket:37]
+- control lines, i.e. % lines, support backslashes to continue long
+  lines (#32)
+- fixed codegen bug when defining <%def> within <%call> within <%call>
+- leading utf-8 BOM in template files is honored according to pep-0263
+  
+0.1.5
+- AST expression generation - added in just about everything 
+  expression-wise from the AST module  [ticket:26]
+- AST parsing, properly detects imports of the form "import foo.bar"
+  [ticket:27]
+- fix to lexing of <%docs> tag nested in other tags
+- fix to context-arguments inside of <%include> tag which broke 
+during 0.1.4 [ticket:29]
+- added "n" filter, disables *all* filters normally applied to an expression
+via <%page> or default_filters (but not those within the filter)
+- added buffer_filters argument, defines filters applied to the return value
+of buffered/cached/filtered %defs, after all filters defined with the %def
+itself have been applied.  allows the creation of default expression filters
+that let the output of return-valued %defs "opt out" of that filtering
+via passing special attributes or objects.
+  
+0.1.4
+- got defs-within-defs to be cacheable
+- fixes to code parsing/whitespace adjusting where plain python comments
+  may contain quote characters [ticket:23]
+- fix to variable scoping for identifiers only referenced within
+  functions
+- added a path normalization step to lookup so URIs like
+  "/foo/bar/../etc/../foo" pre-process the ".." tokens before checking
+  the filesystem
+- fixed/improved "caller" semantics so that undefined caller is
+  "UNDEFINED", propigates __nonzero__ method so it evaulates to False if
+  not present, True otherwise. this way you can say % if caller:\n
+  ${caller.body()}\n% endif
+- <%include> has an "args" attribute that can pass arguments to the
+  called template (keyword arguments only, must be declared in that
+  page's <%page> tag.)
+- <%include> plus arguments is also programmatically available via
+  self.include_file(<filename>, **kwargs)
+- further escaping added for multibyte expressions in %def, %call
+  attributes [ticket:24]
+
+
+0.1.3
+- ***Small Syntax Change*** - the single line comment character is now
+*two* hash signs, i.e. "## this is a comment".  This avoids a common
+collection with CSS selectors. 
+- the magic "coding" comment (i.e. # coding:utf-8) will still work with
+either one "#" sign or two for now; two is preferred going forward, i.e.
+## coding:<someencoding>. 
+- new multiline comment form: "<%doc> a comment </%doc>"
+- UNDEFINED evaluates to False
+- improvement to scoping of "caller" variable when using <%call> tag
+- added lexer error for unclosed control-line (%) line
+- added "preprocessor" argument to Template, TemplateLookup - is a single
+  callable or list of callables which will be applied to the template text
+  before lexing.  given the text as an argument, returns the new text.
+- added mako.ext.preprocessors package, contains one preprocessor so far:
+  'convert_comments', which will convert single # comments to the new ##
+  format
+  
+0.1.2
+- fix to parsing of code/expression blocks to insure that non-ascii
+  characters, combined with a template that indicates a non-standard
+  encoding, are expanded into backslash-escaped glyphs before being AST
+  parsed [ticket:11]
+- all template lexing converts the template to unicode first, to
+  immediately catch any encoding issues and ensure internal unicode
+  representation.
+- added module_filename argument to Template to allow specification of a
+  specific module file
+- added modulename_callable to TemplateLookup to allow a function to
+  determine module filenames (takes filename, uri arguments). used for
+  [ticket:14]
+- added optional input_encoding flag to Template, to allow sending a
+  unicode() object with no magic encoding comment
+- "expression_filter" argument in <%page> applies only to expressions
+- added "default_filters" argument to Template, TemplateLookup. applies only
+  to expressions, gets prepended to "expression_filter" arg from <%page>.
+  defaults to ["unicode"], so that all expressions get stringified into u''
+  by default (this is what Mako already does). By setting to [], expressions
+  are passed through raw.
+- added "imports" argument to Template, TemplateLookup. so you can predefine
+  a list of import statements at the top of the template. can be used in
+  conjunction with default_filters.
+- support for CRLF templates...whoops ! welcome to all the windows users.
+  [ticket:16]
+- small fix to local variable propigation for locals that are conditionally
+  declared
+- got "top level" def calls to work, i.e. template.get_def("somedef").render()
+
+0.1.1
+- buffet plugin supports string-based templates, allows ToscaWidgets to work
+  [ticket:8]
+- AST parsing fixes: fixed TryExcept identifier parsing
+- removed textmate tmbundle from contrib and into separate SVN location;
+  windows users cant handle those files, setuptools not very good at
+  "pruning" certain directories
+- fix so that "cache_timeout" parameter is propigated
+- fix to expression filters so that string conversion (actually unicode)
+  properly occurs before filtering
+- better error message when a lookup is attempted with a template that has no
+  lookup
+- implemented "module" attribute for namespace
+- fix to code generation to correctly track multiple defs with the same name
+- "directories" can be passed to TemplateLookup as a scalar in which case it
+  gets converted to a list [ticket:9]
+
+0.1.0
+
+Initial release.

@@ -1,0 +1,91 @@
+0.4.0a (27.03.2005)
+---------
+    * First public version
+
+0.5.0a (11.05.2005)
+---------
+    * pyExcelerator now can import Excel 5/95/97/2000/XP/2003 files.
+      With imported information you can do what you want.
+      See ./examples/xls2txt.py for reference.
+    * fixed bug in MS OLE2 compound document dumper (not in writer :))
+      Bug causes dumper to combine links in sectors' allocation chain sectors
+      contained in additional MSAT with SAT data.
+    * Excel files dumper supports now Excel 5/95/97/2000/XP/2003 files
+      and produces more informative output.
+      
+0.5.1a (14.05.2005)
+---------
+    * improved floating point decoding code
+
+0.5.2a (18.05.2005)
+---------
+    * improved perfomance (especially on nonfragmented streams)
+    * now pyExcelerator can process XLS files with short streams
+    * OLE2 compound document dumper supports short streams
+    * reading UTF-16-LE and Latin-1 with more accuracy
+    * in DSF (double stream file) XLS data extracted from stream "Workbook"
+    * improved floating point/integer values decoding code
+
+0.5.3a (19.05.2005)
+---------
+    * typos in biff-dumper.py fixed :(
+    * now pyExcelerator can correctly import XLS files with charts
+    * added ability to override default file's encoding
+    * new examples (or tools :)) -- ./examples/xls2csv.py, ./examples/xls2html.py
+
+0.6.0a (19.07.2005)
+---------
+    * blanks, numbers, currency (use number formats!) and dates (use number formats!)
+    * pyExcelerator uses 1.5-2 times less memory (thanks to __brains__ and __slots__)
+    * fixes for Big Endian CPUs
+    * some refactorings
+    * new examples: blanks.py, merged1.py, dates.py, numbers.py, num_formats.py, formulas.py
+    * most important change: formulas support
+
+0.6.1a (29.09.2005)
+---------
+    * fixed: exception when reading OLE2 files with incorrect MSAT
+      (sector ids points to nonexistense sectors)
+
+0.6.2a (30.09.2005)
+---------
+    * fixed: exception when reading OLE2 files with incorrect SSAT
+      (sector ids points to nonexistense sectors)
+
+0.6.3a (25.10.2005)
+---------
+    * slightly new algorithm for reading OLE2 files. I hope it is
+      more robust
+    * splitting and frozing
+    * worksheet protection
+    * protection password
+    * workbook protection
+    * new example: protection.py, hyperlinks.py, panes.py
+    * extracting formula results
+    * speed optmizations(for example, benchmark big-35Mb.py runs about 
+      20-30% faster)
+    * updated THANKS file
+    * xls2csv, xls2txt, xls2html now resides in ./tools
+
+0.6.4.1 (11.04.2009)
+---------
+    * support writing to file-like objects
+    * add support for setting formula cell options
+    * add support for using color name strings to set the Font color
+      properties
+    * add support for setting default row height records
+    * add set_column, set_columns, and write_cols which are similar
+      to the perl counter parts and allow setting/writing to multiple columns
+    * allow page breaks to be intergers in the page break list
+    * add support for setting print area, and beginnings of other macros
+      and builtin functions
+    * allow None to be given to add_style to set default style
+    * Accepted patch for some bugs in the RK conversion routine from
+      John Machin
+    * add support for setting default results for formulas
+    * fix bug in lexer where symbols of more than one character are
+      not recognized
+    * Fix #1621199: typo causes DIMENSIONS record to have wrong number
+      of columns
+    * add support hyperlinks
+    * FIX #1618833: XFStyle defaults are now copies of the default properties.

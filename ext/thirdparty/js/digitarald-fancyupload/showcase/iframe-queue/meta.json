@@ -1,0 +1,10 @@
+{
+	"title": "Attach a File with IFrames",
+	"locked": true,
+	"script_php": "../script.php",
+	"files": [
+		"http://ajax.googleapis.com/ajax/libs/mootools/1.2.2/mootools.js",
+		"../../source/Fx.ProgressBar.js",
+		"../../source/Uploader.js"
+	]
+}

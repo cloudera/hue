@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Manager objects</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="connection-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="proxy-objects.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="manager-objects">
+<h1 class="title">Manager objects</h1>
+<p>A manager object controls a server process which manages <em>shared
+objects</em>.  Other processes can access the shared objects by using
+proxies.</p>
+<p>Manager processes will be shutdown as soon as they are garbage
+collected or their parent process exits.  The manager classes are
+defined in the <tt class="docutils literal"><span class="pre">processing.managers</span></tt> module.</p>
+<div class="section">
+<h1><a id="basemanager" name="basemanager">BaseManager</a></h1>
+<p><tt class="docutils literal"><span class="pre">BaseManager</span></tt> is the base class for all manager classes which use a
+server process.  It does not possess any methods which create shared
+objects.</p>
+<p>The public methods of <tt class="docutils literal"><span class="pre">BaseManager</span></tt> are the following:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">__init__(self,</span> <span class="pre">address=None,</span> <span class="pre">authkey=None)</span></tt></dt>
+<dd><p class="first">Creates a manager object.</p>
+<p>Once created one should call <tt class="docutils literal"><span class="pre">start()</span></tt> or <tt class="docutils literal"><span class="pre">serveForever()</span></tt> to
+ensure that the manager object refers to a started manager
+process.</p>
+<p>The arguments to the constructor are as follows:</p>
+<dl class="last docutils">
+<dt><tt class="docutils literal"><span class="pre">address</span></tt></dt>
+<dd><p class="first">The address on which the manager process listens for
+new connections.  If <tt class="docutils literal"><span class="pre">address</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> then an arbitrary
+one is chosen.</p>
+<p class="last">See <a class="reference" href="connection-ref.html#listener-objects">Listener objects</a>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">authkey</span></tt></dt>
+<dd><p class="first">The authentication key which will be used to check the
+validity of incoming connections to the server process.</p>
+<p>If <tt class="docutils literal"><span class="pre">authkey</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> then <tt class="docutils literal"><span class="pre">currentProcess().getAuthKey()</span></tt>.
+Otherwise <tt class="docutils literal"><span class="pre">authkey</span></tt> is used and it must be a string.</p>
+<p class="last">See <a class="reference" href="connection-ref.html#authentication-keys">Authentication keys</a>.</p>
+</dd>
+</dl>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">start()</span></tt></dt>
+<dd>Spawn or fork a subprocess to start the manager.</dd>
+<dt><tt class="docutils literal"><span class="pre">serveForever()</span></tt></dt>
+<dd>Start the manager in the current process.  See <a class="reference" href="#using-a-remote-manager">Using a remote
+manager</a>.</dd>
+<dt><tt class="docutils literal"><span class="pre">fromAddress(address,</span> <span class="pre">authkey)</span></tt></dt>
+<dd>A class method which returns a manager object referring to a
+pre-existing server process which is using the given address and
+authentication key.  See <a class="reference" href="#using-a-remote-manager">Using a remote manager</a>.</dd>
+<dt><tt class="docutils literal"><span class="pre">shutdown()</span></tt></dt>
+<dd><p class="first">Stop the process used by the manager.  This is only available
+if <tt class="docutils literal"><span class="pre">start()</span></tt> has been used to start the server process.</p>
+<p class="last">This can be called multiple times.</p>
+</dd>
+</dl>
+</blockquote>
+<p><tt class="docutils literal"><span class="pre">BaseManager</span></tt> instances also have one read-only property:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">address</span></tt></dt>
+<dd>The address used by the manager.</dd>
+</dl>
+</blockquote>
+<p>The creation of managers which support arbitrary types is discussed
+below in <a class="reference" href="#customized-managers">Customized managers</a>.</p>
+</div>
+<div class="section">
+<h1><a id="syncmanager" name="syncmanager">SyncManager</a></h1>
+<p><tt class="docutils literal"><span class="pre">SyncManager</span></tt> is a subclass of <tt class="docutils literal"><span class="pre">BaseManager</span></tt> which can be used for
+the synchronization of processes.  Objects of this type are returned
+by <tt class="docutils literal"><span class="pre">processing.Manager()</span></tt>.</p>
+<p>It also supports creation of shared lists and dictionaries.  The
+instance methods defined by <tt class="docutils literal"><span class="pre">SyncManager</span></tt> are</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">BoundedSemaphore(value=1)</span></tt></dt>
+<dd>Creates a shared <tt class="docutils literal"><span class="pre">threading.BoundedSemaphore</span></tt> object and
+returns a proxy for it.</dd>
+<dt><tt class="docutils literal"><span class="pre">Condition(lock=None)</span></tt></dt>
+<dd><p class="first">Creates a shared <tt class="docutils literal"><span class="pre">threading.Condition</span></tt> object and returns a
+proxy for it.</p>
+<p class="last">If <tt class="docutils literal"><span class="pre">lock</span></tt> is supplied then it should be a proxy for a
+<tt class="docutils literal"><span class="pre">threading.Lock</span></tt> or <tt class="docutils literal"><span class="pre">threading.RLock</span></tt> object.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">Event()</span></tt></dt>
+<dd>Creates a shared <tt class="docutils literal"><span class="pre">threading.Event</span></tt> object and returns a proxy
+for it.</dd>
+<dt><tt class="docutils literal"><span class="pre">Lock()</span></tt></dt>
+<dd>Creates a shared <tt class="docutils literal"><span class="pre">threading.Lock</span></tt> object and returns a proxy
+for it.</dd>
+<dt><tt class="docutils literal"><span class="pre">Namespace()</span></tt></dt>
+<dd><p class="first">Creates a shared <tt class="docutils literal"><span class="pre">Namespace</span></tt> object and returns a
+proxy for it.</p>
+<p class="last">See <a class="reference" href="#namespace-objects">Namespace objects</a>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">Queue(maxsize=0)</span></tt></dt>
+<dd>Creates a shared <tt class="docutils literal"><span class="pre">Queue.Queue</span></tt> object and returns a proxy for
+it.</dd>
+<dt><tt class="docutils literal"><span class="pre">RLock()</span></tt></dt>
+<dd>Creates a shared <tt class="docutils literal"><span class="pre">threading.RLock</span></tt> object and returns a proxy
+for it.</dd>
+<dt><tt class="docutils literal"><span class="pre">Semaphore(value=1)</span></tt></dt>
+<dd>Creates a shared <tt class="docutils literal"><span class="pre">threading.Semaphore</span></tt> object and returns a
+proxy for it.</dd>
+<dt><tt class="docutils literal"><span class="pre">Array(typecode,</span> <span class="pre">sequence)</span></tt></dt>
+<dd>Create an array and returns a proxy for
+it.  (<tt class="docutils literal"><span class="pre">format</span></tt> is ignored.)</dd>
+<dt><tt class="docutils literal"><span class="pre">Value(typecode,</span> <span class="pre">value)</span></tt></dt>
+<dd>Create an object with a writable <tt class="docutils literal"><span class="pre">value</span></tt> attribute and returns
+a proxy for it.</dd>
+<dt><tt class="docutils literal"><span class="pre">dict()</span></tt>, <tt class="docutils literal"><span class="pre">dict(mapping)</span></tt>, <tt class="docutils literal"><span class="pre">dict(sequence)</span></tt></dt>
+<dd>Creates a shared <tt class="docutils literal"><span class="pre">dict</span></tt> object and returns a proxy for it.</dd>
+<dt><tt class="docutils literal"><span class="pre">list()</span></tt>, <tt class="docutils literal"><span class="pre">list(sequence)</span></tt></dt>
+<dd>Creates a shared <tt class="docutils literal"><span class="pre">list</span></tt> object and returns a proxy for it.</dd>
+</dl>
+</blockquote>
+<div class="section">
+<h2><a id="namespace-objects" name="namespace-objects">Namespace objects</a></h2>
+<p>A namespace object has no public methods but does have writable
+attributes.  Its representation shows the values of its attributes.</p>
+<p>However, when using a proxy for a namespace object, an attribute
+beginning with <tt class="docutils literal"><span class="pre">'_'</span></tt> will be an attribute of the proxy and not an
+attribute of the referent:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; manager = processing.Manager()
+&gt;&gt;&gt; Global = manager.Namespace()
+&gt;&gt;&gt; Global.x = 10
+&gt;&gt;&gt; Global.y = 'hello'
+&gt;&gt;&gt; Global._z = 12.3    # this is an attribute of the proxy
+&gt;&gt;&gt; print Global
+Namespace(x=10, y='hello')
+</pre>
+</div>
+</div>
+<div class="section">
+<h1><a id="customized-managers" name="customized-managers">Customized managers</a></h1>
+<p>To create one's own manager one creates a subclass of <tt class="docutils literal"><span class="pre">BaseManager</span></tt>.</p>
+<p>To create a method of the subclass which will create new shared
+objects one uses the following function:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">CreatorMethod(callable=None,</span> <span class="pre">proxytype=None,</span> <span class="pre">exposed=None,</span> <span class="pre">typeid=None)</span></tt></dt>
+<dd><p class="first">Returns a function with signature <tt class="docutils literal"><span class="pre">func(self,</span> <span class="pre">*args,</span> <span class="pre">**kwds)</span></tt>
+which will create a shared object using the manager <tt class="docutils literal"><span class="pre">self</span></tt>
+and return a proxy for it.</p>
+<p>The shared objects will be created by evaluating
+<tt class="docutils literal"><span class="pre">callable(*args,</span> <span class="pre">**kwds)</span></tt> in the manager process.</p>
+<p>The arguments are:</p>
+<dl class="last docutils">
+<dt><tt class="docutils literal"><span class="pre">callable</span></tt></dt>
+<dd>The callable used to create a shared object.  If the
+manager will connect to a remote manager then this is ignored.</dd>
+<dt><tt class="docutils literal"><span class="pre">proxytype</span></tt></dt>
+<dd><p class="first">The type of proxy which will be used for object returned
+by <tt class="docutils literal"><span class="pre">callable</span></tt>.</p>
+<p class="last">If <tt class="docutils literal"><span class="pre">proxytype</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> then each time an object is
+returned by <tt class="docutils literal"><span class="pre">callable</span></tt> either a new proxy type is created
+or a cached one is reused.  The methods of the shared
+object which will be exposed via the proxy will then be
+determined by the <tt class="docutils literal"><span class="pre">exposed</span></tt> argument, see below.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">exposed</span></tt></dt>
+<dd><p class="first">Given a shared object returned by <tt class="docutils literal"><span class="pre">callable</span></tt>, the
+<tt class="docutils literal"><span class="pre">exposed</span></tt> argument is the list of those method names which
+should be exposed via <a class="reference" href="proxy-objects.html#methods-of-baseproxy"><tt class="docutils literal"><span class="pre">BaseProxy._callMethod()</span></tt></a>. <a class="footnote-reference" href="#id3" id="id1" name="id1">[1]</a> <a class="footnote-reference" href="#id4" id="id2" name="id2">[2]</a></p>
+<p>If <tt class="docutils literal"><span class="pre">exposed</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> and <tt class="docutils literal"><span class="pre">callable.__exposed__</span></tt> exists then
+<tt class="docutils literal"><span class="pre">callable.__exposed__</span></tt> is used instead.</p>
+<p>If <tt class="docutils literal"><span class="pre">exposed</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> and <tt class="docutils literal"><span class="pre">callable.__exposed__</span></tt> does not
+exist then all methods of the shared object which do not
+start with <tt class="docutils literal"><span class="pre">'_'</span></tt> will be exposed.</p>
+<p class="last">An attempt to use <tt class="docutils literal"><span class="pre">BaseProxy._callMethod()</span></tt> with a method name which is
+not exposed will raise an exception.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">typeid</span></tt></dt>
+<dd>If <tt class="docutils literal"><span class="pre">typeid</span></tt> is a string then it is used as an identifier
+for the callable.  Otherwise, <tt class="docutils literal"><span class="pre">typeid</span></tt> must be <tt class="docutils literal"><span class="pre">None</span></tt> and
+a string prefixed by <tt class="docutils literal"><span class="pre">callable.__name__</span></tt> is used as the
+identifier.</dd>
+</dl>
+</dd>
+</dl>
+</blockquote>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1" name="id3">[1]</a></td><td>A method here means any attribute which has a <tt class="docutils literal"><span class="pre">__call__</span></tt>
+attribute.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2" name="id4">[2]</a></td><td><p class="first">The method names <tt class="docutils literal"><span class="pre">__repr__</span></tt>, <tt class="docutils literal"><span class="pre">__str__</span></tt>, and <tt class="docutils literal"><span class="pre">__cmp__</span></tt> of a
+shared object are always exposed by the manager.  However, instead
+of invoking the <tt class="docutils literal"><span class="pre">__repr__()</span></tt>, <tt class="docutils literal"><span class="pre">__str__()</span></tt>, <tt class="docutils literal"><span class="pre">__cmp__()</span></tt> instance
+methods (none of which are guaranteed to exist) they invoke the
+builtin functions <tt class="docutils literal"><span class="pre">repr()</span></tt>, <tt class="docutils literal"><span class="pre">str()</span></tt> and <tt class="docutils literal"><span class="pre">cmp()</span></tt>.</p>
+<p class="last">Note that one should generally avoid exposing rich comparison
+methods like <tt class="docutils literal"><span class="pre">__eq__()</span></tt>, <tt class="docutils literal"><span class="pre">__ne__()</span></tt>, <tt class="docutils literal"><span class="pre">__le__()</span></tt>.  To make the proxy
+type support comparison by value one can just expose <tt class="docutils literal"><span class="pre">__cmp__()</span></tt>
+instead (even if the referent does not have such a method).</p>
+</td></tr>
+</tbody>
+</table>
+<div class="section">
+<h2><a id="example" name="example">Example</a></h2>
+<pre class="literal-block">
+from processing.managers import BaseManager, CreatorMethod
+
+class FooClass(object):
+    def bar(self):
+        print 'BAR'
+    def baz(self):
+        print 'BAZ'
+
+class NewManager(BaseManager):
+    Foo = CreatorMethod(FooClass)
+
+if __name__ == '__main__':
+    manager = NewManager()
+    manager.start()
+    foo = manager.Foo()
+    foo.bar()               # prints 'BAR'
+    foo.baz()               # prints 'BAZ'
+    manager.shutdown()
+</pre>
+<p>See <a class="reference" href="../examples/ex_newtype.py">ex_newtype.py</a> for more examples.</p>
+</div>
+</div>
+<div class="section">
+<h1><a id="using-a-remote-manager" name="using-a-remote-manager">Using a remote manager</a></h1>
+<p>It is possible to run a manager server on one machine and have clients
+use it from other machines (assuming that the firewalls involved allow
+it).</p>
+<p>Running the following commands creates a server for a shared queue which
+remote clients can use:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from processing.managers import BaseManager, CreatorMethod
+&gt;&gt;&gt; import Queue
+&gt;&gt;&gt; queue = Queue.Queue()
+&gt;&gt;&gt; class QueueManager(BaseManager):
+...     get_proxy = CreatorMethod(callable=lambda:queue, typeid='get_proxy')
+...
+&gt;&gt;&gt; m = QueueManager(address=('foo.bar.org', 50000), authkey='none')
+&gt;&gt;&gt; m.serveForever()
+</pre>
+<p>One client can access the server as follows:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from processing.managers import BaseManager, CreatorMethod
+&gt;&gt;&gt; class QueueManager(BaseManager):
+...     get_proxy = CreatorMethod(typeid='get_proxy')
+...
+&gt;&gt;&gt; m = QueueManager.fromAddress(address=('foo.bar.org', 50000), authkey='none')
+&gt;&gt;&gt; queue = m.get_proxy()
+&gt;&gt;&gt; queue.put('hello')
+</pre>
+<p>Another client can also use it:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from processing.managers import BaseManager, CreatorMethod
+&gt;&gt;&gt; class QueueManager(BaseManager):
+...     get_proxy = CreatorMethod(typeid='get_proxy')
+...
+&gt;&gt;&gt; m = QueueManager.fromAddress(address=('foo.bar.org', 50000), authkey='none')
+&gt;&gt;&gt; queue = m.get_proxy()
+&gt;&gt;&gt; queue.get()
+'hello'
+</pre>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="connection-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="proxy-objects.html">Next</a>
+</div>
+</body>
+</html>

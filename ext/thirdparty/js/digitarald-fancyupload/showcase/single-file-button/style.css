@@ -1,0 +1,36 @@
+/* Basic layout */
+
+h4 {
+	margin-top: 1.25em;
+}
+
+a {
+	padding: 1px;
+}
+
+a:hover, a.hover {
+	color: red;
+}
+
+/* demo elements */
+
+#demo-portrait {
+	float: left;
+	position: relative;
+	width: 130px;
+	height: 153px;
+	border: 1px solid #eee;
+	background-position: 1px 1px;
+	background-repeat: no-repeat;
+}
+
+#demo-portrait a {
+	position: absolute;
+	left: 1px;
+	right: 1px;
+	bottom: 1px;
+	padding: 0;
+	line-height: 22px;
+	display: block;
+	text-align: center;
+}

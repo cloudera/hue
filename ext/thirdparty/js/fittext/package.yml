@@ -1,0 +1,9 @@
+name: FitText
+author: Ryan Florence
+category: Interface
+tags: [truncate, text]
+docs: http://moodocs.net/rpflo/mootools-rpflo/FitText
+demo: http://moodocs.net/rpflo/mootools-rpflo/FitText
+current: 0.5
+sources:
+  - "Source/FitText.js"

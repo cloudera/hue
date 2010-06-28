@@ -1,0 +1,61 @@
+div.ccs-help div.jframe_contents .help-logo {
+	float: right;
+	margin: 0px 20px;
+}
+
+div.ccs-help h1 {
+        background: lightBlue;
+        margin-bottom: 10px;
+        padding: 5px;
+        border: solid black 3px;
+        -moz-border-radius: 10px;
+        -webkit-border-radius: 10px;
+}
+
+div.ccs-help p, {
+        margin-left: 5px;
+}
+
+div.ccs-help pre {
+        margin-left: 10px;
+}
+
+div.ccs-help .art-splitview-left {
+        background: lightBlue !important;
+}
+
+div.ccs-help .art-splitview-right {
+        background: white !important;
+}
+
+div.ccs-help .left_col ul {
+        padding-left: 5px;
+        border-left: solid 5px black;
+}
+
+div.ccs-help .left_col li {
+        margin: 5px 0px;
+        background-color: white;
+        color: black;
+        padding: 1px 0px 1px 5px;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        border: solid lightBlue 1px;
+}
+
+div.ccs-help .left_col li:hover {
+        background-color: lightBlue;
+        border: solid black 1px;
+        color: white;
+}
+
+div.ccs-help .left_col a {
+        color: black;
+        display: block;
+}
+
+div.ccs-help .left_col a:hover {
+        text-decoration: none;
+}
+
+

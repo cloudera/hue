@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% comment %}
+Licensed to Cloudera, Inc. under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  Cloudera, Inc. licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+{% block title %}Submit Job: {{ job_design.name }}{% endblock %}
+{% block content %}
+	<div class="prompt_popup">
+		<h1 class="ccs-hidden">Submit Job: {{ job_design.name }} </h1>
+		<div class="jobsub_parameterize" id="view">
+			<dl class="jobsub_parameterize_description clearfix">
+				<dt>Job Name</dt>
+				<dd>{{ job_design.name }}</dd>
+				{% if job_design.description %}
+				<dt>Description</dt>
+				<dd>{{ job_design.description }}</dd>
+				{% endif %}
+			</dl>
+			
+			<form action="{% url jobsub.views.submit_design job_design.id %}" method="POST" enctype="multipart/form-data">
+			{{ form.render_parameterization }}
+			<dl class="ccs-hidden">
+				<dt>&nbsp;</dt>
+				<dd class="jobsub_edit_save">
+					<input type="submit" name="submitter" value="Start Job" class="ccs-submit"/>
+				</dd>
+			</dl>
+			</form>
+		</div>
+	</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+/* Basic layout */
+
+a.hover {
+	color: red;
+}
+
+.error {
+	cursor: pointer;
+}
+
+#select-more-0 {
+	display: none;
+}
+
+.file-list {
+	padding: 0;
+	list-style: none;
+	margin: 0;
+}
+
+.file {
+	line-height: 2em;
+	padding-left: 21px;
+	background: url(http://iconfinder.net/data/icons/fam_fam_fam_pack/attach.png) no-repeat 1px 50%;
+}
+
+.file span {
+	padding: 0 5px 0 0;
+}
+.file a {
+	padding: 0 0 0 5px;
+}
+
+.file .file-size {
+	color: #666;
+}
+
+.file .file-progress {
+	width: 125px;
+	height: 12px;
+	vertical-align: middle;
+	background-image: url(../../assets/progress-bar/progress.gif);
+}

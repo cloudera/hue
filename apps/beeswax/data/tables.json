@@ -1,0 +1,12 @@
+[
+  {
+    "data_file": "sample_07.csv", 
+    "create_hql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nROW FORMAT DELIMITED\n  FIELDS TERMINATED BY '\t'\nSTORED AS TextFile\n", 
+    "table_name": "sample_07"
+  }, 
+  {
+    "data_file": "sample_08.csv", 
+    "create_hql": "CREATE TABLE `sample_08` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nROW FORMAT DELIMITED\n  FIELDS TERMINATED BY '\t'\nSTORED AS TextFile\n", 
+    "table_name": "sample_08"
+  }
+]

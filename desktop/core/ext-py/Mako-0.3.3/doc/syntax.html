@@ -1,0 +1,919 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Mako Documentation - Syntax</title>
+	
+    <link rel="stylesheet" href="docs.css"></link>
+    <link rel="stylesheet" href="highlight.css"></link>
+    
+
+
+
+
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+<div id="topanchor"><a name="top">&nbsp;</a></div>
+
+<div id="pagecontrol"><a href="index.html">Multiple Pages</a> | <a href="documentation.html">One Page</a></div>
+
+<h1>Mako Documentation</h1>
+
+<div class="versionheader">Version: 0.3.3   Last Updated: 05/31/10 16:21:29</div>
+
+
+
+
+
+
+
+<A name=""></a>
+
+
+    <div class="topnav">
+
+    
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="usage.html">Basic Usage</a>
+
+            |
+            Next: <a href="defs.html">Defs</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+    <br/>
+	<a href="#syntax">Syntax</a>
+	
+	
+    <ul>
+        <li><A style="" href="syntax.html#syntax_expression">Expression Substitution</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="syntax.html#syntax_expression_expression">Expression Escaping</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_control">Control Structures</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_comments">Comments</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_newline">Newline Filters</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_python">Python Blocks</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="syntax.html#syntax_python_module-level">Module-level Blocks</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags">Tags</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="syntax.html#syntax_tags_page"><%page></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_include"><%include></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_def"><%def></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_namespace"><%namespace></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_inherit"><%inherit></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_namespacename:defname"><%namespacename:defname></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_call"><%call></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_doc"><%doc></a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_tags_text"><%text></a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="syntax.html#syntax_returning">Returning early from a template</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+    
+    <A name="syntax"></a>
+    
+    <div class="section">
+    
+
+    <h3>Syntax</h3>
+    
+    
+
+<p>A Mako template is parsed from a text stream containing any kind of content, XML, HTML, email text, etc.  The template can further contain Mako-specific directives which represent variable and/or expression substitutions, control structures (i.e. conditionals and loops), server-side comments, full blocks of Python code, as well as various tags that offer additional functionality.  All of these constructs compile into real Python code.  This means that you can leverage the full power of Python in almost every aspect of a Mako template.
+</p>
+
+
+    
+    <A name="syntax_expression"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Expression Substitution</h3>
+    
+    
+
+<p>The simplest expression is just a variable substitution.  The syntax for this is the <code>${}</code> construct, which is inspired by Perl, Genshi, JSP EL, and others:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre>this is x: <span class="cp">${</span><span class="n">x</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>Above, the string representation of <code>x</code> is applied to the template's output stream.  If you're wondering where <code>x</code> comes from, its usually from the <code>Context</code> supplied to the template's rendering function.  If <code>x</code> was not supplied to the template and was not otherwise assigned locally, it evaluates to a special value <code>UNDEFINED</code>.  More on that later.
+</p>
+<p>The contents within the <code>${}</code> tag are evaluated by Python directly, so full expressions are OK:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre>pythagorean theorem:  <span class="cp">${</span><span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">pow</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="mf">2</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>The results of the expression are evaluated into a string result in all cases before being rendered to the output stream, such as the above example where the expression produces a numeric result.
+</p>
+
+
+    
+    <A name="syntax_expression_expression"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Expression Escaping</h3>
+    
+    
+
+<p>Mako includes a number of built-in escaping mechanisms, including HTML, URI and XML escaping, as well as a "trim" function.  These escapes can be added to an expression substituion using the <code>|</code> operator:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">${</span><span class="s">&quot;this is some text&quot;</span> <span class="o">|</span> <span class="n">u</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>The above expression applies URL escaping to the expression, and produces <code>this+is+some+text</code>.  The <code>u</code> name indicates URL escaping, whereas <code>h</code> represents HTML escaping, <code>x</code> represents XML escaping, and <code>trim</code> applies a trim function.
+</p>
+<p>Read more about built in filtering functions, including how to make your own filter functions, in <a href="filtering.html">Filtering and Buffering</a>.
+</p>
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_control"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Control Structures</h3>
+    
+    
+
+<p>A control structure refers to all those things that control the flow of a program - conditionals (i.e. if/else), loops (like while and for), as well as things like <code>try/except</code>.  In Mako, control structures are written using the <code>%</code> marker followed by a regular Python control expression, and are "closed" by using another <code>%</code> marker with the tag "<code>end&lt;name&gt;</code>", where "<code>&lt;name&gt;</code>" is the keyword of the expression:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">%</span> <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mf">5</span><span class="p">:</span>
+    this is some output
+<span class="cp">%</span><span class="k"> endif</span>
+</pre></div>
+
+    </div>
+<p>The <code>%</code> can appear anywhere on the line as long as no text precedes it; indentation is not signficant.  The full range of Python "colon" expressions are allowed here, including <code>if/elif/else</code>, <code>while</code>, <code>for</code>, and even <code>def</code>, although Mako has a built-in tag for defs which is more full-featured.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">%</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;one&#39;</span><span class="p">,</span> <span class="s">&#39;two&#39;</span><span class="p">,</span> <span class="s">&#39;three&#39;</span><span class="p">,</span> <span class="s">&#39;four&#39;</span><span class="p">,</span> <span class="s">&#39;five&#39;</span><span class="p">]:</span>
+    <span class="cp">%</span> <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;t&#39;</span><span class="p">:</span>
+     its two or three
+    <span class="cp">%</span> <span class="k">elif</span> <span class="n">a</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;f&#39;</span><span class="p">:</span>
+    four/five
+    <span class="cp">%</span> <span class="k">else</span><span class="p">:</span>
+    one
+    <span class="cp">%</span><span class="k">endif</span>
+<span class="cp">%</span><span class="k"> endfor</span>
+</pre></div>
+
+    </div>
+<p>The <code>%</code> sign can also be "escaped", if you actually want to emit a percent sign as the first non whitespace character on a line, by escaping it as in <code>%%</code>:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre>%% some text
+
+    %% some more text
+</pre></div>
+
+    </div>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_comments"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Comments</h3>
+    
+    
+
+<p>Comments come in two varieties.  The single line comment uses <code>##</code> as the first non-space characters on a line:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">## this is a comment.</span>
+...text ...
+</pre></div>
+
+    </div>
+<p>A multiline version exists using <code>&lt;%doc&gt;  ...text... &lt;/%doc&gt;</code>:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%doc&gt;</span>
+<span class="cp">    these are comments</span>
+<span class="cp">    more comments</span>
+<span class="cp">&lt;/%doc&gt;</span>
+</pre></div>
+
+    </div>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_newline"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Newline Filters</h3>
+    
+    
+
+<p>The backslash ("<code>\</code>") character, placed at the end of any line, will consume the newline character before continuing to the next line:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre>here is a line that goes onto <span class="o">\</span>
+another line.
+</pre></div>
+
+    </div>
+<p>The above text evaluates to:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre>here is a line that goes onto another line.
+</pre></div>
+
+    </div>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_python"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Python Blocks</h3>
+    
+    
+
+<p>Any arbitrary block of python can be dropped in using the <code>&lt;% %&gt;</code> tags:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre>this is a template
+<span class="cp">&lt;%</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_resource</span><span class="p">(</span><span class="s">&#39;foo&#39;</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">z</span><span class="o">.</span><span class="n">element</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">frobnizzle</span><span class="o">==</span><span class="mf">5</span><span class="p">]</span>
+<span class="cp">%&gt;</span>
+<span class="cp">%</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
+    element: <span class="cp">${</span><span class="n">elem</span><span class="cp">}</span>
+<span class="cp">%</span><span class="k"> endfor</span>
+</pre></div>
+
+    </div>
+<p>Within <code>&lt;% %&gt;</code>, you're writing a regular block of Python code.  While the code can appear with an arbitrary level of preceding whitespace,  it has to be consistently formatted with itself.  Mako's compiler will adjust the block of Python to be consistent with the surrounding generated Python code.
+</p>
+
+
+    
+    <A name="syntax_python_module-level"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Module-level Blocks</h3>
+    
+    
+
+<p>A variant on <code>&lt;% %&gt;</code> is the module-level code block, denoted by <code>&lt;%! %&gt;</code>.  Code within these tags is executed at the module level of the template, and not within the rendering function of the template.  Therefore, this code does not have access to the template's context and is only executed when the template is loaded into memory (which can be only once per application, or more, depending on the runtime environment).  Use the <code>&lt;%! %&gt;</code> tags to declare your template's imports, as well as any pure-Python functions you might want to declare:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%!</span>
+    <span class="kn">import</span> <span class="nn">mylib</span>
+    <span class="kn">import</span> <span class="nn">re</span>
+
+    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r&#39;^@&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+<span class="cp">%&gt;</span>
+</pre></div>
+
+    </div>
+<p>Any number of <code>&lt;%! %&gt;</code> blocks can be declared anywhere in a template; they will be rendered in the resulting module in the order that they appear.
+</p>
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_tags"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Tags</h3>
+    
+    
+
+<p>The rest of what Mako offers takes place in the form of tags.  All tags use the same syntax, which is similar to an XML tag except that the first character of the tag name is a <code>%</code> character.  The tag is closed either by a contained slash character, or an explicit closing tag:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">include</span> <span class="na">file=</span><span class="s">&quot;foo.txt&quot;</span><span class="cp">/&gt;</span>
+
+<span class="cp">&lt;%</span><span class="nb">def</span> <span class="na">name=</span><span class="s">&quot;foo&quot;</span> <span class="na">buffered=</span><span class="s">&quot;True&quot;</span><span class="cp">&gt;</span>
+    this is a def
+<span class="cp">&lt;/%</span><span class="nb">def</span><span class="cp">&gt;</span>
+</pre></div>
+
+    </div>
+<p>All tags have a set of attributes which are defined for each tag.  Some of these attributes are required.  Also, many attributes support <strong>evaluation</strong>, meaning you can embed an expression (using <code>${}</code>) inside the attribute text:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">include</span> <span class="na">file=</span><span class="s">&quot;/foo/bar/${myfile}.txt&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+<p>Whether or not an attribute accepts runtime evaluation depends on the type of tag and how that tag is compiled into the template.  The best way to find out if you can stick an expression in is to try it !  The lexer will tell you if its not valid.
+</p>
+<p>Heres a quick summary of all the tags:
+</p>
+
+
+    
+    <A name="syntax_tags_page"></a>
+    
+    <div class="subsection">
+    
+
+    <h3><%page></h3>
+    
+    
+
+<p>This tag defines general characteristics of the template, including caching arguments, and optional lists of arguments which the template expects when invoked.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">page</span> <span class="na">args=</span><span class="s">&quot;x, y, z=&#39;default&#39;&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+<p>Or a page tag that defines caching characteristics:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">page</span> <span class="na">cached=</span><span class="s">&quot;True&quot;</span> <span class="na">cache_type=</span><span class="s">&quot;memory&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+<p>Currently, only one <code>&lt;%page&gt;</code> tag gets used per template, the rest get ignored.  While this will be improved in a future release, for now make sure you have only one <code>&lt;%page&gt;</code> tag defined in your template, else you may not get the results you want.  The details of what <code>&lt;%page&gt;</code> is used for are described further in <a href="namespaces.html#namespaces_body">The "body()" method</a> as well as <a href="caching.html">Caching</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_tags_include"></a>
+    
+    <div class="subsection">
+    
+
+    <h3><%include></h3>
+    
+    
+
+<p>A tag that is familiar from other template languages, %include is a regular joe that just accepts a file argument and calls in the rendered result of that file:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">include</span> <span class="na">file=</span><span class="s">&quot;header.html&quot;</span><span class="cp">/&gt;</span>
+
+    hello world
+
+<span class="cp">&lt;%</span><span class="nb">include</span> <span class="na">file=</span><span class="s">&quot;footer.html&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+<p>Include also accepts arguments which are available as <code>&lt;%page&gt;</code> arguments in the receiving template:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">include</span> <span class="na">file=</span><span class="s">&quot;toolbar.html&quot;</span> <span class="na">args=</span><span class="s">&quot;current_section=&#39;members&#39;, username=&#39;ed&#39;&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_tags_def"></a>
+    
+    <div class="subsection">
+    
+
+    <h3><%def></h3>
+    
+    
+
+<p>The <code>%def</code> tag defines a Python function which contains a set of content, that can be called at some other point in the template.  The basic idea is simple:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">def</span> <span class="na">name=</span><span class="s">&quot;myfunc(x)&quot;</span><span class="cp">&gt;</span>
+    this is myfunc, x is <span class="cp">${</span><span class="n">x</span><span class="cp">}</span>
+<span class="cp">&lt;/%</span><span class="nb">def</span><span class="cp">&gt;</span>
+
+<span class="cp">${</span><span class="n">myfunc</span><span class="p">(</span><span class="mf">7</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>The %def tag is a lot more powerful than a plain Python def, as the Mako compiler provides many extra services with %def that you wouldn't normally have, such as the ability to export defs as template "methods", automatic propagation of the current <code>Context</code>, buffering/filtering/caching flags, and def calls with content, which enable packages of defs to be sent as arguments to other def calls (not as hard as it sounds).  Get the full deal on what %def can do in <a href="defs.html">Defs</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_tags_namespace"></a>
+    
+    <div class="subsection">
+    
+
+    <h3><%namespace></h3>
+    
+    
+
+<p>%namespace is Mako's equivalent of Python's <code>import</code> statement.  It allows access to all the rendering functions and metadata of other template files, plain Python modules, as well as locally defined "packages" of functions.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">namespace</span> <span class="na">file=</span><span class="s">&quot;functions.html&quot;</span> <span class="na">import=</span><span class="s">&quot;*&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+<p>The underlying object generated by %namespace, an instance of <code>mako.runtime.Namespace</code>, is a central construct used in templates to reference template-specific information such as the current URI, inheritance structures, and other things that are not as hard as they sound right here.  Namespaces are described in <a href="namespaces.html">Namespaces</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_tags_inherit"></a>
+    
+    <div class="subsection">
+    
+
+    <h3><%inherit></h3>
+    
+    
+
+<p>Inherit allows templates to arrange themselves in <strong>inheritance chains</strong>.  This is a concept familiar in many other template languages.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">inherit</span> <span class="na">file=</span><span class="s">&quot;base.html&quot;</span><span class="cp">/&gt;</span>
+</pre></div>
+
+    </div>
+<p>When using the %inherit tag, control is passed to the topmost inherited template first, which then decides how to handle calling areas of content from its inheriting templates.  Mako offers a lot of flexbility in this area, including dynamic inheritance, content wrapping, and polymorphic method calls.  Check it out in <a href="inheritance.html">Inheritance</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_tags_namespacename:defname"></a>
+    
+    <div class="subsection">
+    
+
+    <h3><%namespacename:defname></h3>
+    
+    
+
+<p>As of Mako 0.2.3, any user-defined "tag" can be created against a namespace by using a tag with a name of the form <em>namespacename</em>:<em>defname</em>.  The closed and open formats of such a tag are equivalent to an inline expression and the <code>&lt;%call&gt;</code> tag, respectively.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">mynamespace:somedef</span> <span class="na">param=</span><span class="s">&quot;some value&quot;</span><span class="cp">&gt;</span>
+    this is the body
+<span class="cp">&lt;/%</span><span class="nb">mynamespace:somedef</span><span class="cp">&gt;</span>
+</pre></div>
+
+    </div>
+<p>To create custom tags which accept a body, see <a href="defs.html#defs_defswithcontent">Calling a def with embedded content and/or other defs</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_tags_call"></a>
+    
+    <div class="subsection">
+    
+
+    <h3><%call></h3>
+    
+    
+
+<p>The call tag is the "classic" form of a user-defined tag, and is roughly equiavlent to the <code>&lt;%namespacename:defname&gt;</code> syntax described above.  This tag is also described in <a href="defs.html#defs_defswithcontent">Calling a def with embedded content and/or other defs</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_tags_doc"></a>
+    
+    <div class="subsection">
+    
+
+    <h3><%doc></h3>
+    
+    
+
+<p>The doc tag handles multiline comments:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%doc&gt;</span>
+<span class="cp">    these are comments</span>
+<span class="cp">    more comments</span>
+<span class="cp">&lt;/%doc&gt;</span>
+</pre></div>
+
+    </div>
+<p>Also the <code>##</code> symbol as the first non-space characters on a line can be used for single line comments.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_tags_text"></a>
+    
+    <div class="subsection">
+    
+
+    <h3><%text></h3>
+    
+    
+
+<p>This tag suspends the Mako lexer's normal parsing of Mako template directives, and returns its entire body contents as plain text.  It is used pretty much to write documentation about Mako:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">text</span> <span class="na">filter=</span><span class="s">&quot;h&quot;</span><span class="cp">&gt;</span>
+    heres some fake mako <span class="cp">${</span><span class="n">syntax</span><span class="cp">}</span>
+    <span class="cp">&lt;%</span><span class="nb">def</span> <span class="na">name=</span><span class="s">&quot;x()&quot;</span><span class="cp">&gt;${</span><span class="n">x</span><span class="cp">}&lt;/%</span><span class="nb">def</span><span class="cp">&gt;</span>
+<span class="cp">&lt;/%</span><span class="nb">text</span><span class="cp">&gt;</span>
+</pre></div>
+
+    </div>
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="syntax_returning"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Returning early from a template</h3>
+    
+    
+
+<p>Sometimes you want to stop processing a template or <code>&lt;%def&gt;</code> method in the middle and just use the text you've accumulated so far.  You can use a <code>return</code> statement inside a Python block to do that.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">%</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">):</span>
+    No records found.
+    <span class="cp">&lt;%</span> <span class="k">return</span> <span class="cp">%&gt;</span>
+<span class="cp">%</span><span class="k"> endif</span>
+</pre></div>
+
+    </div>
+<p>Or perhaps:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">):</span>
+        <span class="k">return</span>
+<span class="cp">%&gt;</span>
+</pre></div>
+
+    </div>
+
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+</html>
+
+
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="usage.html">Basic Usage</a>
+
+            |
+            Next: <a href="defs.html">Defs</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+

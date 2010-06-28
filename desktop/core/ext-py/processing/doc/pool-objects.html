@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Process Pools</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="proxy-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="sharedctypes.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="process-pools">
+<h1 class="title">Process Pools</h1>
+<p>The <tt class="docutils literal"><span class="pre">processing.pool</span></tt> module has one public class:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>class</strong> <tt class="docutils literal"><span class="pre">Pool(processes=None,</span> <span class="pre">initializer=None,</span> <span class="pre">initargs=())</span></tt></dt>
+<dd><p class="first">A class representing a pool of worker processes.</p>
+<p>Tasks can be offloaded to the pool and the results dealt with
+when they become available.</p>
+<p>Note that tasks can only be submitted (or retrieved) by the
+process which created the pool object.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">processes</span></tt> is the number of worker processes to use.  If
+<tt class="docutils literal"><span class="pre">processes</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> then the number returned by <tt class="docutils literal"><span class="pre">cpuCount()</span></tt>
+is used.  If <tt class="docutils literal"><span class="pre">initializer</span></tt> is not <tt class="docutils literal"><span class="pre">None</span></tt> then each worker
+process will call <tt class="docutils literal"><span class="pre">initializer(*initargs)</span></tt> when it starts.</p>
+</dd>
+</dl>
+</blockquote>
+<div class="section">
+<h1><a id="pool-objects" name="pool-objects">Pool objects</a></h1>
+<p><tt class="docutils literal"><span class="pre">Pool</span></tt> has the following public methods:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">__init__(processes=None)</span></tt></dt>
+<dd>The constructor creates and starts <tt class="docutils literal"><span class="pre">processes</span></tt> worker
+processes.  If <tt class="docutils literal"><span class="pre">processes</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> then <tt class="docutils literal"><span class="pre">cpuCount()</span></tt> is used
+to find a default or 1 if <tt class="docutils literal"><span class="pre">cpuCount()</span></tt> raises <tt class="docutils literal"><span class="pre">NotImplemented</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">apply(func,</span> <span class="pre">args=(),</span> <span class="pre">kwds={})</span></tt></dt>
+<dd>Equivalent of the <tt class="docutils literal"><span class="pre">apply()</span></tt> builtin function.  It blocks till
+the result is ready.</dd>
+<dt><tt class="docutils literal"><span class="pre">applyAsync(func,</span> <span class="pre">args=(),</span> <span class="pre">kwds={},</span> <span class="pre">callback=None)</span></tt></dt>
+<dd><p class="first">A variant of the <tt class="docutils literal"><span class="pre">apply()</span></tt> method which returns a
+result object --- see <a class="reference" href="#asynchronous-result-objects">Asynchronous result objects</a>.</p>
+<p class="last">If <tt class="docutils literal"><span class="pre">callback</span></tt> is specified then it should be a callable which
+accepts a single argument.  When the result becomes ready
+<tt class="docutils literal"><span class="pre">callback</span></tt> is applied to it (unless the call failed).
+<tt class="docutils literal"><span class="pre">callback</span></tt> should complete immediately since otherwise the
+thread which handles the results will get blocked.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">map(func,</span> <span class="pre">iterable,</span> <span class="pre">chunksize=None)</span></tt></dt>
+<dd><p class="first">A parallel equivalent of the <tt class="docutils literal"><span class="pre">map()</span></tt> builtin function.  It
+blocks till the result is ready.</p>
+<p class="last">This method chops the iterable into a number of chunks which
+it submits to the process pool as separate tasks.  The
+(approximate) size of these chunks can be specified by setting
+<tt class="docutils literal"><span class="pre">chunksize</span></tt> to a positive integer.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">mapAsync(func,</span> <span class="pre">iterable,</span> <span class="pre">chunksize=None,</span> <span class="pre">callback=None)</span></tt></dt>
+<dd><p class="first">A variant of the <tt class="docutils literal"><span class="pre">map()</span></tt> method which returns a result object
+--- see <a class="reference" href="#asynchronous-result-objects">Asynchronous result objects</a>.</p>
+<p class="last">If <tt class="docutils literal"><span class="pre">callback</span></tt> is specified then it should be a callable which
+accepts a single argument.  When the result becomes ready
+<tt class="docutils literal"><span class="pre">callback</span></tt> is applied to it (unless the call failed).
+<tt class="docutils literal"><span class="pre">callback</span></tt> should complete immediately since otherwise the
+thread which handles the results will get blocked.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">imap(func,</span> <span class="pre">iterable,</span> <span class="pre">chunksize=1)</span></tt></dt>
+<dd><p class="first">An equivalent of <tt class="docutils literal"><span class="pre">itertools.imap()</span></tt>.</p>
+<p>The <tt class="docutils literal"><span class="pre">chunksize</span></tt> argument is the same as the one used by the
+<tt class="docutils literal"><span class="pre">map()</span></tt> method.  For very long iterables using a large value
+for <tt class="docutils literal"><span class="pre">chunksize</span></tt> can make make the job complete <strong>much</strong> faster
+than using the default value of <tt class="docutils literal"><span class="pre">1</span></tt>.</p>
+<p class="last">Also if <tt class="docutils literal"><span class="pre">chunksize</span></tt> is <tt class="docutils literal"><span class="pre">1</span></tt> then the <tt class="docutils literal"><span class="pre">next()</span></tt> method of the
+iterator returned by the <tt class="docutils literal"><span class="pre">imap()</span></tt> method has an optional
+<tt class="docutils literal"><span class="pre">timeout</span></tt> parameter: <tt class="docutils literal"><span class="pre">next(timeout)</span></tt> will raise
+<tt class="docutils literal"><span class="pre">processing.TimeoutError</span></tt> if the result cannot be returned
+within <tt class="docutils literal"><span class="pre">timeout</span></tt> seconds.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">imapUnordered(func,</span> <span class="pre">iterable,</span> <span class="pre">chunksize=1)</span></tt></dt>
+<dd>The same as <tt class="docutils literal"><span class="pre">imap()</span></tt> except that the ordering of the results
+from the returned iterator should be considered arbitrary.
+(Only when there is only one worker process is the order
+guaranteed to be &quot;correct&quot;.)</dd>
+<dt><tt class="docutils literal"><span class="pre">close()</span></tt></dt>
+<dd>Prevents any more tasks from being submitted to the pool.
+Once all the tasks have been completed the worker processes
+will exit.</dd>
+<dt><tt class="docutils literal"><span class="pre">terminate()</span></tt></dt>
+<dd>Stops the worker processes immediately without completing
+outstanding work.  When the pool object is garbage collected
+<tt class="docutils literal"><span class="pre">terminate()</span></tt> will be called immediately.</dd>
+<dt><tt class="docutils literal"><span class="pre">join()</span></tt></dt>
+<dd>Wait for the worker processes to exit.  One must call
+<tt class="docutils literal"><span class="pre">close()</span></tt> or <tt class="docutils literal"><span class="pre">terminate()</span></tt> before using <tt class="docutils literal"><span class="pre">join()</span></tt>.</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section">
+<h1><a id="asynchronous-result-objects" name="asynchronous-result-objects">Asynchronous result objects</a></h1>
+<p>The result objects returns by <tt class="docutils literal"><span class="pre">applyAsync()</span></tt> and <tt class="docutils literal"><span class="pre">mapAsync()</span></tt> have
+the following public methods:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">get(timeout=None)</span></tt></dt>
+<dd>Returns the result when it arrives.  If <tt class="docutils literal"><span class="pre">timeout</span></tt> is not
+<tt class="docutils literal"><span class="pre">None</span></tt> and the result does not arrive within <tt class="docutils literal"><span class="pre">timeout</span></tt> seconds
+then <tt class="docutils literal"><span class="pre">processing.TimeoutError</span></tt> is raised.  If the remote call
+raised an exception then that exception will be reraised by <tt class="docutils literal"><span class="pre">get()</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">wait(timeout=None)</span></tt></dt>
+<dd>Waits until the result is available or until <tt class="docutils literal"><span class="pre">timeout</span></tt> seconds
+pass.</dd>
+<dt><tt class="docutils literal"><span class="pre">ready()</span></tt></dt>
+<dd>Returns whether the call has completed.</dd>
+<dt><tt class="docutils literal"><span class="pre">successful()</span></tt></dt>
+<dd>Returns whether the call completed without raising an
+exception.  Will raise <tt class="docutils literal"><span class="pre">AssertionError</span></tt> if the result is not
+ready.</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section">
+<h1><a id="examples" name="examples">Examples</a></h1>
+<p>The following example demonstrates the use of a pool:</p>
+<pre class="literal-block">
+from processing import Pool
+
+def f(x):
+    return x*x
+
+if __name__ == '__main__':
+    pool = Pool(processes=4)              # start 4 worker processes
+
+    result = pool.applyAsync(f, (10,))    # evaluate &quot;f(10)&quot; asynchronously
+    print result.get(timeout=1)           # prints &quot;100&quot; unless your computer is *very* slow
+
+    print pool.map(f, range(10))          # prints &quot;[0, 1, 4,..., 81]&quot;
+
+    it = pool.imap(f, range(10))
+    print it.next()                       # prints &quot;0&quot;
+    print it.next()                       # prints &quot;1&quot;
+    print it.next(timeout=1)              # prints &quot;4&quot; unless your computer is *very* slow
+
+    import time
+    result = pool.applyAsync(time.sleep, (10,))
+    print result.get(timeout=1)           # raises `TimeoutError`
+</pre>
+<p>See also <a class="reference" href="../examples/ex_pool.py">ex_pool.py</a>.</p>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="proxy-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="sharedctypes.html">Next</a>
+</div>
+</body>
+</html>

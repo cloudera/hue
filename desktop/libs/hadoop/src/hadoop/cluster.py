@@ -1,0 +1,95 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from hadoop.fs import hadoopfs, LocalSubFileSystem
+from hadoop.job_tracker import LiveJobTracker
+
+from desktop.lib.paths import get_build_dir
+from hadoop import conf
+import os
+import logging
+
+def _make_filesystem(identifier):
+  choice = os.getenv("FB_FS")
+  if choice == "testing":
+    path = os.path.join(get_build_dir(), "fs")
+    if not os.path.isdir(path):
+      logging.warning(
+        ("Could not find fs directory: %s. Perhaps you need to run " +
+        "manage.py filebrowser_test_setup?") % path)
+    return LocalSubFileSystem(path)
+  else:
+    cluster_conf = conf.HDFS_CLUSTERS[identifier]
+    return hadoopfs.HadoopFileSystem(
+      cluster_conf.NN_HOST.get(),
+      cluster_conf.NN_THRIFT_PORT.get(),
+      cluster_conf.NN_HDFS_PORT.get(),
+      hadoop_bin_path=conf.HADOOP_BIN.get())
+    raise Exception("Unknown choice: %s" % choice)
+
+def _make_mrcluster(identifier):
+  cluster_conf = conf.MR_CLUSTERS[identifier]
+  return LiveJobTracker(cluster_conf.JT_HOST.get(),
+                        cluster_conf.JT_THRIFT_PORT.get())
+
+FS_CACHE = None
+def get_hdfs(identifier="default"):
+  global FS_CACHE
+  get_all_hdfs()
+  return FS_CACHE[identifier]
+
+def get_all_hdfs():
+  global FS_CACHE
+  if FS_CACHE is not None:
+    return FS_CACHE
+
+  FS_CACHE = {}
+  for identifier in conf.HDFS_CLUSTERS.keys():
+    FS_CACHE[identifier] = _make_filesystem(identifier)
+  return FS_CACHE
+
+MR_CACHE = None
+def get_mrcluster(identifier="default"):
+  global MR_CACHE
+  all_mrclusters()
+  return MR_CACHE[identifier]
+
+def all_mrclusters():
+  global MR_CACHE
+  if MR_CACHE is not None:
+    return MR_CACHE
+  MR_CACHE = {}
+  for identifier in conf.MR_CLUSTERS.keys():
+    MR_CACHE[identifier] = _make_mrcluster(identifier)
+  return MR_CACHE
+
+def clear_caches():
+  """
+  Clears cluster's internal caches.  Returns
+  something that can be given back to restore_caches.
+  """
+  global FS_CACHE, MR_CACHE
+  old = FS_CACHE, MR_CACHE
+  FS_CACHE, MR_CACHE = None, None
+  return old
+
+def restore_caches(old):
+  """
+  Restores caches from the result of a previous clear_caches call.
+  """
+  global FS_CACHE, MR_CACHE
+  FS_CACHE, MR_CACHE = old

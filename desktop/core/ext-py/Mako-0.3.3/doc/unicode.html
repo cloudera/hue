@@ -1,0 +1,474 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Mako Documentation - The Unicode Chapter</title>
+	
+    <link rel="stylesheet" href="docs.css"></link>
+    <link rel="stylesheet" href="highlight.css"></link>
+    
+
+
+
+
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+<div id="topanchor"><a name="top">&nbsp;</a></div>
+
+<div id="pagecontrol"><a href="index.html">Multiple Pages</a> | <a href="documentation.html">One Page</a></div>
+
+<h1>Mako Documentation</h1>
+
+<div class="versionheader">Version: 0.3.3   Last Updated: 05/31/10 16:21:29</div>
+
+
+
+
+
+
+
+<A name=""></a>
+
+
+    <div class="topnav">
+
+    
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="filtering.html">Filtering and Buffering</a>
+
+            |
+            Next: <a href="caching.html">Caching</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+    <br/>
+	<a href="#unicode">The Unicode Chapter</a>
+	
+	
+    <ul>
+        <li><A style="" href="unicode.html#unicode_specifying">Specifying the Encoding of a Template File</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="unicode.html#unicode_handling">Handling Expressions</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="unicode.html#unicode_defining">Defining Output Encoding</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="unicode.html#unicode_defining_buffer">Buffer Selection</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="unicode.html#unicode_saying">Saying to Heck with it:  Disabling the usage of Unicode entirely</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+    
+    <A name="unicode"></a>
+    
+    <div class="section">
+    
+
+    <h3>The Unicode Chapter</h3>
+    
+    
+
+<p>The Python language supports two ways of representing what we know as "strings", i.e. series of characters.   In Python 2, the two types are <code>string</code> and <code>unicode</code>, and in Python 3 they are <code>bytes</code> and <code>string</code>.   A key aspect of the Python 2 <code>string</code> and Python 3 <code>bytes</code> types are that they  contain no information regarding what <strong>encoding</strong> the data is stored in.   For this reason they were commonly referred to as <strong>byte strings</strong> on Python 2, and Python 3 makes this name more explicit.  The origins of this come from Python's background of being developed before the Unicode standard was even available, back when strings were C-style strings and were just that, a series of bytes.  Strings that had only values below 128 just happened to be <strong>ascii</strong> strings and were printable on the console, whereas strings with values above 128 would produce all kinds of graphical characters and bells.
+</p>
+<p>Contrast the "bytestring" types with the "unicode/string" type.   Objects of this type are created whenever you say something like <code>u&quot;hello world&quot;</code> (or in Python 3, just <code>&quot;hello world&quot;</code>).  In this case, Python represents each character in the string internally using multiple bytes per character (something similar to UTF-16).  Whats important is that when using the <code>unicode</code>/<code>string</code> type to store strings, Python knows the data's encoding; its in its own internal format.  Whereas when using the <code>string</code>/<code>bytes</code> type, it does not.
+</p>
+<p>When Python 2 attempts to treat a byte-string as a string, which means its attempting to compare/parse its characters, to coerce it into another encoding, or to decode it to a unicode object, it has to guess what the encoding is.  In this case, it will pretty much always guess the encoding as <code>ascii</code>...and if the bytestring contains bytes above value 128, you'll get an error.  Python 3 eliminates much of this confusion by just raising an error unconditionally if a bytestring is used in a character-aware context.
+</p>
+<p>There is one operation that Python <em>can</em> do with a non-ascii bytestring, and its a great source of confusion:  it can dump the bytestring straight out to a stream or a file, with nary a care what the encoding is.  To Python, this is pretty much like dumping any other kind of binary data (like an image) to a stream somewhere.  In Python 2, it is common to see programs that embed all kinds of international characters and encodings into plain byte-strings (i.e. using <code>&quot;hello world&quot;</code> style literals) can fly right through their run, sending reams of strings out to whereever they are going, and the programmer, seeing the same output as was expressed in the input, is now under the illusion that his or her program is Unicode-compliant.  In fact, their program has no unicode awareness whatsoever, and similarly has no ability to interact with libraries that <em>are</em> unicode aware.   Python 3 makes this much less likely by defaulting to unicode as the storage format for strings.
+</p>
+<p>The "pass through encoded data" scheme is what template languages like Cheetah and earlier versions of Myghty do by default.  Mako as of version 0.2 also supports this mode of operation when using Python 2, using the "disable_unicode=True" flag.  However, when using Mako in its default mode of unicode-aware, it requires explicitness when dealing with non-ascii encodings.  Additionally, if you ever need to handle unicode strings and other kinds of encoding conversions more intelligently, the usage of raw bytestrings quickly becomes a nightmare, since you are sending the Python interpreter collections of bytes for which it can make no intelligent decisions with regards to encoding.   In Python 3 Mako only allows usage of native, unicode strings.
+</p>
+<p>In normal Mako operation, all parsed template constructs and output streams are handled internally as Python <code>unicode</code> objects.  Its only at the point of <code>render()</code> that this unicode stream may be rendered into whatever the desired output encoding is.  The implication here is that the template developer must ensure that the encoding of all non-ascii templates is explicit (still required in Python 3), that all non-ascii-encoded expressions are in one way or another converted to unicode (not much of a burden in Python 3), and that the output stream of the template is handled as a unicode stream being encoded to some encoding (still required in Python 3).
+</p>
+
+
+    
+    <A name="unicode_specifying"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Specifying the Encoding of a Template File</h3>
+    
+    
+
+<p>This is the most basic encoding-related setting, and it is equivalent to Python's "magic encoding comment", as described in <a href='http://www.python.org/dev/peps/pep-0263/'>pep-0263</a>.  Any template that contains non-ascii characters  requires that this comment be present so that Mako can decode to unicode (and also make usage of Python's AST parsing services).  Mako's lexer will use this encoding in order to convert the template source into a <code>unicode</code> object before continuing its parsing:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">## -*- coding: utf-8 -*-</span>
+
+Alors vous imaginez ma surprise, au lever du jour, quand une drôle de petit voix m’a réveillé. Elle disait: « S’il vous plaît… dessine-moi un mouton! »
+</pre></div>
+
+    </div>
+<p>For the picky, the regular expression used is derived from that of the abovementioned pep:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="c">#.*coding[:=]\s*([-\w.]+).*\n</span>
+</pre></div>
+
+    </div>
+<p>The lexer will convert to unicode in all cases, so that if any characters exist in the template that are outside of the specified encoding (or the default of <code>ascii</code>), the error will be immediate.
+</p>
+<p>As an alternative, the template encoding can be specified programmatically to either <code>Template</code> or <code>TemplateLookup</code> via the <code>input_encoding</code> parameter:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="n">t</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span><span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;./&#39;</span><span class="p">],</span> <span class="n">input_encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+<p>The above will assume all located templates specify <code>utf-8</code> encoding, unless the template itself contains its own magic encoding comment, which takes precedence.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="unicode_handling"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Handling Expressions</h3>
+    
+    
+
+<p>The next area that encoding comes into play is in expression constructs.  By default, Mako's treatment of an expression like this:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">${</span><span class="s">&quot;hello world&quot;</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>looks something like this:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="n">context</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="s">&quot;hello world&quot;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+<p>In Python 3, its just:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="n">context</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s">&quot;hello world&quot;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+<p>That is, <em></em>the output of all expressions is run through the <code>unicode</code> builtin<em></em>.  This is the default setting, and can be modified to expect various encodings.  The <code>unicode</code> step serves both the purpose of rendering non-string expressions into strings (such as integers or objects which contain <code>__str()__</code> methods), and to ensure that the final output stream is constructed as a unicode object.  The main implication of this is that <strong>any raw bytestrings that contain an encoding other than ascii must first be decoded to a Python unicode object</strong>.   It means you can't say this in Python 2:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">${</span><span class="s">&quot;voix m’a réveillé.&quot;</span><span class="cp">}</span>  <span class="cp">## error in Python 2!</span>
+</pre></div>
+
+    </div>
+<p>You must instead say this:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">${</span><span class="s">u&quot;voix m’a réveillé.&quot;</span><span class="cp">}</span>  <span class="cp">## OK !</span>
+</pre></div>
+
+    </div>
+<p>Similarly, if you are reading data from a file that is streaming bytes, or returning data from some object that is returning a Python bytestring containing a non-ascii encoding, you have to explcitly decode to unicode first, such as:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">${</span><span class="n">call_my_object</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<p>Note that filehandles acquired by <code>open()</code> in Python 3 default to returning "text", that is the decoding is done for you.  See Python 3's documentation for the <code>open()</code> builtin for details on this.
+</p>
+<p>If you want a certain encoding applied to <em>all</em> expressions, override the <code>unicode</code> builtin with the <code>decode</code> builtin at the <code>Template</code> or <code>TemplateLookup</code> level:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="n">t</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">templatetext</span><span class="p">,</span> <span class="n">default_filters</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;decode.utf8&#39;</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+<p>Note that the built-in <code>decode</code> object is slower than the <code>unicode</code> function, since unlike <code>unicode</code> its not a Python builtin, and it also checks the type of the incoming data to determine if string conversion is needed first.
+</p>
+<p>The <code>default_filters</code> argument can be used to entirely customize the filtering process of expressions.  This argument is described in <a href="filtering.html#filtering_expression_defaultfilters">The default_filters Argument</a>.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="unicode_defining"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Defining Output Encoding</h3>
+    
+    
+
+<p>Now that we have a template which produces a pure unicode output stream, all the hard work is done.  We can take the output and do anything with it.
+</p>
+<p>As stated in the "Usage" chapter, both <code>Template</code> and <code>TemplateLookup</code> accept <code>output_encoding</code> and <code>encoding_errors</code> parameters which can be used to encode the output in any Python supported codec:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">mako.lookup</span> <span class="kn">import</span> <span class="n">TemplateLookup</span>
+
+<span class="n">mylookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span><span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;/docs&#39;</span><span class="p">],</span> <span class="n">output_encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">encoding_errors</span><span class="o">=</span><span class="s">&#39;replace&#39;</span><span class="p">)</span>
+
+<span class="n">mytemplate</span> <span class="o">=</span> <span class="n">mylookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s">&quot;foo.txt&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p><code>render()</code> will return a <code>bytes</code> object in Python 3 if an output encoding is specified.  By default it performs no encoding and returns a native string.
+</p>
+<p><code>render_unicode()</code> will return the template output as a Python <code>unicode</code> object (or <code>string</code> in Python 3):
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render_unicode</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>The above method disgards the output encoding keyword argument; you can encode yourself by saying:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="k">print</span> <span class="n">mytemplate</span><span class="o">.</span><span class="n">render_unicode</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s">&#39;replace&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+
+
+    
+    <A name="unicode_defining_buffer"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Buffer Selection</h3>
+    
+    
+
+<p>Mako does play some games with the style of buffering used internally, to maximize performance.  Since the buffer is by far the most heavily used object in a render operation, its important!
+</p>
+<p>When calling <code>render()</code> on a template that does not specify any output encoding (i.e. its <code>ascii</code>), Python's <code>cStringIO</code> module, which cannot handle encoding of non-ascii <code>unicode</code> objects (even though it can send raw bytestrings through), is used for buffering.  Otherwise, a custom Mako class called <code>FastEncodingBuffer</code> is used, which essentially is a super dumbed-down version of <code>StringIO</code> that gathers all strings into a list and uses <code>u''.join(elements)</code> to produce the final output - its markedly faster than <code>StringIO</code>.
+</p>
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="unicode_saying"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Saying to Heck with it:  Disabling the usage of Unicode entirely</h3>
+    
+    
+
+<p>Some segements of Mako's userbase choose to make no usage of Unicode whatsoever, and instead would prefer the "passthru" approach; all string expressions in their templates return encoded bytestrings, and they would like these strings to pass right through.   The only advantage to this approach is that templates need not use <code>u&quot;&quot;</code> for literal strings; there's an arguable speed improvement as well since raw bytestrings generally perform slightly faster than unicode objects in Python.  For these users, assuming they're sticking with Python 2, they can hit the <code>disable_unicode=True</code> flag as so:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="c"># -*- encoding:utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">mako.template</span> <span class="kn">import</span> <span class="n">Template</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="s">&quot;drôle de petit voix m’a réveillé.&quot;</span><span class="p">,</span> <span class="n">disable_unicode</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">input_encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">code</span>
+</pre></div>
+
+    </div>
+<p>The <code>disable_unicode</code> mode is strictly a Python 2 thing.  It is not supported at all in Python 3.
+</p>
+<p>The generated module source code will contain elements like these:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="c"># -*- encoding:utf-8 -*-</span>
+<span class="c">#  ...more generated code ...</span>
+
+<span class="k">def</span> <span class="nf">render_body</span><span class="p">(</span><span class="n">context</span><span class="p">,</span><span class="o">**</span><span class="n">pageargs</span><span class="p">):</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">caller_stack</span><span class="o">.</span><span class="n">push_frame</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">__M_locals</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">pageargs</span><span class="o">=</span><span class="n">pageargs</span><span class="p">)</span>
+        <span class="c"># SOURCE LINE 1</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;dr</span><span class="se">\xc3\xb4</span><span class="s">le de petit voix m</span><span class="se">\xe2\x80\x99</span><span class="s">a r</span><span class="se">\xc3\xa9</span><span class="s">veill</span><span class="se">\xc3\xa9</span><span class="s">.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">caller_stack</span><span class="o">.</span><span class="n">pop_frame</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+<p>Where above that the string literal used within <code>context.write</code> is a regular bytestring. 
+</p>
+<p>When <code>disable_unicode=True</code> is turned on, the <code>default_filters</code> argument which normally defaults to <code>[&quot;unicode&quot;]</code> now defaults to <code>[&quot;str&quot;]</code> instead.  Setting default_filters to the empty list <code>[]</code> can remove the overhead of the <code>str</code> call.  Also, in this mode you <strong>cannot</strong> safely call <code>render_unicode()</code> - you'll get unicode/decode errors.
+</p>
+<p><strong>Rules for using disable_unicode=True</strong>
+</p>
+<ul>
+ <li>
+     don't use this mode unless you really, really want to and you absolutely understand what you're doing
+ </li>
+
+ <li>
+     don't use this option just because you don't want to learn to use Unicode properly; we aren't supporting user issues in this mode of operation.  We will however offer generous help for the vast majority of users who stick to the Unicode program.
+ </li>
+
+ <li>
+     Python 3 is unicode by default, and the flag is not available when running on Python 3.
+ </li>
+</ul>
+
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+</html>
+
+
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="filtering.html">Filtering and Buffering</a>
+
+            |
+            Next: <a href="caching.html">Caching</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+

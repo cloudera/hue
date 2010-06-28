@@ -1,0 +1,9 @@
+.jframe-gallery .jf-logo {
+	width: 55px;
+	height: 55px;
+	position: relative;
+	top: 20px;
+	left: 6px;
+	background: url(/jframegallery/static/art/jframegallery.png) no-repeat;
+	display:block;
+}

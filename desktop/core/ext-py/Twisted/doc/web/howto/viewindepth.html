@@ -1,0 +1,191 @@
+<?xml version="1.0"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Twisted Documentation: View In Depth</title><link href="stylesheet.css" type="text/css" rel="stylesheet" /></head><body bgcolor="white"><h1 class="title">View In Depth</h1><div class="toc"><ol><li><a href="#auto0">Main Concepts</a></li><li><a href="#auto1">View factories</a></li><li><a href="#auto2">generate</a></li><li><a href="#auto3">Widgets</a></li><li><a href="#auto4">lmx</a></li><li><a href="#auto5">wvupdate_</a></li><li><a href="#auto6">The View stack</a></li></ol></div><div class="content"><span></span><div class="note"><strong>Note: </strong><p>
+This HOWTO documents the View class, part of the Woven framework. The Woven framework should not be used for new projects. The newer <a href="http://www.divmod.org/projects/nevow">Nevow</a> framework, available as part of the <a href="http://www.divmod.org/projects/quotient">Quotient</a> project, is a simpler framework with consistent semantics and better testing and is strongly recommended over Woven.
+</p><p>
+The Woven documentation below is maintained only for users with an existing Woven codebase.
+</p></div><img src="../img/view.png" title="View in Relation to Controller and Model" /><p>View objects are given a Model and a template DOM node, and use the DOM api to insert the given Model data into the DOM. Views are where you manipulate the HTML, in the form of DOM, which will be sent to the web browser.</p><h2>Main Concepts<a name="auto0"></a></h2><ul><li><a href="#viewfactories">View factories</a> provide the glue from a DOM node
+with a <code>'view='</code> directive to an instance of a View class.</li><li><a href="#generate">generate</a> is the method which is called on the View
+instance to render a node.</li><li><a href="#widgets">Widgets</a> are views that have convenient syntax for
+rendering a View.</li><li><a href="#lmx">lmx</a> is a much more convenient API for constructing DOM
+nodes programatically than the actual DOM API.</li><li><a href="#wvupdate">wvupdate_</a> methods provide a convenient way to
+customize a generic Widget's rendering process without writing an inconvenient
+amount of boilerplate.</li><li><a href="#viewstack">The View stack</a> allows your View classes to expose
+private subviews which are only visible while your View is in scope on the
+stack.</li></ul><h2>View factories<a name="auto1"></a></h2><a name="viewfactories"></a><p>View factories provide the glue between a <code>view=</code> directive on a
+DOM node and a View instance. When a DOM node with a <code>view=</code>
+directive is encountered, Woven looks for a corresponding
+<code>wvfactory_</code> method on your Page instance. A View factory is required
+to return an object which implements the interface <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.interfaces.IView.html" title="twisted.web.woven.interfaces.IView">IView</a></code>:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyView</span>(<span class="py-src-parameter">view</span>.<span class="py-src-parameter">View</span>):
+  <span class="py-src-keyword">def</span> <span class="py-src-identifier">generate</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>):
+      <span class="py-src-keyword">return</span> <span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createTextNode</span>(<span class="py-src-string">&quot;Hello, world!&quot;</span>)
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvfactory_foo</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">model</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">MyView</span>(<span class="py-src-variable">model</span>)
+</pre><p>A View factory should almost always construct the View with the Model object it is passed. The exception to this rule is when the View is designed to render data which is not available in the Model tree, such as data which is obtained from the request or from a session object:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvfactory_currentPageName</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">model</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">widgets</span>.<span class="py-src-variable">Text</span>(<span class="py-src-variable">request</span>.<span class="py-src-variable">prepath</span>[-<span class="py-src-number">1</span>])
+</pre><p>Note that if the Model the View is constructed with is not the Model which was passed in to the factory, Woven will notice this and place the new Model data on the Model stack.</p><p>You may set View factories programatically on a generic Page instance after it has been constructed. The first View factory example could be written:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyView</span>(<span class="py-src-parameter">view</span>.<span class="py-src-parameter">View</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">generate</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createTextNode</span>(<span class="py-src-string">&quot;Hello, world!&quot;</span>)
+
+<span class="py-src-variable">resource</span> = <span class="py-src-variable">page</span>.<span class="py-src-variable">Page</span>()
+<span class="py-src-variable">resource</span>.<span class="py-src-variable">setSubviewFactory</span>(<span class="py-src-string">&quot;foo&quot;</span>, <span class="py-src-variable">MyView</span>)
+</pre><h2>generate<a name="auto2"></a></h2><a name="generate"></a><p>The generate method is the most important method in the IView interface. It is the entry point from the Woven framework into your custom Python View code. When your View instance was constructed, it was passed a Model as the first argument. This is the Model data which generate should insert into the DOM. generate is passed the request and a template DOM node, and must return a DOM node, which will replace the template in the DOM tree:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyView</span>(<span class="py-src-parameter">view</span>.<span class="py-src-parameter">View</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">generate</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createTextNode</span>(<span class="py-src-string">&quot;Hello, world!&quot;</span>)
+</pre><p>Note that the current DOM Document object is available as <code>request.d</code>. You should use this document object as a text node and element factory, so the details about the underlying DOM implementation remain hidden.</p><p>Often, it is incredibly useful to use the incoming template node as a <q>skin</q> for your Views. In the simplest form, this involves simply adding nodes to the incoming template node and returning it from generate:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MySkinnedView</span>(<span class="py-src-parameter">view</span>.<span class="py-src-parameter">View</span>):
+      <span class="py-src-keyword">def</span> <span class="py-src-identifier">generate</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>):
+          <span class="py-src-variable">modelData</span> = <span class="py-src-variable">self</span>.<span class="py-src-variable">getData</span>()
+          <span class="py-src-variable">newNode</span> = <span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createTextNode</span>(<span class="py-src-variable">str</span>(<span class="py-src-variable">modelData</span>))
+          <span class="py-src-variable">node</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">newNode</span>)
+          <span class="py-src-keyword">return</span> <span class="py-src-variable">node</span>
+</pre><p>However, Woven also supports the concept of <q>pattern=</q> nodes, nodes which are marked in the template with a given <q>pattern=</q> directive so they may be located by the View abstractly. To support this, Woven contains a View subclass called Widget, which provides a far more convenient API for rendering your Views.</p><h2>Widgets<a name="auto3"></a></h2><a name="widgets"></a><p>Rendering Views is such an important part of developing a Woven application that it needs to be as convenient as possible. To support reducing the amount of boilerplate required to write a new View, the View subclass Widget was created. When subclassing Widget, simply override setUp instead of generate. setUp differs from generate in that it is passed a reference to the Model data, not the Model wrapper, and may simply mutate the template DOM node in place without having to worry about returning anything:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyWidget</span>(<span class="py-src-parameter">widgets</span>.<span class="py-src-parameter">Widget</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">setUp</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">data</span>):
+        <span class="py-src-variable">newNode</span> = <span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createTextNode</span>(<span class="py-src-variable">str</span>(<span class="py-src-variable">data</span>))
+        <span class="py-src-variable">node</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">newNode</span>)
+</pre><p>Widget also supports a very useful and convenient method called getPattern which allows you to locate nodes in the template node which have a <code>pattern=</code> attribute on them, regardless of where they are in the template, what style the node is, or how many children the node has:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPatternWidget</span>(<span class="py-src-parameter">widgets</span>.<span class="py-src-parameter">Widget</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">setUp</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">data</span>):
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">data</span> &gt; <span class="py-src-number">10</span>:
+            <span class="py-src-variable">newNode</span> = <span class="py-src-variable">self</span>.<span class="py-src-variable">getPattern</span>(<span class="py-src-string">&quot;large&quot;</span>)
+        <span class="py-src-keyword">else</span>:
+            <span class="py-src-variable">newNode</span> = <span class="py-src-variable">self</span>.<span class="py-src-variable">getPattern</span>(<span class="py-src-string">&quot;small&quot;</span>)
+        <span class="py-src-variable">node</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">newNode</span>)
+</pre><p>This widget could be used with the following template to abstractly allow the designer to style elements which are larger than 10:</p><pre>
+&lt;div model=&quot;listOfIntegers&quot; view=&quot;List&quot;&gt;
+  &lt;div pattern=&quot;listItem&quot; view=&quot;MyPatternWidget&quot;&gt;
+      &lt;span pattern=&quot;large&quot; style=&quot;background-color: red&quot; view=&quot;Text&quot; /&gt;
+      &lt;span pattern=&quot;small&quot; style=&quot;background-color: blue&quot; view=&quot;Text&quot; /&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre><p>Notice how the Widgets chain themselves to create the final page; the List widget makes copies of the pattern node which have <code>view=&quot;MyPatternWidget&quot;</code> on them; the <code>MyPatternWidget</code> widget makes copies of the <code>pattern=&quot;large&quot;</code> or <code>pattern=&quot;small&quot;</code> nodes which have <code>view=&quot;Text&quot;</code> directives on them; and the Text widget inserts the actual model data from the list into the innermost <code>&lt;span&gt;</code> element.</p><p>Widgets, along with the DOM api and the getPattern helper method, provide a powerful way for you to write view logic in Python without knowing or caring what type of HTML nodes are in your Template.</p><h2>lmx<a name="auto4"></a></h2><a name="lmx"></a><p>Generating View structure using the DOM is very useful for separating the Template from the actual logic which structures the View. However, if you need to do a large amount of HTML generation in Python, it becomes very cumbersome quickly. lmx is a lightweight wrapper around DOM nodes that allows you to quickly and easily build large HTML structures from Python:</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">microdom</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">lmx</span>
+    
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">LMXWidget</span>(<span class="py-src-parameter">widgets</span>.<span class="py-src-parameter">Widget</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">setUp</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">data</span>):
+        <span class="py-src-variable">l</span> = <span class="py-src-variable">lmx</span>(<span class="py-src-variable">node</span>)
+        <span class="py-src-keyword">for</span> <span class="py-src-variable">color</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">data</span>:
+            <span class="py-src-variable">l</span>.<span class="py-src-variable">div</span>(<span class="py-src-variable">style</span>=
+                <span class="py-src-string">&quot;width: 2in; height: 1in; background-color: %s&quot;</span> % <span class="py-src-variable">color</span>)
+</pre><p>When an lmx instance is wrapped around a DOM node, calling a method on the lmx instance creates a new DOM node inside a new lmx instance. The new DOM node will have the same tag name as the name of the method that was called, and an attribute for each keyword argument that was passed to the method. The returned value is the new DOM node wrapped in a new lmx instance. Text nodes can be added to an lmx instance by calling the special method <code>text</code>.</p><p>lmx can enable you to quickly generate a large amount of HTML programatically. For example, to build a calendar for the current month, create a Widget which uses lmx to add DOM nodes to the incoming template node. Here is a complete example which when placed in an rpy and visited through the web will render the current month's calendar:</p><pre class="python">
+<span class="py-src-keyword">import</span> <span class="py-src-variable">time</span>
+<span class="py-src-keyword">import</span> <span class="py-src-variable">calendar</span>
+<span class="py-src-variable">calendar</span>.<span class="py-src-variable">setfirstweekday</span>(<span class="py-src-variable">calendar</span>.<span class="py-src-variable">SUNDAY</span>)
+    
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">microdom</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">lmx</span>
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">woven</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">widgets</span>
+
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">Calendar</span>(<span class="py-src-parameter">widgets</span>.<span class="py-src-parameter">Widget</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">setUp</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">data</span>):
+        <span class="py-src-variable">node</span>.<span class="py-src-variable">tagName</span> = <span class="py-src-string">&quot;table&quot;</span>
+        <span class="py-src-variable">curTime</span> = <span class="py-src-variable">time</span>.<span class="py-src-variable">localtime</span>()
+        <span class="py-src-variable">curMonth</span> = <span class="py-src-variable">calendar</span>.<span class="py-src-variable">monthcalendar</span>(<span class="py-src-variable">curTime</span>[<span class="py-src-number">0</span>], <span class="py-src-variable">curTime</span>[<span class="py-src-number">1</span>])
+        <span class="py-src-variable">today</span> = <span class="py-src-variable">curTime</span>[<span class="py-src-number">2</span>]
+        <span class="py-src-variable">month</span> = <span class="py-src-variable">lmx</span>(<span class="py-src-variable">node</span>)
+        <span class="py-src-variable">headers</span> = <span class="py-src-variable">month</span>.<span class="py-src-variable">tr</span>()
+        <span class="py-src-keyword">for</span> <span class="py-src-variable">dayName</span> <span class="py-src-keyword">in</span> [<span class="py-src-string">&quot;Su&quot;</span>, <span class="py-src-string">&quot;M&quot;</span>, <span class="py-src-string">&quot;T&quot;</span>, <span class="py-src-string">&quot;W&quot;</span>, <span class="py-src-string">&quot;Th&quot;</span>, <span class="py-src-string">&quot;F&quot;</span> , <span class="py-src-string">&quot;S&quot;</span>]:
+            <span class="py-src-variable">headers</span>.<span class="py-src-variable">td</span>(
+                <span class="py-src-variable">_class</span>=<span class="py-src-string">&quot;dayName&quot;</span>, <span class="py-src-variable">align</span>=<span class="py-src-string">&quot;middle&quot;</span>
+            ).<span class="py-src-variable">text</span>(<span class="py-src-variable">dayName</span>)
+        <span class="py-src-keyword">for</span> <span class="py-src-variable">curWeek</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">curMonth</span>:
+            <span class="py-src-variable">week</span> = <span class="py-src-variable">month</span>.<span class="py-src-variable">tr</span>(<span class="py-src-variable">_class</span>=<span class="py-src-string">&quot;week&quot;</span>)
+            <span class="py-src-keyword">for</span> <span class="py-src-variable">curDay</span> <span class="py-src-keyword">in</span> <span class="py-src-variable">curWeek</span>:
+                <span class="py-src-keyword">if</span> <span class="py-src-variable">curDay</span> == <span class="py-src-number">0</span>:
+                    <span class="py-src-variable">week</span>.<span class="py-src-variable">td</span>(<span class="py-src-variable">_class</span>=<span class="py-src-string">&quot;blankDay&quot;</span>)
+                <span class="py-src-keyword">else</span>:
+                    <span class="py-src-keyword">if</span> <span class="py-src-variable">curDay</span> == <span class="py-src-variable">today</span>:
+                        <span class="py-src-variable">className</span> = <span class="py-src-string">&quot;today&quot;</span>
+                    <span class="py-src-keyword">else</span>:
+                        <span class="py-src-variable">className</span> = <span class="py-src-string">&quot;day&quot;</span>
+                    <span class="py-src-variable">week</span>.<span class="py-src-variable">td</span>(
+                        <span class="py-src-variable">_class</span>=<span class="py-src-variable">className</span>, <span class="py-src-variable">align</span>=<span class="py-src-string">&quot;right&quot;</span>
+                    ).<span class="py-src-variable">text</span>(<span class="py-src-variable">str</span>(<span class="py-src-variable">curDay</span>))
+
+    
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">woven</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">page</span>
+    
+    
+<span class="py-src-variable">resource</span> = <span class="py-src-variable">page</span>.<span class="py-src-variable">Page</span>(<span class="py-src-variable">template</span>=<span class="py-src-string">&quot;&quot;&quot;&lt;html&gt;
+    &lt;head&gt;
+        &lt;style type=&quot;text/css&quot;&gt;
+.week {  }
+.day { border: 1px solid black; height: 2em; width: 2em; color: blue }
+.today { border: 1px solid red; height: 2em; width: 2em; color: red }
+.blankDay { height: 2em; width: 2em;}
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div view=&quot;calendar&quot; /&gt;
+    &lt;/body&gt;
+&lt;/html&gt;&quot;&quot;&quot;</span>)
+
+<span class="py-src-variable">resource</span>.<span class="py-src-variable">setSubviewFactory</span>(<span class="py-src-string">&quot;calendar&quot;</span>, <span class="py-src-variable">Calendar</span>)
+</pre><h2>wvupdate_<a name="auto5"></a></h2><a name="wvupdate"></a><p>Sometimes, you need to create some view-rendering code for a very specific
+purpose. Since this code will most likely not be reusable across pages, it is
+irritating to have to create a Widget just to house this code. Thus, Woven
+allows you to place specially named <code>wvupdate_</code> methods on your Page
+subclass. Think of a <code>wvupdate_</code> method as a setUp method that lives
+on the Page class. When Woven encounters a view= directive that matches with a
+<code>wvupdate_</code> method name, it will create a generic Widget instance and
+call the <code>wvupdate_</code> method instead of <code>setUp</code>.</p><p>Note that the generic Widget instance is passed in as the third argument to a <code>wvupdate_</code> method instead of a DOM node instance. Often this fact is not important, however, if you wish to access a Widget API such as getPattern, you must do so using the widget argument rather than self:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvupdate_foo</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">widget</span>, <span class="py-src-parameter">data</span>):
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">data</span> &gt; <span class="py-src-number">10</span>:
+            <span class="py-src-variable">newNode</span> = <span class="py-src-variable">widget</span>.<span class="py-src-variable">getPattern</span>(<span class="py-src-string">&quot;large&quot;</span>)
+        <span class="py-src-keyword">else</span>:
+            <span class="py-src-variable">newNode</span> = <span class="py-src-variable">widget</span>.<span class="py-src-variable">getPattern</span>(<span class="py-src-string">&quot;small&quot;</span>)
+        <span class="py-src-variable">newNode</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createTextNode</span>(<span class="py-src-variable">str</span>(<span class="py-src-variable">data</span>)))
+        <span class="py-src-variable">widget</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">newNode</span>)
+</pre><p>It is often possible to use <code>wvupdate_</code> methods to quickly prototype some View code, and generalize this code later. By moving the <code>wvupdate_</code> code into a Widget subclass, you make this code available to many different Pages.</p><h2>The View stack<a name="auto6"></a></h2><a name="viewstack"></a><p>Woven uses a View stack to keep track of which View objects are currently in
+scope. You can use this fact to provide View objects which contain a lot of
+view-manipulation logic, but are still cleanly implemented. When Woven
+encounters a node with a <code>view=</code> directive, it locates the View (by
+looking for a <code>wvfactory_</code> method) and places it on the View stack.</p><p>While this node is being rendered, the new View is in scope, and is searched for <code>wvfactory_</code> methods before other Views and the Page object. Thus you can create a View which is made up of other smaller parts:</p><pre class="python">
+<span class="py-src-keyword">from</span> <span class="py-src-variable">twisted</span>.<span class="py-src-variable">web</span>.<span class="py-src-variable">woven</span> <span class="py-src-keyword">import</span> <span class="py-src-variable">view</span>, <span class="py-src-variable">page</span>
+    
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">ShowHide</span>(<span class="py-src-parameter">view</span>.<span class="py-src-parameter">View</span>):
+    <span class="py-src-variable">template</span> = <span class="py-src-string">&quot;&quot;&quot;&lt;span&gt;
+    &lt;div view=&quot;hider&quot;&gt;
+        &lt;div pattern=&quot;contents&quot; view=&quot;contents&quot;&gt;
+            Here are the contents!
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/span&gt;&quot;&quot;&quot;</span>
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvupdate_hider</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">widget</span>, <span class="py-src-parameter">data</span>):
+        <span class="py-src-comment">## We want the widget to be cleared before rendering
+</span>        <span class="py-src-variable">widget</span>.<span class="py-src-variable">clearNode</span> = <span class="py-src-number">1</span>
+
+        <span class="py-src-variable">hidden</span> = <span class="py-src-variable">int</span>(<span class="py-src-variable">request</span>.<span class="py-src-variable">args</span>.<span class="py-src-variable">get</span>(<span class="py-src-string">&quot;hide&quot;</span>, [<span class="py-src-number">0</span>])[<span class="py-src-number">0</span>])
+        
+        <span class="py-src-keyword">if</span> <span class="py-src-variable">hidden</span>:
+            <span class="py-src-variable">opener</span> = <span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createElement</span>(<span class="py-src-string">&quot;a&quot;</span>)
+            <span class="py-src-variable">opener</span>.<span class="py-src-variable">setAttribute</span>(<span class="py-src-string">&quot;href&quot;</span>, <span class="py-src-string">&quot;?hide=0&quot;</span>)
+            <span class="py-src-variable">opener</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createTextNode</span>(<span class="py-src-string">&quot;Open&quot;</span>))
+            <span class="py-src-variable">widget</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">opener</span>)
+        <span class="py-src-keyword">else</span>:
+            <span class="py-src-variable">closer</span> = <span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createElement</span>(<span class="py-src-string">&quot;a&quot;</span>)
+            <span class="py-src-variable">closer</span>.<span class="py-src-variable">setAttribute</span>(<span class="py-src-string">&quot;href&quot;</span>, <span class="py-src-string">&quot;?hide=1&quot;</span>)
+            <span class="py-src-variable">closer</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createTextNode</span>(<span class="py-src-string">&quot;Close&quot;</span>))
+            <span class="py-src-variable">widget</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">closer</span>)
+            <span class="py-src-variable">widget</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">widget</span>.<span class="py-src-variable">getPattern</span>(<span class="py-src-string">&quot;contents&quot;</span>))
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvupdate_contents</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">widget</span>, <span class="py-src-parameter">data</span>):
+        <span class="py-src-variable">widget</span>.<span class="py-src-variable">clearNode</span> = <span class="py-src-number">1</span>
+        <span class="py-src-variable">widget</span>.<span class="py-src-variable">appendChild</span>(<span class="py-src-variable">request</span>.<span class="py-src-variable">d</span>.<span class="py-src-variable">createTextNode</span>(<span class="py-src-string">&quot;Some contents here&quot;</span>))
+
+<span class="py-src-variable">resource</span> = <span class="py-src-variable">page</span>.<span class="py-src-variable">Page</span>(<span class="py-src-variable">template</span>=<span class="py-src-string">&quot;&quot;&quot;&lt;html&gt;
+    &lt;body&gt;
+        &lt;span view=&quot;showHide&quot; /&gt;
+    &lt;/body&gt;
+&lt;/html&gt;&quot;&quot;&quot;</span>)
+
+<span class="py-src-variable">resource</span>.<span class="py-src-variable">setSubviewFactory</span>(<span class="py-src-string">&quot;showHide&quot;</span>, <span class="py-src-variable">ShowHide</span>)
+</pre></div><p><a href="index.html">Index</a></p><span class="version">Version: 8.2.0</span></body></html>

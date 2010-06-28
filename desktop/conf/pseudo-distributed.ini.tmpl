@@ -1,0 +1,47 @@
+[desktop]
+[[auth]]
+# Uncomment the next line in order to use PAM for authentication.
+# This will check usernames and passwords against your linux system.
+#
+# WARNING: this may be a security concern if Hue does not
+# run beneath SSL.
+# backend=desktop.auth.backend.PamBackend
+
+[[local_filesystems]]
+# Work in progress: specify local paths that should also be browsable
+[[[tmpfs]]]
+path=/tmp
+
+
+[hadoop]
+# Point this variable at the path to your Hadoop wrapper script
+hadoop_home=$HADOOP_HOME
+
+[[hdfs_clusters]]
+[[[default]]]
+namenode_host=localhost
+
+[[mapred_clusters]]
+[[[default]]]
+jobtracker_host=localhost
+
+[health]
+[[ganglia_clusters]]
+[[[default]]]
+# If you are not running Ganglia, you can delete this whole
+# section or just leave it be.
+gmetad_host=localhost
+gmetad_port=8649
+ganglia_url=http://%(gmetad_host)s:80/ganglia/
+
+
+[[lint_checks]]
+# Users can define new thresholds for lint checks. This is an advanced feature
+# but useful for testing.
+#[[[dfs_free_space]]]
+#critical_level=100000000000
+#warn_level    =1000000000000
+
+[beeswax]
+# Point this variable to your Hive installation config dir (if applicable)
+# hive_conf_dir=

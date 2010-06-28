@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Listeners and Clients</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="sharedctypes.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="programming-guidelines.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="listeners-and-clients">
+<h1 class="title">Listeners and Clients</h1>
+<p>Usually message passing between processes is done using queues or by
+using connection objects returned by <tt class="docutils literal"><span class="pre">Pipe()</span></tt>.</p>
+<p>However, the <tt class="docutils literal"><span class="pre">processing.connection</span></tt> module allows some extra
+flexibility.  It basically gives a high level API for dealing with
+sockets or Windows named pipes, and also has support for <em>digest
+authentication</em> using the <tt class="docutils literal"><span class="pre">hmac</span></tt> module from the standard library.</p>
+<div class="section">
+<h1><a id="classes-and-functions" name="classes-and-functions">Classes and functions</a></h1>
+<p>The module defines the following functions:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Listener(address=None,</span> <span class="pre">family=None,</span> <span class="pre">backlog=1,</span> <span class="pre">authenticate=False,</span> <span class="pre">authkey=None)</span></tt></dt>
+<dd>Returns a wrapper for a bound socket or Windows named pipe
+which is 'listening' for connections.</dd>
+<dt><tt class="docutils literal"><span class="pre">Client(address,</span> <span class="pre">family=None,</span> <span class="pre">authenticate=False,</span> <span class="pre">authkey=None)</span></tt></dt>
+<dd><p class="first">Attempts to set up a connection to the listener which is using
+address <tt class="docutils literal"><span class="pre">address</span></tt>, returning a <a class="reference" href="connection-object.html">connection object</a>.</p>
+<p>The type of the connection is determined by <tt class="docutils literal"><span class="pre">family</span></tt>
+argument, but this can generally be omitted since it can
+usually be inferred from the format of <tt class="docutils literal"><span class="pre">address</span></tt>.</p>
+<p class="last">If <tt class="docutils literal"><span class="pre">authentication</span></tt> or <tt class="docutils literal"><span class="pre">authkey</span></tt> is a string then digest
+authentication is used.  The key used for authentication will
+be either <tt class="docutils literal"><span class="pre">authkey</span></tt> or <tt class="docutils literal"><span class="pre">currentProcess.getAuthKey()</span></tt> if
+<tt class="docutils literal"><span class="pre">authkey</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt>.  If authentication fails then
+<tt class="docutils literal"><span class="pre">AuthenticationError</span></tt> is raised.  See <a class="reference" href="#authentication-keys">Authentication keys</a>.</p>
+</dd>
+</dl>
+</blockquote>
+<!-- `deliverChallenge(connection, authkey)`
+    Sends a randomly generated message to the other end of the
+    connection and waits for a reply.
+
+    If the reply matches the digest of the message using `authkey`
+    as the key then a welcome message is sent to the other end of
+    the connection.  Otherwise `AuthenticationError` is raised.
+
+`answerChallenge(connection, authkey)`
+    Receives a message, calculates the digest of the message using
+    `authkey` as the key, and then sends the digest back.
+
+    If a welcome message is not received then
+    `AuthenticationError` is raised. -->
+<p>The module exports two exception types:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>exception</strong> <tt class="docutils literal"><span class="pre">AuthenticationError</span></tt></dt>
+<dd>Exception raised when there is an authentication error.</dd>
+<dt><strong>exception</strong> <tt class="docutils literal"><span class="pre">BufferTooShort</span></tt></dt>
+<dd><p class="first">Exception raise by the <tt class="docutils literal"><span class="pre">recvBytesInto()</span></tt> method of a
+connection object when the supplied buffer object is too small
+for the message read.</p>
+<p class="last">If <tt class="docutils literal"><span class="pre">e</span></tt> is an instance of <tt class="docutils literal"><span class="pre">BufferTooShort</span></tt> then <tt class="docutils literal"><span class="pre">e.args[0]</span></tt> will
+give the message as a byte string.</p>
+</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section">
+<h1><a id="listener-objects" name="listener-objects">Listener objects</a></h1>
+<p>Instances of <tt class="docutils literal"><span class="pre">Listener</span></tt> have the following methods:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">__init__(address=None,</span> <span class="pre">family=None,</span> <span class="pre">backlog=1,</span> <span class="pre">authenticate=False,</span> <span class="pre">authkey=None)</span></tt></dt>
+<dd><dl class="first last docutils">
+<dt><tt class="docutils literal"><span class="pre">address</span></tt></dt>
+<dd>The address to be used by the bound socket
+or named pipe of the listener object.</dd>
+<dt><tt class="docutils literal"><span class="pre">family</span></tt></dt>
+<dd><p class="first">The type of the socket (or named pipe) to use.</p>
+<p>This can be one of the strings <tt class="docutils literal"><span class="pre">'AF_INET'</span></tt> (for a TCP
+socket), <tt class="docutils literal"><span class="pre">'AF_UNIX'</span></tt> (for a Unix domain socket) or
+<tt class="docutils literal"><span class="pre">'AF_PIPE'</span></tt> (for a Windows named pipe).  Of these only
+the first is guaranteed to be available.</p>
+<p>If <tt class="docutils literal"><span class="pre">family</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> than the family is inferred from the
+format of <tt class="docutils literal"><span class="pre">address</span></tt>.  If <tt class="docutils literal"><span class="pre">address</span></tt> is also <tt class="docutils literal"><span class="pre">None</span></tt> then a
+default is chosen.  This default is the family which is
+assumed to be the fastest available.  See <a class="reference" href="#address-formats">Address
+formats</a>.</p>
+<p class="last">Note that if <tt class="docutils literal"><span class="pre">family</span></tt> is <tt class="docutils literal"><span class="pre">'AF_UNIX'</span></tt> then the associated
+file will have only be readable/writable by the user
+running the current process -- use <tt class="docutils literal"><span class="pre">os.chmod()</span></tt> is you need
+to let other users access the socket.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">backlog</span></tt></dt>
+<dd>If the listener object uses a socket then <tt class="docutils literal"><span class="pre">backlog</span></tt> is
+passed to the <tt class="docutils literal"><span class="pre">listen()</span></tt> method of the socket once it has
+been bound.</dd>
+<dt><tt class="docutils literal"><span class="pre">authenticate</span></tt></dt>
+<dd>If <tt class="docutils literal"><span class="pre">authenticate</span></tt> is true or <tt class="docutils literal"><span class="pre">authkey</span></tt> is not <tt class="docutils literal"><span class="pre">None</span></tt> then
+digest authentication is used.</dd>
+<dt><tt class="docutils literal"><span class="pre">authkey</span></tt></dt>
+<dd><p class="first">If <tt class="docutils literal"><span class="pre">authkey</span></tt> is a string then it will be used as the
+authentication key; otherwise it must be <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
+<p>If <tt class="docutils literal"><span class="pre">authkey</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> and <tt class="docutils literal"><span class="pre">authenticate</span></tt> is true then
+<tt class="docutils literal"><span class="pre">currentProcess.getAuthKey()</span></tt> is used as the authentication
+key.</p>
+<p>If <tt class="docutils literal"><span class="pre">authkey</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> and <tt class="docutils literal"><span class="pre">authentication</span></tt> is false then
+no authentication is done.</p>
+<p class="last">If authentication fails then <tt class="docutils literal"><span class="pre">AuthenticationError</span></tt> is
+raised.  See <a class="reference" href="#authentication-keys">Authentication keys</a>.</p>
+</dd>
+</dl>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">accept()</span></tt></dt>
+<dd><p class="first">Accept a connection on the bound socket or named pipe of the
+listener object.  If authentication is attempted and fails
+then <tt class="docutils literal"><span class="pre">AuthenticationError</span></tt> is raised.</p>
+<p class="last">Returns a <tt class="docutils literal"><span class="pre">connection</span> <span class="pre">object</span> <span class="pre">&lt;connection-object.html&gt;</span></tt> object.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">close()</span></tt></dt>
+<dd><p class="first">Close the bound socket or named pipe of the listener object.</p>
+<p class="last">This is called automatically when the listener is garbage
+collected.  However it is advisable to call it explicitly.</p>
+</dd>
+</dl>
+</blockquote>
+<p>Listener objects have the following read-only properties:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">address</span></tt></dt>
+<dd>The address which is being used by the listener object.</dd>
+<dt><tt class="docutils literal"><span class="pre">last_accepted</span></tt></dt>
+<dd><p class="first">The address from which the last accepted connection came.</p>
+<p class="last">If this is unavailable then <tt class="docutils literal"><span class="pre">None</span></tt> is returned.</p>
+</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section">
+<h1><a id="address-formats" name="address-formats">Address formats</a></h1>
+<ul>
+<li><p class="first">An <tt class="docutils literal"><span class="pre">'AF_INET'</span></tt> address is a tuple of the form <tt class="docutils literal"><span class="pre">(hostname,</span> <span class="pre">port)</span></tt>
+where <tt class="docutils literal"><span class="pre">hostname</span></tt> is a string and <tt class="docutils literal"><span class="pre">port</span></tt> is an integer</p>
+</li>
+<li><p class="first">An <tt class="docutils literal"><span class="pre">'AF_UNIX'</span></tt> address is a string representing a filename on the
+filesystem.</p>
+</li>
+<li><p class="first">An <tt class="docutils literal"><span class="pre">'AF_PIPE'</span></tt> address is a string of the form
+<tt class="docutils literal"><span class="pre">r'\\.\pipe\PipeName'</span></tt>.</p>
+<p>To use <tt class="docutils literal"><span class="pre">Client</span></tt> to connect to a named pipe on a remote computer
+called <tt class="docutils literal"><span class="pre">ServerName</span></tt> one should use an address of the form
+<tt class="docutils literal"><span class="pre">r'\\ServerName\pipe\PipeName'</span></tt> instead.</p>
+</li>
+</ul>
+<p>Note that any string beginning with two backslashes is assumed by
+default to be an <tt class="docutils literal"><span class="pre">'AF_PIPE'</span></tt> address rather than an <tt class="docutils literal"><span class="pre">'AF_UNIX'</span></tt>
+address.</p>
+</div>
+<div class="section">
+<h1><a id="authentication-keys" name="authentication-keys">Authentication keys</a></h1>
+<p>When one uses the <tt class="docutils literal"><span class="pre">recv()</span></tt> method of a connection object, the data
+received is automatically unpickled.  Unfortunately unpickling data
+from an untrusted source is a security risk.  Therefore <tt class="docutils literal"><span class="pre">Listener</span></tt> and
+<tt class="docutils literal"><span class="pre">Client</span></tt> use the <tt class="docutils literal"><span class="pre">hmac</span></tt> module to provide digest authentication.</p>
+<p>An authentication key is a string which can be thought of as a
+password: once a connection is established both ends will demand proof
+that the other knows the authentication key.  (Demonstrating that both
+ends are using the same key does <em>not</em> involve sending the key over
+the connection.)</p>
+<p>If authentication is requested but do authentication key is specified
+then the return value of <tt class="docutils literal"><span class="pre">currentProcess().getAuthKey()</span></tt> is used (see
+<a class="reference" href="process-objects.html">Process objects</a>).  This value will
+automatically inherited by any <tt class="docutils literal"><span class="pre">Process</span></tt> object that the current
+process creates.  This means that (by default) all processes of a
+multi-process program will share a single authentication key which can
+be used when setting up connections between the themselves.</p>
+<p>Suitable authentication keys can also be generated by using
+<tt class="docutils literal"><span class="pre">os.urandom()</span></tt>.</p>
+</div>
+<div class="section">
+<h1><a id="example" name="example">Example</a></h1>
+<p>The following server code creates a listener which uses <tt class="docutils literal"><span class="pre">'secret</span>
+<span class="pre">password'</span></tt> as an authentication key.  It then waits for a connection
+and sends some data to the client:</p>
+<pre class="literal-block">
+from processing.connection import Listener
+from array import array
+
+address = ('localhost', 6000)     # family is deduced to be 'AF_INET'
+listener = Listener(address, authkey='secret password')
+
+conn = listener.accept()
+print 'connection accepted from', listener.last_accepted
+
+conn.send([2.25, None, 'junk', float])
+
+conn.sendBytes('hello')
+
+conn.sendBytes(array('i', [42, 1729]))
+
+conn.close()
+listener.close()
+</pre>
+<p>The following code connects to the server and receives some data from
+the server:</p>
+<pre class="literal-block">
+from processing.connection import Client
+from array import array
+
+address = ('localhost', 6000)
+conn = Client(address, authkey='secret password')
+
+print conn.recv()                 # =&gt; [2.25, None, 'junk', float]
+
+print conn.recvBytes()            # =&gt; 'hello'
+
+arr = array('i', [0, 0, 0, 0, 0])
+print conn.recvBytesInto(arr)    # =&gt; 8
+print arr                         # =&gt; array('i', [42, 1729, 0, 0, 0])
+
+conn.close()
+</pre>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="sharedctypes.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="programming-guidelines.html">Next</a>
+</div>
+</body>
+</html>

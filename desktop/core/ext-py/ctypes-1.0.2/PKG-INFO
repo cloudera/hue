@@ -1,0 +1,28 @@
+Metadata-Version: 1.0
+Name: ctypes
+Version: 1.0.2
+Summary: create and manipulate C data types in Python, call functions in shared libraries
+Home-page: http://starship.python.net/crew/theller/ctypes/
+Author: Thomas Heller
+Author-email: theller@ctypes.org
+License: MIT License
+Download-URL: http://sourceforge.net/project/showfiles.php?group_id=71702
+Description: ctypes is a Python package to create and manipulate C data types in
+        Python, and to call functions in dynamic link libraries/shared
+        dlls. It allows wrapping these libraries in pure Python.
+        
+Platform: windows
+Platform: Linux
+Platform: MacOS X
+Platform: Solaris
+Platform: FreeBSD
+Classifier: Development Status :: 4 - Beta
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: C
+Classifier: Programming Language :: Python
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

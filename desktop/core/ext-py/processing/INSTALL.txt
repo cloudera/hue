@@ -1,0 +1,57 @@
+.. default-role:: literal
+
+============================
+ Installation of processing
+============================
+
+Versions earlier than Python 2.4 are not supported.  If you are using
+Python 2.4 then you should install the `ctypes` package (which comes
+automatically with Python 2.5).
+
+Windows binary builds for Python 2.4 and Python 2.5 are available at
+
+    http://pyprocessing.berlios.de
+
+or
+
+    http://pypi.python.org/pypi/processing
+
+Otherwise, if you have the correct C compiler setup then the source
+distribution can be installed the usual way::
+
+   python setup.py install
+
+It should not be necessary to do any editing of `setup.py` if you are
+using Windows, Mac OS X or Linux.  On other unices it may be necessary
+to modify the values of the `macros` dictionary or `libraries` list.
+The section to modify reads ::
+
+    else:
+        macros = dict(
+            HAVE_SEM_OPEN=1,
+            HAVE_SEM_TIMEDWAIT=1,
+            HAVE_FD_TRANSFER=1
+            )
+        libraries = ['rt']
+
+More details can be found in the comments in `setup.py`.
+
+Note that if you use `HAVE_SEM_OPEN=0` then support for posix
+semaphores will not been compiled in, and then many of the functions
+in the `processing` namespace like `Lock()`, `Queue()` or will not be
+available.  However, one can still create a manager using `manager =
+processing.Manager()` and then do `lock = manager.Lock()` etc.
+
+
+Running tests
+-------------
+
+To run the test scripts using Python 2.5 do ::
+
+    python -m processing.tests
+
+and on Python 2.4 do ::
+
+    python -c "from processing.tests import main; main()"
+
+This will run a number of test scripts using both processes and threads.

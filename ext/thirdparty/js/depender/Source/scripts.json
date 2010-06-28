@@ -1,0 +1,12 @@
+{
+
+	"Depender": {
+
+		"Depender.Client": {
+			"deps": ["Class.Extras", "Element.Event"],
+			"desc": "A dependency loader for the MooTools library that integrates with <a href=\"http://github.com/anutron/mootools-depender/tree/\">the server side Depender library</a>."
+		}
+
+	}
+
+}

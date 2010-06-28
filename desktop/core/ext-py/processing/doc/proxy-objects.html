@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Proxy objects</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="manager-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="pool-objects.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="proxy-objects">
+<h1 class="title">Proxy objects</h1>
+<p>A proxy is an object which <em>refers</em> to a shared object which lives
+(presumably) in a different process.  The shared object is said to be
+the <em>referent</em> of the proxy.  Multiple proxy objects may have the same
+referent.</p>
+<p>A proxy object has methods which invoke corresponding methods of its
+referent (although not every method of the referent will
+necessarily be available through the proxy).  A proxy can usually be
+used in most of the same ways that the its referent can:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from processing import Manager
+&gt;&gt;&gt; manager = Manager()
+&gt;&gt;&gt; l = manager.list([i*i for i in range(10)])
+&gt;&gt;&gt; print l
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+&gt;&gt;&gt; print repr(l)
+&lt;Proxy[list] object at 0x00DFA230&gt;
+&gt;&gt;&gt; l[4]
+16
+&gt;&gt;&gt; l[2:5]
+[4, 9, 16]
+&gt;&gt;&gt; l == [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+True
+</pre>
+<p>Notice that applying <tt class="docutils literal"><span class="pre">str()</span></tt> to a proxy will return the
+representation of the referent, whereas applying <tt class="docutils literal"><span class="pre">repr()</span></tt> will
+return the representation of the proxy.</p>
+<p>An important feature of proxy objects is that they are picklable so
+they can be passed between processes.  Note, however, that if a proxy
+is sent to the corresponding manager's process then unpickling it will
+produce the referent itself.  This means, for example, that one shared
+object can contain a second:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; a = manager.list()
+&gt;&gt;&gt; b = manager.list()
+&gt;&gt;&gt; a.append(b)         # referent of `a` now contains referent of `b`
+&gt;&gt;&gt; print a, b
+[[]] []
+&gt;&gt;&gt; b.append('hello')
+&gt;&gt;&gt; print a, b
+[['hello']] ['hello']
+</pre>
+<p>Some proxy methods return a proxy for an iterator.  In particular list
+and dictionary proxies are iterables so they can be used with the
+<tt class="docutils literal"><span class="pre">for</span></tt> statement:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; a = manager.dict([(i*i, i) for i in range(10)])
+&gt;&gt;&gt; for key in a:
+...     print '&lt;%r,%r&gt;' % (key, a[key]),
+...
+&lt;0,0&gt; &lt;1,1&gt; &lt;4,2&gt; &lt;81,9&gt; &lt;64,8&gt; &lt;9,3&gt; &lt;16,4&gt; &lt;49,7&gt; &lt;25,5&gt; &lt;36,6&gt;
+</pre>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>Although <tt class="docutils literal"><span class="pre">list</span></tt> and <tt class="docutils literal"><span class="pre">dict</span></tt> proxy objects are iterable, it will be
+much more efficient to iterate over a <em>copy</em> of the referent, for
+example</p>
+<pre class="literal-block">
+for item in some_list[:]:
+    ...
+</pre>
+<p>and</p>
+<pre class="last literal-block">
+for key in some_dict.keys():
+    ...
+</pre>
+</div>
+<div class="section">
+<h1><a id="methods-of-baseproxy" name="methods-of-baseproxy">Methods of <tt class="docutils literal"><span class="pre">BaseProxy</span></tt></a></h1>
+<p>Proxy objects are instances of subclasses of <tt class="docutils literal"><span class="pre">BaseProxy</span></tt>.  The only
+semi-public methods of <tt class="docutils literal"><span class="pre">BaseProxy</span></tt> are the following:</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">_callMethod(methodname,</span> <span class="pre">args=(),</span> <span class="pre">kwds={})</span></tt></dt>
+<dd><p class="first">Call and return the result of a method of the proxy's referent.</p>
+<p>If <tt class="docutils literal"><span class="pre">proxy</span></tt> is a proxy whose referent is <tt class="docutils literal"><span class="pre">obj</span></tt> then the
+expression</p>
+<blockquote>
+<tt class="docutils literal"><span class="pre">proxy._callMethod(methodname,</span> <span class="pre">args,</span> <span class="pre">kwds)</span></tt></blockquote>
+<p>will evaluate the expression</p>
+<blockquote>
+<tt class="docutils literal"><span class="pre">getattr(obj,</span> <span class="pre">methodname)(*args,</span> <span class="pre">**kwds)</span></tt> &nbsp; &nbsp; &nbsp; &nbsp; <span class="target" id="id1">(*)</span></blockquote>
+<p>in the manager's process.</p>
+<p>The returned value will be either a copy of the result of
+<a class="reference" href="#id1">(*)</a> or if the result is an unpicklable iterator then a
+proxy for the iterator.</p>
+<p>If an exception is raised by <a class="reference" href="#id1">(*)</a> then then is re-raised by
+<tt class="docutils literal"><span class="pre">_callMethod()</span></tt>.  If some other exception is raised in the
+manager's process then this is converted into a <tt class="docutils literal"><span class="pre">RemoteError</span></tt>
+exception and is raised by <tt class="docutils literal"><span class="pre">_callMethod()</span></tt>.</p>
+<p class="last">Note in particular that an exception will be raised if
+<tt class="docutils literal"><span class="pre">methodname</span></tt> has not been <em>exposed</em> --- see the <tt class="docutils literal"><span class="pre">exposed</span></tt>
+argument to <a class="reference" href="manager-objects.html#customized-managers">CreatorMethod</a>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">_getValue()</span></tt></dt>
+<dd><p class="first">Return a copy of the referent.</p>
+<p class="last">If the referent is unpicklable then this will raise an exception.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">__repr__</span></tt></dt>
+<dd>Return a representation of the proxy object.</dd>
+<dt><tt class="docutils literal"><span class="pre">__str__</span></tt></dt>
+<dd>Return the representation of the referent.</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section">
+<h1><a id="cleanup" name="cleanup">Cleanup</a></h1>
+<p>A proxy object uses a weakref callback so that when it gets garbage
+collected it deregisters itself from the manager which owns its
+referent.</p>
+<p>A shared object gets deleted from the manager process when there
+are no longer any proxies referring to it.</p>
+</div>
+<div class="section">
+<h1><a id="examples" name="examples">Examples</a></h1>
+<p>An example of the usage of <tt class="docutils literal"><span class="pre">_callMethod()</span></tt>:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; l = manager.list(range(10))
+&gt;&gt;&gt; l._callMethod('__getslice__', (2, 7))   # equiv to `l[2:7]`
+[2, 3, 4, 5, 6]
+&gt;&gt;&gt; l._callMethod('__iter__')               # equiv to `iter(l)`
+&lt;Proxy[iter] object at 0x00DFAFF0&gt;
+&gt;&gt;&gt; l._callMethod('__getitem__', (20,))     # equiv to `l[20]`
+Traceback (most recent call last):
+...
+IndexError: list index out of range
+</pre>
+<p>As an example definition of a subclass of BaseProxy, the proxy type
+used for iterators is the following:</p>
+<pre class="literal-block">
+class IteratorProxy(BaseProxy):
+    def __iter__(self):
+        return self
+    def next(self):
+        return self._callMethod('next')
+</pre>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="manager-objects.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="processing-ref.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="pool-objects.html">Next</a>
+</div>
+</body>
+</html>

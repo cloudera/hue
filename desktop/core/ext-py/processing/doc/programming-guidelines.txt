@@ -1,0 +1,193 @@
+.. include:: header.txt
+
+========================
+ Programming guidelines
+========================
+
+There are certain guidelines and idioms which should be adhered to
+when using the `processing` package.  
+
+
+All platforms
+-------------
+
+*Avoid shared state*
+    As far as possible one should try to avoid shifting large amounts
+    of data between processes.
+    
+    It is probably best to stick to using queues or pipes for
+    communication between processes rather than using the lower level
+    synchronization primitives from the `threading` module.
+    
+*Picklability*:
+    Ensure that the arguments to the methods of proxies are
+    picklable.
+
+*Thread safety of proxies*:
+    Do not use a proxy object from more than one thread unless you
+    protect it with a lock.
+
+    (There is never a problem with different processes using the
+    'same' proxy.)
+        
+*Joining zombie processes*
+    On Unix when a process finishes but has not been joined it becomes
+    a zombie.  There should never be very many because each time a new
+    process starts (or `activeChildren()` is called) all completed
+    processes which have not yet been joined will be joined.  Also
+    calling a finished process's `isAlive()` will join the process.
+    Even so it is probably good practice to explicitly join all the
+    processes that you start.
+
+*Better to inherit than pickle/unpickle*
+    On Windows many of types from the `processing` package need to be
+    picklable so that child processes can use them.  However, one
+    should generally avoid sending shared objects to other processes
+    using pipes or queues.  Instead you should arrange the program so
+    that a process which need access to a shared resource created
+    elsewhere can inherit it from an ancestor process.
+
+*Avoid terminating processes*
+    Using the `terminate()` method to stop a process is liable to
+    cause any shared resources (such as locks, semaphores, pipes and
+    queues) currently being used by the process to become broken or
+    unavailable to other processes.
+
+    Therefore it is probably best to only consider using `terminate()`
+    on processes which never use any shared resources.
+
+*Joining processes that use queues*
+    Bear in mind that a process that has put items in a queue will
+    wait before terminating until all the buffered items are fed by
+    the "feeder" thread to the underlying pipe.  (The child process
+    can call the `cancelJoin()` method of the queue to avoid this
+    behaviour.)
+
+    This means that whenever you use a queue you need to make sure
+    that all items which have been put on the queue will eventually be
+    removed before the process is joined.  Otherwise you cannot be
+    sure that processes which have put items on the queue will
+    terminate.  Remember also that non-daemonic processes will be
+    automatically be joined.
+
+    An example which will deadlock is the following::
+
+        from processing import Process, Queue
+
+        def f(q):
+            q.put('X' * 1000000)
+
+        if __name__ == '__main__':
+            queue = Queue()
+            p = Process(target=f, args=(queue,))
+            p.start()
+            p.join()                    # this deadlocks
+            obj = queue.get()
+
+    A fix here would be to swap the last two lines round (or simply
+    remove the `p.join()` line).
+
+*Explicity pass resources to child processes*
+    On Unix a child process can make use of a shared resource created
+    in a parent process using a global resource.  However, it is
+    better to pass the object as an argument to the constructor for
+    the child process.  
+
+    Apart from making the code (potentially) compatible with Windows
+    this also ensures that as long as the child process is still alive
+    the object will not be garbage collected in the parent process.
+    This might be important if some resource is freed when the object
+    is garbage collected in the parent process.
+
+    So for instance ::
+
+        from processing import Process, Lock
+
+        def f():
+            ... do something using "lock" ...
+
+        if __name__ == '__main__':
+           lock = Lock()
+           for i in range(10):
+                Process(target=f).start()
+
+    should be rewritten as ::
+
+        from processing import Process, Lock
+
+        def f(l):
+            ... do something using "l" ...
+
+        if __name__ == '__main__':
+           lock = Lock()
+           for i in range(10):
+                Process(target=f, args=(lock,)).start()
+
+ 
+Windows
+-------
+
+Since Windows lacks `os.fork()` it has a few extra restrictions:
+
+*More picklability*:
+
+    Ensure that all arguments to `Process.__init__()` are picklable.
+    This means, in particular, that bound or unbound methods cannot be
+    used directly as the `target` argument on Windows --- just define
+    a function and use that instead.
+
+    Also, if you subclass `Process` then make sure that instances
+    will be picklable when the `start()` method is called.
+
+*Global variables*:
+    Bear in mind that if code run in a child process tries to access a
+    global variable, then the value it sees (if any) may not be the
+    same as the value in the parent process at the time that
+    `start()` was called.
+
+    However, global variables which are just module level constants
+    cause no problems.
+
+*Safe importing of main module*:
+    Make sure that the main module can be safely imported by a new
+    Python interpreter without causing unintended side effects (such a
+    starting a new process).
+
+    For example, under Windows running the following module would
+    fail with a `RuntimeError`::
+
+        from processing import Process
+
+        def foo():
+            print 'hello'
+
+        p = Process(target=foo)
+        p.start()
+
+    Instead one should protect the "entry point" of the program by
+    using `if __name__ == '__main__':` as follows::
+
+        from processing import Process
+
+        def foo():
+            print 'hello'
+
+        if __name__ == '__main__':
+            freezeSupport()
+            p = Process(target=foo)
+            p.start()
+
+    (The `freezeSupport()` line can be ommitted if the program will
+    be run normally instead of frozen.)
+
+    This allows the newly spawned Python interpreter to safely import
+    the module and then run the module's `foo()` function.
+
+    Similar restrictions apply if a pool or manager is created in the
+    main module.
+
+
+.. _Prev: connection-ref.html
+.. _Up: index.html
+.. _Next: tests.html
+

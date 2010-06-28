@@ -1,0 +1,38 @@
+<?xml version="1.0"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Twisted Documentation: The Twisted Web FAQ</title><link href="stylesheet.css" type="text/css" rel="stylesheet" /></head><body bgcolor="white"><h1 class="title">The Twisted Web FAQ</h1><div class="toc"><ol><li><a href="#auto0">Is the Twisted web server a toy?</a></li><li><a href="#auto1">But can Twisted Web do PHP?</a></li><li><a href="#auto2">And can Twisted Web do virtual hosting?</a></li><li><a href="#auto3">How do I use twisted.web to do complex things?</a></li><li><a href="#auto4">I've been using Woven since before it was called Woven.  I just upgraded
+and now I'm getting a confusing traceback talking about INodeMutator. What
+gives?</a></li><li><a href="#auto5">My Woven pages are sent to the browser with a trailing slash appended to the
+URL, which breaks all of the relative links.  How do I get rid of the trailing
+slash?</a></li><li><a href="#auto6">Argh! When using Woven, my newlines get mangled inside a &lt;pre&gt;</a></li><li><a href="#auto7">When trying to use Guard, I get infinite redirects to URLs with long
+hexadecimal numbers. What's the deal?</a></li></ol></div><div class="content"><span></span><h2>Is the Twisted web server a toy?<a name="auto0"></a></h2><p>No. It is a production grade server. It is running continously on several
+sites and has been proven quite stable. The server can take loads of up to 3000
+users at a time and still keep churning several million requests a day, even on
+low end hardware. It can serve static files or dynamically rendered pages.</p><h2>But can Twisted Web do PHP?<a name="auto1"></a></h2><p>Yes.  It works out-of-the-box, so long as you've got the standalone php
+interpreter installed.
+</p><h2>And can Twisted Web do virtual hosting?<a name="auto2"></a></h2><p>Can it ever!</p><p>You can decide to go with one big process for all of them, a front server
+and a seperate server for each virtual host (for example, for permission
+reasons), and you can even mix-and-match between Apache and Twisted (for
+example, put Apache in the front and have Twisted handle some subset of the
+virtual host).</p><h2>How do I use twisted.web to do complex things?<a name="auto3"></a></h2><p>See <a href="using-twistedweb.html">the Twisted.Web Howto</a>.</p><h2>I've been using Woven since before it was called Woven.  I just upgraded
+and now I'm getting a confusing traceback talking about INodeMutator. What
+gives?<a name="auto4"></a></h2><p>You probably have code that's survived the upgrade from PyXML's
+<code>minidom</code> to Twisted's <code>microdom</code>.  Try deleting any
+<code>.pxp</code> files that you have lying around and the error will probably
+go away.</p><h2>My Woven pages are sent to the browser with a trailing slash appended to the
+URL, which breaks all of the relative links.  How do I get rid of the trailing
+slash?<a name="auto5"></a></h2><p>If you are subclassing <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.page.Page.html" title="twisted.web.woven.page.Page">Page</a></code>, you can add a class attribute <code class="python">addSlash = 0</code>, like this:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">Foo</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+        <span class="py-src-variable">addSlash</span> = <span class="py-src-number">0</span>
+</pre><p>If you are still subclassing <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.controller.Controller.html" title="twisted.web.woven.controller.Controller">Controller</a></code>, you can put the <code class="python">addSlash = 0</code> there. Consider subclassing <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.page.Page.html" title="twisted.web.woven.page.Page">Page</a></code> instead, as having a <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.model.Model.html" title="twisted.web.woven.model.Model">Model</a></code>, <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.view.View.html" title="twisted.web.woven.view.View">View</a></code>, <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.controller.Controller.html" title="twisted.web.woven.controller.Controller">Controller</a></code> triad as the base of a
+<code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.page.Page.html" title="twisted.web.woven.page.Page">Page</a></code> will be deprecated
+in the near future.</p><p>If you're just using the generic <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.page.Page.html" title="twisted.web.woven.page.Page">Page</a></code> instance, you can set it after
+creation like this:</p><pre class="python">
+<span class="py-src-variable">resource</span> = <span class="py-src-variable">page</span>.<span class="py-src-variable">Page</span>(<span class="py-src-string">&quot;foo&quot;</span>)
+<span class="py-src-variable">resource</span>.<span class="py-src-variable">addSlash</span> = <span class="py-src-number">0</span>
+</pre><p>The default behavior of Woven is now to automatically add a slash
+because it makes creating relative links far easier, ironically ;-)</p><h2>Argh! When using Woven, my newlines get mangled inside a &lt;pre&gt;<a name="auto6"></a></h2><p>Use the <code>RawText</code> view.</p><h2>When trying to use Guard, I get infinite redirects to URLs with long
+hexadecimal numbers. What's the deal?<a name="auto7"></a></h2><p>Are you using an RPY? Add a single line containing <code>cache()</code> as
+the first line of your RPY.</p><p>An RPY file is executed every time it is accessed, so the call to <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.guard.SessionWrapper.html" title="twisted.web.woven.guard.SessionWrapper">guard.SessionWrapper</a></code> is executed
+once per request, making a new SessionWrapper for each request. There should be
+only one SessionWrapper object for your application. Caching the RPY file
+enforces this.</p></div><p><a href="index.html">Index</a></p><span class="version">Version: 8.2.0</span></body></html>

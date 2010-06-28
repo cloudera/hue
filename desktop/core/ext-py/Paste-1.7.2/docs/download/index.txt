@@ -1,0 +1,36 @@
+Downloads
+=========
+
+Each of these packages is available in several formats.  The source
+distribution is a complete set of documentation, tests, and the source
+files themselves.  There are also two "Egg" files: these are files
+`easy_install <http://peak.telecommunity.com/DevCenter/EasyInstall>`_
+can install directly into your ``site-packages/`` directory, and are
+Python-version specific.  The download files for the latest version
+are always located on the Cheese Shop pages (listed below).
+
+* `Paste <http://cheeseshop.python.org/pypi/Paste>`_
+* `Paste Script <http://cheeseshop.python.org/pypi/PasteScript>`_
+* `Paste Deploy <http://cheeseshop.python.org/pypi/PasteDeploy>`_
+* `Paste WebKit <http://cheeseshop.python.org/pypi/PasteWebKit>`_
+* `Wareweb <http://cheeseshop.python.org/pypi/Wareweb>`_
+
+All the packages are available in the Subversion repository rooted at
+http://svn.pythonpaste.org/Paste/
+
+* http://svn.pythonpaste.org/Paste/trunk
+* http://svn.pythonpaste.org/Paste/Script/trunk
+* http://svn.pythonpaste.org/Paste/Deploy/trunk
+* http://svn.pythonpaste.org/Paste/WebKit/trunk
+* http://svn.pythonpaste.org/Paste/Wareweb/trunk
+* ... and others
+
+Use::
+
+    svn co http://svn.pythonpaste.org/Paste/trunk Paste
+
+to check out a working copy of Paste.  You can also use::
+
+    easy_install Paste==dev
+
+to install the trunk version of Paste (or the other packages).

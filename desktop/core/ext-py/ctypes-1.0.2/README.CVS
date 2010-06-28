@@ -1,0 +1,12 @@
+I added support to run ctypes from a CVS sandbox without the need to
+install the package. This even works for different Python versions
+on the same machine, or different machines sharing the same directory.
+
+This behaviour is implemented by the _ctypes.py file in this
+directory.  When imported, it replaces itself in sys.modules by the
+correct _ctypes.pyd / _ctypes.so file from the platform specific build
+directory.
+
+Just do a 'setup.py build' and insert the top-level directory into
+sys.path (with setting the PYTHONPATH env variable, with a .pth file,
+or however), and it should work.

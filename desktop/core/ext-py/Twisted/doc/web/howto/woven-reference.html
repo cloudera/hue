@@ -1,0 +1,165 @@
+<?xml version="1.0"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Twisted Documentation: Woven Widget Reference</title><link href="stylesheet.css" type="text/css" rel="stylesheet" /></head><body bgcolor="white"><h1 class="title">Woven Widget Reference</h1><div class="toc"><ol><li><a href="#auto0">Common Factory Signatures</a></li><li><a href="#auto1">Built-in Widgets</a></li><ul><li><a href="#auto2">Attributes</a></li><li><a href="#auto3">Text, RawText</a></li><li><a href="#auto4">ParagraphText</a></li><li><a href="#auto5">Image</a></li><li><a href="#auto6">Error</a></li><li><a href="#auto7">Div</a></li><li><a href="#auto8">Span</a></li><li><a href="#auto9">Br</a></li><li><a href="#auto10">Input</a></li><li><a href="#auto11">CheckBox</a></li><li><a href="#auto12">RadioButton</a></li><li><a href="#auto13">File</a></li><li><a href="#auto14">Password</a></li><li><a href="#auto15">Button</a></li><li><a href="#auto16">Select</a></li><li><a href="#auto17">Option</a></li><li><a href="#auto18">Anchor</a></li><li><a href="#auto19">DirectoryAnchor</a></li><li><a href="#auto20">List</a></li><li><a href="#auto21">KeyedList</a></li><li><a href="#auto22">Bold</a></li><li><a href="#auto23">Table</a></li><li><a href="#auto24">Row</a></li><li><a href="#auto25">Cell</a></li><li><a href="#auto26">Link</a></li><li><a href="#auto27">RootRelativeLink</a></li><li><a href="#auto28">ExpandMacro</a></li><li><a href="#auto29">DeferredWidget</a></li></ul></ol></div><div class="content"><span></span><div class="note"><strong>Note: </strong><p>
+This document is a reference guide for Woven builtins and signatures. However, the Woven framework should not be used for new projects. The newer <a href="http://www.divmod.org/projects/nevow">Nevow</a> framework, available as part of the <a href="http://www.divmod.org/projects/quotient">Quotient</a> project, is a simpler framework with consistent semantics and better testing and is strongly recommended over Woven.
+</p><p>
+The Woven documentation below is maintained only for users with an existing Woven codebase.
+</p><p>
+If you have feedback on this guide, <a href="mailto:stephen@thorne.id.au">please send it</a>!
+</p></div><h2>Common Factory Signatures<a name="auto0"></a></h2><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wchild_foo</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>):
+        <span class="py-src-string">&quot;&quot;&quot; Return the Resource for /mypage/foo/ &quot;&quot;&quot;</span>
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wmfactory_foo</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>):
+        <span class="py-src-string">&quot;&quot;&quot; Return the Model object for model=&quot;/foo&quot; &quot;&quot;&quot;</span>
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvfactory_cool</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">model</span>):
+        <span class="py-src-string">&quot;&quot;&quot; Return node for view=&quot;cool&quot; &quot;&quot;&quot;</span>
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvupdate_thumbnail</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">widget</span>, <span class="py-src-parameter">data</span>):
+        <span class="py-src-string">&quot;&quot;&quot; Update and Return the widget for view=&quot;thumbnail&quot; &quot;&quot;&quot;</span>
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wcfactory_adjuster</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">model</span>):
+        <span class="py-src-string">&quot;&quot;&quot; Return the controller for controller=&quot;adjuster&quot; &quot;&quot;&quot;</span>
+</pre><h2>Built-in Widgets<a name="auto1"></a></h2><h3>Attributes<a name="auto2"></a></h3><p> For dressing a node with extra attributes from the model. </p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-variable">template</span> = <span class="py-src-string">&quot;&quot;&quot;
+    &lt;a view=&quot;Attributes&quot; model=&quot;/mylink&quot;&gt; My Link! &lt;/a&gt;
+    &quot;&quot;&quot;</span>
+
+<span class="py-src-variable">MyPage</span>({<span class="py-src-string">'mylink'</span>: {<span class="py-src-string">'href'</span>: <span class="py-src-string">'/path/to'</span>}})
+</pre><h3>Text, RawText<a name="auto3"></a></h3><p>For putting text into a node. This will escape any HTML/XML special
+characters turning them into HTML entities, i.e.
+<code>&amp;lt;foo&amp;gt;</code>.</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-variable">template</span> = <span class="py-src-string">&quot;&quot;&quot;
+    &lt;span view=&quot;Text&quot; model=&quot;/mytext&quot; /&gt;
+    &quot;&quot;&quot;</span>
+
+<span class="py-src-variable">MyPage</span>({<span class="py-src-string">'mytext'</span>: <span class="py-src-string">'abc'</span>})
+</pre><h3>ParagraphText<a name="auto4"></a></h3><p>For taking text, one paragraph per line, and dressing it with
+<code>&lt;p&gt;</code> tags.</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-variable">template</span> = <span class="py-src-string">&quot;&quot;&quot;
+    &lt;span view=&quot;ParagraphText&quot; model=&quot;/mytext&quot; /&gt;
+    &quot;&quot;&quot;</span>
+
+<span class="py-src-variable">MyPage</span>({<span class="py-src-string">'mytext'</span> : <span class="py-src-string">&quot;&quot;&quot;
+This is one Paragraph.
+This is a second one. It has two sentences.
+&quot;&quot;&quot;</span>})
+</pre><h3>Image<a name="auto5"></a></h3><p>Displaying Images. Easy.</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-variable">template</span> = <span class="py-src-string">&quot;&quot;&quot;
+    &lt;img view=&quot;Image&quot; alt=&quot;MyImage&quot; model=&quot;/myimg&quot; /&gt;
+    &quot;&quot;&quot;</span>
+
+<span class="py-src-variable">MyPage</span>({<span class="py-src-string">'myimg'</span>: <span class="py-src-string">'/images/myimage.png'</span>})
+</pre><h3>Error<a name="auto6"></a></h3><p>Displaying an error. In red.</p><h3>Div<a name="auto7"></a></h3><p>A Div.</p><h3>Span<a name="auto8"></a></h3><p>A Span.</p><h3>Br<a name="auto9"></a></h3><p>A Br.</p><h3>Input<a name="auto10"></a></h3><p>An Input, it takes <code>value</code>, <code>name</code> and <code>id</code>.
+If <code>name</code> isn't supplied, it reverts to the value of <code>id</code>,
+if <code>id</code> isn't supplied either, it takes the name of the submodel. The
+other input classes extend this one, and give it a proper <code>type</code>.</p><h3>CheckBox<a name="auto11"></a></h3><p>As Input, but... boxy.</p><h3>RadioButton<a name="auto12"></a></h3><p>As Input, but... kinda button like.</p><h3>File<a name="auto13"></a></h3><p>As Input, but... more chance of 1's and 0's. And a dialog on some user-agents.</p><h3>Password<a name="auto14"></a></h3><p>Renders a password text field. no option for maxlength, quite strange.</p><h3>Button<a name="auto15"></a></h3><p>Button</p><h3>Select<a name="auto16"></a></h3><p>This falls under input, but instead of taking a value, you have to fiddle
+with options for that. There's no way to specify <code>type=&quot;multiple&quot;</code>
+either it seems.</p><h3>Option<a name="auto17"></a></h3><p>Option widgets have the methods <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.widgets.Option.setText.html" title="twisted.web.woven.widgets.Option.setText">setText</a></code> and <code class="API"><a href="http://twistedmatrix.com/documents/8.2.0/api/twisted.web.woven.widgets.Option.setValue.html" title="twisted.web.woven.widgets.Option.setValue">setValue</a></code>, but if your text
+and your value co-incide, they can just be put in the model and it will all be
+hunky and/or dory.</p><h3>Anchor<a name="auto18"></a></h3><p>To create an anchor, including safe handling of parameters.</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-variable">template</span> = <span class="py-src-string">&quot;&quot;&quot;
+    &lt;a view=&quot;Anchor&quot; model=&quot;/anchorone&quot; /&gt;
+    &lt;a view=&quot;myanchor&quot; model=&quot;/anchortwo&quot; /&gt;
+    &quot;&quot;&quot;</span>
+
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvfactory_myanchor</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">model</span>):
+        <span class="py-src-variable">a</span> = <span class="py-src-variable">Anchor</span>()
+        <span class="py-src-variable">a</span>.<span class="py-src-variable">setText</span>(<span class="py-src-variable">model</span>[<span class="py-src-string">'text'</span>])
+        <span class="py-src-variable">a</span>.<span class="py-src-variable">setParameter</span>(<span class="py-src-string">'thingy'</span>, <span class="py-src-variable">model</span>[<span class="py-src-string">'thingy'</span>])
+        <span class="py-src-variable">a</span>.<span class="py-src-variable">setLink</span>(<span class="py-src-variable">model</span>[<span class="py-src-string">'href'</span>])
+
+<span class="py-src-variable">MyPage</span>({
+    <span class="py-src-string">'anchorone'</span>: <span class="py-src-string">'/pages/otherpage'</span>,
+    <span class="py-src-string">'anchortwo'</span>: {
+        <span class="py-src-string">'href'</span>: <span class="py-src-string">'/pages/thisotherpage/'</span>,
+        <span class="py-src-string">'thingy'</span>: <span class="py-src-string">'foobar'</span>,
+        <span class="py-src-string">'text'</span>: <span class="py-src-string">'The Text Of The Link'</span>
+    }
+})
+</pre><h3>DirectoryAnchor<a name="auto19"></a></h3><p>Exactly like Anchor, but given a model which contains
+<code>/pages/otherpage</code> it will provide a link to
+<code>/pages/otherpage/</code> with a trailing slash.</p><h3>List<a name="auto20"></a></h3><p>List is a nice view for displaying the contents of a list. You can choose
+not to specifiy listHeader, listFooter and emptyList. Specifying listItem twice
+or more will cause alternation.</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-variable">template</span> = <span class="py-src-string">&quot;&quot;&quot;
+         &lt;table model=&quot;blah&quot; view=&quot;List&quot;&gt;
+             &lt;tr pattern=&quot;listHeader&quot;&gt;&lt;th&gt;A&lt;/th&gt;&lt;th&gt;B&lt;/th&gt;&lt;/tr&gt;
+             &lt;tr pattern=&quot;emptyList&quot;&gt;&lt;td colspan='2'&gt;***None***&lt;/td&gt;&lt;/tr&gt;
+             &lt;tr pattern=&quot;listItem&quot;&gt;
+                 &lt;td&gt;&lt;span view=&quot;Text&quot; model=&quot;0&quot; /&gt;&lt;/td&gt;
+                 &lt;td&gt;&lt;span view=&quot;Text&quot; model=&quot;1&quot; /&gt;&lt;/td&gt;
+             &lt;/tr&gt;
+             &lt;tr pattern=&quot;listFooter&quot;&gt;&lt;td colspan=&quot;2&quot;&gt;All done!&lt;/td&gt;&lt;/tr&gt;
+         &lt;/table&gt;
+    &quot;&quot;&quot;</span>
+
+<span class="py-src-variable">MyPage</span>({<span class="py-src-string">'blah'</span>: [(<span class="py-src-string">'abc'</span>, <span class="py-src-string">'fza'</span>), (<span class="py-src-string">'def'</span>, <span class="py-src-string">'fdsa'</span>), (<span class="py-src-string">'ghi'</span>, <span class="py-src-string">'fdas'</span>)]})
+</pre><h3>KeyedList<a name="auto21"></a></h3><p>KeyedList is similar to List above, works nearly the same way, except the
+model is a dictionary, not a list. If you need access to the key in your
+listItems, make your listItem use a view that will inspect the
+<code>model</code> attribute, as the KeyedList widget will create subwidgets,
+respecting <code>view</code> attribute but overriding <code>model</code>.</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-variable">template</span> = <span class="py-src-string">&quot;&quot;&quot;
+         &lt;table model=&quot;blah&quot; view=&quot;List&quot;&gt;
+             &lt;tr pattern=&quot;listHeader&quot;&gt;&lt;th&gt;A&lt;/th&gt;&lt;th&gt;B&lt;/th&gt;&lt;/tr&gt;
+             &lt;tr pattern=&quot;emptyList&quot;&gt;&lt;td colspan='2'&gt;***None***&lt;/td&gt;&lt;/tr&gt;
+             &lt;tr pattern=&quot;listItem&quot;&gt;
+                 &lt;td&gt;&lt;span view=&quot;Text&quot; model=&quot;0&quot; /&gt;&lt;/td&gt;
+                 &lt;td&gt;&lt;span view=&quot;Text&quot; model=&quot;1&quot; /&gt;&lt;/td&gt;
+             &lt;/tr&gt;
+             &lt;tr pattern=&quot;listFooter&quot;&gt;&lt;td colspan=&quot;2&quot;&gt;All done!&lt;/td&gt;&lt;/tr&gt;
+         &lt;/table&gt;
+    &quot;&quot;&quot;</span>
+
+<span class="py-src-variable">MyPage</span>({<span class="py-src-string">'blah'</span> : [(<span class="py-src-string">'abc'</span>, <span class="py-src-string">'fza'</span>), (<span class="py-src-string">'def'</span>, <span class="py-src-string">'fdsa'</span>), (<span class="py-src-string">'ghi'</span>, <span class="py-src-string">'fdas'</span>)]})
+</pre><h3>Bold<a name="auto22"></a></h3><p>A Bold (b, shouldn't this make a 'strong'?).</p><h3>Table<a name="auto23"></a></h3><p>A Table.</p><h3>Row<a name="auto24"></a></h3><p>A Row (tr).</p><h3>Cell<a name="auto25"></a></h3><p>A Cell (td).</p><h3>Link<a name="auto26"></a></h3><p>A Link (a) tag. Similar to Anchor.</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-variable">template</span> = <span class="py-src-string">&quot;&quot;&quot;
+    &lt;a view=&quot;Link&quot; model=&quot;/anchorone&quot;&gt; My Text &lt;/a&gt;
+    &lt;a view=&quot;Link&quot; model=&quot;/anchortwo&quot; /&gt;
+    &quot;&quot;&quot;</span>
+
+<span class="py-src-variable">MyPage</span>({
+    <span class="py-src-string">'anchorone'</span>: <span class="py-src-string">'/pages/otherpage'</span>,
+    <span class="py-src-string">'anchortwo'</span>: {
+        <span class="py-src-string">'href'</span>: <span class="py-src-string">'/pages/thisotherpage/'</span>,
+        <span class="py-src-string">'text'</span>: <span class="py-src-string">'The Text Of The Link'</span>
+    }
+})
+</pre><h3>RootRelativeLink<a name="auto27"></a></h3><p>Extends Link, and adds the functionality that it will respect this
+request.getRootURL, so that we can be deployed in different roots easily.</p><pre class="python">
+<span class="py-src-variable">self</span>[<span class="py-src-string">'href'</span>] = <span class="py-src-variable">request</span>.<span class="py-src-variable">getRootURL</span>() + <span class="py-src-string">'/'</span> + <span class="py-src-variable">self</span>[<span class="py-src-string">'href'</span>]
+</pre><h3>ExpandMacro<a name="auto28"></a></h3><p>A Macro expansion widget modeled after the METAL expander
+    in ZPT/TAL/METAL.</p><p>In the Page that is being rendered, place the ExpandMacro widget
+    on the node you want replaced with the Macro, and provide nodes
+    tagged with <code>fill-slot=</code> attributes which will fill slots in the
+    Macro:</p><pre class="python">
+<span class="py-src-keyword">class</span> <span class="py-src-identifier">MyPage</span>(<span class="py-src-parameter">page</span>.<span class="py-src-parameter">Page</span>):
+    <span class="py-src-keyword">def</span> <span class="py-src-identifier">wvfactory_myMacro</span>(<span class="py-src-parameter">self</span>, <span class="py-src-parameter">request</span>, <span class="py-src-parameter">node</span>, <span class="py-src-parameter">model</span>):
+        <span class="py-src-keyword">return</span> <span class="py-src-variable">ExpandMacro</span>(
+            <span class="py-src-variable">model</span>,
+            <span class="py-src-variable">macroFile</span>=<span class="py-src-string">&quot;MyMacro.xhtml&quot;</span>,
+            <span class="py-src-variable">macroName</span>=<span class="py-src-string">&quot;main&quot;</span>)
+</pre><pre>
+&lt;div view=&quot;myMacro&quot;&gt;
+    &lt;span fill-slot=&quot;greeting&quot;&gt;Hello&lt;/span&gt;
+    &lt;span fill-slot=&quot;greetee&quot;&gt;World&lt;/span&gt;
+&lt;/div&gt;
+</pre><p>
+    Then, in your Macro template file (<q>MyMacro.html</q> in the above
+    example) designate a node as the macro node, and nodes
+    inside that as the slot nodes:
+</p><pre>
+&lt;div macro=&quot;main&quot;&gt;
+    &lt;h3&gt;&lt;span slot=&quot;greeting&quot; /&gt;, &lt;span slot=&quot;greetee&quot; /&gt;!&lt;/h3&gt;
+&lt;/div&gt;
+</pre><h3>DeferredWidget<a name="auto29"></a></h3><p>Wraps around a deferred. Usage unknown.</p></div><p><a href="index.html">Index</a></p><span class="version">Version: 8.2.0</span></body></html>

@@ -1,0 +1,48 @@
+a.hover {
+	color: red;
+}
+
+#demo-list {
+	padding: 0;
+	list-style: none;
+	margin: 0;
+}
+
+#demo-list .file-invalid {
+	cursor: pointer;
+	color: #514721;
+	padding-left: 48px;
+	line-height: 24px;
+	background: url(assets/error.png) no-repeat 24px 5px;
+	margin-bottom: 1px;
+}
+#demo-list .file-invalid span {
+	background-color: #fff6bf;
+	padding: 1px;
+}
+
+#demo-list .file {
+	line-height: 2em;
+	padding-left: 22px;
+	background: url(assets/attach.png) no-repeat 1px 50%;
+}
+
+#demo-list .file span,
+#demo-list .file a {
+	padding: 0 4px;
+}
+
+#demo-list .file .file-size {
+	color: #666;
+}
+
+#demo-list .file .file-error {
+	color: #8a1f11;
+}
+
+#demo-list .file .file-progress {
+	width: 125px;
+	height: 12px;
+	vertical-align: middle;
+	background-image: url(../../assets/progress-bar/progress.gif);
+}

@@ -1,0 +1,99 @@
+<div class="span-5 first">
+
+	<h4>Settings</h4>
+
+	<div id="settings">
+		
+		<label>
+			<span>
+				Upload URL
+				(<a href="http://livedocs.adobe.com/flash/9.0/main/00000349.html#wp122782" title="Website controls (cross-domain policy files)">Restricted?</a>):
+			</span>
+			<span>
+				<select id="option-url">
+					<option value="/project/fancyupload/script.php">script.php</option>
+					<option value="../script.php">script.php (relative)</option>
+					<option value="http://digitarald.de/project/fancyupload/3-0/script.php">digitarald.de/.../script.php</option>
+					<option value="http://up.flickr.com/photos/upload/transfer/">up.flickr.com</option>
+				</select>
+			</span>
+		</label>
+
+		<label>
+			<span>Multiple Files</span>
+			<span>
+				<input type="checkbox" id="option-multiple" value="1" checked="checked" />
+			</span>
+		</label>
+
+		<label>
+			<span>Browse Enabled</span>
+			<span>
+				<input type="checkbox" id="option-enable" value="1" checked="checked" />
+			</span>
+		</label>
+
+		<label>
+			<span>Filesize min/max</span>
+			<span>
+				<input type="text" size="5" id="option-size-min" value="1" />/
+				<input type="text" size="5" id="option-size-max" value="" />
+			</span>
+		</label>
+
+		<label>
+			<span>Queue Upload</span>
+			<span>
+				<select id="option-queued">
+					<option value="0">No</option>
+					<option selected="selected">1</option>
+					<option>2</option>
+					<option>3</option>
+					<option>4</option>
+					<option>5</option>
+				</select>
+			</span>
+		</label>
+
+		<label>
+			<span>File Filter</span>
+			<span>
+				<select id="option-filter">
+					<option>*</option>
+					<option>*.png</option>
+					<option>*.pdf</option>
+					<option>Images &amp; Documents</option>
+				</select>
+			</span>
+		</label>
+		
+	</div>
+	
+</div>
+
+<div class="span-11 last">
+
+<h4>Select one or more Files</h4>
+
+<div class="button-select" id="button-select-0"></div>
+
+<h4>Start Upload</h4>
+
+<a href="#start" class="button-start button-start-disabled" id="button-start-0">Start Upload</a>
+
+<h4>Progress</h4>
+
+<ul class="file-list" id="file-list-0">
+	<li class="file-placeholder">No files added yet. Click "Choose Files" to start.</li>
+</ul>
+
+<dl>
+	<dd>Files:</dd>
+	<dt><span id="queue-files">0</span> (<span id="queue-size">-</span> - <a href="#" id="queue-clear-0">Clear</a>)</dt>
+	<dd>Loaded:</dd>
+	<dt><span id="queue-bytesLoaded">-</span> (<span id="queue-percentLoaded">-</span>% @ <span id="queue-rate">-</span>)</dt>
+</dl>
+
+<ul class="file-list file-list-fail" id="file-list-1"></ul>
+
+</div>

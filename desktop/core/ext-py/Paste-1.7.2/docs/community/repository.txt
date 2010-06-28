@@ -1,0 +1,13 @@
+Repository
+==========
+
+Paste is kept in a `Subversion <http://subversion.tigris.org/>`_
+repository at http://svn.pythonpaste.org/Paste
+
+If you are using a command-line Subversion client, you can check
+it out like::
+
+    svn co http://svn.pythonpaste.org/Paste/trunk Paste
+
+If you are on Windows you may want to use `TortoiseSVN
+<http://tortoisesvn.tigris.org/>`_.

@@ -1,0 +1,221 @@
+{% comment %}
+Licensed to Cloudera, Inc. under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  Cloudera, Inc. licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+{% load unix_ms_to_datetime %}
+<body>
+<h1>{{clusterstatus.hostname}} Map/Reduce Administration</h1>
+<b>State: </b> {{clusterstatus.stateAsString}}<br/>
+<b>Started: </b> {{ clusterstatus.startTime|unix_ms_to_datetime}}<br/>
+<b>Identifier: </b> {{clusterstatus.identifier}}<br/>
+<hr/>
+<h2>Cluster Summary (Heap size is {{clusterstatus.usedMemory|filesizeformat}} / {{clusterstatus.maxMemory|filesizeformat}})</h2>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <tr>
+    <td>
+      Maps
+    </td>
+    <td>
+      Reduces
+    </td>
+    <td>
+      Total Submissions
+    </td>
+    <td>
+      Nodes
+    </td>
+    <td>
+      Map Task Capacity
+    </td>
+    <td>
+      Reduce Task Capacity
+    </td>
+    <td>
+      Avg. Tasks / Node
+    </td>
+    <td>
+      Blacklisted Nodes
+    </td>
+    <td>
+      Excluded Nodes
+    </td>
+  </tr>
+  <tr>
+    <td>{{clusterstatus.mapTasks}}</td>
+    <td>{{clusterstatus.reduceTasks}}</td>
+    <td>{{clusterstatus.totalSubmissions}}</td>
+    <td>{{clusterstatus.numActiveTrackers}}</td>
+    <td>{{clusterstatus.maxMapTasks}}</td>
+    <td>{{clusterstatus.maxReduceTasks}}</td>
+    <td></td>
+    <td>{{clusterstatus.numBlacklistedTrackers}}</td>
+    <td></td>
+   </tr>          
+</table>
+<hr>
+<h2>Scheduling Information</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+  <tr>
+    <td>Queue Name</td>
+    <td>Scheduling Information</td>
+  </tr>
+{% for q in queues.queues %}
+ <tr>
+    <td>
+      {{q.queueName}}
+    </td>
+    <td></td>
+  </tr>
+  {%endfor%}
+</table>
+<hr/>
+
+<h2>Running Jobs</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+  <tr>
+    <td>Jobid </td>
+    <td>Priority </td>
+    <td>User </td>
+    <td>Name </td>
+    <td>Map % Complete </td>
+    <td>Map Total </td>
+    <td>Maps Completed </td>
+    <td>Reduce % Complete </td>
+    <td>Reduce Total </td>
+    <td>Reduces Completed </td>
+    <td>Job Scheduling Information </td>
+  </tr>
+  {% for job in runningjobs %}
+ <tr>
+    <td><a href="/jobbrowser/jobs/{{job.jobId}}">{{job.jobId}}</a></td>
+   <td>{{job.priority}}</td>
+    <td>{{job.profile.user}}</td>
+    <td>{{job.profile.name}}</td>
+    <td>{{job.finishedMaps}}/{{job.desiredMaps}}</td>
+    <td>{{job.desiredMaps}}</td>
+    <td>{{job.finishedMaps}}</td>
+    <td>{{job.finishedReduces}}/{{job.desiredReduces}}</td>
+    <td>{{job.desiredReduces}}</td>
+    <td>{{job.finishedReduces}}</td>
+    <td></td>
+  </tr>
+  {% endfor %}
+</table>
+<hr/>
+<h2>Completed Jobs</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+  <tr>
+    <td>Jobid </td>
+    <td>Priority </td>
+    <td>User </td>
+    <td>Name </td>
+    <td>Map % Complete </td>
+    <td>Map Total </td>
+    <td>Maps Completed </td>
+    <td>Reduce % Complete </td>
+    <td>Reduce Total </td>
+    <td>Reduces Completed </td>
+    <td>Job Scheduling Information </td>
+  </tr>
+  {% for job in completedjobs %}
+ <tr>
+    <td><a href="/jobbrowser/jobs/{{job.jobId}}">{{job.jobId}}</a></td>
+    <td>{{job.priority}}</td>
+    <td>{{job.profile.user}}</td>
+    <td>{{job.profile.name}}</td>
+    <td>{{job.finishedMaps}}/{{job.desiredMaps}}</td>
+    <td>{{job.desiredMaps}}</td>
+    <td>{{job.finishedMaps}}</td>
+    <td>{{job.finishedReduces}}/{{job.desiredReduces}}</td>
+    <td>{{job.desiredReduces}}</td>
+    <td>{{job.finishedReduces}}</td>
+    <td></td>
+  </tr>
+  {% endfor %}
+</table>
+
+<hr/>
+<h2>Failed Jobs</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+  <tr>
+    <td>Jobid </td>
+    <td>Priority </td>
+    <td>User </td>
+    <td>Name </td>
+    <td>Map % Complete </td>
+    <td>Map Total </td>
+    <td>Maps Completed </td>
+    <td>Reduce % Complete </td>
+    <td>Reduce Total </td>
+    <td>Reduces Completed </td>
+    <td>Job Scheduling Information </td>
+  </tr>
+  {% for job in failedjobs %}
+ <tr>
+    <td><a href="/jobbrowser/jobs/{{job.jobId}}">{{job.jobId}}</a></td>
+   <td>{{job.priority}}</td>
+    <td>{{job.profile.user}}</td>
+    <td>{{job.profile.name}}</td>
+    <td>{{job.finishedMaps}}/{{job.desiredMaps}}</td>
+    <td>{{job.desiredMaps}}</td>
+    <td>{{job.finishedMaps}}</td>
+    <td>{{job.finishedReduces}}/{{job.desiredReduces}}</td>
+    <td>{{job.desiredReduces}}</td>
+    <td>{{job.finishedReduces}}</td>
+    <td></td>
+  </tr>
+  {% endfor %}
+</table>
+
+<hr/>
+<h2>Killed Jobs</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+  <tr>
+    <td>Jobid </td>
+    <td>Priority </td>
+    <td>User </td>
+    <td>Name </td>
+    <td>Map % Complete </td>
+    <td>Map Total </td>
+    <td>Maps Completed </td>
+    <td>Reduce % Complete </td>
+    <td>Reduce Total </td>
+    <td>Reduces Completed </td>
+    <td>Job Scheduling Information </td>
+  </tr>
+  {% for job in killedjobs %}
+ <tr>
+    <td><a href="/jobbrowser/jobs/{{job.jobId}}">{{job.jobId}}</a></td>
+   <td>{{job.priority}}</td>
+    <td>{{job.profile.user}}</td>
+    <td>{{job.profile.name}}</td>
+    <td>{{job.finishedMaps}}/{{job.desiredMaps}}</td>
+    <td>{{job.desiredMaps}}</td>
+    <td>{{job.finishedMaps}}</td>
+    <td>{{job.finishedReduces}}/{{job.desiredReduces}}</td>
+    <td>{{job.desiredReduces}}</td>
+    <td>{{job.finishedReduces}}</td>
+    <td></td>
+  </tr>
+  {% endfor %}
+</table>
+
+</body> </html>

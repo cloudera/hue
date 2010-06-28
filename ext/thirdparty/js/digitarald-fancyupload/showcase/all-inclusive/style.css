@@ -1,0 +1,113 @@
+/* Basic layout */
+
+h4 {
+	margin-top: 1.25em;
+}
+
+a {
+	padding: 1px;
+}
+
+a:hover, a.hover {
+	color: red;
+}
+
+label {
+	display: block;
+}
+label span {
+	display: block;
+	line-height: 1.8em;
+}
+
+/* Layout elements */
+
+.file-list {
+	list-style: none;
+	margin: 0;
+	border: 1px solid #ddd;
+	border-right-color: #ccc;
+	border-bottom-color: #ccc;
+	min-height: 100px;
+}
+
+.file-placeholder {
+	color: #999;
+	text-align: center;
+	line-height: 100px;
+}
+.file-list-fail {
+	color: red;
+	min-height: 0;
+}
+
+.button-select {
+	margin-bottom: 0.5em;
+}
+
+.file-list .file {
+	display: block;
+	padding: 5px 7px;
+}
+
+.file-list .file-title {
+	font-weight: bold;
+}
+
+.file-list .file-status {
+	font-size: 0.9em;
+	color: #666;
+	padding-left: 10px;
+	display: inline;
+}
+
+.file-list .file-progress {
+	font-size: 0.9em;
+	color: #666;
+}
+
+.file-list .file-links {
+	float: right;
+	font-size: 0.8em;
+}
+.file-list .file-links a {
+	padding: 0 3px;
+}
+
+.file-running.file-list {
+	color: #000;
+}
+
+.button-start {
+	width: 149px;
+	height: 31px;
+	display: block;
+	padding: 0;
+	outline: 0;
+	text-indent: -9999px;
+	background: url(../../assets/button_start.black.png) no-repeat 0 0;
+}
+
+.button-start:hover {
+	background-position: 0 -31px;
+}
+
+.button-start:active {
+	background-position: 0 -62px;
+}
+
+.button-start-disabled {
+	background-position: 0 -93px !important;
+	cursor: default;
+}
+
+/* Dynamic elements */
+
+#overlay-select {
+	background-color: #fff;
+	position: absolute;
+	z-index: 9999;
+	color: #000;
+	font-size: 5em;
+	text-align: center;
+}

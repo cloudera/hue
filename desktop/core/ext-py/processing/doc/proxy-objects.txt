@@ -1,0 +1,160 @@
+.. include:: header.txt
+
+===============
+ Proxy objects
+===============
+
+A proxy is an object which *refers* to a shared object which lives
+(presumably) in a different process.  The shared object is said to be
+the *referent* of the proxy.  Multiple proxy objects may have the same
+referent.
+
+A proxy object has methods which invoke corresponding methods of its
+referent (although not every method of the referent will
+necessarily be available through the proxy).  A proxy can usually be
+used in most of the same ways that the its referent can::
+
+    >>> from processing import Manager
+    >>> manager = Manager()
+    >>> l = manager.list([i*i for i in range(10)])
+    >>> print l
+    [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+    >>> print repr(l)
+    <Proxy[list] object at 0x00DFA230>
+    >>> l[4]
+    16
+    >>> l[2:5]
+    [4, 9, 16]
+    >>> l == [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+    True
+
+Notice that applying `str()` to a proxy will return the
+representation of the referent, whereas applying `repr()` will
+return the representation of the proxy.
+
+An important feature of proxy objects is that they are picklable so
+they can be passed between processes.  Note, however, that if a proxy
+is sent to the corresponding manager's process then unpickling it will
+produce the referent itself.  This means, for example, that one shared
+object can contain a second::
+
+    >>> a = manager.list()
+    >>> b = manager.list()
+    >>> a.append(b)         # referent of `a` now contains referent of `b`
+    >>> print a, b
+    [[]] []
+    >>> b.append('hello')
+    >>> print a, b
+    [['hello']] ['hello']
+
+Some proxy methods return a proxy for an iterator.  In particular list
+and dictionary proxies are iterables so they can be used with the
+`for` statement::
+
+    >>> a = manager.dict([(i*i, i) for i in range(10)])
+    >>> for key in a:
+    ...     print '<%r,%r>' % (key, a[key]),
+    ...
+    <0,0> <1,1> <4,2> <81,9> <64,8> <9,3> <16,4> <49,7> <25,5> <36,6>
+    
+.. note::
+
+    Although `list` and `dict` proxy objects are iterable, it will be
+    much more efficient to iterate over a *copy* of the referent, for
+    example ::
+
+        for item in some_list[:]:
+            ...
+
+    and ::
+
+        for key in some_dict.keys():
+            ...
+
+
+Methods of `BaseProxy`
+======================
+
+Proxy objects are instances of subclasses of `BaseProxy`.  The only
+semi-public methods of `BaseProxy` are the following:
+
+    `_callMethod(methodname, args=(), kwds={})`
+        Call and return the result of a method of the proxy's referent.
+
+        If `proxy` is a proxy whose referent is `obj` then the
+        expression
+
+            `proxy._callMethod(methodname, args, kwds)`
+
+        will evaluate the expression
+
+            `getattr(obj, methodname)(*args, **kwds)` |spaces| _`(*)`
+
+        in the manager's process.  
+
+        The returned value will be either a copy of the result of
+        `(*)`_ or if the result is an unpicklable iterator then a
+        proxy for the iterator.
+
+        If an exception is raised by `(*)`_ then then is re-raised by
+        `_callMethod()`.  If some other exception is raised in the
+        manager's process then this is converted into a `RemoteError`
+        exception and is raised by `_callMethod()`.
+        
+        Note in particular that an exception will be raised if
+        `methodname` has not been *exposed* --- see the `exposed`
+        argument to `CreatorMethod
+        <manager-objects.html#customized-managers>`_.
+
+    `_getValue()`
+        Return a copy of the referent.
+
+        If the referent is unpicklable then this will raise an exception.
+
+    `__repr__`
+        Return a representation of the proxy object.
+
+    `__str__`
+        Return the representation of the referent.
+
+
+Cleanup
+=======
+
+A proxy object uses a weakref callback so that when it gets garbage
+collected it deregisters itself from the manager which owns its
+referent.
+
+A shared object gets deleted from the manager process when there
+are no longer any proxies referring to it.
+
+
+Examples
+========
+
+An example of the usage of `_callMethod()`::
+
+    >>> l = manager.list(range(10))
+    >>> l._callMethod('__getslice__', (2, 7))   # equiv to `l[2:7]`
+    [2, 3, 4, 5, 6]
+    >>> l._callMethod('__iter__')               # equiv to `iter(l)`
+    <Proxy[iter] object at 0x00DFAFF0>
+    >>> l._callMethod('__getitem__', (20,))     # equiv to `l[20]`
+    Traceback (most recent call last):
+    ...
+    IndexError: list index out of range
+
+As an example definition of a subclass of BaseProxy, the proxy type
+used for iterators is the following::
+
+    class IteratorProxy(BaseProxy):
+        def __iter__(self):
+            return self
+        def next(self):
+            return self._callMethod('next')
+
+
+.. _Prev: manager-objects.html
+.. _Up: processing-ref.html
+.. _Next: pool-objects.html
+

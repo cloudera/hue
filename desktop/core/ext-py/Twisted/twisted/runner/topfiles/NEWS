@@ -1,0 +1,28 @@
+Ticket numbers in this file can be looked up by visiting
+http://twistedmatrix.com/trac/ticket/<number>
+
+Runner 8.2.0 (2008-12-16)
+=========================
+
+No interesting changes since Twisted 8.0.
+
+8.0.0 (2008-03-17)
+==================
+
+Misc
+----
+ - Remove all "API Stability" markers (#2847)
+
+
+0.2.0 (2006-05-24)
+==================
+
+Fixes
+-----
+ - Fix a bug that broke inetdtap.RPCServer.
+ - Misc: #1142
+
+
+0.1.0
+=====
+ - Pass *blocking* sockets to subprocesses run by inetd

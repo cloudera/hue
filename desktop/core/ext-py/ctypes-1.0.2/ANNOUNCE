@@ -1,0 +1,56 @@
+ctypes 1.0.1 released - October 20, 2006
+========================================
+
+Overview
+
+    ctypes is an advanced ffi (Foreign Function Interface) package for
+    Python 2.3 and higher.
+
+    ctypes allows to call functions exposed from dlls/shared libraries
+    and has extensive facilities to create, access and manipulate
+    simple and complicated C data types in Python - in other words:
+    wrap libraries in pure Python.  It is even possible to implement C
+    callback functions in pure Python.
+
+    ctypes runs on Windows, Windows CE, MacOS X, Linux, Solaris,
+    FreeBSD, OpenBSD. It may also run on other systems, provided that
+    libffi supports this platform.
+
+
+Changes in 1.0.1
+
+    If the Python part of a ctypes callback function returns None, and
+    this cannot be converted to the required C type, an exception is
+    printed with PyErr_WriteUnraisable.  Before this change, the C
+    callback returned arbitrary values to the calling code.
+	
+    The __repr__ method of a NULL ctypes.py_object() no longer raises
+    an exception.
+
+    This release contains exactly the same code as the ctypes package
+    included in Python 2.5.
+
+Changes in 1.0.0
+
+    Better support for comtypes.  More target platforms for OpenBSD.
+    Several small bugfixes.
+
+    This is exactly the same version as included in Python 2.5b3.
+
+Download
+
+    Downloads are available in the sourceforge files section
+    <http://sourceforge.net/project/showfiles.php?group_id=71702>
+
+    Binary windows installers, which contain compiled extension
+    modules, are also available, be sure to download the correct one
+    for the Python version you are using.
+
+
+Homepage
+
+    <http://starship.python.net/crew/theller/ctypes/>
+
+Enjoy,
+
+Thomas

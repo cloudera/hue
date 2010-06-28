@@ -1,0 +1,54 @@
+===============
+ToDo's for lxml
+===============
+
+lxml
+====
+
+In general
+----------
+
+* test namespaces more in-depth
+
+* more testing on multi-threading
+
+* better exception messages for XPath and schemas based on error log,
+  e.g. missing namespace mappings in XPath
+
+* more testing on input/output of encoded filenames, including custom
+  resolvers, relative XSLT imports, ...
+
+* always use '<string>' as URL when tree was parsed from string? (can libxml2
+  handle this?)
+
+* follow PEP 8 in API naming (avoidCamelCase in_favour_of_underscores)
+
+* use per-call or per-thread error logs in XSLT/XPath/etc. to keep the
+  messages separate, especially in exceptions
+
+
+QName
+-----
+
+* expose prefix support?
+
+
+Entities
+--------
+
+* clean support for entities (is the Entity element class enough?)
+
+
+Objectify
+---------
+
+* emulate setting special __attributes__ on ObjectifiedElement's as Python
+  attributes, not XML children
+
+
+Maybe
+-----
+
+* rewrite iterparse() to accept a parser as argument instead of being
+  one (or maybe not: iterparse() can't deal with all parser options
+  anyway).

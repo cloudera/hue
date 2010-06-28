@@ -1,0 +1,553 @@
+.. default-role:: literal
+
+==========================
+ Changelog for processing
+==========================
+
+Changes in 0.52
+---------------
+
+* On versions 0.50 and 0.51 Mac OSX `Lock.release()` would fail with
+  `OSError(errno.ENOSYS, "[Errno 78] Function not implemented")`.
+  This appears to be because on Mac OSX `sem_getvalue()` has not been
+  implemented.
+
+  Now `sem_getvalue()` is no longer needed.  Unfortunately, however,
+  on Mac OSX `BoundedSemaphore()` will not raise `ValueError` if it
+  exceeds its initial value.
+
+* Some changes to the code for the reduction/rebuilding of connection
+  and socket objects so that things work the same on Windows and Unix.
+  This should fix a couple of bugs.
+
+* The code has been changed to consistently use "camelCase" for
+  methods and (non-factory) functions.  In the few cases where this
+  has meant a change to the documented API, the old name has been
+  retained as an alias.
+
+
+Changes in 0.51
+---------------
+
+* In 0.50 `processing.Value()` and `processing.sharedctypes.Value()`
+  were related but had different signatures, which was rather
+  confusing.
+
+  Now `processing.sharedctypes.Value()` has been renamed 
+  `processing.sharedctypes.RawValue()` and
+  `processing.sharedctypes.Value()` is the same as `processing.Value()`.
+
+* In version 0.50 `sendfd()` and `recvfd()` apparently did not work on
+  64bit Linux.  This has been fixed by reverting to using the CMSG_*
+  macros as was done in 0.40.  
+
+  However, this means that systems without all the necessary CMSG_*
+  macros (such as Solaris 8) will have to disable compilation of
+  `sendfd()` and `recvfd()` by setting `macros['HAVE_FD_TRANSFRER'] = 0` 
+  in `setup.py`.
+
+* Fixed an authentication error when using a "remote" manager created
+  using `BaseManager.from_address()`.
+
+* Fixed a couple of bugs which only affected Python 2.4.
+
+
+Changes in 0.50
+---------------
+
+* `ctypes` is now a prerequisite if you want to use shared memory --
+  with Python 2.4 you will need to install it separately.
+
+* `LocalManager()` has been removed.
+
+* Added `processing.Value()` and `processing.Array()`
+  which are similar to `LocalManager.SharedValue()` and
+  `LocalManager.SharedArray()`.  
+
+* In the `sharedctypes` module `new_value()` and `new_array()` have
+  been renamed `Value()` and `Array()`.
+
+* `Process.stop()`, `Process.getStoppable()` and
+  `Process.setStoppable()` have been removed.  Use
+  `Process.terminate()` instead.
+
+* `procesing.Lock` now matches `threading.Lock` behaviour more
+  closely: now a thread can release a lock it does not own, and now
+  when a thread tries acquiring a lock it already owns a deadlock
+  results instead of an exception.
+
+* On Windows when the main thread is blocking on a method of `Lock`,
+  `RLock`, `Semaphore`, `BoundedSemaphore`, `Condition` it will no
+  longer ignore Ctrl-C.  (The same was already true on Unix.)  
+
+  This differs from the behaviour of the equivalent objects in
+  `threading` which will completely ignore Ctrl-C.
+
+* The `test` sub-package has been replaced by lots of unit tests in a
+  `tests` sub-package.  Some of the old test files have been moved
+  over to a new `examples` sub-package.
+
+* On Windows it is now possible for a non-console python program
+  (i.e. one using `pythonw.exe` instead of `python.exe`) to use
+  `processing`.  
+
+  Previously an exception was raised when `subprocess.py` tried to
+  duplicate stdin, stdout, stderr.
+
+* Proxy objects should now be thread safe -- they now use thread local
+  storage.
+
+* Trying to transfer shared resources such as locks, queues etc
+  between processes over a pipe or queue will now raise `RuntimeError`
+  with a message saying that the object should only be shared between
+  processes using inheritance.
+
+  Previously, this worked unreliably on Windows but would fail with an
+  unexplained `AssertionError` on Unix.
+
+* The names of some of the macros used for compiling the extension
+  have changed.  See `INSTALL.txt` and `setup.py`.
+
+* A few changes which (hopefully) make compilation possible on Solaris.
+
+* Lots of refactoring of the code.
+
+* Fixed reference leaks so that unit tests pass with "regrtest -R::"
+  (at least on Linux).
+
+
+Changes in 0.40
+---------------
+
+* Removed `SimpleQueue` and `PosixQueue` types.  Just use `Queue` instead.
+
+* Previously if you forgot to use the ::
+
+      if __name__ == '__main__':
+          freezeSupport()
+          ...
+
+  idiom on Windows then processes could be created recursively
+  bringing the computer to its knees.  Now `RuntimeError` will be
+  raised instead.
+
+* Some refactoring of the code.
+
+* A Unix specific bug meant that a child process might fail to start a
+  feeder thread for a queue if its parent process had already started
+  its own feeder thread.  Fixed.
+
+
+Changes in 0.39
+---------------
+
+* One can now create one-way pipes by doing 
+  `reader, writer = Pipe(duplex=False)`.
+
+* Rewrote code for managing shared memory maps.
+
+* Added a `sharedctypes` module for creating `ctypes` objects allocated
+  from shared memory.  On Python 2.4 this requires the installation of
+  `ctypes`.
+
+  `ctypes` objects are not protected by any locks so you will need to
+  synchronize access to them (such as by using a lock).  However they
+  can be much faster to access than equivalent objects allocated using
+  a `LocalManager`.
+
+* Rearranged documentation.
+
+* Previously the C extension caused a segfault on 64 bit machines with
+  Python 2.5 because it used `int` instead of `Py_ssize_t` in certain
+  places.  This is now fixed.  Thanks to Alexy Khrabrov for the report.
+
+* A fix for `Pool.terminate()`.
+
+* A fix for cleanup behaviour of `Queue`.
+
+
+Changes in 0.38
+---------------
+
+* Have revamped the queue types.  Now the queue types are
+  `Queue`, `SimpleQueue` and (on systems which support it)
+  `PosixQueue`.
+
+  Now `Queue` should behave just like Python's normal `Queue.Queue`
+  class except that `qsize()`, `task_done()` and `join()` are not
+  implemented.  In particular, if no maximum size was specified when
+  the queue was created then `put()` will always succeed without
+  blocking.
+
+  A `SimpleQueue` instance is really just a pipe protected by a couple
+  of locks.  It has `get()`, `put()` and `empty()` methods but does
+  not not support timeouts or non-blocking.
+
+  `BufferedPipeQueue()` and `PipeQueue()` remain as deprecated
+  aliases of `Queue()` but `BufferedPosixQueue()` has been removed.
+  (Not sure if we really need to keep `PosixQueue()`...)
+
+* Previously the `Pool.shutdown()` method was a little dodgy -- it
+  could block indefinitely if `map()` or `imap*()` were used and did
+  not try to terminate workers while they were doing a task.
+
+  Now there are three new methods `close()`, `terminate()` and
+  `join()` -- `shutdown()` is retained as a deprecated alias of
+  `terminate()`.  Thanks to Gerald John M. Manipon for feature
+  request/suggested patch to `shutdown()`.
+
+* `Pool.imap()` and `Pool.imap_unordered()` has gained a `chunksize`
+  argument which allows the iterable to be submitted to the pool in
+  chunks.  Choosing `chunksize` appropriately makes `Pool.imap()`
+  almost as fast as `Pool.map()` even for long iterables and cheap
+  functions.
+
+* Previously on Windows when the cleanup code for a `LocalManager`
+  attempts to unlink the name of the file which backs the shared
+  memory map an exception is raised if a child process still exists
+  which has a handle open for that mmap.  This is likely to happen if
+  a daemon process inherits a `LocalManager` instance.
+
+  Now the parent process will remember the filename and attempt to
+  unlink the file name again once all the child processes have been
+  joined or terminated.  Reported by Paul Rudin.
+
+* `types.MethodType` is registered with `copy_reg` so now instance
+  methods and class methods should be picklable.  (Unfortunately there is
+  no obvious way of supporting the pickling of staticmethods since
+  they are not marked with the class in which they were defined.)
+
+  This means that on Windows it is now possible to use an instance
+  method or class method as the target callable of a Process object.
+
+* On Windows `reduction.fromfd()` now returns true instances of
+  `_socket.socket`, so there is no more need for the
+  `_processing.falsesocket` type.
+
+
+Changes in 0.37
+---------------
+
+* Updated metadata and documentation because the project is now hosted
+  at `developer.berlios.de/projects/pyprocessing`.
+
+* The `Pool.join()` method has been removed.  `Pool.shutdown()` will
+  now join the worker processes automatically.
+
+* A pool object no longer participates in a reference cycle so
+  `Pool.shutdown()` should get called as soon as its reference count
+  falls to zero.
+  
+* On Windows if `enableLogging()` was used at module scope then the
+  logger used by a child process would often get two copies of the
+  same handler.  To fix this, now specifiying a handler type in
+  `enableLogging()` will cause any previous handlers used by the
+  logger to be discarded.
+
+
+Changes in 0.36
+---------------
+
+* In recent versions on Unix the finalizers in a manager process were
+  never given a chance to run before `os._exit()` was called, so old
+  unlinked AF_UNIX sockets could accumulate in '/tmp'.  Fixed.
+
+* The shutting down of managers has been cleaned up.
+
+* In previous versions on Windows trying to acquire a lock owned by a
+  different thread of the current process would raise an exception.
+  Fixed.
+
+* In previous versions on Windows trying to use an event object for
+  synchronization between two threads of the same process was likely
+  to raise an exception.  (This was caused by the bug described
+  above.)  Fixed.
+
+* Previously the arguments to `processing.Semaphore()` and
+  `processing.BoundedSemaphore()` did not have any defaults.  The
+  defaults should be 1 to match `threading`.  Fixed.
+
+* It should now be possible for a Windows Service created by using
+  `pywin32` to spawn processes using the `processing` package.
+
+  Note that `pywin32` apparently has a bug meaning that `Py_Finalize()` 
+  is never called when the service exits so functions registered with
+  `atexit` never get a chance to run.  Therefore it is advisable to
+  explicitly call `sys.exitfunc()` or `atexit._run_exitfuncs()` at the
+  end of `ServiceFramework.DoSvcRun()`.  Otherwise child processes are
+  liable to survive the service when it is stopped.  Thanks to Charlie
+  Hull for the report.
+
+* Added `getLogger()` and `enableLogging()` to support logging.
+
+
+Changes in 0.35
+---------------
+
+* By default processes are no longer be stoppable using the `stop()`
+  method: one must call `setStoppable(True)` before `start()` in order
+  to use the `stop()` method.  (Note that `terminate()` will work
+  regardless of whether the process is marked as being "stoppable".)
+
+  The reason for this is that on Windows getting `stop()` to work
+  involves starting a new console for the child process and installing
+  a signal handler for the `SIGBREAK` signal.  This unfortunately
+  means that Ctrl-Break cannot not be used to kill all processes of
+  the program.
+
+* Added `setStoppable()` and `getStoppable()` methods -- see above.
+
+* Added `BufferedQueue`/`BufferedPipeQueue`/`BufferedPosixQueue`.
+  Putting an object on a buffered queue will always succeed without
+  blocking (just like with `Queue.Queue` if no maximum size is
+  specified).  This makes them potentially safer than the normal queue
+  types provided by `processing` which have finite capacity and may
+  cause deadlocks if they fill.
+
+  `test/test_worker.py` has been updated to use `BufferedQueue` for
+  the task queue instead of explicitly spawning a thread to feed tasks
+  to the queue without risking a deadlock.
+
+* Now when the NO_SEM_TIMED macro is set polling will be used to get
+  around the lack of `sem_timedwait()`.  This means that
+  `Condition.wait()` and `Queue.get()` should now work with timeouts
+  on Mac OS X.
+
+* Added a `callback` argument to `Pool.apply_async()`.
+
+* Added `test/test_httpserverpool.py` which runs a pool of http
+  servers which share a single listening socket.
+
+* Previously on Windows the process object was passed to the child
+  process on the commandline (after pickling and hex encoding it).
+  This caused errors when the pickled string was too large.  Now if
+  the pickled string is large then it will be passed to the child
+  over a pipe or socket.
+
+* Fixed bug in the iterator returned by `Pool.imap()`.
+
+* Fixed bug in `Condition.__repr__()`.
+
+* Fixed a handle/file descriptor leak when sockets or connections are
+  unpickled.
+
+
+Changes in 0.34
+---------------
+
+* Although version 0.33 the C extension would compile on Mac OSX
+  trying to import it failed with "undefined symbol: _sem_timedwait".
+  Unfortunately the `ImportError` exception was silently swallowed.
+  
+  This is now fixed by using the `NO_SEM_TIMED` macro.  Unfortunately
+  this means that some methods like `Condition.wait()` and
+  `Queue.get()` will not work with timeouts on Mac OS X.  If you
+  really need to be able to use timeouts then you can always use the
+  equivalent objects created with a manager.  Thanks to Doug Hellmann
+  for report and testing.
+  
+* Added a `terminate()` method to process objects which is more
+  forceful than `stop()`.
+
+* Fixed bug in the cleanup function registered with `atexit` which on
+  Windows could cause a process which is shutting down to deadlock
+  waiting for a manager to exit.  Thanks to Dominique Wahli for report
+  and testing.
+  
+* Added `test/test_workers.py` which gives an example of how to create
+  a collection of worker processes which execute tasks from one queue
+  and return results on another.
+
+* Added `processing.Pool()` which returns a process pool object.  This
+  allows one to execute functions asynchronously.  It also has a
+  parallel implementation of the `map()` builtin.  This is still
+  *experimental* and undocumented --- see `test/test_pool.py` for
+  example usage.
+
+
+Changes in 0.33
+---------------
+
+* Added a `recvbytes_into()` method for receiving byte data into
+  objects with the writable buffer interface.  Also renamed the
+  `_recv_string()` and `_send_string()` methods of connection objects
+  to `recvbytes()` and `sendbytes()`.
+
+* Some optimizations for the transferring of large blocks of data
+  using connection objects.
+
+* On Unix `os.sysconf()` is now used by default to determine whether
+  to compile in support for posix semaphores or posix message queues.
+  
+  By using the `NO_SEM_TIMED` and `NO_MQ_TIMED` macros (see
+  `INSTALL.txt`) it should now also be possible to compile in
+  (partial) semaphore or queue support on Unix systems which lack the
+  timeout functions `sem_timedwait()` or `mq_timedreceive()` and
+  `mq_timesend()`.
+
+* `gettimeofday()` is now used instead of `clock_gettime()` making
+  compilation of the C extension (hopefully) possible on Mac OSX.  No
+  modificaton of `setup.py` should be necessary.  Thanks to Michele
+  Bertoldi for report and proposed patch.
+
+* `cpuCount()` function added which returns the number of CPUs
+  in the system.
+
+* Bugfixes to `PosixQueue` class.
+
+
+Changes in 0.32
+---------------
+
+* Refactored and simplified `_nonforking` module -- info about
+  `sys.modules` of parent process is no longer passed on to child
+  process.  Also `pkgutil` is no longer used.
+
+* Allocated space from an mmap used by `LocalManager` will now be
+  recycled.
+
+* Better tests for `LocalManager`.
+
+* Fixed bug in `managers.py` concerning refcounting of shared objects.
+  Bug affects the case where the callable used to create a shared
+  object does not return a unique object each time it is called.
+  Thanks to Alexey Akimov for the report.
+
+* Added a `freezeSupport()` function. Calling this at the appropriate
+  point in the main module is necessary when freezing a multiprocess
+  program to produce a Windows executable.  (Has been tested with
+  `py2exe`, `PyInstaller` and `cx_Freeze`.)
+
+
+Changes in 0.31
+---------------
+
+* Fixed one line bug in `localmanager.py` which caused shared memory maps
+  not to be resized properly.
+
+* Added tests for shared values/structs/arrays to `test/test_processing`.
+
+
+Changes in 0.30
+----------------
+
+* Process objects now support the complete API of thread objects.
+
+  In particular `isAlive()`, `isDaemon()`, `setDaemon()` have been
+  added and `join()` now supports the `timeout` paramater.
+
+  There are also new methods `stop()`, `getPid()` and `getExitCode()`.
+  
+* Implemented synchronization primitives based on the Windows mutexes
+  and semaphores and posix named semaphores.  
+
+* Added support for sharing simple objects between processes by using
+  a shared memory map and the `struct` or `array` modules.
+
+* An `activeChildren()` function has been added to `processing` which
+  returns a list of the child processes which are still alive.
+
+* A `Pipe()` function has been added which returns a pair of
+  connection objects representing the ends of a duplex connection over
+  which picklable objects can be sent.
+
+* socket objects etc are now picklable and can be transferred between
+  processes.  (Requires compilation of the `_processing` extension.)
+
+* Subclasses of `managers.BaseManager` no longer automatically spawn a
+  child process when an instance is created: the `start()` method must be
+  called explicitly.
+
+* On Windows child processes are now spawned using `subprocess`.
+
+* On Windows the Python 2.5 version of `pkgutil` is now used for
+  loading modules by the `_nonforking` module.  On Python 2.4 this
+  version of `pkgutil` (which uses the standard Python licence) is
+  included in `processing.compat`.
+
+* The arguments to the functions in `processing.connection` have
+  changed slightly.
+
+* Connection objects now have a `poll()` method which tests whether
+  there is any data available for reading.
+
+* The `test/py2exedemo` folder shows how to get `py2exe` to create a
+  Windows executable from a program using the `processing` package.
+
+* More tests.
+
+* Bugfixes.
+
+* Rearrangement of various stuff.
+
+
+Changes in 0.21
+---------------
+
+* By default a proxy is now only able to access those methods of its
+  referent which have been explicitly exposed.
+
+* The `connection` sub-package now supports digest authentication.
+
+* Process objects are now given randomly generated 'inheritable'
+  authentication keys.
+
+* A manager process will now only accept connections from processes
+  using the same authentication key.
+
+* Previously `get_module()` from `_nonforking.py` was seriously messed
+  up (though it generally worked).  It is a lot saner now.
+
+* Python 2.4 or higher is now required.
+
+
+Changes in 0.20
+---------------
+
+* The `doc` folder contains HTML documentation.
+
+* `test` is now a subpackage.  Running `processing.test.main()` 
+  will run test scripts using both processes and threads.
+
+* `nonforking.py` has been renamed `_nonforking.py`.
+  `manager.py` has been renamed `manager.py`.
+  `connection.py` has become a sub-package `connection`
+
+* `Listener` and `Client` have been removed from
+  `processing`, but still exist in `processing.connection`.
+
+* The package is now *probably* compatible with versions of Python
+  earlier than 2.4.
+
+* `set` is no longer a type supported by the default manager type.
+
+* Many more changes.
+
+
+Changes in 0.12
+---------------
+
+* Fixed bug where the arguments to `processing.Manager()` were passed on
+  to `processing.manager.DefaultManager()` in the wrong order.
+
+* `processing.dummy` is now a subpackage of `processing`
+  instead of a module.
+
+* Rearranged package so that the `test` folder, `README.txt` and
+  `CHANGES.txt` are copied when the package is installed.
+
+
+Changes in 0.11
+---------------
+
+* Fixed bug on windows when the full path of `nonforking.py` contains a
+  space.
+
+* On unix there is no longer a need to make the arguments to the
+  constructor of `Process` be picklable or for and instance of a
+  subclass of `Process` to be picklable when you call the start method.
+
+* On unix proxies which a child process inherits from its parent can
+  be used by the child without any problem, so there is no longer a
+  need to pass them as arguments to `Process`.  (This will never be
+  possible on windows.)

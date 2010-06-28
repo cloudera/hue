@@ -1,0 +1,497 @@
+
+/* -- Clear Fix -- */
+.clearfix:after {content: "."; display: block; height: 0; clear: both; visibility: hidden;}
+
+/* wrapper for all css */
+.ccs-shared {
+	position: relative;
+	font-family: "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS", Helvetica, Arial, sans-serif;
+	font-size: 12px;
+}
+/* all links default styles */
+.ccs-shared a {
+	color: #3e528c;
+	text-decoration: none;
+	cursor: pointer;
+	outline: none;
+}
+.ccs-shared .jframe_ignore a {
+	text-decoration: none;
+}
+.ccs-shared a:hover {
+	text-decoration: underline;
+}
+/* all imgs default styles */
+.ccs-shared img {
+	border: 0px;
+}
+/* all paragraph default styles */
+.ccs-shared p {
+	margin-bottom: 12px;
+}
+/* all input and form element default styles */
+.ccs-shared input, .ccs-shared textarea {
+	padding: 2px;
+}
+.ccs-shared label {
+	cursor: pointer;
+}
+.ccs-shared pre {
+	font-family: monaco, courier;
+}
+/* errors */
+.ccs-error {
+	color: #900;
+}
+
+/* all em default styles */
+.ccs-shared em, .ccs-shared i {
+	font-style: italic;
+}
+/* all code default styles */
+.ccs-shared .ccs-code, .ccs-shared.ccs-code, .ccs-code {
+	font-family: "Andale Mono", "Monaco", "Courier New" !important;
+}
+/* text is not selectable; good for double click actions like links to prevent the double click from selecting
+		note that the user cannot select this text even if that's their intention; use sparingly */
+.ccs-no_select, .ccs-no_select * {
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+/* OverText - input lables using OverText.js from MooTools More */
+.ccs-shared label.overTxtLabel {
+	font-size: 11px;
+	color: #999;
+	margin-top: 3px;
+}
+.ccs-shared label.OverText-ccs-search, .ccs-shared label.OverText-ccs-input {
+	margin-top: 0px;
+}
+/* clear both sides of floats */
+.ccs-shared .ccs-clear {
+	clear:both;
+}
+/* center text */
+.ccs-shared .ccs-center {
+	text-align: center;
+}
+/* float left */
+.ccs-shared .ccs-left {
+	float: left;
+}
+/* float right */
+.ccs-shared .ccs-right {
+	float: right;
+}
+/* not displayed */
+.ccs-shared .ccs-hidden {
+	display: none;
+}
+/* cursor pointer to connote clickability */
+.ccs-shared .ccs-pointer {
+	cursor:pointer;
+}
+/* inline block display; makes elements block level, but follows page flow */
+.ccs-shared .ccs-inline, .ccs-shared ul.css-inline_list li {
+	display:-moz-inline-box;                /* FF2 */
+	display:inline-block;                   /* webkit and FF3 */
+	#zoom: 1; /* set hasLayout:true to mimic inline-block */
+	#display:inline; 
+	border:0;
+	padding:0;
+	vertical-align:middle;
+	#vertical-align: auto;  /* makes TextBox,Button line up w/native counterparts on IE6 */
+	position: relative;
+}
+/* down divot image */
+.ccs-shared .ccs-down_divot {
+	width: 11px;
+	height: 11px;
+	display: block;
+	background: url(../art/divots.png) -11px -11px no-repeat;
+}
+/* tabbed layout */
+/* .css-tabs, a ul; container for the tabs 
+
+<ul class="ccs-tabs">
+<li><span>Tab 1</span></li>
+<li><span>Tab 2</span></li>
+<li><span>Tab 3</span></li>
+</ul>
+<ul class="ccs-tab_sections">
+	<li> section for tab 1 </li>
+	<li> section for tab 2 </li>
+	<li> section for tab 3 </li>
+</ul>
+
+*/
+.ccs-shared ul.ccs-tabs {
+	margin: none;
+	padding: none;
+}
+.ccs-shared .right_col pre {
+	overflow: visible;
+}
+.ccs-shared .right_col ul.ccs-tab_sections {
+	overflow: visible;
+}
+
+.ccs-shared ul.ccs-tab_sections {
+	overflow: visible;
+}
+/* the tab elements, li elements */
+.ccs-shared .ccs-tabs li {
+	cursor: pointer;
+	height: 19px;
+	line-height: 19px;
+	background: url(/static/art/tabs.png);
+	margin-right: 8px !important;
+	color: #444;
+}
+/* each tab's text/html is wrapped in a span */
+.ccs-tabs li span {
+	height: 18px;
+	display: block;
+	background: url(/static/art/tabs.png) right top;
+	position: relative;
+	left: 6px;
+	padding: 1px 6px 0px 0px;
+}
+.ccs-shared .ccs-tabs > li {
+	list-style: none;
+	float: left;
+}
+.ccs-shared .ccs-tabs li.tabSelected {
+	color: #000;
+	background: url(/static/art/tabs.png) left 38px;
+}
+.ccs-shared .ccs-tabs li.tabSelected span {
+	background: url(/static/art/tabs.png) right 38px;
+}
+.ccs-shared .ccs-tabs li:hover {
+	color: #000;
+	background: url(/static/art/tabs.png) left 19px;
+}
+.ccs-shared .ccs-tabs li:hover span {
+	background: url(/static/art/tabs.png) right 19px;
+}
+
+/* stripy table */
+/*
+see: HtmlTable.js, HtmlTable.Zebra.js, HtmlTable.Select.js, HtmlTable.Sort.js in MooTools More
+<table class="ccs-data_table selectable sortable" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr>
+			<th>Header for Column 1</th>
+			<th>Header for Column 2</th>
+			<th>Header for Column 3</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr><td> col 1 </td><td> col 2 </td><td> col 3 </td></tr>
+		<tr><td> col 1 </td><td> col 2 </td><td> col 3 </td></tr>
+		<tr><td> col 1 </td><td> col 2 </td><td> col 3 </td></tr>
+		<tr><td> col 1 </td><td> col 2 </td><td> col 3 </td></tr>
+	</tbody>
+</table>
+
+give it class "selectable" to allow the user to select rows
+give it class "sortable" to allow the user to sort the table
+*/
+table.ccs-data_table {
+	width: 100%;
+}
+table.ccs-data_table thead {
+	background: url(/static/art/th_back.png);
+}
+table.ccs-data_table thead th {
+	text-align: left;
+	white-space: nowrap;
+	padding: 0px 6px;
+	border: 1px solid #b2b2b2;
+	border-width: 0px 1px 1px 0px;
+	height: 16px !important;
+	line-height: 16px !important;
+	font-size: 12px;
+	font-weight: normal;
+	overflow: hidden;
+}
+table.ccs-data_table th:last-child {
+	border-right: none;
+}
+
+table.ccs-data_table td {
+	white-space: nowrap;
+	padding: 0px 8px;
+	height: 20px;
+	line-height: 20px;
+	background: #fff;
+	border: none;
+}
+table.ccs-data_table tr.table-tr-odd td {
+	background: #f3f3f3;
+}
+table.ccs-data_table tr:nth-child(odd) td {
+	background: #f3f3f3;
+}
+table.ccs-data_table tr:hover > td, table.ccs-data_table tr.table-tr-hovered td {
+	background-color: #d4e7f8;
+	color: #000;
+	cursor: pointer;
+}
+table.ccs-data_table tr.selected td, table.ccs-data_table tr.table-tr-selected td, table.ccs-data_table tr.selected td a, table.ccs-data_table tr.table-tr-selected td a {
+	background-color: #3875d7;
+	color: #fff;
+}
+table.table-sortable th {
+	cursor: pointer;
+}
+table.table-sortable th div {
+	position: relative;
+	padding-right: 10px;
+}
+span.table-th-sort-span {
+	width: 7px;
+	height: 16px;
+	display: block;
+	cursor: pointer;
+	position: absolute;
+	right: -2px;
+	top: 0px;
+}
+.table-th-sort span.table-th-sort-span {
+	background: url(/static/art/icons/bullet_arrow_down.png) -4px top no-repeat;
+}
+.table-th-sort-rev span.table-th-sort-span {
+	background: url(/static/art/icons/bullet_arrow_up.png) -4px top no-repeat;
+}
+
+/* stickywin solid; this is the login window styles */
+div.solid-win div.body-left { 
+	background: url(../art/sticky-win-solid-back.png); 
+	width: 16px !important; 
+	overflow: visible; 
+	position: relative; 
+	z-index: 1; 
+}
+div.solid-win div.body {
+	position: relative;
+	left: 16px;
+	padding: 10px 16px 1px 0px;
+	background: url(../art/sticky-win-solid-back.png) top right;
+}
+div.solid-win div.bottom { 
+	z-index: 0;
+	background: url(../art/sticky-win-solid-back.png) bottom left;
+	width: 16px !important;
+	overflow: visible;
+	position: relative;
+	clear: both;
+}
+div.solid-win div.bottom_lr { 
+	position: relative;
+	left: 16px;
+	background: url(../art/sticky-win-solid-back.png) bottom right;
+	height: 20px;
+	padding-right: 16px;
+}
+
+/* JFrame styles */
+/* these are applied for you by default */
+div.jframe_wrapper {
+	position: relative;
+	height: 100%;
+}
+div.jframe_contents {
+	min-height: 100%;
+}
+div.jframe_default h1, h2, h3, h4, h5 {
+	padding: 0;
+	margin: 0;
+	margin-bottom: .3em;
+}
+/* put this on your root element (or any element you want to have a 10px padding)
+		jframe content without this will be flush with the borders of the window */
+.jframe_padded {
+	padding: 10px;
+}
+/*	apply jframe_default class if you want to give your layout standard HTML-like layout
+		good for documents for example. */
+div.jframe_default ul,
+div.jframe_default ol {
+  padding-left: 1.5em;
+  margin: 0;
+  margin-bottom: 1em;
+}
+
+div.jframe_default ul li{
+  list-style-type: disc;
+  margin-bottom: 0.5em;
+}
+
+div.jframe_default a{
+  font-weight: bold;
+}
+div.jframe_default code {
+  font-family: fixed;
+}
+
+div.jframe_default table {
+  border-collapse: separate;
+}
+div.jframe_default h1,
+div.jframe_default h2,
+div.jframe_default h3,
+div.jframe_default h4,
+div.jframe_default h5 { font-weight: bold; }
+
+div.jframe_default h1 { font-size: 150%; margin-bottom: 0.3em; padding-top: 8px; margin-top: 0px;}
+div.jframe_default h2 { font-size: 130%; margin-bottom: 0.3em; padding-top: 8px; margin-top: 0px;}
+div.jframe_default h3 { font-size: 120%; margin-bottom: 0.3em; padding-top: 8px; margin-top: 0px;}
+div.jframe_default h4 { font-size: 110%; margin-bottom: 0.3em; padding-top: 8px; margin-top: 0px;}
+div.jframe_default h5 { font-size: 105%; margin-bottom: 0.3em; padding-top: 8px; margin-top: 0px;}
+
+/* context menu */
+/*
+	Create a UL element with the class context-menu (a ul with li items for each menu item). Put it inside the container you want to give a right click menu (like a div; for tables, put it inside a td - if you want the tr to have the right click behaviore, still put it in a td)
+	Give the parent that has the right click control define the following in its data-context-menu-actions property:
+	
+		[ //array of actions; this allows support for more than one context menu in a single parent
+			{
+				'events':['contextmenu','click:relay(.myapp-options)'], //when the user right clicks, or clicks a .myapp-options element
+				'menu':'ul.context-menu' //it shows this menu
+			}
+		]
+	
+	Note that you can have more than one right click menu per container. This allows a table row to be right clicked and show a different menu if the user right clicks, say, an image vs a link or different td elements. See CCS.ContextMenu.js.
+*/
+.ccs-shared ul.context-menu {
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	background: #fff;
+	border: solid #777;
+	border-width: 1px;
+	position: absolute;
+	z-index: 1;
+	display: none;
+	overflow: visible;
+}
+.ccs-shared ul.context-menu * {
+	white-space: nowrap;
+}
+
+.ccs-shared ul.context-menu li {
+	border-bottom: 1px solid #ccc;
+	padding: 3px;
+}
+.ccs-shared table.ccs-data_table tr.table-tr-selected td ul.context-menu li a {
+	color: #000;
+	background-color: #fff;
+	text-decoration: none;
+}
+.ccs-shared .context-menu li:hover, .ccs-shared table.ccs-data_table tr.table-tr-selected td ul.context-menu li:hover a, .ccs-shared ul.context-menu li:hover a {
+	text-decoration: none;
+	background-color: #3875D7;
+	color: #fff;
+}
+.ccs-shared ul.context-menu li:last-child {
+	border: none;
+}
+/* button bar */
+input.ccs-art_button {
+	padding: 0px 0px 0px 0px;
+	/* webkit madness: 
+		put this padding statement in place and buttons are still padding 0/8/0/8px
+		add the border: 0px statement below
+		and they all go to 0/0/0/0px
+	*/
+	border: 0px;
+}
+.ccs-shared .ccs-button_bar a, .ccs-shared .ccs-button_subbar_above a, .ccs-shared .ccs-button_subbar_below a {
+	float: left;
+	height: 19px;
+}
+
+.ccs-shared .ccs-button_bar li, .ccs-shared .ccs-button_subbar_above li, .ccs-shared .ccs-button_subbar_below li {
+	margin-right: 0 !important;
+}
+/* side by side select */
+
+/*
+Takes a multi-select box and makes it so you can click to move elements from a selected list to a non-selected list.
+*/
+
+.sideBySideSelect {
+	min-width:340px;
+}
+.sideBySideSelect .deselected, .sideBySideSelect .selected {
+	border: 1px solid #333;
+	float: left;
+	width: 45%;
+	height: 150px;
+	background: #fff;
+	overflow: auto;
+}
+.sideBySideSelect .spacer {
+	background: url(/static/art/led-icons/tag.png) no-repeat 50% 50%;
+	width: 30px;
+	height: 150px;
+	float: left;
+}
+.sideBySideSelect .selected table.ccs-data_table tr > td:first-child, .sideBySideSelect .selected table.ccs-data_table tr td:first-child {
+	padding-left: 16px;
+}
+.sideBySideSelect .selected table.ccs-data_table tr:hover > td:first-child, .sideBySideSelect .selected table.ccs-data_table tr.table-tr-hovered td:first-child {
+
+	background-image: url(/static/art/icons/arrow_left_tiny.png);
+	background-repeat: no-repeat;
+	background-position: 0px 2px;
+}
+.sideBySideSelect .selected table.ccs-data_table tr > td:first-child, .sideBySideSelect .selected table.ccs-data_table tr td:first-child {
+	padding-right: 16px;
+}
+.sideBySideSelect .deselected table.ccs-data_table tr:hover > td:first-child, .sideBySideSelect .deselected table.ccs-data_table tr.table-tr-hovered td:first-child {
+
+	background-image: url(/static/art/icons/arrow_right_tiny.png);
+	background-repeat: no-repeat;
+	background-position: right 2px;
+}
+
+
+/* help text links */
+.ccs-help_link, .ccs-info_link {
+	display:-moz-inline-box;		/* FF2 */
+	display:inline-block;		   /* webkit and FF3 */
+	#zoom: 1; /* set hasLayout:true to mimic inline-block */
+	#display:inline; 
+	border:0;
+	padding:0;
+	vertical-align:middle;
+	#vertical-align: auto;  /* makes TextBox,Button line up w/native counterparts on IE6 */
+	position: relative;
+	width: 14px;
+	height: 14px;
+	background: url(/static/art/help.png);
+	text-indent: -200px;
+	overflow: hidden;
+}
+
+.ccs-info_link {
+	background: url(/static/art/info.png);
+}
+
+.ccs-search, .ccs-input {
+	display: none;
+}
+
+*[data-size-to-width], *[data-size-to-height] {
+	overflow: auto;
+}
+
+.vertical .art-splitview-splitter {
+	box-shadow: 0px -1px 3px #aaa;
+	-webkit-box-shadow: 0px -1px 3px #aaa;
+	-moz-box-shadow: 0px -1px 3px #aaa;
+}

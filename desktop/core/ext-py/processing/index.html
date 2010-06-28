@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Python processing</title>
+<meta name="author" content="R Oudkerk" />
+<link rel="stylesheet" href="doc/html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="python-processing">
+<h1 class="title">Python processing</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Author:</th>
+<td>R Oudkerk</td></tr>
+<tr><th class="docinfo-name">Contact:</th>
+<td>roudkerk at users.berlios.de</td></tr>
+<tr class="field"><th class="docinfo-name">Url:</th><td class="field-body"><a class="reference" href="http://developer.berlios.de/projects/pyprocessing">http://developer.berlios.de/projects/pyprocessing</a></td>
+</tr>
+<tr><th class="docinfo-name">Version:</th>
+<td>0.52</td></tr>
+<tr class="field"><th class="docinfo-name">Licence:</th><td class="field-body">BSD Licence</td>
+</tr>
+</tbody>
+</table>
+<p><tt class="docutils literal"><span class="pre">processing</span></tt> is a package for the Python language which supports the
+spawning of processes using the API of the standard library's
+<tt class="docutils literal"><span class="pre">threading</span></tt> module.  It runs on both Unix and Windows.</p>
+<p>Features:</p>
+<ul class="simple">
+<li>Objects can be transferred between processes using pipes or
+multi-producer/multi-consumer queues.</li>
+<li>Objects can be shared between processes using a server process or
+(for simple data) shared memory.</li>
+<li>Equivalents of all the synchronization primitives in <tt class="docutils literal"><span class="pre">threading</span></tt>
+are available.</li>
+<li>A <tt class="docutils literal"><span class="pre">Pool</span></tt> class makes it easy to submit tasks to a pool of worker
+processes.</li>
+</ul>
+<div class="section">
+<h1><a id="links" name="links">Links</a></h1>
+<ul class="simple">
+<li><a class="reference" href="./doc/index.html">Documentation</a></li>
+<li><a class="reference" href="./doc/INSTALL.html">Installation instructions</a></li>
+<li><a class="reference" href="./doc/CHANGES.html">Changelog</a></li>
+<li><a class="reference" href="./doc/THANKS.html">Acknowledgments</a></li>
+<li><a class="reference" href="./doc/COPYING.html">BSD Licence</a></li>
+</ul>
+<p>The project is hosted at</p>
+<ul class="simple">
+<li><a class="reference" href="http://developer.berlios.de/projects/pyprocessing">http://developer.berlios.de/projects/pyprocessing</a></li>
+</ul>
+<p>The package can be downloaded from</p>
+<ul class="simple">
+<li><a class="reference" href="http://developer.berlios.de/project/filelist.php?group_id=9001">http://developer.berlios.de/project/filelist.php?group_id=9001</a> or</li>
+<li><a class="reference" href="http://pypi.python.org/pypi/processing">http://pypi.python.org/pypi/processing</a></li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="examples" name="examples">Examples</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">processing.Process</span></tt> class follows the API of <tt class="docutils literal"><span class="pre">threading.Thread</span></tt>.
+For example</p>
+<pre class="literal-block">
+from processing import Process, Queue
+
+def f(q):
+    q.put('hello world')
+
+if __name__ == '__main__':
+    q = Queue()
+    p = Process(target=f, args=[q])
+    p.start()
+    print q.get()
+    p.join()
+</pre>
+<p>Synchronization primitives like locks, semaphores and conditions are
+available, for example</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from processing import Condition
+&gt;&gt;&gt; c = Condition()
+&gt;&gt;&gt; print c
+&lt;Condition(&lt;RLock(None, 0)&gt;), 0&gt;
+&gt;&gt;&gt; c.acquire()
+True
+&gt;&gt;&gt; print c
+&lt;Condition(&lt;RLock(MainProcess, 1)&gt;), 0&gt;
+</pre>
+<p>One can also use a manager to create shared objects either in shared
+memory or in a server process, for example</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from processing import Manager
+&gt;&gt;&gt; manager = Manager()
+&gt;&gt;&gt; l = manager.list(range(10))
+&gt;&gt;&gt; l.reverse()
+&gt;&gt;&gt; print l
+[9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+&gt;&gt;&gt; print repr(l)
+&lt;Proxy[list] object at 0x00E1B3B0&gt;
+</pre>
+<p>Tasks can be offloaded to a pool of worker processes in various ways,
+for example</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from processing import Pool
+&gt;&gt;&gt; def f(x): return x*x
+...
+&gt;&gt;&gt; p = Pool(4)
+&gt;&gt;&gt; result = p.mapAsync(f, range(10))
+&gt;&gt;&gt; print result.get(timeout=1)
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+</pre>
+<a href="http://developer.berlios.de" title="BerliOS Developer">
+<img src="http://developer.berlios.de/bslogo.php?group_id=9001"
+width="124px" height="32px" border="0" alt="BerliOS Developer Logo"></a></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{
+	"copyright": ["//MooTools, <http://mootools.net>, My Object Oriented (JavaScript) Tools. Copyright (c) 2006-2009 Valerio Proietti, <http://mad4milk.net>, MIT Style License.","//MooTools More, <http://mootools.net/more>. Copyright (c) 2006-2009 Aaron Newton <http://clientcide.com/>, Valerio Proietti <http://mad4milk.net> & the MooTools team <http://mootools.net/developers>, MIT Style License.","//Clientcide Scripts, <http://clientcide.com/js> Copyright (c) 2006-2009 Aaron Newton, MIT Style License."],
+	"compression": "none",
+	"available_compressions": [ ],
+	"cache scripts.json": false,
+	"libs": {
+		"mootools-core": {
+			"scripts": "../ext/thirdparty/js/mootools-core/Source"
+		},
+		"mootools-more": {
+			"scripts": "../ext/thirdparty/js/mootools-more/Source"
+		},
+		"clientcide": {
+			"scripts": "../ext/thirdparty/js/clientcide/Source"
+		},
+		"ccs-shared": {
+			"scripts": "core/static/js/Source"
+		},
+		"fancyupload": {
+			"scripts": "libs/fancyupload/static/js/Source"
+		},
+		"filebrowser": {
+			"scripts": "core-apps/filebrowser/static/js/Source"
+		},
+		"mootools-art": {
+			"scripts": "../ext/thirdparty/js/art/Source"
+		},
+		"mootools-color": {
+			"scripts": "libs/mootools-color/static/js/Source"
+		},
+		"mootools-touch": {
+			"scripts": "libs/mootools-touch/static/js/Source"
+		},
+		"protovis" : {
+			"scripts" : "libs/protovis/static/js/Source"
+		},
+		"slick": {
+			"scripts": "../ext/thirdparty/js/art/assets/slick/Source"
+		},
+		"ccs-ui": {
+			"scripts": "core-apps/UI/static/js/Source"
+		},
+		"jobbrowser": {
+			"scripts": "apps/jobbrowser/static/js/Source"
+		},
+		"jobsub": {
+			"scripts": "apps/jobsub/static/js/Source"
+		},
+		"useradmin": {
+			"scripts": "core-apps/useradmin/static/js/Source"
+		},
+		"beeswax": {
+			"scripts": "apps/beeswax/static/js/Source"
+		},
+		"depender_client": {
+			"scripts": "apps/depender/client/Source"
+		}
+	}
+}

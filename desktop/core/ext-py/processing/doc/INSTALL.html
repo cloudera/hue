@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Installation of processing</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="installation-of-processing">
+<h1 class="title">Installation of processing</h1>
+<p>Versions earlier than Python 2.4 are not supported.  If you are using
+Python 2.4 then you should install the <tt class="docutils literal"><span class="pre">ctypes</span></tt> package (which comes
+automatically with Python 2.5).</p>
+<p>Windows binary builds for Python 2.4 and Python 2.5 are available at</p>
+<blockquote>
+<a class="reference" href="http://pyprocessing.berlios.de">http://pyprocessing.berlios.de</a></blockquote>
+<p>or</p>
+<blockquote>
+<a class="reference" href="http://pypi.python.org/pypi/processing">http://pypi.python.org/pypi/processing</a></blockquote>
+<p>Otherwise, if you have the correct C compiler setup then the source
+distribution can be installed the usual way:</p>
+<pre class="literal-block">
+python setup.py install
+</pre>
+<p>It should not be necessary to do any editing of <tt class="docutils literal"><span class="pre">setup.py</span></tt> if you are
+using Windows, Mac OS X or Linux.  On other unices it may be necessary
+to modify the values of the <tt class="docutils literal"><span class="pre">macros</span></tt> dictionary or <tt class="docutils literal"><span class="pre">libraries</span></tt> list.
+The section to modify reads</p>
+<pre class="literal-block">
+else:
+    macros = dict(
+        HAVE_SEM_OPEN=1,
+        HAVE_SEM_TIMEDWAIT=1,
+        HAVE_FD_TRANSFER=1
+        )
+    libraries = ['rt']
+</pre>
+<p>More details can be found in the comments in <tt class="docutils literal"><span class="pre">setup.py</span></tt>.</p>
+<p>Note that if you use <tt class="docutils literal"><span class="pre">HAVE_SEM_OPEN=0</span></tt> then support for posix
+semaphores will not been compiled in, and then many of the functions
+in the <tt class="docutils literal"><span class="pre">processing</span></tt> namespace like <tt class="docutils literal"><span class="pre">Lock()</span></tt>, <tt class="docutils literal"><span class="pre">Queue()</span></tt> or will not be
+available.  However, one can still create a manager using <tt class="docutils literal"><span class="pre">manager</span> <span class="pre">=</span>
+<span class="pre">processing.Manager()</span></tt> and then do <tt class="docutils literal"><span class="pre">lock</span> <span class="pre">=</span> <span class="pre">manager.Lock()</span></tt> etc.</p>
+<div class="section">
+<h1><a id="running-tests" name="running-tests">Running tests</a></h1>
+<p>To run the test scripts using Python 2.5 do</p>
+<pre class="literal-block">
+python -m processing.tests
+</pre>
+<p>and on Python 2.4 do</p>
+<pre class="literal-block">
+python -c &quot;from processing.tests import main; main()&quot;
+</pre>
+<p>This will run a number of test scripts using both processes and threads.</p>
+</div>
+</div>
+</body>
+</html>

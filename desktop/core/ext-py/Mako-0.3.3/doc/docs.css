@@ -1,0 +1,91 @@
+#topanchor {position:absolute;left:0px;top:0px;width:0px;height:0px;}
+#pagecontrol {float:right;}
+
+body { 
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size:.90em;
+    line-height:1.4em;
+}
+
+a { text-decoration: none; color:#2929ff;}
+a:visited  { color: #2929ff;}
+a:hover { color: #600060;}
+
+h1 {
+    font-size:1.6em;
+    font-weight:bold;
+}
+
+h2 {
+    font-size:1.1em;
+    font-weight:bold;
+    margin:10px 0px 10px 0px;
+}
+
+.topnav h3 {
+    font-weight:normal;
+    margin:0px 0px 0px 0px;
+}
+
+.prevnext {
+    float:right;
+}
+.section {
+    
+}
+.subsection {
+    margin:0px 0px 0px 20px;
+}
+
+.topnav li {
+    font-size:.9em;
+    list-style-type:none;
+}
+
+.topnav ul {
+    padding:0px 0px 0px 20px;
+    margin:0px 0px 0px 0px;
+}
+
+.topnav .toolbar{
+    margin:0px 0px 0px 0px;
+    padding:0px 0px 0px 0px;
+}
+.topnav {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    padding:10px 10px 0px 10px;
+    margin:0px 0px 10px 0px;
+}
+
+.smalllink {
+    font-size:.80em;
+}
+code {
+    font-size:1.2em;
+}
+.code {
+    font-family:monospace;
+}
+p {
+    /*margin:5px 20px 5px 10px;*/
+}
+
+li {
+    margin:1px 0px 1px 0px;
+}
+td {
+    font-size:small;
+}
+
+.section pre { 
+    margin: 1.5em; 
+    padding: .7em; 
+    font-size: 1em; 
+    line-height:1em;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    width:640px;
+    overflow:auto;
+}
+

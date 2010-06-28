@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Changelog for processing</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="changelog-for-processing">
+<h1 class="title">Changelog for processing</h1>
+<div class="section">
+<h1><a id="changes-in-0-52" name="changes-in-0-52">Changes in 0.52</a></h1>
+<ul>
+<li><p class="first">On versions 0.50 and 0.51 Mac OSX <tt class="docutils literal"><span class="pre">Lock.release()</span></tt> would fail with
+<tt class="docutils literal"><span class="pre">OSError(errno.ENOSYS,</span> <span class="pre">&quot;[Errno</span> <span class="pre">78]</span> <span class="pre">Function</span> <span class="pre">not</span> <span class="pre">implemented&quot;)</span></tt>.
+This appears to be because on Mac OSX <tt class="docutils literal"><span class="pre">sem_getvalue()</span></tt> has not been
+implemented.</p>
+<p>Now <tt class="docutils literal"><span class="pre">sem_getvalue()</span></tt> is no longer needed.  Unfortunately, however,
+on Mac OSX <tt class="docutils literal"><span class="pre">BoundedSemaphore()</span></tt> will not raise <tt class="docutils literal"><span class="pre">ValueError</span></tt> if it
+exceeds its initial value.</p>
+</li>
+<li><p class="first">Some changes to the code for the reduction/rebuilding of connection
+and socket objects so that things work the same on Windows and Unix.
+This should fix a couple of bugs.</p>
+</li>
+<li><p class="first">The code has been changed to consistently use &quot;camelCase&quot; for
+methods and (non-factory) functions.  In the few cases where this
+has meant a change to the documented API, the old name has been
+retained as an alias.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-51" name="changes-in-0-51">Changes in 0.51</a></h1>
+<ul>
+<li><p class="first">In 0.50 <tt class="docutils literal"><span class="pre">processing.Value()</span></tt> and <tt class="docutils literal"><span class="pre">processing.sharedctypes.Value()</span></tt>
+were related but had different signatures, which was rather
+confusing.</p>
+<p>Now <tt class="docutils literal"><span class="pre">processing.sharedctypes.Value()</span></tt> has been renamed
+<tt class="docutils literal"><span class="pre">processing.sharedctypes.RawValue()</span></tt> and
+<tt class="docutils literal"><span class="pre">processing.sharedctypes.Value()</span></tt> is the same as <tt class="docutils literal"><span class="pre">processing.Value()</span></tt>.</p>
+</li>
+<li><p class="first">In version 0.50 <tt class="docutils literal"><span class="pre">sendfd()</span></tt> and <tt class="docutils literal"><span class="pre">recvfd()</span></tt> apparently did not work on
+64bit Linux.  This has been fixed by reverting to using the CMSG_*
+macros as was done in 0.40.</p>
+<p>However, this means that systems without all the necessary CMSG_*
+macros (such as Solaris 8) will have to disable compilation of
+<tt class="docutils literal"><span class="pre">sendfd()</span></tt> and <tt class="docutils literal"><span class="pre">recvfd()</span></tt> by setting <tt class="docutils literal"><span class="pre">macros['HAVE_FD_TRANSFRER']</span> <span class="pre">=</span> <span class="pre">0</span></tt>
+in <tt class="docutils literal"><span class="pre">setup.py</span></tt>.</p>
+</li>
+<li><p class="first">Fixed an authentication error when using a &quot;remote&quot; manager created
+using <tt class="docutils literal"><span class="pre">BaseManager.from_address()</span></tt>.</p>
+</li>
+<li><p class="first">Fixed a couple of bugs which only affected Python 2.4.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-50" name="changes-in-0-50">Changes in 0.50</a></h1>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">ctypes</span></tt> is now a prerequisite if you want to use shared memory --
+with Python 2.4 you will need to install it separately.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">LocalManager()</span></tt> has been removed.</p>
+</li>
+<li><p class="first">Added <tt class="docutils literal"><span class="pre">processing.Value()</span></tt> and <tt class="docutils literal"><span class="pre">processing.Array()</span></tt>
+which are similar to <tt class="docutils literal"><span class="pre">LocalManager.SharedValue()</span></tt> and
+<tt class="docutils literal"><span class="pre">LocalManager.SharedArray()</span></tt>.</p>
+</li>
+<li><p class="first">In the <tt class="docutils literal"><span class="pre">sharedctypes</span></tt> module <tt class="docutils literal"><span class="pre">new_value()</span></tt> and <tt class="docutils literal"><span class="pre">new_array()</span></tt> have
+been renamed <tt class="docutils literal"><span class="pre">Value()</span></tt> and <tt class="docutils literal"><span class="pre">Array()</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Process.stop()</span></tt>, <tt class="docutils literal"><span class="pre">Process.getStoppable()</span></tt> and
+<tt class="docutils literal"><span class="pre">Process.setStoppable()</span></tt> have been removed.  Use
+<tt class="docutils literal"><span class="pre">Process.terminate()</span></tt> instead.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">procesing.Lock</span></tt> now matches <tt class="docutils literal"><span class="pre">threading.Lock</span></tt> behaviour more
+closely: now a thread can release a lock it does not own, and now
+when a thread tries acquiring a lock it already owns a deadlock
+results instead of an exception.</p>
+</li>
+<li><p class="first">On Windows when the main thread is blocking on a method of <tt class="docutils literal"><span class="pre">Lock</span></tt>,
+<tt class="docutils literal"><span class="pre">RLock</span></tt>, <tt class="docutils literal"><span class="pre">Semaphore</span></tt>, <tt class="docutils literal"><span class="pre">BoundedSemaphore</span></tt>, <tt class="docutils literal"><span class="pre">Condition</span></tt> it will no
+longer ignore Ctrl-C.  (The same was already true on Unix.)</p>
+<p>This differs from the behaviour of the equivalent objects in
+<tt class="docutils literal"><span class="pre">threading</span></tt> which will completely ignore Ctrl-C.</p>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">test</span></tt> sub-package has been replaced by lots of unit tests in a
+<tt class="docutils literal"><span class="pre">tests</span></tt> sub-package.  Some of the old test files have been moved
+over to a new <tt class="docutils literal"><span class="pre">examples</span></tt> sub-package.</p>
+</li>
+<li><p class="first">On Windows it is now possible for a non-console python program
+(i.e. one using <tt class="docutils literal"><span class="pre">pythonw.exe</span></tt> instead of <tt class="docutils literal"><span class="pre">python.exe</span></tt>) to use
+<tt class="docutils literal"><span class="pre">processing</span></tt>.</p>
+<p>Previously an exception was raised when <tt class="docutils literal"><span class="pre">subprocess.py</span></tt> tried to
+duplicate stdin, stdout, stderr.</p>
+</li>
+<li><p class="first">Proxy objects should now be thread safe -- they now use thread local
+storage.</p>
+</li>
+<li><p class="first">Trying to transfer shared resources such as locks, queues etc
+between processes over a pipe or queue will now raise <tt class="docutils literal"><span class="pre">RuntimeError</span></tt>
+with a message saying that the object should only be shared between
+processes using inheritance.</p>
+<p>Previously, this worked unreliably on Windows but would fail with an
+unexplained <tt class="docutils literal"><span class="pre">AssertionError</span></tt> on Unix.</p>
+</li>
+<li><p class="first">The names of some of the macros used for compiling the extension
+have changed.  See <tt class="docutils literal"><span class="pre">INSTALL.txt</span></tt> and <tt class="docutils literal"><span class="pre">setup.py</span></tt>.</p>
+</li>
+<li><p class="first">A few changes which (hopefully) make compilation possible on Solaris.</p>
+</li>
+<li><p class="first">Lots of refactoring of the code.</p>
+</li>
+<li><p class="first">Fixed reference leaks so that unit tests pass with &quot;regrtest -R::&quot;
+(at least on Linux).</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-40" name="changes-in-0-40">Changes in 0.40</a></h1>
+<ul>
+<li><p class="first">Removed <tt class="docutils literal"><span class="pre">SimpleQueue</span></tt> and <tt class="docutils literal"><span class="pre">PosixQueue</span></tt> types.  Just use <tt class="docutils literal"><span class="pre">Queue</span></tt> instead.</p>
+</li>
+<li><p class="first">Previously if you forgot to use the</p>
+<pre class="literal-block">
+if __name__ == '__main__':
+    freezeSupport()
+    ...
+</pre>
+<p>idiom on Windows then processes could be created recursively
+bringing the computer to its knees.  Now <tt class="docutils literal"><span class="pre">RuntimeError</span></tt> will be
+raised instead.</p>
+</li>
+<li><p class="first">Some refactoring of the code.</p>
+</li>
+<li><p class="first">A Unix specific bug meant that a child process might fail to start a
+feeder thread for a queue if its parent process had already started
+its own feeder thread.  Fixed.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-39" name="changes-in-0-39">Changes in 0.39</a></h1>
+<ul>
+<li><p class="first">One can now create one-way pipes by doing
+<tt class="docutils literal"><span class="pre">reader,</span> <span class="pre">writer</span> <span class="pre">=</span> <span class="pre">Pipe(duplex=False)</span></tt>.</p>
+</li>
+<li><p class="first">Rewrote code for managing shared memory maps.</p>
+</li>
+<li><p class="first">Added a <tt class="docutils literal"><span class="pre">sharedctypes</span></tt> module for creating <tt class="docutils literal"><span class="pre">ctypes</span></tt> objects allocated
+from shared memory.  On Python 2.4 this requires the installation of
+<tt class="docutils literal"><span class="pre">ctypes</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">ctypes</span></tt> objects are not protected by any locks so you will need to
+synchronize access to them (such as by using a lock).  However they
+can be much faster to access than equivalent objects allocated using
+a <tt class="docutils literal"><span class="pre">LocalManager</span></tt>.</p>
+</li>
+<li><p class="first">Rearranged documentation.</p>
+</li>
+<li><p class="first">Previously the C extension caused a segfault on 64 bit machines with
+Python 2.5 because it used <tt class="docutils literal"><span class="pre">int</span></tt> instead of <tt class="docutils literal"><span class="pre">Py_ssize_t</span></tt> in certain
+places.  This is now fixed.  Thanks to Alexy Khrabrov for the report.</p>
+</li>
+<li><p class="first">A fix for <tt class="docutils literal"><span class="pre">Pool.terminate()</span></tt>.</p>
+</li>
+<li><p class="first">A fix for cleanup behaviour of <tt class="docutils literal"><span class="pre">Queue</span></tt>.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-38" name="changes-in-0-38">Changes in 0.38</a></h1>
+<ul>
+<li><p class="first">Have revamped the queue types.  Now the queue types are
+<tt class="docutils literal"><span class="pre">Queue</span></tt>, <tt class="docutils literal"><span class="pre">SimpleQueue</span></tt> and (on systems which support it)
+<tt class="docutils literal"><span class="pre">PosixQueue</span></tt>.</p>
+<p>Now <tt class="docutils literal"><span class="pre">Queue</span></tt> should behave just like Python's normal <tt class="docutils literal"><span class="pre">Queue.Queue</span></tt>
+class except that <tt class="docutils literal"><span class="pre">qsize()</span></tt>, <tt class="docutils literal"><span class="pre">task_done()</span></tt> and <tt class="docutils literal"><span class="pre">join()</span></tt> are not
+implemented.  In particular, if no maximum size was specified when
+the queue was created then <tt class="docutils literal"><span class="pre">put()</span></tt> will always succeed without
+blocking.</p>
+<p>A <tt class="docutils literal"><span class="pre">SimpleQueue</span></tt> instance is really just a pipe protected by a couple
+of locks.  It has <tt class="docutils literal"><span class="pre">get()</span></tt>, <tt class="docutils literal"><span class="pre">put()</span></tt> and <tt class="docutils literal"><span class="pre">empty()</span></tt> methods but does
+not not support timeouts or non-blocking.</p>
+<p><tt class="docutils literal"><span class="pre">BufferedPipeQueue()</span></tt> and <tt class="docutils literal"><span class="pre">PipeQueue()</span></tt> remain as deprecated
+aliases of <tt class="docutils literal"><span class="pre">Queue()</span></tt> but <tt class="docutils literal"><span class="pre">BufferedPosixQueue()</span></tt> has been removed.
+(Not sure if we really need to keep <tt class="docutils literal"><span class="pre">PosixQueue()</span></tt>...)</p>
+</li>
+<li><p class="first">Previously the <tt class="docutils literal"><span class="pre">Pool.shutdown()</span></tt> method was a little dodgy -- it
+could block indefinitely if <tt class="docutils literal"><span class="pre">map()</span></tt> or <tt class="docutils literal"><span class="pre">imap*()</span></tt> were used and did
+not try to terminate workers while they were doing a task.</p>
+<p>Now there are three new methods <tt class="docutils literal"><span class="pre">close()</span></tt>, <tt class="docutils literal"><span class="pre">terminate()</span></tt> and
+<tt class="docutils literal"><span class="pre">join()</span></tt> -- <tt class="docutils literal"><span class="pre">shutdown()</span></tt> is retained as a deprecated alias of
+<tt class="docutils literal"><span class="pre">terminate()</span></tt>.  Thanks to Gerald John M. Manipon for feature
+request/suggested patch to <tt class="docutils literal"><span class="pre">shutdown()</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Pool.imap()</span></tt> and <tt class="docutils literal"><span class="pre">Pool.imap_unordered()</span></tt> has gained a <tt class="docutils literal"><span class="pre">chunksize</span></tt>
+argument which allows the iterable to be submitted to the pool in
+chunks.  Choosing <tt class="docutils literal"><span class="pre">chunksize</span></tt> appropriately makes <tt class="docutils literal"><span class="pre">Pool.imap()</span></tt>
+almost as fast as <tt class="docutils literal"><span class="pre">Pool.map()</span></tt> even for long iterables and cheap
+functions.</p>
+</li>
+<li><p class="first">Previously on Windows when the cleanup code for a <tt class="docutils literal"><span class="pre">LocalManager</span></tt>
+attempts to unlink the name of the file which backs the shared
+memory map an exception is raised if a child process still exists
+which has a handle open for that mmap.  This is likely to happen if
+a daemon process inherits a <tt class="docutils literal"><span class="pre">LocalManager</span></tt> instance.</p>
+<p>Now the parent process will remember the filename and attempt to
+unlink the file name again once all the child processes have been
+joined or terminated.  Reported by Paul Rudin.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">types.MethodType</span></tt> is registered with <tt class="docutils literal"><span class="pre">copy_reg</span></tt> so now instance
+methods and class methods should be picklable.  (Unfortunately there is
+no obvious way of supporting the pickling of staticmethods since
+they are not marked with the class in which they were defined.)</p>
+<p>This means that on Windows it is now possible to use an instance
+method or class method as the target callable of a Process object.</p>
+</li>
+<li><p class="first">On Windows <tt class="docutils literal"><span class="pre">reduction.fromfd()</span></tt> now returns true instances of
+<tt class="docutils literal"><span class="pre">_socket.socket</span></tt>, so there is no more need for the
+<tt class="docutils literal"><span class="pre">_processing.falsesocket</span></tt> type.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-37" name="changes-in-0-37">Changes in 0.37</a></h1>
+<ul class="simple">
+<li>Updated metadata and documentation because the project is now hosted
+at <tt class="docutils literal"><span class="pre">developer.berlios.de/projects/pyprocessing</span></tt>.</li>
+<li>The <tt class="docutils literal"><span class="pre">Pool.join()</span></tt> method has been removed.  <tt class="docutils literal"><span class="pre">Pool.shutdown()</span></tt> will
+now join the worker processes automatically.</li>
+<li>A pool object no longer participates in a reference cycle so
+<tt class="docutils literal"><span class="pre">Pool.shutdown()</span></tt> should get called as soon as its reference count
+falls to zero.</li>
+<li>On Windows if <tt class="docutils literal"><span class="pre">enableLogging()</span></tt> was used at module scope then the
+logger used by a child process would often get two copies of the
+same handler.  To fix this, now specifiying a handler type in
+<tt class="docutils literal"><span class="pre">enableLogging()</span></tt> will cause any previous handlers used by the
+logger to be discarded.</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-36" name="changes-in-0-36">Changes in 0.36</a></h1>
+<ul>
+<li><p class="first">In recent versions on Unix the finalizers in a manager process were
+never given a chance to run before <tt class="docutils literal"><span class="pre">os._exit()</span></tt> was called, so old
+unlinked AF_UNIX sockets could accumulate in '/tmp'.  Fixed.</p>
+</li>
+<li><p class="first">The shutting down of managers has been cleaned up.</p>
+</li>
+<li><p class="first">In previous versions on Windows trying to acquire a lock owned by a
+different thread of the current process would raise an exception.
+Fixed.</p>
+</li>
+<li><p class="first">In previous versions on Windows trying to use an event object for
+synchronization between two threads of the same process was likely
+to raise an exception.  (This was caused by the bug described
+above.)  Fixed.</p>
+</li>
+<li><p class="first">Previously the arguments to <tt class="docutils literal"><span class="pre">processing.Semaphore()</span></tt> and
+<tt class="docutils literal"><span class="pre">processing.BoundedSemaphore()</span></tt> did not have any defaults.  The
+defaults should be 1 to match <tt class="docutils literal"><span class="pre">threading</span></tt>.  Fixed.</p>
+</li>
+<li><p class="first">It should now be possible for a Windows Service created by using
+<tt class="docutils literal"><span class="pre">pywin32</span></tt> to spawn processes using the <tt class="docutils literal"><span class="pre">processing</span></tt> package.</p>
+<p>Note that <tt class="docutils literal"><span class="pre">pywin32</span></tt> apparently has a bug meaning that <tt class="docutils literal"><span class="pre">Py_Finalize()</span></tt>
+is never called when the service exits so functions registered with
+<tt class="docutils literal"><span class="pre">atexit</span></tt> never get a chance to run.  Therefore it is advisable to
+explicitly call <tt class="docutils literal"><span class="pre">sys.exitfunc()</span></tt> or <tt class="docutils literal"><span class="pre">atexit._run_exitfuncs()</span></tt> at the
+end of <tt class="docutils literal"><span class="pre">ServiceFramework.DoSvcRun()</span></tt>.  Otherwise child processes are
+liable to survive the service when it is stopped.  Thanks to Charlie
+Hull for the report.</p>
+</li>
+<li><p class="first">Added <tt class="docutils literal"><span class="pre">getLogger()</span></tt> and <tt class="docutils literal"><span class="pre">enableLogging()</span></tt> to support logging.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-35" name="changes-in-0-35">Changes in 0.35</a></h1>
+<ul>
+<li><p class="first">By default processes are no longer be stoppable using the <tt class="docutils literal"><span class="pre">stop()</span></tt>
+method: one must call <tt class="docutils literal"><span class="pre">setStoppable(True)</span></tt> before <tt class="docutils literal"><span class="pre">start()</span></tt> in order
+to use the <tt class="docutils literal"><span class="pre">stop()</span></tt> method.  (Note that <tt class="docutils literal"><span class="pre">terminate()</span></tt> will work
+regardless of whether the process is marked as being &quot;stoppable&quot;.)</p>
+<p>The reason for this is that on Windows getting <tt class="docutils literal"><span class="pre">stop()</span></tt> to work
+involves starting a new console for the child process and installing
+a signal handler for the <tt class="docutils literal"><span class="pre">SIGBREAK</span></tt> signal.  This unfortunately
+means that Ctrl-Break cannot not be used to kill all processes of
+the program.</p>
+</li>
+<li><p class="first">Added <tt class="docutils literal"><span class="pre">setStoppable()</span></tt> and <tt class="docutils literal"><span class="pre">getStoppable()</span></tt> methods -- see above.</p>
+</li>
+<li><p class="first">Added <tt class="docutils literal"><span class="pre">BufferedQueue</span></tt>/<tt class="docutils literal"><span class="pre">BufferedPipeQueue</span></tt>/<tt class="docutils literal"><span class="pre">BufferedPosixQueue</span></tt>.
+Putting an object on a buffered queue will always succeed without
+blocking (just like with <tt class="docutils literal"><span class="pre">Queue.Queue</span></tt> if no maximum size is
+specified).  This makes them potentially safer than the normal queue
+types provided by <tt class="docutils literal"><span class="pre">processing</span></tt> which have finite capacity and may
+cause deadlocks if they fill.</p>
+<p><tt class="docutils literal"><span class="pre">test/test_worker.py</span></tt> has been updated to use <tt class="docutils literal"><span class="pre">BufferedQueue</span></tt> for
+the task queue instead of explicitly spawning a thread to feed tasks
+to the queue without risking a deadlock.</p>
+</li>
+<li><p class="first">Now when the NO_SEM_TIMED macro is set polling will be used to get
+around the lack of <tt class="docutils literal"><span class="pre">sem_timedwait()</span></tt>.  This means that
+<tt class="docutils literal"><span class="pre">Condition.wait()</span></tt> and <tt class="docutils literal"><span class="pre">Queue.get()</span></tt> should now work with timeouts
+on Mac OS X.</p>
+</li>
+<li><p class="first">Added a <tt class="docutils literal"><span class="pre">callback</span></tt> argument to <tt class="docutils literal"><span class="pre">Pool.apply_async()</span></tt>.</p>
+</li>
+<li><p class="first">Added <tt class="docutils literal"><span class="pre">test/test_httpserverpool.py</span></tt> which runs a pool of http
+servers which share a single listening socket.</p>
+</li>
+<li><p class="first">Previously on Windows the process object was passed to the child
+process on the commandline (after pickling and hex encoding it).
+This caused errors when the pickled string was too large.  Now if
+the pickled string is large then it will be passed to the child
+over a pipe or socket.</p>
+</li>
+<li><p class="first">Fixed bug in the iterator returned by <tt class="docutils literal"><span class="pre">Pool.imap()</span></tt>.</p>
+</li>
+<li><p class="first">Fixed bug in <tt class="docutils literal"><span class="pre">Condition.__repr__()</span></tt>.</p>
+</li>
+<li><p class="first">Fixed a handle/file descriptor leak when sockets or connections are
+unpickled.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-34" name="changes-in-0-34">Changes in 0.34</a></h1>
+<ul>
+<li><p class="first">Although version 0.33 the C extension would compile on Mac OSX
+trying to import it failed with &quot;undefined symbol: _sem_timedwait&quot;.
+Unfortunately the <tt class="docutils literal"><span class="pre">ImportError</span></tt> exception was silently swallowed.</p>
+<p>This is now fixed by using the <tt class="docutils literal"><span class="pre">NO_SEM_TIMED</span></tt> macro.  Unfortunately
+this means that some methods like <tt class="docutils literal"><span class="pre">Condition.wait()</span></tt> and
+<tt class="docutils literal"><span class="pre">Queue.get()</span></tt> will not work with timeouts on Mac OS X.  If you
+really need to be able to use timeouts then you can always use the
+equivalent objects created with a manager.  Thanks to Doug Hellmann
+for report and testing.</p>
+</li>
+<li><p class="first">Added a <tt class="docutils literal"><span class="pre">terminate()</span></tt> method to process objects which is more
+forceful than <tt class="docutils literal"><span class="pre">stop()</span></tt>.</p>
+</li>
+<li><p class="first">Fixed bug in the cleanup function registered with <tt class="docutils literal"><span class="pre">atexit</span></tt> which on
+Windows could cause a process which is shutting down to deadlock
+waiting for a manager to exit.  Thanks to Dominique Wahli for report
+and testing.</p>
+</li>
+<li><p class="first">Added <tt class="docutils literal"><span class="pre">test/test_workers.py</span></tt> which gives an example of how to create
+a collection of worker processes which execute tasks from one queue
+and return results on another.</p>
+</li>
+<li><p class="first">Added <tt class="docutils literal"><span class="pre">processing.Pool()</span></tt> which returns a process pool object.  This
+allows one to execute functions asynchronously.  It also has a
+parallel implementation of the <tt class="docutils literal"><span class="pre">map()</span></tt> builtin.  This is still
+<em>experimental</em> and undocumented --- see <tt class="docutils literal"><span class="pre">test/test_pool.py</span></tt> for
+example usage.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-33" name="changes-in-0-33">Changes in 0.33</a></h1>
+<ul>
+<li><p class="first">Added a <tt class="docutils literal"><span class="pre">recvbytes_into()</span></tt> method for receiving byte data into
+objects with the writable buffer interface.  Also renamed the
+<tt class="docutils literal"><span class="pre">_recv_string()</span></tt> and <tt class="docutils literal"><span class="pre">_send_string()</span></tt> methods of connection objects
+to <tt class="docutils literal"><span class="pre">recvbytes()</span></tt> and <tt class="docutils literal"><span class="pre">sendbytes()</span></tt>.</p>
+</li>
+<li><p class="first">Some optimizations for the transferring of large blocks of data
+using connection objects.</p>
+</li>
+<li><p class="first">On Unix <tt class="docutils literal"><span class="pre">os.sysconf()</span></tt> is now used by default to determine whether
+to compile in support for posix semaphores or posix message queues.</p>
+<p>By using the <tt class="docutils literal"><span class="pre">NO_SEM_TIMED</span></tt> and <tt class="docutils literal"><span class="pre">NO_MQ_TIMED</span></tt> macros (see
+<tt class="docutils literal"><span class="pre">INSTALL.txt</span></tt>) it should now also be possible to compile in
+(partial) semaphore or queue support on Unix systems which lack the
+timeout functions <tt class="docutils literal"><span class="pre">sem_timedwait()</span></tt> or <tt class="docutils literal"><span class="pre">mq_timedreceive()</span></tt> and
+<tt class="docutils literal"><span class="pre">mq_timesend()</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">gettimeofday()</span></tt> is now used instead of <tt class="docutils literal"><span class="pre">clock_gettime()</span></tt> making
+compilation of the C extension (hopefully) possible on Mac OSX.  No
+modificaton of <tt class="docutils literal"><span class="pre">setup.py</span></tt> should be necessary.  Thanks to Michele
+Bertoldi for report and proposed patch.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">cpuCount()</span></tt> function added which returns the number of CPUs
+in the system.</p>
+</li>
+<li><p class="first">Bugfixes to <tt class="docutils literal"><span class="pre">PosixQueue</span></tt> class.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-32" name="changes-in-0-32">Changes in 0.32</a></h1>
+<ul class="simple">
+<li>Refactored and simplified <tt class="docutils literal"><span class="pre">_nonforking</span></tt> module -- info about
+<tt class="docutils literal"><span class="pre">sys.modules</span></tt> of parent process is no longer passed on to child
+process.  Also <tt class="docutils literal"><span class="pre">pkgutil</span></tt> is no longer used.</li>
+<li>Allocated space from an mmap used by <tt class="docutils literal"><span class="pre">LocalManager</span></tt> will now be
+recycled.</li>
+<li>Better tests for <tt class="docutils literal"><span class="pre">LocalManager</span></tt>.</li>
+<li>Fixed bug in <tt class="docutils literal"><span class="pre">managers.py</span></tt> concerning refcounting of shared objects.
+Bug affects the case where the callable used to create a shared
+object does not return a unique object each time it is called.
+Thanks to Alexey Akimov for the report.</li>
+<li>Added a <tt class="docutils literal"><span class="pre">freezeSupport()</span></tt> function. Calling this at the appropriate
+point in the main module is necessary when freezing a multiprocess
+program to produce a Windows executable.  (Has been tested with
+<tt class="docutils literal"><span class="pre">py2exe</span></tt>, <tt class="docutils literal"><span class="pre">PyInstaller</span></tt> and <tt class="docutils literal"><span class="pre">cx_Freeze</span></tt>.)</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-31" name="changes-in-0-31">Changes in 0.31</a></h1>
+<ul class="simple">
+<li>Fixed one line bug in <tt class="docutils literal"><span class="pre">localmanager.py</span></tt> which caused shared memory maps
+not to be resized properly.</li>
+<li>Added tests for shared values/structs/arrays to <tt class="docutils literal"><span class="pre">test/test_processing</span></tt>.</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-30" name="changes-in-0-30">Changes in 0.30</a></h1>
+<ul>
+<li><p class="first">Process objects now support the complete API of thread objects.</p>
+<p>In particular <tt class="docutils literal"><span class="pre">isAlive()</span></tt>, <tt class="docutils literal"><span class="pre">isDaemon()</span></tt>, <tt class="docutils literal"><span class="pre">setDaemon()</span></tt> have been
+added and <tt class="docutils literal"><span class="pre">join()</span></tt> now supports the <tt class="docutils literal"><span class="pre">timeout</span></tt> paramater.</p>
+<p>There are also new methods <tt class="docutils literal"><span class="pre">stop()</span></tt>, <tt class="docutils literal"><span class="pre">getPid()</span></tt> and <tt class="docutils literal"><span class="pre">getExitCode()</span></tt>.</p>
+</li>
+<li><p class="first">Implemented synchronization primitives based on the Windows mutexes
+and semaphores and posix named semaphores.</p>
+</li>
+<li><p class="first">Added support for sharing simple objects between processes by using
+a shared memory map and the <tt class="docutils literal"><span class="pre">struct</span></tt> or <tt class="docutils literal"><span class="pre">array</span></tt> modules.</p>
+</li>
+<li><p class="first">An <tt class="docutils literal"><span class="pre">activeChildren()</span></tt> function has been added to <tt class="docutils literal"><span class="pre">processing</span></tt> which
+returns a list of the child processes which are still alive.</p>
+</li>
+<li><p class="first">A <tt class="docutils literal"><span class="pre">Pipe()</span></tt> function has been added which returns a pair of
+connection objects representing the ends of a duplex connection over
+which picklable objects can be sent.</p>
+</li>
+<li><p class="first">socket objects etc are now picklable and can be transferred between
+processes.  (Requires compilation of the <tt class="docutils literal"><span class="pre">_processing</span></tt> extension.)</p>
+</li>
+<li><p class="first">Subclasses of <tt class="docutils literal"><span class="pre">managers.BaseManager</span></tt> no longer automatically spawn a
+child process when an instance is created: the <tt class="docutils literal"><span class="pre">start()</span></tt> method must be
+called explicitly.</p>
+</li>
+<li><p class="first">On Windows child processes are now spawned using <tt class="docutils literal"><span class="pre">subprocess</span></tt>.</p>
+</li>
+<li><p class="first">On Windows the Python 2.5 version of <tt class="docutils literal"><span class="pre">pkgutil</span></tt> is now used for
+loading modules by the <tt class="docutils literal"><span class="pre">_nonforking</span></tt> module.  On Python 2.4 this
+version of <tt class="docutils literal"><span class="pre">pkgutil</span></tt> (which uses the standard Python licence) is
+included in <tt class="docutils literal"><span class="pre">processing.compat</span></tt>.</p>
+</li>
+<li><p class="first">The arguments to the functions in <tt class="docutils literal"><span class="pre">processing.connection</span></tt> have
+changed slightly.</p>
+</li>
+<li><p class="first">Connection objects now have a <tt class="docutils literal"><span class="pre">poll()</span></tt> method which tests whether
+there is any data available for reading.</p>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">test/py2exedemo</span></tt> folder shows how to get <tt class="docutils literal"><span class="pre">py2exe</span></tt> to create a
+Windows executable from a program using the <tt class="docutils literal"><span class="pre">processing</span></tt> package.</p>
+</li>
+<li><p class="first">More tests.</p>
+</li>
+<li><p class="first">Bugfixes.</p>
+</li>
+<li><p class="first">Rearrangement of various stuff.</p>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-21" name="changes-in-0-21">Changes in 0.21</a></h1>
+<ul class="simple">
+<li>By default a proxy is now only able to access those methods of its
+referent which have been explicitly exposed.</li>
+<li>The <tt class="docutils literal"><span class="pre">connection</span></tt> sub-package now supports digest authentication.</li>
+<li>Process objects are now given randomly generated 'inheritable'
+authentication keys.</li>
+<li>A manager process will now only accept connections from processes
+using the same authentication key.</li>
+<li>Previously <tt class="docutils literal"><span class="pre">get_module()</span></tt> from <tt class="docutils literal"><span class="pre">_nonforking.py</span></tt> was seriously messed
+up (though it generally worked).  It is a lot saner now.</li>
+<li>Python 2.4 or higher is now required.</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-20" name="changes-in-0-20">Changes in 0.20</a></h1>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">doc</span></tt> folder contains HTML documentation.</li>
+<li><tt class="docutils literal"><span class="pre">test</span></tt> is now a subpackage.  Running <tt class="docutils literal"><span class="pre">processing.test.main()</span></tt>
+will run test scripts using both processes and threads.</li>
+<li><tt class="docutils literal"><span class="pre">nonforking.py</span></tt> has been renamed <tt class="docutils literal"><span class="pre">_nonforking.py</span></tt>.
+<tt class="docutils literal"><span class="pre">manager.py</span></tt> has been renamed <tt class="docutils literal"><span class="pre">manager.py</span></tt>.
+<tt class="docutils literal"><span class="pre">connection.py</span></tt> has become a sub-package <tt class="docutils literal"><span class="pre">connection</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Listener</span></tt> and <tt class="docutils literal"><span class="pre">Client</span></tt> have been removed from
+<tt class="docutils literal"><span class="pre">processing</span></tt>, but still exist in <tt class="docutils literal"><span class="pre">processing.connection</span></tt>.</li>
+<li>The package is now <em>probably</em> compatible with versions of Python
+earlier than 2.4.</li>
+<li><tt class="docutils literal"><span class="pre">set</span></tt> is no longer a type supported by the default manager type.</li>
+<li>Many more changes.</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-12" name="changes-in-0-12">Changes in 0.12</a></h1>
+<ul class="simple">
+<li>Fixed bug where the arguments to <tt class="docutils literal"><span class="pre">processing.Manager()</span></tt> were passed on
+to <tt class="docutils literal"><span class="pre">processing.manager.DefaultManager()</span></tt> in the wrong order.</li>
+<li><tt class="docutils literal"><span class="pre">processing.dummy</span></tt> is now a subpackage of <tt class="docutils literal"><span class="pre">processing</span></tt>
+instead of a module.</li>
+<li>Rearranged package so that the <tt class="docutils literal"><span class="pre">test</span></tt> folder, <tt class="docutils literal"><span class="pre">README.txt</span></tt> and
+<tt class="docutils literal"><span class="pre">CHANGES.txt</span></tt> are copied when the package is installed.</li>
+</ul>
+</div>
+<div class="section">
+<h1><a id="changes-in-0-11" name="changes-in-0-11">Changes in 0.11</a></h1>
+<ul class="simple">
+<li>Fixed bug on windows when the full path of <tt class="docutils literal"><span class="pre">nonforking.py</span></tt> contains a
+space.</li>
+<li>On unix there is no longer a need to make the arguments to the
+constructor of <tt class="docutils literal"><span class="pre">Process</span></tt> be picklable or for and instance of a
+subclass of <tt class="docutils literal"><span class="pre">Process</span></tt> to be picklable when you call the start method.</li>
+<li>On unix proxies which a child process inherits from its parent can
+be used by the child without any problem, so there is no longer a
+need to pass them as arguments to <tt class="docutils literal"><span class="pre">Process</span></tt>.  (This will never be
+possible on windows.)</li>
+</ul>
+</div>
+</div>
+</body>
+</html>

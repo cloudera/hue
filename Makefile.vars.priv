@@ -1,0 +1,81 @@
+#
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# The including file must define:
+#   ROOT	- The root of the repository
+# and should probably define:
+#   SYS_PYTHON	- The system python executable
+#
+
+include $(ROOT)/Makefile.vars
+
+VERBOSE ?= 0		# Set to 1 for a more verbose build process
+
+PROD_NAME := hue-$(DESKTOP_VERSION)
+
+# Locations of various source directory
+APPS_DIR := $(ROOT)/apps
+DESKTOP_DIR := $(ROOT)/desktop
+CONF_DIR := $(DESKTOP_DIR)/conf
+
+TOOLS_DIR := $(ROOT)/tools
+SCRIPTS_DIR := $(ROOT)/tools/scripts
+
+
+# TODO moveme
+DESKTOP_DB=$(DESKTOP_DIR)/desktop.db
+
+# Locations of various build output directories
+#BDIST_DIR := $(BLD_DIR)/bdist
+#BLD_DIR_EXT := $(BLD_DIR)/ext
+
+BLD_DIR_RELEASE := $(BLD_DIR)/release
+BLD_DIR_PROD := $(BLD_DIR_RELEASE)/prod/$(PROD_NAME)
+BLD_DIR_PROD_TGZ := $(BLD_DIR_PROD).tgz
+BLD_DIR_WEB := $(BLD_DIR_RELEASE)/web
+BLD_DIR_DOC := $(BLD_DIR)/docs
+
+# Installation directory
+PREFIX ?= /usr/local
+INSTALL_DIR ?= $(PREFIX)/hue
+INSTALL_APPS_DIR ?= $(INSTALL_DIR)/desktop/apps
+
+ifeq ($(INSTALL_DIR),$(patsubst /%,%,$(INSTALL_DIR)))
+  $(error "INSTALL_DIR $(INSTALL_DIR) must be an absolute path:")
+endif
+
+# Various commands
+APP_REG := $(ENV_PYTHON) $(TOOLS_DIR)/app_reg/app_reg.py
+VIRTUAL_BOOTSTRAP := $(TOOLS_DIR)/virtual-bootstrap/virtual-bootstrap.py
+
+
+# <<<< DEV ONLY
+STRIP_DEV = sed -e '/<<<< DEV ONLY/,/.*END DEV ONLY >>>>$$/D' $(1) > $(2)
+# END DEV ONLY >>>>
+
+# Verbosity control
+ifeq ($(VERBOSE),1)
+  ANT_OPTS = -v
+  SETUPTOOLS_OPTS = -vv
+  VIRTUALENV_OPTS = -vv
+else
+  ANT_OPTS =
+  SETUPTOOLS_OPTS = -qq
+  VIRTUALENV_OPTS = -qq
+endif

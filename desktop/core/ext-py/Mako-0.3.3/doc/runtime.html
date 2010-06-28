@@ -1,0 +1,394 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Mako Documentation - The Mako Runtime Environment</title>
+	
+    <link rel="stylesheet" href="docs.css"></link>
+    <link rel="stylesheet" href="highlight.css"></link>
+    
+
+
+
+
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+<div id="topanchor"><a name="top">&nbsp;</a></div>
+
+<div id="pagecontrol"><a href="index.html">Multiple Pages</a> | <a href="documentation.html">One Page</a></div>
+
+<h1>Mako Documentation</h1>
+
+<div class="versionheader">Version: 0.3.3   Last Updated: 05/31/10 16:21:29</div>
+
+
+
+
+
+
+
+<A name=""></a>
+
+
+    <div class="topnav">
+
+    
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="defs.html">Defs</a>
+
+            |
+            Next: <a href="namespaces.html">Namespaces</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+    <br/>
+	<a href="#runtime">The Mako Runtime Environment</a>
+	
+	
+    <ul>
+        <li><A style="" href="runtime.html#runtime_context">Context</a></li>
+        
+            
+    <ul>
+        <li><A style="" href="runtime.html#runtime_context_buffer">The Buffer</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="runtime.html#runtime_context_variables">Context Variables</a></li>
+        
+            
+    <ul>
+    </ul>
+
+        <li><A style="" href="runtime.html#runtime_context_accessors">Context Methods and Accessors</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+        <li><A style="" href="runtime.html#runtime_builtins">All the built-in names</a></li>
+        
+            
+    <ul>
+    </ul>
+
+    </ul>
+
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+    
+    <A name="runtime"></a>
+    
+    <div class="section">
+    
+
+    <h3>The Mako Runtime Environment</h3>
+    
+    
+
+<p>This section describes a little bit about the objects and built-in functions that are available in templates.
+</p>
+
+
+    
+    <A name="runtime_context"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Context</h3>
+    
+    
+
+<p>The <code>Context</code> is the central object that is created when a template is first executed, and is responsible for handling all communication with the outside world.  This includes two major components, one of which is the output buffer, which is a file-like object such as Python's <code>StringIO</code> or similar, and the other a dictionary of variables that can be freely referenced within a template; this dictionary is a combination of the arguments sent to the <code>template.render()</code> function and some built-in variables provided by Mako's runtime environment.
+</p>
+
+
+    
+    <A name="runtime_context_buffer"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>The Buffer</h3>
+    
+    
+
+<p>The buffer is stored within the <code>Context</code>, and writing to it is achieved by calling <code>context.write()</code>.  You usually don't need to care about this as all text within a template, as well as all expressions provided by <code>${}</code>, automatically send everything to this method.  The cases you might want to be aware of its existence are if you are dealing with various filtering/buffering scenarios, which are described in <a href="filtering.html">Filtering and Buffering</a>, or if you want to programmatically send content to the output stream, such as within a <code>&lt;% %&gt;</code> block.
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;some programmatic text&quot;</span><span class="p">)</span>
+<span class="cp">%&gt;</span>
+</pre></div>
+
+    </div>
+<p>The actual buffer may or may not be the original buffer sent to the <code>Context</code> object, as various filtering/caching scenarios may "push" a new buffer onto the context's underlying buffer stack.  For this reason, just stick with <code>context.write()</code> and content will always go to the topmost buffer.
+</p>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="runtime_context_variables"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Context Variables</h3>
+    
+    
+
+<p>When your template is compiled into a Python module, the body content is enclosed within a Python function called <code>render_body</code>.  Other top-level defs defined in the template are defined within their own function bodies which are named after the def's name with the prefix <code>render_</code> (i.e. <code>render_mydef</code>).  One of the first things that happens within these functions is that all variable names that are referenced within the function which are not defined in some other way (i.e. such as via assignment, module level imports, etc.) are pulled from the <code>Context</code> object's dictionary of variables.  This is how you're able to freely reference variable names in a template which automatically correspond to what was passed into the current <code>Context</code>.
+</p>
+<ul>
+ <li><p><strong>What happens if I reference a variable name that is not in the current context?</strong> - the value you get back is a special value called <code>UNDEFINED</code>.  This is just a simple global variable with the class <code>mako.runtime.Undefined</code>.  The <code>UNDEFINED</code> object throws an error when you call <code>str()</code> on it, which is what happens if you try to use it in an expression.
+</p>
+
+ </li>
+
+ <li><p><strong>Why not just return None?</strong>  Using <code>UNDEFINED</code> is more explicit and allows differentiation between a value of <code>None</code> that was explicitly passed to the <code>Context</code> and a value that wasn't present at all.
+</p>
+
+ </li>
+
+ <li><p><strong>Why raise an exception when you call str() on it ?  Why not just return a blank string?</strong> - Mako tries to stick to the Python philosophy of "explicit is better than implicit".  In this case, its decided that the template author should be made to specifically handle a missing value rather than experiencing what may be a silent failure.  Since <code>UNDEFINED</code> is a singleton object just like Python's <code>True</code> or <code>False</code>, you can use the <code>is</code> operator to check for it:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">%</span> <span class="k">if</span> <span class="n">someval</span> <span class="ow">is</span> <span class="n">UNDEFINED</span><span class="p">:</span>
+    someval is: no value
+<span class="cp">%</span> <span class="k">else</span><span class="p">:</span>
+    someval is: <span class="cp">${</span><span class="n">someval</span><span class="cp">}</span>
+<span class="cp">%</span><span class="k"> endif</span>
+</pre></div>
+
+    </div>
+
+ </li>
+</ul>
+<p>Another facet of the <code>Context</code> is that its dictionary of variables is <strong>immutable</strong>.  Whatever is set when <code>template.render()</code> is called is what stays.  Of course, since its Python, you can hack around this and change values in the context's internal dictionary, but this will probably will not work as well as you'd think.  The reason for this is that Mako in many cases creates copies of the <code>Context</code> object, which get sent to various elements of the template and inheriting templates used in an execution.  So changing the value in your local <code>Context</code> will not necessarily make that value available in other parts of the template's execution.  Examples of where Mako creates copies of the <code>Context</code> include within top-level def calls from the main body of the template (the context is used to propagate locally assigned variables into the scope of defs; since in the template's body they appear as inlined functions, Mako tries to make them act that way), and within an inheritance chain (each template in an inheritance chain has a different notion of <code>parent</code> and <code>next</code>, which are all stored in unique <code>Context</code> instances).
+</p>
+<ul>
+ <li>
+     <strong>So what if I want to set values that are global to everyone within a template request?</strong> - All you have to do is provide a dictionary to your <code>Context</code> when the template first runs, and everyone can just get/set variables from that.  Lets say its called <code>attributes</code>.
+ </li>
+</ul>
+<p>Running the template looks like:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="n">output</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="p">{})</span>
+</pre></div>
+
+    </div>
+<p>Within a template, just reference the dictionary:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">&lt;%</span>
+    <span class="n">attributes</span><span class="p">[</span><span class="s">&#39;foo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;bar&#39;</span>
+<span class="cp">%&gt;</span>
+&#39;foo&#39; attribute is: <span class="cp">${</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;foo&#39;</span><span class="p">]</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+<ul>
+ <li>
+     <strong>Why can't "attributes" be a built-in feature of the Context?</strong> - This is an area where Mako is trying to make as few decisions about your application as it possibly can.  Perhaps you don't want your templates to use this technique of assigning and sharing data, or perhaps you have a different notion of the names and kinds of data structures that should be passed around.  Once again Mako would rather ask the user to be explicit.
+ </li>
+</ul>
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="runtime_context_accessors"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>Context Methods and Accessors</h3>
+    
+    
+
+<p>Significant members off of <code>Context</code> include:
+</p>
+<ul>
+ <li><p><code>context[key]</code> / <code>context.get(key, default=None)</code> - dictionary-like accessors for the context.  Normally, any variable you use in your template is automatically pulled from the context if it isnt defined somewhere already.  Use the dictionary accessor and/or <code>get</code> method when you want a variable that <em>is</em> already defined somewhere else, such as in the local arguments sent to a %def call.  If a key is not present, like a dictionary it raises <code>KeyError</code>.
+</p>
+
+ </li>
+
+ <li><p><code>keys()</code> - all the names defined within this context.
+</p>
+
+ </li>
+
+ <li><p><code>kwargs</code> - this returns a <strong>copy</strong> of the context's dictionary of variables.  This is useful when you want to propagate the variables in the current context to a function as keyword arguments, i.e.:
+</p>
+
+    
+    
+
+    <div class="code">
+        <div class="highlight"><pre><span class="cp">${</span><span class="n">next</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="o">**</span><span class="n">context</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span><span class="cp">}</span>
+</pre></div>
+
+    </div>
+
+ </li>
+
+ <li><p><code>write(text)</code> - write some text to the current output stream.
+</p>
+
+ </li>
+
+ <li><p><code>lookup</code> - returns the <code>TemplateLookup</code> instance that is used for all file-lookups within the current execution (even though individual <code>Template</code> instances can conceivably have different instances of a <code>TemplateLookup</code>, only the <code>TemplateLookup</code> of the originally-called <code>Template</code> gets used in a particular execution).
+</p>
+
+ </li>
+</ul>
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+
+    
+    <A name="runtime_builtins"></a>
+    
+    <div class="subsection">
+    
+
+    <h3>All the built-in names</h3>
+    
+    
+
+<p>A one-stop shop for all the names Mako defines.  Most of these names are instances of <code>Namespace</code>, which are described in the next section,   <a href="namespaces.html">Namespaces</a>.  Also, most of these names other than <code>context</code> and <code>UNDEFINED</code> are also present <em>within</em> the <code>Context</code> itself.
+</p>
+<ul>
+ <li>
+     <code>local</code> - the namespace of the current template, described in <a href="namespaces.html#namespaces_builtin">Built-in Namespaces</a>
+ </li>
+
+ <li>
+     <code>self</code> - the namespace of the topmost template in an inheritance chain (if any, otherwise the same as <code>local</code>), mostly described in <a href="inheritance.html">Inheritance</a>
+ </li>
+
+ <li>
+     <code>parent</code> - the namespace of the parent template in an inheritance chain (otherwise undefined); see <a href="inheritance.html">Inheritance</a>
+ </li>
+
+ <li>
+     <code>next</code> - the namespace of the next template in an inheritance chain (otherwise undefined); see <a href="inheritance.html">Inheritance</a>
+ </li>
+
+ <li>
+     <code>caller</code> - a "mini" namespace created when using the <code>&lt;%call&gt;</code> tag to define a "def call with content"; described in <a href="defs.html#defs_defswithcontent">Calling a def with embedded content and/or other defs</a>
+ </li>
+
+ <li>
+     <code>capture</code> - a function that calls a given def and captures its resulting content into a string, which is returned.  Usage is described in <a href="filtering.html#filtering_buffering">Buffering</a>
+ </li>
+
+ <li>
+     <code>UNDEFINED</code> - a global singleton that is applied to all otherwise uninitialized template variables that were not located within the <code>Context</code> when rendering began.  Is an instance of <code>mako.runtime.Undefined</code>, and raises an exception when its <code>__str__()</code> method is called.
+ </li>
+
+ <li>
+     <code>pageargs</code> - this is a dictionary which is present in a template which does not define any <em></em>kwargs section in its <code>&lt;%page&gt;</code> tag.  All keyword arguments sent to the <code>body()</code> function of a template (when used via namespaces) go here by default unless otherwise defined as a page argument.  If this makes no sense, it shouldn't; read the section <a href="namespaces.html#namespaces_body">The "body()" method</a>.
+ </li>
+</ul>
+
+
+
+
+    </div>
+
+
+
+
+            <a href="#top">back to section top</a>
+    </div>
+
+
+</html>
+
+
+    <div class="toolbar">
+        <div class="prevnext">
+            Previous: <a href="defs.html">Defs</a>
+
+            |
+            Next: <a href="namespaces.html">Namespaces</a>
+        </div>
+        <h3><a href="index.html">Table of Contents</a></h3>
+    </div>
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+

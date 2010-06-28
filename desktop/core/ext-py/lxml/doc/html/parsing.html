@@ -1,0 +1,621 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>Parsing XML and HTML with lxml</title>
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="parsing-xml-and-html-with-lxml">
+<div class="sidemenu"><ul id="lxml-section"><li><span class="section title">lxml</span><ul class="menu foreign" id="index-menu"><li class="menu title"><a href="index.html">lxml</a><ul class="submenu"><li class="menu item"><a href="index.html#introduction">Introduction</a></li><li class="menu item"><a href="index.html#documentation">Documentation</a></li><li class="menu item"><a href="index.html#download">Download</a></li><li class="menu item"><a href="index.html#mailing-list">Mailing list</a></li><li class="menu item"><a href="index.html#bug-tracker">Bug tracker</a></li><li class="menu item"><a href="index.html#license">License</a></li><li class="menu item"><a href="index.html#old-versions">Old Versions</a></li></ul></li></ul><ul class="menu foreign" id="intro-menu"><li class="menu title"><a href="intro.html">Why lxml?</a><ul class="submenu"><li class="menu item"><a href="intro.html#motto">Motto</a></li><li class="menu item"><a href="intro.html#aims">Aims</a></li></ul></li></ul><ul class="menu foreign" id="installation-menu"><li class="menu title"><a href="installation.html">Installing lxml</a><ul class="submenu"><li class="menu item"><a href="installation.html#requirements">Requirements</a></li><li class="menu item"><a href="installation.html#installation">Installation</a></li><li class="menu item"><a href="installation.html#building-lxml-from-sources">Building lxml from sources</a></li><li class="menu item"><a href="installation.html#ms-windows">MS Windows</a></li><li class="menu item"><a href="installation.html#macos-x">MacOS-X</a></li></ul></li></ul><ul class="menu foreign" id="lxml2-menu"><li class="menu title"><a href="lxml2.html">What's new in lxml 2.0?</a><ul class="submenu"><li class="menu item"><a href="lxml2.html#changes-in-etree-and-objectify">Changes in etree and objectify</a></li><li class="menu item"><a href="lxml2.html#new-modules">New modules</a></li></ul></li></ul><ul class="menu foreign" id="performance-menu"><li class="menu title"><a href="performance.html">Benchmarks and Speed</a><ul class="submenu"><li class="menu item"><a href="performance.html#general-notes">General notes</a></li><li class="menu item"><a href="performance.html#how-to-read-the-timings">How to read the timings</a></li><li class="menu item"><a href="performance.html#parsing-and-serialising">Parsing and Serialising</a></li><li class="menu item"><a href="performance.html#the-elementtree-api">The ElementTree API</a></li><li class="menu item"><a href="performance.html#xpath">XPath</a></li><li class="menu item"><a href="performance.html#a-longer-example">A longer example</a></li><li class="menu item"><a href="performance.html#lxml-objectify">lxml.objectify</a></li></ul></li></ul><ul class="menu foreign" id="compatibility-menu"><li class="menu title"><a href="compatibility.html">ElementTree compatibility of lxml.etree</a></li></ul><ul class="menu foreign" id="FAQ-menu"><li class="menu title"><a href="FAQ.html">lxml FAQ - Frequently Asked Questions</a><ul class="submenu"><li class="menu item"><a href="FAQ.html#general-questions">General Questions</a></li><li class="menu item"><a href="FAQ.html#installation">Installation</a></li><li class="menu item"><a href="FAQ.html#contributing">Contributing</a></li><li class="menu item"><a href="FAQ.html#bugs">Bugs</a></li><li class="menu item"><a href="FAQ.html#threading">Threading</a></li><li class="menu item"><a href="FAQ.html#parsing-and-serialisation">Parsing and Serialisation</a></li><li class="menu item"><a href="FAQ.html#xpath-and-document-traversal">XPath and Document Traversal</a></li></ul></li></ul></li></ul><ul id="Developing with lxml-section"><li><span class="section title">Developing with lxml</span><ul class="menu foreign" id="tutorial-menu"><li class="menu title"><a href="tutorial.html">The lxml.etree Tutorial</a><ul class="submenu"><li class="menu item"><a href="tutorial.html#the-element-class">The Element class</a></li><li class="menu item"><a href="tutorial.html#the-elementtree-class">The ElementTree class</a></li><li class="menu item"><a href="tutorial.html#parsing-from-strings-and-files">Parsing from strings and files</a></li><li class="menu item"><a href="tutorial.html#namespaces">Namespaces</a></li><li class="menu item"><a href="tutorial.html#the-e-factory">The E-factory</a></li><li class="menu item"><a href="tutorial.html#elementpath">ElementPath</a></li></ul></li></ul><ul class="menu foreign" id="api index-menu"><li class="menu title"><a href="api/index.html">API reference</a></li></ul><ul class="menu foreign" id="api-menu"><li class="menu title"><a href="api.html">APIs specific to lxml.etree</a><ul class="submenu"><li class="menu item"><a href="api.html#lxml-etree">lxml.etree</a></li><li class="menu item"><a href="api.html#other-element-apis">Other Element APIs</a></li><li class="menu item"><a href="api.html#trees-and-documents">Trees and Documents</a></li><li class="menu item"><a href="api.html#iteration">Iteration</a></li><li class="menu item"><a href="api.html#error-handling-on-exceptions">Error handling on exceptions</a></li><li class="menu item"><a href="api.html#error-logging">Error logging</a></li><li class="menu item"><a href="api.html#serialisation">Serialisation</a></li><li class="menu item"><a href="api.html#cdata">CDATA</a></li><li class="menu item"><a href="api.html#xinclude-and-elementinclude">XInclude and ElementInclude</a></li><li class="menu item"><a href="api.html#write-c14n-on-elementtree">write_c14n on ElementTree</a></li></ul></li></ul><ul class="menu current" id="parsing-menu"><li class="menu title"><a href="parsing.html">Parsing XML and HTML with lxml</a><ul class="submenu"><li class="menu item"><a href="parsing.html#parsers">Parsers</a></li><li class="menu item"><a href="parsing.html#the-target-parser-interface">The target parser interface</a></li><li class="menu item"><a href="parsing.html#the-feed-parser-interface">The feed parser interface</a></li><li class="menu item"><a href="parsing.html#iterparse-and-iterwalk">iterparse and iterwalk</a></li><li class="menu item"><a href="parsing.html#python-unicode-strings">Python unicode strings</a></li></ul></li></ul><ul class="menu foreign" id="validation-menu"><li class="menu title"><a href="validation.html">Validation with lxml</a><ul class="submenu"><li class="menu item"><a href="validation.html#validation-at-parse-time">Validation at parse time</a></li><li class="menu item"><a href="validation.html#dtd">DTD</a></li><li class="menu item"><a href="validation.html#relaxng">RelaxNG</a></li><li class="menu item"><a href="validation.html#xmlschema">XMLSchema</a></li><li class="menu item"><a href="validation.html#schematron">Schematron</a></li></ul></li></ul><ul class="menu foreign" id="xpathxslt-menu"><li class="menu title"><a href="xpathxslt.html">XPath and XSLT with lxml</a><ul class="submenu"><li class="menu item"><a href="xpathxslt.html#xpath">XPath</a></li><li class="menu item"><a href="xpathxslt.html#xslt">XSLT</a></li></ul></li></ul><ul class="menu foreign" id="objectify-menu"><li class="menu title"><a href="objectify.html">lxml.objectify</a><ul class="submenu"><li class="menu item"><a href="objectify.html#the-lxml-objectify-api">The lxml.objectify API</a></li><li class="menu item"><a href="objectify.html#asserting-a-schema">Asserting a Schema</a></li><li class="menu item"><a href="objectify.html#objectpath">ObjectPath</a></li><li class="menu item"><a href="objectify.html#python-data-types">Python data types</a></li><li class="menu item"><a href="objectify.html#how-data-types-are-matched">How data types are matched</a></li><li class="menu item"><a href="objectify.html#what-is-different-from-lxml-etree">What is different from lxml.etree?</a></li></ul></li></ul><ul class="menu foreign" id="lxmlhtml-menu"><li class="menu title"><a href="lxmlhtml.html">lxml.html</a><ul class="submenu"><li class="menu item"><a href="lxmlhtml.html#parsing-html">Parsing HTML</a></li><li class="menu item"><a href="lxmlhtml.html#html-element-methods">HTML Element Methods</a></li><li class="menu item"><a href="lxmlhtml.html#running-html-doctests">Running HTML doctests</a></li><li class="menu item"><a href="lxmlhtml.html#creating-html-with-the-e-factory">Creating HTML with the E-factory</a></li><li class="menu item"><a href="lxmlhtml.html#working-with-links">Working with links</a></li><li class="menu item"><a href="lxmlhtml.html#forms">Forms</a></li><li class="menu item"><a href="lxmlhtml.html#cleaning-up-html">Cleaning up HTML</a></li><li class="menu item"><a href="lxmlhtml.html#html-diff">HTML Diff</a></li><li class="menu item"><a href="lxmlhtml.html#examples">Examples</a></li></ul></li></ul><ul class="menu foreign" id="cssselect-menu"><li class="menu title"><a href="cssselect.html">lxml.cssselect</a><ul class="submenu"><li class="menu item"><a href="cssselect.html#the-cssselector-class">The CSSSelector class</a></li><li class="menu item"><a href="cssselect.html#css-selectors">CSS Selectors</a></li><li class="menu item"><a href="cssselect.html#namespaces">Namespaces</a></li><li class="menu item"><a href="cssselect.html#limitations">Limitations</a></li></ul></li></ul><ul class="menu foreign" id="elementsoup-menu"><li class="menu title"><a href="elementsoup.html">BeautifulSoup Parser</a><ul class="submenu"><li class="menu item"><a href="elementsoup.html#parsing-with-the-soupparser">Parsing with the soupparser</a></li><li class="menu item"><a href="elementsoup.html#entity-handling">Entity handling</a></li><li class="menu item"><a href="elementsoup.html#using-soupparser-as-a-fallback">Using soupparser as a fallback</a></li></ul></li></ul><ul class="menu foreign" id="html5parser-menu"><li class="menu title"><a href="html5parser.html">html5lib Parser</a><ul class="submenu"><li class="menu item"><a href="html5parser.html#differences-to-regular-html-parsing">Differences to regular HTML parsing</a></li><li class="menu item"><a href="html5parser.html#function-reference">Function Reference</a></li></ul></li></ul></li></ul><ul id="Extending lxml-section"><li><span class="section title">Extending lxml</span><ul class="menu foreign" id="resolvers-menu"><li class="menu title"><a href="resolvers.html">Document loading and URL resolving</a><ul class="submenu"><li class="menu item"><a href="resolvers.html#uri-resolvers">URI Resolvers</a></li><li class="menu item"><a href="resolvers.html#document-loading-in-context">Document loading in context</a></li><li class="menu item"><a href="resolvers.html#i-o-access-control-in-xslt">I/O access control in XSLT</a></li></ul></li></ul><ul class="menu foreign" id="extensions-menu"><li class="menu title"><a href="extensions.html">Python extensions for XPath and XSLT</a><ul class="submenu"><li class="menu item"><a href="extensions.html#xpath-extension-functions">XPath Extension functions</a></li><li class="menu item"><a href="extensions.html#xslt-extension-elements">XSLT extension elements</a></li></ul></li></ul><ul class="menu foreign" id="element classes-menu"><li class="menu title"><a href="element_classes.html">Using custom Element classes in lxml</a><ul class="submenu"><li class="menu item"><a href="element_classes.html#background-on-element-proxies">Background on Element proxies</a></li><li class="menu item"><a href="element_classes.html#element-initialization">Element initialization</a></li><li class="menu item"><a href="element_classes.html#setting-up-a-class-lookup-scheme">Setting up a class lookup scheme</a></li><li class="menu item"><a href="element_classes.html#generating-xml-with-custom-classes">Generating XML with custom classes</a></li><li class="menu item"><a href="element_classes.html#implementing-namespaces">Implementing namespaces</a></li></ul></li></ul><ul class="menu foreign" id="sax-menu"><li class="menu title"><a href="sax.html">Sax support</a><ul class="submenu"><li class="menu item"><a href="sax.html#building-a-tree-from-sax-events">Building a tree from SAX events</a></li><li class="menu item"><a href="sax.html#producing-sax-events-from-an-elementtree-or-element">Producing SAX events from an ElementTree or Element</a></li><li class="menu item"><a href="sax.html#interfacing-with-pulldom-minidom">Interfacing with pulldom/minidom</a></li></ul></li></ul><ul class="menu foreign" id="capi-menu"><li class="menu title"><a href="capi.html">The public C-API of lxml.etree</a><ul class="submenu"><li class="menu item"><a href="capi.html#writing-external-modules-in-cython">Writing external modules in Cython</a></li><li class="menu item"><a href="capi.html#writing-external-modules-in-c">Writing external modules in C</a></li></ul></li></ul></li></ul><ul id="Developing lxml-section"><li><span class="section title">Developing lxml</span><ul class="menu foreign" id="build-menu"><li class="menu title"><a href="build.html">How to build lxml from source</a><ul class="submenu"><li class="menu item"><a href="build.html#cython">Cython</a></li><li class="menu item"><a href="build.html#subversion">Subversion</a></li><li class="menu item"><a href="build.html#setuptools">Setuptools</a></li><li class="menu item"><a href="build.html#running-the-tests-and-reporting-errors">Running the tests and reporting errors</a></li><li class="menu item"><a href="build.html#building-an-egg">Building an egg</a></li><li class="menu item"><a href="build.html#building-lxml-on-macos-x">Building lxml on MacOS-X</a></li><li class="menu item"><a href="build.html#static-linking-on-windows">Static linking on Windows</a></li><li class="menu item"><a href="build.html#building-debian-packages-from-svn-sources">Building Debian packages from SVN sources</a></li></ul></li></ul><ul class="menu foreign" id="lxml source howto-menu"><li class="menu title"><a href="lxml-source-howto.html">How to read the source of lxml</a><ul class="submenu"><li class="menu item"><a href="lxml-source-howto.html#what-is-cython">What is Cython?</a></li><li class="menu item"><a href="lxml-source-howto.html#where-to-start">Where to start?</a></li><li class="menu item"><a href="lxml-source-howto.html#lxml-etree">lxml.etree</a></li><li class="menu item"><a href="lxml-source-howto.html#python-modules">Python modules</a></li><li class="menu item"><a href="lxml-source-howto.html#lxml-objectify">lxml.objectify</a></li><li class="menu item"><a href="lxml-source-howto.html#lxml-html">lxml.html</a></li></ul></li></ul><ul class="menu foreign" id="changes 2 2 2-menu"><li class="menu title"><a href="changes-2.2.2.html">Release Changelog</a></li></ul><ul class="menu foreign" id="credits-menu"><li class="menu title"><a href="credits.html">Credits</a><ul class="submenu"><li class="menu item"><a href="credits.html#main-contributors">Main contributors</a></li><li class="menu item"><a href="credits.html#special-thanks-goes-to">Special thanks goes to:</a></li></ul></li></ul></li></ul></div><h1 class="title">Parsing XML and HTML with lxml</h1>
+
+<p>lxml provides a very simple and powerful API for parsing XML and HTML.  It
+supports one-step parsing as well as step-by-step parsing using an
+event-driven API (currently only for XML).</p>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#parsers" id="id1">Parsers</a><ul>
+<li><a class="reference internal" href="#parser-options" id="id2">Parser options</a></li>
+<li><a class="reference internal" href="#error-log" id="id3">Error log</a></li>
+<li><a class="reference internal" href="#parsing-html" id="id4">Parsing HTML</a></li>
+<li><a class="reference internal" href="#doctype-information" id="id5">Doctype information</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-target-parser-interface" id="id6">The target parser interface</a></li>
+<li><a class="reference internal" href="#the-feed-parser-interface" id="id7">The feed parser interface</a></li>
+<li><a class="reference internal" href="#iterparse-and-iterwalk" id="id8">iterparse and iterwalk</a><ul>
+<li><a class="reference internal" href="#selective-tag-events" id="id9">Selective tag events</a></li>
+<li><a class="reference internal" href="#comments-and-pis" id="id10">Comments and PIs</a></li>
+<li><a class="reference internal" href="#modifying-the-tree" id="id11">Modifying the tree</a></li>
+<li><a class="reference internal" href="#iterwalk" id="id12">iterwalk</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#python-unicode-strings" id="id13">Python unicode strings</a><ul>
+<li><a class="reference internal" href="#serialising-to-unicode-strings" id="id14">Serialising to Unicode strings</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>The usual setup procedure:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+</pre></div>
+<div class="section" id="parsers">
+<h1>Parsers</h1>
+<p>Parsers are represented by parser objects.  There is support for parsing both
+XML and (broken) HTML.  Note that XHTML is best parsed as XML, parsing it with
+the HTML parser can lead to unexpected results.  Here is a simple example for
+parsing XML from an in-memory string:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">xml</span> <span class="o">=</span> <span class="s">'&lt;a xmlns="test"&gt;&lt;b xmlns="test"/&gt;&lt;/a&gt;'</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+<span class="go">b'&lt;a xmlns="test"&gt;&lt;b xmlns="test"/&gt;&lt;/a&gt;'</span>
+</pre></div>
+<p>To read from a file or file-like object, you can use the <tt class="docutils literal"><span class="pre">parse()</span></tt> function,
+which returns an <tt class="docutils literal"><span class="pre">ElementTree</span></tt> object:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">())</span>
+<span class="go">b'&lt;a xmlns="test"&gt;&lt;b xmlns="test"/&gt;&lt;/a&gt;'</span>
+</pre></div>
+<p>Note how the <tt class="docutils literal"><span class="pre">parse()</span></tt> function reads from a file-like object here.  If
+parsing is done from a real file, it is more common (and also somewhat more
+efficient) to pass a filename:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">"doc/test.xml"</span><span class="p">)</span>
+</pre></div>
+<p>lxml can parse from a local file, an HTTP URL or an FTP URL.  It also
+auto-detects and reads gzip-compressed XML files (.gz).</p>
+<p>If you want to parse from memory and still provide a base URL for the document
+(e.g. to support relative paths in an XInclude), you can pass the <tt class="docutils literal"><span class="pre">base_url</span></tt>
+keyword argument:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="s">"http://where.it/is/from.xml"</span><span class="p">)</span>
+</pre></div>
+<div class="section" id="parser-options">
+<h2>Parser options</h2>
+<p>The parsers accept a number of setup options as keyword arguments.  The above
+example is easily extended to clean up namespaces during parsing:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">(</span><span class="n">ns_clean</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span>   <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">),</span> <span class="n">parser</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">())</span>
+<span class="go">b'&lt;a xmlns="test"&gt;&lt;b/&gt;&lt;/a&gt;'</span>
+</pre></div>
+<p>The keyword arguments in the constructor are mainly based on the libxml2
+parser configuration.  A DTD will also be loaded if validation or attribute
+default values are requested.</p>
+<p>Available boolean keyword arguments:</p>
+<ul class="simple">
+<li>attribute_defaults - read the DTD (if referenced by the document) and add
+the default attributes from it</li>
+<li>dtd_validation - validate while parsing (if a DTD was referenced)</li>
+<li>load_dtd - load and parse the DTD while parsing (no validation is performed)</li>
+<li>no_network - prevent network access when looking up external
+documents (on by default)</li>
+<li>ns_clean - try to clean up redundant namespace declarations</li>
+<li>recover - try hard to parse through broken XML</li>
+<li>remove_blank_text - discard blank text nodes between tags</li>
+<li>remove_comments - discard comments</li>
+<li>remove_pis - discard processing instructions</li>
+<li>strip_cdata - replace CDATA sections by normal text content (on by
+default)</li>
+<li>resolve_entities - replace entities by their text value (on by
+default)</li>
+<li>huge_tree - disable security restrictions and support very deep trees
+and very long text content (only affects libxml2 2.7+)</li>
+<li>compact - use compact storage for short text content (on by default)</li>
+</ul>
+</div>
+<div class="section" id="error-log">
+<h2>Error log</h2>
+<p>Parsers have an <tt class="docutils literal"><span class="pre">error_log</span></tt> property that lists the errors of the
+last parser run:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">error_log</span><span class="p">))</span>
+<span class="go">0</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="s">"&lt;root&gt;&lt;/b&gt;"</span><span class="p">,</span> <span class="n">parser</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="nc">lxml.etree.XMLSyntaxError: Opening and ending tag mismatch</span>: <span class="n-Identifier">root line 1 and b, line 1, column 11</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">error_log</span><span class="p">))</span>
+<span class="go">1</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">error_log</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+<span class="go">Opening and ending tag mismatch: root line 1 and b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">line</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">column</span><span class="p">)</span>
+<span class="go">11</span>
+</pre></div>
+</div>
+<div class="section" id="parsing-html">
+<h2>Parsing HTML</h2>
+<p>HTML parsing is similarly simple.  The parsers have a <tt class="docutils literal"><span class="pre">recover</span></tt>
+keyword argument that the HTMLParser sets by default.  It lets libxml2
+try its best to return a valid HTML tree with all content it can
+manage to parse.  It will not raise an exception on parser errors.
+You should use libxml2 version 2.6.21 or newer to take advantage of
+this feature.</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">broken_html</span> <span class="o">=</span> <span class="s">"&lt;html&gt;&lt;head&gt;&lt;title&gt;test&lt;body&gt;&lt;h1&gt;page title&lt;/h3&gt;"</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">HTMLParser</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span>   <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">broken_html</span><span class="p">),</span> <span class="n">parser</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">(),</span>
+<span class="gp">... </span>                        <span class="n">pretty_print</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">"html"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="go">&lt;html&gt;</span>
+<span class="go">  &lt;head&gt;</span>
+<span class="go">    &lt;title&gt;test&lt;/title&gt;</span>
+<span class="go">  &lt;/head&gt;</span>
+<span class="go">  &lt;body&gt;</span>
+<span class="go">    &lt;h1&gt;page title&lt;/h1&gt;</span>
+<span class="go">  &lt;/body&gt;</span>
+<span class="go">&lt;/html&gt;</span>
+</pre></div>
+<p>Lxml has an HTML function, similar to the XML shortcut known from
+ElementTree:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="n">broken_html</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">"html"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="go">&lt;html&gt;</span>
+<span class="go">  &lt;head&gt;</span>
+<span class="go">    &lt;title&gt;test&lt;/title&gt;</span>
+<span class="go">  &lt;/head&gt;</span>
+<span class="go">  &lt;body&gt;</span>
+<span class="go">    &lt;h1&gt;page title&lt;/h1&gt;</span>
+<span class="go">  &lt;/body&gt;</span>
+<span class="go">&lt;/html&gt;</span>
+</pre></div>
+<p>The support for parsing broken HTML depends entirely on libxml2's recovery
+algorithm.  It is <em>not</em> the fault of lxml if you find documents that are so
+heavily broken that the parser cannot handle them.  There is also no guarantee
+that the resulting tree will contain all data from the original document.  The
+parser may have to drop seriously broken parts when struggling to keep
+parsing.  Especially misplaced meta tags can suffer from this, which may lead
+to encoding problems.</p>
+<p>Note that the result is a valid HTML tree, but it may not be a
+well-formed XML tree.  For example, XML forbids double hyphens in
+comments, which the HTML parser will happily accept in recovery mode.
+Therefore, if your goal is to serialise an HTML document as an
+XML/XHTML document after parsing, you may have to apply some manual
+preprocessing first.</p>
+</div>
+<div class="section" id="doctype-information">
+<h2>Doctype information</h2>
+<p>The use of the libxml2 parsers makes some additional information available at
+the API level.  Currently, ElementTree objects can access the DOCTYPE
+information provided by a parsed document, as well as the XML version and the
+original encoding:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pub_id</span>  <span class="o">=</span> <span class="s">"-//W3C//DTD XHTML 1.0 Transitional//EN"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys_url</span> <span class="o">=</span> <span class="s">"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doctype_string</span> <span class="o">=</span> <span class="s">'&lt;!DOCTYPE html PUBLIC "</span><span class="si">%s</span><span class="s">" "</span><span class="si">%s</span><span class="s">"&gt;'</span> <span class="o">%</span> <span class="p">(</span><span class="n">pub_id</span><span class="p">,</span> <span class="n">sys_url</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xml_header</span> <span class="o">=</span> <span class="s">'&lt;?xml version="1.0" encoding="ascii"?&gt;'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xhtml</span> <span class="o">=</span> <span class="n">xml_header</span> <span class="o">+</span> <span class="n">doctype_string</span> <span class="o">+</span> <span class="s">'&lt;html&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;'</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">xhtml</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">docinfo</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">docinfo</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">docinfo</span><span class="o">.</span><span class="n">public_id</span><span class="p">)</span>
+<span class="go">-//W3C//DTD XHTML 1.0 Transitional//EN</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">docinfo</span><span class="o">.</span><span class="n">system_url</span><span class="p">)</span>
+<span class="go">http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">docinfo</span><span class="o">.</span><span class="n">doctype</span> <span class="o">==</span> <span class="n">doctype_string</span>
+<span class="go">True</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">docinfo</span><span class="o">.</span><span class="n">xml_version</span><span class="p">)</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">docinfo</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
+<span class="go">ascii</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-target-parser-interface">
+<h1>The target parser interface</h1>
+<p><a class="reference external" href="http://effbot.org/elementtree/elementtree-xmlparser.htm">As in ElementTree</a>, and similar to a SAX event handler, you can pass
+a target object to the parser:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">EchoTarget</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">attrib</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"start </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">attrib</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"end </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="n">tag</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"data </span><span class="si">%r</span><span class="s">"</span> <span class="o">%</span> <span class="n">data</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"comment </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="n">text</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"close"</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="s">"closed!"</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">(</span><span class="n">target</span> <span class="o">=</span> <span class="n">EchoTarget</span><span class="p">())</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="s">"&lt;element&gt;some&lt;!--comment--&gt;text&lt;/element&gt;"</span><span class="p">,</span>
+<span class="gp">... </span>                   <span class="n">parser</span><span class="p">)</span>
+<span class="go">start element {}</span>
+<span class="go">data u'some'</span>
+<span class="go">comment comment</span>
+<span class="go">data u'text'</span>
+<span class="go">end element</span>
+<span class="go">close</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="go">closed!</span>
+</pre></div>
+<p>It is important for the <tt class="docutils literal"><span class="pre">.close()</span></tt> method to reset the parser target
+to a usable state, so that you can reuse the parser as often as you
+like:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="s">"&lt;element&gt;some&lt;!--comment--&gt;text&lt;/element&gt;"</span><span class="p">,</span>
+<span class="gp">... </span>                   <span class="n">parser</span><span class="p">)</span>
+<span class="go">start element {}</span>
+<span class="go">data u'some'</span>
+<span class="go">comment comment</span>
+<span class="go">data u'text'</span>
+<span class="go">end element</span>
+<span class="go">close</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="go">closed!</span>
+</pre></div>
+<p>Note that the parser does <em>not</em> build a tree when using a parser
+target.  The result of the parser run is whatever the target object
+returns from its <tt class="docutils literal"><span class="pre">.close()</span></tt> method.  If you want to return an XML
+tree here, you have to create it programmatically in the target
+object.  An example for a parser target that builds a tree is the
+<tt class="docutils literal"><span class="pre">TreeBuilder</span></tt>.</p>
+<blockquote>
+<pre class="doctest-block">
+&gt;&gt;&gt; parser = etree.XMLParser(target = etree.TreeBuilder())
+</pre>
+<pre class="doctest-block">
+&gt;&gt;&gt; result = etree.XML("&lt;element&gt;some&lt;!--comment--&gt;text&lt;/element&gt;",
+...                    parser)
+</pre>
+<pre class="doctest-block">
+&gt;&gt;&gt; print(result.tag)
+element
+&gt;&gt;&gt; print(result[0].text)
+comment
+</pre>
+</blockquote>
+</div>
+<div class="section" id="the-feed-parser-interface">
+<h1>The feed parser interface</h1>
+<p>Since lxml 2.0, the parsers have a feed parser interface that is
+compatible to the <a class="reference external" href="http://effbot.org/elementtree/elementtree-xmlparser.htm">ElementTree parsers</a>.  You can use it to feed data
+into the parser in a controlled step-by-step way.</p>
+<p>In lxml.etree, you can use both interfaces to a parser at the same
+time: the <tt class="docutils literal"><span class="pre">parse()</span></tt> or <tt class="docutils literal"><span class="pre">XML()</span></tt> functions, and the feed parser
+interface.  Both are independent and will not conflict (except if used
+in conjunction with a parser target object as described above).</p>
+<p>To start parsing with a feed parser, just call its <tt class="docutils literal"><span class="pre">feed()</span></tt> method
+to feed it some data.</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="p">(</span><span class="s">'&lt;?xml versio'</span><span class="p">,</span> <span class="s">'n="1.0"?'</span><span class="p">,</span> <span class="s">'&gt;&lt;roo'</span><span class="p">,</span> <span class="s">'t&gt;&lt;a'</span><span class="p">,</span> <span class="s">'/&gt;&lt;/root&gt;'</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">parser</span><span class="o">.</span><span class="n">feed</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+<p>When you are done parsing, you <strong>must</strong> call the <tt class="docutils literal"><span class="pre">close()</span></tt> method to
+retrieve the root Element of the parse result document, and to unlock the
+parser:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">root</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+<span class="go">root</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">root</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+<span class="go">a</span>
+</pre></div>
+<p>If you do not call <tt class="docutils literal"><span class="pre">close()</span></tt>, the parser will stay locked and
+subsequent feeds will keep appending data, usually resulting in a non
+well-formed document and an unexpected parser error.  So make sure you
+always close the parser after use, also in the exception case.</p>
+<p>Another way of achieving the same step-by-step parsing is by writing your own
+file-like object that returns a chunk of data on each <tt class="docutils literal"><span class="pre">read()</span></tt> call.  Where
+the feed parser interface allows you to actively pass data chunks into the
+parser, a file-like object passively responds to <tt class="docutils literal"><span class="pre">read()</span></tt> requests of the
+parser itself.  Depending on the data source, either way may be more natural.</p>
+<p>Note that the feed parser has its own error log called
+<tt class="docutils literal"><span class="pre">feed_error_log</span></tt>.  Errors in the feed parser do not show up in the
+normal <tt class="docutils literal"><span class="pre">error_log</span></tt> and vice versa.</p>
+<p>You can also combine the feed parser interface with the target parser:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">(</span><span class="n">target</span> <span class="o">=</span> <span class="n">EchoTarget</span><span class="p">())</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span><span class="o">.</span><span class="n">feed</span><span class="p">(</span><span class="s">"&lt;eleme"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span><span class="o">.</span><span class="n">feed</span><span class="p">(</span><span class="s">"nt&gt;some text&lt;/elem"</span><span class="p">)</span>
+<span class="go">start element {}</span>
+<span class="go">data u'some text'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span><span class="o">.</span><span class="n">feed</span><span class="p">(</span><span class="s">"ent&gt;"</span><span class="p">)</span>
+<span class="go">end element</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="go">close</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="go">closed!</span>
+</pre></div>
+<p>Again, this prevents the automatic creation of an XML tree and leaves
+all the event handling to the target object.  The <tt class="docutils literal"><span class="pre">close()</span></tt> method
+of the parser forwards the return value of the target's <tt class="docutils literal"><span class="pre">close()</span></tt>
+method.</p>
+</div>
+<div class="section" id="iterparse-and-iterwalk">
+<h1>iterparse and iterwalk</h1>
+<p>As known from ElementTree, the <tt class="docutils literal"><span class="pre">iterparse()</span></tt> utility function
+returns an iterator that generates parser events for an XML file (or
+file-like object), while building the tree.  The values are tuples
+<tt class="docutils literal"><span class="pre">(event-type,</span> <span class="pre">object)</span></tt>.  The event types supported by ElementTree
+and lxml.etree are the strings 'start', 'end', 'start-ns' and
+'end-ns'.</p>
+<p>The 'start' and 'end' events represent opening and closing elements.
+They are accompanied by the respective Element instance.  By default,
+only 'end' events are generated:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">xml</span> <span class="o">=</span> <span class="s">'''</span><span class="se">\</span>
+<span class="gp">... </span><span class="s">&lt;root&gt;</span>
+<span class="gp">... </span><span class="s">  &lt;element key='value'&gt;text&lt;/element&gt;</span>
+<span class="gp">... </span><span class="s">  &lt;element&gt;text&lt;/element&gt;tail</span>
+<span class="gp">... </span><span class="s">  &lt;empty-element xmlns="http://testns/" /&gt;</span>
+<span class="gp">... </span><span class="s">&lt;/root&gt;</span>
+<span class="gp">... </span><span class="s">'''</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+<span class="go">end: element</span>
+<span class="go">end: element</span>
+<span class="go">end: {http://testns/}empty-element</span>
+<span class="go">end: root</span>
+</pre></div>
+<p>The resulting tree is available through the <tt class="docutils literal"><span class="pre">root</span></tt> property of the iterator:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">tag</span>
+<span class="go">'root'</span>
+</pre></div>
+<p>The other event types can be activated with the <tt class="docutils literal"><span class="pre">events</span></tt> keyword argument:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">=</span> <span class="p">(</span><span class="s">"start"</span><span class="p">,</span> <span class="s">"end"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">),</span> <span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+<span class="go">start: root</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+<span class="go">start: {http://testns/}empty-element</span>
+<span class="go">end: {http://testns/}empty-element</span>
+<span class="go">end: root</span>
+</pre></div>
+<p>The 'start-ns' and 'end-ns' events notify about namespace
+declarations.  They do not come with Elements.  Instead, the value of
+the 'start-ns' event is a tuple <tt class="docutils literal"><span class="pre">(prefix,</span> <span class="pre">namespaceURI)</span></tt> that
+designates the beginning of a prefix-namespace mapping.  The
+corresponding <tt class="docutils literal"><span class="pre">end-ns</span></tt> event does not have a value (None).  It is
+common practice to use a list as namespace stack and pop the last
+entry on the 'end-ns' event.</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">xml</span><span class="p">[:</span><span class="o">-</span><span class="mf">1</span><span class="p">])</span>
+<span class="go">&lt;root&gt;</span>
+<span class="go">  &lt;element key='value'&gt;text&lt;/element&gt;</span>
+<span class="go">  &lt;element&gt;text&lt;/element&gt;tail</span>
+<span class="go">  &lt;empty-element xmlns="http://testns/" /&gt;</span>
+<span class="go">&lt;/root&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">=</span> <span class="p">(</span><span class="s">"start"</span><span class="p">,</span> <span class="s">"end"</span><span class="p">,</span> <span class="s">"start-ns"</span><span class="p">,</span> <span class="s">"end-ns"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">),</span> <span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">(</span><span class="s">'start'</span><span class="p">,</span> <span class="s">'end'</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s">'start-ns'</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+<span class="go">start: root</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+<span class="go">start-ns: ('', 'http://testns/')</span>
+<span class="go">start: {http://testns/}empty-element</span>
+<span class="go">end: {http://testns/}empty-element</span>
+<span class="go">end-ns</span>
+<span class="go">end: root</span>
+</pre></div>
+<div class="section" id="selective-tag-events">
+<h2>Selective tag events</h2>
+<p>As an extension over ElementTree, lxml.etree accepts a <tt class="docutils literal"><span class="pre">tag</span></tt> keyword
+argument just like <tt class="docutils literal"><span class="pre">element.iter(tag)</span></tt>.  This restricts events to a
+specific tag or namespace:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">),</span> <span class="n">tag</span><span class="o">=</span><span class="s">"element"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+<span class="go">end: element</span>
+<span class="go">end: element</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">=</span> <span class="p">(</span><span class="s">"start"</span><span class="p">,</span> <span class="s">"end"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">),</span> <span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s">"{http://testns/}*"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+<span class="go">start: {http://testns/}empty-element</span>
+<span class="go">end: {http://testns/}empty-element</span>
+</pre></div>
+</div>
+<div class="section" id="comments-and-pis">
+<h2>Comments and PIs</h2>
+<p>As an extension over ElementTree, the <tt class="docutils literal"><span class="pre">iterparse()</span></tt> function in
+lxml.etree also supports the event types 'comment' and 'pi' for the
+respective XML structures.</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">commented_xml</span> <span class="o">=</span> <span class="s">'''</span><span class="se">\</span>
+<span class="gp">... </span><span class="s">&lt;?some pi ?&gt;</span>
+<span class="gp">... </span><span class="s">&lt;!-- a comment --&gt;</span>
+<span class="gp">... </span><span class="s">&lt;root&gt;</span>
+<span class="gp">... </span><span class="s">  &lt;element key='value'&gt;text&lt;/element&gt;</span>
+<span class="gp">... </span><span class="s">  &lt;!-- another comment --&gt;</span>
+<span class="gp">... </span><span class="s">  &lt;element&gt;text&lt;/element&gt;tail</span>
+<span class="gp">... </span><span class="s">  &lt;empty-element xmlns="http://testns/" /&gt;</span>
+<span class="gp">... </span><span class="s">&lt;/root&gt;</span>
+<span class="gp">... </span><span class="s">'''</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">=</span> <span class="p">(</span><span class="s">"start"</span><span class="p">,</span> <span class="s">"end"</span><span class="p">,</span> <span class="s">"comment"</span><span class="p">,</span> <span class="s">"pi"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">commented_xml</span><span class="p">),</span> <span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">(</span><span class="s">'start'</span><span class="p">,</span> <span class="s">'end'</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s">'pi'</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: -</span><span class="si">%s</span><span class="s">=</span><span class="si">%s</span><span class="s">-"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="k">else</span><span class="p">:</span> <span class="c"># 'comment'</span>
+<span class="gp">... </span>        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: -</span><span class="si">%s</span><span class="s">-"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+<span class="go">pi: -some=pi -</span>
+<span class="go">comment: - a comment -</span>
+<span class="go">start: root</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+<span class="go">comment: - another comment -</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+<span class="go">start: {http://testns/}empty-element</span>
+<span class="go">end: {http://testns/}empty-element</span>
+<span class="go">end: root</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+<span class="go">root</span>
+</pre></div>
+</div>
+<div class="section" id="modifying-the-tree">
+<h2>Modifying the tree</h2>
+<p>You can modify the element and its descendants when handling the 'end' event.
+To save memory, for example, you can remove subtrees that are no longer
+needed:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">elem</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">elem</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="go">0</span>
+<span class="go">0</span>
+<span class="go">0</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">getchildren</span><span class="p">()</span>
+<span class="go">[]</span>
+</pre></div>
+<p><strong>WARNING</strong>: During the 'start' event, the descendants and following siblings
+are not yet available and should not be accessed.  During the 'end' event, the
+element and its descendants can be freely modified, but its following siblings
+should not be accessed.  During either of the two events, you <strong>must not</strong>
+modify or move the ancestors (parents) of the current element.  You should
+also avoid moving or discarding the element itself.  The golden rule is: do
+not touch anything that will have to be touched again by the parser later on.</p>
+<p>If you have elements with a long list of children in your XML file and want to
+save more memory during parsing, you can clean up the preceding siblings of
+the current element:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">event</span><span class="p">,</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">)):</span>
+<span class="gp">... </span>    <span class="c"># ... do something with the element</span>
+<span class="gp">... </span>    <span class="n">element</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>                 <span class="c"># clean up children</span>
+<span class="gp">... </span>    <span class="k">while</span> <span class="n">element</span><span class="o">.</span><span class="n">getprevious</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">del</span> <span class="n">element</span><span class="o">.</span><span class="n">getparent</span><span class="p">()[</span><span class="mf">0</span><span class="p">]</span>  <span class="c"># clean up preceding siblings</span>
+</pre></div>
+<p>The <tt class="docutils literal"><span class="pre">while</span></tt> loop deletes multiple siblings in a row.  This is only necessary
+if you skipped over some of them using the <tt class="docutils literal"><span class="pre">tag</span></tt> keyword argument.
+Otherwise, a simple <tt class="docutils literal"><span class="pre">if</span></tt> should do.  The more selective your tag is,
+however, the more thought you will have to put into finding the right way to
+clean up the elements that were skipped.  Therefore, it is sometimes easier to
+traverse all elements and do the tag selection by hand in the event handler
+code.</p>
+</div>
+<div class="section" id="iterwalk">
+<h2>iterwalk</h2>
+<p>A second extension over ElementTree is the <tt class="docutils literal"><span class="pre">iterwalk()</span></tt> function.  It
+behaves exactly like <tt class="docutils literal"><span class="pre">iterparse()</span></tt>, but works on Elements and ElementTrees:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterwalk</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">root</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="p">(</span><span class="s">"start"</span><span class="p">,</span> <span class="s">"end"</span><span class="p">),</span> <span class="n">tag</span><span class="o">=</span><span class="s">"element"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">f</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="p">(</span><span class="s">"start"</span><span class="p">,</span> <span class="s">"end"</span><span class="p">),</span> <span class="n">tag</span><span class="o">=</span><span class="s">"element"</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">action</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+<span class="go">start: element</span>
+<span class="go">end: element</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="python-unicode-strings">
+<h1>Python unicode strings</h1>
+<p>lxml.etree has broader support for Python unicode strings than the ElementTree
+library.  First of all, where ElementTree would raise an exception, the
+parsers in lxml.etree can handle unicode strings straight away.  This is most
+helpful for XML snippets embedded in source code using the <tt class="docutils literal"><span class="pre">XML()</span></tt>
+function:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">uxml</span> <span class="o">=</span> <span class="s">u'&lt;test&gt; </span><span class="se">\uf8d1</span><span class="s"> + </span><span class="se">\uf8d2</span><span class="s"> &lt;/test&gt;'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uxml</span>
+<span class="go">u'&lt;test&gt; \uf8d1 + \uf8d2 &lt;/test&gt;'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">uxml</span><span class="p">)</span>
+</pre></div>
+<p>This requires, however, that unicode strings do not specify a conflicting
+encoding themselves and thus lie about their real encoding:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span> <span class="s">u'&lt;?xml version="1.0" encoding="ASCII"?&gt;</span><span class="se">\n</span><span class="s">'</span> <span class="o">+</span> <span class="n">uxml</span> <span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="nc">ValueError</span>: <span class="n-Identifier">Unicode strings with encoding declaration are not supported.</span>
+</pre></div>
+<p>Similarly, you will get errors when you try the same with HTML data in a
+unicode string that specifies a charset in a meta tag of the header.  You
+should generally avoid converting XML/HTML data to unicode before passing it
+into the parsers.  It is both slower and error prone.</p>
+<div class="section" id="serialising-to-unicode-strings">
+<h2>Serialising to Unicode strings</h2>
+<p>To serialize the result, you would normally use the <tt class="docutils literal"><span class="pre">tostring()</span></tt>
+module function, which serializes to plain ASCII by default or a
+number of other byte encodings if asked for:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+<span class="go">b'&lt;test&gt; &amp;#63697; + &amp;#63698; &lt;/test&gt;'</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">'UTF-8'</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="go">b'&lt;test&gt; \xef\xa3\x91 + \xef\xa3\x92 &lt;/test&gt;'</span>
+</pre></div>
+<p>As an extension, lxml.etree recognises the unicode type as an argument to the
+encoding parameter to build a Python unicode representation of a tree:</p>
+<div class="syntax"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="nb">unicode</span><span class="p">)</span>
+<span class="go">u'&lt;test&gt; \uf8d1 + \uf8d2 &lt;/test&gt;'</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s">"test"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="nb">unicode</span><span class="p">)</span>
+<span class="go">u'&lt;test/&gt;'</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subel</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="s">"subtest"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="nb">unicode</span><span class="p">)</span>
+<span class="go">u'&lt;test&gt;&lt;subtest/&gt;&lt;/test&gt;'</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">ElementTree</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="nb">unicode</span><span class="p">)</span>
+<span class="go">u'&lt;test&gt;&lt;subtest/&gt;&lt;/test&gt;'</span>
+</pre></div>
+<p>The result of <tt class="docutils literal"><span class="pre">tostring(encoding=unicode)</span></tt> can be treated like any
+other Python unicode string and then passed back into the parsers.
+However, if you want to save the result to a file or pass it over the
+network, you should use <tt class="docutils literal"><span class="pre">write()</span></tt> or <tt class="docutils literal"><span class="pre">tostring()</span></tt> with a byte
+encoding (typically UTF-8) to serialize the XML.  The main reason is
+that unicode strings returned by <tt class="docutils literal"><span class="pre">tostring(encoding=unicode)</span></tt> are
+not byte streams and they never have an XML declaration to specify
+their encoding.  These strings are most likely not parsable by other
+XML libraries.</p>
+<p>For normal byte encodings, the <tt class="docutils literal"><span class="pre">tostring()</span></tt> function automatically
+adds a declaration as needed that reflects the encoding of the
+returned string.  This makes it possible for other parsers to
+correctly parse the XML byte stream.  Note that using <tt class="docutils literal"><span class="pre">tostring()</span></tt>
+with UTF-8 is also considerably faster in most cases.</p>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+Generated on: 2009-06-21.
+
+</div>
+</body>
+</html>

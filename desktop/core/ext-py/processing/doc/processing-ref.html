@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>processing package reference</title>
+<link rel="stylesheet" href="html4css1.css" type="text/css" />
+</head>
+<body>
+<div class="header">
+<a class="reference" href="intro.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="index.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="process-objects.html">Next</a>
+<hr class="header"/>
+</div>
+<div class="document" id="processing-package-reference">
+<h1 class="title">processing package reference</h1>
+<p>The <tt class="docutils literal"><span class="pre">processing</span></tt> package mostly replicates the API of the <tt class="docutils literal"><span class="pre">threading</span></tt>
+module.</p>
+<div class="section">
+<h1><a id="classes-and-exceptions" name="classes-and-exceptions">Classes and exceptions</a></h1>
+<blockquote>
+<dl class="docutils">
+<dt><strong>class</strong> <tt class="docutils literal"><span class="pre">Process(group=None,</span> <span class="pre">target=None,</span> <span class="pre">name=None,</span> <span class="pre">args=(),</span> <span class="pre">kwargs={})</span></tt></dt>
+<dd><p class="first">An analogue of <tt class="docutils literal"><span class="pre">threading.Thread</span></tt>.</p>
+<p class="last">See <a class="reference" href="process-objects.html">Process objects</a>.</p>
+</dd>
+<dt><strong>exception</strong> <tt class="docutils literal"><span class="pre">BufferTooShort</span></tt></dt>
+<dd><p class="first">Exception raised by the <tt class="docutils literal"><span class="pre">recvBytesInto()</span></tt> method of a
+<a class="reference" href="connection-objects.html">connection object</a>
+when the supplied buffer object is too small for the message
+read.</p>
+<p class="last">If <tt class="docutils literal"><span class="pre">e</span></tt> is an instance of <tt class="docutils literal"><span class="pre">BufferTooShort</span></tt> then <tt class="docutils literal"><span class="pre">e.args[0]</span></tt>
+will give the message as a byte string.</p>
+</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section">
+<h1><a id="pipes-and-queues" name="pipes-and-queues">Pipes and Queues</a></h1>
+<p>When using multiple processes one generally uses message passing for
+communication between processes and avoids having to use any
+synchronization primitives like locks.</p>
+<p>For passing messages one can use a pipe (for a connection between two
+processes) or a queue (which allows multiple producers and consumers).</p>
+<p>Note that one can also create a shared queue by using a manager object
+-- see <a class="reference" href="#managers">Managers</a>.</p>
+<p>For an example of the usage of queues for interprocess communication
+see <a class="reference" href="../examples/ex_workers.py">ex_workers.py</a>.</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Pipe(duplex=True)</span></tt></dt>
+<dd><p class="first">Returns a pair <tt class="docutils literal"><span class="pre">(conn1,</span> <span class="pre">conn2)</span></tt> of connection objects
+representing the ends of a pipe.</p>
+<p>If <tt class="docutils literal"><span class="pre">duplex</span></tt> is true then the pipe is two way; otherwise
+<tt class="docutils literal"><span class="pre">conn1</span></tt> can only be used for receiving messages and <tt class="docutils literal"><span class="pre">conn2</span></tt>
+can only be used for sending messages.</p>
+<p class="last">See <a class="reference" href="connection-objects.html">Connection objects</a>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">Queue(maxsize=0)</span></tt></dt>
+<dd><p class="first">Returns a process shared queue object.  The usual <tt class="docutils literal"><span class="pre">Empty</span></tt> and
+<tt class="docutils literal"><span class="pre">Full</span></tt> exceptions from the standard library's <tt class="docutils literal"><span class="pre">Queue</span></tt> module
+are raised to signal timeouts.</p>
+<p class="last">See <a class="reference" href="queue-objects.html">Queue objects</a>.</p>
+</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section">
+<h1><a id="synchronization-primitives" name="synchronization-primitives">Synchronization primitives</a></h1>
+<p>Generally synchronization primitives are not as necessary in a
+multiprocess program as they are in a mulithreaded program.  See the
+documentation for the standard library's <tt class="docutils literal"><span class="pre">threading</span></tt> module.</p>
+<p>Note that one can also create synchronization primitves by using a
+manager object -- see <a class="reference" href="#managers">Managers</a>.</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">BoundedSemaphore(value=1)</span></tt></dt>
+<dd><p class="first">Returns a bounded semaphore object: a clone of
+<tt class="docutils literal"><span class="pre">threading.BoundedSemaphore</span></tt>.</p>
+<p class="last">(On Mac OSX this is indistiguishable from <tt class="docutils literal"><span class="pre">Semaphore()</span></tt>
+because <tt class="docutils literal"><span class="pre">sem_getvalue()</span></tt> is not implemented on that platform).</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">Condition(lock=None)</span></tt></dt>
+<dd><p class="first">Returns a condition variable: a clone of <tt class="docutils literal"><span class="pre">threading.Condition</span></tt>.</p>
+<p class="last">If <tt class="docutils literal"><span class="pre">lock</span></tt> is specified then it should be a <tt class="docutils literal"><span class="pre">Lock</span></tt> or <tt class="docutils literal"><span class="pre">RLock</span></tt>
+object from <tt class="docutils literal"><span class="pre">processing</span></tt>.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">Event()</span></tt></dt>
+<dd>Returns an event object: a clone of <tt class="docutils literal"><span class="pre">threading.Event</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">Lock()</span></tt></dt>
+<dd>Returns a non-recursive lock object: a clone of <tt class="docutils literal"><span class="pre">threading.Lock</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">RLock()</span></tt></dt>
+<dd>Returns a recursive lock object: a clone of <tt class="docutils literal"><span class="pre">threading.RLock</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">Semaphore(value=1)</span></tt></dt>
+<dd>Returns a bounded semaphore object: a clone of
+<tt class="docutils literal"><span class="pre">threading.Semaphore</span></tt>.</dd>
+</dl>
+</blockquote>
+<div class="admonition-acquiring-with-a-timeout admonition">
+<p class="first admonition-title">Acquiring with a timeout</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">acquire()</span></tt> method of <tt class="docutils literal"><span class="pre">BoundedSemaphore</span></tt>, <tt class="docutils literal"><span class="pre">Lock</span></tt>, <tt class="docutils literal"><span class="pre">RLock</span></tt> and
+<tt class="docutils literal"><span class="pre">Semaphore</span></tt> has a timeout parameter not supported by the
+equivalents in <tt class="docutils literal"><span class="pre">threading</span></tt>.  The signature is <tt class="docutils literal"><span class="pre">acquire(block=True,</span>
+<span class="pre">timeout=None)</span></tt> with keyword parameters being acceptable.  If
+<tt class="docutils literal"><span class="pre">block</span></tt> is true and <tt class="docutils literal"><span class="pre">timeout</span></tt> is not <tt class="docutils literal"><span class="pre">None</span></tt> then it specifies a
+timeout in seconds.  If <tt class="docutils literal"><span class="pre">block</span></tt> is false then <tt class="docutils literal"><span class="pre">timeout</span></tt> is ignored.</p>
+</div>
+<div class="admonition-interrupting-the-main-thread admonition">
+<p class="first admonition-title">Interrupting the main thread</p>
+<p>If the SIGINT signal generated by Ctrl-C arrives while the main
+thread is blocked by a call to <tt class="docutils literal"><span class="pre">BoundedSemaphore.acquire()</span></tt>,
+<tt class="docutils literal"><span class="pre">Lock.acquire()</span></tt>, <tt class="docutils literal"><span class="pre">RLock.acquire()</span></tt>, <tt class="docutils literal"><span class="pre">Semaphore.acquire()</span></tt>,
+<tt class="docutils literal"><span class="pre">Condition.acquire()</span></tt> or <tt class="docutils literal"><span class="pre">Condition.wait()</span></tt> then the call will be
+immediately interrupted and <tt class="docutils literal"><span class="pre">KeyboardInterrupt</span></tt> will be raised.</p>
+<p class="last">This differs from the behaviour of <tt class="docutils literal"><span class="pre">threading</span></tt> where SIGINT will be
+ignored while the equivalent blocking calls are in progress.</p>
+</div>
+</div>
+<div class="section">
+<h1><a id="shared-objects" name="shared-objects">Shared Objects</a></h1>
+<p>It is possible to create shared objects using shared memory which can
+be inherited by child processes.</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Value(typecode_or_type,</span> <span class="pre">*args,</span> <span class="pre">**,</span> <span class="pre">lock=True)</span></tt></dt>
+<dd><p class="first">Returns a ctypes object allocated from shared memory.  By
+default the return value is actually a synchronized wrapper
+for the object.</p>
+<p><tt class="docutils literal"><span class="pre">typecode_or_type</span></tt> determines the type of the returned object:
+it is either a ctypes type or a one character typecode of the
+kind used by the <tt class="docutils literal"><span class="pre">array</span></tt> module.  <tt class="docutils literal"><span class="pre">*args</span></tt> is passed on to the
+constructor for the type.</p>
+<p>If <tt class="docutils literal"><span class="pre">lock</span></tt> is true (the default) then a new lock object is
+created to synchronize access to the value.  If <tt class="docutils literal"><span class="pre">lock</span></tt> is a
+<tt class="docutils literal"><span class="pre">Lock</span></tt> or <tt class="docutils literal"><span class="pre">RLock</span></tt> object then that will be used to synchronize
+access to the value.  If <tt class="docutils literal"><span class="pre">lock</span></tt> is false then access to the
+returned object will not be automatically protected by a lock,
+so it will not necessarily be &quot;process-safe&quot;.</p>
+<p class="last">Note that <tt class="docutils literal"><span class="pre">lock</span></tt> is a keyword only argument.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">Array(typecode_or_type,</span> <span class="pre">size_or_initializer,</span> <span class="pre">**,</span> <span class="pre">lock=True)</span></tt></dt>
+<dd><p class="first">Returns a ctypes array allocated from shared memory.  By
+default the return value is actually a synchronized wrapper
+for the array.</p>
+<p><tt class="docutils literal"><span class="pre">typecode_or_type</span></tt> determines the type of the elements of the
+returned array: it is either a ctypes type or a one character
+typecode of the kind used by the <tt class="docutils literal"><span class="pre">array</span></tt> module.  If
+<tt class="docutils literal"><span class="pre">size_or_initializer</span></tt> is an integer then it determines the
+length of the array, and the array will be initially zeroed.
+Otherwise <tt class="docutils literal"><span class="pre">size_or_initializer</span></tt> is a sequence which is used to
+initialize the array and whose length determines the length of
+the array.</p>
+<p>If <tt class="docutils literal"><span class="pre">lock</span></tt> is true (the default) then a new lock object is
+created to synchronize access to the value.  If <tt class="docutils literal"><span class="pre">lock</span></tt> is a
+<tt class="docutils literal"><span class="pre">Lock</span></tt> or <tt class="docutils literal"><span class="pre">RLock</span></tt> object then that will be used to synchronize
+access to the value.  If <tt class="docutils literal"><span class="pre">lock</span></tt> is false then access to the
+returned object will not be automatically protected by a lock,
+so it will not necessarily be &quot;process-safe&quot;.</p>
+<p>Note that <tt class="docutils literal"><span class="pre">lock</span></tt> is a keyword only argument.</p>
+<p class="last">Note that an array of <tt class="docutils literal"><span class="pre">ctypes.c_char</span></tt> has <tt class="docutils literal"><span class="pre">value</span></tt> and
+<tt class="docutils literal"><span class="pre">rawvalue</span></tt> attributes which allow one to use it to store and
+retrieve strings -- see the documentation for ctypes in the
+standard library.</p>
+</dd>
+</dl>
+</blockquote>
+<p>See also <a class="reference" href="sharedctypes.html">sharedctypes</a>.</p>
+</div>
+<div class="section">
+<h1><a id="managers" name="managers">Managers</a></h1>
+<p>Managers provide a way to create data which can be shared between
+different processes.</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Manager()</span></tt></dt>
+<dd><p class="first">Returns a started <tt class="docutils literal"><span class="pre">SyncManager</span></tt> object which can be
+used for sharing objects between processes.  The returned
+manager object corresponds to a spawned child process and has
+methods which will create shared objects and return
+corresponding proxies.</p>
+<p>The methods for creating shared objects are</p>
+<blockquote>
+<tt class="docutils literal"><span class="pre">list()</span></tt>, <tt class="docutils literal"><span class="pre">dict()</span></tt>, <tt class="docutils literal"><span class="pre">Namespace()</span></tt>, <tt class="docutils literal"><span class="pre">Value()</span></tt>,
+<tt class="docutils literal"><span class="pre">Array()</span></tt>, <tt class="docutils literal"><span class="pre">Lock()</span></tt>, <tt class="docutils literal"><span class="pre">RLock()</span></tt>, <tt class="docutils literal"><span class="pre">Semaphore()</span></tt>,
+<tt class="docutils literal"><span class="pre">BoundedSemaphore()</span></tt>, <tt class="docutils literal"><span class="pre">Condition()</span></tt>, <tt class="docutils literal"><span class="pre">Event()</span></tt>, <tt class="docutils literal"><span class="pre">Queue()</span></tt>.</blockquote>
+<p class="last">See <a class="reference" href="manager-objects.html#sync-manager">SyncManager</a>.</p>
+</dd>
+</dl>
+</blockquote>
+<p>It is possible to create managers which support other types -- see
+<a class="reference" href="manager-objects.html#customized-managers">Customized managers</a>.</p>
+</div>
+<div class="section">
+<h1><a id="process-pools" name="process-pools">Process Pools</a></h1>
+<p>One can create a pool of processes which will carry out tasks
+submitted to it.</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Pool(processes=None,</span> <span class="pre">initializer=None,</span> <span class="pre">initargs=())</span></tt></dt>
+<dd><p class="first">Returns a process pool object which controls a pool of worker
+processes to which jobs can be submitted.</p>
+<p>It supports asynchronous results with timeouts and
+callbacks and has a parallel map implementation.</p>
+<p><tt class="docutils literal"><span class="pre">processes</span></tt> is the number of worker processes to use.  If
+<tt class="docutils literal"><span class="pre">processes</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> then the number returned by <tt class="docutils literal"><span class="pre">cpuCount()</span></tt>
+is used.  If <tt class="docutils literal"><span class="pre">initializer</span></tt> is not <tt class="docutils literal"><span class="pre">None</span></tt> then each worker
+process will call <tt class="docutils literal"><span class="pre">initializer(*initargs)</span></tt> when it starts.</p>
+<p class="last">See <a class="reference" href="pool-objects.html">Pool objects</a>.</p>
+</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section">
+<h1><a id="logging" name="logging">Logging</a></h1>
+<p>Some support for logging is available.  Note, however, that the
+<tt class="docutils literal"><span class="pre">logging</span></tt> package does not use process shared locks so it is possible
+(depending on the handler type) for messages from different processes
+to get mixed up.</p>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">enableLogging(level,</span> <span class="pre">HandlerType=None,</span> <span class="pre">handlerArgs=(),</span> <span class="pre">format=None)</span></tt></dt>
+<dd><p class="first">Enables logging and sets the debug level used by the package's
+logger to <tt class="docutils literal"><span class="pre">level</span></tt>.  See documentation for the <tt class="docutils literal"><span class="pre">logging</span></tt> module
+in the standard library.</p>
+<p>If <tt class="docutils literal"><span class="pre">HandlerType</span></tt> is specified then a handler is created using
+<tt class="docutils literal"><span class="pre">HandlerType(*handlerArgs)</span></tt> and this will be used by the
+logger -- any previous handlers will be discarded.  If
+<tt class="docutils literal"><span class="pre">format</span></tt> is specified then this will be used for the handler;
+otherwise <tt class="docutils literal"><span class="pre">format</span></tt> defaults to
+<tt class="docutils literal"><span class="pre">'[%(levelname)s/%(processName)s]</span> <span class="pre">%(message)s'</span></tt>.  (The logger
+used by <tt class="docutils literal"><span class="pre">processing</span></tt> allows use of the non-standard
+<tt class="docutils literal"><span class="pre">'%(processName)s'</span></tt> format.)</p>
+<p>If <tt class="docutils literal"><span class="pre">HandlerType</span></tt> is not specified and the logger has no
+handlers then a default one is created which prints to
+<tt class="docutils literal"><span class="pre">sys.stderr</span></tt>.</p>
+<p class="last"><em>Note</em>: on Windows a child process does not directly inherit
+its parent's logger; instead it will automatically call
+<tt class="docutils literal"><span class="pre">enableLogging()</span></tt> with the same arguments which were used when
+its parent process last called <tt class="docutils literal"><span class="pre">enableLogging()</span></tt> (if it ever
+did).</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">getLogger()</span></tt></dt>
+<dd>Returns the logger used by <tt class="docutils literal"><span class="pre">processing</span></tt>.  If <tt class="docutils literal"><span class="pre">enableLogging()</span></tt>
+has not yet been called then <tt class="docutils literal"><span class="pre">None</span></tt> is returned.</dd>
+</dl>
+</blockquote>
+<p>Below is an example session with logging turned on:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; import processing, logging
+&gt;&gt;&gt; processing.enableLogging(level=logging.INFO)
+&gt;&gt;&gt; processing.getLogger().warning('doomed')
+[WARNING/MainProcess] doomed
+&gt;&gt;&gt; m = processing.Manager()
+[INFO/SyncManager-1] child process calling self.run()
+[INFO/SyncManager-1] manager bound to '\\\\.\\pipe\\pyc-2776-0-lj0tfa'
+&gt;&gt;&gt; del m
+[INFO/MainProcess] sending shutdown message to manager
+[INFO/SyncManager-1] manager received shutdown message
+[INFO/SyncManager-1] manager exiting with exitcode 0
+</pre>
+</div>
+<div class="section">
+<h1><a id="miscellaneous" name="miscellaneous">Miscellaneous</a></h1>
+<blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">activeChildren()</span></tt></dt>
+<dd><p class="first">Return list of all live children of the current process.</p>
+<p class="last">Calling this has the side affect of &quot;joining&quot; any processes
+which have already finished.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">cpuCount()</span></tt></dt>
+<dd>Returns the number of CPUs in the system.  May raise
+<tt class="docutils literal"><span class="pre">NotImplementedError</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">currentProcess()</span></tt></dt>
+<dd><p class="first">An analogue of <tt class="docutils literal"><span class="pre">threading.currentThread()</span></tt>.</p>
+<p class="last">Returns the object corresponding to the current process.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">freezeSupport()</span></tt></dt>
+<dd><p class="first">Adds support for when a program which uses the <tt class="docutils literal"><span class="pre">processing</span></tt>
+package has been frozen to produce a Windows executable.  (Has
+been tested with <tt class="docutils literal"><span class="pre">py2exe</span></tt>, <tt class="docutils literal"><span class="pre">PyInstaller</span></tt> and <tt class="docutils literal"><span class="pre">cx_Freeze</span></tt>.)</p>
+<p>One needs to call this function straight after the <tt class="docutils literal"><span class="pre">if</span> <span class="pre">__name__</span>
+<span class="pre">==</span> <span class="pre">'__main__'</span></tt> line of the main module.  For example</p>
+<pre class="literal-block">
+from processing import Process, freezeSupport
+
+def f():
+    print 'hello world!'
+
+if __name__ == '__main__':
+    freezeSupport()
+    Process(target=f).start()
+</pre>
+<p>If the <tt class="docutils literal"><span class="pre">freezeSupport()</span></tt> line is missed out then trying to run
+the frozen executable will raise <tt class="docutils literal"><span class="pre">RuntimeError</span></tt>.</p>
+<p class="last">If the module is being run normally by the python interpreter
+then <tt class="docutils literal"><span class="pre">freezeSupport()</span></tt> has no effect.</p>
+</dd>
+</dl>
+</blockquote>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>The <tt class="docutils literal"><span class="pre">processing.dummy</span></tt> package replicates the API of <tt class="docutils literal"><span class="pre">processing</span></tt>
+but is no more than a wrapper around the <tt class="docutils literal"><span class="pre">threading</span></tt> module.</li>
+<li><tt class="docutils literal"><span class="pre">processing</span></tt> contains no analogues of <tt class="docutils literal"><span class="pre">activeCount</span></tt>,
+<tt class="docutils literal"><span class="pre">enumerate</span></tt>, <tt class="docutils literal"><span class="pre">settrace</span></tt>, <tt class="docutils literal"><span class="pre">setprofile</span></tt>, <tt class="docutils literal"><span class="pre">Timer</span></tt>, or
+<tt class="docutils literal"><span class="pre">local</span></tt> from the <tt class="docutils literal"><span class="pre">threading</span></tt> module.</li>
+</ul>
+</div>
+</div>
+<div class="section">
+<h1><a id="subsections" name="subsections">Subsections</a></h1>
+<ul class="simple">
+<li><a class="reference" href="process-objects.html">Process objects</a></li>
+<li><a class="reference" href="queue-objects.html">Queue objects</a></li>
+<li><a class="reference" href="connection-objects.html">Connection objects</a></li>
+<li><a class="reference" href="manager-objects.html">Manager objects</a></li>
+<li><a class="reference" href="proxy-objects.html">Proxy objects</a></li>
+<li><a class="reference" href="pool-objects.html">Pool objects</a></li>
+<li><a class="reference" href="sharedctypes.html">Shared ctypes object</a></li>
+<li><a class="reference" href="connection-ref.html">Listeners and Clients</a></li>
+</ul>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference" href="intro.html">Prev</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="index.html">Up</a> &nbsp; &nbsp; &nbsp; &nbsp; <a class="reference" href="process-objects.html">Next</a>
+</div>
+</body>
+</html>

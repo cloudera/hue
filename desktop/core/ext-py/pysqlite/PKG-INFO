@@ -1,0 +1,25 @@
+Metadata-Version: 1.0
+Name: pysqlite
+Version: 2.5.5
+Summary: DB-API 2.0 interface for SQLite 3.x
+Home-page: http://oss.itsystementwicklung.de/trac/pysqlite
+Author: Gerhard Haering
+Author-email: gh@ghaering.de
+License: zlib/libpng license
+Download-URL: http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.5/
+Description: Python interface to SQLite 3
+        
+        pysqlite is an interface to the SQLite 3.x embedded relational database engine.
+        It is almost fully compliant with the Python database API version 2.0 also
+        exposes the unique features of SQLite.
+Platform: ALL
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: zlib/libpng License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: C
+Classifier: Programming Language :: Python
+Classifier: Topic :: Database :: Database Engines/Servers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

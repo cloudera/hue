@@ -1,0 +1,20 @@
+[
+  {
+    "data": "{\"query\": {\"query\": \"SELECT sample_07.description, sample_07.salary\\nFROM\\n  sample_07\\nWHERE\\n( sample_07.salary > 100000)\\nSORT BY sample_07.salary DESC\", \"type\": null}, \"functions\": [], \"VERSION\": \"0.4.0\", \"file_resources\": [], \"settings\": []}",
+    "type": "0", 
+    "name": "Sample: Top salary", 
+    "desc": "Top salary 2007 above $100k"
+  },
+  {
+    "data": "{\"query\": {\"query\": \"SELECT s07.description, s07.salary, s08.salary,\\n  s08.salary - s07.salary\\nFROM\\n  sample_07 s07 JOIN sample_08 s08\\nON ( s07.code = s08.code)\\nWHERE\\n s07.salary < s08.salary\\nSORT BY s08.salary-s07.salary DESC\", \"type\": null}, \"functions\": [], \"VERSION\": \"0.4.0\", \"file_resources\": [], \"settings\": [{\"value\": \"1\", \"key\": \"hive.merge.mapredfiles\"}]}",
+    "type": "0", 
+    "name": "Sample: Salary growth", 
+    "desc": "Salary growth (sorted) from 2007-08"
+  },
+  {
+    "data": "{\"query\": {\"query\": \"SELECT s07.description, s07.total_emp, s08.total_emp, s07.salary\\nFROM\\n  sample_07 s07 JOIN \\n  sample_08 s08\\nON ( s07.code = s08.code )\\nWHERE\\n( s07.total_emp > s08.total_emp\\n AND s07.salary > 100000 )\\nSORT BY s07.salary DESC\", \"type\": null}, \"functions\": [], \"VERSION\": \"0.4.0\", \"file_resources\": [], \"settings\": []}",
+    "type": "0", 
+    "name": "Sample: Job loss", 
+    "desc": "Job loss among the top earners 2007-08"
+  }
+]
