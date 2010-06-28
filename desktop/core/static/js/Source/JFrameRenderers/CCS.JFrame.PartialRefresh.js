@@ -55,7 +55,6 @@ script: CCS.JFrame.PartialRefresh.js
 				if (enableLog) dbug.log('not auto refreshed (%s), or new path (%s != %s) and not forced (%s), existing partial refresh after setup', !options.autorefreshed, jState.prevPath, options.responsePath, options.forcePartial);
 				setPrevPath();
 				jState.partials = partials;
-				content.elements.push(new Element('div', {'class':'footer', 'text': 'TODO: partial footer'}));
 				this.disableSpinnerUsage();
 				return;
 			}
