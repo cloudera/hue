@@ -22,26 +22,6 @@ from south.v2 import SchemaMigration
 class Migration(SchemaMigration):
     
     def forwards(self, orm):
-        
-        # Adding model 'UserProfile'
-        try:
-            db.create_table('desktop_userprofile', (
-                ('login_count', self.gf('django.db.models.fields.IntegerField')(default=0)),
-                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-                ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
-            ))
-        except:
-            logging.warning("Initial db creation being skipped, likely because table already exists.", exc_info=True)
-            return
-
-        db.send_create_signal('desktop', ['UserProfile'])
-
-        if not db.dry_run:
-          for user in orm['auth.User'].objects.all():
-            profile = orm.UserProfile()
-            profile.user = user
-            profile.save()
-
         # Adding model 'UserPreferences'
         db.create_table('desktop_userpreferences', (
             ('value', self.gf('django.db.models.fields.TextField')(max_length=4096)),
@@ -53,10 +33,6 @@ class Migration(SchemaMigration):
     
     
     def backwards(self, orm):
-        
-        # Deleting model 'UserProfile'
-        db.delete_table('desktop_userprofile')
-
         # Deleting model 'UserPreferences'
         db.delete_table('desktop_userpreferences')
     
@@ -105,12 +81,6 @@ class Migration(SchemaMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'value': ('django.db.models.fields.TextField', [], {'max_length': '4096'})
         },
-        'desktop.userprofile': {
-            'Meta': {'object_name': 'UserProfile'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'login_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
-        }
     }
     
     complete_apps = ['desktop']
