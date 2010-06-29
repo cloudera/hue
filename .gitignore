@@ -29,6 +29,9 @@ TAGS
 *.egg-info/
 dist/
 
+# Include top level distribution dir
+!/dist/
+
 # Crepo fetched them
 ext/thirdparty/js/art-widgets/
 ext/thirdparty/js/mootools-table/
