@@ -25,7 +25,7 @@
 	<link rel="stylesheet" href="/static/css/windows.css" type="text/css" media="screen" charset="utf-8">
 	<link rel="stylesheet" href="/static/css/desktop.css" type="text/css" media="screen" charset="utf-8">
 
-  <script src="/depender/build?client=true&require=dbug,DomReady,Cookie"></script>
+  <script src="/depender/build?client=true&require=dbug,DomReady,Cookie,Element.Dimensions,Element.Style"></script>
   <!--[if IE 8]>
       <script>
           window.ie8 = true;
@@ -34,6 +34,30 @@
   <script>
   
   window.addEvent('domready', function(){
+    //this method automatically sizes the desktop image to fill the screen
+    var sizer = function(){
+      //get the backgrounds (there may be more than one if rotation is in process)
+      var bgs = $('bg').getElements('.desktop-bg');
+      //get the window dimensions
+      var size = window.getSize();
+      //if the aspect ratio of the window is > 1.6
+      if (size.x/size.y > 1.6) {
+        //then set the width of the image to equal the window
+        bgs.setStyles({
+          width: size.x,
+          height: 'auto'
+        });
+      } else {
+        //else set the height to match the window
+        bgs.setStyles({
+          width: 'auto',
+          height: size.y
+        });
+      }
+    };
+    //when the window is resized, resize the background
+    window.addEvent('resize', sizer);
+    
     if (Browser.Engine.trident) {
       $('closeWarning').addEvent('click', function(){
         Cookie.write('desktop-browser-warned', true);
@@ -46,6 +70,8 @@
     Depender.require({
       scripts: ["CCS.Request", "CCS.User", "CCS.Desktop", "CCS.Desktop.Config", "CCS.Desktop.FlashMessage", "CCS.Desktop.Keys", "CCS.Login", "StickyWin.PointyTip", "Element.Delegation", "Fx.Tween", "Fx.Elements"],
       callback: function(){
+        //before fading in the screen, resize the background to match the window size
+        sizer();
         $('bg').set('tween', {duration:500}).tween('opacity', 0, 1);
         $(document.body).addEvent('click:relay(img.desktop-logo)', rotateBG);
         rotateBG.periodical(300000); //rotate the background every 5 min
@@ -160,6 +186,7 @@
           new Element('img', {
             src: '/static/art/desktops/' + r + '.jpg',
             'class': 'desktop-bg',
+            styles: bg.getStyles('width', 'height'),
             events: {
               load: function(){
                 //after they load, crossfade
