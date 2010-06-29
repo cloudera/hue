@@ -358,7 +358,7 @@ input[type=submit] {
 
 /* growl */
 
-.ccs-shared .growl {
+.growl {
 	cursor: pointer;
 	position: absolute;
 	right: 0px;
@@ -379,7 +379,7 @@ input[type=submit] {
 	z-index: 100000;
 }
 
-.ccs-shared .growl:hover {
+.growl:hover {
 	opacity: 1;
 	filter: alpha(opacity=100);
 	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";

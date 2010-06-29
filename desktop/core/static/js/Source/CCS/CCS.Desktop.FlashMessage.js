@@ -82,9 +82,9 @@ CCS.Desktop.flashMessage = function(message, duration, noCleanup){
 			right : 0,
 			bottom: b
 		}
-	}).inject(this.options.append);
+	}).inject(document.body);
 	//set a timeout to hide the message
-	timeout = cleanup.delay(duration || 4500);
+	if (!noCleanup) timeout = cleanup.delay(duration || 4500);
 	//return the cleanup function so that the code that called this method can optionally
 	//clean it before the timeout.
 	return cleanup;
