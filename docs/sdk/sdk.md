@@ -77,8 +77,8 @@ for their "models".	 (For example, the JobDesigner application stores
 job designs in the database.)
 
 In addition to the web server, some Desktop applications run
-daemon processes "on the side".	 For example, the Health dashboard
-runs a metrics collection daemon ("healthd").	 Running
+daemon processes "on the side".	 For example, Beeswax runs a daemon
+("beeswax_server") that keeps track of query states.  Running
 a separate process for applications is the preferred
 way to manage long-running tasks that you may wish
 to co-exist with web page rendering.	The web "views"
@@ -216,8 +216,10 @@ the applications that are installed
         calculator           0.1     /Users/philip/src/hue/calculator
 
 <div class="note">
-If you'd like to customize the build process, you can create your own `Makefile`
-which includes `app.mk`. Please see `desktop/apps/beeswax/Makefile` for an example.
+If you'd like to customize the build process, you can modify (or even complete
+rewrite) your own `Makefile`, as long as it supports the set of required
+targets. Please see `Makefile.sdk` for the required targets and their
+semantics.
 </div>
 
 Congrats, you've added a new app!
@@ -583,7 +585,7 @@ a common pattern to push state into a "helper process".	 For example, in the Job
 a helper process keeps track of the processes that have been launched.	The Django views
 themselves are stateless, but they talk to this stateful helper process for
 updates.	A similar approach is taken with updating metrics for
-the Cluster Health application.
+the Beeswax application.
 
 ### Authentication Backends
 
@@ -830,9 +832,9 @@ You can create a link to a specific application, or even a specific view within 
 This is done by adding a hash value for "launch" with comma separated values of application
 names and optional encoded urls. For examples:
 
-	http://desktop/#launch=FileBrowser,Health
-	http://desktop/#launch=FileBrowser:/some/path,Heath:/some/other/path
-	http://desktop/#launch=FileBrowser,Health&noSession=true
+	http://desktop/#launch=FileBrowser,JobBrowser
+	http://desktop/#launch=FileBrowser:/some/path,JobBrowser:/some/other/path
+	http://desktop/#launch=FileBrowser,JobBrowser&noSession=true
 
 The last example shows an additional parameter to prevent session restoration.
 
