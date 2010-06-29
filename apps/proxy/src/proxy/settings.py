@@ -14,4 +14,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 DJANGO_APPS = [ "proxy" ]
+NICE_NAME = "Proxy"
 REQUIRES_HADOOP = False
