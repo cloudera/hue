@@ -31,6 +31,7 @@ PROD_INCLUDES := \
 	virtualenv_support
 
 PROD_EXCLUDES := \
+        Makefile.tarball \
 	desktop/apps/jframegallery \
 	desktop/apps/beeswax \
 	desktop/conf \

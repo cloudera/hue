@@ -39,10 +39,10 @@ APPS := about \
 	proxy \
 	useradmin
 
-# <<<< SDK ONLY
+# <<<< DEV ONLY
 APPS += hello \
 	jframegallery
-# END SDK ONLY >>>>
+# END DEV ONLY >>>>
 
 ################################################
 # Install all applications into the Desktop environment
