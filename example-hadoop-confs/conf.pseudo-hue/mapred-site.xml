@@ -14,4 +14,8 @@
     <description>Comma-separated list of jobtracker plug-ins to be activated.
     </description>
   </property>
+  <property>
+    <name>jobtracker.thrift.address</name>
+    <value>0.0.0.0:9290</value>
+  </property>
 </configuration>
