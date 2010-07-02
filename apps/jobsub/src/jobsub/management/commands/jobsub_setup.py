@@ -53,6 +53,8 @@ class Command(NoArgsCommand):
 
     # Also copy over Hadoop examples and streaming jars
     local_src = hadoop.conf.HADOOP_EXAMPLES_JAR.get()
+    if local_src is None:
+      raise Exception('Failed to locate the Hadoop example jar')
     remote_dst = posixpath.join(jobsub.conf.REMOTE_DATA_DIR.get(), "examples", "hadoop-examples.jar")
     copy_file(local_src, remote_fs, remote_dst)
 

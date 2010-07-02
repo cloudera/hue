@@ -52,14 +52,13 @@ def find_jar(desired_glob, root=None):
   def f():
     pattern = os.path.join(root_f(), desired_glob)
     possibilities = glob.glob(pattern)
-    if len(possibilities) == 1:
-      return possibilities[0]
-    elif len(possibilities) >= 1:
-      logging.warning("Found multiple jars matching %s: %s" % (pattern, possibilities))
+    if len(possibilities) == 0:
+      logging.error("Trouble finding jars matching %s" % (pattern,))
       return None
     else:
-      logging.warning("Trouble finding jars matching %s" % (pattern,))
-      return None
+      if len(possibilities) != 1:
+        logging.warning("Found multiple jars matching %s: %s" % (pattern, possibilities))
+      return possibilities[0]
   if root is None:
     root_str = "$HADOOP_HOME"
   else:
