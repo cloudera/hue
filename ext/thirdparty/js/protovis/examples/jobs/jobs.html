@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <title>Job Voyager</title>
+    <link type="text/css" rel="stylesheet" href="../ex.css"/>
+    <script type="text/javascript" src="../../protovis-d3.2.js"></script>
+    <script type="text/javascript" src="jobs.js"></script>
+    <style type="text/css">
+
+#fig {
+  width: 860px;
+  height: 580px;
+}
+
+    </style>
+  </head>
+  <body>
+    <div id="center"><div id="fig">
+    <script type="text/javascript+protovis">
+
+/* Flatten the tree into an array to faciliate transformation. */
+var jobs = pv.flatten(jobs)
+    .key("job")
+    .key("gender", function(i) i.charAt(0))
+    .key("year", function(i) years[i])
+    .key("people")
+    .array();
+
+/* Compute per-year and per-job totals. */
+var sumByYear = pv.nest(jobs)
+    .key(function(d) d.year)
+    .rollup(function(v) pv.sum(v, function(d) d.people)),
+  sumByJob = pv.nest(jobs)
+    .key(function(d) d.gender + d.job)
+    .rollup(function(v) pv.sum(v, function(d) d.people));
+
+var w = 800,
+    h = 480,
+    x = pv.Scale.linear(years).range(0, w),
+    y = pv.Scale.linear(0, sumByYear[2000]).range(0, h),
+    c = pv.Scale.ordinal("men", "women").range("#33f", "#f33")
+    a = pv.Scale.linear(pv.values(sumByJob)).range(.4, .8);
+
+var vis = new pv.Panel()
+    .width(w)
+    .height(h)
+    .margin(30);
+
+vis.add(pv.Rule)
+    .data(x.ticks())
+    .left(x)
+    .strokeStyle("#ccc")
+  .anchor("bottom").add(pv.Label);
+
+vis.add(pv.Rule)
+    .bottom(0);
+
+var area = vis.add(pv.Layout.Stack)
+    .layers(pv.nest(jobs).key(function(d) d.gender + d.job).entries())
+    .values(function(d) d.values)
+    .x(function(d) x(d.year))
+    .y(function(d) y(d.people))
+    .order("reverse")
+    .offset("expand")
+  .layer.add(pv.Area)
+    .fillStyle(function(d, p) c(d.gender).alpha(a(sumByJob[p.key])));
+
+vis.render();
+
+    </script>
+  </div></div></body>
+</html>

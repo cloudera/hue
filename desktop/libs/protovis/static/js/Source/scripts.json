@@ -1,6 +1,6 @@
 {
 	"protovis": {
-		"protovis-d3.1": {
+		"protovis-d3.2": {
 			"deps": []
 		}
 	},
@@ -9,7 +9,7 @@
 			"deps" : ["Protovis","Protovis.Line","Protovis.Bar","Protovis.Pie"]
 		},
 		"Protovis" : {
-			"deps" : ["protovis-d3.1"]
+			"deps" : ["protovis-d3.2"]
 		},
 		"Protovis.Line" : {
 			"deps" : ["Protovis"]

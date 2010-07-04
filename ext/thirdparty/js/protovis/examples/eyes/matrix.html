@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>Matrix</title>
+    <link rel="stylesheet" type="text/css" href="../ex.css"/>
+    <script type="text/javascript" src="../../protovis-r3.2.js"></script>
+    <style type="text/css">
+
+body {
+  background: #222;
+}
+
+#fig {
+  width: 200px;
+  height: 200px;
+}
+
+    </style>
+  </head>
+  <body><div id="center"><div id="fig">
+    <script type="text/javascript+protovis">
+
+var vis = new pv.Panel()
+    .width(200)
+    .height(200)
+    .strokeStyle("#aaa");
+
+vis.add(pv.Panel)
+    .data(pv.range(0, 201, 20))
+    .left(function(x) x)
+  .add(pv.Panel)
+    .data(pv.range(0, 201, 20))
+    .top(function(y) y)
+  .add(pv.Dot)
+    .fillStyle("#fff")
+    .strokeStyle(null)
+    .size(function() this.mouse().length());
+
+vis.render();
+
+pv.listen(window, "mousemove", function() vis.render());
+
+    </script>
+  </div></div></body>
+</html>

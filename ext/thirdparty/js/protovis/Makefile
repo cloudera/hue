@@ -1,78 +1,146 @@
-# Protovis Makefile
-#
-# Note: This Makefile depends on the YUI Compressor for JavaScript
-# minification. The JAR file should be installed in the lib directory.
-# The YUI Compressor is available at http://yuilibrary.com/downloads/
-
 JS_LANG_FILES = \
-	js/lang/Array.js \
-	js/lang/Date.js
+	src/lang/Array.js
 
-JS_PV_FILES = \
-	js/pv.js \
-	js/data/Tree.js \
-	js/data/Nest.js \
-	js/data/Flatten.js \
-	js/data/Vector.js \
-	js/data/Scale.js \
-	js/data/LinearScale.js \
-	js/data/LogScale.js \
-	js/data/OrdinalScale.js \
-	js/color/Color.js \
-	js/color/Colors.js \
-	js/color/Ramp.js \
-	js/scene/SvgScene.js \
-	js/scene/SvgArea.js \
-	js/scene/SvgBar.js \
-	js/scene/SvgDot.js \
-	js/scene/SvgImage.js \
-	js/scene/SvgLabel.js \
-	js/scene/SvgLine.js \
-	js/scene/SvgPanel.js \
-	js/scene/SvgRule.js \
-	js/scene/SvgWedge.js \
-	js/mark/Mark.js \
-	js/mark/Anchor.js \
-	js/mark/Area.js \
-	js/mark/Bar.js \
-	js/mark/Dot.js \
-	js/mark/Label.js \
-	js/mark/Line.js \
-	js/mark/Rule.js \
-	js/mark/Panel.js \
-	js/mark/Image.js \
-	js/mark/Wedge.js \
-	js/layout/Layout.js \
-	js/layout/Grid.js \
-	js/layout/Stack.js \
-	js/layout/Icicle.js \
-	js/layout/Sunburst.js \
-	js/layout/Treemap.js
+JS_CORE_FILES = \
+	src/pv.js \
+	src/pv-internals.js \
+	src/lang/init.js \
+	src/text/Format.js \
+	src/text/DateFormat.js \
+	src/text/TimeFormat.js \
+	src/text/NumberFormat.js \
+	src/data/Arrays.js \
+	src/data/Numbers.js \
+	src/data/Objects.js \
+	src/data/Dom.js \
+	src/data/Tree.js \
+	src/data/Nest.js \
+	src/data/Flatten.js \
+	src/data/Vector.js \
+	src/data/Transform.js \
+	src/data/Scale.js \
+	src/data/QuantitativeScale.js \
+	src/data/LinearScale.js \
+	src/data/LogScale.js \
+	src/data/RootScale.js \
+	src/data/OrdinalScale.js \
+	src/data/QuantileScale.js \
+	src/data/Histogram.js \
+	src/color/Color.js \
+	src/color/Colors.js \
+	src/color/Ramp.js \
+	src/scene/svg/SvgScene.js \
+	src/scene/svg/SvgCurve.js \
+	src/scene/svg/SvgArea.js \
+	src/scene/svg/SvgBar.js \
+	src/scene/svg/SvgDot.js \
+	src/scene/svg/SvgImage.js \
+	src/scene/svg/SvgLabel.js \
+	src/scene/svg/SvgLine.js \
+	src/scene/svg/SvgPanel.js \
+	src/scene/svg/SvgRule.js \
+	src/scene/svg/SvgWedge.js \
+	src/scene/vml/VmlScene.js \
+	src/scene/vml/VmlArea.js \
+	src/scene/vml/VmlBar.js \
+	src/scene/vml/VmlDot.js \
+	src/scene/vml/VmlImage.js \
+	src/scene/vml/VmlLabel.js \
+	src/scene/vml/VmlLine.js \
+	src/scene/vml/VmlPanel.js \
+	src/scene/vml/VmlRule.js \
+	src/scene/vml/VmlWedge.js \
+	src/scene/Scene.js \
+	src/mark/Mark.js \
+	src/mark/Anchor.js \
+	src/mark/Area.js \
+	src/mark/Bar.js \
+	src/mark/Dot.js \
+	src/mark/Label.js \
+	src/mark/Line.js \
+	src/mark/Rule.js \
+	src/mark/Panel.js \
+	src/mark/Image.js \
+	src/mark/Wedge.js
+
+JS_LAYOUT_FILES = \
+	src/physics/Particle.js \
+	src/physics/Simulation.js \
+	src/physics/Quadtree.js \
+	src/physics/Force.js \
+	src/physics/ChargeForce.js \
+	src/physics/DragForce.js \
+	src/physics/SpringForce.js \
+	src/physics/Constraint.js \
+	src/physics/CollisionConstraint.js \
+	src/physics/PositionConstraint.js \
+	src/physics/BoundConstraint.js \
+	src/layout/Layout.js \
+	src/layout/Network.js \
+	src/layout/Hierarchy.js \
+	src/layout/Grid.js \
+	src/layout/Stack.js \
+	src/layout/Treemap.js \
+	src/layout/Tree.js \
+	src/layout/Indent.js \
+	src/layout/Pack.js \
+	src/layout/Force.js \
+	src/layout/Cluster.js \
+	src/layout/Partition.js \
+	src/layout/Arc.js \
+	src/layout/Horizon.js \
+	src/layout/Rollup.js \
+	src/layout/Matrix.js \
+	src/layout/Bullet.js \
+	src/behavior/Behavior.js \
+	src/behavior/Drag.js \
+	src/behavior/Point.js \
+	src/behavior/Select.js \
+	src/behavior/Resize.js \
+	src/behavior/Pan.js \
+	src/behavior/Zoom.js
+
+JS_GEO_FILES = \
+	src/geo/Geo.js \
+	src/geo/LatLng.js \
+	src/geo/Projection.js \
+	src/geo/Projections.js \
+	src/geo/GeoScale.js
 
 JS_FILES = \
 	$(JS_LANG_FILES) \
-	js/pv-start.js \
-	$(JS_PV_FILES) \
-	js/pv-end.js 
-# not needed because this is used for function expressions support (ugly eval).	HUE CHANGE
-#	js/lang/init.js     
+	$(JS_CORE_FILES) \
+	$(JS_LAYOUT_FILES) \
+	$(JS_GEO_FILES)
 
-all: protovis-d3.1.js protovis-r3.1.js
+JS_COMPILER = \
+	java -jar lib/google-compiler/compiler-20100201.jar \
+	--charset UTF-8 \
+	--warning_level=QUIET
 
-protovis-d3.1.js: $(JS_FILES) Makefile
-	grep '	' -Hn $(JS_FILES) && echo "ERROR: tab" && exit 1 || true
-	grep '' -Hn $(JS_FILES) && echo "ERROR: dos newline" && exit 1 || true
-	grep ' $$' -Hn $(JS_FILES) && echo "ERROR: trailing space" && exit 1 || true
-	cat $(JS_FILES) > $@
+JSDOC_HOME = /Library/jsdoc-toolkit
+JSDOC = java -jar $(JSDOC_HOME)/jsrun.jar $(JSDOC_HOME)/app/run.js
 
-protovis-r3.1.js: protovis-d3.1.js
+all: protovis-d3.2.js protovis-r3.2.js
+protovis-d3.2.js: $(JS_FILES)
+protovis-r3.2.js: $(JS_FILES)
+
+%-d3.2.js: Makefile
+	grep '	' -Hn $(filter %.js,$^) && echo "ERROR: tab" && exit 1 || true
+	grep -P '\r\n' -Hn $(filter %.js,$^) && echo "ERROR: dos newline" && exit 1 || true
+	grep ' $$' -Hn $(filter %.js,$^) && echo "ERROR: trailing space" && exit 1 || true
 	rm -f $@
-	cat $(JS_LANG_FILES) | java -jar lib/yuicompressor-2.4.2.jar --charset UTF-8 --type js >> $@
-	cat js/pv-start.js >> $@
-	cat $(JS_PV_FILES) | java -jar lib/yuicompressor-2.4.2.jar --charset UTF-8 --type js >> $@
-	cat js/pv-end.js >> $@
-	cat js/lang/init.js | java -jar lib/yuicompressor-2.4.2.jar --charset UTF-8 --type js >> $@
+	echo "// $(shell git rev-parse HEAD)" >> $@
+	cat $(filter %.js,$^) >> $@
+
+%-r3.2.js:: Makefile
+	rm -f $@
+	echo "// $(shell git rev-parse --short HEAD)" >> $@
+	cat $(filter %.js,$^) | $(JS_COMPILER) >> $@
+
+jsdoc: $(JS_FILES) Makefile
+	rm -rf jsdoc
+	$(JSDOC) -a -t=$(JSDOC_HOME)/templates/jsdoc -d=$@ -E="^pv-" $(JS_FILES)
 
 clean:
-	rm -rf protovis-d3.1.js protovis-r3.1.js
-
+	rm -rf protovis-d3.2.js protovis-r3.2.js jsdoc

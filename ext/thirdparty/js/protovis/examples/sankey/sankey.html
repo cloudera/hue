@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <title>GDP of the World</title>
+    <script type="text/javascript" src="../../protovis-d3.2.js"></script>
+    <script type="text/javascript" src="gdp2009.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript+protovis">
+var top20 = [];
+for(var i = 0; i < 20; i++) {
+  top20.push(gdp2009[i]);
+}
+
+// define the data
+var data = top20;
+var text = function(d) d.name;
+var value = function(d) d.gdp;
+
+
+var prev = 0,
+    sum = 0,
+    hdif = [];
+for(var i = 0; i < data.length; i++) {
+  sum += value(data[i]);
+  hdif.push((sum + prev) / 2);
+  prev = sum;
+}
+
+var w = 700,
+    h = 800,
+    lMargin = 50,
+    rMargin = 230,
+    baseWidth = 400,
+    scale = 1.9,
+    steps = [0, 0.2, 0.8, 1],
+    x = pv.Scale.linear(steps).range(lMargin, w-rMargin),
+    ws = pv.Scale.linear(0, sum).range(0, baseWidth),
+    h0 = pv.Scale.linear(0, sum).range(-baseWidth/2, baseWidth/2),
+    h1 = pv.Scale.linear(0, sum).range(-scale*baseWidth/2, scale*baseWidth/2);
+
+var vis = new pv.Panel()
+    .width(w)
+    .height(h)
+    .strokeStyle("#ccc")
+    .margin(20);
+
+vis.add(pv.Panel)
+    .data(hdif)
+  .add(pv.Line)
+    .data(steps)
+    .left(x)
+    .bottom(function(step, val) h/2 - ((this.index < 2)?h0(val):h1(val)))
+    .lineWidth(function() ws(value(data[this.parent.index])))
+    .interpolate("monotone");
+
+vis.add(pv.Label)
+    .left(x(0))
+    .bottom(h/2)
+    .textBaseline("middle")
+    .textAlign("right")
+    .font("18px sans-serif")
+    .text("All");
+
+vis.add(pv.Label)
+    .data(hdif)
+    .left(x(1))
+    .bottom(function(val) h/2 - h1(val))
+    .textBaseline("middle")
+    .textAlign("left")
+    .font(function() (6*Math.log(ws(value(data[this.index])))).toFixed(0) + "px sans-serif")
+    .text(function() text(data[this.index]));
+
+vis.render();
+
+    </script>
+  </body>
+</html>

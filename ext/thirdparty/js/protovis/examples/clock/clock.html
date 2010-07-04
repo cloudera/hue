@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <title>PolarClock</title>
+    <link type="text/css" rel="stylesheet" href="../ex.css"/>
+    <script type="text/javascript" src="../../protovis-r3.2.js"></script>
+    <style type="text/css">
+
+body {
+  background: #222;
+}
+
+#fig {
+  width: 768px;
+  height: 768px;
+}
+
+#label {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font: 10px sans-serif;
+  color: #999;
+}
+
+#label a {
+  color: #ccc;
+}
+
+    </style>
+  </head>
+  <body><div id="center"><div id="fig">
+    <script type="text/javascript+protovis">
+
+var radius = 768 / 2;
+
+/* Generate the fields for the given date. */
+function fields() {
+  var d = new Date();
+
+  function days() {
+    return 32 - new Date(d.getYear(), d.getMonth(), 32).getDate();
+  }
+
+  var millis = d.getMilliseconds() / 1000;
+  var second = (d.getSeconds() + millis) / 60;
+  var minute = (d.getMinutes() + second) / 60;
+  var hour = (d.getHours() + minute) / 24;
+  var weekday = (d.getDay() + hour) / 7;
+  var date = (d.getDate() - 1 + hour) / days();
+  var month = (d.getMonth() + date) / 12;
+
+  return [
+      {value: second, index: .7, text: pv.Format.date("%S s")(d)},
+      {value: minute, index: .6, text: pv.Format.date("%M m")(d)},
+      {value: hour, index: .5, text: pv.Format.date("%H h")(d)},
+      {value: weekday, index: .3, text: pv.Format.date("%a")(d)},
+      {value: date, index: .2, text: pv.Format.date("%d d")(d)},
+      {value: month, index: .1, text: pv.Format.date("%b")(d)}
+    ];
+}
+
+var vis = new pv.Panel()
+    .width(radius * 2)
+    .height(radius * 2);
+
+vis.add(pv.Wedge)
+    .data(fields)
+    .left(radius)
+    .bottom(radius)
+    .innerRadius(function(d) radius * d.index)
+    .outerRadius(function(d) radius * (d.index + .1))
+    .startAngle(-Math.PI / 2)
+    .angle(function(d) 2 * Math.PI * d.value)
+    .fillStyle(function(d) "hsl(" + (360 * d.value - 180) + ", 50%, 50%)")
+    .lineWidth(4)
+    .strokeStyle("#222")
+  .anchor("end").add(pv.Label)
+    .font("bold 12px sans-serif")
+    .textStyle("#000")
+    .textMargin(7)
+    .text(function(d) d.text);
+
+setInterval(function() vis.render(), 50);
+
+    </script>
+  </div></div>
+  <div id="label">
+    Inspired by <a href="http://blog.pixelbreaker.com/polarclock/">pixelbreaker</a>.
+  </div>
+  </body>
+</html>

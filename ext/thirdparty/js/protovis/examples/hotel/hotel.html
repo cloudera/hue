@@ -1,0 +1,76 @@
+<html>
+  <head>
+    <title>Hotel Stays</title>
+    <link type="text/css" rel="stylesheet" href="../ex.css"/>
+    <script type="text/javascript" src="../../protovis-r3.2.js"></script>
+    <script type="text/javascript" src="hotel.js"></script>
+    <style type="text/css">
+
+#fig {
+  width: 520px;
+  height: 520px;
+}
+
+    </style>
+  </head>
+  <body><div id="center"><div id="fig">
+    <script type="text/javascript+protovis">
+
+/* Scales and size parameters. */
+var w = 270,
+    h = 480,
+    x = pv.Scale.ordinal(pv.range(24)).splitBanded(0, w),
+    y = pv.Scale.ordinal(order).splitBanded(0, h, 4 / 5);
+
+/* Compute the mean per metric. */
+var type = pv.nest(hotel).key(function(d) d.type),
+    mean = type.rollup(function(values) pv.mean(values, function(d) d.count));
+
+/* The root panel. */
+var vis = new pv.Panel()
+    .width(w)
+    .height(h)
+    .top(40)
+    .right(200);
+
+/* A panel per type... */
+var panel = vis.add(pv.Panel)
+    .data(type.entries())
+    .top(y.by(pv.index))
+    .height(y.range().band);
+
+/* ... with a label ... */
+panel.anchor("right").add(pv.Label)
+    .font("13px Georgia")
+    .textAlign("left")
+    .textMargin(8)
+    .text(function(x, d) d.key);
+
+/* ... and bar chart. */
+panel.add(pv.Bar)
+    .def("y", function(d) pv.Scale.linear()
+        .domain(0, pv.max(d.values, function(d) d.count))
+        .range(0, this.parent.height()))
+    .data(function(d) pv.repeat(d.values))
+    .left(x.by(pv.index))
+    .bottom(0)
+    .width(x.range().band)
+    .height(function(d) this.y()(d.count))
+    .antialias(false)
+    .fillStyle(function(d) (d.count > mean[d.type]) ? "#000" : null)
+    .strokeStyle("#000")
+    .lineWidth(1);
+
+/* Month labels. */
+vis.add(pv.Label)
+    .data(pv.repeat("JFMAMJJASOND".split("")))
+    .top(function() (this.index % 6) > 2 ? 0 : -2)
+    .left(function() x(this.index) + x.range().band / 2)
+    .textAlign("center")
+    .font("bold 15px Arial");
+
+vis.render();
+
+    </script>
+  </div></div></body>
+</html>

@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <title>Group Stacked Bar Chart</title>
+    <script type="text/javascript" src="../../protovis-d3.2.js"></script>
+    <script type="text/javascript" src="headcount.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript+protovis">
+
+/* Extract the unique dates, departments and types. */
+var dates = pv.uniq(headcount, function(d) d.date),
+    depts = pv.uniq(headcount, function(d) d.dept),
+    types = pv.uniq(headcount, function(d) d.type);
+
+/* Build a map of headcounts by date > dept > type. */
+var count = pv.nest(headcount)
+    .key(function(d) d.date)
+    .key(function(d) d.dept)
+    .key(function(d) d.type)
+    .rollup(function(v) v[0].headcount);
+
+/* Compute the maximum stack height using sum(types | date + dept). */
+var max = pv.max(dates,
+    function(q) pv.max(depts,
+    function(d) pv.sum(types,
+    function(t) count[q][d][t])));
+
+var w = 250,
+    h = 400,
+    x1 = pv.Scale.ordinal(dates).splitBanded(0, w, .8),
+    x2 = pv.Scale.ordinal(depts).splitBanded(0, x1.range().band, .9),
+    y = pv.Scale.linear(0, max).range(0, h);
+
+var vis = new pv.Panel()
+    .width(w)
+    .height(h)
+    .bottom(20)
+    .left(25)
+    .right(5)
+    .top(5);
+
+var bar = vis.add(pv.Panel)
+    .data(dates)
+    .left(x1)
+  .add(pv.Layout.Stack)
+    .layers(types)
+    .values(depts)
+    .x(x2)
+    .y(function(d, t, q) y(count[q][d][t]))
+  .layer.add(pv.Bar)
+    .width(x2.range().band)
+    .title(function(d, t, q) d + "-" + t + ": " + count[q][d][t])
+    .fillStyle(pv.Colors.category20().by(function(d, t) d + t));
+
+vis.add(pv.Label)
+    .data(dates)
+    .bottom(0)
+    .left(function(d) x1(d) + x1.range().band / 2)
+    .textMargin(5)
+    .textBaseline("top")
+    .textAlign("center")
+    .text(pv.Format.date("%m/%y"));
+
+vis.add(pv.Rule)
+    .data(y.ticks())
+    .bottom(y)
+    .strokeStyle(function(d) d ? "rgba(255, 255, 255, .3)" : "#000")
+  .add(pv.Rule)
+    .left(0)
+    .width(5)
+    .strokeStyle("#000")
+  .anchor("left").add(pv.Label)
+    .text(y.tickFormat);
+
+vis.render();
+
+    </script>
+  </body>
+</html>

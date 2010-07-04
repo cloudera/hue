@@ -1,0 +1,112 @@
+<html>
+  <head>
+    <title>Automaton Explorer</title>
+    <script type="text/javascript" src="../../protovis-d3.2.js"></script>
+		<script type="text/javascript" src="../jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="jquery-ui-1.8rc3.custom.min.js"></script>
+    <script type="text/javascript" src="cell.js"></script>
+		<link type="text/css" href="ui-lightness/jquery-ui-1.8rc3.custom.css" rel="stylesheet"/>
+    <link type="text/css" href="../../tests/style.css" rel="stylesheet"/>
+    <style type="text/css">
+
+.ui-slider {
+  font-size: 10px;
+  width: 300px;
+  margin-top: 5px;
+}
+
+sup, sub {
+  line-height: 0;
+}
+
+.ui-state-focus {
+  outline: none;
+}
+
+#slider {
+  width: 300px;
+  display: inline-block;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+    </style>
+  </head>
+  <body>
+    <h3>Automaton Explorer</h3>
+    <div style="width:8in;">
+      rule: <span id="slider"></span><span id="rule">30</span>
+      <span style="float:right;">
+        start: <input type="radio" checked id="point" name="start" value="point">
+        <label for="point">point</label>
+        <input type="radio" id="random" name="start" value="random">
+        <label for="random">random</label>
+      </span>
+    </div><p>
+    <script type="text/javascript+protovis">
+
+var h = 128,
+    w = h << 1,
+    start = "point",
+    rule = 30;
+
+var vis = new pv.Panel()
+    .width(w * 3)
+    .height(h * 3)
+    .top(40);
+
+vis.add(pv.Panel)
+    .data(pv.range(8))
+    .right(function(i) (i + .5) * w * 3 / 8)
+    .top(-35)
+    .event("mousedown", function(i)
+        ($("#rule").html(rule ^= 1 << i),
+         $(slider).slider('value', rule),
+         vis))
+  .add(pv.Bar)
+    .top(10)
+    .right(-5)
+    .width(10)
+    .height(10)
+    .title(function(j, i) "Toggle bit " + i + ".")
+    .strokeStyle("#bbb")
+    .fillStyle(function(i) rule >> i & 1 ? "#000" : "#fff")
+  .add(pv.Bar)
+    .data(pv.range(3))
+    .top(0)
+    .right(function(i) i * 10 - 15)
+    .fillStyle(function(i, j) j >> i & 1 ? "#000" : "#fff");
+
+vis.add(pv.Image)
+    .def("cell", cell)
+    .imageWidth(w)
+    .imageHeight(h)
+    .image(pv.colors("#fff", "#000").by(function(x, y) this.cell()[y][x]));
+
+vis.render();
+
+$(slider).slider({
+  min: 1, value: 30, max: 255, slide: function(e, ui) {
+    $("#rule").html(rule = ui.value);
+    vis.render();
+  }
+});
+
+$([point, random]).change(function() {
+  start = this.value;
+  vis.render();
+});
+
+    </script>
+
+    <p>From <a href="http://mathworld.wolfram.com/CellularAutomaton.html">MathWorld</a>:
+    "A cellular automaton is a collection of 'colored' cells on a grid of
+    specified shape that evolves through a number of discrete time steps
+    according to a set of rules based on the states of neighboring cells." This
+    example explores binary, nearest-neighbor, one-dimensional automata, of
+    which there are 256 (2<sup>8</sup>) possible rules. The eight possible
+    outcomes for the current rule are shown across the top; click to toggle the
+    selected bit.
+
+  </body>
+</html>

@@ -1,0 +1,85 @@
+<html>
+  <head>
+    <title>Horizon Explorer</title>
+    <script type="text/javascript" src="../../protovis-d3.2.js"></script>
+		<script type="text/javascript" src="../jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="jquery-ui-1.8rc3.custom.min.js"></script>
+		<link type="text/css" href="ui-lightness/jquery-ui-1.8rc3.custom.css" rel="stylesheet"/>
+    <link type="text/css" href="../../tests/style.css" rel="stylesheet"/>
+    <style type="text/css">
+
+.ui-slider {
+  font-size: 10px;
+  width: 300px;
+  margin-top: 5px;
+}
+
+.ui-state-focus {
+  outline: none;
+}
+
+#slider {
+  width: 300px;
+  display: inline-block;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+#bands {
+  display: inline-block;
+  width: 20px;
+  text-align: right;
+}
+
+    </style>
+  </head>
+  <body>
+    <h3>Horizon Explorer</h3>
+    <div style="width:600px;">
+      bands: <span id="slider"></span><span id="bands">1</span>
+      <span style="float:right;">
+        mode: <input type="radio" id="mirror" name="mode" value="mirror">
+        <label for="mirror">mirror</label>
+        <input type="radio" checked id="offset" name="mode" value="offset">
+        <label for="offset">offset</label>
+      </span>
+    </div><p>
+    <script type="text/javascript+protovis">
+
+var w = 600,
+    h = 70,
+    bands = 1,
+    mode = "offset",
+    data = pv.range(101).map(function(d) Math.sin(d / 2) + Math.sin(d / 7)),
+    x = pv.Scale.linear(data, pv.index).range(0, w).by(pv.index),
+    y = pv.Scale.linear(data).range(-h, h);
+
+var vis = new pv.Panel()
+    .width(w)
+    .height(function() h / bands);
+
+vis.add(pv.Layout.Horizon)
+    .bands(function() bands)
+    .mode(function() mode)
+  .band.add(pv.Area)
+    .data(data)
+    .left(x)
+    .height(y);
+
+vis.render();
+
+$(slider).slider({
+  min: 1, max: 10, slide: function(e, ui) {
+    $("#bands").html(bands = ui.value);
+    vis.render();
+  }
+});
+
+$([mirror, offset]).change(function() {
+  mode = this.value;
+  vis.render();
+});
+
+    </script>
+  </body>
+</html>

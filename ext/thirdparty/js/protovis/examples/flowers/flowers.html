@@ -1,0 +1,109 @@
+<html>
+  <head>
+    <title>Iris Flowers</title>
+    <link type="text/css" rel="stylesheet" href="../ex.css"/>
+    <script type="text/javascript" src="../../protovis-r3.2.js"></script>
+    <script type="text/javascript" src="flowers.js"></script>
+    <style type="text/css">
+
+#fig {
+  width: 680px;
+  height: 705px;
+}
+
+    </style>
+  </head>
+  <body><div id="center"><div id="fig">
+    <script type="text/javascript+protovis">
+
+/* Size parameters. */
+var size = 150,
+    padding = 20;
+
+/* Scales for color and position. */
+var color = pv.colors(
+        "rgba(50%, 0%, 0%, .5)",
+        "rgba(0%, 50%, 0%, .5)",
+        "rgba(0%, 0%, 50%, .5)");
+    position = pv.dict(traits, function(t)
+        pv.Scale.linear(flowers, function(d) d[t])
+        .range(0, size));
+
+/* Root panel. */
+var vis = new pv.Panel()
+    .width((size + padding) * traits.length)
+    .height((size + padding) * traits.length + padding)
+    .left(.5)
+    .top(5.5);
+
+/* One cell per trait pair. */
+var cell = vis.add(pv.Panel)
+    .data(traits)
+    .top(function() this.index * (size + padding) + padding / 2)
+    .height(size)
+  .add(pv.Panel)
+    .data(function(y) traits.map(function(x) { return {x:x, y:y}; }))
+    .left(function() this.index * (size + padding) + padding / 2)
+    .width(size);
+
+/* Framed dot plots not along the diagonal. */
+var plot = cell.add(pv.Panel)
+    .visible(function(t) t.x != t.y)
+    .strokeStyle("#aaa");
+
+/* X-axis ticks. */
+var xtick = plot.add(pv.Rule)
+    .data(function(t) position[t.x].ticks().filter(function(x) !(x % 1)))
+    .left(function(d, t) position[t.x](d))
+    .strokeStyle("#eee")
+    .textMargin(5);
+
+/* Bottom and top labels. */
+xtick.anchor("bottom").add(pv.Label)
+    .visible(function() (cell.parent.index == traits.length - 1) && !(cell.index % 2));
+xtick.anchor("top").add(pv.Label)
+    .visible(function() (cell.parent.index == 0) && (cell.index % 2));
+
+/* Y-axis ticks. */
+var ytick = plot.add(pv.Rule)
+    .data(function(t) position[t.y].ticks().filter(function(x) !(x % 1)))
+    .bottom(function(d, t) position[t.y](d))
+    .strokeStyle("#eee")
+    .textMargin(5);
+
+/* Left and right labels. */
+ytick.anchor("left").add(pv.Label)
+    .visible(function() (cell.index == 0) && (cell.parent.index % 2));
+ytick.anchor("right").add(pv.Label)
+    .visible(function() (cell.index == traits.length - 1) && !(cell.parent.index % 2));
+
+/* Frame and dot plot. */
+plot.add(pv.Dot)
+    .data(flowers)
+    .left(function(d, t) position[t.x](d[t.x]))
+    .bottom(function(d, t) position[t.y](d[t.y]))
+    .size(8)
+    .strokeStyle(null)
+    .fillStyle(function(d) color(d.species));
+
+/* Labels along the diagonal. */
+cell.anchor("center").add(pv.Label)
+    .visible(function(t) t.x == t.y)
+    .font("bold 14px sans-serif")
+    .text(function(t) t.x.replace(/([WL])/, " $1").toLowerCase());
+
+/* Legend. */
+vis.add(pv.Dot)
+    .data(species)
+    .bottom(5)
+    .left(function() 15 + this.index * 65)
+    .size(8)
+    .strokeStyle(null)
+    .fillStyle(color)
+  .anchor("right").add(pv.Label);
+
+vis.render();
+
+    </script>
+  </div></div></body>
+</html>

@@ -1,0 +1,50 @@
+<html>
+	<head>
+		<title>Slider</title>
+		<script type="text/javascript" src="../../protovis-d3.2.js"></script>
+		<script type="text/javascript" src="../jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="jquery-ui-1.8rc3.custom.min.js"></script>
+		<link type="text/css" href="ui-lightness/jquery-ui-1.8rc3.custom.css" rel="stylesheet"/>
+    <style type="text/css">
+
+.ui-slider {
+  font-size: 10px;
+  width: 300px;
+  margin-top: 5px;
+}
+
+.ui-state-focus {
+  outline: none;
+}
+
+    </style>
+	</head>
+	<body>
+    <script type="text/javascript+protovis">
+
+var color = pv.color("black");
+
+var vis = new pv.Panel()
+    .width(300)
+    .height(300)
+    .fillStyle(color);
+
+vis.anchor("center").add(pv.Label)
+    .text(function() color.color);
+
+vis.render();
+
+$([red, green, blue]).slider({
+    min: 0, max: 255, slide: function(e, ui) {
+        vis.fillStyle(color = color[this.id](ui.value)).render();
+      }
+  });
+
+    </script>
+    <div id="red"></div>
+    <div id="green"></div>
+    <div id="blue"></div>
+	</body>
+</html>
+
+
