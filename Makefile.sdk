@@ -54,6 +54,7 @@ APP_VERSION ?= $(shell python setup.py --version)
 APP_FULL_NAME ?= $(APP_NAME)-$(APP_VERSION)
 
 BUILD_DIR := $(APP_ROOT)/build
+EGG_INFO_DIR := $(APP_ROOT)/src/$(APP_NAME).egg-info
 
 .PHONY: default
 default::
@@ -64,25 +65,18 @@ default::
 	@echo '  sdist *        : Create a source distribution tree and tarball'
 	@echo '  bdist          : Create a built distribution tree'
 	@echo '  install-bdist *: Install a built distribution to a target location'
-	@echo '  env-install    : Install into virtual-env'
 	@echo '  ext-env-install: Install external dependencies into virtual-env'
 	@echo '  ext-clean      : Clean external dependencies'
 	@echo '  clean *        : Clean $(APP_NAME). Requires ext-clean'
 	@echo '  distclean      : Dist clean $(APP_NAME). Requires clean'
 
 .PHONY: egg
-egg-info: compile
+egg-info: compile $(EGG_INFO_DIR)
+
+$(EGG_INFO_DIR): $(APP_ROOT)/setup.py
 	@echo '--- Making egg-info for $(APP_NAME)'
 	@$(ENV_PYTHON) setup.py -q egg_info
 
-#
-# env-install
-# 	Install app into the virtual environment. Used by desktop core.
-#
-.PHONY: env-install
-env-install: compile ext-env-install
-	@echo '--- Installing $(APP_NAME) into virtual-env'
-	@$(ENV_PYTHON) setup.py develop -N -q
 
 # Hook to allow extra build steps (eg java builds)
 .PHONY: compile
@@ -122,7 +116,7 @@ $(EXT_PY_EGG_TARGETS):
 	@cd ext-py/$(CUR_EXT_PY) && $(ENV_PYTHON) \
 	  -c '__import__("setuptools.sandbox").sandbox.run_setup("setup.py", __import__("sys").argv[1:])' \
 	  bdist_egg
-	@mkdir -p $(BUILD_DIR)/$(CUR_EXT_PY) && touch $@
+	@mkdir -p $(@D) && touch $@
 
 #
 # ext-clean
@@ -156,6 +150,7 @@ $(EXT_PY_ENV_INSTALL_TARGETS):
 	@# it wasn't necessary.  If the build had failed, the command that produced
 	@# the egg should have thrown an error.
 	@cd ext-py/$(CUR_EXT_PY) && [ ! -e dist ] || $(ENV_EASY_INSTALL) -N dist/*egg 2>/dev/null
+	@mkdir -p $(@D) && touch $@
 
 .PHONY: clean
 clean:: ext-clean
