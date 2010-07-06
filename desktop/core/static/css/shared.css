@@ -65,7 +65,7 @@
 	color: #999;
 	margin-top: 3px;
 }
-.ccs-shared label.OverText-ccs-search, .ccs-shared label.OverText-ccs-input {
+.ccs-shared label.OverText-ArtInput {
 	margin-top: 0px;
 }
 /* clear both sides of floats */
@@ -478,11 +478,11 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 	background: url(/static/art/info.png);
 }
 
-.ccs-search, .ccs-input {
+[data-filters*=ArtInput] {
 	display: none;
 }
 
-*[data-size-to-width], *[data-size-to-height] {
+[data-size-to-width], [data-size-to-height] {
 	overflow: auto;
 }
 

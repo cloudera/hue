@@ -60,9 +60,9 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
           <td class="fb-name">
             <div class="fb-name-container">
               % if "dir" == file['type']:
-                <a class="fb-item fb-dir jframe_ignore" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
+                <a data-filters="FitText" class="fb-item fb-dir jframe_ignore" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
               % else:
-                <a class="fb-item fb-file jframe_ignore" target="FileViewer" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
+                <a data-filters="FitText" class="fb-item fb-file jframe_ignore" target="FileViewer" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
               % endif
               % if ".." != file['name']:
                 <ul class="fb-item-actions context-menu">

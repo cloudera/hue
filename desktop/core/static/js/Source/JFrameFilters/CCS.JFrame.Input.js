@@ -17,7 +17,7 @@
 ---
 description: Inputs.
 provides: [CCS.JFrame.Input]
-requires: [/CCS.JFrame, Widgets/ART.Input, Widgets/ART.Search]
+requires: [/CCS.JFrame]
 script: CCS.JFrame.Input.js
 
 ...
@@ -31,22 +31,9 @@ CCS.JFrame.addGlobalFilters({
 	artInputs: function(container) {
 		if (!container.get('html').match(re)) return;
 		container.getElements('.ccs-search, .ccs-input').each(function(input){
-			var temp = new Element('span').injectAfter(input);
-			var widget = new ART[input.hasClass('ccs-search') ? 'Search' : 'Input']({
-				inputElement: input,
-				placeholder: false,
-				onChange: function() {
-					input.fireEvent('change');
-				}
-			});
-			widget.inject(this, temp, 'after');
-			widget.draw();
-			temp.dispose();
-			
-			if (input.retrieve('OverText')) input.retrieve('OverText').reposition();
-			this.markForCleanup(function(){
-				widget.eject();
-			});
+			dbug.warn('you are using a deprecated JFrame filter (ccs-search or ccs-input) on %o, use the ArtInput data-filter instead.', input);
+			input.addDataFilter('ArtInput');
+			if (input.hasClass('ccs-search')) input.set('data', 'art-input-type', 'search');
 		}, this);
 	}
 

@@ -32,17 +32,8 @@ CCS.JFrame.addGlobalFilters({
 			//if the element with the side_by_side class is the container of the select, get the 
 			//select element within it.
 			if (select && select.get('tag') != "select") select = select.getElement('select');
-			if (!select || !select.get('multiple')){
-				dbug.warn("Side_by_side_select element does not contain multiple=true.");
-				return;
-			}
-			//create a new instance of SideBySideSelect
-			var sbss = new ART.SideBySideSelect(select);
-			sbss.inject(this, select, 'after');
-			select.hide();
-			this.markForCleanup(function(){
-				sbss.destroy();
-			});
+			dbug.warn('you are using a deprecated JFrame filter (side_by_side_select) on %o, use the SideBySideSelect data-filter instead.', select);
+			select.addDataFilter('SideBySideSelect');
 		}, this);
 	}
 

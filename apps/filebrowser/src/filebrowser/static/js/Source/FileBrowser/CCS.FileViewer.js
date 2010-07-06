@@ -47,7 +47,7 @@ CCS.FileViewer = new Class({
 		this.addEvents({
 			load: function(){
 				//Set width of input fields to width of biggest value that could be required, using totalBytes span as guide
-				$(this).getElements("input.overtext").setStyle('width', $(this).getElement('.totalBytes').getWidth());
+				$(this).getElements("input[data-filter*=OverText]").setStyle('width', $(this).getElement('.totalBytes').getWidth());
 				//Set events on anchors to edit and cancel changes to byte values
 				$(this).getElement('.fv-editBytes').addEvent('click', function() {
 					$(this).getElement('.fv-navChange').show();

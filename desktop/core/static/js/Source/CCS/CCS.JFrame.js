@@ -30,6 +30,12 @@ requires:
  - More/HtmlTable.Sort
  - More/HtmlTable.Select
  - More/Spinner
+ - Widgets/Behavior
+ - Widgets/Behavior.OverText
+ - Widgets/Behavior.ArtInput
+ - Widgets/Behavior.ArtButton
+ - /Behavior.SideBySideSelect
+ - /Behavior.FitText
  - /CCS
  - /CCS.ContextMenu
 script: CCS.JFrame.js
@@ -70,7 +76,10 @@ CCS.JFrame = new Class({
 		useSpinner: true,
 		//linkers: a key/value set of linkers (see the addLinker method for docs)
 		linkers: {},
+		//filters: a key/value set of JFrame filters
 		filters: {},
+		//behaviors: a key/value set of behavior filters passed along to Behavior.addFilters
+		behaviors: {},
 		//the selector to match clicks against for delegation; defaults to only links
 		clickRelays: 'a',
 		//given the response and response text, this method determines if there's been a serverside error
@@ -95,6 +104,11 @@ CCS.JFrame = new Class({
 		new ART.Keyboard(this, this.keyboardOptions);
 		this.addLinkers(this.options.linkers);
 		this.addFilters(this.options.filters);
+
+		this.behavior = new Behavior(this.element);
+		this.addEvent('resize', this.behavior.resize.bind(this.behavior));
+		this.addBehaviors(this.options.behaviors);
+
 		this.element.addClass('jframe_wrapper').addClass('ccs-shared');
 		this.scroller = new Fx.Scroll(this.options.getScroller.call(this));
 		this.content = new Element('div', {
@@ -292,6 +306,26 @@ CCS.JFrame = new Class({
 
 	},
 
+	/*
+		fill: fills a given target with the appropriate content
+		target - (*element*) the target to fill with content
+		content - (*object*) an object with the following properties:
+			js - (*string*) any inline javascript to evalutate (stripped from <script> tags)
+			links - (*elements array*) css links to be injected into the target
+			elements - (*elements array*) elements to inject into the target (i.e. the actual content)
+			title - (*string*) the title of the content
+			view - (*string*; optional) if defined, the view of the content
+			viewElement - (*element*; optional) if defined, the element for the view
+	*/
+
+	fill: function(target, content){
+		target.empty().adopt(content.elements);
+		if (content.links && content.links.length && this.options.includeLinkTags) target.adopt(content.links);
+		if (this.options.evaluateJs && content.js) $exec(content.js);
+		this.applyDelegates(target);
+		this.applyFilters(target, content);
+	},
+
 	resize: function(x, y){
 		this.element.setStyles({
 			width: 'auto',
@@ -322,10 +356,52 @@ CCS.JFrame = new Class({
 		obj - (*object*) a key/value set of filters to add
 	*/
 	addFilters: function(obj){
-		$each(obj, function(fn, name){
-			this.addFilter(name, fn);
-		}, this);
+		for (var name in obj) {
+			this.addFilter(name, obj[name]);
+		}
 		return this;
+	},
+
+	/*
+		add a new behavior filter
+		name - (*string*) the name fo the behavior (no spaces or commas; preferably CamelCase)
+		fn - (*function*) the function for the behavior filter.
+		overwrite - (*boolean*) if true, will overwrite any pre-existing filter if one is present
+	*/
+	addBehavior: function(name, fn, overwrite){
+		this.behavior.addFilter(name, fn, overwrite);
+	},
+
+	/*
+		add a group of behavior filters
+		obj - (*object*) an object of key/value pairs of name/functions for filters (see addBehavior)
+		overwrite - (*boolean*) if true, will overwrite any pre-existing filter if one is present
+	*/
+	addBehaviors: function(obj, overwrite){
+		this.behavior.addFilters(obj, overwrite);
+	},
+
+	/*
+		apply a specific behavior to an element
+		name - (*string*) the name fo the behavior (no spaces or commas; preferably CamelCase)
+		element - (*element*) the DOM element to apply the behavior to
+		force - (*boolean*) forces the behavior to reapply, even if it has already been applied; defaults to *false*.
+	*/
+	applyBehavior: function(name, element, force){
+		var behavior = this.behavior.lookup(name);
+		this.behavior.applyBehavior(element, behavior, force);
+	},
+
+	//Applies all the behavior filters for an element.
+	//element - (element) an element to apply the filters registered with this Behavior instance to.
+	//force - (boolean; optional) passed through to applyBehavior (see it for docs)
+	applyBehaviors: function(element, force){
+		this.behavior.apply(element, force);
+	},
+
+	//garbage collects all applied filters for the specified element
+	collectElement: function(element){
+		this.behavior.cleanup(element);
 	},
 
 	/*
@@ -336,9 +412,10 @@ CCS.JFrame = new Class({
 	*/
 
 	applyFilters: function(container, content){
-		for (name in this.filters) {
+		for (var name in this.filters) {
 			this.applyFilter(name, container, content);
 		}
+		this.applyBehaviors(container);
 	},
 
 
@@ -347,7 +424,6 @@ CCS.JFrame = new Class({
 		name - (*string*) the name of the JFrame filter to apply
 		container - (*element*) applies all the filters on this instance of jFrame to the contents of the container.
 		content - (*object*) optional object containing various metadata about the content; js tags, meta tags, title, view, etc. See the "notes" section of the renderContent method comments in this file.
-		
 	*/
 	applyFilter: function(name, container, content){
 		dbug.conditional(this.filters[name].bind(this, [container, content]), function(e) {
@@ -442,7 +518,7 @@ CCS.JFrame = new Class({
 	*/
 
 	destroy: function(){
-		this._sweep();
+		this._sweep(this.element);
 	},
 
 
@@ -494,28 +570,6 @@ CCS.JFrame = new Class({
 			//grab the contents of the body tag
 			data.elements = Elements.from(data.html.getTags('body', true)[0] || data.html);
 		}
-	},
-
-	/*
-		fill: fills a given target with the appropriate content
-		target - (*element*) the target to fill with content
-		content - (*object*) an object with the following properties:
-			
-			js - (*string*) any the inline javascript to evalutate,
-			links - (*elements array*) css links to be injected into the target
-			elements - (*elements array*) elements to inject into the target (i.e. the actual content)
-			title - (*string*) the title of the content
-			view - (*string*; optional) if defined, the view of the content
-			viewElement - (*element*; optional) if defined, the element for the view
-		
-	*/
-
-	fill: function(target, content){
-		target.empty().adopt(content.elements);
-		if (content.links && content.links.length && this.options.includeLinkTags) target.adopt(content.links);
-		if (this.options.evaluateJs && content.js) $exec(content.js);
-		this.applyDelegates(target);
-		this.applyFilters(target, content);
 	},
 
 	/*
@@ -642,14 +696,16 @@ CCS.JFrame = new Class({
 
 	/*
 		sweeps all marked functions.
+		target - (*element*) the element to garbage collect;
 	*/
-	_sweep: function(){
+	_sweep: function(target){
 		this.marked.each(function(fn) {
 			dbug.conditional(fn.bind(this), function(e) {
 				dbug.log('sweeper failed, error: ', e);
 			});
 		});
 		this.marked.empty();
+		this.behavior.cleanup(target);
 		//if there are any child widgets that were not destroyed, destroy them
 		if (this._childWidgets.length) this._childWidgets.each(function(w) { w.eject(); });
 	},
@@ -718,7 +774,7 @@ CCS.JFrame = new Class({
 		//if we're injecting into the main content body, cleanup and scrollto the top
 		if (target == this.content) {
 			this.scroller.toTop();
-			this._sweep();
+			this._sweep(target);
 		}
 
 		//if we're injecting into the main content body apply the view classes and remove the old one

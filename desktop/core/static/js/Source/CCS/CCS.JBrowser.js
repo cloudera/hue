@@ -178,7 +178,13 @@ script: CCS.JBrowser.js
 				}.bind(this),
 				destroy: function(){
 					this.jframe.destroy();
-				}.bind(this)
+				}.bind(this),
+				unshade: function(){
+					this.jframe.behavior.show();
+				},
+				shade: function(){
+					this.jframe.behavior.hide();
+				}
 			});
 			this.jframe.addEvent('refresh', this._storeScroll.bind(this));
 			

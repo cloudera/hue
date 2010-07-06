@@ -33,7 +33,8 @@ ${wrappers.head('Choose a File')}
               <p>Enter the name of your new table and a file (compressed files are okay) to base this new table definition on.</p>
               <dl class="clearfix">
                 ${comps.field(file_form["name"], attrs=dict(
-                  klass='overtext required bw-validate-name',
+                  klass='required bw-validate-name',
+                  data_filters="OverText",
                   alt='table_name',
                 ),
                 help="Name of the new table.  Table names must be globally unique.  Table names tend to correspond as well to the directory where the data will be stored.",
@@ -42,13 +43,15 @@ ${wrappers.head('Choose a File')}
                 )
               )}
               ${comps.field(file_form["comment"], attrs=dict(
-                  klass='overtext bw-table-comment',
+                  klass='bw-table-comment',
+                  data_filters="OverText",
                   alt='Optional'
                 ),
                 help="Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
 
                 ${comps.field(file_form["path"], attrs=dict(
-                    klass='overtext required bw-validate-file',
+                    klass='required bw-validate-file',
+                    data_filters="OverText",
                     alt="/user/user_name/data_dir",
                   ),
                   help="The HDFS path to the file that you would like to base this new table definition on.  It can be compressed (gzip) or not.")}

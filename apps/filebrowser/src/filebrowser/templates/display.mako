@@ -72,7 +72,7 @@
         <div class="fv-navChange ccs-hidden">
           <span class="fv-bold">Enter Bytes</span><a class="ccs-inline fv-cancelChangeBytes" title="Cancel Entry"></a><p/>
           <form class="fv-changeBytesForm" action="${url('filebrowser.views.view', path=path_enc)}" method="GET">
-           <input class="overtext" alt="${view['offset'] + 1}" name="begin"/>-<input class="overtext" alt="${view['end']}" name="end"><p/>
+           <input data-filters="OverText" alt="${view['offset'] + 1}" name="begin"/>-<input data-filters="OverText" alt="${view['end']}" name="end"><p/>
             % if view['mode']:
               <input type="hidden" name="mode" value="${view['mode']}"/><br/>
             % endif

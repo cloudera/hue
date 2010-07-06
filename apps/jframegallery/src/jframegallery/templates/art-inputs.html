@@ -22,10 +22,19 @@ limitations under the License.
 	</head>
 	<body>
 		<div class="jframe_padded">
-			
-			<input type="input" placeholder="search..." class="ccs-search" />
-			<input type="input" placeholder="your name here..." class="ccs-input" />
-			<input type="input" placeholder="your last name here..." class="ccs-input" />
+			<p>
+				The inputs below should look rather slick with blue outlines when you focus them. They should have hint text that disappears when you focus them and reappear when you move your cursor out of them. Tabbing through them should work appropriately. The first input should have round corners and a search icon. This is achieved by adding the ArtInput data-filter. To get the search input, the property data-art-input-type set to "search".
+			</p>
+
+			<input type="input" title="search..." data-filters="ArtInput, OverText" data-art-input-type="search"/>
+			<input type="input" title="your name here..." data-filters="ArtInput, OverText"/>
+
+			<hr/>
+			<p>
+				The examples below should work exactly the same way but they are using the deprecated methods of having 
+			</p>
+			<input type="input" title="search..." data-filters="OverText, ArtInput" data-art-input-type="search" />
+			<input type="input" title="your name here..." class="ccs-input" data-filters="OverText"/>
 			
 		</div>
 	</body>

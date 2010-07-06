@@ -62,6 +62,8 @@ sources: [
   Source/Native/Element.Data.js,
   Source/StaticThirdParty/DynamicTextarea.js,
   Source/CCS/CCS.PostEditor.Simple.js,
-  Source/UI/ART.SideBySideSelect.js
+  Source/UI/ART.SideBySideSelect.js,
+  Source/BehaviorFilters/Behavior.FitText.js,
+  Source/BehaviorFilters/Behavior.SideBySideSelect.js,
 ]
 version: Unknown

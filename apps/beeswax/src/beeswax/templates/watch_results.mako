@@ -39,7 +39,7 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
                         <label for="id_save_target_0">In a new table</label>
                       </div>
                       ${comps.field(save_form['target_table'], notitle=True, klass="target", attrs=dict(
-                        klass="overtext",
+                        data_filters="OverText",
                         alt="table_name"
                       ))}
                       <div>
@@ -48,7 +48,7 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
                       </div>
                       <div class="target">
                         ${comps.field(save_form['target_dir'], notitle=True, attrs=dict(
-                        klass="overtext",
+                        data_filters="OverText",
                         alt="/user/dir"
                         ))}
                         <a class="ccs-art_button ccs-choose_file" data-icon-styles="{'width': 16, 'height': 16, 'top': 1, 'left': 4 }" data-chooseFor="target_dir">Choose File</a>

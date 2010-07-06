@@ -17,7 +17,7 @@
 ---
 description: Sets up all inputs with the css class .overtext to have an OverText instance for inline labeling. The OverText label element inherits all the classes assigned to the input (at run time) with an "OverText-" prefix, allowing you to style OverText labels on a per-input basis.
 provides: [CCS.JFrame.OverText]
-requires: [/CCS.JFrame, More/OverText]
+requires: [/CCS.JFrame]
 script: CCS.JFrame.OverText.js
 
 ...
@@ -28,26 +28,9 @@ CCS.JFrame.addGlobalFilters({
 	overText: function(container){
 		//get all input.overtext elements and make an OverText for them.
 		var ots = container.getElements('input.overtext, textarea.overtext').map(function(input){
-			var ot = new OverText(input);
-			input.get('class').split(' ').each(function(cls) {
-				ot.text.addClass('OverText-'+cls);
-			});
-			return ot;
+			dbug.warn('you are using a deprecated JFrame filter (overtext) on %o, use the OverText data-filter instead.', input);
+			input.addDataFilter('OverText');
 		});
-		var updater = function(){
-			(function(){
-				ots.each(function(ot) {
-					ot.reposition();
-				});
-			}).delay(10);
-		};
-		this.addEvent('loadComplete', updater);
-		var win = this.getWindow();
-		if (win) win.addEvent('unshade', updater);
-		this.markForCleanup(function(){
-			this.removeEvent('loadComplete', updater);
-			if (win) win.removeEvent('unshade', updater);
-		}.bind(this));
 	}
 
 });

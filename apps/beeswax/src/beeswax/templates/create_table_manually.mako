@@ -37,7 +37,8 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
           <p>Let's start with a name and description for where we'll store your data.</p>
           <dl class="clearfix">
             ${comps.field(table_form["name"], attrs=dict(
-                klass='overtext required bw-validate-name',
+                klass='required bw-validate-name',
+                data_filters="OverText",
                 alt='table_name',
               ),
               help="Name of the new table.  Table names must be globally unique.  Table names tend to correspond as well to the directory where the data will be stored.",
@@ -46,7 +47,8 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               )
             )}
             ${comps.field(table_form["comment"], attrs=dict(
-                klass='overtext bw-table-comment',
+                klass='bw-table-comment',
+                data_filters="OverText",
                 alt='Optional'
               ),
               help="Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
@@ -117,7 +119,8 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                 ${comps.field(table_form["serde_name"],
                   help="Enter the Java Classname of your SerDe. <em>e.g.</em>, org.apache.hadoop.hive.contrib.serde2.RegexSerDe",
                   attrs=dict(
-                    klass='overtext required',
+                    klass='required',
+                    data_filters="OverText",
                     alt='com.acme.hive.SerDe',
                   )
                 )}
@@ -128,7 +131,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                 ${comps.field(table_form["serde_properties"],
                   help=help,
                   attrs=dict(
-                    klass='overtext',
+                    data_filters="OverText",
                     alt=r'"prop" = "value", "prop2" = "value2"'
                   )
                 )}
@@ -158,14 +161,14 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               ${comps.field(table_form["input_format_class"],
                 help="Java Class to read data",
                 attrs=dict(
-                  klass='overtext',
+                  data_filters="OverText",
                   alt='com.acme.data.MyInputFormat'
                 )
               )}
               ${comps.field(table_form["output_format_class"],
                 help="Java Class used to write data",
                 attrs=dict(
-                  klass='overtext',
+                  data_filters="OverText",
                   alt='com.acme.data.MyOutputFormat'
                 )
               )}
@@ -190,7 +193,8 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               ${comps.field(table_form["external_location"],
                 help="Enter the path (on HDFS) to your table's data location",
                 attrs=dict(
-                  klass='overtext required',
+                  klass='required',
+                  data_filters="OverText",
                   alt='/user/user_name/data_dir'
                 )
               )}<a class="ccs-choose_file ccs-art_button" data-icon-styles="{'width': 16, 'height': 16, 'top': 3, 'left': 6 }" data-chooseFor="table-external_location">Choose File</a>
@@ -208,7 +212,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
             <%def name="render_column(form, is_partition_form=False)">
               <div class="bw-column">
                 <dt class="bw-column_header bw-inactive">
-                  <input name="${form["column_name"].html_name | n}" value="${form["column_name"].data or ''}" class="overtext required bw-column_name" alt="Column Name"/>
+                  <input name="${form["column_name"].html_name | n}" value="${form["column_name"].data or ''}" class="required bw-column_name" alt="Column Name" data-filters="OverText"/>
                   <p class="ccs-help_text" data-help-direction="1">
                     Column name must be single words that start
                     with a letter or a digit.

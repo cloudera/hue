@@ -20,6 +20,7 @@
 <%def name="field(
   field, 
   render_default=False, 
+  data_filters=None,
   hidden=False, 
   notitle=False, 
   tag='input', 
@@ -51,6 +52,9 @@
     attrs = {}
   if not render_default:
     attrs.setdefault('type', 'text')
+
+  if data_filters:
+    attrs.data_filters = data_filters
 
   classes = []
   if klass:

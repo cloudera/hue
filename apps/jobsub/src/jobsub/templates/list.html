@@ -28,8 +28,8 @@ limitations under the License.
 			<div class="jobsub_topsection clearfix">
 				<form class="jobsub_filter submit_on_change" action="{% url jobsub.list %}" method="get">
 					<span class="filter_text">Filter by owner:</span>
-					<input class="overtext" name="owner" alt="filter by owner" value="{{ owner }}"/>
-					<input class="overtext" name="name" alt="filter by name" value="{{ name }}"/>
+					<input data-filters="OverText" name="owner" alt="filter by owner" value="{{ owner }}"/>
+					<input data-filters="OverText" name="name" alt="filter by name" value="{{ name }}"/>
 					<input class="submit" type="submit"/>
 				</form>
 			</div>

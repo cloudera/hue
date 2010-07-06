@@ -43,10 +43,10 @@
                 </select>
               </li>
               <li class="ccs-inline">
-                <input type="text" class="jt_filter overtext" name="user" title="filter on user" value="${user_filter}"/>
+                <input type="text" class="jt_filter" data-filters="OverText" name="user" title="filter on user" value="${user_filter}"/>
               </li>
               <li class="ccs-inline">
-                <input type="text" class="jt_filter overtext" name="text" title="text filter" value="${text_filter}"/>
+                <input type="text" class="jt_filter" data-filters="OverText" name="text" title="text filter" value="${text_filter}"/>
               </li>
             </form>
           </ul>

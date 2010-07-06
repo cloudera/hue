@@ -18,23 +18,15 @@ limitations under the License.
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 	<head>
-		<title>Splitview (Vertical)</title>
+		<title>Overtext</title>
 	</head>
 	<body>
-			<div class="splitview resizable">
-				<div class="top_col jframe_padded">
-					this is the top column<br/>
-					<a data-splitview-resize="{'top':0}">hide the top</a><br/>
-					<a data-splitview-toggle="{'side': 'bottom', 'hideSplitter': true}">toggle the bottom (hide splitter)</a>
-				</div>
-				<div class="splitter_col" style="background: #88f; padding: 4px">
-					<h4>this is the splitter handle</h4>
-				</div>
-				<div class="bottom_col jframe_padded" style="height:100px">
-					and this is the bottom,<br/>
-					you can resize us by dragging the middle bar around.<br/>
-					<a data-splitview-toggle="{'side': 'top', 'hideSplitter': true}">toggle the top</a>
-				</div>
-			</div>
+		<div class="jframe_padded">
+			<p>The input below should have some placeholder text that disappears when you click inside the input. If you enter a value and click out, it should not return. If you empty the value and click out, it should reappear. To achieve this, the input has "OverText" as a value in its data-filters property.</p>
+			<input name="test" data-filters="OverText" title="example text..."/>
+			<hr/>
+			<p>This is the same thing using the deprecated .overtext css class (there should be a dbug.warning for it).</p>
+			<input name="test" class="overtext" title="example text..."/>
+		</div>
 	</body>
 </html>

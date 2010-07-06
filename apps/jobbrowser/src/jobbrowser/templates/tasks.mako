@@ -81,7 +81,7 @@
             </select>
           </li>
           <li class="ccs-inline">
-            <input type="text" name="tasktext" class="jtv_filter overtext" title="text filter"
+            <input type="text" name="tasktext" class="jtv_filter" data-filters="OverText" title="text filter"
               % if tasktext:
                 value="${tasktext}"
               % endif

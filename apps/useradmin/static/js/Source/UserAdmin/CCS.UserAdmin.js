@@ -50,8 +50,7 @@ CCS.UserAdmin = new Class({
 	options: {
 		className: 'art browser logo_header useradmin',
 		jframeOptions: {
-		    clickRelays: 'a, .relays'
+			clickRelays: 'a, .relays'
 		}
 	}
-
 });

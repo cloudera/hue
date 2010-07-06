@@ -66,6 +66,44 @@ UI.Sheet.define('window.art button.art.wincontrol', {
 	'font-color': 'black'
 });
 
+(function(){
+	var button = {
+		'height': 19,
+		'width': 22,
+		'padding': [0, 0, 0, 0],
+		'float': 'left',
+		'marginLeft': -1,
+		'corner-radius-top-right': 4,
+		'corner-radius-bottom-right': 4,
+		'corner-radius-top-left': 0,
+		'corner-radius-bottom-left': 0,
+		'glyph': ART.Glyphs.refresh,
+		'glyph-stroke': 0,
+		'glyph-fill': true,
+		'glyph-height': 12,
+		'glyph-width': 12,
+		'glyph-top': 4,
+		'glyph-left': 5
+	};
+	var large = {
+		'height': 24,
+		'width': 24,
+		'glyph-top': 6,
+		'glyph-left': 6
+	};
+	ART.Sheet.define('button.art.ccs-refresh', button);
+	ART.Sheet.define('button.art.ccs-refresh.large', large);
+	button.glyph = ART.Glyphs.triangleLeft;
+	button['glyph-top'] = 5;
+	button['glyph-left'] = 6;
+	ART.Sheet.define('button.art.ccs-back', button);
+	ART.Sheet.define('button.art.ccs-back.large', large);
+	button.glyph = ART.Glyphs.triangleRight;
+	button['glyph-left'] = 8;
+	ART.Sheet.define('button.art.ccs-next', button);
+	ART.Sheet.define('button.art.ccs-next.large', large);
+})();
+
 if (Browser.Engine.trident) {
 	UI.Sheet.define('window.art:dragging', {
 		'background-color': hsb(202, 20, 38, 1)

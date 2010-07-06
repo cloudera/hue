@@ -181,7 +181,7 @@ ART.Sheet.define('splitview.bw-editor', {
 					if (!container.get('html').contains('ccs-select-with-other')) return;
 					container.getElements('.ccs-select-with-other').each(function(el) {
 						//get the 'other' input
-						var other = el.getElement('input').set('alt', 'Enter a custom value').addClass('overtext required');
+						var other = el.getElement('input').set('alt', 'Enter a custom value').addClass('required').addDataFilter('OverText');
 						//create hint text
 						var ot = new OverText(other);
 						//get the select input

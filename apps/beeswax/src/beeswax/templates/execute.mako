@@ -55,7 +55,7 @@
       </ul>
     </dt>
     <dd class="bw-query_bottom default" style="height: auto;">
-      <textarea class="overtext bw-query-field ccs-simple-posteditor"
+      <textarea class="bw-query-field ccs-simple-posteditor" data-filters="OverText"
         alt="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}">${extract_field_data(form.query["query"]) or ''}</textarea>
         % if len(form.query["query"].errors):
           <div class="validation-advice">
@@ -112,7 +112,7 @@ ${wrappers.head('Hive Query', section='query')}
                 % endif
                 ${comps.field(f['key'], attrs=dict(
                   alt="mapred.reduce.tasks",
-                  klass="overtext"
+                  data_filters="OverText"
                 ))}
                 <div class="bw-query_settings_delete">
                   ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
@@ -123,7 +123,7 @@ ${wrappers.head('Hive Query', section='query')}
 
                 ${comps.field(f['value'], attrs=dict(
                   alt="1",
-                  klass="overtext"
+                  data_filters="OverText",
                 ))}
                 ${comps.field(f['_exists'], hidden=True)}
               % endfor
@@ -151,7 +151,7 @@ ${wrappers.head('Hive Query', section='query')}
 
                 ${comps.field(f['path'], attrs=dict(
                   alt="/user/foo/udf.jar",
-                  klass="overtext"
+                  data_filters="OverText",
                 ))}
                 <div class="ccs-button_subbar_below clearfix">
                   <a class="ccs-art_button ccs-choose_file" data-chooseFor="${f['path'].html_name | n}" data-icon-styles="{'width':16, 'height':16, 'top':2}">Choose a File</a>
@@ -174,7 +174,7 @@ ${wrappers.head('Hive Query', section='query')}
 
                 ${comps.field(f['name'], attrs=dict(
                   alt="myFunction",
-                  klass="overtext"
+                  data_filters="OverText",
                 ))}
                 <div class="bw-query_settings_delete">
                   ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
@@ -185,7 +185,7 @@ ${wrappers.head('Hive Query', section='query')}
 
                 ${comps.field(f['class_name'], attrs=dict(
                   alt="com.acme.example",
-                  klass="overtext"
+                  data_filters="OverText",
                 ))}
                 ${comps.field(f['_exists'], hidden=True)}
               % endfor

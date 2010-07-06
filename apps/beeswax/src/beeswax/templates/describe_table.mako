@@ -63,7 +63,8 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
                         <div class="bw-overwriteLabel">Overwrite existing data ? <input type="checkbox" name="overwrite" class="bw-overwriteCheckbox"/></div>
                         ##Path (on HDFS) of files to load.
                         ${comps.field(load_form["path"], title_klass='bw-pathLabel', attrs=dict(
-                          klass='overtext bw-loadPath',
+                          klass='bw-loadPath',
+                          data_filters="OverText",
                           alt='/user/data'))}
                         <div class="ccs-button_bar">
                           <a class="ccs-choose_file ccs-art_button" 
