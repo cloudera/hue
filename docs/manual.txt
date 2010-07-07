@@ -31,7 +31,7 @@ on _every_ machine that's running Hadoop daemons.
 === Install Hadoop First!
 
 Hue requires an installation of the Cloudera Distribution
-of Hadoop (version 2).  See link:http://archive.cloudera.com/
+of Hadoop (version 2 or above).  See link:http://archive.cloudera.com/
 for instructions.
 
 To use Hue, you must be running Cloudera's Distribution for Hadoop
