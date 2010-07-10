@@ -211,6 +211,10 @@ class HadoopFileSystem(object):
     return [self._unpack_stat(s) for s in stats]
 
   @_coerce_exceptions
+  def get_content_summaries(self, paths):
+    return self.nn_client.multiGetContentSummary(self.request_context, [normpath(path) for path in paths])
+
+  @_coerce_exceptions
   def rename(self, old, new):
     success = self.nn_client.rename(
       self.request_context, normpath(old), normpath(new))

@@ -418,14 +418,39 @@ public class NamenodePlugin
       assumeUserContext(ctx);
       LOG.debug("getContentSummary(" + path + "): Entering");
       try {
-        ContentSummary cs = ThriftUtils.toThrift(
-          namenode.getContentSummary(path));
+        ContentSummary cs = getContentSummary(path);
         LOG.debug("getContentSummary(" + path + "): Returning " + cs);
         return cs;
       } catch (Throwable t) {
         LOG.info("getContentSummary(" + path + "): Failed", t);
         throw ThriftUtils.toThrift(t);
       }
+    }
+
+    public List<ContentSummary> multiGetContentSummary(RequestContext ctx, List<String> paths)
+        throws IOException, TException {
+        assumeUserContext(ctx);
+        LOG.debug("multiGetContentSummary(" + paths + "): Entering");
+        List<ContentSummary> ret = new ArrayList<ContentSummary>();
+        try {
+            for (String path : paths) {
+                ret.add(getContentSummary(path));
+            }
+        } catch (Throwable t) {
+            LOG.info("multiGetContentSummary(" + paths + "): Failed", t);
+            throw ThriftUtils.toThrift(t);
+        }
+        LOG.debug("multiGetContentSummary(" + paths + "): Returning " + ret);
+        return ret;
+    }
+
+    private ContentSummary getContentSummary(String path) throws java.io.IOException {
+        try {
+            return ThriftUtils.toThrift(namenode.getContentSummary(path), path);
+        } catch (java.io.IOException e) {
+            LOG.error(e);
+            throw e;
+        }
     }
 
     public boolean unlink(RequestContext ctx, String path, boolean recursive) throws IOException,

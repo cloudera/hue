@@ -38,6 +38,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print '  void reportBadBlocks(RequestContext ctx,  blocks)'
   print '  Stat stat(RequestContext ctx, string path)'
   print '  ContentSummary getContentSummary(RequestContext ctx, string Path)'
+  print '   multiGetContentSummary(RequestContext ctx,  paths)'
   print '  void setQuota(RequestContext ctx, string path, i64 namespaceQuota, i64 diskspaceQuota)'
   print '  bool setReplication(RequestContext ctx, string path, i16 replication)'
   print '  bool unlink(RequestContext ctx, string path, bool recursive)'
@@ -193,6 +194,12 @@ elif cmd == 'getContentSummary':
     print 'getContentSummary requires 2 args'
     sys.exit(1)
   pp.pprint(client.getContentSummary(eval(args[0]),args[1],))
+
+elif cmd == 'multiGetContentSummary':
+  if len(args) != 2:
+    print 'multiGetContentSummary requires 2 args'
+    sys.exit(1)
+  pp.pprint(client.multiGetContentSummary(eval(args[0]),eval(args[1]),))
 
 elif cmd == 'setQuota':
   if len(args) != 4:

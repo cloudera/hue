@@ -85,6 +85,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getDatanodeReport(self, ctx, type):
     """
     Get a report on the system's current data nodes.
+    Note that ctx is currently ignored by the server.
     
     Parameters:
      - ctx
@@ -95,7 +96,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
 
   def getHealthReport(self, ctx):
     """
-    Get a health report of DFS
+    Get a health report of DFS.  Note that ctx is ignored by the server.
     
     Parameters:
      - ctx
@@ -213,6 +214,17 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
     Parameters:
      - ctx
      - Path
+    """
+    pass
+
+  def multiGetContentSummary(self, ctx, paths):
+    """
+    Get ContentSummary objects for multiple directories simultaneously. The same warnings
+    apply as for getContentSummary(...) above.
+    
+    Parameters:
+     - ctx
+     - paths
     """
     pass
 
@@ -509,6 +521,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getDatanodeReport(self, ctx, type):
     """
     Get a report on the system's current data nodes.
+    Note that ctx is currently ignored by the server.
     
     Parameters:
      - ctx
@@ -545,7 +558,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
 
   def getHealthReport(self, ctx):
     """
-    Get a health report of DFS
+    Get a health report of DFS.  Note that ctx is ignored by the server.
     
     Parameters:
      - ctx
@@ -944,6 +957,43 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
       raise result.err
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getContentSummary failed: unknown result");
 
+  def multiGetContentSummary(self, ctx, paths):
+    """
+    Get ContentSummary objects for multiple directories simultaneously. The same warnings
+    apply as for getContentSummary(...) above.
+    
+    Parameters:
+     - ctx
+     - paths
+    """
+    self.send_multiGetContentSummary(ctx, paths)
+    return self.recv_multiGetContentSummary()
+
+  def send_multiGetContentSummary(self, ctx, paths):
+    self._oprot.writeMessageBegin('multiGetContentSummary', TMessageType.CALL, self._seqid)
+    args = multiGetContentSummary_args()
+    args.ctx = ctx
+    args.paths = paths
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_multiGetContentSummary(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = multiGetContentSummary_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success != None:
+      return result.success
+    if result.err != None:
+      raise result.err
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "multiGetContentSummary failed: unknown result");
+
   def setQuota(self, ctx, path, namespaceQuota, diskspaceQuota):
     """
     Set the quota for a directory.
@@ -1210,6 +1260,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     self._processMap["reportBadBlocks"] = Processor.process_reportBadBlocks
     self._processMap["stat"] = Processor.process_stat
     self._processMap["getContentSummary"] = Processor.process_getContentSummary
+    self._processMap["multiGetContentSummary"] = Processor.process_multiGetContentSummary
     self._processMap["setQuota"] = Processor.process_setQuota
     self._processMap["setReplication"] = Processor.process_setReplication
     self._processMap["unlink"] = Processor.process_unlink
@@ -1466,6 +1517,20 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("getContentSummary", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_multiGetContentSummary(self, seqid, iprot, oprot):
+    args = multiGetContentSummary_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = multiGetContentSummary_result()
+    try:
+      result.success = self._handler.multiGetContentSummary(args.ctx, args.paths)
+    except hadoop.api.common.ttypes.IOException, err:
+      result.err = err
+    oprot.writeMessageBegin("multiGetContentSummary", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -3990,6 +4055,168 @@ class getContentSummary_result(object):
     if self.success != None:
       oprot.writeFieldBegin('success', TType.STRUCT, 0)
       self.success.write(oprot)
+      oprot.writeFieldEnd()
+    if self.err != None:
+      oprot.writeFieldBegin('err', TType.STRUCT, 1)
+      self.err.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class multiGetContentSummary_args(object):
+  """
+  Attributes:
+   - ctx
+   - paths
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.LIST, 'paths', (TType.STRING,None), None, ), # 1
+    None, # 2
+    None, # 3
+    None, # 4
+    None, # 5
+    None, # 6
+    None, # 7
+    None, # 8
+    None, # 9
+    (10, TType.STRUCT, 'ctx', (hadoop.api.common.ttypes.RequestContext, hadoop.api.common.ttypes.RequestContext.thrift_spec), None, ), # 10
+  )
+
+  def __init__(self, ctx=None, paths=None,):
+    self.ctx = ctx
+    self.paths = paths
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 10:
+        if ftype == TType.STRUCT:
+          self.ctx = hadoop.api.common.ttypes.RequestContext()
+          self.ctx.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.LIST:
+          self.paths = []
+          (_etype45, _size42) = iprot.readListBegin()
+          for _i46 in xrange(_size42):
+            _elem47 = iprot.readString();
+            self.paths.append(_elem47)
+          iprot.readListEnd()
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('multiGetContentSummary_args')
+    if self.paths != None:
+      oprot.writeFieldBegin('paths', TType.LIST, 1)
+      oprot.writeListBegin(TType.STRING, len(self.paths))
+      for iter48 in self.paths:
+        oprot.writeString(iter48)
+      oprot.writeListEnd()
+      oprot.writeFieldEnd()
+    if self.ctx != None:
+      oprot.writeFieldBegin('ctx', TType.STRUCT, 10)
+      self.ctx.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class multiGetContentSummary_result(object):
+  """
+  Attributes:
+   - success
+   - err
+  """
+
+  thrift_spec = (
+    (0, TType.LIST, 'success', (TType.STRUCT,(ContentSummary, ContentSummary.thrift_spec)), None, ), # 0
+    (1, TType.STRUCT, 'err', (hadoop.api.common.ttypes.IOException, hadoop.api.common.ttypes.IOException.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, success=None, err=None,):
+    self.success = success
+    self.err = err
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.LIST:
+          self.success = []
+          (_etype52, _size49) = iprot.readListBegin()
+          for _i53 in xrange(_size49):
+            _elem54 = ContentSummary()
+            _elem54.read(iprot)
+            self.success.append(_elem54)
+          iprot.readListEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.err = hadoop.api.common.ttypes.IOException()
+          self.err.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('multiGetContentSummary_result')
+    if self.success != None:
+      oprot.writeFieldBegin('success', TType.LIST, 0)
+      oprot.writeListBegin(TType.STRUCT, len(self.success))
+      for iter55 in self.success:
+        iter55.write(oprot)
+      oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.err != None:
       oprot.writeFieldBegin('err', TType.STRUCT, 1)

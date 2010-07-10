@@ -191,6 +191,9 @@ struct ContentSummary {
   
   /** Quota consumed in disk (in bytes). */
   5: i64 spaceQuota,  
+
+  /** The path */
+  6: string path,
 }
 
 struct UpgradeStatusReport {
@@ -388,6 +391,13 @@ service Namenode extends common.HadoopServiceBase {
    */
   ContentSummary getContentSummary(10: common.RequestContext ctx,
                                    1:  string Path) throws (1: common.IOException err),
+
+  /**
+   * Get ContentSummary objects for multiple directories simultaneously. The same warnings
+   * apply as for getContentSummary(...) above.
+   */
+  list<ContentSummary> multiGetContentSummary(10: common.RequestContext ctx,
+                                              1: list<string> paths) throws (1: common.IOException err),
   
   /**
    * Set the quota for a directory.

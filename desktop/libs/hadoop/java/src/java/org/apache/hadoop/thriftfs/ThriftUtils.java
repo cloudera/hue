@@ -83,13 +83,14 @@ public class ThriftUtils {
                      b.getGenerationStamp(), block.getStartOffset(), nodes);
   }
 
-  public static ContentSummary toThrift(org.apache.hadoop.fs.ContentSummary cs) {
+  public static ContentSummary toThrift(org.apache.hadoop.fs.ContentSummary cs, String path) {
     ContentSummary tcs = new ContentSummary();
     tcs.fileCount = cs.getFileCount();
     tcs.directoryCount = cs.getDirectoryCount();
     tcs.quota = cs.getQuota();
     tcs.spaceConsumed = cs.getSpaceConsumed();
     tcs.spaceQuota = cs.getSpaceQuota();
+    tcs.path = path;
     return tcs;
   }
 

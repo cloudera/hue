@@ -89,6 +89,7 @@ public class Namenode {
 
     /**
      * Get a report on the system's current data nodes.
+     * Note that ctx is currently ignored by the server.
      * 
      * @param ctx
      * @param type Type of data nodes to return
@@ -97,7 +98,7 @@ public class Namenode {
     public List<DatanodeInfo> getDatanodeReport(org.apache.hadoop.thriftfs.api.RequestContext ctx, DatanodeReportType type) throws org.apache.hadoop.thriftfs.api.IOException, TException;
 
     /**
-     * Get a health report of DFS
+     * Get a health report of DFS.  Note that ctx is ignored by the server.
      * 
      * @param ctx
      */
@@ -198,6 +199,15 @@ public class Namenode {
      * @param Path
      */
     public ContentSummary getContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, String Path) throws org.apache.hadoop.thriftfs.api.IOException, TException;
+
+    /**
+     * Get ContentSummary objects for multiple directories simultaneously. The same warnings
+     * apply as for getContentSummary(...) above.
+     * 
+     * @param ctx
+     * @param paths
+     */
+    public List<ContentSummary> multiGetContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<String> paths) throws org.apache.hadoop.thriftfs.api.IOException, TException;
 
     /**
      * Set the quota for a directory.
@@ -915,6 +925,43 @@ public class Namenode {
       throw new TApplicationException(TApplicationException.MISSING_RESULT, "getContentSummary failed: unknown result");
     }
 
+    public List<ContentSummary> multiGetContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<String> paths) throws org.apache.hadoop.thriftfs.api.IOException, TException
+    {
+      send_multiGetContentSummary(ctx, paths);
+      return recv_multiGetContentSummary();
+    }
+
+    public void send_multiGetContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<String> paths) throws TException
+    {
+      oprot_.writeMessageBegin(new TMessage("multiGetContentSummary", TMessageType.CALL, seqid_));
+      multiGetContentSummary_args args = new multiGetContentSummary_args();
+      args.ctx = ctx;
+      args.paths = paths;
+      args.write(oprot_);
+      oprot_.writeMessageEnd();
+      oprot_.getTransport().flush();
+    }
+
+    public List<ContentSummary> recv_multiGetContentSummary() throws org.apache.hadoop.thriftfs.api.IOException, TException
+    {
+      TMessage msg = iprot_.readMessageBegin();
+      if (msg.type == TMessageType.EXCEPTION) {
+        TApplicationException x = TApplicationException.read(iprot_);
+        iprot_.readMessageEnd();
+        throw x;
+      }
+      multiGetContentSummary_result result = new multiGetContentSummary_result();
+      result.read(iprot_);
+      iprot_.readMessageEnd();
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      if (result.err != null) {
+        throw result.err;
+      }
+      throw new TApplicationException(TApplicationException.MISSING_RESULT, "multiGetContentSummary failed: unknown result");
+    }
+
     public void setQuota(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long namespaceQuota, long diskspaceQuota) throws org.apache.hadoop.thriftfs.api.IOException, TException
     {
       send_setQuota(ctx, path, namespaceQuota, diskspaceQuota);
@@ -1151,6 +1198,7 @@ public class Namenode {
       processMap_.put("reportBadBlocks", new reportBadBlocks());
       processMap_.put("stat", new stat());
       processMap_.put("getContentSummary", new getContentSummary());
+      processMap_.put("multiGetContentSummary", new multiGetContentSummary());
       processMap_.put("setQuota", new setQuota());
       processMap_.put("setReplication", new setReplication());
       processMap_.put("unlink", new unlink());
@@ -1652,6 +1700,34 @@ public class Namenode {
           return;
         }
         oprot.writeMessageBegin(new TMessage("getContentSummary", TMessageType.REPLY, seqid));
+        result.write(oprot);
+        oprot.writeMessageEnd();
+        oprot.getTransport().flush();
+      }
+
+    }
+
+    private class multiGetContentSummary implements ProcessFunction {
+      public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
+      {
+        multiGetContentSummary_args args = new multiGetContentSummary_args();
+        args.read(iprot);
+        iprot.readMessageEnd();
+        multiGetContentSummary_result result = new multiGetContentSummary_result();
+        try {
+          result.success = iface_.multiGetContentSummary(args.ctx, args.paths);
+        } catch (org.apache.hadoop.thriftfs.api.IOException err) {
+          result.err = err;
+        } catch (Throwable th) {
+          LOGGER.error("Internal error processing multiGetContentSummary", th);
+          TApplicationException x = new TApplicationException(TApplicationException.INTERNAL_ERROR, "Internal error processing multiGetContentSummary");
+          oprot.writeMessageBegin(new TMessage("multiGetContentSummary", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
+        oprot.writeMessageBegin(new TMessage("multiGetContentSummary", TMessageType.REPLY, seqid));
         result.write(oprot);
         oprot.writeMessageEnd();
         oprot.getTransport().flush();
@@ -13774,6 +13850,788 @@ public class Namenode {
     @Override
     public String toString() {
       StringBuilder sb = new StringBuilder("getContentSummary_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("err:");
+      if (this.err == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.err);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws TException {
+      // check for required fields
+    }
+
+  }
+
+  public static class multiGetContentSummary_args implements TBase<multiGetContentSummary_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final TStruct STRUCT_DESC = new TStruct("multiGetContentSummary_args");
+
+    private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
+    private static final TField PATHS_FIELD_DESC = new TField("paths", TType.LIST, (short)1);
+
+    public org.apache.hadoop.thriftfs.api.RequestContext ctx;
+    public List<String> paths;
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      CTX((short)10, "ctx"),
+      PATHS((short)1, "paths");
+
+      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byId.put((int)field._thriftId, field);
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        return byId.get(fieldId);
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+
+    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
+      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      put(_Fields.PATHS, new FieldMetaData("paths", TFieldRequirementType.DEFAULT, 
+          new ListMetaData(TType.LIST, 
+              new FieldValueMetaData(TType.STRING))));
+    }});
+
+    static {
+      FieldMetaData.addStructMetaDataMap(multiGetContentSummary_args.class, metaDataMap);
+    }
+
+    public multiGetContentSummary_args() {
+    }
+
+    public multiGetContentSummary_args(
+      org.apache.hadoop.thriftfs.api.RequestContext ctx,
+      List<String> paths)
+    {
+      this();
+      this.ctx = ctx;
+      this.paths = paths;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public multiGetContentSummary_args(multiGetContentSummary_args other) {
+      if (other.isSetCtx()) {
+        this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext(other.ctx);
+      }
+      if (other.isSetPaths()) {
+        List<String> __this__paths = new ArrayList<String>();
+        for (String other_element : other.paths) {
+          __this__paths.add(other_element);
+        }
+        this.paths = __this__paths;
+      }
+    }
+
+    public multiGetContentSummary_args deepCopy() {
+      return new multiGetContentSummary_args(this);
+    }
+
+    @Deprecated
+    public multiGetContentSummary_args clone() {
+      return new multiGetContentSummary_args(this);
+    }
+
+    public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
+      return this.ctx;
+    }
+
+    public multiGetContentSummary_args setCtx(org.apache.hadoop.thriftfs.api.RequestContext ctx) {
+      this.ctx = ctx;
+      return this;
+    }
+
+    public void unsetCtx() {
+      this.ctx = null;
+    }
+
+    /** Returns true if field ctx is set (has been asigned a value) and false otherwise */
+    public boolean isSetCtx() {
+      return this.ctx != null;
+    }
+
+    public void setCtxIsSet(boolean value) {
+      if (!value) {
+        this.ctx = null;
+      }
+    }
+
+    public int getPathsSize() {
+      return (this.paths == null) ? 0 : this.paths.size();
+    }
+
+    public java.util.Iterator<String> getPathsIterator() {
+      return (this.paths == null) ? null : this.paths.iterator();
+    }
+
+    public void addToPaths(String elem) {
+      if (this.paths == null) {
+        this.paths = new ArrayList<String>();
+      }
+      this.paths.add(elem);
+    }
+
+    public List<String> getPaths() {
+      return this.paths;
+    }
+
+    public multiGetContentSummary_args setPaths(List<String> paths) {
+      this.paths = paths;
+      return this;
+    }
+
+    public void unsetPaths() {
+      this.paths = null;
+    }
+
+    /** Returns true if field paths is set (has been asigned a value) and false otherwise */
+    public boolean isSetPaths() {
+      return this.paths != null;
+    }
+
+    public void setPathsIsSet(boolean value) {
+      if (!value) {
+        this.paths = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case CTX:
+        if (value == null) {
+          unsetCtx();
+        } else {
+          setCtx((org.apache.hadoop.thriftfs.api.RequestContext)value);
+        }
+        break;
+
+      case PATHS:
+        if (value == null) {
+          unsetPaths();
+        } else {
+          setPaths((List<String>)value);
+        }
+        break;
+
+      }
+    }
+
+    public void setFieldValue(int fieldID, Object value) {
+      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case CTX:
+        return getCtx();
+
+      case PATHS:
+        return getPaths();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    public Object getFieldValue(int fieldId) {
+      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      switch (field) {
+      case CTX:
+        return isSetCtx();
+      case PATHS:
+        return isSetPaths();
+      }
+      throw new IllegalStateException();
+    }
+
+    public boolean isSet(int fieldID) {
+      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof multiGetContentSummary_args)
+        return this.equals((multiGetContentSummary_args)that);
+      return false;
+    }
+
+    public boolean equals(multiGetContentSummary_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_ctx = true && this.isSetCtx();
+      boolean that_present_ctx = true && that.isSetCtx();
+      if (this_present_ctx || that_present_ctx) {
+        if (!(this_present_ctx && that_present_ctx))
+          return false;
+        if (!this.ctx.equals(that.ctx))
+          return false;
+      }
+
+      boolean this_present_paths = true && this.isSetPaths();
+      boolean that_present_paths = true && that.isSetPaths();
+      if (this_present_paths || that_present_paths) {
+        if (!(this_present_paths && that_present_paths))
+          return false;
+        if (!this.paths.equals(that.paths))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public void read(TProtocol iprot) throws TException {
+      TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == TType.STOP) { 
+          break;
+        }
+        _Fields fieldId = _Fields.findByThriftId(field.id);
+        if (fieldId == null) {
+          TProtocolUtil.skip(iprot, field.type);
+        } else {
+          switch (fieldId) {
+            case CTX:
+              if (field.type == TType.STRUCT) {
+                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+                this.ctx.read(iprot);
+              } else { 
+                TProtocolUtil.skip(iprot, field.type);
+              }
+              break;
+            case PATHS:
+              if (field.type == TType.LIST) {
+                {
+                  TList _list24 = iprot.readListBegin();
+                  this.paths = new ArrayList<String>(_list24.size);
+                  for (int _i25 = 0; _i25 < _list24.size; ++_i25)
+                  {
+                    String _elem26;
+                    _elem26 = iprot.readString();
+                    this.paths.add(_elem26);
+                  }
+                  iprot.readListEnd();
+                }
+              } else { 
+                TProtocolUtil.skip(iprot, field.type);
+              }
+              break;
+          }
+          iprot.readFieldEnd();
+        }
+      }
+      iprot.readStructEnd();
+
+      // check for required fields of primitive type, which can't be checked in the validate method
+      validate();
+    }
+
+    public void write(TProtocol oprot) throws TException {
+      validate();
+
+      oprot.writeStructBegin(STRUCT_DESC);
+      if (this.paths != null) {
+        oprot.writeFieldBegin(PATHS_FIELD_DESC);
+        {
+          oprot.writeListBegin(new TList(TType.STRING, this.paths.size()));
+          for (String _iter27 : this.paths)
+          {
+            oprot.writeString(_iter27);
+          }
+          oprot.writeListEnd();
+        }
+        oprot.writeFieldEnd();
+      }
+      if (this.ctx != null) {
+        oprot.writeFieldBegin(CTX_FIELD_DESC);
+        this.ctx.write(oprot);
+        oprot.writeFieldEnd();
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("multiGetContentSummary_args(");
+      boolean first = true;
+
+      sb.append("ctx:");
+      if (this.ctx == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.ctx);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("paths:");
+      if (this.paths == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.paths);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws TException {
+      // check for required fields
+    }
+
+  }
+
+  public static class multiGetContentSummary_result implements TBase<multiGetContentSummary_result._Fields>, java.io.Serializable, Cloneable, Comparable<multiGetContentSummary_result>   {
+    private static final TStruct STRUCT_DESC = new TStruct("multiGetContentSummary_result");
+
+    private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
+    private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
+
+    public List<ContentSummary> success;
+    public org.apache.hadoop.thriftfs.api.IOException err;
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      ERR((short)1, "err");
+
+      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byId.put((int)field._thriftId, field);
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        return byId.get(fieldId);
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+
+    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
+      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new ListMetaData(TType.LIST, 
+              new StructMetaData(TType.STRUCT, ContentSummary.class))));
+      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+    }});
+
+    static {
+      FieldMetaData.addStructMetaDataMap(multiGetContentSummary_result.class, metaDataMap);
+    }
+
+    public multiGetContentSummary_result() {
+    }
+
+    public multiGetContentSummary_result(
+      List<ContentSummary> success,
+      org.apache.hadoop.thriftfs.api.IOException err)
+    {
+      this();
+      this.success = success;
+      this.err = err;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public multiGetContentSummary_result(multiGetContentSummary_result other) {
+      if (other.isSetSuccess()) {
+        List<ContentSummary> __this__success = new ArrayList<ContentSummary>();
+        for (ContentSummary other_element : other.success) {
+          __this__success.add(new ContentSummary(other_element));
+        }
+        this.success = __this__success;
+      }
+      if (other.isSetErr()) {
+        this.err = new org.apache.hadoop.thriftfs.api.IOException(other.err);
+      }
+    }
+
+    public multiGetContentSummary_result deepCopy() {
+      return new multiGetContentSummary_result(this);
+    }
+
+    @Deprecated
+    public multiGetContentSummary_result clone() {
+      return new multiGetContentSummary_result(this);
+    }
+
+    public int getSuccessSize() {
+      return (this.success == null) ? 0 : this.success.size();
+    }
+
+    public java.util.Iterator<ContentSummary> getSuccessIterator() {
+      return (this.success == null) ? null : this.success.iterator();
+    }
+
+    public void addToSuccess(ContentSummary elem) {
+      if (this.success == null) {
+        this.success = new ArrayList<ContentSummary>();
+      }
+      this.success.add(elem);
+    }
+
+    public List<ContentSummary> getSuccess() {
+      return this.success;
+    }
+
+    public multiGetContentSummary_result setSuccess(List<ContentSummary> success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public org.apache.hadoop.thriftfs.api.IOException getErr() {
+      return this.err;
+    }
+
+    public multiGetContentSummary_result setErr(org.apache.hadoop.thriftfs.api.IOException err) {
+      this.err = err;
+      return this;
+    }
+
+    public void unsetErr() {
+      this.err = null;
+    }
+
+    /** Returns true if field err is set (has been asigned a value) and false otherwise */
+    public boolean isSetErr() {
+      return this.err != null;
+    }
+
+    public void setErrIsSet(boolean value) {
+      if (!value) {
+        this.err = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((List<ContentSummary>)value);
+        }
+        break;
+
+      case ERR:
+        if (value == null) {
+          unsetErr();
+        } else {
+          setErr((org.apache.hadoop.thriftfs.api.IOException)value);
+        }
+        break;
+
+      }
+    }
+
+    public void setFieldValue(int fieldID, Object value) {
+      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      case ERR:
+        return getErr();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    public Object getFieldValue(int fieldId) {
+      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      case ERR:
+        return isSetErr();
+      }
+      throw new IllegalStateException();
+    }
+
+    public boolean isSet(int fieldID) {
+      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof multiGetContentSummary_result)
+        return this.equals((multiGetContentSummary_result)that);
+      return false;
+    }
+
+    public boolean equals(multiGetContentSummary_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_err = true && this.isSetErr();
+      boolean that_present_err = true && that.isSetErr();
+      if (this_present_err || that_present_err) {
+        if (!(this_present_err && that_present_err))
+          return false;
+        if (!this.err.equals(that.err))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(multiGetContentSummary_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      multiGetContentSummary_result typedOther = (multiGetContentSummary_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      return 0;
+    }
+
+    public void read(TProtocol iprot) throws TException {
+      TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == TType.STOP) { 
+          break;
+        }
+        _Fields fieldId = _Fields.findByThriftId(field.id);
+        if (fieldId == null) {
+          TProtocolUtil.skip(iprot, field.type);
+        } else {
+          switch (fieldId) {
+            case SUCCESS:
+              if (field.type == TType.LIST) {
+                {
+                  TList _list28 = iprot.readListBegin();
+                  this.success = new ArrayList<ContentSummary>(_list28.size);
+                  for (int _i29 = 0; _i29 < _list28.size; ++_i29)
+                  {
+                    ContentSummary _elem30;
+                    _elem30 = new ContentSummary();
+                    _elem30.read(iprot);
+                    this.success.add(_elem30);
+                  }
+                  iprot.readListEnd();
+                }
+              } else { 
+                TProtocolUtil.skip(iprot, field.type);
+              }
+              break;
+            case ERR:
+              if (field.type == TType.STRUCT) {
+                this.err = new org.apache.hadoop.thriftfs.api.IOException();
+                this.err.read(iprot);
+              } else { 
+                TProtocolUtil.skip(iprot, field.type);
+              }
+              break;
+          }
+          iprot.readFieldEnd();
+        }
+      }
+      iprot.readStructEnd();
+
+      // check for required fields of primitive type, which can't be checked in the validate method
+      validate();
+    }
+
+    public void write(TProtocol oprot) throws TException {
+      oprot.writeStructBegin(STRUCT_DESC);
+
+      if (this.isSetSuccess()) {
+        oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+        {
+          oprot.writeListBegin(new TList(TType.STRUCT, this.success.size()));
+          for (ContentSummary _iter31 : this.success)
+          {
+            _iter31.write(oprot);
+          }
+          oprot.writeListEnd();
+        }
+        oprot.writeFieldEnd();
+      } else if (this.isSetErr()) {
+        oprot.writeFieldBegin(ERR_FIELD_DESC);
+        this.err.write(oprot);
+        oprot.writeFieldEnd();
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("multiGetContentSummary_result(");
       boolean first = true;
 
       sb.append("success:");

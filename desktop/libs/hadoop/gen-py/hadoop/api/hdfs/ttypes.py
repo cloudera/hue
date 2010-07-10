@@ -542,9 +542,10 @@ class ContentSummary(object):
   Attributes:
    - fileCount: Number of files in this directory
    - directoryCount: Number of directories in this directory
-   - quota: Quota for this directory (in bytes).
+   - quota: Quota for this directory (number of files).
    - spaceConsumed: Space consumed in disk (in bytes).
    - spaceQuota: Quota consumed in disk (in bytes).
+   - path: The path
   """
 
   thrift_spec = (
@@ -554,14 +555,16 @@ class ContentSummary(object):
     (3, TType.I64, 'quota', None, None, ), # 3
     (4, TType.I64, 'spaceConsumed', None, None, ), # 4
     (5, TType.I64, 'spaceQuota', None, None, ), # 5
+    (6, TType.STRING, 'path', None, None, ), # 6
   )
 
-  def __init__(self, fileCount=None, directoryCount=None, quota=None, spaceConsumed=None, spaceQuota=None,):
+  def __init__(self, fileCount=None, directoryCount=None, quota=None, spaceConsumed=None, spaceQuota=None, path=None,):
     self.fileCount = fileCount
     self.directoryCount = directoryCount
     self.quota = quota
     self.spaceConsumed = spaceConsumed
     self.spaceQuota = spaceQuota
+    self.path = path
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -597,6 +600,11 @@ class ContentSummary(object):
           self.spaceQuota = iprot.readI64();
         else:
           iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.STRING:
+          self.path = iprot.readString();
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -626,6 +634,10 @@ class ContentSummary(object):
     if self.spaceQuota != None:
       oprot.writeFieldBegin('spaceQuota', TType.I64, 5)
       oprot.writeI64(self.spaceQuota)
+      oprot.writeFieldEnd()
+    if self.path != None:
+      oprot.writeFieldBegin('path', TType.STRING, 6)
+      oprot.writeString(self.path)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

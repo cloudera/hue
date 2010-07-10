@@ -35,6 +35,7 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
   private static final TField QUOTA_FIELD_DESC = new TField("quota", TType.I64, (short)3);
   private static final TField SPACE_CONSUMED_FIELD_DESC = new TField("spaceConsumed", TType.I64, (short)4);
   private static final TField SPACE_QUOTA_FIELD_DESC = new TField("spaceQuota", TType.I64, (short)5);
+  private static final TField PATH_FIELD_DESC = new TField("path", TType.STRING, (short)6);
 
   /**
    * Number of files in this directory
@@ -45,7 +46,7 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
    */
   public long directoryCount;
   /**
-   * Quota for this directory (in bytes).
+   * Quota for this directory (number of files).
    */
   public long quota;
   /**
@@ -56,6 +57,10 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
    * Quota consumed in disk (in bytes).
    */
   public long spaceQuota;
+  /**
+   * The path
+   */
+  public String path;
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements TFieldIdEnum {
@@ -68,7 +73,7 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
      */
     DIRECTORY_COUNT((short)2, "directoryCount"),
     /**
-     * Quota for this directory (in bytes).
+     * Quota for this directory (number of files).
      */
     QUOTA((short)3, "quota"),
     /**
@@ -78,7 +83,11 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     /**
      * Quota consumed in disk (in bytes).
      */
-    SPACE_QUOTA((short)5, "spaceQuota");
+    SPACE_QUOTA((short)5, "spaceQuota"),
+    /**
+     * The path
+     */
+    PATH((short)6, "path");
 
     private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
@@ -150,6 +159,8 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
         new FieldValueMetaData(TType.I64)));
     put(_Fields.SPACE_QUOTA, new FieldMetaData("spaceQuota", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
+    put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
   }});
 
   static {
@@ -164,7 +175,8 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     long directoryCount,
     long quota,
     long spaceConsumed,
-    long spaceQuota)
+    long spaceQuota,
+    String path)
   {
     this();
     this.fileCount = fileCount;
@@ -177,6 +189,7 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     setSpaceConsumedIsSet(true);
     this.spaceQuota = spaceQuota;
     setSpaceQuotaIsSet(true);
+    this.path = path;
   }
 
   /**
@@ -190,6 +203,9 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     this.quota = other.quota;
     this.spaceConsumed = other.spaceConsumed;
     this.spaceQuota = other.spaceQuota;
+    if (other.isSetPath()) {
+      this.path = other.path;
+    }
   }
 
   public ContentSummary deepCopy() {
@@ -260,14 +276,14 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
   }
 
   /**
-   * Quota for this directory (in bytes).
+   * Quota for this directory (number of files).
    */
   public long getQuota() {
     return this.quota;
   }
 
   /**
-   * Quota for this directory (in bytes).
+   * Quota for this directory (number of files).
    */
   public ContentSummary setQuota(long quota) {
     this.quota = quota;
@@ -346,6 +362,36 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     __isset_bit_vector.set(__SPACEQUOTA_ISSET_ID, value);
   }
 
+  /**
+   * The path
+   */
+  public String getPath() {
+    return this.path;
+  }
+
+  /**
+   * The path
+   */
+  public ContentSummary setPath(String path) {
+    this.path = path;
+    return this;
+  }
+
+  public void unsetPath() {
+    this.path = null;
+  }
+
+  /** Returns true if field path is set (has been asigned a value) and false otherwise */
+  public boolean isSetPath() {
+    return this.path != null;
+  }
+
+  public void setPathIsSet(boolean value) {
+    if (!value) {
+      this.path = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case FILE_COUNT:
@@ -388,6 +434,14 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
       }
       break;
 
+    case PATH:
+      if (value == null) {
+        unsetPath();
+      } else {
+        setPath((String)value);
+      }
+      break;
+
     }
   }
 
@@ -412,6 +466,9 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     case SPACE_QUOTA:
       return new Long(getSpaceQuota());
 
+    case PATH:
+      return getPath();
+
     }
     throw new IllegalStateException();
   }
@@ -433,6 +490,8 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
       return isSetSpaceConsumed();
     case SPACE_QUOTA:
       return isSetSpaceQuota();
+    case PATH:
+      return isSetPath();
     }
     throw new IllegalStateException();
   }
@@ -499,6 +558,15 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
         return false;
     }
 
+    boolean this_present_path = true && this.isSetPath();
+    boolean that_present_path = true && that.isSetPath();
+    if (this_present_path || that_present_path) {
+      if (!(this_present_path && that_present_path))
+        return false;
+      if (!this.path.equals(that.path))
+        return false;
+    }
+
     return true;
   }
 
@@ -552,6 +620,14 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
       return lastComparison;
     }
     lastComparison = TBaseHelper.compareTo(spaceQuota, typedOther.spaceQuota);
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    lastComparison = Boolean.valueOf(isSetPath()).compareTo(isSetPath());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    lastComparison = TBaseHelper.compareTo(path, typedOther.path);
     if (lastComparison != 0) {
       return lastComparison;
     }
@@ -612,6 +688,13 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
+          case PATH:
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
         }
         iprot.readFieldEnd();
       }
@@ -641,6 +724,11 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     oprot.writeFieldBegin(SPACE_QUOTA_FIELD_DESC);
     oprot.writeI64(this.spaceQuota);
     oprot.writeFieldEnd();
+    if (this.path != null) {
+      oprot.writeFieldBegin(PATH_FIELD_DESC);
+      oprot.writeString(this.path);
+      oprot.writeFieldEnd();
+    }
     oprot.writeFieldStop();
     oprot.writeStructEnd();
   }
@@ -668,6 +756,14 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     if (!first) sb.append(", ");
     sb.append("spaceQuota:");
     sb.append(this.spaceQuota);
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("path:");
+    if (this.path == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.path);
+    }
     first = false;
     sb.append(")");
     return sb.toString();
