@@ -148,11 +148,11 @@ def do_remove(app_name):
   reg = registry.AppRegistry()
   try:
     app = reg.unregister(app_name)
-    app.uninstall_conf()
   except KeyError:
     LOG.error("%s is not installed" % (app_name,))
     return False
 
+  app.uninstall_conf()
   reg.save()
 
   # Update the pth file

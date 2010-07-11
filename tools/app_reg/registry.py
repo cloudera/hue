@@ -192,7 +192,9 @@ class HueApp(object):
 
   def uninstall_conf(self):
     """uninstall_conf() -> True/False"""
-    app_conf_dir = os.path.join(self.path, 'conf')
+    app_conf_dir = os.path.abspath(os.path.join(self.path, 'conf'))
+    if not os.path.isdir(app_conf_dir):
+      return True
 
     # Check all symlink in the conf dir and remove any that point to this app
     for name in os.listdir(common.HUE_CONF_DIR):
@@ -200,7 +202,8 @@ class HueApp(object):
       if not os.path.islink(path):
         continue
       target = os.readlink(path)
-      if os.path.samefile(os.path.dirname(target), app_conf_dir):
+      target_dir = os.path.abspath(os.path.dirname(target))
+      if target_dir == app_conf_dir:
         try:
           os.unlink(path)
           LOG.info('Remove config symlink %s -> %s' % (path, target))

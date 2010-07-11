@@ -156,3 +156,5 @@ SOURCE_PARTS = \
 install-source-parts:
 	@mkdir -p $(INSTALL_DIR)/desktop
 	@tar cf - $(SOURCE_PARTS) | tar -C $(INSTALL_DIR)/desktop -xf -
+	@# Remove the application configuration files
+	@find $(INSTALL_DIR)/desktop/conf -type l -exec rm {} \;
