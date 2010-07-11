@@ -48,6 +48,7 @@ class AppRegistry(object):
       reg_file.close()
 
       for app_json in app_list:
+        app_json.setdefault('author', 'Unknown')        # Added after 0.9
         app = DesktopApp.create(app_json)
         self._apps[app.name] = app
 
@@ -122,13 +123,14 @@ class DesktopApp(object):
   """
   @staticmethod
   def create(json):
-    return DesktopApp(json['name'], json['version'], json['path'], json['desc'])
+    return DesktopApp(json['name'], json['version'], json['path'], json['desc'], json['author'])
 
-  def __init__(self, name, version, path, desc):
+  def __init__(self, name, version, path, desc, author):
     self.name = name
     self.version = version
     self.path = path
     self.desc = desc
+    self.author = author
 
   def __str__(self):
     return "%s (version %s)" % (self.name, self.version)
@@ -139,7 +141,8 @@ class DesktopApp(object):
     return cmp((self.name, self.version), (other.name, other.version))
 
   def jsonable(self):
-    return dict(name=self.name, version=self.version, path=self.path, desc=self.desc)
+    return dict(name=self.name, version=self.version, path=self.path,
+                desc=self.desc, author=self.author)
 
   def find_ext_pys(self):
     """find_ext_pys() -> A list of paths for all ext-py packages"""
