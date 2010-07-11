@@ -25,9 +25,15 @@ export REPO_TRACE=1
 
 . $BINDIR/build-functions
 
-git clean -xdf
-rm -rf ext
-git reset --hard HEAD
+# Use $SKIP_CLEAN if the cleaning is done outside of this script.
+if [ -z "$SKIP_CLEAN" ]; then
+  echo "Cleaning repo."
+  git clean -xdf
+  rm -rf ext
+  git reset --hard HEAD
+else
+  echo "Skipping cleaning of repo."
+fi
 
 build_hadoop
 
