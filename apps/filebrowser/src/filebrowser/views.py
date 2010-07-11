@@ -591,7 +591,16 @@ def chmod(request):
   return generic_op(ChmodForm, request, request.fs.chmod, ["path", "mode"], "path", template="chmod.mako")
 
 def chown(request):
-  return generic_op(ChownForm, request, request.fs.chown, ["path", "user", "group"], "path", template="chown.mako")
+  # This is a bit clever: generic_op takes an argument (here, args), indicating
+  # which POST parameters to pick out and pass to the given function.
+  # We update that mapping based on whether or not the user selected "other".
+  args = [ "path", "user", "group" ]
+  if request.POST.get("user") == "__other__":
+    args[1] = "user_other"
+  if request.POST.get("group") == "__other__":
+    args[2] = "group_other"
+
+  return generic_op(ChownForm, request, request.fs.chown, args, "path", template="chown.mako")
 
 def upload_flash(request):
   """

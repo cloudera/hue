@@ -20,6 +20,7 @@ from django.forms import FileField, CharField, BooleanField, Textarea
 
 from filebrowser.lib import rwx
 from hadoop.fs import normpath
+from django.contrib.auth.models import User, Group
 
 import logging
 logger = logging.getLogger(__name__)
@@ -70,7 +71,15 @@ class ChownForm(forms.Form):
   # These could be "ChoiceFields", listing only users and groups
   # that the current user has permissions for.
   user = CharField(label="User", min_length=1)
+  user_other = CharField(label="OtherUser", min_length=1, required=False)
   group = CharField(label="Group", min_length=1)
+  group_other = CharField(label="OtherGroup", min_length=1, required=False)
+
+  def __init__(self, *args, **kwargs):
+    super(ChownForm, self).__init__(*args, **kwargs)
+
+    self.all_groups = [ group.name for group in Group.objects.all() ]
+    self.all_users = [ user.username for user in User.objects.all() ]
 
 class ChmodForm(forms.Form):
   op = "chmod"

@@ -26,6 +26,25 @@ import logging
 LOG = logging.getLogger(__name__)
 
 @attr('requires_hadoop')
+def test_chown():
+  cluster = mini_cluster.shared_cluster(conf=True)
+  try:
+    # Only the Hadoop superuser really has carte blanche here
+    c = make_logged_in_client(cluster.superuser)
+    cluster.fs.setuser(cluster.superuser)
+
+    PATH = "/test-chown"
+    cluster.fs.mkdir(PATH)
+    c.post("/filebrowser/chown", dict(path=PATH, user="x", group="y"))
+    assert_equal("x", cluster.fs.stats(PATH)["user"])
+    assert_equal("y", cluster.fs.stats(PATH)["group"])
+    c.post("/filebrowser/chown", dict(path=PATH, user="__other__", user_other="z", group="y"))
+    assert_equal("z", cluster.fs.stats(PATH)["user"])
+
+  finally:
+    cluster.shutdown()
+
+@attr('requires_hadoop')
 def test_listdir():
   cluster = mini_cluster.shared_cluster(conf=True)
   try:
