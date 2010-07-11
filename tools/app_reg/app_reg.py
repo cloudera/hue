@@ -17,7 +17,7 @@
 
 """
 A tool to manage Hue applications. This does not stop/restart a
-running Desktop instance.
+running Hue instance.
 
 Usage:
     %(PROG_NAME)s [flags] --install <path_to_app> [<path_to_app> ...]
@@ -30,7 +30,7 @@ Usage:
         To list all registered applications.
 
     %(PROG_NAME)s [flags] --sync
-        Synchronize all registered applications with the Desktop environment.
+        Synchronize all registered applications with the Hue environment.
         Useful after a `make clean'.
 
 Optional flags:
@@ -111,11 +111,11 @@ def _do_install_one(reg, app_loc):
     LOG.error(ex)
     return False
 
-  app = registry.DesktopApp(app_name, version, app_loc, desc, author)
+  app = registry.HueApp(app_name, version, app_loc, desc, author)
   if reg.contains(app):
     LOG.warn("=== %s is already installed" % (app,))
     return True
-  return reg.register(app) and build.make_app(app)
+  return reg.register(app) and build.make_app(app) and app.install_conf()
 
 
 def do_install(app_loc_list):
@@ -148,6 +148,7 @@ def do_remove(app_name):
   reg = registry.AppRegistry()
   try:
     app = reg.unregister(app_name)
+    app.uninstall_conf()
   except KeyError:
     LOG.error("%s is not installed" % (app_name,))
     return False

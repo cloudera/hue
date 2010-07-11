@@ -17,8 +17,11 @@
 
 import os.path
 
-# The root of the Desktop installation
+# The root of the Hue installation
 INSTALL_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+# The Hue config directory
+HUE_CONF_DIR = os.path.join(INSTALL_ROOT, 'desktop', 'conf')
 
 # Virtual env
 VIRTUAL_ENV = os.path.join(INSTALL_ROOT, 'build', 'env')

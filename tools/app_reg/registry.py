@@ -19,6 +19,7 @@
 Registry for the applications
 """
 
+import errno
 import glob
 import logging
 import os
@@ -36,7 +37,7 @@ class AppRegistry(object):
     """Open the existing registry"""
     self._reg_path = os.path.join(common.INSTALL_ROOT, 'app.reg')
     self._initialized = False
-    self._apps = { }    # Map of name -> DesktopApp
+    self._apps = { }    # Map of name -> HueApp
     self._open()
 
 
@@ -49,7 +50,7 @@ class AppRegistry(object):
 
       for app_json in app_list:
         app_json.setdefault('author', 'Unknown')        # Added after 0.9
-        app = DesktopApp.create(app_json)
+        app = HueApp.create(app_json)
         self._apps[app.name] = app
 
     self._initialized = True
@@ -94,7 +95,7 @@ class AppRegistry(object):
 
 
   def unregister(self, app_name):
-    """unregister(app_Name) -> DesktopApp. May raise KeyError"""
+    """unregister(app_Name) -> HueApp. May raise KeyError"""
     assert self._initialized, "Registry not yet initialized"
 
     app = self._apps[app_name]
@@ -103,7 +104,7 @@ class AppRegistry(object):
 
 
   def get_all_apps(self):
-    """get_all_apps() -> List of DesktopApp"""
+    """get_all_apps() -> List of HueApp"""
     return self._apps.values()
 
 
@@ -117,13 +118,13 @@ class AppRegistry(object):
     LOG.info('=== Saved registry at %s' % (self._reg_path,))
 
 
-class DesktopApp(object):
+class HueApp(object):
   """
   Represents an app.
   """
   @staticmethod
   def create(json):
-    return DesktopApp(json['name'], json['version'], json['path'], json['desc'], json['author'])
+    return HueApp(json['name'], json['version'], json['path'], json['desc'], json['author'])
 
   def __init__(self, name, version, path, desc, author):
     self.name = name
@@ -136,7 +137,7 @@ class DesktopApp(object):
     return "%s (version %s)" % (self.name, self.version)
 
   def __cmp__(self, other):
-    if not isinstance(other, DesktopApp):
+    if not isinstance(other, HueApp):
       raise TypeError
     return cmp((self.name, self.version), (other.name, other.version))
 
@@ -148,12 +149,72 @@ class DesktopApp(object):
     """find_ext_pys() -> A list of paths for all ext-py packages"""
     return glob.glob(os.path.join(self.path, 'ext-py', '*'))
 
+  def get_conffiles(self):
+    """get_conffiles() -> A list of config (.ini) files"""
+    ini_files = glob.glob(os.path.join(self.path, 'conf', '*.ini'))
+    return [ os.path.abspath(ini) for ini in ini_files ]
+
+
+  def install_conf(self):
+    """
+    install_conf() -> True/False
+
+    Symlink the app's conf/*.ini files into the conf directory.
+    """
+    installed = [ ]
+
+    for target in self.get_conffiles():
+      link_name = os.path.join(common.HUE_CONF_DIR, os.path.basename(target))
+      try:
+        os.symlink(target, link_name)
+        LOG.info('Symlink config %s -> %s' % (link_name, target))
+        installed.append(link_name)
+      except OSError, ex:
+        # Does the link already exists?
+        if ex.errno == errno.EEXIST and os.path.islink(link_name):
+          try:
+            cur = os.readlink(link_name)
+            if cur == target:
+              LOG.warn("Symlink for configuration already exists: %s" % (link_name,))
+              continue
+          except:
+            pass
+        # Nope. True error. Cleanup.
+        LOG.error("Failed to symlink %s to %s: %s" % (target, link_name, ex))
+        for lnk in installed:
+          try:
+            os.unlink(lnk)
+          except:
+            LOG.error("Failed to cleanup link %s" % (link_name,))
+        return False
+    return True
+
+
+  def uninstall_conf(self):
+    """uninstall_conf() -> True/False"""
+    app_conf_dir = os.path.join(self.path, 'conf')
+
+    # Check all symlink in the conf dir and remove any that point to this app
+    for name in os.listdir(common.HUE_CONF_DIR):
+      path = os.path.join(common.HUE_CONF_DIR, name)
+      if not os.path.islink(path):
+        continue
+      target = os.readlink(path)
+      if os.path.samefile(os.path.dirname(target), app_conf_dir):
+        try:
+          os.unlink(path)
+          LOG.info('Remove config symlink %s -> %s' % (path, target))
+        except OSError, ex:
+          LOG.error("Failed to remove configuration link %s: %s" % (path, ex))
+          return False
+    return True
+
 
 class AppJsonEncoder(simplejson.JSONEncoder):
   def __init__(self, **kwargs):
     simplejson.JSONEncoder.__init__(self, **kwargs)
 
   def default(self, obj):
-    if isinstance(obj, DesktopApp):
+    if isinstance(obj, HueApp):
       return obj.jsonable()
     return simplejson.JSONEncoder.default(self, obj)

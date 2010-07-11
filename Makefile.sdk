@@ -232,20 +232,10 @@ bdist: ext-eggs compile
 .PHONY: install-bdist
 install-bdist: bdist
 	@echo "--- Install built distribution for $(APP_NAME) at $(INSTALL_DIR)"
+	@# Check that INSTALL_DIR is empty
+	@if [ -n '$(wildcard $(INSTALL_DIR)/*)' ] ; then \
+	  echo 'ERROR: $(INSTALL_DIR) not empty. Cowardly refusing to continue.' ; \
+	  false ; \
+	fi
 	@mkdir -p $(INSTALL_DIR)
 	@rsync -a $(BDIST_DIR)/ $(INSTALL_DIR)
-ifneq ($(wildcard conf),) # if there are conf files
-	@echo "--- Installing $(APP_NAME) configuration into $(INSTALL_CONF_DIR)"
-	@mkdir -p $(INSTALL_CONF_DIR)
-	for conffile in $(INSTALL_DIR)/conf/* ; do \
-	  filename=$$(basename $$conffile) ; \
-	  if [ -f $(INSTALL_CONF_DIR)/$$filename ]; then \
-	    echo "Moving aside old config $(INSTALL_CONF_DIR)/$$filename" ; \
-	    mv $(INSTALL_CONF_DIR)/$$filename{,.save.$(shell date +"%Y%m%d.%H%M%S")} ; \
-	  fi ; \
-	  mv $$conffile $(INSTALL_CONF_DIR)/$$filename ; \
-	done
-	@# Remove the conf dir from the install location since we've placed the confs in the
-	@# right spot
-	@rmdir $(INSTALL_DIR)/conf
-endif
