@@ -61,25 +61,19 @@ Development Prerequisites
 
     Debian:
       * gcc
-      * libldap2-dev
       * libmysqlclient-dev
-      * libsasl2-dev
       * libsqlite3-dev
-      * libssl-dev
       * libxml2-dev
       * libxslt-dev
       * python-dev
       * python-setuptools
 
     CentOS:
-      * cyrus-sasl-devel
       * gcc
       * libxml2-devel
       * libxslt-devel
       * mysql
       * mysql-devel
-      * openldap-devel
-      * openssl
       * python-devel
       * python-setuptools
       * sqlite-devel

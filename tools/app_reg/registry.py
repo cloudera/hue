@@ -165,27 +165,34 @@ class HueApp(object):
 
     for target in self.get_conffiles():
       link_name = os.path.join(common.HUE_CONF_DIR, os.path.basename(target))
+
+      # Does the link already exists?
+      if os.path.islink(link_name):
+        try:
+          cur = os.readlink(link_name)
+          if cur == target:
+            LOG.warn("Symlink for configuration already exists: %s" % (link_name,))
+            installed.append(link_name)
+            continue
+          # Remove broken link
+          if not os.path.exists(cur):
+            os.unlink(link_name)
+            LOG.warn("Removing broken link: %s" % (link_name,))
+        except OSError, ex:
+          LOG.warn("Error checking for existing link %s: %s" % (link_name, ex))
+
+      # Actually install the link
       try:
         os.symlink(target, link_name)
         LOG.info('Symlink config %s -> %s' % (link_name, target))
         installed.append(link_name)
       except OSError, ex:
-        # Does the link already exists?
-        if ex.errno == errno.EEXIST and os.path.islink(link_name):
-          try:
-            cur = os.readlink(link_name)
-            if cur == target:
-              LOG.warn("Symlink for configuration already exists: %s" % (link_name,))
-              continue
-          except:
-            pass
-        # Nope. True error. Cleanup.
         LOG.error("Failed to symlink %s to %s: %s" % (target, link_name, ex))
         for lnk in installed:
           try:
             os.unlink(lnk)
-          except:
-            LOG.error("Failed to cleanup link %s" % (link_name,))
+          except OSError, ex2:
+            LOG.error("Failed to cleanup link %s: %s" % (link_name, ex2))
         return False
     return True
 

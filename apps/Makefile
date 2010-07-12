@@ -61,9 +61,7 @@ env-install: $(EGG_INFO_TARGETS)
 ################################################
 INSTALL_BDIST_TARGETS := $(APPS:%=.recursive-install-bdist/%)
 .recursive-install-bdist/%: %
-	INSTALL_DIR=$(INSTALL_DIR)/apps/$< \
-		INSTALL_CONF_DIR=$(INSTALL_DIR)/desktop/conf \
-		$(MAKE) -C $< install-bdist
+	INSTALL_DIR=$(INSTALL_DIR)/apps/$< $(MAKE) -C $< install-bdist
 
 .PHONY: install
 install: install-source-parts $(INSTALL_BDIST_TARGETS)

@@ -43,7 +43,7 @@
 #
 #   install-bdist
 #   	Responsible for installing a built distribution to a target directory,
-#   	as specified by $(INSTALL_DIR) and $(INSTALL_CONF_DIR).
+#   	as specified by $(INSTALL_DIR).
 #
 
 include $(ROOT)/Makefile.vars
@@ -225,9 +225,8 @@ bdist: ext-eggs compile
 
 #
 # install-bdist
-# 	Install the built distribution in $(INSTALL_DIR), and any conf file in
-# 	$(INSTALL_CONF_DIR). NOTE that this does NOT install the app into the
-# 	virtual environment.
+# 	Install the built distribution in $(INSTALL_DIR).
+# 	NOTE that this does NOT install the app into the virtual environment.
 #
 .PHONY: install-bdist
 install-bdist: bdist
