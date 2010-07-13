@@ -24,33 +24,34 @@ script: CCS.UserAdmin.js
 */
 
 UI.Sheet.define('window.art.browser.useradmin', {
-          'header-height': 70,
-          'header-overflow': 'visible',
-          'min-width': 700
+	'header-height': 70,
+	'header-overflow': 'visible',
+	'min-width': 700
 });
 
 ART.Sheet.define('window.useradmin history.browser', {
-          'top':32,
-          'padding': '0 8px 0 60px'
+	'top':32,
+	'padding': '0 8px 0 60px'
 });
 
 ART.Sheet.define('window.useradmin history input', {
-          'left': 66
+	'left': 66
 });
 
 ART.Sheet.define('window.useradmin history input.disabled', {
-          'left': 66
+	'left': 66
 });
 
 
 CCS.UserAdmin = new Class({
 
-      Extends: CCS.JBrowser,
+	Extends: CCS.JBrowser,
 
-      options: {
-          className: 'art browser logo_header useradmin',
-          jframeOptions: {
-              clickRelays: 'a, .relays'
-          }
-      },
+	options: {
+		className: 'art browser logo_header useradmin',
+		jframeOptions: {
+		    clickRelays: 'a, .relays'
+		}
+	}
+
 });
