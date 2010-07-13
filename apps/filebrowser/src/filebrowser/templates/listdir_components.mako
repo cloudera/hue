@@ -88,13 +88,17 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
               % endif
             </div>
           </td>
+          <% 
+            if "dir" == file['type']:
+              sortValue = 0;
+            else:
+              sortValue = file['stats']['size']
+          %>
           <td class="fb-filesize">
             % if "dir" == file['type']:
-              ##this hidden zero is for sorting
-              <span style="display:none">0</span>
-              ~
+              <span data-sort-value="${sortValue}">~</span>
             % else:
-              ${file['stats']['size']|filesizeformat}
+              <span data-sort-value="${sortValue}">${file['stats']['size']|filesizeformat}</span>
             % endif
           </td>
           <td class="fb-user">${file['stats']['user']}</td>

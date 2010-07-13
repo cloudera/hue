@@ -17,11 +17,34 @@
 ---
 description: Creates instances of HtmlTable for any table with the css class .ccs-data_table with additional options for sortability and selectability.
 provides: [CCS.JFrame.HtmlTable]
-requires: [/CCS.JFrame, More/HtmlTable.Sort, More/HtmlTable.Zebra, More/HtmlTable.Select]
+requires: [/CCS.JFrame, More/HtmlTable.Sort, More/HtmlTable.Zebra, More/HtmlTable.Select, /Element.Data]
 script: CCS.JFrame.HtmlTable.js
 
 ...
 */
+
+//The newHash here is used to attach these parsers at the beginning of the HtmlTable.Parsers hash.  Otherwise, anything that begins with a number is picked up by the 'number' parser, which is not what we want.
+newHash = new Hash();
+//A parser to allow numeric sorting by any value.
+newHash.dataSortValue = {
+        match: /data-sort-value/,
+        convert: function() {
+                text = this.getElement('[data-sort-value]').get('data', 'sort-value');
+                return text.toInt();
+        },
+        number: true
+};
+//A parser to allow lexicographical sorting by any string.
+newHash.dataSortString = {
+        match: /data-sort-string/,
+        convert: function() {
+                text = this.getElement('[data-sort-string]').get('data', 'sort-string');
+                return text;
+        },
+        number: false 
+};
+newHash.combine(HtmlTable.Parsers);
+HtmlTable.Parsers = newHash;
 
 CCS.JFrame.addGlobalFilters({
 
@@ -72,3 +95,7 @@ CCS.JFrame.addGlobalFilters({
 	}
 
 });
+
+
+
+
