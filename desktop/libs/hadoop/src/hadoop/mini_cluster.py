@@ -95,6 +95,8 @@ class MiniHadoopCluster(object):
 
     in_conf_dir = tmppath("in-conf")
     os.mkdir(in_conf_dir)
+    self.log_dir = tmppath("logs")
+    os.mkdir(self.log_dir)
     f = file(os.path.join(in_conf_dir, "hadoop-metrics.properties"), "w")
     try:
       f.write("""
@@ -139,10 +141,11 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       ]
       env = {}
       env["HADOOP_CONF_DIR"] = in_conf_dir
-      env["HADOOP_OPTS"] = "-Dtest.build.data=%s" % self.tmpdir
+      env["HADOOP_OPTS"] = "-Dtest.build.data=%s" % (self.tmpdir, )
       env["HADOOP_CLASSPATH"] = hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get()
       env["HADOOP_HEAPSIZE"] = "128"
       env["HADOOP_HOME"] = hadoop.conf.HADOOP_HOME.get()
+      env["HADOOP_LOG_DIR"] = self.log_dir
       if "JAVA_HOME" in os.environ:
         env["JAVA_HOME"] = os.environ["JAVA_HOME"]
       # Wait for the debugger to attach
