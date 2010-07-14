@@ -18,6 +18,7 @@
 Tests for libs/hadoop
 """
 import cStringIO
+import os
 
 from nose.tools import assert_true, assert_equal
 from nose.plugins.attrib import attr
@@ -96,3 +97,11 @@ def test_confparse():
 
   cp_empty = confparse.ConfParse("")
   assert_equal(cp_empty.get('whatever', 'yes'), 'yes')
+
+def test_tricky_confparse():
+  """
+  We found (experimentally) that dealing with a file
+  sometimes triggered the wrong results here.
+  """
+  cp_data = confparse.ConfParse(file(os.path.join(os.path.dirname(__file__), "test_data", "sample_conf.xml")))
+  assert_equal("org.apache.hadoop.examples.SleepJob", cp_data["mapred.mapper.class"])

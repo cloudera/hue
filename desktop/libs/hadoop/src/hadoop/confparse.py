@@ -55,9 +55,14 @@ class ConfParse(dict):
 
   def _element_end(self, name):
     self._element = None
+    if name == "value":
+      self._curname = None
 
   def _char_handler(self, bytes):
+    # We do appends here, because _char_handler may be called multiple
+    # times.  The get() or syntax here is intentional, because
+    # the dictionary usually has the element, but it's value is None.
     if self._element == "name":
-      self._curname = bytes
+      self._curname = (self.__dict__.get("_curname") or "") + bytes
     if self._element == "value":
-      self[self._curname] = bytes
+      self[self._curname] = (self.get(self._curname) or "") + bytes
