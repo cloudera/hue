@@ -424,9 +424,12 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 */
 
 .sideBySideSelect {
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
 	min-width:340px;
 }
-.sideBySideSelect .deselected, .sideBySideSelect .selected {
+.sideBySideSelect div.deselected, .sideBySideSelect div.selected {
 	border: 1px solid #333;
 	float: left;
 	width: 45%;
@@ -435,30 +438,23 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 	overflow: auto;
 }
 .sideBySideSelect .spacer {
-	background: url(/static/art/led-icons/tag.png) no-repeat 50% 50%;
+	padding-top: 50px;
 	width: 30px;
-	height: 150px;
 	float: left;
 }
-.sideBySideSelect .selected table.ccs-data_table tr > td:first-child, .sideBySideSelect .selected table.ccs-data_table tr td:first-child {
-	padding-left: 16px;
+.sideBySideSelect .spacer a {
+	display: block;
+	width: 16px;
+	height: 16px;
+	text-indent: -900px;
+	margin: 5px auto;
 }
-.sideBySideSelect .selected table.ccs-data_table tr:hover > td:first-child, .sideBySideSelect .selected table.ccs-data_table tr.table-tr-hovered td:first-child {
-
-	background-image: url(/static/art/icons/arrow_left_tiny.png);
-	background-repeat: no-repeat;
-	background-position: 0px 2px;
+.sideBySideSelect .spacer .moveRight {
+	background: url(/static/art/led-icons/arrow_right.png) no-repeat;
 }
-.sideBySideSelect .selected table.ccs-data_table tr > td:first-child, .sideBySideSelect .selected table.ccs-data_table tr td:first-child {
-	padding-right: 16px;
+.sideBySideSelect .spacer .moveLeft {
+	background: url(/static/art/led-icons/arrow_left.png) no-repeat;
 }
-.sideBySideSelect .deselected table.ccs-data_table tr:hover > td:first-child, .sideBySideSelect .deselected table.ccs-data_table tr.table-tr-hovered td:first-child {
-
-	background-image: url(/static/art/icons/arrow_right_tiny.png);
-	background-repeat: no-repeat;
-	background-position: right 2px;
-}
-
 
 /* help text links */
 .ccs-help_link, .ccs-info_link {
