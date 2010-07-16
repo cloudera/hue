@@ -65,7 +65,10 @@ CCS.JFrame.addGlobalFilters({
 			var inlineSize = {};
 			conf.sides.each(function(side) {
 				var size = conf.elements[side].style[conf.dimension];
-				if (size) inlineSize[side] = size.toInt();
+				if (size) {
+					inlineSize[side] = size.toInt();
+					conf.fixed = side;
+				}
 				conf.elements[side].setStyle(conf.dimension, 'auto');
 			});
 			
@@ -85,7 +88,8 @@ CCS.JFrame.addGlobalFilters({
 				resizable: splitview.hasClass("resizable"),
 				foldable: splitview.hasClass("foldable"),
 				splitterContent: splitview.getElement('.splitter_col'),
-				styles: styles
+				styles: styles,
+				fixed: conf.fixed || 'left'
 			}).inject(this, splitview, 'after').draw();
 			var sized;
 			conf.sides.each(function(side) {
