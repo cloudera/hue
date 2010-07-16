@@ -8063,6 +8063,8 @@ pv.Mark.prototype.context = function(scene, index, f) {
   }
 
   /* Context switch, invoke the function, then switch back. */
+  clear(oscene, oindex);
+  apply(scene, index);
   try {
     f.apply(this, stack);
   } finally {
