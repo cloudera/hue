@@ -151,7 +151,6 @@ CCS.JFrame.addGlobalLinkers({
 	'[data-splitview-resize]': function(e, link){
 		var widget = getWidget(link);
 		if (!widget) return;
-		e.stop();
 		var resize = link.get('data', 'splitview-resize', true);
 		if (!resize) return;
 		var side;
@@ -165,7 +164,6 @@ CCS.JFrame.addGlobalLinkers({
 	'[data-splitview-toggle]': function(e, link){
 		var widget = getWidget(link);
 		if (!widget) return;
-		e.stop();
 		var resize = link.get('data', 'splitview-toggle', true);
 		if (!resize) return;
 		widget.toggle(resize.side, resize.hideSplitter).chain(partialPostFold.bind(this, [resize, e, link]));
