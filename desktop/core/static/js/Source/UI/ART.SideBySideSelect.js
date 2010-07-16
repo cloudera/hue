@@ -105,7 +105,7 @@ ART.SideBySideSelect = new Class({
 		this.selected.body.empty();
 		this.deselected.body.empty();
 		this.select.getElements('option').each(function(option){
-			var name = [option.get('text') || option.get('value')];
+			var name = option.get('text') || option.get('value');
 			this._options[name] = option;
 			var row = this._makeRow(name, option.get('selected') ? 'selected' : 'deselected');
 		}, this);
@@ -268,7 +268,7 @@ ART.SideBySideSelect = new Class({
 
 	//given a name, create a row in the specified table; either 'selected' or 'deselected'
 	_makeRow: function(name, where){
-		var row = this[where].push([this.options.makeContent.call(this, name, true)]).tr.store('_sideBySide:name', name);
+		var row = this[where].push([this.options.makeContent.call(this, name, where)]).tr.store('_sideBySide:name', name);
 		this._options[name].set('selected', where == 'selected');
 		this._rows[name] = row;
 		return row;

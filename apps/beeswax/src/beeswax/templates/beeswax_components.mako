@@ -52,10 +52,10 @@
     attrs = {}
   if not render_default:
     attrs.setdefault('type', 'text')
-
+    
   if data_filters:
     attrs.data_filters = data_filters
-
+  
   classes = []
   if klass:
     classes.append(klass)

@@ -106,6 +106,9 @@ CCS.JFrame = new Class({
 		this.addFilters(this.options.filters);
 
 		this.behavior = new Behavior(this.element);
+		['attachKeys', 'detachKeys', 'addShortcut', 'addShortcuts', 'removeShortcut', 'removeShortcuts', 'applyDelegates'].each(function(method){
+			this.behavior.passMethod(method, this[method].bind(this));
+		}, this);
 		this.addEvent('resize', this.behavior.resize.bind(this.behavior));
 		this.addBehaviors(this.options.behaviors);
 
@@ -310,12 +313,13 @@ CCS.JFrame = new Class({
 		fill: fills a given target with the appropriate content
 		target - (*element*) the target to fill with content
 		content - (*object*) an object with the following properties:
-			js - (*string*) any inline javascript to evalutate (stripped from <script> tags)
+			js - (*string*) any the inline javascript to evalutate,
 			links - (*elements array*) css links to be injected into the target
 			elements - (*elements array*) elements to inject into the target (i.e. the actual content)
 			title - (*string*) the title of the content
 			view - (*string*; optional) if defined, the view of the content
 			viewElement - (*element*; optional) if defined, the element for the view
+		
 	*/
 
 	fill: function(target, content){
@@ -337,7 +341,7 @@ CCS.JFrame = new Class({
 		};
 		this.fireEvent('resize', [x, y]);
 	},
-
+	
 	filters: {},
 
 	/*
@@ -371,7 +375,7 @@ CCS.JFrame = new Class({
 	addBehavior: function(name, fn, overwrite){
 		this.behavior.addFilter(name, fn, overwrite);
 	},
-
+	
 	/*
 		add a group of behavior filters
 		obj - (*object*) an object of key/value pairs of name/functions for filters (see addBehavior)
@@ -391,7 +395,7 @@ CCS.JFrame = new Class({
 		var behavior = this.behavior.lookup(name);
 		this.behavior.applyBehavior(element, behavior, force);
 	},
-
+	
 	//Applies all the behavior filters for an element.
 	//element - (element) an element to apply the filters registered with this Behavior instance to.
 	//force - (boolean; optional) passed through to applyBehavior (see it for docs)
