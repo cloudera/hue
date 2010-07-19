@@ -470,28 +470,37 @@ ART.Sheet.define('window.filechooser.browser', {
 					this.setCaption(saver.getDirPath() + " :: " + caption);
 				}.bind(saver));
 				var locationInput = $(saver).getElement('.fs-locationInput');
-					saver.getOk().addEvent('press', function(){
-					var selected = $(saver).getElement('.table-tr-selected');
+                                saver.getOk().addEvent('press', function(){
+                                //Get selected row of filebrowser table
+                                var selected = $(saver).getElement('.table-tr-selected');
+                                var selectedPath, isDirSelected = false;
+                                // If there is a row selected create a selected path based on that row
+                                // If not create a selected path based on the current displayed directory
+                                if(selected) {
                                         var selectedData = selected.get('data', 'filedata', true);
-                                        var isDirSelected = selectedData.type == 'dir';
-                                        var selectedPath = selectedData.path;
-					var error = function(){
-						var msg = "Please choose a directory.";
-						if (options.filter == "file") msg = "Please choose a file.";
-						saver.alert(caption || "Choose a File", msg);
-						saver.fireEvent('badSelection', selected);
-					};
-					var inputPath = (isDirSelected ? selectedPath + "/" : "") + locationInput.get('value');
-					var returnPath; 
-					//An input path belonging with a slash is assumed to be an absolute path.
-					if (inputPath[0] == '/') returnPath = inputPath;
-					else returnPath = saver.getDirPath() + '/' + inputPath;
-					callback({
-						path: returnPath,
-						type: 'dir'
-					});
-					saver.hide();
-					});
+                                        isDirSelected = selectedData.type == 'dir';
+                                        selectedPath = selectedData.path;
+                                } else {
+                                        selectedPath = saver.getDirPath();
+                                }
+                                var error = function(){
+                                        var msg = "Please choose a directory.";
+                                        if (options.filter == "file") msg = "Please choose a file.";
+                                        saver.alert(caption || "Choose a File", msg);
+                                        saver.fireEvent('badSelection', selected);
+                                };
+                                //if a directory is selected, move to the selected directory
+                                var inputPath = (isDirSelected ? selectedPath + "/" : "") + locationInput.get('value');
+                                var returnPath; 
+                                //An input path belonging with a slash is assumed to be an absolute path.
+                                if (inputPath[0] == '/') returnPath = inputPath;
+                                else returnPath = saver.getDirPath() + '/' + inputPath;
+                                callback({
+                                        path: returnPath,
+                                        type: 'dir'
+                                });
+                                saver.hide();
+                                });
 			return saver;
 		});
 	};
