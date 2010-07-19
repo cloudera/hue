@@ -52,7 +52,7 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
           <dt class="ccs-dt_cap">Actions</dt>
           <dd class="ccs-dd_bottom bw-actions">
             <ul>
-              <li><a class="bw-load_data collapser">Import Data</a>
+              <li class="ccs-clear"><a class="bw-load_data collapser">Import Data</a>
                   <div class="collapsible ccs-hidden">
                     <form action="${ url("beeswax.views.load_table", table=table_name) }">
                       <dl>
@@ -66,7 +66,7 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
                           klass='bw-loadPath',
                           data_filters="OverText",
                           alt='/user/data'))}
-                        <div class="ccs-button_bar">
+                        <div class="ccs-button_bar clearfix">
                           <a class="ccs-choose_file ccs-art_button" 
                             data-icon-styles="{'width': 16, 'height': 16, 'top': 1, 'left': 4 }" data-chooseFor="path">Choose File</a>
                           <input type="submit" class="ccs-art_button bw-loadSubmit" value="Submit"/>
@@ -82,9 +82,9 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
                     </form>
                   </div>
               </li>
-              <li><a href="${ url("beeswax.views.read_table", table=table_name) }" class="bw-browse_data">Browse Data</a></li>
-              <li><a href="${ url("beeswax.views.drop_table", table=table_name) }" class="bw-drop_table">Drop Table</a></li>
-              <li><a href="${hdfs_link}" target="FileBrowser" class="ccs-pointy_tip bw-location_link" data-tip-direction="11" rel="${ table.sd.location }">View File Location</a></li>
+              <li class="ccs-clear"><a href="${ url("beeswax.views.read_table", table=table_name) }" class="bw-browse_data">Browse Data</a></li>
+              <li class="ccs-clear"><a href="${ url("beeswax.views.drop_table", table=table_name) }" class="bw-drop_table">Drop Table</a></li>
+              <li class="ccs-clear"><a href="${hdfs_link}" target="FileBrowser" class="ccs-pointy_tip bw-location_link" data-tip-direction="11" rel="${ table.sd.location }">View File Location</a></li>
             </ul>
           </dd>
         </dl>
