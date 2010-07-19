@@ -27,8 +27,7 @@ PROD_INCLUDES := \
 	Makefile* \
 	tools/app_reg \
 	tools/virtual-bootstrap \
-	VERSION_DATA \
-	virtualenv_support
+	VERSION_DATA
 
 PROD_EXCLUDES := \
         Makefile.tarball \
