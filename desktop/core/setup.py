@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "desktop",
-      version = "0.9",
+      version = "0.9.1",
       url = 'http://github.com/cloudera/hue',
       description = "Hue core",
       packages = find_packages('src'),

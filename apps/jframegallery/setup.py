@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "jframegallery",
-      version = "0.9",
+      version = "0.9.1",
       author = "Hue",
       url = 'http://github.com/cloudera/hue',
       description = "Hue JFrame Gallery",

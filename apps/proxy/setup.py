@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "proxy",
-      version = "0.9",
+      version = "0.9.1",
       url = 'http://github.com/cloudera/hue',
       author = "Hue",
       description = "Reverse Proxy",

@@ -69,7 +69,7 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
                         <div class="ccs-button_bar">
                           <a class="ccs-choose_file ccs-art_button" 
                             data-icon-styles="{'width': 16, 'height': 16, 'top': 1, 'left': 4 }" data-chooseFor="path">Choose File</a>
-                          <input type="submit" class="ccs-art_button bw-loadSubmit" value="Submit">
+                          <input type="submit" class="ccs-art_button bw-loadSubmit" value="Submit"/>
                         </div>
                         
                         % for pf in load_form.partition_columns:
@@ -80,6 +80,7 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
                         ## this data corresponds to.
                       </dl>
                     </form>
+                  </div>
               </li>
               <li><a href="${ url("beeswax.views.read_table", table=table_name) }" class="bw-browse_data">Browse Data</a></li>
               <li><a href="${ url("beeswax.views.drop_table", table=table_name) }" class="bw-drop_table">Drop Table</a></li>
