@@ -40,7 +40,7 @@ def col_type(col):
 %   endif
   `${col["column_name"]|n}` ${col_type(col)|n} \
 %   if col.get("comment"):
-   COMMENT "${col["comment"]|n}" \
+COMMENT "${col["comment"]|n}" \
 %   endif
 % endfor
 ) \
@@ -52,11 +52,11 @@ EXTERNAL \
 % endif
 TABLE `${ table["name"] | n }`
 ${column_list(columns)|n}
+% if table["comment"]:
+COMMENT "${table["comment"] | n}"
+% endif
 % if len(partition_columns) > 0:
 PARTITIONED BY ${column_list(partition_columns)|n}
-% endif
-% if table["comment"]:
-  COMMENT "${table["comment"] | n}"
 % endif
 ## TODO: CLUSTERED BY here
 ## TODO: SORTED BY...INTO...BUCKETS here
