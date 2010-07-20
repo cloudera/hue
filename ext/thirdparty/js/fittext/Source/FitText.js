@@ -40,8 +40,8 @@ var FitText = new Class({
 		this.bound = this.fit.bind(this);
 		
 		this.elements.each(function(element){
-			element.store('scrollWidth',element.getSize().x).store('text',element.get('text'));
-		}.bind(this));
+			element.store('scrollWidth',element.getSize().x).store('text',element.get('text')).store('FitText', this);
+		}, this);
 
 		this.attach();
 		this.fit();
@@ -61,8 +61,7 @@ var FitText = new Class({
 				element.removeClass(this.options.fitClass);
 				element.set('text',text);
 			}
-
-		}.bind(this));
+		}, this);
 
 		return this;
 	},

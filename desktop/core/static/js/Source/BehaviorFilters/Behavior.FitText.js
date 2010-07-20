@@ -24,8 +24,15 @@ script: Behavior.FitText.js
 */
 
 (function(){
-	//implements the FitText filter on an element; attaches to the jframe for events on resize
-	var fitIt = function(filter, element, events){
+	/*
+		implements the FitText filter on an element; attaches to Behavior for events on resize
+		filter - the Behavior filter instance
+		element - the element to instantiate FitText against
+		methods - the Behavior methods object passed into the filter
+		garbageElement - (optional) if the element passed to the filter is not the one having 
+		     FitText applied, pass in the filter element for garbage collection marking
+	*/
+	var fitIt = function(filter, element, methods, garbageElement){
 		if (element.get('tag') == 'td' || element.getParent('table')) {
 			fixTable(element.getParent('table'));
 			if (element.get('tag') == 'td') element.setStyles(tdStyles);
@@ -61,9 +68,9 @@ script: Behavior.FitText.js
 				//rerun this after a while, as some filters muck about w/ the DOM
 				//I'm not crazy about this solution, but it'll have to do for now
 				fitTextFit.delay(10); 
-				events.addEvent('show', fitTextFit);
-				filter.markForCleanup(element, function(){
-					events.removeEvent('show', fitTextFit);
+				methods.addEvent('show', fitTextFit);
+				filter.markForCleanup(garbageElement || element, function(){
+					methods.removeEvent('show', fitTextFit);
 				});
 			}
 		};
@@ -89,18 +96,18 @@ script: Behavior.FitText.js
 			elements cannot have child elements (only text)
 		*/
 
-		FitText: function(element, events) {
-			fitIt(this, element, events);
+		FitText: function(element, methods) {
+			fitIt(this, element, methods);
 		},
 
 		/*
 			finds all elements wth data-fit-text properties - these properties must be selectors
 			for the elements to apply the FitText class to.
 		*/
-		'FitText-Children': function(element, events){
+		'FitText-Children': function(element, methods){
 			var selector = element.get('data', 'fit-text');
 			element.getElements(selector).each(function(el){
-				fitIt(this, el, events);
+				fitIt(this, el, methods, element);
 			}, this);
 		}
 
