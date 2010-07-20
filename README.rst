@@ -61,7 +61,6 @@ Development Prerequisites
 
     Debian:
       * gcc
-      * libldap2-dev
       * libmysqlclient-dev
       * libsqlite3-dev
       * libxml2-dev
@@ -75,7 +74,6 @@ Development Prerequisites
       * libxslt-devel
       * mysql
       * mysql-devel
-      * openldap-devel
       * python-devel
       * python-setuptools
       * python-simplejson (for the crepo tool)
