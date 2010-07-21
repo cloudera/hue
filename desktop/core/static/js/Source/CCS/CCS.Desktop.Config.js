@@ -171,4 +171,19 @@ window.addEvent('domready', function(){
 	});
 });
 
-Selectors.Pseudo.widget = function() { return !! this.get("widget"); }; 
+Selectors.Pseudo.widget = function() { return this.get && (!! this.get("widget")); };
+
+//Although implement checks for a pre-existing implementation of the method, it has to be forced for IE to overwrite the MooTools version.
+//Thus, the IE check.
+if (Browser.Engine.trident) {
+        Array.implement({
+                forEach: function(fn, bind){
+                        var len = this.length;
+                        for (var i=0; i < len; i++) {
+                                if(i in this) fn.call(bind, this[i], i, this);
+                        }
+                }       
+        }, true);
+
+        Array.alias('forEach', 'each', true); 
+}

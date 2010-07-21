@@ -85,11 +85,11 @@ script: CCS.JBrowser.js
 			options.showNow = false;
 			this.parent(options);
 			this._setupHistory(path);
+			this._makeJFrame(path);
 			if (show) {
 				this.options.showNow = true;
 				this.show();
 			}
-			this._makeJFrame(path);
 			if (Browser.Engine.trident) {
 				$(this).setStyle('top', -111111111);
 			} else {
