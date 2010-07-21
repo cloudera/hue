@@ -153,6 +153,7 @@ var getWidget = function(link) {
 CCS.JFrame.addGlobalLinkers({
 
 	'[data-splitview-resize]': function(e, link){
+		if ($(e.target).get('tag') == 'a') e.preventDefault();
 		var widget = getWidget(link);
 		if (!widget) return;
 		var resize = link.get('data', 'splitview-resize', true);
@@ -166,6 +167,7 @@ CCS.JFrame.addGlobalLinkers({
 	},
 
 	'[data-splitview-toggle]': function(e, link){
+		if ($(e.target).get('tag') == 'a') e.preventDefault();
 		var widget = getWidget(link);
 		if (!widget) return;
 		var resize = link.get('data', 'splitview-toggle', true);
