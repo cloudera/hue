@@ -238,3 +238,12 @@ DJANGO_DEBUG_MODE = Config(
   type=coerce_bool,
   default=True
 )
+
+HTTP_500_DEBUG_MODE = Config(
+  key='http_500_debug_mode',
+  help='Enable or disable debugging information in the 500 internal server error response. '
+       'Note that the debugging information may contain sensitive data. '
+       'If django_debug_mode is True, this is automatically enabled.',
+  type=coerce_bool,
+  default=True
+)

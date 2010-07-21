@@ -18,6 +18,7 @@ from desktop.lib import django_mako
 
 from nose.tools import assert_true, assert_equal
 from desktop.lib.django_test_util import make_logged_in_client
+from django.conf.urls.defaults import patterns, url
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
 from desktop.lib.paginator import Paginator
@@ -194,3 +195,47 @@ def test_truncating_model():
 
   a.non_string_field = 10**10
   assert_true(a.non_string_field == 10**10, 'non-string fields are not truncated')
+
+
+def test_500_handling():
+  restore_django_debug = desktop.conf.DJANGO_DEBUG_MODE.set_for_testing(False)
+  restore_500_debug = desktop.conf.HTTP_500_DEBUG_MODE.set_for_testing(False)
+
+  exc_msg = "error_raising_view: Test 500 handling"
+  def error_raising_view(request, *args, **kwargs):
+    raise Exception(exc_msg)
+
+  # Add an error view
+  error_url_pat = patterns('', url('^500_internal_error$', error_raising_view))[0]
+  desktop.urls.urlpatterns.append(error_url_pat)
+  try:
+    def store_exc_info(*args, **kwargs):
+      pass
+    # Disable the test client's exception forwarding
+    c = make_logged_in_client()
+    c.store_exc_info = store_exc_info
+
+    response = c.get('/500_internal_error')
+    assert_equal(response.template.name, '500.html')
+    assert_true('should be fixed shortly. Thanks for your patience' in response.content)
+    assert_true(exc_msg not in response.content)
+
+    # Now test the 500 handler with backtrace
+    desktop.conf.HTTP_500_DEBUG_MODE.set_for_testing(True)
+    response = c.get('/500_internal_error')
+    assert_equal(response.template.name, 'Technical 500 template')
+    assert_true(exc_msg in response.content)
+  finally:
+    # Restore the world
+    desktop.urls.urlpatterns.remove(error_url_pat)
+    restore_django_debug()
+    restore_500_debug()
+
+
+def test_404_handling():
+  view_name = '/the-view-that-is-not-there'
+  c = make_logged_in_client()
+  response = c.get(view_name)
+  assert_equal(response.template.name, '404.html')
+  assert_true('Page Not Found' in response.content)
+  assert_true(view_name in response.content)

@@ -16,20 +16,22 @@
 # limitations under the License.
 
 import logging
-import zipfile
+import sys
 import tempfile
 import time
-import sys
 import traceback
+import zipfile
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
+import django.views.debug
 
 from desktop.lib.django_util import login_notrequired, render_json, render
-from desktop.log.access import access_log_level
+from desktop.log.access import access_log_level, access_warn
 from desktop.models import UserPreferences
 from desktop import appmanager
+import desktop.conf
 import desktop.log.log_buffer
 
 LOG = logging.getLogger(__name__)
@@ -196,3 +198,16 @@ def index(request):
   return render("index.mako", request, dict(
     feedback_url=desktop.conf.FEEDBACK_URL.get()
   ))
+
+def serve_404_error(request, *args, **kwargs):
+  """Registered handler for 404. We just return a simple error"""
+  access_warn(request, "404 not found")
+  return render_to_response("404.html", dict(uri=request.build_absolute_uri()))
+  return HttpResponse('Page not found. You are trying to access %s' % (request.build_absolute_uri(),),
+                      content_type="text/plain")
+
+def serve_500_error(request, *args, **kwargs):
+  """Registered handler for 500. We use the debug view to make debugging easier."""
+  if desktop.conf.HTTP_500_DEBUG_MODE.get():
+    return django.views.debug.technical_500_response(request, *sys.exc_info())
+  return render_to_response("500.html")

@@ -19,13 +19,18 @@ import logging
 import os
 import re
 
-# The "*" import below is important.  
-# Django expects, for example, handler500 and handler404
-# to be defined.  See http://code.djangoproject.com/ticket/5350
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import include, patterns, url
 from django.contrib import admin
+
 from desktop import appmanager
 import depender.urls
+
+# Django expects handler404 and handler500 to be defined.
+# django.conf.urls.defaults provides them. But we want to override them.
+# Also see http://code.djangoproject.com/ticket/5350
+handler404 = 'desktop.views.serve_404_error'
+handler500 = 'desktop.views.serve_500_error'
+
 
 # Set up /appname/static mappings for any apps that have static directories
 def static_pattern(urlprefix, root):
