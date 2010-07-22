@@ -64,6 +64,7 @@ sources: [
   Source/CCS/CCS.PostEditor.Simple.js,
   Source/UI/ART.SideBySideSelect.js,
   Source/BehaviorFilters/Behavior.FitText.js,
+  Source/BehaviorFilters/Behavior.MultiChecks.js,
   Source/BehaviorFilters/Behavior.SideBySideSelect.js,
 ]
 version: Unknown

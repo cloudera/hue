@@ -36,6 +36,7 @@ requires:
  - Widgets/Behavior.ArtButton
  - /Behavior.SideBySideSelect
  - /Behavior.FitText
+ - /Behavior.MultiChecks
  - /CCS
  - /CCS.ContextMenu
 script: CCS.JFrame.js
