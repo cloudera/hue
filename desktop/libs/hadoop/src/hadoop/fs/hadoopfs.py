@@ -447,6 +447,7 @@ class HadoopFileSystem(object):
       'mode': mode,
       'user': stat.owner,
       'group': stat.group,
+      'atime': stat.atime
       }
 
   @staticmethod
