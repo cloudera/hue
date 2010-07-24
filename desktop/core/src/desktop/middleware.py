@@ -24,6 +24,7 @@ import django.db
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response
 from django.utils.http import urlquote
+from django.utils.encoding import iri_to_uri
 import django.views.static
 import django.views.generic.simple
 import django.contrib.auth.views
@@ -97,7 +98,7 @@ class JFrameMiddleware(object):
       query_string = get_params.urlencode()
       if query_string:
         path = request.path + "?" + query_string
-    response['X-Hue-JFrame-Path'] = path
+    response['X-Hue-JFrame-Path'] = iri_to_uri(path)
     if response.status_code == 200:
       if is_jframe_request(request):
         if hasattr(request, "flash"):

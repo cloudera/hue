@@ -35,7 +35,7 @@ from django.utils.html import escape
 from cStringIO import StringIO
 from gzip import GzipFile
 
-
+from desktop.lib import i18n
 from desktop.lib.django_util import make_absolute, render_json
 from desktop.lib.django_util import PopupException, format_preserving_redirect
 from filebrowser.lib.rwx import filetype, rwx
@@ -45,7 +45,6 @@ from filebrowser.forms import RenameForm, UploadForm, MkDirForm, RmDirForm, RmTr
 from hadoop.fs import normpath
 from filebrowser.plugin.views import render_with_toolbars
 
-import filebrowser.plugin.toolbar
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024*4 # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024*1024 # 1MB
@@ -55,12 +54,9 @@ DOWNLOAD_CHUNK_SIZE = 32*1024 # 32KB
 # Sentences refer to groups of bytes printed together, within a line.
 BYTES_PER_LINE = 16
 BYTES_PER_SENTENCE = 2
-# If the percentage of non-printable bytes is greater than this, binary mode is
-# enabled by default.
-BINARY_PERCENTAGE = 0.10
 
 # The maximum size the file editor will allow you to edit
-MAX_FILEEDITOR_SIZE=256*1024
+MAX_FILEEDITOR_SIZE = 256*1024
 
 logger = logging.getLogger(__name__)
 
@@ -140,21 +136,21 @@ def edit(request, path, form=None):
   if stats and stats['size'] > MAX_FILEEDITOR_SIZE:
     raise PopupException("File too big to edit: %s" % (path,))
 
-  if stats:
-    f = request.fs.open(path)
-    try:
-      current_contents = f.read()
-      try:
-        current_contents = unicode(current_contents)
-      except UnicodeDecodeError:
-        raise PopupException("File is not unicode text; cannot be edited: %s" % (path,))
-    finally:
-      f.close()
-  else:
-    current_contents = ""
-
   if not form:
-    form = EditorForm(dict(path=path, contents=current_contents))
+    encoding = request.REQUEST.get('encoding', i18n.get_site_encoding())
+    if stats:
+      f = request.fs.open(path)
+      try:
+        try:
+          current_contents = unicode(f.read(), encoding)
+        except UnicodeDecodeError:
+          raise PopupException("File is not encoded in %s; cannot be edited: %s" % (encoding, path))
+      finally:
+        f.close()
+    else:
+      current_contents = u""
+
+    form = EditorForm(dict(path=path, contents=current_contents, encoding=encoding))
 
   data = dict(
     exists=(stats is not None),
@@ -187,16 +183,20 @@ def save_file(request):
     return edit(request, path, form=form)
 
   if request.fs.exists(path):
-    _do_overwrite_save(request.fs, path, form.cleaned_data['contents'])
+    _do_overwrite_save(request.fs, path,
+                       form.cleaned_data['contents'],
+                       form.cleaned_data['encoding'])
   else:
-    _do_newfile_save(request.fs, path, form.cleaned_data['contents'])
+    _do_newfile_save(request.fs, path,
+                     form.cleaned_data['contents'],
+                     form.cleaned_data['encoding'])
 
   request.flash.put('Saved %s.' % os.path.basename(path))
   """ Changing path to reflect the request path of the JFrame that will actually be returned."""
   request.path = urlresolvers.reverse("filebrowser.views.edit", kwargs=dict(path=path))
   return edit(request, path, form)
 
-def _do_overwrite_save(fs, path, data):
+def _do_overwrite_save(fs, path, data, encoding):
   """
   Atomically (best-effort) save the specified data to the given path
   on the filesystem.
@@ -214,7 +214,7 @@ def _do_overwrite_save(fs, path, data):
   new_file = fs.open(path_dest, "w")
   try:
     try:
-      new_file.write(data)
+      new_file.write(data.encode(encoding))
       logging.info("Wrote to " + path_dest)
     finally:
       new_file.close()
@@ -253,7 +253,7 @@ def _do_overwrite_save(fs, path, data):
   fs.rename(path_dest, path)
 
 
-def _do_newfile_save(fs, path, data):
+def _do_newfile_save(fs, path, data, encoding):
   """
   Save data to the path 'path' on the filesystem 'fs'.
 
@@ -261,7 +261,7 @@ def _do_newfile_save(fs, path, data):
   """
   new_file = fs.open(path, "w")
   try:
-    new_file.write(data)
+    new_file.write(data.encode(encoding))
   finally:
     new_file.close()
 
@@ -291,12 +291,14 @@ def listdir(request, path):
     'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
     'cwd_set': True
   }
+
   stats = request.fs.listdir_stats(path)
+
   # Include parent dir, unless at filesystem root.
   if normpath(path) != posixpath.sep:
     parent_stat = request.fs.stats(posixpath.join(path, ".."))
-    # the 'path' field would be absolute, but we want its basename to be
-    # actually '..' for display purposes
+    # The 'path' field would be absolute, but we want its basename to be
+    # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.
     parent_stat['path'] = posixpath.join(path, "..")
     stats.insert(0, parent_stat)
 
@@ -314,10 +316,11 @@ def _massage_stats(request, stats):
   Massage a stats record as returned by the filesystem implementation
   into the format that the views would like it in.
   """
-  normalized = normpath(stats['path'])
+  path = stats['path']
+  normalized = normpath(path)
   return {
     'path': normalized,
-    'name': posixpath.basename(stats['path']),
+    'name': posixpath.basename(path),
     'stats': stats,
     'type': filetype(stats['mode']),
     'rwx': rwx(stats['mode']),
@@ -341,8 +344,10 @@ def display(request, path):
   """
   Implements displaying part of a file.
 
-  GET arguments are length, offset, mode and compression with reasonable
-  defaults chosen.
+  GET arguments are length, offset, mode, compression and encoding
+  with reasonable defaults chosen.
+
+  Note that display by length and offset are on bytes, not on characters.
 
   TODO(philip): Could easily built-in file type detection
   (perhaps using something similar to file(1)), as well
@@ -355,6 +360,7 @@ def display(request, path):
     raise PopupException("Not a file: '%s'" % (path,))
 
   stats = request.fs.stats(path)
+  encoding = request.GET.get('encoding', i18n.get_site_encoding())
 
   # I'm mixing URL-based parameters and traditional
   # HTTP GET parameters, since URL-based parameters
@@ -364,11 +370,11 @@ def display(request, path):
   # because the offset came in via the toolbar manual byte entry.
   end = request.GET.get("end")
   if end:
-      end = int(end)
-  begin = request.GET.get("begin")
+    end = int(end)
+  begin = request.GET.get("begin", 1)
   if begin:
-      # Subtract one to zero index for file read
-      begin = int(begin) - 1
+    # Subtract one to zero index for file read
+    begin = int(begin) - 1
   if end:
     offset = begin
     length = end - begin
@@ -378,7 +384,6 @@ def display(request, path):
     length = int(request.GET.get("length", DEFAULT_CHUNK_SIZE_BYTES))
     # Display first block by default.
     offset = int(request.GET.get("offset", 0))
-
 
   mode = request.GET.get("mode")
   compression = request.GET.get("compression")
@@ -392,8 +397,8 @@ def display(request, path):
   if length > MAX_CHUNK_SIZE_BYTES:
     raise PopupException("Cannot request chunks greater than %d bytes" % MAX_CHUNK_SIZE_BYTES)
 
-
-  if not compression:
+  # Auto gzip detection, unless we are explicitly told to view binary
+  if not compression and mode != 'binary':
     if path.endswith('.gz') and detect_gzip(request.fs.open(path).read(2)):
       compression = 'gzip'
       offset = 0
@@ -413,7 +418,6 @@ def display(request, path):
         raise PopupException("Failed to decompress file")
     finally:
       f.close()
-
   else:
     try:
       f.seek(offset)
@@ -421,30 +425,24 @@ def display(request, path):
     finally:
       f.close()
 
-  masked = None
+  # Get contents as string for text mode, or at least try
+  uni_contents = None
+  if not mode or mode == 'text':
+    uni_contents = unicode(contents, encoding, errors='replace')
+    is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
+    # Auto-detect mode
+    if not mode:
+      mode = is_binary and 'binary' or 'text'
 
-
-  if not mode:
-    # Auto-detect mode:
-    (mask_count, masked) = xxd.mask_not_printable(contents)
-    if mask_count and float(mask_count)/len(contents) > BINARY_PERCENTAGE:
-      mode = "binary"
-
-    else:
-      mode = "text"
-
+  # Get contents as bytes
   if mode == "binary":
     xxd_out = list(xxd.xxd(offset, contents, BYTES_PER_LINE, BYTES_PER_SENTENCE))
-  else:
-    # May have been calculated already as part of detection.
-    if not masked:
-      (mask_count, masked) = xxd.mask_not_printable(contents)
 
   dirname = posixpath.dirname(path)
   # Start with index-like data:
   data = _massage_stats(request, request.fs.stats(path))
   # And add a view structure:
-  data["success"] = True;
+  data["success"] = True
   data["view"] = {
     'offset': offset,
     'length': length,
@@ -464,8 +462,8 @@ def display(request, path):
     data['view']['xxd'] = xxd_out
     data['view']['masked_binary_data'] =  False
   else:
-    data['view']['contents'] = masked
-    data['view']['masked_binary_data'] = (mask_count > 0)
+    data['view']['contents'] = uni_contents
+    data['view']['masked_binary_data'] = is_binary
 
   return render_with_toolbars("display.mako", request, data)
 

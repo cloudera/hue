@@ -5,11 +5,11 @@ If you're impatient, these are the key steps.  Please check the full manual
 for more details.
 
 ## Install
-$ HADOOP_HOME=/path/to/hadoop-0.20.1+152 PREFIX=/path/to/install/into \
-  make install
+$ HADOOP_HOME=/usr/lib/hadoop-0.20 PREFIX=/usr/local make install
+
 ## Install plug-ins
 $ cd /usr/lib/hadoop/lib
-$ ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar
+$ ln -s /usr/local/hue/desktop/libs/hadoop/java-lib/hue*jar
 
 ## Configure Hadoop
 Edit hdfs-site.xml:
@@ -37,4 +37,4 @@ Edit mapred-site.xml:
 </property>
 
 ## Run!
-$ /usr/share/hue/build/env/bin/supervisor
+$ /usr/local/hue/build/env/bin/supervisor

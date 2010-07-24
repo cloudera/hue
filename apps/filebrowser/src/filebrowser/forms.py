@@ -37,6 +37,7 @@ class PathField(CharField):
 class EditorForm(forms.Form):
   path = PathField(label="File to edit")
   contents = CharField(widget=Textarea, label="Contents", required=False)
+  encoding = CharField(label='Encoding', required=False)
 
 class RenameForm(forms.Form):
   op = "rename"

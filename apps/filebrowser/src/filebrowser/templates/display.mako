@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 ## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
@@ -52,16 +53,16 @@
        <a class="fv-download" data-filters="ArtButton" target="_blank" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.download', path=path_enc)}">Download</a>
        <a class="fv-viewLocation" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View File Location</a>
        <a class="ccs-refresh large" data-filters="ArtButton">Refresh</a>
-    </div> 
+    </div>
   </div>
   <div class="fv-navhead">
     % if not view['compression'] or view['compression'] == "none":
       <div class="fv-navStatus">
         <form data-filters="SubmitOnChange" class="fv-changeBytesForm" action="${url('filebrowser.views.view', path=path_enc)}" method="GET">
           <span class="fv-bold">Viewing Bytes:</span><a class="fv-editBytes ccs-inline" title="Enter Bytes"></a>
-          <input data-filters="OverText" name="begin" value="${view['offset'] + 1}"/>
+          <input name="begin" value="${view['offset'] + 1}"/>
           -
-          <input data-filters="OverText" value="${view['end']}" name="end"/> of 
+          <input value="${view['end']}" name="end"/> of
           <span class="fv-bold totalBytes">${stats['size']}</span>
           <span class="fv-stepInfo">(${view['length']} B block size)</span>
           % if view['mode']:
@@ -76,14 +77,14 @@
               first = "style='visibility:hidden'"
               prev = "style='visibility:hidden'"
           else:
-              first = "href='%s?offset=0&length=%d&compression=none' title='1 - %d'" %(base_url, view['length'], min(view['length'], stats['size'])) 
-              prev =  "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, max(0, view['offset']-view['length']), view['length'], max(0, view['offset']-view['length']) + 1, min(max(0, view['offset'] - view['length']) + view['length'], stats['size'])) 
+              first = "href='%s?offset=0&length=%d&compression=none' title='1 - %d'" %(base_url, view['length'], min(view['length'], stats['size']))
+              prev =  "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, max(0, view['offset']-view['length']), view['length'], max(0, view['offset']-view['length']) + 1, min(max(0, view['offset'] - view['length']) + view['length'], stats['size']))
           if view['offset'] + view['length'] >= stats['size']:
               next = "style='visibility:hidden'"
               last = "style='visibility:hidden'"
           else:
-              next = "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, view['offset'] + view['length'], view['length'], view['offset'] + view['length'] + 1, view['offset'] + (2 * view['length'])) 
-              last =  "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, stats['size']-(stats['size'] % view['length']), view['length'], stats['size']-(stats['size'] % view['length']) + 1, stats['size']) 
+              next = "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, view['offset'] + view['length'], view['length'], view['offset'] + view['length'] + 1, view['offset'] + (2 * view['length']))
+              last =  "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, stats['size']-(stats['size'] % view['length']), view['length'], stats['size']-(stats['size'] % view['length']) + 1, stats['size'])
         %>
         ###DEFINE REL
         <a class="ccs-inline fv-firstBlock" data-filters="PointyTip" ${first}>First Block</a>
@@ -113,7 +114,7 @@
     <div class="right_col">
     %if 'contents' in view:
       % if view['masked_binary_data']:
-      <div class="fv-binaryWarning">Warning: some binary data has been masked out with '.'.</div>
+      <div class="fv-binaryWarning">Warning: some binary data has been masked out with '&#xfffd'.</div>
       % endif
     % endif
       <div class="jframe_padded">

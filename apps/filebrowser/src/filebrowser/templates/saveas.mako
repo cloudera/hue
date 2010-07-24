@@ -21,7 +21,7 @@
       <div class="alert_popup">
         % for field in form:
           % if len(field.errors):
-               ${str(field.errors) | n}
+               ${unicode(field.errors) | n}
           % endif
         % endfor
       </div>
@@ -31,6 +31,7 @@
           Please enter the location where you'd like to save the file.
           ${edit.render_field(form["path"], notitle=True)}
           <div>${edit.render_field(form["contents"], hidden=True)}</div>
+	  <div>${edit.render_field(form["encoding"], hidden=True)}</div>
           <input type="submit" class="ccs-hidden" name="save" value="save"/>
       </form>
     </div>

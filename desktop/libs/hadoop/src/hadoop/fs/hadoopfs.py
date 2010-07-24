@@ -31,6 +31,7 @@ from thrift.transport import TTransport
 from thrift.transport import TSocket
 from thrift.protocol import TBinaryProtocol
 
+from django.utils.encoding import smart_str, force_unicode
 from desktop.lib import thrift_util
 from hadoop.api.hdfs import Namenode, Datanode
 from hadoop.api.hdfs.constants import QUOTA_DONT_SET, QUOTA_RESET
@@ -59,11 +60,23 @@ DEFAULT_READ_SIZE = 1024*1024 # 1MB
 WRITE_BUFFER_SIZE = 128*1024 # 128K
 
 # Class that we translate into PermissionDeniedException
-HADOOP_ACCESSCONTROLEXCEPTION="org.apache.hadoop.security.AccessControlException"
+HADOOP_ACCESSCONTROLEXCEPTION = "org.apache.hadoop.security.AccessControlException"
 
 # Timeout for thrift calls to NameNode
 NN_THRIFT_TIMEOUT = 15
 DN_THRIFT_TIMEOUT = 3
+
+# Encoding used by HDFS namespace
+HDFS_ENCODING = 'utf-8'
+
+def encode_fs_path(path):
+  """encode_fs_path(path) -> byte string in utf8"""
+  return smart_str(path, HDFS_ENCODING, errors='strict')
+
+def decode_fs_path(path):
+  """decode_fs_path(bytestring) -> unicode path"""
+  return force_unicode(path, HDFS_ENCODING, errors='strict')
+
 
 class HadoopFileSystem(object):
   """
@@ -127,7 +140,6 @@ class HadoopFileSystem(object):
 
     raise Exception("Hadoop binary (%s) does not exist." % self.hadoop_bin_path)
 
-
   @property
   def uri(self):
     return self._get_hdfs_base()
@@ -161,6 +173,7 @@ class HadoopFileSystem(object):
 
   @_coerce_exceptions
   def remove(self, path):
+    path = encode_fs_path(path)
     stat = self._hadoop_stat(path)
     if not stat:
       raise IOError("File not found: %s" % path)
@@ -176,11 +189,13 @@ class HadoopFileSystem(object):
   def mkdir(self, path, mode=0755):
     # TODO(todd) there should be a mkdir that isn't mkdirHIER
     # (this is mkdir -p I think)
+    path = encode_fs_path(path)
     success = self.nn_client.mkdirhier(self.request_context, normpath(path), mode)
     if not success:
       raise IOError("mkdir failed")
 
   def _rmdir(self, path, recursive=False):
+    path = encode_fs_path(path)
     stat = self._hadoop_stat(path)
     if not stat:
       raise IOError("Directory not found: %s" % (path,))
@@ -202,20 +217,30 @@ class HadoopFileSystem(object):
 
   @_coerce_exceptions
   def listdir(self, path):
+    path = encode_fs_path(path)
     stats = self.nn_client.ls(self.request_context, normpath(path))
-    return [self.basename(stat.path) for stat in stats]
+    return [self.basename(decode_fs_path(stat.path)) for stat in stats]
 
   @_coerce_exceptions
   def listdir_stats(self, path):
+    path = encode_fs_path(path)
     stats = self.nn_client.ls(self.request_context, normpath(path))
     return [self._unpack_stat(s) for s in stats]
 
   @_coerce_exceptions
   def get_content_summaries(self, paths):
-    return self.nn_client.multiGetContentSummary(self.request_context, [normpath(path) for path in paths])
+    path = encode_fs_path(path)
+    summaries = self.nn_client.multiGetContentSummary(self.request_context,
+                                                      [normpath(path) for path in paths])
+    def _fix_summary(summary):
+      summary.path = decode_fs_path(summary.path)
+      return summary
+    return [_fix_summary(s) for s in summaries]
 
   @_coerce_exceptions
   def rename(self, old, new):
+    old = encode_fs_path(old)
+    new = encode_fs_path(new)
     success = self.nn_client.rename(
       self.request_context, normpath(old), normpath(new))
     if not success: #TODO(todd) these functions should just throw if failed
@@ -267,10 +292,12 @@ class HadoopFileSystem(object):
 
   @_coerce_exceptions
   def chmod(self, path, mode):
+    path = encode_fs_path(path)
     self.nn_client.chmod(self.request_context, normpath(path), mode)
 
   @_coerce_exceptions
   def chown(self, path, user, group):
+    path = encode_fs_path(path)
     self.nn_client.chown(self.request_context, normpath(path), user, group)
 
   @_coerce_exceptions
@@ -281,6 +308,7 @@ class HadoopFileSystem(object):
                  used_bytes=used,
                  available_bytes=available),
       )
+
   @_coerce_exceptions
   def _get_blocks(self, path, offset, length):
     """
@@ -291,13 +319,20 @@ class HadoopFileSystem(object):
         thriftPort=53417, state=1, remaining=18987925504, host='127.0.0.1',
         storageID='DS-1238582576-127.0.1.1-50010-1240968238474', dfsUsed=36864)], numBytes=424)]
     """
-    return self.nn_client.getBlocks(self.request_context, normpath(path), offset, length)
+    path = encode_fs_path(path)
+    blocks = self.nn_client.getBlocks(self.request_context, normpath(path), offset, length)
+    def _fix_block(blk):
+      blk.path = decode_fs_path(blk.path)
+      return blk
+    return [_fix_block(blk) for blk in blocks]
 
 
   def _hadoop_stat(self, path):
     """Returns None if file does not exist."""
+    path = encode_fs_path(path)
     try:
       stat = self.nn_client.stat(self.request_context, normpath(path))
+      stat.path = decode_fs_path(stat.path)
       return stat
     except IOException, ioe:
       if ioe.clazz == 'java.io.FileNotFoundException':
@@ -315,6 +350,7 @@ class HadoopFileSystem(object):
     @param len the number of bytes to read
     """
     errs = []
+    block.path = encode_fs_path(block.path)
     for node in block.nodes:
       dn_conn = self._connect_dn(node)
       try:
@@ -335,7 +371,7 @@ class HadoopFileSystem(object):
     @param path The path to the given hdfs resource
     @param size The amount of bytes that a given subtree of files can grow to.
     """
-
+    path = encode_fs_path(path)
     if normpath(path) == '/':
       raise ValueError('Cannot set quota for "/"')
 
@@ -352,7 +388,7 @@ class HadoopFileSystem(object):
     @param path The path to the given hdfs resource
     @param num_files The amount of files that can exist within that subtree.
     """
-
+    path = encode_fs_path(path)
     if normpath(path) == '/':
       raise ValueError('Cannot set quota for "/"')
 
@@ -366,6 +402,7 @@ class HadoopFileSystem(object):
     """
     Remove the diskspace quota at a given path
     """
+    path = encode_fs_path(path)
     self.nn_client.setQuota(self.request_context, normpath(path), QUOTA_DONT_SET, QUOTA_RESET)
 
   @_coerce_exceptions
@@ -373,6 +410,7 @@ class HadoopFileSystem(object):
     """
     Remove the namespace quota at a given path
     """
+    path = encode_fs_path(path)
     self.nn_client.setQuota(self.request_context, normpath(path), QUOTA_RESET, QUOTA_DONT_SET)
 
 
@@ -381,6 +419,7 @@ class HadoopFileSystem(object):
     """
     Get the current space quota in bytes for disk space. None if it is unset
     """
+    path = encode_fs_path(path)
     space_quota = self.nn_client.getContentSummary(self.request_context, normpath(path)).spaceQuota
     if space_quota == QUOTA_RESET or space_quota == QUOTA_DONT_SET:
       return None
@@ -393,6 +432,7 @@ class HadoopFileSystem(object):
     """
     Get the current quota in number of files. None if it is unset
     """
+    path = encode_fs_path(path)
     file_count_quota = self.nn_client.getContentSummary(self.request_context, normpath(path)).quota
     if file_count_quota == QUOTA_RESET or file_count_quota == QUOTA_DONT_SET:
       return None
@@ -406,6 +446,7 @@ class HadoopFileSystem(object):
     "space_used", and "space_quota".  The quotas
     may be None.
     """
+    path = encode_fs_path(path)
     summary = self.nn_client.getContentSummary(self.request_context, normpath(path))
     ret = dict()
     ret["file_count"] = summary.fileCount
@@ -430,7 +471,6 @@ class HadoopFileSystem(object):
     client.close = lambda: transport.close()
     return client
 
-
   @staticmethod
   def _unpack_stat(stat):
     """Unpack a Thrift "Stat" object into a dictionary that looks like fs.stat"""
@@ -441,7 +481,7 @@ class HadoopFileSystem(object):
       mode |= statconsts.S_IFREG
 
     return {
-      'path': stat.path,
+      'path': decode_fs_path(stat.path),
       'size': stat.length,
       'mtime': stat.mtime / 1000,
       'mode': mode,
@@ -630,7 +670,7 @@ class FileUpload(object):
                            "-Dfs.default.name=" + self.fs._get_hdfs_base(),
                            "-Dhadoop.job.ugi=" + self.fs.ugi] + \
                            extra_confs + \
-                           ["-put", "-", path]
+                           ["-put", "-", encode_fs_path(path)]
     self.path = path
     self.putter = subprocess.Popen(self.subprocess_cmd,
                                    stdin=subprocess.PIPE,
@@ -647,9 +687,9 @@ class FileUpload(object):
     try:
       (stdout, stderr) = self.putter.communicate()
     except IOError, ioe:
-        logging.debug("Saw IOError writing %r" % self.path, exc_info=1)
-        if ioe.errno == 32: # Broken Pipe
-           stdout, stderr = self.putter.communicate()
+      logging.debug("Saw IOError writing %r" % self.path, exc_info=1)
+      if ioe.errno == errno.EPIPE:
+        stdout, stderr = self.putter.communicate()
     self.closed = True
     if stderr:
       LOG.warn("HDFS FileUpload (cmd='%s')outputted stderr:\n%s" %

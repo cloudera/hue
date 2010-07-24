@@ -179,6 +179,13 @@ TIME_ZONE = Config(
   default=os.environ.get("TZ", "America/Los_Angeles")
 )
 
+DEFAULT_SITE_ENCODING = Config(
+  key='default_site_encoding',
+  help='Default system-wide unicode encoding',
+  type=str,
+  default='utf-8'
+)
+
 SERVER_USER = Config(
   key="server_user",
   help="Username to run servers as",

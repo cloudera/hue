@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -33,14 +34,13 @@ def test_chown():
     c = make_logged_in_client(cluster.superuser)
     cluster.fs.setuser(cluster.superuser)
 
-    PATH = "/test-chown"
+    PATH = u"/test-chown-en-Español"
     cluster.fs.mkdir(PATH)
     c.post("/filebrowser/chown", dict(path=PATH, user="x", group="y"))
     assert_equal("x", cluster.fs.stats(PATH)["user"])
     assert_equal("y", cluster.fs.stats(PATH)["group"])
     c.post("/filebrowser/chown", dict(path=PATH, user="__other__", user_other="z", group="y"))
     assert_equal("z", cluster.fs.stats(PATH)["user"])
-
   finally:
     cluster.shutdown()
 
@@ -51,16 +51,35 @@ def test_listdir():
     c = make_logged_in_client()
     cluster.fs.setuser(cluster.superuser)
 
-    # Delete if there's already something there
+    # These paths contain non-ascii characters. Your editor will need the
+    # corresponding font library to display them correctly.
+    #
+    # We test that mkdir can handle unicode strings as well as byte strings.
+    # And even when the byte string can't be decoded properly (big5), the listdir
+    # still succeeds.
+    orig_paths = [
+      u'greek-Ελληνικά',
+      u'chinese-漢語',
+      'listdir',
+      'non-utf-8-(big5)-\xb2\xc4\xa4@\xb6\xa5\xacq',
+    ]
+
+    prefix = '/test-filebrowser/'
+    for path in orig_paths:
+      cluster.fs.mkdir(prefix + path)
+    response = c.get('/filebrowser/view' + prefix)
+    paths = [f['path'] for f in response.context['files']]
+    for path in orig_paths:
+      if isinstance(path, unicode):
+        uni_path = path
+      else:
+        uni_path = unicode(path, 'utf-8', errors='replace')
+      assert_true(prefix + uni_path in paths,
+                  '%s should be in dir listing %s' % (prefix + uni_path, paths))
+
+    # Delete user's home if there's already something there
     if cluster.fs.isdir("/user/test"):
       cluster.fs.rmtree("/user/test")
-
-    cluster.fs.mkdir('/test-filebrowser/listdir')
-    response = c.get('/filebrowser/view/test-filebrowser/')
-    paths = [f['path'] for f in response.context['files']]
-    assert_true("/test-filebrowser/listdir" in paths)
-
-    # test's home dir doesn't exist yet
     assert_false(response.context['home_directory'])
 
     # test's home directory now exists. Should be returned.
@@ -68,6 +87,11 @@ def test_listdir():
     response = c.get('/filebrowser/view/test-filebrowser/')
     assert_equal(response.context['home_directory'], '/user/test')
   finally:
+    try:
+      cluster.fs.rmtree('/test-filebrowser')
+      cluster.fs.rmtree('/user/test')
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
     cluster.shutdown()
 
 
@@ -84,56 +108,64 @@ def test_view_gz():
     cluster.fs.mkdir('/test-gz-filebrowser/')
 
     f = cluster.fs.open('/test-gz-filebrowser/test-view.gz', "w")
-    sdf_string='\x1f\x8b\x08\x082r\xf4K\x00\x03f\x00+NI\xe3\x02\x00\xad\x96b\xc4\x04\x00\x00\x00'
+    sdf_string = '\x1f\x8b\x08\x082r\xf4K\x00\x03f\x00+NI\xe3\x02\x00\xad\x96b\xc4\x04\x00\x00\x00'
     f.write(sdf_string)
     f.close()
 
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view.gz?compression=gzip')
     assert_equal(response.context['view']['contents'], "sdf\n")
 
-# autodetect
+    # autodetect
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view.gz')
     assert_equal(response.context['view']['contents'], "sdf\n")
 
-#offset should do nothing
+    # offset should do nothing
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view.gz?compression=gzip&offset=1')
     assert_false(response.context.has_key('view'))
-
 
     f = cluster.fs.open('/test-gz-filebrowser/test-view2.gz', "w")
     f.write("hello")
     f.close()
 
-#we shouldn't autodetect  non gzip files
+    # we shouldn't autodetect non gzip files
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view2.gz')
     assert_equal(response.context['view']['contents'], "hello")
 
-#we should fail to do a bad thing if they specify compression when it's not set.
+    # we should fail to do a bad thing if they specify compression when it's not set.
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view2.gz?compression=gzip')
     assert_false(response.context.has_key('view'))
 
   finally:
+    try:
+      cluster.fs.rmtree('/test-gz-filebrowser/')
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
     cluster.shutdown()
 
+
 @attr('requires_hadoop')
-def test_view():
+def test_view_i18n():
   cluster = mini_cluster.shared_cluster(conf=True)
   try:
-    c = make_logged_in_client()
     cluster.fs.setuser(cluster.superuser)
-
     cluster.fs.mkdir('/test-filebrowser/')
 
-    f = cluster.fs.open('/test-filebrowser/test-view', "w")
-    f.write("hello")
-    f.close()
+    # Test viewing files in different encodings
+    content = u'pt-Olá en-hello ch-你好 ko-안녕 ru-Здравствуйте'
+    view_helper(cluster, 'utf-8', content)
+    view_helper(cluster, 'utf-16', content)
 
-    response = c.get('/filebrowser/view/test-filebrowser/test-view')
-    assert_equal(response.context['view']['contents'], "hello")
+    content = u'你好-big5'
+    view_helper(cluster, 'big5', content)
 
-    response = c.get('/filebrowser/view/test-filebrowser/test-view?end=2&begin=1')
-    assert_equal(response.context['view']['contents'], "he")
+    content = u'こんにちは-shift-jis'
+    view_helper(cluster, 'shift_jis', content)
 
+    content = u'안녕하세요-johab'
+    view_helper(cluster, 'johab', content)
+
+    # Test that the default view is home
+    c = make_logged_in_client()
     response = c.get('/filebrowser/view/')
     assert_equal(response.context['path'], '/')
     cluster.fs.mkdir('/user/test')
@@ -141,60 +173,125 @@ def test_view():
     response = c.get('/filebrowser/view/?default_to_home=1')
     assert_equal("http://testserver/filebrowser/view/user/test", response["location"])
   finally:
+    try:
+      cluster.fs.rmtree('/user/test')
+      cluster.fs.rmtree('/test-filebrowser/')
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
     cluster.shutdown()
 
 
+def view_helper(cluster, encoding, content):
+  """
+  Write the content in the given encoding directly into the filesystem.
+  Then try to view it and make sure the data is correct.
+  """
+  c = make_logged_in_client()
+  filename = u'/test-filebrowser/test-view-carácter-internacional'
+  bytestring = content.encode(encoding)
+
+  try:
+    f = cluster.fs.open(filename, "w")
+    f.write(bytestring)
+    f.close()
+
+    response = c.get('/filebrowser/view%s?encoding=%s' % (filename, encoding))
+    assert_equal(response.context['view']['contents'], content)
+
+    response = c.get('/filebrowser/view%s?encoding=%s&end=8&begin=1' % (filename, encoding))
+    assert_equal(response.context['view']['contents'],
+                 unicode(bytestring[0:8], encoding, errors='replace'))
+  finally:
+    try:
+      cluster.fs.remove(filename)
+    except:
+      pass
+
+
 @attr('requires_hadoop')
-def test_edit():
+def test_edit_i18n():
   cluster = mini_cluster.shared_cluster(conf=True)
   try:
-    c = make_logged_in_client(cluster.superuser)
     cluster.fs.setuser(cluster.superuser)
-
     cluster.fs.mkdir('/test-filebrowser/')
-    # File doesn't exist - should be empty
-    test_path = '//test-filebrowser//test-edit'
-    # (this path is non-normalized to test normalization too)
-    edit_url = '/filebrowser/edit' + test_path
-    response = c.get(edit_url)
-    assert_equal(response.context['form'].data['path'],
-                 test_path)
-    assert_equal(response.context['form'].data['contents'], "")
 
-    # Just going to the edit page and not hitting save should not
-    # create the file
-    assert_false(cluster.fs.exists(test_path))
+    # Test utf-8
+    pass_1 = u'en-hello pt-Olá ch-你好 ko-안녕 ru-Здравствуйте'
+    pass_2 = pass_1 + u'yi-העלא'
+    edit_helper(cluster, 'utf-8', pass_1, pass_2)
 
+    # Test utf-16
+    edit_helper(cluster, 'utf-16', pass_1, pass_2)
+
+    # Test cjk
+    pass_1 = u'big5-你好'
+    pass_2 = pass_1 + u'世界'
+    edit_helper(cluster, 'big5', pass_1, pass_2)
+
+    pass_1 = u'shift_jis-こんにちは'
+    pass_2 = pass_1 + u'世界'
+    edit_helper(cluster, 'shift_jis', pass_1, pass_2)
+
+    pass_1 = u'johab-안녕하세요'
+    pass_2 = pass_1 + u'세상'
+    edit_helper(cluster, 'johab', pass_1, pass_2)
+  finally:
+    try:
+      cluster.fs.rmtree('/test-filebrowser/')
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+    cluster.shutdown()
+
+
+def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
+  """
+  Put the content into the file with a specific encoding.
+  """
+  c = make_logged_in_client(cluster.superuser)
+
+  # This path is non-normalized to test normalization too
+  filename = u'//test-filebrowser//./test-edit-carácter-internacional'
+
+  # File doesn't exist - should be empty
+  edit_url = '/filebrowser/edit' + filename
+  response = c.get(edit_url)
+  assert_equal(response.context['form'].data['path'], filename)
+  assert_equal(response.context['form'].data['contents'], "")
+
+  # Just going to the edit page and not hitting save should not
+  # create the file
+  assert_false(cluster.fs.exists(filename))
+
+  try:
     # Put some data in there and post
-    new_contents = "hello world from editor"
     response = c.post("/filebrowser/save", dict(
-        path=test_path,
-        contents=new_contents), follow=True)
-    assert_equal(response.context['form'].data['path'],
-                 test_path)
-    assert_equal(response.context['form'].data['contents'],
-                 new_contents)
+        path=filename,
+        contents=contents_pass_1,
+        encoding=encoding), follow=True)
+    assert_equal(response.context['form'].data['path'], filename)
+    assert_equal(response.context['form'].data['contents'], contents_pass_1)
 
     # File should now exist
-    assert_true(cluster.fs.exists(test_path))
+    assert_true(cluster.fs.exists(filename))
     # And its contents should be what we expect
-    f = cluster.fs.open(test_path)
-    assert_equal(f.read(), new_contents)
+    f = cluster.fs.open(filename)
+    assert_equal(f.read(), contents_pass_1.encode(encoding))
     f.close()
 
     # We should be able to overwrite the file with another save
-    new_contents = "hello world again from editor"
     response = c.post("/filebrowser/save", dict(
-        path=test_path,
-        contents=new_contents), follow=True)
-    assert_equal(response.context['form'].data['path'],
-                 test_path)
-    assert_equal(response.context['form'].data['contents'],
-                 new_contents)
-    f = cluster.fs.open(test_path)
-    assert_equal(f.read(), new_contents)
+        path=filename,
+        contents=contents_pass_2,
+        encoding=encoding), follow=True)
+    assert_equal(response.context['form'].data['path'], filename)
+    assert_equal(response.context['form'].data['contents'], contents_pass_2)
+    f = cluster.fs.open(filename)
+    assert_equal(f.read(), contents_pass_2.encode(encoding))
     f.close()
 
     # TODO(todd) add test for maintaining ownership/permissions
   finally:
-    cluster.shutdown()
+    try:
+      cluster.fs.remove(filename)
+    except:
+      pass

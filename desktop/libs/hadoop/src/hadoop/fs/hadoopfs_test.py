@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -203,35 +204,35 @@ def test_quota_space():
       fs.rmtree('/tmp/foo2')
     fs.mkdir("/tmp/foo2", 0777) # this also tests more restrictive subdirectories
     ONE_HUNDRED_192_MEGS = 1024 * 1024 * 192
-    
-    fs.set_diskspace_quota("/tmp/foo2", ONE_HUNDRED_192_MEGS) 
+
+    fs.set_diskspace_quota("/tmp/foo2", ONE_HUNDRED_192_MEGS)
     assert_equals(fs.get_diskspace_quota("/tmp/foo2"), ONE_HUNDRED_192_MEGS)
 
-    f = fs.open('/tmp/foo2/asdf', 'w')	 # we should be able to do this 
-    f.write('a') 
+    f = fs.open('/tmp/foo2/asdf', 'w')	 # we should be able to do this
+    f.write('a')
     f.close()
 
     assert_equals(fs.get_diskspace_quota("/tmp/foo2"), ONE_HUNDRED_192_MEGS)
 
-    fs.set_diskspace_quota("/tmp/foo2", 1) 
+    fs.set_diskspace_quota("/tmp/foo2", 1)
     assert_equals(fs.get_diskspace_quota("/tmp/foo2"), 1)
 
-    f = fs.open('/tmp/foo2/asdfsd', 'w')	 
+    f = fs.open('/tmp/foo2/asdfsd', 'w')
     f.write('a')
     assert_raises(IOError, f.close)
 
     fs.clear_diskspace_quota("/tmp/foo2")
     assert_equals(fs.get_diskspace_quota("/tmp/foo2"), None)
 
-    f = fs.open('/tmp/foo2/asdfsda', 'w')	 
-    f.write('a') 
+    f = fs.open('/tmp/foo2/asdfsda', 'w')
+    f.write('a')
     f.close()
 
     fs.mkdir("/tmp/baz/bar", 0777)  # this tests more permissive subdirectories
     fs.set_diskspace_quota("/tmp/baz", 1)
-    fs.set_diskspace_quota("/tmp/baz/bar", ONE_HUNDRED_192_MEGS) 
+    fs.set_diskspace_quota("/tmp/baz/bar", ONE_HUNDRED_192_MEGS)
 
-    f = fs.open('/tmp/baz/bar', 'w')	 
+    f = fs.open('/tmp/baz/bar', 'w')
     f.write('aaaa') #should violate the subquota
     assert_raises(IOError, f.close)
 
@@ -256,17 +257,17 @@ def test_quota_namespace_count():
     fs.mkdir("/tmp/foo2", 0777)
 
     # check the get_namespace_quota function
-    fs.set_namespace_quota("/tmp/foo2", 4) 
+    fs.set_namespace_quota("/tmp/foo2", 4)
     assert_equals(fs.get_namespace_quota("/tmp/foo2"), 4)
 
     # violate the namespace count
     for i in range(3):
       f = fs.open('/tmp/foo2/works' + str(i), 'w')
-      f.write('a') 
+      f.write('a')
       f.close()
 
     f = fs.open('/tmp/foo2/asdfsdc', 'w')
-    f.write('a') 
+    f.write('a')
     assert_raises(IOError, f.close)
 
     # Check summary stats
@@ -281,9 +282,56 @@ def test_quota_namespace_count():
     assert_equals(fs.get_namespace_quota("/tmp/foo2"), None)
 
     f = fs.open('/tmp/foo2/asdfsdd', 'w')
-    f.write('a') 
+    f.write('a')
     f.close()
   finally:
     if fs.exists('/tmp/foo2'):
       fs.rmtree("/tmp/foo2")
+    cluster.shutdown()
+
+
+@attr('requires_hadoop')
+def test_i18n_namespace():
+  cluster = mini_cluster.shared_cluster()
+  cluster.fs.setuser(cluster.superuser)
+
+  def check_existence(name, parent, present=True):
+    assertion = present and assert_true or assert_false
+    listing = cluster.fs.listdir(parent)
+    assertion(name in listing, "%s should be in %s" % (name, listing))
+
+  name = u'pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте'
+  prefix = '/tmp/i18n'
+  dir_path = '%s/%s' % (prefix, name)
+  file_path = '%s/%s' % (dir_path, name)
+
+  try:
+    # Create a directory
+    cluster.fs.mkdir(dir_path)
+    # Create a file (same name) in the directory
+    cluster.fs.open(file_path, 'w').close()
+
+    # Directory is there
+    check_existence(name, prefix)
+    # File is there
+    check_existence(name, dir_path)
+
+    # Test rename
+    new_file_path = file_path + '.new'
+    cluster.fs.rename(file_path, new_file_path)
+    # New file is there
+    check_existence(name + '.new', dir_path)
+
+    # Test remove
+    cluster.fs.remove(new_file_path)
+    check_existence(name + '.new', dir_path, present=False)
+
+    # Test rmtree
+    cluster.fs.rmtree(dir_path)
+    check_existence(name, prefix, present=False)
+  finally:
+    try:
+      cluster.fs.rmtree(prefix)
+    except:
+      pass
     cluster.shutdown()

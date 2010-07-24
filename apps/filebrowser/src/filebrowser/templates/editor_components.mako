@@ -23,10 +23,10 @@
     titlecls = "ccs-hidden"
 %>
   <dt class="${titlecls}">${field.label_tag() | n}</dt>
-  <dd class="${cls}">${str(field) | n}</dd>
+  <dd class="${cls}">${unicode(field) | n}</dd>
   % if len(field.errors):
     <dd class="beeswax_error">
-       ${str(field.errors) | n}
+       ${unicode(field.errors) | n}
      </dd>
   % endif
 </%def>

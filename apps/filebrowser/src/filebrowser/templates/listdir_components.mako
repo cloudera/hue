@@ -16,6 +16,7 @@
 <%!
 import datetime
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time
+from django.utils.encoding import iri_to_uri
 %>
 
 
@@ -55,7 +56,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
             display_name = file['path']
           endif
         %>
-        <% path_enc = urlencode(file['path']) %>
+        <% path_enc = iri_to_uri(urlencode(file['path'])) %>
         <tr class="ccs-no_select fb-item-row ${cls}"
          data-filters="ContextMenu"
          data-context-menu-actions="[{'events':['contextmenu','click:relay(.fb-item-options)'],'menu':'ul.context-menu'}]"
