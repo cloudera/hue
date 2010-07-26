@@ -25,6 +25,7 @@ from desktop.lib.paginator import Paginator
 import desktop
 import desktop.urls
 import desktop.conf
+import logging
 from desktop.lib.django_util import TruncatingModel
 import desktop.views as views
 
@@ -239,3 +240,38 @@ def test_404_handling():
   assert_equal(response.template.name, '404.html')
   assert_true('Page Not Found' in response.content)
   assert_true(view_name in response.content)
+
+class RecordingHandler(logging.Handler):
+  def __init__(self, *args, **kwargs):
+    logging.Handler.__init__(self, *args, **kwargs)
+    self.records = []
+
+  def emit(self, r):
+    self.records.append(r)
+
+def test_log_event():
+  c = make_logged_in_client()
+  root = logging.getLogger("desktop.views.log_frontend_event")
+  handler = RecordingHandler()
+  root.addHandler(handler)
+
+  c.get("/log_frontend_event?level=info&message=foo")
+  assert_equal("INFO", handler.records[-1].levelname)
+  assert_equal("Untrusted log event from user test: foo", handler.records[-1].message)
+  assert_equal("desktop.views.log_frontend_event", handler.records[-1].name)
+
+  c.get("/log_frontend_event?level=error&message=foo2")
+  assert_equal("ERROR", handler.records[-1].levelname)
+  assert_equal("Untrusted log event from user test: foo2", handler.records[-1].message)
+
+  c.get("/log_frontend_event?message=foo3")
+  assert_equal("INFO", handler.records[-1].levelname)
+  assert_equal("Untrusted log event from user test: foo3", handler.records[-1].message)
+
+  c.post("/log_frontend_event", {
+    "message": "01234567" * 1024})
+  assert_equal("INFO", handler.records[-1].levelname)
+  assert_equal("Untrusted log event from user test: " + "01234567"*(1024/8), 
+    handler.records[-1].message)
+
+  root.removeHandler(handler)

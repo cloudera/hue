@@ -183,7 +183,7 @@ def threads(request):
   """Dumps out server threads.  Useful for debugging."""
   if not request.user.is_superuser:
     return HttpResponse("You must be a superuser.")
-    
+
   out = []
   for thread_id, stack in _threads():
     out.append("Thread id: %s" % thread_id)
@@ -211,3 +211,35 @@ def serve_500_error(request, *args, **kwargs):
   if desktop.conf.HTTP_500_DEBUG_MODE.get():
     return django.views.debug.technical_500_response(request, *sys.exc_info())
   return render_to_response("500.html")
+
+_LOG_LEVELS = {
+  "critical": logging.CRITICAL,
+  "error": logging.ERROR,
+  "warning": logging.WARNING,
+  "info": logging.INFO,
+  "debug": logging.DEBUG
+}
+
+_MAX_LOG_FRONTEND_EVENT_LENGTH = 1024
+
+_LOG_FRONTEND_LOGGER = logging.getLogger("desktop.views.log_frontend_event")
+
+@login_notrequired
+def log_frontend_event(request):
+  """
+  Logs arguments to server's log.  Returns an
+  empty string.
+
+  Parameters (specified via either GET or POST) are
+  "logname", "level" (one of "debug", "info", "warning",
+  "error", or "critical"), and "message".
+  """
+  def get(param, default=None):
+    return request.REQUEST.get(param, default)
+
+  level = _LOG_LEVELS.get(get("level"), logging.INFO)
+  msg = "Untrusted log event from user %s: %s" % (
+    request.user, 
+    get("message", "")[:_MAX_LOG_FRONTEND_EVENT_LENGTH])
+  _LOG_FRONTEND_LOGGER.log(level, msg)
+  return HttpResponse("")
