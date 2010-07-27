@@ -40,7 +40,6 @@ requires:
  - /Behavior.ContextMenu
  - /Behavior.FilterInput
  - /Behavior.FitText
- - /Behavior.HtmlTableKeys
  - /Behavior.MultiChecks
  - /Behavior.SideBySideSelect
  - /Behavior.SizeTo
