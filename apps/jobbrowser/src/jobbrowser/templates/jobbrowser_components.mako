@@ -37,7 +37,7 @@
 <%
   from jobbrowser.views import format_counter_name
 %>
-    <table class="ccs-data_table jt_counter_table">
+    <table data-filters="HtmlTable" class="jt_counter_table">
       <thead>
          <tr>
            <th class="jt_counter_display_name">Counter Name</th>
@@ -65,7 +65,7 @@
   from jobbrowser.views import format_counter_name
 %>
 
-    <table class="ccs-data_table jt_counter_table">
+    <table data-filters="HtmlTable" class="jt_counter_table">
       <thead>
          <tr>
            <th class="jt_counter_display_name">Name</th>

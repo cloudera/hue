@@ -21,7 +21,7 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
     content="3;url=${url('beeswax.views.watch_query', query.id)}?${fwd_params}">
 
 <div class="view partial_refresh" id="watch_wait">
-  <div class="splitview resizable">
+  <div class="resizable" data-filters="SplitView">
     <div class="left_col">
       ${util.render_query_context(query_context)}
       <dl class="jframe_padded">

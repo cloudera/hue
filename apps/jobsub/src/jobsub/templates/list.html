@@ -20,13 +20,13 @@ limitations under the License.
 {% block content %}
 <div id="jobsub_joblist" class="view">
 	<h1>Job Designer: Job Designs</h1>
-	<div class="jobsub_col_wrapper splitview">
+	<div class="jobsub_col_wrapper" data-filters="SplitView">
 		<div class="jobsub_left_col left_col">
 			{% include "types.html" %}
 		</div>
 		<div class="jobsub_right_col right_col">
 			<div class="jobsub_topsection clearfix">
-				<form class="jobsub_filter submit_on_change" action="{% url jobsub.list %}" method="get">
+				<form class="jobsub_filter" data-filters="SubmitOnChange" action="{% url jobsub.list %}" method="get">
 					<span class="filter_text">Filter by owner:</span>
 					<input data-filters="OverText" name="owner" alt="filter by owner" value="{{ owner }}"/>
 					<input data-filters="OverText" name="name" alt="filter by name" value="{{ name }}"/>
@@ -34,7 +34,7 @@ limitations under the License.
 				</form>
 			</div>
 		
-			<table class="ccs-data_table sortable" cellpadding="0" cellspacing="0">
+			<table data-filters="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
 				<thead>
 					<tr>
 						<th>Owner</th>

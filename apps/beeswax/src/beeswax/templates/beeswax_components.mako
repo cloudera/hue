@@ -89,7 +89,7 @@
         % endif
       % endif
       % if help:
-        <p class="ccs-help_text" ${make_attr_str(help_attrs) | n}>${help}</p>
+        <p class="ccs-inline" data-filters="HelpTip" ${make_attr_str(help_attrs) | n}>${help}</p>
       % endif
     </dd>
     % if len(field.errors):

@@ -18,7 +18,7 @@
   <title>${title}</title>
 </head>
 <body>
-  <div class="splitview resizable">
+  <div class="resizable" data-filters="SplitView">
     <div class="left_col jframe_padded">
       <h2>Index</h2>
       <ul>

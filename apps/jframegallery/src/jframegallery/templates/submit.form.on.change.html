@@ -18,23 +18,30 @@ limitations under the License.
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 	<head>
-		<title>Splitview (Vertical)</title>
+		<title>Submit Form on Change</title>
 	</head>
 	<body>
-		<div class="resizable" data-filters="SplitView">
-			<div class="top_col jframe_padded">
-				this is the top column<br/>
-				<a data-splitview-resize="{'top':0}">hide the top</a><br/>
-				<a data-splitview-toggle="{'side': 'bottom', 'hideSplitter': true}">toggle the bottom (hide splitter)</a>
+		{% if post_vars %}
+			<div class="jframe_padded">
+				You submitted the following values:
+				<ul>
+					{% for post_var, val in post_vars %}
+					 <li>{{post_var}}: {{val}}</li>
+					{% endfor %}
+				</ul>
 			</div>
-			<div class="splitter_col" style="background: #88f; padding: 4px">
-				<h4>this is the splitter handle</h4>
-			</div>
-			<div class="bottom_col jframe_padded" style="height:100px">
-				and this is the bottom,<br/>
-				you can resize us by dragging the middle bar around.<br/>
-				<a data-splitview-toggle="{'side': 'top', 'hideSplitter': true}">toggle the top</a>
-			</div>
-		</div>
+		{% else %}
+		<p>
+			The form below will submit as soon as you select a value.
+		</p>
+		<form action="/jframegallery/submit.form.on.change.html" method="post" style="margin: 6px 0px 0px;">
+			<select name="select_list">
+				<option value="option 1">option 1</option>
+				<option value="option 2">option 2</option>
+				<option value="option 3">option 3</option>
+			</select>
+			<input type="submit" class="ccs-hidden" name="submit"/>
+		</form>
+		{% endif %}
 	</body>
 </html>

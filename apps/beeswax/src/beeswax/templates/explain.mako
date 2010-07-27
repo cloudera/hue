@@ -18,7 +18,7 @@
 <%namespace name="util" file="util.mako" />
 ${wrappers.head('Query Explanation', section='saved queries')}
 <div class="view" id="watch_wait">
-  <div class="splitview resizable">
+  <div class="resizable" data-filters="SplitView">
     <div class="left_col">
       ${util.render_query_context(query_context)}
     </div>

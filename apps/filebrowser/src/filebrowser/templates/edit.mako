@@ -27,8 +27,8 @@
 <body>
 <div class="toolbar">
   <div class="fe-path">${truncate(path, 91)}</div>
-  <div class="fe-buttons ccs-button_bar">
-    <a class="fe-viewLocation ccs-art_button" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View Location</a>
+  <div class="fe-buttons" data-filters="ArtButtonBar">
+    <a class="fe-viewLocation" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View Location</a>
   </div>
 </div>
 % if form.errors:

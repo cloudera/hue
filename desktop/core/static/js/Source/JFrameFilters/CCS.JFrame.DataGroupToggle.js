@@ -17,7 +17,7 @@
 ---
 description: Toggles the display of a group of elements when another is clicked or changed 
 provides: [CCS.JFrame.DataGroupToggle]
-requires: [/CCS.JFrame, /Element.Data]
+requires: [/CCS.JFrame, Widgets/Element.Data]
 script: CCS.JFrame.DataGroupToggle.js
 
 ...

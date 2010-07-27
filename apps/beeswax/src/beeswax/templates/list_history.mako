@@ -52,13 +52,13 @@ ${wrappers.head("Beeswax: Query History", section='history')}
         my_querydict = filter_params.copy()
         my_querydict['user'] = request.user.username
       %>
-      <a href="?${my_querydict.urlencode()}" class="ccs-art_button bw-show_group_mine">mine</a>
+      <a href="?${my_querydict.urlencode()}" class="bw-show_group_mine" data-filters="ArtButton">mine</a>
     % else:
       <%
         my_querydict = filter_params.copy()
         my_querydict['user'] = '_all'
       %>
-      <a href="?${my_querydict.urlencode()}" class="ccs-art_button bw-show_group_all">everyone's</a>
+      <a href="?${my_querydict.urlencode()}" class="bw-show_group_all" data-filters="ArtButton">everyone's</a>
     % endif
 
     % if filter_params.get('auto_query', None):
@@ -66,18 +66,18 @@ ${wrappers.head("Beeswax: Query History", section='history')}
         my_querydict = filter_params.copy()
         my_querydict['auto_query'] = ''
       %>
-      <a href="?${my_querydict.urlencode()}" class="ccs-art_button bw-show_group_noauto">user queries</a>
+      <a href="?${my_querydict.urlencode()}" class="bw-show_group_noauto" data-filters="ArtButton">user queries</a>
     % else:
       <%
         my_querydict = filter_params.copy()
         my_querydict['auto_query'] = 'on'
       %>
-      <a href="?${my_querydict.urlencode()}" class="ccs-art_button bw-show_group_auto">auto actions</a>
+      <a href="?${my_querydict.urlencode()}" class="bw-show_group_auto" data-filters="ArtButton">auto actions</a>
     % endif
   </div>
 
   <h3 class="ccs-hidden">Query History:</h3>
-  <table class="ccs-data_table selectable" cellpadding="0" cellspacing="0">
+  <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
         <th>Time</th>
@@ -103,7 +103,7 @@ ${wrappers.head("Beeswax: Query History", section='history')}
         <td>${query.submission_date.strftime("%x %X")}</td>
         <td>${show_saved_query(design, query)}</td>
         <td>
-          <p class="ccs-info_text">
+          <p class="ccs-inline" data-filters="InfoTip">
             % if len(query.query) > 100:
               <code>${collapse_whitespace(query.query[:100])}...</code>
             % else:
@@ -115,7 +115,7 @@ ${wrappers.head("Beeswax: Query History", section='history')}
         <td>${models.QueryHistory.STATE[query.last_state]}</td>
         <td class="bw-query_result">
           % if query.last_state != models.QueryHistory.STATE.expired.index:
-            <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" class="bw-view_result ccs-art_button" data-icon-styles="{'width': 16, 'height': 16, 'top': 2}">Results</a>
+            <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" class="bw-view_result" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 2}">Results</a>
           % else:
             ~
           % endif

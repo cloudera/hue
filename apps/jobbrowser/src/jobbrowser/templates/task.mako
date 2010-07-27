@@ -40,7 +40,7 @@
 
         <ul class="ccs-tab_sections ccs-clear">
           <li>
-            <table border="0" cellpadding="0" cellspacing="0" class="ccs-data_table jt_meta_table sortable">
+            <table border="0" cellpadding="0" cellspacing="0" data-filters="HtmlTable" class="jt_meta_table sortable">
               <thead>
                 <tr>
                  <th>Attempt ID</th>
@@ -79,7 +79,7 @@
             </table>
           </li>
           <li>
-            <table class="ccs-data_table jt_meta_table sortable" cellpadding="0" cellspacing="0">
+            <table data-filters="HtmlTable" class="jt_meta_table sortable" cellpadding="0" cellspacing="0">
               <thead>
                 <th>Name</th>
                 <th>Value</th>

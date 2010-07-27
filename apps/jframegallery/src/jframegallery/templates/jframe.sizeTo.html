@@ -1,11 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
-<html>
-	<head>
-		<title>Art Button</title>
-	</head>
-	<body>
-		<h1 style="background: #999; height: 30px; padding: 10px">This is a header that's 100px tall</h1>
-		<div data-size-to-height="-70" class="jframe_padded" style="background: #ccc">
 {% comment %}
 Licensed to Cloudera, Inc. under one
 or more contributor license agreements.  See the NOTICE file
@@ -23,6 +15,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+	<head>
+		<title>SizeTo</title>
+	</head>
+	<body>
+		<h1 style="background: #999; height: 30px; padding: 10px">This is a header that's 100px tall</h1>
+		<div data-filters="SizeTo" data-size-to-height="-70" class="jframe_padded" style="background: #ccc">
 			<p>This is content that is stretched to the height of the JFrame - 70px (this isn't 100px because of padding added to this container and the header). This element's background is light grey and should go all the way to the bottom of the window. Further, the overflow (scroll) should be limited to this lower element (because it has overflow:auto assigned to it).</p>
 			<p>this is here to provide an overflow.</p>
 			<p>this is here to provide an overflow.</p>

@@ -34,7 +34,7 @@
 	display: none;
 }
 
-.jobsub table.ccs-data_table {
+.jobsub table[data-filters*=HtmlTable] {
 	border: #B2B2B2 solid;
 	border-width: 1px 0px;
 }

@@ -19,7 +19,7 @@
 ${wrappers.head("Beeswax: Query Results", section='query')}
 
 <div class="view" id="watch_results">
-  <div class="splitview resizable">
+  <div class="resizable" data-filters="SplitView">
     <div class="left_col">
       ${util.render_query_context(query_context)}
         <dl class="jframe_padded">
@@ -51,9 +51,9 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
                         data_filters="OverText",
                         alt="/user/dir"
                         ))}
-                        <a class="ccs-art_button ccs-choose_file" data-icon-styles="{'width': 16, 'height': 16, 'top': 1, 'left': 4 }" data-chooseFor="target_dir">Choose File</a>
+                        <a data-filters="ArtButton" class="ccs-choose_file" data-icon-styles="{'width': 16, 'height': 16, 'top': 1, 'left': 4 }" data-chooseFor="target_dir">Choose File</a>
                       </div>
-                      <input type="submit" value="Save" name="save" class="ccs-art_button"> 
+                      <input type="submit" value="Save" name="save" data-filters="ArtButton"> 
                     </form>
                   </div>
                 </li>
@@ -114,7 +114,7 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
               % if expected_first_row != start_row:
                 <div class="bw-result_warning">Warning:</i> Page offset may have incremented since last view.</div>
               % endif
-              <table class="ccs-data_table" cellpadding="0" cellspacing="0">
+              <table data-filters="HtmlTable" cellpadding="0" cellspacing="0">
                 <thead>
                   <tr>
                     <th>-</th>

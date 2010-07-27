@@ -17,7 +17,7 @@
 ---
 description: Right-click context menu for CCS.JFrame
 provides: [CCS.ContextMenu]
-requires: [More/Element.Shortcuts, Core/Element.Event, Core/Class.Extras, /Element.Data,
+requires: [More/Element.Shortcuts, Core/Element.Event, Core/Class.Extras, Widgets/Element.Data,
   Core/Element.Dimensions, Core/Selectors]
 script: CCS.ContextMenu.js
 

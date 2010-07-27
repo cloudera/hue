@@ -17,7 +17,7 @@
 ---
 description: File Browser
 provides: [CCS.FileBrowser, CCS.FileChooser, CCS.FileSaver]
-requires: [ccs-shared/CCS.JBrowser, fancyupload/FancyUpload3.Attach, More/URI, More/Fx.Reveal, ccs-shared/Element.Data]
+requires: [ccs-shared/CCS.JBrowser, fancyupload/FancyUpload3.Attach, More/URI, More/Fx.Reveal, Widgets/Element.Data]
 script: CCS.FileBrowser.js
 
 ...
@@ -160,7 +160,7 @@ ART.Sheet.define('window.filechooser.browser', {
 					keys: 'enter',
 					shortcut: 'enter',
 					handler: function(e){
-						var table = $(this).getElement('.ccs-data_table');
+						var table = $(this).getElement('[data-filters*=HtmlTable]');
 						if (!table) return;
 						hTable = table.retrieve('HtmlTable');
 						var selected = hTable.selectedRows[0];
@@ -318,7 +318,7 @@ ART.Sheet.define('window.filechooser.browser', {
 					keys: 'enter',
 					shortcut: 'enter',
 					handler: function(e){
-						var table = $(this).getElement('.ccs-data_table');
+						var table = $(this).getElement('[data-filters*=HtmlTable]');
 						if (!table) return;
 						var selectInfo = this.getSelected(table);
 						if (selectInfo == null) return;
@@ -381,7 +381,7 @@ ART.Sheet.define('window.filechooser.browser', {
 				shortcut: 'enter',
 				handler: function(e){
 					if (document.activeElement != this.locationInput) { 
-						var table = $(this).getElement('.ccs-data_table');
+						var table = $(this).getElement('[data-filters*=HtmlTable]');
 						if (!table) return;
 						hTable = table.retrieve('HtmlTable');
 						var selected = hTable.selectedRows[0];

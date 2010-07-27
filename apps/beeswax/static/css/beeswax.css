@@ -62,7 +62,7 @@ div.beeswax a.bw-history_nav {
 div.beeswax a.bw-config_nav {
 	background: url(/static/art/icons/cog.png) no-repeat;
 }
-div.beeswax a.ccs-art_button.ccs-refresh.large {
+div.beeswax a.ccs-refresh.large {
 	height: 25px;
 }
 div.beeswax .bw-nav li {
@@ -815,10 +815,10 @@ div.beeswax .watch_results .bw-save_query_results label.overTxtLabel {
 div.beeswax .watch_results .bw-save_query_results input[type=text]{
 	margin-left: 17px;
 }
-div.beeswax .watch_results .bw-save_query_results a.ccs-art_button {
+div.beeswax .watch_results .bw-save_query_results a[data-filters*=ArtButton] {
 	margin-left: 17px;
 }
-div.beeswax .watch_results .bw-save_query_results div.ccs-art_button {
+div.beeswax .watch_results .bw-save_query_results div[data-filters*=ArtButton] {
 	margin-top: 5px;
 }
 div.beeswax .watch_results .bw-save_query_results a.ccs-choose_file {
@@ -1093,7 +1093,7 @@ div.beeswax .context-menu li a {
 	display: block;
 	height: 18px;
 }
-div.beeswax table.ccs-data_table tr.table-tr-selected td .context-menu li a {
+div.beeswax table[data-filters*=HtmlTable] tr.table-tr-selected td .context-menu li a {
 	color: #000;
 	text-decoration: none;
 }

@@ -180,7 +180,7 @@
 /* stripy table */
 /*
 see: HtmlTable.js, HtmlTable.Zebra.js, HtmlTable.Select.js, HtmlTable.Sort.js in MooTools More
-<table class="ccs-data_table selectable sortable" cellpadding="0" cellspacing="0">
+<table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
 	<thead>
 		<tr>
 			<th>Header for Column 1</th>
@@ -199,13 +199,13 @@ see: HtmlTable.js, HtmlTable.Zebra.js, HtmlTable.Select.js, HtmlTable.Sort.js in
 give it class "selectable" to allow the user to select rows
 give it class "sortable" to allow the user to sort the table
 */
-table.ccs-data_table {
+table[data-filters*=HtmlTable] {
 	width: 100%;
 }
-table.ccs-data_table thead {
+table[data-filters*=HtmlTable] thead {
 	background: url(/static/art/th_back.png);
 }
-table.ccs-data_table thead th {
+table[data-filters*=HtmlTable] thead th {
 	text-align: left;
 	white-space: nowrap;
 	padding: 0px 6px;
@@ -217,11 +217,11 @@ table.ccs-data_table thead th {
 	font-weight: normal;
 	overflow: hidden;
 }
-table.ccs-data_table th:last-child {
+table[data-filters*=HtmlTable] th:last-child {
 	border-right: none;
 }
 
-table.ccs-data_table td {
+table[data-filters*=HtmlTable] td {
 	white-space: nowrap;
 	padding: 0px 8px;
 	height: 20px;
@@ -229,18 +229,21 @@ table.ccs-data_table td {
 	background: #fff;
 	border: none;
 }
-table.ccs-data_table tr.table-tr-odd td {
+table[data-filters*=HtmlTable] tr.table-tr-odd td {
 	background: #f3f3f3;
 }
-table.ccs-data_table tr:nth-child(odd) td {
+table[data-filters*=HtmlTable] tr:nth-child(odd) td {
 	background: #f3f3f3;
 }
-table.ccs-data_table tr:hover > td, table.ccs-data_table tr.table-tr-hovered td {
+table[data-filters*=HtmlTable] tr:hover > td, table[data-filters*=HtmlTable] tr.table-tr-hovered td {
 	background-color: #d4e7f8;
 	color: #000;
 	cursor: pointer;
 }
-table.ccs-data_table tr.selected td, table.ccs-data_table tr.table-tr-selected td, table.ccs-data_table tr.selected td a, table.ccs-data_table tr.table-tr-selected td a {
+table[data-filters*=HtmlTable].noSelect tr:hover > td, table[data-filters*=HtmlTable].noSelect tr.table-tr-hovered td {
+	cursor: auto;
+}
+table[data-filters*=HtmlTable] tr.selected td, table[data-filters*=HtmlTable] tr.table-tr-selected td, table[data-filters*=HtmlTable] tr.selected td a, table[data-filters*=HtmlTable] tr.table-tr-selected td a {
 	background-color: #3875d7;
 	color: #fff;
 }
@@ -386,12 +389,12 @@ div.jframe_default h5 { font-size: 105%; margin-bottom: 0.3em; padding-top: 8px;
 	border-bottom: 1px solid #ccc;
 	padding: 3px;
 }
-.ccs-shared table.ccs-data_table tr.table-tr-selected td ul.context-menu li a {
+.ccs-shared table[data-filters*=HtmlTable] tr.table-tr-selected td ul.context-menu li a {
 	color: #000;
 	background-color: #fff;
 	text-decoration: none;
 }
-.ccs-shared .context-menu li:hover, .ccs-shared table.ccs-data_table tr.table-tr-selected td ul.context-menu li:hover a, .ccs-shared ul.context-menu li:hover a {
+.ccs-shared .context-menu li:hover, .ccs-shared table[data-filters*=HtmlTable] tr.table-tr-selected td ul.context-menu li:hover a, .ccs-shared ul.context-menu li:hover a {
 	text-decoration: none;
 	background-color: #3875D7;
 	color: #fff;
@@ -400,7 +403,7 @@ div.jframe_default h5 { font-size: 105%; margin-bottom: 0.3em; padding-top: 8px;
 	border: none;
 }
 /* button bar */
-input.ccs-art_button {
+input[data-filters*=ArtButton] {
 	padding: 0px 0px 0px 0px;
 	/* webkit madness: 
 		put this padding statement in place and buttons are still padding 0/8/0/8px
@@ -409,12 +412,12 @@ input.ccs-art_button {
 	*/
 	border: 0px;
 }
-.ccs-shared .ccs-button_bar a, .ccs-shared .ccs-button_subbar_above a, .ccs-shared .ccs-button_subbar_below a {
+.ccs-shared [data-filters*=ArtButtonBar] a {
 	float: left;
 	height: 19px;
 }
 
-.ccs-shared .ccs-button_bar li, .ccs-shared .ccs-button_subbar_above li, .ccs-shared .ccs-button_subbar_below li {
+.ccs-shared [data-filters*=ArtButtonBar] li {
 	margin-right: 0 !important;
 }
 /* side by side select */
@@ -457,7 +460,7 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 }
 
 /* help text links */
-.ccs-help_link, .ccs-info_link {
+[data-filters*=HelpTip], [data-filters*=InfoTip] {
 	display:-moz-inline-box;		/* FF2 */
 	display:inline-block;		   /* webkit and FF3 */
 	#zoom: 1; /* set hasLayout:true to mimic inline-block */
@@ -474,7 +477,7 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 	overflow: hidden;
 }
 
-.ccs-info_link {
+[data-filters*=InfoTip] {
 	background: url(/static/art/info.png);
 }
 
@@ -482,7 +485,7 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 	display: none;
 }
 
-[data-size-to-width], [data-size-to-height] {
+[data-filters*=SizeTo] {
 	overflow: auto;
 }
 

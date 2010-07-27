@@ -28,28 +28,28 @@
         <label>
           ${design.name}
           % if design.desc:
-            <p class="ccs-info_text" data-help-direction="6">${design.desc}</p>
+            <p class="ccs-inline" data-filters="InfoTip" data-help-direction="6">${design.desc}</p>
           % endif
         </label>
       % else:
         <label>New Query</label>
       % endif
       <ul class="query_edit_actions clearfix">
-        <li class="ccs-button_bar bw-query_save_buttons">
+        <li class="bw-query_save_buttons" data-filters="ArtButtonBar">
           <a href="${ url('beeswax.views.execute_query') }"
-            class="ccs-art_button bw-query_new"
+            class="bw-query_new" data-filters="ArtButton"
             data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">New</a>
 
           % if design and not design.is_auto and design.name:
-            <input type="submit" name="saveform-save" value="Save" class="ccs-art_button bw-query_save"
+            <input type="submit" name="saveform-save" value="Save" class="bw-query_save" data-filters="ArtButton"
               data-icon-styles="{'width':16,'height':16, 'left':7}"/>
           % endif
-          <input type="submit" name="saveform-saveas" value="Save As..." class="ccs-art_button bw-query_save_as"
+          <input type="submit" name="saveform-saveas" value="Save As..." class="bw-query_save_as" data-filters="ArtButton"
             data-icon-styles="{'width':16,'height':16, 'left':7}"/>
-          <a href="#settings" class="ccs-art_button bw-query_settings_toggle" data-icon-styles="{'width':16, 'height': 16}">Advanced</a>
-          <input type="submit" name="button-explain" value="Explain" class="ccs-art_button bw-query_explain"
+          <a href="#settings" class="bw-query_settings_toggle" data-filters="ArtButton" data-icon-styles="{'width':16, 'height': 16}">Advanced</a>
+          <input type="submit" name="button-explain" value="Explain" class="bw-query_explain" data-filters="ArtButton"
            data-icon-styles="{'width':16,'height':16, left: 7}"/>
-          <input type="submit" name="button-submit" value="Execute" class="ccs-art_button bw-query_execute"
+          <input type="submit" name="button-submit" value="Execute" class="bw-query_execute" data-filters="ArtButton"
            data-icon-styles="{'width':16,'height':16, 'left':52, 'top':3}"/>
         </li>
       </ul>
@@ -93,7 +93,7 @@ ${wrappers.head('Hive Query', section='query')}
 
 <div class="view" id="execute">
   <form action="${action}" method="POST" class="form-validator">
-    <div class="splitview resizable">
+    <div class="resizable" data-filters="SplitView">
       <%
         if form.settings.forms or form.file_resources.forms or form.functions.forms:
           width = 230
@@ -154,7 +154,7 @@ ${wrappers.head('Hive Query', section='query')}
                   data_filters="OverText",
                 ))}
                 <div class="ccs-button_subbar_below clearfix">
-                  <a class="ccs-art_button ccs-choose_file" data-chooseFor="${f['path'].html_name | n}" data-icon-styles="{'width':16, 'height':16, 'top':2}">Choose a File</a>
+                  <a class="ccs-choose_file" data-filters="ArtButton" data-chooseFor="${f['path'].html_name | n}" data-icon-styles="{'width':16, 'height':16, 'top':2}">Choose a File</a>
                 </div>
                 ${comps.field(f['_exists'], hidden=True)}
               % endfor

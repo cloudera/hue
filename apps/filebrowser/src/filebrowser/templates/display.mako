@@ -33,31 +33,31 @@
     %>
   </div>
 
-  <div class="fv-actions ccs-button_bar">
+  <div class="fv-actions" data-filters="ArtButtonBar">
     % if view['mode'] == "binary":
-      <a class="fv-viewText ccs-art_button" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">View As Text</a>
+      <a class="fv-viewText" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">View As Text</a>
     % endif
 
     % if view['mode'] == "text":
-      <a class="fv-viewBinary ccs-art_button" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}">View As Binary</a>
+      <a class="fv-viewBinary" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}">View As Binary</a>
     % endif
 
     % if view['compression'] != "gzip" and path.endswith('.gz'):
-      <a class="fv-viewGzip ccs-art_button" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">Preview As Gzip</a>
+      <a class="fv-viewGzip" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">Preview As Gzip</a>
     % endif
 
     % if view['compression'] and view['compression'] != "none":
-      <a class="fv-viewGzip ccs-art_button" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none">Stop preview</a>
+      <a class="fv-viewGzip" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none">Stop preview</a>
     % endif
 
     % if editable and view['compression'] == "none":
-      <a class="fv-editFile ccs-art_button" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit This File</a>
+      <a class="fv-editFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit This File</a>
     % endif
-     <a class="fv-download ccs-art_button" target="_blank" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.download', path=path_enc)}">Download</a>
-     <a class="fv-viewLocation ccs-art_button" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View File Location</a>
+     <a class="fv-download" data-filters="ArtButton" target="_blank" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.download', path=path_enc)}">Download</a>
+     <a class="fv-viewLocation" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View File Location</a>
   </div> 
   </div>
-  <div class="splitview resizable">
+  <div class="resizable" data-filters="SplitView">
     <div class="left_col jframe_padded">
       <div class="fv-controlInfo">
         % if not view['compression'] or view['compression'] == "none":
@@ -98,10 +98,10 @@
               last =  "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, stats['size']-(stats['size'] % view['length']), view['length'], stats['size']-(stats['size'] % view['length']) + 1, stats['size']) 
         %>
           ###DEFINE REL
-          <a class="ccs-inline fv-firstBlock ccs-pointy_tip" ${first}>First Block</a>
-          <a class="ccs-inline fv-prevBlock ccs-pointy_tip" ${prev}>Previous Block</a>
-          <a class="ccs-inline fv-nextBlock ccs-pointy_tip" ${next}>Next Block</a>
-          <a class="ccs-inline fv-lastBlock ccs-pointy_tip" ${last}>Last Block</a>
+          <a class="ccs-inline fv-firstBlock" data-filters="PointyTip" ${first}>First Block</a>
+          <a class="ccs-inline fv-prevBlock" data-filters="PointyTip" ${prev}>Previous Block</a>
+          <a class="ccs-inline fv-nextBlock" data-filters="PointyTip" ${next}>Next Block</a>
+          <a class="ccs-inline fv-lastBlock" data-filters="PointyTip" ${last}>Last Block</a>
       </div>
 % endif
       <dl class="fv-fileInfo">

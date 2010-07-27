@@ -16,43 +16,42 @@
 /*
 ---
 description: Allows an element to be sized to the dimensions of the jframe portion of the window.
-provides: [CCS.JFrame.SizeTo]
-requires: [/CCS.JFrame, /Element.Data]
-script: CCS.JFrame.SizeTo.js
+provides: [Behavior.SizeTo]
+requires: [Widgets/Element.Data]
+script: Behavior.SizeTo.js
 
 ...
 */
 
-CCS.JFrame.addGlobalFilters({
+Behavior.addGlobalFilters({
 
 	/*
 		elements are given data properties for data-size-to-height or data-size-to-width
 		these values are offsets. So, for example:
 		
-			<div data-size-to-height="-100"></div>
+			<div data-filters="SizeTo" data-size-to-height="-100"></div>
 		
 		will size that div to the height of the window -100 pixels. The value must always
 		be a number. Use zero for 100% height/width.
 	*/
-	sizeTo: function(container) {
-		if (!container.get('html').contains('data-size-to')) return;
-		var sizers = [];
-		container.getElements('[data-size-to-width], [data-size-to-height]').each(function(element) {
-			var axis = 'width';
-			var sizeTo = {
-				x: element.get('data', 'size-to-width'),
-				y: element.get('data', 'size-to-height')
-			};
-			sizers.push(function(x, y){
-				if (sizeTo.x) element.setStyle('width', x + sizeTo.x.toInt());
-				if (sizeTo.y) element.setStyle('height', y + sizeTo.y.toInt());
-			});
-		}, this);
-		var resize = function(x, y) { sizers.each(function(fn){ fn(x, y); }); };
-		resize(this.currentSize.x, this.currentSize.y);
-		this.addEvent('resize', resize);
-		this.markForCleanup(function(){
-			this.removeEvent('resize', resize);
+	SizeTo: function(element, methods) {
+		var sizeTo = {
+			x: element.get('data', 'size-to-width'),
+			y: element.get('data', 'size-to-height')
+		};
+		if (!sizeTo.x && !sizeTo.y) {
+			dbug.log('this element has the SizeTo filter, but no sizes defined for size-to-height/width: ', element);
+			return;
+		}
+		resize = function(x, y){
+			if (sizeTo.x) element.setStyle('width', x + sizeTo.x.toInt());
+			if (sizeTo.y) element.setStyle('height', y + sizeTo.y.toInt());
+		};
+		size = methods.getContainerSize();
+		resize(size.x, size.y);
+		methods.addEvent('resize', resize);
+		this.markForCleanup(element, function(){
+			methods.removeEvent('resize', resize);
 		});
 	}
 

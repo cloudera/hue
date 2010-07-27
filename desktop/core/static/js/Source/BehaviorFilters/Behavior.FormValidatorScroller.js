@@ -1,6 +1,3 @@
-// Licensed to Cloudera, Inc. under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
 // regarding copyright ownership.  Cloudera, Inc. licenses this file
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
@@ -15,10 +12,22 @@
 // limitations under the License.
 /*
 ---
-description: This file is deprecated; the functionality has been moved to the ART Widgets repo. This is here for dependency backwards compatibility.
-provides: [Element.Data]
-requires: [Widgets/Element.Data]
-script: Element.Data.js
-
+description: Makes form validator instances scroll the jframe to the errors.
+provides: [Behavior.FormValidatorScroller]
+requires: [Widgets/Behavior.FormValidator]
+script: Behavior.FormValidatorScroller.js
 ...
 */
+
+Behavior.addGlobalPlugin('FormValidator', 'FormValidatorScroller', function(element, methods){
+	var validator = element.retrieve('validator');
+	validator.setOptions({
+		onShow: function(input, advice, className) {
+			//scroll to errors within the jframe
+			/*JFrame Reference */
+			methods.getScroller().toElement(input);
+		},
+		//not the window
+		scrollToErrorsOnSubmit: false
+	});
+});

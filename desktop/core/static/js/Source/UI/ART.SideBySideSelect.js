@@ -34,13 +34,13 @@ ART.SideBySideSelect = new Class({
 		className: 'sideBySideSelect clearfix',
 		deselectedOptions: {
 			properties: {
-				'class': 'ccs-data_table'
+				'data-filters': 'HtmlTable'
 			},
 			headers: ['Deselected']
 		},
 		selectedOptions: {
 			properties: {
-				'class': 'ccs-data_table'
+				'data-filters': 'HtmlTable'
 			},
 			headers: ['Selected']
 		},
@@ -318,7 +318,7 @@ ART.SideBySideSelect = new Class({
 			var startSelected = $(this.selected).hasChild(start);
 			var end = row;
 			//see if the end is a child of the selected table
-			var endSelected = $(this.selected).hasChild(start);
+			var endSelected = $(this.selected).hasChild(end);
 			//if both are in the same table, select the range
 			if (startSelected == endSelected) {
 				var rows;

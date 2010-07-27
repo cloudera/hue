@@ -29,13 +29,13 @@ from django.template.defaultfilters import urlencode, escape
 
         <a href="${url('filebrowser.views.view', path='/')}"><img src="/filebrowser/static/art/icon_large.png" class="fb_icon"/></a>
         % if current_request_path:
-          <div class="fb-actions ccs-button_bar">
+          <div class="fb-actions" data-filters="ArtButtonBar">
             % if home_directory:
-              <a class="fb-home ccs-art_button" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.view', path=home_directory)}">My Home</a>
+              <a class="fb-home" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.view', path=home_directory)}">My Home</a>
             % endif
             % if cwd_set:
-              <a class="fb-upload ccs-art_button" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.upload')}?dest=${path|urlencode}&next=${current_request_path|urlencode}">Upload a File</a>
-              <a class="fb-mkdir ccs-art_button" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.mkdir')}?path=${path|urlencode}&next=${current_request_path|urlencode}">New Directory</a>
+              <a class="fb-upload" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.upload')}?dest=${path|urlencode}&next=${current_request_path|urlencode}">Upload a File</a>
+              <a class="fb-mkdir" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.mkdir')}?path=${path|urlencode}&next=${current_request_path|urlencode}">New Directory</a>
             % endif
           </div>
         % endif

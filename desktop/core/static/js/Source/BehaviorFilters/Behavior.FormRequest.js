@@ -15,7 +15,7 @@
 // limitations under the License.
 /*
 ---
-description: Configures every form to use the Form.Request behavior.
+description: Creates an instance of Form.Request for every form that JFrame loads.
 provides: [CCS.JFrame.FormRequest]
 requires: [/CCS.JFrame, More/Form.Request]
 script: CCS.JFrame.FormRequest.js
@@ -25,23 +25,23 @@ script: CCS.JFrame.FormRequest.js
 
 CCS.JFrame.addGlobalFilters({
 
-	//this runs BEFORE Behavior.FormRequest
-	formRequest: function(container){
-		//get all forms in the response
+	formRequest: function(element, events){
+		// Make forms submit inside the jframe
 		container.getElements('form').each(function(form){
-			//set their action url and add the FormRequest filter
-			form.set('action', new URI(form.get('action'), {base: this.currentPath})).addDataFilter("FormRequest");
-		});
+			form.set('action', new URI(form.get('action'), {base: this.currentPath}));
+			//pass null for the update element argument; JFrame does our updating for us
+			var req = new Form.Request(form, null, {
+				//we don't want submission of the form to reset it on AJAX success;
+				//sometimes JFrame gets an error back in the html; JFrame will replace
+				//the form for us.
+				resetForm: false
+			});
+			this._setRequestOptions(req.request, {
+				onSuccess: function(nodes, elements, text){
+					this._requestSuccessHandler(req.request, text);
+				}.bind(this)
+			});
+		}, this);
 	}
 
-});
-
-//this runs AFTER Behavior.FormRequest
-Behavior.addGlobalPlugin('FormRequest', 'JFrameFormRequest', function(element, methods){
-	//get the Form.Request instance
-	var req = element.get('formRequest');
-	//tell it not to update anything
-	req.update = null;
-	//configure its request to use JFrame's response handler
-	methods.configureRequest(req.request);
 });

@@ -21,7 +21,7 @@ ${wrappers.head("Beeswax: Load Data into " + table)}
     <form action="${action}" method="POST">
       <dl>
         ${util.render_field(form["path"])}
-        <a class="ccs-chooseFile ccs-art_button" data-icon-styles="{'width': 16, 'height': 16, 'top': 6, 'left': 6 }" data-chooseFor="path">Open File Chooser </a>
+        <a class="ccs-chooseFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 6, 'left': 6 }" data-chooseFor="path">Open File Chooser </a>
         ## Path (on HDFS) of files to load.
         ${util.render_field(form["overwrite"])}
         ## Any existing data will be erased!

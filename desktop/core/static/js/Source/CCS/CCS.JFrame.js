@@ -31,12 +31,23 @@ requires:
  - More/HtmlTable.Select
  - More/Spinner
  - Widgets/Behavior
- - Widgets/Behavior.OverText
- - Widgets/Behavior.ArtInput
  - Widgets/Behavior.ArtButton
- - /Behavior.SideBySideSelect
+ - Widgets/Behavior.ArtInput
+ - Widgets/Behavior.FormValidator
+ - Widgets/Behavior.HtmlTable
+ - Widgets/Behavior.OverText
+ - Widgets/Behavior.SplitView
+ - /Behavior.ContextMenu
+ - /Behavior.FilterInput
  - /Behavior.FitText
+ - /Behavior.HtmlTableKeys
  - /Behavior.MultiChecks
+ - /Behavior.SideBySideSelect
+ - /Behavior.SizeTo
+ - /Behavior.SplitViewPostFold
+ - /Behavior.SubmitOnChange
+ - /Behavior.Tabs
+ - /Behavior.Tips
  - /CCS
  - /CCS.ContextMenu
 script: CCS.JFrame.js
@@ -105,11 +116,26 @@ CCS.JFrame = new Class({
 		new ART.Keyboard(this, this.keyboardOptions);
 		this.addLinkers(this.options.linkers);
 		this.addFilters(this.options.filters);
-
-		this.behavior = new Behavior(this.element);
-		['attachKeys', 'detachKeys', 'addShortcut', 'addShortcuts', 'removeShortcut', 'removeShortcuts', 'applyDelegates'].each(function(method){
+		this.behavior = new Behavior(this.element, {
+			onError: function(){
+				dbug.warn.apply(dbug, arguments);
+			}
+		});
+		if(this.options.size) this.behavior.resize(this.options.size.width, this.options.size.height);
+		['attachKeys', 'detachKeys', 'addShortcut', 'addShortcuts', 'removeShortcut', 'removeShortcuts',
+		 'applyDelegates', 'getScroller', 'getContentElement', 'invokeLinker'].each(function(method){
 			this.behavior.passMethod(method, this[method].bind(this));
 		}, this);
+		this.behavior.passMethods({
+			getContainerSize: this.getCurrentSize.bind(this),
+			configureRequest: function(request){
+				this._setRequestOptions(request, {
+					onSuccess: function(nodes, elements, text){
+						this._requestSuccessHandler(request, text);
+					}.bind(this)
+				});
+			}.bind(this)
+		});
 		this.addEvent('resize', this.behavior.resize.bind(this.behavior));
 		this.addBehaviors(this.options.behaviors);
 
@@ -299,7 +325,8 @@ CCS.JFrame = new Class({
 		}
 		
 		//determine view and view element
-		var view, viewElement = content.elements.filter('.view')[0] || content.elements.getElement('.view')[0];
+		var view,
+		    viewElement = content.elements.filter('.view')[0] || content.elements.getElement('.view')[0];
 		if (viewElement) {
 			view = viewElement.get('id');
 			viewElement.set('id', '');
@@ -343,6 +370,18 @@ CCS.JFrame = new Class({
 		this.fireEvent('resize', [x, y]);
 	},
 	
+	getCurrentSize: function(){
+		return this.currentSize;
+	},
+
+	getContentElement: function(){
+		return this.getWindow().contents;
+	},
+
+	getScroller: function(){
+		return this.scroller;
+	},
+
 	filters: {},
 
 	/*
@@ -525,7 +564,6 @@ CCS.JFrame = new Class({
 	destroy: function(){
 		this._sweep(this.element);
 	},
-
 
 /****************************************************************************************
 	PRIVATE METHODS BELOW

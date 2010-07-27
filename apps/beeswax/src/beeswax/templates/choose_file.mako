@@ -55,7 +55,7 @@ ${wrappers.head('Choose a File')}
                     alt="/user/user_name/data_dir",
                   ),
                   help="The HDFS path to the file that you would like to base this new table definition on.  It can be compressed (gzip) or not.")}
-                <a class="ccs-art_button ccs-choose_file" data-icon-styles="{'width': 16, 'height' : 16, 'top' : 3, 'left' : 6 }" data-chooseFor="path">Choose File</a>
+                <a class="ccs-choose_file" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height' : 16, 'top' : 3, 'left' : 6 }" data-chooseFor="path">Choose File</a>
                 <div class="bw-import_data">
                   ${comps.field(file_form["do_import"],
                     render_default=True,

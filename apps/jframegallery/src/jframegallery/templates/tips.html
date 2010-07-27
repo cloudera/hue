@@ -23,20 +23,20 @@ limitations under the License.
 	<body>
 		<div class="jframe_padded">
 			<ul>
-				<li><a class="ccs-pointy_tip" rel="I'm the caption." title="I'm the title!">this link has a tip</a></li>
-				<li><a class="ccs-pointy_tip" rel="I point down." title="I'm the title!" data-tip-direction="6">my tip points down</a></li>
-				<li><a class="ccs-pointy_tip" rel="I point up, but I'm on the right." title="I'm the title!" data-tip-direction="11">my tip is offset</a></li>
-				<li><a class="ccs-pointy_tip" rel="I point left." title="I'm the title!" data-tip-direction="9">my tip points to the left</a></li>
+				<li><a data-filters="PointyTip" rel="I'm the caption." title="I'm the title!">this link has a tip</a></li>
+				<li><a data-filters="PointyTip" rel="I point down." title="I'm the title!" data-tip-direction="6">my tip points down</a></li>
+				<li><a data-filters="PointyTip" rel="I point up, but I'm on the right." title="I'm the title!" data-tip-direction="11">my tip is offset</a></li>
+				<li><a data-filters="PointyTip" rel="I point left." title="I'm the title!" data-tip-direction="9">my tip points to the left</a></li>
 			</ul>
 			
 			<ul>
 				<li>
 					I am some text. Nothing special.
-					<p class="ccs-help_text">I'm some help text that gets turned into a help tip</p>
+					<p class="ccs-inline" data-filters="HelpTip">I'm some help text that gets turned into a help tip</p>
 				</li>
 				<li>
 					I am some text. Nothing special.
-					<p class="ccs-info_text">I'm some help text that gets turned into an info tip</p>
+					<p class="ccs-inline" data-filters="InfoTip">I'm some help text that gets turned into an info tip</p>
 				</li>
 			</ul>
 			

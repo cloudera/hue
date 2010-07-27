@@ -17,7 +17,7 @@
 ---
 description: Creates a double click action for any element with the class .dbclick_delegate.
 provides: [CCS.JFrame.DoubleClickDelegate]
-requires: [/CCS.JFrame, /Element.Data]
+requires: [/CCS.JFrame, Widgets/Element.Data]
 script: CCS.JFrame.DoubleClickDelegate.js
 
 ...

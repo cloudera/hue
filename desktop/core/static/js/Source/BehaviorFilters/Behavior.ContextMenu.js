@@ -1,12 +1,3 @@
-// Licensed to Cloudera, Inc. under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  Cloudera, Inc. licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +7,9 @@
 /*
 ---
 description: Adds context menu support for any element with a data-context-menu-actions property. See the CCS.ContextMenu class for details on usage.
-provides: [CCS.JFrame.ContextMenu]
-requires: [/CCS.JFrame, /CCS.ContextMenu]
-script: CCS.JFrame.ContextMenu.js
-
+provides: [Behavior.ContextMenu]
+requires: [Widgets/Behavior, /CCS.ContextMenu]
+script: Behavior.ContextMenu.js
 ...
 */
 
@@ -39,7 +29,8 @@ var JframeContextMenu = new Class({
 		this.parent.apply(this, arguments);
 		//pointer to the jframe; it's wrapped in function to prevent a recurssion issue - 
 		//when you run a class instance through $merge (which setOptions does) you get one...
-		this._jframe = $lambda(this.options.jframe)();
+		//this._jframe = $lambda(this.options.jframe)();
+		this.applyDelegates = this.options.applyDelegates;
 	},
 	show: function(x, y){
 		//when the menu is shown, put the place holder after the menu
@@ -47,7 +38,7 @@ var JframeContextMenu = new Class({
 		//move the menu into the container
 		this.activeMenu.inject(this.options.container);
 		//apply click delegates to it since it's likely no longer in the jframe (where the delegates start)
-		this._jframe.applyDelegates(this.activeMenu);
+		this.applyDelegates(this.activeMenu);
 		this.parent(x, y);
 	},
 	hide: function(){
@@ -58,30 +49,18 @@ var JframeContextMenu = new Class({
 	}
 });
 
-CCS.JFrame.addGlobalFilters({
+Behavior.addGlobalFilters({
 
 	//intercept right click behaviors
-	contextMenu: function(container){
-		//get the elements that capture right click events for context menus
-		var delegates = container.getElements('[data-context-menu-actions]');
-		if (!delegates.length) return;
-		
-		//get a pointer to the content contaner of the window; this is the jbrowser container
-		//that contains the jframe
-		var contents = this.getWindow().contents;
-		
+	ContextMenu: function(element, methods){
 		//create an instance of CCS.Context menu for each delegate
-		var menus = delegates.map(function(delegate) {
-			return new JframeContextMenu(delegate, {
-				jframe: $lambda(this), //pass a function that wraps this jframe instance
-				container: contents //inject the menu into the container outside the jframe
-			});
-		}, this);
+		var menu = new JframeContextMenu(element, {
+			applyDelegates: methods.applyDelegates, //pass a function that wraps this jframe instance
+			container: methods.getContentElement() //inject the menu into the container outside the jframe
+		});
 		//detatch these whenever we unload jframe
-		this.markForCleanup(function(){
-			menus.each(function(menu){
+		this.markForCleanup(element, function(){
 				menu.detach();
-			});
 		});
 	}
 

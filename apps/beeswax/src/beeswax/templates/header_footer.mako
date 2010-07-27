@@ -34,28 +34,28 @@ def is_selected(section, matcher):
   <div class="toolbar">
     <a href="${ url('beeswax.views.index') }"><img src="/beeswax/static/art/beeswax-logo.png" width="55" height="55" alt="Beeswax" class="beeswax_logo"></a>
     % if toolbar:
-    <ul class="bw-nav ccs-button_bar">
+    <ul class="bw-nav" data-filters="ArtButtonBar">
       <li><a href="${ url('beeswax.views.execute_query') }" 
-        class="ccs-art_button bw-nav_icon bw-query_nav ${is_selected(section, 'query')}" 
+        class="bw-nav_icon bw-query_nav ${is_selected(section, 'query')}" data-filters="ArtButton"
         data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Query Editor</a></li>
       <li><a href="${ url('beeswax.views.my_queries') }"
-        class="ccs-art_button bw-nav_icon bw-my_queries_nav ${is_selected(section, 'my queries')}"
+        class="bw-nav_icon bw-my_queries_nav ${is_selected(section, 'my queries')}" data-filters="ArtButton"
         data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">My Queries</a></li>
       <li><a href="${ url('beeswax.views.list_designs') }" 
-        class="ccs-art_button bw-nav_icon bw-queries_nav ${is_selected(section, 'saved queries')}" 
+        class="bw-nav_icon bw-queries_nav ${is_selected(section, 'saved queries')}" data-filters="ArtButton"
         data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Saved Queries</a></li>
-    ## <li><a href="${ url('beeswax.views.edit_report') }" class="ccs-art_button bw-nav_icon bw-new_report_gen_nav ${is_selected(section, 'report generator')}" data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Report Generator</a></li>
+    ## <li><a href="${ url('beeswax.views.edit_report') }" class="bw-nav_icon bw-new_report_gen_nav ${is_selected(section, 'report generator')}" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Report Generator</a></li>
       <li><a href="${ url('beeswax.views.list_query_history') }" 
-        class="ccs-art_button bw-nav_icon bw-history_nav ${is_selected(section, 'history')}" 
+        class="bw-nav_icon bw-history_nav ${is_selected(section, 'history')}" data-filters="ArtButton"
         data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">History</a></li>
       <li><a href="${ url('beeswax.views.show_tables') }" 
-        class="ccs-art_button bw-nav_icon bw-tables_nav ${is_selected(section, 'tables')}" 
+        class="bw-nav_icon bw-tables_nav ${is_selected(section, 'tables')}" data-filters="ArtButton"
         data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Tables</a></li>
       <li><a href="${ url('beeswax.views.configuration') }" 
-        class="ccs-art_button bw-nav_icon bw-config_nav ${is_selected(section, 'hive configuration')}" 
+        class="bw-nav_icon bw-config_nav ${is_selected(section, 'hive configuration')}" data-filters="ArtButton"
         data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Settings</a>
       </li>
-      <li><a class="ccs-art_button ccs-refresh large">Refresh</a></li>
+      <li><a class="ccs-refresh large" data-filters="ArtButton">Refresh</a></li>
     </ul>
     % endif
   </div>

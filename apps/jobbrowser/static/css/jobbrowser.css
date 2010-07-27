@@ -103,7 +103,7 @@ ul.jt_filters li input {
 	margin: 0 auto;
 }
 
-.job_browser_list table.ccs-data_table {
+.job_browser_list table[data-filters*=HtmlTable] {
 	border-bottom: 1px solid #B2B2B2;
 }
 .job_browser_list td div.jt_jobid {
@@ -365,6 +365,6 @@ table.jt_counter_table, table.jt_meta_table {
 	-webkit-border-radius: 0px 0px 2px 2px;
 	padding: 8px;
 }
-.jobbrowser table.ccs-data_table .jt-raw_delimiter {
+.jobbrowser table[data-filters*=HtmlTable] .jt-raw_delimiter {
 	background: #bbb;
 }

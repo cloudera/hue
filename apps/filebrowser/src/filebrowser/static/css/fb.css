@@ -126,7 +126,7 @@ div.filebrowser .fb-mkdir {
 	border-bottom: 1px solid #ccc;
 	padding: 3px;
 }
-.filebrowser table.ccs-data_table tr.table-tr-selected td .context-menu li a {
+.filebrowser table[data-filters*=HtmlTable] tr.table-tr-selected td .context-menu li a {
 	color: #000;
 	text-decoration: none;
 }

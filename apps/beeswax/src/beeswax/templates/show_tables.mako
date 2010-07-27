@@ -16,18 +16,18 @@
 <%namespace name="wrappers" file="header_footer.mako" />
 ${wrappers.head("Beeswax: Table List", section='tables')}
   <div class="toolbar">
-    <div class="bw-show_tables_subnav ccs-button_bar">
+    <div class="bw-show_tables_subnav" data-filters="ArtButtonBar">
       % if not examples_installed:
-        <a href="${ url('beeswax.views.install_examples') }" class="ccs-art_button bw-install_samples" data-icon-styles="{'width': 16, 'height': 16, 'top': 1}">install samples</a>
+        <a href="${ url('beeswax.views.install_examples') }" data-filters="ArtButton" class="bw-install_samples" data-icon-styles="{'width': 16, 'height': 16, 'top': 1}">install samples</a>
       % endif
-      <a href="${ url('beeswax.create_table.index') }" class="ccs-art_button bw-new_table" data-icon-styles="{'width': 16, 'height': 16, 'top': 1}">new table</a>
+      <a href="${ url('beeswax.create_table.index') }" data-filters="ArtButton" class="bw-new_table" data-icon-styles="{'width': 16, 'height': 16, 'top': 1}">new table</a>
     </div>
   </div>
 
 <div id="show_tables" class="view">
   <h2 class="ccs-hidden">Tables</h2>
 
-  <table class="ccs-data_table sortable" cellpadding="0" cellspacing="0">
+  <table data-filters="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
         <th>Table Name</th>
@@ -39,7 +39,7 @@ ${wrappers.head("Beeswax: Table List", section='tables')}
         <tr data-dblclick-delegate="{'dblclick_loads':'.bw-tables_table a'}" class="ccs-no_select">
           <td class="bw-tables_table ccs-no_select">
             <a href="${ url("beeswax.views.describe_table", table=table) }">${ table }</a>
-            <!-- <p class="ccs-help_text">TODO</p> -->
+            <!-- <p class="ccs-inline" data-filters="HelpTip">TODO</p> -->
           </td>
           <td class="bw-tables_browse"><a href="${ url("beeswax.views.read_table", table=table) }">Browse Data</a></td>
         </tr>

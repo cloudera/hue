@@ -22,7 +22,7 @@
 %>
 
 <%def name="task_table(tasks)">
-  <table class="ccs-data_table sortable" cellpadding="0" cellspacing="0">
+  <table data-filters="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
         <th>Tasks</th>
@@ -158,7 +158,7 @@
             
           </li>
           <li>
-            <table class="ccs-data_table jt_meta_table sortable" cellpadding="0" cellspacing="0">
+            <table data-filters="HtmlTable" class="jt_meta_table sortable" cellpadding="0" cellspacing="0">
               <thead>
                 <th>Name</th>
                 <th>Value</th>

@@ -23,7 +23,7 @@ script: CCS.User.js
 ...
 */
 (function(){
-        // Lazily cached user profile data.
+	// Lazily cached user profile data.
 	var data = undefined;
 
 	var outstandingRequest = undefined;

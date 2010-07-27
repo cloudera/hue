@@ -53,7 +53,7 @@ ART.Sheet.define('splitview.bw-editor', {
 					keys: 'enter',
 					shortcut: 'enter',
 					handler: function(e){
-						var table = $(this).getElement('.ccs-data_table');
+						var table = $(this).getElement('[data-filters*=HtmlTable]');
 						if (!table) return;
 						hTable = table.retrieve('HtmlTable');
 						var selected = hTable.selectedRows[0];
@@ -554,7 +554,7 @@ ART.Sheet.define('splitview.bw-editor', {
 			}.bind(this));
 			
 			//add the settings toggle
-			var splitEl = $(this).getElement('div.splitview');
+			var splitEl = $(this).getElement('div[data-filters*=SplitView]');
 			if (splitEl) {
 				//get the instance of splitview
 				var split = splitEl.get('widget');

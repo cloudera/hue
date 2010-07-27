@@ -31,7 +31,7 @@
         <div class="toolbar">
           <a href="/jobbrowser/jobs/"><img src="/jobbrowser/static/art/icon_large.png" class="jt_icon"/></a>
           <ul class="jt_filters">
-            <form class="jt_filter_form submit_on_change" method="get" action="/jobbrowser/jobs/">
+            <form class="jt_filter_form" data-filters="SubmitOnChange" method="get" action="/jobbrowser/jobs/">
               <li class="ccs-inline"><b>Filter Jobs:</b></li>
               <li class="ccs-inline">
                 <select name="state">
@@ -53,7 +53,7 @@
         </div>
     
     
-        <table class="ccs-data_table sortable" cellpadding="0" cellspacing="0">
+        <table data-filters="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
           <thead>
             <tr>
               <th>Name / Id</th>

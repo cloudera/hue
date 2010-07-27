@@ -197,7 +197,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                   data_filters="OverText",
                   alt='/user/user_name/data_dir'
                 )
-              )}<a class="ccs-choose_file ccs-art_button" data-icon-styles="{'width': 16, 'height': 16, 'top': 3, 'left': 6 }" data-chooseFor="table-external_location">Choose File</a>
+              )}<a class="ccs-choose_file" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 3, 'left': 6 }" data-chooseFor="table-external_location">Choose File</a>
             </div>
           </dl>
           <a href="#step6" class="ccs-multipart-next">Final Step: Configure Table Columns &raquo;</a>
@@ -213,7 +213,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               <div class="bw-column">
                 <dt class="bw-column_header bw-inactive">
                   <input name="${form["column_name"].html_name | n}" value="${form["column_name"].data or ''}" class="required bw-column_name" alt="Column Name" data-filters="OverText"/>
-                  <p class="ccs-help_text" data-help-direction="1">
+                  <p class="ccs-inline" data-filters="HelpTip" data-help-direction="1">
                     Column name must be single words that start
                     with a letter or a digit.
                   </p>

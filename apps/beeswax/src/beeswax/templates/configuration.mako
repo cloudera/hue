@@ -17,7 +17,7 @@
 <%namespace name="util" file="util.mako" />
 ${wrappers.head('Hive Configuration Variables', section='hive configuration')}
 <h1 class="ccs-hidden">Hive Configuration Variables</h1>
-<table class="ccs-data_table sortable" cellpadding="0" cellspacing="0">
+<table class="sortable" data-filters="HtmlTable" cellpadding="0" cellspacing="0">
   <thead>
     <tr>
       <th>Key</th>

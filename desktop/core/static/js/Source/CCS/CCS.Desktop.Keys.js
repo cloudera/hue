@@ -122,7 +122,7 @@ script: CCS.Desktop.Keys.js
 			this.table = new HtmlTable({
 				headers: ['Key', 'Shortcut Name', 'Description'],
 				properties: {
-					'class':'ccs-data_table'
+					'data-filters':'HtmlTable'
 				}
 			});
 			//a holder for styling

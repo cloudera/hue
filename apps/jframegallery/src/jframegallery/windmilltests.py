@@ -43,7 +43,7 @@ def test_context_menu():
   client.waits.forElement(jquery='(".CCS-JFRAMEGALLERY .show-options")[0]')
   #simulating right click, as windmill doesn't provide a mechanism for doing so
   #and it's regular (left) click event doesn't include page location information.
-  client.execJS(js="$$('.context-menu-delegate')[0].fireEvent('contextmenu', new Event({type: 'click', page: {x: 20, y: 20}}))")
+  client.execJS(js="$$('[data-filters*=ContextMenu]')[0].fireEvent('contextmenu', new Event({type: 'click', page: {x: 20, y: 20}}))")
   client.asserts.assertJS(js='document.getElement(\'div.CCS-JFRAMEGALLERY .cm-one\').isVisible()')
   client.click(jquery='(".CCS-JFRAMEGALLERY")[0]')
   client.asserts.assertJS(js='!document.getElement(\'div.CCS-JFRAMEGALLERY .cm-one\').isVisible()')
@@ -140,7 +140,7 @@ def test_split_view():
   launch_jframe_gallery(client)
 
   client.click(id='splitview')
-  client.waits.forElement(jquery="('.CCS-JFRAMEGALLERY .splitview')[0]")
+  client.waits.forElement(jquery="('.CCS-JFRAMEGALLERY [data-filters*=SplitView]')[0]")
   client.asserts.assertJS(js="$$('.CCS-JFRAMEGALLERY .art-splitview-left')[0].getStyle('width') == '200px'")
   client.dragDropElem(jquery="('.CCS-JFRAMEGALLERY .art-splitview-splitter')[0]", pixels='-100,0')
   client.asserts.assertJS(js="$$('.CCS-JFRAMEGALLERY .art-splitview-left')[0].getStyle('width') == '101px'")

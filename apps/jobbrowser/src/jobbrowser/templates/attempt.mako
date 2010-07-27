@@ -44,7 +44,7 @@
 
         <ul class="ccs-tab_sections ccs-clear">
           <li>
-            <table class="ccs-data_table jt_meta_table sortable" cellpadding="0" cellspacing="0">
+            <table data-filters="HtmlTable" class="jt_meta_table sortable" cellpadding="0" cellspacing="0">
               <thead>
                 <th>Name</th>
                 <th>Value</th>

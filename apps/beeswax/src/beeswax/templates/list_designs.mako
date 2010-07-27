@@ -23,7 +23,7 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
 <div id="list_designs" class="view">
   ${comps.pagination(page)}
   <h2 class="ccs-hidden">Saved Queries:</h2>
-  <table class="ccs-data_table selectable" cellpadding="0" cellspacing="0">
+  <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
         <th colspan="2">Name</th>
@@ -69,7 +69,7 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
         </td>
         <td>
           % if design.desc:
-           <p class="ccs-info_text">${design.desc}</p>
+           <p class="ccs-inline" data-filters="InfoTip">${design.desc}</p>
           % endif
         </td>
         <td>${design.owner.username}</td>

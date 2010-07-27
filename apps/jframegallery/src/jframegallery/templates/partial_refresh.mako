@@ -25,7 +25,7 @@ from datetime import datetime
   <body>
     <div class="jframe_padded partial_refresh">
       <h2 data-partial-id="0">The current time: ${datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</h2>
-      <a class="ccs-art_button" data-partial-id="1">current time: ${datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</a>
+      <a data-filters="ArtButton" data-partial-id="1">current time: ${datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</a>
       <br/>
       <textarea type="text">you can change this</textarea>
       <p>you can interact with the input above while the blocks with the time stamps update. Note that the button is rendered each time and your input changes aren't.</p>

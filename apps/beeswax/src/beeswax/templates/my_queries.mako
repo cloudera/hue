@@ -33,7 +33,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
 
     <ul class="ccs-tab_sections ccs-clear">
       <li>
-        <table class="ccs-data_table selectable" cellpadding="0" cellspacing="0">
+        <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
           <thead>
             <tr>
               <th colspan="2">Name</th>
@@ -68,7 +68,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
               </td>
               <td>
                 % if design.desc:
-                 <p class="ccs-info_text">${design.desc}</p>
+                 <p class="ccs-inline" data-filters="InfoTip">${design.desc}</p>
                 % endif
               </td>
               <td>
@@ -96,7 +96,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
         ##
         ## ----------------- My history -------------------
         ##
-        <table class="ccs-data_table selectable" cellpadding="0" cellspacing="0">
+        <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
           <thead>
             <tr>
               <th>Time</th>
@@ -120,7 +120,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
               ## TODO (bc): Only showing HQL (not REPORT)
               <td><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" class="bw-view_query">${design.name}</a></td>
               <td>
-                <p class="ccs-info_text">
+                <p class="ccs-inline" data-filters="InfoTip">
                   % if len(query.query) > 100:
                     <code>${collapse_whitespace(query.query[:100])}...</code>
                   % else:
@@ -131,7 +131,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
               <td>${models.QueryHistory.STATE[query.last_state]}</td>
               <td class="bw-query_result">
                 % if query.last_state != models.QueryHistory.STATE.expired.index:
-                  <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" class="bw-view_result ccs-art_button" data-icon-styles="{'width': 16, 'height': 16, 'top': 2}">View</a>
+                  <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" class="bw-view_result" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 2}">View</a>
                 % else:
                   ~
                 % endif

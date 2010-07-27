@@ -60,7 +60,7 @@
 
       </div>
       <ul class="jt_filters">
-        <form class="jtv_filter_form submit_on_change" method="get" action="/jobbrowser/jobs/${jobid}/tasks">
+        <form class="jtv_filter_form" data-filters="SubmitOnChange" method="get" action="/jobbrowser/jobs/${jobid}/tasks">
           <li class="ccs-inline">
             <select name="taskstate">
               <option value="">All states</option>
@@ -90,7 +90,7 @@
         </form>
       </ul>
     </div>
-    <table class="ccs-data_table" cellpadding="0" cellspacing="0">
+    <table data-filters="HtmlTable" cellpadding="0" cellspacing="0">
       <thead>
          <tr>
            <th>Task ID</th>

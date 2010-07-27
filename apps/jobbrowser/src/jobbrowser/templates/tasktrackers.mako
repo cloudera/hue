@@ -16,7 +16,7 @@
 <%namespace name="comps" file="jobbrowser_components.mako" />
 ${comps.header("Task Trackers :: Job Browser")}
   <h1 class="ccs-hidden">Task Trackers :: Job Browser</h1>
-  <table border="0" cellpadding="0" cellspacing="0" class="ccs-data_table sortable">
+  <table border="0" cellpadding="0" cellspacing="0" data-filters="HtmlTable" class="sortable">
     <thead>
       <tr>
        <th>Name</th>

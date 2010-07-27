@@ -84,7 +84,8 @@ CCS.FileEditor = new Class({
 				var buttons = toolbar.getElement('.fe-buttons');
 				['saveAs', 'save'].each(function(button) {
 					var link = new Element("a", {
-						'class': 'fe-' + button + 'Button ccs-art_button ',
+						'class': 'fe-' + button + 'Button',
+						'data-filters': 'ArtButton',
 						'data-icon-styles': "{'width': 16, 'height': 16}",
 						'events': {
 							'click': function (e) {
