@@ -26,38 +26,38 @@ Behavior.addGlobalPlugin('HtmlTable', 'HtmlTableMutiSelect', function(element, m
 	if (table.options.allowMultiSelect && element.hasDataFilter('ContextMenu')) {
 		//wait for a short period to get the table's context menu; we have no guarantee
 		//that its been created before this filter runs
-		var menu;
+		var tableMenu;
 		(function(){
-			menu = element.retrieve('ContextMenu');
-			if (menu) menu.disable();
+			tableMenu = element.retrieve('ContextMenu');
+			if (tableMenu) tableMenu.disable();
 		}).delay(10);
 		//when the user selects a row
 		table.addEvent('rowFocus', function(row, selectedRows){
 			//if there is no context menu on the table, then exit
-			if (!menu) return;
+			if (!tableMenu) return;
 			var action;
-			//if there were a previously selected group of menus, re-enable them.
+			//if there was a previously selected group of menus, re-enable them.
 			if (previousSelected) {
-				previousSelected.each(function(menu){
-					menu.enable();
+				previousSelected.each(function(trMenu){
+					trMenu.enable();
 				});
 				previousSelected.empty();
 			}
 			//if the user has selected more than one row
 			if (selectedRows.length > 1) {
 				//enable the table's menu
-				menu.enable();
+				tableMenu.enable();
 				//loop through the selected rows and disable their menus
 				//this allows the right click event to travel past the table row level and up to the table
 				//so the bulk action menu is displayed
 				previousSelected = selectedRows.map(function(tr){
-					var menu = tr.retrieve('ContextMenu');
-					if (menu) menu.disable();
-					return menu;
+					var trMenu = tr.retrieve('ContextMenu');
+					if (trMenu) trMenu.disable();
+					return trMenu;
 				}).clean();
 			} else {
 				//otherwise, if there aren't multiple rows selected, disable the table's menu
-				menu.disable();
+				tableMenu.disable();
 			}
 		});
 	}
