@@ -396,7 +396,7 @@ div.jframe_default h5 { font-size: 105%; margin-bottom: 0.3em; padding-top: 8px;
 }
 .ccs-shared .context-menu li:hover, .ccs-shared table[data-filters*=HtmlTable] tr.table-tr-selected td ul.context-menu li:hover a, .ccs-shared ul.context-menu li:hover a {
 	text-decoration: none;
-	background-color: #3875D7;
+	background-color: #333;
 	color: #fff;
 }
 .ccs-shared ul.context-menu li:last-child {

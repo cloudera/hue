@@ -56,8 +56,9 @@ Behavior.addGlobalPlugin('HtmlTable', 'HtmlTableMutiSelect', function(element, m
 					return trMenu;
 				}).clean();
 			} else {
+				if (row.hasDataFilter('ContextMenu')) tableMenu.disable();
 				//otherwise, if there aren't multiple rows selected, disable the table's menu
-				tableMenu.disable();
+				else tableMenu.enable();
 			}
 		});
 	}
