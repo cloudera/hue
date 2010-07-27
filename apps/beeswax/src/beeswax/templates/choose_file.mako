@@ -63,10 +63,10 @@ ${wrappers.head('Choose a File')}
                   )}
                 </div>
                 ## TODO(marcus): Button style?
-                <a class="ccs-multipart-next ccs-form_submit ccs-visible" style="display:none" data-extraData="{'submit_file' : 'Step 2: Choose Your Delimiter'}">
+                <a class="ccs-multipart-next ccs-submit_form ccs-visible" style="display:none" data-extra-data="{'submit_file' : 'Step 2: Choose Your Delimiter'}">
                   Step 2: Choose Your Delimiter&raquo;
                 </a>
-                  <input type="submit" name="submit_file" value="Step 2: Choose Your Delimiter" class="ccs-hidden ccs-form_submit ccs-multipart-next ccs-visible"/>
+                  <input type="submit" name="submit_file" value="Step 2: Choose Your Delimiter" class="ccs-hidden ccs-submit_form ccs-multipart-next ccs-visible"/>
               </dl>
             </form>
           </dd>

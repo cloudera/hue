@@ -48,8 +48,12 @@ script: CCS.ContextMenu.js
 	document.addEvents({
 		mousedown: function(e) {
 			//if there is a menu visible, hide it on any click
-			var active = $(CCS.ContextMenu.active);
-			if (active && e.target != active && !active.hasChild(e.target)) CCS.ContextMenu.active.hide();
+			var menu = CCS.ContextMenu.active;
+			var active = $(menu);
+			if (active && e.target != active && !active.hasChild(e.target)) {
+				active.hide();
+				menu.fireEvent('hide', active);
+			}
 		}.bind(this),
 		keyup: function(e) {
 			//or if the user hits escape
@@ -64,7 +68,10 @@ script: CCS.ContextMenu.js
 		},
 		initialize: function(delegate, options){
 			this.setOptions(options);
-			this.delegate = $(delegate);
+			this.delegate = $(delegate).store('ContextMenu', this);
+			this._eventStopper = function(){
+				if (this.disabled) return false;
+			};
 			this.attach();
 		},
 		detachers: [],
@@ -81,9 +88,9 @@ script: CCS.ContextMenu.js
 						//if there is no menu, but there was data, we want to kill right-click support
 						//on this element; we assume that the right-click behavior is still intended,
 						//but there's simply no menu
-						this.delegate.addEvent('contextmenu', eventStopper);
+						this.delegate.addEvent('contextmenu', this._eventStopper);
 						this.detachers.push(function(){
-							this.delegate.removeEvent('contextmenu', eventStopper);
+							this.delegate.removeEvent('contextmenu', this._eventStopper);
 						}.bind(this));
 						return;
 					}
@@ -94,17 +101,19 @@ script: CCS.ContextMenu.js
 						click: this.hide.bind(this)
 					});
 					this.detachers.push(function(){
-						menu.removeEvent('contextmenu', eventStopper);
-					});
+						menu.removeEvent('contextmenu', this._eventStopper);
+					}.bind(this));
 					//for each event defined in the data, delegate that event to the container
 					//contextmenu, click:relay(selector), etc
 					data.events.each(function(event) {
 						events[event] = function(e){
-							e.preventDefault();
-							//let's only show one menu like this at a time
-							this.activeMenu = menu;
-							//put the menu on the mouse
-							this.show(e.page.x, e.page.y);
+							if (!this.disabled) {
+								e.preventDefault();
+								//let's only show one menu like this at a time
+								this.activeMenu = menu;
+								//put the menu on the mouse
+								this.show(e.page.x, e.page.y);
+							}
 						}.bind(this);
 					}, this);
 					this.delegate.addEvents(events);
@@ -120,14 +129,21 @@ script: CCS.ContextMenu.js
 				fn();
 			});
 		},
+		disable: function(){
+			this.hide();
+			this.disabled = true;
+		},
+		enable: function(){
+			this.disabled = false;
+		},
 		toElement: function(){
 			return this.activeMenu;
 		},
 		//shows the menu at the given x/y position
 		show: function(x, y){
+			if (this.disabled) return;
 			//if there is a menu visible, hide it on any click
 			if (CCS.ContextMenu.active && CCS.ContextMenu.active != this) CCS.ContextMenu.active.hide();
-			
 			if (this.activeMenu) {
 				this.activeMenu.show();
 				this.position(x, y);
@@ -157,11 +173,12 @@ script: CCS.ContextMenu.js
 		},
 		//hides the active menu
 		hide: function(){
+			if (this.disabled) return;
 			var menu = this.activeMenu;
 			if (menu) menu.hide();
 			this.activeMenu = null;
 			if (CCS.ContextMenu.active == this) CCS.ContextMenu.active = null;
-			this.fireEvent('hide', menu);
+			if (menu) this.fireEvent('hide', menu);
 		}
 	});
 

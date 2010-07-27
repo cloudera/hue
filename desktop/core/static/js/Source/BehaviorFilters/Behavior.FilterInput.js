@@ -33,13 +33,13 @@ Behavior.addGlobalFilters({
 	FilterInput: function(element, methods){
 		var container = methods.getContentElement();
 		//this method will find all the elements and check them for the value
+		var selector = element.get('data', 'filter-elements');
+		if (!selector) {
+			dbug.warn('warning, there was no selector defined for data-filter-elements for this element: ', element);
+			return;
+		}
+		var filterParents = element.get('data', 'filter-parents');
 		var filter = function (){
-			var selector = element.get('data', 'filter-elements');
-			var filterParents = element.get('data', 'filter-parents');
-			if (!selector) {
-				dbug.warn('warning, there was no selector defined for data-filter-elements for this element: ', element);
-				return;
-			}
 			var elements = container.getElements(selector);
 			if (!elements.length) {
 				dbug.warn('warning, this filter element %o has data-filter-elements selector defined as %s but this selector matches no elements.', element, selector);

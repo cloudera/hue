@@ -21,39 +21,40 @@ requires:
  - /CCS.JFrame
  - Widgets/ART.Browser
  - Widgets/ART.SolidWindow
+ - /CCS.JFrame.Alert
+ - /CCS.JFrame.ArtButtons
  - /CCS.JFrame.AutoRefresh
+ - /CCS.JFrame.CheckAllOrNone
+ - /CCS.JFrame.Chooser
  - /CCS.JFrame.Collapsible
- - /CCS.JFrame.DoubleClickDelegate
- - /CCS.JFrame.HtmlTable
- - /CCS.JFrame.OverText
- - /CCS.JFrame.SubmitOnChange
- - /CCS.JFrame.ContextMenu
- - /CCS.JFrame.FormRequest
- - /CCS.JFrame.NoOverflow
- - /CCS.JFrame.SplitView
- - /CCS.JFrame.Tabs
- - /CCS.JFrame.FitText
  - /CCS.JFrame.ConfirmAndPost
+ - /CCS.JFrame.ContextMenu
+ - /CCS.JFrame.DataGroupToggle
+ - /CCS.JFrame.DoubleClickDelegate
+ - /CCS.JFrame.FakeRefresh
+ - /CCS.JFrame.FilterInput
+ - /CCS.JFrame.FormRequest
+ - /CCS.JFrame.FormValidator
+ - /CCS.JFrame.FitText
+ - /CCS.JFrame.HtmlTable
+ - /CCS.JFrame.Input
+ - /CCS.JFrame.Nav
+ - /CCS.JFrame.NoOverflow
+ - /CCS.JFrame.OverText
+ - /CCS.JFrame.PartialRefresh
+ - /CCS.JFrame.Prompt
  - /CCS.JFrame.PromptAndPost
  - /CCS.JFrame.Refresh
- - /CCS.JFrame.SizeTo
- - /CCS.JFrame.FilterInput
- - /CCS.JFrame.FakeRefresh
- - /CCS.JFrame.Target
- - /CCS.JFrame.Chooser
- - /CCS.JFrame.Alert
- - /CCS.JFrame.Prompt
- - /CCS.JFrame.PartialRefresh
- - /CCS.JFrame.ArtButtons
- - /CCS.JFrame.SideBySideSelect
- - /CCS.JFrame.CheckAllOrNone
- - /CCS.JFrame.FormValidator
- - /CCS.JFrame.DataGroupToggle
- - /CCS.JFrame.ToggleHistory
- - /CCS.JFrame.Nav
- - /CCS.JFrame.Tips
  - /CCS.JFrame.SelectWithOther
- - /CCS.JFrame.Input
+ - /CCS.JFrame.SideBySideSelect
+ - /CCS.JFrame.SizeTo
+ - /CCS.JFrame.SplitView
+ - /CCS.JFrame.SubmitLink
+ - /CCS.JFrame.SubmitOnChange
+ - /CCS.JFrame.Tabs
+ - /CCS.JFrame.Target
+ - /CCS.JFrame.Tips
+ - /CCS.JFrame.ToggleHistory
 script: CCS.JBrowser.js
 
 ...

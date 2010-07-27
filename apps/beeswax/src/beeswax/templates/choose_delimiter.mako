@@ -29,10 +29,10 @@ ${wrappers.head('Choose a Delimiter')}
     <div class="bw-choose-delimiter">
         <div class="ccs-bc-section">
           <form action ="${action}" method="POST">
-	    <div class="ccs-hidden">
-	      ${util.render_form(file_form)}
-	      ${comps.field(delim_form['file_type'])}
-	    </div>
+            <div class="ccs-hidden">
+              ${util.render_form(file_form)}
+              ${comps.field(delim_form['file_type'])}
+            </div>
             <a name="step2"></a>
             <dt>Step 2: Choose A Delimiter</dt>
             <dd>
@@ -43,45 +43,45 @@ ${wrappers.head('Choose a Delimiter')}
                       <p class="delimiter_confirmation">Beeswax has determined that this file is delimited by ${delim_readable}.  Is this correct?</p>
                       <label>
                         Yes
-			## TODO(marcus)  The YES button does nothing
+                        ## TODO(marcus)  The YES button does nothing
                         <input type="submit" name="submit_delim" value="Select this Delimiter" class="ccs-hidden"/>
                       </label>
                       <label>
                         No
-			## TODO(marcus)  The NO + preview jump out of jframe
+                        ## TODO(marcus)  The NO + preview jump out of jframe
                         <input type="button" name="No" class="ccs-hidden"/>
                       </label>
                     </div>
                   % endif
                   <div class="bw-select_delim" class="ccs-hidden">
-		    ${comps.field(delim_form["delimiter"], render_default=True, help=r'Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.', klass="ccs-select-with-other")}
+                    ${comps.field(delim_form["delimiter"], render_default=True, help=r'Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.', klass="ccs-select-with-other")}
 
-		    <input class="ccs-hidden" type="submit" value="Preview" name="submit_preview"/>
-		    <input class="ccs-hidden" type="submit" value="Select this Delimiter" name="submit_delim"/>
+                    <input class="ccs-hidden" type="submit" value="Preview" name="submit_preview"/>
+                    <input class="ccs-hidden" type="submit" value="Select this Delimiter" name="submit_delim"/>
                   </div>
                   <div class="delimiter_preview_holder">
                     <table class="delimiter_preview">
-		      <thead>
-			<tr>
-			  % for i in range(n_cols):
-			    <th>col_${i+1}</th>
-			  % endfor
-			</tr>
-		      </thead>
-		      <tbody>
-			% for row in fields_list:
-			  <tr>
-			    % for val in row:
-			    <td>${val}</td>
-			    % endfor
-			  </tr>
-			% endfor
-		      </tbody>
+                      <thead>
+                        <tr>
+                          % for i in range(n_cols):
+                            <th>col_${i+1}</th>
+                          % endfor
+                        </tr>
+                      </thead>
+                      <tbody>
+                        % for row in fields_list:
+                          <tr>
+                            % for val in row:
+                            <td>${val}</td>
+                            % endfor
+                          </tr>
+                        % endfor
+                      </tbody>
                     </table>
                   </div>
                 </dt>
               </dl>
-	      <a class="ccs-form_submit ccs-visible ccs-multipart-next" data-extraData="{'submit_delim': 'Step 3: Define Your Columns'}">
+              <a class="ccs-submit_form ccs-visible ccs-multipart-next" data-extra-data="{'submit_delim': 'Step 3: Define Your Columns'}">
               Step 3: Define Your Columns&raquo;
               </a>
               <input type="submit" name="submit_delim" value="Step 3: Define Your Columns" class="ccs-hidden"/>

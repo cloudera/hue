@@ -85,13 +85,6 @@ ART.Sheet.define('splitview.bw-editor', {
 					sections.each(function(section) {
 						section.setStyle('display', show.contains(section) ? 'block' : 'none');
 					});
-				},
-				'.ccs-form_submit': function(event, el) {
-				/*
-					submit the form that the element is in.
-					el.getParent('form').formUpdate();
-				*/
-					el.getParent('form').retrieve('form.request').setOptions({extraData: el.getJSONData('extraData')}).send();
 				}
 			});
 			this.jframe.addFilters({

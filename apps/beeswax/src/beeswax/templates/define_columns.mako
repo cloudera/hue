@@ -29,15 +29,15 @@ ${wrappers.head('Define Columns')}
   <div class="bw-define-columns">
     <form action="${action}" method="POST">
       <div class="ccs-hidden">
-	${util.render_form(file_form)}
-	${util.render_form(delim_form)}
-	${str(column_formset.management_form) | n}
+        ${util.render_form(file_form)}
+        ${util.render_form(delim_form)}
+        ${str(column_formset.management_form) | n}
       </div>
       <div class="ccs-bc-section">
       <dt> Step 3: Define Your Columns </dt>
       <%
-	n_rows = len(fields_list)
-	if n_rows > 2: n_rows = 2
+        n_rows = len(fields_list)
+        if n_rows > 2: n_rows = 2
       %>
       <dd>
           Beeswax has attempted to determine the types of your columns.  Please check them as you name the columns.
@@ -46,44 +46,44 @@ ${wrappers.head('Define Columns')}
           <dt> </dt>
           <dd>
             <table class="row_headers ccs-visible" style="display:none">
-	      % for i in range(n_rows):
-		<tr><td> Row ${i + 1} </td></tr>
-	      % endfor
+              % for i in range(n_rows):
+                <tr><td> Row ${i + 1} </td></tr>
+              % endfor
               <tr><td>&nbsp;</td></tr>
               <tr><td class="input_row_header"> Column Name </td></tr>
               <tr><td class="input_row_header"> Type </td></tr>
             </table>
             <div class="table_holder">
-	      <table class="data_table">
-		% for i, row in enumerate(fields_list[:n_rows]):
-		  <tr>
-		    <td class="ccs-hidden"> Row ${i + 1} </td>
-		    % for val in row:
-		      <td>${val}</td>
-		    % endfor
-		  </tr>
-		% endfor
+              <table class="data_table">
+                % for i, row in enumerate(fields_list[:n_rows]):
+                  <tr>
+                    <td class="ccs-hidden"> Row ${i + 1} </td>
+                    % for val in row:
+                      <td>${val}</td>
+                    % endfor
+                  </tr>
+                % endfor
                 <tr><td colspan="${n_cols}">&nbsp;</td></tr>
                 <tr>
-		  % for form in column_formset.forms:
-		    <td>
-		      ${comps.field(form["column_name"],
-			render_default=False,
-			help="Column name",
-		      )}
-		      ${comps.field(form["column_type"],
-			render_default=True,
-			help="Type for this column",
-		      )}
-		      ${str(form["_exists"]) | n}
-		    </td>
-		  %endfor
+                  % for form in column_formset.forms:
+                    <td>
+                      ${comps.field(form["column_name"],
+                        render_default=False,
+                        help="Column name",
+                      )}
+                      ${comps.field(form["column_type"],
+                        render_default=True,
+                        help="Type for this column",
+                      )}
+                      ${str(form["_exists"]) | n}
+                    </td>
+                  %endfor
                 </tr>
               </table>
             </div>
           </dd>
           </dl>
-          <a class="ccs-form_submit ccs-visible ccs-multipart-next" data-extraData="{'submit_create': 'Finish Creating Table'}" style="display:none">
+          <a class="ccs-submit_form ccs-visible ccs-multipart-next" data-extra-data="{'submit_create': 'Finish Creating Table'}" style="display:none">
           Finish Creating Table
           </a>
           <input type="submit" name="submit_create" value="Finish Creating Table" class="ccs-hidden"/>

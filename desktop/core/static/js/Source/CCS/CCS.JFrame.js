@@ -33,6 +33,7 @@ requires:
  - Widgets/Behavior
  - Widgets/Behavior.ArtButton
  - Widgets/Behavior.ArtInput
+ - Widgets/Behavior.FormRequest
  - Widgets/Behavior.FormValidator
  - Widgets/Behavior.HtmlTable
  - Widgets/Behavior.OverText
@@ -40,6 +41,8 @@ requires:
  - /Behavior.ContextMenu
  - /Behavior.FilterInput
  - /Behavior.FitText
+ - /Behavior.HtmlTableKeyboard
+ - /Behavior.HtmlTableMultiSelectMenu
  - /Behavior.MultiChecks
  - /Behavior.SideBySideSelect
  - /Behavior.SizeTo
@@ -133,6 +136,12 @@ CCS.JFrame = new Class({
 						this._requestSuccessHandler(request, text);
 					}.bind(this)
 				});
+			}.bind(this),
+			registerKeyboard: function(keyboard){
+				this.keyboard.manage(keyboard);
+			}.bind(this),
+			unregisterKeyboard: function(keyboard){
+				this.keyboard.drop(keyboard);
 			}.bind(this)
 		});
 		this.addEvent('resize', this.behavior.resize.bind(this.behavior));

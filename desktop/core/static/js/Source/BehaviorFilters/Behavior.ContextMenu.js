@@ -33,6 +33,7 @@ var JframeContextMenu = new Class({
 		this.applyDelegates = this.options.applyDelegates;
 	},
 	show: function(x, y){
+		if (this.disabled || !this.activeMenu) return;
 		//when the menu is shown, put the place holder after the menu
 		this._placeHolder.inject(this.activeMenu, 'after');
 		//move the menu into the container
@@ -42,6 +43,7 @@ var JframeContextMenu = new Class({
 		this.parent(x, y);
 	},
 	hide: function(){
+		if (this.disabled || !this.activeMenu) return;
 		//when we hide the menu, put the menu back where it was and pop the placeholder out of the DOM
 		this.activeMenu.inject(this._placeHolder, 'after');
 		this._placeHolder.dispose();
