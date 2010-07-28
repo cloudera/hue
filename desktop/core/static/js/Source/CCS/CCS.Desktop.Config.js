@@ -194,3 +194,49 @@ if (Browser.Engine.trident) {
 
 	Array.alias('forEach', 'each', true); 
 }
+
+// Monkey-patch the dbug.* functions to also log their events to the server. We don't want to
+// crush the server either with too-many or too-frequent messages, so we only send every 5 seconds,
+// unless there are more than 100 messages in the message queue.
+(function(info, warn, error) {
+
+  var monkeyPatchDbugFunction = function(dbugMethod, level) {
+    var messageQueue = [];
+
+    var sendQueuedMessages = function() {
+      if (window.sendDbug && messageQueue.length > 0) {
+        new Request.JSON({
+          url: '/log_frontend_event',
+          data: {
+            message: JSON.encode(messageQueue),
+            level: level
+          }
+        }).post();
+        // Immediately clear the queue after we try to send it.
+        // If the send fails, oh well.
+        messageQueue.empty();
+      }
+    };
+
+    // Poll the message queue every 5 seconds to see if it has messages to send.
+    sendQueuedMessages.periodical(5000);
+
+    return function(message) {
+      messageQueue.push(message);
+      // Immediately send the message queue if it's getting too big.
+      if (messageQueue.length > 100) {
+        sendQueuedMessages();
+      }
+      dbugMethod(message);
+    };
+  };
+
+  // We do the monkey-patching of the functions regardless of the initial value
+  // of window.sendDbug so that some one can turn this on in the browser at
+  // run-time without having to restart the server.
+  //
+  // These strings are what hue expects.
+  dbug.info = monkeyPatchDbugFunction(info, 'info');
+  dbug.warn = monkeyPatchDbugFunction(warn, 'warning');
+  dbug.error = monkeyPatchDbugFunction(error, 'error');
+})(dbug.info, dbug.warn, dbug.error);

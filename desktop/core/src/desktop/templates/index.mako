@@ -161,6 +161,14 @@
     });
   });
   </script>
+
+  <script>
+    % if send_dbug_messages:
+      window.sendDbug = true;
+    % else:
+      window.sendDbug = false;
+    % endif
+  </script>
 </head>
 <body>
   <div id="bg">

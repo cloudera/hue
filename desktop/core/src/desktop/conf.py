@@ -226,6 +226,13 @@ FEEDBACK_URL = Config(
   dynamic_default=default_feedback_url
 )
 
+SEND_DBUG_MESSAGES = Config(
+  key="send_dbug_messages",
+  help="Whether to send dbug messages from JavaScript to the server logs.",
+  type=coerce_bool,
+  default=False
+)
+
 DATABASE_LOGGING = Config(
   key="database_logging",
   help="If true, log all database requests.",

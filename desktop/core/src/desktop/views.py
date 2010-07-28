@@ -196,7 +196,8 @@ def threads(request):
 @login_notrequired
 def index(request):
   return render("index.mako", request, dict(
-    feedback_url=desktop.conf.FEEDBACK_URL.get()
+    feedback_url=desktop.conf.FEEDBACK_URL.get(),
+    send_dbug_messages=desktop.conf.SEND_DBUG_MESSAGES.get()
   ))
 
 def serve_404_error(request, *args, **kwargs):
