@@ -62,6 +62,8 @@ script: Behavior.FitText.js
 				var offset = element.get('data', 'fit-text-offset', true);
 				if (offset != null) options.offset = offset;
 				var fitText = new FitText(element, span, options);
+				//detach the window resize events that FitText attaches itself
+				fitText.detach();
 				fitText.fit();
 				element.store('FitText', fitText).set('title', text);
 				var fitTextFit = fitText.fit.bind(fitText);
