@@ -27,7 +27,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
   </ul>
 </div>
 <div id="table-setup" class="view">
-  <form action="#" method="POST" class="jframe_padded form-validator">
+  <form action="#" method="POST" class="jframe_padded" data-filters="FormValidator">
     <dl class="bw-table-setup">
 
   <div class="ccs-bc-section">
@@ -67,7 +67,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
           (One common specialized SerDe is for parsing out columns with a regular
           expression.)
           </p>
-          <dl class="bw-format">
+          <dl class="bw-format clearfix">
             <% 
               selected = table_form["row_format"].data or table_form["row_format"].field.initial
             %>

@@ -92,7 +92,7 @@ ${wrappers.head('Hive Query', section='query')}
 % endif
 
 <div class="view" id="execute">
-  <form action="${action}" method="POST" class="form-validator">
+  <form action="${action}" method="POST" data-filters="FormValidator">
     <div class="resizable" data-filters="SplitView">
       <%
         if form.settings.forms or form.file_resources.forms or form.functions.forms:

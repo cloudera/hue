@@ -22,7 +22,7 @@ ${wrappers.head("Beeswax: Query History", section='history')}
 <h4>${error_msg}</h4>
 % endif
 
-<form action="${action}" method="POST" class="form-validator">
+<form action="${action}" method="POST" data-filters="FormValidator">
   ${util.render_form(form)}
   <input type="submit" name="save" value="Save"/>
   <input type="submit" name="cancel" value="Cancel"/>

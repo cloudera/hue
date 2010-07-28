@@ -72,7 +72,15 @@
       callback: function(){
         //before fading in the screen, resize the background to match the window size
         sizer();
-        $('bg').set('tween', {duration:500}).tween('opacity', 0, 1);
+        var bgEls = $('bg').getElements('img');
+        bgEls.push($('bg'));
+        var styles = {};
+        bgEls.each(function(el, i){
+          styles[i.toString()] = { opacity: [0, 1] };
+        });
+        new Fx.Elements(bgEls, {
+          duration: 500
+        }).start(styles);
         $(document.body).addEvent('click:relay(img.desktop-logo)', rotateBG);
         rotateBG.periodical(300000); //rotate the background every 5 min
         

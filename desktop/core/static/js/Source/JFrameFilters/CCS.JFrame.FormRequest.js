@@ -31,7 +31,7 @@ CCS.JFrame.addGlobalFilters({
 		container.getElements('form').each(function(form){
 			//set their action url and add the FormRequest filter
 			form.set('action', new URI(form.get('action'), {base: this.currentPath})).addDataFilter("FormRequest");
-		});
+		}, this);
 	}
 
 });
