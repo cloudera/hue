@@ -75,7 +75,7 @@
 ${wrappers.head('Hive Query', section='query')}
 % if error_message:
 <div class="alert_popup jframe_renders">
-  <dl class="bw-query">
+  <dl class="bw-query_error">
     <dt class="ccs-dt_cap">Your Query Has the Following Error(s):</dt>
     <dd class="ccs-dd_bottom ccs-error">
       <div class="validation-advice">
@@ -83,7 +83,7 @@ ${wrappers.head('Hive Query', section='query')}
       </div>
       % if log:
         <div class="bw-error_tab_msg">
-          (click the <b>Error Log</b> tab above for details)
+          (click the <b>Error Log</b> tab above the editor input for details)
         </div>
       % endif
     </dd>
@@ -246,8 +246,8 @@ ${wrappers.head('Hive Query', section='query')}
               <li>
                 ${query()}
               </li>
-              % if log:
-                <li class="jframe_padded">
+              % if error_message or log:
+                <li class="bw-results_log jframe_padded">
                   % if log:
                     <pre>${log}</pre>
                   % endif

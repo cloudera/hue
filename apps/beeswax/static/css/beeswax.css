@@ -788,14 +788,14 @@ div.beeswax .bw-actions ul li a.bw-download_xls {
 	background: #9acef5 url(/static/art/led-icons/doc_excel_table.png) no-repeat 4px 50%;
 }
 div.beeswax .ccs-window-toolbar .tabs {
-	left:206px;
-	position:absolute;
-	top:69px;
+	right: 7px;
+	position: absolute;
+	top: 69px;
 	margin: 0;
 }
 div.beeswax .bw-save_query_results input[type=radio] {
 	float: left;
-	clear:both;
+	clear: both;
 }
 div.beeswax .watch_results .bw-save_query_results .accordion .target {
 	clear: both;
@@ -828,6 +828,13 @@ div.beeswax .bw-save {
 	background: #9acef5 url(/static/art/icons/525_floppy.gif) no-repeat 4px 50%;
 }
 /* query page */
+div.beeswax .bw-query_error {
+	width: 400px;
+	min-height: 100px;
+}
+div.beeswax .bw-results_log {
+	background: #fff;
+}
 div.beeswax .bw-query-field {
 	width: 100%;
 	margin: 0px auto;
