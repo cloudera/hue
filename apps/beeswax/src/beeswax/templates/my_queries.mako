@@ -25,13 +25,13 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
 ## ----------------- Saved queries -------------------
 ##
 <div id="my_queries" class="view">
-  <div class="ccs-tab_ui">
-    <ul class="toolbar bw-my_queries_tabs ccs-tabs clearfix">
+  <div data-filters="Tabs">
+    <ul class="toolbar bw-my_queries_tabs tabs clearfix">
       <li><span>Recent Saved Queries</span></li>
       <li><span>Recent Run Queries</span></li>
     </ul>
 
-    <ul class="ccs-tab_sections ccs-clear">
+    <ul class="tab_sections ccs-clear">
       <li>
         <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
           <thead>

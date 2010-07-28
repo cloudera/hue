@@ -1,6 +1,6 @@
 /*
 ---
-description: Adds a tab interface (TabSwapper instance) for elements with .css-tab_ui. Matched with tab elements that are .ccs-tabs and sections that are .ccs-tab_sections.
+description: Adds a tab interface (TabSwapper instance) for elements with .css-tab_ui. Matched with tab elements that are .tabs and sections that are .tab_sections.
 provides: [Behavior.Tabs]
 requires: [Widgets/Behavior, clientcide/TabSwapper]
 script: Behavior.Tabs.js

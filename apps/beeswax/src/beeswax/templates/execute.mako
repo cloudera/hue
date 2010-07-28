@@ -231,8 +231,8 @@ ${wrappers.head('Hive Query', section='query')}
         % endif
 
         % if error_messages or log:
-          <div class="ccs-tab_ui">
-            <ul class="toolbar bw-results_tabs ccs-tabs ccs-right clearfix">
+          <div data-filters="Tabs">
+            <ul class="toolbar bw-results_tabs ccs-right clearfix tabs" data-filters="Tabs">
               <li><span>Query</span></li>
               % if error_message or log:
               <li><span>
@@ -242,7 +242,7 @@ ${wrappers.head('Hive Query', section='query')}
               </span></li>
               % endif
             </ul>
-            <ul class="ccs-tab_sections ccs-clear">
+            <ul class="tab_sections ccs-clear">
               <li>
                 ${query()}
               </li>

@@ -35,14 +35,14 @@
         </dl>
       </div>
 
-      <div class="ccs-tab_ui">
-        <ul class="ccs-tabs jtv_tabs ccs-right clearfix">
+      <div data-filters="Tabs">
+        <ul class="tabs jtv_tabs ccs-right clearfix">
           <li><span>Metadata</span></li>
           <li><span>Counters</span></li>
           <li><span>Logs</span></li>
         </ul>
 
-        <ul class="ccs-tab_sections ccs-clear">
+        <ul class="tab_sections ccs-clear">
           <li>
             <table data-filters="HtmlTable" class="jt_meta_table sortable" cellpadding="0" cellspacing="0">
               <thead>

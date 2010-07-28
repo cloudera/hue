@@ -238,15 +238,11 @@ div.job_browser_job div.jt_mr_display .jt_maps, div.job_browser_job div.jt_mr_di
 div.job_browser_job span.jt_reduces_complete, div.job_browser_job span.jt_maps_complete {
 	border-left: 1px solid #fff;
 }
-div.job_browser_job div.ccs-tab_ui {
-/*	width: 50%;*/
-}
-div.job_browser_job div.ccs-tab_ui ul.ccs-tab_sections {
+div.job_browser_job ul.tab_sections {
 	border-top: 1px solid #666;
 }
-div.job_browser_job div.ccs-tab_ui ul.ccs-tab_sections .ccs-data_table {
+div.job_browser_job ul.tab_sections [data-filters*=HtmlTable] {
 	border-top: none;
-	
 }
 div.job_browser_job .task_table_type {
 	width: 100px;

@@ -22,14 +22,14 @@ limitations under the License.
 	</head>
 	<body>
 		<div class="jframe_padded">
-			<div class="ccs-tab_ui">
-				<ul class="ccs-tabs ccs-right clearfix">
+			<div data-filters="Tabs">
+				<ul class="tabs ccs-right clearfix">
 					<li><span>Tab 1</span></li>
 					<li><span>Tab 2</span></li>
 				</ul>
-				<ul class="ccs-tab_sections ccs-clear" style="border-top: 1px solid #999; padding: 10px">
+				<ul class="tab_sections ccs-clear" style="border-top: 1px solid #999; padding: 10px">
 					<li>
-						<p>I'm the section for Tab 1. Note that my UL has both a .ccs-tab_sections class but also a .ccs-clear; that's because the tabs are aligned to the right, so we need to clear that float.</p>
+						<p>I'm the section for Tab 1. Note that my UL has both a .tab_sections class but also a .ccs-clear; that's because the tabs are aligned to the right, so we need to clear that float.</p>
 						<p>
 							The tabs are right aligned because their UL has the class .ccs-right; to fix the firefox height bug with floating elements, we also give it the class .clearfix (<a href="http://www.positioniseverything.net/easyclearing.html">details on this</a>). Note that if we didn't want the tabs on the right we just wouldn't give it the .ccs-right class, and in that case we wouldn't need the .clearfix or .ccs-clear classes in there either.
 						</p>

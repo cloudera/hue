@@ -113,14 +113,14 @@
 
       </div>
 
-      <div class="ccs-tab_ui">
-        <ul class="ccs-tabs jtv_tabs ccs-right clearfix">
+      <div data-filters="Tabs">
+        <ul class="tabs jtv_tabs ccs-right clearfix">
           <li><span>Tasks</span></li>
           <li><span>Metadata</span></li>
           <li><span>Counters</span></li>
         </ul>
 
-        <ul class="ccs-tab_sections ccs-clear">
+        <ul class="tab_sections ccs-clear">
           <li>
             <div class="jt_mr_display">
               <dl class="jtv_graph">

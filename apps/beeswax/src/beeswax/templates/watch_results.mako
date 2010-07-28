@@ -82,8 +82,8 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
         </dl>
     </div>
     <div class="right_col">
-      <div class="ccs-tab_ui">
-          <ul class="toolbar bw-results_tabs ccs-tabs ccs-right clearfix">
+      <div data-filters="Tabs">
+          <ul class="toolbar bw-results_tabs tabs ccs-right clearfix">
             <li><span>
                 % if error:
                   Error
@@ -95,7 +95,7 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
             <li><span>Log</span></li>
           </ul>
 
-        <ul class="ccs-tab_sections ccs-clear">
+        <ul class="tab_sections ccs-clear">
           <li>
             % if error:
               <div class="ccs-error jframe_padded">

@@ -648,7 +648,7 @@ div.beeswax a.bw-install_samples, div.beeswax a.bw-new_table {
 /* table page */
 div.beeswax .bw-col_table_wrapper, div.beeswax .bw-table_sample {
 }
-div.beeswax .describe_table .ccs-tabs {
+div.beeswax .describe_table .tabs {
 	margin: 10px 10px 0px 0px;
 }
 div.beeswax .bw-location_link a:hover {
@@ -733,7 +733,7 @@ div.beeswax .bw-view_result {
 	background: url(/static/art/icons/magnifier.png);
 	margin: 2px 0;
 }
-div.beeswax .ccs-tabs li {
+div.beeswax .tabs li {
 	margin: 0px 2px;
 }
 div.beeswax .watch_results .bw-result_nav {
@@ -787,7 +787,7 @@ div.beeswax .bw-actions ul li a.bw-download_csv {
 div.beeswax .bw-actions ul li a.bw-download_xls {
 	background: #9acef5 url(/static/art/led-icons/doc_excel_table.png) no-repeat 4px 50%;
 }
-div.beeswax .ccs-window-toolbar .ccs-tabs {
+div.beeswax .ccs-window-toolbar .tabs {
 	left:206px;
 	position:absolute;
 	top:69px;

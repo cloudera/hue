@@ -23,13 +23,13 @@ ${wrappers.head('Query Explanation', section='saved queries')}
       ${util.render_query_context(query_context)}
     </div>
     <div class="right_col jframe_padded">
-      <div class="ccs-tab_ui">
-        <ul class="toolbar bw-results_tabs ccs-tabs ccs-right clearfix">
+      <div data-filters="Tabs">
+        <ul class="toolbar bw-results_tabs tabs ccs-right clearfix">
           <li><span>Explanation</span></li>
           <li><span>Query</span></li>
         </ul>
 
-        <ul class="ccs-tab_sections ccs-clear">
+        <ul class="tab_sections ccs-clear">
           <li>
             <pre>${explanation}</pre>
           </li>

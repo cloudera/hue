@@ -91,8 +91,8 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
       </div>
     </div>dd
     <div class="right_col">
-      <div class="ccs-tab_ui">
-        <ul class="toolbar ccs-tabs">
+      <div data-filters="Tabs">
+        <ul class="toolbar tabs">
           % if top_rows is not None:
             <li><span>Sample</span></li>
           % endif
@@ -101,7 +101,7 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
             <li><span>Partition Columns</span></li>
           % endif
         </ul>
-        <ul class="ccs-tab_sections ccs-clear">
+        <ul class="tab_sections ccs-clear">
           % if top_rows is not None:
             <li class="bw-table_sample">
               <table data-filters="HtmlTable" cellpadding="0" cellspacing="0">

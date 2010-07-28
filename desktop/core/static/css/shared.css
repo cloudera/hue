@@ -114,34 +114,34 @@
 /* tabbed layout */
 /* .css-tabs, a ul; container for the tabs 
 
-<ul class="ccs-tabs">
+<ul class="tabs">
 <li><span>Tab 1</span></li>
 <li><span>Tab 2</span></li>
 <li><span>Tab 3</span></li>
 </ul>
-<ul class="ccs-tab_sections">
+<ul class="tab_sections">
 	<li> section for tab 1 </li>
 	<li> section for tab 2 </li>
 	<li> section for tab 3 </li>
 </ul>
 
 */
-.ccs-shared ul.ccs-tabs {
+.ccs-shared ul.tabs {
 	margin: none;
 	padding: none;
 }
 .ccs-shared .right_col pre {
 	overflow: visible;
 }
-.ccs-shared .right_col ul.ccs-tab_sections {
+.ccs-shared .right_col ul.tab_sections {
 	overflow: visible;
 }
 
-.ccs-shared ul.ccs-tab_sections {
+.ccs-shared ul.tab_sections {
 	overflow: visible;
 }
 /* the tab elements, li elements */
-.ccs-shared .ccs-tabs li {
+.ccs-shared .tabs li {
 	cursor: pointer;
 	height: 19px;
 	line-height: 19px;
@@ -150,7 +150,7 @@
 	color: #444;
 }
 /* each tab's text/html is wrapped in a span */
-.ccs-tabs li span {
+.tabs li span {
 	height: 18px;
 	display: block;
 	background: url(/static/art/tabs.png) right top;
@@ -158,22 +158,22 @@
 	left: 6px;
 	padding: 1px 6px 0px 0px;
 }
-.ccs-shared .ccs-tabs > li {
+.ccs-shared .tabs > li {
 	list-style: none;
 	float: left;
 }
-.ccs-shared .ccs-tabs li.tabSelected {
+.ccs-shared .tabs li.tabSelected {
 	color: #000;
 	background: url(/static/art/tabs.png) left 38px;
 }
-.ccs-shared .ccs-tabs li.tabSelected span {
+.ccs-shared .tabs li.tabSelected span {
 	background: url(/static/art/tabs.png) right 38px;
 }
-.ccs-shared .ccs-tabs li:hover {
+.ccs-shared .tabs li:hover {
 	color: #000;
 	background: url(/static/art/tabs.png) left 19px;
 }
-.ccs-shared .ccs-tabs li:hover span {
+.ccs-shared .tabs li:hover span {
 	background: url(/static/art/tabs.png) right 19px;
 }
 

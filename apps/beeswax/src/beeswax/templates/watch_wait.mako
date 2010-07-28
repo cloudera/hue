@@ -56,13 +56,13 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
       </dl>
     </div>
     <div class="right_col jframe_padded">
-      <div class="ccs-tab_ui">
-        <ul class="toolbar bw-results_tabs ccs-tabs ccs-right clearfix">
+      <div data-filters="Tabs">
+        <ul class="toolbar bw-results_tabs tabs ccs-right clearfix">
           <li><span>Log</span></li>
           <li><span>Query</span></li>
         </ul>
 
-        <ul class="ccs-tab_sections ccs-clear">
+        <ul class="tab_sections ccs-clear">
           <li>
             <h3 class="ccs-hidden">Server Log</h3>
             <pre data-partial-id="log">${log}</pre>

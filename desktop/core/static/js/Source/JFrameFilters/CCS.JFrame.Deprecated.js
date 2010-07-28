@@ -165,6 +165,8 @@ script: CCS.JFrame.ArtButtons.js
 			container.getElements('.ccs-tab_ui').each(function(element){
 				dbug.warn('you are using a deprecated JFrame filter (ccs-tab_ui) on %o, use the Tabs data-filter instead.', element);
 				element.addDataFilter('Tabs');
+				element.getElements('.ccs-tabs').addClass('tabs');
+				element.getElements('.ccs-tab_sections').addClass('tab_sections');
 			});
 		},
 
