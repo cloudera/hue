@@ -16,6 +16,7 @@
 <%
   from jobbrowser.views import get_state_link
   from desktop import appmanager
+  from django.template.defaultfilters import urlencode
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 <%def name="get_state(option, state)">
@@ -74,7 +75,7 @@
               </tr>
             % endif
             % for job in jobs:
-            <tr>
+            <tr data-dblclick-delegate="{'dblclick_loads':'.view_this_job'}">
               <td>${job.jobName}
                   <div class="jt_jobid">${job.jobId_short}</div>
               </td>
@@ -95,10 +96,12 @@
               <td>${job.startTimeFormatted}</td>
               <td>
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
-                  <a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" class="frame_tip jt_kill confirm_and_post" title="Kill this job">kill</a>
+                  % if request.user.is_superuser or request.user.username == job.user:
+                    <a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" class="frame_tip jt_kill confirm_and_post" title="Kill this job">kill</a>
+                  % endif
                 % endif
               </td>
-              <td><a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" class="frame_tip jt_view jt_slide_right" title="View this job">view</a></td>
+              <td><a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" class="frame_tip jt_view jt_slide_right view_this_job" title="View this job">view</a></td>
             </tr>
             % endfor
           </tbody>

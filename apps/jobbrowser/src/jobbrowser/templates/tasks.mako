@@ -105,7 +105,7 @@
       </thead>
       <tbody>
         %for t in page.object_list:
-         <tr>
+         <tr data-dblclick-delegate="{'dblclick_loads':'.view_task'}">
             <td>${t.taskId_short}</td>
             <td>${t.taskType}</td>
             <td>${"%d" % (t.progress * 100)}%</td>
@@ -115,7 +115,7 @@
             <td>${t.mostRecentState}</td>
             <td>${t.execStartTimeFormatted}</td>
             <td>${t.execFinishTimeFormatted}</td>
-            <td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" class="jt_slide_right">Attempts</a></td>
+            <td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" class="view_task jt_slide_right">Attempts</a></td>
          </tr>
         %endfor
       </tbody>

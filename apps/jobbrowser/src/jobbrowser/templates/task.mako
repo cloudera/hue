@@ -59,7 +59,7 @@
               </thead>
               <tbody>
                 % for attempt in task.attempts:
-                 <tr>
+                 <tr data-dblclick-delegate="{'dblclick_loads':'.view_attempt'}">
                    <td>${attempt.attemptId_short}</td>
                    <td>${"%d" % (attempt.progress * 100)}%</td>
                    <td><span class="status_link ${attempt.state}">${attempt.state}</span></td>
@@ -71,7 +71,7 @@
                    <td>${attempt.shuffleFinishTimeFormatted}</td>
                    <td>${attempt.sortFinishTimeFormatted}</td>
                    <td>${attempt.mapFinishTimeFormatted}</td>
-                   <td><a class="frame_tip jtask_view jt_slide_right" title="View this attempt"
+                   <td><a class="frame_tip jtask_view jt_slide_right view_attempt" title="View this attempt"
                           href="${ url('jobbrowser.views.single_task_attempt', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }"></a></td>
                  </tr>
                 % endfor

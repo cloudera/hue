@@ -26,6 +26,8 @@ from urllib import quote_plus
 from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import render_json, MessageException, render
 from desktop.lib.django_util import copy_query_dict
+from django.http import HttpResponseRedirect
+
 from desktop.log.access import access_warn, access_log_level
 from desktop.views import register_status_bar_view
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority
@@ -102,7 +104,7 @@ def kill_job(request, jobid):
   if job.user != request.user.username and not request.user.is_superuser:
     access_warn(request, 'Insufficient permission')
     raise MessageException("Permission denied.  User %s cannot delete user %s's job." %
-                           (request.user.username, job.profile.user))
+                           (request.user.username, job.user))
 
   job.kill()
   cur_time = time.time()
@@ -110,7 +112,10 @@ def kill_job(request, jobid):
     job = Job.from_id(jt=request.jt, jobid=jobid)
 
     if job.status not in ["RUNNING", "QUEUED"]:
-      return render_json({})
+      if request.REQUEST.get("next"):
+        return HttpResponseRedirect(request.REQUEST.get("next"))
+      else:
+        raise MessageException("Job Killed")
     time.sleep(1)
     job = Job.from_id(jt=request.jt, jobid=jobid)
 

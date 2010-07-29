@@ -230,7 +230,14 @@ class TestJobBrowserWithHadoop(object):
     time.sleep(15)                      # 15 seconds should be enough to start the job
     hadoop_job_id = get_hadoop_job_id(self.jobsubd, job_id)
 
+    client2 = make_logged_in_client('test_non_superuser', is_superuser=False)
+    response = client2.post('/jobbrowser/jobs/%s/kill' % (hadoop_job_id,))
+    assert_equal("Permission denied.  User test_non_superuser cannot delete user test's job.",
+      response.context["error"])
+
     self.client.post('/jobbrowser/jobs/%s/kill' % (hadoop_job_id,))
+
+  
 
     # It should say killed
     response = self.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))

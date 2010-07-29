@@ -31,11 +31,11 @@
     </thead>
     <tbody>
       % for task in tasks:
-        <tr>
+        <tr data-dblclick-delegate="{'dblclick_loads':'.view_task'}">
           <td class="task_table_id">${task.taskId_short}</td>
           <td class="task_table_type">${task.taskType}</td>
-          <td class="jtask_view_col"><a class="frame_tip jtask_view jt_slide_right" title="View this task"
-                 href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }"></a></td>
+          <td class="jtask_view_col"><a class="frame_tip jtask_view jt_slide_right view_task" title="View this task"
+                 href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }">View</a></td>
         </tr>
       % endfor
     </tbody>
