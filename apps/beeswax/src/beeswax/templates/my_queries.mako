@@ -47,6 +47,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
           %>
           % for design in q_page.object_list:
             <tr data-dblclick-delegate="{'dblclick_loads':'.bw-query_edit, .bw-query_clone'}" class="ccs-no_select ccs-help_links_small"
+            data-filters="ContextMenu"
             data-context-menu-actions="[{'events':['contextmenu','click:relay(a.bw-options)'],'menu':'ul.context-menu'}]">
               <td>
                 % if design.type == models.SavedQuery.REPORT:

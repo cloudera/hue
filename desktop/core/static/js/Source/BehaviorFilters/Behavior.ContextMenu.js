@@ -6,7 +6,7 @@
 // limitations under the License.
 /*
 ---
-description: Adds context menu support for any element with a data-context-menu-actions property. See the CCS.ContextMenu class for details on usage.
+description: Adds context menu support for any element with a data-context-menu-actions property and the ContextMenu data-filter. See the CCS.ContextMenu class for details on usage.
 provides: [Behavior.ContextMenu]
 requires: [Widgets/Behavior, /CCS.ContextMenu]
 script: Behavior.ContextMenu.js

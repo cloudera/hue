@@ -411,6 +411,7 @@ input[data-filters*=ArtButton] {
 		and they all go to 0/0/0/0px
 	*/
 	border: 0px;
+	vertical-align: bottom;
 }
 .ccs-shared [data-filters*=ArtButtonBar] a {
 	float: left;

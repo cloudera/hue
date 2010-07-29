@@ -56,7 +56,10 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
           endif
         %>
         <% path_enc = urlencode(file['path']) %>
-        <tr class="ccs-no_select fb-item-row ${cls}" data-context-menu-actions="[{'events':['contextmenu','click:relay(.fb-item-options)'],'menu':'ul.context-menu'}]" data-dblclick-delegate= "{'dblclick_loads':'a.fb-item'}" data-filedata="{'path':'${path_enc}','type':'${file['type']|u}'}">
+        <tr class="ccs-no_select fb-item-row ${cls}"
+         data-filters="ContextMenu"
+         data-context-menu-actions="[{'events':['contextmenu','click:relay(.fb-item-options)'],'menu':'ul.context-menu'}]"
+         data-dblclick-delegate= "{'dblclick_loads':'a.fb-item'}" data-filedata="{'path':'${path_enc}','type':'${file['type']|u}'}">
           <td class="fb-name">
             <div class="fb-name-container">
               % if "dir" == file['type']:
