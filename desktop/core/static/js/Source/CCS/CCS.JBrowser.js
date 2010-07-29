@@ -230,7 +230,9 @@ script: CCS.JBrowser.js
 				}).delay(20, this);
 			}
 			this.setCaption(this.options.windowTitler(data.title || data.repsonsePath));
+			this.jframe.behavior.cleanup(this.toolbar);
 			this.toolbar.empty();
+			this.jframe.behavior.cleanup(this.footerText);
 			this.footerText.empty();
 			if (data.toolbar) this.toolbar.adopt(data.toolbar);
 			if (data.footer) this.footerText.adopt(data.footer);

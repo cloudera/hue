@@ -310,6 +310,7 @@ div.filebrowser .fb-mkdir {
 	line-height: 16px;
 	background: transparent url(/static/art/icons/page.png) no-repeat scroll;
 	text-indent: 20px;
+	width: 90%;
 }
 .toolbar .fe-buttons {
 	position: absolute;
@@ -350,18 +351,18 @@ div.filebrowser .fb-mkdir {
 .fv-navigation .fv-lastBlock {
 	background: transparent url(../art/fb_offset_end.png) no-repeat scroll	
 }
-
-.fv-status, .fv-changeStatus, .fv-navigation, .fv-fileInfo {
+.fv-status, .fv-changeStatus, .fv-fileInfo {
 	float: left;
 }
 
 .fv-navigation {
-	padding-top: 5px;
+	position: absolute;
+	right: 12px;
+	top: 11px;
 }
 
 .fv-stepInfo {
-	display: block;
-	float: left;
+	font-size: 10px;
 }
 
 .fv-controlInfo {
@@ -376,7 +377,20 @@ div.filebrowser .fb-mkdir {
 	width: 16px;
 	margin-left: 5px;
 }
-
+.fv-changeBytesForm input {
+	width: 80px;
+}
+.fv-navChange h2 {
+	font-size: 12px;
+	margin-bottom: 4px;
+}
+.fv-navhead {
+	height: 22px; 
+	padding: 6px 8px 7px;
+	border-bottom: 1px solid #000;
+	background: #ccc;
+	overflow: hidden;
+}
 .fv-editBytes {
 	background: url(/static/art/led-icons/pencil.png) left 50% no-repeat;
 }

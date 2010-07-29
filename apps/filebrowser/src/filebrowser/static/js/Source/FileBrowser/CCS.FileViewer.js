@@ -44,28 +44,6 @@ CCS.FileViewer = new Class({
 
 	initialize: function(path, options){
 		this.parent(path || '/filebrowser/', options);
-		this.addEvents({
-			load: function(){
-				//Set width of input fields to width of biggest value that could be required, using totalBytes span as guide
-				$(this).getElements("input[data-filter*=OverText]").setStyle('width', $(this).getElement('.totalBytes').getWidth());
-				//Set events on anchors to edit and cancel changes to byte values
-				$(this).getElement('.fv-editBytes').addEvent('click', function() {
-					$(this).getElement('.fv-navChange').show();
-					OverText.update();
-					$(this).getElement('.fv-navStatus').hide();
-				}.bind(this));
-				$(this).getElements('.fv-cancelChangeBytes').addEvent('click', function() {
-					$(this).getElement('.fv-navChange').hide();
-					$(this).getElement('.fv-navStatus').show();
-				}.bind(this));
-				$(this).getElement('.fv-changeBytes').addEvent('click', function(e) {
-					e.preventDefault();
-					var form = $(this).getElement('.fv-changeBytesForm');
-					form.formUpdate();
-				}.bind(this));
-
-			}
-		});
 		this.jframe.addShortcuts({
 			'Go To Next Block': {
 				keys: 'v+right',

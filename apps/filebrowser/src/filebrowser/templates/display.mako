@@ -21,67 +21,55 @@
 <%
   path_enc = urlencode(path)
   dirname_enc = urlencode(view['dirname'])
+  base_url = url('filebrowser.views.view', path=path_enc)
 %>
 <html>
 <head><title>${truncate(filename)} :: File Viewer</title></head>
 <body>
   <div class="toolbar">
-    <div class="fv-path">${truncate(path, 100)}</div>
-    <div class="fv-controls">
-    <%
-        base_url = url('filebrowser.views.view', path=path_enc)
-    %>
+    <div class="fv-path draggable" data-filters="FitText">${path}</div>
+
+    <div class="fv-actions" data-filters="ArtButtonBar">
+      % if view['mode'] == "binary":
+        <a class="fv-viewText" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">View As Text</a>
+      % endif
+
+      % if view['mode'] == "text":
+        <a class="fv-viewBinary" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}">View As Binary</a>
+      % endif
+
+      % if view['compression'] != "gzip" and path.endswith('.gz'):
+        <a class="fv-viewGzip" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">Preview As Gzip</a>
+      % endif
+
+      % if view['compression'] and view['compression'] != "none":
+        <a class="fv-viewGzip" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none">Stop preview</a>
+      % endif
+
+      % if editable and view['compression'] == "none":
+        <a class="fv-editFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit This File</a>
+      % endif
+       <a class="fv-download" data-filters="ArtButton" target="_blank" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.download', path=path_enc)}">Download</a>
+       <a class="fv-viewLocation" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View File Location</a>
+       <a class="ccs-refresh large" data-filters="ArtButton">Refresh</a>
+    </div> 
   </div>
-
-  <div class="fv-actions" data-filters="ArtButtonBar">
-    % if view['mode'] == "binary":
-      <a class="fv-viewText" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">View As Text</a>
-    % endif
-
-    % if view['mode'] == "text":
-      <a class="fv-viewBinary" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}">View As Binary</a>
-    % endif
-
-    % if view['compression'] != "gzip" and path.endswith('.gz'):
-      <a class="fv-viewGzip" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">Preview As Gzip</a>
-    % endif
-
-    % if view['compression'] and view['compression'] != "none":
-      <a class="fv-viewGzip" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none">Stop preview</a>
-    % endif
-
-    % if editable and view['compression'] == "none":
-      <a class="fv-editFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit This File</a>
-    % endif
-     <a class="fv-download" data-filters="ArtButton" target="_blank" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.download', path=path_enc)}">Download</a>
-     <a class="fv-viewLocation" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View File Location</a>
-  </div> 
-  </div>
-  <div class="resizable" data-filters="SplitView">
-    <div class="left_col jframe_padded">
-      <div class="fv-controlInfo">
-        % if not view['compression'] or view['compression'] == "none":
-          <div class="fv-navStatus">
-            <span class="fv-bold">Viewing Bytes</span><a class="fv-editBytes ccs-inline" title="Enter Bytes"></a><br/> 
-            <span class="fv-italic">${view['offset']+1}</span>
-            to
-            <span class="fv-italic">${view['end']}</span><br/><br/>
-            <span class="fv-bold totalBytes">${stats['size']}</span> Total Bytes<br/>
-            <span id="fv-stepInfo">Block Size: ${view['length']} Bytes</span>
-        </div>
-        <div class="fv-navChange ccs-hidden">
-          <span class="fv-bold">Enter Bytes</span><a class="ccs-inline fv-cancelChangeBytes" title="Cancel Entry"></a><p/>
-          <form class="fv-changeBytesForm" action="${url('filebrowser.views.view', path=path_enc)}" method="GET">
-           <input data-filters="OverText" alt="${view['offset'] + 1}" name="begin"/>-<input data-filters="OverText" alt="${view['end']}" name="end"><p/>
-            % if view['mode']:
-              <input type="hidden" name="mode" value="${view['mode']}"/><br/>
-            % endif
-              <a class="ccs-inline fv-changeBytes" title="Go to Entered Bytes"></a><input type="submit" value="Go To Bytes" class="ccs-hidden"/></a><br/>
-           </form>
-           <span class="fv-bold totalBytes">${stats['size']}</span> Total Bytes<br/>
-           <span id="fv-stepInfo">Block Size: ${view['length']} Bytes</span> 
-        </div>
-        <div class="fv-navigation">
+  <div class="fv-navhead">
+    % if not view['compression'] or view['compression'] == "none":
+      <div class="fv-navStatus">
+        <form data-filters="SubmitOnChange" class="fv-changeBytesForm" action="${url('filebrowser.views.view', path=path_enc)}" method="GET">
+          <span class="fv-bold">Viewing Bytes:</span><a class="fv-editBytes ccs-inline" title="Enter Bytes"></a>
+          <input data-filters="OverText" name="begin" value="${view['offset'] + 1}"/>
+          -
+          <input data-filters="OverText" value="${view['end']}" name="end"/> of 
+          <span class="fv-bold totalBytes">${stats['size']}</span>
+          <span class="fv-stepInfo">(${view['length']} B block size)</span>
+          % if view['mode']:
+            <input type="hidden" name="mode" value="${view['mode']}"/><br/>
+          % endif
+        </form>
+      </div>
+      <div class="fv-navigation">
         <%
           base_url = url('filebrowser.views.view', path=path_enc)
           if view['offset'] == 0:
@@ -97,13 +85,16 @@
               next = "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, view['offset'] + view['length'], view['length'], view['offset'] + view['length'] + 1, view['offset'] + (2 * view['length'])) 
               last =  "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, stats['size']-(stats['size'] % view['length']), view['length'], stats['size']-(stats['size'] % view['length']) + 1, stats['size']) 
         %>
-          ###DEFINE REL
-          <a class="ccs-inline fv-firstBlock" data-filters="PointyTip" ${first}>First Block</a>
-          <a class="ccs-inline fv-prevBlock" data-filters="PointyTip" ${prev}>Previous Block</a>
-          <a class="ccs-inline fv-nextBlock" data-filters="PointyTip" ${next}>Next Block</a>
-          <a class="ccs-inline fv-lastBlock" data-filters="PointyTip" ${last}>Last Block</a>
+        ###DEFINE REL
+        <a class="ccs-inline fv-firstBlock" data-filters="PointyTip" ${first}>First Block</a>
+        <a class="ccs-inline fv-prevBlock" data-filters="PointyTip" ${prev}>Previous Block</a>
+        <a class="ccs-inline fv-nextBlock" data-filters="PointyTip" ${next}>Next Block</a>
+        <a class="ccs-inline fv-lastBlock" data-filters="PointyTip" ${last}>Last Block</a>
       </div>
-% endif
+    % endif
+  </div>
+  <div class="resizable" data-filters="SplitView" data-split-offset-y="36">
+    <div class="left_col jframe_padded">
       <dl class="fv-fileInfo">
         <dt>Last Modified</dt>
         <dd>${date(datetime.datetime.fromtimestamp(stats['mtime']))} ${time(datetime.datetime.fromtimestamp(stats['mtime']))}</dd>
@@ -118,10 +109,6 @@
         <dd>${stringformat(stats['mode'], "o")}</dd>
         ## Could increase accuracy here depending on how long ago this was
       </dl>
-      </p>
-
-
-     
     </div>
     <div class="right_col">
     %if 'contents' in view:
