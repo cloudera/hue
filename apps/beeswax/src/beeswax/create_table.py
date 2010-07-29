@@ -60,6 +60,8 @@ def create_table(request):
           'partition_columns': partition_columns
         }
       )
+      # Mako outputs bytestring in utf8
+      proposed_query = proposed_query.decode('utf-8')
       tablename = form.table.cleaned_data['name']
       on_success_url = urlresolvers.reverse(describe_table, kwargs={'table': tablename})
       return confirm_query(request, proposed_query, on_success_url)

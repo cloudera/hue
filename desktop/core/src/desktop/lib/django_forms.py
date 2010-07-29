@@ -162,10 +162,14 @@ class KeyValueField(CharField):
       raise ValidationError("Not in key=value format.")
 
 class UnicodeEncodingField(ChoiceOrOtherField):
+  """
+  The cleaned value of the field is the actual encoding, not a tuple
+  """
   CHOICES = [
     ('utf-8', 'Unicode UTF8'),
     ('utf-16', 'Unicode UTF16'),
     ('latin_1', 'Western ISO-8859-1'),
+    ('latin_9', 'Western ISO-8859-15'),
     ('cyrillic', 'Cryrillic'),
     ('arabic', 'Arabic'),
     ('greek', 'Greek'),
@@ -176,7 +180,7 @@ class UnicodeEncodingField(ChoiceOrOtherField):
     ('euc-kr', 'Korean (EUC-KR)'),
     ('iso2022-kr', 'Korean (ISO-2022-KR)'),
     ('gbk', 'Chinese Simplified (GBK)'),
-    ('big5hkscs', 'Chinese Traditional (Big5)'),
+    ('big5hkscs', 'Chinese Traditional (Big5-HKSCS)'),
     ('ascii', 'ASCII'),
   ]
 
@@ -184,10 +188,10 @@ class UnicodeEncodingField(ChoiceOrOtherField):
     ChoiceOrOtherField.__init__(self, UnicodeEncodingField.CHOICES, initial, *args, **kwargs)
 
   def clean(self, value):
-    encoding = value[0]
+    encoding = value[0] == OTHER_VAL and value[1] or value[0]
     if encoding and not desktop.lib.i18n.validate_encoding(encoding):
       raise forms.ValidationError("'%s' encoding is not available" % (encoding,))
-    return value
+    return encoding
 
 
 class MultiForm(object):

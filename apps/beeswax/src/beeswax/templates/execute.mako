@@ -59,7 +59,7 @@
         alt="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}">${extract_field_data(form.query["query"]) or ''}</textarea>
         % if len(form.query["query"].errors):
           <div class="validation-advice">
-             ${str(form.query["query"].errors) | n}
+             ${unicode(form.query["query"].errors) | n}
           </div>
         % endif
     </dd>

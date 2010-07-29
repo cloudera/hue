@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -160,9 +161,9 @@ def wait_for_query_to_finish(client, response, max=30.0):
 
 
 def make_query(client, query, submission_type="Execute",
-               follow=True, udfs=None, settings=None, resources=[],
+               udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True):
+               is_parameterized=True, **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -210,8 +211,9 @@ def make_query(client, query, submission_type="Execute",
     parameters["file_resources-%d-type" % i] = type
     parameters["file_resources-%d-path" % i] = path
     parameters["file_resources-%d-_exists" % i] = 'True'
-  response = client.post("/beeswax/execute", parameters,
-    follow=follow)
+
+  kwargs.setdefault('follow', True)
+  response = client.post("/beeswax/execute", parameters, **kwargs)
 
   if wait:
     return wait_for_query_to_finish(client, response)
@@ -246,6 +248,11 @@ class BeeswaxSampleProvider(object):
 
   @classmethod
   def teardown_class(cls):
+    cls.cluster.fs.setuser(cls.cluster.superuser)
+    try:
+      cls.cluster.fs.rmtree('/tmp/beeswax')
+    except IOError, ex:
+      LOG.warn('Failed to cleanup /tmp/beeswax: %s' % (ex,))
     cls.shutdown[0]()
 
   @classmethod
@@ -257,32 +264,9 @@ class BeeswaxSampleProvider(object):
     if _INITIALIZED:
       return
 
-    # Create a test table and load data here;
-    # this is used in several tests.
-    CREATE_TABLE = """
-      CREATE TABLE test (foo INT, bar STRING)
-      ROW FORMAT DELIMITED
-        FIELDS TERMINATED BY '\t'
-        LINES TERMINATED BY '\n'
-    """
-    make_query(cls.client, CREATE_TABLE, wait=True)
+    data_file = u'/tmp/beeswax/sample_data_échantillon_%d.tsv'
 
-    # Create some data for it
-    cls.cluster.fs.setuser(cls.cluster.superuser)
-    def write_sample_data(cluster, filename):
-      f = cluster.fs.open(filename, "w")
-      for x in range(256):
-        f.write("%d\t0x%x\n" % (x, x))
-      f.close()
-    write_sample_data(cls.cluster, "/tmp/sample_data.tsv")
-    write_sample_data(cls.cluster, "/tmp/sample_data2.tsv")
-
-    # Load the data
-    LOAD_DATA = """
-      LOAD DATA INPATH '/tmp/sample_data.tsv' OVERWRITE INTO TABLE test
-    """
-    make_query(cls.client, LOAD_DATA, wait=True, local=False)
-
+    # Create a "test_partitions" table.
     CREATE_PARTITIONED_TABLE = """
       CREATE TABLE test_partitions (foo INT, bar STRING)
       PARTITIONED BY (baz STRING, boom STRING)
@@ -291,9 +275,77 @@ class BeeswaxSampleProvider(object):
         LINES TERMINATED BY '\n'
     """
     make_query(cls.client, CREATE_PARTITIONED_TABLE, wait=True)
+    cls._make_data_file(data_file % 1)
 
     LOAD_DATA = """
-      LOAD DATA INPATH '/tmp/sample_data2.tsv' OVERWRITE INTO TABLE test_partitions PARTITION (baz='baz_one', boom='boom_two')
-    """
+      LOAD DATA INPATH '%s'
+      OVERWRITE INTO TABLE test_partitions
+      PARTITION (baz='baz_one', boom='boom_two')
+    """ % (data_file % 1,)
     make_query(cls.client, LOAD_DATA, wait=True, local=False)
+
+    # Create a bunch of other tables
+    CREATE_TABLE = """
+      CREATE TABLE `%(name)s` (foo INT, bar STRING)
+      COMMENT "%(comment)s"
+      ROW FORMAT DELIMITED
+        FIELDS TERMINATED BY '\t'
+        LINES TERMINATED BY '\n'
+    """
+
+    # Create a "test" table.
+    table_info = dict(name='test', comment='Test table')
+    cls._make_data_file(data_file % 2)
+    cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 2)
+
+    # Create a "test_utf8" table.
+    table_info = dict(name='test_utf8', comment=cls.get_i18n_table_comment())
+    cls._make_i18n_data_file(data_file % 3, 'utf-8')
+    cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 3)
+
+    # Create a "test_latin1" table.
+    table_info = dict(name='test_latin1', comment=cls.get_i18n_table_comment())
+    cls._make_i18n_data_file(data_file % 4, 'latin1')
+    cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
+
     _INITIALIZED = True
+
+  @staticmethod
+  def get_i18n_table_comment():
+    return u'en-hello pt-Olá ch-你好 ko-안녕 ru-Здравствуйте'
+
+  @classmethod
+  def _make_table(cls, table_name, create_ddl, filename):
+    make_query(cls.client, create_ddl, wait=True)
+    LOAD_DATA = """
+      LOAD DATA INPATH '%s' OVERWRITE INTO TABLE %s
+    """ % (filename, table_name)
+    make_query(cls.client, LOAD_DATA, wait=True, local=False)
+
+  @classmethod
+  def _make_data_file(cls, filename):
+    """
+    Create data to be loaded into tables.
+    Data contains two columns of:
+      <num>     0x<hex_num>
+    where <num> goes from 0 to 255 inclusive.
+    """
+    cls.cluster.fs.setuser(cls.cluster.superuser)
+    f = cls.cluster.fs.open(filename, "w")
+    for x in xrange(256):
+      f.write("%d\t0x%x\n" % (x, x))
+    f.close()
+
+  @classmethod
+  def _make_i18n_data_file(cls, filename, encoding):
+    """
+    Create i18n data to be loaded into tables.
+    Data contains two columns of:
+      <num>     <unichr(num)>
+    where <num> goes from 0 to 255 inclusive.
+    """
+    cls.cluster.fs.setuser(cls.cluster.superuser)
+    f = cls.cluster.fs.open(filename, "w")
+    for x in xrange(256):
+      f.write("%d\t%s\n" % (x, unichr(x).encode(encoding)))
+    f.close()

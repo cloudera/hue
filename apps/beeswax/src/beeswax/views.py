@@ -25,6 +25,7 @@ from django import forms
 from django.core import urlresolvers
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
+from django.utils.encoding import force_unicode
 
 from desktop.lib import django_mako
 from desktop.lib.paginator import Paginator
@@ -89,7 +90,7 @@ def drop_table(request, table):
     # external by looking at db_utils.meta_client().get_table("default", table).tableType,
     # but this was introduced in Hive 0.5, and therefore may not be available
     # with older metastores.
-    title="This may delete the underlying data as well as the metadata.  Drop table %s?" % table
+    title = "This may delete the underlying data as well as the metadata.  Drop table %s?" % table
     return render('confirm.html', request, dict(url=request.path, title=title))
   elif request.method == 'POST':
     hql = "DROP TABLE `%s`" % (table,)
@@ -288,7 +289,6 @@ def execute_query(request, design_id=None):
         break
 
       query_str = _strip_trailing_semicolon(form.query.cleaned_data["query"])
-      notify = form.query.cleaned_data.get('email_notify', False)
 
       # (Optional) Parameterization.
       parameterization = get_parameterization(request, query_str, form.query, design, to_explain)
@@ -300,6 +300,7 @@ def execute_query(request, design_id=None):
         if to_explain:
           return explain_directly(request, query_str, query_msg, design)
         else:
+          notify = form.query.cleaned_data.get('email_notify', False)
           return execute_directly(request, query_msg, design,
                                   on_success_url=on_success_url,
                                   notify=notify)
@@ -410,7 +411,7 @@ def expand_exception(exc):
   if not exc.message:
     error_message = "Unknown exception."
   else:
-    error_message = exc.message
+    error_message = force_unicode(exc.message, strings_only=True, errors='replace')
   return error_message, log
 
 

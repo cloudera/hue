@@ -28,7 +28,8 @@ from beeswax import models
 from beeswax.models import QueryHistory
 from beeswaxd import BeeswaxService
 
-from desktop.lib import thrift_util
+from django.utils.encoding import smart_str, force_unicode
+from desktop.lib import thrift_util, i18n
 from hive_metastore import ThriftHiveMetastore
 from beeswaxd.ttypes import BeeswaxException, QueryHandle, QueryNotFoundException
 
@@ -150,19 +151,179 @@ def get_query_state(query_history):
               (query_history.id, ex))
     return None
 
+
 #
 # Note that thrift_util does client connection caching for us.
 #
 def db_client():
-  return thrift_util.get_client(BeeswaxService.Client,
+  """Get the Thrift client to talk to beeswax server"""
+
+  class UnicodeBeeswaxClient(object):
+    """Wrap the thrift client to take and return Unicode"""
+    def __init__(self, client):
+      self._client = client
+
+    def __getattr__(self, attr):
+      if attr in self.__dict__:
+        return self.__dict__[attr]
+      return getattr(self._client, attr)
+
+    def query(self, query):
+      _encode_struct_attr(query, 'query')
+      return self._client.query(query)
+
+    def explain(self, query):
+      _encode_struct_attr(query, 'query')
+      res = self._client.explain(query)
+      return _decode_struct_attr(res, 'textual')
+
+    def fetch(self, *args, **kwargs):
+      res = self._client.fetch(*args, **kwargs)
+      if res.ready:
+        res.columns = [ force_unicode(col, errors='replace') for col in res.columns ]
+        res.data = [ force_unicode(row, errors='replace') for row in res.data ]
+      return res
+
+    def dump_config(self):
+      res = self._client.dump_config()
+      return force_unicode(res, errors='replace')
+
+    def echo(self, msg):
+      return self._client.echo(smart_str(msg))
+
+    def get_log(self, *args, **kwargs):
+      res = self._client.get_log(*args, **kwargs)
+      return force_unicode(res, errors='replace')
+
+    def get_default_configuration(self, *args, **kwargs):
+      config_list = self._client.get_default_configuration(*args, **kwargs)
+      for config in config_list:
+        _decode_struct_attr(config, 'key')
+        _decode_struct_attr(config, 'value')
+        _decode_struct_attr(config, 'desc')
+      return config_list
+
+    def get_results_metadata(self, *args, **kwargs):
+      res = self._client.get_results_metadata(*args, **kwargs)
+      return _decode_struct_attr(res, 'table_dir')
+
+  client = thrift_util.get_client(BeeswaxService.Client,
                                 conf.BEESWAX_SERVER_HOST.get(),
                                 conf.BEESWAX_SERVER_PORT.get(),
                                 service_name="Beeswax (Hive UI) Server",
                                 timeout_seconds=BEESWAX_SERVER_THRIFT_TIMEOUT)
+  return UnicodeBeeswaxClient(client)
+
 
 def meta_client():
-  return thrift_util.get_client(ThriftHiveMetastore.Client,
+  """Get the Thrift client to talk to the metastore"""
+
+  class UnicodeMetastoreClient(object):
+    """Wrap the thrift client to take and return Unicode."""
+    def __init__(self, client):
+      self._client = client
+
+    def __getattr__(self, attr):
+      if attr in self.__dict__:
+        return self.__dict__[attr]
+      return getattr(self._client, attr)
+
+    def _encode_storage_descriptor(self, sd):
+      _encode_struct_attr(sd, 'location')
+      for col in sd.cols:
+        _encode_struct_attr(col, 'comment')
+      self._encode_map(sd.parameters)
+
+    def _decode_storage_descriptor(self, sd):
+      _decode_struct_attr(sd, 'location')
+      for col in sd.cols:
+        _decode_struct_attr(col, 'comment')
+      self._decode_map(sd.parameters)
+
+    def _encode_map(self, mapp):
+      for key, value in mapp.iteritems():
+        mapp[key] = smart_str(value, strings_only=True)
+
+    def _decode_map(self, mapp):
+      for key, value in mapp.iteritems():
+        mapp[key] = force_unicode(value, strings_only=True, errors='replace')
+
+    def create_database(self, name, description):
+      description = smart_str(description)
+      return self._client.create_database(name, description)
+
+    def get_database(self, *args, **kwargs):
+      db = self._client.get_database(*args, **kwargs)
+      return _decode_struct_attr(db, 'description')
+
+    def get_fields(self, *args, **kwargs):
+      res = self._client.get_fields(*args, **kwargs)
+      for fschema in res:
+        _decode_struct_attr(fschema, 'comment')
+      return res
+
+    def get_table(self, *args, **kwargs):
+      res = self._client.get_table(*args, **kwargs)
+      self._decode_storage_descriptor(res.sd)
+      self._decode_map(res.parameters)
+      return res
+
+    def alter_table(self, dbname, tbl_name, new_tbl):
+      self._encode_storage_descriptor(new_tbl.sd)
+      self._encode_map(new_tbl.parameters)
+      return self._client.alter_table(dbname, tbl_name, new_tbl)
+
+    def _encode_partition(self, part):
+      self._encode_storage_descriptor(part.sd)
+      self._encode_map(part.parameters)
+      return part
+
+    def _decode_partition(self, part):
+      self._decode_storage_descriptor(part.sd)
+      self._decode_map(part.parameters)
+      return part
+
+    def add_partition(self, new_part):
+      self._encode_partition(new_part)
+      part = self._client.add_partition(new_part)
+      return self._decode_partition(part)
+
+    def get_partition(self, *args, **kwargs):
+      part = self._client.get_partition(*args, **kwargs)
+      return self._decode_partition(part)
+
+    def get_partitions(self, *args, **kwargs):
+      part_list = self._client.get_partitions(*args, **kwargs)
+      for part in part_list:
+        self._decode_partition(part)
+      return part_list
+
+    def alter_partition(self, db_name, tbl_name, new_part):
+      self._encode_partition(new_part)
+      return self._client.alter_partition(db_name, tbl_name, new_part)
+
+  client = thrift_util.get_client(ThriftHiveMetastore.Client,
                                 conf.BEESWAX_META_SERVER_HOST.get(),
                                 conf.BEESWAX_META_SERVER_PORT.get(),
                                 service_name="Hive Metadata (Hive UI) Server",
                                 timeout_seconds=METASTORE_THRIFT_TIMEOUT)
+  return UnicodeMetastoreClient(client)
+
+
+def _decode_struct_attr(struct, attr):
+  try:
+    val = getattr(struct, attr)
+  except AttributeError:
+    return struct
+  unival = force_unicode(val, strings_only=True, errors='replace')
+  setattr(struct, attr, unival)
+  return struct
+
+def _encode_struct_attr(struct, attr):
+  try:
+    unival = getattr(struct, attr)
+  except AttributeError:
+    return struct
+  val = smart_str(unival, strings_only=True)
+  setattr(struct, attr, val)
+  return struct

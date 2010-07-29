@@ -94,7 +94,7 @@
     </dd>
     % if len(field.errors):
       <dd class="beeswax_error ccs-error">
-         ${str(field.errors) | n}
+         ${unicode(field.errors) | n}
        </dd>
     % endif
   % endif

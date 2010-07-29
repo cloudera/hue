@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -27,6 +28,7 @@ import tempfile
 import threading
 from nose.tools import assert_true, assert_equal, assert_false
 from nose.plugins.skip import SkipTest
+from django.utils.encoding import smart_str
 
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.django_test_util import assert_similar_pages
@@ -45,20 +47,29 @@ from beeswax.test_base import BeeswaxSampleProvider
 from beeswaxd import BeeswaxService
 
 LOG = logging.getLogger(__name__)
+CSV_LINK_PAT = re.compile('/beeswax/download/\d+/csv')
 
 def _make_query(client, query, submission_type="Execute",
-                follow=True, udfs=None, settings=None, resources=[],
+                udfs=None, settings=None, resources=[],
                 wait=False, name=None, desc=None, local=True,
-                is_parameterized=True):
+                is_parameterized=True, **kwargs):
   """Wrapper around the real make_query"""
   res = make_query(client, query, submission_type,
-                   follow, udfs, settings, resources,
-                   wait, name, desc, local, is_parameterized)
+                   udfs, settings, resources,
+                   wait, name, desc, local, is_parameterized, **kwargs)
   # Should be in the history if it's submitted.
   if submission_type == 'Execute':
-    verify_history(client, fragment=collapse_whitespace(query[:20]))
+    fragment = collapse_whitespace(smart_str(query[:20]))
+    verify_history(client, fragment=fragment)
 
   return res
+
+
+def get_csv(client, result_response):
+  """Get the csv for a query result"""
+  csv_link = CSV_LINK_PAT.search(result_response.content)
+  assert_true(csv_link, "Query result should have a csv download link")
+  return client.get(csv_link.group()).content
 
 
 class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
@@ -292,6 +303,32 @@ for x in sys.stdin:
     response = _make_query(c, "SELECT SUM(foo) FROM test_explain", submission_type="Explain")
     assert_true(response.context["explanation"])
 
+  def test_explain_query_i18n(self):
+    query = u"SELECT foo FROM test_utf8 WHERE bar='%s'" % (unichr(200),)
+    response = _make_query(self.client, query, submission_type="Explain")
+    assert_true(response.context['explanation'])
+
+  def test_query_i18n(self):
+    # Selecting from utf-8 table should get correct result
+    query = u"SELECT * FROM test_utf8 WHERE bar='%s'" % (unichr(200),)
+    response = _make_query(self.client, query, wait=True)
+    assert_equal(["200", unichr(200)], response.context["results"][0],
+                 "selecting from utf-8 table should get correct result")
+
+    csv = get_csv(self.client, response)
+    assert_equal('"200","%s"' % (unichr(200).encode('utf-8'),), csv.split()[1])
+
+    # Selecting from latin1 table should not blow up
+    query = u"SELECT * FROM test_latin1 WHERE bar='%s'" % (unichr(200),)
+    response = _make_query(self.client, query, wait=True)
+    assert_true(response.context.has_key("results"),
+                "selecting from latin1 table should not blow up")
+
+    # Describe table should be fine with non-ascii comment
+    response = self.client.get('/beeswax/table/test_utf8')
+    assert_equal(response.context['table'].parameters['comment'],
+                 self.get_i18n_table_comment())
+
   def _parallel_query_helper(self, i, result_holder, lock, num_tasks):
     client = make_logged_in_client()
     try:
@@ -329,13 +366,10 @@ for x in sys.stdin:
     for t in threads:
       t.join()
 
-    csv_link_pat = re.compile('/beeswax/download/\d+/csv')
     for i in range(PARALLEL_TASKS):
-      csv_link = csv_link_pat.search(responses[i].content)
-      assert csv_link, "Query result should have a csv download link"
-      csv_resp = self.client.get(csv_link.group())
+      csv = get_csv(self.client, responses[i])
       # We get 3 rows: Column header, and 2 rows of results in double quotes
-      answer = [ int(data.strip('"')) for data in csv_resp.content.split()[1:] ]
+      answer = [ int(data.strip('"')) for data in csv.split()[1:] ]
       assert_equal( [ i + 1, i + 2 ], answer)
 
   def test_data_export(self):

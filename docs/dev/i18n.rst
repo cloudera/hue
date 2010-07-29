@@ -1,0 +1,55 @@
+.. -*- coding: utf-8 -*-
+
+=============================================
+Status of Internationalization (i18n) Support
+=============================================
+
+.. Note::
+    This documents the design of i18n in HUE, as well as the various degrees of
+    i18n support in different HUE applications.
+
+
+---------------
+Design Overview
+---------------
+
+Thanks to Django, HUE always receives unicode data from the browser. Data
+operations within the boundary of HUE should be done in unicode as much as
+possible. Data encoding occurs when the data exits HUE, in one of the following
+ways:
+
+Model Storage
+    These are data to go into a Django model, such as user firstname, lastname,
+    Beeswax saved query. Since the Django model layer handles unicode data, HUE
+    does not need to do any encoding.
+
+Hadoop Metadata
+    These include namespace metadata, Hive Metastore data, and so on. In
+    general, Hadoop metadata (where they support international characters) all
+    seem to be in UTF-8.
+
+Hadoop Data
+    This category includes file data, Hive table contents, HBase contents, etc.
+    The goal is to support custom encodings as specified by the user.
+    Eventually, on a view by view basis, the user may select the correct data
+    encoding. Meanwhile, for applications and views that do not yet expose such
+    flexibility, they may use the ``DEFAULT_SITE_ENCODING`` configuration
+    variable to interpret binary Hadoop Data.
+
+
+---------------------
+Implementation Status
+---------------------
+
+HDFS
+====
+HDFS namespace is in UTF-8. So we always encode to (and decode from) UTF-8.
+The ``libs.hadoop.fs.hadoopfs`` module speaks UTF-8 and handles this for us.
+The File Browser correctly handles HDFS namespace. *It does not yet expose file
+contents encoding in the UI*.
+
+Hive
+====
+Hive metadata (such as table comments) is also in UTF-8. The
+``beeswax.db_utils`` module converts between HUE (unicode) and Hive (UTF-8).
+Currently, Hive seems to only work with UTF-8 data.

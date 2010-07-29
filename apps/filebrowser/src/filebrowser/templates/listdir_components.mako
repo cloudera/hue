@@ -16,7 +16,6 @@
 <%!
 import datetime
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time
-from django.utils.encoding import iri_to_uri
 %>
 
 
@@ -56,7 +55,9 @@ from django.utils.encoding import iri_to_uri
             display_name = file['path']
           endif
         %>
-        <% path_enc = iri_to_uri(urlencode(file['path'])) %>
+	## Since path is in unicode, Django and Mako handle url encoding and
+	## iri encoding correctly for us.
+        <% path_enc = file['path'] %>
         <tr class="ccs-no_select fb-item-row ${cls}"
          data-filters="ContextMenu"
          data-context-menu-actions="[{'events':['contextmenu','click:relay(.fb-item-options)'],'menu':'ul.context-menu'}]"

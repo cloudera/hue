@@ -15,7 +15,7 @@
 ## limitations under the License.
 <%def name="render_error(err)">
   <div class="ccs-error">
-    ${str(err) | n}
+    ${unicode(err) | n}
   </div>
 </%def>
 
