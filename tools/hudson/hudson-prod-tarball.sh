@@ -20,7 +20,7 @@ set -x
 
 BINDIR=$(dirname $0)
 
-desktop_root=$PWD
+HUE_ROOT=$PWD
 
 export REPO_TRACE=1
 
@@ -48,8 +48,8 @@ make apps
 ##############################
 # Smoke tests
 ##############################
-./build/env/bin/desktop depender_check
-./build/env/bin/desktop config_help
+./build/env/bin/hue depender_check
+./build/env/bin/hue config_help
 
 ##############################
 # Install
@@ -60,5 +60,5 @@ INSTALL_DIR=$(pwd)/../installdir make install
 # Check install
 ##############################
 cd ../installdir
-./build/env/bin/desktop depender_check
-./build/env/bin/desktop config_help
+./build/env/bin/hue depender_check
+./build/env/bin/hue config_help

@@ -271,7 +271,7 @@ following sections describe the key configuration options you must make to confi
 ============================================================
 To list all available configuration options, run:
 ----
-/usr/share/hue/build/env/bin/desktop config_help | less
+/usr/share/hue/build/env/bin/hue config_help | less
 ----
 This commands outlines the various sections and options in the configuration,
 and provides help and information on the default values.
@@ -398,11 +398,11 @@ UID        PID  PPID  C STIME TTY          TIME CMD
 hue       7899     1  0 12:14 ?        00:00:00 /usr/share/hue/build/build/env/bin/python2.4 \
   /usr/share/hue/desktop/build/env/bin/supervisor -p /var/run/hue/desktop/s
 hue       7903  7899  1 12:14 ?        00:02:59 /usr/share/hue/desktop/build/env/bin/python2.4 \
-  /usr/share/hue/desktop/build/env/bin/desktop runcpserver
+  /usr/share/hue/desktop/build/env/bin/hue runcpserver
 hue       7906  7899  0 12:14 ?        00:00:00 /usr/share/hue/desktop/build/env/bin/python2.4 \
-  /usr/share/hue/desktop/build/env/bin/desktop jobsubd
+  /usr/share/hue/desktop/build/env/bin/hue jobsubd
 hue       7907  7899  0 12:14 ?        00:00:12 /usr/share/hue/desktop/build/env/bin/python2.4 \
-  /usr/share/hue/desktop/build/env/bin/desktop run_healthd
+  /usr/share/hue/desktop/build/env/bin/hue run_healthd
 ------------------
 
 Note that the supervisor automatically restarts these processes if they fail for any reason. If the processes fail repeatedly within a short time, the supervisor itself shuts down.
@@ -482,7 +482,7 @@ Query OK, 0 rows affected (0.00 sec)
 3. To migrate your existing data to MySQL, use the following command to dump the
 existing database to a text file.
 ----
-$ /usr/share/hue/build/env/bin/desktop dumpdata
+$ /usr/share/hue/build/env/bin/hue dumpdata
 ----
 4. Open the `/etc/hue/hue.ini` file in a text editor. Directly below the `[desktop]` line, add the following options (and modify accordingly for your MySQL setup):
 ----
@@ -505,9 +505,9 @@ to a tarball (such as `/tmp/MySQL-python-1.2.2.tar.gz`) instead.
 6. As the Hue user, configure Hue to load the existing data and create the
 necessary database tables:
 ----
-$ /usr/share/hue/build/env/bin/desktop loaddata
-$ /usr/share/hue/build/env/bin/desktop syncdb --noinput
-$ /usr/share/hue/build/env/bin/desktop migrate
+$ /usr/share/hue/build/env/bin/hue loaddata
+$ /usr/share/hue/build/env/bin/hue syncdb --noinput
+$ /usr/share/hue/build/env/bin/hue migrate
 ----
 
 Your system is now configured and you can start the Hue server as normal.

@@ -43,7 +43,7 @@ APPS := core \
 	libs/hadoop
 
 .PHONY: default
-default:: desktop syncdb
+default:: hue syncdb
 
 ###################################
 # Configuration
@@ -59,7 +59,7 @@ $(CONF_DIR)/%.ini:: $(CONF_DIR)/%.ini.tmpl
 	@echo "--- Rewriting $@"
 	sed -e 's:$$HADOOP_HOME:$(HADOOP_HOME):' $< > $@
 
-# Pattern rule for desktop config file
+# Pattern rule for HUE config file
 .PHONY: conf
 conf: $(CONF_INI)
 
@@ -77,15 +77,15 @@ include $(DESKTOP_ROOT)/devtools.mk
 .PHONY: syncdb
 syncdb: $(DESKTOP_DB)
 
-$(DESKTOP_DB): $(BLD_DIR_BIN)/desktop
+$(DESKTOP_DB): $(BLD_DIR_BIN)/hue
 	@echo "--- Regenerating database at $@"
 	@if [ -n "$(DESKTOP_DEBUG)" ]; then \
 	  echo 'Removing old database (DESKTOP_DEBUG is set)' ; \
 	  rm -f $@ ; \
 	fi
 	@echo "--- Syncing/updating database at $@"
-	@$(BLD_DIR_BIN)/desktop syncdb --noinput
-	@$(BLD_DIR_BIN)/desktop migrate
+	@$(BLD_DIR_BIN)/hue syncdb --noinput
+	@$(BLD_DIR_BIN)/hue migrate
 
 # Targets that simply recurse into all of the applications
 ENV_INSTALL_TARGETS := $(APPS:%=.recursive-env-install/%)
@@ -112,13 +112,15 @@ distclean: clean $(DISTCLEAN_TARGETS)
 
 
 #
-# desktop target
+# hue target
 #
-.PHONY: desktop
+.PHONY: hue
 # <<<< DEV ONLY
-desktop: $(BLD_DIR)/.devtools
+hue: $(BLD_DIR)/.devtools
 # END DEV ONLY >>>>
-desktop: env-install
+hue: env-install
+	@# Make symlink for backward compatibility
+	@ln -sf hue $(BLD_DIR_BIN)/desktop
 
 
 ###################################

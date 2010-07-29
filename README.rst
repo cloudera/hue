@@ -101,7 +101,7 @@ To build and get the core server running (without any helper daemons)::
     $ git clone http://github.com/cloudera/hue.git
     $ cd hue
     $ make apps
-    $ build/env/bin/desktop runserver_plus
+    $ build/env/bin/hue runserver_plus
 
 Now Hue should be running on http://localhost:8000.
 

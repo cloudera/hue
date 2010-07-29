@@ -19,8 +19,8 @@ set -x
 fluxbox 2&>1 > /dev/null &
 recordmydesktop --on-the-fly-encoding -v_quality 15 --no-sound -o recording.ogv &
 RECORDER_PID=$!
-rm -f build/desktop/desktop-test.db
-build/env/bin/desktop test windmill --with-xunit -v --nologcapture
+rm -f desktop/desktop-test.db
+build/env/bin/hue test windmill --with-xunit -v --nologcapture
 EXIT=$?
 kill $RECORDER_PID || true
 sleep 20 # Wait for recording to finish

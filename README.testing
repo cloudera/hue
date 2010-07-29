@@ -3,17 +3,17 @@ The short story
 
 Python-based tests:
 
-  "build/env/bin/desktop test all" runs all the tests.
+  "build/env/bin/hue test all" runs all the tests.
 
 You should be running that before you push.
 
 Windmill-tests:
 
-  build/env/bin/desktop test windmill
+  build/env/bin/hue test windmill
 
 runs all the windmill tests.  It uses port 8999.
 
-  build/env/bin/desktop runserver_plus
+  build/env/bin/hue runserver_plus
 followed by
   build/env/bin/windmill -e test=core/src/desktop/windmilltests.py firefox http://localhost:8000/
 
@@ -36,23 +36,23 @@ Helpful command-line tricks
 ===========================
 
 To run tests that do no depend on Hadoop, use:
-  build/env/bin/desktop test fast
+  build/env/bin/hue test fast
 
 To run all tests, use:
-  build/env/bin/desktop test all
+  build/env/bin/hue test all
 
 To run only tests of a particular app, use:
-  build/env/bin/desktop test specific <app>
+  build/env/bin/hue test specific <app>
 E.g.
-  build/env/bin/desktop test specific filebrowser
+  build/env/bin/hue test specific filebrowser
 
 To run a specific test, use:
-  build/env/bin/desktop test specific <test_func>
+  build/env/bin/hue test specific <test_func>
 E.g.
-  build/env/bin/desktop test specific useradmin.tests:test_user_admin
+  build/env/bin/hue test specific useradmin.tests:test_user_admin
 
 Start up pdb on test failures:
-  build/env/bin/desktop test <args> --pdb --pdb-failure
+  build/env/bin/hue test <args> --pdb --pdb-failure
 
 
 Special environment variables
@@ -72,13 +72,13 @@ DESKTOP_PROFILE
   console output for the location of the file.
 
 DESKTOP_LOG_DIR=<dir>
-  Specify the desktop log directory. Defaults to ./log.
+  Specify the HUE log directory. Defaults to ./log.
 
 DESKTOP_DEPENDER_DEBUG
   When specified, re-evaluate the js depender every time.
 
 DESKTOP_DB_CONFIG=<db engine:db name:test db name:username:password:host:port>
-  Specify alternate DB connection parameters for desktop to use. Useful for
+  Specify alternate DB connection parameters for HUE to use. Useful for
   testing your changes against, for example, MySQL instead of sqlite. String
   is a colon-delimited list.
 
@@ -105,7 +105,7 @@ and greatest in build technologies.
 
 Headless Windmill
 =================
-Ideally, all you need to do is install xvfb and run "xvfb-run bin/desktop test_windmill".
+Ideally, all you need to do is install xvfb and run "xvfb-run bin/hue test_windmill".
 To debug, however, you'll need to be able to check out what's going on.  You can run
 "xvfb-run bash", followed by "x11vnc", and then connect to your X via VNC from another
 machine.  This lets you eavesdrop nicely.

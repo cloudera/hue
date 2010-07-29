@@ -25,7 +25,7 @@ setup(
       install_requires = ['setuptools'],
 
       entry_points = { 'console_scripts': [ 'supervisor = desktop.supervisor:main',
-                                            'desktop = desktop.manage_entry:entry', ],
+                                            'hue = desktop.manage_entry:entry', ],
                        'desktop.supervisor.specs': [ 'runcpserver = desktop:SUPERVISOR_SPEC' ]
                        },
       )

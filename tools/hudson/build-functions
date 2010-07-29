@@ -34,16 +34,16 @@ fi
 
 CDH_TGZ=$(basename $CDH_URL)
 CDH_VERSION=${CDH_TGZ/.tar.gz/}
-CDH_CACHE="$HOME/.desktop_cache/${CDH_TGZ}"
+CDH_CACHE="$HOME/.hue_cache/${CDH_TGZ}"
 
 build_hadoop() {
   if [ ! -f $CDH_CACHE ]; then
-    mkdir -p $HOME/.desktop_cache
+    mkdir -p $HOME/.hue_cache
     echo "Downloading $CDH_URL..."
     wget $CDH_URL -O $CDH_CACHE
   fi
 
-  HADOOP_DIR=$desktop_root/ext/hadoop
+  HADOOP_DIR=$HUE_ROOT/ext/hadoop
 
   mkdir -p $HADOOP_DIR
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"

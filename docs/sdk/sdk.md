@@ -26,19 +26,19 @@ h6 {
 }
 </style>
 
-# Hue SDK Documentation
+# HUE SDK Documentation
 
 [TOC]
 
 ## Introduction and Overview
 
-Hue leverages the browser to provide users with an
+HUE leverages the browser to provide users with an
 environment for exploring and analyzing data.
 
-Building on top of the Hue SDK lets your application interact naturally with
-Hadoop, as well as the other services offered by Hue.
+Building on top of the HUE SDK lets your application interact naturally with
+Hadoop, as well as the other services offered by HUE.
 
-By building on top of Hue SDK, you get,
+By building on top of HUE SDK, you get,
 out of the box:
 
 + Configuration Management
@@ -48,35 +48,35 @@ out of the box:
 + A CSS class-based UI toolkit
 + Basic user administration
 
-This document will orient you with the general structure of Hue
+This document will orient you with the general structure of HUE
 and will walk you through adding a new application using the SDK.
 
-NOTE: Hue began its life as "Cloudera Desktop," so you may find
+NOTE: HUE began its life as "Cloudera Desktop," so you may find
 references to "Desktop" in a few places.
 
 ### From 30,000 feet
 
 ![From up on high](from30kfeet.png)
 
-Hue, as a "container" web application, 
+HUE, as a "container" web application,
 sits in between your Hadoop
-installation and the browser.	 It hosts all the Hue
+installation and the browser.	 It hosts all the HUE
 Apps, including the built-in ones, and
 ones that you may write yourself.
 
-### The Hue Server
+### The HUE Server
 
 ![Web Back-end](webbackend.png)
 
-Hue is a web application built on the Django python web framework.
+HUE is a web application built on the Django python web framework.
 Django, running on the WSGI container/web server (typically CherryPy), manages
 the url dispatch, executes application logic code, and puts together the views
 from their templates.	 Django uses a database (typically sqlite)
-to manage session data, and Desktop applications can use it as well
+to manage session data, and HUE applications can use it as well
 for their "models".	 (For example, the JobDesigner application stores
 job designs in the database.)
 
-In addition to the web server, some Desktop applications run
+In addition to the web server, some HUE applications run
 daemon processes "on the side".	 For example, Beeswax runs a daemon
 ("beeswax_server") that keeps track of query states.  Running
 a separate process for applications is the preferred
@@ -90,17 +90,17 @@ by using Thrift (e.g., for job submission) or by exchanging state through the da
 
 ![Interacting with Hadoop](interactingwithhadoop.png)
 
-Hue provides some APIs for interacting with Hadoop.
+HUE provides some APIs for interacting with Hadoop.
 Most noticeably, there are python file-object-like APIs for
 interacting with HDFS.	These APIs work by making Thrift calls
-to "plug-ins" running inside the Hadoop daemons.	
+to "plug-ins" running inside the Hadoop daemons.
 The Hadoop administrator must enable these plug-ins.
 
 ### On the Front-End
 
 ![JFrames](jframes.png)
 
-Hue provides a front-end framework allowing you to co-locate
+HUE provides a front-end framework allowing you to co-locate
 many logical applications within the same windowing environment.
 The essential pattern is that individual apps handle their own HTTP requests.
 The front-end renders the responses of those requests in windows within
@@ -110,9 +110,9 @@ the same web page.	We have dubbed these windows "JFrames".
 
 ![Architecture](architecture.png)
 
-A Hue application may span three tiers: (1) the UI
+A HUE application may span three tiers: (1) the UI
 and user interaction in the client's browser, (2) the
-core application logic in the Hue web
+core application logic in the HUE web
 server, and (3) external services with which applications
 may interact.
 
@@ -129,15 +129,15 @@ will pull in the code necessary to talk to that service.
 
 ### Software
 
-Developing for the Desktop SDK has similar requirements to running
-Desktop itself.	 We require python (2.4, 2.5, or 2.6), Django (1.1 included
+Developing for the HUE SDK has similar requirements to running
+HUE itself.	 We require python (2.4, 2.5, or 2.6), Django (1.1 included
 with our distribution), Hadoop (Cloudera's Distribution for Hadoop,
 at least `0.20.1+152`), Java (Sun Java 1.6), and Firefox (at least 3.0).
 
 ### Recommended Reading / Important Technologies
 
 The following are core technologies used inside
-of Hue.
+of HUE.
 
 * Python.	 <a href="http://diveintopython.org/">Dive Into Python</a> is one
 of several excellent books on python.
@@ -148,27 +148,27 @@ communication between daemons.
 language.
 * [MooTools](http://mootools.net/) is the Javascript framework.
 
-## Fast-Guide to Creating a New Desktop Application
+## Fast-Guide to Creating a New HUE Application
 
 Now that we have a high-level overview of what's going on,
 let's go ahead and create a new installation.
 
 ### Crepo
 
-Development versions of Hue require "crepo", a tool to grab external repositories
+Development versions of HUE require "crepo", a tool to grab external repositories
 into your workspace.  Crepo can be run out of its repository (simply point the CREPO
 environment variable to `crepo.py`) and is available at http://github.com/cloudera/crepo.
 
 ### Download, unpack, build distro
 
-The Hue SDK is available from http://github.com/cloudera/hue; releases are at http://archive.cloudera.com/cdh/3.
+The HUE SDK is available from http://github.com/cloudera/hue; releases are at http://archive.cloudera.com/cdh/3.
 
 		$ cd hue
 		# Build
 		$ export HADOOP_HOME=...
 		$ make apps
 		# Run
-		$ build/env/bin/desktop runserver_plus
+		$ build/env/bin/hue runserver_plus
 		# Visit http://localhost:8000/ with your web browser.
 
 <div class="note">
@@ -179,7 +179,7 @@ which is very handy.
 
 ### Run "create_app" to set up a new source tree
 
-		$ ./build/env/bin/desktop create_desktop_app calculator
+		$ ./build/env/bin/hue create_desktop_app calculator
 		$ find calculator -type f
 		calculator/setup.py																	# distutils setup file
 		calculator/src/calculator/__init__.py								# main src module
@@ -201,9 +201,9 @@ which is very handy.
 ### Install that app
 
 As you'll discover if you look at calculator's <tt>setup.py</tt>,
-Hue uses a distutils <tt>entrypoint</tt> to
+HUE uses a distutils <tt>entrypoint</tt> to
 register applications.	By installing the calculator
-package into Desktop's python virtual environment,
+package into HUE's python virtual environment,
 you'll install a new app.  The "app_reg.py" tool manages
 the applications that are installed
 
@@ -227,14 +227,14 @@ Congrats, you've added a new app!
 <div class="note">
 What was that all about?	<a href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>
 is a way to isolate python environments in your system, and isolate incompatible
-versions of dependencies.	 Hue uses the system python, and that's about all.
+versions of dependencies.	 HUE uses the system python, and that's about all.
 It installs its own versions of dependencies.
 
 <a href="http://peak.telecommunity.com/DevCenter/PkgResources#entry-points">Entry Points</a>
 are a way for packages to optionally hook up with other packages.
 </div>
 
-### Run Desktop, and find your new app
+### Run HUE, and find your new app
 
 		# If you haven't killed the old process, do so now.
 		$ env/bin/python runserver_plus
@@ -248,7 +248,7 @@ will bring up a boring screen:
 <div style="note">
 Try going to <a href="http://localhost:8000/calculator/">http://localhost:8000/calculator/</a>.
 You'll see the same page as was brought up when you clicked on the icon, but natively in your
-browser.	This is an example of Hue's "JFrame" functionality: individual application
+browser.	This is an example of HUE's "JFrame" functionality: individual application
 windows are really just individual HTTP requests.
 </div>
 
@@ -281,7 +281,7 @@ to include a simple form:
 		</html>
 
 The template language here is <a href="http://www.makotemplates.org/docs/">Mako</a>,
-which is flexible and powerful.	 If you use the "`.html`" extension, Hue
+which is flexible and powerful.	 If you use the "`.html`" extension, HUE
 will render your page using <a href="http://docs.djangoproject.com/en/1.1/topics/templates/#topics-templates">Django templates</a>
 instead.
 
@@ -322,7 +322,7 @@ If you enter a number only in the first text box, you'll see
 
 <img src="calculator_error.png">
 
-Hue noticed that an exception was thrown, and created a modal
+HUE noticed that an exception was thrown, and created a modal
 dialog error for you.
 
 If you access the calculator URL at `/calculator` in your browser,
@@ -361,12 +361,12 @@ In addition to many views (in `views.py`), Beeswax uses
 Django Forms for server-side form validation (the forms are in `forms.py`),
 several features of the Mako templating engine (especially includes and
 functions), a separate server (implemented in Java), and significant
-JavaScript for user interaction.	
+JavaScript for user interaction.
 
 ## Backend Development
 
 This section goes into greater detail on useful features within
-the Hue environment.
+the HUE environment.
 
 ### User management
 
@@ -380,7 +380,7 @@ standard Django `models.User` object.	 If you were to set a breakpoint at the
 <div class="note">
 "Under the covers:" Django uses a notion called middleware that's called in between
 the request coming in and the view being executed.	That's how <code>request.user</code>
-gets populated.	 There's also a middleware for Hue that makes sure that no pages
+gets populated.	 There's also a middleware for HUE that makes sure that no pages
 are displayed unless the user is authenticated.
 </div>
 
@@ -388,8 +388,8 @@ are displayed unless the user is authenticated.
 
 #### Configuration File
 
-Hue uses a typed configuration system that reads configuration files (in an
-ini-style format).	By default, Desktop loads all `*.ini` files in the `build/desktop/conf`
+HUE uses a typed configuration system that reads configuration files (in an
+ini-style format).	By default, HUE loads all `*.ini` files in the `build/desktop/conf`
 directory.	The configuration files have the following format:
 
 		# This is a comment
@@ -438,7 +438,7 @@ define the following:
 																nn_host=Config(key='namenode_host', required=True))
 </pre>
 	An `UnspecifiedConfigSection` is useful when the children of the section are not known.
-	When Desktop loads your application's configuration, it binds all sub-sections. You can
+	When HUE loads your application's configuration, it binds all sub-sections. You can
 	access the values by:
 <pre>
 		cluster1_val = FS['cluster_1'].nn_host.get()
@@ -452,16 +452,16 @@ You should specify the <code>help="..."</code> argument to all configuration rel
 your <code>conf.py</code>. The examples omit some for the sake of space. But you and your
 application's users can view all the configuration variables by doing:
 <pre>
-		$ env/bin/desktop config_help
+		$ build/env/bin/hue config_help
 </pre>
 </div>
 
 
 ### Running "Helper Processes"
 
-Some Hue applications need to run separate daemon processes on the side.
+Some HUE applications need to run separate daemon processes on the side.
 For example, `jobsubd` is responsible for submitting Hadoop jobs (on behalf
-of the user) and monitoring them.	 The Desktop "views" communicate with it
+of the user) and monitoring them.	 The HUE "views" communicate with it
 through Thrift and shared states in the Django database.
 
 Suppose your application needs a helper `my_daemon.py`. You need to register it by:
@@ -473,7 +473,7 @@ Suppose your application needs a helper `my_daemon.py`. You need to register it 
 			'desktop.supervisor.specs': [ 'my_daemon = my_app:SUPERVISOR_SPEC' ] }
 </pre>
 
-* In `src/my_app/__init__.py`, tell Hue what to run by adding:
+* In `src/my_app/__init__.py`, tell HUE what to run by adding:
 <pre>
 		SUPERVISOR_SPEC = dict(django_command="my_daemon")
 </pre>
@@ -482,15 +482,15 @@ Suppose your application needs a helper `my_daemon.py`. You need to register it 
 	daemon program has only one requirement: it must define a class called `Command` that
 	extends `django.core.management.base.BaseCommand`. Please see `jobsubd.py` for an example.
 
-The next time Hue restarts, your `my_daemon` will start automatically.
-If your daemon program dies (exits with a non-zero exit code), Desktop will
+The next time HUE restarts, your `my_daemon` will start automatically.
+If your daemon program dies (exits with a non-zero exit code), HUE will
 restart it.
 
-"Under the covers:" Threading.	Desktop, by default, runs under
+"Under the covers:" Threading.	HUE, by default, runs under
 a slightly modified CherryPy WSGI server.
 This server is multi-threaded, so you can use python
 threading support (such as it is).	The "runserver_plus" version
-is single-threaded.	 If Desktop is configured (and it may be, in the future)
+is single-threaded.	 If HUE is configured (and it may be, in the future)
 to use mod_wsgi under Apache httpd, then there would be multiple python
 processes serving the backend.	This means that your Django application
 code should avoid depending on shared process state.	Instead, place
@@ -507,17 +507,17 @@ the "view" is called a "template".	For an application developer, the essential
 flow to understand is how the "urls.py" file provides a mapping between URLs (expressed as a
 regular expression, optionally with captured parameters) and view functions.
 These view functions typically use their arguments (for example, the captured parameters) and
-their request object (which has, for example, the POST and GET parameters) to 
+their request object (which has, for example, the POST and GET parameters) to
 prepare dynamic content to be rendered using a template.
 
 ### Templates: Django and Mako
 
-In Hue, the typical pattern for rendering data through a template
+In HUE, the typical pattern for rendering data through a template
 is:
 
 		from desktop.lib.django_util import render
 
-		def view_function(request):	 
+		def view_function(request):
 			return render('view_function.mako', request, dict(greeting="hello"))
 
 The `render()` function chooses a template engine (either Django or Mako) based on the
@@ -543,7 +543,7 @@ operations that manipulate HDFS.	It is pre-configured to access
 HDFS as the user that's currently logged in.	Operations available
 on `request.fs` are similar to the file operations typically
 available in python.	See `hadoopfs.py` for details; the list
-of functions available is as follows: 
+of functions available is as follows:
 `chmod`,
 `chown,
 `exists`,
@@ -560,16 +560,16 @@ of functions available is as follows:
 
 ### Making your views thread-safe
 
-Hue works in any WSGI-compliant container web server.
+HUE works in any WSGI-compliant container web server.
 The current recommended deployment server is the built-in CherryPy server.
 The CherryPy server, which is multi-threaded, is invoked by `runcpserver`
-and is configured to start when Desktop's `supervisor` script is used.
+and is configured to start when HUE's `supervisor` script is used.
 Meanwhile, `runserver` and `runserver_plus` start a single-threaded
 testing server.
 
-Because multiple threads may be accessing your views 
+Because multiple threads may be accessing your views
 concurrently, your views should not use shared state.
-An exception is that it is acceptable to initialize 
+An exception is that it is acceptable to initialize
 some state when the module is first imported.
 If you must use shared state, use Python's `threading.Lock`.
 
@@ -581,7 +581,7 @@ there still may be multiple copies of this state.
 
 For persistent global state, it is common to place the state
 in the database.	If the state needs to be managed with application code,
-a common pattern to push state into a "helper process".	 For example, in the Job Designer, 
+a common pattern to push state into a "helper process".	 For example, in the Job Designer,
 a helper process keeps track of the processes that have been launched.	The Django views
 themselves are stateless, but they talk to this stateful helper process for
 updates.	A similar approach is taken with updating metrics for
@@ -589,14 +589,14 @@ the Beeswax application.
 
 ### Authentication Backends
 
-Hue exposes a configuration flag ("auth") to configure
-a custom authentication backend.  See 
+HUE exposes a configuration flag ("auth") to configure
+a custom authentication backend.  See
 See http://docs.djangoproject.com/en/dev/topics/auth/#writing-an-authentication-backend
 for writing such a backend.
 
 In addition to that, backends may support a `manages_passwords_externally()` method, returning
 True or False, to tell the user manager application whether or not changing
-passwords within Desktop is possible.
+passwords within HUE is possible.
 
 <!--
 ### Django Models
@@ -606,13 +606,13 @@ passwords within Desktop is possible.
 
 ## Front-end Development
 
-Developing applications for Hue requires a minimal amount of CSS and JavaScript to use existing functionality. As covered above, creating an application for the Desktop is a matter of creating a standard HTML application that is available when you visit it in your browser (i.e. <a href="http://localhost:8000/calculator/">http://localhost:8000/calculator/</a>) but also in the Desktop environment.
+Developing applications for HUE requires a minimal amount of CSS and JavaScript to use existing functionality. As covered above, creating an application for the HUE is a matter of creating a standard HTML application that is available when you visit it in your browser (i.e. <a href="http://localhost:8000/calculator/">http://localhost:8000/calculator/</a>) but also in the HUE environment.
 
 Our goal is to make it easy for you to author Django applications and enhance their views with default styles and behaviors provided by our SDK. If you find you want to use a UI feature that we don't have in the SDK yet, there are clear pathways for you to author that functionality using JavaScript. As time goes on and our SDK matures, you'll find more and more UI patterns present for your use.
 
 ### Default CSS Styles
 
-Hue comes with a collection of default styles that you can use to make your apps and their UI components look like all the other apps. Your app doesn't have to use these styles, but if you do, it'll save you some time and make your app look at home on the Desktop.
+HUE comes with a collection of default styles that you can use to make your apps and their UI components look like all the other apps. Your app doesn't have to use these styles, but if you do, it'll save you some time and make your app look at home in HUE.
 
 You can find the default styles inside the SDK in the file located at *desktop/core/static/css/shared.css*.
 
@@ -645,7 +645,7 @@ Note that the JavaScript environment (which we cover later) always provides you 
 
 You should create an icon for your application that is a transparent png sized 55px by 55px. You'll probably want to put this in the header of your application to make it easy to recognize. We'll cover that when we get to the Jframe patterns and how to add a toolbar to your application.
 
-Hue includes a selection of around 1,500 small 16px by 16px icons that can be useful when making links that perform actions. These are open source icons that you can use in your own applications as you like. You can find these in *desktop/core/static/art/icons/* and *desktop/core/static/art/led-icons/* and you can style your elements to use them like this (in your css file):
+HUE includes a selection of around 1,500 small 16px by 16px icons that can be useful when making links that perform actions. These are open source icons that you can use in your own applications as you like. You can find these in *desktop/core/static/art/icons/* and *desktop/core/static/art/led-icons/* and you can style your elements to use them like this (in your css file):
 
 	/* show an add icon next to the text of the link: */
 	.calculator a.add {
@@ -666,7 +666,7 @@ Hue includes a selection of around 1,500 small 16px by 16px icons that can be us
 
 ### Registering your Application
 
-By default, all windows in Hue have a the same basic look and feel. If you don't do anything, you'll get a window with the history component (the forward, back, and refresh buttons and the history list / current location). You can style this window to be radically different if you choose, but doing so will take some JavaScript work on your part.
+By default, all windows in HUE have a the same basic look and feel. If you don't do anything, you'll get a window with the history component (the forward, back, and refresh buttons and the history list / current location). You can style this window to be radically different if you choose, but doing so will take some JavaScript work on your part.
 
 Before we can change the style of our application's window, we need to change the way our application is invoked. By default, our bootstrap.js file looks like this:
 
@@ -676,8 +676,8 @@ Before we can change the style of our application's window, we need to change th
 			css : '/calculator/static/css/calculator.css',
 			require: [ /* put required js assets here	 example: */ 'CCS.JBrowser' ],
 			launch: function(path, options){
-				// application launch code here 
-				// example code below: 
+				// application launch code here
+				// example code below:
 				return new Calculator(path || '/calculator/', options);
 			},
 			menu: {
@@ -690,11 +690,11 @@ Before we can change the style of our application's window, we need to change th
 		}
 	});
 
-Let's walk through this line by line. 
+Let's walk through this line by line.
 
 	CCS.Desktop.register({
 
-You can see we register our application with the desktop. This does several things, but principally it tells the Desktop environment that your app exists and how to invoke it as well as what dependencies it has. By default, you can see that we tell it about the following:
+You can see we register our application with HUE. This does several things, but principally it tells the HUE environment that your app exists and how to invoke it as well as what dependencies it has. By default, you can see that we tell it about the following:
 
 		Calculator : {
 			name : 'calculator',
@@ -712,8 +712,8 @@ This is pretty straightforward. Your application has its own dedicated css file 
 Here's where things get interesting. By default, our application only requires the file CCS.JBrowser.js, which gives us all our default application functionality. There's really no reason to change this unless you want to add more JavaScript functionality; we'll cover how to do that in the next section. For now, let's leave this one alone and we'll revisit it later.
 
 	launch: function(path, options){
-		// application launch code here 
-		// example code below: 
+		// application launch code here
+		// example code below:
 		return new Calculator(path || '/calculator/', options);
 	},
 
@@ -739,7 +739,7 @@ It's actually not uncommon to have an application without adding it to the dock.
 
 ### Adding Interactive Elements to Your UI
 
-We'll talk a bit more about JavaScript in a bit, but one of the things the Hue SDK does for you is allow you to imbue your app with various UI behaviors by using pre-defined HTML markup. These patterns include things like:
+We'll talk a bit more about JavaScript in a bit, but one of the things the HUE SDK does for you is allow you to imbue your app with various UI behaviors by using pre-defined HTML markup. These patterns include things like:
 
 * Alert and confirmation messages
 * Client side form validation
@@ -786,11 +786,11 @@ If this were the entirety of your HTML structure, you would get a view like this
 
 The key to get this layout is to have a table with the CSS classes `css-data_table` and, optionally, adding onto that the CSS classes `selectable` and `sortable`. It's also important that your table have both `thead` and `tbody` tags.
 
-This mechanism for inspecting the HTML response for key structures is at the heart of front-end development with the Hue SDK. When you want to write your own behaviors, you'll be best served to write your logic into as many of these types as patterns as possible.
+This mechanism for inspecting the HTML response for key structures is at the heart of front-end development with the HUE SDK. When you want to write your own behaviors, you'll be best served to write your logic into as many of these types as patterns as possible.
 
-There are many patterns available in the SDK for your use with more added regularly. There are so many potential patterns that there's no way we could code everything you might find yourself wanting. The Hue SDK provides mechanisms for you to write your own (covered below), but chances are if the pattern you are after seems commonplace but isn't yet available in our SDK, we'll add it soon. For example, as of this writing the SDK doesn't have a date chooser for form inputs. It's something we'll definitely add, but none of the apps authored thus far have required such an input. If there's a pattern that you feel is not unique to your own application, we encourage you to let us know what you need so that we can help you.
+There are many patterns available in the SDK for your use with more added regularly. There are so many potential patterns that there's no way we could code everything you might find yourself wanting. The HUE SDK provides mechanisms for you to write your own (covered below), but chances are if the pattern you are after seems commonplace but isn't yet available in our SDK, we'll add it soon. For example, as of this writing the SDK doesn't have a date chooser for form inputs. It's something we'll definitely add, but none of the apps authored thus far have required such an input. If there's a pattern that you feel is not unique to your own application, we encourage you to let us know what you need so that we can help you.
 
-**Tip:** In your Desktop SDK environment there is an app called JFrame Gallery that shows all the built-in components. Here you can learn how to use all the items already present for you in the SDK.
+**Tip:** In your HUE SDK environment there is an app called JFrame Gallery that shows all the built-in components. Here you can learn how to use all the items already present for you in the SDK.
 
 ### How HTML, Links, Forms, etc Work
 
@@ -798,14 +798,14 @@ The JavaScript class that does this HTML inspection is called CCS.JFrame (which 
 
 As a result, if you write your "web 1.0" application and load it into a JBrowser's JFrame, all the links and forms will work as you would expect them to.
 
-#### Launching Other Desktop Applications
+#### Launching Other HUE Applications
 
-The Hue SDK provides an easy way to spawn other applications from within your own. All that is required is that any link you wish have spawn another app have a `target` value defined for that app's name (the non-nice name, so the File Browser's app name is FileBrowser). These names aren't always obvious. The easiest way to find a manifest is to open [http://localhost:8000/bootstrap.js](http://localhost:8000/bootstrap.js) in your browser and look at all the application registrations. For example, here's the bootstrap for the *About* application (which just shows you information about what version of Hue you are running):
+The HUE SDK provides an easy way to spawn other applications from within your own. All that is required is that any link you wish have spawn another app have a `target` value defined for that app's name (the non-nice name, so the File Browser's app name is FileBrowser). These names aren't always obvious. The easiest way to find a manifest is to open [http://localhost:8000/bootstrap.js](http://localhost:8000/bootstrap.js) in your browser and look at all the application registrations. For example, here's the bootstrap for the *About* application (which just shows you information about what version of HUE you are running):
 
 	/* about */
 	CCS.Desktop.register({
 		About : {
-			name: 'About Hue',
+			name: 'About HUE',
 			require: ['CCS.JBrowser'],
 			launch: function(path, options){
 				return new CCS.JBrowser('/about/', $merge({
@@ -816,7 +816,7 @@ The Hue SDK provides an easy way to spawn other applications from within your ow
 		}
 	});
 
-In this case, the app name is "About", while the "nice" name is "About Hue".
+In this case, the app name is "About", while the "nice" name is "About HUE".
 
 If you wanted to launch this app from yours, you would just have an anchor tag with a target specified:
 
@@ -824,17 +824,17 @@ If you wanted to launch this app from yours, you would just have an anchor tag w
 
 Note that we didn't specify an `href`. This will launch the application to it's "home" page. If you want to launch an application to a specific URL, you should specify that path in the `href`. Be sure that you use a path that the application in question knows. For example, if you tried to launch the About app and gave it a url to the File Browser, the app will launch and display the File Browser contents but they won't be styled nor will they work.
 
-If you specify a `target` for a link that does not match a known (i.e. registered) application, the link will work as normal, spawning a new window or tab in the user's web browser. You can use this if you wanted to, for example, link to some external documentation. (It's also possible for the SDK to proxy an external web service into a Desktop app, but that is not covered here.)
+If you specify a `target` for a link that does not match a known (i.e. registered) application, the link will work as normal, spawning a new window or tab in the user's web browser. You can use this if you wanted to, for example, link to some external documentation. (It's also possible for the SDK to proxy an external web service into a HUE app, but that is not covered here.)
 
-#### Launching Desktop Applications from External Links
+#### Launching HUE Applications from External Links
 
 You can create a link to a specific application, or even a specific view within an application.
 This is done by adding a hash value for "launch" with comma separated values of application
 names and optional encoded urls. For examples:
 
-	http://desktop/#launch=FileBrowser,JobBrowser
-	http://desktop/#launch=FileBrowser:/some/path,JobBrowser:/some/other/path
-	http://desktop/#launch=FileBrowser,JobBrowser&noSession=true
+	http://hue/#launch=FileBrowser,JobBrowser
+	http://hue/#launch=FileBrowser:/some/path,JobBrowser:/some/other/path
+	http://hue/#launch=FileBrowser,JobBrowser&noSession=true
 
 The last example shows an additional parameter to prevent session restoration.
 
@@ -865,7 +865,7 @@ That element will be updated (emptied and filled) with the countdown.
 
 #### Putting Elements into the Navigation Bar
 
-When you provision your application we automatically set it up to have the history component in the header along with your app's icon. To accommodate these things, the header area of your application is given a relatively generous amount of space that you can use to show additional elements. You might want to use the space, for example, to add buttons to do things or to navigate. If you look around Hue itself you'll find a lot of examples. Here's the header of the File Browser application:
+When you provision your application we automatically set it up to have the history component in the header along with your app's icon. To accommodate these things, the header area of your application is given a relatively generous amount of space that you can use to show additional elements. You might want to use the space, for example, to add buttons to do things or to navigate. If you look around HUE itself you'll find a lot of examples. Here's the header of the File Browser application:
 
 ![File Browser Header](file_browser_header.png)
 
@@ -919,13 +919,13 @@ This "view" value is also passed to you in your JavaScript, allowing you to defi
 
 ### Getting Started With JavaScript
 
-So let's say you want to customize your application. You might want to add some JavaScript to let the user interact with your application in some esoteric fashion that the SDK doesn't provide. This might be a drag and drop feature or maybe an image gallery. As mentioned previously, the web 1.0 applications do not have JavaScript. If you put a JavaScript tag in your content, the Desktop application will not execute it.
+So let's say you want to customize your application. You might want to add some JavaScript to let the user interact with your application in some esoteric fashion that the SDK doesn't provide. This might be a drag and drop feature or maybe an image gallery. As mentioned previously, the web 1.0 applications do not have JavaScript. If you put a JavaScript tag in your content, the HUE application will not execute it.
 
-Why do we do this? Because Hue applications don't have a scope when their HTML is evaluated. They can't; their scope is shared with the entire Desktop. The way we limit the scope of functionality is to provide callbacks when your Application renders a view so that you can define custom behavior without affecting other windows on the page.
+Why do we do this? Because HUE applications don't have a scope when their HTML is evaluated. They can't; their scope is shared across HUE entirely. The way we limit the scope of functionality is to provide callbacks when your Application renders a view so that you can define custom behavior without affecting other windows on the page.
 
-#### Hue Uses MooTools
+#### HUE Uses MooTools
 
-At this point it's worth noting that Hue uses the [MooTools](http://mootools.net) JavaScript framework for all its client side development. Hue uses the following libraries:
+At this point it's worth noting that HUE uses the [MooTools](http://mootools.net) JavaScript framework for all its client side development. HUE uses the following libraries:
 
 * MooTools Core ([www](http://mootools.net) | [git](http://github.com/mootools/mootools-core))
 * MooTools More ([www](http://mootools.net/more) | [git](http://github.com/mootools/mootools-more))
@@ -948,17 +948,17 @@ The default boostrap for your application invokes your app like this:
 
 To customize your application, we need to extend the CCS.JBrowser class to create our own custom implementation. When you provision your application, we will already have an extension defined for you.
 
-Inside your application you'll find a JavaScript directory already provisioned for you in */static/js/*. In that directory you'll find a file called *package.yml*. This file is a manifest of the contents of your application's JavaScript. By default it points to a single JavaScript source file in Source/YourAppName.js. If you add more JavaScript source files, be sure to update the package.yml file so that Desktop can properly load your JavaScript. Whenever you change the JavaScript dependencies for your application, you need to restart the Django server unless you have the `DESKTOP_DEPENDER_DEBUG` environment variable set to have it run in "live" mode (see note below on Debugging Tips and Tricks).
+Inside your application you'll find a JavaScript directory already provisioned for you in */static/js/*. In that directory you'll find a file called *package.yml*. This file is a manifest of the contents of your application's JavaScript. By default it points to a single JavaScript source file in Source/YourAppName.js. If you add more JavaScript source files, be sure to update the package.yml file so that HUE can properly load your JavaScript. Whenever you change the JavaScript dependencies for your application, you need to restart the Django server unless you have the `DESKTOP_DEPENDER_DEBUG` environment variable set to have it run in "live" mode (see note below on Debugging Tips and Tricks).
 
 
 #### Declaring Dependencies
 
-Any JavaScript you write will either be a dependency of another JavaScript file or depend on another JavaScript file (often both). Hue calculates JS dependencies on the fly using a combination of [YAML](http://www.yaml.org/) manifest files and YAML headers in our JavaScript files. Briefly, here's what they look like.
+Any JavaScript you write will either be a dependency of another JavaScript file or depend on another JavaScript file (often both). HUE calculates JS dependencies on the fly using a combination of [YAML](http://www.yaml.org/) manifest files and YAML headers in our JavaScript files. Briefly, here's what they look like.
 
 The YAML manifest file lists the names of all the files in a package, the package's name, and some metadata. here's a sample:
 
 	copyright: 2010
-	description: Shared components for Hue
+	description: Shared components for HUE
 	name: ccs-shared
 	sources: [Source/Path/To/A/JS/File.js, Source/Path/To/Another/JS/File.js, etc]
 	version: 0.4.0
@@ -972,7 +972,7 @@ To understand the JavaScript file headers, let's look at the one we created for 
 
 	script: Calculator.js
 
-	description: Defines Calculator; a Hue application that extends CCS.JBrowser.
+	description: Defines Calculator; a HUE application that extends CCS.JBrowser.
 
 	license: MIT-style license
 
@@ -996,13 +996,13 @@ This is the beginning of our application's JavaScript. It is a YAML fragment tha
 * requires: a list of package/source files on which our script depends. As you can see, this file, by default, only requires the `CCS.JBrowser` source from the ccs-shared package.
 * provides: a list of components that our script provides. A script can provide more than one, which gives you the option of eventually splitting it up if you so choose. Typically every public method, variable, and class defined in a script is in this list.
 
-Note that class dependencies cascade; by requiring `CCS.JBrowser` you get all of its dependencies. If, for example, you needed something out of MooTools Core, you'd look in it's package.yaml (at *ext/mootools-core/package.yaml*) to see its manifest and its name (`core`) and then look in any file for what it provides. The same is true of all the other packages in desktop.
+Note that class dependencies cascade; by requiring `CCS.JBrowser` you get all of its dependencies. If, for example, you needed something out of MooTools Core, you'd look in it's package.yaml (at *ext/mootools-core/package.yaml*) to see its manifest and its name (`core`) and then look in any file for what it provides. The same is true of all the other packages in HUE.
 
 Perhaps a simpler method is to drop to your shell and execute the following:
 
-	$ env/bin/desktop depender_check
+	$ build/env/bin/hue depender_check
 
-This command is useful in two ways: first, it will list all the files available to the Desktop and secondly it will validate that all the files required are found and that there are no circular references. So if we wanted to require, say, Swiff.js from MooTools Core, we could alter our script header thusly:
+This command is useful in two ways: first, it will list all the files available to HUE and secondly it will validate that all the files required are found and that there are no circular references. So if we wanted to require, say, Swiff.js from MooTools Core, we could alter our script header thusly:
 
 	requires:
 	- ccs-shared/CCS.JBrowser
@@ -1010,7 +1010,7 @@ This command is useful in two ways: first, it will list all the files available 
 
 #### Styling the Application Window
 
-CCS.JBrowser is an extension of a MooTools plugin called ART.Browser found in the MooTools ART library, specifically in its widgets collection. You can see the version of this running in Hue at [http://github.com/cloudera/art-widgets/](http://github.com/cloudera/art-widgets/). This codebase is still in beta and is light on documentation. That's ok, we'll try and tell you what you need to know here.
+CCS.JBrowser is an extension of a MooTools plugin called ART.Browser found in the MooTools ART library, specifically in its widgets collection. You can see the version of this running in HUE at [http://github.com/cloudera/art-widgets/](http://github.com/cloudera/art-widgets/). This codebase is still in beta and is light on documentation. That's ok, we'll try and tell you what you need to know here.
 
 The most important thing to know about styling ART.Window is how ART.Sheet works. Every component in ART has a CSS selector applied to it, and its styles are derived from values assigned to ART.Sheet. Let's look at the default styles that come with ART.Browser.
 
@@ -1041,7 +1041,7 @@ The most important thing to know about styling ART.Window is how ART.Sheet works
 			historyOptions: {...}
 			etc...
 		},
-		
+
 		etc...
 
 As you can see, ART.Browser extends ART.Window, meaning that it inherits all the properties of that parent class. It defines in is options a "className" value of "browser". In the first lines, you'll see that it defines styles for the height of the header of 60px by using the selector "window.browser". Each ART component has a fixed set of styles that are valid and they all cascade. If you look at ART.Window you'll find many, many more styles.
@@ -1074,7 +1074,7 @@ The only things that really interest us for the purpose of this demo are the sty
 		options: {
 			className: 'browser calculator'
 		},
-		
+
 		etc
 
 In the code above, we set the className value to both 'browser' and 'calculator', which allows us to define custom styles for our application. In this case, we define a taller header height and we style the history component to be shorter on the left to make room for our logo.
@@ -1083,7 +1083,7 @@ To put the logo in the header, as well as, perhaps, other things like toolbar bu
 
 #### Customizing Your Application's Behavior
 
-In the previous section we touched on CCS.JBrowser, which is the JavaScript class that generates an application window in Hue. This window is empty - just a header, a footer, a content area, and an optional history navigation. To load content into it, every instance of CCS.JBrowser has an instance of another class called CCS.JFrame (which we discussed earlier).
+In the previous section we touched on CCS.JBrowser, which is the JavaScript class that generates an application window in HUE. This window is empty - just a header, a footer, a content area, and an optional history navigation. To load content into it, every instance of CCS.JBrowser has an instance of another class called CCS.JFrame (which we discussed earlier).
 
 To customize your application you'll need to add new code to your extension of JBrowser to do additional things when that instance's JFrame changes state.
 
@@ -1094,25 +1094,25 @@ If you want to define JavaScript that your application uses you can't just write
 Let's say whenever your application loads you wanted to alert the user (which would be annoying, but it will illustrate the point). We'd pick up with our class's definition from the previous example and write some code in its initialize method, which is invoked every time our application is instantiated.
 
 	var Calculator = new Class({
-		
+
 		Extends: CCS.JBrowser,
 
 		options: {
 			className: 'browser calculator'
 		},
-		
+
 		//your app will possibly be passed two arguments, a path, and an object called options
 		initialize: function(path, options) {
 			//this.parent calls this initialize method on the superclass, in this case, CCS.JBrowser
 			//note that if the path isn't specified, we have a default path, /calculator/
 			this.parent(path || '/calculator/', options);
-			
+
 			//now let's customize our application. We'll add an event listener for JBrowser's custom 'load' event
 			this.addEvent('load', function(){
 				alert('I just loaded this url: ' + this.currentPath);
 			}.bind(this)); //don't forget to bind your function to this instance (see below)
 		},
-		
+
 		etc
 
 In the example above we have a standard CCS.JBrowser extension. It states that it extends CCS.JBrowser, defines a custom className for itself and has an initialize method that invokes the initialize method of CCS.JBrowser using the this.parent method. Then we customize the behavior, adding an function callback to the load event. Because our function references a property of our JBrowser instance, we need to bind "this" to our function. We then reference a JFrame property for the current url that's loaded.
@@ -1132,14 +1132,14 @@ This "view" value is also used when you want to write custom JavaScript for a sp
 	var Calculator = new Class({
 
 		//...excluding some lines from our earlier example
-		
+
 		initialize: function(path, options) {
 			this.parent(path || '/calculator/', options);
-			
+
 			//when JFrame loads, call our setup method - don't forget to bind!
 			this.addEvent('load', this.setup.bind(this));
 		},
-		
+
 		//the load event in JFrame invokes our callback and passes it the view
 		setup: function(view) {
 			//detect our view - did we wrap our response in a <div class="view" id="gallery"> ?
@@ -1155,7 +1155,7 @@ This "view" value is also used when you want to write custom JavaScript for a sp
 				});
 			}
 		},
-		
+
 		etc
 
 Let's digest this a bit. First, there's a bit of magic going on with the `$(this)` statement. This is MooTools providing us a mechanism to get to the element that our Class is represented by. In this case, when we invoke `$(this)` we get a pointer to the DOM element containing the window of our app. From this point, we can execute a selector method to get elements only within our window. Thus `$(this).getElements('img.thumbnail')` won't return images with a 'thumbnail' CSS class in some other window, but rather only in the one our instance is bound to. The rest of the code is fairly straight forward. You should refer to [the MooTools documentation](http://mootools.net/docs) and [tutorial](http://www.mootorial.com) for more examples.
@@ -1214,26 +1214,26 @@ If renderers are on the front end of the load process - the thing that handles t
 	var Calculator = new Class({
 
 		//...excluding some lines from our earlier example
-		
+
 		initialize: function(path, options) {
 			this.parent(path || '/calculator/', options);
-			
+
 			this.jframe.addLinker('a.foo', function(theClickEvent, theLinkElementClicked){
 				alert('you clicked a foo link!');
 			});
 		},
-		
+
 		etc...
 
-JFrame already intercepts all the clicks to links in your document. By default, it loads the content of those links into the content area unless they have a location reference on the page (`href="#name"`) - in which case it scrolls the window to the element in question - or if there is a target attribute specified (this is covered in the "Launching Other Desktop Applications" section).
+JFrame already intercepts all the clicks to links in your document. By default, it loads the content of those links into the content area unless they have a location reference on the page (`href="#name"`) - in which case it scrolls the window to the element in question - or if there is a target attribute specified (this is covered in the "Launching Other HUE Applications" section).
 
-With linkers, you can easily override what an anchor would normally do. If the CSS selector matches the link the user clicked, the default linker (described in the previous paragraph) will not handle that event and instead defer to your function. Your function is passed two arguments: the event object (see [the MooTools documentation for its properties and methods](http://mootools.net/docs/core/Native/Event)) and the element that was clicked (see [the MooTools documentation for Elements](http://mootools.net/docs/core/Element/Element)). With these two references you can define any behavior you like. Be sure to cancel the default behavior of the event object (`theClickEvent.preventDefault();`) or else the browser will leave the desktop.
+With linkers, you can easily override what an anchor would normally do. If the CSS selector matches the link the user clicked, the default linker (described in the previous paragraph) will not handle that event and instead defer to your function. Your function is passed two arguments: the event object (see [the MooTools documentation for its properties and methods](http://mootools.net/docs/core/Native/Event)) and the element that was clicked (see [the MooTools documentation for Elements](http://mootools.net/docs/core/Element/Element)). With these two references you can define any behavior you like. Be sure to cancel the default behavior of the event object (`theClickEvent.preventDefault();`) or else the browser will leave HUE.
 
 Note that when you add such linkers they persist. You shouldn't add them more than once (e.g. don't add them in the `onLoad` event). Typically they are added in the initialize method of your class.
 
 ###### JFrame: Filters
 
-If renderers are at the beginning of the handling of HTML responses, and linkers are kind of at the end (in that they typically handle the user clicking to load new content, though not always), filters are kind of in the middle. Filters snoop through the content of the response and look for patterns in the HTML that match their requirements. The sortable table example from the "Adding Interactive Elements to Your UI" section is a great example of this. Let's look at another one to see how these work. Here's the JFrame filter from the Hue SDK for a tabbed UI. To illustrate this, I'll provide the HTML, JavaScript, and a screenshot of what it looks like; here's the screenshot:
+If renderers are at the beginning of the handling of HTML responses, and linkers are kind of at the end (in that they typically handle the user clicking to load new content, though not always), filters are kind of in the middle. Filters snoop through the content of the response and look for patterns in the HTML that match their requirements. The sortable table example from the "Adding Interactive Elements to Your UI" section is a great example of this. Let's look at another one to see how these work. Here's the JFrame filter from the HUE SDK for a tabbed UI. To illustrate this, I'll provide the HTML, JavaScript, and a screenshot of what it looks like; here's the screenshot:
 
 ![Tabs](tabs.png)
 
@@ -1299,7 +1299,7 @@ There are a few interesting things going on here. Let's walk through the JavaScr
 	  tabs: function(container) {
 
 Here we're adding a global filter that affects all JFrames. You should probably only add filters to your own application(s) (many of our own applications add their own locally in the same manner). The SDK adds some global ones for all applications. The name isn't really that important; it's mostly used for providing useful debugging when there's an error (so we can log which filter failed).
-		
+
 		if (!container.get('html').test('ccs-tab_ui')) return;
 
 In the code above we check to see if our HTML contains a string match. We could try and select any elements that match the selector, but this is more expensive. Doing a quick string check allows us to exit quickly if there is no match.
@@ -1311,7 +1311,7 @@ In this next section we find the containers of each of the tab components, loop 
 			var sections = tabGroup.getElements('.ccs-tab_sections>li');
 
 If the tabs and the sections they are supposed to show don't match in count, something is probably wrong. We throw a warning to the console (via the [dbug](http://www.clientcide.com/docs/Core/dbug) wrapper). This won't show up to the user, but if we enable the debugger, we'll see the complaint. In this case, our HTML should degrade; the UI may look ugly, but all the HTML will be visible.
-			
+
 			if (tabs.length != sections.length) {
 				dbug.warn('warning; sections and sections are not of equal number. tabs: %o, sections: %o', tabs, sections);
 				return;
@@ -1326,7 +1326,7 @@ We create an instance of our JavaScript class that handles tabs - [TabSwapper](h
 				smoothSize: true
 			});
 
-The last thing we do (and this isn't a requirement) is store a reference to the instance of the `TabSwapper` on the wrapper element. 
+The last thing we do (and this isn't a requirement) is store a reference to the instance of the `TabSwapper` on the wrapper element.
 
 			tabGroup.store('TabSwapper', ts);
 		}, this);
@@ -1337,9 +1337,9 @@ Now whenever our JFrame receives an HTML response it will grep the response and,
 
 ##### Keyboard Shortcuts
 
-Declaring keyboard shortcuts for your application is fairly easy, though it is possible to come up with complexities of course. First, you'll want to review the documentation for [Keyboard](http://mootools.net/docs/more/Interface/Keyboard) and [Keyboard.Extras](http://mootools.net/docs/more/Interface/Keyboard.Extras). In general, you'll want to define hot-keys with the `addShortcut` method which allows you to add metadata like a description and a custom string for the keys to press. This is added to the list of shortcuts when the user clicks the "shortcuts" button in the Desktop (or uses the hot-key to show them - *ctrl+?*). Note that your hot-keys are only in effect when your application is in focus.
+Declaring keyboard shortcuts for your application is fairly easy, though it is possible to come up with complexities of course. First, you'll want to review the documentation for [Keyboard](http://mootools.net/docs/more/Interface/Keyboard) and [Keyboard.Extras](http://mootools.net/docs/more/Interface/Keyboard.Extras). In general, you'll want to define hot-keys with the `addShortcut` method which allows you to add metadata like a description and a custom string for the keys to press. This is added to the list of shortcuts when the user clicks the "shortcuts" button in HUE (or uses the hot-key to show them - *ctrl+?*). Note that your hot-keys are only in effect when your application is in focus.
 
-Here's a quick example of a hot-key in Hue - in this case, from the File Browser:
+Here's a quick example of a hot-key in HUE - in this case, from the File Browser:
 
 	this.jframe.addShortcuts({
 		'Open Selected': {
@@ -1366,7 +1366,7 @@ You can add as many as you like, but be cautious of how certain keys can affect 
 
 ##### Growl-like Notifications
 
-Hue provides a simple way for you to display temporary messages to the viewer. You simply invoke the following JavaScript:
+HUE provides a simple way for you to display temporary messages to the viewer. You simply invoke the following JavaScript:
 
 	CCS.Desktop.flashMessage(messages, duration);
 
@@ -1384,12 +1384,12 @@ When you write functionality for your application there are times where you may 
 	var Calculator = new Class({
 
 		//...excluding some lines from our earlier example
-	
+
 		initialize: function(path, options) {
 			this.parent(path || '/calculator/', options);
 			this.addEvent('load', this.setup.bind(this));
 		},
-	
+
 		setup: function(view) {
 			if (view == 'gallery') {
 				//$(this.jframe) gives us a pointer to the content area of the window
@@ -1399,7 +1399,7 @@ When you write functionality for your application there are times where you may 
 				});
 			}
 		},
-	
+
 		etc.
 
 Ok, you've now added this event, but there are two problems. First, we're going to add this event every time the page loads, which means that we'll end up showing many alerts when the user right clicks (one for every time the page loaded). The second issue is that this event will be attached when the user visits a gallery page, but will stay in effect on non-gallery pages. We need some way to clean up this reference.
@@ -1447,9 +1447,9 @@ into your code.	 If you want to inspect variables, you can simply insert `raise 
 URL of the view you're interested in, activating the Werkzeug debugger.
 * Django tends to restart its server whenever it notices a file changes.	For certain
 things (like configuration changes), this is not sufficient.	Restart the server whole-heartedly.
-* If you find yourself writing a lot of JavaScript, you'll want to disable the JavaScript caching that the server does. At startup Hue reads all your dependencies and JS files into memory to make things faster. You can disable this by executing the runserver_plus command with an environment variable set. Desktop will be a little slower, but your JS will always represent what's on the disk. Here's what that looks like:
+* If you find yourself writing a lot of JavaScript, you'll want to disable the JavaScript caching that the server does. At startup HUE reads all your dependencies and JS files into memory to make things faster. You can disable this by executing the runserver_plus command with an environment variable set. HUE will be a little slower, but your JS will always represent what's on the disk. Here's what that looks like:
 
-		`$ DESKTOP_DEPENDER_DEBUG=1 build/env/bin/desktop runserver_plus`
+		`$ DESKTOP_DEPENDER_DEBUG=1 build/env/bin/hue runserver_plus`
 
 * We highly recommend developing with the [Firebug](http://getfirebug.com) debugging plugin for Firefox. With it enabled, you can use a utility called [dbug](http://www.clientcide.com/docs/Core/dbug) which wraps Firebug commands. This allows you to leave debug statements in your code and display them on demand. In particular, typing in `dbug.cookie()` in Firebug will set a cookie in your browser that will turn these statements on until you type that command again to toggle them off. You'll see some of our own debugging statements and you can add your own. In the future, entering this state may also provide access to additional debugging features.
 

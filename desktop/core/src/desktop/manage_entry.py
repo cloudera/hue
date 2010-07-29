@@ -17,12 +17,23 @@
 
 import logging
 import os
+import os.path
 import sys
 import traceback
 
 LOG = logging.getLogger(__name__)
 
+def _deprecation_check(arg0):
+  """HUE-71. Deprecate build/env/bin/desktop"""
+  if os.path.basename(arg0) == 'desktop':
+    to_use = os.path.join(os.path.dirname(arg0), 'hue')
+    msg = "Warning: '%s' has been deprecated. Please use '%s' instead." % (arg0, to_use)
+    print >> sys.stderr, msg
+    LOG.warn(msg)
+
 def entry():
+  _deprecation_check(sys.argv[0])
+
   from django.core.management import execute_manager, find_commands, find_management_module
   from django.core.management import LaxOptionParser
   from django.core.management.base import BaseCommand

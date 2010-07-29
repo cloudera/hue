@@ -19,7 +19,7 @@ set -e
 set -x
 
 BINDIR=$(dirname $0)
-desktop_root=$PWD
+HUE_ROOT=$PWD
 
 export REPO_TRACE=1
 
@@ -44,7 +44,7 @@ if python -V 2>&1 | grep -q -v 2.4; then
   build/env/bin/easy_install \
     -f http://archive.cloudera.com/desktop-sdk-python-packages/ \
     -H pypi.python.org,archive.cloudera.com pylint
-  build/env/bin/desktop runpylint all -- -f parseable > PYLINT.txt
+  build/env/bin/hue runpylint all -- -f parseable > PYLINT.txt
 fi
 
 rm -f JAVASCRIPTLINT.txt
@@ -56,7 +56,7 @@ done;
 if [ "$1" == "slow" ]; then
   make test-slow
 elif [ "$1" == "windmill" ]; then
-  xvfb-run -a -s '-screen 0 1024x768x16' tools/scripts/hudson_windmill_in_X.sh
+  xvfb-run -a -s '-screen 0 1024x768x16' tools/hudson/hudson_windmill_in_X.sh
 else
   make test docs
 fi

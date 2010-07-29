@@ -38,7 +38,7 @@ def _get_pth_filename():
   res = glob.glob(glob_path)
   if len(res) == 0:
     raise SystemError("Cannot find a Python installation in %s. "
-                      "Did you do `make desktop'?" % (glob_path,))
+                      "Did you do `make hue'?" % (glob_path,))
   elif len(res) > 1:
     raise SystemError("Found multiple Python installations in %s. "
                       "Please `make clean' first." % (glob_path,))

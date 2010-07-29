@@ -257,12 +257,12 @@ distclean: clean
 # Misc (some used by automated test scripts)
 ###############################################
 test:
-	DESKTOP_DEBUG=1 $(BLD_DIR_BIN)/desktop test fast --with-xunit
+	DESKTOP_DEBUG=1 $(BLD_DIR_BIN)/hue test fast --with-xunit
 
 test-slow:
-	DESKTOP_DEBUG=1 $(BLD_DIR_BIN)/desktop test all --with-xunit --with-cover
+	DESKTOP_DEBUG=1 $(BLD_DIR_BIN)/hue test all --with-xunit --with-cover
 	$(BLD_DIR_BIN)/coverage xml
 
 start-dev:
-	DESKTOP_DEBUG=1 $(BLD_DIR_BIN)/desktop runserver_plus
+	DESKTOP_DEBUG=1 $(BLD_DIR_BIN)/hue runserver_plus
 # END DEV ONLY >>>>
