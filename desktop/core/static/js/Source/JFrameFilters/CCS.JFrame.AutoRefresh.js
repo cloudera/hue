@@ -43,9 +43,9 @@ CCS.JFrame.addGlobalFilters({
 			}, this);
 			if (!sec) return;
 			var end = new Date().increment('second', sec);
-			var span = container.getElement('span.sec_to_autorefresh');
-			var until, diff;
+			var until, diff, span;
 			var update = function() {
+				span = $(this).getElement('span.sec_to_autorefresh');
 				diff = ((end - new Date()) / Date.units['second']());
 				until = diff.toInt();
 				if (span) span.set('html', until);
