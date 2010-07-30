@@ -34,13 +34,15 @@ ART.SideBySideSelect = new Class({
 		className: 'sideBySideSelect clearfix',
 		deselectedOptions: {
 			properties: {
-				'data-filters': 'HtmlTable'
+				'data-filters': 'HtmlTable',
+				'class':'noKeyboard noSelect'
 			},
 			headers: ['Deselected']
 		},
 		selectedOptions: {
 			properties: {
-				'data-filters': 'HtmlTable'
+				'data-filters': 'HtmlTable',
+				'class':'noKeyboard noSelect'
 			},
 			headers: ['Selected']
 		},
@@ -117,7 +119,8 @@ ART.SideBySideSelect = new Class({
 			e.preventDefault();
 			var trs;
 			if (this._rangeStart) trs = this._rangeStart.getSiblings('tr');
-			else trs = this.deselected.getElements('tbody tr');
+			else if (this._focusedRow) trs = this._focusedRow.getSiblings('tr');
+			else trs = $(this.deselected).getElements('tbody tr');
 			trs.each(function(tr) {
 				this.selectRow(tr, true);
 			}, this);
@@ -127,7 +130,7 @@ ART.SideBySideSelect = new Class({
 		var getCurrentRow = function(){
 			if (this._focusedRow) return this._focusedRow;
 			if (this._rangeStart) return this._rangeStart;
-			else return this.deselected.getElement('tbody tr');
+			else return $(this.deselected).getElement('tbody tr');
 		}.bind(this);
 		//return the sibling rows for a given row
 		var getSiblings = function(row){
@@ -280,8 +283,6 @@ ART.SideBySideSelect = new Class({
 		var name = this._getName(row);
 		if (!where) where = $(this.selected).hasChild(row) ? 'deselected' : 'selected';
 		this[where].push(row);
-		this.selected.updateZebras();
-		this.deselected.updateZebras();
 		this[where + 'Container'].scrollTo(0, 999999);
 		this._options[name].set('selected', where == 'selected');
 		this.fireEvent(where == 'selected' ? 'select' : 'deselect', [name, row]);
@@ -325,10 +326,10 @@ ART.SideBySideSelect = new Class({
 				//get the selected rows
 				if (startSelected) {
 					rows = $(this.selected).getElements('tr');
-					deselected.removeClass('selected');
+					$(this.deselected).getElements('.selected').removeClass('selected');
 				} else {
 					rows = $(this.deselected).getElements('tr');
-					selected.removeClass('selected');
+					$(this.selected).getElements('.selected').removeClass('selected');
 				}
 				var toToggle = [], started;
 				//go through each row in the respective table and find the rows to mark and mark them
