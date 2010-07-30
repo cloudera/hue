@@ -42,11 +42,11 @@ class JarForm(interface.JobSubForm, mixins.DjangoFormBasedEditForm, mixins.Basic
     Form representing a JarSubmission.
     This is a private inner class.
     """
-    jarfile = forms.CharField(max_length=300, 
-      initial="/user/hue/jobsub/examples/hadoop-0.20.1-dev-examples.jar", 
+    jarfile = forms.CharField(max_length=300,
+      initial="/user/hue/jobsub/examples/hadoop-examples.jar",
       help_text="Filename, on the cluster, of jar to launch.")
-    arguments = forms.CharField(max_length=300, 
-      initial="pi 2 1000", 
+    arguments = forms.CharField(max_length=300,
+      initial="pi 2 1000",
       help_text="Arguments to pass to launched jar.")
 
   def render_edit(self):
