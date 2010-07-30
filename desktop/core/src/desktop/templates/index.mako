@@ -68,7 +68,8 @@
     }
     var appName = "Hue";
     Depender.require({
-      scripts: ["CCS.Request", "CCS.User", "CCS.Desktop", "CCS.Desktop.Config", "CCS.Desktop.FlashMessage", "CCS.Desktop.Keys", "CCS.Login", "StickyWin.PointyTip", "Element.Delegation", "Fx.Tween", "Fx.Elements"],
+      scripts: ["CCS.Request", "CCS.User", "CCS.Desktop", "CCS.Desktop.Config", "CCS.Desktop.FlashMessage", 
+        "CCS.Desktop.Keys", "CCS.Login", "StickyWin.PointyTip", "Element.Delegation", "Fx.Tween", "Fx.Elements"],
       callback: function(){
         //before fading in the screen, resize the background to match the window size
         sizer();
@@ -82,7 +83,6 @@
           duration: 500
         }).start(styles);
         $(document.body).addEvent('click:relay(img.desktop-logo)', rotateBG);
-        rotateBG.periodical(300000); //rotate the background every 5 min
         
         Clientcide.setAssetLocation("/static/js/ThirdParty/clientcide/Assets");
         var growled = {};
