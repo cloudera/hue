@@ -62,7 +62,7 @@ class ExceptionMiddleware(object):
   """
   def process_exception(self, request, exception):
     import traceback
-    logging.info("Processing exception: %s: %s" % (str(exception), traceback.format_exc()))
+    logging.info("Processing exception: %s: %s" % (exception, traceback.format_exc()))
 
     if hasattr(exception, "response"):
       return exception.response(request)
@@ -79,7 +79,7 @@ class ExceptionMiddleware(object):
     # need to do some kind of nicer handling than the built-in page
     # Note that exception may actually be an Http404 or similar.
     if request.ajax:
-      err = "An error occurred: " + str(exception)
+      err = "An error occurred: %s" % (exception,)
       logging.exception("Middleware caught an exception")
       return PopupException(err, detail=None).response(request)
 

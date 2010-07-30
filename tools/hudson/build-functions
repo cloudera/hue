@@ -27,7 +27,7 @@ if [ -z "$CDH_URL" ] ; then
       CDH_URL="http://archive.cloudera.com/cdh/2/hadoop-0.20.1+169.68.tar.gz"
       ;;
     3)
-      CDH_URL="http://archive.cloudera.com/cdh/3/hadoop-0.20.2+228.tar.gz"
+      CDH_URL="http://archive.cloudera.com/cdh/3/hadoop-0.20.2+320.tar.gz"
       ;;
   esac
 fi

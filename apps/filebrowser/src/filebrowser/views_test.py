@@ -174,10 +174,10 @@ def test_view_i18n():
     assert_equal("http://testserver/filebrowser/view/user/test", response["location"])
   finally:
     try:
-      cluster.fs.rmtree('/user/test')
       cluster.fs.rmtree('/test-filebrowser/')
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+      cluster.fs.rmtree('/user/test')
+    except Exception, ex:
+      LOG.error('Failed to cleanup test directory: %s' % (ex,))
     cluster.shutdown()
 
 
@@ -204,8 +204,8 @@ def view_helper(cluster, encoding, content):
   finally:
     try:
       cluster.fs.remove(filename)
-    except:
-      pass
+    except Exception, ex:
+      LOG.error('Failed to cleanup %s: %s' % (filename, ex))
 
 
 @attr('requires_hadoop')
@@ -238,8 +238,8 @@ def test_edit_i18n():
   finally:
     try:
       cluster.fs.rmtree('/test-filebrowser/')
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    except Exception, ex:
+      LOG.error('Failed to remove tree /test-filebrowser: %s' % (ex,))
     cluster.shutdown()
 
 
@@ -293,5 +293,5 @@ def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
   finally:
     try:
       cluster.fs.remove(filename)
-    except:
-      pass
+    except Exception, ex:
+      LOG.error('Failed to remove %s: %s' % (filename, ex))

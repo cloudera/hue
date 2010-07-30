@@ -32,7 +32,7 @@ from thrift.transport import TSocket
 from thrift.protocol import TBinaryProtocol
 
 from django.utils.encoding import smart_str, force_unicode
-from desktop.lib import thrift_util
+from desktop.lib import thrift_util, i18n
 from hadoop.api.hdfs import Namenode, Datanode
 from hadoop.api.hdfs.constants import QUOTA_DONT_SET, QUOTA_RESET
 from hadoop.api.common.ttypes import RequestContext, IOException
@@ -119,6 +119,8 @@ class HadoopFileSystem(object):
       try:
         return function(*args, **kwargs)
       except IOException, e:
+        e.msg = force_unicode(e.msg, errors='replace')
+        e.stack = force_unicode(e.stack, errors='replace')
         LOG.exception("Exception in Hadoop FS call " + function.__name__)
         if e.clazz == HADOOP_ACCESSCONTROLEXCEPTION:
           raise PermissionDeniedException(e.msg, e)
@@ -676,7 +678,8 @@ class FileUpload(object):
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
-           close_fds=True,
+                                   close_fds=True,
+                                   env=i18n.make_utf8_env(),
                                    bufsize=WRITE_BUFFER_SIZE)
   @require_open
   def write(self, data):

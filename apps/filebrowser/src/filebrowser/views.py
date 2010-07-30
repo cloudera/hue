@@ -137,7 +137,7 @@ def edit(request, path, form=None):
     raise PopupException("File too big to edit: %s" % (path,))
 
   if not form:
-    encoding = request.REQUEST.get('encoding', i18n.get_site_encoding())
+    encoding = request.REQUEST.get('encoding') or i18n.get_site_encoding()
     if stats:
       f = request.fs.open(path)
       try:
@@ -360,7 +360,7 @@ def display(request, path):
     raise PopupException("Not a file: '%s'" % (path,))
 
   stats = request.fs.stats(path)
-  encoding = request.GET.get('encoding', i18n.get_site_encoding())
+  encoding = request.GET.get('encoding') or i18n.get_site_encoding()
 
   # I'm mixing URL-based parameters and traditional
   # HTTP GET parameters, since URL-based parameters

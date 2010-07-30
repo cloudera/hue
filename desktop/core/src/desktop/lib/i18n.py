@@ -20,11 +20,16 @@ Library methods to deal with non-ascii data
 """
 
 import codecs
-import desktop.conf
 import logging
+import os
+import re
+
+import desktop.conf
 
 SITE_ENCODING = None
 REPLACEMENT_CHAR = u'\ufffd'
+DEFAULT_LANG = 'en_US.UTF-8'
+
 
 def get_site_encoding():
   """Get the default site encoding"""
@@ -47,3 +52,27 @@ def validate_encoding(encoding):
     return True
   except LookupError:
     return False
+
+
+_CACHED_ENV = None
+
+def make_utf8_env():
+  """
+  Communication with child processes is in utf8. Make a utf8 environment.
+  """
+  global _CACHED_ENV
+  if not _CACHED_ENV:
+    # LANG are in the form of <language>[.<encoding>[@<modifier>]]
+    # We want to replace the "encoding" part with UTF-8
+    lang_re = re.compile('\.([^@]*)')
+
+    env = os.environ.copy()
+    lang = env.get('LANG', DEFAULT_LANG)
+    if lang_re.search(lang):
+      lang = lang_re.sub('.UTF-8', lang)
+    else:
+      lang = DEFAULT_LANG
+
+    env['LANG'] = lang
+    _CACHED_ENV = env
+  return _CACHED_ENV

@@ -18,6 +18,7 @@
 from django import forms
 from django.forms import FileField, CharField, BooleanField, Textarea
 
+from desktop.lib import i18n
 from filebrowser.lib import rwx
 from hadoop.fs import normpath
 from django.contrib.auth.models import User, Group
@@ -38,6 +39,12 @@ class EditorForm(forms.Form):
   path = PathField(label="File to edit")
   contents = CharField(widget=Textarea, label="Contents", required=False)
   encoding = CharField(label='Encoding', required=False)
+
+  def clean_encoding(self):
+    encoding = self.cleaned_data.get('encoding', '').strip()
+    if not encoding:
+      return i18n.get_site_encoding()
+    return encoding
 
 class RenameForm(forms.Form):
   op = "rename"

@@ -20,12 +20,15 @@ Tests for Hadoop FS.
 """
 from nose.tools import assert_false, assert_true, assert_equals, assert_raises
 from nose.plugins.attrib import attr
+import logging
 import posixfile
 import random
 
 from hadoop import mini_cluster
 from hadoop.fs.exceptions import PermissionDeniedException
 from hadoop.fs.hadoopfs import HadoopFileSystem
+
+LOG = logging.getLogger(__name__)
 
 @attr('requires_hadoop')
 def test_hadoopfs():
@@ -308,11 +311,11 @@ def test_i18n_namespace():
   try:
     # Create a directory
     cluster.fs.mkdir(dir_path)
-    # Create a file (same name) in the directory
-    cluster.fs.open(file_path, 'w').close()
-
     # Directory is there
     check_existence(name, prefix)
+
+    # Create a file (same name) in the directory
+    cluster.fs.open(file_path, 'w').close()
     # File is there
     check_existence(name, dir_path)
 
@@ -329,9 +332,15 @@ def test_i18n_namespace():
     # Test rmtree
     cluster.fs.rmtree(dir_path)
     check_existence(name, prefix, present=False)
+
+    # Test exception can handle non-ascii characters
+    try:
+      cluster.fs.rmtree(dir_path)
+    except IOError, ex:
+      LOG.info('Successfully caught error: %s' % (ex,))
   finally:
     try:
       cluster.fs.rmtree(prefix)
-    except:
-      pass
+    except Exception, ex:
+      LOG.error('Failed to cleanup %s: %s' % (prefix, ex))
     cluster.shutdown()
