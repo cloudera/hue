@@ -27,8 +27,8 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
 <div id="my_queries" class="view">
   <div data-filters="Tabs">
     <ul class="toolbar bw-my_queries_tabs tabs clearfix">
-      <li><span>Recent Saved Queries</span></li>
-      <li><span>Recent Run Queries</span></li>
+      <li><span>Recently Saved Queries</span></li>
+      <li><span>Recently Run Queries</span></li>
     </ul>
 
     <ul class="tab_sections ccs-clear">
