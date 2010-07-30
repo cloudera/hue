@@ -440,10 +440,10 @@ CCS.JFrame = new Class({
 		force - (*boolean*) forces the behavior to reapply, even if it has already been applied; defaults to *false*.
 	*/
 	applyBehavior: function(name, element, force){
-		var behavior = this.behavior.lookup(name);
+		var behavior = this.behavior.getBehavior(name);
 		this.behavior.applyBehavior(element, behavior, force);
 	},
-	
+
 	//Applies all the behavior filters for an element.
 	//element - (element) an element to apply the filters registered with this Behavior instance to.
 	//force - (boolean; optional) passed through to applyBehavior (see it for docs)
@@ -479,12 +479,12 @@ CCS.JFrame = new Class({
 	*/
 	applyFilter: function(name, container, content){
 		dbug.conditional(this.filters[name].bind(this, [container, content]), function(e) {
-			dbug.log('filter failed, name %s, error: ', name, e);
+			dbug.error('filter failed, name %s, error: ', name, e);
 		});
 	},
 
 	marked: [],
-	
+
 	/*
 		marks a function to execute when the jFrame is unloaded (before new content is loaded)
 		fn - (*function*) the function to mark. Executed only once.
@@ -536,7 +536,7 @@ CCS.JFrame = new Class({
 
 	invokeLinker: function(selector, element, event){
 		dbug.conditional(this.linkers[selector].bind(this, [event, element]), function(e) {
-			dbug.log('linker failed, selector %s, error: ', selector, e);
+			dbug.error('linker failed, selector %s, error: ', selector, e);
 		});
 	},
 
@@ -752,7 +752,7 @@ CCS.JFrame = new Class({
 	_sweep: function(target){
 		this.marked.each(function(fn) {
 			dbug.conditional(fn.bind(this), function(e) {
-				dbug.log('sweeper failed, error: ', e);
+				dbug.error('sweeper failed, error: ', e);
 			});
 		});
 		this.marked.empty();
@@ -789,16 +789,12 @@ CCS.JFrame = new Class({
 			dbug.conditional(function(){
 				rendered = renderer.call(this, content, options);
 			}.bind(this), function(e) {
-				dbug.log('renderer failed: name %s, error: ', e);
+				dbug.error('renderer failed: name %s, error: ', e);
 			});
 			return rendered;
 		}, this);
 		//if no renderers returned true, then call the default one
-		if (!rendered) {
-			dbug.conditional(this._defaultRenderer.bind(this, [content, options]), function(e){
-				dbug.log('default renderer failed, error: ', e);
-			});
-		}
+		if (!rendered) this._defaultRenderer(content, options);
 		this.fireEvent('afterRenderer', [content, options]);
 	},
 
