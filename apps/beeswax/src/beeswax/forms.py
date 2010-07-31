@@ -38,7 +38,7 @@ def query_form():
 
 class SaveForm(forms.Form):
   """Used for saving query design and report design."""
-  name = forms.CharField(required=True,
+  name = forms.CharField(required=False,
                         max_length=64,
                         initial=models.SavedQuery.DEFAULT_NEW_DESIGN_NAME,
                         help_text='Change the name to save as a new design')
