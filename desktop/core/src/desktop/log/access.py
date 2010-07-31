@@ -52,8 +52,11 @@ recent_access_map = { }
 _recent_access_map_lk = threading.Lock()
 _per_user_lk = { }      # Indexed by username
 
-# Store the IP address of users
+# Store a map of usernames and their IP addresses
 remote_ip_map = { }
+
+# Store a map of usernames and last access times
+recent_access_time_map = { }
 
 # Max number of records per user per view to keep
 _USER_ACCESS_HISTORY_SIZE = desktop.conf.USER_ACCESS_HISTORY_SIZE.get()
@@ -100,8 +103,9 @@ class AccessInfo(dict):
         app_dict = { }
         _per_user_lk[user] = threading.Lock()
         recent_access_map[user] = app_dict
-        # Update the IP address of the user
+        # Update the IP address and last access time of the user
         remote_ip_map[user] = self['remote_ip']
+        recent_access_time_map[user] = self['time']
       finally:
         _recent_access_map_lk.release()
 
@@ -138,7 +142,6 @@ def log_page_hit(request, view_func, level=None):
     level = logging.INFO
   ai = AccessInfo(request)
   ai.log(level)
-  ai['remote_ip'] = request.META.get('REMOTE_ADDR', '-')
   # Find the app
   app_re_match = _MODULE_RE.match(view_func.__module__)
   app = app_re_match and app_re_match.group(0) or '-'

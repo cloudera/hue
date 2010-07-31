@@ -52,13 +52,13 @@ E.g.
   build/env/bin/hue test specific useradmin.tests:test_user_admin
 
 Start up pdb on test failures:
-  build/env/bin/hue test <args> --pdb --pdb-failure
+  build/env/bin/hue test <args> --pdb --pdb-failure -s
 
 
 Special environment variables
 =============================
 
-DESKTOP_LOG_LEVEL=<level>
+DESKTOP_LOGLEVEL=<level>
   level can be DEBUG, INFO, WARN, ERROR, or CRITICAL
 
   When specified, the console logger is set to the given log level. A console

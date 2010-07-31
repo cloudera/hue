@@ -28,8 +28,7 @@ from django.http import HttpResponseRedirect
 from desktop.auth.backend import AllowFirstUserDjangoBackend
 from desktop.lib.django_util import render_json, render
 from desktop.lib.django_util import login_notrequired
-from desktop.log.access import access_warn, recent_access_map, remote_ip_map
-from userman.models import UserProfile
+from desktop.log.access import access_warn, remote_ip_map, recent_access_time_map
 
 LOG = logging.getLogger(__name__)
 
@@ -63,16 +62,19 @@ def login_form(request):
 
 
 def get_current_users():
-  """Return current users by inspecting sessions"""
-  _current_users = { }
+  """Return dictionary of User objects and
+  a dictionary of the user's IP address and last access time"""
+  current_users = { }
   for session in Session.objects.all():
-    uid = session.get_decoded().get('_auth_user_id')
-    if uid != None:
-      userobj = User.objects.get(pk=uid)
-      profile = UserProfile.objects.get(user=userobj)
-      _current_users[userobj] = remote_ip_map.get(userobj.username, { })
+    uid = session.get_decoded().get(django.contrib.auth.SESSION_KEY)
+    if uid is not None:
+      try:
+        userobj = User.objects.get(pk=uid)
+      except User.DoesNotExist:
+        LOG.debug("User with id=%d does not exist" % uid)
+      current_users[userobj] = {'ip':remote_ip_map.get(userobj.username, ''), 'time':recent_access_time_map.get(userobj.username, '')}
 
-  return _current_users
+  return current_users
 
 
 @login_notrequired
