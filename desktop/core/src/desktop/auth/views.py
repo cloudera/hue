@@ -22,18 +22,16 @@ import django.contrib.auth.views
 
 from django.core import urlresolvers
 from django.contrib.auth import authenticate, login, get_backends
+from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from desktop.auth.backend import AllowFirstUserDjangoBackend
 from desktop.lib.django_util import render_json, render
 from desktop.lib.django_util import login_notrequired
-from desktop.log.access import access_warn, AccessInfo
+from desktop.log.access import access_warn, recent_access_map, remote_ip_map
+from userman.models import UserProfile
 
 LOG = logging.getLogger(__name__)
-
-# The users who are currently logged in.
-# This is a User -> AccessInfo map
-_current_users = { }
-_current_users_lk = threading.Lock()
 
 
 @login_notrequired
@@ -44,8 +42,6 @@ def login_ajax(request):
   if user:
     access_warn(request, '"%s" login ok' % (user.username,))
     login(request, user)
-    _add_to_current_users(user, AccessInfo(request))
-
     return render_json(dict(success=True))
   else:
     access_warn(request, 'Failed login for user "%s"' % (username,))
@@ -67,15 +63,16 @@ def login_form(request):
 
 
 def get_current_users():
-  """Return a copy of the User -> AccessInfo map"""
-  return _current_users.copy()
+  """Return current users by inspecting sessions"""
+  _current_users = { }
+  for session in Session.objects.all():
+    uid = session.get_decoded().get('_auth_user_id')
+    if uid != None:
+      userobj = User.objects.get(pk=uid)
+      profile = UserProfile.objects.get(user=userobj)
+      _current_users[userobj] = remote_ip_map.get(userobj.username, { })
 
-def _add_to_current_users(user, access_info):
-  _current_users_lk.acquire()
-  try:
-    _current_users[user] = access_info
-  finally:
-    _current_users_lk.release()
+  return _current_users
 
 
 @login_notrequired
@@ -89,7 +86,6 @@ def dt_login(request):
       if request.session.test_cookie_worked():
         request.session.delete_test_cookie()
       access_warn(request, '"%s" login ok' % (request.user.username,))
-      _add_to_current_users(request.user, AccessInfo(request))
       return HttpResponseRedirect(redirect_to)
     else:
       access_warn(request, 'Failed login for user "%s"' % (request.POST.get('username'),))
@@ -104,15 +100,7 @@ def dt_login(request):
 
 
 def dt_logout(request, next_page=None):
-  """Wrapper that performs logout house-keeping"""
-  _current_users_lk.acquire()
-  try:
-    try:
-      del _current_users[request.user]
-    except KeyError:
-      LOG.warn('Logging out user "%s", who has no record of logging in' % (request.user.username,))
-  finally:
-    _current_users_lk.release()
+  """Log out the user"""
   return django.contrib.auth.views.logout(request, next_page)
 
 
