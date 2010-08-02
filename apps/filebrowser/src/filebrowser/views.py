@@ -26,6 +26,7 @@ import posixpath
 import stat as stat_module
 import urllib
 import os
+import simplejson
 
 from django.core import urlresolvers
 from django.http import Http404, HttpResponse, HttpResponseNotModified
@@ -613,7 +614,7 @@ def upload_flash(request):
     else:
       raise Exception("Unknown error")
   except Exception, e:
-    return HttpResponse(simplejson.dumps(dict(error=str(e))),
+    return HttpResponse(simplejson.dumps(dict(error=unicode(e))),
                         content_type="application/json")
 
 def upload(request):
