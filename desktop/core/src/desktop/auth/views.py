@@ -28,7 +28,7 @@ from django.http import HttpResponseRedirect
 from desktop.auth.backend import AllowFirstUserDjangoBackend
 from desktop.lib.django_util import render_json, render
 from desktop.lib.django_util import login_notrequired
-from desktop.log.access import access_warn, remote_ip_map, recent_access_time_map
+from desktop.log.access import access_warn, last_access_map
 
 LOG = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ def get_current_users():
         userobj = User.objects.get(pk=uid)
       except User.DoesNotExist:
         LOG.debug("User with id=%d does not exist" % uid)
-      current_users[userobj] = {'ip':remote_ip_map.get(userobj.username, ''), 'time':recent_access_time_map.get(userobj.username, '')}
+      current_users[userobj] = last_access_map.get(userobj.username, { })
 
   return current_users
 

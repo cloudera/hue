@@ -52,11 +52,9 @@ recent_access_map = { }
 _recent_access_map_lk = threading.Lock()
 _per_user_lk = { }      # Indexed by username
 
-# Store a map of usernames and their IP addresses
-remote_ip_map = { }
-
-# Store a map of usernames and last access times
-recent_access_time_map = { }
+# Store a map of usernames and a dictionary of
+# their IP addresses and last access times
+last_access_map = { }
 
 # Max number of records per user per view to keep
 _USER_ACCESS_HISTORY_SIZE = desktop.conf.USER_ACCESS_HISTORY_SIZE.get()
@@ -104,8 +102,8 @@ class AccessInfo(dict):
         _per_user_lk[user] = threading.Lock()
         recent_access_map[user] = app_dict
         # Update the IP address and last access time of the user
-        remote_ip_map[user] = self['remote_ip']
-        recent_access_time_map[user] = self['time']
+        last_access_map[user] = {'ip':self['remote_ip'],
+                                 'time':self['time']}
       finally:
         _recent_access_map_lk.release()
 
