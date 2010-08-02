@@ -17,7 +17,7 @@
 
 ${wrappers.head()}
     <div id="useradmin_userlist" class="view">
-      <table data-table="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
+      <table data-filters="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
         <thead>
           <tr>
             <th>Username</th>
