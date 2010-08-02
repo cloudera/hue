@@ -27,6 +27,8 @@ from hadoop.api.jobtracker.ttypes import ThriftJobID, ThriftTaskAttemptID, \
     JobTrackerState, JobNotFoundException, ThriftTaskQueryState
 from hadoop.api.common.ttypes import RequestContext
 
+import threading
+
 VALID_TASK_STATES = set(["succeeded", "failed", "running", "pending", "killed"])
 VALID_TASK_TYPES = set(["map", "reduce", "job_cleanup", "job_setup"])
 
@@ -50,7 +52,10 @@ class LiveJobTracker(object):
       timeout_seconds=JT_THRIFT_TIMEOUT)
     self.host = host
     self.thrift_port = thrift_port
-    self.request_context = RequestContext()
+    # We allow a single LiveJobTracker to be used across multiple
+    # threads by restricting the stateful components to a thread
+    # thread-local.
+    self.thread_local = threading.local()
     self.setuser(DEFAULT_USER, DEFAULT_GROUPS)
 
   def thriftjobid_from_string(self, jobid):
@@ -132,25 +137,37 @@ class LiveJobTracker(object):
   def setuser(self, user, groups=None):
     # Hadoop UGI *must* have at least one group, so we mirror
     # the username as a group if not specified
+    self.thread_local.request_context = RequestContext()
     if not groups:
       groups = [user]
-    if not self.request_context.confOptions:
-      self.request_context.confOptions = {}
-    self.ugi = ",".join([user] + groups)
-    self.request_context.confOptions['hadoop.job.ugi'] = self.ugi
+    if not self.thread_local.request_context.confOptions:
+      self.thread_local.request_context.confOptions = {}
+    self.thread_local.ugi = ",".join([user] + groups)
+    self.thread_local.request_context.confOptions['hadoop.job.ugi'] = self.thread_local.ugi
+
+  @property
+  def ugi(self):
+    # Here for backwards-compatibility.
+    return self.thread_local.ugi
+
+  @property
+  def request_context(self):
+    # Here for backwards-compatibility.
+    return self.thread_local.request_context
+
 
   def queues(self):
     """
     Returns a ThriftJobQueueList
     """
-    qs = self.client.getQueues(self.request_context)
+    qs = self.client.getQueues(self.thread_local.request_context)
     return qs
 
   def cluster_status(self):
     """
     Returns a ThriftClusterStatus
     """
-    cs = self.client.getClusterStatus(self.request_context)
+    cs = self.client.getClusterStatus(self.thread_local.request_context)
     fixup_enums(cs, {"state":JobTrackerState})
     return cs
 
@@ -158,13 +175,13 @@ class LiveJobTracker(object):
     """
     Returns a RuntimeInfo
     """
-    return self.client.getRuntimeInfo(self.request_context)
+    return self.client.getRuntimeInfo(self.thread_local.request_context)
 
   def all_task_trackers(self):
     """
     Returns a ThriftTaskTrackerStatusList
     """
-    tts = self.client.getAllTrackers(self.request_context)
+    tts = self.client.getAllTrackers(self.thread_local.request_context)
     for tracker in tts.trackers:
       self._fixup_tasktracker(tracker)
     return tts
@@ -173,7 +190,7 @@ class LiveJobTracker(object):
     """
     Returns a ThriftTaskTrackerStatusList
     """
-    tts = self.client.getActiveTrackers(self.request_context)
+    tts = self.client.getActiveTrackers(self.thread_local.request_context)
     for tracker in tts.trackers:
       self._fixup_tasktracker(tracker)
     return tts
@@ -182,7 +199,7 @@ class LiveJobTracker(object):
     """
     Returns a ThriftTaskTrackerStatusList
     """
-    tts = self.client.getBlacklistedTrackers(self.request_context)
+    tts = self.client.getBlacklistedTrackers(self.thread_local.request_context)
     for tracker in tts.trackers:
       self._fixup_tasktracker(tracker)
     return tts
@@ -191,7 +208,7 @@ class LiveJobTracker(object):
     """
     Returns a ThriftTaskTrackerStatus or None
     """
-    tracker = self.client.getTracker(self.request_context, name)
+    tracker = self.client.getTracker(self.thread_local.request_context, name)
     if not tracker:
       return None
     self._fixup_tasktracker(tracker)
@@ -202,7 +219,7 @@ class LiveJobTracker(object):
     Returns a ThriftJobInProgress (including task info)
     """
     try:
-      job = self.client.getJob(self.request_context, jobid)
+      job = self.client.getJob(self.thread_local.request_context, jobid)
     except JobNotFoundException, e:
       e.response_data = dict(code="JT_JOB_NOT_FOUND", message="Could not find job %s on JobTracker." % jobid.asString, data=jobid)
       raise
@@ -213,7 +230,7 @@ class LiveJobTracker(object):
     """
     Returns a ThriftJobList (does not include task info)
     """
-    joblist = self.client.getRunningJobs(self.request_context)
+    joblist = self.client.getRunningJobs(self.thread_local.request_context)
     for job in joblist.jobs:
       self._fixup_job(job)
     return joblist
@@ -222,7 +239,7 @@ class LiveJobTracker(object):
     """
     Returns a ThriftJobList (does not include task info)
     """
-    joblist = self.client.getCompletedJobs(self.request_context)
+    joblist = self.client.getCompletedJobs(self.thread_local.request_context)
     for job in joblist.jobs:
       self._fixup_job(job)
     return joblist
@@ -231,7 +248,7 @@ class LiveJobTracker(object):
     """
     Returns a ThriftJobList (does not include task info)
     """
-    joblist = self.client.getFailedJobs(self.request_context)
+    joblist = self.client.getFailedJobs(self.thread_local.request_context)
     for job in joblist.jobs:
       self._fixup_job(job)
     return joblist
@@ -249,7 +266,7 @@ class LiveJobTracker(object):
     """
     Returns a ThriftJobList (does not include task info)
     """
-    joblist = self.client.getAllJobs(self.request_context)
+    joblist = self.client.getAllJobs(self.thread_local.request_context)
     for job in joblist.jobs:
       self._fixup_job(job)
     return joblist
@@ -258,19 +275,19 @@ class LiveJobTracker(object):
     """
     Returns a ThriftUserJobCounts.
     """
-    return self.client.getUserJobCounts(self.request_context, user)
+    return self.client.getUserJobCounts(self.thread_local.request_context, user)
 
   def get_job_counters(self, jobid):
     """
     Returns a ThriftGroupList
     """
-    return self.client.getJobCounters(self.request_context, jobid)
+    return self.client.getJobCounters(self.thread_local.request_context, jobid)
 
   def get_job_counter_rollups(self, jobid):
     """
     Returns a ThriftGroupList
     """
-    return self.client.getJobCounterRollups(self.request_context, jobid)
+    return self.client.getJobCounterRollups(self.thread_local.request_context, jobid)
 
 
   def get_task_list(self, jobid, task_types, task_states, task_text, count, offset):
@@ -281,7 +298,7 @@ class LiveJobTracker(object):
     ttask_types = [ ThriftTaskType._NAMES_TO_VALUES[x.upper()] for x in task_types ]
     ttask_states = [ ThriftTaskQueryState._NAMES_TO_VALUES[x.upper()] for x in task_states ]
     tip_list = self.client.getTaskList(
-          self.request_context, jobid, ttask_types, ttask_states, task_text, count, offset)
+          self.thread_local.request_context, jobid, ttask_types, ttask_states, task_text, count, offset)
 
     for tip in tip_list.tasks:
       self._fixup_task_in_progress(tip)
@@ -308,28 +325,28 @@ class LiveJobTracker(object):
     """
     Returns an integer timestamp
     """
-    return self.client.getCurrentTime(self.request_context)
+    return self.client.getCurrentTime(self.thread_local.request_context)
 
   def get_job_xml(self, jobid):
     """
     Returns a string representation of the job XML
     """
-    return self.client.getJobConfXML(self.request_context, jobid)
+    return self.client.getJobConfXML(self.thread_local.request_context, jobid)
 
   def kill_job(self, jobid):
     """
     Kill a job
     """
-    return self.client.killJob(self.request_context, jobid)
+    return self.client.killJob(self.thread_local.request_context, jobid)
 
   def kill_task_attempt(self, attemptid):
     """
     Kill a task attempt
     """
-    return self.client.killTaskAttempt(self.request_context, attemptid)
+    return self.client.killTaskAttempt(self.thread_local.request_context, attemptid)
 
   def set_job_priority(self, jobid, priority):
     """
     Set a job's priority
     """
-    return self.client.setJobPriority(self.request_context, jobid, priority)
+    return self.client.setJobPriority(self.thread_local.request_context, jobid, priority)

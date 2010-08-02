@@ -23,6 +23,7 @@ from nose.plugins.attrib import attr
 import logging
 import posixfile
 import random
+from threading import Thread
 
 from hadoop import mini_cluster
 from hadoop.fs.exceptions import PermissionDeniedException
@@ -343,4 +344,25 @@ def test_i18n_namespace():
       cluster.fs.rmtree(prefix)
     except Exception, ex:
       LOG.error('Failed to cleanup %s: %s' % (prefix, ex))
+    cluster.shutdown()
+
+@attr('requires_hadoop')
+def test_threadedness():
+  # Start a second thread to change the user, and
+  # make sure that isn't reflected.
+  cluster = mini_cluster.shared_cluster()
+  try:
+    fs = cluster.fs
+    fs.setuser("alpha")
+    class T(Thread):
+      def run(self):
+        fs.setuser("beta")
+        assert_equals("beta", fs.user)
+    t = T()
+    t.start()
+    t.join()
+    assert_equals("alpha", fs.user)
+    fs.setuser("gamma")
+    assert_equals("gamma", fs.user)
+  finally:
     cluster.shutdown()

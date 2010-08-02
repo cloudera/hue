@@ -26,6 +26,7 @@ import stat as statconsts
 import subprocess
 import sys
 import urlparse
+import threading
 
 from thrift.transport import TTransport
 from thrift.transport import TSocket
@@ -101,7 +102,10 @@ class HadoopFileSystem(object):
     self.nn_client = thrift_util.get_client(Namenode.Client, host, thrift_port, service_name="HDFS Namenode",
                                             timeout_seconds=NN_THRIFT_TIMEOUT)
 
-    self.request_context = RequestContext()
+    # The file systems are cached globally.  We store
+    # user information in a thread-local variable so that
+    # safety can be preserved there.
+    self.thread_local = threading.local()
     self.setuser(DEFAULT_USER, DEFAULT_GROUPS)
     LOG.debug("Initialized HadoopFS: %s:%d (%s)", host, thrift_port, hadoop_bin_path)
 
@@ -158,14 +162,31 @@ class HadoopFileSystem(object):
   def setuser(self, user, groups=None):
     # Hadoop UGI *must* have at least one group, so we mirror
     # the username as a group if not specified
+    self.thread_local.request_context = RequestContext()
     if not groups:
       groups = [user]
     if not self.request_context.confOptions:
       self.request_context.confOptions = {}
-    self.ugi = ",".join([user] + groups)
-    self.request_context.confOptions['hadoop.job.ugi'] = self.ugi
-    self.user = user
-    self.groups = groups
+    self.thread_local.ugi = ",".join([user] + groups)
+    self.thread_local.request_context.confOptions['hadoop.job.ugi'] = self.thread_local.ugi
+    self.thread_local.user = user
+    self.thread_local.groups = groups
+
+  @property
+  def user(self):
+    return self.thread_local.user
+
+  @property
+  def groups(self):
+    return self.thread_local.groups
+
+  @property
+  def request_context(self):
+    return self.thread_local.request_context
+
+  @property
+  def ugi(self):
+    return self.thread_local.ugi
 
   @_coerce_exceptions
   def open(self, path, mode="r", *args, **kwargs):

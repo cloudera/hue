@@ -244,3 +244,14 @@ def log_frontend_event(request):
     get("message", "")[:_MAX_LOG_FRONTEND_EVENT_LENGTH])
   _LOG_FRONTEND_LOGGER.log(level, msg)
   return HttpResponse("")
+
+def who_am_i(request):
+  """
+  Returns username and FS username, and optionally sleeps.
+  """
+  try:
+    sleep = float(request.REQUEST.get("sleep") or 0.0)
+  except ValueError:
+    sleep = 0.0
+  time.sleep(sleep)
+  return HttpResponse(request.user.username + "\t" + request.fs.user + "\n")

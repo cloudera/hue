@@ -60,6 +60,7 @@ dynamic_patterns = patterns('',
   (r'^admin/', include(admin.site.urls)),
   (r'^depender/', include(depender.urls)),
   (r'^debug/threads$', 'desktop.views.threads'),
+  (r'^debug/who_am_i$', 'desktop.views.who_am_i'),
   (r'^log_frontend_event$', 'desktop.views.log_frontend_event'),
   # Top level web page!
   (r'^$', 'desktop.views.index'),
