@@ -39,9 +39,9 @@ CCS.JFrame.addGlobalFilters({
 //this runs AFTER Behavior.FormRequest
 Behavior.addGlobalPlugin('FormRequest', 'JFrameFormRequest', function(element, methods){
 	//get the Form.Request instance
-	var req = element.get('formRequest');
+	var formRequest = element.get('formRequest');
 	//tell it not to update anything
-	req.update = null;
+	formRequest.request.options.update = null;
 	//configure its request to use JFrame's response handler
-	methods.configureRequest(req.request);
+	methods.configureRequest(formRequest.request);
 });

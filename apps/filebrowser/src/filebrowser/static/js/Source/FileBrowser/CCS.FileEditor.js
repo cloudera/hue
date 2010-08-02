@@ -49,11 +49,13 @@ CCS.FileEditor = new Class({
 		this.jframe.addFilters({
 			'fe-resizer': function (container) {
 				this.textarea = $(this.jframe).getElement('textarea');
+				if (!this.textarea) return;
 				this.divResize = $(this.jframe).getElement('.fe-divResize');
 				this.resizeTextarea(this.contentSize.x, this.contentSize.y);
 			}.bind(this),
 			'fe-posteditor': function (container) {
 				this.textarea = $(this.jframe).getElement('textarea');
+				if (!this.textarea) return;
 				var postEditor = new CCS.PostEditor.Simple(this.textarea);
 			}.bind(this)
 		});
@@ -67,9 +69,10 @@ CCS.FileEditor = new Class({
 				CCS.saveFile(this, file, pathNoFile, "Save As", function(data) {
 					var form = saveAs.getElement("form");
 					this.jframe.applyFilter('formRequest', saveAs);
+					this.jframe.applyBehavior('FormRequest', form);
 					var request = form.retrieve('form.request');
 					saveAs.getElement('input[name=path]').set('value', data.path);
-					request.send(); 
+					request.send();
 				}.bind(this), {
 						filesystem: this.options.filesystem,
 						filter: 'dir'
@@ -82,6 +85,7 @@ CCS.FileEditor = new Class({
 				var toolbar = content.elements.filter('div.toolbar')[0];
 				if (!toolbar) return;
 				var buttons = toolbar.getElement('.fe-buttons');
+				if (!buttons) return;
 				['saveAs', 'save'].each(function(button) {
 					var link = new Element("a", {
 						'class': 'fe-' + button + 'Button',

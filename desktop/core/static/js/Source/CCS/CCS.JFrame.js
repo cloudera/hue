@@ -784,15 +784,15 @@ CCS.JFrame = new Class({
 		var rendered;
 		this.fireEvent('beforeRenderer', [content, options]);
 		//loop through all the renderers
-		$H(this._renderers).some(function(renderer, name){
-			//except the default one
+		for (name in this._renderers) {
+			var renderer = this._renderers[name];
 			dbug.conditional(function(){
 				rendered = renderer.call(this, content, options);
 			}.bind(this), function(e) {
 				dbug.error('renderer failed: name %s, error: ', e);
 			});
-			return rendered;
-		}, this);
+			if (rendered) break;
+		}
 		//if no renderers returned true, then call the default one
 		if (!rendered) this._defaultRenderer(content, options);
 		this.fireEvent('afterRenderer', [content, options]);
