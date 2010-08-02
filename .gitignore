@@ -19,7 +19,7 @@ metastore_db
 VERSION_INFO
 
 # Generated configuration
-desktop/conf/pseudo-distributed.ini
+desktop/conf/*.ini
 
 # ctags file
 tags

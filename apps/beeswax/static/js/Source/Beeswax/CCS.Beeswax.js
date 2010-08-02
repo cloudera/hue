@@ -521,6 +521,23 @@ ART.Sheet.define('splitview.bw-editor', {
 			//when the user clicks the save as link, show a popup with the save as form
 			//when we fire the click manually, it means we want to submit the form
 			var saveAs = $(this).getElement('.bw-query_save_as');
+			var saver = $(this).getElement('.bw-query_save_form');
+			var saveIt = function(){
+				//grab the container of the save as inputs and clone them
+				//(clone them because our windows destroy themselves on hide)
+				var form = saver.clone();
+				//prompt the user w/ the form
+				var prompt = this.prompt('Save This Query', form.show(), function(){
+					//replace the saver form with the one the user filled out
+					form.replaces(saver).hide();
+					//now we're ready to submit the form
+					saving = true;
+					//and submit the form
+					saveAs.click();
+					//back to showing the popup
+					saving = false;
+				});
+			}.bind(this);
 			var saving;
 			saveAs.addEvent('click', function(e){
 				//if we aren't trying to submit the form, show the popup
@@ -528,23 +545,10 @@ ART.Sheet.define('splitview.bw-editor', {
 					//this is the callback for when the user hits the "ok" button
 					//TODO add some keyboard love for the enter button in fields?
 					e.stop();
-					//grab the container of the save as inputs and clone them
-					//(clone them because our windows destroy themselves on hide)
-					var saver = $(this).getElement('.bw-query_save_form');
-					var form = saver.clone();
-					//prompt the user w/ the form
-					var prompt = this.prompt('Save This Query', form.show(), function(){
-						//replace the saver form with the one the user filled out
-						form.replaces(saver).hide();
-						//now we're ready to submit the form
-						saving = true;
-						//and submit the form
-						saveAs.click();
-						//back to showing the popup
-						saving = false;
-					});
+					saveIt();
 				}
 			}.bind(this));
+			if (saver.getElements('.beeswax_error li').length) saveIt();
 			
 			//add the settings toggle
 			var splitEl = $(this).getElement('div[data-filters*=SplitView]');
