@@ -837,7 +837,7 @@ CCS.JFrame = new Class({
 			}
 		}
 
-
+		this.loadedOnce = true;
 		//fill the target
 		this.fill(target, content);
 
@@ -862,9 +862,8 @@ CCS.JFrame = new Class({
 		// Let observers know
 		if (!options.suppressLoadComplete) this.fireEvent('loadComplete', data);
 		if (options.callback) options.callback(data);
-		this.loadedOnce = true;
 	},
-	
+
 	_resetOverflow: function(target) {
 		//reset the overflow style for those filters which alter the content
 		//such as splitview, etc.:
