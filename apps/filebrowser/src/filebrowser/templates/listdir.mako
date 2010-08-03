@@ -19,7 +19,7 @@ from django.template.defaultfilters import escape, stringformat, date, time
 %>
 <%namespace name="comps" file="fb_components.mako" />
 <%namespace name="dir" file="listdir_components.mako" />
-${comps.header(path, current_request_path, cwd_set=cwd_set)}
+${comps.header(path, current_request_path, cwd_set=cwd_set, show_upload=show_upload)}
 
   <div id="dirlist" class="view">
     <h1 class="ccs-hidden">${path|escape}</h1>

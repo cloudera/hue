@@ -17,7 +17,7 @@
 import datetime
 from django.template.defaultfilters import urlencode, escape
 %>
-<%def name="header(path, current_request_path=False, toolbar=True, cwd_set=True)">
+<%def name="header(path, current_request_path=False, toolbar=True, cwd_set=True, show_upload=True)">
   <html>
     <head>
       <title>${path}</title>
@@ -34,7 +34,9 @@ from django.template.defaultfilters import urlencode, escape
               <a class="fb-home" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.view', path=home_directory)}">My Home</a>
             % endif
             % if cwd_set:
-              <a class="fb-upload" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.upload')}?dest=${path|urlencode}&next=${current_request_path|urlencode}">Upload a File</a>
+              % if show_upload:
+                <a class="fb-upload" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.upload')}?dest=${path|urlencode}&next=${current_request_path|urlencode}">Upload a File</a>
+              % endif
               <a class="fb-mkdir" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.mkdir')}?path=${path|urlencode}&next=${current_request_path|urlencode}">New Directory</a>
             % endif
           </div>

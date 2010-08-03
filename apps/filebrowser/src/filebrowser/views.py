@@ -290,7 +290,8 @@ def listdir(request, path):
     # but manually seems cleaner, since we only need it here.
     'current_request_path': request.path,
     'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
-    'cwd_set': True
+    'cwd_set': True,
+    'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0]
   }
 
   stats = request.fs.listdir_stats(path)

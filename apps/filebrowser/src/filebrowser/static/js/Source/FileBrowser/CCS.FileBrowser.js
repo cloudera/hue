@@ -465,7 +465,7 @@ ART.Sheet.define('window.filechooser.browser', {
 					resizable: true,
 					fileToMove: toMove
 				});
-				var saver = new CCS.FileSaver("/filebrowser/view" + fsPath, options);
+				var saver = new CCS.FileSaver("/filebrowser/view" + fsPath + "?show_upload=false", options);
 				saver.jframe.addEvent('loadComplete', function() {
 					this.setCaption(saver.getDirPath() + " :: " + caption);
 				}.bind(saver));
