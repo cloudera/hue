@@ -41,29 +41,30 @@ script: CCS.Desktop.Keys.js
 		'keydown:backspace': stopper
 	});
 
-
 	Keyboard.manager.addShortcuts({
 		'Previous Window': {
-			keys: 'ctrl+left',
-			shortcut: 'control (or alt) + left',
+			keys: 'alt+left',
+			shortcut: 'alt + left',
 			handler: function(e){
 				ART.Popup.DefaultManager.cycle('back', 'default');
 				Keyboard.stop(e);
+				e.stop();
 			},
 			description: 'Bring the previous window to the foreground.'
 		},
 		'Next Window': {
-			keys: 'ctrl+right',
-			shortcut: 'control (or alt) + right',
+			keys: 'alt+right',
+			shortcut: 'alt + right',
 			handler: function(e){
 				ART.Popup.DefaultManager.cycle('forward', 'default');
 				Keyboard.stop(e);
+				e.stop();
 			},
 			description: 'Bring the next window to the foreground.'
 		},
 		'New Window': {
-			keys: 'ctrl+shift+n',
-			shortcut: 'control (or alt) + shift + n',
+			keys: 'alt+shift+n',
+			shortcut: 'alt + shift + n',
 			handler: function(e){
 				var app = CCS.Desktop.getAppComponentName(ART.Popup.DefaultManager.focused);
 				if (app) CCS.Desktop.launch(app);
@@ -72,41 +73,27 @@ script: CCS.Desktop.Keys.js
 			description: 'Launch a new window for the current application (if it allows it).'
 		},
 		'Close Window': {
-			keys: 'ctrl+shift+w',
-			shortcut: 'control (or alt) + shift + w',
+			keys: 'alt+shift+w',
+			shortcut: 'alt + shift + w',
 			handler: function(e){
 				if (ART.Popup.DefaultManager.focused) ART.Popup.DefaultManager.focused.hide();
 				Keyboard.stop(e);
 			},
 			description: 'Close the current window.'
 		},
-		'Show Shortcuts': {
-			keys: 'ctrl+shift+/',
-			shortcut: 'control + "?" (shift + "/")',
+		'Show/Hide Shortcuts': {
+			keys: 'alt+/',
+			shortcut: 'alt + /',
 			handler: function(e){
 				keyShower.toggle();
 				Keyboard.stop(e);
 			},
-			description: 'Show a list of all active shortcuts.'
+			description: 'Show or hide the list of all active shortcuts.'
 		}
 	});
 	Keyboard.manager.addEvents({
-		'alt+left': function(e){
-			ART.Popup.DefaultManager.cycle('back', 'default');
-			Keyboard.stop(e);
-		},
-		'alt+right': function(e){
-			ART.Popup.DefaultManager.cycle('forward', 'default');
-			Keyboard.stop(e);
-		},
-		'alt+shift+n': function(e){
-			var app = CCS.Desktop.getAppComponentName(ART.Popup.DefaultManager.focused);
-			if (app) CCS.Desktop.launch(app);
-			Keyboard.stop(e);
-		},
-		'alt+shift+w': function(e){
-			if (ART.Popup.DefaultManager.focused) ART.Popup.DefaultManager.focused.hide();
-			Keyboard.stop(e);
+		'esc': function(e){
+			keyShower.hide();
 		}
 	});
 
