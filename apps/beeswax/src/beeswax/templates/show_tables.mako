@@ -27,7 +27,7 @@ ${wrappers.head("Beeswax: Table List", section='tables')}
 <div id="show_tables" class="view">
   <h2 class="ccs-hidden">Tables</h2>
 
-  <table data-filters="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
+  <table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
         <th>Table Name</th>

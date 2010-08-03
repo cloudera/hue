@@ -17,8 +17,7 @@
 ---
 description: Job Designer (nee "JobSub")
 provides: [CCS.JobSub]
-requires: [ccs-shared/CCS.JBrowser, More/HtmlTable.Sort, Widgets/ART.SplitView,
-  clientcide/Collapsible, clientcide/StickyWin.Confirm]
+requires: [ccs-shared/CCS.JBrowser]
 script: CCS.JobSub.js
 
 ...

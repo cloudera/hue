@@ -35,14 +35,14 @@ ART.SideBySideSelect = new Class({
 		deselectedOptions: {
 			properties: {
 				'data-filters': 'HtmlTable',
-				'class':'noKeyboard noSelect'
+				'class':'noKeyboard'
 			},
 			headers: ['Deselected']
 		},
 		selectedOptions: {
 			properties: {
 				'data-filters': 'HtmlTable',
-				'class':'noKeyboard noSelect'
+				'class':'noKeyboard'
 			},
 			headers: ['Selected']
 		},

@@ -54,7 +54,7 @@
         </div>
     
     
-        <table data-filters="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
+        <table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
           <thead>
             <tr>
               <th>Name / Id</th>

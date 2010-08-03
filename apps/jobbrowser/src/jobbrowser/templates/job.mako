@@ -22,7 +22,7 @@
 %>
 
 <%def name="task_table(tasks)">
-  <table data-filters="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
+  <table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
         <th>Tasks</th>

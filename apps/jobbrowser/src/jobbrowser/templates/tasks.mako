@@ -90,7 +90,7 @@
         </form>
       </ul>
     </div>
-    <table data-filters="HtmlTable" cellpadding="0" cellspacing="0">
+    <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
       <thead>
          <tr>
            <th>Task ID</th>

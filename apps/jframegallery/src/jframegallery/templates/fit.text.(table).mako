@@ -22,7 +22,7 @@
 	<body>
 	<h1 class="ccs-hidden">FitText (table)</h1>
 	
-	<table data-filters="" class="noSelect" cellpadding="0" cellspacing="0">
+	<table cellpadding="0" cellspacing="0">
 		<thead>
 			<tr>
 				<th>
