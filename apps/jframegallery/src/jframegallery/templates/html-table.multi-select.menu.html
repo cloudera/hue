@@ -29,14 +29,14 @@ limitations under the License.
 		
 		<table data-filters="HtmlTable, ContextMenu" class="multiselect selectable sortable" cellpadding="0" cellspacing="0"
 		data-context-menu-actions="[{'events':['contextmenu'], 'menu':'ul.table-context-menu'}]">
-			<ul class="table-context-menu context-menu ccs-hidden">
+		    <thead>
+		      <tr>
+			<th><ul class="table-context-menu context-menu ccs-hidden">
 				<li class="cm-one">multi-select option 1</li>
 				<li class="cm-two">multi-select option 2</li>
 				<li class="cm-three">multi-select option 3</li>
-			</ul>
-			<thead>
-				<tr>
-					<th>
+			      </ul>
+
 								ID
 					</th>
 					<th>
@@ -55,12 +55,12 @@ limitations under the License.
 			</thead>
 			<tbody>
 				<tr data-filters="ContextMenu" data-context-menu-actions="[{'events':['contextmenu','click:relay(a.show-options)'],'menu':'ul.context-menu'}]">
-					<ul class="context-menu ccs-hidden">
+					<td><ul class="context-menu ccs-hidden">
 						<li class="cm-one">Item 1</li>
 						<li class="cm-two">Item 2</li>
 						<li class="cm-three">Item 3</li>
 					</ul>
-					<td>
+
 						22
 					</td>
 					<td>
@@ -77,12 +77,12 @@ limitations under the License.
 					</td>
 				</tr>
 				<tr data-filters="ContextMenu" data-context-menu-actions="[{'events':['contextmenu','click:relay(a.show-options)'],'menu':'ul.context-menu'}]">
-					<ul class="context-menu ccs-hidden">
+					<td><ul class="context-menu ccs-hidden">
 						<li class="cm-one">Item 1</li>
 						<li class="cm-two">Item 2</li>
 						<li class="cm-three">Item 3</li>
 					</ul>
-					<td>
+
 						23
 					</td>
 					<td>
@@ -99,12 +99,12 @@ limitations under the License.
 					</td>
 				</tr>
 				<tr data-filters="ContextMenu" data-context-menu-actions="[{'events':['contextmenu','click:relay(a.show-options)'],'menu':'ul.context-menu'}]">
-					<ul class="context-menu ccs-hidden">
+					<td><ul class="context-menu ccs-hidden">
 						<li class="cm-one">Item 1</li>
 						<li class="cm-two">Item 2</li>
 						<li class="cm-three">Item 3</li>
 					</ul>
-					<td>
+
 						24
 					</td>
 					<td>

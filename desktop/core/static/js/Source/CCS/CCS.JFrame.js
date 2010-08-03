@@ -614,7 +614,7 @@ CCS.JFrame = new Class({
 		},
 		meta: function(data) {
 			//grab any meta tags and remove them from the html
-			data.meta = Elements.from(data.html.getTags('meta').join(' '));
+			data.meta = data.html.getTags('meta');
 			data.html = data.html.stripTags('meta');
 		},
 		elements: function(data) {
