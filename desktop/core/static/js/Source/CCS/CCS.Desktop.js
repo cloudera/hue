@@ -192,15 +192,15 @@ CCS.Desktop = {
 		if (instances.length == 1) {
 			instances[0].focus();
 		} else {
-			instances.sort(function(left, right){
+			var sorted = instances.sort(function(left, right){
 				var zl = $(left).getStyle('z-index').toInt();
 				var zr = $(right).getStyle('z-index').toInt();
 				return (zl == zr) ? 0 : (zl < zr) ? -1 : 1;
-			}).each(function(instance){
-				instance.bringToFront();
 			});
-			var last = instances.getLast();
-			if (last.focus) last.focus();
+			sorted.each(function(win, i){
+				if (i == sorted.length - 1) win.focus(true);
+				else win.bringToFront(true);
+			});
 		}
 		return instances;
 	},
