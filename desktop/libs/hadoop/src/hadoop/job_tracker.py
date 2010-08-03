@@ -48,7 +48,8 @@ class LiveJobTracker(object):
 
   def __init__(self, host, thrift_port):
     self.client = thrift_util.get_client(
-      Jobtracker.Client, host, thrift_port, service_name="Hadoop MR JobTracker",
+      Jobtracker.Client, host, thrift_port,
+      service_name="Hadoop MR JobTracker HUE Plugin",
       timeout_seconds=JT_THRIFT_TIMEOUT)
     self.host = host
     self.thrift_port = thrift_port

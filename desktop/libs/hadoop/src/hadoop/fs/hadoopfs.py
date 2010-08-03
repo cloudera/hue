@@ -99,8 +99,9 @@ class HadoopFileSystem(object):
     self.hadoop_bin_path = hadoop_bin_path
     self._resolve_hadoop_path()
 
-    self.nn_client = thrift_util.get_client(Namenode.Client, host, thrift_port, service_name="HDFS Namenode",
-                                            timeout_seconds=NN_THRIFT_TIMEOUT)
+    self.nn_client = thrift_util.get_client(Namenode.Client, host, thrift_port,
+        service_name="HDFS Namenode HUE Plugin",
+        timeout_seconds=NN_THRIFT_TIMEOUT)
 
     # The file systems are cached globally.  We store
     # user information in a thread-local variable so that
