@@ -41,6 +41,17 @@ def test_chown():
     assert_equal("y", cluster.fs.stats(PATH)["group"])
     c.post("/filebrowser/chown", dict(path=PATH, user="__other__", user_other="z", group="y"))
     assert_equal("z", cluster.fs.stats(PATH)["user"])
+
+    # Make sure that the regular user chown form doesn't have useless fields,
+    # and that the superuser's form has all the fields it could dream of.
+    PATH = '/filebrowser/chown-regular-user'
+    cluster.fs.mkdir(PATH)
+    cluster.fs.chown(PATH, 'chown_test', 'chown_test')
+    response = c.get('/filebrowser/chown', dict(path=PATH, user='chown_test', group='chown_test'))
+    assert_true('<option value="__other__"' in response.content)
+    c = make_logged_in_client('chown_test')
+    response = c.get('/filebrowser/chown', dict(path=PATH, user='chown_test', group='chown_test'))
+    assert_false('<option value="__other__"' in response.content)
   finally:
     cluster.shutdown()
 

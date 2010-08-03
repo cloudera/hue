@@ -18,8 +18,13 @@
 ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
 <%! from desktop.lib.django_util import extract_field_data %>
 
+<%
+  is_superuser = extra_params['current_user'].username == extra_params['superuser']
+  select_class = is_superuser and 'ccs-select-with-other' or ''
+%>
+
 ## Puts together a selection list with an "other" field as well.
-<%def name="selection(name, choices, current_value, other_key)">
+<%def name="selection(name, choices, current_value, other_key=None)">
     <% seen = False %>
     % if len(choices) == 0:
       <select name="${name}" class="ccs-hidden">
@@ -34,20 +39,23 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
         <option>${choice}</option>
       % endif
     % endfor
-    % if seen or not current_value:
-      <option value="__other__">Other</option>
-    % else:
-      <option value="__other__" selected="true">Other</option>
+    % if is_superuser:
+      % if seen or not current_value:
+        <option value="__other__">Other</option>
+      % else:
+        <option value="__other__" selected="true">Other</option>
+      % endif
     % endif
 
     </select>
-    % if seen or not current_value:
-      <input name="${other_key}" class="ccs-hidden">
-    % else:
-      <input name="${other_key}" value="${current_value}">
+    % if is_superuser:
+      % if seen or not current_value:
+        <input name="${other_key}" class="ccs-hidden">
+      % else:
+        <input name="${other_key}" value="${current_value}">
+      % endif
     % endif
 </%def>
-
 
 <div class="prompt_popup">
 <form action="/filebrowser/chown?next=${next|u}" method="POST" enctype="multipart/form-data">
@@ -56,12 +64,25 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
     ${edit.render_field(form["path"], hidden=True)}
 
     <dt><label>User</label></dt>
-    <dd class="ccs-select-with-other">${ selection("user", form.all_users, extract_field_data(form["user"]), "user_other") }</dd>
+    <dd class="${select_class}">
+      % if is_superuser:
+        ${ selection("user", form.all_users, extract_field_data(form["user"]), "user_other") }
+      % else:
+        ${ selection("user", [extract_field_data(form['user'])], extract_field_data(form["user"])) }
+      % endif
+    </dd>
     <dt><label>Group</label></dt>
-    <dd class="ccs-select-with-other">${ selection("group", form.all_groups, extract_field_data(form["group"]), "group_other") }</dd>
+    <dd class="${select_class}">
+      % if is_superuser:
+        ${ selection("group", form.all_groups, extract_field_data(form["group"]), "group_other") }
+      % else:
+        ${ selection("group", [group for group in form.all_groups if group in extra_params['current_user'].get_groups()], extract_field_data(form["group"])) }
+      % endif
+    </dd>
   </dl>
   <input class="ccs-hidden" type="submit" value="Submit" />
 </form>
+<p>Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</p>
 </div>
 
 <div class="ccs-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>

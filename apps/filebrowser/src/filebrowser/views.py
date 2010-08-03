@@ -497,7 +497,7 @@ def _calculate_navigation(offset, length, size):
 
   return first, prev, next, last
 
-def generic_op(form_class, request, op, parameter_names, piggyback=None, template="fileop.mako"):
+def generic_op(form_class, request, op, parameter_names, piggyback=None, template="fileop.mako", extra_params=None):
   """
   Generic implementation for several operations.
 
@@ -506,6 +506,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
   @param op callable with the filesystem operation
   @param parameter_names list of form parameters that are extracted and then passed to op
   @param piggyback list of form parameters whose file stats to look up after the operation
+  @param extra_params dictionary of extra parameters to send to the template for rendering
   """
   # Use next for non-ajax requests, when available.
   next = request.GET.get("next")
@@ -515,11 +516,14 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
   ret = dict({
     'next':next
   })
+
+  if extra_params is not None:
+    ret['extra_params'] = extra_params
+
   for p in parameter_names:
     val = request.REQUEST.get(p)
     if val:
       ret[p] = val
-
 
   if request.method == 'POST':
     form = form_class(request.POST)
@@ -599,7 +603,8 @@ def chown(request):
   if request.POST.get("group") == "__other__":
     args[2] = "group_other"
 
-  return generic_op(ChownForm, request, request.fs.chown, args, "path", template="chown.mako")
+  return generic_op(ChownForm, request, request.fs.chown, args, "path", template="chown.mako",
+    extra_params=dict(current_user=request.user, superuser=request.fs.superuser))
 
 def upload_flash(request):
   """
