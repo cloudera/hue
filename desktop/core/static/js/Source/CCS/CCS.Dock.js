@@ -89,8 +89,8 @@ CCS.Dock = {
 		lnk.inject(dock);
 		// Sort the menu.
 		var sortkey = function(a_left, a_right) {
-			var left = a_left.getElement('img').get('title');
-			var right = a_right.getElement('img').get('title');
+			var left = a_left.get('id');
+			var right = a_right.get('id');
 			return (left == right) ? 0 : (left < right) ? -1 : 1;
 		};
 		dock.getChildren().sort(sortkey).inject(dock);
