@@ -26,6 +26,19 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
   ${_table(files, path_enc, current_request_path, 'view', cwd_set)}
 </%def>
 <%def name="_table(files, path_enc, current_request_path, view, cwd_set=False)">
+  <%
+  # Sortable takes a while for big lists; skip it in that case.
+  if len(files) < 100:
+    optional_sortable = "sortable"
+  else:
+    optional_sortable = ""
+  # FitText doesn't scale well with many rows, so we disable it for
+  # larger views.
+  if len(files) < 30:
+    optional_fit_text = 'data-filters="FitText"'
+  else:
+    optional_fit_text = ''
+  %>
   <table data-filters="HtmlTable" class="fb-file-list selectable sortable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
@@ -43,7 +56,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
     </thead>
     <tbody>
       % for file in files:
-        <% 
+        <%
           cls = ''
           if (file_filter == 'dir' and file['type'] != 'dir') or (file_filter != 'dir' and file['type'] == 'dir'):
             if (file_filter != 'any'):
@@ -55,8 +68,8 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
             display_name = file['path']
           endif
         %>
-	## Since path is in unicode, Django and Mako handle url encoding and
-	## iri encoding correctly for us.
+  ## Since path is in unicode, Django and Mako handle url encoding and
+  ## iri encoding correctly for us.
         <% path_enc = file['path'] %>
         <tr class="ccs-no_select fb-item-row ${cls}"
          data-filters="ContextMenu"
@@ -65,9 +78,9 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
           <td class="fb-name">
             <div class="fb-name-container">
               % if "dir" == file['type']:
-                <a data-filters="FitText" class="fb-item fb-dir jframe_ignore" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
+                <a ${optional_fit_text} class="fb-item fb-dir jframe_ignore" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
               % else:
-                <a data-filters="FitText" class="fb-item fb-file jframe_ignore" target="FileViewer" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
+                <a ${optional_fit_text} class="fb-item fb-file jframe_ignore" target="FileViewer" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
               % endif
               % if ".." != file['name']:
                 <ul class="fb-item-actions context-menu">
@@ -82,7 +95,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
                   <li class="fb-rename-container"><a class="fb-rename" href="${url('filebrowser.views.rename')}?src_path=${path_enc}&next=${urlencode(current_request_path)}">Rename</a></li>
                   <li class="fb-chown-container"><a class="fb-chown" href="${url('filebrowser.views.chown') }?path=${path_enc}&user=${file['stats']['user']}&group=${file['stats']['group']}&next=${urlencode(current_request_path)}">Change Owner / Group</a></li>
                   <li class="fb-chmod-container"><a class="fb-chmod" href="${url('filebrowser.views.chmod')}?path=${path_enc}&mode=${stringformat(file['stats']['mode'], "o")}&next=${urlencode(current_request_path)}">Change Permissions</a></li>
-                  <% 
+                  <%
                     if "dir" == file['type']:
                       cls = "fb-move-dir"
                     else:
@@ -93,7 +106,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
               % endif
             </div>
           </td>
-          <% 
+          <%
             if "dir" == file['type']:
               sortValue = 0;
             else:
