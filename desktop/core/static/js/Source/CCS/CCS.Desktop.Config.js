@@ -171,10 +171,25 @@ window.addEvent('domready', function(){
 	window.addEvent('scroll', function(e) {
 		window.scrollTo(0,0);
 	});
+
+        var canSelectOnDblClick = function(elem) {
+                if (elem.match('input') || elem.match('textarea')) return true;
+                if (elem.getParent('.jframe_contents')) {
+                        var parentTable = elem.getParent('[data-filters*=HtmlTable]');
+                        if(parentTable && (parentTable.hasClass('.selectable') || parentTable.hasClass('.multiselect'))){
+                                return false;
+                        }
+                        if(elem.match('[data-dblclick-delegate]') || elem.getParent('[data-dblclick-delegate]')) return false;
+                        return true;
+                }
+                return false;
+        };
 	
 	$(document.body).addEvent('dblclick', function(e){
-		if(document.selection && document.selection.empty) document.selection.empty();
-		else if(window.getSelection) window.getSelection().removeAllRanges();
+                if(!canSelectOnDblClick(e.target)){ 
+                        if(document.selection && document.selection.empty) document.selection.empty();
+                        else if(window.getSelection) window.getSelection().removeAllRanges();
+                }
 	});
 });
 
