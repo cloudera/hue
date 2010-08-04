@@ -50,25 +50,31 @@
 .jobsub_joblist form span, .jobsub_joblist form input.submit {
 	display: none;
 }
-.jobsub_joblist td.jobsub_listing_actions a {
+.jobsub_joblist .context-menu a {
+	padding-left: 22px;
 	display: block;
-	float: right;
-	width: 18px;
 	height: 18px;
-	overflow: hidden;
-	text-indent: -9999999px;
-	margin-left: 6px;
 }
-.jobsub_joblist td a.copy {
+.item-options {
+	background: url(/static/art/led-icons/ui_combo_box.png) no-repeat;
+	display: block;
+	width: 16px;
+	height: 16px;
+	text-indent: -500px;
+	overflow: hidden;
+	float: right;
+}
+
+.jobsub_joblist a.copy {
 	background: url('../art/line_icons.png') no-repeat;	
 }
-.jobsub_joblist td a.edit {
+.jobsub_joblist a.edit {
 	background: url('../art/line_icons.png') no-repeat 0 -23px;
 }
-.jobsub_joblist td a.delete {
+.jobsub_joblist a.delete {
 	background: url('../art/line_icons.png') no-repeat 0 -70px;
 }
-.jobsub_joblist td a.run {
+.jobsub_joblist a.run {
 	background: url('../art/line_icons.png') no-repeat 0 -47px;
 }
 .jobsub_left_col {
@@ -217,6 +223,7 @@ ul.jobsub_new li a:hover {
 	height: 14px;
 	background: url(/static/art/info.png);
 	text-indent: -999999px;
+	float: right;
 }
 
 .jobsub_output h1 {

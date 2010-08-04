@@ -23,7 +23,7 @@ limitations under the License.
 {% block content %}
   <div id="jobsub_history" class="view">
     <h1>Recently Launched Jobs</h1>
-    <table data-filters="HtmlTable" class="sortable">
+    <table data-filters="HtmlTable" class="selectable sortable">
       <thead>
         <tr>
           <th>Owner</th>
@@ -34,7 +34,7 @@ limitations under the License.
       </thead>
       <tbody>
         {% for submission in submissions %}
-          <tr>
+          <tr data-dblclick-delegate= "{'dblclick_loads':'a'}">
             <td>{{ submission.owner }}</td>
             <td>{{ submission.name }}</td>
             <td>
