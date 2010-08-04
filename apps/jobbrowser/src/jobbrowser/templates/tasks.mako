@@ -46,19 +46,6 @@
     <h1 class="ccs-hidden">Tasks for Job ${jobid}</h1>
     <div class="toolbar">
       <a href="/jobbrowser/jobs/"><img src="/jobbrowser/static/art/icon_large.png" class="jt_icon"/></a>
-      <div class="jtv_nav">
-        <div class="ccs-inline">
-          Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} tasks
-        </div>
-        <div class="jtv_offset_controls ccs-inline">
-          <a title="Beginning of File" class="jtv_offset_begin" ${toppage()}>Beginning of File</a>
-          <a title="Previous Block" class="jtv_offset_previous" ${prevpage()}>Previous Block</a>
-          <div class="jtv_nav_pages">page <span class="jtv_page">${page.number} of ${page.num_pages()}</span></div>
-          <a title="Next Block" class="jtv_offset_next" ${nextpage()}>Next Block</a>
-          <a title="End of File" class="jtv_offset_end" ${bottompage()}>End of File</a>
-        </div>
-
-      </div>
       <ul class="jt_filters">
         <form class="jtv_filter_form" data-filters="SubmitOnChange" method="get" action="/jobbrowser/jobs/${jobid}/tasks">
           <li class="ccs-inline">
@@ -81,7 +68,7 @@
             </select>
           </li>
           <li class="ccs-inline">
-            <input type="text" name="tasktext" class="jtv_filter" data-filters="OverText" title="text filter"
+            <input type="text" name="tasktext" class="jtv_filter" data-filters="OverText, ArtInput" data-art-input-type="search" title="text filter"
               % if tasktext:
                 value="${tasktext}"
               % endif
@@ -90,34 +77,48 @@
         </form>
       </ul>
     </div>
-    <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
-      <thead>
-         <tr>
-           <th>Task ID</th>
-           <th>Type</th>
-           <th>Progress</th>
-           <th>Status</th>
-           <th>State</th>
-           <th>Start Time</th>
-           <th>End Time</th>
-           <th>View Attempts</th>
-        </tr>
-      </thead>
-      <tbody>
-        %for t in page.object_list:
-         <tr data-dblclick-delegate="{'dblclick_loads':'.view_task'}">
-            <td>${t.taskId_short}</td>
-            <td>${t.taskType}</td>
-            <td>${"%d" % (t.progress * 100)}%</td>
-            <td><a href="${url('jobbrowser.views.tasks', jobid=jobid)}?${get_state_link(request, 'taskstate', t.state.lower())}"
-                  title="Show only ${t.state.lower()} tasks"
-                  class="frame_tip status_link ${t.state.lower()}">${t.state.lower()}</a></td>
-            <td>${t.mostRecentState}</td>
-            <td>${t.execStartTimeFormatted}</td>
-            <td>${t.execFinishTimeFormatted}</td>
-            <td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" class="view_task jt_slide_right">Attempts</a></td>
-         </tr>
-        %endfor
-      </tbody>
-    </table>
+    <div data-filters="SizeTo" data-size-to-height="-30" style="overflow: auto">
+      <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
+        <thead>
+           <tr>
+             <th>Task ID</th>
+             <th>Type</th>
+             <th>Progress</th>
+             <th>Status</th>
+             <th>State</th>
+             <th>Start Time</th>
+             <th>End Time</th>
+             <th>View Attempts</th>
+          </tr>
+        </thead>
+        <tbody>
+          %for t in page.object_list:
+           <tr data-dblclick-delegate="{'dblclick_loads':'.view_task'}">
+              <td>${t.taskId_short}</td>
+              <td>${t.taskType}</td>
+              <td>${"%d" % (t.progress * 100)}%</td>
+              <td><a href="${url('jobbrowser.views.tasks', jobid=jobid)}?${get_state_link(request, 'taskstate', t.state.lower())}"
+                    title="Show only ${t.state.lower()} tasks"
+                    class="frame_tip status_link ${t.state.lower()}">${t.state.lower()}</a></td>
+              <td>${t.mostRecentState}</td>
+              <td>${t.execStartTimeFormatted}</td>
+              <td>${t.execFinishTimeFormatted}</td>
+              <td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" class="view_task jt_slide_right">Attempts</a></td>
+           </tr>
+          %endfor
+        </tbody>
+      </table>
+    </div>
+    <div class="jtv-pagination">
+      <div class="jtv-pagination_count ccs-inline">
+        Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} tasks
+      </div>
+      <div class="jtv_offset_controls">
+        <a title="Beginning of File" class="jtv_offset_begin" ${toppage()}>Beginning of File</a>
+        <a title="Previous Block" class="jtv_offset_previous" ${prevpage()}>Previous Block</a>
+        <div class="jtv_nav_pages">page <span class="jtv_page">${page.number} of ${page.num_pages()}</span></div>
+        <a title="Next Block" class="jtv_offset_next" ${nextpage()}>Next Block</a>
+        <a title="End of File" class="jtv_offset_end" ${bottompage()}>End of File</a>
+      </div>
+    </div>
   ${comps.footer()}

@@ -201,6 +201,9 @@ div.job_browser_job .jtv_meta_top dl {
 	float: left;
 	width: 235px;
 }
+div.job_browser_job ul.tab_sections>li {
+	overflow: auto;
+}
 div.job_browser_job dt {
 	font-weight: bold;
 	float: left;
@@ -283,7 +286,21 @@ table.jt_counter_table, table.jt_meta_table {
 	border: 1px solid #aaa;
 }
 
-
+.jtv-pagination {
+	padding: 0px 10px;
+	position: relative;
+	background: #999; 
+	height: 30px
+}
+.jtv-pagination_count {
+	line-height: 30px;
+}
+.jtv_offset_controls {
+	position: absolute;
+	right: 20px;
+	top: 0px;
+	line-height: 30px;
+}
 .jtv_offset_controls div {
 	float: left;
 }
@@ -360,6 +377,7 @@ table.jt_counter_table, table.jt_meta_table {
 	-moz-border-radius: 0px 0px 2px 2px;
 	-webkit-border-radius: 0px 0px 2px 2px;
 	padding: 8px;
+	overflow: auto;
 }
 .jobbrowser table[data-filters*=HtmlTable] .jt-raw_delimiter {
 	background: #bbb;
