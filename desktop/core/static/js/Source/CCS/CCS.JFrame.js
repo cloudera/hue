@@ -202,7 +202,7 @@ CCS.JFrame = new Class({
 			//allow links to force jframe to nerf them
 			//this is required for doubleclick support
 			//as otherwise there's no way to prevent this default jframe handler per link
-			if (elem.hasClass('jframe_ignore')) return e.preventDefault();
+			if (elem.hasClass('jframe_ignore') || elem.hasClass('disabled')) return e.preventDefault();
 			// Fix relative links
 			if (elem.get('href')) {
 				var url = new URI(elem.get('href'), {base: this.currentPath});

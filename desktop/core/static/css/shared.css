@@ -18,6 +18,10 @@
 .ccs-shared .jframe_ignore a {
 	text-decoration: none;
 }
+.ccs-shared a.disabled {
+	text-decoration: none;
+	color: #000;
+}
 .ccs-shared a:hover {
 	text-decoration: underline;
 }
