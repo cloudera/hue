@@ -41,6 +41,7 @@ requires:
  - /Behavior.ContextMenu
  - /Behavior.FilterInput
  - /Behavior.FitText
+ - /Behavior.HtmlTableChromeHack
  - /Behavior.HtmlTableKeyboard
  - /Behavior.HtmlTableMultiSelectMenu
  - /Behavior.MultiChecks
