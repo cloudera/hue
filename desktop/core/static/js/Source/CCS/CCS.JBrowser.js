@@ -97,6 +97,21 @@ script: CCS.JBrowser.js
 				$(this).setStyle('visibility', 'hidden');
 				if (this.history) $(this.history).setStyle('visibility', 'hidden');
 			}
+
+			this.addEvents({
+				maximize: function(){
+					if (!this._jbrowserMinMaxState) this._jbrowserMinMaxState = this.element.getStyles('top', 'left');
+					this.element.setStyles({
+						top: 0,
+						left: 0
+					});
+				}.bind(this),
+				restore: function(){
+					//restore
+					this.element.setStyles(this._jbrowserMinMaxState);
+					this._jbrowserMinMaxState = null;
+				}.bind(this)
+			});
 		},
 		
 		draw: function(){
@@ -281,35 +296,11 @@ script: CCS.JBrowser.js
 			return this;
 		},
 		
-		minMax: function(operation){
-			if (operation == "maximize") {
-				this.toolbar.setStyle('display', 'block');
-				if (this.history) $(this.history).setStyle('display','block');
-				this._minimized = false;
-				var beforeStr = 'before'+ operation.capitalize();
-				if (this[beforeStr]) {
-					this.element.setStyles(this.posBefore);
-				} else {
-					this.posBefore = this.element.getStyles('top', 'left');
-					this.element.setStyles({
-						top: 0,
-						left: 0
-					});
-				}
-			} else {
-				if (!this._minimized) {
-					this.toolbar.setStyle('display', 'none');
-					if (this.history) $(this.history).setStyle('display','none');
-					this._minimized = true;
-				} else {
-					if (this.history) $(this.history).setStyle('display','block');
-					this.toolbar.setStyle('display', 'block');
-					this._minimized = false;
-				}
-			}
-			this.parent(operation);
+		resetMinMaxState: function(){
+			this.parent.apply(this, arguments);
+			this._jbrowserMinMaxState = null;
 		},
-
+		
 		//returns the elements whose scroll offset we want to store
 		//this includes any element with the .save_scroll class
 		//and also the contents of the window itself.

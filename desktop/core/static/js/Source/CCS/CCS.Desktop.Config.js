@@ -172,24 +172,29 @@ window.addEvent('domready', function(){
 		window.scrollTo(0,0);
 	});
 
-        var canSelectOnDblClick = function(elem) {
-                if (elem.match('input') || elem.match('textarea')) return true;
-                if (elem.getParent('.jframe_contents')) {
-                        var parentTable = elem.getParent('[data-filters*=HtmlTable]');
-                        if(parentTable && (parentTable.hasClass('.selectable') || parentTable.hasClass('.multiselect'))){
-                                return false;
-                        }
-                        if(elem.match('[data-dblclick-delegate]') || elem.getParent('[data-dblclick-delegate]')) return false;
-                        return true;
-                }
-                return false;
-        };
+	//given an element, determine if it's cool to double click and select text within it
+	var canSelectOnDblClick = function(elem) {
+		//if it's a textarea or input, go for it
+		if (elem.match('input') || elem.match('textarea')) return true;
+		//otherwise, we only allow double click selection inside of window contents
+		if (elem.getParent('.jframe_contents')) {
+			//except if the double clicked element is inside an html table that has selectable rows
+			var parentTable = elem.getParent('[data-filters*=HtmlTable]');
+			if(parentTable && (parentTable.hasClass('.selectable') || parentTable.hasClass('.multiselect'))){
+				return false;
+			}
+			//or if the element is part of a double click action
+			if(elem.match('[data-dblclick-delegate]') || elem.getParent('[data-dblclick-delegate]')) return false;
+			return true;
+		}
+		return false;
+	};
 	
 	$(document.body).addEvent('dblclick', function(e){
-                if(!canSelectOnDblClick(e.target)){ 
-                        if(document.selection && document.selection.empty) document.selection.empty();
-                        else if(window.getSelection) window.getSelection().removeAllRanges();
-                }
+		if(!canSelectOnDblClick(e.target)){ 
+			if(document.selection && document.selection.empty) document.selection.empty();
+			else if(window.getSelection) window.getSelection().removeAllRanges();
+		}
 	});
 });
 
@@ -215,43 +220,43 @@ if (Browser.Engine.trident) {
 // unless there are more than 100 messages in the message queue.
 (function(info, warn, error) {
 
-  var monkeyPatchDbugFunction = function(dbugMethod, level) {
-    var messageQueue = [];
+	var monkeyPatchDbugFunction = function(dbugMethod, level) {
+		var messageQueue = [];
 
-    var sendQueuedMessages = function() {
-      if (window.sendDbug && messageQueue.length > 0) {
-        new Request.JSON({
-          url: '/log_frontend_event',
-          data: {
-            message: JSON.encode(messageQueue),
-            level: level
-          }
-        }).post();
-        // Immediately clear the queue after we try to send it.
-        // If the send fails, oh well.
-        messageQueue.empty();
-      }
-    };
+		var sendQueuedMessages = function() {
+			if (window.sendDbug && messageQueue.length > 0) {
+				new Request.JSON({
+					url: '/log_frontend_event',
+					data: {
+						message: JSON.encode(messageQueue),
+						level: level
+					}
+				}).post();
+				// Immediately clear the queue after we try to send it.
+				// If the send fails, oh well.
+				messageQueue.empty();
+			}
+		};
 
-    // Poll the message queue every 5 seconds to see if it has messages to send.
-    sendQueuedMessages.periodical(5000);
+		// Poll the message queue every 5 seconds to see if it has messages to send.
+		sendQueuedMessages.periodical(5000);
 
-    return function(message) {
-      messageQueue.push(message);
-      // Immediately send the message queue if it's getting too big.
-      if (messageQueue.length > 100) {
-        sendQueuedMessages();
-      }
-      dbugMethod(message);
-    };
-  };
+		return function(message) {
+			messageQueue.push(message);
+			// Immediately send the message queue if it's getting too big.
+			if (messageQueue.length > 100) {
+				sendQueuedMessages();
+			}
+			dbugMethod(message);
+		};
+	};
 
-  // We do the monkey-patching of the functions regardless of the initial value
-  // of window.sendDbug so that some one can turn this on in the browser at
-  // run-time without having to restart the server.
-  //
-  // These strings are what hue expects.
-  dbug.info = monkeyPatchDbugFunction(info, 'info');
-  dbug.warn = monkeyPatchDbugFunction(warn, 'warning');
-  dbug.error = monkeyPatchDbugFunction(error, 'error');
+	// We do the monkey-patching of the functions regardless of the initial value
+	// of window.sendDbug so that some one can turn this on in the browser at
+	// run-time without having to restart the server.
+	//
+	// These strings are what hue expects.
+	dbug.info = monkeyPatchDbugFunction(info, 'info');
+	dbug.warn = monkeyPatchDbugFunction(warn, 'warning');
+	dbug.error = monkeyPatchDbugFunction(error, 'error');
 })(dbug.info, dbug.warn, dbug.error);
