@@ -102,7 +102,7 @@
 	cursor:pointer;
 }
 /* inline block display; makes elements block level, but follows page flow */
-.ccs-shared .ccs-inline, .ccs-shared ul.css-inline_list li {
+.ccs-shared .ccs-inline, .ccs-shared ul.ccs-inline_list li {
 	display:-moz-inline-box;                /* FF2 */
 	display:inline-block;                   /* webkit and FF3 */
 	#zoom: 1; /* set hasLayout:true to mimic inline-block */
@@ -121,7 +121,7 @@
 	background: url(../art/divots.png) -11px -11px no-repeat;
 }
 /* tabbed layout */
-/* .css-tabs, a ul; container for the tabs 
+/* .ccs-tabs, a ul; container for the tabs 
 
 <ul class="tabs">
 <li><span>Tab 1</span></li>
@@ -426,6 +426,9 @@ input[data-filters*=ArtButton] {
 
 .ccs-shared [data-filters*=ArtButtonBar] li {
 	margin-right: 0 !important;
+}
+.ccs-shared a[data-filters*=ArtButton] {
+	vertical-align: top;
 }
 /* side by side select */
 
