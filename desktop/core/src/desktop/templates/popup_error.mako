@@ -20,7 +20,9 @@
   </head>
   <body>
     <div class="alert_popup ccs-error-popup">
-        ${message.replace("\n", "<br />") | n}
+        <pre>
+        ${message}
+        </pre>
         % if detail:
         <a><div class="collapser">Click for Details</div></a>
         <div id="data_one" class="ccs-hidden collapsible">
