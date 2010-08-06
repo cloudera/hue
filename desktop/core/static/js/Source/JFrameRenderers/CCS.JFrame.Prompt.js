@@ -30,20 +30,30 @@ CCS.JFrame.addGlobalRenderers({
 		//when the user clicks "ok"
 		var popup = content.elements.filter('.prompt_popup')[0];
 		if (!popup) return;
-
 		var target = new Element('div', {'class': 'jframe_prompt'}).hide().inject($(this));
-		this.fill(target, content);
-		target.show();
-		var toolbar = target.getElements('.toolbar');
+                var fillAndShow = function() {
+                        this.fill(target, content);
+                        target.show();
+                }.bind(this);
+                //VML in IE doesn't like being hidden and redisplayed.  Delaying filling and showing the target for IE.
+                if(!Browser.Engine.trident) {
+                        fillAndShow();
+                }
+		var toolbar = content.elements.filter('.toolbar');
 		if (toolbar.length) toolbar.hide();
 
 		var size = this.content.getSize();
-		var form = target.getElement('form');
+		var form = popup.getElement('form');
+                var hasInput = !!popup.getElement('form') && !!popup.getElement('input, textarea, select');
 		var prompt = this.prompt(content.title || 'Enter Details', target, function(){
 			if (form) form.retrieve('form.request').send();
 		}, {
+                        detectInput: !hasInput,
 			resizable: true
 		});
+                if(Browser.Engine.trident) {
+                        fillAndShow();
+                }
 		target.getElements(":widget").each(function(widget) {
 			widget.get("widget").register(widget.getParent(":widget").get("widget"));
 		});
@@ -63,7 +73,7 @@ CCS.JFrame.addGlobalRenderers({
 
 		}
 		if (options.callback) options.callback(data);
+
 		return true;
 	}
-
 });
