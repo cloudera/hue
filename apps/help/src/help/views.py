@@ -62,8 +62,9 @@ def view(request, app, path):
 
   if not fs.isfile(path):
     raise PopupException("Could not find or read the file: %s (app %s)" % (path, app))
-  
+
   content = fs.open(path, 'r').read()
+  content = unicode(content, 'utf-8', errors='replace')
   if path.lower().endswith(".md"):
     content = ('<div class="rendered-markdown">' +
                markdown.markdown(content, ['extra']) +
