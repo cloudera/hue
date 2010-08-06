@@ -558,6 +558,7 @@ CCS.FileBrowser.Uploader = new Class({
 		this.jframe = jframe;
 		this.setOptions(options);
 		this.makeSwf();
+		this.completedFiles = 0;
 	},
 
 	makeSwf: function(){
@@ -597,9 +598,10 @@ CCS.FileBrowser.Uploader = new Class({
 				(function(){
 					file.ui.element.nix();
 				}).delay(300);
-			},
+				this.completedFiles++;
+			}.bind(this),
 
-			//when the file failes to upload, display the error and a link to retry
+			//when the file fails to upload, display the error and a link to retry
 			onFileError: function(file) {
 				file.ui.cancel.set('html', 'Retry').removeEvents().addEvent('click', function() {
 					file.requeue();
@@ -610,7 +612,8 @@ CCS.FileBrowser.Uploader = new Class({
 					html: file.errorMessage,
 					'class': 'file-error'
 				}).inject(file.ui.cancel, 'after');
-			},
+				this.completedFiles++;
+			}.bind(this),
 
 			onFileRequeue: function(file) {
 				file.ui.element.getElement('.file-error').destroy();
@@ -626,6 +629,15 @@ CCS.FileBrowser.Uploader = new Class({
 			//when all files are complete and there are no errors,
 			//hide the upload display and refresh the file browser
 			onComplete: function() {
+				// onComplete might get fired before onFileError does, in which case this
+				// routine will hide the uploader without ever having shown the user the
+				// error message. So, we manually wait until every file has reported its
+				// status.
+				if (this.completedFiles < this.uploader.fileList.length) {
+					this.uploader.fireEvent.delay(100, this.uploader, ['onComplete']);
+					return;
+				}
+				// Every file we tried to upload has reported either success or failure at this point.
 				if (list.getElement('span.file-error')) return;
 				this.hide();
 				this.jframe.refresh();
