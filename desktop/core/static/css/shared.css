@@ -22,6 +22,11 @@
 	text-decoration: none;
 	color: #000;
 }
+.ccs-shared ul.context-menu a.disabled {
+	text-decoration: none;
+	color: #999;
+	cursor: pointer;
+}
 .ccs-shared a:hover {
 	text-decoration: underline;
 }
