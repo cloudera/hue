@@ -395,15 +395,15 @@ ini-style format).	By default, HUE loads all `*.ini` files in the `build/desktop
 directory.	The configuration files have the following format:
 
 		# This is a comment
-		[ app_name ]								# Same as your app's name
+		[ app_name ]					# Same as your app's name
 		app_property = "Pink Floyd"
 
-		[[ section_a ]]							# The double brackets start a section under [ app_name ]
-		a_weight = 80								# that is useful for grouping
+		[[ section_a ]]					# The double brackets start a section under [ app_name ]
+		a_weight = 80					# that is useful for grouping
 		a_height = 180
 
-		[[ filesystems ]]						# Sections are also useful for making a list
-		[[[ cluster_1 ]]]						# All list members are sub-sections of the same type
+		[[ filesystems ]]				# Sections are also useful for making a list
+		[[[ cluster_1 ]]]				# All list members are sub-sections of the same type
 		namenode_host = localhost
 		# User may define more:
 		# [[[ cluster_2 ]]]
@@ -418,43 +418,62 @@ define the following:
 
 * A `desktop.lib.conf.Config` object for `app_property`, such as:
 <pre>
-		MY_PROPERTY = Config(key='app_property', default='Beatles', help='blah')
+	MY_PROPERTY = Config(key='app_property', default='Beatles', help='blah')
 </pre>
 	You can access its value by `MY_PROPERTY.get()`.
 
 * A `desktop.lib.conf.ConfigSection` object for `section_a`, such as:
 <pre>
-		SECTION_A = ConfigSection(key='section_a',
-															help='blah',
-															members=dict(
-																AWEIGHT=Config(key='a_weight', type=int, default=0),
-																AHEIGHT=Config(key='a_height', type=int, default=0)))
+	SECTION_A = ConfigSection(key='section_a',
+				help='blah',
+				members=dict(
+					AWEIGHT=Config(key='a_weight', type=int, default=0),
+					AHEIGHT=Config(key='a_height', type=int, default=0)))
 </pre>
 	You can access the values by `SECTION_A.AWEIGHT.get()`.
 
 * A `desktop.lib.conf.UnspecifiedConfigSection` object for `filesystems`, such as:
 <pre>
-		FS = UnspecifiedConfigSection(
-														 key='filesystems',
-														 each=ConfigSection(members=dict(
-																nn_host=Config(key='namenode_host', required=True))
+	FS = UnspecifiedConfigSection(
+			key='filesystems',
+			each=ConfigSection(members=dict(
+					nn_host=Config(key='namenode_host', required=True))
 </pre>
 	An `UnspecifiedConfigSection` is useful when the children of the section are not known.
 	When HUE loads your application's configuration, it binds all sub-sections. You can
 	access the values by:
 <pre>
-		cluster1_val = FS['cluster_1'].nn_host.get()
-		all_clusters = FS.keys()
-		for cluster in all_clusters:
-				val = FS[cluster].nn_host.get()
+	cluster1_val = FS['cluster_1'].nn_host.get()
+	all_clusters = FS.keys()
+	for cluster in all_clusters:
+			val = FS[cluster].nn_host.get()
 </pre>
+
+Your HUE application can automatically detect configuration problems and alert
+the admin. To take advantage of this feature, create a `config_validator`
+function in your `conf.py`:
+
+<pre>
+	def config_validator():
+		"""
+		config_validator() -> [(config_variable, error_msg)] or None
+		Called by core check_config() view.
+		"""
+		res = [ ]
+		if not REQUIRED_PROPERTY.get():
+			res.append((REQUIRED_PROPERTY, "This variable must be set"))
+		if MY_INT_PROPERTY.get() < 0:
+			res.append((MY_INT_PROPERTY, "This must be a non-negative number"))
+		return res
+</pre>
+
 
 <div class="note">
 You should specify the <code>help="..."</code> argument to all configuration related objects in
 your <code>conf.py</code>. The examples omit some for the sake of space. But you and your
 application's users can view all the configuration variables by doing:
 <pre>
-		$ build/env/bin/hue config_help
+	$ build/env/bin/hue config_help
 </pre>
 </div>
 

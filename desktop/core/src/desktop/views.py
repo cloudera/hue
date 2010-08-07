@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import os
 import sys
 import tempfile
 import time
@@ -28,6 +29,7 @@ from django.core.servers.basehttp import FileWrapper
 import django.views.debug
 
 from desktop.lib.django_util import login_notrequired, render_json, render
+from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
 from desktop.models import UserPreferences
 from desktop import appmanager
@@ -144,7 +146,6 @@ def status_bar(request):
   Concatenates multiple views together to build up a "status bar"/"status_bar".
   These views are registered using register_status_bar_view above.
   """
-  global _status_bar_views
   resp = ""
   for view in _status_bar_views:
     try:
@@ -152,14 +153,15 @@ def status_bar(request):
       if r.status_code == 200:
         resp += r.content
       else:
-        LOG.warning("Failed to execute status_bar view %s" % view)
+        LOG.warning("Failed to execute status_bar view %s" % (view,))
     except:
-      LOG.exception("Failed to execute status_bar view %s" % view)
+      LOG.exception("Failed to execute status_bar view %s" % (view,))
   return HttpResponse(resp)
 
 def dump_config(request):
   # Note that this requires login (as do most apps).
   show_private = False
+  conf_dir = os.path.realpath(get_desktop_root('conf'))
 
   if not request.user.is_superuser:
     return HttpResponse("You must be a superuser.")
@@ -167,8 +169,11 @@ def dump_config(request):
   if request.GET.get("private"):
     show_private = True
 
-  return render("dump_config.mako", request, dict(show_private=show_private,
-    top_level=desktop.lib.conf.GLOBAL_CONFIG, apps=appmanager.DESKTOP_MODULES))
+  return render("dump_config.mako", request, dict(
+    show_private=show_private,
+    top_level=desktop.lib.conf.GLOBAL_CONFIG,
+    conf_dir=conf_dir,
+    apps=appmanager.DESKTOP_MODULES))
 
 if sys.version_info[0:2] <= (2,4):
   def _threads():
@@ -204,8 +209,6 @@ def serve_404_error(request, *args, **kwargs):
   """Registered handler for 404. We just return a simple error"""
   access_warn(request, "404 not found")
   return render_to_response("404.html", dict(uri=request.build_absolute_uri()))
-  return HttpResponse('Page not found. You are trying to access %s' % (request.build_absolute_uri(),),
-                      content_type="text/plain")
 
 def serve_500_error(request, *args, **kwargs):
   """Registered handler for 500. We use the debug view to make debugging easier."""
@@ -240,7 +243,7 @@ def log_frontend_event(request):
 
   level = _LOG_LEVELS.get(get("level"), logging.INFO)
   msg = "Untrusted log event from user %s: %s" % (
-    request.user, 
+    request.user,
     get("message", "")[:_MAX_LOG_FRONTEND_EVENT_LENGTH])
   _LOG_FRONTEND_LOGGER.log(level, msg)
   return HttpResponse("")
@@ -255,3 +258,67 @@ def who_am_i(request):
     sleep = 0.0
   time.sleep(sleep)
   return HttpResponse(request.user.username + "\t" + request.fs.user + "\n")
+
+
+# If the app's conf.py has a config_validator() method, call it.
+CONFIG_VALIDATOR = 'config_validator'
+
+#
+# Cache config errors because (1) they mostly don't go away until restart,
+# and (2) they can be costly to compute. So don't stress the system just because
+# the dock bar wants to refresh every n seconds.
+#
+# The actual viewing of all errors may choose to disregard the cache.
+#
+_CONFIG_ERROR_LIST = None
+
+def _get_config_errors(cache=True):
+  """Returns a list of (confvar, err_msg) tuples."""
+  global _CONFIG_ERROR_LIST
+
+  if not cache or _CONFIG_ERROR_LIST is None:
+    error_list = [ ]
+    for module in appmanager.DESKTOP_MODULES:
+      # Get the config_validator() function
+      try:
+        validator = getattr(module.conf, CONFIG_VALIDATOR)
+      except AttributeError:
+        continue
+
+      if not callable(validator):
+        LOG.warn("Auto config validation: %s.%s is not a function" %
+                 (module.conf.__name__, CONFIG_VALIDATOR))
+        continue
+
+      try:
+        error_list.extend(validator())
+      except Exception, ex:
+        LOG.exception("Error in config validation by %s: %s" % (module.nice_name, ex))
+    _CONFIG_ERROR_LIST = error_list
+  return _CONFIG_ERROR_LIST
+
+
+def check_config(request):
+  """Check config and view for the list of errors"""
+  if not request.user.is_superuser:
+    return HttpResponse("You must be a superuser.")
+  conf_dir = os.path.realpath(get_desktop_root('conf'))
+  return render('check_config.mako', request, dict(
+                    error_list=_get_config_errors(cache=False),
+                    conf_dir=conf_dir))
+
+def status_bar_config_check(request):
+  """Alert administrators about configuration problems."""
+  if not request.user.is_superuser:
+    return HttpResponse('')
+
+  error_list = _get_config_errors()
+  if not error_list:
+    # Return an empty response, rather than using the mako template, for performance.
+    return HttpResponse('')
+  return render('config_alert_dock.mako',
+                request,
+                dict(error_list=error_list),
+                force_template=True)
+
+register_status_bar_view(status_bar_config_check)

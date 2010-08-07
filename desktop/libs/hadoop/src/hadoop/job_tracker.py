@@ -18,6 +18,7 @@
 # Django-side implementation of the JobTracker plugin interface
 
 from desktop.lib import thrift_util
+from desktop.lib.conf import validate_port
 from desktop.lib.thrift_util import fixup_enums
 
 from hadoop.api.jobtracker import Jobtracker
@@ -26,6 +27,7 @@ from hadoop.api.jobtracker.ttypes import ThriftJobID, ThriftTaskAttemptID, \
     ThriftTaskState, ThriftJobState, ThriftJobPriority, TaskNotFoundException, \
     JobTrackerState, JobNotFoundException, ThriftTaskQueryState
 from hadoop.api.common.ttypes import RequestContext
+from thrift.transport import TTransport
 
 import threading
 
@@ -33,10 +35,26 @@ VALID_TASK_STATES = set(["succeeded", "failed", "running", "pending", "killed"])
 VALID_TASK_TYPES = set(["map", "reduce", "job_cleanup", "job_setup"])
 
 # timeout (seconds) for thrift calls to jobtracker
-JT_THRIFT_TIMEOUT=15
+JT_THRIFT_TIMEOUT = 15
 
 DEFAULT_USER = "webui"
 DEFAULT_GROUPS = ["webui"]
+
+def test_jt_configuration(cluster):
+  """Test FS configuration. Returns list of (confvar, error)."""
+  err = validate_port(cluster.JT_THRIFT_PORT)
+  if err:
+    return err
+
+  try:
+    jt = LiveJobTracker(cluster.JT_HOST.get(), cluster.JT_THRIFT_PORT.get())
+    jt.runtime_info()
+  except TTransport.TTransportException:
+    msg = 'Failed to contact JobTracker plugin at %s:%s.' % \
+          (cluster.JT_HOST.get(), cluster.JT_THRIFT_PORT.get())
+    return [ (cluster, msg) ]
+  return []
+
 
 class LiveJobTracker(object):
   """

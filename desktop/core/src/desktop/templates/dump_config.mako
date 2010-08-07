@@ -23,6 +23,7 @@ from desktop.lib.conf import BoundContainer, is_anonymous
 <html><head><title>Hue Configuration</title></head>
 <body>
 <h1>Hue Configuration</h1>
+<ul><li>Configuration files located in <code>${conf_dir}</code></li></ul>
 <h2>Installed applications</h2>
 <ul>
 % for app in sorted(apps, key=lambda app: app.name.lower()):

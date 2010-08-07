@@ -275,3 +275,29 @@ def test_log_event():
     handler.records[-1].message)
 
   root.removeHandler(handler)
+
+
+def test_config_check():
+  reset = (
+    desktop.conf.SECRET_KEY.set_for_testing(''),
+    desktop.conf.SSL_CERTIFICATE.set_for_testing('foobar'),
+    desktop.conf.SSL_PRIVATE_KEY.set_for_testing(''),
+    desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon')
+  )
+
+  try:
+    cli = make_logged_in_client()
+    resp = cli.get('/debug/check_config')
+    assert_true('Secret key should be configured' in resp.content)
+    assert_true('desktop.ssl_certificate' in resp.content)
+    assert_true('Path does not exist' in resp.content)
+    assert_true('SSL private key file should be set' in resp.content)
+    assert_true('klingon' in resp.content)
+    assert_true('Encoding not supported' in resp.content)
+
+    # Alert present in the status bar
+    resp = cli.get('/status_bar/')
+    assert_true('Misconfiguration' in resp.content)
+  finally:
+    for old_conf in reset:
+      old_conf()

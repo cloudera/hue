@@ -19,7 +19,7 @@ import logging
 import os
 import re
 
-from django.conf.urls.defaults import include, patterns, url
+from django.conf.urls.defaults import include, patterns
 from django.contrib import admin
 
 from desktop import appmanager
@@ -61,6 +61,7 @@ dynamic_patterns = patterns('',
   (r'^depender/', include(depender.urls)),
   (r'^debug/threads$', 'desktop.views.threads'),
   (r'^debug/who_am_i$', 'desktop.views.who_am_i'),
+  (r'^debug/check_config$', 'desktop.views.check_config'),
   (r'^log_frontend_event$', 'desktop.views.log_frontend_event'),
   # Top level web page!
   (r'^$', 'desktop.views.index'),
@@ -89,6 +90,6 @@ static_patterns.append(static_pattern("static", buildpath("core/static")))
 urlpatterns = patterns('', *static_patterns) + dynamic_patterns
 
 for x in dynamic_patterns:
-  logging.debug("Dynamic pattern: %s" % x)
+  logging.debug("Dynamic pattern: %s" % (x,))
 for x in static_patterns:
-  logging.debug("Static pattern: %s" % str(x))
+  logging.debug("Static pattern: %s" % (x,))

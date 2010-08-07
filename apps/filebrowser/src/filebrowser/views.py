@@ -20,6 +20,7 @@
 # Useful resources:
 #   django/views/static.py manages django's internal directory index
 
+import errno
 import logging
 import mimetypes
 import posixpath
@@ -124,7 +125,7 @@ def edit(request, path, form=None):
     stats = request.fs.stats(path)
   except IOError, ioe:
     # A file not found is OK, otherwise re-raise
-    if "not found" in ioe.args[0]:
+    if ioe.errno == errno.ENOENT:
       stats = None
     else:
       raise

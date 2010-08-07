@@ -70,7 +70,7 @@ variables.
 """
 
 # Magical object for use as a "symbol"
-_ANONYMOUS=["_ANONYMOUS"]
+_ANONYMOUS = ("_ANONYMOUS")
 
 # a BoundContainer(BoundConfig) object which has all of the application's configs as members
 GLOBAL_CONFIG = None
@@ -78,17 +78,33 @@ GLOBAL_CONFIG = None
 __all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool"]
 
 class BoundConfig(object):
-  def __init__(self, config, bind_to, grab_key=_ANONYMOUS):
+  def __init__(self, config, bind_to, grab_key=_ANONYMOUS, prefix=''):
     """
     A Config object that has been bound to specific data.
 
     @param config   The config that is bound - must handle get_value
     @param bind_to  The data it is bound to - must support subscripting
     @param grab_key The key in bind_to in which to expect this configuration
+    @param prefix   The prefix in the config tree leading to this configuration
     """
     self.config = config
     self.bind_to = bind_to
     self.grab_key = grab_key
+
+    # The prefix of a config is the path leading to the config, including section and subsections
+    # along the way, e.g. hadoop.filesystems.cluster_1.
+    #
+    # The prefix is recorded in BoundConfig only, because section names can change dynamically for
+    # UnspecifiedConfigSection's, which have children with _ANONYMOUS keys. If our config is
+    # _ANONYMOUS, this `prefix' includes the prefix plus the actual key name.
+    self.prefix = prefix
+
+  def get_fully_qualifying_key(self):
+    """Returns the full key name, in the form of section[.subsection[...]].key"""
+    res = self.prefix
+    if self.config.key is not _ANONYMOUS:
+      res += self.prefix and '.' + self.config.key or self.config.key
+    return res
 
   def _get_data_and_presence(self):
     """
@@ -108,7 +124,7 @@ class BoundConfig(object):
   def get(self):
     """Get the data, or its default value."""
     data, present = self._get_data_and_presence()
-    return self.config.get_value(data, present=present)
+    return self.config.get_value(data, present=present, prefix=self.prefix)
 
   def set_for_testing(self, data=None, present=True):
     """
@@ -178,7 +194,7 @@ class Config(object):
     assert not (self.required and self.default), \
            "Config cannot be required if it has a default."
 
-  def bind(self, conf):
+  def bind(self, conf, prefix):
     """Rather than doing the lookup now and assigning self.value or something,
     this binding creates a new object. This is because, for a given Config
     object, it might need to be bound to different parts of a configuration
@@ -188,9 +204,9 @@ class Config(object):
     it will be end up applying to each subsection. We therefore bind it
     multiple times, once to each subsection.
     """
-    return BoundConfig(config=self, bind_to=conf, grab_key=self.key)
+    return BoundConfig(config=self, bind_to=conf, grab_key=self.key, prefix=prefix)
 
-  def get_value(self, val, present):
+  def get_value(self, val, present, prefix=None):
     """
     Return the value for this configuration variable from the
     currently loaded configuration.
@@ -205,7 +221,7 @@ class Config(object):
       raw_val = val
     else:
       raw_val = self.default
-    return self._coerce_type(raw_val)
+    return self._coerce_type(raw_val, prefix)
 
   def validate(self, source):
     """
@@ -213,12 +229,13 @@ class Config(object):
     or of the incorrect type.
     """
     # Getting the value will raise an exception if it's in bad form.
-    _ = self.get_value()
+    val = source.get(self.key, None)
+    present = val is not None
+    _ = self.get_value(val, present)
 
-  def _coerce_type(self, raw):
+  def _coerce_type(self, raw, _):
     """
-    Coerces the value in 'raw' to the correct type, based on
-    self.type
+    Coerces the value in 'raw' to the correct type, based on self.type
     """
     if raw is None:
       return raw
@@ -300,7 +317,7 @@ class BoundContainerWithGetAttr(BoundContainer):
   This is used by ConfigSection
   """
   def __getattr__(self, attr):
-    return self.config.get_member(self.get_data_dict(), attr)
+    return self.config.get_member(self.get_data_dict(), attr, self.prefix)
 
 class BoundContainerWithGetItem(BoundContainer):
   """
@@ -312,7 +329,7 @@ class BoundContainerWithGetItem(BoundContainer):
   def __getitem__(self, attr):
     if attr in self.__dict__:
       return self.__dict__[attr]
-    return self.config.get_member(self.get_data_dict(), attr)
+    return self.config.get_member(self.get_data_dict(), attr, self.prefix)
 
 
 class ConfigSection(Config):
@@ -353,21 +370,23 @@ class ConfigSection(Config):
     self.members.update(new_members)
 
 
-  def bind(self, config):
-    return BoundContainerWithGetAttr(self, bind_to=config, grab_key=self.key)
+  def bind(self, config, prefix):
+    return BoundContainerWithGetAttr(self, bind_to=config, grab_key=self.key, prefix=prefix)
 
-  def _coerce_type(self, raw):
+  def _coerce_type(self, raw, prefix=''):
     """
     Materialize this section as a dictionary.
 
     The keys are those specified in the members dict, and the values
     are bound configuration parameters.
     """
-    return dict([(key, self.get_member(raw, key))
+    return dict([(key, self.get_member(raw, key, prefix))
                  for key in self.members.iterkeys()])
 
-  def get_member(self, data, attr):
-    return self.members[attr].bind(data)
+  def get_member(self, data, attr, prefix):
+    if self.key is not _ANONYMOUS:
+      prefix += prefix and '.' + self.key or self.key
+    return self.members[attr].bind(data, prefix)
 
   def print_help(self, out=sys.stdout, indent=0, skip_header=False):
     if self.private:
@@ -387,31 +406,41 @@ class ConfigSection(Config):
 
 class UnspecifiedConfigSection(Config):
   """
-  A section of configuration variables whose subsections are unknown
-  but of some given type.
+  A special Config that maps a section name to a list of anonymous subsections.
+  The subsections are anonymous in the sense that their names are unknown beforehand,
+  but all have the same structure.
 
   For example, this can be used for a [clusters] section which
   expects some number of [[cluster]] sections underneath it.
+
+  This class is NOT a ConfigSection, although it supports get_member(). The key
+  difference is that its get_member() returns a BoundConfig with:
+  (1) an anonymous ConfigSection,
+  (2) an anonymous grab_key, and
+  (3) a `prefix' containing the prefix plus the actual key name.
   """
   def __init__(self, key=_ANONYMOUS, each=None, **kwargs):
     super(UnspecifiedConfigSection, self).__init__(key, default={}, **kwargs)
     assert each.key is _ANONYMOUS
-    self.each = each
+    self.each = each    # `each' is a ConfigSection
 
-  def bind(self, config):
-    return BoundContainerWithGetItem(self, bind_to=config, grab_key=self.key)
+  def bind(self, config, prefix):
+    return BoundContainerWithGetItem(self, bind_to=config, grab_key=self.key, prefix=prefix)
 
-  def _coerce_type(self, raw):
+  def _coerce_type(self, raw, prefix=''):
     """
     Materialize this section as a dictionary.
 
     The keys are the keys specified by the user in the config file.
     """
-    return dict([(key, self.get_member(raw, key))
+    return dict([(key, self.get_member(raw, key, prefix))
                  for key in raw.iterkeys()])
 
-  def get_member(self, data, attr):
-    return self.each.bind(data[attr])
+  def get_member(self, data, attr, prefix=''):
+    tail = self.key + '.' + attr
+    child_prefix = prefix
+    child_prefix += prefix and '.' + tail or tail
+    return self.each.bind(data[attr], child_prefix)
 
   def print_help(self, out=sys.stdout, indent=0):
     indent_str = " " * indent
@@ -452,7 +481,7 @@ def load_confs(conf_source=None):
     conf.merge(in_conf)
   return conf
 
-def _bind_module_members(module, data):
+def _bind_module_members(module, data, section):
   """
   Bind all Config instances found inside the given module
   to the given data.
@@ -465,7 +494,7 @@ def _bind_module_members(module, data):
       continue
 
     members[key] = val
-    module.__dict__[key] = val.bind(data)
+    module.__dict__[key] = val.bind(data, prefix=section)
   return members
 
 
@@ -496,7 +525,7 @@ def bind_module_config(mod, conf_data):
     section = mod.__name__
 
   bind_data = conf_data.get(section, {})
-  members = _bind_module_members(mod, bind_data)
+  members = _bind_module_members(mod, bind_data, section)
   return ConfigSection(section,
                        members=members,
                        help=mod.__doc__)
@@ -518,12 +547,12 @@ def initialize(modules):
 
   GLOBAL_HELP = "(root of all configuration)"
   if GLOBAL_CONFIG is None:
-    GLOBAL_CONFIG = ConfigSection(members=sections, help=GLOBAL_HELP).bind(conf_data)
+    GLOBAL_CONFIG = ConfigSection(members=sections, help=GLOBAL_HELP).bind(conf_data, prefix='')
   else:
     new_config = ConfigSection(members=sections, help=GLOBAL_HELP)
     new_config.update_members(GLOBAL_CONFIG.config.members, overwrite=False)
     conf_data.merge(GLOBAL_CONFIG.bind_to)
-    GLOBAL_CONFIG = new_config.bind(conf_data)
+    GLOBAL_CONFIG = new_config.bind(conf_data, prefix='')
   return
 
 def is_anonymous(key):
@@ -537,3 +566,39 @@ def coerce_bool(value):
   if value in ("true", "True", "1", "yes", "on"):
     return True
   raise Exception("Could not coerce boolean value: " + str(value))
+
+
+def validate_path(confvar, is_dir=None):
+  """
+  Validate that the value of confvar is an existent local path.
+
+  @param confvar  The configuration variable.
+  @param is_dir  True/False would verify that the path is/isn't a directory.
+                 None to disable check.
+  @return [(confvar, error_msg)] or []
+  """
+  path = confvar.get()
+  if not os.path.exists(path):
+    return [(confvar, 'Path does not exist on local filesystem.')]
+  if is_dir is not None:
+    if is_dir:
+      if not os.path.isdir(path):
+        return [(confvar, 'Not a directory.')]
+    elif not os.path.isfile(path):
+      return [(confvar, 'Not a file.')]
+  return [ ]
+
+def validate_port(confvar):
+  """
+  Validate that the value of confvar is between [0, 65535].
+  Returns [(confvar, error_msg)] or []
+  """
+  port_val = confvar.get()
+  error_res = [(confvar, 'Port should be an integer between 0 and 65535 (inclusive).')]
+  try:
+    port = int(port_val)
+    if port < 0 or port > 65535:
+      return error_res
+  except ValueError:
+    return error_res
+  return [ ]

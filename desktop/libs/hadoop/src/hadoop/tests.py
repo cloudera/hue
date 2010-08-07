@@ -20,9 +20,13 @@ Tests for libs/hadoop
 import cStringIO
 import os
 
-from nose.tools import assert_true, assert_equal
+from nose.tools import assert_true, assert_equal, assert_false
 from nose.plugins.attrib import attr
 
+import desktop.views
+
+from desktop.lib.django_test_util import make_logged_in_client
+from hadoop import conf
 from hadoop import confparse
 from hadoop import mini_cluster
 
@@ -103,5 +107,60 @@ def test_tricky_confparse():
   We found (experimentally) that dealing with a file
   sometimes triggered the wrong results here.
   """
-  cp_data = confparse.ConfParse(file(os.path.join(os.path.dirname(__file__), "test_data", "sample_conf.xml")))
+  cp_data = confparse.ConfParse(file(os.path.join(os.path.dirname(__file__),
+                                                  "test_data",
+                                                  "sample_conf.xml")))
   assert_equal("org.apache.hadoop.examples.SleepJob", cp_data["mapred.mapper.class"])
+
+
+def test_config_validator_basic():
+  reset = (
+    conf.HADOOP_STREAMING_JAR.set_for_testing('/tmp'),
+    conf.HDFS_CLUSTERS['default'].NN_THRIFT_PORT.set_for_testing(1),
+    conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(70000),
+  )
+  try:
+    cli = make_logged_in_client()
+    resp = cli.get('/debug/check_config')
+    assert_true('hadoop.hadoop_streaming_jar' in resp.content)
+    assert_true('Not a file' in resp.content)
+    assert_true('hadoop.hdfs_clusters.default' in resp.content)
+    assert_true('Failed to contact Namenode plugin' in resp.content)
+    assert_true('hadoop.mapred_clusters.default.thrift_port' in resp.content)
+    assert_true('Port should be' in resp.content)
+  finally:
+    for old_conf in reset:
+      old_conf()
+
+
+@attr('requires_hadoop')
+def test_config_validator_more():
+  # TODO: Setup DN to not load the plugin, which is a common user error.
+
+  # We don't actually use the mini_cluster. But the cluster sets up the correct
+  # configuration that forms the test basis.
+  cluster = mini_cluster.shared_cluster()
+  if not cluster.fs.exists('/tmp'):
+    cluster.fs.setuser(cluster.fs.superuser)
+    cluster.fs.mkdir('/tmp', 0777)
+  cli = make_logged_in_client()
+
+  reset = (
+    conf.HADOOP_BIN.set_for_testing(cluster.fs.hadoop_bin_path),
+    conf.HDFS_CLUSTERS['default'].NN_HOST.set_for_testing('localhost'),
+    conf.HDFS_CLUSTERS['default'].NN_HDFS_PORT.set_for_testing(22),
+    conf.HDFS_CLUSTERS["default"].NN_THRIFT_PORT.set_for_testing(cluster.fs.thrift_port),
+    conf.MR_CLUSTERS["default"].JT_HOST.set_for_testing("localhost"),
+    conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(23),
+  )
+  try:
+    resp = cli.get('/debug/check_config')
+
+    assert_false('Failed to contact Namenode plugin' in resp.content)
+    assert_false('Failed to see HDFS root' in resp.content)
+    assert_true('Failed to upload files' in resp.content)
+    assert_true('Failed to contact JobTracker plugin' in resp.content)
+  finally:
+    for old_conf in reset:
+      old_conf()
+    cluster.shutdown()

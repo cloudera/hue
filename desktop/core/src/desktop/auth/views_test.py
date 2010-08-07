@@ -17,10 +17,15 @@
 
 from nose.tools import assert_true, assert_false, assert_equal
 
+from django.contrib.auth.models import User
 from django.test.client import Client
 from desktop.lib.django_test_util import make_logged_in_client
 
 def test_jframe_login():
+  # Simulate first login ever
+  for user in User.objects.all():
+    user.delete()
+
   c = Client()
 
   response = c.get('/accounts/login_form')

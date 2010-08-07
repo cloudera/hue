@@ -83,7 +83,8 @@ class ConfigTest(unittest.TestCase):
                                        type=int, default=9090))))))
     self.conf = self.conf.bind(
       load_confs([configobj.ConfigObj(infile=StringIO(self.CONF_ONE)),
-                  configobj.ConfigObj(infile=StringIO(self.CONF_TWO))]))
+                  configobj.ConfigObj(infile=StringIO(self.CONF_TWO))]),
+      prefix='')
 
   def testDynamicDefault(self):
     self.assertEquals(7, self.conf.DYNAMIC_DEF.get())
@@ -105,6 +106,14 @@ class ConfigTest(unittest.TestCase):
     self.assertTrue("clustera" in self.conf.CLUSTERS)
     self.assertEquals("localhost", self.conf.CLUSTERS['clustera'].HOST.get())
     self.assertEquals(9090, self.conf.CLUSTERS['clustera'].PORT.get())
+
+  def testFullKeyName(self):
+    self.assertEquals(self.conf.REQ.get_fully_qualifying_key(), 'req')
+    self.assertEquals(self.conf.CLUSTERS.get_fully_qualifying_key(), 'clusters')
+    self.assertEquals(self.conf.CLUSTERS['clustera'].get_fully_qualifying_key(),
+                      'clusters.clustera')
+    self.assertEquals(self.conf.CLUSTERS['clustera'].HOST.get_fully_qualifying_key(),
+                      'clusters.clustera.host')
 
   def testSetForTesting(self):
     # Test base case

@@ -16,8 +16,10 @@
 # limitations under the License.
 """General configuration for core Desktop features (authentication, etc)"""
 
-from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool
+from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
+from desktop.lib.conf import coerce_bool, validate_path
 from desktop.lib.paths import get_desktop_root
+from desktop.lib import i18n
 import os
 import socket
 
@@ -261,3 +263,25 @@ HTTP_500_DEBUG_MODE = Config(
   type=coerce_bool,
   default=True
 )
+
+
+def config_validator():
+  """
+  config_validator() -> [ (config_variable, error_message) ]
+
+  Called by core check_config() view.
+  """
+  res = [ ]
+  if not SECRET_KEY.get():
+    res.append((SECRET_KEY, "Secret key should be configured as a random string."))
+
+  if SSL_CERTIFICATE.get():
+    res.extend(validate_path(SSL_CERTIFICATE, is_dir=False))
+    if not SSL_PRIVATE_KEY.get():
+      res.append((SSL_PRIVATE_KEY, "SSL private key file should be set to enable HTTPS."))
+    else:
+      res.extend(validate_path(SSL_PRIVATE_KEY, is_dir=False))
+  if not i18n.validate_encoding(DEFAULT_SITE_ENCODING.get()):
+    res.append((DEFAULT_SITE_ENCODING, "Encoding not supported."))
+
+  return res

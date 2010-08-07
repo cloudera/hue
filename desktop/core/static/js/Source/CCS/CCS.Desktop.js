@@ -215,7 +215,9 @@ CCS.Desktop = {
 	launch: function(component, args, callback){
 		callback = callback || $empty;
 		if (!this.hasApp(component)) {
-			CCS.error('Could Not Launch App', 'Sorry, we couldn\'t find an app named ' + component + '. Launching a new window instead.');
+			if (component != '_blank') {
+				CCS.error('Could Not Launch App', 'Sorry, we couldn\'t find an app named ' + component + '. Launching a new window instead.');
+			}
 			callback();
 			return window.open(args[0], component);
 		}

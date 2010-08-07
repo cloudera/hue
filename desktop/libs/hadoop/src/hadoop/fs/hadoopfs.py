@@ -22,6 +22,7 @@ import errno
 import logging
 import os
 import posixpath
+import random
 import stat as statconsts
 import subprocess
 import sys
@@ -34,6 +35,7 @@ from thrift.protocol import TBinaryProtocol
 
 from django.utils.encoding import smart_str, force_unicode
 from desktop.lib import thrift_util, i18n
+from desktop.lib.conf import validate_port
 from hadoop.api.hdfs import Namenode, Datanode
 from hadoop.api.hdfs.constants import QUOTA_DONT_SET, QUOTA_RESET
 from hadoop.api.common.ttypes import RequestContext, IOException
@@ -79,6 +81,96 @@ def decode_fs_path(path):
   return force_unicode(path, HDFS_ENCODING, errors='strict')
 
 
+def test_fs_configuration(fs_config, hadoop_bin_conf):
+  """Test FS configuration. Returns list of (confvar, error)."""
+  TEST_FILE = '/tmp/.hue_config_test.%s' % (random.randint(0, 9999999999))
+  res = [ ]
+
+  res.extend(validate_port(fs_config.NN_THRIFT_PORT))
+  res.extend(validate_port(fs_config.NN_HDFS_PORT))
+  if res:
+    return res
+
+  # Check thrift plugin
+  try:
+    fs = HadoopFileSystem(fs_config.NN_HOST.get(),
+                          fs_config.NN_THRIFT_PORT.get(),
+                          fs_config.NN_HDFS_PORT.get(),
+                          hadoop_bin_conf.get())
+
+    fs.setuser(fs.superuser)
+    ls = fs.listdir('/')
+  except TTransport.TTransportException:
+    msg = 'Failed to contact Namenode plugin at %s:%s.' % \
+            (fs_config.NN_HOST.get(), fs_config.NN_THRIFT_PORT.get())
+    LOG.exception(msg)
+    res.append((fs_config, msg))
+    return res
+  except (IOError, IOException):
+    msg = 'Failed to see HDFS root directory at %s. Please check HDFS configuration.' % (fs.uri,)
+    LOG.exception(msg)
+    res.append((fs_config, msg))
+    return res
+
+  if 'tmp' not in ls:
+    return res
+
+  # Check nn port (via upload)
+  try:
+    w_file = fs.open(TEST_FILE, 'w')
+  except OSError, ex:
+    msg = 'Failed to execute Hadoop (%s)' % (hadoop_bin_conf.get(),)
+    LOG.exception(msg)
+    res.append((hadoop_bin_conf, msg))
+    return res
+
+  try:
+    try:
+      w_file.write('hello world')
+      w_file.close()
+    except IOError:
+      msg = 'Failed to upload files using %s' % (fs.uri,)
+      LOG.exception(msg)
+      res.append((fs_config.NN_HDFS_PORT, msg))
+      return res
+
+    # Check dn plugin (via read)
+    try:
+      r_file = fs.open(TEST_FILE, 'r')
+      r_file.read()
+    except Exception:
+      msg = 'Failed to read file. Are all datanodes configured with the HUE plugin?'
+      res.append((fs_config, msg))
+  finally:
+    # Cleanup. Ignore if file not found.
+    try:
+      if fs.exists(TEST_FILE):
+        fs.remove(TEST_FILE)
+    except Exception, ex:
+      LOG.error('Failed to cleanup test file "%s:%s": %s' % (fs.uri, TEST_FILE, ex))
+  return res
+
+
+def _coerce_exceptions(function):
+  """
+  Decorator that causes exceptions thrown by the decorated function
+  to be coerced into generic exceptions from the hadoop.fs.exceptions
+  module.
+  """
+  def wrapper(*args, **kwargs):
+    try:
+      return function(*args, **kwargs)
+    except IOException, e:
+      e.msg = force_unicode(e.msg, errors='replace')
+      e.stack = force_unicode(e.stack, errors='replace')
+      LOG.exception("Exception in Hadoop FS call " + function.__name__)
+      if e.clazz == HADOOP_ACCESSCONTROLEXCEPTION:
+        raise PermissionDeniedException(e.msg, e)
+      else:
+        raise
+  return wrapper
+
+
 class HadoopFileSystem(object):
   """
   Implementation of Filesystem APIs through Thrift to a Hadoop cluster.
@@ -113,26 +205,6 @@ class HadoopFileSystem(object):
   def _get_hdfs_base(self):
     return "hdfs://%s:%d" % (self.host, self.hdfs_port) # TODO(todd) fetch the port from the NN thrift
 
-
-  def _coerce_exceptions(function):
-    """
-    Decorator that causes exceptions thrown by the decorated function
-    to be coerced into generic exceptions from the hadoop.fs.exceptions
-    module.
-    """
-    def wrapper(*args, **kwargs):
-      try:
-        return function(*args, **kwargs)
-      except IOException, e:
-        e.msg = force_unicode(e.msg, errors='replace')
-        e.stack = force_unicode(e.stack, errors='replace')
-        LOG.exception("Exception in Hadoop FS call " + function.__name__)
-        if e.clazz == HADOOP_ACCESSCONTROLEXCEPTION:
-          raise PermissionDeniedException(e.msg, e)
-        else:
-          raise
-    return wrapper
-
   def _resolve_hadoop_path(self):
     """The hadoop_bin_path configuration may be a non-absolute path, in which case
     it's checked against $PATH.
@@ -144,8 +216,7 @@ class HadoopFileSystem(object):
       if os.path.exists(path):
         self.hadoop_bin_path = os.path.abspath(path)
         return
-
-    raise Exception("Hadoop binary (%s) does not exist." % self.hadoop_bin_path)
+    raise OSError(errno.ENOENT, "Hadoop binary (%s) does not exist." % (self.hadoop_bin_path,))
 
   @property
   def uri(self):
@@ -200,9 +271,9 @@ class HadoopFileSystem(object):
     path = encode_fs_path(path)
     stat = self._hadoop_stat(path)
     if not stat:
-      raise IOError("File not found: %s" % path)
+      raise IOError(errno.ENOENT, "File not found: %s" % path)
     if stat.isDir:
-      raise IOError("Is a directory: %s" % path)
+      raise IOError(errno.EISDIR, "Is a directory: %s" % path)
 
     success = self.nn_client.unlink(
       self.request_context, normpath(path), recursive=False)
@@ -222,9 +293,9 @@ class HadoopFileSystem(object):
     path = encode_fs_path(path)
     stat = self._hadoop_stat(path)
     if not stat:
-      raise IOError("Directory not found: %s" % (path,))
+      raise IOError(errno.ENOENT, "Directory not found: %s" % (path,))
     if not stat.isDir:
-      raise IOError("Is not a directory: %s" % (path,))
+      raise IOError(errno.EISDIR, "Is not a directory: %s" % (path,))
 
     success = self.nn_client.unlink(
       self.request_context, normpath(path), recursive=recursive)
@@ -253,9 +324,8 @@ class HadoopFileSystem(object):
 
   @_coerce_exceptions
   def get_content_summaries(self, paths):
-    path = encode_fs_path(path)
-    summaries = self.nn_client.multiGetContentSummary(self.request_context,
-                                                      [normpath(path) for path in paths])
+    paths = [ normpath(encode_fs_path(path)) for path in paths ]
+    summaries = self.nn_client.multiGetContentSummary(self.request_context, paths)
     def _fix_summary(summary):
       summary.path = decode_fs_path(summary.path)
       return summary
@@ -274,11 +344,11 @@ class HadoopFileSystem(object):
   def rename_star(self, old_dir, new_dir):
     """Equivalent to `mv old_dir/* new"""
     if not self.isdir(old_dir):
-      raise IOError("'%s' is not a directory" % (old_dir,))
+      raise IOError(errno.ENOTDIR, "'%s' is not a directory" % (old_dir,))
     if not self.exists(new_dir):
       self.mkdir(new_dir)
     elif not self.isdir(new_dir):
-      raise IOError("'%s' is not a directory" % (new_dir,))
+      raise IOError(errno.ENOTDIR, "'%s' is not a directory" % (new_dir,))
     ls = self.listdir(old_dir)
     for dirent in ls:
       self.rename(HadoopFileSystem.join(old_dir, dirent),
@@ -308,7 +378,7 @@ class HadoopFileSystem(object):
     stat = self._hadoop_stat(path)
     if not stat:
       if raise_on_fnf:
-        raise IOError("File %s not found" % path)
+        raise IOError(errno.ENOENT, "File %s not found" % (path,))
       else:
         return None
     ret = self._unpack_stat(stat)
@@ -560,7 +630,7 @@ def require_open(func):
   """
   def wrapper(self, *args, **kwargs):
     if self.closed:
-      raise IOError("I/O operation on closed file")
+      raise IOError(errno.EBADF, "I/O operation on closed file")
     return func(self, *args, **kwargs)
   return wrapper
 
@@ -583,9 +653,9 @@ class File(object):
     stat = self._stat()
 
     if stat is None:
-      raise IOError("No such file or directory: '%s'" % path)
+      raise IOError(errno.ENOENT, "No such file or directory: '%s'" % path)
     if stat.isDir:
-      raise IOError("Is a directory: '%s'" % path)
+      raise IOError(errno.EISDIR, "Is a directory: '%s'" % path)
     #TODO(todd) somehow we need to check permissions here - maybe we need an access() call?
 
   # Minimal context manager implementation.
@@ -607,7 +677,7 @@ class File(object):
     elif whence == SEEK_END:
       self.pos = self._stat().length + offset
     else:
-      raise IOError("Invalid argument to seek for whence")
+      raise IOError(errno.EINVAL, "Invalid argument to seek for whence")
 
   @require_open
   def tell(self):
@@ -691,7 +761,7 @@ class FileUpload(object):
       extra_confs.append("-Ddfs.block.size=%d" % block_size)
     self.subprocess_cmd = [self.fs.hadoop_bin_path,
                            "dfs",
-                           "-Dfs.default.name=" + self.fs._get_hdfs_base(),
+                           "-Dfs.default.name=" + self.fs.uri,
                            "-Dhadoop.job.ugi=" + self.fs.ugi] + \
                            extra_confs + \
                            ["-put", "-", encode_fs_path(path)]

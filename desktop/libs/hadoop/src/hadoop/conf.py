@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Settings to configure your Hadoop cluster."""
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path
 import glob
 import os
 import logging
@@ -80,7 +80,7 @@ HADOOP_EXAMPLES_JAR = Config(
   private=True)
 
 HADOOP_STREAMING_JAR = Config(
-  key="hadoop_examples_jar",
+  key="hadoop_streaming_jar",
   dynamic_default=find_jar(os.path.join("contrib", "streaming", "hadoop-*streaming*.jar")),
   help="Path to the hadoop-streaming.jar (used by jobdesigner)",
   type=str,
@@ -122,3 +122,35 @@ MR_CLUSTERS = UnspecifiedConfigSection(
       JT_HOST=Config("jobtracker_host", help="IP for JobTracker"),
       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
                             type=int))))
+
+
+def config_validator():
+  """
+  config_validator() -> [ (config_variable, error_message) ]
+
+  Called by core check_config() view.
+  """
+  from hadoop.fs import hadoopfs
+  from hadoop import job_tracker
+  res = [ ]
+
+  # HADOOP_HOME
+  res.extend(validate_path(HADOOP_HOME, is_dir=True))
+  # HADOOP_BIN
+  res.extend(validate_path(HADOOP_BIN, is_dir=False))
+
+  # JARs: even though these are private, we need them to run jobsub
+  res.extend(validate_path(HADOOP_EXAMPLES_JAR, is_dir=False))
+  res.extend(validate_path(HADOOP_STREAMING_JAR, is_dir=False))
+
+  # HDFS_CLUSTERS
+  for name in HDFS_CLUSTERS.keys():
+    cluster = HDFS_CLUSTERS[name]
+    res.extend(hadoopfs.test_fs_configuration(cluster, HADOOP_BIN))
+
+  # MR_CLUSTERS
+  for name in MR_CLUSTERS.keys():
+    cluster = MR_CLUSTERS[name]
+    res.extend(job_tracker.test_jt_configuration(cluster))
+
+  return res
