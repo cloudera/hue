@@ -1,10 +1,8 @@
 About Hue
 =========
-The "About" application reveals the version of Hue
-you're running, and the current configuration.  Access it
-by clicking on the "Hue Dot" in the very top-left of your
-window.
+Click the "About Hue" icon in the upper-left corner of the Hue window to open the "About - Hue" window and  view the Hue version you're running.
 
-<img src="/about/static/help/images/feather.gif" >
+<img src ="/about/static/help/images/about-hue-icon.jpg" width="200">
 
+In the "About - Hue" window, click the "Configuration" link to view the current Hue configuration, or click the "Server Logs" link to view the Hue server logs.
 
