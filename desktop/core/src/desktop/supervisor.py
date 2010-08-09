@@ -50,23 +50,23 @@ LOG = logging.getLogger()
 
 # If a process restarts mre than MAX_RESTARTS_IN_WINDOW times
 # within TIME_WINDOW number of seconds, the supervisor shuts down
-TIME_WINDOW=120
-MAX_RESTARTS_IN_WINDOW=3
+TIME_WINDOW = 120
+MAX_RESTARTS_IN_WINDOW = 3
 
 # User to setuid down to for any supervisees that don't have the
 # drop_root option set to False
-SETUID_USER="hue"
+SETUID_USER = "hue"
 
 # The entry point group in which to find processes to supervise.
-ENTRY_POINT_GROUP="desktop.supervisor.specs"
+ENTRY_POINT_GROUP = "desktop.supervisor.specs"
 
 # How long to wait while trying to acquire the supervisor pid lock
 # file. We shouldn't spin long here - we'd rather fail to start up.
-LOCKFILE_TIMEOUT=2
+LOCKFILE_TIMEOUT = 2
 
-# The desktop program
-DESKTOP_BIN = os.path.join(desktop.lib.paths.get_run_root(),
-                           'build', 'env', 'bin', 'desktop')
+# The hue program
+HUE_BIN = os.path.join(desktop.lib.paths.get_run_root(),
+                       'build', 'env', 'bin', 'hue')
 
 ######
 
@@ -99,7 +99,7 @@ class DjangoCommandSupervisee(SuperviseeSpec):
 
   @property
   def cmdv(self):
-    return [ DESKTOP_BIN, self.django_command ]
+    return [ HUE_BIN, self.django_command ]
 
 
 class TimeOutPIDLockFile(PIDLockFile):
@@ -224,7 +224,7 @@ def get_supervisees():
 
 def drop_privileges():
   """Drop root privileges down to the specified SETUID_USER.
-  
+
   N.B. DO NOT USE THE logging MODULE FROM WITHIN THIS FUNCTION.
   This function is run in forked processes right before it calls
   exec, but the fork may have occured while a different thread
@@ -300,6 +300,7 @@ def main():
         }
 
     context.open()
+  os.umask(022)
 
   # Log initialization must come after daemonization, which closes all open files.
   # Log statements before this point goes to stderr.

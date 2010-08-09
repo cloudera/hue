@@ -174,7 +174,6 @@ apps: desktop
 ###################################
 INSTALL_CORE_FILES = \
 	Makefile* $(wildcard *.mk) \
-	virtual* \
 	example* \
 	ext \
 	tools/app_reg \
