@@ -41,16 +41,22 @@ script: CCS.Request.js
 			},
 			onFailure: function() {
                                 var msg;
-				if(this.status == 0) msg = "The Hue server can not be reached. (Is the server running ?)";
-                                //In IE, the attempt to get the profile upon logout often results in a status error 12030 or 12031.  The request completes successfully, just that IE is unhappy with the response.  This condition catches that condition and passes it to handleLoginRequired(), which is what should happen.
-				else if (Browser.Engine.trident && this.status == 12030 || this.status == 12031) {
+				if(this.status == 0) {
+                                        msg = "The Hue server can not be reached. (Is the server running ?)";
+				} else if (Browser.Engine.trident && (this.status == 12030 || this.status == 12031)) {
+                                        
+                                        //In IE, the attempt to get the profile upon logout often results in a status
+                                        //error 12030 or 12031.  The request completes successfully, just that IE is 
+                                        //unhappy with the response.  This condition catches that condition and passes it
+                                        //to handleLoginRequired(), which is what should happen.
                                         this.handleLoginRequired();
                                         return;
-                                }
-                                else msg = "Error " + this.status + " retrieving <a target='_blank' href='" + this.options.url + "'>link</a>";
-				this.genericErrorAlert({ 
-					message: msg
-				});
+                                } else {
+                                        msg = "Error " + this.status + " retrieving <a target='_blank' href='" + this.options.url + "'>link</a>";
+				}
+                                this.genericErrorAlert({ 
+                                        message: msg
+                                });
 			}
 		},
 
