@@ -37,7 +37,7 @@ Behavior.addGlobalPlugin('SplitView', 'SplitViewScroller', function(element, met
 		for (sideName in sides) {
 			if (sides[sideName].hasChild(anchor)) scrollSide = sides[sideName];
 		}
-		if (scrollSide){
+		if (scrollSide) {
 			var scroller = scrollSide.retrieve('_scroller');
 			if (!scroller) {
 				scroller = new Fx.Scroll(scrollSide);
@@ -48,7 +48,7 @@ Behavior.addGlobalPlugin('SplitView', 'SplitViewScroller', function(element, met
 		}
 	};
 	el.addEvent('click:relay([href*=#])', tabAnchorScroller);
-	this.markForCleanup(element, function(){
+	this.markForCleanup(element, function() {
 		el.removeEvent('click:relay([href*=#]', tabEnchorScroller);
 	});
 });
