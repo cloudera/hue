@@ -70,9 +70,9 @@ def get_current_users():
     if uid is not None:
       try:
         userobj = User.objects.get(pk=uid)
+        current_users[userobj] = last_access_map.get(userobj.username, { })
       except User.DoesNotExist:
         LOG.debug("User with id=%d does not exist" % uid)
-      current_users[userobj] = last_access_map.get(userobj.username, { })
 
   return current_users
 
