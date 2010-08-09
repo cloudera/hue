@@ -58,4 +58,7 @@ div.ccs-help .left_col a:hover {
 	text-decoration: none;
 }
 
-
+div.ccs-help .right_col a[name] {
+  position: relative;
+  left: -10px;
+}

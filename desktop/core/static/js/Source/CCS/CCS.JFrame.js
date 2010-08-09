@@ -48,6 +48,7 @@ requires:
  - /Behavior.SideBySideSelect
  - /Behavior.SizeTo
  - /Behavior.SplitViewPostFold
+ - /Behavior.SplitViewScroller
  - /Behavior.SubmitOnChange
  - /Behavior.Tabs
  - /Behavior.Tips
