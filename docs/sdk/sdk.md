@@ -35,8 +35,8 @@ h6 {
 HUE leverages the browser to provide users with an
 environment for exploring and analyzing data.
 
-Building on top of the HUE SDK lets your application interact naturally with
-Hadoop, as well as the other services offered by HUE.
+Build on top of the HUE SDK to enable your application to interact efficiently with
+Hadoop and the other HUE services.
 
 By building on top of HUE SDK, you get,
 out of the box:
@@ -205,7 +205,9 @@ HUE uses a distutils <tt>entrypoint</tt> to
 register applications.	By installing the calculator
 package into HUE's python virtual environment,
 you'll install a new app.  The "app_reg.py" tool manages
-the applications that are installed
+the applications that are installed. Note that in the following example, the value after the
+"--install" option is the path to the root directory of the application you want to install. In this
+example, it is a relative path to "/Users/philip/src/hue/calculator".
 
         $ ./build/env/bin/python tools/app_reg/app_reg.py --install calculator
         === Installing app at calculator

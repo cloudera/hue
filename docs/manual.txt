@@ -390,30 +390,26 @@ A standard Hue installation starts and monitors the following processes:
 
 If you have installed other applications into your Hue instance, you may see other daemons running under the supervisor as well.
 
-You can see the supervised processes running in the output of `ps`:
+You can see the supervised processes running in the output of `ps -f -u hue`:
 
 ------------------
-[todd@monster01 ~]$ ps -f -u hue
 UID        PID  PPID  C STIME TTY          TIME CMD
-hue       7899     1  0 12:14 ?        00:00:00 /usr/share/hue/build/build/env/bin/python2.4 \
-  /usr/share/hue/desktop/build/env/bin/supervisor -p /var/run/hue/desktop/s
-hue       7903  7899  1 12:14 ?        00:02:59 /usr/share/hue/desktop/build/env/bin/python2.4 \
-  /usr/share/hue/desktop/build/env/bin/hue runcpserver
-hue       7906  7899  0 12:14 ?        00:00:00 /usr/share/hue/desktop/build/env/bin/python2.4 \
-  /usr/share/hue/desktop/build/env/bin/hue jobsubd
-hue       7907  7899  0 12:14 ?        00:00:12 /usr/share/hue/desktop/build/env/bin/python2.4 \
-  /usr/share/hue/desktop/build/env/bin/hue run_healthd
+hue       8685  8679  0 Aug05 ?        00:01:39 /usr/share/hue/build/env/bin/python /usr/share/hue/build/env/bin/desktop runcpserver
+hue       8693  8679  0 Aug05 ?        00:00:01 /usr/share/hue/build/env/bin/python /usr/share/hue/build/env/bin/desktop jobsubd
+hue       8695  8679  0 Aug05 ?        00:00:06 /usr/java/jdk1.6.0_14/bin/java -Xmx1000m -Dhadoop.log.dir=/usr/lib/hadoop-0.20/logs -Dhadoop.log.file=hadoop.log ...
 ------------------
 
 Note that the supervisor automatically restarts these processes if they fail for any reason. If the processes fail repeatedly within a short time, the supervisor itself shuts down.
 
 === Hue Logging
 
-The Hue logs are found in `<installation_directory>/logs`. Inside the log directory you can find:
+The Hue logs are found in `/var/log/hue`. Inside the log directory you can find:
 
-* An `access.log`, which contains a log for all requests against the Hue web server.
-* A `.log` file, which contains the logs for each of the processes described above.
-* A `.out` file, which contains the stdout and stderr for each of the processes described above.
+* An `access.log` file, which contains a log for all requests against the Hue web server.
+* A `supervisor.log` file, which contains log information for the supervisor process.
+* A `supervisor.out` file, which contains the stdout and stderr for the supervisor process.
+* A `.log` file for each supervised process described above, which contains the logs for that process.
+* A `.out` file for each supervised process described above, which contains the stdout and stderr for that process.
 
 If users on your cluster have problems running Hue, you can often find error messages in these log files. If you are unable to start Hue from the init script, the
 `supervisor.log` log file can often contain clues.
@@ -440,8 +436,9 @@ You can inspect this database from the command line using the `sqlite3` program.
 
 ---------
 # sqlite3 /usr/share/hue/desktop/desktop.db
-SQLite version 3.3.6
+SQLite version 3.6.22
 Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
 sqlite> select username from auth_user;
 admin
 test
@@ -464,8 +461,13 @@ Although SQLite is the default database type, some advanced users may prefer to 
 alternate database type. Note that if you elect to configure Hue to use an external database,
 upgrades may require more manual steps in the future.
 
-The following instructions are for MySQL, though you can also configure Hue may to work with other common databases such as PostgreSQL and Oracle.
-But note that Hue has only been tested with SQLite and MySQL database backends.
+The following instructions are for MySQL, though you can also configure Hue to work with other common databases such as PostgreSQL and Oracle.
+
+[NOTE]
+.Tested Database Backends
+============================================================
+Note that Hue has only been tested with SQLite and MySQL database backends.
+============================================================
 
 ===== Configuring Hue to Store Data in MySQL
 
@@ -480,13 +482,12 @@ Query OK, 0 rows affected (0.00 sec)
 ----
 2. Shut down Hue if it is running.
 3. To migrate your existing data to MySQL, use the following command to dump the
-existing database to a text file.
+existing database data to a text file. Note that using the ".json" extension is required.
 ----
-$ /usr/share/hue/build/env/bin/hue dumpdata
+$ /usr/share/hue/build/env/bin/hue dumpdata > <some-temporary-file>.json
 ----
-4. Open the `/etc/hue/hue.ini` file in a text editor. Directly below the `[desktop]` line, add the following options (and modify accordingly for your MySQL setup):
+4. Open the `/etc/hue/hue.ini` file in a text editor. Directly below the `[[database]]` line, add the following options (and modify accordingly for your MySQL setup):
 ----
-[[database]]
 host=localhost
 port=3306
 engine=mysql
@@ -505,9 +506,9 @@ to a tarball (such as `/tmp/MySQL-python-1.2.2.tar.gz`) instead.
 6. As the Hue user, configure Hue to load the existing data and create the
 necessary database tables:
 ----
-$ /usr/share/hue/build/env/bin/hue loaddata
 $ /usr/share/hue/build/env/bin/hue syncdb --noinput
-$ /usr/share/hue/build/env/bin/hue migrate
+$ mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
+$ /usr/share/hue/build/env/bin/hue loaddata <temporary-file-containing-dumped-data>.json
 ----
 
 Your system is now configured and you can start the Hue server as normal.
