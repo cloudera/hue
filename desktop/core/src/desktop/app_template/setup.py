@@ -30,6 +30,7 @@ setup(
   version = "0.1",
   url = 'TODO',
   description = 'TODO',
+  author = 'TODO',
   packages = find_packages('src'),
   package_dir = {'': 'src'},
   install_requires = ['setuptools', 'desktop'],
