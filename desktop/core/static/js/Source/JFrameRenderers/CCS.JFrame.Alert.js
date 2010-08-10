@@ -34,37 +34,34 @@ CCS.JFrame.addGlobalRenderers({
 		var jframe_renders = popup.hasClass('jframe_renders');
 
 		var target = new Element('div', {'class': 'jframe_alert'}).hide().inject($(this));
-                var fillAndShow = function() {
-                        if (!jframe_renders) {
-                                //if we aren't rendering the jframe, fill the popup
-                                //and remove the toolbar
-                                this.fill(target, content);
-                                var toolbar = content.elements.filter('.toolbar');
-                                if (toolbar.length) toolbar.hide();
-                        } else {
-                                //otherwise we're going to leave the content object alone and clone
-                                //the popup, hiding the original
-                                this.fill(target, {
-                                        elements: $$(popup.clone())
-                                });
-                                popup.hide();
-                        }
-                }.bind(this);
+		var fillAndShow = function() {
+			if (!jframe_renders) {
+				//if we aren't rendering the jframe, fill the popup
+				//and remove the toolbar
+				this.fill(target, content);
+				var toolbar = content.elements.filter('.toolbar');
+				if (toolbar.length) toolbar.hide();
+			} else {
+				//otherwise we're going to leave the content object alone and clone
+				//the popup, hiding the original
+				this.fill(target, {
+					elements: $$(popup.clone())
+				});
+				popup.hide();
+			}
+			target.show();
+		}.bind(this);
 
-	        if(!Browser.Engine.trident) {
-                        fillAndShow();
-                }
-	
 		//our method to actually show the alert
 		var alerter = function(){
+			if(!Browser.Engine.trident) fillAndShow();
 			if (options.blankWindowWithError) {
 				CCS.error(content.title, target);
+				if (Browser.Engine.trident) fillAndShow();
 				this.getWindow().hide();
 			} else {
 				var alert = this.alert(content.title, target);
-                                if(Browser.Engine.trident) {
-                                        fillAndShow();
-                                }
+				if (Browser.Engine.trident) fillAndShow();
 				target.getElements(":widget").each(function(widget) {
 					widget.get("widget").register(widget.getParent(":widget").get("widget"));
 				});
@@ -76,8 +73,7 @@ CCS.JFrame.addGlobalRenderers({
 					}
 				}
 				alert.position().show();
-                                target.show();
-			
+				
 				//if jframe is rendering we remove this event which we're going to add a few lines down
 				if (jframe_renders) this.removeEvent('afterRenderer', alerter);
 				if (options.callback) options.callback(data);
