@@ -2,7 +2,7 @@
 ---
 description: Any JFrame response that has a root-level child element with the class .prompt_popup is displayed in a prompt overlaying the previous state which is restored when the prompt is canceled.
 provides: [CCS.JFrame.Prompt]
-requires: [/CCS.JFrame, Widgets/ART.Alerts]
+requires: [/CCS.JFrame, Widgets/ART.Alerts, Widgets/Behavior]
 script: CCS.JFrame.Prompt.js
 
 ...
@@ -31,11 +31,20 @@ CCS.JFrame.addGlobalRenderers({
 		var popup = content.elements.filter('.prompt_popup')[0];
 		if (!popup) return;
 		var target = new Element('div', {'class': 'jframe_prompt'}).hide().inject($(this));
+                var popupBehavior = new Behavior({
+                        onError: function(){
+                                dbug.warn.apply(dbug, arguments);
+                        }
+                });
+                popupBehavior.passMethods({
+                        getContentElement: $lambda(target),
+                        configureRequest: this.configureRequest.bind(this)
+                });
                 var fillAndShow = function() {
-                        this.fill(target, content);
+                        this.fill(target, content, popupBehavior);
                         target.show();
                 }.bind(this);
-                //VML in IE doesn't like being hidden and redisplayed.  Delaying filling and showing the target for IE.
+                //VML in IE doesn't like being hidden and redisplayed.  Delaying filling and showing the target for 
                 if(!Browser.Engine.trident) {
                         fillAndShow();
                 }
@@ -51,6 +60,9 @@ CCS.JFrame.addGlobalRenderers({
                         detectInput: !hasInput,
 			resizable: true
 		});
+                prompt.addEvent('resize', function() {popupBehavior.resize.bind(popupBehavior);});
+                prompt.addEvent('destroy', function() {popupBehavior.cleanup(target); });
+                
                 if(Browser.Engine.trident) {
                         fillAndShow();
                 }
