@@ -20,7 +20,7 @@
 	</head>
 	<body>
 		<div class="jframe_padded">
-                        <div class="ccs-select-with-other">
+                        <div data-filters="SelectWithOther">
                                 <select>
                                 <option>A</option>
                                 <option>B</option>

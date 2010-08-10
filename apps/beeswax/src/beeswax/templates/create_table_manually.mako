@@ -108,9 +108,9 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               <p class="ccs-hidden">If your records are delimited, please configure these fields:</p>
               Hive only supports single-character delimiters.
               <dl>
-                ${comps.field(table_form["field_terminator"], render_default=True, help=r'Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.', klass="ccs-select-with-other")}
-                ${comps.field(table_form["collection_terminator"], render_default=True, help="Use for array types.", klass="ccs-select-with-other")}
-                ${comps.field(table_form["map_key_terminator"], render_default=True, help="Use for map types.", klass="ccs-select-with-other")}
+                ${comps.field(table_form["field_terminator"], render_default=True, help=r'Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.', dd_attrs=dict(data_filters="SelectWithOther"))}
+                ${comps.field(table_form["collection_terminator"], render_default=True, help="Use for array types.", dd_attrs=dict(data_filters="SelectWithOther"))}
+                ${comps.field(table_form["map_key_terminator"], render_default=True, help="Use for map types.", dd_attrs=dict(data_filters="SelectWithOther"))}
               </dl>
             </li>
             <li class="bw-serde-options">

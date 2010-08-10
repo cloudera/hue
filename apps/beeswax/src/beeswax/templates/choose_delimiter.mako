@@ -54,7 +54,7 @@ ${wrappers.head('Choose a Delimiter')}
                     </div>
                   % endif
                   <div class="bw-select_delim" class="ccs-hidden">
-                    ${comps.field(delim_form["delimiter"], render_default=True, help=r'Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.', klass="ccs-select-with-other")}
+                    ${comps.field(delim_form["delimiter"], render_default=True, help=r'Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.', dd_attrs=dict(data_filters='SelectWithOther'))}
 
                     <input class="ccs-hidden" type="submit" value="Preview" name="submit_preview"/>
                     <input class="ccs-hidden" type="submit" value="Select this Delimiter" name="submit_delim"/>

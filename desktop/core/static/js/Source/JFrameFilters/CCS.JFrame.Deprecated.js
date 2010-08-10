@@ -28,6 +28,7 @@ provides: [
  CCS.JFrame.HtmlTable,
  CCS.JFrame.Input,
  CCS.JFrame.OverText,
+ CCS.JFrame.SelectWithOther,
  CCS.JFrame.SizeTo,
  CCS.JFrame.SplitView,
  CCS.JFrame.SubmitOnChange,
@@ -190,8 +191,15 @@ script: CCS.JFrame.ArtButtons.js
 					element.addDataFilter('InfoTip');
 				}
 			});
-		}
+		},
 
+                select_with_other: function(container) {
+                        if (!container.get('html').contains('ccs-select-with-other')) return;
+                        container.getElements('.ccs-select-with-other').each(function(el) {
+                                dbug.warn('you are using a deprecated JFrame filter (ccs-select-with-other) on %o, use the SelectWithOther data-fitler instead.', el);
+                                el.addDataFilter('SelectWithOther');
+                        });
+                }
 	});
 
 })();

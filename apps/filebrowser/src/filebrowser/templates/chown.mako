@@ -20,7 +20,7 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
 
 <%
   is_superuser = extra_params['current_user'].username == extra_params['superuser']
-  select_class = is_superuser and 'ccs-select-with-other' or ''
+  select_filter = is_superuser and 'SelectWithOther' or ''
 %>
 
 ## Puts together a selection list with an "other" field as well.
@@ -64,7 +64,7 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
     ${edit.render_field(form["path"], hidden=True)}
 
     <dt><label>User</label></dt>
-    <dd class="${select_class}">
+    <dd data-filters="${select_filter}">
       % if is_superuser:
         ${ selection("user", form.all_users, extract_field_data(form["user"]), "user_other") }
       % else:
@@ -72,7 +72,7 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
       % endif
     </dd>
     <dt><label>Group</label></dt>
-    <dd class="${select_class}">
+    <dd data-filters="${select_filter}">
       % if is_superuser:
         ${ selection("group", form.all_groups, extract_field_data(form["group"]), "group_other") }
       % else:

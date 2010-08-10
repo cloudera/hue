@@ -45,6 +45,7 @@ requires:
  - /Behavior.HtmlTableKeyboard
  - /Behavior.HtmlTableMultiSelectMenu
  - /Behavior.MultiChecks
+ - /Behavior.SelectWithOther
  - /Behavior.SideBySideSelect
  - /Behavior.SizeTo
  - /Behavior.SplitViewPostFold
