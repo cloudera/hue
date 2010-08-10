@@ -101,9 +101,6 @@ class AccessInfo(dict):
         app_dict = { }
         _per_user_lk[user] = threading.Lock()
         recent_access_map[user] = app_dict
-        # Update the IP address and last access time of the user
-        last_access_map[user] = {'ip':self['remote_ip'],
-                                 'time':self['time']}
       finally:
         _recent_access_map_lk.release()
 
@@ -128,6 +125,10 @@ class AccessInfo(dict):
       view_access_list.insert(0, self)
       if len(view_access_list) > _USER_ACCESS_HISTORY_SIZE:
         view_access_list.pop()
+
+      # Update the IP address and last access time of the user
+      last_access_map[user] = {'ip':self['remote_ip'],
+                               'time':self['time']}
     finally:
       user_lk.release()
 

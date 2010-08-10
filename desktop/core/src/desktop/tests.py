@@ -26,6 +26,7 @@ import desktop
 import desktop.urls
 import desktop.conf
 import logging
+import time
 from desktop.lib.django_util import TruncatingModel
 import desktop.views as views
 
@@ -301,3 +302,23 @@ def test_config_check():
   finally:
     for old_conf in reset:
       old_conf()
+
+
+def test_last_access_time():
+  c = make_logged_in_client(username="access_test")
+  c.post('/accounts/login_ajax')
+  login = desktop.auth.views.get_current_users()
+  before_access_time = time.time()
+  response = c.post('/status_bar')
+  after_access_time = time.time()
+  access = desktop.auth.views.get_current_users()
+
+  user = response.context['user']
+  login_time = login[user]['time']
+  access_time = access[user]['time']
+
+  # Check that 'last_access_time' is later than login time
+  assert_true(login_time < access_time)
+  # Check that 'last_access_time' is in between the timestamps before and after the last access path
+  assert_true(before_access_time < access_time)
+  assert_true(access_time < after_access_time)
