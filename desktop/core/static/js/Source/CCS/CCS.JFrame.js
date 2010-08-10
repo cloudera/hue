@@ -39,6 +39,7 @@ requires:
  - Widgets/Behavior.OverText
  - Widgets/Behavior.SplitView
  - /Behavior.ContextMenu
+ - /Behavior.DataGroupToggle
  - /Behavior.FilterInput
  - /Behavior.FitText
  - /Behavior.HtmlTableChromeHack

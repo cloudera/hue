@@ -111,7 +111,7 @@ CCS.FileEditor = new Class({
 		});
 		this.addEvents({
 			load: function(){
-				this.addEvent('resize', this.resizeTextarea.bind(this));
+				this.jframe.addEvent('resize', this.resizeTextarea.bind(this));
 				$(this.jframe).setStyle('overflow', 'hidden');
 			}.bind(this)
 		});
@@ -121,10 +121,6 @@ CCS.FileEditor = new Class({
 	resizeTextarea: function (w, h) {
 		this.textarea.setStyles({
 			width: w - 20,
-			height: h
-		});
-		this.divResize.setStyles({
-			width: w,
 			height: h
 		});
 	}

@@ -22,6 +22,7 @@ provides: [
  CCS.JFrame.DeprecatedFilters,
  CCS.JFrame.ContextMenu,
  CCS.JFrame.ArtButtons,
+ CCS.JFrame.DataGroupToggle,
  CCS.JFrame.FilterInput,
  CCS.JFrame.FitText,
  CCS.JFrame.FormValidator,
@@ -29,6 +30,7 @@ provides: [
  CCS.JFrame.Input,
  CCS.JFrame.OverText,
  CCS.JFrame.SelectWithOther,
+ CCS.JFrame.SideBySideSelect,
  CCS.JFrame.SizeTo,
  CCS.JFrame.SplitView,
  CCS.JFrame.SubmitOnChange,
@@ -199,7 +201,30 @@ script: CCS.JFrame.ArtButtons.js
                                 dbug.warn('you are using a deprecated JFrame filter (ccs-select-with-other) on %o, use the SelectWithOther data-fitler instead.', el);
                                 el.addDataFilter('SelectWithOther');
                         });
+                },
+
+                side_by_side_select: function(container) {
+                        if (!container.get('html').contains('side_by_side_select')) return;
+                        //get the side by side containers
+                        container.getElements('.side_by_side_select').each(function(select) {
+                                //if the element with the side_by_side class is the container of the select, get the 
+                                //select element within it.
+                                if (select && select.get('tag') != "select") select = select.getElement('select');
+                                dbug.warn('you are using a deprecated JFrame filter (side_by_side_select) on %o, use the SideBySideSelect data-filter instead.', select);
+                                select.addDataFilter('SideBySideSelect');
+                        });
+                },
+
+                data_group_toggle : function(container){
+                        if(!container.get('html').contains('ccs-group_toggle')) return;
+                        var toggles = container.getElements('.ccs-group_toggle');
+                        toggles.each(function(toggle) {
+                                dbug.warn("you are using a deprecated JFrameFilter (ccs-group_toggle) on %o, use the DataGroupToggle data-filters propery instead.", toggle);
+                                toggle.addDataFilter('DataGroupToggle');
+                        });
                 }
+
+
 	});
 
 })();
