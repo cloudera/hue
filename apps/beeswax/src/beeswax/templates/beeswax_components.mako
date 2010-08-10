@@ -45,7 +45,7 @@
     for key, value in attributes.iteritems():
       if key == "klass":
         key = "class"
-      ret_str += "%s='%s'" % (key.replace("_", "-"), str(value))
+      ret_str += "%s='%s'" % (key.replace("_", "-"), unicode(value))
     return ret_str
 
   if not attrs:
@@ -71,12 +71,12 @@
   titlecls = ' '.join(title_classes)
 %>
   % if field.is_hidden:
-    ${str(field) | n}
+    ${unicode(field) | n}
   % else:
     <dt class="${titlecls}" ${make_attr_str(dt_attrs) | n}>${field.label_tag() | n}</dt>
     <dd class="${cls}" ${make_attr_str(dd_attrs) | n}>
       % if render_default:
-        ${str(field) | n}
+        ${unicode(field) | n}
       % else:
         % if tag == 'textarea':
           <textarea name="${field.html_name | n}" ${make_attr_str(attrs) | n} />${extract_field_data(field) or ''}</textarea>

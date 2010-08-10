@@ -757,7 +757,7 @@ for x in sys.stdin:
       f.write(data)
       f.close()
 
-    write_file('/tmp/space.dat', RAW_FIELDS, ' ')
+    write_file('/tmp/spacé.dat', RAW_FIELDS, ' ')
     write_file('/tmp/tab.dat', RAW_FIELDS, '\t')
     write_file('/tmp/comma.dat', RAW_FIELDS, ',')
     write_file('/tmp/comma.dat.gz', RAW_FIELDS, ',', do_gzip=True)
@@ -781,7 +781,7 @@ for x in sys.stdin:
     # Make sure space works
     resp = self.client.post('/beeswax/create/import_wizard', {
       'submit_preview': 'on',
-      'path': '/tmp/space.dat',
+      'path': '/tmp/spacé.dat',
       'name': 'test_create_import',
       'delimiter_0': ' ',
       'delimiter_1': '',

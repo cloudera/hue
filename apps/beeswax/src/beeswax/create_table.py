@@ -24,7 +24,7 @@ import gzip
 
 from django.core import urlresolvers
 
-from desktop.lib import django_mako
+from desktop.lib import django_mako, i18n
 from desktop.lib.django_util import render, PopupException
 from desktop.lib.django_forms import MultiForm
 from hadoop.fs import hadoopfs
@@ -76,7 +76,6 @@ def create_table(request):
   ))
 
 
-IMPORT_DEFAULT_ENCODING = 'utf8'
 IMPORT_PEEK_SIZE = 8192
 IMPORT_PEEK_NLINES = 10
 DELIMITERS = [ hive_val for hive_val, _, _ in beeswax.common.TERMINATORS ]
@@ -98,7 +97,7 @@ def import_wizard(request):
     - No partition table.
     - Does not work with binary data.
   """
-  encoding = IMPORT_DEFAULT_ENCODING
+  encoding = i18n.get_site_encoding()
 
   if request.method == 'POST':
     # Have a while loop to allow an easy way to break
@@ -389,7 +388,7 @@ class GzipFileReader(object):
     except IOError:
       return None
     try:
-      return unicode(data, encoding).split('\n')[:IMPORT_PEEK_NLINES]
+      return unicode(data, encoding, errors='replace').split('\n')[:IMPORT_PEEK_NLINES]
     except UnicodeError:
       return None
 
@@ -405,7 +404,7 @@ class TextFileReader(object):
     """readlines(fileobj, encoding) -> list of lines"""
     try:
       data = fileobj.read(IMPORT_PEEK_SIZE)
-      return unicode(data, encoding).split('\n')[:IMPORT_PEEK_NLINES]
+      return unicode(data, encoding, errors='replace').split('\n')[:IMPORT_PEEK_NLINES]
     except UnicodeError:
       return None
 

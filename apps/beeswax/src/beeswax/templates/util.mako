@@ -21,10 +21,10 @@
 
 <%def name="render_field(field)">
   % if field.is_hidden:
-    ${str(field) | n}
+    ${unicode(field) | n}
   % else:
     <dt>${field.label_tag() | n}</dt>
-    <dd>${str(field) | n}</dd>
+    <dd>${unicode(field) | n}</dd>
     % if len(field.errors):
       <dd class="ccs-error">
         ${render_error(field.errors)}

@@ -461,7 +461,12 @@ def _configs_from_dir(conf_dir):
     if filename.startswith(".") or not filename.endswith('.ini'):
       continue
     logging.debug("Loading configuration from: %s" % filename)
-    conf = configobj.ConfigObj(os.path.join(conf_dir, filename))
+    try:
+      conf = configobj.ConfigObj(os.path.join(conf_dir, filename))
+    except configobj.ConfigObjError, ex:
+      logging.error("Error in configuration file '%s': %s" %
+                    (os.path.join(conf_dir, filename), ex))
+      raise
     conf['DEFAULT'] = dict(desktop_root=get_desktop_root(), build_dir=get_build_dir())
     yield conf
 

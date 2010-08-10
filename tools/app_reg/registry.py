@@ -84,7 +84,7 @@ class AppRegistry(object):
       elif version_diff < 0:
         LOG.info('Upgrading %s from version %s' % (app, existing.version))
       elif version_diff > 0:
-        LOG.error('A newer version of %s is already installed' % (app,))
+        LOG.error('A newer version (%s) of %s is already installed' % (existing.version, app))
         return False
     except KeyError:
       pass
@@ -134,7 +134,7 @@ class HueApp(object):
     self.author = author
 
   def __str__(self):
-    return "%s (version %s)" % (self.name, self.version)
+    return "%s v.%s" % (self.name, self.version)
 
   def __cmp__(self, other):
     if not isinstance(other, HueApp):

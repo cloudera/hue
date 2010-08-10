@@ -444,17 +444,21 @@ class HadoopFileSystem(object):
     @param len the number of bytes to read
     """
     errs = []
+    unipath = block.path
     block.path = encode_fs_path(block.path)
-    for node in block.nodes:
-      dn_conn = self._connect_dn(node)
-      try:
+    try:
+      for node in block.nodes:
+        dn_conn = self._connect_dn(node)
         try:
-          data = dn_conn.readBlock(self.request_context, block, offset, len)
-          return data.data
-        except Exception, e:
-          errs.append(e)
-      finally:
-        dn_conn.close()
+          try:
+            data = dn_conn.readBlock(self.request_context, block, offset, len)
+            return data.data
+          except Exception, e:
+            errs.append(e)
+        finally:
+          dn_conn.close()
+    finally:
+      block.path = unipath
 
     raise IOError("Could not read block %s from any replicas: %s" % (block, repr(errs)))
 
