@@ -17,9 +17,9 @@ from setuptools import setup, find_packages
 
 setup(
       name = "jobsub",
-      version = "0.9.1",
+      version = "1.0",
       url = 'http://github.com/cloudera/hue',
-      author = "Hue",
+      author = "HUE",
       description = "Hadoop Job Submission",
       packages = find_packages('src'),
       package_dir = {'': 'src'},

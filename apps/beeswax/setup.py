@@ -17,10 +17,10 @@ from setuptools import setup, find_packages
 
 setup(
       name = "beeswax",
-      version = "0.9.1",
-      author = "Hue",
+      version = "1.0",
+      author = "HUE",
       url = 'http://github.com/cloudera/hue',
-      description = "Hive Interface on Hue",
+      description = "Hive Interface on HUE",
       packages = find_packages('src') + find_packages('gen-py'),
       package_dir = {'hive_metastore': 'gen-py', 'beeswaxd': 'gen-py', 'fb303': 'gen-py', '': 'src'},
       install_requires = ['setuptools', 'desktop'],

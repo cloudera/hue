@@ -17,10 +17,10 @@ from setuptools import setup, find_packages
 
 setup(
       name = "jframegallery",
-      version = "0.9.1",
-      author = "Hue",
+      version = "1.0",
+      author = "HUE",
       url = 'http://github.com/cloudera/hue',
-      description = "Hue JFrame Gallery",
+      description = "HUE JFrame Gallery",
       packages = find_packages('src'),
       package_dir = {'': 'src'},
       install_requires = ['setuptools', 'desktop'],
