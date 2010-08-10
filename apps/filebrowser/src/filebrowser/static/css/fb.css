@@ -421,7 +421,7 @@ div.fileviewer .fv-viewLocation {
 }
 
 div.fileviewer .fv-viewGzip {
-	background: url(/static/art/icons/view_gzip.png) left 50%;
+	background: url(/static/art/icons/page_white_zip.png) left 50%;
 }
 
 div.fileviewer .fv-viewBinary {
