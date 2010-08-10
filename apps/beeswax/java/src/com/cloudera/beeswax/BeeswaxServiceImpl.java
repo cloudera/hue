@@ -21,21 +21,26 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -537,7 +542,26 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     this.executor = Executors.newCachedThreadPool(new NamingThreadFactory("Beeswax-%d"));
     this.runningQueries = new ConcurrentHashMap<String, RunningQueryState>();
 
-    String protocol = dtHttps ? "https" : "http";
+    String protocol;
+    if (dtHttps) {
+      protocol = "https";
+      try {
+        // Disable SSL verification. HUE cert may be signed by untrusted CA.
+        SSLContext sslcontext = SSLContext.getInstance("SSL");
+        sslcontext.init(null,
+                        new DummyX509TrustManager[] { new DummyX509TrustManager() },
+                        new SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sslcontext.getSocketFactory());
+      } catch (NoSuchAlgorithmException ex) {
+        LOG.warn("Failed to disable SSL certificate check " + ex);
+      } catch (KeyManagementException ex) {
+        LOG.warn("Failed to disable SSL certificate check " + ex);
+      }
+      DummyHostnameVerifier dummy = new DummyHostnameVerifier();
+      HttpsURLConnection.setDefaultHostnameVerifier(dummy);
+    } else {
+      protocol = "http";
+    }
     this.notifyUrl = protocol + "://" + dtHost + ":" + dtPort + NOTIFY_URL_BASE;
 
     // A daemon thread that periodically evict stale RunningQueryState objects
