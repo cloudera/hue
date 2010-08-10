@@ -24,5 +24,19 @@ limitations under the License.
 		<div data-dblclick-delegate="{'dblclick_loads':'.dblme'}" style="width: 200px; height: 100px; padding: 40px; background: #ccc; border: 1px solid #000; margin: 10px auto;">
 			<a class="dblme" href="/jframegallery/post-load.alert.popup.html">I show an alert if you double click anywhere inside the box around me.</a>
 		</div>
+
+		<div data-dblclick-delegate="{'dblclick_loads':'.dblme'}" style="width: 200px; height: 100px; padding: 40px; background: #ccc; border: 1px solid #000; margin: 10px auto;">
+			I'm a div with a double click delegate specified, but no link matching, so I don't do anything.
+		</div>
+
+		<div data-dblclick-delegate="{'dblclick_loads':'.dblme'}" style="width: 200px; height: 100px; padding: 40px; background: #ccc; border: 1px solid #000; margin: 10px auto;">
+			<a class="dblme">I'm an anchor with no href, so clicking me or double clicking my container should do nothing.</a>
+		</div>
+
+		<div data-dblclick-delegate="{'dblclick_loads':'.dblme'}" style="width: 200px; height: 100px; padding: 40px; background: #ccc; border: 1px solid #000; margin: 10px auto;">
+			<a class="dblme ccs-nav_back">I'm a link with no href, but I have the ccs class name ccs-nav_back, so I navigate back in the app window's history. Double clicking my container should send you back to the JFrame gallery.</a>
+		</div>
+
+
 	</body>
 </html>

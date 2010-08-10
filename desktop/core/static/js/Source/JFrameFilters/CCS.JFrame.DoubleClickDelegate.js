@@ -23,7 +23,7 @@ script: CCS.JFrame.DoubleClickDelegate.js
 ...
 */
 
-CCS.JFrame.doubleClickHandler = function(jframe, delegate){
+CCS.JFrame.doubleClickHandler = function(jframe, event, delegate){
 	var getLink = function(delegate){
 		//retrieve configuration from the css property JSON
 		var data = delegate.get('data', 'dblclick-delegate', true);
@@ -35,16 +35,7 @@ CCS.JFrame.doubleClickHandler = function(jframe, delegate){
 	};
 	
 	var link = getLink(delegate);
-	if (link) {
-		if (link.get('target')) {
-			CCS.Desktop.launch(link.get('target'), link.get('href'));
-		} else {
-			jframe.load({
-				requestPath: link.get('href')
-			});
-		}
-	}
-
+	if (link) jframe.callClick(event, link);
 };
 
 CCS.JFrame.addGlobalFilters({
@@ -54,7 +45,7 @@ CCS.JFrame.addGlobalFilters({
 
 		//define our handler
 		var handler = function(e, delegate){
-			CCS.JFrame.doubleClickHandler(this, delegate);
+			CCS.JFrame.doubleClickHandler(this, e, delegate);
 		}.bind(this);
 		//add this behavior to the delegate
 		container.addEvent('dblclick:relay([data-dblclick-delegate])', handler);

@@ -58,7 +58,7 @@ ART.Sheet.define('splitview.bw-editor', {
 						hTable = table.retrieve('HtmlTable');
 						var selected = hTable.selectedRows[0];
 						if (!selected) return;
-						CCS.JFrame.doubleClickHandler(this.jframe, selected);
+						CCS.JFrame.doubleClickHandler(this.jframe, e, selected);
 					}.bind(this),
 					description: 'Open the selected item.'
 				}

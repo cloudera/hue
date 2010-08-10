@@ -255,6 +255,9 @@
     <div id="ccs-loading">Launching Hue</div>
     <a id="ccs-feedback" href="${feedback_url}" target="_blank"><img src="/static/art/feedback-tab.png" width="76" height="26"/></a>
   </div>
+  <div class="alert_popup ccs-error-popup">
+    Warning, an AJAX request was made for the Hue desktop which cannot be loaded into an application window. Typically this means that a link clicked has no <em>href</em> value. Please notify the application's author.
+  </div>
 
     <script>
       if (Browser.Engine.trident) $(document.body).addClass('IEroot');

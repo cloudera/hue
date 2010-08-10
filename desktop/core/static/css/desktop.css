@@ -14,6 +14,9 @@ body {
 	padding: 0px;
 	font-size: 12px;
 }
+body>.ccs-error-popup {
+	display: none;
+}
 #bg {
 	width: 100%;
 	position: absolute;
