@@ -34,11 +34,16 @@ CCS.JFrame.addGlobalRenderers({
 		var jframe_renders = popup.hasClass('jframe_renders');
 
 		var target = new Element('div', {'class': 'jframe_alert'}).hide().inject($(this));
+                var popupBehavior = new Behavior({
+                        onError: function(){
+                                dbug.warn.apply(dbug, arguments);
+                        }
+                });
 		var fillAndShow = function() {
 			if (!jframe_renders) {
 				//if we aren't rendering the jframe, fill the popup
 				//and remove the toolbar
-				this.fill(target, content);
+				this.fill(target, content, popupBehavior);
 				var toolbar = content.elements.filter('.toolbar');
 				if (toolbar.length) toolbar.hide();
 			} else {
@@ -46,7 +51,7 @@ CCS.JFrame.addGlobalRenderers({
 				//the popup, hiding the original
 				this.fill(target, {
 					elements: $$(popup.clone())
-				});
+				}, popupBehavior);
 				popup.hide();
 			}
 			target.show();
@@ -72,6 +77,7 @@ CCS.JFrame.addGlobalRenderers({
 						}.bind(this));
 					}
 				}
+                                alert.addEvent('destroy', function() {popupBehavior.cleanup(target);});
 				alert.position().show();
 				
 				//if jframe is rendering we remove this event which we're going to add a few lines down

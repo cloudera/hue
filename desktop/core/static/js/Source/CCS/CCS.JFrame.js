@@ -128,18 +128,11 @@ CCS.JFrame = new Class({
 		});
 		if(this.options.size) this.behavior.resize(this.options.size.width, this.options.size.height);
 		['attachKeys', 'detachKeys', 'addShortcut', 'addShortcuts', 'removeShortcut', 'removeShortcuts',
-		 'applyDelegates', 'getScroller', 'getContentElement', 'invokeLinker'].each(function(method){
+		 'applyDelegates', 'getScroller', 'getContentElement', 'invokeLinker', 'configureRequest'].each(function(method){
 			this.behavior.passMethod(method, this[method].bind(this));
 		}, this);
 		this.behavior.passMethods({
 			getContainerSize: this.getCurrentSize.bind(this),
-			configureRequest: function(request){
-				this._setRequestOptions(request, {
-					onSuccess: function(nodes, elements, text){
-						this._requestSuccessHandler(request, text);
-					}.bind(this)
-				});
-			}.bind(this),
 			registerKeyboard: function(keyboard){
 				this.keyboard.manage(keyboard);
 			}.bind(this),
@@ -159,6 +152,19 @@ CCS.JFrame = new Class({
 		if (this.options.size) this.resize(this.options.size.width, this.options.size.height);
 		this.load({requestPath: path});
 	},
+        
+        /*
+                configureRequest - configures a passed in request to be have its response rendered within JFrame..
+                request - (* request object *) request object to be configured
+        */
+        configureRequest: function(request){
+                this._setRequestOptions(request, {
+                        onSuccess: function(nodes, elements, text){
+                                this._requestSuccessHandler(request, text);
+                        }.bind(this)
+                });
+        },
+
 
 	toElement: function(){
 		return this.element;
@@ -370,15 +376,16 @@ CCS.JFrame = new Class({
 			title - (*string*) the title of the content
 			view - (*string*; optional) if defined, the view of the content
 			viewElement - (*element*; optional) if defined, the element for the view
+                behavior - (*behavior object*; optional) if defined, the behavior instance to use
 		
 	*/
 
-	fill: function(target, content){
+	fill: function(target, content, behavior){
 		target.empty().adopt(content.elements);
 		if (content.links && content.links.length && this.options.includeLinkTags) target.adopt(content.links);
 		if (this.options.evaluateJs && content.js) $exec(content.js);
 		this.applyDelegates(target);
-		this.applyFilters(target, content);
+		this.applyFilters(target, content, behavior || this.behavior);
 	},
 
 	resize: function(x, y){
@@ -461,9 +468,10 @@ CCS.JFrame = new Class({
 
 	//Applies all the behavior filters for an element.
 	//element - (element) an element to apply the filters registered with this Behavior instance to.
+        //behavior - (behavior object) behavior instance to use 
 	//force - (boolean; optional) passed through to applyBehavior (see it for docs)
-	applyBehaviors: function(element, force){
-		this.behavior.apply(element, force);
+	applyBehaviors: function(element, behavior, force){
+		behavior.apply(element, force);
 	},
 
 	//garbage collects all applied filters for the specified element
@@ -475,14 +483,15 @@ CCS.JFrame = new Class({
 		applyFilters:
 		container - (*element*) applies all the filters on this instance of jFrame to the contents of the container.
 		content - (*object*) optional object containing various metadata about the content; js tags, meta tags, title, view, etc. See the "notes" section of the renderContent method comments in this file.
-		
+                behavior - (*behavior object*) optional behavior instance to be used for application of behaviors
+	        	
 	*/
 
-	applyFilters: function(container, content){
-		for (var name in this.filters) {
+	applyFilters: function(container, content, behavior){
+                for (var name in this.filters) {
 			this.applyFilter(name, container, content);
 		}
-		this.applyBehaviors(container);
+		this.applyBehaviors(container, behavior || this.behavior);
 	},
 
 
