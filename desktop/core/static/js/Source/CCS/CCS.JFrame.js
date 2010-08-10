@@ -100,9 +100,10 @@ CCS.JFrame = new Class({
 		//the selector to match clicks against for delegation; defaults to only links
 		clickRelays: 'a',
 		//given the response and response text, this method determines if there's been a serverside error
-		errorDetector: function(requestInstance, repsonseText) {
+		errorDetector: function(requestInstance, responseText) {
 			//flag this as an error
 			return repsonseText.contains('ccs-error-popup');
+			return responseText.contains('ccs-error-popup');
 		},
 		getScroller: function(){
 			return this.element;
@@ -345,7 +346,6 @@ CCS.JFrame = new Class({
 			content.viewElement = viewElement;
 		}
 		this._applyRenderers(content, options);
-
 	},
 
 	/*
@@ -636,6 +636,7 @@ CCS.JFrame = new Class({
 			spinnerTarget: this.options.spinnerTarget || this.element,
 			spinnerOptions: { fxOptions: {duration: 200} },
 			onFailure: this.error.bind(this),
+			evalScripts: false,
 			onRequest: function(){
 				if (this._request) this._request.cancel();
 				this._request = request;
@@ -663,7 +664,7 @@ CCS.JFrame = new Class({
 	_requestSuccessHandler: function(request, html, options) {
 		var error, blankWindowWithError;
 		if (this._checkForEmptyErrorState(request, html)) {
-			serverSideError = true;
+			error = true;
 			if (!this.loadedOnce) blankWindowWithError = true;
 		}
 		var responsePath = request.getHeader('X-Hue-JFrame-Path');

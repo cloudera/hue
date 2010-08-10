@@ -165,7 +165,7 @@ ART.Sheet.define('window.filechooser.browser', {
 						hTable = table.retrieve('HtmlTable');
 						var selected = hTable.selectedRows[0];
 						if (!selected) return;
-						CCS.JFrame.doubleClickHandler(this.jframe, selected);
+						CCS.JFrame.doubleClickHandler(this.jframe, e, selected);
 					}.bind(this),
 					description: 'Open the selected item.'
 				},
@@ -324,7 +324,7 @@ ART.Sheet.define('window.filechooser.browser', {
 						if (selectInfo == null) return;
 						var selectData = selectInfo.data;
 						var selected = selectInfo.elem;
-						if (selectData.type == 'dir') CCS.JFrame.doubleClickHandler(this.jframe, selected);
+						if (selectData.type == 'dir') CCS.JFrame.doubleClickHandler(this.jframe, e, selected);
 						else if (selectData.type == 'file') this.getOk().fireEvent('press');
 					}.bind(this)
 				},
@@ -387,7 +387,7 @@ ART.Sheet.define('window.filechooser.browser', {
 						var selected = hTable.selectedRows[0];
 						if (!selected) return;
 						var selectData = selected.get('data', 'filedata', true);
-						if (selectData.type == 'dir') CCS.JFrame.doubleClickHandler(this.jframe, selected);
+						if (selectData.type == 'dir') CCS.JFrame.doubleClickHandler(this.jframe, e, selected);
 						//Leaving this code here for when overwrite does work.
 						/*else if (selectData.type == 'file') {
 							locationInput.set('value', selectData.path.split('/').getLast());
