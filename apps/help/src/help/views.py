@@ -66,9 +66,11 @@ def view(request, app, path):
   content = fs.open(path, 'r').read()
   content = unicode(content, 'utf-8', errors='replace')
   if path.lower().endswith(".md"):
-    content = ('<div class="rendered-markdown">' +
+    content = ('<div class="print rendered-markdown">' +
                markdown.markdown(content, ['extra']) +
                '</div>')
+  elif path.lower().endswith(".html"):
+    content = '<div class="print">%s</div>' % (content,)
   else:
     # TODO(todd) escape content?
     content = '<pre>' + content + '</pre>'
