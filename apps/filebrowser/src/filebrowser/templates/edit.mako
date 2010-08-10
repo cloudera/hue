@@ -40,11 +40,11 @@
     % endfor
   </div>
 % endif
-<form class="no_overflow fe-editForm" method="post" action="${url('filebrowser.views.save_file')}">
+<form class="fe-editForm" method="post" action="${url('filebrowser.views.save_file')}">
     ${edit.render_field(form["path"], hidden=True, notitle=True)}
     ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
     <h2 class="ccs-hidden">${form["contents"].label_tag() | n}</h2>
-    <div class="fe-divResize">${unicode(form["contents"]) | n}</div>
+    <div class="fe-divResize" data-filters="SizeTo">${unicode(form["contents"]) | n}</div>
     <input class="ccs-hidden" type="submit" name="save" value="saveAs">
     <input class="ccs-hidden" type="submit" name="save" value="save">
 </form>

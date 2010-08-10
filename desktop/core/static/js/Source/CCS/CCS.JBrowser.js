@@ -39,7 +39,6 @@ requires:
  - /CCS.JFrame.HtmlTable
  - /CCS.JFrame.Input
  - /CCS.JFrame.Nav
- - /CCS.JFrame.NoOverflow
  - /CCS.JFrame.OverText
  - /CCS.JFrame.PartialRefresh
  - /CCS.JFrame.Prompt

@@ -2,14 +2,12 @@ copyright: Apache License v2.0
 description: Shared components for Hue
 name: ccs-shared
 sources: [
-  Source/JFrameFilters/CCS.JFrame.NoOverflow.js,
   Source/JFrameFilters/CCS.JFrame.FormRequest.js,
   Source/JFrameFilters/CCS.JFrame.Clearfix.js,
   Source/JFrameFilters/CCS.JFrame.AutoRefresh.js,
   Source/JFrameFilters/CCS.JFrame.DoubleClickDelegate.js,
   Source/JFrameFilters/CCS.JFrame.Collapsible.js,
   Source/JFrameFilters/CCS.JFrame.ToggleHistory.js,
-  Source/JFrameFilters/CCS.JFrame.DataGroupToggle.js,
   Source/JFrameFilters/CCS.JFrame.Deprecated.js,
   Source/Fx/Fx.Shake.js,
   Source/JFrameRenderers/CCS.JFrame.Alert.js,
@@ -31,7 +29,6 @@ sources: [
   Source/CCS/CCS.Desktop.Keys.js,
   Source/CCS/CCS.User.js,
   Source/CCS/CCS.Login.js,
-  Source/JFrameFilters/CCS.JFrame.SideBySideSelect.js,
   Source/Forms/Form.Request.JSON.js,
   Source/Forms/EditInline.js,
   Source/UI/StickyWin.Drawer.js,
@@ -52,6 +49,7 @@ sources: [
   Source/CCS/CCS.PostEditor.Simple.js,
   Source/UI/ART.SideBySideSelect.js,
   Source/BehaviorFilters/Behavior.ContextMenu.js,
+  Source/BehaviorFilters/Behavior.DataGroupToggle.js,
   Source/BehaviorFilters/Behavior.FilterInput.js,
   Source/BehaviorFilters/Behavior.FitText.js,
   Source/BehaviorFilters/Behavior.HtmlTableChromeHack.js,
