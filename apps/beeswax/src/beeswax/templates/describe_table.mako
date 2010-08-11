@@ -52,7 +52,7 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
           <dt class="ccs-dt_cap">Actions</dt>
           <dd class="ccs-dd_bottom bw-actions">
             <ul>
-              <li class="ccs-clear"><a class="bw-load_data collapser">Import Data</a>
+              <li class="ccs-clear" data-filters="CollapsingElements"><a class="bw-load_data collapser">Import Data</a>
                   <div class="collapsible ccs-hidden">
                     <form action="${ url("beeswax.views.load_table", table=table_name) }">
                       <dl>
