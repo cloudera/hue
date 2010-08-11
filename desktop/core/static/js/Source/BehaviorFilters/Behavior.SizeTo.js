@@ -44,8 +44,8 @@ Behavior.addGlobalFilters({
 			return;
 		}
 		resize = function(x, y){
-			if (sizeTo.x) element.setStyle('width', x + sizeTo.x.toInt());
-			if (sizeTo.y) element.setStyle('height', y + sizeTo.y.toInt());
+			element.setStyle('width', x + (sizeTo.x ? sizeTo.x.toInt() : 0));
+			element.setStyle('height', y + (sizeTo.y ? sizeTo.y.toInt() : 0));
 		};
 		size = methods.getContainerSize();
 		resize(size.x, size.y);
