@@ -46,19 +46,13 @@ CCS.FileEditor = new Class({
 
 	initialize: function (path, options) {
 		this.parent(path || '/filebrowser/', options);
-		this.jframe.addFilters({
-			'fe-resizer': function (container) {
-				this.textarea = $(this.jframe).getElement('textarea');
-				if (!this.textarea) return;
-				this.divResize = $(this.jframe).getElement('.fe-divResize');
-				this.resizeTextarea(this.contentSize.x, this.contentSize.y);
-			}.bind(this),
-			'fe-posteditor': function (container) {
-				this.textarea = $(this.jframe).getElement('textarea');
-				if (!this.textarea) return;
-				var postEditor = new CCS.PostEditor.Simple(this.textarea);
-			}.bind(this)
-		});
+                this.jframe.addBehaviors({
+                        'FE-PostEditor': function(element, methods) {
+                                var textarea = element.getElement('textarea');
+                                if(!textarea) return;
+                                var postEditor = new CCS.PostEditor.Simple(textarea); 
+                        }
+                });
 		this.jframe.addRenderers({
 			'saveAsPrompt_popup': function (content) {
 				var saveAs = content.elements.filter('.saveAsPrompt_popup')[0];
@@ -111,18 +105,9 @@ CCS.FileEditor = new Class({
 		});
 		this.addEvents({
 			load: function(){
-				this.jframe.addEvent('resize', this.resizeTextarea.bind(this));
 				$(this.jframe).setStyle('overflow', 'hidden');
 			}.bind(this)
 		});
 		
-	},
-
-	resizeTextarea: function (w, h) {
-		this.textarea.setStyles({
-			width: w - 20,
-			height: h
-		});
 	}
-
 });

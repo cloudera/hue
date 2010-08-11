@@ -44,7 +44,9 @@
     ${edit.render_field(form["path"], hidden=True, notitle=True)}
     ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
     <h2 class="ccs-hidden">${form["contents"].label_tag() | n}</h2>
-    <div class="fe-divResize" data-filters="SizeTo">${unicode(form["contents"]) | n}</div>
+    <div class="fe-divResize" data-filters="SizeTo, FE-PostEditor">${edit.render_field(form["contents"], tag="textarea", notitle=True, attrs=dict(
+      data_filters="SizeTo",
+      data_size_to_width="-20")) | n}</div>
     <input class="ccs-hidden" type="submit" name="save" value="saveAs">
     <input class="ccs-hidden" type="submit" name="save" value="save">
 </form>
