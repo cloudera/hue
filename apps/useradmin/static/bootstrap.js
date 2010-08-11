@@ -27,6 +27,7 @@ CCS.Desktop.register({
 			img: {
 				src: '/useradmin/static/art/useradmin-logo.png'
 			}
-		}
+		},
+    help: '/help/useradmin'
 	}
 });
