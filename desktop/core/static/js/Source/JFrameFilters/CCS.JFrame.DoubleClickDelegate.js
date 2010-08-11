@@ -35,7 +35,7 @@ CCS.JFrame.doubleClickHandler = function(jframe, event, delegate){
 	};
 	
 	var link = getLink(delegate);
-	if (link) jframe.callClick(event, link);
+	if (link) jframe.callClick(event, link, true);
 };
 
 CCS.JFrame.addGlobalFilters({
