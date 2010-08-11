@@ -19,7 +19,7 @@
     <title>${title}</title>
   </head>
   <body>
-    <div class="alert_popup ccs-error-popup">
+    <div class="alert_popup ccs-error-popup" data-filters="CollapsingElements">
         <pre>
         ${message}
         </pre>

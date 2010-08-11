@@ -38,6 +38,7 @@ requires:
  - Widgets/Behavior.HtmlTable
  - Widgets/Behavior.OverText
  - Widgets/Behavior.SplitView
+ - /Behavior.CollapsingElements
  - /Behavior.ContextMenu
  - /Behavior.DataGroupToggle
  - /Behavior.FilterInput

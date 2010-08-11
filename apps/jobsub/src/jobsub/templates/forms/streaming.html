@@ -89,110 +89,112 @@ limitations under the License.
 
 	</dl>
 
-	<dl class="jobsub_toggler clearfix">
-		<dt></dt>
-		<dd>
-			<a class="jobsub_toggle_advanced collapser">Show Advanced Options</a>
-		</dd>
-	</dl>
-	<dl class="jobsub_advanced clearfix collapsible">
-		<dt>{{ form.mapper_class.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.mapper_class|safe }}
-			</div>
-			<p>
-				{{ form.mapper_class.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.mapper_class.errors }}</div>
-		</dd>
+	<div data-filters="CollapsingElements">
+          <dl class="jobsub_toggler clearfix">
+                  <dt></dt>
+                  <dd>
+                          <a class="jobsub_toggle_advanced collapser">Show Advanced Options</a>
+                  </dd>
+          </dl>
+          <dl class="jobsub_advanced clearfix collapsible">
+                  <dt>{{ form.mapper_class.label }}</dt>
+                  <dd>
+                          <div class="jobsub_input">
+                                  {{ form.mapper_class|safe }}
+                          </div>
+                          <p>
+                                  {{ form.mapper_class.help_text|safe}}
+                          </p>
+                          <div class="jobsub_errors">{{ form.mapper_class.errors }}</div>
+                  </dd>
 
-		<dt>{{ form.combiner_class.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.combiner_class|safe }}
-			</div>
-			<p>
-				{{ form.combiner_class.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.jobsub_input.errors }}</div>
-		</dd>
+                  <dt>{{ form.combiner_class.label }}</dt>
+                  <dd>
+                          <div class="jobsub_input">
+                                  {{ form.combiner_class|safe }}
+                          </div>
+                          <p>
+                                  {{ form.combiner_class.help_text|safe}}
+                          </p>
+                          <div class="jobsub_errors">{{ form.jobsub_input.errors }}</div>
+                  </dd>
 
-		<dt>{{ form.reducer_class.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.reducer_class|safe }}
-			</div>
-			<p>
-				{{ form.reducer_class.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.reducer_class.errors }}</div>
-		</dd>
+                  <dt>{{ form.reducer_class.label }}</dt>
+                  <dd>
+                          <div class="jobsub_input">
+                                  {{ form.reducer_class|safe }}
+                          </div>
+                          <p>
+                                  {{ form.reducer_class.help_text|safe}}
+                          </p>
+                          <div class="jobsub_errors">{{ form.reducer_class.errors }}</div>
+                  </dd>
 
-		<dt>{{ form.inputformat_class.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.inputformat_class|safe }}
-			</div>
-			<p>
-				{{ form.inputformat_class.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.inputformat_class.errors }}</div>
-		</dd>
+                  <dt>{{ form.inputformat_class.label }}</dt>
+                  <dd>
+                          <div class="jobsub_input">
+                                  {{ form.inputformat_class|safe }}
+                          </div>
+                          <p>
+                                  {{ form.inputformat_class.help_text|safe}}
+                          </p>
+                          <div class="jobsub_errors">{{ form.inputformat_class.errors }}</div>
+                  </dd>
 
-		<dt>{{ form.outputformat_class.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.outputformat_class|safe }}
-			</div>
-			<p>
-				{{ form.outputformat_class.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.outputformat_class.errors }}</div>
-		</dd>
+                  <dt>{{ form.outputformat_class.label }}</dt>
+                  <dd>
+                          <div class="jobsub_input">
+                                  {{ form.outputformat_class|safe }}
+                          </div>
+                          <p>
+                                  {{ form.outputformat_class.help_text|safe}}
+                          </p>
+                          <div class="jobsub_errors">{{ form.outputformat_class.errors }}</div>
+                  </dd>
 
-		<dt>{{ form.partitioner_class.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.partitioner_class|safe }}
-			</div>
-			<p>
-				{{ form.partitioner_class.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.partitioner_class.errors }}</div>
-		</dd>
+                  <dt>{{ form.partitioner_class.label }}</dt>
+                  <dd>
+                          <div class="jobsub_input">
+                                  {{ form.partitioner_class|safe }}
+                          </div>
+                          <p>
+                                  {{ form.partitioner_class.help_text|safe}}
+                          </p>
+                          <div class="jobsub_errors">{{ form.partitioner_class.errors }}</div>
+                  </dd>
 
-		<dt>{{ form.inputreader.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.inputreader|safe }}
-			</div>
-			<p>
-				{{ form.inputreader.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.inputreader.errors }}</div>
-		</dd>
+                  <dt>{{ form.inputreader.label }}</dt>
+                  <dd>
+                          <div class="jobsub_input">
+                                  {{ form.inputreader|safe }}
+                          </div>
+                          <p>
+                                  {{ form.inputreader.help_text|safe}}
+                          </p>
+                          <div class="jobsub_errors">{{ form.inputreader.errors }}</div>
+                  </dd>
 
-		<dt>{{ form.cache_archives.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.cache_archives|safe }}
-			</div>
-			<p>
-				{{ form.cache_archives.help_text|safe }}
-			</p>
-			<div class="jobsub_errors">{{ form.cache_archives.errors }}</div>
-		</dd>
+                  <dt>{{ form.cache_archives.label }}</dt>
+                  <dd>
+                          <div class="jobsub_input">
+                                  {{ form.cache_archives|safe }}
+                          </div>
+                          <p>
+                                  {{ form.cache_archives.help_text|safe }}
+                          </p>
+                          <div class="jobsub_errors">{{ form.cache_archives.errors }}</div>
+                  </dd>
 
-		<dt>{{ form.hadoop_properties.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.hadoop_properties|safe }}
-			</div>
-			<p>
-				{{ form.hadoop_properties.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.hadoop_properties.errors }}</div>
-		</dd>
+                  <dt>{{ form.hadoop_properties.label }}</dt>
+                  <dd>
+                          <div class="jobsub_input">
+                                  {{ form.hadoop_properties|safe }}
+                          </div>
+                          <p>
+                                  {{ form.hadoop_properties.help_text|safe}}
+                          </p>
+                          <div class="jobsub_errors">{{ form.hadoop_properties.errors }}</div>
+                  </dd>
 
-	</dl>
+          </dl>
+        </div>

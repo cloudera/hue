@@ -20,6 +20,7 @@
 description: Deprecated JFrame filters here for backwards compatibility.
 provides: [
  CCS.JFrame.DeprecatedFilters,
+ CCS.JFrame.Collapsible,
  CCS.JFrame.ContextMenu,
  CCS.JFrame.ArtButtons,
  CCS.JFrame.DataGroupToggle,
@@ -222,7 +223,24 @@ script: CCS.JFrame.ArtButtons.js
                                 dbug.warn("you are using a deprecated JFrameFilter (ccs-group_toggle) on %o, use the DataGroupToggle data-filters propery instead.", toggle);
                                 toggle.addDataFilter('DataGroupToggle');
                         });
+                },
+
+                collapsible: function(container) {
+                        if (!container.get('html').contains('collapser')) return;
+                        //make collapsibles for each .collapser/.collapsible pair (kind of like accordion)
+                        var togglers = container.getElements('.collapser');
+                        var sections = container.getElements('.collapsible');
+                        togglers.each(function(toggler, i) {
+                                //This message is uniquely strong because there's no reasonable way to add the functionality,
+                                //as every case is unique.  In order to get the functionality, you MUST add the CollapsingElements
+                                //data-filter property.
+                                if(!toggler.getParent('[data-filters*=CollapsingElements]'))
+                                {
+                                        dbug.warn("you are using a deprecated JFrame pattern (collapser) on %o, you must add the CollapsingElements data-filter property to a mutual parent of the collapser and collapsible to get the collapsible functionality.", toggler);
+                                }
+                        });
                 }
+
 
 
 	});
