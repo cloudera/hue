@@ -44,6 +44,6 @@ var Help = new Class({
 				return path.replace('/help/', '');
 			}
 		});
-		if (!CCS.Desktop.helpInstance || CCS.Desktop.helpInstance.destroyed) CCS.Desktop.helpInstance = this;
+		if (!CCS.Desktop.helpInstance || CCS.Desktop.helpInstance.isDestroyed()) CCS.Desktop.helpInstance = this;
 	}
 });

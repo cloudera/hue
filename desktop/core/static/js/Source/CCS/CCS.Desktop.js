@@ -297,7 +297,7 @@ CCS.Desktop = {
 			instances.each(function(instance) {
 				//if it has a serialize method and it's not destroyed
 				//store its serialization
-				if (instance.serialize && !instance.destroyed) state[component].push(instance.serialize());
+				if (instance.serialize && !instance.isDestroyed()) state[component].push(instance.serialize());
 			});
 		});
 		//return the object of all the states
@@ -528,8 +528,13 @@ CCS.Desktop = {
 	
 	showHelp: function(componentOrInstance, url) {
 		var data = this.getBootstrap(componentOrInstance) || {};
-		if (this.healthInstance && !this.healthInstance.destroyed && data.help) this.healthInstance.load({ requestPath: url || data.help }).focus();
-		else this.healthInstance = CCS.Desktop.launch('Help', data.help);
+		if (this.healthInstance && !this.healthInstance.isDestroyed() && (url || data.help)) {
+			this.healthInstance.load({ requestPath: url || data.help }).focus();
+		} else {
+			CCS.Desktop.launch('Help', data.help, function(instance) {
+				if (instance) this.healthInstance = instance;
+			}.bind(this));
+		}
 	}
 	
 };
