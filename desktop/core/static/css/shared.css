@@ -504,3 +504,124 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 	-webkit-box-shadow: 0px -1px 3px #aaa;
 	-moz-box-shadow: 0px -1px 3px #aaa;
 }
+/* -----------------------------------------------------------------------
+
+
+ Blueprint CSS Framework 0.9
+ http://blueprintcss.org
+
+   * Copyright (c) 2007-Present. See LICENSE for more info.
+   * See README for instructions on how to use Blueprint.
+   * For credits and origins, see AUTHORS.
+   * This is a compressed file. See the sources in the 'src' directory.
+
+Copyright (c) 2007 - 2010 blueprintcss.org
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+----------------------------------------------------------------------- */
+
+/* typography.css */
+.print h1, .print h2, .print h3, .print h4, .print h5, .print h6 {font-weight:bold;color:#111;}
+.print h1 {font-size:3em;line-height:1;margin-bottom:0.5em;}
+.print h2 {font-size:2em;margin-bottom:0.75em;}
+.print h3 {font-size:1.5em;line-height:1;margin-bottom:1em;}
+.print h4 {font-size:1.2em;line-height:1.25;margin-bottom:1.25em;}
+.print h5 {font-size:1em;font-weight:bold;margin-bottom:1.5em;}
+.print h6 {font-size:1em;font-weight:bold;}
+.print h1 img, .print h2 img, .print h3 img, .print h4 img, .print h5 img, .print h6 img {margin:0;}
+.print pre { background: #f3f3f3; border: 1px solid #666; padding: 4px;}
+.print p {margin:0 0 1.5em;}
+.print p img.left {float:left;margin:1.5em 1.5em 1.5em 0;padding:0;}
+.print p img.right {float:right;margin:1.5em 0 1.5em 1.5em;}
+.print a:focus, .print a:hover {color:#000;}
+.print a {color:#009;text-decoration:underline;}
+.print blockquote {margin:1.5em;color:#666;font-style:italic;}
+.print strong {font-weight:bold;}
+.print em, .print dfn {font-style:italic;}
+.print dfn {font-weight:bold;}
+.print sup, .print sub {line-height:0;}
+.print abbr, .print acronym {border-bottom:1px dotted #666;}
+.print address {margin:0 0 1.5em;font-style:italic;}
+.print del {color:#666;}
+.print pre {margin:1.5em 0;white-space:pre;}
+.print pre, .print code, .print tt {font:1em 'andale mono', 'lucida console', monospace;line-height:1.5;}
+.print li ul, .print li ol {margin:0;}
+.print ul, .print ol {margin:0 1.5em 1.5em 0;padding-left:3.333em;}
+.print ul, .print ul li {list-style-type:disc;}
+.print ol, .print ol li {list-style-type:decimal;}
+.print dl {margin:0 0 1.5em 0;}
+.print dl dt {font-weight:bold;}
+.print dd {margin-left:1.5em;}
+.print table {margin-bottom:1.4em;width:100%; border: 1px solid #666;}
+.print table th {
+	background: #dadada;
+        text-align: left;
+        white-space: nowrap;
+        padding: 0px 6px;
+        border-bottom: solid #000;
+        border-width: 0px 1px 1px 0px;
+        height: 16px !important;
+        line-height: 16px !important;
+        font-size: 12px;
+        font-weight: border;
+}
+.print table th:last-child {
+        border-right: none;
+}
+
+.print table td {
+        padding: 0px 8px;
+        height: 20px;
+        line-height: 20px;
+        background: #fff;
+        border: none;
+}
+.print table tr:nth-child(odd) td {
+        background: #f3f3f3;
+}
+.print th {font-weight:bold;}
+.print thead th {background:#c3d9ff;}
+.print th, .print td, .print caption {padding:4px 10px 4px 5px;}
+.print tr.even td {background:#e5ecf9;}
+.print tfoot {font-style:italic;}
+.print caption {background:#eee;}
+.print .small {font-size:.8em;margin-bottom:1.875em;line-height:1.875em;}
+.print .large {font-size:1.2em;line-height:2.5em;margin-bottom:1.25em;}
+.print .hide {display:none;}
+.print .quiet {color:#666;}
+.print .loud {color:#000;}
+.print .highlight {background:#ff0;}
+.print .added {background:#060;color:#fff;}
+.print .removed {background:#900;color:#fff;}
+.print .first {margin-left:0;padding-left:0;}
+.print .last {margin-right:0;padding-right:0;}
+.print .top {margin-top:0;padding-top:0;}
+.print .bottom {margin-bottom:0;padding-bottom:0;}
+
+/* forms.css */
+.print .error, .print .notice, .print .success {padding:.8em;margin-bottom:1em;border:2px solid #ddd;}
+.print .error {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
+.print .notice {background:#FFF6BF;color:#514721;border-color:#FFD324;}
+.print .success {background:#E6EFC2;color:#264409;border-color:#C6D880;}
+.print .error a {color:#8a1f11;}
+.print .notice a {color:#514721;}
+.print .success a {color:#264409;}
