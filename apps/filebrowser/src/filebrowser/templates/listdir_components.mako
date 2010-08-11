@@ -39,7 +39,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
   else:
     optional_fit_text = ''
   %>
-  <table data-filters="HtmlTable" class="fb-file-list selectable sortable" cellpadding="0" cellspacing="0">
+  <table data-filters="HtmlTable" class="fb-file-list selectable ${optional_sortable}" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
         % if cwd_set:
@@ -78,9 +78,9 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
           <td class="fb-name">
             <div class="fb-name-container">
               % if "dir" == file['type']:
-                <a ${optional_fit_text} class="fb-item fb-dir jframe_ignore" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
+                <a ${optional_fit_text | n} class="fb-item fb-dir jframe_ignore" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
               % else:
-                <a ${optional_fit_text} class="fb-item fb-file jframe_ignore" target="FileViewer" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
+                <a ${optional_fit_text | n} class="fb-item fb-file jframe_ignore" target="FileViewer" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
               % endif
               % if ".." != file['name']:
                 <ul class="fb-item-actions context-menu">
