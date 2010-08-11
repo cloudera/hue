@@ -27,7 +27,7 @@ CCS.Desktop.register({
 			img: {
 				src: '/jobsub/static/art/icon.png'
 			}
-		}
-	},
-	help: '/help/jobsub/'
+		},
+		help: '/help/jobsub/'
+	}
 });

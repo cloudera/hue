@@ -26,7 +26,7 @@ CCS.Desktop.register({
 			img: {
 				src: '/beeswax/static/art/beeswax-logo.png'
 			}
-		}
-	},
-	help: '/help/beeswax/'
+		},
+		help: '/help/beeswax/'
+	}
 });
