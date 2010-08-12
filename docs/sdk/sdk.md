@@ -169,6 +169,8 @@ The HUE SDK is available from http://github.com/cloudera/hue; releases are at ht
 		$ make apps
 		# Run
 		$ build/env/bin/hue runserver_plus
+		$ build/env/bin/hue beeswax_server
+		$ build/env/bin/hue jobsubd
 		# Visit http://localhost:8000/ with your web browser.
 
 <div class="note">
@@ -239,7 +241,7 @@ are a way for packages to optionally hook up with other packages.
 ### Run HUE, and find your new app
 
 		# If you haven't killed the old process, do so now.
-		$ env/bin/python runserver_plus
+		$ build/env/bin/hue runserver_plus
 
 And then visit <a href="http://localhost:8000">http://localhost:8000/</a> to check it out!
 You should see the app (with a boring "SDK" icon) in the dock, and clicking it
