@@ -1,0 +1,448 @@
+<h1><a name="Beeswax-IntroducingBeeswax"></a>Introducing Beeswax</h1>
+
+<p>Beeswax enables you to perform queries on Apache Hive, a data warehousing system designed to work with Hadoop. </p>
+
+<h2><a name="Beeswax-BeeswaxandHiveInstallationandConfiguration"></a>Beeswax and Hive Installation and Configuration</h2>
+
+<p>Beeswax is installed as part of Hue. For more information about installing Hue, see <a href="https://wiki.cloudera.com/display/DOC/Hue+Installation">https://wiki.cloudera.com/display/DOC/Hue+Installation</a>. </p>
+
+<h2><a name="Beeswax-HiveConfiguration"></a>Hive Configuration</h2>
+
+<p>Beeswax, the Hive user interface in Hue, includes Hive 0.5. You do not need an existing Hive installation.</p>
+
+<p>Your Hive data is stored in the Hadoop Distributed File System (HDFS), typically in the <tt>/user/hive/warehouse</tt> directory (or the directory you specify as <tt>hive.metastore.warehouse.dir</tt> in the <tt>hive-site.xml</tt> file). Make sure this directory exists and is writable by the users whom you expect to be creating tables. The directory <tt>/tmp</tt> (on the local file system) must also be world-writable because Hive uses it extensively.</p>
+
+<h2><a name="Beeswax-BeeswaxConfiguration"></a>Beeswax Configuration </h2>
+
+<p><b>If there is an existing Hive installation:</b></p>
+
+<p>In <tt>/etc/hue/conf/hue-beeswax.ini</tt>, modify <tt>hive_conf_dir</tt> to refer to the directory containing <tt>hive-site.xml</tt>.</p>
+
+<p><b>If there is no existing Hive installation:</b></p>
+
+<p>For information about the configuration options in <tt>hive-site.xml</tt>, see <a href="http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration">http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration</a>. The <tt>hive-site.xml</tt> file is optional but it is often useful, particularly if you want to set up a metastore. You may store the <tt>hive-site.xml</tt> file in <tt>/etc/hue/conf</tt>, or instruct Beeswax to locate it using the <tt>hive_conf_dir</tt> configuration variable (see <tt>/etc/hue/conf/hue-beeswax.ini</tt>).</p>
+
+<h1><a name="Beeswax-UsingBeeswax"></a>Using Beeswax</h1>
+
+<h2><a name="Beeswax-StartingBeeswax"></a>Starting Beeswax </h2>
+
+<p>To start the Beeswax application, click this icon <span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259203.jpg" height="29" width="30" style="border: 0px solid black"/></span> in the application bar at the bottom of the Hue web browser page. The <b>Beeswax: Hive Query</b> window opens in the Hue web page. </p> <h2><a name="Beeswax-InstallingtheBeeswaxSamples"></a>Installing the Beeswax Samples</h2>
+
+<p>You can install two sample Beeswax tables to use as examples. </p>
+
+<p><b>To install Beeswax samples:</b> </p>
+
+<ol>
+	<li>In the <b>Beeswax</b> window, click <b>Tables</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Table List</b> window, click <b>install samples</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259202.jpg" height="416" width="710" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+After you click <b>install samples</b>, the samples are displayed in the <b>Hive Table List</b> window. Beeswax removes the <b>install samples</b> button after the samples are installed. </li>
+</ol>
+
+
+<h2><a name="Beeswax-WorkingwithQueries"></a>Working with Queries</h2>
+
+<p>The <b>Hive Query</b> view enables you to enter queries in Hive's Query Language (HQL), which is similar to Structured Query Language (SQL). You can name and save your queries to use later. When you submit a query, the Beeswax Server uses Hive to run the queries. You can either wait for the query to complete, or return later to find the queries in the <b>Beeswax History</b> view. You can also receive an email message after the query is completed. </p>
+
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>For More Information</b><br />For information about HQL syntax, see <a href="http://wiki.apache.org/hadoop/Hive/LanguageManual.">http://wiki.apache.org/hadoop/Hive/LanguageManual.</a></td></tr></table></div> 
+
+<h3><a name="Beeswax-CreatingandRunningQueries"></a>Creating and Running Queries</h3>
+
+<p><b>To create and run a query</b>: </p>
+
+<ol>
+	<li>In the <b>Beeswax: Hive Query</b> window, type the query.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+For example, to select all data from the <em>sample_08</em> table, you would type: 
+<br class="atl-forced-newline" />
+<tt>SELECT * FROM sample_08</tt>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259206.jpg" height="411" width="713" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To override the default Hive and Hadoop settings for the current query, click <b>Advanced</b>. (To view the Hive default settings, click <b>Settings</b>.)
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+A panel opens on the left side of the window where you can specify the advanced settings.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259207.jpg" height="411" width="713" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click the plus sign icon <span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259208.jpg" height="18" width="18" style="border: 0px solid black"/></span> to add a setting for the following options. Click the plus sign icon again to specify multiple settings for a group, such as <b>Hive Settings</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> <b>Option</b> </th>
+<th class='confluenceTh'> <b>Description</b> </th>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Hive Settings</b> </td>
+<td class='confluenceTd'> Use <b>Hive Settings</b> to override Hive and Hadoop default settings. For <b>Key</b>, enter a Hive or Hadoop configuration variable name. For <b>Value</b>, enter the value you want to use for the variable. For example, to override the directory where structured hive query logs are created, you would enter <tt>hive.querylog.location</tt> for <b>Key</b>, and a path for <b>Value.</b> For information about Hive configuration variables, see:  <a href="http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration">http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration</a>.  For information about Hadoop configuration variables, see: <a href="http://hadoop.apache.org/common/docs/current/mapred-default.html">http://hadoop.apache.org/common/docs/current/mapred-default.html</a> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>File Resources</b> </td>
+<td class='confluenceTd'> Use <b>File Resources</b> to make locally accessible files available at query execution time on the entire Hadoop cluster. Hive uses Hadoop's Distributed Cache to distribute the added files to all machines in the cluster at query execution time.  
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+From the <b>Type</b> drop-down menu, choose one of the following: 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<b>JAR</b> — Adds the resources to the Java classpath. This is required in order to reference objects such as user defined functions. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<b>ARCHIVE</b> — Automatically unarchives resources when distributing them.  
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<b>FILE</b> — Adds resources to the distributed cache. Typically, this might be a transform script (or similar) to be executed.  
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+For <b>Path</b>, enter the path to the file. You can also click <b>Choose File</b> to browse and select the file.  
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<b>Note</b>: It is not necessary to specify files used in a transform script if the files are available in the same path on all machines in the Hadoop cluster. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>User-defined Functions</b> </td>
+<td class='confluenceTd'> You can use user-defined functions in a query. Specify the function name for <b>Name</b>, and specify the class name for <b>Class</b> <b>name</b>. You must specify a jar file for the user-defined functions in <b>File Resources</b>. To include a user-defined function in a query, add a $ (dollar sign) before the function name in the query. For example, if <em>MyTable</em> is a user-defined function name in the query, you would type: <tt>SELECT * $MyTable</tt> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Parameterization</b> </td>
+<td class='confluenceTd'> If you want to display a dialog box for you or other users to enter parameter values when a query is executed, select <b>Parameterization</b>. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Email Notification</b> </td>
+<td class='confluenceTd'> If you want to receive an email message after a query completes, select <b>Email Notification</b>. </td>
+</tr>
+</tbody></table>
+</div>
+
+<p><br class="atl-forced-newline" /></p></li>
+	<li>Click the red Close icon <span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259205.jpg" height="16" width="16" style="border: 0px solid black"/></span> to close a group, and click all of the Close icons to close the <b>Advanced</b> panel.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>If you want to save your query and advanced settings to use them again later, click <b>Save As,</b> enter a name and description, and then click <b>OK</b>. To save changes to an existing query, click <b>Save.</b>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>If you want to view the execution plan for the query, click <b>Explain</b>. For more information, see <a href="http://wiki.apache.org/hadoop/Hive/LanguageManual/Explain">http://wiki.apache.org/hadoop/Hive/LanguageManual/Explain</a>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To run the query, click <b>Execute</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The <b>Beeswax: Hive Query</b> window appears with the results of your query. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259204.jpg" height="411" width="712" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Do any of the following to download or save the query results:
+<br class="atl-forced-newline" />
+	<ul>
+		<li>Click <b>Download XLS</b> to download the results in a Microsoft Office Excel worksheet file.</li>
+		<li>Click <b>Download CSV</b> to download the results in a comma-separated values file suitable for use in other applications.</li>
+		<li>Click <b>Save.</b> To save the results in a new table, select <b>In a new table</b>, enter a name, and then click <b>Save</b>. To save the results in an HDFS file, select <b>In an HDFS directory</b>, enter a path or <b>Choose File</b> and browse to the directory, and then click <b>Save</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	</ul>
+	</li>
+	<li>To view a log of the query execution, click <b>Log</b>. You can use the information in this tab to debug your query.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Under <b>MR Jobs</b>, you can view any Map Reduce jobs that the query started.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To return to the query in the <b>Query Editor,</b> click <b>Unsaved Query</b> or the name of your saved query in the blue box at the top of the panel on the left side of the Beeswax window.</li>
+</ol>
+
+
+<h3><a name="Beeswax-ViewingQueryHistory"></a>Viewing Query History</h3>
+
+<p>Beeswax enables you to view the history of queries that you have previously run. Results for these queries are available for one week or until Hue is restarted. </p>
+
+<p><b>To view query history:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax</b> window, click <b>History</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays a list of your unsaved and saved queries in the <b>Beeswax:Query History</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259210.jpg" height="385" width="711" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To display the queries for all users, click <b>everyone's</b>. To display your queries only, click <b>mine</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To display the automatically generated actions that Beeswax performed on a user's behalf, click <b>auto actions</b>. To display user queries again, click <b>user queries</b>.</li>
+</ol>
+
+
+
+<h3><a name="Beeswax-Viewing%2CEditing%2CorDeletingSavedQueries"></a>Viewing, Editing, or Deleting Saved Queries</h3>
+
+<p>You can view a list of saved queries of all users by clicking <b>Saved Queries</b> in the <b>Beeswax</b> window. You can copy any user's query, but you can only edit, delete, and view the history of your own queries. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259211.jpg" height="385" width="711" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" /></p>
+
+<p><b>To edit a saved query:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax</b> window, click <b>Saved Queries</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the <b>Beeswax:Queries</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Right-click one of your queries and choose <b>Edit</b> from the context menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259212.jpg" height="385" width="711" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the query in the <b>Beeswax:Query Editor</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Change the query and then click <b>Save.</b> You can also click <b>Save As</b>, enter a new name, and click <b>OK</b> to save a copy of the query.</li>
+</ol>
+
+
+
+<p><b>To delete a saved query:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax</b> window, click <b>Saved Queries</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the <b>Beeswax:Queries</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Right-click any of the queries and choose <b>Delete</b> from the context menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>OK</b> to confirm the deletion.</li>
+</ol>
+
+
+
+<p><b>To copy a saved query:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax</b> window, click <b>Saved Queries</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the <b>Beeswax:Queries</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Right-click on any of the queries and choose <b>Clone</b> from the context menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the query in the <b>Beeswax:Query Editor</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Change the query as necessary and then click <b>Save.</b> You can also click <b>Save As</b>, enter a new name, and click <b>OK</b> to save a copy of the query.</li>
+</ol>
+
+
+
+<p><b>To copy a query in the Beeswax: Query History window:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax</b> window, click <b>History</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the <b>Beeswax: Query History</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To display the queries for all users, click <b>everyone's</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the queries for all users in the <b>Beeswax:Query History</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259209.jpg" height="385" width="711" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click the <b>Clone</b> link next to the query you want to copy.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays a copy of the query in the <b>Beeswax:Query Editor</b> window.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Change the query, if necessary, and then click <b>Save As</b>, enter a new name, and click <b>OK</b> to save the query.</li>
+</ol>
+
+
+<h2><a name="Beeswax-WorkingwithTables"></a>Working with Tables</h2>
+
+<p>When working with Hive tables, you can use Beeswax to:</p>
+<ul>
+	<li>Create tables (see <a href="#Beeswax-CreatingTables">Creating Tables</a>)</li>
+	<li>Browse tables (see <a href="#Beeswax-BrowsingTables">Browsing Tables</a>)</li>
+	<li>Import data into tables (see <a href="#Beeswax-ImportingDataintoTables">Importing Data into Tables</a>)</li>
+	<li>Drop tables (see <a href="#Beeswax-DroppingTables">Dropping Tables</a>)</li>
+	<li>View the location of a table (see <a href="#Beeswax-ViewingaTable%27sLocation">Viewing a Table's Location</a>)</li>
+</ul>
+
+
+<h3><a name="Beeswax-CreatingTables"></a><a name="Beeswax-CreatingTables"></a>Creating Tables</h3>
+
+<p>Although you can create tables by executing the appropriate HQL DDL query commands, it is easier to create a table using the Beeswax table creation wizard. </p>
+
+<p><b>To create a table:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax</b> window, click <b>Tables</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259215.jpg" height="411" width="713" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Beeswax: Table List</b> window, click <b>new table</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The table creation wizard starts. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259216.jpg" height="411" width="713" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Follow the instructions in the wizard to create the table. For information about an option in the wizard, place your mouse cursor on the help icon <span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259217.jpg" height="16" width="16" style="border: 0px solid black"/></span> next to the option.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+After you click <b>Submit Query</b> at the end of the table creation wizard, a new query to create the table is displayed in the Query Editor window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259214.jpg" height="416" width="710" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>Execute</b> to run the query and create the table.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the new table's metadata on the right side of the <b>Beeswax:Table Metadata</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259213.jpg" height="416" width="709" style="border: 0px solid black"/></span></li>
+</ol>
+
+
+<h3><a name="Beeswax-BrowsingTables"></a><a name="Beeswax-BrowsingTables"></a>Browsing Tables</h3>
+
+<p><b>To browse the data in a table:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax:Table List</b> window, click <b>Tables</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click the <b>Browse Data</b> link next to the table you want to browse.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259218.jpg" height="416" width="710" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the table's data in the <b>Query Results</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/beeswax/static/help/images/6259219.jpg" width="710" style="border: 0px solid black"/></span></li>
+</ol>
+
+
+<p><b>To browse the metadata in a table:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax:Table List</b> window, click <b>Tables</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Double-click the table.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the table's metadata on the right side of the <b>Beeswax:Table Metadata</b> window. </li>
+</ol>
+
+
+<h3><a name="Beeswax-ImportingDataintoTables"></a><a name="Beeswax-ImportingDataintoTables"></a>Importing Data into Tables</h3>
+
+<p>When importing data, you can choose to append or overwrite the table's data with data from a file. </p>
+
+<p><b>To import data into a table:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax:Table List</b> window, click <b>Tables</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Double-click the table.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /> 
+Beeswax displays the <b>Beeswax:Table Metadata</b> window.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /> </li>
+	<li>Click <b>Import Data</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Select <b>Overwrite existing data</b> to replace the data in the selected table with the imported data.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /> </li>
+	<li>For <b>Path</b>, enter the path to the file that contains the data you want to import, or click <b>Choose File</b> to browse to the file.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>Submit</b> to start importing the data.</li>
+</ol>
+
+
+<h3><a name="Beeswax-DroppingTables"></a><a name="Beeswax-DroppingTables"></a>Dropping Tables</h3>
+
+<p><b>To drop a table:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax:Table List</b> window, click <b>Tables</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Double-click the table.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax displays the <b>Beeswax:Table Metadata</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>Drop Table</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>Ok</b> to confirm the deletion.</li>
+</ol>
+
+
+<h3><a name="Beeswax-ViewingaTable%27sLocation"></a><a name="Beeswax-ViewingaTable%27sLocation"></a>Viewing a Table's Location</h3>
+
+<p><b>To view a table's location:</b></p>
+
+<ol>
+	<li>In the <b>Beeswax:Table List</b> window, click <b>Tables</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Double-click the table.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /> 
+Beeswax displays the <b>Beeswax:Table Metadata</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>View File Location</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+Beeswax lists the selected table in its directory in the <b>File Browser</b> window. </li>
+</ol>
+
+
+				    					    <br/>
+                        
