@@ -37,24 +37,12 @@ CCS.JFrame.addGlobalFilters({
 		//contents with the number of seconds until a refresh.
                 if (content && content.meta) {
 			var sec, url;
-                        			content.meta.each(function(meta) {
-			        var match = metaRE.exec(meta);
-                                if(match[1]) {
-                                         var data = match[1]; //set data to string of html attributes, space separated
-                                } else {
-                                         return;
-                                }  
-                                data = data.trim().split(' ');
-                                var attributeMap = new Object;
-                                data.each(function(item) {
-                                        var attribute = item.split('=');
-                                        attributeMap[attribute[0].replace(removeQuotes, '')] = attribute[1].replace(removeQuotes, ''); // remove quotes within string
-                                }); 
-                                var parts = attributeMap['content'].split(';');
-				if (attributeMap['http-equiv'] == "refresh") {
-					sec = parts[0];
-					if (parts[1]) url = unescape(parts[1].replace('url=', ''));
-				}
+                        content.meta.each(function(meta) {
+                                var parts = meta.get('content').split(';');
+                                if(meta.get('http-equiv') == "refresh") {
+                                        sec = parts[0].toInt();
+				        if (parts[1]) url = unescape(parts[1].replace('url=', ''));
+                                }
 			}, this);
 			if (!sec) return;
 			var end = new Date().increment('second', sec);
