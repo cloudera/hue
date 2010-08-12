@@ -17,8 +17,7 @@
 <%namespace name="util" file="util.mako" />
 ${wrappers.head("Beeswax: Waiting for query...", section='query')}
 
-<meta http-equiv="refresh"
-    content="3;url=${url('beeswax.views.watch_query', query.id)}?${fwd_params}">
+<meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
 
 <div class="view partial_refresh" id="watch_wait">
   <div class="resizable" data-filters="SplitView">
