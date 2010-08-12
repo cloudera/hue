@@ -95,7 +95,7 @@ Development Prerequisites
 
 Getting Started
 ===============
-To build and get the core server running:
+To build and get the core server running::
 
     $ export HADOOP_HOME=<path-to-hadoop-home>
     $ git clone http://github.com/cloudera/hue.git
@@ -103,7 +103,8 @@ To build and get the core server running:
     $ make apps
     $ build/env/bin/hue runserver_plus
 
-To start the helper daemons:
+To start the helper daemons::
+
     $ build/env/bin/hue beeswax_server
     $ build/env/bin/hue jobsubd
 
