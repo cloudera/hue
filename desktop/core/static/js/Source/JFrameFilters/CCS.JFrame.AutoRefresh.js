@@ -24,25 +24,23 @@ script: CCS.JFrame.AutoRefresh.js
 */
 
 (function(){
-var metaRE = /<meta(.*)?\/>/;  //regular expression to remove all but attributes
-var removeQuotes = /"/g; //regular expression to remove quotes
-
+var urlRE = /^url=/;
 
 CCS.JFrame.addGlobalFilters({
 
 	autorefresh: function(container, content){
 		$clear(refreshTable.get(this));
-		//get the first input.autorefresh and use its value as the duration before 
+		//get the first input.autorefresh and use its value as the duration before
 		//it auto refreshes the input. if span.sec_to_autorefresh is present, fill its
 		//contents with the number of seconds until a refresh.
-                if (content && content.meta) {
+		if (content && content.meta) {
 			var sec, url;
-                        content.meta.each(function(meta) {
-                                var parts = meta.get('content').split(';');
-                                if(meta.get('http-equiv') == "refresh") {
-                                        sec = parts[0].toInt();
-				        if (parts[1]) url = unescape(parts[1].replace('url=', ''));
-                                }
+			content.meta.each(function(meta) {
+				var parts = meta.get('content').split(';');
+				if(meta.get('http-equiv') == "refresh") {
+					sec = parts[0].toInt();
+					if (parts[1]) url = unescape(parts[1].replace(urlRE, ''));
+				}
 			}, this);
 			if (!sec) return;
 			var end = new Date().increment('second', sec);
@@ -65,9 +63,9 @@ CCS.JFrame.addGlobalFilters({
 					update();
 				}
 			}).periodical(250, this);
-			
+
 			refreshTable.set(this, timer);
-			
+
 			var clearer = function(){
 				$clear(timer);
 				this.removeEvent('request', clearer);
