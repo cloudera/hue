@@ -17,7 +17,7 @@
 ---
 description: Desktop Configuration
 provides: [CCS.Desktop.Config]
-requires: [/CCS.Desktop, clientcide/StickyWin.Drag, Widgets/ART.Popup, Widgets/ART.Glyphs, Core/Selectors, More/HtmlTable.Select]
+requires: [/CCS.Desktop, clientcide/StickyWin.Drag, Widgets/ART.Popup, Widgets/ART.Glyphs, Core/Selectors, More/HtmlTable.Select, Core/JSON]
 script: CCS.Desktop.Config.js
 
 ...
@@ -219,35 +219,92 @@ if (Browser.Engine.trident) {
 // crush the server either with too-many or too-frequent messages, so we only send every 5 seconds,
 // unless there are more than 100 messages in the message queue.
 (function(info, warn, error) {
+	var parse = function(){
+		var str = '';
+		for (var i = 0; i < arguments.length; i++) {
+			var value = arguments[i];
+			switch ($type(value)) {
+				case 'element':
+					var el = document.id(value);
+					str += el.get('tag');
+					if (el.get('id')) str += '#' + el.get('id');
+					if (el.get('class')) str += el.get('class').split(' ').join('.');
+					break;
+
+				case 'array': case 'collection':
+					str +='[';
+					var results = [];
+					for (var index = 0; index < value.length; index++) {
+						results.push(parse(value[index]));
+					}
+					str += results.join(', ') + ']';
+					break;
+
+				case 'object':
+					var objs = [];
+					for (name in value) {
+						if ($type(value[name]) != 'object') {
+							objs.push(name + ': ' + parse(value[name]));
+						} else {
+							objs.push(name + ': (object)');
+						}
+					}
+					str += '{' + objs.join(', ') + '}';
+					break;
+
+				case 'function':
+					str += '(function)';
+					break;
+
+				case 'boolean':
+					str += String(value);
+					break;
+
+				default: str += value;
+			}
+			if (i != (arguments.length - 1)) str += ', ';
+		}
+		return str;
+	};
 
 	var monkeyPatchDbugFunction = function(dbugMethod, level) {
-		var messageQueue = [];
+		var messageQueue = [],
+		    timer;
+
+		var startTimer = function(){
+			$clear(timer);
+			timer = sendQueuedMessages.delay(5000);
+		};
 
 		var sendQueuedMessages = function() {
+			$clear(timer);
 			if (window.sendDbug && messageQueue.length > 0) {
 				new Request.JSON({
 					url: '/log_frontend_event',
 					data: {
 						message: JSON.encode(messageQueue),
 						level: level
-					}
+					},
+					onComplete: startTimer
 				}).post();
 				// Immediately clear the queue after we try to send it.
 				// If the send fails, oh well.
 				messageQueue.empty();
+			} else {
+				startTimer();
 			}
 		};
 
 		// Poll the message queue every 5 seconds to see if it has messages to send.
-		sendQueuedMessages.periodical(5000);
+		startTimer();
 
-		return function(message) {
-			messageQueue.push(message);
+		return function() {
+			messageQueue.push(parse.apply(parse, arguments));
 			// Immediately send the message queue if it's getting too big.
 			if (messageQueue.length > 100) {
 				sendQueuedMessages();
 			}
-			dbugMethod(message);
+			dbugMethod.apply(dbug, arguments);
 		};
 	};
 
