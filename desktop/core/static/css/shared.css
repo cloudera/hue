@@ -244,14 +244,17 @@ table[data-filters*=HtmlTable] tr.table-tr-odd td {
 table[data-filters*=HtmlTable] tr:nth-child(odd) td {
 	background: #f3f3f3;
 }
-table[data-filters*=HtmlTable].selectable tr:hover > td, table[data-filters*=HtmlTable].selectable tr.table-tr-hovered td {
-	background-color: #d4e7f8;
-	color: #000;
-	cursor: pointer;
-}
 table[data-filters*=HtmlTable] tr.selected td, table[data-filters*=HtmlTable] tr.table-tr-selected td, table[data-filters*=HtmlTable] tr.selected td a, table[data-filters*=HtmlTable] tr.table-tr-selected td a {
 	background-color: #3875d7;
 	color: #fff;
+}
+table[data-filters*=HtmlTable].selectable tr:hover > td, table[data-filters*=HtmlTable].selectable tr.table-tr-hovered td,
+	table[data-filters*=HtmlTable].multiselect tr:hover > td, table[data-filters*=HtmlTable].multiselect tr.table-tr-hovered td,
+	table[data-filters*=HtmlTable].selectable tr:hover > td a, table[data-filters*=HtmlTable].selectable tr.table-tr-hovered td a,
+	table[data-filters*=HtmlTable].multiselect tr:hover > td a, table[data-filters*=HtmlTable].multiselect tr.table-tr-hovered td a {
+	background-color: #d4e7f8;
+	color: #000;
+	cursor: pointer;
 }
 table.table-sortable th {
 	cursor: pointer;
