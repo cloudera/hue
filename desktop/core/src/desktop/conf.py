@@ -19,7 +19,6 @@
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
 from desktop.lib.conf import coerce_bool, validate_path
 from desktop.lib.paths import get_desktop_root
-from desktop.lib import i18n
 import os
 import socket
 
@@ -271,6 +270,8 @@ def config_validator():
 
   Called by core check_config() view.
   """
+  from desktop.lib import i18n
+
   res = [ ]
   if not SECRET_KEY.get():
     res.append((SECRET_KEY, "Secret key should be configured as a random string."))
