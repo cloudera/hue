@@ -135,7 +135,7 @@ def get_shared_beeswax_server():
   return cluster, s
 
 
-REFRESH_RE = re.compile('<\s*meta\s+http-equiv="refresh"\s+content="\d*;url=([^"]*)"\s*>', re.I)
+REFRESH_RE = re.compile('<\s*meta\s+http-equiv="refresh"\s+content="\d*;([^"]*)"\s*/>', re.I)
 
 def wait_for_query_to_finish(client, response, max=30.0):
   logging.info(str(response.template) + ": " + str(response.content))
@@ -154,6 +154,7 @@ def wait_for_query_to_finish(client, response, max=30.0):
     match = REFRESH_RE.search(response.content)
     if match is not None:
       url = match.group(1)
+      url = url.lstrip('url=')
     else:
       url = response.request['PATH_INFO']
     response = client.get(url, follow=True)
