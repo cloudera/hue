@@ -31,41 +31,42 @@ CCS.JFrame.addGlobalRenderers({
 		var popup = content.elements.filter('.prompt_popup')[0];
 		if (!popup) return;
 		var target = new Element('div', {'class': 'jframe_prompt'}).hide().inject($(this));
-                var popupBehavior = new Behavior({
-                        onError: function(){
-                                dbug.warn.apply(dbug, arguments);
-                        }
-                });
-                popupBehavior.passMethods({
-                        getContentElement: $lambda(target),
-                        configureRequest: this.configureRequest.bind(this)
-                });
-                var fillAndShow = function() {
-                        this.fill(target, content, popupBehavior);
-                        target.show();
-                }.bind(this);
-                //VML in IE doesn't like being hidden and redisplayed.  Delaying filling and showing the target for 
-                if(!Browser.Engine.trident) {
-                        fillAndShow();
-                }
+		var popupBehavior = new Behavior({
+			onError: function(){
+				dbug.warn.apply(dbug, arguments);
+			}
+		});
+		popupBehavior.passMethods({
+			getContentElement: $lambda(target),
+			configureRequest: this.configureRequest.bind(this)
+		});
+		var fillAndShow = function() {
+			this.fill(target, content, popupBehavior);
+			target.show();
+		}.bind(this);
+		//VML in IE doesn't like being hidden and redisplayed.  Delaying filling and showing the target for 
+		if(!Browser.Engine.trident) {
+			fillAndShow();
+		}
 		var toolbar = content.elements.filter('.toolbar');
 		if (toolbar.length) toolbar.hide();
 
 		var size = this.content.getSize();
 		var form = popup.getElement('form');
-                var hasInput = !!popup.getElement('form') && !!popup.getElement('input, textarea, select');
+		var hasInput = !!popup.getElement('form') && !!popup.getElement('input, textarea, select');
 		var prompt = this.prompt(content.title || 'Enter Details', target, function(){
 			if (form) form.retrieve('form.request').send();
 		}, {
-                        detectInput: !hasInput,
+			detectInput: !hasInput,
 			resizable: true
 		});
-                prompt.addEvent('resize', function() {popupBehavior.resize.bind(popupBehavior);});
-                prompt.addEvent('destroy', function() {popupBehavior.cleanup(target); });
-                
-                if(Browser.Engine.trident) {
-                        fillAndShow();
-                }
+		prompt.addEvent('resize', function() {popupBehavior.resize.bind(popupBehavior);});
+		prompt.addEvent('destroy', function() {popupBehavior.cleanup(target); });
+		
+		if(Browser.Engine.trident) {
+			fillAndShow();
+			prompt.findInputs();
+		}
 		target.getElements(":widget").each(function(widget) {
 			widget.get("widget").register(widget.getParent(":widget").get("widget"));
 		});
