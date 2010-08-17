@@ -55,7 +55,7 @@
       </ul>
     </dt>
     <dd class="bw-query_bottom default" style="height: auto;">
-      <textarea class="bw-query-field ccs-simple-posteditor" data-filters="OverText"
+      <textarea class="bw-query-field" data-filters="OverText, PostEditor"
         alt="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}">${extract_field_data(form.query["query"]) or ''}</textarea>
         % if len(form.query["query"].errors):
           <div class="validation-advice">

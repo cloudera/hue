@@ -31,6 +31,7 @@ requires:
  - More/HtmlTable.Select
  - More/Spinner
  - Widgets/Behavior
+ - Widgets/Behavior.Accordion
  - Widgets/Behavior.ArtButton
  - Widgets/Behavior.ArtInput
  - Widgets/Behavior.FormRequest
@@ -47,6 +48,7 @@ requires:
  - /Behavior.HtmlTableKeyboard
  - /Behavior.HtmlTableMultiSelectMenu
  - /Behavior.MultiChecks
+ - /Behavior.PostEditor
  - /Behavior.SelectWithOther
  - /Behavior.SideBySideSelect
  - /Behavior.SizeTo
@@ -456,6 +458,26 @@ CCS.JFrame = new Class({
 	addBehaviors: function(obj, overwrite){
 		this.behavior.addFilters(obj, overwrite);
 	},
+        /* 
+                add a new behavior plugin
+                filterName - (*string*) the name of the filter this plugin is for (no spaces or commas; preferably CamelCase)
+                name - (*string*) the name of the plugin (no spaces or commas; preferably CamelCase)
+                fn - (*string*) the attachment function for the plugin
+                overwrite - (*boolean*) if true, will overwite any pre-existing filter if one is present
+        */
+
+        addBehaviorPlugin: function(filterName, name, fn, overwrite) {
+                this.behavior.addPlugin(filterName, name, fn, overwrite);
+        },
+        /*
+                add a group of behavior plugins
+                obj - (*object*) an object containing objects containing the filter name, the plugin name, and the attachment function for the plugin
+                overwrite - (*boolean*) if true, will overwrite any pre-existing filter if one is present
+        */
+
+        addBehaviorPlugins: function(obj, overwrite){
+                this.behavior.addPlugins(obj, overwrite);
+        },
 
 	/*
 		apply a specific behavior to an element

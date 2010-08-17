@@ -17,7 +17,7 @@
 <%namespace name="wrappers" file="header_footer.mako" />
 ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
 <div class="toolbar">
-  <ul class="ccs-bc-form ccs-breadcrumb clearfix" data-bc-sections=".ccs-bc-section" data-bc-form="form">
+  <ul class="clearfix" data-filters="Breadcrumb, BreadcrumbForm" data-bc-sections=".ccs-bc-section" data-bc-form="form">
     <li><a href="#step1">Name</a></li>
     <li><a href="#step2">Record Format</a></li>
     <li><a href="#step3">Serialization</a></li>
@@ -71,7 +71,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
             <% 
               selected = table_form["row_format"].data or table_form["row_format"].field.initial
             %>
-            <dt class="bw-format-delimited relays" data-group-toggle="{'group': '.bw-config-data li', 'show':'.bw-delim-options'}">
+            <dt class="bw-format-delimited relays" data-filters="DataGroupToggle" data-group-toggle="{'group': '.bw-config-data li', 'show':'.bw-delim-options'}">
               <label>
                 Delimited
                 <input type="radio" name="table-row_format" value="Delimited" class="validate-one-required:'.bw-format'" title="Please choose one of these record formats." data-error-container=''
@@ -83,7 +83,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               <div class="ccs-errors"></div>
             </dt>
             <dd>Data files use delimiters, like commas (CSV) or tabs.</dd>
-            <dt class="bw-format-SerDe relays" data-group-toggle="{'group': '.bw-config-data li', 'show':'.bw-serde-options'}">
+            <dt class="bw-format-SerDe relays" data-filters="DataGroupToggle" data-group-toggle="{'group': '.bw-config-data li', 'show':'.bw-serde-options'}">
               <label>
                 SerDe
                 <input type="radio" name="table-row_format" value="SerDe"

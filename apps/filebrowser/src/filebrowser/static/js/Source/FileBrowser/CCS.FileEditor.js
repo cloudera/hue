@@ -46,13 +46,6 @@ CCS.FileEditor = new Class({
 
 	initialize: function (path, options) {
 		this.parent(path || '/filebrowser/', options);
-                this.jframe.addBehaviors({
-                        'FE-PostEditor': function(element, methods) {
-                                var textarea = element.getElement('textarea');
-                                if(!textarea) return;
-                                var postEditor = new CCS.PostEditor.Simple(textarea); 
-                        }
-                });
 		this.jframe.addRenderers({
 			'saveAsPrompt_popup': function (content) {
 				var saveAs = content.elements.filter('.saveAsPrompt_popup')[0];
