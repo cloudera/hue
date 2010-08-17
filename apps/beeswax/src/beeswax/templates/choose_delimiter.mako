@@ -18,7 +18,7 @@
 <%namespace name="util" file="util.mako" />
 ${wrappers.head('Choose a Delimiter')}
 <div class="toolbar">
-  <ul class="ccs-breadcrumb clearfix">
+  <ul data-filters="Breadcrumb" class="clearfix">
     ## TODO(marcus) These links should be part of the form, and do POST
     <li><a href="${ url('beeswax.create_table.import_wizard') }">Choose File</a></li>
     <li class="tabSelected"><a href="${ url('beeswax.create_table.import_wizard') }">Choose Delimiter</a></li>

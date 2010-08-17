@@ -119,14 +119,14 @@ div.beeswax div.bw-welcome a.bw-load-sample-button {
 }
 
 /* breadcrumb */
-div.beeswax ul.ccs-breadcrumb {
+div.beeswax ul[data-filters*=Breadcrumb] {
 	position: absolute;
 	top: 57px;
 	left: 80px;
 	margin: 0 auto;
 	z-index: 0;
 }
-div.beeswax ul.ccs-breadcrumb li {
+div.beeswax ul[data-filters*=Breadcrumb] li {
 	float: left;
 	height: 23px;
 	background: url(../art/breadcrumb.png) top right;
@@ -134,25 +134,25 @@ div.beeswax ul.ccs-breadcrumb li {
 	margin-left: -16px;
 	padding-left: 12px;
 }
-div.beeswax ul.ccs-breadcrumb li.tabSelected {
+div.beeswax ul[data-filters*=Breadcrumb] li.tabSelected {
 	background: url(../art/breadcrumb.png) right -23px;
 }
-div.beeswax ul.ccs-breadcrumb li.ccs-bc-error {
+div.beeswax ul[data-filters*=Breadcrumb] li.ccs-bc-error {
 	background: url(../art/breadcrumb.png) right 23px;
 }
-div.beeswax ul.ccs-breadcrumb li:first-child {
+div.beeswax ul[data-filters*=Breadcrumb] li:first-child {
 	margin-left: 0px;
 	border-radius: 4px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 }
-div.beeswax ul.ccs-breadcrumb li a {
+div.beeswax ul[data-filters*=Breadcrumb] li a {
 	line-height: 23px;
 	color: #000;
 	padding: 0px 16px 0px 8px;
 	text-shadow: 0px 1px #ccc;
 }
-div.beeswax ul.ccs-breadcrumb li a:hover {
+div.beeswax ul[data-filters*=Breadcrumb] li a:hover {
 	text-decoration: none;
 }
 
@@ -797,7 +797,7 @@ div.beeswax .bw-save_query_results input[type=radio] {
 	float: left;
 	clear: both;
 }
-div.beeswax .watch_results .bw-save_query_results .accordion .target {
+div.beeswax .watch_results .bw-save_query_results [data-filters*=Accordion] .target {
 	clear: both;
 }
 div.beeswax .watch_results .bw-save_query_results {

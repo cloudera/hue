@@ -39,9 +39,8 @@ Behavior.addGlobalFilters({
                                 });
                         //else hide and disable the input
                         } else {
-                                other.addClass('ignoreValidation').dissolve().get('reveal').chain(function(){
-                                        ot.disable();
-                                });
+                                ot.disable();
+                                other.addClass('ignoreValidation').dissolve();
                         }
                 });
                 this.markForCleanup(element, function(){

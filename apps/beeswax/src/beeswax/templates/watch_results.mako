@@ -31,7 +31,7 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
                 <li><a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a>
                 <li><a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a>
                 <li data-filters="CollapsingElements"><a class="bw-save collapser jframe_ignore" href="${url('beeswax.views.save_results', query.id)}">Save</a>
-                  <div class="collapsible accordion ccs-hidden bw-save_query_results" style="display:none"> 
+                  <div class="collapsible ccs-hidden bw-save_query_results" style="display:none" data-filters="Accordion"> 
                     <form action="${url('beeswax.views.save_results', query.id) }" method="POST">
                       ## Writing the save_target fields myself so I can match them to their respective text input fields.
                       <div> 

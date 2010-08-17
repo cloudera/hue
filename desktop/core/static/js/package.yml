@@ -56,6 +56,7 @@ sources: [
   Source/BehaviorFilters/Behavior.HtmlTableKeyboard.js,
   Source/BehaviorFilters/Behavior.HtmlTableMultiSelectMenu.js,
   Source/BehaviorFilters/Behavior.MultiChecks.js,
+  Source/BehaviorFilters/Behavior.PostEditor.js,
   Source/BehaviorFilters/Behavior.SelectWithOther.js,
   Source/BehaviorFilters/Behavior.SideBySideSelect.js,
   Source/BehaviorFilters/Behavior.SizeTo.js,

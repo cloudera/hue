@@ -17,7 +17,7 @@
 <%namespace name="comps" file="beeswax_components.mako" />
 ${wrappers.head('Choose a File')}
 <div class="toolbar">
-  <ul class="ccs-breadcrumb clearfix">
+  <ul class="clearfix" data-filters="Breadcrumb">
     <li class="tabSelected"><a href="${ url('beeswax.create_table.import_wizard') }">Choose File</a></li>
     <li><a>Choose Delimiter</a></li>
     <li><a>Define Columns</a></li>
