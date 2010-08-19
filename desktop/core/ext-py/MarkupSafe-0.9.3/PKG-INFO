@@ -1,0 +1,53 @@
+Metadata-Version: 1.0
+Name: MarkupSafe
+Version: 0.9.3
+Summary: Implements a XML/HTML/XHTML Markup safe string for Python
+Home-page: http://dev.pocoo.org/
+Author: Armin Ronacher
+Author-email: armin.ronacher@active-4.com
+License: BSD
+Description: MarkupSafe
+        ==========
+        
+        Implements a unicode subclass that supports HTML strings:
+        
+        >>> from markupsafe import Markup, escape
+        >>> escape("<script>alert(document.cookie);</script>")
+        Markup(u'&lt;script&gt;alert(document.cookie);&lt;/script&gt;')
+        >>> tmpl = Markup("<em>%s</em>")
+        >>> tmpl % "Peter > Lustig"
+        Markup(u'<em>Peter &gt; Lustig</em>')
+        
+        If you want to make an object unicode that is not yet unicode
+        but don't want to lose the taint information, you can use the
+        `soft_unicode` function:
+        
+        >>> from markupsafe import soft_unicode
+        >>> soft_unicode(42)
+        u'42'
+        >>> soft_unicode(Markup('foo'))
+        Markup(u'foo')
+        
+        Objects can customize their HTML markup equivalent by overriding
+        the `__html__` function:
+        
+        >>> class Foo(object):
+        ...  def __html__(self):
+        ...   return '<strong>Nice</strong>'
+        ...
+        >>> escape(Foo())
+        Markup(u'<strong>Nice</strong>')
+        >>> Markup(Foo())
+        Markup(u'<strong>Nice</strong>')
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Text Processing :: Markup :: HTML

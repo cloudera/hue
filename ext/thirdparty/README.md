@@ -22,8 +22,9 @@ Checked-in third party dependencies
 |Y|FancyUpload|3.0|MIT|http://github.com/digitarald/digitarald-fancyupload/tarball/3.0|
 |Y|lockfile|0.8|MIT|http://smontanaro.dyndns.org/python/lockfile-0.8.tar.gz|
 |Y|lxml|2.2.2|BSD|http://codespeak.net/lxml/|
-|Y|Mako|0.3.3|MIT|http://makotemplates.org/|
+|Y|Mako|0.3.4|MIT|http://makotemplates.org/|
 |Y|Markdown|2.0.3|BSD|http://pypi.python.org/packages/source/M/Markdown/Markdown-2.0.3.tar.gz|
+|Y|MarkupSafe|0.9.3|BSD|http://pypi.python.org/pypi/MarkupSafe|
 |Y|processing|0.52|BSD|http://developer.berlios.de/projects/pyprocessing|
 |Y|pyexelerator|0.6.4.1|BSD|http://sourceforge.net/projects/pyexcelerator|
 |Y|pysqlite|2.55|zlib/libpng|http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.5/|
