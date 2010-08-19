@@ -107,6 +107,10 @@ div.filebrowser .fb-mkdir {
 	background: url(/static/art/icons/page_white_edit.png) no-repeat 1px 1px !important;
 }
 
+.filebrowser .fb-item-actions a.fb-downloadfile {
+	background: url(/static/art/icons/page_white_put.png) no-repeat 1px 1px !important;
+}
+
 .filebrowser .context-menu {
 	border-radius: 2px;
 	-moz-border-radius: 2px;

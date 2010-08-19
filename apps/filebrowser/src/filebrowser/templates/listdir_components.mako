@@ -90,6 +90,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
                   % else:
                     <li><a class="fb-viewfile" href="${url('filebrowser.views.view', path=path_enc)}" target="FileViewer">View File</a></li>
                     <li><a class="fb-editfile" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit File</a></li>
+                    <li><a class="fb-downloadfile" href="${url('filebrowser.views.download', path=path_enc)}" target="_blank">Download File</a></li>
                     <li class="fb-rm-container"><a class="fb-rm fb-default-rm confirm_and_post" alt="Are you sure you want to remove this file?" href="${url('filebrowser.views.remove')}?path=${path_enc}&next=${urlencode(current_request_path)}">Remove</a></li>
                   % endif
                   <li class="fb-rename-container"><a class="fb-rename" href="${url('filebrowser.views.rename')}?src_path=${path_enc}&next=${urlencode(current_request_path)}">Rename</a></li>
