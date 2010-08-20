@@ -14,6 +14,8 @@ Release Notes
 -------------
 Note that prior to version 0.9, Hue was "Cloudera Desktop".
 
+* Aug 20, 2010 --- link:release-notes/release-notes-1.0.1.txt[Version 1.0.1]
+* Aug 13, 2010 --- link:release-notes/release-notes-1.0.0.txt[Version 1.0.0]
 * June 29, 2010 --- link:release-notes/release-notes-0.9.0.txt[Version 0.9.0]
 * May 21, 2010 --- link:release-notes/release-notes-0.4.2.txt[Version 0.4.2]
 * April 7, 2010 --- link:release-notes/release-notes-0.4.1.txt[Version 0.4.1]
