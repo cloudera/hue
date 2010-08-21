@@ -52,6 +52,7 @@ sources: [
   Source/BehaviorFilters/Behavior.DataGroupToggle.js,
   Source/BehaviorFilters/Behavior.FilterInput.js,
   Source/BehaviorFilters/Behavior.FitText.js,
+  Source/BehaviorFilters/Behavior.HtmlTableCheckSelected.js,
   Source/BehaviorFilters/Behavior.HtmlTableChromeHack.js,
   Source/BehaviorFilters/Behavior.HtmlTableKeyboard.js,
   Source/BehaviorFilters/Behavior.HtmlTableMultiSelectMenu.js,

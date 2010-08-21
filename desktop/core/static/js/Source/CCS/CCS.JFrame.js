@@ -44,6 +44,7 @@ requires:
  - /Behavior.DataGroupToggle
  - /Behavior.FilterInput
  - /Behavior.FitText
+ - /Behavior.HtmlTableCheckSelected
  - /Behavior.HtmlTableChromeHack
  - /Behavior.HtmlTableKeyboard
  - /Behavior.HtmlTableMultiSelectMenu
