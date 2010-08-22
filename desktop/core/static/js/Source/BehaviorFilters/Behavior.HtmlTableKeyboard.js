@@ -26,7 +26,9 @@ Behavior.addGlobalPlugin('HtmlTable', 'HtmlTableJFrame', function(element, metho
 
 	var table = element.retrieve('HtmlTable');
 	if (table.keyboard) {
+		table.keyboard.relinquish();
 		methods.registerKeyboard(table.keyboard);
+		table.keyboard.activate();
 		this.markForCleanup(element, function(){
 			methods.unregisterKeyboard(table.keyboard);
 		});
