@@ -238,12 +238,18 @@ table[data-filters*=HtmlTable] td {
 	background: #fff;
 	border: none;
 }
+table[data-filters*=HtmlTable]:not(.treeView) tr:nth-child(odd) td {
+	background-color: #f3f3f3;
+}
 table[data-filters*=HtmlTable] tr.table-tr-odd td {
-	background: #f3f3f3;
+	background-color: #f3f3f3;
 }
-table[data-filters*=HtmlTable] tr:nth-child(odd) td {
-	background: #f3f3f3;
+table.ccs-bordered-table {
+	width: 98%;
+	margin: 4px 1%;
+	border: 1px solid #888;
 }
+
 table[data-filters*=HtmlTable] tr.selected td, table[data-filters*=HtmlTable] tr.table-tr-selected td, table[data-filters*=HtmlTable] tr.selected td a, table[data-filters*=HtmlTable] tr.table-tr-selected td a {
 	background-color: #3875d7;
 	color: #fff;
@@ -278,6 +284,20 @@ span.table-th-sort-span {
 .table-th-sort-rev span.table-th-sort-span {
 	background: url(/static/art/icons/bullet_arrow_up.png) -4px top no-repeat;
 }
+table[data-filters*=HtmlTable].treeView tr a.expand {
+	display: block;
+	float: left;
+	width: 10px;
+	height: 10px;
+	background: url(/static/art/divots.png);
+	position: relative;
+	top: 4px;
+	left: -4px;
+}
+table[data-filters*=HtmlTable].treeView tr.table-expanded a.expand {
+	background: url(/static/art/divots.png) 0px -14px;
+}
+
 
 /* stickywin solid; this is the login window styles */
 div.solid-win div.body-left { 
