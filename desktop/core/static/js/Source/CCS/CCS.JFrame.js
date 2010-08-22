@@ -390,6 +390,13 @@ CCS.JFrame = new Class({
 		if (this.options.evaluateJs && content.js) $exec(content.js);
 		this.applyDelegates(target);
 		this.applyFilters(target, content, behavior || this.behavior);
+		if (Browser.Engine.webkit) {
+				var width = target.style.width;
+				target.setStyle('width', '99%');
+				(function() {
+					target.style.width = width;
+				}).delay(1);
+		}
 	},
 
 	resize: function(x, y){
