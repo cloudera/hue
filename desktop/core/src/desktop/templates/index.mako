@@ -261,6 +261,7 @@
 
     <script>
       if (Browser.Engine.trident) $(document.body).addClass('IEroot');
+      $(document.body).addClass(Browser.Engine.name);
     </script>
 </body>
 </html>
