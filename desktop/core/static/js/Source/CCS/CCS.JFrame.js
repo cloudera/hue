@@ -156,18 +156,18 @@ CCS.JFrame = new Class({
 		if (this.options.size) this.resize(this.options.size.width, this.options.size.height);
 		this.load({requestPath: path});
 	},
-        
-        /*
-                configureRequest - configures a passed in request to be have its response rendered within JFrame..
-                request - (* request object *) request object to be configured
-        */
-        configureRequest: function(request){
-                this._setRequestOptions(request, {
-                        onSuccess: function(nodes, elements, text){
-                                this._requestSuccessHandler(request, text);
-                        }.bind(this)
-                });
-        },
+	
+	/*
+		configureRequest - configures a passed in request to be have its response rendered within JFrame..
+		request - (* request object *) request object to be configured
+	*/
+	configureRequest: function(request){
+		this._setRequestOptions(request, {
+			onSuccess: function(nodes, elements, text){
+				this._requestSuccessHandler(request, text);
+			}.bind(this)
+		});
+	},
 
 
 	toElement: function(){
@@ -374,13 +374,13 @@ CCS.JFrame = new Class({
 		fill: fills a given target with the appropriate content
 		target - (*element*) the target to fill with content
 		content - (*object*) an object with the following properties:
-			js - (*string*) any the inline javascript to evalutate,
-			links - (*elements array*) css links to be injected into the target
-			elements - (*elements array*) elements to inject into the target (i.e. the actual content)
-			title - (*string*) the title of the content
-			view - (*string*; optional) if defined, the view of the content
-			viewElement - (*element*; optional) if defined, the element for the view
-                behavior - (*behavior object*; optional) if defined, the behavior instance to use
+		js - (*string*) any the inline javascript to evalutate,
+		links - (*elements array*) css links to be injected into the target
+		elements - (*elements array*) elements to inject into the target (i.e. the actual content)
+		title - (*string*) the title of the content
+		view - (*string*; optional) if defined, the view of the content
+		viewElement - (*element*; optional) if defined, the element for the view
+		behavior - (*behavior object*; optional) if defined, the behavior instance to use
 		
 	*/
 
@@ -492,7 +492,7 @@ CCS.JFrame = new Class({
 
 	//Applies all the behavior filters for an element.
 	//element - (element) an element to apply the filters registered with this Behavior instance to.
-        //behavior - (behavior object) behavior instance to use 
+	//behavior - (behavior object) behavior instance to use 
 	//force - (boolean; optional) passed through to applyBehavior (see it for docs)
 	applyBehaviors: function(element, behavior, force){
 		behavior.apply(element, force);
@@ -507,12 +507,12 @@ CCS.JFrame = new Class({
 		applyFilters:
 		container - (*element*) applies all the filters on this instance of jFrame to the contents of the container.
 		content - (*object*) optional object containing various metadata about the content; js tags, meta tags, title, view, etc. See the "notes" section of the renderContent method comments in this file.
-                behavior - (*behavior object*) optional behavior instance to be used for application of behaviors
-	        	
+		behavior - (*behavior object*) optional behavior instance to be used for application of behaviors
+			
 	*/
 
 	applyFilters: function(container, content, behavior){
-                for (var name in this.filters) {
+		for (var name in this.filters) {
 			this.applyFilter(name, container, content);
 		}
 		this.applyBehaviors(container, behavior || this.behavior);
