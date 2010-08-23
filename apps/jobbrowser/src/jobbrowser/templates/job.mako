@@ -61,7 +61,7 @@
                     else:
                       target = "FileBrowser"
                   %>
-                  <a href="${location_to_url(request, val)}" title="${val}" target="${target}">${location_to_url(request, val)}</a>
+                  <a href="${location_to_url(request, val)}" title="${val}" target="${target}">${val}</a>
                   % if i != len(splitArray) - 1:
                     <br>
                   % endif  
