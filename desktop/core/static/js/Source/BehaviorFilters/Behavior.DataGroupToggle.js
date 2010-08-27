@@ -46,7 +46,11 @@ Behavior.addGlobalFilters({
                                 return;
                         }
                         sections.each(function(section) {
-                                section.setStyle('display', show.contains(section) ? section.get('data', 'display') : 'none');
+                                if(show.contains(section)) {
+                                        section.show();
+                                } else {
+                                        section.hide();
+                                }
                         });
                 };
                 var linkHandler = function(event) {
