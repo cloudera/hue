@@ -23,7 +23,7 @@ limitations under the License.
 	<body>
 		<div class="jframe_padded">
 			<h2 style="margin: 0px 0px 4px">Example with just a select element w/ side_by_side_select class</h2>
-			<select class="side_by_side_select" multiple="true">
+			<select data-filters="SideBySideSelect" multiple="true">
 				<option value="1">one</option>
 				<option value="2">two</option>
 				<option value="3">three</option>
@@ -40,7 +40,7 @@ limitations under the License.
 			</select>
 			
 			<h2 style="margin: 8px 0px 4px">Example in a container that has the side_by_side_select class</h2>
-			<div class="side_by_side_select">
+			<div data-filters="SideBySideSelect">
 				<select multiple="true">
 					<option value="1">one</option>
 					<option value="2">two</option>
@@ -49,7 +49,7 @@ limitations under the License.
 			</div>
 
 			<h2 style="margin: 8px 0px 4px">Example of a select with the class but <tt>multiple</tt> is not true (so it's ignored)</h2>
-			<select class="side_by_side_select">
+			<select data-filters="SideBySideSelect">
 				<option value="1">one</option>
 				<option value="2">two</option>
 				<option value="3">three</option>

@@ -38,13 +38,15 @@ Behavior.addGlobalFilters({
                                 dbug.warn("Search using data-group-toggle[group] as selector returned no elements.");
                                 return;
                         }
-                        var show = container.getElements(toggleData.show);
-                        if(!show.length) {
+                        //If toggleData.show is undefined, then display none of the sections.
+                        var show = [];
+                        if(toggleData.show) show = container.getElements(toggleData.show);
+                        if(toggleData.show && !show.length) {
                                 dbug.warn("Search using data-group-toggle[show] as selector returned no elements.");
                                 return;
                         }
                         sections.each(function(section) {
-                                section.setStyle('display', show.contains(section) ? 'block' : 'none');
+                                section.setStyle('display', show.contains(section) ? section.get('data', 'display') : 'none');
                         });
                 };
                 var linkHandler = function(event) {
@@ -64,11 +66,16 @@ Behavior.addGlobalFilters({
                                 return;
                         }
                         sections.each(function(section) {
-                                section.setStyle('display', show.contains(section) ? 'block' : 'none');
+                                if(show.contains(section)) {
+                                        section.show();
+                                } else {
+                                        section.hide();
+                                }
                         });
                 };
                 if(element.tagName == 'SELECT') {
                         element.addEvent('change', selectHandler);
+                        selectHandler();
                         this.markForCleanup(element, function(){
                                 element.removeEvent('change', selectHandler);
                         });
