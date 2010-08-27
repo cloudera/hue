@@ -46,10 +46,10 @@ Behavior.addGlobalFilters({
                                 return;
                         }
                         sections.each(function(section) {
-                                if(show.contains(section)) {
-                                        section.show();
-                                } else {
+                                if(!show.contains(section)) {
                                         section.hide();
+                                } else if (!section.isDisplayed()) {
+                                        section.show();
                                 }
                         });
                 };
@@ -70,10 +70,10 @@ Behavior.addGlobalFilters({
                                 return;
                         }
                         sections.each(function(section) {
-                                if(show.contains(section)) {
-                                        section.show();
-                                } else {
+                                if(!show.contains(section)) {
                                         section.hide();
+                                } else if (!section.isDisplayed()) {
+                                        section.show();
                                 }
                         });
                 };
