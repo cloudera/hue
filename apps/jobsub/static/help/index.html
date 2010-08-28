@@ -1,0 +1,343 @@
+<h1><a name="JobDesigner-IntroducingHueJobDesigner"></a>Introducing Hue Job Designer</h1>
+
+<p>The Job Designer application enables you to submit Hadoop Map/Reduce jobs to the Hadoop cluster. You can include variables with your jobs to enable you and other users to enter values for the variables when they run your job.  The Job Designer supports streaming and jar jobs. For more information about Hadoop Map/Reduce, see the <a href="http://archive.cloudera.com/cdh/3/hadoop-0.20.2+320/mapred_tutorial.html">Hadoop Map/Reduce Tutorial</a>. </p>
+
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />A job's input files must be uploaded to the cluster before you can submit the job.</td></tr></table></div>
+
+<h2><a name="JobDesigner-Contents"></a>Contents</h2>
+
+<p><a href="#JobDesigner-JobDesignerInstallationandConfiguration">Job Designer Installation and Configuration</a><br/>
+<a href="#JobDesigner-StartingJobDesigner">Starting Job Designer</a> <br/>
+<a href="#JobDesigner-InstallingtheJobDesignerExamples">Installing the Job Designer Examples</a><br/>
+<a href="#JobDesigner-Wo4rkingwithJobDesigns">Wo4rking with Job Designs</a><br/>
+<a href="#JobDesigner-CreatingaStreamingJobDesign">Creating a Streaming Job Design</a><br/>
+<a href="#JobDesigner-CreatingaJARJobDesign">Creating a JAR Job Design</a><br/>
+<a href="#JobDesigner-SubmittingaJobtoaCluster">Submitting a Job to a Cluster</a><br/>
+<a href="#JobDesigner-Copying%2CEditing%2CandDeletingaJobDesign">Copying, Editing, and Deleting a Job Design</a><br/>
+<a href="#JobDesigner-FilteringtheJobDesignList">Filtering the Job Design List</a><br/>
+<a href="#JobDesigner-DisplayingJobResults">Displaying Job Results</a></p>
+
+<h2><a name="JobDesigner-JobDesignerInstallationandConfiguration"></a><a name="JobDesigner-JobDesignerInstallationandConfiguration"></a>Job Designer Installation and Configuration</h2>
+
+<p>Job Designer is one of the applications that can be installed as part of Hue. For more information about installing Hue, see <a href="https://wiki.cloudera.com/display/DOC/Hue+Installation">https://wiki.cloudera.com/display/DOC/Hue+Installation</a>. </p>
+
+<h2><a name="JobDesigner-StartingJobDesigner"></a><a name="JobDesigner-StartingJobDesigner"></a>Starting Job Designer </h2>
+
+<p>To start Job Designer, click this icon <span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259292.jpg" height="27" width="27" style="border: 0px solid black"/></span> in the application bar at the bottom of the Hue web page. The <b>Job Design List</b> window opens in the Hue web page. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259293.jpg" height="333" width="712" style="border: 0px solid black"/></span></p>
+
+<h2><a name="JobDesigner-InstallingtheJobDesignerExamples"></a><a name="JobDesigner-InstallingtheJobDesignerExamples"></a>Installing the Job Designer Examples</h2>
+
+<p>The Job Designer example jobs can help you learn how to use Job Designer. To install the Job Designer samples, click <b>install examples</b> in the <b>Job Design List</b> window and then click <b>Ok</b>. The example jobs are displayed in the <b>Job Design List</b> window. Job Designer removes the <b>install examples</b> button after the examples are installed.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /> 
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259294.jpg" height="332" width="712" style="border: 0px solid black"/></span></p>
+
+<h2><a name="JobDesigner-WorkingwithJobDesigns"></a><a name="JobDesigner-CreatingJobDesigns"></a>Working with Job Designs</h2>
+
+<p>In the Job Designer, a job design specifies several meta-level properties of a Map/Reduce job, including the job design name, description, the Map/Reduce executable scripts or classes, and any parameters for those scripts or classes. You can create two types of job designs: a streaming job  design and a JAR job design. </p>
+
+<h3><a name="JobDesigner-CreatingaStreamingJobDesign"></a><a name="JobDesigner-CreatingaStreamingJobDesign"></a>Creating a Streaming Job Design</h3>
+
+<p>Hadoop streaming jobs enable you to create Map/Reduce functions in any non-Java language that reads standard Unix input and writes standard Unix output. For more information about Hadoop streaming jobs, see <a href="http://archive.cloudera.com/cdh/3/hadoop-0.20.2+320/streaming.html">http://archive.cloudera.com/cdh/3/hadoop-0.20.2+320/streaming.html</a></p>
+
+<p><b>To create a streaming job design:</b> </p>
+
+<ol>
+	<li>In the <b>Job Design List</b> window, click <b>new streaming</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The <b>Job Design Editor:Streaming Job</b> window opens to enable you to specify information about the streaming job. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259295.jpg" height="394" width="718" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Job Design Editor:Streaming Job</b> window, specify the following information.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />You can use variables of the form <tt>$variable_name</tt> for the <b>Input</b>, <b>Output</b>, <b>Mapper CMD</b>, and <b>Reducer Cmd</b> settings described in the following table. When the streaming job is run, a dialog box will appear to enable you or users to specify the values of the variables.</td></tr></table></div>
+<p><br class="atl-forced-newline" /></p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'>Setting </th>
+<th class='confluenceTh'>Description</th>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Name</b> </td>
+<td class='confluenceTd'> The <b>Name</b> identifies the streaming job design including the associated properties and parameters. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Description</b> </td>
+<td class='confluenceTd'> Specify a description of the streaming job design. The description is displayed in the dialog box that appears if you specify variables for the job. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Input</b> </td>
+<td class='confluenceTd'> Specify the path to the file or directory you want to use as the input data for the streaming job. If you specify a directory, all files in that directory are used for input. Equivalent to the Hadoop <tt>-input</tt> option. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Output</b> </td>
+<td class='confluenceTd'> Specify the path to the directory where you want to save the output of the streaming job. The directory cannot exist before you run the job or else the job will not run. (This requirement is a precaution to prevent overwriting data from other jobs.) Equivalent to the Hadoop <tt>-output</tt> option.</td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Mapper Cmd</b> </td>
+<td class='confluenceTd'> Specify the path to the mapper script or class. If the mapper file is not on the machines on the cluster, use the <b>Required Files</b> option to pack it as a part of job submission. Equivalent to the Hadoop <tt>-mapper</tt> option.</td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Reducer Cmd</b> </td>
+<td class='confluenceTd'> Specify the path to the reducer script or class. If the reducer file is not on the machines on the cluster, use the <b>Required Files</b> option to pack it as a part of job submission. Equivalent to the Hadoop <tt>-reducer</tt> option.</td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Num Reduce Tasks</b> </td>
+<td class='confluenceTd'> Specify the number of reduce tasks you want to use. Specify zero if you do not want to run any reducer tasks.  The optimal number of reduce tasks is the product of the following values: 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+&#45;- a factor of 0.95 or 1.75 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+multiplied by: 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+&#45;- <em>the number of nodes in your cluster</em> multiplied by the <tt>mapred.tasktracker.reduce.tasks.maximum</tt> property 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+If your reduce tasks are not very big, use a factor of 0.95 to use fewer reduce tasks than the number of nodes in your cluster. This factor allows for a small number of failed reduce tasks without increasing the time required for running the jobs.  
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+If your reduce tasks are very big, use a factor of 1.75 to use more reduce tasks than the number of nodes in your cluster. This factor allows for better load balancing and failed reduce tasks do not significantly increase the time required for running the jobs. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Required Files</b> </td>
+<td class='confluenceTd'> Specify the executable files that do not exist on the machines in the cluster to pack your executable files as a part of job submission. </td>
+</tr>
+</tbody></table>
+</div>
+
+<p><br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></p></li>
+	<li>Select <b>Submit upon save</b> to submit the job to the cluster immediately after you click <b>Save</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>Save</b> to save the job settings.</li>
+</ol>
+
+
+<h3><a name="JobDesigner-CreatingaJARJobDesign"></a><a name="JobDesigner-CreatingaJARJobDesign"></a>Creating a JAR Job Design</h3>
+
+<p>A Hadoop JAR consists of Map/Reduce functions written in Java. </p>
+
+<p><b>To create a JAR job design:</b> </p>
+
+<ol>
+	<li>In the <b>Job Design List</b> window, click <b>new jar</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The <b>Job Design Editor:Jar Job</b> window opens where you can specify information about the JAR job. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259296.jpg" height="394" width="718" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Job Design Editor:Jar Job</b> window, specify the following information.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />You can use variables of the form <tt>$variable_name</tt> for the <b>Arguments</b> setting described in the following table. When the JAR job is run, a dialog box will appear to enable you or users to specify the values of the variables.</td></tr></table></div>
+<p><br class="atl-forced-newline" /></p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'><b>Setting</b> </th>
+<th class='confluenceTh'><b>Description</b></th>
+</tr>
+<tr>
+<td class='confluenceTd'><b>Name</b></td>
+<td class='confluenceTd'>The <b>Name</b> identifies the JAR job and it's collection of parameters. </td>
+</tr>
+<tr>
+<td class='confluenceTd'><b>Description</b></td>
+<td class='confluenceTd'>Specify a description of the JAR job. The description is displayed in the dialog box that appears if you specify variables for the job. </td>
+</tr>
+<tr>
+<td class='confluenceTd'><b>Jarfile</b></td>
+<td class='confluenceTd'>Specify the name of the JAR file, including the path. </td>
+</tr>
+<tr>
+<td class='confluenceTd'><b>Arguments</b></td>
+<td class='confluenceTd'>Specify the arguments you want to pass to the running JAR job. </td>
+</tr>
+</tbody></table>
+</div>
+
+<p><br class="atl-forced-newline" /></p></li>
+	<li>Select <b>Submit upon save</b> to submit the job to the cluster immediately after you click <b>Save</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>Save</b> to save the job settings.</li>
+</ol>
+
+
+<h3><a name="JobDesigner-SubmittingaJobtoaCluster"></a><a name="JobDesigner-SubmittingaJobtoaCluster"></a>Submitting a Job to a Cluster</h3>
+
+<p><b>To submit a job to a cluster:</b> </p>
+
+<ol>
+	<li>In the <b>Job Design List</b> window, click <b>job designs</b>.
+<br class="atl-forced-newline" />
+Your jobs and other users' jobs are displayed in the <b>Job Design List</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259297.jpg" height="300" width="716" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Job Design List</b> window, double-click the job you want to submit. You can also right-click and choose <b>submit to cluster</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>If the job contains variables, enter the information requested in the dialog box that appears.
+<br class="atl-forced-newline" />
+For example, the sample streaming PI Calculator job displays the following dialog box to enable you to specify the settings for <b>Iterations per Mapper</b> and <b>Num of mappers</b>. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259298.jpg" height="234" width="615" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>After specifying the values in the dialog box, click <b>Ok.</b>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+After all jobs complete, the Job Designer displays the results of the job including the last 10 KB of <tt>stdout</tt> and <tt>stderr</tt> for a streaming job. For example, after the sample streaming PI Calculator job completes, the following results appear. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259299.jpg" height="496" width="715" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+For information about displaying job details, see "h2. Working with the Job History". </li>
+</ol>
+
+
+<h3><a name="JobDesigner-Copying%2CEditing%2CandDeletingaJobDesign"></a><a name="JobDesigner-Copying%2CEditing%2CandDeletingaJobDesign"></a>Copying, Editing, and Deleting a Job Design</h3>
+
+<p>If you want to edit and use a job but you don't own it, you can make a copy of it and then edit and use the copied job. </p>
+
+<p><b>To copy a job design:</b> </p>
+
+<ol>
+	<li>In the <b>Job Design List</b> window, click <b>job designs</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The jobs are displayed in the <b>Job Design List</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Job Design List</b> window, select the job, right click, and choose <b>copy</b> from the context menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259302.jpg" height="359" width="716" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Job Designer</b> window, change the settings and then click <b>Save</b> to save the job settings.</li>
+</ol>
+
+
+<p><b>To edit a job design:</b> </p>
+
+<ol>
+	<li>In the <b>Job Design List</b> window, click <b>job designs</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The jobs are displayed in the <b>Job Design List</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Job Design List</b> window, select the job, right click, and choose <b>edit</b> from the context menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Job Designer</b> window, change the settings and then click <b>Save</b> to save the job settings.</li>
+</ol>
+
+
+<p><b>To delete a job design:</b> </p>
+
+<ol>
+	<li>In the <b>Job Design List</b> window, click <b>job designs</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The jobs are displayed in the <b>Job Design List</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>In the <b>Job Design List</b> window, select the job, right click, and choose <b>delete</b> from the context menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /> </li>
+	<li>Click <b>Ok</b> to confirm the deletion.</li>
+</ol>
+
+
+<h3><a name="JobDesigner-FilteringtheJobDesignList"></a><a name="JobDesigner-FilteringtheJobDesignList"></a>Filtering the Job Design List</h3>
+
+<p>You can filter the <b>Job Design List</b> by owner, by job name, or both. </p>
+
+<p><b>To filter the Job Design list:</b> </p>
+
+<ol>
+	<li>In the <b>Job Design List</b> window, click <b>job designs</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Enter the name of the owner, job name, or both in the query search boxes at the top of the <b>Job Design List</b> window.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<b>Job Designer</b> displays the jobs that match the filter criteria. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259303.jpg" height="143" width="716" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+</ol>
+
+
+<h2><a name="JobDesigner-DisplayingJobResults"></a><a name="JobDesigner-DisplayingJobResults"></a>Displaying Job Results</h2>
+
+<p><b>To display job results:</b> </p>
+
+<ol>
+	<li>In the <b>Job Design List</b> window, click *history.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The jobs are displayed in the <b>Job History</b> window. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259304.jpg" height="258" width="716" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To display details about a job, double-click it or click this icon <span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259301.jpg" height="16" width="16" style="border: 0px solid black"/></span> next to the task.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The results of the job appear. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259299.jpg" height="491" width="707" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To display details about the job, click the job name under the <b>Launched Jobs</b> heading at the top of the results window.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The following screen appears with details about the job. 
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259305.jpg" height="391" width="711" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To display details about a task, double-click a task under <b>Recent Tasks</b> or click this icon <span class="image-wrap" style=""><img src="/jobsub/static/help/images/6259306.jpg" height="16" width="16" style="border: 0px solid black"/></span> next to the task.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To view other types of job information, click the <b>Metadata</b> and <b>Counters</b> tabs.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To view the output of the job, click the <b>out</b> link next to <b>Output</b> at the top of the screen.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To view status information of all jobs, click the <b>view all tasks</b> link.</li>
+</ol>
+
+
+
+				    					    <br/>
+                        
