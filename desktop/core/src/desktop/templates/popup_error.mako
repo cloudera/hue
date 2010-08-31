@@ -20,9 +20,9 @@
   </head>
   <body>
     <div class="alert_popup ccs-error-popup" data-filters="CollapsingElements">
-        <pre>
+        <code>
         ${message}
-        </pre>
+        </code>
         % if detail:
         <a><div class="collapser">Click for Details</div></a>
         <div id="data_one" class="ccs-hidden collapsible">
