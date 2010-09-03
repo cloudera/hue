@@ -542,16 +542,3 @@ div.fileeditor .fe-buttons {
 	width: 400px;
 	margin-left: 5px;
 }
-
-div.fb-search {
-	position: absolute;
-	left: 70px;
-	padding: 2px;
-	top: 55px;
-}
-
-div.fb-search select {
-	position:relative;
-	top:3px;
-	vertical-align:top;
-}
