@@ -63,10 +63,11 @@ Redhat,Debian
 gcc,gcc
 libxml2-devel,libxml2-dev
 libxslt-devel,libxslt-dev
-mysql-devel,librarysqlclient-dev
+mysql-devel,libmysqlclient-dev
 python-devel,python-dev
 python-setuptools,python-setuptools
 sqlite-devel,libsqlite3-dev
+ant,ant
 ~~~~~~~~~~
 
 ==== Build
@@ -95,7 +96,7 @@ to this jar:
 
 ----
 $ cd /usr/lib/hadoop/lib
-$ ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar .
+$ ln -s /usr/local/hue/desktop/libs/hadoop/java-lib/hue*jar .
 # Restart Hadoop
 ----
 
