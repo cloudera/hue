@@ -17,7 +17,7 @@ CCS.Desktop.register({
 	FileBrowser: {
 		name: 'File Browser',
 		css: '/filebrowser/static/css/fb.css',
-		require: ['CCS.FileBrowser'],
+		require: ['filebrowser/CCS.FileBrowser'],
 		launch: function(path, options){
 			return new CCS.FileBrowser(path || 'filebrowser/view/?default_to_home=1', options);
 		},

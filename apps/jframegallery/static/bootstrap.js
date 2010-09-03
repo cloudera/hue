@@ -16,7 +16,7 @@
 CCS.Desktop.register({
 	JFrameGallery: {
 		name: 'JFrame Gallery',
-		require: ['CCS.JFrameGallery'],
+		require: ['jframe-gallery/CCS.JFrameGallery'],
 		css: '/jframegallery/static/css/jframegallery.css',
 		launch: function(path, options){
 			return new CCS.JFrameGallery(path, options);
