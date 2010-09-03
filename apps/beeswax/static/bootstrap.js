@@ -16,7 +16,7 @@
 CCS.Desktop.register({
 	Beeswax: {
 		name: 'Beeswax for Hive',
-		require: ['CCS.Beeswax'],
+		require: ['beeswax/CCS.Beeswax'],
 		launch: function(path, options) {
 			return new CCS.Beeswax(path, options);
 		},

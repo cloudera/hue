@@ -169,7 +169,7 @@ ART.Sheet.define('window.filechooser.browser', {
 					keys: 'keydown:backspace',
 					shortcut: 'backspace',
 					handler: function(e){
-                                                if ($(e.target).match('input, textarea')) return;
+						if ($(e.target).match('input, textarea')) return;
 						e.stop();
 						var table = this.getDirList().retrieve('HtmlTable');
 						//the view only allows one item to be selected at a time currently
@@ -201,16 +201,16 @@ ART.Sheet.define('window.filechooser.browser', {
 
 		//when jframe loads, set up the content
 		setup: function(view){
-                        if (!this._shortcutsAdded) {
-			        this.addFBShortcuts();
-			        this._shortcutsAdded = true;
+			if (!this._shortcutsAdded) {
+				this.addFBShortcuts();
+				this._shortcutsAdded = true;
 			}
 			this.setupHistory();
 			this.addLinkers();
 			this.removeOkEvents();
 			this.addSaverInfo();
 			this.addRowFocusEvents();
-                        			//make the uploader
+						//make the uploader
 			(function(){
 				//note we have a very short delay here; the DOM needs a moment to be there or else you sometimes
 				//get the error "obj.CallFunction is not a function" which means that the JS can't communicate with
@@ -230,12 +230,12 @@ ART.Sheet.define('window.filechooser.browser', {
 			return this.jframe.currentPath.split("?")[0].replace('/' + this.options.filesystem + '/' + this.options.view, '');
 		},
 
-                getClickPath: function(selected){
-                        var dblclickdelegate = selected.get('data', 'dblclick-delegate', true);
-                        if (dblclickdelegate) var dblclick_loads = dblclickdelegate.dblclick_loads;
-                        if (dblclick_loads) var elemLoad = selected.getElement(dblclick_loads);
-                        if (elemLoad) return elemLoad.href; 
-                }
+		getClickPath: function(selected){
+			var dblclickdelegate = selected.get('data', 'dblclick-delegate', true);
+			if (dblclickdelegate) var dblclick_loads = dblclickdelegate.dblclick_loads;
+			if (dblclick_loads) var elemLoad = selected.getElement(dblclick_loads);
+			if (elemLoad) return elemLoad.href; 
+		}
 
 
 
@@ -357,7 +357,7 @@ ART.Sheet.define('window.filechooser.browser', {
 				return this.caption || "Choose Where To Save This File";
 			}.bind(this)
 		},
-                //append an input to the alert, allowing the user to view/enter the path where the file will be saved
+		//append an input to the alert, allowing the user to view/enter the path where the file will be saved
 		addSaverInfo: function() {
 			var locationInput = new Element("input", {
 				'type' : 'text',
@@ -372,29 +372,29 @@ ART.Sheet.define('window.filechooser.browser', {
 			locationDiv.inject($(this.footer), 'top');
 			this.locationInput = locationInput;
 		},
-                //add events which will occur when rows of filebrowser table are focused 
+		//add events which will occur when rows of filebrowser table are focused 
 		addRowFocusEvents: function(){
-                        var table = $(this).getElement('[data-filters*=HtmlTable]');
-                        if(!table) return;
-                        var hTable = table.retrieve('HtmlTable');
-                        var locationInput = $(this).getElement('.fs-locationInput');
-                        hTable.addEvent('rowFocus', function(row) {
-                                var selectData = row.get('data', 'filedata', true);
-                                if (selectData.type == 'file') {
-                                        //Doesn't make sense to do this if overwriting files is not possible.
-                                        //locationInput.set('value', targetData.path.split('/').getLast());
-                                        this.getOk().setText("Save");
-                                }
-                                if (selectData.type =='dir') {
-                                        locationInput.set('value', this.options.fileToMove);
-                                        this.getOk().setText("Open");
-                                }
-                        }.bind(this));
+			var table = $(this).getElement('[data-filters*=HtmlTable]');
+			if(!table) return;
+			var hTable = table.retrieve('HtmlTable');
+			var locationInput = $(this).getElement('.fs-locationInput');
+			hTable.addEvent('rowFocus', function(row) {
+				var selectData = row.get('data', 'filedata', true);
+				if (selectData.type == 'file') {
+					//Doesn't make sense to do this if overwriting files is not possible.
+					//locationInput.set('value', targetData.path.split('/').getLast());
+					this.getOk().setText("Save");
+				}
+				if (selectData.type =='dir') {
+					locationInput.set('value', this.options.fileToMove);
+					this.getOk().setText("Open");
+				}
+			}.bind(this));
 
 		},
-                //add keyboard shortcuts for filebrowser
+		//add keyboard shortcuts for filebrowser
 		addFBShortcuts: function(){
-                        this.jframe.addShortcuts({
+			this.jframe.addShortcuts({
 			'Select Highlighted': {
 				keys: 'enter',
 				shortcut: 'enter',
@@ -418,11 +418,11 @@ ART.Sheet.define('window.filechooser.browser', {
 					} else {
 						this.getOk().fireEvent('press');
 					}
-                                }.bind(this),
+				}.bind(this),
 				description: 'Select the highlighted row or folder.'
 			}
 			});
-                }
+		}
 	});
 
 	/*
@@ -443,10 +443,10 @@ ART.Sheet.define('window.filechooser.browser', {
 				resizable: true
 			});
 			var chooser = new CCS.FileChooser("/filebrowser/view" + fsPath, options);
-                        //set caption when jframe is done loading
+			//set caption when jframe is done loading
 			chooser.jframe.addEvent('loadComplete', function() {
 				this.setCaption(chooser.getDirPath() + " :: " + caption);
-                                chooser.getOk().addEvent('press', function(){
+				chooser.getOk().addEvent('press', function(){
 				var selected = $(chooser).getElement('.table-tr-selected');
 				var error = function(){
 					var msg = "Please choose a directory.";
@@ -455,27 +455,27 @@ ART.Sheet.define('window.filechooser.browser', {
 					chooser.fireEvent('badSelection', selected);
 				};
 				if (selected) {
-                                        //If file_filter was part of query, the filtered rows will have a "not-selectable" class.
+					//If file_filter was part of query, the filtered rows will have a "not-selectable" class.
 					if (selected.hasClass('not-selectable')) {
 						error();
 						return;
 					}
-                                        var selectedData = selected.get('data', 'filedata', true);
-                                        //Otherwise, use options.filter and the selected row's filedata object to determine whether or not the row should be filtered.
+					var selectedData = selected.get('data', 'filedata', true);
+					//Otherwise, use options.filter and the selected row's filedata object to determine whether or not the row should be filtered.
 					if(selectedData) {
-                                                //Ensure that the two values don't conflict.  (Other possible value is 'any', which allows any selection.) If they don't, fire callback.  Otherwise, show error.
-                                                if(selectedData.type == 'file' && options.filter != 'dir' || selectedData.type == 'dir' && options.filter != 'file'){
-                                                        callback(selectedData);
-                                                        chooser.hide();
-                                                } else {
-                                                        error();
-                                                }
-                                        }
+						//Ensure that the two values don't conflict.  (Other possible value is 'any', which allows any selection.) If they don't, fire callback.  Otherwise, show error.
+						if(selectedData.type == 'file' && options.filter != 'dir' || selectedData.type == 'dir' && options.filter != 'file'){
+							callback(selectedData);
+							chooser.hide();
+						} else {
+							error();
+						}
+					}
 				} else if (options.filter == "file") {
-                                        //If nothing is selected, and filter is 'file', show error.
+					//If nothing is selected, and filter is 'file', show error.
 					error();
 				} else {
-                                        //If nothing is selected, and filter is 'dir or any', call callback using chooser's current directory as path.
+					//If nothing is selected, and filter is 'dir or any', call callback using chooser's current directory as path.
 					callback({
 						path: chooser.getDirPath(),
 						type: 'dir'
@@ -485,7 +485,7 @@ ART.Sheet.define('window.filechooser.browser', {
 			});
 
 			}.bind(chooser));
-                        //add event on click of ok button which handles filtering and passing of file data to callback 
+			//add event on click of ok button which handles filtering and passing of file data to callback 
 						return chooser;
 		});
 	};
@@ -498,46 +498,46 @@ ART.Sheet.define('window.filechooser.browser', {
 					fileToMove: toMove
 				});
 				var saver = new CCS.FileSaver("/filebrowser/view" + fsPath + "?show_upload=false", options);
-                                //Set caption on loadComplete
+				//Set caption on loadComplete
 				saver.jframe.addEvent('loadComplete', function() {
 					this.setCaption(saver.getDirPath() + " :: " + caption);
-                                        var locationInput = $(saver).getElement('.fs-locationInput');
-                                        saver.getOk().addEvent('press', function(){
-                                                //Get selected row of filebrowser table
-                                                var selected = $(saver).getElement('.table-tr-selected');
-                                                var selectedPath, isDirSelected = false;
-                                                // If there is a row selected, navigate to that directory 
-                                                // If not create a selected path based on the current displayed directory
-                                                if(selected) {
-                                                        var selectedData = selected.get('data', 'filedata', true);
-                                                        isDirSelected = selectedData.type == 'dir';
-                                                } else {
-                                                        selectedPath = saver.getDirPath();
-                                                }
-                                                var error = function(){
-                                                        var msg = "Please choose a directory.";
-                                                        if (options.filter == "file") msg = "Please choose a file.";
-                                                        saver.alert(caption || "Choose a File", msg);
-                                                        saver.fireEvent('badSelection', selected);
-                                                };
-                                                //if a directory is selected, naviagte to the selected directory
-                                                if (isDirSelected) {
-                                                        saver.jframe.load({
-                                                                requestPath: saver.getClickPath(selected) 
-                                                        });
-                                                } else {
-                                                        var inputPath = locationInput.get('value');
-                                                        var returnPath; 
-                                                        //An input path belonging with a slash is assumed to be an absolute path.
-                                                        if (inputPath[0] == '/') returnPath = inputPath;
-                                                        else returnPath = saver.getDirPath() + '/' + inputPath;
-                                                        callback({
-                                                                path: returnPath,
-                                                                type: 'dir'
-                                                        });
-                                                        saver.hide();
-                                                }
-                                        });
+					var locationInput = $(saver).getElement('.fs-locationInput');
+					saver.getOk().addEvent('press', function(){
+						//Get selected row of filebrowser table
+						var selected = $(saver).getElement('.table-tr-selected');
+						var selectedPath, isDirSelected = false;
+						// If there is a row selected, navigate to that directory 
+						// If not create a selected path based on the current displayed directory
+						if(selected) {
+							var selectedData = selected.get('data', 'filedata', true);
+							isDirSelected = selectedData.type == 'dir';
+						} else {
+							selectedPath = saver.getDirPath();
+						}
+						var error = function(){
+							var msg = "Please choose a directory.";
+							if (options.filter == "file") msg = "Please choose a file.";
+							saver.alert(caption || "Choose a File", msg);
+							saver.fireEvent('badSelection', selected);
+						};
+						//if a directory is selected, naviagte to the selected directory
+						if (isDirSelected) {
+							saver.jframe.load({
+								requestPath: saver.getClickPath(selected) 
+							});
+						} else {
+							var inputPath = locationInput.get('value');
+							var returnPath; 
+							//An input path belonging with a slash is assumed to be an absolute path.
+							if (inputPath[0] == '/') returnPath = inputPath;
+							else returnPath = saver.getDirPath() + '/' + inputPath;
+							callback({
+								path: returnPath,
+								type: 'dir'
+							});
+							saver.hide();
+						}
+					});
 				}.bind(saver));
 				return saver;
 		});

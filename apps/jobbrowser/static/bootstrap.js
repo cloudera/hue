@@ -17,7 +17,7 @@ CCS.Desktop.register({
 	JobBrowser: {
 		name: 'Job Browser',
 		css: '/jobbrowser/static/css/jobbrowser.css',
-		require: ["CCS.JobBrowser"],
+		require: ["jobbrowser/CCS.JobBrowser"],
 		launch: function(path, options){
 			return new CCS.JobBrowser(path, options);
 		},

@@ -17,7 +17,7 @@ CCS.Desktop.register({
 	UserAdmin: {
 		name: 'User Admin',
 		libs: '/useradmin/static/js/libs.json',
-		require: ['CCS.UserAdmin'],
+		require: ['useradmin/CCS.UserAdmin'],
 		launch: function(path, options) {
 			return new CCS.UserAdmin(path || '/useradmin/', options);
 		},
