@@ -23,7 +23,6 @@ script: Behavior.HtmlTableKeyboard.js
 */
 
 Behavior.addGlobalPlugin('HtmlTable', 'HtmlTableJFrame', function(element, methods){
-
 	var table = element.retrieve('HtmlTable');
 	if (table.keyboard) {
 		table.keyboard.relinquish();
@@ -32,6 +31,6 @@ Behavior.addGlobalPlugin('HtmlTable', 'HtmlTableJFrame', function(element, metho
 		this.markForCleanup(element, function(){
 			methods.unregisterKeyboard(table.keyboard);
 		});
+		ART.Popup.DefaultManager.keyboard.activate();
 	}
-
 });

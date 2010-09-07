@@ -25,70 +25,70 @@ script: Behavior.DataGroupToggle.js
 
 Behavior.addGlobalFilters({
 	DataGroupToggle: function(element, methods){
-                container = methods.getContentElement();
-                var selectHandler = function(event) {
-                        var selected = element.getSelected()[0];
-                        var toggleData = selected.get('data', 'group-toggle', true);
-                        if(!toggleData) {
-                                dbug.warn("data-group-toggle either not present or unparseable.");
-                                return;
-                        }
-                        var sections = container.getElements(toggleData.group);
-                        if(!sections.length) {
-                                dbug.warn("Search using data-group-toggle[group] as selector returned no elements.");
-                                return;
-                        }
-                        //If toggleData.show is undefined, then display none of the sections.
-                        var show = [];
-                        if(toggleData.show) show = container.getElements(toggleData.show);
-                        if(toggleData.show && !show.length) {
-                                dbug.warn("Search using data-group-toggle[show] as selector returned no elements.");
-                                return;
-                        }
-                        sections.each(function(section) {
-                                if(!show.contains(section)) {
-                                        section.hide();
-                                } else if (!section.isDisplayed()) {
-                                        section.show();
-                                }
-                        });
-                };
-                var linkHandler = function(event) {
-                        var toggleData = element.get('data', 'group-toggle', true);
-                        if(!toggleData) {
-                                dbug.warn("data-group-toggle either not present or unparseable.");
-                                return;
-                        } 
-                        var sections = container.getElements(toggleData.group);
-                        if(!sections.length) {
-                                dbug.warn("Search using data-group-toggle[group] as selector returned no elements.");
-                                return;
-                        }
-                        var show = container.getElements(toggleData.show);
-                        if(!show.length) {
-                                dbug.warn("search using data-group-toggle[show] as selector returned no elements.");
-                                return;
-                        }
-                        sections.each(function(section) {
-                                if(!show.contains(section)) {
-                                        section.hide();
-                                } else if (!section.isDisplayed()) {
-                                        section.show();
-                                }
-                        });
-                };
-                if(element.tagName == 'SELECT') {
-                        element.addEvent('change', selectHandler);
-                        selectHandler();
-                        this.markForCleanup(element, function(){
-                                element.removeEvent('change', selectHandler);
-                        });
-                } else {
-                        element.addEvent('click', linkHandler);
-                        this.markForCleanup(element, function(){
-                                element.removeEvent('click', linkHandler);
-                        }); 
-                }
+		container = methods.getContentElement();
+		var selectHandler = function(event) {
+			var selected = element.getSelected()[0];
+			var toggleData = selected.get('data', 'group-toggle', true);
+			if(!toggleData) {
+				dbug.warn("data-group-toggle either not present or unparseable.");
+				return;
+			}
+			var sections = container.getElements(toggleData.group);
+			if(!sections.length) {
+				dbug.warn("Search using data-group-toggle[group] as selector returned no elements.");
+				return;
+			}
+			//If toggleData.show is undefined, then display none of the sections.
+			var show = [];
+			if(toggleData.show) show = container.getElements(toggleData.show);
+			if(toggleData.show && !show.length) {
+				dbug.warn("Search using data-group-toggle[show] as selector returned no elements.");
+				return;
+			}
+			sections.each(function(section) {
+				if(!show.contains(section)) {
+					section.hide();
+				} else if (!section.isDisplayed()) {
+					section.show();
+				}
+			});
+		};
+		var linkHandler = function(event) {
+			var toggleData = element.get('data', 'group-toggle', true);
+			if(!toggleData) {
+				dbug.warn("data-group-toggle either not present or unparseable.");
+				return;
+			} 
+			var sections = container.getElements(toggleData.group);
+			if(!sections.length) {
+				dbug.warn("Search using data-group-toggle[group] as selector returned no elements.");
+				return;
+			}
+			var show = container.getElements(toggleData.show);
+			if(!show.length) {
+				dbug.warn("search using data-group-toggle[show] as selector returned no elements.");
+				return;
+			}
+			sections.each(function(section) {
+				if(!show.contains(section)) {
+					section.hide();
+				} else if (!section.isDisplayed()) {
+					section.show();
+				}
+			});
+		};
+		if(element.tagName == 'SELECT') {
+			element.addEvent('change', selectHandler);
+			selectHandler();
+			this.markForCleanup(element, function(){
+				element.removeEvent('change', selectHandler);
+			});
+		} else {
+			element.addEvent('click', linkHandler);
+			this.markForCleanup(element, function(){
+				element.removeEvent('click', linkHandler);
+			}); 
+		}
 	}
 
 });
