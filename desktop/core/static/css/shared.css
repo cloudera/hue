@@ -308,6 +308,26 @@ table[data-filters*=HtmlTable].treeView tr.table-expanded a.expand {
 	background: url(/static/art/divots.png) 0px -14px;
 }
 
+.table-th-resizable.table-th-sort span.table-th-sort-span, .table-th-resizable.table-th-sort-rev span.table-th-sort-span {
+        padding-right: 13px;
+}
+
+table.table-resizable th div {
+        position: relative;
+        padding-right: 0px;
+}
+span.table-th-resizer {
+        position: absolute;
+        cursor: col-resize;
+        right: 9px;
+        width: 6px;
+        top: 0px;
+        display: block;
+        height: 100%;
+        z-index: 1;
+}
+
+
 table a.ccs-table_config_link {
 	display: inline-block;
 	float: right;

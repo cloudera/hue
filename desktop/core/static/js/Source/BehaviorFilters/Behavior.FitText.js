@@ -115,5 +115,24 @@ script: Behavior.FitText.js
 
 	});
 
+        Behavior.addGlobalPlugin('HtmlTable', 'FitTextResize', function(element, methods) {
+                if(element.hasClass('resizable')) {
+                        htmlTable = element.retrieve('HtmlTable');
+                        htmlTable.addEvent('columnResize', function() {
+                                if(element.hasDataFilter('FitText-Children')) {
+                                        var selector = element.get('data', 'fit-text');
+                                        element.getElements(selector).each(function(el){
+                                                el.retrieve('FitText').fit();
+                                        }, this);
+                                }
+                                element.getElements('[data-filters*=FitText]').each(function(el) {
+                                        el.retrieve('FitText').fit();
+                                });
+                        });
+                }
+        });
+
+        
+
 
 })();

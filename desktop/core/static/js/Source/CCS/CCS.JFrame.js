@@ -45,6 +45,7 @@ requires:
  - /Behavior.HtmlTableKeyboard
  - /Behavior.HtmlTableLiveTreeKeyboard
  - /Behavior.HtmlTableMultiSelectMenu
+ - /Behavior.HtmlTableRestore
  - /Behavior.HtmlTableUpdate
  - /Behavior.MultiChecks
  - /Behavior.PostEditor
@@ -120,7 +121,7 @@ CCS.JFrame = new Class({
 
 	// path: initial page to load
 	initialize: function(path, options){
-		this.parent(options);
+                this.parent(options);
 		new ART.Keyboard(this, this.keyboardOptions);
 		this.addLinkers(this.options.linkers);
 		this.addFilters(this.options.filters);
@@ -131,7 +132,7 @@ CCS.JFrame = new Class({
 		});
 		if(this.options.size) this.behavior.resize(this.options.size.width, this.options.size.height);
 		['attachKeys', 'detachKeys', 'addShortcut', 'addShortcuts', 'removeShortcut', 'removeShortcuts',
-		 'applyDelegates', 'getScroller', 'getContentElement', 'invokeLinker', 'configureRequest'].each(function(method){
+		 'applyDelegates', 'getScroller', 'getContentElement', 'invokeLinker', 'configureRequest', 'getBehaviorState'].each(function(method){
 			this.behavior.passMethod(method, this[method].bind(this));
 		}, this);
 		this.behavior.passMethods({
@@ -293,6 +294,11 @@ CCS.JFrame = new Class({
 			})
 		);
 	},
+
+        getBehaviorState: function() {
+                if(!this.options.behaviorState) this.options.behaviorState = {};
+                return this.options.behaviorState;
+        },
 
 	/*
 	options:
@@ -736,7 +742,8 @@ CCS.JFrame = new Class({
 	},
 
 	_requestSuccessHandler: function(request, html, options) {
-		var error, blankWindowWithError;
+		var error, blankWindowWithError, previousPath;
+                previousPath = this.currentPath;
 		if (this._checkForEmptyErrorState(request, html)) {
 			error = true;
 			if (!this.loadedOnce) blankWindowWithError = true;
@@ -760,6 +767,14 @@ CCS.JFrame = new Class({
 			});
 		}
 		if (redirected) this.fireEvent('redirectAfterRender', [this.currentPath, responsePath]);
+                var loadOptions = $merge({
+                        content: html,
+                        responsePath: responsePath || request.options.url,
+                        error: error,
+                        blankWindowWithError: blankWindowWithError,
+                        previousPath: previousPath
+                }, options || {}); 
+                this.behavior.fireEvent('load', loadOptions); 
 	},
 
 	/*
