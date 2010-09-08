@@ -60,6 +60,7 @@ sources: [
   Source/BehaviorFilters/Behavior.HtmlTableKeyboard.js,
   Source/BehaviorFilters/Behavior.HtmlTableLiveTreeKeyboard.js,
   Source/BehaviorFilters/Behavior.HtmlTableMultiSelectMenu.js,
+  Source/BehaviorFilters/Behavior.HtmlTableRestore.js,
   Source/BehaviorFilters/Behavior.HtmlTableUpdate.js,
   Source/BehaviorFilters/Behavior.MultiChecks.js,
   Source/BehaviorFilters/Behavior.PostEditor.js,
