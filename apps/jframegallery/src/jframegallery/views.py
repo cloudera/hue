@@ -117,3 +117,86 @@ def forms_with_dependencies(request):
   else:
     form = DepForm()
   return render("forms_with_dependencies.mako", request, dict(form=form, data=data))
+
+class PsLine(object):
+  def __init__(self, user, pid, ppid, pgid, cputime, command):
+    self.user = user
+    self.pid = int(pid)
+    self.ppid = int(ppid)
+    self.pgid = int(pgid)
+    self.cputime = cputime
+    self.command = command
+    self.children = []
+
+def pstree(request):
+  """
+  Draws 'pstree' by using output from ps command.
+
+  GET arguments:
+    subtree: show only pids below this tree
+    show_all: expand the entire tree
+    paths: slash-separated paths that are expanded
+      (can be specified multiple times)
+  
+  """
+  import subprocess
+  import urllib
+  import re
+
+  # Call ps
+  p = subprocess.Popen(args=["ps", "-axwwo", "user,pid,ppid,pgid,cputime,command"], stdout=subprocess.PIPE)
+
+  children = {}
+  first = True
+  if "subtree" in request.GET:
+    subtree = long(request.GET.get("subtree"))
+  else:
+    subtree = None
+  subtree_top = None
+
+  # Parse in the data
+  for row in p.stdout:
+    if first:
+      # skip header line
+      first = False
+      continue
+    data = user, pid, ppid, pgid, cputime, command = re.split("\s+", row.rstrip(), 5)
+    ps = PsLine(*data)
+    if ps.pid == subtree:
+      subtree_top = ps
+    if ps.ppid in children:
+      children[ps.ppid].append(ps)
+    else:
+      children[ps.ppid] = [ps]
+
+  # Utility method to create the tree
+  def fill(root):
+    root.children = children.get(root.pid, [])
+    for child in root.children:
+      fill(child)
+
+  if subtree_top:
+    fill(subtree_top)
+    tops = subtree_top.children
+  else:
+    # Start with init and create the tree
+    assert len(children[0]) == 1
+    top = children[0][0]
+    fill(top)
+    tops = [top]
+
+  # Methods to manipulate the extant paths list; used by the template.
+  def add(p):
+    paths = list(request.GET.getlist("paths")) # make a copy
+    paths.append(p)
+    return request.path + "?" + "&".join(urllib.urlencode([("paths", x)]) for x in paths)
+  def remove(p):
+    paths = list(request.GET.getlist("paths")) # make a copy
+    paths.remove(p)
+    return request.path + "?" + "&".join(urllib.urlencode([("paths", x)]) for x in paths)
+
+  paths = request.GET.getlist("paths")
+  return render("pstree.mako", request, dict(
+    tops=tops, show_all=request.GET.get("show_all"), 
+    open_paths=paths, request_path=request.path,
+    add=add, remove=remove))
