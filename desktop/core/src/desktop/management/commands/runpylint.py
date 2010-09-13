@@ -14,10 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
 
-from django.core.management.base import BaseCommand
+import logging
+import os.path
+import subprocess
+
+from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from desktop.lib import paths
 
 class Command(BaseCommand):
   help = """
@@ -36,9 +40,7 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
     """Check the source code using PyLint."""
-    import pylint.lint
 
-    # Pylint modifies these, so we need a mutable copy.
     pylint_args = list(args)
 
     if "all" in pylint_args or len(pylint_args) == 0:
@@ -50,10 +52,17 @@ class Command(BaseCommand):
         apps.append(app.name)
       pylint_args = apps + pylint_args
 
-    pylint_args = ["--rcfile=" + settings.PYLINTRC] + pylint_args
+    # Note that get_build_dir() is suitable for testing use only.
+    pylint_prog = paths.get_build_dir('env', 'bin', 'pylint')
+    pylint_args = [pylint_prog, "--rcfile=" + settings.PYLINTRC] + pylint_args
 
-    logging.info("Running pylint with args: %s" % " ".join(pylint_args))
-    try:
-      pylint.lint.Run(pylint_args)
-    except SystemExit:
-      logging.debug("Ignoring pylint sys.exit()", exc_info=1)
+    if not os.path.exists(pylint_prog):
+      msg = "Cannot find pylint at '%s'. Please install pylint first." % (pylint_prog,)
+      logging.error(msg)
+      raise CommandError(msg)
+
+    logging.info("Running pylint with args: %s" % (" ".join(pylint_args),))
+
+    # We exec pylint directly due to a "maximum recursion depth" bug when doing
+    # pylint.lint(...) programmatically.
+    subprocess.call(pylint_args)
