@@ -3,68 +3,47 @@ Welcome to Hue!
 
 <img src='/static/art/help/logo.png' class="help-logo">
 
-Hue is a browser based environment for interacting with your
-Hadoop cluster.  You or your system administrator has already
-installed the system (excellent!); this document will help get you oriented.
+Hue is a browser-based, desktop-style environment that enables you to interact with a Hadoop cluster. Hue includes several easy to use applications that help you work with Hadoop Map/Reduce jobs, Hive queries, and user accounts. The Hue applications run in a Web browser and require no client installation. Hue is also a development platform for building custom applications via the Hue SDK.   
+
+## Displaying Help for the Hue Applications
+
+To display the help text for each Hue application, click the links in the **Index** on the left side of the Help window.
 
 ## Starting Applications
 
-The icons at the bottom of your screen, when clicked, will open
-different applications (e.g., the file browser or the health dashboard).
-Double-click to open a second instance of an application.
-<img src="/static/help/images/dock.gif"/>
+To open the Hue applications, click the icons at the bottom of the Hue web browser window. You can double-click an icon to open a second instance of the application.
 
-## Logging in and out
+## Logging In and Out
 
-The logout link is in the top left of your screen, right after your
-username.  When you log out, Hue will restore the 
-application windows you had open.
+To log out of Hue, click the **logout** link at the top left corner of the Hue web browser window, next to your user name.  When you log back in, Hue restores the application windows you had open the last time you logged out.
 
-## Keyboard Shortcuts
+<img src="/static/help/images/logout.gif"/>
 
-To see what keyboard shortcuts are available, type "Ctrl-/" or 
-click on the "command" clover in the top right corner of the screen.  
+## Hue Keyboard Shortcuts
+
+To view a list of Hue keyboard shortcuts, press Ctrl-/ or click the **Shortcuts** in the top right corner of the screen.
+ 
 <img src="/static/help/images/shortcuts.gif"/>
 
-## Changing your password
+## Changing your Password
 
-If authentication is managed by Desktop (i.e., it is not configured
-to authenticate via some other mechanism), the 
-<a href="/help/useradmin/index.md">User Manager</a> application
-allows you to change your password.
+If authentication is managed by Hue (that is, authentication is not managed via some external mechanism), you can use the User Manager or User Admin application to change your password. For more information, see the User Manager Help.
 
 ## Seeking Help, Reporting Bugs, and Providing Feedback
 
-The Hue team strongly values your feedback!
-The "feedback" link in the bottom right of your screen
-is the best way to reach us.
+The Hue team strongly values your feedback. The best way to contact us is to click the **feedback** link in the bottom left section of the Hue web browser window. 
 
-If you're experiencing transient errors (typically
-an error message saying a service is down), you may
-wish to run them by your system administrator first.
+<img src="/static/help/images/feedback.gif"/>
 
-Every window that's rendered in Hue
-is typically backed by an HTTP GET or POST request 
-sent to the server via AJAX.  If you're familiar with
-web development, and you're reporting a problem or bug,
-it's very useful to use Firebug (or similar) to figure out
-what request is failing, and include that in
-your bug report.
+If you're experiencing transient errors (typically an error message saying a service is down), contact your system administrator first.
+
+Every window that's rendered in Hue is typically backed by an HTTP GET or POST request sent to the server via AJAX.  If you are reporting a problem and you are familiar with web development and a tool such as Firebug, mention the request that is failing in your bug report. 
 
 ## Browser Compatibility
 
-Hue works best in Firefox, and works well in Chrome
-and Safari as well.
+Hue works best in Firefox, and works well in Chrome and Safari. Internet Explorer 8 is also supported. 
 
 ## Extending Desktop
 
-Hue has an SDK to build new applications within
-the framework.  Contact us (again, via the feedback link)
-if you're interested in building new applications within the
-framework.
+Hue supports an SDK to build new applications within the framework. If you're interested in building new applications within the framework, click the **feedback** link to contact us via the Hue-users group.
 
-## Help for the Applications
-
-Each application installed within Hue
-may have its own help page(s).  The index below
-directs you there.
