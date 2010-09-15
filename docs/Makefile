@@ -28,10 +28,11 @@ docs: $(BLD_DIR_DOC)
 NO_TOC := --xsltproc-opts='--stringparam generate.toc ""'
 
 #
-# Being lazy/loose with the prerequsite. Include all files except sdk, which is
-# handled separately below.
+# Being lazy/loose with the prerequsite. Include all files except sdk and
+# release notes, which are handled separately below.
 #
-$(BLD_DIR_DOC): $(BLD_DIR_DOC)/sdk $(shell find . -name sdk -prune -o -print)
+DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -o -print)
+$(BLD_DIR_DOC): sdk release-notes $(DOC_FILES)
 	@echo '--- Generating doc at $@'
 	@mkdir -p $@
 
@@ -43,10 +44,21 @@ $(BLD_DIR_DOC): $(BLD_DIR_DOC)/sdk $(shell find . -name sdk -prune -o -print)
 	@cp *.repo $@
 	@# Remove intermediate file
 	@rsync -a images $@/
-	@cp -r release-notes $@/
 
 
-$(BLD_DIR_DOC)/sdk: $(shell find sdk)
+.PHONY: release-notes
+release-notes: $(BLD_DIR_DOC)/release-notes
+$(BLD_DIR_DOC)/release-notes: $(shell find release-notes -name \*.txt)
+	@echo '--- Generating release notes at $@'
+	@mkdir -p $@
+	@for i in $? ; do asciidoc $$i ; done
+	@mv release-notes/*.html $@/
+	@echo "--- Generated $@"
+
+
+.PHONY: sdk
+sdk: $(BLD_DIR_DOC)/sdk/sdk.html
+$(BLD_DIR_DOC)/sdk/sdk.html: $(shell find sdk -type f)
 	@echo '--- Generating sdk doc at $@'
 	@mkdir -p $@
 	@cp sdk/*.png $@
@@ -57,7 +69,8 @@ $(BLD_DIR_DOC)/sdk: $(shell find sdk)
 	@PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown \
 	  $(DESKTOP_DIR)/core/ext-py/markdown/bin/markdown \
 	  sdk/sdk.md -x toc > $@/sdk.html
-	@echo "--- Generated $@/sdk.html"
+	@echo "--- Generated $@"
+
 
 clean:
 	@echo '--- Removing $(BLD_DIR_DOC)'
