@@ -24,7 +24,9 @@ script: CCS.JFrame.Prompt.js
 // limitations under the License.
 CCS.JFrame.addGlobalRenderers({
 
-	prompt: function(content, options) {
+	prompt: function(content) {
+		var options = content.options;
+		
 		//if the contents have an element with .prompt_popup *at the root*
 		//then display those contents in a prompt, submitting the form (if present)
 		//when the user clicks "ok"

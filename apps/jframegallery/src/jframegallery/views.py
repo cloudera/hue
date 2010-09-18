@@ -137,11 +137,15 @@ def pstree(request):
     show_all: expand the entire tree
     paths: slash-separated paths that are expanded
       (can be specified multiple times)
-  
+
   """
   import subprocess
   import urllib
   import re
+
+  if request.REQUEST.get('sleep'):
+    sleep = int(request.REQUEST.get('sleep'))
+    time.sleep(sleep)
 
   # Call ps
   p = subprocess.Popen(args=["ps", "-axwwo", "user,pid,ppid,pgid,cputime,command"], stdout=subprocess.PIPE)
@@ -170,33 +174,41 @@ def pstree(request):
       children[ps.ppid] = [ps]
 
   # Utility method to create the tree
-  def fill(root):
+  def fill(root, current_path):
+    root.path = current_path + str(root.pid)
     root.children = children.get(root.pid, [])
     for child in root.children:
-      fill(child)
+      fill(child, root.path + "/")
 
+
+  # Start with init and create the tree
+  assert len(children[0]) == 1
+  top = children[0][0]
+  fill(top, "/")
+  tops = [top]
+
+  # If we're only interested in a subtree, pick that out explicitly
   if subtree_top:
-    fill(subtree_top)
     tops = subtree_top.children
-  else:
-    # Start with init and create the tree
-    assert len(children[0]) == 1
-    top = children[0][0]
-    fill(top)
-    tops = [top]
 
   # Methods to manipulate the extant paths list; used by the template.
   def add(p):
     paths = list(request.GET.getlist("paths")) # make a copy
     paths.append(p)
-    return request.path + "?" + "&".join(urllib.urlencode([("paths", x)]) for x in paths)
+    query = [urllib.urlencode([("paths", x)]) for x in paths]
+    if subtree:
+      query.append('subtree=' + str(subtree))
+    return request.path + "?" + "&".join(query)
   def remove(p):
     paths = list(request.GET.getlist("paths")) # make a copy
     paths.remove(p)
-    return request.path + "?" + "&".join(urllib.urlencode([("paths", x)]) for x in paths)
+    query = [urllib.urlencode([("paths", x)]) for x in paths]
+    if subtree:
+      query.append('subtree=' + str(subtree))
+    return request.path + "?" + "&".join(query)
 
   paths = request.GET.getlist("paths")
   return render("html-table.treeview.ajax.mako", request, dict(
     tops=tops, show_all=request.GET.get("show_all"), 
     open_paths=paths, request_path=request.path,
-    add=add, remove=remove))
+    add=add, remove=remove, depth=request.GET.get('depth', 0)))
