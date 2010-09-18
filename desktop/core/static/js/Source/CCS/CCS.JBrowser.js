@@ -21,39 +21,29 @@ requires:
  - /CCS.JFrame
  - Widgets/ART.Browser
  - Widgets/ART.SolidWindow
+ - /CCS.ContextMenu
+
  - /CCS.JFrame.Alert
- - /CCS.JFrame.ArtButtons
- - /CCS.JFrame.AutoRefresh
- - /CCS.JFrame.CheckAllOrNone
- - /CCS.JFrame.Chooser
- - /CCS.JFrame.Collapsible
- - /CCS.JFrame.ConfirmAndPost
- - /CCS.JFrame.ContextMenu
- - /CCS.JFrame.DataGroupToggle
- - /CCS.JFrame.DoubleClickDelegate
- - /CCS.JFrame.FakeRefresh
- - /CCS.JFrame.FilterInput
- - /CCS.JFrame.FormRequest
- - /CCS.JFrame.FormValidator
- - /CCS.JFrame.FitText
- - /CCS.JFrame.HtmlTable
- - /CCS.JFrame.Input
- - /CCS.JFrame.Nav
- - /CCS.JFrame.OverText
  - /CCS.JFrame.PartialRefresh
  - /CCS.JFrame.Prompt
+
+ - /CCS.JFrame.AutoRefresh
+ - /CCS.JFrame.DoubleClickDelegate
+ - /CCS.JFrame.FormRequest
+ - /CCS.JFrame.ToggleHistory
+
+ - /CCS.JFrame.AjaxLoad
+ - /CCS.JFrame.CheckAllOrNone
+ - /CCS.JFrame.Chooser
+ - /CCS.JFrame.ConfirmAndPost
+ - /CCS.JFrame.FakeRefresh
+ - /CCS.JFrame.LivePath
+ - /CCS.JFrame.Nav
+ - /CCS.JFrame.NoScroll
  - /CCS.JFrame.PromptAndPost
  - /CCS.JFrame.Refresh
- - /CCS.JFrame.SelectWithOther
- - /CCS.JFrame.SideBySideSelect
- - /CCS.JFrame.SizeTo
- - /CCS.JFrame.SplitView
  - /CCS.JFrame.SubmitLink
- - /CCS.JFrame.SubmitOnChange
- - /CCS.JFrame.Tabs
  - /CCS.JFrame.Target
- - /CCS.JFrame.Tips
- - /CCS.JFrame.ToggleHistory
 script: CCS.JBrowser.js
 
 ...

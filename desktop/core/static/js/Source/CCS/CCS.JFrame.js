@@ -18,18 +18,14 @@
 description: JFrame--Configurable "container" for simple HTML pages, within the CCS framework.
 provides: [CCS.JFrame]
 requires: 
- - Core/Request.JSON
- - More/URI
+ - Core/Request
  - More/Element.Delegation
- - More/Fx.Scroll
  - More/Elements.From
+ - More/Fx.Scroll
+ - More/String.Extras
+ - More/Spinner
  - clientcide/Collapsible
  - Widgets/ART.Alerts
- - More/String.Extras
- - Widgets/ART.SplitView
- - More/HtmlTable.Sort
- - More/HtmlTable.Select
- - More/Spinner
  - Widgets/Behavior
  - Widgets/Behavior.Accordion
  - Widgets/Behavior.ArtButton
@@ -59,7 +55,7 @@ requires:
  - /Behavior.Tabs
  - /Behavior.Tips
  - /CCS
- - /CCS.ContextMenu
+
 script: CCS.JFrame.js
 ...
 */

@@ -18,7 +18,7 @@
 description: CCS Configuration Options
 provides: [CCS]
 requires: [clientcide/StickyWin, Widgets/ART.Popup, Core/Element.Event, Core/Request.HTML,
-  More/Spinner, Core/Selectors]
+  More/Spinner, Core/Selectors, More/URI]
 script: CCS.js
 
 ...

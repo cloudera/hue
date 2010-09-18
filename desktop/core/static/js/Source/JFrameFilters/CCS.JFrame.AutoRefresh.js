@@ -33,7 +33,8 @@ CCS.JFrame.addGlobalFilters({
 		//get the first input.autorefresh and use its value as the duration before
 		//it auto refreshes the input. if span.sec_to_autorefresh is present, fill its
 		//contents with the number of seconds until a refresh.
-		if (content && content.meta) {
+		var ignoreAutoRefresh = content && content.options && content.options.ignoreAutoRefresh;
+		if (!ignoreAutoRefresh && content && content.meta) {
 			var sec, url;
 			content.meta.each(function(meta) {
 				var parts = meta.get('content').split(';');

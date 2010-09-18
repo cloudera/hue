@@ -33,6 +33,7 @@ sources: [
   Source/UI/StickyWin.Drawer.js,
   Source/UI/StickyWin.UI.Solid.js,
   Source/UI/ThumbTack.js,
+  Source/JFrameLinkers/CCS.JFrame.AjaxLoad.js,
   Source/JFrameLinkers/CCS.JFrame.CheckAllOrNone.js,
   Source/JFrameLinkers/CCS.JFrame.Chooser.js,
   Source/JFrameLinkers/CCS.JFrame.ConfirmAndPost.js,
