@@ -1,3 +1,6 @@
+<%!
+  import urllib
+%>
 ## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
@@ -15,55 +18,75 @@
 ## limitations under the License.
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
-	<head>
-		<title>Process Viewer</title>
-	</head>
-	<body>
-        
-<a href="${request_path}?show_all=true">Show everything</a>
-<table data-filters="HtmlTable" class="treeView">
+  <head>
+    <title>Process Viewer</title>
+    <style>
+    .table-depth-0>td:first-child { padding-left: 10px; }
+    .table-depth-1>td:first-child { padding-left: 25px; }
+    .table-depth-2>td:first-child { padding-left: 40px; }
+    .table-depth-3>td:first-child { padding-left: 55px; }
+    .table-depth-4>td:first-child { padding-left: 70px; }
+    .table-depth-5>td:first-child { padding-left: 85px; }
+    .table-depth-6>td:first-child { padding-left: 100px; }
+    .table-depth-7>td:first-child { padding-left: 115px; }
+    .table-depth-8>td:first-child { padding-left: 130px; }
+    .table-depth-9>td:first-child { padding-left: 145px; }
+    .table-depth-10>td:first-child { padding-left: 160px; }
+    .table-depth-11>td:first-child { padding-left: 175px; }
+    </style>
+  </head>
+  <body>
+    <div class="jframe_padded"> 
+      <p><a href="${request_path}?show_all=true">Show everything</a> || <a href="${request_path}">back to top</a></p>
+      <table data-filters="HtmlTable" class="selectable treeView" style="border: 1px solid #999; width: 98%">
 
-<%def name="r(node, depth, path)">
-  <tr class="table-folder table-depth-${depth}">
-  % if node.children:
-    <td class="expand">${node.pid}</td>
-  % else:
-    <td>${node.pid}</td>
-  % endif
-  <td>
-  % if path in open_paths:
-    <a href="${remove(path)}">collapse</a>
-  % elif node.children:
-    <a href="${add(path)}">expand</a>
-  % endif
+      <%def name="create_row(node, depth, path)">
+        <%
+          expanded = ""
+          if path in open_paths:
+            expanded = "table-expanded"
+        %>
+        <tr class="table-folder table-depth-${depth} ${expanded} pstree-${node.pid}">
+          <td style="max-width:400px">
+            % if path in open_paths:
+              <a href="${remove(path)}" class="ccs-hidden">collapse</a>
+            % elif node.children:
+              <a href="${add(path)}" class="ccs-hidden">expand</a>
+            % endif
 
-  <a href="${request_path}?subtree=${node.pid}">subset</a>
-  </td>
-  <td>${node.user}</td>
-  <td>${node.cputime}</td>
-  <td>${node.command}</td>
-  </tr>
-  % if path in open_paths or show_all:
-    % for child in node.children:
-      ${r(child, depth+1, path+"/"+str(child.pid))}
-    % endfor
-  % endif
-</%def>
+            % if node.children:
+              <a href="${request_path}?subtree=${node.pid}&depth=${int(depth)+1}&sleep=1" class="expand"
+                data-spinner-target=".pstree-${node.pid}"
+                data-livepath-toggle="${urllib.urlencode([('paths', node.path)])}"
+                data-ajax-replace=".pstree-${node.pid}-target" data-ajax-filter="tbody tr">subset</a>
+            % endif
+      
+            <div style="overflow:hidden; white-space:nowrap;">${node.command}</div></td>
+          <td>${node.pid}</td>
+          <td>${node.user}</td>
+          <td>${node.cputime}</td>
+        </tr>
+        % if path in open_paths or show_all:
+          % for child in node.children:
+            ${r(child, depth+1, path+"/"+str(child.pid))}
+          % endfor
+        % elif not show_all and len(node.children) > 0:
+          <tr style="display:none" class="html-table-tree-ignore pstree-${node.pid}-target"><td colspan="4"></td></tr>
+        % endif
+      </%def>
 
-<thead>
-<th>pid</th>
-<th>links</th>
-<th>user</th>
-<th>cputime</th>
-<th>command</th>
-</thead>
-<tbody>
-% for top in tops:
- ${r(top, 0, "/" + str(top.pid))}
-% endfor
-</tbody>
-</table>
-
-
-        </body>
+      <thead>
+      <th>command</th>
+      <th>pid</th>
+      <th>user</th>
+      <th>cputime</th>
+      </thead>
+      <tbody>
+      % for top in tops:
+       ${create_row(top, depth, "/" + str(top.pid))}
+      % endfor
+      </tbody>
+      </table>
+    </div>
+  </body>
 </html>

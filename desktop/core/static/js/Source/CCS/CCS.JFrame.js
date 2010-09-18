@@ -43,7 +43,9 @@ requires:
  - /Behavior.HtmlTableCheckSelected
  - /Behavior.HtmlTableChromeHack
  - /Behavior.HtmlTableKeyboard
+ - /Behavior.HtmlTableLiveTreeKeyboard
  - /Behavior.HtmlTableMultiSelectMenu
+ - /Behavior.HtmlTableUpdate
  - /Behavior.MultiChecks
  - /Behavior.PostEditor
  - /Behavior.SelectWithOther
@@ -139,6 +141,9 @@ CCS.JFrame = new Class({
 			}.bind(this),
 			unregisterKeyboard: function(keyboard){
 				this.keyboard.drop(keyboard);
+			}.bind(this),
+			callClick: function(){
+				this.callClick.apply(this, arguments);
 			}.bind(this)
 		});
 		this.addEvent('resize', this.behavior.resize.bind(this.behavior));
@@ -200,7 +205,7 @@ CCS.JFrame = new Class({
 		if (this.delegatedTo.contains(target)) return;
 		this.delegatedTo.push(target);
 		
-		var handler = function(e, elem, url, target){
+		var handler = function(e, elem, url, options){
 			if (elem.get('tag') == 'a') e.preventDefault();
 			if (!this._checkLinkers(e, elem)) {
 				// If it's an anchor link, do scrolling
@@ -215,13 +220,17 @@ CCS.JFrame = new Class({
 				var path = url ? url.toString() : '';
 				if (!path) return;
 
-				this.load({
+				options = $merge({
 					requestPath: path
-				});
+				}, options);
+				var spinnerTarget = elem.get('data', 'spinner-target');
+				if (spinnerTarget) spinnerTarget = $(this).getElement(spinnerTarget);
+				options.spinnerTarget = spinnerTarget;
+				this.load(options);
 
 			}
 		}.bind(this);
-		this.callClick = function(e, elem, force){
+		this.callClick = function(e, elem, force, options){
 			//allow links to force jframe to nerf them
 			//this is required for doubleclick support
 			//as otherwise there's no way to prevent this default jframe handler per link
@@ -241,10 +250,10 @@ CCS.JFrame = new Class({
 					// by this class with the current design.
 					elem.set('target', '_blank');
 				} else {
-					handler(e, elem, url);
+					handler(e, elem, url, options);
 				}
 			} else {
-				handler(e, elem);
+				handler(e, elem, false, options);
 			}
 		}.bind(this);
 		target.addEvent('click:relay(' + this.options.clickRelays + ')', this.callClick);
@@ -313,6 +322,7 @@ CCS.JFrame = new Class({
 		target: the target where the content was loaded
 		toolbar: the toolbar elements (see below),
 		footer: the footer elements (see below)
+		everything else: used to pass along options to filters, renderers, etc.
 		
 	views:
 		The content of a JFrame request is searched for the first element with the class "view". 
@@ -344,6 +354,12 @@ CCS.JFrame = new Class({
 	*/
 	renderContent: function(options){
 		var content = {};
+		var filter = function(elements, selector){
+			if (!elements.length) return elements;
+			var first = elements[0];
+			var holder = new Element('div').adopt(elements);
+			return first.getParent().getElements(selector);
+		};
 		if ($(options.content)) {
 			//if the content is an element, cast it into an Elements array
 			content.elements = $$($(options.content));
@@ -355,7 +371,7 @@ CCS.JFrame = new Class({
 			//cast it into an Elements array in case it's just a vanilla array
 			content.elements = $$(options.content);
 		}
-		
+		if (options.filter) content.elements = filter(content.elements, options.filter);
 		//determine view and view element
 		var view,
 		    viewElement = content.elements.filter('.view')[0] || content.elements.getElement('.view')[0];
@@ -365,20 +381,22 @@ CCS.JFrame = new Class({
 			content.view = view;
 			content.viewElement = viewElement;
 		}
-		this._applyRenderers(content, options);
+		content.options = options;
+		this._applyRenderers(content);
 	},
 
 	/*
 		fill: fills a given target with the appropriate content
 		target - (*element*) the target to fill with content
 		content - (*object*) an object with the following properties:
-		js - (*string*) any the inline javascript to evalutate,
-		links - (*elements array*) css links to be injected into the target
-		elements - (*elements array*) elements to inject into the target (i.e. the actual content)
-		title - (*string*) the title of the content
-		view - (*string*; optional) if defined, the view of the content
-		viewElement - (*element*; optional) if defined, the element for the view
-		behavior - (*behavior object*; optional) if defined, the behavior instance to use
+			options - (*object*) the options object that created the request; see renderContent
+			js - (*string*) any the inline javascript to evalutate,
+			links - (*elements array*) css links to be injected into the target
+			elements - (*elements array*) elements to inject into the target (i.e. the actual content)
+			title - (*string*) the title of the content
+			view - (*string*; optional) if defined, the view of the content
+			viewElement - (*element*; optional) if defined, the element for the view
+			behavior - (*behavior object*; optional) if defined, the behavior instance to use
 		
 	*/
 
@@ -463,26 +481,26 @@ CCS.JFrame = new Class({
 	addBehaviors: function(obj, overwrite){
 		this.behavior.addFilters(obj, overwrite);
 	},
-        /* 
-                add a new behavior plugin
-                filterName - (*string*) the name of the filter this plugin is for (no spaces or commas; preferably CamelCase)
-                name - (*string*) the name of the plugin (no spaces or commas; preferably CamelCase)
-                fn - (*string*) the attachment function for the plugin
-                overwrite - (*boolean*) if true, will overwite any pre-existing filter if one is present
-        */
+	/*
+		add a new behavior plugin
+		filterName - (*string*) the name of the filter this plugin is for (no spaces or commas; preferably CamelCase)
+		name - (*string*) the name of the plugin (no spaces or commas; preferably CamelCase)
+		fn - (*string*) the attachment function for the plugin
+		overwrite - (*boolean*) if true, will overwite any pre-existing filter if one is present
+	*/
 
-        addBehaviorPlugin: function(filterName, name, fn, overwrite) {
-                this.behavior.addPlugin(filterName, name, fn, overwrite);
-        },
-        /*
-                add a group of behavior plugins
-                obj - (*object*) an object containing objects containing the filter name, the plugin name, and the attachment function for the plugin
-                overwrite - (*boolean*) if true, will overwrite any pre-existing filter if one is present
-        */
+	addBehaviorPlugin: function(filterName, name, fn, overwrite) {
+		this.behavior.addPlugin(filterName, name, fn, overwrite);
+	},
+	/*
+		add a group of behavior plugins
+		obj - (*object*) an object containing objects containing the filter name, the plugin name, and the attachment function for the plugin
+		overwrite - (*boolean*) if true, will overwrite any pre-existing filter if one is present
+	*/
 
-        addBehaviorPlugins: function(obj, overwrite){
-                this.behavior.addPlugins(obj, overwrite);
-        },
+	addBehaviorPlugins: function(obj, overwrite){
+		this.behavior.addPlugins(obj, overwrite);
+	},
 
 	/*
 		apply a specific behavior to an element
@@ -824,6 +842,7 @@ CCS.JFrame = new Class({
 	/*
 		_applyRenderers: renders content into the target
 		content - (*object*) an object with the following props:
+			options - (*object*) the object that created the request
 			html - (*string*) the source html, if it was present
 			js - (*string*) any the inline javascript to evalutate,
 			links - (*elements array*) css links and style tags to be injected into the target
@@ -840,22 +859,22 @@ CCS.JFrame = new Class({
 		and filters, linkers, etc. as usual.
 	*/
 
-	_applyRenderers: function(content, options){
+	_applyRenderers: function(content){
 		var rendered;
-		this.fireEvent('beforeRenderer', [content, options]);
+		this.fireEvent('beforeRenderer', [content, content.options]);
 		//loop through all the renderers
 		for (name in this._renderers) {
 			var renderer = this._renderers[name];
 			dbug.conditional(function(){
-				rendered = renderer.call(this, content, options);
+				rendered = renderer.call(this, content);
 			}.bind(this), function(e) {
 				dbug.error('renderer failed: name %s, error: ', e);
 			});
 			if (rendered) break;
 		}
 		//if no renderers returned true, then call the default one
-		if (!rendered) this._defaultRenderer(content, options);
-		this.fireEvent('afterRenderer', [content, options]);
+		if (!rendered) this._defaultRenderer(content);
+		this.fireEvent('afterRenderer', [content, content.options]);
 	},
 
 	/*
@@ -871,15 +890,16 @@ CCS.JFrame = new Class({
 		as well as assigns the toolbar to the callback object for JBrowser to do with it what it will.
 		Finally, it calls the callback in the options (if specified) and fires the loadComplete event.
 	*/
-	_defaultRenderer: function(content, options){
+	_defaultRenderer: function(content){
+		var options = content.options;
 		//store the path as the current one
-		this.currentPath = options.responsePath || this.currentPath;
+		if (!options.retainPath) this.currentPath = options.responsePath || this.currentPath;
 		//grab the target
 		var target = options.target ? $$(options.target)[0] || this.content : this.content;
 		this._resetOverflow(target);
 
 		//if we're injecting into the main content body, cleanup and scrollto the top
-		if (target == this.content) {
+		if (target == this.content && !options.noScroll) {
 			this.scroller.toTop();
 			this._sweep(target);
 		}
@@ -908,6 +928,8 @@ CCS.JFrame = new Class({
 		//define the callback data
 		var data = {
 			content: options.content,
+			elements: content.elements,
+			requestOptions: content.options,
 			responsePath: options.responsePath,
 			title: content.title || options.title || options.responsePath,
 			userData: options.userData,

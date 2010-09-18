@@ -28,7 +28,9 @@ script: CCS.JFrame.PartialRefresh.js
 
 	CCS.JFrame.addGlobalRenderers({
 
-		partialRefresh: function(content, options){
+		partialRefresh: function(content){
+			var options = content.options;
+			if (options && options.ignorePartialRefresh) return;
 			var jState = getJState(this);
 			//get the partial containers; containers that have elements in them to be partially refreshed
 			var partialContainers = content.elements.filter('.partial_refresh');
