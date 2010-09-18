@@ -279,6 +279,7 @@ CCS.JFrame = new Class({
 		this.fireEvent('refresh');
 		this.load(
 			$merge(options, {
+				noScroll: true,
 				requestPath: this.currentPath
 			})
 		);

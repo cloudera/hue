@@ -39,6 +39,7 @@ sources: [
   Source/JFrameLinkers/CCS.JFrame.ConfirmAndPost.js,
   Source/JFrameLinkers/CCS.JFrame.FakeRefresh.js,
   Source/JFrameLinkers/CCS.JFrame.Nav.js,
+  Source/JFrameLinkers/CCS.JFrame.NoScroll.js,
   Source/JFrameLinkers/CCS.JFrame.PromptAndPost.js,
   Source/JFrameLinkers/CCS.JFrame.Refresh.js,
   Source/JFrameLinkers/CCS.JFrame.SubmitLink.js,
