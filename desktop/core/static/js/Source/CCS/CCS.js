@@ -38,6 +38,60 @@ Spinner.implement({
 		}
 	}
 });
+
+Hash.implement({
+	//implements the ability to serialize arrays into query strings without brackets
+	//foo[0]=bar&foo[1]=baz
+	//vs
+	//foo=bar&foo=baz
+	toQueryString: function(base, useBrackets){
+		useBrackets = useBrackets == null ? true : useBrackets;
+		var queryString = [];
+		Hash.each(this, function(value, key){
+			if (base && useBrackets) key = base + '[' + key + ']';
+			var result;
+			switch ($type(value)){
+				case 'object': result = Hash.toQueryString(value, key); break;
+				case 'array':
+					if (useBrackets) {
+						var qs = {};
+						value.each(function(val, i){
+							qs[i] = val;
+						});
+						result = Hash.toQueryString(qs, key);
+					} else {
+						result = value.map(function(val){
+							return key + '=' + encodeURIComponent(val);
+						}).join('&');
+					}
+				break;
+				default: result = key + '=' + encodeURIComponent(value);
+			}
+			if (value != undefined) queryString.push(result);
+		});
+		return queryString.join('&');
+	}
+});
+
+URI.implement({
+
+	options: {
+		useBrackets: false
+	},
+
+	setData: function(values, merge, part){
+		if (typeof values == 'string'){
+			data = this.getData();
+			data[arguments[0]] = arguments[1];
+			values = data;
+		} else if (merge) {
+			values = $merge(this.getData(), values);
+		}
+		return this.set(part || 'query', Hash.toQueryString(values, null, this.options.useBrackets));
+	}
+
+});
+
 Element.Events.esc = {
 	base: 'keydown', //we set a base type
 	condition: function(event){ //and a function to perform additional checks.
@@ -65,3 +119,6 @@ StickyWin.Stacker.implement({
 StickyWin.WM.setOptions({
 	zIndexBase: 10003
 });
+
+//allows for selectors like $$('[data-foo-bar]'); TODO: move this up at some point. Note that it'll be in Moo 1.3
+// Selectors.RegExps.combined = (/\.([\w-]+)|\[([\w-]+)(?:([!*^$~|]?=)(["']?)([^\4]*?)\4)?\]|:([\w-]+)(?:\(["']?(.*?)?["']?\)|$)/g);
