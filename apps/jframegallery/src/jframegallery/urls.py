@@ -31,6 +31,6 @@ urlpatterns = patterns('jframegallery',
   url(r'^error_message_exception.*$', 'views.error_message_exception'),
   url(r'^error_popup_exception.*$', 'views.error_popup_exception'),
   url(r'^forms_with_dependencies.*$', 'views.forms_with_dependencies'),
-  url(r'^pstree.*$', 'views.pstree'),
+  url(r'^html-table.treeview.ajax.*$', 'views.pstree'),
   url(r'^(?P<path>.*)$', 'views.show')
 )
