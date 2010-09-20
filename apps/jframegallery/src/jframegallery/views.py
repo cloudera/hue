@@ -36,7 +36,7 @@ def index(request):
       name = filename.replace('.html', '').replace('.mako', '')
       files.append(dict(
         filename=filename,
-        name= name.capitalize().replace('.', ' '),
+        name= name.capitalize().replace('.', ' ').replace('_', ' '),
         id=name.replace(' ', '-').replace('.', '-')
       ))
   #render the index, passing along the file list
@@ -196,7 +196,7 @@ def pstree(request):
     return request.path + "?" + "&".join(urllib.urlencode([("paths", x)]) for x in paths)
 
   paths = request.GET.getlist("paths")
-  return render("pstree.mako", request, dict(
+  return render("html-table.treeview.ajax.mako", request, dict(
     tops=tops, show_all=request.GET.get("show_all"), 
     open_paths=paths, request_path=request.path,
     add=add, remove=remove))
