@@ -42,6 +42,7 @@ import java.util.Vector;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
@@ -261,6 +262,17 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       }
 
       driver = new Driver(hiveConf);
+      ClassLoader loader = hiveConf.getClassLoader();
+      String auxJars = HiveConf.getVar(hiveConf, HiveConf.ConfVars.HIVEAUXJARS);
+      if (StringUtils.isNotBlank(auxJars)) {
+        try {
+          loader = Utilities.addToClassPath(loader, StringUtils.split(auxJars, ","));
+        } catch (Exception e) {
+          LOG.error("Failed to add jars to class loader: " + auxJars, e);
+        }
+      }
+      hiveConf.setClassLoader(loader);
+      Thread.currentThread().setContextClassLoader(loader);
       SessionState.start(hiveConf); // this is thread-local
       this.sessionState = SessionState.get();
 
