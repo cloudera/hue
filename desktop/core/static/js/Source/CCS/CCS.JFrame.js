@@ -707,6 +707,12 @@ CCS.JFrame = new Class({
 				}.bind(this));
 			}.bind(this)
 		}, options));
+		request.addEvent('complete', function(){
+			if (this.spinner) {
+				this.spinner.destroy();
+				this.spinner = null;
+			}
+		}.bind(request));
 		request.setHeader('X-Hue-JFrame', 'true');
 	},
 
