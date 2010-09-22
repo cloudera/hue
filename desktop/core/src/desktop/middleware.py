@@ -135,12 +135,12 @@ class ClusterMiddleware(object):
         raise
 
     if request.user.is_authenticated() and request.fs is not None:
-      request.fs.setuser(request.user.username, request.user.get_groups())
+      request.fs.setuser(request.user.username)
 
     if request.user.is_authenticated() and has_hadoop:
       request.jt = cluster.get_mrcluster()
       if request.jt is not None:
-        request.jt.setuser(request.user.username, request.user.get_groups())
+        request.jt.setuser(request.user.username)
     else:
       request.jt = None
 

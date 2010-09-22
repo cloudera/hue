@@ -20,9 +20,10 @@ package org.apache.hadoop.mapred;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.InetSocketAddress;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,6 +42,7 @@ import org.apache.hadoop.mapred.Counters.Counter;
 import org.apache.hadoop.mapred.Counters.Group;
 import org.apache.hadoop.mapred.JobTracker.State;
 import org.apache.hadoop.mapred.TaskStatus.Phase;
+import org.apache.hadoop.mapreduce.TaskType;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.thriftfs.ThriftHandlerBase;
 import org.apache.hadoop.thriftfs.ThriftPluginServer;
@@ -240,7 +242,6 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             // could cause inconsistency between the values copied above and
             // the tasks themselves, but no deadlocks/CMEs.
             if (includeTasks) {
-                final boolean do_sort = true;
                 ret.setTasks(getInitialViewTaskList(job, tracker));
             }
             return ret;
@@ -281,7 +282,6 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             return ret;
         }
 
-        @SuppressWarnings("deprecation")
         public static List<ThriftCounterGroup> toThrift(Counters jcs) {
           Collection<String> groupNames = null;
           List<ThriftCounterGroup> ret = null;
@@ -360,8 +360,8 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             ttts.setLastSeen(t.getLastSeen());
             ttts.setMapCount(t.countMapTasks());
             ttts.setReduceCount(t.countReduceTasks());
-            ttts.setMaxMapTasks(t.getMaxMapTasks());
-            ttts.setMaxReduceTasks(t.getMaxReduceTasks());
+            ttts.setMaxMapTasks(t.getMaxMapSlots());
+            ttts.setMaxReduceTasks(t.getMaxReduceSlots());
 
             ttts.setTotalPhysicalMemory(t.getResourceStatus().getTotalPhysicalMemory());
             ttts.setTotalVirtualMemory(t.getResourceStatus().getTotalVirtualMemory());
@@ -486,12 +486,12 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
                                                         JobTracker jobTracker) {
             List<TaskInProgress> allTips = new ArrayList<TaskInProgress>();
             synchronized(job) {
-                allTips.addAll(Arrays.asList(job.getMapTasks()));
-                allTips.addAll(Arrays.asList(job.getReduceTasks()));
+                allTips.addAll(Arrays.asList(job.getTasks(TaskType.MAP)));
+                allTips.addAll(Arrays.asList(job.getTasks(TaskType.REDUCE)));
                 allTips.addAll(Arrays.asList(
-                      JTThriftUtils.sanitizeCleanupSetupTask(job.getCleanupTasks())));
+                      JTThriftUtils.sanitizeCleanupSetupTask(job.getTasks(TaskType.JOB_CLEANUP))));
                 allTips.addAll(Arrays.asList(
-                      JTThriftUtils.sanitizeCleanupSetupTask(job.getSetupTasks())));
+                      JTThriftUtils.sanitizeCleanupSetupTask(job.getTasks(TaskType.JOB_SETUP))));
             }
 
             // Sort by reverse time, but put all the genuine failures in front, and the
@@ -688,45 +688,52 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
 
         /** Returns the JobTracker's name */
         public String getJobTrackerName(RequestContext ctx) {
-            assumeUserContext(ctx);
-            return jobTracker.getJobTrackerMachine();
+          return assumeUserContextAndExecute(ctx, new PrivilegedAction<String>() {
+            public String run() {
+              return jobTracker.getJobTrackerMachine();
+            }
+          });
         }
 
         /** Returns a large clusterstatus object, augmented with some extra
          * detail from the JobTracker
          */
         public ThriftClusterStatus getClusterStatus(RequestContext ctx) {
-            assumeUserContext(ctx);
-            ClusterStatus cs = jobTracker.getClusterStatus(true);
-            return JTThriftUtils.toThrift(cs,jobTracker);
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftClusterStatus>() {
+              public ThriftClusterStatus run() {
+                ClusterStatus cs = jobTracker.getClusterStatus(true);
+                return JTThriftUtils.toThrift(cs,jobTracker);
+              }
+            });
         }
 
         /** Returns a list of all run-queues available to the JobTracker */
         public ThriftJobQueueList getQueues(RequestContext ctx) throws IOException, TException {
-            assumeUserContext(ctx);
-            JobQueueInfo queues[] = null;
-            try {
+            return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<ThriftJobQueueList>() {
+              public ThriftJobQueueList run() throws java.io.IOException {
+                JobQueueInfo queues[] = null;
                 queues = jobTracker.getQueues();
-            } catch (Throwable t) {
-                LOG.info("getQueues failed", t);
-                throw ThriftUtils.toThrift(t);
-            }
 
-            ArrayList<ThriftJobQueueInfo> ret =
-                new ArrayList<ThriftJobQueueInfo>(queues.length);
+                ArrayList<ThriftJobQueueInfo> ret =
+                    new ArrayList<ThriftJobQueueInfo>(queues.length);
 
-            for (JobQueueInfo q : queues) {
-                ThriftJobQueueInfo tq = JTThriftUtils.toThrift(q);
-                ret.add(tq);
-            }
-            return new ThriftJobQueueList(ret);
+                for (JobQueueInfo q : queues) {
+                    ThriftJobQueueInfo tq = JTThriftUtils.toThrift(q);
+                    ret.add(tq);
+                }
+                return new ThriftJobQueueList(ret);
+              }
+            });
         }
 
         /** Returns job by id (including task info) */
         public ThriftJobInProgress getJob(RequestContext ctx, ThriftJobID jobID) throws JobNotFoundException {
-            assumeUserContext(ctx);
-            JobID jid = JTThriftUtils.fromThrift(jobID);
-            JobInProgress job = jobTracker.getJob(jid);
+            final JobID jid = JTThriftUtils.fromThrift(jobID);
+            JobInProgress job = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobInProgress>() {
+              public JobInProgress run() {
+                return jobTracker.getJob(jid);
+              }
+            });
             if (job == null) {
               throw new JobNotFoundException();
             }
@@ -735,118 +742,137 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
 
         /** Returns all running jobs (does not include task info) */
         public ThriftJobList getRunningJobs(RequestContext ctx) {
-            assumeUserContext(ctx);
-            // Atomic copy
-            List<JobInProgress> jobs = jobTracker.getRunningJobs();
-            ArrayList<ThriftJobInProgress> ret =
-                new ArrayList<ThriftJobInProgress>(jobs.size());
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobList>() {
+              public ThriftJobList run() {
+                // Atomic copy
+                List<JobInProgress> jobs = jobTracker.getRunningJobs();
+                ArrayList<ThriftJobInProgress> ret =
+                    new ArrayList<ThriftJobInProgress>(jobs.size());
 
-            for (JobInProgress job : jobs) {
-                ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
-            }
-            return new ThriftJobList(ret);
+                for (JobInProgress job : jobs) {
+                    ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
+                }
+                return new ThriftJobList(ret);
+              }
+            });
         }
 
         /** Returns all completed jobs (does not include task info) */
         public ThriftJobList getCompletedJobs(RequestContext ctx) {
-            assumeUserContext(ctx);
-            List<JobInProgress> jobs = null;
-            synchronized(jobTracker){
-                jobs = jobTracker.completedJobs();
-            }
-            ArrayList<ThriftJobInProgress> ret =
-                new ArrayList<ThriftJobInProgress>(jobs.size());
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobList>() {
+              public ThriftJobList run() {
+                List<JobInProgress> jobs = null;
+                synchronized(jobTracker){
+                    jobs = jobTracker.completedJobs();
+                }
+                ArrayList<ThriftJobInProgress> ret =
+                    new ArrayList<ThriftJobInProgress>(jobs.size());
 
-            for (JobInProgress job : jobs) {
-                ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
-            }
-            return new ThriftJobList(ret);
+                for (JobInProgress job : jobs) {
+                    ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
+                }
+                return new ThriftJobList(ret);
+              }
+            });
         }
 
         /** Returns all failed jobs (does not include task info) */
         public ThriftJobList getFailedJobs(RequestContext ctx) {
-            assumeUserContext(ctx);
-            List<JobInProgress> jobs = null;
-            synchronized(jobTracker){
-                jobs = jobTracker.failedJobs();
-            }
-            List<ThriftJobInProgress> ret =
-                new ArrayList<ThriftJobInProgress>(jobs.size());
-            for (JobInProgress job : jobs) {
-                if (job.getStatus().getRunState() == JobStatus.FAILED) {
-                    ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobList>() {
+              public ThriftJobList run() {
+                List<JobInProgress> jobs = null;
+                synchronized(jobTracker){
+                    jobs = jobTracker.failedJobs();
                 }
-            }
-            return new ThriftJobList(ret);
+                List<ThriftJobInProgress> ret =
+                    new ArrayList<ThriftJobInProgress>(jobs.size());
+                for (JobInProgress job : jobs) {
+                    if (job.getStatus().getRunState() == JobStatus.FAILED) {
+                        ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
+                    }
+                }
+                return new ThriftJobList(ret);
+              }
+            });
         }
 
         /** Returns all killed jobs (does not include task info) */
         public ThriftJobList getKilledJobs(RequestContext ctx) {
-            assumeUserContext(ctx);
-            List<JobInProgress> jobs = null;
-            synchronized(jobTracker){
-                jobs = jobTracker.failedJobs();
-            }
-            List<ThriftJobInProgress> ret =
-                new ArrayList<ThriftJobInProgress>(jobs.size());
-            for (JobInProgress job : jobs) {
-                if (job.getStatus().getRunState() == JobStatus.KILLED) {
-                    ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobList>() {
+              public ThriftJobList run() {
+                List<JobInProgress> jobs = null;
+                synchronized(jobTracker){
+                    jobs = jobTracker.failedJobs();
                 }
-            }
-            return new ThriftJobList(ret);
+                List<ThriftJobInProgress> ret =
+                    new ArrayList<ThriftJobInProgress>(jobs.size());
+                for (JobInProgress job : jobs) {
+                    if (job.getStatus().getRunState() == JobStatus.KILLED) {
+                        ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
+                    }
+                }
+                return new ThriftJobList(ret);
+              }
+            });
         }
 
         /** Returns all running / failed / completed jobs (does not include task info) */
         public ThriftJobList getAllJobs(RequestContext ctx) {
-            assumeUserContext(ctx);
-            List<JobInProgress> jobList = new ArrayList<JobInProgress>();
-            jobList.addAll(jobTracker.getRunningJobs());
-            synchronized(jobTracker){
-                jobList.addAll(jobTracker.failedJobs());
-                jobList.addAll(jobTracker.completedJobs());
-            }
-            List<ThriftJobInProgress> ret =
-                new ArrayList<ThriftJobInProgress>();
-            for (JobInProgress job : jobList) {
-                    ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobList>() {
+              public ThriftJobList run() {
+                List<JobInProgress> jobList = new ArrayList<JobInProgress>();
+                jobList.addAll(jobTracker.getRunningJobs());
+                synchronized(jobTracker){
+                    jobList.addAll(jobTracker.failedJobs());
+                    jobList.addAll(jobTracker.completedJobs());
                 }
-            return new ThriftJobList(ret);
+                List<ThriftJobInProgress> ret =
+                    new ArrayList<ThriftJobInProgress>();
+                for (JobInProgress job : jobList) {
+                        ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
+                    }
+                return new ThriftJobList(ret);
+              }
+            });
         }
 
         /**
          * Return the count of jobs, broken down by status, for a given user.
          */
-        public ThriftUserJobCounts getUserJobCounts(RequestContext ctx, String user) {
-            assumeUserContext(ctx);
-            ThriftUserJobCounts ret = new ThriftUserJobCounts(0, 0, 0, 0, 0);
+        public ThriftUserJobCounts getUserJobCounts(RequestContext ctx, final String user) {
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftUserJobCounts>() {
+              public ThriftUserJobCounts run() {
+                ThriftUserJobCounts ret = new ThriftUserJobCounts(0, 0, 0, 0, 0);
 
-            JobStatus[] allJobs = jobTracker.getAllJobs();
-            for (JobStatus js : allJobs) {
-                if (!js.getUsername().equals(user))
-                    continue;
-                switch (js.getRunState()) {
-                    case JobStatus.PREP:
-                        ++ret.nPrep;
-                        break;
-                    case JobStatus.RUNNING:
-                        ++ret.nRunning;
-                        break;
-                    case JobStatus.SUCCEEDED:
-                        ++ret.nSucceeded;
-                        break;
-                    case JobStatus.FAILED:
-                        ++ret.nFailed;
-                        break;
-                    case JobStatus.KILLED:
-                        ++ret.nKilled;
-                        break;
-                    default:
-                        LOG.error("Unknown JobStatus " + js.getRunState() +
-                                  " for job id " + js.getJobID().getId());
+                JobStatus[] allJobs = jobTracker.getAllJobs();
+                for (JobStatus js : allJobs) {
+                  System.out.println("jid: " + js.getJobId() + " js: " + js.getRunState());
+                    if (!js.getUsername().equals(user))
+                        continue;
+                    switch (js.getRunState()) {
+                        case JobStatus.PREP:
+                            ++ret.nPrep;
+                            break;
+                        case JobStatus.RUNNING:
+                            ++ret.nRunning;
+                            break;
+                        case JobStatus.SUCCEEDED:
+                            ++ret.nSucceeded;
+                            break;
+                        case JobStatus.FAILED:
+                            ++ret.nFailed;
+                            break;
+                        case JobStatus.KILLED:
+                            ++ret.nKilled;
+                            break;
+                        default:
+                            LOG.error("Unknown JobStatus " + js.getRunState() +
+                                      " for job id " + js.getJobID().getId());
+                    }
                 }
-            }
-            return ret;
+                return ret;
+              }
+            });
         }
 
         /**
@@ -860,25 +886,29 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
                                   String text,
                                   int count,
                                   int offset) throws JobNotFoundException {
-            assumeUserContext(ctx);
-            JobID jid = JTThriftUtils.fromThrift(thriftJobID);
-            JobInProgress job = jobTracker.getJob(jid);
+            final JobID jid = JTThriftUtils.fromThrift(thriftJobID);
+            JobInProgress job = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobInProgress>() {
+              public JobInProgress run() {
+                return jobTracker.getJob(jid);
+              }
+            });
+
             if (job == null)
-                throw new JobNotFoundException();
+              throw new JobNotFoundException();
 
             // Gather all the tasks of the matching type
             List<TaskInProgress> allTips = new ArrayList<TaskInProgress>();
             synchronized(job) {
                 if (types.contains(ThriftTaskType.MAP))
-                    allTips.addAll(Arrays.asList(job.getMapTasks()));
+                    allTips.addAll(Arrays.asList(job.getTasks(TaskType.MAP)));
                 if (types.contains(ThriftTaskType.REDUCE))
-                    allTips.addAll(Arrays.asList(job.getReduceTasks()));
+                    allTips.addAll(Arrays.asList(job.getTasks(TaskType.REDUCE)));
                 if (types.contains(ThriftTaskType.JOB_CLEANUP))
                     allTips.addAll(Arrays.asList(
-                          JTThriftUtils.sanitizeCleanupSetupTask(job.getCleanupTasks())));
+                          JTThriftUtils.sanitizeCleanupSetupTask(job.getTasks(TaskType.JOB_CLEANUP))));
                 if (types.contains(ThriftTaskType.JOB_SETUP))
                     allTips.addAll(Arrays.asList(
-                          JTThriftUtils.sanitizeCleanupSetupTask(job.getSetupTasks())));
+                          JTThriftUtils.sanitizeCleanupSetupTask(job.getTasks(TaskType.JOB_SETUP))));
             }
 
             // Are the arguments out of bound?
@@ -942,13 +972,20 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
         /** Returns the task identified by the id */
         public ThriftTaskInProgress getTask(RequestContext ctx, ThriftTaskID ttaskId)
                 throws JobNotFoundException, TaskNotFoundException {
-            assumeUserContext(ctx);
-            TaskID taskId = JTThriftUtils.fromThrift(ttaskId);
-            JobID jobId = JTThriftUtils.fromThrift(ttaskId.getJobID());
-            JobInProgress job = jobTracker.getJob(jobId);
+            final TaskID taskId = JTThriftUtils.fromThrift(ttaskId);
+            final JobID jobId = JTThriftUtils.fromThrift(ttaskId.getJobID());
+            final JobInProgress job = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobInProgress>() {
+              public JobInProgress run() {
+                return jobTracker.getJob(jobId);
+              }
+            });
             if (job == null)
                 throw new JobNotFoundException();
-            TaskInProgress tip = job.getTaskInProgress(taskId);
+            TaskInProgress tip = assumeUserContextAndExecute(ctx, new PrivilegedAction<TaskInProgress>() {
+              public TaskInProgress run() {
+                return job.getTaskInProgress(taskId);
+              }
+            });
             if (tip == null)
                 throw new TaskNotFoundException();
             return JTThriftUtils.toThrift(tip, jobTracker);
@@ -956,22 +993,33 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
 
 
         /** Returns the set of counters associated with a given job */
-        public ThriftGroupList getJobCounters(RequestContext ctx, ThriftJobID jobID)
+        public ThriftGroupList getJobCounters(RequestContext ctx, final ThriftJobID jobID)
             throws JobNotFoundException
         {
-            assumeUserContext(ctx);
-            Counters jcs = jobTracker.getJobCounters(JTThriftUtils.fromThrift(jobID));
+            Counters jcs;
+            try {
+              jcs = assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Counters>() {
+                public Counters run() throws java.io.IOException {
+                    return jobTracker.getJobCounters(JTThriftUtils.fromThrift(jobID));
+                }
+              });
+            } catch (IOException e) {
+              throw new JobNotFoundException();
+            }
             if (jcs == null) {
                 throw new JobNotFoundException();
             }
             return new ThriftGroupList(JTThriftUtils.toThrift(jcs));
         }
 
-        public ThriftJobCounterRollups getJobCounterRollups(RequestContext ctx, ThriftJobID jobID)
+        public ThriftJobCounterRollups getJobCounterRollups(RequestContext ctx, final ThriftJobID jobID)
             throws JobNotFoundException
         {
-            assumeUserContext(ctx);
-            JobInProgress jip = jobTracker.getJob(JTThriftUtils.fromThrift(jobID));
+            JobInProgress jip = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobInProgress>() {
+              public JobInProgress run() {
+                return jobTracker.getJob(JTThriftUtils.fromThrift(jobID));
+              }
+            });
             if (jip == null) {
                 throw new JobNotFoundException();
             }
@@ -990,50 +1038,66 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
 
         /** Returns only active TaskTrackerStatus objects */
         public ThriftTaskTrackerStatusList getActiveTrackers(RequestContext ctx) {
-            assumeUserContext(ctx);
-            Collection<TaskTrackerStatus> active = jobTracker.activeTaskTrackers();
-            List<ThriftTaskTrackerStatus> trackers =
-                new ArrayList<ThriftTaskTrackerStatus>(active.size());
-            for (TaskTrackerStatus t : active) {
-                trackers.add(JTThriftUtils.toThrift(t));
-            }
-            return new ThriftTaskTrackerStatusList(trackers);
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftTaskTrackerStatusList>() {
+              public ThriftTaskTrackerStatusList run() {
+                Collection<TaskTrackerStatus> active = jobTracker.activeTaskTrackers();
+                List<ThriftTaskTrackerStatus> trackers =
+                    new ArrayList<ThriftTaskTrackerStatus>(active.size());
+                for (TaskTrackerStatus t : active) {
+                    trackers.add(JTThriftUtils.toThrift(t));
+                }
+                return new ThriftTaskTrackerStatusList(trackers);
+              }
+            });
         }
 
         /** Returns only blacklisted TaskTrackerStatus objects */
         public ThriftTaskTrackerStatusList getBlacklistedTrackers(RequestContext ctx) {
-            assumeUserContext(ctx);
-            Collection<TaskTrackerStatus> black = jobTracker.blacklistedTaskTrackers();
-            List<ThriftTaskTrackerStatus> trackers =
-                new ArrayList<ThriftTaskTrackerStatus>(black.size());
-            for (TaskTrackerStatus t : black) {
-                trackers.add(JTThriftUtils.toThrift(t));
-            }
-            return new ThriftTaskTrackerStatusList(trackers);
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftTaskTrackerStatusList>() {
+              public ThriftTaskTrackerStatusList run() {
+                Collection<TaskTrackerStatus> black = jobTracker.blacklistedTaskTrackers();
+                List<ThriftTaskTrackerStatus> trackers =
+                    new ArrayList<ThriftTaskTrackerStatus>(black.size());
+                for (TaskTrackerStatus t : black) {
+                    trackers.add(JTThriftUtils.toThrift(t));
+                }
+                return new ThriftTaskTrackerStatusList(trackers);
+              }
+            });
         }
 
         /** Returns all TaskTrackerStatus objects */
         public ThriftTaskTrackerStatusList getAllTrackers(RequestContext ctx) {
-            assumeUserContext(ctx);
-            Collection<TaskTrackerStatus> all = jobTracker.taskTrackers();
-            List<ThriftTaskTrackerStatus> trackers =
-                new ArrayList<ThriftTaskTrackerStatus>(all.size());
-            for (TaskTrackerStatus t : all) {
-                trackers.add(JTThriftUtils.toThrift(t));
-            }
-            return new ThriftTaskTrackerStatusList(trackers);
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftTaskTrackerStatusList>() {
+              public ThriftTaskTrackerStatusList run() {
+                Collection<TaskTrackerStatus> all = jobTracker.taskTrackers();
+                List<ThriftTaskTrackerStatus> trackers =
+                    new ArrayList<ThriftTaskTrackerStatus>(all.size());
+                for (TaskTrackerStatus t : all) {
+                    trackers.add(JTThriftUtils.toThrift(t));
+                }
+                return new ThriftTaskTrackerStatusList(trackers);
+              }
+            });
         }
 
         /** Returns a single TaskTrackerStatus object by name */
-        public ThriftTaskTrackerStatus getTracker(RequestContext ctx, String name)
+        public ThriftTaskTrackerStatus getTracker(RequestContext ctx, final String name)
             throws TaskTrackerNotFoundException {
-            assumeUserContext(ctx);
-            Collection<TaskTrackerStatus> all = jobTracker.taskTrackers();
-            for (TaskTrackerStatus t : all) {
-                if (t.getTrackerName().equals(name))
-                    return JTThriftUtils.toThrift(t);
-            }
-            throw new TaskTrackerNotFoundException();
+            ThriftTaskTrackerStatus ret = assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftTaskTrackerStatus>() {
+              public ThriftTaskTrackerStatus run() {
+                Collection<TaskTrackerStatus> all = jobTracker.taskTrackers();
+                for (TaskTrackerStatus t : all) {
+                    if (t.getTrackerName().equals(name))
+                        return JTThriftUtils.toThrift(t);
+                }
+                return null;
+              }
+            });
+            if (ret != null)
+              return ret;
+            else
+              throw new TaskTrackerNotFoundException();
         }
 
         /** Returns the current time in ms on this machine */
@@ -1043,22 +1107,21 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
         }
 
         /** Reads the local jobconf XML file for a given job */
-        public String getJobConfXML(RequestContext ctx, ThriftJobID jobID) throws IOException {
-            assumeUserContext(ctx);
-            /* This always returns a filename of hadoop.log.dir + "/" + jobid + "_conf.xml"
-             * Better check that jobid doesn't contain anything nasty.
-             */
-            JobID jid = JTThriftUtils.fromThrift(jobID);
-            String jidstring = jid.toString();
-            if (jidstring.contains(File.separator) || jidstring.contains(File.pathSeparator)) {
-                throw ThriftUtils.toThrift(
-                        new IllegalArgumentException("jobConf arguments can't contain path separators"));
-            }
-            String jobFilePath = JobTracker.getLocalJobFilePath(jid);
+        public String getJobConfXML(RequestContext ctx, final ThriftJobID jobID) throws IOException {
+            return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<String>() {
+              public String run() throws java.io.IOException {
+                /* This always returns a filename of hadoop.log.dir + "/" + jobid + "_conf.xml"
+                 * Better check that jobid doesn't contain anything nasty.
+                 */
+                JobID jid = JTThriftUtils.fromThrift(jobID);
+                String jidstring = jid.toString();
+                if (jidstring.contains(File.separator) || jidstring.contains(File.pathSeparator)) {
+                    throw new IllegalArgumentException("jobConf arguments can't contain path separators");
+                }
+                String jobFilePath = JobTracker.getLocalJobFilePath(jid);
 
-            StringBuffer fileData = new StringBuffer(1000);
-            BufferedReader reader;
-            try {
+                StringBuffer fileData = new StringBuffer(1000);
+                BufferedReader reader;
                 reader = new BufferedReader(
                         new FileReader(jobFilePath));
                 char[] buf = new char[1024];
@@ -1067,17 +1130,18 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
                     fileData.append(buf, 0, numRead);
                 }
                 reader.close();
-            } catch (Throwable t) {
-                LOG.error("getJobConfXML failed", t);
-                throw ThriftUtils.toThrift(t);
-            }
-            return fileData.toString();
+                return fileData.toString();
+              }
+            });
         }
 
         /** Kill a job by jobid */
-        public void killJob(RequestContext ctx, ThriftJobID jobID) throws IOException, JobNotFoundException {
-            assumeUserContext(ctx);
-            ThriftJobInProgress job = getJob(ctx, jobID);
+        public void killJob(final RequestContext ctx, final ThriftJobID jobID) throws IOException, JobNotFoundException {
+            ThriftJobInProgress job = assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<ThriftJobInProgress>() {
+              public ThriftJobInProgress run() throws JobNotFoundException {
+                return getJob(ctx, jobID);
+              }
+            });
             if (job == null) {
                 throw new JobNotFoundException();
             }
@@ -1093,46 +1157,65 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
         /** Kill a task attempt by taskattemptid */
         public void killTaskAttempt(RequestContext ctx, ThriftTaskAttemptID attemptID)
             throws IOException, TaskAttemptNotFoundException, JobNotFoundException {
-            assumeUserContext(ctx);
-            TaskAttemptID taskid = JTThriftUtils.fromThrift(attemptID);
-            JobID jid = JTThriftUtils.fromThrift(attemptID.taskID.jobID);
-            JobInProgress job = jobTracker.getJob(jid);
+            final TaskAttemptID taskid = JTThriftUtils.fromThrift(attemptID);
+            final JobID jid = JTThriftUtils.fromThrift(attemptID.taskID.jobID);
+
+            final JobInProgress job = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobInProgress>() {
+              public JobInProgress run() {
+                return jobTracker.getJob(jid);
+              }
+            });
             if (job == null) {
               throw new JobNotFoundException();
             }
-            TaskInProgress tip = job.getTaskInProgress(taskid.getTaskID());
+
+            final TaskInProgress tip = assumeUserContextAndExecute(ctx, new PrivilegedAction<TaskInProgress>() {
+              public TaskInProgress run() {
+                return job.getTaskInProgress(taskid.getTaskID());
+              }
+            });
             if (tip == null) {
                 throw new TaskAttemptNotFoundException();
             }
-            TaskStatus status = tip.getTaskStatus(taskid);
+
+            TaskStatus status = assumeUserContextAndExecute(ctx, new PrivilegedAction<TaskStatus>() {
+              public TaskStatus run() {
+                return tip.getTaskStatus(taskid);
+              }
+            });
             if (status == null) {
                 throw new TaskAttemptNotFoundException();
             }
-            try {
+
+            assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+              public Void run() throws java.io.IOException {
                 // Second parameter means always kill, don't fail
                 if (!jobTracker.killTask(taskid, true)) {
                     throw new RuntimeException();
                 }
-            } catch (Throwable t) {
-                LOG.info("killTask failed", t);
-                throw ThriftUtils.toThrift(t);
-            }
+                return null;
+              }
+            });
         }
 
         /** Set a job's priority */
-        public void setJobPriority(RequestContext ctx, ThriftJobID jobID, ThriftJobPriority priority)
+        public void setJobPriority(RequestContext ctx, final ThriftJobID jobID, final ThriftJobPriority priority)
             throws IOException, JobNotFoundException {
-            JobID jid = JTThriftUtils.fromThrift(jobID);
-            JobInProgress job = jobTracker.getJob(jid);
+            final JobID jid = JTThriftUtils.fromThrift(jobID);
+            JobInProgress job = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobInProgress>() {
+              public JobInProgress run() {
+                return jobTracker.getJob(jid);
+              }
+            });
             if (job == null) {
               throw new JobNotFoundException();
             }
-            try {
+            assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+              public Void run() throws java.io.IOException {
                 jobTracker.setJobPriority(jid, priority.toString());
-            } catch (Throwable t) {
-                LOG.info("setJobPriority failed", t);
-                throw ThriftUtils.toThrift(t);
-            }
+                return null;
+              }
+            });
         }
     }
 

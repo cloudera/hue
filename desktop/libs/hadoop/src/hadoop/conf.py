@@ -98,6 +98,12 @@ HADOOP_PLUGIN_CLASSPATH = Config("hadoop_plugin_classpath",
   dynamic_default=find_jar("../../java-lib/hue-plugins-*.jar", root=os.path.dirname(__file__)),
   private=True)
 
+HADOOP_STATIC_GROUP_MAPPING_CLASSPATH = Config("hadoop_static_group_mapping_classpath",
+  help="[Used only in testing code.] Path to the Hadoop static group mapping jar.",
+  type=str,
+  dynamic_default=find_jar("../../static-group-mapping/java-lib/static-group-mapping-*.jar", root=os.path.dirname(__file__)),
+  private=True)
+
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
   help="One entry for each HDFS cluster",

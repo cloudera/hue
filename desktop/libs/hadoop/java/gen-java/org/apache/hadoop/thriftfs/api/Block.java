@@ -35,8 +35,9 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
   private static final TField PATH_FIELD_DESC = new TField("path", TType.STRING, (short)2);
   private static final TField NUM_BYTES_FIELD_DESC = new TField("numBytes", TType.I64, (short)3);
   private static final TField GEN_STAMP_FIELD_DESC = new TField("genStamp", TType.I64, (short)4);
-  private static final TField START_OFFSET_FIELD_DESC = new TField("startOffset", TType.I64, (short)6);
   private static final TField NODES_FIELD_DESC = new TField("nodes", TType.LIST, (short)5);
+  private static final TField START_OFFSET_FIELD_DESC = new TField("startOffset", TType.I64, (short)6);
+  private static final TField TOKEN_FIELD_DESC = new TField("token", TType.STRING, (short)7);
 
   /**
    * Block ID (unique among all blocks in a filesystem).
@@ -55,13 +56,17 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
    */
   public long genStamp;
   /**
+   * List of data nodes with copies  of this block.
+   */
+  public List<DatanodeInfo> nodes;
+  /**
    * Offset of the first byte of the block relative to the start of the file
    */
   public long startOffset;
   /**
-   * List of data nodes with copies  of this block.
+   * The serialized token associated with this block.
    */
-  public List<DatanodeInfo> nodes;
+  public String token;
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements TFieldIdEnum {
@@ -82,13 +87,17 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
      */
     GEN_STAMP((short)4, "genStamp"),
     /**
+     * List of data nodes with copies  of this block.
+     */
+    NODES((short)5, "nodes"),
+    /**
      * Offset of the first byte of the block relative to the start of the file
      */
     START_OFFSET((short)6, "startOffset"),
     /**
-     * List of data nodes with copies  of this block.
+     * The serialized token associated with this block.
      */
-    NODES((short)5, "nodes");
+    TOKEN((short)7, "token");
 
     private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
@@ -157,11 +166,13 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
         new FieldValueMetaData(TType.I64)));
     put(_Fields.GEN_STAMP, new FieldMetaData("genStamp", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.START_OFFSET, new FieldMetaData("startOffset", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
     put(_Fields.NODES, new FieldMetaData("nodes", TFieldRequirementType.DEFAULT, 
         new ListMetaData(TType.LIST, 
             new StructMetaData(TType.STRUCT, DatanodeInfo.class))));
+    put(_Fields.START_OFFSET, new FieldMetaData("startOffset", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    put(_Fields.TOKEN, new FieldMetaData("token", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
   }});
 
   static {
@@ -176,8 +187,9 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     String path,
     long numBytes,
     long genStamp,
+    List<DatanodeInfo> nodes,
     long startOffset,
-    List<DatanodeInfo> nodes)
+    String token)
   {
     this();
     this.blockId = blockId;
@@ -187,9 +199,10 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     setNumBytesIsSet(true);
     this.genStamp = genStamp;
     setGenStampIsSet(true);
+    this.nodes = nodes;
     this.startOffset = startOffset;
     setStartOffsetIsSet(true);
-    this.nodes = nodes;
+    this.token = token;
   }
 
   /**
@@ -204,13 +217,16 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     }
     this.numBytes = other.numBytes;
     this.genStamp = other.genStamp;
-    this.startOffset = other.startOffset;
     if (other.isSetNodes()) {
       List<DatanodeInfo> __this__nodes = new ArrayList<DatanodeInfo>();
       for (DatanodeInfo other_element : other.nodes) {
         __this__nodes.add(new DatanodeInfo(other_element));
       }
       this.nodes = __this__nodes;
+    }
+    this.startOffset = other.startOffset;
+    if (other.isSetToken()) {
+      this.token = other.token;
     }
   }
 
@@ -340,35 +356,6 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     __isset_bit_vector.set(__GENSTAMP_ISSET_ID, value);
   }
 
-  /**
-   * Offset of the first byte of the block relative to the start of the file
-   */
-  public long getStartOffset() {
-    return this.startOffset;
-  }
-
-  /**
-   * Offset of the first byte of the block relative to the start of the file
-   */
-  public Block setStartOffset(long startOffset) {
-    this.startOffset = startOffset;
-    setStartOffsetIsSet(true);
-    return this;
-  }
-
-  public void unsetStartOffset() {
-    __isset_bit_vector.clear(__STARTOFFSET_ISSET_ID);
-  }
-
-  /** Returns true if field startOffset is set (has been asigned a value) and false otherwise */
-  public boolean isSetStartOffset() {
-    return __isset_bit_vector.get(__STARTOFFSET_ISSET_ID);
-  }
-
-  public void setStartOffsetIsSet(boolean value) {
-    __isset_bit_vector.set(__STARTOFFSET_ISSET_ID, value);
-  }
-
   public int getNodesSize() {
     return (this.nodes == null) ? 0 : this.nodes.size();
   }
@@ -414,6 +401,65 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     }
   }
 
+  /**
+   * Offset of the first byte of the block relative to the start of the file
+   */
+  public long getStartOffset() {
+    return this.startOffset;
+  }
+
+  /**
+   * Offset of the first byte of the block relative to the start of the file
+   */
+  public Block setStartOffset(long startOffset) {
+    this.startOffset = startOffset;
+    setStartOffsetIsSet(true);
+    return this;
+  }
+
+  public void unsetStartOffset() {
+    __isset_bit_vector.clear(__STARTOFFSET_ISSET_ID);
+  }
+
+  /** Returns true if field startOffset is set (has been asigned a value) and false otherwise */
+  public boolean isSetStartOffset() {
+    return __isset_bit_vector.get(__STARTOFFSET_ISSET_ID);
+  }
+
+  public void setStartOffsetIsSet(boolean value) {
+    __isset_bit_vector.set(__STARTOFFSET_ISSET_ID, value);
+  }
+
+  /**
+   * The serialized token associated with this block.
+   */
+  public String getToken() {
+    return this.token;
+  }
+
+  /**
+   * The serialized token associated with this block.
+   */
+  public Block setToken(String token) {
+    this.token = token;
+    return this;
+  }
+
+  public void unsetToken() {
+    this.token = null;
+  }
+
+  /** Returns true if field token is set (has been asigned a value) and false otherwise */
+  public boolean isSetToken() {
+    return this.token != null;
+  }
+
+  public void setTokenIsSet(boolean value) {
+    if (!value) {
+      this.token = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case BLOCK_ID:
@@ -448,6 +494,14 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
       }
       break;
 
+    case NODES:
+      if (value == null) {
+        unsetNodes();
+      } else {
+        setNodes((List<DatanodeInfo>)value);
+      }
+      break;
+
     case START_OFFSET:
       if (value == null) {
         unsetStartOffset();
@@ -456,11 +510,11 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
       }
       break;
 
-    case NODES:
+    case TOKEN:
       if (value == null) {
-        unsetNodes();
+        unsetToken();
       } else {
-        setNodes((List<DatanodeInfo>)value);
+        setToken((String)value);
       }
       break;
 
@@ -485,11 +539,14 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     case GEN_STAMP:
       return new Long(getGenStamp());
 
+    case NODES:
+      return getNodes();
+
     case START_OFFSET:
       return new Long(getStartOffset());
 
-    case NODES:
-      return getNodes();
+    case TOKEN:
+      return getToken();
 
     }
     throw new IllegalStateException();
@@ -510,10 +567,12 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
       return isSetNumBytes();
     case GEN_STAMP:
       return isSetGenStamp();
-    case START_OFFSET:
-      return isSetStartOffset();
     case NODES:
       return isSetNodes();
+    case START_OFFSET:
+      return isSetStartOffset();
+    case TOKEN:
+      return isSetToken();
     }
     throw new IllegalStateException();
   }
@@ -571,6 +630,15 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
         return false;
     }
 
+    boolean this_present_nodes = true && this.isSetNodes();
+    boolean that_present_nodes = true && that.isSetNodes();
+    if (this_present_nodes || that_present_nodes) {
+      if (!(this_present_nodes && that_present_nodes))
+        return false;
+      if (!this.nodes.equals(that.nodes))
+        return false;
+    }
+
     boolean this_present_startOffset = true;
     boolean that_present_startOffset = true;
     if (this_present_startOffset || that_present_startOffset) {
@@ -580,12 +648,12 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
         return false;
     }
 
-    boolean this_present_nodes = true && this.isSetNodes();
-    boolean that_present_nodes = true && that.isSetNodes();
-    if (this_present_nodes || that_present_nodes) {
-      if (!(this_present_nodes && that_present_nodes))
+    boolean this_present_token = true && this.isSetToken();
+    boolean that_present_token = true && that.isSetToken();
+    if (this_present_token || that_present_token) {
+      if (!(this_present_token && that_present_token))
         return false;
-      if (!this.nodes.equals(that.nodes))
+      if (!this.token.equals(that.token))
         return false;
     }
 
@@ -637,6 +705,14 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     if (lastComparison != 0) {
       return lastComparison;
     }
+    lastComparison = Boolean.valueOf(isSetNodes()).compareTo(isSetNodes());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    lastComparison = TBaseHelper.compareTo(nodes, typedOther.nodes);
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
     lastComparison = Boolean.valueOf(isSetStartOffset()).compareTo(isSetStartOffset());
     if (lastComparison != 0) {
       return lastComparison;
@@ -645,11 +721,11 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetNodes()).compareTo(isSetNodes());
+    lastComparison = Boolean.valueOf(isSetToken()).compareTo(isSetToken());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(nodes, typedOther.nodes);
+    lastComparison = TBaseHelper.compareTo(token, typedOther.token);
     if (lastComparison != 0) {
       return lastComparison;
     }
@@ -701,14 +777,6 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
-          case START_OFFSET:
-            if (field.type == TType.I64) {
-              this.startOffset = iprot.readI64();
-              setStartOffsetIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
           case NODES:
             if (field.type == TType.LIST) {
               {
@@ -723,6 +791,21 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
                 }
                 iprot.readListEnd();
               }
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case START_OFFSET:
+            if (field.type == TType.I64) {
+              this.startOffset = iprot.readI64();
+              setStartOffsetIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case TOKEN:
+            if (field.type == TType.STRING) {
+              this.token = iprot.readString();
             } else { 
               TProtocolUtil.skip(iprot, field.type);
             }
@@ -770,6 +853,11 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     oprot.writeFieldBegin(START_OFFSET_FIELD_DESC);
     oprot.writeI64(this.startOffset);
     oprot.writeFieldEnd();
+    if (this.token != null) {
+      oprot.writeFieldBegin(TOKEN_FIELD_DESC);
+      oprot.writeString(this.token);
+      oprot.writeFieldEnd();
+    }
     oprot.writeFieldStop();
     oprot.writeStructEnd();
   }
@@ -799,15 +887,23 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     sb.append(this.genStamp);
     first = false;
     if (!first) sb.append(", ");
-    sb.append("startOffset:");
-    sb.append(this.startOffset);
-    first = false;
-    if (!first) sb.append(", ");
     sb.append("nodes:");
     if (this.nodes == null) {
       sb.append("null");
     } else {
       sb.append(this.nodes);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("startOffset:");
+    sb.append(this.startOffset);
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("token:");
+    if (this.token == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.token);
     }
     first = false;
     sb.append(")");

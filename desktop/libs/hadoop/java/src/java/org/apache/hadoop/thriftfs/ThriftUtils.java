@@ -28,7 +28,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.thriftfs.api.Block;
 import org.apache.hadoop.thriftfs.api.Constants;
@@ -65,7 +64,7 @@ public class ThriftUtils {
   }
 
   public static Block toThrift(LocatedBlock block, String path,
-      Map<DatanodeID, Integer> thriftPorts) {
+      Map<DatanodeID, Integer> thriftPorts) throws java.io.IOException {
     if (block == null) {
       return new Block();
     }
@@ -80,7 +79,7 @@ public class ThriftUtils {
 
     org.apache.hadoop.hdfs.protocol.Block b = block.getBlock();
     return new Block(b.getBlockId(), path, b.getNumBytes(),
-                     b.getGenerationStamp(), block.getStartOffset(), nodes);
+                     b.getGenerationStamp(), nodes, block.getStartOffset(), block.getBlockToken().encodeToUrlString());
   }
 
   public static ContentSummary toThrift(org.apache.hadoop.fs.ContentSummary cs, String path) {

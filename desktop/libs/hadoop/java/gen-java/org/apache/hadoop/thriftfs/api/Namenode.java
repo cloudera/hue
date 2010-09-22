@@ -66,7 +66,7 @@ public class Namenode {
      * 
      * @param ctx
      */
-    public List<Long> df(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws org.apache.hadoop.thriftfs.api.IOException, TException;
+    public List<Long> df(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException;
 
     /**
      * Enter safe mode.
@@ -86,23 +86,6 @@ public class Namenode {
      * @param length Length of the region
      */
     public List<Block> getBlocks(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long offset, long length) throws org.apache.hadoop.thriftfs.api.IOException, TException;
-
-    /**
-     * Get a report on the system's current data nodes.
-     * Note that ctx is currently ignored by the server.
-     * 
-     * @param ctx
-     * @param type Type of data nodes to return
-     * information about.
-     */
-    public List<DatanodeInfo> getDatanodeReport(org.apache.hadoop.thriftfs.api.RequestContext ctx, DatanodeReportType type) throws org.apache.hadoop.thriftfs.api.IOException, TException;
-
-    /**
-     * Get a health report of DFS.  Note that ctx is ignored by the server.
-     * 
-     * @param ctx
-     */
-    public DFSHealthReport getHealthReport(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws org.apache.hadoop.thriftfs.api.IOException, TException;
 
     /**
      * Get the preferred block size for the given file.
@@ -384,7 +367,7 @@ public class Namenode {
       return;
     }
 
-    public List<Long> df(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws org.apache.hadoop.thriftfs.api.IOException, TException
+    public List<Long> df(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
       send_df(ctx);
       return recv_df();
@@ -400,7 +383,7 @@ public class Namenode {
       oprot_.getTransport().flush();
     }
 
-    public List<Long> recv_df() throws org.apache.hadoop.thriftfs.api.IOException, TException
+    public List<Long> recv_df() throws TException
     {
       TMessage msg = iprot_.readMessageBegin();
       if (msg.type == TMessageType.EXCEPTION) {
@@ -413,9 +396,6 @@ public class Namenode {
       iprot_.readMessageEnd();
       if (result.isSetSuccess()) {
         return result.success;
-      }
-      if (result.err != null) {
-        throw result.err;
       }
       throw new TApplicationException(TApplicationException.MISSING_RESULT, "df failed: unknown result");
     }
@@ -490,79 +470,6 @@ public class Namenode {
         throw result.err;
       }
       throw new TApplicationException(TApplicationException.MISSING_RESULT, "getBlocks failed: unknown result");
-    }
-
-    public List<DatanodeInfo> getDatanodeReport(org.apache.hadoop.thriftfs.api.RequestContext ctx, DatanodeReportType type) throws org.apache.hadoop.thriftfs.api.IOException, TException
-    {
-      send_getDatanodeReport(ctx, type);
-      return recv_getDatanodeReport();
-    }
-
-    public void send_getDatanodeReport(org.apache.hadoop.thriftfs.api.RequestContext ctx, DatanodeReportType type) throws TException
-    {
-      oprot_.writeMessageBegin(new TMessage("getDatanodeReport", TMessageType.CALL, seqid_));
-      getDatanodeReport_args args = new getDatanodeReport_args();
-      args.ctx = ctx;
-      args.type = type;
-      args.write(oprot_);
-      oprot_.writeMessageEnd();
-      oprot_.getTransport().flush();
-    }
-
-    public List<DatanodeInfo> recv_getDatanodeReport() throws org.apache.hadoop.thriftfs.api.IOException, TException
-    {
-      TMessage msg = iprot_.readMessageBegin();
-      if (msg.type == TMessageType.EXCEPTION) {
-        TApplicationException x = TApplicationException.read(iprot_);
-        iprot_.readMessageEnd();
-        throw x;
-      }
-      getDatanodeReport_result result = new getDatanodeReport_result();
-      result.read(iprot_);
-      iprot_.readMessageEnd();
-      if (result.isSetSuccess()) {
-        return result.success;
-      }
-      if (result.err != null) {
-        throw result.err;
-      }
-      throw new TApplicationException(TApplicationException.MISSING_RESULT, "getDatanodeReport failed: unknown result");
-    }
-
-    public DFSHealthReport getHealthReport(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws org.apache.hadoop.thriftfs.api.IOException, TException
-    {
-      send_getHealthReport(ctx);
-      return recv_getHealthReport();
-    }
-
-    public void send_getHealthReport(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
-    {
-      oprot_.writeMessageBegin(new TMessage("getHealthReport", TMessageType.CALL, seqid_));
-      getHealthReport_args args = new getHealthReport_args();
-      args.ctx = ctx;
-      args.write(oprot_);
-      oprot_.writeMessageEnd();
-      oprot_.getTransport().flush();
-    }
-
-    public DFSHealthReport recv_getHealthReport() throws org.apache.hadoop.thriftfs.api.IOException, TException
-    {
-      TMessage msg = iprot_.readMessageBegin();
-      if (msg.type == TMessageType.EXCEPTION) {
-        TApplicationException x = TApplicationException.read(iprot_);
-        iprot_.readMessageEnd();
-        throw x;
-      }
-      getHealthReport_result result = new getHealthReport_result();
-      result.read(iprot_);
-      iprot_.readMessageEnd();
-      if (result.isSetSuccess()) {
-        return result.success;
-      }
-      if (result.err != null) {
-        throw result.err;
-      }
-      throw new TApplicationException(TApplicationException.MISSING_RESULT, "getHealthReport failed: unknown result");
     }
 
     public long getPreferredBlockSize(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path) throws org.apache.hadoop.thriftfs.api.IOException, TException
@@ -1186,8 +1093,6 @@ public class Namenode {
       processMap_.put("df", new df());
       processMap_.put("enterSafeMode", new enterSafeMode());
       processMap_.put("getBlocks", new getBlocks());
-      processMap_.put("getDatanodeReport", new getDatanodeReport());
-      processMap_.put("getHealthReport", new getHealthReport());
       processMap_.put("getPreferredBlockSize", new getPreferredBlockSize());
       processMap_.put("isInSafeMode", new isInSafeMode());
       processMap_.put("leaveSafeMode", new leaveSafeMode());
@@ -1290,19 +1195,7 @@ public class Namenode {
         args.read(iprot);
         iprot.readMessageEnd();
         df_result result = new df_result();
-        try {
-          result.success = iface_.df(args.ctx);
-        } catch (org.apache.hadoop.thriftfs.api.IOException err) {
-          result.err = err;
-        } catch (Throwable th) {
-          LOGGER.error("Internal error processing df", th);
-          TApplicationException x = new TApplicationException(TApplicationException.INTERNAL_ERROR, "Internal error processing df");
-          oprot.writeMessageBegin(new TMessage("df", TMessageType.EXCEPTION, seqid));
-          x.write(oprot);
-          oprot.writeMessageEnd();
-          oprot.getTransport().flush();
-          return;
-        }
+        result.success = iface_.df(args.ctx);
         oprot.writeMessageBegin(new TMessage("df", TMessageType.REPLY, seqid));
         result.write(oprot);
         oprot.writeMessageEnd();
@@ -1360,62 +1253,6 @@ public class Namenode {
           return;
         }
         oprot.writeMessageBegin(new TMessage("getBlocks", TMessageType.REPLY, seqid));
-        result.write(oprot);
-        oprot.writeMessageEnd();
-        oprot.getTransport().flush();
-      }
-
-    }
-
-    private class getDatanodeReport implements ProcessFunction {
-      public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
-      {
-        getDatanodeReport_args args = new getDatanodeReport_args();
-        args.read(iprot);
-        iprot.readMessageEnd();
-        getDatanodeReport_result result = new getDatanodeReport_result();
-        try {
-          result.success = iface_.getDatanodeReport(args.ctx, args.type);
-        } catch (org.apache.hadoop.thriftfs.api.IOException err) {
-          result.err = err;
-        } catch (Throwable th) {
-          LOGGER.error("Internal error processing getDatanodeReport", th);
-          TApplicationException x = new TApplicationException(TApplicationException.INTERNAL_ERROR, "Internal error processing getDatanodeReport");
-          oprot.writeMessageBegin(new TMessage("getDatanodeReport", TMessageType.EXCEPTION, seqid));
-          x.write(oprot);
-          oprot.writeMessageEnd();
-          oprot.getTransport().flush();
-          return;
-        }
-        oprot.writeMessageBegin(new TMessage("getDatanodeReport", TMessageType.REPLY, seqid));
-        result.write(oprot);
-        oprot.writeMessageEnd();
-        oprot.getTransport().flush();
-      }
-
-    }
-
-    private class getHealthReport implements ProcessFunction {
-      public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
-      {
-        getHealthReport_args args = new getHealthReport_args();
-        args.read(iprot);
-        iprot.readMessageEnd();
-        getHealthReport_result result = new getHealthReport_result();
-        try {
-          result.success = iface_.getHealthReport(args.ctx);
-        } catch (org.apache.hadoop.thriftfs.api.IOException err) {
-          result.err = err;
-        } catch (Throwable th) {
-          LOGGER.error("Internal error processing getHealthReport", th);
-          TApplicationException x = new TApplicationException(TApplicationException.INTERNAL_ERROR, "Internal error processing getHealthReport");
-          oprot.writeMessageBegin(new TMessage("getHealthReport", TMessageType.EXCEPTION, seqid));
-          x.write(oprot);
-          oprot.writeMessageEnd();
-          oprot.getTransport().flush();
-          return;
-        }
-        oprot.writeMessageBegin(new TMessage("getHealthReport", TMessageType.REPLY, seqid));
         result.write(oprot);
         oprot.writeMessageEnd();
         oprot.getTransport().flush();
@@ -3685,15 +3522,12 @@ public class Namenode {
     private static final TStruct STRUCT_DESC = new TStruct("df_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
-    private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
 
     public List<Long> success;
-    public org.apache.hadoop.thriftfs.api.IOException err;
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements TFieldIdEnum {
-      SUCCESS((short)0, "success"),
-      ERR((short)1, "err");
+      SUCCESS((short)0, "success");
 
       private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
@@ -3752,8 +3586,6 @@ public class Namenode {
       put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new FieldValueMetaData(TType.I64))));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
     }});
 
     static {
@@ -3764,12 +3596,10 @@ public class Namenode {
     }
 
     public df_result(
-      List<Long> success,
-      org.apache.hadoop.thriftfs.api.IOException err)
+      List<Long> success)
     {
       this();
       this.success = success;
-      this.err = err;
     }
 
     /**
@@ -3782,9 +3612,6 @@ public class Namenode {
           __this__success.add(other_element);
         }
         this.success = __this__success;
-      }
-      if (other.isSetErr()) {
-        this.err = new org.apache.hadoop.thriftfs.api.IOException(other.err);
       }
     }
 
@@ -3836,30 +3663,6 @@ public class Namenode {
       }
     }
 
-    public org.apache.hadoop.thriftfs.api.IOException getErr() {
-      return this.err;
-    }
-
-    public df_result setErr(org.apache.hadoop.thriftfs.api.IOException err) {
-      this.err = err;
-      return this;
-    }
-
-    public void unsetErr() {
-      this.err = null;
-    }
-
-    /** Returns true if field err is set (has been asigned a value) and false otherwise */
-    public boolean isSetErr() {
-      return this.err != null;
-    }
-
-    public void setErrIsSet(boolean value) {
-      if (!value) {
-        this.err = null;
-      }
-    }
-
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case SUCCESS:
@@ -3867,14 +3670,6 @@ public class Namenode {
           unsetSuccess();
         } else {
           setSuccess((List<Long>)value);
-        }
-        break;
-
-      case ERR:
-        if (value == null) {
-          unsetErr();
-        } else {
-          setErr((org.apache.hadoop.thriftfs.api.IOException)value);
         }
         break;
 
@@ -3890,9 +3685,6 @@ public class Namenode {
       case SUCCESS:
         return getSuccess();
 
-      case ERR:
-        return getErr();
-
       }
       throw new IllegalStateException();
     }
@@ -3906,8 +3698,6 @@ public class Namenode {
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
-      case ERR:
-        return isSetErr();
       }
       throw new IllegalStateException();
     }
@@ -3938,15 +3728,6 @@ public class Namenode {
           return false;
       }
 
-      boolean this_present_err = true && this.isSetErr();
-      boolean that_present_err = true && that.isSetErr();
-      if (this_present_err || that_present_err) {
-        if (!(this_present_err && that_present_err))
-          return false;
-        if (!this.err.equals(that.err))
-          return false;
-      }
-
       return true;
     }
 
@@ -3968,14 +3749,6 @@ public class Namenode {
         return lastComparison;
       }
       lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -4013,14 +3786,6 @@ public class Namenode {
                 TProtocolUtil.skip(iprot, field.type);
               }
               break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
           }
           iprot.readFieldEnd();
         }
@@ -4045,10 +3810,6 @@ public class Namenode {
           oprot.writeListEnd();
         }
         oprot.writeFieldEnd();
-      } else if (this.isSetErr()) {
-        oprot.writeFieldBegin(ERR_FIELD_DESC);
-        this.err.write(oprot);
-        oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
@@ -4064,14 +3825,6 @@ public class Namenode {
         sb.append("null");
       } else {
         sb.append(this.success);
-      }
-      first = false;
-      if (!first) sb.append(", ");
-      sb.append("err:");
-      if (this.err == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.err);
       }
       first = false;
       sb.append(")");
@@ -5529,1415 +5282,6 @@ public class Namenode {
     @Override
     public String toString() {
       StringBuilder sb = new StringBuilder("getBlocks_result(");
-      boolean first = true;
-
-      sb.append("success:");
-      if (this.success == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.success);
-      }
-      first = false;
-      if (!first) sb.append(", ");
-      sb.append("err:");
-      if (this.err == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.err);
-      }
-      first = false;
-      sb.append(")");
-      return sb.toString();
-    }
-
-    public void validate() throws TException {
-      // check for required fields
-    }
-
-  }
-
-  public static class getDatanodeReport_args implements TBase<getDatanodeReport_args._Fields>, java.io.Serializable, Cloneable   {
-    private static final TStruct STRUCT_DESC = new TStruct("getDatanodeReport_args");
-
-    private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
-    private static final TField TYPE_FIELD_DESC = new TField("type", TType.I32, (short)1);
-
-    public org.apache.hadoop.thriftfs.api.RequestContext ctx;
-    /**
-     * Type of data nodes to return
-     * information about.
-     * 
-     * @see DatanodeReportType
-     */
-    public DatanodeReportType type;
-
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
-    public enum _Fields implements TFieldIdEnum {
-      CTX((short)10, "ctx"),
-      /**
-       * Type of data nodes to return
-       * information about.
-       * 
-       * @see DatanodeReportType
-       */
-      TYPE((short)1, "type");
-
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
-
-      static {
-        for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
-          byName.put(field.getFieldName(), field);
-        }
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, or null if its not found.
-       */
-      public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, throwing an exception
-       * if it is not found.
-       */
-      public static _Fields findByThriftIdOrThrow(int fieldId) {
-        _Fields fields = findByThriftId(fieldId);
-        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
-        return fields;
-      }
-
-      /**
-       * Find the _Fields constant that matches name, or null if its not found.
-       */
-      public static _Fields findByName(String name) {
-        return byName.get(name);
-      }
-
-      private final short _thriftId;
-      private final String _fieldName;
-
-      _Fields(short thriftId, String fieldName) {
-        _thriftId = thriftId;
-        _fieldName = fieldName;
-      }
-
-      public short getThriftFieldId() {
-        return _thriftId;
-      }
-
-      public String getFieldName() {
-        return _fieldName;
-      }
-    }
-
-    // isset id assignments
-
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.TYPE, new FieldMetaData("type", TFieldRequirementType.DEFAULT, 
-          new EnumMetaData(TType.ENUM, DatanodeReportType.class)));
-    }});
-
-    static {
-      FieldMetaData.addStructMetaDataMap(getDatanodeReport_args.class, metaDataMap);
-    }
-
-    public getDatanodeReport_args() {
-    }
-
-    public getDatanodeReport_args(
-      org.apache.hadoop.thriftfs.api.RequestContext ctx,
-      DatanodeReportType type)
-    {
-      this();
-      this.ctx = ctx;
-      this.type = type;
-    }
-
-    /**
-     * Performs a deep copy on <i>other</i>.
-     */
-    public getDatanodeReport_args(getDatanodeReport_args other) {
-      if (other.isSetCtx()) {
-        this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext(other.ctx);
-      }
-      if (other.isSetType()) {
-        this.type = other.type;
-      }
-    }
-
-    public getDatanodeReport_args deepCopy() {
-      return new getDatanodeReport_args(this);
-    }
-
-    @Deprecated
-    public getDatanodeReport_args clone() {
-      return new getDatanodeReport_args(this);
-    }
-
-    public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
-      return this.ctx;
-    }
-
-    public getDatanodeReport_args setCtx(org.apache.hadoop.thriftfs.api.RequestContext ctx) {
-      this.ctx = ctx;
-      return this;
-    }
-
-    public void unsetCtx() {
-      this.ctx = null;
-    }
-
-    /** Returns true if field ctx is set (has been asigned a value) and false otherwise */
-    public boolean isSetCtx() {
-      return this.ctx != null;
-    }
-
-    public void setCtxIsSet(boolean value) {
-      if (!value) {
-        this.ctx = null;
-      }
-    }
-
-    /**
-     * Type of data nodes to return
-     * information about.
-     * 
-     * @see DatanodeReportType
-     */
-    public DatanodeReportType getType() {
-      return this.type;
-    }
-
-    /**
-     * Type of data nodes to return
-     * information about.
-     * 
-     * @see DatanodeReportType
-     */
-    public getDatanodeReport_args setType(DatanodeReportType type) {
-      this.type = type;
-      return this;
-    }
-
-    public void unsetType() {
-      this.type = null;
-    }
-
-    /** Returns true if field type is set (has been asigned a value) and false otherwise */
-    public boolean isSetType() {
-      return this.type != null;
-    }
-
-    public void setTypeIsSet(boolean value) {
-      if (!value) {
-        this.type = null;
-      }
-    }
-
-    public void setFieldValue(_Fields field, Object value) {
-      switch (field) {
-      case CTX:
-        if (value == null) {
-          unsetCtx();
-        } else {
-          setCtx((org.apache.hadoop.thriftfs.api.RequestContext)value);
-        }
-        break;
-
-      case TYPE:
-        if (value == null) {
-          unsetType();
-        } else {
-          setType((DatanodeReportType)value);
-        }
-        break;
-
-      }
-    }
-
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
-    public Object getFieldValue(_Fields field) {
-      switch (field) {
-      case CTX:
-        return getCtx();
-
-      case TYPE:
-        return getType();
-
-      }
-      throw new IllegalStateException();
-    }
-
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
-    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
-    public boolean isSet(_Fields field) {
-      switch (field) {
-      case CTX:
-        return isSetCtx();
-      case TYPE:
-        return isSetType();
-      }
-      throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
-    }
-
-    @Override
-    public boolean equals(Object that) {
-      if (that == null)
-        return false;
-      if (that instanceof getDatanodeReport_args)
-        return this.equals((getDatanodeReport_args)that);
-      return false;
-    }
-
-    public boolean equals(getDatanodeReport_args that) {
-      if (that == null)
-        return false;
-
-      boolean this_present_ctx = true && this.isSetCtx();
-      boolean that_present_ctx = true && that.isSetCtx();
-      if (this_present_ctx || that_present_ctx) {
-        if (!(this_present_ctx && that_present_ctx))
-          return false;
-        if (!this.ctx.equals(that.ctx))
-          return false;
-      }
-
-      boolean this_present_type = true && this.isSetType();
-      boolean that_present_type = true && that.isSetType();
-      if (this_present_type || that_present_type) {
-        if (!(this_present_type && that_present_type))
-          return false;
-        if (!this.type.equals(that.type))
-          return false;
-      }
-
-      return true;
-    }
-
-    @Override
-    public int hashCode() {
-      return 0;
-    }
-
-    public void read(TProtocol iprot) throws TException {
-      TField field;
-      iprot.readStructBegin();
-      while (true)
-      {
-        field = iprot.readFieldBegin();
-        if (field.type == TType.STOP) { 
-          break;
-        }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case TYPE:
-              if (field.type == TType.I32) {
-                this.type = DatanodeReportType.findByValue(iprot.readI32());
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
-        }
-      }
-      iprot.readStructEnd();
-
-      // check for required fields of primitive type, which can't be checked in the validate method
-      validate();
-    }
-
-    public void write(TProtocol oprot) throws TException {
-      validate();
-
-      oprot.writeStructBegin(STRUCT_DESC);
-      if (this.type != null) {
-        oprot.writeFieldBegin(TYPE_FIELD_DESC);
-        oprot.writeI32(this.type.getValue());
-        oprot.writeFieldEnd();
-      }
-      if (this.ctx != null) {
-        oprot.writeFieldBegin(CTX_FIELD_DESC);
-        this.ctx.write(oprot);
-        oprot.writeFieldEnd();
-      }
-      oprot.writeFieldStop();
-      oprot.writeStructEnd();
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder sb = new StringBuilder("getDatanodeReport_args(");
-      boolean first = true;
-
-      sb.append("ctx:");
-      if (this.ctx == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.ctx);
-      }
-      first = false;
-      if (!first) sb.append(", ");
-      sb.append("type:");
-      if (this.type == null) {
-        sb.append("null");
-      } else {
-        String type_name = type.name();
-        if (type_name != null) {
-          sb.append(type_name);
-          sb.append(" (");
-        }
-        sb.append(this.type);
-        if (type_name != null) {
-          sb.append(")");
-        }
-      }
-      first = false;
-      sb.append(")");
-      return sb.toString();
-    }
-
-    public void validate() throws TException {
-      // check for required fields
-    }
-
-  }
-
-  public static class getDatanodeReport_result implements TBase<getDatanodeReport_result._Fields>, java.io.Serializable, Cloneable, Comparable<getDatanodeReport_result>   {
-    private static final TStruct STRUCT_DESC = new TStruct("getDatanodeReport_result");
-
-    private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
-    private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
-
-    public List<DatanodeInfo> success;
-    public org.apache.hadoop.thriftfs.api.IOException err;
-
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
-    public enum _Fields implements TFieldIdEnum {
-      SUCCESS((short)0, "success"),
-      ERR((short)1, "err");
-
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
-
-      static {
-        for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
-          byName.put(field.getFieldName(), field);
-        }
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, or null if its not found.
-       */
-      public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, throwing an exception
-       * if it is not found.
-       */
-      public static _Fields findByThriftIdOrThrow(int fieldId) {
-        _Fields fields = findByThriftId(fieldId);
-        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
-        return fields;
-      }
-
-      /**
-       * Find the _Fields constant that matches name, or null if its not found.
-       */
-      public static _Fields findByName(String name) {
-        return byName.get(name);
-      }
-
-      private final short _thriftId;
-      private final String _fieldName;
-
-      _Fields(short thriftId, String fieldName) {
-        _thriftId = thriftId;
-        _fieldName = fieldName;
-      }
-
-      public short getThriftFieldId() {
-        return _thriftId;
-      }
-
-      public String getFieldName() {
-        return _fieldName;
-      }
-    }
-
-    // isset id assignments
-
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new ListMetaData(TType.LIST, 
-              new StructMetaData(TType.STRUCT, DatanodeInfo.class))));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
-    static {
-      FieldMetaData.addStructMetaDataMap(getDatanodeReport_result.class, metaDataMap);
-    }
-
-    public getDatanodeReport_result() {
-    }
-
-    public getDatanodeReport_result(
-      List<DatanodeInfo> success,
-      org.apache.hadoop.thriftfs.api.IOException err)
-    {
-      this();
-      this.success = success;
-      this.err = err;
-    }
-
-    /**
-     * Performs a deep copy on <i>other</i>.
-     */
-    public getDatanodeReport_result(getDatanodeReport_result other) {
-      if (other.isSetSuccess()) {
-        List<DatanodeInfo> __this__success = new ArrayList<DatanodeInfo>();
-        for (DatanodeInfo other_element : other.success) {
-          __this__success.add(new DatanodeInfo(other_element));
-        }
-        this.success = __this__success;
-      }
-      if (other.isSetErr()) {
-        this.err = new org.apache.hadoop.thriftfs.api.IOException(other.err);
-      }
-    }
-
-    public getDatanodeReport_result deepCopy() {
-      return new getDatanodeReport_result(this);
-    }
-
-    @Deprecated
-    public getDatanodeReport_result clone() {
-      return new getDatanodeReport_result(this);
-    }
-
-    public int getSuccessSize() {
-      return (this.success == null) ? 0 : this.success.size();
-    }
-
-    public java.util.Iterator<DatanodeInfo> getSuccessIterator() {
-      return (this.success == null) ? null : this.success.iterator();
-    }
-
-    public void addToSuccess(DatanodeInfo elem) {
-      if (this.success == null) {
-        this.success = new ArrayList<DatanodeInfo>();
-      }
-      this.success.add(elem);
-    }
-
-    public List<DatanodeInfo> getSuccess() {
-      return this.success;
-    }
-
-    public getDatanodeReport_result setSuccess(List<DatanodeInfo> success) {
-      this.success = success;
-      return this;
-    }
-
-    public void unsetSuccess() {
-      this.success = null;
-    }
-
-    /** Returns true if field success is set (has been asigned a value) and false otherwise */
-    public boolean isSetSuccess() {
-      return this.success != null;
-    }
-
-    public void setSuccessIsSet(boolean value) {
-      if (!value) {
-        this.success = null;
-      }
-    }
-
-    public org.apache.hadoop.thriftfs.api.IOException getErr() {
-      return this.err;
-    }
-
-    public getDatanodeReport_result setErr(org.apache.hadoop.thriftfs.api.IOException err) {
-      this.err = err;
-      return this;
-    }
-
-    public void unsetErr() {
-      this.err = null;
-    }
-
-    /** Returns true if field err is set (has been asigned a value) and false otherwise */
-    public boolean isSetErr() {
-      return this.err != null;
-    }
-
-    public void setErrIsSet(boolean value) {
-      if (!value) {
-        this.err = null;
-      }
-    }
-
-    public void setFieldValue(_Fields field, Object value) {
-      switch (field) {
-      case SUCCESS:
-        if (value == null) {
-          unsetSuccess();
-        } else {
-          setSuccess((List<DatanodeInfo>)value);
-        }
-        break;
-
-      case ERR:
-        if (value == null) {
-          unsetErr();
-        } else {
-          setErr((org.apache.hadoop.thriftfs.api.IOException)value);
-        }
-        break;
-
-      }
-    }
-
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
-    public Object getFieldValue(_Fields field) {
-      switch (field) {
-      case SUCCESS:
-        return getSuccess();
-
-      case ERR:
-        return getErr();
-
-      }
-      throw new IllegalStateException();
-    }
-
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
-    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
-    public boolean isSet(_Fields field) {
-      switch (field) {
-      case SUCCESS:
-        return isSetSuccess();
-      case ERR:
-        return isSetErr();
-      }
-      throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
-    }
-
-    @Override
-    public boolean equals(Object that) {
-      if (that == null)
-        return false;
-      if (that instanceof getDatanodeReport_result)
-        return this.equals((getDatanodeReport_result)that);
-      return false;
-    }
-
-    public boolean equals(getDatanodeReport_result that) {
-      if (that == null)
-        return false;
-
-      boolean this_present_success = true && this.isSetSuccess();
-      boolean that_present_success = true && that.isSetSuccess();
-      if (this_present_success || that_present_success) {
-        if (!(this_present_success && that_present_success))
-          return false;
-        if (!this.success.equals(that.success))
-          return false;
-      }
-
-      boolean this_present_err = true && this.isSetErr();
-      boolean that_present_err = true && that.isSetErr();
-      if (this_present_err || that_present_err) {
-        if (!(this_present_err && that_present_err))
-          return false;
-        if (!this.err.equals(that.err))
-          return false;
-      }
-
-      return true;
-    }
-
-    @Override
-    public int hashCode() {
-      return 0;
-    }
-
-    public int compareTo(getDatanodeReport_result other) {
-      if (!getClass().equals(other.getClass())) {
-        return getClass().getName().compareTo(other.getClass().getName());
-      }
-
-      int lastComparison = 0;
-      getDatanodeReport_result typedOther = (getDatanodeReport_result)other;
-
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      return 0;
-    }
-
-    public void read(TProtocol iprot) throws TException {
-      TField field;
-      iprot.readStructBegin();
-      while (true)
-      {
-        field = iprot.readFieldBegin();
-        if (field.type == TType.STOP) { 
-          break;
-        }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.LIST) {
-                {
-                  TList _list12 = iprot.readListBegin();
-                  this.success = new ArrayList<DatanodeInfo>(_list12.size);
-                  for (int _i13 = 0; _i13 < _list12.size; ++_i13)
-                  {
-                    DatanodeInfo _elem14;
-                    _elem14 = new DatanodeInfo();
-                    _elem14.read(iprot);
-                    this.success.add(_elem14);
-                  }
-                  iprot.readListEnd();
-                }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
-        }
-      }
-      iprot.readStructEnd();
-
-      // check for required fields of primitive type, which can't be checked in the validate method
-      validate();
-    }
-
-    public void write(TProtocol oprot) throws TException {
-      oprot.writeStructBegin(STRUCT_DESC);
-
-      if (this.isSetSuccess()) {
-        oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
-        {
-          oprot.writeListBegin(new TList(TType.STRUCT, this.success.size()));
-          for (DatanodeInfo _iter15 : this.success)
-          {
-            _iter15.write(oprot);
-          }
-          oprot.writeListEnd();
-        }
-        oprot.writeFieldEnd();
-      } else if (this.isSetErr()) {
-        oprot.writeFieldBegin(ERR_FIELD_DESC);
-        this.err.write(oprot);
-        oprot.writeFieldEnd();
-      }
-      oprot.writeFieldStop();
-      oprot.writeStructEnd();
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder sb = new StringBuilder("getDatanodeReport_result(");
-      boolean first = true;
-
-      sb.append("success:");
-      if (this.success == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.success);
-      }
-      first = false;
-      if (!first) sb.append(", ");
-      sb.append("err:");
-      if (this.err == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.err);
-      }
-      first = false;
-      sb.append(")");
-      return sb.toString();
-    }
-
-    public void validate() throws TException {
-      // check for required fields
-    }
-
-  }
-
-  public static class getHealthReport_args implements TBase<getHealthReport_args._Fields>, java.io.Serializable, Cloneable   {
-    private static final TStruct STRUCT_DESC = new TStruct("getHealthReport_args");
-
-    private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
-
-    public org.apache.hadoop.thriftfs.api.RequestContext ctx;
-
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
-    public enum _Fields implements TFieldIdEnum {
-      CTX((short)10, "ctx");
-
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
-
-      static {
-        for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
-          byName.put(field.getFieldName(), field);
-        }
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, or null if its not found.
-       */
-      public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, throwing an exception
-       * if it is not found.
-       */
-      public static _Fields findByThriftIdOrThrow(int fieldId) {
-        _Fields fields = findByThriftId(fieldId);
-        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
-        return fields;
-      }
-
-      /**
-       * Find the _Fields constant that matches name, or null if its not found.
-       */
-      public static _Fields findByName(String name) {
-        return byName.get(name);
-      }
-
-      private final short _thriftId;
-      private final String _fieldName;
-
-      _Fields(short thriftId, String fieldName) {
-        _thriftId = thriftId;
-        _fieldName = fieldName;
-      }
-
-      public short getThriftFieldId() {
-        return _thriftId;
-      }
-
-      public String getFieldName() {
-        return _fieldName;
-      }
-    }
-
-    // isset id assignments
-
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
-    static {
-      FieldMetaData.addStructMetaDataMap(getHealthReport_args.class, metaDataMap);
-    }
-
-    public getHealthReport_args() {
-    }
-
-    public getHealthReport_args(
-      org.apache.hadoop.thriftfs.api.RequestContext ctx)
-    {
-      this();
-      this.ctx = ctx;
-    }
-
-    /**
-     * Performs a deep copy on <i>other</i>.
-     */
-    public getHealthReport_args(getHealthReport_args other) {
-      if (other.isSetCtx()) {
-        this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext(other.ctx);
-      }
-    }
-
-    public getHealthReport_args deepCopy() {
-      return new getHealthReport_args(this);
-    }
-
-    @Deprecated
-    public getHealthReport_args clone() {
-      return new getHealthReport_args(this);
-    }
-
-    public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
-      return this.ctx;
-    }
-
-    public getHealthReport_args setCtx(org.apache.hadoop.thriftfs.api.RequestContext ctx) {
-      this.ctx = ctx;
-      return this;
-    }
-
-    public void unsetCtx() {
-      this.ctx = null;
-    }
-
-    /** Returns true if field ctx is set (has been asigned a value) and false otherwise */
-    public boolean isSetCtx() {
-      return this.ctx != null;
-    }
-
-    public void setCtxIsSet(boolean value) {
-      if (!value) {
-        this.ctx = null;
-      }
-    }
-
-    public void setFieldValue(_Fields field, Object value) {
-      switch (field) {
-      case CTX:
-        if (value == null) {
-          unsetCtx();
-        } else {
-          setCtx((org.apache.hadoop.thriftfs.api.RequestContext)value);
-        }
-        break;
-
-      }
-    }
-
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
-    public Object getFieldValue(_Fields field) {
-      switch (field) {
-      case CTX:
-        return getCtx();
-
-      }
-      throw new IllegalStateException();
-    }
-
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
-    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
-    public boolean isSet(_Fields field) {
-      switch (field) {
-      case CTX:
-        return isSetCtx();
-      }
-      throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
-    }
-
-    @Override
-    public boolean equals(Object that) {
-      if (that == null)
-        return false;
-      if (that instanceof getHealthReport_args)
-        return this.equals((getHealthReport_args)that);
-      return false;
-    }
-
-    public boolean equals(getHealthReport_args that) {
-      if (that == null)
-        return false;
-
-      boolean this_present_ctx = true && this.isSetCtx();
-      boolean that_present_ctx = true && that.isSetCtx();
-      if (this_present_ctx || that_present_ctx) {
-        if (!(this_present_ctx && that_present_ctx))
-          return false;
-        if (!this.ctx.equals(that.ctx))
-          return false;
-      }
-
-      return true;
-    }
-
-    @Override
-    public int hashCode() {
-      return 0;
-    }
-
-    public void read(TProtocol iprot) throws TException {
-      TField field;
-      iprot.readStructBegin();
-      while (true)
-      {
-        field = iprot.readFieldBegin();
-        if (field.type == TType.STOP) { 
-          break;
-        }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
-        }
-      }
-      iprot.readStructEnd();
-
-      // check for required fields of primitive type, which can't be checked in the validate method
-      validate();
-    }
-
-    public void write(TProtocol oprot) throws TException {
-      validate();
-
-      oprot.writeStructBegin(STRUCT_DESC);
-      if (this.ctx != null) {
-        oprot.writeFieldBegin(CTX_FIELD_DESC);
-        this.ctx.write(oprot);
-        oprot.writeFieldEnd();
-      }
-      oprot.writeFieldStop();
-      oprot.writeStructEnd();
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder sb = new StringBuilder("getHealthReport_args(");
-      boolean first = true;
-
-      sb.append("ctx:");
-      if (this.ctx == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.ctx);
-      }
-      first = false;
-      sb.append(")");
-      return sb.toString();
-    }
-
-    public void validate() throws TException {
-      // check for required fields
-    }
-
-  }
-
-  public static class getHealthReport_result implements TBase<getHealthReport_result._Fields>, java.io.Serializable, Cloneable, Comparable<getHealthReport_result>   {
-    private static final TStruct STRUCT_DESC = new TStruct("getHealthReport_result");
-
-    private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
-    private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
-
-    public DFSHealthReport success;
-    public org.apache.hadoop.thriftfs.api.IOException err;
-
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
-    public enum _Fields implements TFieldIdEnum {
-      SUCCESS((short)0, "success"),
-      ERR((short)1, "err");
-
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
-
-      static {
-        for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
-          byName.put(field.getFieldName(), field);
-        }
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, or null if its not found.
-       */
-      public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, throwing an exception
-       * if it is not found.
-       */
-      public static _Fields findByThriftIdOrThrow(int fieldId) {
-        _Fields fields = findByThriftId(fieldId);
-        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
-        return fields;
-      }
-
-      /**
-       * Find the _Fields constant that matches name, or null if its not found.
-       */
-      public static _Fields findByName(String name) {
-        return byName.get(name);
-      }
-
-      private final short _thriftId;
-      private final String _fieldName;
-
-      _Fields(short thriftId, String fieldName) {
-        _thriftId = thriftId;
-        _fieldName = fieldName;
-      }
-
-      public short getThriftFieldId() {
-        return _thriftId;
-      }
-
-      public String getFieldName() {
-        return _fieldName;
-      }
-    }
-
-    // isset id assignments
-
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, DFSHealthReport.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
-    static {
-      FieldMetaData.addStructMetaDataMap(getHealthReport_result.class, metaDataMap);
-    }
-
-    public getHealthReport_result() {
-    }
-
-    public getHealthReport_result(
-      DFSHealthReport success,
-      org.apache.hadoop.thriftfs.api.IOException err)
-    {
-      this();
-      this.success = success;
-      this.err = err;
-    }
-
-    /**
-     * Performs a deep copy on <i>other</i>.
-     */
-    public getHealthReport_result(getHealthReport_result other) {
-      if (other.isSetSuccess()) {
-        this.success = new DFSHealthReport(other.success);
-      }
-      if (other.isSetErr()) {
-        this.err = new org.apache.hadoop.thriftfs.api.IOException(other.err);
-      }
-    }
-
-    public getHealthReport_result deepCopy() {
-      return new getHealthReport_result(this);
-    }
-
-    @Deprecated
-    public getHealthReport_result clone() {
-      return new getHealthReport_result(this);
-    }
-
-    public DFSHealthReport getSuccess() {
-      return this.success;
-    }
-
-    public getHealthReport_result setSuccess(DFSHealthReport success) {
-      this.success = success;
-      return this;
-    }
-
-    public void unsetSuccess() {
-      this.success = null;
-    }
-
-    /** Returns true if field success is set (has been asigned a value) and false otherwise */
-    public boolean isSetSuccess() {
-      return this.success != null;
-    }
-
-    public void setSuccessIsSet(boolean value) {
-      if (!value) {
-        this.success = null;
-      }
-    }
-
-    public org.apache.hadoop.thriftfs.api.IOException getErr() {
-      return this.err;
-    }
-
-    public getHealthReport_result setErr(org.apache.hadoop.thriftfs.api.IOException err) {
-      this.err = err;
-      return this;
-    }
-
-    public void unsetErr() {
-      this.err = null;
-    }
-
-    /** Returns true if field err is set (has been asigned a value) and false otherwise */
-    public boolean isSetErr() {
-      return this.err != null;
-    }
-
-    public void setErrIsSet(boolean value) {
-      if (!value) {
-        this.err = null;
-      }
-    }
-
-    public void setFieldValue(_Fields field, Object value) {
-      switch (field) {
-      case SUCCESS:
-        if (value == null) {
-          unsetSuccess();
-        } else {
-          setSuccess((DFSHealthReport)value);
-        }
-        break;
-
-      case ERR:
-        if (value == null) {
-          unsetErr();
-        } else {
-          setErr((org.apache.hadoop.thriftfs.api.IOException)value);
-        }
-        break;
-
-      }
-    }
-
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
-    public Object getFieldValue(_Fields field) {
-      switch (field) {
-      case SUCCESS:
-        return getSuccess();
-
-      case ERR:
-        return getErr();
-
-      }
-      throw new IllegalStateException();
-    }
-
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
-    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
-    public boolean isSet(_Fields field) {
-      switch (field) {
-      case SUCCESS:
-        return isSetSuccess();
-      case ERR:
-        return isSetErr();
-      }
-      throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
-    }
-
-    @Override
-    public boolean equals(Object that) {
-      if (that == null)
-        return false;
-      if (that instanceof getHealthReport_result)
-        return this.equals((getHealthReport_result)that);
-      return false;
-    }
-
-    public boolean equals(getHealthReport_result that) {
-      if (that == null)
-        return false;
-
-      boolean this_present_success = true && this.isSetSuccess();
-      boolean that_present_success = true && that.isSetSuccess();
-      if (this_present_success || that_present_success) {
-        if (!(this_present_success && that_present_success))
-          return false;
-        if (!this.success.equals(that.success))
-          return false;
-      }
-
-      boolean this_present_err = true && this.isSetErr();
-      boolean that_present_err = true && that.isSetErr();
-      if (this_present_err || that_present_err) {
-        if (!(this_present_err && that_present_err))
-          return false;
-        if (!this.err.equals(that.err))
-          return false;
-      }
-
-      return true;
-    }
-
-    @Override
-    public int hashCode() {
-      return 0;
-    }
-
-    public int compareTo(getHealthReport_result other) {
-      if (!getClass().equals(other.getClass())) {
-        return getClass().getName().compareTo(other.getClass().getName());
-      }
-
-      int lastComparison = 0;
-      getHealthReport_result typedOther = (getHealthReport_result)other;
-
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      return 0;
-    }
-
-    public void read(TProtocol iprot) throws TException {
-      TField field;
-      iprot.readStructBegin();
-      while (true)
-      {
-        field = iprot.readFieldBegin();
-        if (field.type == TType.STOP) { 
-          break;
-        }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new DFSHealthReport();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
-        }
-      }
-      iprot.readStructEnd();
-
-      // check for required fields of primitive type, which can't be checked in the validate method
-      validate();
-    }
-
-    public void write(TProtocol oprot) throws TException {
-      oprot.writeStructBegin(STRUCT_DESC);
-
-      if (this.isSetSuccess()) {
-        oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
-        this.success.write(oprot);
-        oprot.writeFieldEnd();
-      } else if (this.isSetErr()) {
-        oprot.writeFieldBegin(ERR_FIELD_DESC);
-        this.err.write(oprot);
-        oprot.writeFieldEnd();
-      }
-      oprot.writeFieldStop();
-      oprot.writeStructEnd();
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder sb = new StringBuilder("getHealthReport_result(");
       boolean first = true;
 
       sb.append("success:");
@@ -9532,14 +7876,14 @@ public class Namenode {
             case SUCCESS:
               if (field.type == TType.LIST) {
                 {
-                  TList _list16 = iprot.readListBegin();
-                  this.success = new ArrayList<Stat>(_list16.size);
-                  for (int _i17 = 0; _i17 < _list16.size; ++_i17)
+                  TList _list12 = iprot.readListBegin();
+                  this.success = new ArrayList<Stat>(_list12.size);
+                  for (int _i13 = 0; _i13 < _list12.size; ++_i13)
                   {
-                    Stat _elem18;
-                    _elem18 = new Stat();
-                    _elem18.read(iprot);
-                    this.success.add(_elem18);
+                    Stat _elem14;
+                    _elem14 = new Stat();
+                    _elem14.read(iprot);
+                    this.success.add(_elem14);
                   }
                   iprot.readListEnd();
                 }
@@ -9572,9 +7916,9 @@ public class Namenode {
         oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
         {
           oprot.writeListBegin(new TList(TType.STRUCT, this.success.size()));
-          for (Stat _iter19 : this.success)
+          for (Stat _iter15 : this.success)
           {
-            _iter19.write(oprot);
+            _iter15.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -12086,14 +10430,14 @@ public class Namenode {
             case BLOCKS:
               if (field.type == TType.LIST) {
                 {
-                  TList _list20 = iprot.readListBegin();
-                  this.blocks = new ArrayList<Block>(_list20.size);
-                  for (int _i21 = 0; _i21 < _list20.size; ++_i21)
+                  TList _list16 = iprot.readListBegin();
+                  this.blocks = new ArrayList<Block>(_list16.size);
+                  for (int _i17 = 0; _i17 < _list16.size; ++_i17)
                   {
-                    Block _elem22;
-                    _elem22 = new Block();
-                    _elem22.read(iprot);
-                    this.blocks.add(_elem22);
+                    Block _elem18;
+                    _elem18 = new Block();
+                    _elem18.read(iprot);
+                    this.blocks.add(_elem18);
                   }
                   iprot.readListEnd();
                 }
@@ -12119,9 +10463,9 @@ public class Namenode {
         oprot.writeFieldBegin(BLOCKS_FIELD_DESC);
         {
           oprot.writeListBegin(new TList(TType.STRUCT, this.blocks.size()));
-          for (Block _iter23 : this.blocks)
+          for (Block _iter19 : this.blocks)
           {
-            _iter23.write(oprot);
+            _iter19.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -14176,13 +12520,13 @@ public class Namenode {
             case PATHS:
               if (field.type == TType.LIST) {
                 {
-                  TList _list24 = iprot.readListBegin();
-                  this.paths = new ArrayList<String>(_list24.size);
-                  for (int _i25 = 0; _i25 < _list24.size; ++_i25)
+                  TList _list20 = iprot.readListBegin();
+                  this.paths = new ArrayList<String>(_list20.size);
+                  for (int _i21 = 0; _i21 < _list20.size; ++_i21)
                   {
-                    String _elem26;
-                    _elem26 = iprot.readString();
-                    this.paths.add(_elem26);
+                    String _elem22;
+                    _elem22 = iprot.readString();
+                    this.paths.add(_elem22);
                   }
                   iprot.readListEnd();
                 }
@@ -14208,9 +12552,9 @@ public class Namenode {
         oprot.writeFieldBegin(PATHS_FIELD_DESC);
         {
           oprot.writeListBegin(new TList(TType.STRING, this.paths.size()));
-          for (String _iter27 : this.paths)
+          for (String _iter23 : this.paths)
           {
-            oprot.writeString(_iter27);
+            oprot.writeString(_iter23);
           }
           oprot.writeListEnd();
         }
@@ -14573,14 +12917,14 @@ public class Namenode {
             case SUCCESS:
               if (field.type == TType.LIST) {
                 {
-                  TList _list28 = iprot.readListBegin();
-                  this.success = new ArrayList<ContentSummary>(_list28.size);
-                  for (int _i29 = 0; _i29 < _list28.size; ++_i29)
+                  TList _list24 = iprot.readListBegin();
+                  this.success = new ArrayList<ContentSummary>(_list24.size);
+                  for (int _i25 = 0; _i25 < _list24.size; ++_i25)
                   {
-                    ContentSummary _elem30;
-                    _elem30 = new ContentSummary();
-                    _elem30.read(iprot);
-                    this.success.add(_elem30);
+                    ContentSummary _elem26;
+                    _elem26 = new ContentSummary();
+                    _elem26.read(iprot);
+                    this.success.add(_elem26);
                   }
                   iprot.readListEnd();
                 }
@@ -14613,9 +12957,9 @@ public class Namenode {
         oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
         {
           oprot.writeListBegin(new TList(TType.STRUCT, this.success.size()));
-          for (ContentSummary _iter31 : this.success)
+          for (ContentSummary _iter27 : this.success)
           {
-            _iter31.write(oprot);
+            _iter27.write(oprot);
           }
           oprot.writeListEnd();
         }

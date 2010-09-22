@@ -13,7 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.jobsub;
+package org.apache.hadoop.security;
 
 import org.apache.hadoop.mapred.RunningJob;
 import java.io.PrintStream;
@@ -26,7 +26,7 @@ public class JobClientTracer {
   private static JobClientTracer instance = new JobClientTracer();
   private PrintStream reportStream;
 
-  public static final String DEFAULT_JOB_LOG="reported-jobs.txt";
+  public static final String DEFAULT_JOB_LOG = "reported-jobs.txt";
 
   public synchronized static JobClientTracer getInstance() {
     return instance;

@@ -82,27 +82,6 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
     """
     pass
 
-  def getDatanodeReport(self, ctx, type):
-    """
-    Get a report on the system's current data nodes.
-    Note that ctx is currently ignored by the server.
-    
-    Parameters:
-     - ctx
-     - type: Type of data nodes to return
-    information about.
-    """
-    pass
-
-  def getHealthReport(self, ctx):
-    """
-    Get a health report of DFS.  Note that ctx is ignored by the server.
-    
-    Parameters:
-     - ctx
-    """
-    pass
-
   def getPreferredBlockSize(self, ctx, path):
     """
     Get the preferred block size for the given file.
@@ -442,8 +421,6 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
     self._iprot.readMessageEnd()
     if result.success != None:
       return result.success
-    if result.err != None:
-      raise result.err
     raise TApplicationException(TApplicationException.MISSING_RESULT, "df failed: unknown result");
 
   def enterSafeMode(self, ctx):
@@ -517,78 +494,6 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
     if result.err != None:
       raise result.err
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getBlocks failed: unknown result");
-
-  def getDatanodeReport(self, ctx, type):
-    """
-    Get a report on the system's current data nodes.
-    Note that ctx is currently ignored by the server.
-    
-    Parameters:
-     - ctx
-     - type: Type of data nodes to return
-    information about.
-    """
-    self.send_getDatanodeReport(ctx, type)
-    return self.recv_getDatanodeReport()
-
-  def send_getDatanodeReport(self, ctx, type):
-    self._oprot.writeMessageBegin('getDatanodeReport', TMessageType.CALL, self._seqid)
-    args = getDatanodeReport_args()
-    args.ctx = ctx
-    args.type = type
-    args.write(self._oprot)
-    self._oprot.writeMessageEnd()
-    self._oprot.trans.flush()
-
-  def recv_getDatanodeReport(self, ):
-    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
-    if mtype == TMessageType.EXCEPTION:
-      x = TApplicationException()
-      x.read(self._iprot)
-      self._iprot.readMessageEnd()
-      raise x
-    result = getDatanodeReport_result()
-    result.read(self._iprot)
-    self._iprot.readMessageEnd()
-    if result.success != None:
-      return result.success
-    if result.err != None:
-      raise result.err
-    raise TApplicationException(TApplicationException.MISSING_RESULT, "getDatanodeReport failed: unknown result");
-
-  def getHealthReport(self, ctx):
-    """
-    Get a health report of DFS.  Note that ctx is ignored by the server.
-    
-    Parameters:
-     - ctx
-    """
-    self.send_getHealthReport(ctx)
-    return self.recv_getHealthReport()
-
-  def send_getHealthReport(self, ctx):
-    self._oprot.writeMessageBegin('getHealthReport', TMessageType.CALL, self._seqid)
-    args = getHealthReport_args()
-    args.ctx = ctx
-    args.write(self._oprot)
-    self._oprot.writeMessageEnd()
-    self._oprot.trans.flush()
-
-  def recv_getHealthReport(self, ):
-    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
-    if mtype == TMessageType.EXCEPTION:
-      x = TApplicationException()
-      x.read(self._iprot)
-      self._iprot.readMessageEnd()
-      raise x
-    result = getHealthReport_result()
-    result.read(self._iprot)
-    self._iprot.readMessageEnd()
-    if result.success != None:
-      return result.success
-    if result.err != None:
-      raise result.err
-    raise TApplicationException(TApplicationException.MISSING_RESULT, "getHealthReport failed: unknown result");
 
   def getPreferredBlockSize(self, ctx, path):
     """
@@ -1248,8 +1153,6 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     self._processMap["df"] = Processor.process_df
     self._processMap["enterSafeMode"] = Processor.process_enterSafeMode
     self._processMap["getBlocks"] = Processor.process_getBlocks
-    self._processMap["getDatanodeReport"] = Processor.process_getDatanodeReport
-    self._processMap["getHealthReport"] = Processor.process_getHealthReport
     self._processMap["getPreferredBlockSize"] = Processor.process_getPreferredBlockSize
     self._processMap["isInSafeMode"] = Processor.process_isInSafeMode
     self._processMap["leaveSafeMode"] = Processor.process_leaveSafeMode
@@ -1316,10 +1219,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     args.read(iprot)
     iprot.readMessageEnd()
     result = df_result()
-    try:
-      result.success = self._handler.df(args.ctx)
-    except hadoop.api.common.ttypes.IOException, err:
-      result.err = err
+    result.success = self._handler.df(args.ctx)
     oprot.writeMessageBegin("df", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -1349,34 +1249,6 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("getBlocks", TMessageType.REPLY, seqid)
-    result.write(oprot)
-    oprot.writeMessageEnd()
-    oprot.trans.flush()
-
-  def process_getDatanodeReport(self, seqid, iprot, oprot):
-    args = getDatanodeReport_args()
-    args.read(iprot)
-    iprot.readMessageEnd()
-    result = getDatanodeReport_result()
-    try:
-      result.success = self._handler.getDatanodeReport(args.ctx, args.type)
-    except hadoop.api.common.ttypes.IOException, err:
-      result.err = err
-    oprot.writeMessageBegin("getDatanodeReport", TMessageType.REPLY, seqid)
-    result.write(oprot)
-    oprot.writeMessageEnd()
-    oprot.trans.flush()
-
-  def process_getHealthReport(self, seqid, iprot, oprot):
-    args = getHealthReport_args()
-    args.read(iprot)
-    iprot.readMessageEnd()
-    result = getHealthReport_result()
-    try:
-      result.success = self._handler.getHealthReport(args.ctx)
-    except hadoop.api.common.ttypes.IOException, err:
-      result.err = err
-    oprot.writeMessageBegin("getHealthReport", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -1987,17 +1859,14 @@ class df_result(object):
   """
   Attributes:
    - success
-   - err
   """
 
   thrift_spec = (
     (0, TType.LIST, 'success', (TType.I64,None), None, ), # 0
-    (1, TType.STRUCT, 'err', (hadoop.api.common.ttypes.IOException, hadoop.api.common.ttypes.IOException.thrift_spec), None, ), # 1
   )
 
-  def __init__(self, success=None, err=None,):
+  def __init__(self, success=None,):
     self.success = success
-    self.err = err
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -2018,12 +1887,6 @@ class df_result(object):
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
-      elif fid == 1:
-        if ftype == TType.STRUCT:
-          self.err = hadoop.api.common.ttypes.IOException()
-          self.err.read(iprot)
-        else:
-          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -2040,10 +1903,6 @@ class df_result(object):
       for iter13 in self.success:
         oprot.writeI64(iter13)
       oprot.writeListEnd()
-      oprot.writeFieldEnd()
-    if self.err != None:
-      oprot.writeFieldBegin('err', TType.STRUCT, 1)
-      self.err.write(oprot)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -2339,296 +2198,6 @@ class getBlocks_result(object):
       for iter20 in self.success:
         iter20.write(oprot)
       oprot.writeListEnd()
-      oprot.writeFieldEnd()
-    if self.err != None:
-      oprot.writeFieldBegin('err', TType.STRUCT, 1)
-      self.err.write(oprot)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class getDatanodeReport_args(object):
-  """
-  Attributes:
-   - ctx
-   - type: Type of data nodes to return
-  information about.
-  """
-
-  thrift_spec = (
-    None, # 0
-    (1, TType.I32, 'type', None, None, ), # 1
-    None, # 2
-    None, # 3
-    None, # 4
-    None, # 5
-    None, # 6
-    None, # 7
-    None, # 8
-    None, # 9
-    (10, TType.STRUCT, 'ctx', (hadoop.api.common.ttypes.RequestContext, hadoop.api.common.ttypes.RequestContext.thrift_spec), None, ), # 10
-  )
-
-  def __init__(self, ctx=None, type=None,):
-    self.ctx = ctx
-    self.type = type
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 10:
-        if ftype == TType.STRUCT:
-          self.ctx = hadoop.api.common.ttypes.RequestContext()
-          self.ctx.read(iprot)
-        else:
-          iprot.skip(ftype)
-      elif fid == 1:
-        if ftype == TType.I32:
-          self.type = iprot.readI32();
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('getDatanodeReport_args')
-    if self.type != None:
-      oprot.writeFieldBegin('type', TType.I32, 1)
-      oprot.writeI32(self.type)
-      oprot.writeFieldEnd()
-    if self.ctx != None:
-      oprot.writeFieldBegin('ctx', TType.STRUCT, 10)
-      self.ctx.write(oprot)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class getDatanodeReport_result(object):
-  """
-  Attributes:
-   - success
-   - err
-  """
-
-  thrift_spec = (
-    (0, TType.LIST, 'success', (TType.STRUCT,(DatanodeInfo, DatanodeInfo.thrift_spec)), None, ), # 0
-    (1, TType.STRUCT, 'err', (hadoop.api.common.ttypes.IOException, hadoop.api.common.ttypes.IOException.thrift_spec), None, ), # 1
-  )
-
-  def __init__(self, success=None, err=None,):
-    self.success = success
-    self.err = err
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 0:
-        if ftype == TType.LIST:
-          self.success = []
-          (_etype24, _size21) = iprot.readListBegin()
-          for _i25 in xrange(_size21):
-            _elem26 = DatanodeInfo()
-            _elem26.read(iprot)
-            self.success.append(_elem26)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
-      elif fid == 1:
-        if ftype == TType.STRUCT:
-          self.err = hadoop.api.common.ttypes.IOException()
-          self.err.read(iprot)
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('getDatanodeReport_result')
-    if self.success != None:
-      oprot.writeFieldBegin('success', TType.LIST, 0)
-      oprot.writeListBegin(TType.STRUCT, len(self.success))
-      for iter27 in self.success:
-        iter27.write(oprot)
-      oprot.writeListEnd()
-      oprot.writeFieldEnd()
-    if self.err != None:
-      oprot.writeFieldBegin('err', TType.STRUCT, 1)
-      self.err.write(oprot)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class getHealthReport_args(object):
-  """
-  Attributes:
-   - ctx
-  """
-
-  thrift_spec = (
-    None, # 0
-    None, # 1
-    None, # 2
-    None, # 3
-    None, # 4
-    None, # 5
-    None, # 6
-    None, # 7
-    None, # 8
-    None, # 9
-    (10, TType.STRUCT, 'ctx', (hadoop.api.common.ttypes.RequestContext, hadoop.api.common.ttypes.RequestContext.thrift_spec), None, ), # 10
-  )
-
-  def __init__(self, ctx=None,):
-    self.ctx = ctx
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 10:
-        if ftype == TType.STRUCT:
-          self.ctx = hadoop.api.common.ttypes.RequestContext()
-          self.ctx.read(iprot)
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('getHealthReport_args')
-    if self.ctx != None:
-      oprot.writeFieldBegin('ctx', TType.STRUCT, 10)
-      self.ctx.write(oprot)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class getHealthReport_result(object):
-  """
-  Attributes:
-   - success
-   - err
-  """
-
-  thrift_spec = (
-    (0, TType.STRUCT, 'success', (DFSHealthReport, DFSHealthReport.thrift_spec), None, ), # 0
-    (1, TType.STRUCT, 'err', (hadoop.api.common.ttypes.IOException, hadoop.api.common.ttypes.IOException.thrift_spec), None, ), # 1
-  )
-
-  def __init__(self, success=None, err=None,):
-    self.success = success
-    self.err = err
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 0:
-        if ftype == TType.STRUCT:
-          self.success = DFSHealthReport()
-          self.success.read(iprot)
-        else:
-          iprot.skip(ftype)
-      elif fid == 1:
-        if ftype == TType.STRUCT:
-          self.err = hadoop.api.common.ttypes.IOException()
-          self.err.read(iprot)
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('getHealthReport_result')
-    if self.success != None:
-      oprot.writeFieldBegin('success', TType.STRUCT, 0)
-      self.success.write(oprot)
       oprot.writeFieldEnd()
     if self.err != None:
       oprot.writeFieldBegin('err', TType.STRUCT, 1)
@@ -3155,11 +2724,11 @@ class ls_result(object):
       if fid == 0:
         if ftype == TType.LIST:
           self.success = []
-          (_etype31, _size28) = iprot.readListBegin()
-          for _i32 in xrange(_size28):
-            _elem33 = Stat()
-            _elem33.read(iprot)
-            self.success.append(_elem33)
+          (_etype24, _size21) = iprot.readListBegin()
+          for _i25 in xrange(_size21):
+            _elem26 = Stat()
+            _elem26.read(iprot)
+            self.success.append(_elem26)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -3182,8 +2751,8 @@ class ls_result(object):
     if self.success != None:
       oprot.writeFieldBegin('success', TType.LIST, 0)
       oprot.writeListBegin(TType.STRUCT, len(self.success))
-      for iter34 in self.success:
-        iter34.write(oprot)
+      for iter27 in self.success:
+        iter27.write(oprot)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.err != None:
@@ -3682,11 +3251,11 @@ class reportBadBlocks_args(object):
       elif fid == 1:
         if ftype == TType.LIST:
           self.blocks = []
-          (_etype38, _size35) = iprot.readListBegin()
-          for _i39 in xrange(_size35):
-            _elem40 = Block()
-            _elem40.read(iprot)
-            self.blocks.append(_elem40)
+          (_etype31, _size28) = iprot.readListBegin()
+          for _i32 in xrange(_size28):
+            _elem33 = Block()
+            _elem33.read(iprot)
+            self.blocks.append(_elem33)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -3703,8 +3272,8 @@ class reportBadBlocks_args(object):
     if self.blocks != None:
       oprot.writeFieldBegin('blocks', TType.LIST, 1)
       oprot.writeListBegin(TType.STRUCT, len(self.blocks))
-      for iter41 in self.blocks:
-        iter41.write(oprot)
+      for iter34 in self.blocks:
+        iter34.write(oprot)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.ctx != None:
@@ -4117,10 +3686,10 @@ class multiGetContentSummary_args(object):
       elif fid == 1:
         if ftype == TType.LIST:
           self.paths = []
-          (_etype45, _size42) = iprot.readListBegin()
-          for _i46 in xrange(_size42):
-            _elem47 = iprot.readString();
-            self.paths.append(_elem47)
+          (_etype38, _size35) = iprot.readListBegin()
+          for _i39 in xrange(_size35):
+            _elem40 = iprot.readString();
+            self.paths.append(_elem40)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -4137,8 +3706,8 @@ class multiGetContentSummary_args(object):
     if self.paths != None:
       oprot.writeFieldBegin('paths', TType.LIST, 1)
       oprot.writeListBegin(TType.STRING, len(self.paths))
-      for iter48 in self.paths:
-        oprot.writeString(iter48)
+      for iter41 in self.paths:
+        oprot.writeString(iter41)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.ctx != None:
@@ -4187,11 +3756,11 @@ class multiGetContentSummary_result(object):
       if fid == 0:
         if ftype == TType.LIST:
           self.success = []
-          (_etype52, _size49) = iprot.readListBegin()
-          for _i53 in xrange(_size49):
-            _elem54 = ContentSummary()
-            _elem54.read(iprot)
-            self.success.append(_elem54)
+          (_etype45, _size42) = iprot.readListBegin()
+          for _i46 in xrange(_size42):
+            _elem47 = ContentSummary()
+            _elem47.read(iprot)
+            self.success.append(_elem47)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -4214,8 +3783,8 @@ class multiGetContentSummary_result(object):
     if self.success != None:
       oprot.writeFieldBegin('success', TType.LIST, 0)
       oprot.writeListBegin(TType.STRUCT, len(self.success))
-      for iter55 in self.success:
-        iter55.write(oprot)
+      for iter48 in self.success:
+        iter48.write(oprot)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.err != None:

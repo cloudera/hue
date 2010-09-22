@@ -18,28 +18,23 @@
 
 package org.apache.hadoop.thriftfs;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.io.IOException;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.Map;
-import javax.security.auth.login.LoginException;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.security.UnixUserGroupInformation;
 import org.apache.hadoop.util.VersionInfo;
 import org.apache.hadoop.metrics.ContextFactory;
 import org.apache.hadoop.metrics.spi.OutputRecord;
 
 import org.apache.hadoop.thriftfs.api.HadoopServiceBase;
+import org.apache.hadoop.thriftfs.api.IOException;
 import org.apache.hadoop.thriftfs.api.MetricsContext;
 import org.apache.hadoop.thriftfs.api.MetricsRecord;
 import org.apache.hadoop.thriftfs.api.RequestContext;
@@ -96,7 +91,7 @@ public abstract class ThriftHandlerBase implements HadoopServiceBase.Iface {
       for (org.apache.hadoop.metrics.MetricsContext ctx : allContexts) {
         ret.add(metricsContextToThrift(ctx));
       }
-    } catch (IOException ioe) {
+    } catch (java.io.IOException ioe) {
       LOG.warn("getAllMetrics() failed", ioe);
       throw ThriftUtils.toThrift(ioe);
     }
@@ -185,48 +180,33 @@ public abstract class ThriftHandlerBase implements HadoopServiceBase.Iface {
     return dump;
   }
 
-
   /**
-   * Should be called by all RPCs on the request context passed in.
-   * This assumes the authentication role of the requester.
+   * The methods below should be called by all RPCs with the request context
+   * passed in, whenever said RPCs are accessing Hadoop-internal methods. These
+   * assume the authentication role of the requester.
+   *
+   * Most of the time you can just wrap the entire contents of the method with
+   * these methods. If, however, your RPC needs to throw an exception not of
+   * type IOException, then you may need to wrap only the portions which
+   * actually touch Hadoop, and then throw your own exception(s) based on the
+   * result of these calls.
    */
-  protected void assumeUserContext(RequestContext ctx) {
-    UserGroupInformation ugi = null;
-    if (ctx != null && ctx.confOptions != null) {
-      Configuration conf = new Configuration(false);
-      
-      for (Map.Entry<String, String> entry : ctx.confOptions.entrySet()) {
-        conf.set(entry.getKey(), entry.getValue());
-      }
-      // UnixUserGroupInformation.readFromConf() caches UGIs based on
-      // on username, so it's not usable if the group list
-      // may be changing.
-      String[] ugiparts = conf.getStrings(UnixUserGroupInformation.UGI_PROPERTY_NAME);
-      ugi = new UnixUserGroupInformation(ugiparts);
-    } else {
-      LOG.warn("Did not receive UGI information with call.");
-      // For backwards-compatibility, continue, though this really
-      // should be an error.
-      ugi = new UnixUserGroupInformation(new String[] { "nobody", "nogroup" });
-    }
-    UserGroupInformation.setCurrentUser(ugi);
-    LOG.info("Connection from user " + ugi);
-  }
-
-  /**
-   * Take on the credentials of the current process, which,
-   * since this is running inside of a Hadoop daemon, is
-   * the cluster's superuser.  If for some reason this
-   * fails, this will return nobody/nogroup.
-   */
-  protected void assumeSuperuserContext() {
-    UserGroupInformation ugi = null;
+  protected <T> T assumeUserContextAndExecute(RequestContext ctx, PrivilegedExceptionAction<T> action) throws IOException {
     try {
-      ugi = UnixUserGroupInformation.login();
-    } catch (LoginException e) {
-      LOG.info("Cannot get current UNIX user: " + e.getMessage());
-      ugi = new UnixUserGroupInformation(new String[] { "nobody", "nogroup" });
+      return UserGroupInformation.createProxyUser(ctx.confOptions.get("effective_user"), UserGroupInformation.getLoginUser()).doAs(action);
+    } catch (Throwable e) {
+      throw ThriftUtils.toThrift(e);
     }
-    UserGroupInformation.setCurrentUser(ugi);
   }
+
+  protected <T> T assumeUserContextAndExecute(RequestContext ctx, PrivilegedAction<T> action) {
+    try {
+      return UserGroupInformation.createProxyUser(ctx.confOptions.get("effective_user"),
+          UserGroupInformation.getLoginUser()).doAs(action);
+    } catch (java.io.IOException e) {
+      // This should only be thrown in the event getLoginUser() fails.
+      throw new Error(e);
+    }
+  }
+
 }

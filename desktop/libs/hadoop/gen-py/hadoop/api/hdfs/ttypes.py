@@ -242,8 +242,9 @@ class Block(object):
    - path: Path of the file which this block belongs to.
    - numBytes: Length of this block.
    - genStamp: Generational stamp of this block.
-   - startOffset: Offset of the first byte of the block relative to the start of the file
    - nodes: List of data nodes with copies  of this block.
+   - startOffset: Offset of the first byte of the block relative to the start of the file
+   - token: The serialized token associated with this block.
   """
 
   thrift_spec = (
@@ -254,15 +255,17 @@ class Block(object):
     (4, TType.I64, 'genStamp', None, None, ), # 4
     (5, TType.LIST, 'nodes', (TType.STRUCT,(DatanodeInfo, DatanodeInfo.thrift_spec)), None, ), # 5
     (6, TType.I64, 'startOffset', None, None, ), # 6
+    (7, TType.STRING, 'token', None, None, ), # 7
   )
 
-  def __init__(self, blockId=None, path=None, numBytes=None, genStamp=None, startOffset=None, nodes=None,):
+  def __init__(self, blockId=None, path=None, numBytes=None, genStamp=None, nodes=None, startOffset=None, token=None,):
     self.blockId = blockId
     self.path = path
     self.numBytes = numBytes
     self.genStamp = genStamp
-    self.startOffset = startOffset
     self.nodes = nodes
+    self.startOffset = startOffset
+    self.token = token
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -293,11 +296,6 @@ class Block(object):
           self.genStamp = iprot.readI64();
         else:
           iprot.skip(ftype)
-      elif fid == 6:
-        if ftype == TType.I64:
-          self.startOffset = iprot.readI64();
-        else:
-          iprot.skip(ftype)
       elif fid == 5:
         if ftype == TType.LIST:
           self.nodes = []
@@ -307,6 +305,16 @@ class Block(object):
             _elem5.read(iprot)
             self.nodes.append(_elem5)
           iprot.readListEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.I64:
+          self.startOffset = iprot.readI64();
+        else:
+          iprot.skip(ftype)
+      elif fid == 7:
+        if ftype == TType.STRING:
+          self.token = iprot.readString();
         else:
           iprot.skip(ftype)
       else:
@@ -345,6 +353,10 @@ class Block(object):
     if self.startOffset != None:
       oprot.writeFieldBegin('startOffset', TType.I64, 6)
       oprot.writeI64(self.startOffset)
+      oprot.writeFieldEnd()
+    if self.token != None:
+      oprot.writeFieldBegin('token', TType.STRING, 7)
+      oprot.writeString(self.token)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

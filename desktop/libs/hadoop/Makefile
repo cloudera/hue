@@ -45,10 +45,16 @@ PLUGIN_JAVA_DIR := $(PLUGIN_DIR)/java
 PLUGIN := $(PLUGIN_JAVA_LIB)/hue-plugins-$(DESKTOP_VERSION).jar
 BLD_DIR_PLUGINS := $(PLUGIN_DIR)/build/java
 
-compile: $(PLUGIN)
+STATIC_GROUP_MAPPING_DIR := $(realpath .)/static-group-mapping
+STATIC_GROUP_MAPPING_SRC := $(STATIC_GROUP_MAPPING_DIR)/src
+STATIC_GROUP_MAPPING_BUILD := $(STATIC_GROUP_MAPPING_DIR)/build
+STATIC_GROUP_MAPPING_LIB := $(STATIC_GROUP_MAPPING_DIR)/java-lib
+STATIC_GROUP_MAPPING := $(STATIC_GROUP_MAPPING_LIB)/static-group-mapping-$(DESKTOP_VERSION).jar
+
+compile: $(PLUGIN) $(STATIC_GROUP_MAPPING)
 
 clean::
-	rm -Rf $(PLUGIN_JAVA_LIB)
+	rm -Rf $(PLUGIN_JAVA_LIB) $(STATIC_GROUP_MAPPING_LIB)
 
 ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
 PLUGIN_OPTS := -Dbuild.dir=$(BLD_DIR_PLUGINS) \
@@ -64,6 +70,16 @@ else
 $(PLUGIN):
 	$(error Cannot build hadoop plugin without source)
 endif
+
+STATIC_GROUP_MAPPING_OPTS := -Dbuild.dir=$(STATIC_GROUP_MAPPING_BUILD) \
+         -Dhadoop.home=$(HADOOP_HOME) \
+         -Dstatic-group-mapping.version=$(DESKTOP_VERSION)
+
+$(STATIC_GROUP_MAPPING): $(shell find $(STATIC_GROUP_MAPPING_SRC))
+	mkdir -p $(STATIC_GROUP_MAPPING_LIB)
+	@echo "--- Building static UserGroupMappingService"
+	cd $(STATIC_GROUP_MAPPING_DIR) && ant $(ANT_OPTS) $(STATIC_GROUP_MAPPING_OPTS) jar
+	cp $(STATIC_GROUP_MAPPING_BUILD)/$(notdir $(STATIC_GROUP_MAPPING)) $(STATIC_GROUP_MAPPING)
 
 #
 # Tell the `bdist' target to exclude our java source.
