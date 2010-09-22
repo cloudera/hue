@@ -174,7 +174,7 @@ def test_job_design_cycle():
   response = c.post("/jobsub/delete/%d" % not_mine.id)
   assert_true("Permission Denied." in response.context["error"])
 
-def create_test_user_homedir(cluster):
+def setup_cluster_fs(cluster):
   """
   Irritatingly, pi doesn't run unless /user/test exists.
   """
@@ -182,8 +182,11 @@ def create_test_user_homedir(cluster):
   if not cluster.fs.exists("/user/test"):
     cluster.fs.mkdir("/user/test")
   cluster.fs.chown("/user/test", "test", "test")
+  if not cluster.fs.exists("/tmp"):
+    cluster.fs.mkdir("/tmp")
+  cluster.fs.chmod("/tmp", int('777', 8))
   cluster.fs.setuser("test")
-create_test_user_homedir.__test__ = False # Don't confuse nose.
+setup_cluster_fs.__test__ = False # Don't confuse nose.
 
 @attr('requires_hadoop')
 def test_job_submission():
@@ -208,7 +211,7 @@ def test_job_submission():
       assert_true("<form " in response.content)
 
       # Create home dir
-      create_test_user_homedir(cluster)
+      setup_cluster_fs(cluster)
 
       # Prepare sample data
       f = cluster.fs.open("/user/test/input", "w")
@@ -323,7 +326,7 @@ def test_jobsub_setup_and_samples():
     # And now submit and run the samples
     # pi Example
     # Irritatingly, /user/test needs to exist first
-    create_test_user_homedir(cluster)
+    setup_cluster_fs(cluster)
     id = JobDesign.objects.get(name__contains="Example: Pi").id
     response = c.get("/jobsub/submit/%d" % id)
     assert_true("Iterations per mapper" in response.content)

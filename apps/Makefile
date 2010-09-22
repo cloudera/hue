@@ -31,7 +31,6 @@ default: env-install
 .PHONY: clean default distclean install
 
 APPS := about \
-	beeswax \
 	filebrowser \
 	help \
 	jobbrowser \

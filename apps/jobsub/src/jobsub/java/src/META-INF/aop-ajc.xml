@@ -17,8 +17,8 @@
 -->
 <aspectj>
 <aspects>
-<aspect name="com.cloudera.jobsub.JobClientTrace"/>
-<aspect name="com.cloudera.jobsub.UgiFixer"/>
+<aspect name="org.apache.hadoop.security.JobClientTrace"/>
+<aspect name="org.apache.hadoop.security.UgiFixer"/>
 </aspects>
 </aspectj>
 

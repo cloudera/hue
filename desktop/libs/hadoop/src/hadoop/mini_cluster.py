@@ -31,6 +31,7 @@
 import atexit
 import subprocess
 import os
+import pwd
 import logging
 import sys
 import signal
@@ -55,6 +56,13 @@ USE_STDERR=os.environ.get("MINI_CLUSTER_USE_STDERR", False)
 CLEANUP_TMP_DIR=os.environ.get("MINI_CLUSTER_CLEANUP", True)
 # How long to wait for cluster to start up.  (seconds)
 MAX_CLUSTER_STARTUP_TIME = 120.0
+
+# users and their groups which are used in Hue tests.
+TEST_USER_GROUP_MAPPING = {
+   'test': ['test'], 'chown_test': ['chown_test'],
+   'notsuperuser': ['notsuperuser'], 'gamma': ['gamma'],
+   'webui': ['webui']
+}
 
 LOGGER=logging.getLogger(__name__)
 
@@ -107,7 +115,22 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 """)
     finally:
       f.close()
-  
+
+    if self.superuser not in TEST_USER_GROUP_MAPPING:
+      TEST_USER_GROUP_MAPPING[self.superuser] = [self.superuser]
+
+    _write_static_group_mapping(TEST_USER_GROUP_MAPPING,
+      tmppath('ugm.properties'))
+
+    write_config({'hadoop.security.group.mapping': 'org.apache.hadoop.security.StaticUserGroupMapping',
+      'hadoop.security.static.group.mapping.file': tmppath('ugm.properties')}, tmppath('in-conf/core-site.xml'))
+
+    hadoop_policy_keys = ['client', 'client.datanode', 'datanode', 'inter.datanode', 'namenode', 'inter.tracker', 'job.submission', 'task.umbilical', 'refresh.policy', 'admin.operations']
+    hadoop_policy_config = {}
+    for policy in hadoop_policy_keys:
+      hadoop_policy_config['security.' + policy + '.protocol.acl'] = '*'
+    write_config(hadoop_policy_config, tmppath('in-conf/hadoop-policy.xml'))
+
     details_file = file(tmppath("details.json"), "w+")
     try:
       args = [ hadoop.conf.HADOOP_BIN.get(), "jar",
@@ -138,11 +161,13 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         "-D", "jobtracker.thrift.address=localhost:%d" % _find_unused_port(),
         # Jobs realize they have finished faster with this timeout.
         "-D", "jobclient.completion.poll.interval=50",
+        "-D", "hadoop.security.authorization=true",
+        "-D", "hadoop.policy.file=%s/hadoop-policy.xml" % in_conf_dir,
       ]
       env = {}
       env["HADOOP_CONF_DIR"] = in_conf_dir
       env["HADOOP_OPTS"] = "-Dtest.build.data=%s" % (self.tmpdir, )
-      env["HADOOP_CLASSPATH"] = hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get()
+      env["HADOOP_CLASSPATH"] = ':'.join([hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(), hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()])
       env["HADOOP_HEAPSIZE"] = "128"
       env["HADOOP_HOME"] = hadoop.conf.HADOOP_HOME.get()
       env["HADOOP_LOG_DIR"] = self.log_dir
@@ -199,26 +224,31 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     self.config_dir = tmppath("conf")
     os.mkdir(self.config_dir)
     write_config(self.config, tmppath("conf/core-site.xml"), 
-      ["fs.default.name", "jobclient.completion.poll.interval", "fs.checkpoint.period", "fs.checkpoint.dir"])
+      ["fs.default.name", "jobclient.completion.poll.interval",
+       "fs.checkpoint.period", "fs.checkpoint.dir",
+       'hadoop.security.group.mapping', 'hadoop.security.static.group.mapping.file'])
     write_config(self.config, tmppath("conf/hdfs-site.xml"), ["fs.default.name", "dfs.http.address", "dfs.secondary.http.address"])
     # mapred.job.tracker isn't written out into self.config, so we fill
     # that one out more manually.
     write_config({ "mapred.job.tracker": "localhost:%d" % self.jobtracker_port },
-      tmppath("conf/mapred-site.xml"), ["mapred.job.tracker"])
+      tmppath("conf/mapred-site.xml"))
+    write_config(hadoop_policy_config, tmppath('conf/hadoop-policy.xml'))
 
     # Once the config is written out, we can start the 2NN.
-    env = os.environ.copy()
     args = [hadoop.conf.HADOOP_BIN.get(), 
       '--config', self.config_dir,
       'secondarynamenode']
-    self.secondary_proc = subprocess.Popen(
-      args=args,
-      stdout=file(tmppath("stdout"), "w"),
-      stderr=stderr,
-      env=env)
 
     LOGGER.debug("Starting 2NN at: " +
       self.config['dfs.secondary.http.address'])
+    LOGGER.debug("2NN command: %s env: %s" % (repr(args), repr(env)))
+
+    self.secondary_proc = subprocess.Popen(
+      args=args,
+      stdout=file(tmppath("stdout.2nn"), "w"),
+      stderr=file(tmppath("stderr.2nn"), "w"),
+      env=env)
+
     while True:
       try:
         response = urllib2.urlopen(urllib2.Request('http://' +
@@ -284,7 +314,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     This is essentially the user that the cluster was started
     with.
     """
-    return self.config["hadoop.job.ugi"].split(",")[0]
+    return pwd.getpwuid(os.getuid()).pw_name
 
   @property
   def namenode_thrift_port(self):
@@ -363,7 +393,7 @@ def shared_cluster(conf=False):
   cluster.shutdown = finish
   return cluster
 
-def write_config(config, path, variables):
+def write_config(config, path, variables=None):
   """
   Minimal utility to write Hadoop-style configuration
   from a configuration map (config), into a new file
@@ -375,13 +405,26 @@ def write_config(config, path, variables):
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
 """)
-    for name in variables:
+    keys = (variables and (variables,) or (config.keys(),))[0]
+    for name in keys:
       value = config[name]
-      f.write("<property>\n")
-      f.write("  <name>%s</name>\n" % name)
-      f.write("  <value>%s</value>\n" % value)
-      f.write("</property>\n")
+      f.write("  <property>\n")
+      f.write("    <name>%s</name>\n" % name)
+      f.write("    <value>%s</value>\n" % value)
+      f.write("  </property>\n")
     f.write("</configuration>\n")
+  finally:
+    f.close()
+
+def _write_static_group_mapping(user_group_mapping, path):
+  """
+  Create a Java-style .properties file to contain the static user -> group
+  mapping used by tests.
+  """
+  f = file(path, 'w')
+  try:
+    for user, groups in user_group_mapping.iteritems():
+      f.write('%s = %s\n' % (user, ','.join(groups)))
   finally:
     f.close()
 

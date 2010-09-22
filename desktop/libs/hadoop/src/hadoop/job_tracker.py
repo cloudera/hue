@@ -38,7 +38,6 @@ VALID_TASK_TYPES = set(["map", "reduce", "job_cleanup", "job_setup"])
 JT_THRIFT_TIMEOUT = 15
 
 DEFAULT_USER = "webui"
-DEFAULT_GROUPS = ["webui"]
 
 def test_jt_configuration(cluster):
   """Test FS configuration. Returns list of (confvar, error)."""
@@ -75,7 +74,7 @@ class LiveJobTracker(object):
     # threads by restricting the stateful components to a thread
     # thread-local.
     self.thread_local = threading.local()
-    self.setuser(DEFAULT_USER, DEFAULT_GROUPS)
+    self.setuser(DEFAULT_USER)
 
   def thriftjobid_from_string(self, jobid):
     """The jobid looks like this: job_201001301455_0001"""
@@ -153,21 +152,17 @@ class LiveJobTracker(object):
     for taskstatus in tip.taskStatuses.values():
       self._fixup_taskstatus(taskstatus)
 
-  def setuser(self, user, groups=None):
-    # Hadoop UGI *must* have at least one group, so we mirror
-    # the username as a group if not specified
+  def setuser(self, user):
+    # Hadoop determines the groups the user belongs to on the server side.
     self.thread_local.request_context = RequestContext()
-    if not groups:
-      groups = [user]
     if not self.thread_local.request_context.confOptions:
       self.thread_local.request_context.confOptions = {}
-    self.thread_local.ugi = ",".join([user] + groups)
-    self.thread_local.request_context.confOptions['hadoop.job.ugi'] = self.thread_local.ugi
+    self.thread_local.request_context.confOptions['effective_user'] = user
+    self.thread_local.user = user
 
   @property
-  def ugi(self):
-    # Here for backwards-compatibility.
-    return self.thread_local.ugi
+  def user(self):
+    return self.thread_local.user
 
   @property
   def request_context(self):
@@ -276,7 +271,7 @@ class LiveJobTracker(object):
     """
     Returns a ThriftJobList (does not include task info)
     """
-    joblist = self.client.getKilledJobs(None)
+    joblist = self.client.getKilledJobs(self.thread_local.request_context)
     for job in joblist.jobs:
       self._fixup_job(job)
     return joblist
@@ -326,7 +321,7 @@ class LiveJobTracker(object):
   def get_task(self, jobid, taskid):
     """Return a ThriftTaskInProgress"""
     try:
-      tip = self.client.getTask(jobid, taskid)
+      tip = self.client.getTask(self.thread_local.request_context, taskid)
     except JobNotFoundException, e:
       e.response_data = dict(code="JT_JOB_NOT_FOUND",
                              message="Could not find job %s on JobTracker." % (jobid.asString,),

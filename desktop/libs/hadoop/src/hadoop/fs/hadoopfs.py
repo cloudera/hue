@@ -39,6 +39,7 @@ from desktop.lib.conf import validate_port
 from hadoop.api.hdfs import Namenode, Datanode
 from hadoop.api.hdfs.constants import QUOTA_DONT_SET, QUOTA_RESET
 from hadoop.api.common.ttypes import RequestContext, IOException
+import hadoop.conf
 from hadoop.fs import normpath
 from hadoop.fs.exceptions import PermissionDeniedException
 
@@ -54,7 +55,6 @@ del _tmp_mod
 LOG = logging.getLogger(__name__)
 
 DEFAULT_USER = "webui"
-DEFAULT_GROUPS = ["webui"]
 
 # The number of bytes to read if not specified
 DEFAULT_READ_SIZE = 1024*1024 # 1MB
@@ -199,7 +199,7 @@ class HadoopFileSystem(object):
     # user information in a thread-local variable so that
     # safety can be preserved there.
     self.thread_local = threading.local()
-    self.setuser(DEFAULT_USER, DEFAULT_GROUPS)
+    self.setuser(DEFAULT_USER)
     LOG.debug("Initialized HadoopFS: %s:%d (%s)", host, thrift_port, hadoop_bin_path)
 
   def _get_hdfs_base(self):
@@ -231,18 +231,13 @@ class HadoopFileSystem(object):
     """
     return self.stats("/")["user"]
 
-  def setuser(self, user, groups=None):
-    # Hadoop UGI *must* have at least one group, so we mirror
-    # the username as a group if not specified
+  def setuser(self, user):
+    # Hadoop determines the groups the user belongs to on the server side.
     self.thread_local.request_context = RequestContext()
-    if not groups:
-      groups = [user]
     if not self.request_context.confOptions:
       self.request_context.confOptions = {}
-    self.thread_local.ugi = ",".join([user] + groups)
-    self.thread_local.request_context.confOptions['hadoop.job.ugi'] = self.thread_local.ugi
+    self.thread_local.request_context.confOptions['effective_user'] = user
     self.thread_local.user = user
-    self.thread_local.groups = groups
 
   @property
   def user(self):
@@ -255,10 +250,6 @@ class HadoopFileSystem(object):
   @property
   def request_context(self):
     return self.thread_local.request_context
-
-  @property
-  def ugi(self):
-    return self.thread_local.ugi
 
   @_coerce_exceptions
   def open(self, path, mode="r", *args, **kwargs):
@@ -765,17 +756,22 @@ class FileUpload(object):
       extra_confs.append("-Ddfs.block.size=%d" % block_size)
     self.subprocess_cmd = [self.fs.hadoop_bin_path,
                            "dfs",
-                           "-Dfs.default.name=" + self.fs.uri,
-                           "-Dhadoop.job.ugi=" + self.fs.ugi] + \
+                           "-Dfs.default.name=" + self.fs.uri] + \
                            extra_confs + \
                            ["-put", "-", encode_fs_path(path)]
+    env = i18n.make_utf8_env()
+    if env.has_key('HADOOP_CLASSPATH'):
+      env['HADOOP_CLASSPATH'] += ':' + hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
+    else:
+      env['HADOOP_CLASSPATH'] = hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
+
     self.path = path
     self.putter = subprocess.Popen(self.subprocess_cmd,
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
                                    close_fds=True,
-                                   env=i18n.make_utf8_env(),
+                                   env=env,
                                    bufsize=WRITE_BUFFER_SIZE)
   @require_open
   def write(self, data):

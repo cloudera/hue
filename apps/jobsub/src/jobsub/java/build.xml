@@ -43,7 +43,7 @@
 
   <target name="build" depends="init">
     <iajc sourceroots="${src.dir}"
-          destDir="${build.dir}/out">
+          destDir="${build.dir}/out" source="1.5">
       <classpath refid="build.classpath" />
     </iajc>
   </target>

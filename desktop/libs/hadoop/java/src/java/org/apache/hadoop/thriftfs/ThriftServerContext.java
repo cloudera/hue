@@ -17,18 +17,11 @@
  */
 package org.apache.hadoop.thriftfs;
 
-import java.io.OutputStream;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Random;
-import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.util.LineReader;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TSocket;
 

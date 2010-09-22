@@ -13,7 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.jobsub;
+package org.apache.hadoop.security;
 
 import org.apache.hadoop.mapred.*;
 import org.apache.commons.logging.Log;
@@ -25,9 +25,9 @@ public aspect JobClientTrace {
   JobClientTrace() {
     LOG.info("Hue job submission aspect loaded.");
   }
+
   RunningJob around(JobConf conf):
-    call(RunningJob JobClient.submitJobInternal(JobConf))
-    && args(conf) {
+    call(RunningJob JobClient.submitJobInternal(JobConf)) && args(conf) {
     RunningJob ret = proceed(conf);
     JobClientTracer.getInstance().submittedJob(ret);
     return ret;

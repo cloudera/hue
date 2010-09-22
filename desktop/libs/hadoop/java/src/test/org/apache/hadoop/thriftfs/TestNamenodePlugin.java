@@ -27,13 +27,10 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.security.UnixUserGroupInformation;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.thriftfs.api.Block;
 import org.apache.hadoop.thriftfs.api.Constants;
 import org.apache.hadoop.thriftfs.api.ContentSummary;
-import org.apache.hadoop.thriftfs.api.DatanodeInfo;
-import org.apache.hadoop.thriftfs.api.DatanodeReportType;
 import org.apache.hadoop.thriftfs.api.IOException;
 import org.apache.hadoop.thriftfs.api.Namenode;
 import org.apache.hadoop.thriftfs.api.RequestContext;
@@ -136,20 +133,6 @@ public class TestNamenodePlugin {
     for (long val : st) {
       assertTrue(val > 0);
     }
-  }
-
-  @Test
-  public void testGetDatanodeReport() throws Exception {
-    int numNodes = cluster.getDataNodes().size();
-    List<DatanodeInfo> nodes = namenode
-      .getDatanodeReport(ctx, DatanodeReportType.ALL_DATANODES);
-    assertEquals(numNodes, nodes.size());
-
-    nodes = namenode.getDatanodeReport(ctx, DatanodeReportType.DEAD_DATANODES);
-    assertEquals(0, nodes.size());
-
-    nodes = namenode.getDatanodeReport(ctx, DatanodeReportType.LIVE_DATANODES);
-    assertEquals(numNodes, nodes.size());
   }
 
   @Test
@@ -461,14 +444,14 @@ public class TestNamenodePlugin {
 
     // Dir made by 'ctx' should be owned by the current user
     namenode.mkdirhier(ctx, "/test-by-current", (short)0755);
-    assertEquals(UserGroupInformation.getCurrentUGI().getUserName(),
+    assertEquals(UserGroupInformation.getCurrentUser().getUserName(),
                  fs.getFileStatus(byCurrentPath).getOwner());
 
     // With a null context (eg clients that don't support this), should be
     // the current user
     assertTrue(fs.delete(byCurrentPath, true));
     namenode.mkdirhier(null, "/test-by-current", (short)0755);
-    assertEquals(UserGroupInformation.getCurrentUGI().getUserName(),
+    assertEquals(UserGroupInformation.getCurrentUser().getUserName(),
                  fs.getFileStatus(byCurrentPath).getOwner());
 
 
