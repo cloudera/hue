@@ -25,6 +25,23 @@ script: Behavior.SubmitOnChange.js
 ...
 */
 
+(function(){
+
+var setupInput = function(input, form, cleanupElement){
+	var events = {
+		change: function(e){
+			if (e) form.fireEvent('submit', e);
+			else form.fireEvent('submit');
+		},
+		keydown: function(e) {
+			if (e.key == 'enter' && document.id(e.target).get('tag') != 'textarea') form.fireEvent('submit', e);
+		}
+	};
+	input.addEvents(events);
+	this.markForCleanup(cleanupElement, function(){
+		input.removeEvents(events);
+	});
+};
 
 Behavior.addGlobalFilters({
 	
@@ -41,21 +58,15 @@ Behavior.addGlobalFilters({
 	*/
 
 	SubmitOnChange: function(element, methods) {
-		element.getElements('input, select, textarea').each(function(input){
-			var events = {
-				change: function(e){
-					if (e) element.fireEvent('submit', e);
-					else element.fireEvent('submit');
-				},
-				keydown: function(e) {
-					if (e.key == 'enter' && document.id(e.target).get('tag') != 'textarea') element.fireEvent('submit', e);
-				}
-			};
-			input.addEvents(events);
-			this.markForCleanup(element, function(){
-				input.removeEvents(events);
-			});
-		}, this);
+		if (['input', 'select', 'textarea'].contains(element.get('tag'))) {
+			setupInput.call(this, element, element.getParent('form'), element);
+		} else {
+			element.getElements('input, select, textarea').each(function(el){
+				setupInput.call(this, el, element, element);
+			}, this);
+		}
 	}
 
 });
+
+})();
