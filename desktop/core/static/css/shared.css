@@ -308,7 +308,42 @@ table[data-filters*=HtmlTable].treeView tr.table-expanded a.expand {
 	background: url(/static/art/divots.png) 0px -14px;
 }
 
-
+table a.ccs-table_config_link {
+	display: inline-block;
+	float: right;
+	width: 16px;
+	height: 16px;
+	background: url(../art/icons/small_cog.png);
+}
+table form.ccs-table_config {
+	position: absolute;
+	background: #fff;
+	border: 1px solid #777;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	min-width: 200px;
+	right: 25px;
+	top: 5px;
+}
+table form.ccs-table_config label {
+	display: block;
+}
+table form.ccs-table_config label:hover {
+	color: #36f;
+}
+table form.ccs-table_config ul {
+	padding: 2px;
+	max-height: 200px;
+	overflow: auto;
+	border-bottom:1px solid #777;
+}
+table form.ccs-table_config li {
+	padding: 2px;
+}
+table form.ccs-table_config .art {
+	margin: 4px;
+}
 /* stickywin solid; this is the login window styles */
 div.solid-win div.body-left { 
 	background: url(../art/sticky-win-solid-back.png); 

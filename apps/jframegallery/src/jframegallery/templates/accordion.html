@@ -17,20 +17,20 @@ limitations under the License.
 {% endcomment %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
-	<head>
-		<title>Accordion</title>
-	</head>
-	<body>
-          <p> Below is an accordion, only one of the target areas should be visible at a time, dependent on which toggle was clicked last. </p>
-          <div data-filters="Accordion">
-            <ul>
-              <li class="toggle">Toggle 1</li>
-              <li class="toggle">Toggle 2</li>
-              <li class="toggle">Toggle 3</li>
-            </ul>
-            <div class="target">This area is controlled by Toggle 1.</div>
-            <div class="target">This area is controlled by Toggle 2.</div>
-            <div class="target">This area is controlled by Toggle 3.</div>
-          </div>
-        </body>
-        </html>
+  <head>
+    <title>Accordion</title>
+  </head>
+  <body>
+  <div class="jframe_padded">
+    <p>Below is an accordion, only one of the target areas should be visible at a time, dependent on which toggle was clicked last. </p>
+    <div data-filters="Accordion" style="width: 300px; margin: 10px;">
+      <div class="toggle" style="cursor:pointer; background: #777; padding: 2px;">Toggle 1</div>
+      <div class="target" style="padding: 4px;">This area is controlled by Toggle 1.</div>
+      <div class="toggle" style="cursor:pointer; background: #777; padding: 2px;">Toggle 2</div>
+      <div class="target" style="padding: 4px;">This area is controlled by Toggle 2.</div>
+      <div class="toggle" style="cursor:pointer; background: #777; padding: 2px;">Toggle 3</div>
+      <div class="target" style="padding: 4px;">This area is controlled by Toggle 3.</div>
+    </div>
+  </div>
+</body>
+</html>
