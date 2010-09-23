@@ -19,7 +19,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
   <head>
-    <title>Process Viewer</title>
+    <title>HtmlTable Treeview w/ Ajax</title>
     <style>
     .table-depth-0>td:first-child { padding-left: 10px; }
     .table-depth-1>td:first-child { padding-left: 25px; }

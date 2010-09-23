@@ -48,12 +48,16 @@ def index(request):
 
 def show(request, path):
   post_vars = None
-  if (request.POST): post_vars = request.POST.iteritems()
+  if request.POST: post_vars = request.POST.iteritems()
   if request.REQUEST.get('sleep'):
     sleep = int(request.REQUEST.get('sleep'))
     time.sleep(sleep)
+  
   return render(path, request, dict(
-    post_vars = post_vars
+    post_vars = post_vars,
+    get_var = request.REQUEST.get,
+    get_list = request.REQUEST.getlist,
+    request_path = request.path
   ))
   
 def flash(request):
