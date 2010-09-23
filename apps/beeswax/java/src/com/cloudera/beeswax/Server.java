@@ -174,7 +174,9 @@ public class Server {
         }
       }
     } catch (IOException e) {
-      LOG.error("Error while trying to check/create /tmp and warehouse directory.", e);
+      HiveConf conf = new HiveConf(Driver.class);
+      LOG.error("Error while trying to check/create /tmp and warehouse directory " + conf
+          .get(HiveConf.ConfVars.METASTOREWAREHOUSE.varname), e);
     }
   }
 

@@ -32,7 +32,7 @@ class Command(NoArgsCommand):
   """ Starts beeswax daemon.  """
   def handle_noargs(self, **options):
     env = os.environ.copy()
-    env['HADOOP_HOME'] = hadoop.conf.HADOOP_HOME.get()
+    env['HADOOP_HOME'] = "/home/vinithra/repos/hadoop"#hadoop.conf.HADOOP_HOME.get()
     if hadoop.conf.HADOOP_CONF_DIR.get():
       env['HADOOP_CONF_DIR'] = hadoop.conf.HADOOP_CONF_DIR.get()
     if beeswax.conf.BEESWAX_HIVE_CONF_DIR.get():

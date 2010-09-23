@@ -25,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivilegedExceptionAction;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ import org.apache.hadoop.hive.ql.processors.CommandProcessorFactory;
 import org.apache.hadoop.hive.ql.QueryPlan;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.serde.Constants;
-import org.apache.hadoop.security.UnixUserGroupInformation;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 
@@ -95,6 +96,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
   private static final String NOTIFY_URL_BASE = "/beeswax/query_cb/done/";
 
   private static Logger LOG = Logger.getLogger(BeeswaxServiceImpl.class.getName());
+
+  private UserGroupInformation ugi;
 
   /**
    * To be read and modified while holding a lock on the state object.
@@ -241,13 +244,16 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       if (query.hadoop_user == null) {
         throw new RuntimeException("User must be specified.");
       }
+      /*
       StringBuilder ugi = new StringBuilder();
       ugi.append(query.hadoop_user);
       for (String group : query.hadoop_groups) {
         ugi.append(",");
         ugi.append(group);
       }
+
       hiveConf.set(UnixUserGroupInformation.UGI_PROPERTY_NAME, ugi.toString());
+      */
 
       // Update scratch dir (to have one per user)
       File scratchDir = new File("/tmp/hive-beeswax-" + query.hadoop_user);
@@ -605,26 +611,42 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     // First, create an id and reset the LogContext
     String uuid = UUID.randomUUID().toString();
     final QueryHandle handle = new QueryHandle(uuid, uuid);
-    final LogContext lc = LogContext.registerCurrentThread(handle.log_context);
-    lc.resetLog();
 
-    // Make an administrative record
-    final RunningQueryState state = new RunningQueryState(query, lc);
-    state.setQueryHandle(handle);
-    runningQueries.put(handle.id, state);
-    state.initialize();
-    // All kinds of things can go wrong when we compile it. So catch all.
     try {
-      state.compile();
-    } catch (BeeswaxException perr) {
-      state.saveException(perr);
-      throw perr;
-    } catch (Throwable t) {
-      state.saveException(t);
-      throw new BeeswaxException(t.toString(), handle.log_context, handle);
+      UserGroupInformation ugi = UserGroupInformation.createProxyUser("hue", UserGroupInformation.getLoginUser());
+      ugi.doAs(new PrivilegedExceptionAction<Void>() {
+        public Void run() throws Exception {
+          final LogContext lc = LogContext.registerCurrentThread(handle.log_context);
+          lc.resetLog();
+			    // Make an administrative record
+			    final RunningQueryState state = new RunningQueryState(query, lc);
+			    state.setQueryHandle(handle);
+			    runningQueries.put(handle.id, state);
+			    state.initialize();
+			    // All kinds of things can go wrong when we compile it. So catch all.
+			    try {
+			      state.compile();
+			    } catch (BeeswaxException perr) {
+			      state.saveException(perr);
+			      throw perr;
+			    } catch (Throwable t) {
+			      state.saveException(t);
+			      throw new BeeswaxException(t.toString(), handle.log_context, handle);
+			    }
+			    // Now spin off the query.
+			    state.submitTo(executor, lc);
+			    return null;
+			  }
+      });
+    } catch (IOException e) {
+      String errorMsg = "Error while creating proxy user";
+      LOG.error(errorMsg);
+      throw new BeeswaxException(errorMsg, handle.log_context, handle);
+    } catch (InterruptedException e) {
+      String errorMsg = "Error while submitting query";
+      LOG.error(errorMsg);
+      throw new BeeswaxException(errorMsg, handle.log_context, handle);
     }
-    // Now spin off the query.
-    state.submitTo(executor, lc);
 
     return handle;
   }
@@ -652,22 +674,43 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
    * Get the query plan for a query.
    */
   @Override
-  public QueryExplanation explain(Query query) throws BeeswaxException, TException {
-    String contextName = UUID.randomUUID().toString();
-    LogContext lc = LogContext.registerCurrentThread(contextName);
-    RunningQueryState state = new RunningQueryState(query, lc);
-    state.initialize();
-    // All kinds of things can go wrong when we compile it. So catch all.
+  public QueryExplanation explain(final Query query) throws BeeswaxException, TException {
     QueryExplanation exp;
     try {
-      exp = state.explain();
-    } catch (BeeswaxException perr) {
-      throw perr;
-    } catch (Throwable t) {
-      throw new BeeswaxException(t.toString(), contextName, null);
+      UserGroupInformation ugi = UserGroupInformation.createProxyUser("hue", UserGroupInformation.getLoginUser());
+      exp = ugi.doAs(new PrivilegedExceptionAction<QueryExplanation>() {
+        public QueryExplanation run() throws Exception {
+          String contextName = UUID.randomUUID().toString();
+          LogContext lc = LogContext.registerCurrentThread(contextName);
+          RunningQueryState state = new RunningQueryState(query, lc);
+          state.initialize();
+          QueryExplanation expl;
+          // All kinds of things can go wrong when we compile it. So catch all.
+          try {
+            expl = state.explain();
+          } catch (BeeswaxException perr) {
+            throw perr;
+          } catch (Throwable t) {
+            throw new BeeswaxException(t.toString(), contextName, null);
+          }
+          // On success, we remove the LogContext
+          LogContext.destroyContext(contextName);
+          return expl;
+        }
+      });
+    } catch (IOException e) {
+      String errorMsg = "Error while creating proxy user";
+      LOG.error(errorMsg);
+      BeeswaxException bwe = new BeeswaxException();
+      bwe.setMessage(errorMsg);
+      throw bwe;
+    } catch (InterruptedException e) {
+      String errorMsg = "Error while submitting query";
+      LOG.error(errorMsg);
+      BeeswaxException bwe = new BeeswaxException();
+      bwe.setMessage(errorMsg);
+      throw bwe;
     }
-    // On success, we remove the LogContext
-    LogContext.destroyContext(contextName);
     return exp;
   }
 
