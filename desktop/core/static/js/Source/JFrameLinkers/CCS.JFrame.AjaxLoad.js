@@ -33,7 +33,7 @@ script: CCS.JFrame.AjaxLoad.js
 		* links have properties for one of data-ajax-append, data-ajax-replace, and data-ajax-target
 		* replace means destroy the target and replace it entirely with the response.
 		* append means leave everything in place and inject the response after the target.
-		* update means empty the target and fill it with the response
+		* target means empty the target and fill it with the response
 		* links with a "data-ajax-filter" property will inject only the elements that match the selector it specifies.
 		  For example, if you have a table that you want to add rows to, and your request returns an HTML document that
 		  includes an entire table, you would specify data-ajax-filter="table tbody tr" to only inject the rows from
@@ -54,12 +54,12 @@ script: CCS.JFrame.AjaxLoad.js
 			}
 
 			var requestTarget = target;
-			if (action != 'update') requestTarget = new Element('div');
+			if (action != 'target') requestTarget = new Element('div');
 
 			var options = {
 				filter: link.get('data', 'ajax-filter'),
 				requestPath: link.get('href'),
-				spinnerTarget: requestTarget,
+				spinnerTarget: target,
 				target: requestTarget,
 				ignorePartialRefresh: true,
 				ignoreAutoRefresh: true,
