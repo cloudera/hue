@@ -30,6 +30,7 @@ script: CCS.JFrame.PartialRefresh.js
 
 		partialRefresh: function(content){
 			var options = content.options;
+			//when we load content via ajax, we don't want the response being parsed for partials
 			if (options && options.ignorePartialRefresh) return;
 			var jState = getJState(this);
 			//get the partial containers; containers that have elements in them to be partially refreshed
