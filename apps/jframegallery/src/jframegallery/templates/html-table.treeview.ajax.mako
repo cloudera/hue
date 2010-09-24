@@ -45,8 +45,11 @@
           expanded = ""
           if path in open_paths:
             expanded = "table-expanded"
+          folder = ""
+          if node.children:
+            folder = "table-folder"
         %>
-        <tr class="table-folder table-depth-${depth} ${expanded} pstree-${node.pid}">
+        <tr class="${folder} table-depth-${depth} ${expanded} pstree-${node.pid}">
           <td style="max-width:400px">
             % if path in open_paths:
               <a href="${remove(path)}" class="ccs-hidden">collapse</a>
@@ -68,7 +71,7 @@
         </tr>
         % if path in open_paths or show_all:
           % for child in node.children:
-            ${r(child, depth+1, path+"/"+str(child.pid))}
+            ${create_row(child, depth+1, path+"/"+str(child.pid))}
           % endfor
         % elif not show_all and len(node.children) > 0:
           <tr style="display:none" class="html-table-tree-ignore pstree-${node.pid}-target"><td colspan="4"></td></tr>

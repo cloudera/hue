@@ -44,7 +44,7 @@ script: CCS.JFrame.AjaxLoad.js
 
 	['append', 'replace', 'target'].each(function(action){
 
-		linkers['data-ajax-' + action] = function(event, link){
+		linkers['[data-ajax-' + action + ']'] = function(event, link){
 			var target = $(this).getElement(link.get('data', 'ajax-' + action));
 			if (!target) {
 				link.erase('data-ajax-' + action);
@@ -100,5 +100,6 @@ script: CCS.JFrame.AjaxLoad.js
 			this.load(options);
 		};
 	});
+	CCS.JFrame.addGlobalLinkers(linkers);
 
 })();
