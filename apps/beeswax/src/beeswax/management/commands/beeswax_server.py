@@ -52,7 +52,8 @@ class Command(NoArgsCommand):
       '--desktop-host',
       str(dt_host),
       '--desktop-port',
-      str(desktop.conf.HTTP_PORT.get()),
+      "8000",
+      #str(desktop.conf.HTTP_PORT.get()),
     ]
 
     # Running on HTTPS?
