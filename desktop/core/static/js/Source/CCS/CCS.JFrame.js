@@ -121,7 +121,7 @@ CCS.JFrame = new Class({
 
 	// path: initial page to load
 	initialize: function(path, options){
-                this.parent(options);
+		this.parent(options);
 		new ART.Keyboard(this, this.keyboardOptions);
 		this.addLinkers(this.options.linkers);
 		this.addFilters(this.options.filters);
@@ -265,7 +265,11 @@ CCS.JFrame = new Class({
 	 *   options: see renderContent's options
 	 */
 	load: function(options){
-		this.fireEvent('request', [options.requestPath, options.userData]);
+		options = $merge({
+			//by default, requests reload the entire jframe
+			fullFrameLoad: true
+		}, options);
+		this.fireEvent('request', [options.requestPath, options.userData, options]);
 		var req = new Request();
 		this._setRequestOptions(req, 
 			$merge(options, {
@@ -295,10 +299,10 @@ CCS.JFrame = new Class({
 		);
 	},
 
-        getBehaviorState: function() {
-                if(!this.options.behaviorState) this.options.behaviorState = {};
-                return this.options.behaviorState;
-        },
+	getBehaviorState: function() {
+		if(!this.options.behaviorState) this.options.behaviorState = {};
+		return this.options.behaviorState;
+	},
 
 	/*
 	options:
@@ -715,10 +719,15 @@ CCS.JFrame = new Class({
 		if (request._jframeConfigured) return;
 		request._jframeConfigured = true;
 		request.setOptions($merge({
+			//determine if this request should be appearent to the user
 			useSpinner: this.options.spinnerCondition.apply(this, [options]),
+			//where to put the spinner
 			spinnerTarget: this.options.spinnerTarget || this.element,
+			//any options specific to spinner
 			spinnerOptions: { fxOptions: {duration: 200} },
+			//when there's an exception, invoke an error handler
 			onFailure: this.error.bind(this),
+			//do not eval scripts in the response; in theory this should never been overridden
 			evalScripts: false,
 			onRequest: function(){
 				/*
@@ -733,10 +742,18 @@ CCS.JFrame = new Class({
 				this._request = request;
 			}.bind(this),
 			onSuccess: function(requestTxt){
-				this._requestSuccessHandler(request, requestTxt, options);
+				//if there's a method called requestChecker defined in the options, run our response through it
+				//if it returns false, then throw out the response.
+				if (!options.requestChecker || options.requestChecker(requestTxt, request, options)) {
+					this._requestSuccessHandler(request, requestTxt, options);
+				}
+				//we're done with this request
 				this._request = null;
 			}.bind(this),
 			onCcsErrorPopup: function(alert){
+				//when the request shows a popup error because there's been an exception of some sort
+				//attach some logic to that popup so that when the user closes the alert the app window,
+				//if it's never been displayed and is still hidden, is destroyed.
 				alert.addEvent('destroy', function(){
 					if (!this.loadedOnce) {
 						var win = this.getWindow();
@@ -745,12 +762,14 @@ CCS.JFrame = new Class({
 				}.bind(this));
 			}.bind(this)
 		}, options));
+		//whenever the request completes, destroy it's spinner
 		request.addEvent('complete', function(){
 			if (this.spinner) {
 				this.spinner.destroy();
 				this.spinner = null;
 			}
 		}.bind(request));
+		//custom header for Hue
 		request.setHeader('X-Hue-JFrame', 'true');
 	},
 
@@ -760,7 +779,7 @@ CCS.JFrame = new Class({
 
 	_requestSuccessHandler: function(request, html, options) {
 		var error, blankWindowWithError, previousPath;
-                previousPath = this.currentPath;
+		previousPath = this.currentPath;
 		if (this._checkForEmptyErrorState(request, html)) {
 			error = true;
 			if (!this.loadedOnce) blankWindowWithError = true;
@@ -784,14 +803,14 @@ CCS.JFrame = new Class({
 			});
 		}
 		if (redirected) this.fireEvent('redirectAfterRender', [this.currentPath, responsePath]);
-                var loadOptions = $merge({
-                        content: html,
-                        responsePath: responsePath || request.options.url,
-                        error: error,
-                        blankWindowWithError: blankWindowWithError,
-                        previousPath: previousPath
-                }, options || {}); 
-                this.behavior.fireEvent('load', loadOptions); 
+		var loadOptions = $merge({
+			content: html,
+			responsePath: responsePath || request.options.url,
+			error: error,
+			blankWindowWithError: blankWindowWithError,
+			previousPath: previousPath
+		}, options || {}); 
+		this.behavior.fireEvent('load', loadOptions); 
 	},
 
 	/*

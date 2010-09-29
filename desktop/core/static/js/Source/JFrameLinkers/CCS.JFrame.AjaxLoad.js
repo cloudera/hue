@@ -42,7 +42,7 @@ script: CCS.JFrame.AjaxLoad.js
 
 	var linkers = {};
 
-	['append', 'replace', 'target'].each(function(action){
+	['append', 'replace', 'target', 'after', 'before'].each(function(action){
 
 		linkers['[data-ajax-' + action + ']'] = function(event, link){
 			var target = $(this).getElement(link.get('data', 'ajax-' + action));
@@ -61,9 +61,10 @@ script: CCS.JFrame.AjaxLoad.js
 				requestPath: link.get('href'),
 				spinnerTarget: target,
 				target: requestTarget,
-				ignorePartialRefresh: true,
+				onlyProcessPartials: true,
 				ignoreAutoRefresh: true,
 				suppressLoadComplete: true,
+				fullFrameLoad: false,
 				retainPath: true,
 				callback: function(data){
 					switch(action){
@@ -75,9 +76,12 @@ script: CCS.JFrame.AjaxLoad.js
 							target.destroy();
 							break;
 						case 'append':
+						case 'after':
 							//see note above in 'replace' case as to why we use reverse here
 							data.elements.reverse().injectAfter(target);
 							break;
+						case 'before':
+							data.elements.reverse().injectBefore(target);
 						//do nothing for update, as Request.HTML already does it for you
 					}
 					var state = {

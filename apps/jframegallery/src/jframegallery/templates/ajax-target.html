@@ -39,6 +39,18 @@ limitations under the License.
 				<div style="padding: 10px; background: #99f;">The response gets appended after this box</div>
 			</div>
 			<hr/>
+			<a href="/jframegallery/partial_refresh.mako?sleep=1" data-ajax-after=".ajax_after"><em>Also</em> adds the response after the blue box below.</a>
+			<div style="border: 1px solid #000; padding: 10px; margin: 10px 0px;">
+				<div style="padding: 10px; background: #99f;" class="ajax_after">The response gets appended after this box</div>
+			</div>
+			<hr/>
+			<a href="/jframegallery/partial_refresh.mako?sleep=1" data-ajax-before=".ajax_before">Add the response <em>before</em> the blue box below.</a>
+			<div style="border: 1px solid #000; padding: 10px; margin: 10px 0px;">
+				<div style="padding: 10px; background: #99f;" class="ajax_before">The response gets prepended <em>before</em> this box</div>
+			</div>
+			<hr/>
+
+
 			<a href="/jframegallery/partial_refresh.mako?sleep=1" data-ajax-target=".ajax_filter" data-ajax-filter="textarea">This link loads the same url as the others, but only the textarea is inserted into the box below</a>
 			<div style="border: 1px solid #000; padding: 10px; margin: 10px 0px;" class="ajax_filter">
 				This box is replaced with a textarea when you click the 
