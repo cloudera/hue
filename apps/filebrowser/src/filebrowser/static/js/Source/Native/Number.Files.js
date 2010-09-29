@@ -27,7 +27,7 @@ Number.implement({
 	parsePermissions: function() {
 		var perms = {};
 		$H({
-		  user_read: 0400,
+			user_read: 0400,
 			user_write: 0200,
 			user_execute: 0100,
 			group_read: 0040,
@@ -48,17 +48,17 @@ Number.implement({
 		if (this < 1099511627776) return (this/1073741824).round(1) + ' GB';
 		if (this < (1099511627776*1024)) return (this/1099511627776).round(1) + ' TB';
 		return (this/(1099511627776*1024)).round(1) + ' PB'; //hey, it could happen
-  },
-  
-  //From: http://snipplr.com/view/7345/format-number-with-commas-every-3-decimal-places/
-  convertWithCommas: function(){
-    var pieces = this.toString().split('.');
-    var p1 = pieces[0];
-    var p2 = pieces.length > 1 ? '.' + pieces[1] : '';
-    var regex = /(\d+)(\d{3})/;
-    while (regex.test(p1)) {
-  		p1 = p1.replace(regex, '$1' + ',' + '$2');
-  	}
-  	return p1 + p2;
-  }
+	},
+	
+	//From: http://snipplr.com/view/7345/format-number-with-commas-every-3-decimal-places/
+	convertWithCommas: function(){
+		var pieces = this.toString().split('.');
+		var p1 = pieces[0];
+		var p2 = pieces.length > 1 ? '.' + pieces[1] : '';
+		var regex = /(\d+)(\d{3})/;
+		while (regex.test(p1)) {
+			p1 = p1.replace(regex, '$1' + ',' + '$2');
+		}
+		return p1 + p2;
+	}
 });
