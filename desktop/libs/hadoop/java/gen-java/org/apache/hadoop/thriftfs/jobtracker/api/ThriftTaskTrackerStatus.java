@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * TaskTracker status; contains details of individual tasks
  */
-public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._Fields>, java.io.Serializable, Cloneable {
+public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus, ThriftTaskTrackerStatus._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftTaskTrackerStatus");
 
   private static final TField TRACKER_NAME_FIELD_DESC = new TField("trackerName", TType.STRING, (short)1);
@@ -103,12 +106,10 @@ public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._F
     MAP_COUNT((short)14, "mapCount"),
     REDUCE_COUNT((short)15, "reduceCount");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -117,7 +118,36 @@ public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._F
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // TRACKER_NAME
+          return TRACKER_NAME;
+        case 2: // HOST
+          return HOST;
+        case 3: // HTTP_PORT
+          return HTTP_PORT;
+        case 4: // FAILURE_COUNT
+          return FAILURE_COUNT;
+        case 5: // TASK_REPORTS
+          return TASK_REPORTS;
+        case 6: // LAST_SEEN
+          return LAST_SEEN;
+        case 7: // MAX_MAP_TASKS
+          return MAX_MAP_TASKS;
+        case 8: // MAX_REDUCE_TASKS
+          return MAX_REDUCE_TASKS;
+        case 9: // TOTAL_VIRTUAL_MEMORY
+          return TOTAL_VIRTUAL_MEMORY;
+        case 11: // TOTAL_PHYSICAL_MEMORY
+          return TOTAL_PHYSICAL_MEMORY;
+        case 13: // AVAILABLE_SPACE
+          return AVAILABLE_SPACE;
+        case 14: // MAP_COUNT
+          return MAP_COUNT;
+        case 15: // REDUCE_COUNT
+          return REDUCE_COUNT;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -167,37 +197,37 @@ public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._F
   private static final int __REDUCECOUNT_ISSET_ID = 9;
   private BitSet __isset_bit_vector = new BitSet(10);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.TRACKER_NAME, new FieldMetaData("trackerName", TFieldRequirementType.DEFAULT, 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
+  static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.TRACKER_NAME, new FieldMetaData("trackerName", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.STRING)));
-    put(_Fields.HOST, new FieldMetaData("host", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.HOST, new FieldMetaData("host", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.STRING)));
-    put(_Fields.HTTP_PORT, new FieldMetaData("httpPort", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.HTTP_PORT, new FieldMetaData("httpPort", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I32)));
-    put(_Fields.FAILURE_COUNT, new FieldMetaData("failureCount", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.FAILURE_COUNT, new FieldMetaData("failureCount", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I32)));
-    put(_Fields.TASK_REPORTS, new FieldMetaData("taskReports", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.TASK_REPORTS, new FieldMetaData("taskReports", TFieldRequirementType.DEFAULT, 
         new ListMetaData(TType.LIST, 
             new StructMetaData(TType.STRUCT, ThriftTaskStatus.class))));
-    put(_Fields.LAST_SEEN, new FieldMetaData("lastSeen", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.LAST_SEEN, new FieldMetaData("lastSeen", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.MAX_MAP_TASKS, new FieldMetaData("maxMapTasks", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.MAX_MAP_TASKS, new FieldMetaData("maxMapTasks", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I32)));
-    put(_Fields.MAX_REDUCE_TASKS, new FieldMetaData("maxReduceTasks", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.MAX_REDUCE_TASKS, new FieldMetaData("maxReduceTasks", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I32)));
-    put(_Fields.TOTAL_VIRTUAL_MEMORY, new FieldMetaData("totalVirtualMemory", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.TOTAL_VIRTUAL_MEMORY, new FieldMetaData("totalVirtualMemory", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.TOTAL_PHYSICAL_MEMORY, new FieldMetaData("totalPhysicalMemory", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.TOTAL_PHYSICAL_MEMORY, new FieldMetaData("totalPhysicalMemory", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.AVAILABLE_SPACE, new FieldMetaData("availableSpace", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.AVAILABLE_SPACE, new FieldMetaData("availableSpace", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.MAP_COUNT, new FieldMetaData("mapCount", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.MAP_COUNT, new FieldMetaData("mapCount", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I32)));
-    put(_Fields.REDUCE_COUNT, new FieldMetaData("reduceCount", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.REDUCE_COUNT, new FieldMetaData("reduceCount", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I32)));
-  }});
-
-  static {
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftTaskTrackerStatus.class, metaDataMap);
   }
 
@@ -280,9 +310,31 @@ public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._F
     return new ThriftTaskTrackerStatus(this);
   }
 
-  @Deprecated
-  public ThriftTaskTrackerStatus clone() {
-    return new ThriftTaskTrackerStatus(this);
+  @Override
+  public void clear() {
+    this.trackerName = null;
+    this.host = null;
+    setHttpPortIsSet(false);
+    this.httpPort = 0;
+    setFailureCountIsSet(false);
+    this.failureCount = 0;
+    this.taskReports = null;
+    setLastSeenIsSet(false);
+    this.lastSeen = 0;
+    setMaxMapTasksIsSet(false);
+    this.maxMapTasks = 0;
+    setMaxReduceTasksIsSet(false);
+    this.maxReduceTasks = 0;
+    setTotalVirtualMemoryIsSet(false);
+    this.totalVirtualMemory = 0;
+    setTotalPhysicalMemoryIsSet(false);
+    this.totalPhysicalMemory = 0;
+    setAvailableSpaceIsSet(false);
+    this.availableSpace = 0;
+    setMapCountIsSet(false);
+    this.mapCount = 0;
+    setReduceCountIsSet(false);
+    this.reduceCount = 0;
   }
 
   public String getTrackerName() {
@@ -741,10 +793,6 @@ public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._F
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case TRACKER_NAME:
@@ -790,12 +838,12 @@ public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._F
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case TRACKER_NAME:
       return isSetTrackerName();
@@ -825,10 +873,6 @@ public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._F
       return isSetReduceCount();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -969,6 +1013,151 @@ public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._F
     return 0;
   }
 
+  public int compareTo(ThriftTaskTrackerStatus other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    ThriftTaskTrackerStatus typedOther = (ThriftTaskTrackerStatus)other;
+
+    lastComparison = Boolean.valueOf(isSetTrackerName()).compareTo(typedOther.isSetTrackerName());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTrackerName()) {
+      lastComparison = TBaseHelper.compareTo(this.trackerName, typedOther.trackerName);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHost()).compareTo(typedOther.isSetHost());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetHost()) {
+      lastComparison = TBaseHelper.compareTo(this.host, typedOther.host);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHttpPort()).compareTo(typedOther.isSetHttpPort());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetHttpPort()) {
+      lastComparison = TBaseHelper.compareTo(this.httpPort, typedOther.httpPort);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetFailureCount()).compareTo(typedOther.isSetFailureCount());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetFailureCount()) {
+      lastComparison = TBaseHelper.compareTo(this.failureCount, typedOther.failureCount);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTaskReports()).compareTo(typedOther.isSetTaskReports());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTaskReports()) {
+      lastComparison = TBaseHelper.compareTo(this.taskReports, typedOther.taskReports);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetLastSeen()).compareTo(typedOther.isSetLastSeen());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetLastSeen()) {
+      lastComparison = TBaseHelper.compareTo(this.lastSeen, typedOther.lastSeen);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMaxMapTasks()).compareTo(typedOther.isSetMaxMapTasks());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetMaxMapTasks()) {
+      lastComparison = TBaseHelper.compareTo(this.maxMapTasks, typedOther.maxMapTasks);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMaxReduceTasks()).compareTo(typedOther.isSetMaxReduceTasks());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetMaxReduceTasks()) {
+      lastComparison = TBaseHelper.compareTo(this.maxReduceTasks, typedOther.maxReduceTasks);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTotalVirtualMemory()).compareTo(typedOther.isSetTotalVirtualMemory());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTotalVirtualMemory()) {
+      lastComparison = TBaseHelper.compareTo(this.totalVirtualMemory, typedOther.totalVirtualMemory);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTotalPhysicalMemory()).compareTo(typedOther.isSetTotalPhysicalMemory());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTotalPhysicalMemory()) {
+      lastComparison = TBaseHelper.compareTo(this.totalPhysicalMemory, typedOther.totalPhysicalMemory);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetAvailableSpace()).compareTo(typedOther.isSetAvailableSpace());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetAvailableSpace()) {
+      lastComparison = TBaseHelper.compareTo(this.availableSpace, typedOther.availableSpace);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMapCount()).compareTo(typedOther.isSetMapCount());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetMapCount()) {
+      lastComparison = TBaseHelper.compareTo(this.mapCount, typedOther.mapCount);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetReduceCount()).compareTo(typedOther.isSetReduceCount());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetReduceCount()) {
+      lastComparison = TBaseHelper.compareTo(this.reduceCount, typedOther.reduceCount);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -978,126 +1167,123 @@ public class ThriftTaskTrackerStatus implements TBase<ThriftTaskTrackerStatus._F
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case TRACKER_NAME:
-            if (field.type == TType.STRING) {
-              this.trackerName = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case HOST:
-            if (field.type == TType.STRING) {
-              this.host = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case HTTP_PORT:
-            if (field.type == TType.I32) {
-              this.httpPort = iprot.readI32();
-              setHttpPortIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case FAILURE_COUNT:
-            if (field.type == TType.I32) {
-              this.failureCount = iprot.readI32();
-              setFailureCountIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case TASK_REPORTS:
-            if (field.type == TType.LIST) {
+      switch (field.id) {
+        case 1: // TRACKER_NAME
+          if (field.type == TType.STRING) {
+            this.trackerName = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // HOST
+          if (field.type == TType.STRING) {
+            this.host = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // HTTP_PORT
+          if (field.type == TType.I32) {
+            this.httpPort = iprot.readI32();
+            setHttpPortIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // FAILURE_COUNT
+          if (field.type == TType.I32) {
+            this.failureCount = iprot.readI32();
+            setFailureCountIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // TASK_REPORTS
+          if (field.type == TType.LIST) {
+            {
+              TList _list35 = iprot.readListBegin();
+              this.taskReports = new ArrayList<ThriftTaskStatus>(_list35.size);
+              for (int _i36 = 0; _i36 < _list35.size; ++_i36)
               {
-                TList _list35 = iprot.readListBegin();
-                this.taskReports = new ArrayList<ThriftTaskStatus>(_list35.size);
-                for (int _i36 = 0; _i36 < _list35.size; ++_i36)
-                {
-                  ThriftTaskStatus _elem37;
-                  _elem37 = new ThriftTaskStatus();
-                  _elem37.read(iprot);
-                  this.taskReports.add(_elem37);
-                }
-                iprot.readListEnd();
+                ThriftTaskStatus _elem37;
+                _elem37 = new ThriftTaskStatus();
+                _elem37.read(iprot);
+                this.taskReports.add(_elem37);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readListEnd();
             }
-            break;
-          case LAST_SEEN:
-            if (field.type == TType.I64) {
-              this.lastSeen = iprot.readI64();
-              setLastSeenIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MAX_MAP_TASKS:
-            if (field.type == TType.I32) {
-              this.maxMapTasks = iprot.readI32();
-              setMaxMapTasksIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MAX_REDUCE_TASKS:
-            if (field.type == TType.I32) {
-              this.maxReduceTasks = iprot.readI32();
-              setMaxReduceTasksIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case TOTAL_VIRTUAL_MEMORY:
-            if (field.type == TType.I64) {
-              this.totalVirtualMemory = iprot.readI64();
-              setTotalVirtualMemoryIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case TOTAL_PHYSICAL_MEMORY:
-            if (field.type == TType.I64) {
-              this.totalPhysicalMemory = iprot.readI64();
-              setTotalPhysicalMemoryIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case AVAILABLE_SPACE:
-            if (field.type == TType.I64) {
-              this.availableSpace = iprot.readI64();
-              setAvailableSpaceIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MAP_COUNT:
-            if (field.type == TType.I32) {
-              this.mapCount = iprot.readI32();
-              setMapCountIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case REDUCE_COUNT:
-            if (field.type == TType.I32) {
-              this.reduceCount = iprot.readI32();
-              setReduceCountIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // LAST_SEEN
+          if (field.type == TType.I64) {
+            this.lastSeen = iprot.readI64();
+            setLastSeenIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // MAX_MAP_TASKS
+          if (field.type == TType.I32) {
+            this.maxMapTasks = iprot.readI32();
+            setMaxMapTasksIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 8: // MAX_REDUCE_TASKS
+          if (field.type == TType.I32) {
+            this.maxReduceTasks = iprot.readI32();
+            setMaxReduceTasksIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 9: // TOTAL_VIRTUAL_MEMORY
+          if (field.type == TType.I64) {
+            this.totalVirtualMemory = iprot.readI64();
+            setTotalVirtualMemoryIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 11: // TOTAL_PHYSICAL_MEMORY
+          if (field.type == TType.I64) {
+            this.totalPhysicalMemory = iprot.readI64();
+            setTotalPhysicalMemoryIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 13: // AVAILABLE_SPACE
+          if (field.type == TType.I64) {
+            this.availableSpace = iprot.readI64();
+            setAvailableSpaceIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 14: // MAP_COUNT
+          if (field.type == TType.I32) {
+            this.mapCount = iprot.readI32();
+            setMapCountIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 15: // REDUCE_COUNT
+          if (field.type == TType.I32) {
+            this.reduceCount = iprot.readI32();
+            setReduceCountIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

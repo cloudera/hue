@@ -20,8 +20,8 @@ set -o xtrace
 
 cd $(dirname $0)
 
-thrift -I include -r --gen py:new_style -o ../ beeswax.thrift
-thrift -I include -r --gen java:hashcode -o ../java beeswax.thrift
+thrift -I thrift/include -r --gen py:new_style -o ./ thrift/beeswax.thrift
+thrift -I thrift/include -r --gen java:hashcode -o java thrift/beeswax.thrift
 
 # This is based on thirdparty.
 # thrift -r --gen py:new_style -o ../ ../../../../ext/thirdparty/py/thrift/contrib/fb303/if/fb303.thrift

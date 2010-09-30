@@ -15,19 +15,22 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Information about an entire subtree under a directory
  * Includes the information from org.apache.hadoop.fs.ContentSummary
  */
-public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Serializable, Cloneable, Comparable<ContentSummary> {
+public class ContentSummary implements TBase<ContentSummary, ContentSummary._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ContentSummary");
 
   private static final TField FILE_COUNT_FIELD_DESC = new TField("fileCount", TType.I64, (short)1);
@@ -89,12 +92,10 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
      */
     PATH((short)6, "path");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -103,7 +104,22 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // FILE_COUNT
+          return FILE_COUNT;
+        case 2: // DIRECTORY_COUNT
+          return DIRECTORY_COUNT;
+        case 3: // QUOTA
+          return QUOTA;
+        case 4: // SPACE_CONSUMED
+          return SPACE_CONSUMED;
+        case 5: // SPACE_QUOTA
+          return SPACE_QUOTA;
+        case 6: // PATH
+          return PATH;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -148,22 +164,22 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
   private static final int __SPACEQUOTA_ISSET_ID = 4;
   private BitSet __isset_bit_vector = new BitSet(5);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.FILE_COUNT, new FieldMetaData("fileCount", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.DIRECTORY_COUNT, new FieldMetaData("directoryCount", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.QUOTA, new FieldMetaData("quota", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.SPACE_CONSUMED, new FieldMetaData("spaceConsumed", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.SPACE_QUOTA, new FieldMetaData("spaceQuota", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.FILE_COUNT, new FieldMetaData("fileCount", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.DIRECTORY_COUNT, new FieldMetaData("directoryCount", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.QUOTA, new FieldMetaData("quota", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.SPACE_CONSUMED, new FieldMetaData("spaceConsumed", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.SPACE_QUOTA, new FieldMetaData("spaceQuota", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ContentSummary.class, metaDataMap);
   }
 
@@ -212,9 +228,19 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     return new ContentSummary(this);
   }
 
-  @Deprecated
-  public ContentSummary clone() {
-    return new ContentSummary(this);
+  @Override
+  public void clear() {
+    setFileCountIsSet(false);
+    this.fileCount = 0;
+    setDirectoryCountIsSet(false);
+    this.directoryCount = 0;
+    setQuotaIsSet(false);
+    this.quota = 0;
+    setSpaceConsumedIsSet(false);
+    this.spaceConsumed = 0;
+    setSpaceQuotaIsSet(false);
+    this.spaceQuota = 0;
+    this.path = null;
   }
 
   /**
@@ -445,10 +471,6 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case FILE_COUNT:
@@ -473,12 +495,12 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case FILE_COUNT:
       return isSetFileCount();
@@ -494,10 +516,6 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
       return isSetPath();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -583,55 +601,71 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
     int lastComparison = 0;
     ContentSummary typedOther = (ContentSummary)other;
 
-    lastComparison = Boolean.valueOf(isSetFileCount()).compareTo(isSetFileCount());
+    lastComparison = Boolean.valueOf(isSetFileCount()).compareTo(typedOther.isSetFileCount());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(fileCount, typedOther.fileCount);
+    if (isSetFileCount()) {
+      lastComparison = TBaseHelper.compareTo(this.fileCount, typedOther.fileCount);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetDirectoryCount()).compareTo(typedOther.isSetDirectoryCount());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetDirectoryCount()).compareTo(isSetDirectoryCount());
+    if (isSetDirectoryCount()) {
+      lastComparison = TBaseHelper.compareTo(this.directoryCount, typedOther.directoryCount);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetQuota()).compareTo(typedOther.isSetQuota());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(directoryCount, typedOther.directoryCount);
+    if (isSetQuota()) {
+      lastComparison = TBaseHelper.compareTo(this.quota, typedOther.quota);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetSpaceConsumed()).compareTo(typedOther.isSetSpaceConsumed());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetQuota()).compareTo(isSetQuota());
+    if (isSetSpaceConsumed()) {
+      lastComparison = TBaseHelper.compareTo(this.spaceConsumed, typedOther.spaceConsumed);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetSpaceQuota()).compareTo(typedOther.isSetSpaceQuota());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(quota, typedOther.quota);
+    if (isSetSpaceQuota()) {
+      lastComparison = TBaseHelper.compareTo(this.spaceQuota, typedOther.spaceQuota);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetSpaceConsumed()).compareTo(isSetSpaceConsumed());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(spaceConsumed, typedOther.spaceConsumed);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetSpaceQuota()).compareTo(isSetSpaceQuota());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(spaceQuota, typedOther.spaceQuota);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetPath()).compareTo(isSetPath());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(path, typedOther.path);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetPath()) {
+      lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -643,61 +677,58 @@ public class ContentSummary implements TBase<ContentSummary._Fields>, java.io.Se
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case FILE_COUNT:
-            if (field.type == TType.I64) {
-              this.fileCount = iprot.readI64();
-              setFileCountIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case DIRECTORY_COUNT:
-            if (field.type == TType.I64) {
-              this.directoryCount = iprot.readI64();
-              setDirectoryCountIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case QUOTA:
-            if (field.type == TType.I64) {
-              this.quota = iprot.readI64();
-              setQuotaIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case SPACE_CONSUMED:
-            if (field.type == TType.I64) {
-              this.spaceConsumed = iprot.readI64();
-              setSpaceConsumedIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case SPACE_QUOTA:
-            if (field.type == TType.I64) {
-              this.spaceQuota = iprot.readI64();
-              setSpaceQuotaIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PATH:
-            if (field.type == TType.STRING) {
-              this.path = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // FILE_COUNT
+          if (field.type == TType.I64) {
+            this.fileCount = iprot.readI64();
+            setFileCountIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // DIRECTORY_COUNT
+          if (field.type == TType.I64) {
+            this.directoryCount = iprot.readI64();
+            setDirectoryCountIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // QUOTA
+          if (field.type == TType.I64) {
+            this.quota = iprot.readI64();
+            setQuotaIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // SPACE_CONSUMED
+          if (field.type == TType.I64) {
+            this.spaceConsumed = iprot.readI64();
+            setSpaceConsumedIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // SPACE_QUOTA
+          if (field.type == TType.I64) {
+            this.spaceQuota = iprot.readI64();
+            setSpaceQuotaIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // PATH
+          if (field.type == TType.STRING) {
+            this.path = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

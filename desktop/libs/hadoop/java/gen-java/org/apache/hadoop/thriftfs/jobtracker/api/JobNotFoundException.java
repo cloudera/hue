@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Merely an indicator that job wasn't found.
  */
-public class JobNotFoundException extends Exception implements TBase<JobNotFoundException._Fields>, java.io.Serializable, Cloneable, Comparable<JobNotFoundException> {
+public class JobNotFoundException extends Exception implements TBase<JobNotFoundException, JobNotFoundException._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("JobNotFoundException");
 
 
@@ -35,12 +38,10 @@ public class JobNotFoundException extends Exception implements TBase<JobNotFound
   public enum _Fields implements TFieldIdEnum {
 ;
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -49,7 +50,10 @@ public class JobNotFoundException extends Exception implements TBase<JobNotFound
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        default:
+          return null;
+      }
     }
 
     /**
@@ -85,10 +89,10 @@ public class JobNotFoundException extends Exception implements TBase<JobNotFound
       return _fieldName;
     }
   }
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(JobNotFoundException.class, metaDataMap);
   }
 
@@ -105,18 +109,13 @@ public class JobNotFoundException extends Exception implements TBase<JobNotFound
     return new JobNotFoundException(this);
   }
 
-  @Deprecated
-  public JobNotFoundException clone() {
-    return new JobNotFoundException(this);
+  @Override
+  public void clear() {
   }
 
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     }
-  }
-
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
   }
 
   public Object getFieldValue(_Fields field) {
@@ -125,19 +124,15 @@ public class JobNotFoundException extends Exception implements TBase<JobNotFound
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -172,6 +167,10 @@ public class JobNotFoundException extends Exception implements TBase<JobNotFound
     return 0;
   }
 
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -181,14 +180,11 @@ public class JobNotFoundException extends Exception implements TBase<JobNotFound
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

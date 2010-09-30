@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Describes the current state of a single attempt
  */
-public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.io.Serializable, Cloneable {
+public class ThriftTaskStatus implements TBase<ThriftTaskStatus, ThriftTaskStatus._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftTaskStatus");
 
   private static final TField TASK_ID_FIELD_DESC = new TField("taskID", TType.STRUCT, (short)1);
@@ -92,12 +95,10 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
     SORT_FINISH_TIME((short)13, "sortFinishTime"),
     MAP_FINISH_TIME((short)14, "mapFinishTime");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -106,7 +107,38 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // TASK_ID
+          return TASK_ID;
+        case 2: // PROGRESS
+          return PROGRESS;
+        case 3: // STATE
+          return STATE;
+        case 4: // DIAGNOSTIC_INFO
+          return DIAGNOSTIC_INFO;
+        case 5: // STATE_STRING
+          return STATE_STRING;
+        case 6: // TASK_TRACKER
+          return TASK_TRACKER;
+        case 7: // START_TIME
+          return START_TIME;
+        case 8: // FINISH_TIME
+          return FINISH_TIME;
+        case 9: // OUTPUT_SIZE
+          return OUTPUT_SIZE;
+        case 10: // PHASE
+          return PHASE;
+        case 11: // COUNTERS
+          return COUNTERS;
+        case 12: // SHUFFLE_FINISH_TIME
+          return SHUFFLE_FINISH_TIME;
+        case 13: // SORT_FINISH_TIME
+          return SORT_FINISH_TIME;
+        case 14: // MAP_FINISH_TIME
+          return MAP_FINISH_TIME;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -153,38 +185,38 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
   private static final int __MAPFINISHTIME_ISSET_ID = 6;
   private BitSet __isset_bit_vector = new BitSet(7);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.TASK_ID, new FieldMetaData("taskID", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftTaskAttemptID.class)));
-    put(_Fields.PROGRESS, new FieldMetaData("progress", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.DOUBLE)));
-    put(_Fields.STATE, new FieldMetaData("state", TFieldRequirementType.DEFAULT, 
-        new EnumMetaData(TType.ENUM, ThriftTaskState.class)));
-    put(_Fields.DIAGNOSTIC_INFO, new FieldMetaData("diagnosticInfo", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.STATE_STRING, new FieldMetaData("stateString", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.TASK_TRACKER, new FieldMetaData("taskTracker", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.FINISH_TIME, new FieldMetaData("finishTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.OUTPUT_SIZE, new FieldMetaData("outputSize", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.PHASE, new FieldMetaData("phase", TFieldRequirementType.DEFAULT, 
-        new EnumMetaData(TType.ENUM, ThriftTaskPhase.class)));
-    put(_Fields.COUNTERS, new FieldMetaData("counters", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
-    put(_Fields.SHUFFLE_FINISH_TIME, new FieldMetaData("shuffleFinishTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.SORT_FINISH_TIME, new FieldMetaData("sortFinishTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.MAP_FINISH_TIME, new FieldMetaData("mapFinishTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.TASK_ID, new FieldMetaData("taskID", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftTaskAttemptID.class)));
+    tmpMap.put(_Fields.PROGRESS, new FieldMetaData("progress", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.DOUBLE)));
+    tmpMap.put(_Fields.STATE, new FieldMetaData("state", TFieldRequirementType.DEFAULT, 
+        new EnumMetaData(TType.ENUM, ThriftTaskState.class)));
+    tmpMap.put(_Fields.DIAGNOSTIC_INFO, new FieldMetaData("diagnosticInfo", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.STATE_STRING, new FieldMetaData("stateString", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.TASK_TRACKER, new FieldMetaData("taskTracker", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.FINISH_TIME, new FieldMetaData("finishTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.OUTPUT_SIZE, new FieldMetaData("outputSize", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.PHASE, new FieldMetaData("phase", TFieldRequirementType.DEFAULT, 
+        new EnumMetaData(TType.ENUM, ThriftTaskPhase.class)));
+    tmpMap.put(_Fields.COUNTERS, new FieldMetaData("counters", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
+    tmpMap.put(_Fields.SHUFFLE_FINISH_TIME, new FieldMetaData("shuffleFinishTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.SORT_FINISH_TIME, new FieldMetaData("sortFinishTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.MAP_FINISH_TIME, new FieldMetaData("mapFinishTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftTaskStatus.class, metaDataMap);
   }
 
@@ -271,9 +303,29 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
     return new ThriftTaskStatus(this);
   }
 
-  @Deprecated
-  public ThriftTaskStatus clone() {
-    return new ThriftTaskStatus(this);
+  @Override
+  public void clear() {
+    this.taskID = null;
+    setProgressIsSet(false);
+    this.progress = 0.0;
+    this.state = null;
+    this.diagnosticInfo = null;
+    this.stateString = null;
+    this.taskTracker = null;
+    setStartTimeIsSet(false);
+    this.startTime = 0;
+    setFinishTimeIsSet(false);
+    this.finishTime = 0;
+    setOutputSizeIsSet(false);
+    this.outputSize = 0;
+    this.phase = null;
+    this.counters = null;
+    setShuffleFinishTimeIsSet(false);
+    this.shuffleFinishTime = 0;
+    setSortFinishTimeIsSet(false);
+    this.sortFinishTime = 0;
+    setMapFinishTimeIsSet(false);
+    this.mapFinishTime = 0;
   }
 
   public ThriftTaskAttemptID getTaskID() {
@@ -738,10 +790,6 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case TASK_ID:
@@ -790,12 +838,12 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case TASK_ID:
       return isSetTaskID();
@@ -827,10 +875,6 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
       return isSetMapFinishTime();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -980,6 +1024,161 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
     return 0;
   }
 
+  public int compareTo(ThriftTaskStatus other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    ThriftTaskStatus typedOther = (ThriftTaskStatus)other;
+
+    lastComparison = Boolean.valueOf(isSetTaskID()).compareTo(typedOther.isSetTaskID());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTaskID()) {
+      lastComparison = TBaseHelper.compareTo(this.taskID, typedOther.taskID);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetProgress()).compareTo(typedOther.isSetProgress());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetProgress()) {
+      lastComparison = TBaseHelper.compareTo(this.progress, typedOther.progress);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetState()).compareTo(typedOther.isSetState());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetState()) {
+      lastComparison = TBaseHelper.compareTo(this.state, typedOther.state);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetDiagnosticInfo()).compareTo(typedOther.isSetDiagnosticInfo());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetDiagnosticInfo()) {
+      lastComparison = TBaseHelper.compareTo(this.diagnosticInfo, typedOther.diagnosticInfo);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStateString()).compareTo(typedOther.isSetStateString());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetStateString()) {
+      lastComparison = TBaseHelper.compareTo(this.stateString, typedOther.stateString);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTaskTracker()).compareTo(typedOther.isSetTaskTracker());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTaskTracker()) {
+      lastComparison = TBaseHelper.compareTo(this.taskTracker, typedOther.taskTracker);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStartTime()).compareTo(typedOther.isSetStartTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetStartTime()) {
+      lastComparison = TBaseHelper.compareTo(this.startTime, typedOther.startTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetFinishTime()).compareTo(typedOther.isSetFinishTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetFinishTime()) {
+      lastComparison = TBaseHelper.compareTo(this.finishTime, typedOther.finishTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetOutputSize()).compareTo(typedOther.isSetOutputSize());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetOutputSize()) {
+      lastComparison = TBaseHelper.compareTo(this.outputSize, typedOther.outputSize);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetPhase()).compareTo(typedOther.isSetPhase());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetPhase()) {
+      lastComparison = TBaseHelper.compareTo(this.phase, typedOther.phase);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCounters()).compareTo(typedOther.isSetCounters());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetCounters()) {
+      lastComparison = TBaseHelper.compareTo(this.counters, typedOther.counters);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetShuffleFinishTime()).compareTo(typedOther.isSetShuffleFinishTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetShuffleFinishTime()) {
+      lastComparison = TBaseHelper.compareTo(this.shuffleFinishTime, typedOther.shuffleFinishTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetSortFinishTime()).compareTo(typedOther.isSetSortFinishTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetSortFinishTime()) {
+      lastComparison = TBaseHelper.compareTo(this.sortFinishTime, typedOther.sortFinishTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMapFinishTime()).compareTo(typedOther.isSetMapFinishTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetMapFinishTime()) {
+      lastComparison = TBaseHelper.compareTo(this.mapFinishTime, typedOther.mapFinishTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -989,121 +1188,118 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case TASK_ID:
-            if (field.type == TType.STRUCT) {
-              this.taskID = new ThriftTaskAttemptID();
-              this.taskID.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PROGRESS:
-            if (field.type == TType.DOUBLE) {
-              this.progress = iprot.readDouble();
-              setProgressIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case STATE:
-            if (field.type == TType.I32) {
-              this.state = ThriftTaskState.findByValue(iprot.readI32());
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case DIAGNOSTIC_INFO:
-            if (field.type == TType.STRING) {
-              this.diagnosticInfo = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case STATE_STRING:
-            if (field.type == TType.STRING) {
-              this.stateString = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case TASK_TRACKER:
-            if (field.type == TType.STRING) {
-              this.taskTracker = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case START_TIME:
-            if (field.type == TType.I64) {
-              this.startTime = iprot.readI64();
-              setStartTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case FINISH_TIME:
-            if (field.type == TType.I64) {
-              this.finishTime = iprot.readI64();
-              setFinishTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case OUTPUT_SIZE:
-            if (field.type == TType.I64) {
-              this.outputSize = iprot.readI64();
-              setOutputSizeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PHASE:
-            if (field.type == TType.I32) {
-              this.phase = ThriftTaskPhase.findByValue(iprot.readI32());
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case COUNTERS:
-            if (field.type == TType.STRUCT) {
-              this.counters = new ThriftGroupList();
-              this.counters.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case SHUFFLE_FINISH_TIME:
-            if (field.type == TType.I64) {
-              this.shuffleFinishTime = iprot.readI64();
-              setShuffleFinishTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case SORT_FINISH_TIME:
-            if (field.type == TType.I64) {
-              this.sortFinishTime = iprot.readI64();
-              setSortFinishTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MAP_FINISH_TIME:
-            if (field.type == TType.I64) {
-              this.mapFinishTime = iprot.readI64();
-              setMapFinishTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // TASK_ID
+          if (field.type == TType.STRUCT) {
+            this.taskID = new ThriftTaskAttemptID();
+            this.taskID.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // PROGRESS
+          if (field.type == TType.DOUBLE) {
+            this.progress = iprot.readDouble();
+            setProgressIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // STATE
+          if (field.type == TType.I32) {
+            this.state = ThriftTaskState.findByValue(iprot.readI32());
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // DIAGNOSTIC_INFO
+          if (field.type == TType.STRING) {
+            this.diagnosticInfo = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // STATE_STRING
+          if (field.type == TType.STRING) {
+            this.stateString = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // TASK_TRACKER
+          if (field.type == TType.STRING) {
+            this.taskTracker = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // START_TIME
+          if (field.type == TType.I64) {
+            this.startTime = iprot.readI64();
+            setStartTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 8: // FINISH_TIME
+          if (field.type == TType.I64) {
+            this.finishTime = iprot.readI64();
+            setFinishTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 9: // OUTPUT_SIZE
+          if (field.type == TType.I64) {
+            this.outputSize = iprot.readI64();
+            setOutputSizeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 10: // PHASE
+          if (field.type == TType.I32) {
+            this.phase = ThriftTaskPhase.findByValue(iprot.readI32());
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 11: // COUNTERS
+          if (field.type == TType.STRUCT) {
+            this.counters = new ThriftGroupList();
+            this.counters.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 12: // SHUFFLE_FINISH_TIME
+          if (field.type == TType.I64) {
+            this.shuffleFinishTime = iprot.readI64();
+            setShuffleFinishTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 13: // SORT_FINISH_TIME
+          if (field.type == TType.I64) {
+            this.sortFinishTime = iprot.readI64();
+            setSortFinishTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 14: // MAP_FINISH_TIME
+          if (field.type == TType.I64) {
+            this.mapFinishTime = iprot.readI64();
+            setMapFinishTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 
@@ -1196,15 +1392,7 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
     if (this.state == null) {
       sb.append("null");
     } else {
-      String state_name = state.name();
-      if (state_name != null) {
-        sb.append(state_name);
-        sb.append(" (");
-      }
       sb.append(this.state);
-      if (state_name != null) {
-        sb.append(")");
-      }
     }
     first = false;
     if (!first) sb.append(", ");
@@ -1248,15 +1436,7 @@ public class ThriftTaskStatus implements TBase<ThriftTaskStatus._Fields>, java.i
     if (this.phase == null) {
       sb.append("null");
     } else {
-      String phase_name = phase.name();
-      if (phase_name != null) {
-        sb.append(phase_name);
-        sb.append(" (");
-      }
       sb.append(this.phase);
-      if (phase_name != null) {
-        sb.append(")");
-      }
     }
     first = false;
     if (!first) sb.append(", ");

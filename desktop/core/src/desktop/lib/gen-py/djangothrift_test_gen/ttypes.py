@@ -7,7 +7,7 @@
 from thrift.Thrift import *
 
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -30,6 +30,7 @@ class TestEnum(object):
     "ENUM_TWO": 1,
     "ENUM_THREE": 2,
   }
+
 
 class TestStruct(object):
   """
@@ -87,6 +88,9 @@ class TestStruct(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -156,6 +160,9 @@ class TestNesting(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -417,6 +424,9 @@ class TestManyTypes(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -428,4 +438,3 @@ class TestManyTypes(object):
 
   def __ne__(self, other):
     return not (self == other)
-

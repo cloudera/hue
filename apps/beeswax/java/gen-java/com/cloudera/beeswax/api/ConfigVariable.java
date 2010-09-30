@@ -10,45 +10,113 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Collections;
-import org.apache.log4j.Logger;
+import java.util.BitSet;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Represents a Hadoop-style configuration variable.
  */
-public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
+public class ConfigVariable implements TBase<ConfigVariable, ConfigVariable._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ConfigVariable");
+
   private static final TField KEY_FIELD_DESC = new TField("key", TType.STRING, (short)1);
   private static final TField VALUE_FIELD_DESC = new TField("value", TType.STRING, (short)2);
   private static final TField DESCRIPTION_FIELD_DESC = new TField("description", TType.STRING, (short)3);
 
   public String key;
-  public static final int KEY = 1;
   public String value;
-  public static final int VALUE = 2;
   public String description;
-  public static final int DESCRIPTION = 3;
 
-  private final Isset __isset = new Isset();
-  private static final class Isset implements java.io.Serializable {
+  /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+  public enum _Fields implements TFieldIdEnum {
+    KEY((short)1, "key"),
+    VALUE((short)2, "value"),
+    DESCRIPTION((short)3, "description");
+
+    private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+    static {
+      for (_Fields field : EnumSet.allOf(_Fields.class)) {
+        byName.put(field.getFieldName(), field);
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, or null if its not found.
+     */
+    public static _Fields findByThriftId(int fieldId) {
+      switch(fieldId) {
+        case 1: // KEY
+          return KEY;
+        case 2: // VALUE
+          return VALUE;
+        case 3: // DESCRIPTION
+          return DESCRIPTION;
+        default:
+          return null;
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, throwing an exception
+     * if it is not found.
+     */
+    public static _Fields findByThriftIdOrThrow(int fieldId) {
+      _Fields fields = findByThriftId(fieldId);
+      if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+      return fields;
+    }
+
+    /**
+     * Find the _Fields constant that matches name, or null if its not found.
+     */
+    public static _Fields findByName(String name) {
+      return byName.get(name);
+    }
+
+    private final short _thriftId;
+    private final String _fieldName;
+
+    _Fields(short thriftId, String fieldName) {
+      _thriftId = thriftId;
+      _fieldName = fieldName;
+    }
+
+    public short getThriftFieldId() {
+      return _thriftId;
+    }
+
+    public String getFieldName() {
+      return _fieldName;
+    }
   }
 
-  public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-    put(KEY, new FieldMetaData("key", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(VALUE, new FieldMetaData("value", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(DESCRIPTION, new FieldMetaData("description", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
+  // isset id assignments
 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.KEY, new FieldMetaData("key", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.VALUE, new FieldMetaData("value", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.DESCRIPTION, new FieldMetaData("description", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ConfigVariable.class, metaDataMap);
   }
 
@@ -81,24 +149,31 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
     }
   }
 
-  @Override
-  public ConfigVariable clone() {
+  public ConfigVariable deepCopy() {
     return new ConfigVariable(this);
+  }
+
+  @Override
+  public void clear() {
+    this.key = null;
+    this.value = null;
+    this.description = null;
   }
 
   public String getKey() {
     return this.key;
   }
 
-  public void setKey(String key) {
+  public ConfigVariable setKey(String key) {
     this.key = key;
+    return this;
   }
 
   public void unsetKey() {
     this.key = null;
   }
 
-  // Returns true if field key is set (has been asigned a value) and false otherwise
+  /** Returns true if field key is set (has been asigned a value) and false otherwise */
   public boolean isSetKey() {
     return this.key != null;
   }
@@ -113,15 +188,16 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
     return this.value;
   }
 
-  public void setValue(String value) {
+  public ConfigVariable setValue(String value) {
     this.value = value;
+    return this;
   }
 
   public void unsetValue() {
     this.value = null;
   }
 
-  // Returns true if field value is set (has been asigned a value) and false otherwise
+  /** Returns true if field value is set (has been asigned a value) and false otherwise */
   public boolean isSetValue() {
     return this.value != null;
   }
@@ -136,15 +212,16 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
     return this.description;
   }
 
-  public void setDescription(String description) {
+  public ConfigVariable setDescription(String description) {
     this.description = description;
+    return this;
   }
 
   public void unsetDescription() {
     this.description = null;
   }
 
-  // Returns true if field description is set (has been asigned a value) and false otherwise
+  /** Returns true if field description is set (has been asigned a value) and false otherwise */
   public boolean isSetDescription() {
     return this.description != null;
   }
@@ -155,8 +232,8 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    switch (fieldID) {
+  public void setFieldValue(_Fields field, Object value) {
+    switch (field) {
     case KEY:
       if (value == null) {
         unsetKey();
@@ -181,13 +258,11 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
       }
       break;
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
   }
 
-  public Object getFieldValue(int fieldID) {
-    switch (fieldID) {
+  public Object getFieldValue(_Fields field) {
+    switch (field) {
     case KEY:
       return getKey();
 
@@ -197,23 +272,25 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
     case DESCRIPTION:
       return getDescription();
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
-  // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-  public boolean isSet(int fieldID) {
-    switch (fieldID) {
+  /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+  public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
+    switch (field) {
     case KEY:
       return isSetKey();
     case VALUE:
       return isSetValue();
     case DESCRIPTION:
       return isSetDescription();
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
   @Override
@@ -281,6 +358,51 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
     return builder.toHashCode();
   }
 
+  public int compareTo(ConfigVariable other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    ConfigVariable typedOther = (ConfigVariable)other;
+
+    lastComparison = Boolean.valueOf(isSetKey()).compareTo(typedOther.isSetKey());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetKey()) {
+      lastComparison = TBaseHelper.compareTo(this.key, typedOther.key);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetValue()).compareTo(typedOther.isSetValue());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetValue()) {
+      lastComparison = TBaseHelper.compareTo(this.value, typedOther.value);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetDescription()).compareTo(typedOther.isSetDescription());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetDescription()) {
+      lastComparison = TBaseHelper.compareTo(this.description, typedOther.description);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -290,23 +412,22 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
       if (field.type == TType.STOP) { 
         break;
       }
-      switch (field.id)
-      {
-        case KEY:
+      switch (field.id) {
+        case 1: // KEY
           if (field.type == TType.STRING) {
             this.key = iprot.readString();
           } else { 
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case VALUE:
+        case 2: // VALUE
           if (field.type == TType.STRING) {
             this.value = iprot.readString();
           } else { 
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case DESCRIPTION:
+        case 3: // DESCRIPTION
           if (field.type == TType.STRING) {
             this.description = iprot.readString();
           } else { 
@@ -315,12 +436,10 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
           break;
         default:
           TProtocolUtil.skip(iprot, field.type);
-          break;
       }
       iprot.readFieldEnd();
     }
     iprot.readStructEnd();
-
 
     // check for required fields of primitive type, which can't be checked in the validate method
     validate();
@@ -383,7 +502,6 @@ public class ConfigVariable implements TBase, java.io.Serializable, Cloneable {
 
   public void validate() throws TException {
     // check for required fields
-    // check that fields of type enum have valid values
   }
 
 }

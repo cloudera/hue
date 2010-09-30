@@ -9,21 +9,16 @@ package org.apache.hadoop.thriftfs.jobtracker.api;
 import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
-public enum ThriftTaskState implements TEnum{
-    RUNNING(0),
-    SUCCEEDED(1),
-    FAILED(2),
-    UNASSIGNED(3),
-    KILLED(4),
-    COMMIT_PENDING(5),
-    FAILED_UNCLEAN(6),
-    KILLED_UNCLEAN(7);
 
-  private static final Map<Integer, ThriftTaskState> BY_VALUE = new HashMap<Integer,ThriftTaskState>() {{
-    for(ThriftTaskState val : ThriftTaskState.values()) {
-      put(val.getValue(), val);
-    }
-  }};
+public enum ThriftTaskState implements TEnum {
+  RUNNING(0),
+  SUCCEEDED(1),
+  FAILED(2),
+  UNASSIGNED(3),
+  KILLED(4),
+  COMMIT_PENDING(5),
+  FAILED_UNCLEAN(6),
+  KILLED_UNCLEAN(7);
 
   private final int value;
 
@@ -43,6 +38,25 @@ public enum ThriftTaskState implements TEnum{
    * @return null if the value is not found.
    */
   public static ThriftTaskState findByValue(int value) { 
-    return BY_VALUE.get(value);
+    switch (value) {
+      case 0:
+        return RUNNING;
+      case 1:
+        return SUCCEEDED;
+      case 2:
+        return FAILED;
+      case 3:
+        return UNASSIGNED;
+      case 4:
+        return KILLED;
+      case 5:
+        return COMMIT_PENDING;
+      case 6:
+        return FAILED_UNCLEAN;
+      case 7:
+        return KILLED_UNCLEAN;
+      default:
+        return null;
+    }
   }
 }

@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Counter which represents some custom job metric
  */
-public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Serializable, Cloneable, Comparable<ThriftCounter> {
+public class ThriftCounter implements TBase<ThriftCounter, ThriftCounter._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftCounter");
 
   private static final TField NAME_FIELD_DESC = new TField("name", TType.STRING, (short)1);
@@ -43,12 +46,10 @@ public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Seri
     DISPLAY_NAME((short)2, "displayName"),
     VALUE((short)3, "value");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -57,7 +58,16 @@ public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Seri
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // NAME
+          return NAME;
+        case 2: // DISPLAY_NAME
+          return DISPLAY_NAME;
+        case 3: // VALUE
+          return VALUE;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -98,16 +108,16 @@ public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Seri
   private static final int __VALUE_ISSET_ID = 0;
   private BitSet __isset_bit_vector = new BitSet(1);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.DISPLAY_NAME, new FieldMetaData("displayName", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.VALUE, new FieldMetaData("value", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.DISPLAY_NAME, new FieldMetaData("displayName", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.VALUE, new FieldMetaData("value", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftCounter.class, metaDataMap);
   }
 
@@ -145,9 +155,12 @@ public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Seri
     return new ThriftCounter(this);
   }
 
-  @Deprecated
-  public ThriftCounter clone() {
-    return new ThriftCounter(this);
+  @Override
+  public void clear() {
+    this.name = null;
+    this.displayName = null;
+    setValueIsSet(false);
+    this.value = 0;
   }
 
   public String getName() {
@@ -250,10 +263,6 @@ public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Seri
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case NAME:
@@ -269,12 +278,12 @@ public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Seri
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case NAME:
       return isSetName();
@@ -284,10 +293,6 @@ public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Seri
       return isSetValue();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -346,31 +351,41 @@ public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Seri
     int lastComparison = 0;
     ThriftCounter typedOther = (ThriftCounter)other;
 
-    lastComparison = Boolean.valueOf(isSetName()).compareTo(isSetName());
+    lastComparison = Boolean.valueOf(isSetName()).compareTo(typedOther.isSetName());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(name, typedOther.name);
+    if (isSetName()) {
+      lastComparison = TBaseHelper.compareTo(this.name, typedOther.name);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetDisplayName()).compareTo(typedOther.isSetDisplayName());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetDisplayName()).compareTo(isSetDisplayName());
+    if (isSetDisplayName()) {
+      lastComparison = TBaseHelper.compareTo(this.displayName, typedOther.displayName);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetValue()).compareTo(typedOther.isSetValue());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(displayName, typedOther.displayName);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetValue()).compareTo(isSetValue());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(value, typedOther.value);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetValue()) {
+      lastComparison = TBaseHelper.compareTo(this.value, typedOther.value);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -382,36 +397,33 @@ public class ThriftCounter implements TBase<ThriftCounter._Fields>, java.io.Seri
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case NAME:
-            if (field.type == TType.STRING) {
-              this.name = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case DISPLAY_NAME:
-            if (field.type == TType.STRING) {
-              this.displayName = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case VALUE:
-            if (field.type == TType.I64) {
-              this.value = iprot.readI64();
-              setValueIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // NAME
+          if (field.type == TType.STRING) {
+            this.name = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // DISPLAY_NAME
+          if (field.type == TType.STRING) {
+            this.displayName = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // VALUE
+          if (field.type == TType.I64) {
+            this.value = iprot.readI64();
+            setValueIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

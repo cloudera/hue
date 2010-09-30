@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Counters for map tasks only, reduce tasks only, and job-scoped counters
  */
-public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._Fields>, java.io.Serializable, Cloneable {
+public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups, ThriftJobCounterRollups._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftJobCounterRollups");
 
   private static final TField MAP_COUNTERS_FIELD_DESC = new TField("mapCounters", TType.STRUCT, (short)1);
@@ -43,12 +46,10 @@ public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._F
     REDUCE_COUNTERS((short)2, "reduceCounters"),
     JOB_COUNTERS((short)3, "jobCounters");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -57,7 +58,16 @@ public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._F
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // MAP_COUNTERS
+          return MAP_COUNTERS;
+        case 2: // REDUCE_COUNTERS
+          return REDUCE_COUNTERS;
+        case 3: // JOB_COUNTERS
+          return JOB_COUNTERS;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -96,16 +106,16 @@ public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._F
 
   // isset id assignments
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.MAP_COUNTERS, new FieldMetaData("mapCounters", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
-    put(_Fields.REDUCE_COUNTERS, new FieldMetaData("reduceCounters", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
-    put(_Fields.JOB_COUNTERS, new FieldMetaData("jobCounters", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.MAP_COUNTERS, new FieldMetaData("mapCounters", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
+    tmpMap.put(_Fields.REDUCE_COUNTERS, new FieldMetaData("reduceCounters", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
+    tmpMap.put(_Fields.JOB_COUNTERS, new FieldMetaData("jobCounters", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftJobCounterRollups.class, metaDataMap);
   }
 
@@ -142,9 +152,11 @@ public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._F
     return new ThriftJobCounterRollups(this);
   }
 
-  @Deprecated
-  public ThriftJobCounterRollups clone() {
-    return new ThriftJobCounterRollups(this);
+  @Override
+  public void clear() {
+    this.mapCounters = null;
+    this.reduceCounters = null;
+    this.jobCounters = null;
   }
 
   public ThriftGroupList getMapCounters() {
@@ -248,10 +260,6 @@ public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._F
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case MAP_COUNTERS:
@@ -267,12 +275,12 @@ public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._F
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case MAP_COUNTERS:
       return isSetMapCounters();
@@ -282,10 +290,6 @@ public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._F
       return isSetJobCounters();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -336,6 +340,51 @@ public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._F
     return 0;
   }
 
+  public int compareTo(ThriftJobCounterRollups other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    ThriftJobCounterRollups typedOther = (ThriftJobCounterRollups)other;
+
+    lastComparison = Boolean.valueOf(isSetMapCounters()).compareTo(typedOther.isSetMapCounters());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetMapCounters()) {
+      lastComparison = TBaseHelper.compareTo(this.mapCounters, typedOther.mapCounters);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetReduceCounters()).compareTo(typedOther.isSetReduceCounters());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetReduceCounters()) {
+      lastComparison = TBaseHelper.compareTo(this.reduceCounters, typedOther.reduceCounters);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetJobCounters()).compareTo(typedOther.isSetJobCounters());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetJobCounters()) {
+      lastComparison = TBaseHelper.compareTo(this.jobCounters, typedOther.jobCounters);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -345,38 +394,35 @@ public class ThriftJobCounterRollups implements TBase<ThriftJobCounterRollups._F
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case MAP_COUNTERS:
-            if (field.type == TType.STRUCT) {
-              this.mapCounters = new ThriftGroupList();
-              this.mapCounters.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case REDUCE_COUNTERS:
-            if (field.type == TType.STRUCT) {
-              this.reduceCounters = new ThriftGroupList();
-              this.reduceCounters.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case JOB_COUNTERS:
-            if (field.type == TType.STRUCT) {
-              this.jobCounters = new ThriftGroupList();
-              this.jobCounters.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // MAP_COUNTERS
+          if (field.type == TType.STRUCT) {
+            this.mapCounters = new ThriftGroupList();
+            this.mapCounters.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // REDUCE_COUNTERS
+          if (field.type == TType.STRUCT) {
+            this.reduceCounters = new ThriftGroupList();
+            this.reduceCounters.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // JOB_COUNTERS
+          if (field.type == TType.STRUCT) {
+            this.jobCounters = new ThriftGroupList();
+            this.jobCounters.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 
