@@ -18,6 +18,7 @@
 package org.apache.hadoop.thriftfs;
 
 import java.io.EOFException;
+import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.PrivilegedExceptionAction;
@@ -108,18 +109,19 @@ public class DatanodePlugin
             if (n == length) {
               // If we read exactly the same number of bytes that was asked for,
               // we can simply return the buffer directly
-              ret.data = buf;
+              ret.data = ByteBuffer.wrap(buf);
             } else {
               assert n < length;
               // If we read fewer bytes than they asked for, we need to write
               // back a smaller byte array. With the appropriate thrift hook
               // we could avoid this copy, too.
-              ret.data = new byte[n];
+              byte[] data = new byte[n];
               System.arraycopy(buf, 0, ret.data, 0, n);
+              ret.data = ByteBuffer.wrap(data);
             }
             ret.length = n;
 
-            summer.update(ret.data);
+            summer.update(ret.data.array());
             ret.crc = (int) summer.getValue();
             summer.reset();
             LOG.debug("readBlock(" + block.blockId + ", " + offset + ", " + length + "): CRC32: "
