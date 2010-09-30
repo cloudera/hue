@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Encapsulates a block data transfer with its CRC
  */
-public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable, Cloneable, Comparable<BlockData> {
+public class BlockData implements TBase<BlockData, BlockData._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("BlockData");
 
   private static final TField CRC_FIELD_DESC = new TField("crc", TType.I32, (short)1);
@@ -44,7 +47,7 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
   /**
    * The data itsef
    */
-  public byte[] data;
+  public ByteBuffer data;
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements TFieldIdEnum {
@@ -61,12 +64,10 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
      */
     DATA((short)3, "data");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -75,7 +76,16 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // CRC
+          return CRC;
+        case 2: // LENGTH
+          return LENGTH;
+        case 3: // DATA
+          return DATA;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -117,16 +127,16 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
   private static final int __LENGTH_ISSET_ID = 1;
   private BitSet __isset_bit_vector = new BitSet(2);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.CRC, new FieldMetaData("crc", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.LENGTH, new FieldMetaData("length", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.DATA, new FieldMetaData("data", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.CRC, new FieldMetaData("crc", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.LENGTH, new FieldMetaData("length", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.DATA, new FieldMetaData("data", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(BlockData.class, metaDataMap);
   }
 
@@ -136,7 +146,7 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
   public BlockData(
     int crc,
     int length,
-    byte[] data)
+    ByteBuffer data)
   {
     this();
     this.crc = crc;
@@ -155,8 +165,8 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
     this.crc = other.crc;
     this.length = other.length;
     if (other.isSetData()) {
-      this.data = new byte[other.data.length];
-      System.arraycopy(other.data, 0, data, 0, other.data.length);
+      this.data = TBaseHelper.copyBinary(other.data);
+;
     }
   }
 
@@ -164,9 +174,13 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
     return new BlockData(this);
   }
 
-  @Deprecated
-  public BlockData clone() {
-    return new BlockData(this);
+  @Override
+  public void clear() {
+    setCrcIsSet(false);
+    this.crc = 0;
+    setLengthIsSet(false);
+    this.length = 0;
+    this.data = null;
   }
 
   /**
@@ -231,13 +245,23 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
    * The data itsef
    */
   public byte[] getData() {
-    return this.data;
+    setData(TBaseHelper.rightSize(data));
+    return data.array();
+  }
+
+  public ByteBuffer BufferForData() {
+    return data;
   }
 
   /**
    * The data itsef
    */
   public BlockData setData(byte[] data) {
+    setData(ByteBuffer.wrap(data));
+    return this;
+  }
+
+  public BlockData setData(ByteBuffer data) {
     this.data = data;
     return this;
   }
@@ -279,15 +303,11 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
       if (value == null) {
         unsetData();
       } else {
-        setData((byte[])value);
+        setData((ByteBuffer)value);
       }
       break;
 
     }
-  }
-
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
   }
 
   public Object getFieldValue(_Fields field) {
@@ -305,12 +325,12 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case CRC:
       return isSetCrc();
@@ -320,10 +340,6 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
       return isSetData();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -362,7 +378,7 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
     if (this_present_data || that_present_data) {
       if (!(this_present_data && that_present_data))
         return false;
-      if (!java.util.Arrays.equals(this.data, that.data))
+      if (!this.data.equals(that.data))
         return false;
     }
 
@@ -382,31 +398,41 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
     int lastComparison = 0;
     BlockData typedOther = (BlockData)other;
 
-    lastComparison = Boolean.valueOf(isSetCrc()).compareTo(isSetCrc());
+    lastComparison = Boolean.valueOf(isSetCrc()).compareTo(typedOther.isSetCrc());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(crc, typedOther.crc);
+    if (isSetCrc()) {
+      lastComparison = TBaseHelper.compareTo(this.crc, typedOther.crc);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetLength()).compareTo(typedOther.isSetLength());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetLength()).compareTo(isSetLength());
+    if (isSetLength()) {
+      lastComparison = TBaseHelper.compareTo(this.length, typedOther.length);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetData()).compareTo(typedOther.isSetData());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(length, typedOther.length);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetData()).compareTo(isSetData());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(data, typedOther.data);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetData()) {
+      lastComparison = TBaseHelper.compareTo(this.data, typedOther.data);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -418,37 +444,34 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case CRC:
-            if (field.type == TType.I32) {
-              this.crc = iprot.readI32();
-              setCrcIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case LENGTH:
-            if (field.type == TType.I32) {
-              this.length = iprot.readI32();
-              setLengthIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case DATA:
-            if (field.type == TType.STRING) {
-              this.data = iprot.readBinary();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // CRC
+          if (field.type == TType.I32) {
+            this.crc = iprot.readI32();
+            setCrcIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // LENGTH
+          if (field.type == TType.I32) {
+            this.length = iprot.readI32();
+            setLengthIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // DATA
+          if (field.type == TType.STRING) {
+            this.data = iprot.readBinary();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 
@@ -492,12 +515,7 @@ public class BlockData implements TBase<BlockData._Fields>, java.io.Serializable
     if (this.data == null) {
       sb.append("null");
     } else {
-        int __data_size = Math.min(this.data.length, 128);
-        for (int i = 0; i < __data_size; i++) {
-          if (i != 0) sb.append(" ");
-          sb.append(Integer.toHexString(this.data[i]).length() > 1 ? Integer.toHexString(this.data[i]).substring(Integer.toHexString(this.data[i]).length() - 2).toUpperCase() : "0" + Integer.toHexString(this.data[i]).toUpperCase());
-        }
-        if (this.data.length > 128) sb.append(" ...");
+      TBaseHelper.toString(this.data, sb);
     }
     first = false;
     sb.append(")");

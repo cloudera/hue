@@ -10,21 +10,30 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Collections;
-import org.apache.log4j.Logger;
+import java.util.BitSet;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Metadata information about the results.
  * Applicable only for SELECT.
  */
-public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
+public class ResultsMetadata implements TBase<ResultsMetadata, ResultsMetadata._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ResultsMetadata");
+
   private static final TField SCHEMA_FIELD_DESC = new TField("schema", TType.STRUCT, (short)1);
   private static final TField TABLE_DIR_FIELD_DESC = new TField("table_dir", TType.STRING, (short)2);
   private static final TField IN_TABLENAME_FIELD_DESC = new TField("in_tablename", TType.STRING, (short)3);
@@ -34,39 +43,112 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
    * The schema of the results
    */
   public org.apache.hadoop.hive.metastore.api.Schema schema;
-  public static final int SCHEMA = 1;
   /**
    * The directory containing the results. Not applicable for partition table.
    */
   public String table_dir;
-  public static final int TABLE_DIR = 2;
   /**
    * If the results are straight from an existing table, the table name.
    */
   public String in_tablename;
-  public static final int IN_TABLENAME = 3;
   /**
    * Field delimiter
    */
   public String delim;
-  public static final int DELIM = 4;
 
-  private final Isset __isset = new Isset();
-  private static final class Isset implements java.io.Serializable {
+  /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+  public enum _Fields implements TFieldIdEnum {
+    /**
+     * The schema of the results
+     */
+    SCHEMA((short)1, "schema"),
+    /**
+     * The directory containing the results. Not applicable for partition table.
+     */
+    TABLE_DIR((short)2, "table_dir"),
+    /**
+     * If the results are straight from an existing table, the table name.
+     */
+    IN_TABLENAME((short)3, "in_tablename"),
+    /**
+     * Field delimiter
+     */
+    DELIM((short)4, "delim");
+
+    private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+    static {
+      for (_Fields field : EnumSet.allOf(_Fields.class)) {
+        byName.put(field.getFieldName(), field);
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, or null if its not found.
+     */
+    public static _Fields findByThriftId(int fieldId) {
+      switch(fieldId) {
+        case 1: // SCHEMA
+          return SCHEMA;
+        case 2: // TABLE_DIR
+          return TABLE_DIR;
+        case 3: // IN_TABLENAME
+          return IN_TABLENAME;
+        case 4: // DELIM
+          return DELIM;
+        default:
+          return null;
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, throwing an exception
+     * if it is not found.
+     */
+    public static _Fields findByThriftIdOrThrow(int fieldId) {
+      _Fields fields = findByThriftId(fieldId);
+      if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+      return fields;
+    }
+
+    /**
+     * Find the _Fields constant that matches name, or null if its not found.
+     */
+    public static _Fields findByName(String name) {
+      return byName.get(name);
+    }
+
+    private final short _thriftId;
+    private final String _fieldName;
+
+    _Fields(short thriftId, String fieldName) {
+      _thriftId = thriftId;
+      _fieldName = fieldName;
+    }
+
+    public short getThriftFieldId() {
+      return _thriftId;
+    }
+
+    public String getFieldName() {
+      return _fieldName;
+    }
   }
 
-  public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-    put(SCHEMA, new FieldMetaData("schema", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, org.apache.hadoop.hive.metastore.api.Schema.class)));
-    put(TABLE_DIR, new FieldMetaData("table_dir", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(IN_TABLENAME, new FieldMetaData("in_tablename", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(DELIM, new FieldMetaData("delim", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
+  // isset id assignments
 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.SCHEMA, new FieldMetaData("schema", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, org.apache.hadoop.hive.metastore.api.Schema.class)));
+    tmpMap.put(_Fields.TABLE_DIR, new FieldMetaData("table_dir", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.IN_TABLENAME, new FieldMetaData("in_tablename", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.DELIM, new FieldMetaData("delim", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ResultsMetadata.class, metaDataMap);
   }
 
@@ -104,9 +186,16 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
     }
   }
 
-  @Override
-  public ResultsMetadata clone() {
+  public ResultsMetadata deepCopy() {
     return new ResultsMetadata(this);
+  }
+
+  @Override
+  public void clear() {
+    this.schema = null;
+    this.table_dir = null;
+    this.in_tablename = null;
+    this.delim = null;
   }
 
   /**
@@ -119,15 +208,16 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
   /**
    * The schema of the results
    */
-  public void setSchema(org.apache.hadoop.hive.metastore.api.Schema schema) {
+  public ResultsMetadata setSchema(org.apache.hadoop.hive.metastore.api.Schema schema) {
     this.schema = schema;
+    return this;
   }
 
   public void unsetSchema() {
     this.schema = null;
   }
 
-  // Returns true if field schema is set (has been asigned a value) and false otherwise
+  /** Returns true if field schema is set (has been asigned a value) and false otherwise */
   public boolean isSetSchema() {
     return this.schema != null;
   }
@@ -148,15 +238,16 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
   /**
    * The directory containing the results. Not applicable for partition table.
    */
-  public void setTable_dir(String table_dir) {
+  public ResultsMetadata setTable_dir(String table_dir) {
     this.table_dir = table_dir;
+    return this;
   }
 
   public void unsetTable_dir() {
     this.table_dir = null;
   }
 
-  // Returns true if field table_dir is set (has been asigned a value) and false otherwise
+  /** Returns true if field table_dir is set (has been asigned a value) and false otherwise */
   public boolean isSetTable_dir() {
     return this.table_dir != null;
   }
@@ -177,15 +268,16 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
   /**
    * If the results are straight from an existing table, the table name.
    */
-  public void setIn_tablename(String in_tablename) {
+  public ResultsMetadata setIn_tablename(String in_tablename) {
     this.in_tablename = in_tablename;
+    return this;
   }
 
   public void unsetIn_tablename() {
     this.in_tablename = null;
   }
 
-  // Returns true if field in_tablename is set (has been asigned a value) and false otherwise
+  /** Returns true if field in_tablename is set (has been asigned a value) and false otherwise */
   public boolean isSetIn_tablename() {
     return this.in_tablename != null;
   }
@@ -206,15 +298,16 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
   /**
    * Field delimiter
    */
-  public void setDelim(String delim) {
+  public ResultsMetadata setDelim(String delim) {
     this.delim = delim;
+    return this;
   }
 
   public void unsetDelim() {
     this.delim = null;
   }
 
-  // Returns true if field delim is set (has been asigned a value) and false otherwise
+  /** Returns true if field delim is set (has been asigned a value) and false otherwise */
   public boolean isSetDelim() {
     return this.delim != null;
   }
@@ -225,8 +318,8 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    switch (fieldID) {
+  public void setFieldValue(_Fields field, Object value) {
+    switch (field) {
     case SCHEMA:
       if (value == null) {
         unsetSchema();
@@ -259,13 +352,11 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
       }
       break;
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
   }
 
-  public Object getFieldValue(int fieldID) {
-    switch (fieldID) {
+  public Object getFieldValue(_Fields field) {
+    switch (field) {
     case SCHEMA:
       return getSchema();
 
@@ -278,14 +369,17 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
     case DELIM:
       return getDelim();
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
-  // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-  public boolean isSet(int fieldID) {
-    switch (fieldID) {
+  /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+  public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
+    switch (field) {
     case SCHEMA:
       return isSetSchema();
     case TABLE_DIR:
@@ -294,9 +388,8 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
       return isSetIn_tablename();
     case DELIM:
       return isSetDelim();
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
   @Override
@@ -378,6 +471,61 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
     return builder.toHashCode();
   }
 
+  public int compareTo(ResultsMetadata other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    ResultsMetadata typedOther = (ResultsMetadata)other;
+
+    lastComparison = Boolean.valueOf(isSetSchema()).compareTo(typedOther.isSetSchema());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetSchema()) {
+      lastComparison = TBaseHelper.compareTo(this.schema, typedOther.schema);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTable_dir()).compareTo(typedOther.isSetTable_dir());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTable_dir()) {
+      lastComparison = TBaseHelper.compareTo(this.table_dir, typedOther.table_dir);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetIn_tablename()).compareTo(typedOther.isSetIn_tablename());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetIn_tablename()) {
+      lastComparison = TBaseHelper.compareTo(this.in_tablename, typedOther.in_tablename);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetDelim()).compareTo(typedOther.isSetDelim());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetDelim()) {
+      lastComparison = TBaseHelper.compareTo(this.delim, typedOther.delim);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -387,9 +535,8 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
       if (field.type == TType.STOP) { 
         break;
       }
-      switch (field.id)
-      {
-        case SCHEMA:
+      switch (field.id) {
+        case 1: // SCHEMA
           if (field.type == TType.STRUCT) {
             this.schema = new org.apache.hadoop.hive.metastore.api.Schema();
             this.schema.read(iprot);
@@ -397,21 +544,21 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case TABLE_DIR:
+        case 2: // TABLE_DIR
           if (field.type == TType.STRING) {
             this.table_dir = iprot.readString();
           } else { 
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case IN_TABLENAME:
+        case 3: // IN_TABLENAME
           if (field.type == TType.STRING) {
             this.in_tablename = iprot.readString();
           } else { 
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case DELIM:
+        case 4: // DELIM
           if (field.type == TType.STRING) {
             this.delim = iprot.readString();
           } else { 
@@ -420,12 +567,10 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
           break;
         default:
           TProtocolUtil.skip(iprot, field.type);
-          break;
       }
       iprot.readFieldEnd();
     }
     iprot.readStructEnd();
-
 
     // check for required fields of primitive type, which can't be checked in the validate method
     validate();
@@ -501,7 +646,6 @@ public class ResultsMetadata implements TBase, java.io.Serializable, Cloneable {
 
   public void validate() throws TException {
     // check for required fields
-    // check that fields of type enum have valid values
   }
 
 }

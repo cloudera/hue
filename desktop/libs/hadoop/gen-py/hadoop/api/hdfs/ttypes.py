@@ -9,7 +9,7 @@ import hadoop.api.common.ttypes
 
 
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -50,12 +50,13 @@ class DatanodeState(object):
     "DECOMMISSIONED": 3,
   }
 
+
 class DatanodeInfo(object):
   """
   Information and state of a data node.
-  
+
   Modelled after org.apache.hadoop.hdfs.protocol.DatanodeInfo
-  
+
   Attributes:
    - name: HDFS name of the datanode (equals to <host>:<datanode port>)
    - storageID: Unique ID within a HDFS cluster
@@ -219,6 +220,9 @@ class DatanodeInfo(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -234,9 +238,9 @@ class DatanodeInfo(object):
 class Block(object):
   """
   Representation of a file block in HDFS
-  
+
   Modelled after org.apache.hadoop.hdfs.protocol.LocatedBlock
-  
+
   Attributes:
    - blockId: Block ID (unique among all blocks in a filesystem).
    - path: Path of the file which this block belongs to.
@@ -360,6 +364,9 @@ class Block(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -375,9 +382,9 @@ class Block(object):
 class Stat(object):
   """
   Information about a path in HDFS.
-  
+
   Modelled after org.apache.hadoop.fs.FileStatus
-  
+
   Attributes:
    - path: The path.
    - isDir: True:  The path represents a file.
@@ -534,6 +541,9 @@ class Stat(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -550,7 +560,7 @@ class ContentSummary(object):
   """
   Information about an entire subtree under a directory
   Includes the information from org.apache.hadoop.fs.ContentSummary
-  
+
   Attributes:
    - fileCount: Number of files in this directory
    - directoryCount: Number of directories in this directory
@@ -653,6 +663,9 @@ class ContentSummary(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -745,6 +758,9 @@ class UpgradeStatusReport(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -761,7 +777,7 @@ class DFSHealthReport(object):
   """
   Information that mirrors the "health report" information available on the
   NameNode web UI
-  
+
   Attributes:
    - bytesTotal
    - bytesUsed
@@ -891,6 +907,9 @@ class DFSHealthReport(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -906,7 +925,7 @@ class DFSHealthReport(object):
 class QuotaException(Exception):
   """
   Quota-related error
-  
+
   Attributes:
    - msg: Error message.
    - stack: Textual representation of the call stack.
@@ -961,6 +980,9 @@ class QuotaException(Exception):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -979,7 +1001,7 @@ class QuotaException(Exception):
 class BlockData(object):
   """
   Encapsulates a block data transfer with its CRC
-  
+
   Attributes:
    - crc: CRC32 of the data being transfered
    - length: Length of the data being transfered
@@ -1046,6 +1068,9 @@ class BlockData(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1057,4 +1082,3 @@ class BlockData(object):
 
   def __ne__(self, other):
     return not (self == other)
-

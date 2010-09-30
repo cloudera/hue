@@ -15,12 +15,15 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 public class Datanode {
@@ -47,7 +50,23 @@ public class Datanode {
 
   }
 
-  public static class Client implements Iface {
+  public interface AsyncIface {
+
+    public void readBlock(org.apache.hadoop.thriftfs.api.RequestContext ctx, Block block, long offset, int length, AsyncMethodCallback<AsyncClient.readBlock_call> resultHandler) throws TException;
+
+  }
+
+  public static class Client implements TServiceClient, Iface {
+    public static class Factory implements TServiceClientFactory<Client> {
+      public Factory() {}
+      public Client getClient(TProtocol prot) {
+        return new Client(prot);
+      }
+      public Client getClient(TProtocol iprot, TProtocol oprot) {
+        return new Client(iprot, oprot);
+      }
+    }
+
     public Client(TProtocol prot)
     {
       this(prot, prot);
@@ -82,12 +101,12 @@ public class Datanode {
 
     public void send_readBlock(org.apache.hadoop.thriftfs.api.RequestContext ctx, Block block, long offset, int length) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("readBlock", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("readBlock", TMessageType.CALL, ++seqid_));
       readBlock_args args = new readBlock_args();
-      args.ctx = ctx;
-      args.block = block;
-      args.offset = offset;
-      args.length = length;
+      args.setCtx(ctx);
+      args.setBlock(block);
+      args.setOffset(offset);
+      args.setLength(length);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -100,6 +119,9 @@ public class Datanode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "readBlock failed: out of sequence response");
       }
       readBlock_result result = new readBlock_result();
       result.read(iprot_);
@@ -114,6 +136,65 @@ public class Datanode {
     }
 
   }
+  public static class AsyncClient extends TAsyncClient implements AsyncIface {
+    public static class Factory implements TAsyncClientFactory<AsyncClient> {
+      private TAsyncClientManager clientManager;
+      private TProtocolFactory protocolFactory;
+      public Factory(TAsyncClientManager clientManager, TProtocolFactory protocolFactory) {
+        this.clientManager = clientManager;
+        this.protocolFactory = protocolFactory;
+      }
+      public AsyncClient getAsyncClient(TNonblockingTransport transport) {
+        return new AsyncClient(protocolFactory, clientManager, transport);
+      }
+    }
+
+    public AsyncClient(TProtocolFactory protocolFactory, TAsyncClientManager clientManager, TNonblockingTransport transport) {
+      super(protocolFactory, clientManager, transport);
+    }
+
+    public void readBlock(org.apache.hadoop.thriftfs.api.RequestContext ctx, Block block, long offset, int length, AsyncMethodCallback<readBlock_call> resultHandler) throws TException {
+      checkReady();
+      readBlock_call method_call = new readBlock_call(ctx, block, offset, length, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class readBlock_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private Block block;
+      private long offset;
+      private int length;
+      public readBlock_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, Block block, long offset, int length, AsyncMethodCallback<readBlock_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.block = block;
+        this.offset = offset;
+        this.length = length;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("readBlock", TMessageType.CALL, 0));
+        readBlock_args args = new readBlock_args();
+        args.setCtx(ctx);
+        args.setBlock(block);
+        args.setOffset(offset);
+        args.setLength(length);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public BlockData getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_readBlock();
+      }
+    }
+
+  }
+
   public static class Processor implements TProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(Processor.class.getName());
     public Processor(Iface iface)
@@ -151,7 +232,17 @@ public class Datanode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         readBlock_args args = new readBlock_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("readBlock", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         readBlock_result result = new readBlock_result();
         try {
@@ -177,7 +268,7 @@ public class Datanode {
 
   }
 
-  public static class readBlock_args implements TBase<readBlock_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class readBlock_args implements TBase<readBlock_args, readBlock_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("readBlock_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -215,12 +306,10 @@ public class Datanode {
        */
       LENGTH((short)3, "length");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -229,7 +318,18 @@ public class Datanode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // BLOCK
+            return BLOCK;
+          case 2: // OFFSET
+            return OFFSET;
+          case 3: // LENGTH
+            return LENGTH;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -271,18 +371,18 @@ public class Datanode {
     private static final int __LENGTH_ISSET_ID = 1;
     private BitSet __isset_bit_vector = new BitSet(2);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.BLOCK, new FieldMetaData("block", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, Block.class)));
-      put(_Fields.OFFSET, new FieldMetaData("offset", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I64)));
-      put(_Fields.LENGTH, new FieldMetaData("length", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I32)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.BLOCK, new FieldMetaData("block", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, Block.class)));
+      tmpMap.put(_Fields.OFFSET, new FieldMetaData("offset", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I64)));
+      tmpMap.put(_Fields.LENGTH, new FieldMetaData("length", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(readBlock_args.class, metaDataMap);
     }
 
@@ -324,9 +424,14 @@ public class Datanode {
       return new readBlock_args(this);
     }
 
-    @Deprecated
-    public readBlock_args clone() {
-      return new readBlock_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.block = null;
+      setOffsetIsSet(false);
+      this.offset = 0;
+      setLengthIsSet(false);
+      this.length = 0;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -478,10 +583,6 @@ public class Datanode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -500,12 +601,12 @@ public class Datanode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -517,10 +618,6 @@ public class Datanode {
         return isSetLength();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -580,6 +677,61 @@ public class Datanode {
       return 0;
     }
 
+    public int compareTo(readBlock_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      readBlock_args typedOther = (readBlock_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetBlock()).compareTo(typedOther.isSetBlock());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetBlock()) {
+        lastComparison = TBaseHelper.compareTo(this.block, typedOther.block);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetOffset()).compareTo(typedOther.isSetOffset());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetOffset()) {
+        lastComparison = TBaseHelper.compareTo(this.offset, typedOther.offset);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetLength()).compareTo(typedOther.isSetLength());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetLength()) {
+        lastComparison = TBaseHelper.compareTo(this.length, typedOther.length);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -589,46 +741,43 @@ public class Datanode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case BLOCK:
-              if (field.type == TType.STRUCT) {
-                this.block = new Block();
-                this.block.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case OFFSET:
-              if (field.type == TType.I64) {
-                this.offset = iprot.readI64();
-                setOffsetIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case LENGTH:
-              if (field.type == TType.I32) {
-                this.length = iprot.readI32();
-                setLengthIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // BLOCK
+            if (field.type == TType.STRUCT) {
+              this.block = new Block();
+              this.block.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // OFFSET
+            if (field.type == TType.I64) {
+              this.offset = iprot.readI64();
+              setOffsetIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3: // LENGTH
+            if (field.type == TType.I32) {
+              this.length = iprot.readI32();
+              setLengthIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -698,7 +847,7 @@ public class Datanode {
 
   }
 
-  public static class readBlock_result implements TBase<readBlock_result._Fields>, java.io.Serializable, Cloneable, Comparable<readBlock_result>   {
+  public static class readBlock_result implements TBase<readBlock_result, readBlock_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("readBlock_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -712,12 +861,10 @@ public class Datanode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -726,7 +873,14 @@ public class Datanode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -765,14 +919,14 @@ public class Datanode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, BlockData.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, BlockData.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(readBlock_result.class, metaDataMap);
     }
 
@@ -804,9 +958,10 @@ public class Datanode {
       return new readBlock_result(this);
     }
 
-    @Deprecated
-    public readBlock_result clone() {
-      return new readBlock_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public BlockData getSuccess() {
@@ -878,10 +1033,6 @@ public class Datanode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -894,12 +1045,12 @@ public class Datanode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -907,10 +1058,6 @@ public class Datanode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -960,23 +1107,31 @@ public class Datanode {
       int lastComparison = 0;
       readBlock_result typedOther = (readBlock_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -988,30 +1143,27 @@ public class Datanode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new BlockData();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new BlockData();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 

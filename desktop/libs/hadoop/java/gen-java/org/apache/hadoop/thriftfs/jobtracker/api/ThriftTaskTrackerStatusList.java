@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Container structure for TaskTrackerStatus objects
  */
-public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatusList._Fields>, java.io.Serializable, Cloneable {
+public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatusList, ThriftTaskTrackerStatusList._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftTaskTrackerStatusList");
 
   private static final TField TRACKERS_FIELD_DESC = new TField("trackers", TType.LIST, (short)1);
@@ -37,12 +40,10 @@ public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatu
   public enum _Fields implements TFieldIdEnum {
     TRACKERS((short)1, "trackers");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -51,7 +52,12 @@ public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatu
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // TRACKERS
+          return TRACKERS;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -90,13 +96,13 @@ public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatu
 
   // isset id assignments
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.TRACKERS, new FieldMetaData("trackers", TFieldRequirementType.DEFAULT, 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
+  static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.TRACKERS, new FieldMetaData("trackers", TFieldRequirementType.DEFAULT, 
         new ListMetaData(TType.LIST, 
             new StructMetaData(TType.STRUCT, ThriftTaskTrackerStatus.class))));
-  }});
-
-  static {
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftTaskTrackerStatusList.class, metaDataMap);
   }
 
@@ -127,9 +133,9 @@ public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatu
     return new ThriftTaskTrackerStatusList(this);
   }
 
-  @Deprecated
-  public ThriftTaskTrackerStatusList clone() {
-    return new ThriftTaskTrackerStatusList(this);
+  @Override
+  public void clear() {
+    this.trackers = null;
   }
 
   public int getTrackersSize() {
@@ -184,10 +190,6 @@ public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatu
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case TRACKERS:
@@ -197,21 +199,17 @@ public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatu
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case TRACKERS:
       return isSetTrackers();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -244,6 +242,31 @@ public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatu
     return 0;
   }
 
+  public int compareTo(ThriftTaskTrackerStatusList other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    ThriftTaskTrackerStatusList typedOther = (ThriftTaskTrackerStatusList)other;
+
+    lastComparison = Boolean.valueOf(isSetTrackers()).compareTo(typedOther.isSetTrackers());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTrackers()) {
+      lastComparison = TBaseHelper.compareTo(this.trackers, typedOther.trackers);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -253,32 +276,29 @@ public class ThriftTaskTrackerStatusList implements TBase<ThriftTaskTrackerStatu
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case TRACKERS:
-            if (field.type == TType.LIST) {
+      switch (field.id) {
+        case 1: // TRACKERS
+          if (field.type == TType.LIST) {
+            {
+              TList _list39 = iprot.readListBegin();
+              this.trackers = new ArrayList<ThriftTaskTrackerStatus>(_list39.size);
+              for (int _i40 = 0; _i40 < _list39.size; ++_i40)
               {
-                TList _list39 = iprot.readListBegin();
-                this.trackers = new ArrayList<ThriftTaskTrackerStatus>(_list39.size);
-                for (int _i40 = 0; _i40 < _list39.size; ++_i40)
-                {
-                  ThriftTaskTrackerStatus _elem41;
-                  _elem41 = new ThriftTaskTrackerStatus();
-                  _elem41.read(iprot);
-                  this.trackers.add(_elem41);
-                }
-                iprot.readListEnd();
+                ThriftTaskTrackerStatus _elem41;
+                _elem41 = new ThriftTaskTrackerStatus();
+                _elem41.read(iprot);
+                this.trackers.add(_elem41);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readListEnd();
             }
-            break;
-        }
-        iprot.readFieldEnd();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

@@ -8,7 +8,7 @@ from thrift.Thrift import *
 from ttypes import *
 from thrift.Thrift import TProcessor
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -23,9 +23,9 @@ class Iface(object):
   def readBlock(self, ctx, block, offset, length):
     """
     Read bytes from a block.
-    
+
     Only 2^31 - 1 bytes may be read on a single call to this method.
-    
+
     Parameters:
      - ctx
      - block: Block to be read from.
@@ -49,9 +49,9 @@ class Client(Iface):
   def readBlock(self, ctx, block, offset, length):
     """
     Read bytes from a block.
-    
+
     Only 2^31 - 1 bytes may be read on a single call to this method.
-    
+
     Parameters:
      - ctx
      - block: Block to be read from.
@@ -215,6 +215,9 @@ class readBlock_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -284,6 +287,9 @@ class readBlock_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -295,5 +301,3 @@ class readBlock_result(object):
 
   def __ne__(self, other):
     return not (self == other)
-
-

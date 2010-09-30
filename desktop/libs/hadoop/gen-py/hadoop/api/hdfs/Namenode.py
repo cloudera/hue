@@ -9,7 +9,7 @@ import hadoop.api.common.HadoopServiceBase
 from ttypes import *
 from thrift.Thrift import TProcessor
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -24,7 +24,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def chmod(self, ctx, path, perms):
     """
     Set permissions of an existing file or directory.
-    
+
     Parameters:
      - ctx
      - path: Path of the file or directory.
@@ -35,12 +35,12 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def chown(self, ctx, path, owner, group):
     """
     Set owner of a file or directory.
-    
+
     If either parameter 'owner' or 'group' is set to null, that
     parameter is left unchanged.
-    
+
     Parameters 'owner' and 'group' cannot be both null.
-    
+
     Parameters:
      - ctx
      - path: Path to the file or directory
@@ -55,7 +55,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
       (index 0) The total storage capacity of the file system (in bytes).
       (index 1) The total used space of the file system (in bytes).
       (index 2) The available storage of the file system (in bytes).
-    
+
     Parameters:
      - ctx
     """
@@ -64,7 +64,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def enterSafeMode(self, ctx):
     """
     Enter safe mode.
-    
+
     Parameters:
      - ctx
     """
@@ -73,7 +73,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getBlocks(self, ctx, path, offset, length):
     """
     Get a list of all blocks containing a region of a file
-    
+
     Parameters:
      - ctx
      - path: Path to the file.
@@ -85,9 +85,9 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getPreferredBlockSize(self, ctx, path):
     """
     Get the preferred block size for the given file.
-    
+
     The path must exist, or common.IOException is thrown.
-    
+
     Parameters:
      - ctx
      - path: Path to the file.
@@ -97,7 +97,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def isInSafeMode(self, ctx):
     """
     Returns whether HDFS is in safe mode or not.
-    
+
     Parameters:
      - ctx
     """
@@ -106,7 +106,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def leaveSafeMode(self, ctx):
     """
     Leave safe mode.
-    
+
     Parameters:
      - ctx
     """
@@ -115,7 +115,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def ls(self, ctx, path):
     """
     Get a listing of the indicated directory.
-    
+
     Parameters:
      - ctx
      - path: Path to the directory.
@@ -125,10 +125,10 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def mkdirhier(self, ctx, path, perms):
     """
     Create a directory (or hierarchy of directories).
-    
+
     Returns false if directory did not exist and could not be created,
     true otherwise.
-    
+
     Parameters:
      - ctx
      - path: Path to the directory.
@@ -139,7 +139,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def refreshNodes(self, ctx):
     """
     Tells the name node to reread the hosts and exclude files.
-    
+
     Parameters:
      - ctx
     """
@@ -148,11 +148,11 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def rename(self, ctx, path, newPath):
     """
     Rename an item in the file system namespace.
-    
+
     Returns true  if successful, or
             false if the old name does not exist or if the new name already
                   belongs to the namespace.
-    
+
     Parameters:
      - ctx
      - path: Path to existing file or directory.
@@ -163,7 +163,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def reportBadBlocks(self, ctx, blocks):
     """
     Report corrupted blocks.
-    
+
     Parameters:
      - ctx
      - blocks: List of corrupted blocks.
@@ -173,9 +173,9 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def stat(self, ctx, path):
     """
     Get information about a path in HDFS.
-    
+
     Return value will be nul if path does not exist.
-    
+
     Parameters:
      - ctx
      - path: Path of the file or directory.
@@ -185,11 +185,11 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getContentSummary(self, ctx, Path):
     """
     Get the summary of a directory's contents.
-    
+
     Note that this has runtime linear in the total number of nodes
     in the directory tree - this can be expensive for directories
     near the top of a big HDFS. Use with care.
-    
+
     Parameters:
      - ctx
      - Path
@@ -200,7 +200,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
     """
     Get ContentSummary objects for multiple directories simultaneously. The same warnings
     apply as for getContentSummary(...) above.
-    
+
     Parameters:
      - ctx
      - paths
@@ -210,15 +210,15 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def setQuota(self, ctx, path, namespaceQuota, diskspaceQuota):
     """
     Set the quota for a directory.
-    
+
     Quota parameters may have three types of values:
-    
+
        (1) 0 or more:      Quota will be set to that value.
        (2) QUOTA_DONT_SET: Quota will not be changed,
        (3) QUOTA_RESET:    Quota will be reset.
-    
+
     Any other value is a runtime error.
-    
+
     Parameters:
      - ctx
      - path: Path of the directory.
@@ -231,15 +231,15 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def setReplication(self, ctx, path, replication):
     """
     Set replication factor for an existing file.
-    
+
     This call just updates the value of the replication factor. The actual
     block replication is not expected to be performed during this method call.
     The blocks will be populated or removed in the background as the result of
     the routine block maintenance procedures.
-    
+
     Returns true if successful, false if file does not exist or is a
     directory.
-    
+
     Parameters:
      - ctx
      - path: Path of the file.
@@ -250,9 +250,9 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def unlink(self, ctx, path, recursive):
     """
     Delete a file or directory from the file system.
-    
+
     Any blocks belonging to the deleted files will be garbage-collected.
-    
+
     Parameters:
      - ctx
      - path: Path of the file or directory.
@@ -263,13 +263,13 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def utime(self, ctx, path, atime, mtime):
     """
     Sets the modification and access time of a file or directory.
-    
+
     Setting *one single time paramater* to -1 means that time parameter
     must not be set by this call.
-    
+
     Setting *both time parameters* to -1 means both of them must be set to
     the current time.
-    
+
     Parameters:
      - ctx
      - path: Path of the file or directory.
@@ -281,7 +281,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def datanodeUp(self, name, storage, thriftPort):
     """
     Inform the namenode that a datanode process has started.
-    
+
     Parameters:
      - name: <host name>:<port number> of the datanode
      - storage: the storage id of the datanode
@@ -292,7 +292,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def datanodeDown(self, name, storage, thriftPort):
     """
     Inform the namenode that a datanode process has stopped.
-    
+
     Parameters:
      - name: <host name>:<port number> of the datanode
      - storage: the storage id of the datanode
@@ -312,7 +312,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def chmod(self, ctx, path, perms):
     """
     Set permissions of an existing file or directory.
-    
+
     Parameters:
      - ctx
      - path: Path of the file or directory.
@@ -348,12 +348,12 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def chown(self, ctx, path, owner, group):
     """
     Set owner of a file or directory.
-    
+
     If either parameter 'owner' or 'group' is set to null, that
     parameter is left unchanged.
-    
+
     Parameters 'owner' and 'group' cannot be both null.
-    
+
     Parameters:
      - ctx
      - path: Path to the file or directory
@@ -394,7 +394,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
       (index 0) The total storage capacity of the file system (in bytes).
       (index 1) The total used space of the file system (in bytes).
       (index 2) The available storage of the file system (in bytes).
-    
+
     Parameters:
      - ctx
     """
@@ -426,7 +426,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def enterSafeMode(self, ctx):
     """
     Enter safe mode.
-    
+
     Parameters:
      - ctx
     """
@@ -458,7 +458,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getBlocks(self, ctx, path, offset, length):
     """
     Get a list of all blocks containing a region of a file
-    
+
     Parameters:
      - ctx
      - path: Path to the file.
@@ -498,9 +498,9 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getPreferredBlockSize(self, ctx, path):
     """
     Get the preferred block size for the given file.
-    
+
     The path must exist, or common.IOException is thrown.
-    
+
     Parameters:
      - ctx
      - path: Path to the file.
@@ -536,7 +536,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def isInSafeMode(self, ctx):
     """
     Returns whether HDFS is in safe mode or not.
-    
+
     Parameters:
      - ctx
     """
@@ -570,7 +570,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def leaveSafeMode(self, ctx):
     """
     Leave safe mode.
-    
+
     Parameters:
      - ctx
     """
@@ -602,7 +602,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def ls(self, ctx, path):
     """
     Get a listing of the indicated directory.
-    
+
     Parameters:
      - ctx
      - path: Path to the directory.
@@ -638,10 +638,10 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def mkdirhier(self, ctx, path, perms):
     """
     Create a directory (or hierarchy of directories).
-    
+
     Returns false if directory did not exist and could not be created,
     true otherwise.
-    
+
     Parameters:
      - ctx
      - path: Path to the directory.
@@ -679,7 +679,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def refreshNodes(self, ctx):
     """
     Tells the name node to reread the hosts and exclude files.
-    
+
     Parameters:
      - ctx
     """
@@ -711,11 +711,11 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def rename(self, ctx, path, newPath):
     """
     Rename an item in the file system namespace.
-    
+
     Returns true  if successful, or
             false if the old name does not exist or if the new name already
                   belongs to the namespace.
-    
+
     Parameters:
      - ctx
      - path: Path to existing file or directory.
@@ -753,7 +753,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def reportBadBlocks(self, ctx, blocks):
     """
     Report corrupted blocks.
-    
+
     Parameters:
      - ctx
      - blocks: List of corrupted blocks.
@@ -787,9 +787,9 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def stat(self, ctx, path):
     """
     Get information about a path in HDFS.
-    
+
     Return value will be nul if path does not exist.
-    
+
     Parameters:
      - ctx
      - path: Path of the file or directory.
@@ -825,11 +825,11 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getContentSummary(self, ctx, Path):
     """
     Get the summary of a directory's contents.
-    
+
     Note that this has runtime linear in the total number of nodes
     in the directory tree - this can be expensive for directories
     near the top of a big HDFS. Use with care.
-    
+
     Parameters:
      - ctx
      - Path
@@ -866,7 +866,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
     """
     Get ContentSummary objects for multiple directories simultaneously. The same warnings
     apply as for getContentSummary(...) above.
-    
+
     Parameters:
      - ctx
      - paths
@@ -902,15 +902,15 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def setQuota(self, ctx, path, namespaceQuota, diskspaceQuota):
     """
     Set the quota for a directory.
-    
+
     Quota parameters may have three types of values:
-    
+
        (1) 0 or more:      Quota will be set to that value.
        (2) QUOTA_DONT_SET: Quota will not be changed,
        (3) QUOTA_RESET:    Quota will be reset.
-    
+
     Any other value is a runtime error.
-    
+
     Parameters:
      - ctx
      - path: Path of the directory.
@@ -949,15 +949,15 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def setReplication(self, ctx, path, replication):
     """
     Set replication factor for an existing file.
-    
+
     This call just updates the value of the replication factor. The actual
     block replication is not expected to be performed during this method call.
     The blocks will be populated or removed in the background as the result of
     the routine block maintenance procedures.
-    
+
     Returns true if successful, false if file does not exist or is a
     directory.
-    
+
     Parameters:
      - ctx
      - path: Path of the file.
@@ -995,9 +995,9 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def unlink(self, ctx, path, recursive):
     """
     Delete a file or directory from the file system.
-    
+
     Any blocks belonging to the deleted files will be garbage-collected.
-    
+
     Parameters:
      - ctx
      - path: Path of the file or directory.
@@ -1035,13 +1035,13 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def utime(self, ctx, path, atime, mtime):
     """
     Sets the modification and access time of a file or directory.
-    
+
     Setting *one single time paramater* to -1 means that time parameter
     must not be set by this call.
-    
+
     Setting *both time parameters* to -1 means both of them must be set to
     the current time.
-    
+
     Parameters:
      - ctx
      - path: Path of the file or directory.
@@ -1079,7 +1079,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def datanodeUp(self, name, storage, thriftPort):
     """
     Inform the namenode that a datanode process has started.
-    
+
     Parameters:
      - name: <host name>:<port number> of the datanode
      - storage: the storage id of the datanode
@@ -1113,7 +1113,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def datanodeDown(self, name, storage, thriftPort):
     """
     Inform the namenode that a datanode process has stopped.
-    
+
     Parameters:
      - name: <host name>:<port number> of the datanode
      - storage: the storage id of the datanode
@@ -1564,6 +1564,9 @@ class chmod_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1621,6 +1624,9 @@ class chmod_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1720,6 +1726,9 @@ class chown_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1777,6 +1786,9 @@ class chown_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1843,6 +1855,9 @@ class df_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1906,6 +1921,9 @@ class df_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1972,6 +1990,9 @@ class enterSafeMode_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2029,6 +2050,9 @@ class enterSafeMode_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2128,6 +2152,9 @@ class getBlocks_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2205,6 +2232,9 @@ class getBlocks_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2282,6 +2312,9 @@ class getPreferredBlockSize_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2350,6 +2383,9 @@ class getPreferredBlockSize_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2416,6 +2452,9 @@ class isInSafeMode_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2484,6 +2523,9 @@ class isInSafeMode_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2550,6 +2592,9 @@ class leaveSafeMode_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2607,6 +2652,9 @@ class leaveSafeMode_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2684,6 +2732,9 @@ class ls_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2761,6 +2812,9 @@ class ls_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2849,6 +2903,9 @@ class mkdirhier_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2917,6 +2974,9 @@ class mkdirhier_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2983,6 +3043,9 @@ class refreshNodes_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3040,6 +3103,9 @@ class refreshNodes_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3128,6 +3194,9 @@ class rename_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3196,6 +3265,9 @@ class rename_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3282,6 +3354,9 @@ class reportBadBlocks_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3339,6 +3414,9 @@ class reportBadBlocks_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3416,6 +3494,9 @@ class stat_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3485,6 +3566,9 @@ class stat_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3562,6 +3646,9 @@ class getContentSummary_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3631,6 +3718,9 @@ class getContentSummary_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3716,6 +3806,9 @@ class multiGetContentSummary_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3793,6 +3886,9 @@ class multiGetContentSummary_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3893,6 +3989,9 @@ class setQuota_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3950,6 +4049,9 @@ class setQuota_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4038,6 +4140,9 @@ class setReplication_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4106,6 +4211,9 @@ class setReplication_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4194,6 +4302,9 @@ class unlink_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4262,6 +4373,9 @@ class unlink_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4361,6 +4475,9 @@ class utime_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4418,6 +4535,9 @@ class utime_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4498,6 +4618,9 @@ class datanodeUp_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4536,6 +4659,9 @@ class datanodeUp_result(object):
     oprot.writeStructBegin('datanodeUp_result')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4616,6 +4742,9 @@ class datanodeDown_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4654,6 +4783,9 @@ class datanodeDown_result(object):
     oprot.writeStructBegin('datanodeDown_result')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4665,5 +4797,3 @@ class datanodeDown_result(object):
 
   def __ne__(self, other):
     return not (self == other)
-
-

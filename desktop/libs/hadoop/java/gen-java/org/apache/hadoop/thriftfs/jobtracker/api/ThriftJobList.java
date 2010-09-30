@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Container structure of a list of jobs, in case we ever want to add metadata
  */
-public class ThriftJobList implements TBase<ThriftJobList._Fields>, java.io.Serializable, Cloneable {
+public class ThriftJobList implements TBase<ThriftJobList, ThriftJobList._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftJobList");
 
   private static final TField JOBS_FIELD_DESC = new TField("jobs", TType.LIST, (short)1);
@@ -37,12 +40,10 @@ public class ThriftJobList implements TBase<ThriftJobList._Fields>, java.io.Seri
   public enum _Fields implements TFieldIdEnum {
     JOBS((short)1, "jobs");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -51,7 +52,12 @@ public class ThriftJobList implements TBase<ThriftJobList._Fields>, java.io.Seri
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // JOBS
+          return JOBS;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -90,13 +96,13 @@ public class ThriftJobList implements TBase<ThriftJobList._Fields>, java.io.Seri
 
   // isset id assignments
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.JOBS, new FieldMetaData("jobs", TFieldRequirementType.DEFAULT, 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
+  static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.JOBS, new FieldMetaData("jobs", TFieldRequirementType.DEFAULT, 
         new ListMetaData(TType.LIST, 
             new StructMetaData(TType.STRUCT, ThriftJobInProgress.class))));
-  }});
-
-  static {
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftJobList.class, metaDataMap);
   }
 
@@ -127,9 +133,9 @@ public class ThriftJobList implements TBase<ThriftJobList._Fields>, java.io.Seri
     return new ThriftJobList(this);
   }
 
-  @Deprecated
-  public ThriftJobList clone() {
-    return new ThriftJobList(this);
+  @Override
+  public void clear() {
+    this.jobs = null;
   }
 
   public int getJobsSize() {
@@ -184,10 +190,6 @@ public class ThriftJobList implements TBase<ThriftJobList._Fields>, java.io.Seri
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case JOBS:
@@ -197,21 +199,17 @@ public class ThriftJobList implements TBase<ThriftJobList._Fields>, java.io.Seri
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case JOBS:
       return isSetJobs();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -244,6 +242,31 @@ public class ThriftJobList implements TBase<ThriftJobList._Fields>, java.io.Seri
     return 0;
   }
 
+  public int compareTo(ThriftJobList other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    ThriftJobList typedOther = (ThriftJobList)other;
+
+    lastComparison = Boolean.valueOf(isSetJobs()).compareTo(typedOther.isSetJobs());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetJobs()) {
+      lastComparison = TBaseHelper.compareTo(this.jobs, typedOther.jobs);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -253,32 +276,29 @@ public class ThriftJobList implements TBase<ThriftJobList._Fields>, java.io.Seri
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case JOBS:
-            if (field.type == TType.LIST) {
+      switch (field.id) {
+        case 1: // JOBS
+          if (field.type == TType.LIST) {
+            {
+              TList _list47 = iprot.readListBegin();
+              this.jobs = new ArrayList<ThriftJobInProgress>(_list47.size);
+              for (int _i48 = 0; _i48 < _list47.size; ++_i48)
               {
-                TList _list47 = iprot.readListBegin();
-                this.jobs = new ArrayList<ThriftJobInProgress>(_list47.size);
-                for (int _i48 = 0; _i48 < _list47.size; ++_i48)
-                {
-                  ThriftJobInProgress _elem49;
-                  _elem49 = new ThriftJobInProgress();
-                  _elem49.read(iprot);
-                  this.jobs.add(_elem49);
-                }
-                iprot.readListEnd();
+                ThriftJobInProgress _elem49;
+                _elem49 = new ThriftJobInProgress();
+                _elem49.read(iprot);
+                this.jobs.add(_elem49);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readListEnd();
             }
-            break;
-        }
-        iprot.readFieldEnd();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

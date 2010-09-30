@@ -15,12 +15,15 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
@@ -33,7 +36,7 @@ import org.apache.thrift.protocol.*;
  * Assumption: there won't be so many task attempts that retrieving a single task
  * will be too expensive.
  */
-public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>, java.io.Serializable, Cloneable {
+public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress, ThriftTaskInProgress._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftTaskInProgress");
 
   private static final TField EXEC_START_TIME_FIELD_DESC = new TField("execStartTime", TType.I64, (short)2);
@@ -89,12 +92,10 @@ public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>
     RUNNING_ATTEMPTS((short)14, "runningAttempts"),
     SUCCESSFUL_ATTEMPT((short)15, "successfulAttempt");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -103,7 +104,38 @@ public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 2: // EXEC_START_TIME
+          return EXEC_START_TIME;
+        case 3: // EXEC_FINISH_TIME
+          return EXEC_FINISH_TIME;
+        case 4: // PROGRESS
+          return PROGRESS;
+        case 5: // START_TIME
+          return START_TIME;
+        case 6: // FAILED
+          return FAILED;
+        case 7: // COMPLETE
+          return COMPLETE;
+        case 8: // TASK_ID
+          return TASK_ID;
+        case 9: // TASKS
+          return TASKS;
+        case 10: // TASK_STATUSES
+          return TASK_STATUSES;
+        case 11: // TASK_DIAGNOSTIC_DATA
+          return TASK_DIAGNOSTIC_DATA;
+        case 12: // COUNTERS
+          return COUNTERS;
+        case 13: // MOST_RECENT_STATE
+          return MOST_RECENT_STATE;
+        case 14: // RUNNING_ATTEMPTS
+          return RUNNING_ATTEMPTS;
+        case 15: // SUCCESSFUL_ATTEMPT
+          return SUCCESSFUL_ATTEMPT;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -149,45 +181,45 @@ public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>
   private static final int __COMPLETE_ISSET_ID = 5;
   private BitSet __isset_bit_vector = new BitSet(6);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.EXEC_START_TIME, new FieldMetaData("execStartTime", TFieldRequirementType.DEFAULT, 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
+  static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.EXEC_START_TIME, new FieldMetaData("execStartTime", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.EXEC_FINISH_TIME, new FieldMetaData("execFinishTime", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.EXEC_FINISH_TIME, new FieldMetaData("execFinishTime", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.PROGRESS, new FieldMetaData("progress", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.PROGRESS, new FieldMetaData("progress", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.DOUBLE)));
-    put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.FAILED, new FieldMetaData("failed", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.FAILED, new FieldMetaData("failed", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.BOOL)));
-    put(_Fields.COMPLETE, new FieldMetaData("complete", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.COMPLETE, new FieldMetaData("complete", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.BOOL)));
-    put(_Fields.TASK_ID, new FieldMetaData("taskID", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.TASK_ID, new FieldMetaData("taskID", TFieldRequirementType.DEFAULT, 
         new StructMetaData(TType.STRUCT, ThriftTaskID.class)));
-    put(_Fields.TASKS, new FieldMetaData("tasks", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.TASKS, new FieldMetaData("tasks", TFieldRequirementType.DEFAULT, 
         new ListMetaData(TType.LIST, 
             new StructMetaData(TType.STRUCT, ThriftTaskAttemptID.class))));
-    put(_Fields.TASK_STATUSES, new FieldMetaData("taskStatuses", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.TASK_STATUSES, new FieldMetaData("taskStatuses", TFieldRequirementType.DEFAULT, 
         new MapMetaData(TType.MAP, 
             new FieldValueMetaData(TType.STRING), 
             new StructMetaData(TType.STRUCT, ThriftTaskStatus.class))));
-    put(_Fields.TASK_DIAGNOSTIC_DATA, new FieldMetaData("taskDiagnosticData", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.TASK_DIAGNOSTIC_DATA, new FieldMetaData("taskDiagnosticData", TFieldRequirementType.DEFAULT, 
         new MapMetaData(TType.MAP, 
             new FieldValueMetaData(TType.STRING), 
             new ListMetaData(TType.LIST, 
                 new FieldValueMetaData(TType.STRING)))));
-    put(_Fields.COUNTERS, new FieldMetaData("counters", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.COUNTERS, new FieldMetaData("counters", TFieldRequirementType.DEFAULT, 
         new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
-    put(_Fields.MOST_RECENT_STATE, new FieldMetaData("mostRecentState", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.MOST_RECENT_STATE, new FieldMetaData("mostRecentState", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.STRING)));
-    put(_Fields.RUNNING_ATTEMPTS, new FieldMetaData("runningAttempts", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.RUNNING_ATTEMPTS, new FieldMetaData("runningAttempts", TFieldRequirementType.DEFAULT, 
         new ListMetaData(TType.LIST, 
             new FieldValueMetaData(TType.STRING))));
-    put(_Fields.SUCCESSFUL_ATTEMPT, new FieldMetaData("successfulAttempt", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.SUCCESSFUL_ATTEMPT, new FieldMetaData("successfulAttempt", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.STRING)));
-  }});
-
-  static {
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftTaskInProgress.class, metaDataMap);
   }
 
@@ -310,9 +342,28 @@ public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>
     return new ThriftTaskInProgress(this);
   }
 
-  @Deprecated
-  public ThriftTaskInProgress clone() {
-    return new ThriftTaskInProgress(this);
+  @Override
+  public void clear() {
+    setExecStartTimeIsSet(false);
+    this.execStartTime = 0;
+    setExecFinishTimeIsSet(false);
+    this.execFinishTime = 0;
+    setProgressIsSet(false);
+    this.progress = 0.0;
+    setStartTimeIsSet(false);
+    this.startTime = 0;
+    setFailedIsSet(false);
+    this.failed = false;
+    setCompleteIsSet(false);
+    this.complete = false;
+    this.taskID = null;
+    this.tasks = null;
+    this.taskStatuses = null;
+    this.taskDiagnosticData = null;
+    this.counters = null;
+    this.mostRecentState = null;
+    this.runningAttempts = null;
+    this.successfulAttempt = null;
   }
 
   public long getExecStartTime() {
@@ -820,10 +871,6 @@ public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case EXEC_START_TIME:
@@ -872,12 +919,12 @@ public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case EXEC_START_TIME:
       return isSetExecStartTime();
@@ -909,10 +956,6 @@ public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>
       return isSetSuccessfulAttempt();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -1062,6 +1105,161 @@ public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>
     return 0;
   }
 
+  public int compareTo(ThriftTaskInProgress other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    ThriftTaskInProgress typedOther = (ThriftTaskInProgress)other;
+
+    lastComparison = Boolean.valueOf(isSetExecStartTime()).compareTo(typedOther.isSetExecStartTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetExecStartTime()) {
+      lastComparison = TBaseHelper.compareTo(this.execStartTime, typedOther.execStartTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetExecFinishTime()).compareTo(typedOther.isSetExecFinishTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetExecFinishTime()) {
+      lastComparison = TBaseHelper.compareTo(this.execFinishTime, typedOther.execFinishTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetProgress()).compareTo(typedOther.isSetProgress());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetProgress()) {
+      lastComparison = TBaseHelper.compareTo(this.progress, typedOther.progress);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStartTime()).compareTo(typedOther.isSetStartTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetStartTime()) {
+      lastComparison = TBaseHelper.compareTo(this.startTime, typedOther.startTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetFailed()).compareTo(typedOther.isSetFailed());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetFailed()) {
+      lastComparison = TBaseHelper.compareTo(this.failed, typedOther.failed);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetComplete()).compareTo(typedOther.isSetComplete());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetComplete()) {
+      lastComparison = TBaseHelper.compareTo(this.complete, typedOther.complete);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTaskID()).compareTo(typedOther.isSetTaskID());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTaskID()) {
+      lastComparison = TBaseHelper.compareTo(this.taskID, typedOther.taskID);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTasks()).compareTo(typedOther.isSetTasks());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTasks()) {
+      lastComparison = TBaseHelper.compareTo(this.tasks, typedOther.tasks);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTaskStatuses()).compareTo(typedOther.isSetTaskStatuses());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTaskStatuses()) {
+      lastComparison = TBaseHelper.compareTo(this.taskStatuses, typedOther.taskStatuses);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTaskDiagnosticData()).compareTo(typedOther.isSetTaskDiagnosticData());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTaskDiagnosticData()) {
+      lastComparison = TBaseHelper.compareTo(this.taskDiagnosticData, typedOther.taskDiagnosticData);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCounters()).compareTo(typedOther.isSetCounters());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetCounters()) {
+      lastComparison = TBaseHelper.compareTo(this.counters, typedOther.counters);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMostRecentState()).compareTo(typedOther.isSetMostRecentState());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetMostRecentState()) {
+      lastComparison = TBaseHelper.compareTo(this.mostRecentState, typedOther.mostRecentState);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetRunningAttempts()).compareTo(typedOther.isSetRunningAttempts());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetRunningAttempts()) {
+      lastComparison = TBaseHelper.compareTo(this.runningAttempts, typedOther.runningAttempts);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetSuccessfulAttempt()).compareTo(typedOther.isSetSuccessfulAttempt());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetSuccessfulAttempt()) {
+      lastComparison = TBaseHelper.compareTo(this.successfulAttempt, typedOther.successfulAttempt);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -1071,176 +1269,173 @@ public class ThriftTaskInProgress implements TBase<ThriftTaskInProgress._Fields>
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case EXEC_START_TIME:
-            if (field.type == TType.I64) {
-              this.execStartTime = iprot.readI64();
-              setExecStartTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case EXEC_FINISH_TIME:
-            if (field.type == TType.I64) {
-              this.execFinishTime = iprot.readI64();
-              setExecFinishTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PROGRESS:
-            if (field.type == TType.DOUBLE) {
-              this.progress = iprot.readDouble();
-              setProgressIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case START_TIME:
-            if (field.type == TType.I64) {
-              this.startTime = iprot.readI64();
-              setStartTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case FAILED:
-            if (field.type == TType.BOOL) {
-              this.failed = iprot.readBool();
-              setFailedIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case COMPLETE:
-            if (field.type == TType.BOOL) {
-              this.complete = iprot.readBool();
-              setCompleteIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case TASK_ID:
-            if (field.type == TType.STRUCT) {
-              this.taskID = new ThriftTaskID();
-              this.taskID.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case TASKS:
-            if (field.type == TType.LIST) {
+      switch (field.id) {
+        case 2: // EXEC_START_TIME
+          if (field.type == TType.I64) {
+            this.execStartTime = iprot.readI64();
+            setExecStartTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // EXEC_FINISH_TIME
+          if (field.type == TType.I64) {
+            this.execFinishTime = iprot.readI64();
+            setExecFinishTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // PROGRESS
+          if (field.type == TType.DOUBLE) {
+            this.progress = iprot.readDouble();
+            setProgressIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // START_TIME
+          if (field.type == TType.I64) {
+            this.startTime = iprot.readI64();
+            setStartTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // FAILED
+          if (field.type == TType.BOOL) {
+            this.failed = iprot.readBool();
+            setFailedIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // COMPLETE
+          if (field.type == TType.BOOL) {
+            this.complete = iprot.readBool();
+            setCompleteIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 8: // TASK_ID
+          if (field.type == TType.STRUCT) {
+            this.taskID = new ThriftTaskID();
+            this.taskID.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 9: // TASKS
+          if (field.type == TType.LIST) {
+            {
+              TList _list13 = iprot.readListBegin();
+              this.tasks = new ArrayList<ThriftTaskAttemptID>(_list13.size);
+              for (int _i14 = 0; _i14 < _list13.size; ++_i14)
               {
-                TList _list13 = iprot.readListBegin();
-                this.tasks = new ArrayList<ThriftTaskAttemptID>(_list13.size);
-                for (int _i14 = 0; _i14 < _list13.size; ++_i14)
-                {
-                  ThriftTaskAttemptID _elem15;
-                  _elem15 = new ThriftTaskAttemptID();
-                  _elem15.read(iprot);
-                  this.tasks.add(_elem15);
-                }
-                iprot.readListEnd();
+                ThriftTaskAttemptID _elem15;
+                _elem15 = new ThriftTaskAttemptID();
+                _elem15.read(iprot);
+                this.tasks.add(_elem15);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readListEnd();
             }
-            break;
-          case TASK_STATUSES:
-            if (field.type == TType.MAP) {
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 10: // TASK_STATUSES
+          if (field.type == TType.MAP) {
+            {
+              TMap _map16 = iprot.readMapBegin();
+              this.taskStatuses = new HashMap<String,ThriftTaskStatus>(2*_map16.size);
+              for (int _i17 = 0; _i17 < _map16.size; ++_i17)
               {
-                TMap _map16 = iprot.readMapBegin();
-                this.taskStatuses = new HashMap<String,ThriftTaskStatus>(2*_map16.size);
-                for (int _i17 = 0; _i17 < _map16.size; ++_i17)
-                {
-                  String _key18;
-                  ThriftTaskStatus _val19;
-                  _key18 = iprot.readString();
-                  _val19 = new ThriftTaskStatus();
-                  _val19.read(iprot);
-                  this.taskStatuses.put(_key18, _val19);
-                }
-                iprot.readMapEnd();
+                String _key18;
+                ThriftTaskStatus _val19;
+                _key18 = iprot.readString();
+                _val19 = new ThriftTaskStatus();
+                _val19.read(iprot);
+                this.taskStatuses.put(_key18, _val19);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readMapEnd();
             }
-            break;
-          case TASK_DIAGNOSTIC_DATA:
-            if (field.type == TType.MAP) {
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 11: // TASK_DIAGNOSTIC_DATA
+          if (field.type == TType.MAP) {
+            {
+              TMap _map20 = iprot.readMapBegin();
+              this.taskDiagnosticData = new HashMap<String,List<String>>(2*_map20.size);
+              for (int _i21 = 0; _i21 < _map20.size; ++_i21)
               {
-                TMap _map20 = iprot.readMapBegin();
-                this.taskDiagnosticData = new HashMap<String,List<String>>(2*_map20.size);
-                for (int _i21 = 0; _i21 < _map20.size; ++_i21)
+                String _key22;
+                List<String> _val23;
+                _key22 = iprot.readString();
                 {
-                  String _key22;
-                  List<String> _val23;
-                  _key22 = iprot.readString();
+                  TList _list24 = iprot.readListBegin();
+                  _val23 = new ArrayList<String>(_list24.size);
+                  for (int _i25 = 0; _i25 < _list24.size; ++_i25)
                   {
-                    TList _list24 = iprot.readListBegin();
-                    _val23 = new ArrayList<String>(_list24.size);
-                    for (int _i25 = 0; _i25 < _list24.size; ++_i25)
-                    {
-                      String _elem26;
-                      _elem26 = iprot.readString();
-                      _val23.add(_elem26);
-                    }
-                    iprot.readListEnd();
+                    String _elem26;
+                    _elem26 = iprot.readString();
+                    _val23.add(_elem26);
                   }
-                  this.taskDiagnosticData.put(_key22, _val23);
+                  iprot.readListEnd();
                 }
-                iprot.readMapEnd();
+                this.taskDiagnosticData.put(_key22, _val23);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readMapEnd();
             }
-            break;
-          case COUNTERS:
-            if (field.type == TType.STRUCT) {
-              this.counters = new ThriftGroupList();
-              this.counters.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MOST_RECENT_STATE:
-            if (field.type == TType.STRING) {
-              this.mostRecentState = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case RUNNING_ATTEMPTS:
-            if (field.type == TType.LIST) {
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 12: // COUNTERS
+          if (field.type == TType.STRUCT) {
+            this.counters = new ThriftGroupList();
+            this.counters.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 13: // MOST_RECENT_STATE
+          if (field.type == TType.STRING) {
+            this.mostRecentState = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 14: // RUNNING_ATTEMPTS
+          if (field.type == TType.LIST) {
+            {
+              TList _list27 = iprot.readListBegin();
+              this.runningAttempts = new ArrayList<String>(_list27.size);
+              for (int _i28 = 0; _i28 < _list27.size; ++_i28)
               {
-                TList _list27 = iprot.readListBegin();
-                this.runningAttempts = new ArrayList<String>(_list27.size);
-                for (int _i28 = 0; _i28 < _list27.size; ++_i28)
-                {
-                  String _elem29;
-                  _elem29 = iprot.readString();
-                  this.runningAttempts.add(_elem29);
-                }
-                iprot.readListEnd();
+                String _elem29;
+                _elem29 = iprot.readString();
+                this.runningAttempts.add(_elem29);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readListEnd();
             }
-            break;
-          case SUCCESSFUL_ATTEMPT:
-            if (field.type == TType.STRING) {
-              this.successfulAttempt = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 15: // SUCCESSFUL_ATTEMPT
+          if (field.type == TType.STRING) {
+            this.successfulAttempt = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

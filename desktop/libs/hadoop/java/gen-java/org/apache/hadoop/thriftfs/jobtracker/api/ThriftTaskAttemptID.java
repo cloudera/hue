@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Unique task attempt id
  */
-public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, java.io.Serializable, Cloneable, Comparable<ThriftTaskAttemptID> {
+public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID, ThriftTaskAttemptID._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftTaskAttemptID");
 
   private static final TField TASK_ID_FIELD_DESC = new TField("taskID", TType.STRUCT, (short)1);
@@ -43,12 +46,10 @@ public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, 
     ATTEMPT_ID((short)2, "attemptID"),
     AS_STRING((short)3, "asString");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -57,7 +58,16 @@ public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, 
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // TASK_ID
+          return TASK_ID;
+        case 2: // ATTEMPT_ID
+          return ATTEMPT_ID;
+        case 3: // AS_STRING
+          return AS_STRING;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -98,16 +108,16 @@ public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, 
   private static final int __ATTEMPTID_ISSET_ID = 0;
   private BitSet __isset_bit_vector = new BitSet(1);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.TASK_ID, new FieldMetaData("taskID", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftTaskID.class)));
-    put(_Fields.ATTEMPT_ID, new FieldMetaData("attemptID", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.AS_STRING, new FieldMetaData("asString", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.TASK_ID, new FieldMetaData("taskID", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftTaskID.class)));
+    tmpMap.put(_Fields.ATTEMPT_ID, new FieldMetaData("attemptID", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.AS_STRING, new FieldMetaData("asString", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftTaskAttemptID.class, metaDataMap);
   }
 
@@ -145,9 +155,12 @@ public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, 
     return new ThriftTaskAttemptID(this);
   }
 
-  @Deprecated
-  public ThriftTaskAttemptID clone() {
-    return new ThriftTaskAttemptID(this);
+  @Override
+  public void clear() {
+    this.taskID = null;
+    setAttemptIDIsSet(false);
+    this.attemptID = 0;
+    this.asString = null;
   }
 
   public ThriftTaskID getTaskID() {
@@ -250,10 +263,6 @@ public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, 
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case TASK_ID:
@@ -269,12 +278,12 @@ public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, 
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case TASK_ID:
       return isSetTaskID();
@@ -284,10 +293,6 @@ public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, 
       return isSetAsString();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -346,31 +351,41 @@ public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, 
     int lastComparison = 0;
     ThriftTaskAttemptID typedOther = (ThriftTaskAttemptID)other;
 
-    lastComparison = Boolean.valueOf(isSetTaskID()).compareTo(isSetTaskID());
+    lastComparison = Boolean.valueOf(isSetTaskID()).compareTo(typedOther.isSetTaskID());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(taskID, typedOther.taskID);
+    if (isSetTaskID()) {
+      lastComparison = TBaseHelper.compareTo(this.taskID, typedOther.taskID);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetAttemptID()).compareTo(typedOther.isSetAttemptID());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetAttemptID()).compareTo(isSetAttemptID());
+    if (isSetAttemptID()) {
+      lastComparison = TBaseHelper.compareTo(this.attemptID, typedOther.attemptID);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetAsString()).compareTo(typedOther.isSetAsString());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(attemptID, typedOther.attemptID);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetAsString()).compareTo(isSetAsString());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(asString, typedOther.asString);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetAsString()) {
+      lastComparison = TBaseHelper.compareTo(this.asString, typedOther.asString);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -382,37 +397,34 @@ public class ThriftTaskAttemptID implements TBase<ThriftTaskAttemptID._Fields>, 
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case TASK_ID:
-            if (field.type == TType.STRUCT) {
-              this.taskID = new ThriftTaskID();
-              this.taskID.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case ATTEMPT_ID:
-            if (field.type == TType.I32) {
-              this.attemptID = iprot.readI32();
-              setAttemptIDIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case AS_STRING:
-            if (field.type == TType.STRING) {
-              this.asString = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // TASK_ID
+          if (field.type == TType.STRUCT) {
+            this.taskID = new ThriftTaskID();
+            this.taskID.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // ATTEMPT_ID
+          if (field.type == TType.I32) {
+            this.attemptID = iprot.readI32();
+            setAttemptIDIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // AS_STRING
+          if (field.type == TType.STRING) {
+            this.asString = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

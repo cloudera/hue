@@ -6,35 +6,51 @@
 package com.cloudera.beeswax.api;
 
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Collections;
-import org.apache.thrift.IntRangeSet;
 import java.util.Map;
 import java.util.HashMap;
+import org.apache.thrift.TEnum;
 
-public class QueryState {
-  public static final int CREATED = 0;
-  public static final int INITIALIZED = 1;
-  public static final int COMPILED = 2;
-  public static final int RUNNING = 3;
-  public static final int FINISHED = 4;
-  public static final int EXCEPTION = 5;
+public enum QueryState implements TEnum {
+  CREATED(0),
+  INITIALIZED(1),
+  COMPILED(2),
+  RUNNING(3),
+  FINISHED(4),
+  EXCEPTION(5);
 
-  public static final IntRangeSet VALID_VALUES = new IntRangeSet(
-    CREATED, 
-    INITIALIZED, 
-    COMPILED, 
-    RUNNING, 
-    FINISHED, 
-    EXCEPTION );
+  private final int value;
 
-  public static final Map<Integer, String> VALUES_TO_NAMES = new HashMap<Integer, String>() {{
-    put(CREATED, "CREATED");
-    put(INITIALIZED, "INITIALIZED");
-    put(COMPILED, "COMPILED");
-    put(RUNNING, "RUNNING");
-    put(FINISHED, "FINISHED");
-    put(EXCEPTION, "EXCEPTION");
-  }};
+  private QueryState(int value) {
+    this.value = value;
+  }
+
+  /**
+   * Get the integer value of this enum value, as defined in the Thrift IDL.
+   */
+  public int getValue() {
+    return value;
+  }
+
+  /**
+   * Find a the enum type by its integer value, as defined in the Thrift IDL.
+   * @return null if the value is not found.
+   */
+  public static QueryState findByValue(int value) { 
+    switch (value) {
+      case 0:
+        return CREATED;
+      case 1:
+        return INITIALIZED;
+      case 2:
+        return COMPILED;
+      case 3:
+        return RUNNING;
+      case 4:
+        return FINISHED;
+      case 5:
+        return EXCEPTION;
+      default:
+        return null;
+    }
+  }
 }

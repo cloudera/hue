@@ -9,16 +9,11 @@ package org.apache.hadoop.thriftfs.api;
 import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
-public enum DatanodeState implements TEnum{
-    NORMAL_STATE(1),
-    DECOMMISSION_INPROGRESS(2),
-    DECOMMISSIONED(3);
 
-  private static final Map<Integer, DatanodeState> BY_VALUE = new HashMap<Integer,DatanodeState>() {{
-    for(DatanodeState val : DatanodeState.values()) {
-      put(val.getValue(), val);
-    }
-  }};
+public enum DatanodeState implements TEnum {
+  NORMAL_STATE(1),
+  DECOMMISSION_INPROGRESS(2),
+  DECOMMISSIONED(3);
 
   private final int value;
 
@@ -38,6 +33,15 @@ public enum DatanodeState implements TEnum{
    * @return null if the value is not found.
    */
   public static DatanodeState findByValue(int value) { 
-    return BY_VALUE.get(value);
+    switch (value) {
+      case 1:
+        return NORMAL_STATE;
+      case 2:
+        return DECOMMISSION_INPROGRESS;
+      case 3:
+        return DECOMMISSIONED;
+      default:
+        return null;
+    }
   }
 }
