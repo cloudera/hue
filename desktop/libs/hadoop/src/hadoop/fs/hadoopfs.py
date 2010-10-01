@@ -27,6 +27,7 @@ import stat as statconsts
 import subprocess
 import sys
 import urlparse
+import tempfile
 import threading
 
 from thrift.transport import TTransport
@@ -176,7 +177,7 @@ class HadoopFileSystem(object):
   Implementation of Filesystem APIs through Thrift to a Hadoop cluster.
   """
 
-  def __init__(self, host, thrift_port, hdfs_port=8020, hadoop_bin_path="hadoop"):
+  def __init__(self, host, thrift_port, hdfs_port=8020, hadoop_bin_path="hadoop", security_enabled=False):
     """
     @param host hostname or IP of the namenode
     @param thrift_port port on which the Thrift plugin is listening
@@ -190,6 +191,7 @@ class HadoopFileSystem(object):
     self.hdfs_port = hdfs_port
     self.hadoop_bin_path = hadoop_bin_path
     self._resolve_hadoop_path()
+    self.security_enabled = security_enabled
 
     self.nn_client = thrift_util.get_client(Namenode.Client, host, thrift_port,
         service_name="HDFS Namenode HUE Plugin",
@@ -550,6 +552,12 @@ class HadoopFileSystem(object):
       ret["space_quota"] = summary.spaceQuota
     return ret
 
+  @_coerce_exceptions
+  def get_delegation_token(self):
+    # TODO(atm): The second argument here should really be the Hue kerberos
+    # principal, which doesn't exist yet. Todd's working on that.
+    return self.nn_client.getDelegationToken(self.request_context, '')
+
   def _connect_dn(self, node):
     sock = TSocket.TSocket(node.host, node.thriftPort)
     sock.setTimeout(int(DN_THRIFT_TIMEOUT * 1000))
@@ -759,11 +767,19 @@ class FileUpload(object):
                            "-Dfs.default.name=" + self.fs.uri] + \
                            extra_confs + \
                            ["-put", "-", encode_fs_path(path)]
-    env = i18n.make_utf8_env()
-    if env.has_key('HADOOP_CLASSPATH'):
-      env['HADOOP_CLASSPATH'] += ':' + hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
+    self.subprocess_env = i18n.make_utf8_env()
+
+    if self.fs.security_enabled:
+      token = self.fs.get_delegation_token()
+      self.token_file = tempfile.NamedTemporaryFile()
+      self.token_file.write(token.delegationTokenBytes)
+      self.token_file.flush()
+      self.subprocess_env['HADOOP_TOKEN_FILE_LOCATION'] = self.token_file.name
+
+    if self.subprocess_env.has_key('HADOOP_CLASSPATH'):
+      self.subprocess_env['HADOOP_CLASSPATH'] += ':' + hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
     else:
-      env['HADOOP_CLASSPATH'] = hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
+      self.subprocess_env['HADOOP_CLASSPATH'] = hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
 
     self.path = path
     self.putter = subprocess.Popen(self.subprocess_cmd,
@@ -771,7 +787,7 @@ class FileUpload(object):
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
                                    close_fds=True,
-                                   env=env,
+                                   env=self.subprocess_env,
                                    bufsize=WRITE_BUFFER_SIZE)
   @require_open
   def write(self, data):
@@ -785,13 +801,20 @@ class FileUpload(object):
       logging.debug("Saw IOError writing %r" % self.path, exc_info=1)
       if ioe.errno == errno.EPIPE:
         stdout, stderr = self.putter.communicate()
+
+    if self.fs.security_enabled and self.token_file:
+      try:
+        self.token_file.close()
+      except:
+        LOG.warn('Failed to close HDFS delegation token file %s' % (self.token_file.name(),))
+
     self.closed = True
     if stderr:
-      LOG.warn("HDFS FileUpload (cmd='%s')outputted stderr:\n%s" %
-                   (repr(self.subprocess_cmd), stderr))
+      LOG.warn("HDFS FileUpload (cmd='%s', env='%s') outputted stderr:\n%s" %
+                   (repr(self.subprocess_cmd), repr(self.subprocess_env), stderr))
     if stdout:
-      LOG.info("HDFS FileUpload (cmd='%s')outputted stdout:\n%s" %
-                   (repr(self.subprocess_cmd), stdout))
+      LOG.info("HDFS FileUpload (cmd='%s', env='%s') outputted stdout:\n%s" %
+                   (repr(self.subprocess_cmd), repr(self.subprocess_env), stdout))
     if self.putter.returncode != 0:
       raise IOError("hdfs put returned bad code: %d\nstderr: %s" %
                     (self.putter.returncode, stderr))

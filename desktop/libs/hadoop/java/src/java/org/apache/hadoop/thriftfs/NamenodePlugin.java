@@ -18,6 +18,7 @@
 package org.apache.hadoop.thriftfs;
 
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
@@ -40,8 +41,14 @@ import org.apache.hadoop.hdfs.protocol.HdfsFileStatus;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.protocol.FSConstants.SafeModeAction;
+import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.net.NetUtils;
+import org.apache.hadoop.security.Credentials;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.thriftfs.api.Block;
 import org.apache.hadoop.thriftfs.api.Constants;
 import org.apache.hadoop.thriftfs.api.ContentSummary;
@@ -49,6 +56,7 @@ import org.apache.hadoop.thriftfs.api.IOException;
 import org.apache.hadoop.thriftfs.api.Namenode;
 import org.apache.hadoop.thriftfs.api.RequestContext;
 import org.apache.hadoop.thriftfs.api.Stat;
+import org.apache.hadoop.thriftfs.api.ThriftHdfsDelegationToken;
 import org.apache.thrift.TException;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
@@ -400,6 +408,30 @@ public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.Namen
       DatanodeID dnId = new DatanodeID(name, storage, -1, -1);
       LOG.info("Datanode " + dnId + ": " + "Thrift port " + thriftPort + " open");
       thriftPorts.put(dnId, thriftPort);
+    }
+
+    @Override
+    public ThriftHdfsDelegationToken getDelegationToken(RequestContext ctx, final String renewer) throws IOException,
+        TException {
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<ThriftHdfsDelegationToken>() {
+        public ThriftHdfsDelegationToken run() throws java.io.IOException {
+          UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
+          Token<DelegationTokenIdentifier> delegationToken = namenode.getDelegationToken(new Text(renewer));
+
+          InetSocketAddress address = namenode.getNameNodeAddress();
+          String nnAddress = InetAddress.getByName(address.getHostName()).getHostAddress() + ":" + address.getPort();
+          delegationToken.setService(new Text(nnAddress));
+
+          DataOutputBuffer out = new DataOutputBuffer();
+          Credentials ts = new Credentials();
+          ts.addToken(new Text(ugi.getShortUserName()), delegationToken);
+          ts.writeTokenStorageToStream(out);
+
+          byte[] tokenData = new byte[out.getLength()];
+          System.arraycopy(out.getData(), 0, tokenData, 0, tokenData.length);
+          return new ThriftHdfsDelegationToken(tokenData);
+        }
+      });
     }
   }
 

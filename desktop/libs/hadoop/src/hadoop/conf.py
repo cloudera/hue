@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Settings to configure your Hadoop cluster."""
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
 import glob
 import os
 import logging
@@ -114,7 +114,8 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=9090,
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
-                            type=int)
+                            type=int),
+      SECURITY_ENABLED=Config('security_enabled', help='True if security is enabled for this HDFS cluster', type=coerce_bool, default=False)
     )
   )
 )
@@ -127,7 +128,11 @@ MR_CLUSTERS = UnspecifiedConfigSection(
     members=dict(
       JT_HOST=Config("jobtracker_host", help="IP for JobTracker"),
       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
-                            type=int))))
+                            type=int),
+      SECURITY_ENABLED=Config('security_enabled', help='True if security is enabled for this MR cluster', type=coerce_bool, default=False)
+    )
+  )
+)
 
 
 def config_validator():

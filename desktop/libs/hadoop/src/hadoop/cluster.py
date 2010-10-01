@@ -38,7 +38,8 @@ def _make_filesystem(identifier):
       cluster_conf.NN_HOST.get(),
       cluster_conf.NN_THRIFT_PORT.get(),
       cluster_conf.NN_HDFS_PORT.get(),
-      hadoop_bin_path=conf.HADOOP_BIN.get())
+      conf.HADOOP_BIN.get(),
+      cluster_conf.SECURITY_ENABLED.get())
     raise Exception("Unknown choice: %s" % choice)
 
 def _make_mrcluster(identifier):
