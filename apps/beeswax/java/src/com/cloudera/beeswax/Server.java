@@ -157,7 +157,7 @@ public class Server {
    */
   private static void createDirectoriesAsNecessary() {
     try {
-      LOG.info("Classpath: " + System.getProperty("java.class.path"));
+      LOG.debug("Classpath: " + System.getProperty("java.class.path"));
       HiveConf conf = new HiveConf(Driver.class);
       FileSystem fs = FileSystem.get(conf);
       Path tmpDir = new Path("/tmp");

@@ -214,6 +214,9 @@ for x in sys.stdin:
     assert_equal(257, response.content.count("\n"))
 
   def test_query_with_udf(self):
+    """
+    Testing query with udf
+    """
     response = _make_query(self.client, "SELECT my_sqrt(foo), my_power(foo, foo) FROM test WHERE foo=4",
       udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'),
         ('my_power', 'org.apache.hadoop.hive.ql.udf.UDFPower')], local=False)
@@ -264,6 +267,9 @@ for x in sys.stdin:
     check_error_in_response(resp)
 
   def test_parameterization(self):
+    """
+    Test parameterization
+    """
     response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", is_parameterized=False)
     # Assert no parameterization was offered
     assert_equal("watch_wait.mako", response.template, "we should have seen the template for a query executing")

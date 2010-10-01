@@ -66,7 +66,7 @@ def show_tables(request):
 def describe_table(request, table):
   table_obj = db_utils.meta_client().get_table("default", table)
   # Show the first few rows
-  hql = "SELECT * FROM %s" % (table,)
+  hql = "SELECT * FROM `%s`" % (table,)
   query_msg = make_beeswax_query(request, hql)
   try:
     results = db_utils.execute_and_wait(request.user, query_msg, timeout_sec=5.0)
@@ -93,7 +93,7 @@ def drop_table(request, table):
     title = "This may delete the underlying data as well as the metadata.  Drop table %s?" % table
     return render('confirm.html', request, dict(url=request.path, title=title))
   elif request.method == 'POST':
-    hql = "DROP TABLE %s" % (table,)
+    hql = "DROP TABLE `%s`" % (table,)
     query_msg = make_beeswax_query(request, hql)
     try:
       return execute_directly(request,
@@ -962,7 +962,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
   """
   # Case 1: The results are straight from an existing table
   if result_meta.in_tablename:
-    hql = 'CREATE TABLE %s AS SELECT * FROM %s' % (target_table, result_meta.in_tablename)
+    hql = 'CREATE TABLE `%s` AS SELECT * FROM %s' % (target_table, result_meta.in_tablename)
     query_msg = make_beeswax_query(request, hql)
     # Display the CTAS running. Could take a long time.
     return execute_directly(request, query_msg, on_success_url=urlresolvers.reverse(show_tables))
@@ -1031,7 +1031,7 @@ def load_table(request, table):
       if form.cleaned_data['overwrite']:
         hql += " OVERWRITE"
       hql += " INTO TABLE "
-      hql += "%s" % (table,)
+      hql += "`%s`" % (table,)
       if len(form.partition_columns) > 0:
         hql += " PARTITION ("
         vals = []
