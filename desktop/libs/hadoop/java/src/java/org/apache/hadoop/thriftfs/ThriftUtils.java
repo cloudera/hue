@@ -25,10 +25,12 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.net.NetUtils;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.thriftfs.api.Block;
 import org.apache.hadoop.thriftfs.api.Constants;
 import org.apache.hadoop.thriftfs.api.ContentSummary;
@@ -185,6 +187,14 @@ public class ThriftUtils {
     }
 
     TTransport t = new TSocket(addr.getHostName(), addr.getPort());
+    if (UserGroupInformation.isSecurityEnabled()) {
+      t = new HadoopThriftAuthBridge.Client()
+        .createClientTransport(
+          conf.get(DFSConfigKeys.DFS_NAMENODE_USER_NAME_KEY),
+          addr.getHostName(),
+          "KERBEROS", t);
+    }
+
     t.open();
     TProtocol p = new TBinaryProtocol(t);
     return new Namenode.Client(p);

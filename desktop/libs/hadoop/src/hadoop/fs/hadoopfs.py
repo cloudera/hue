@@ -26,6 +26,7 @@ import random
 import stat as statconsts
 import subprocess
 import sys
+import time
 import urlparse
 import threading
 
@@ -175,7 +176,8 @@ class HadoopFileSystem(object):
   """
 
   def __init__(self, host, thrift_port, hdfs_port=8020,
-               kerberos_principal="hdfs",
+               nn_kerberos_principal="hdfs",
+               dn_kerberos_principal="hdfs",
                security_enabled=False,
                hadoop_bin_path="hadoop"):
     """
@@ -190,7 +192,8 @@ class HadoopFileSystem(object):
     self.thrift_port = thrift_port
     self.hdfs_port = hdfs_port
     self.security_enabled = security_enabled
-    self.kerberos_principal = kerberos_principal
+    self.nn_kerberos_principal = nn_kerberos_principal
+    self.dn_kerberos_principal = dn_kerberos_principal
     self.hadoop_bin_path = hadoop_bin_path
     self._resolve_hadoop_path()
 
@@ -198,7 +201,7 @@ class HadoopFileSystem(object):
       Namenode.Client, host, thrift_port,
       service_name="HDFS Namenode HUE Plugin",
       use_sasl=security_enabled,
-      kerberos_principal=kerberos_principal,
+      kerberos_principal=nn_kerberos_principal,
       timeout_seconds=NN_THRIFT_TIMEOUT)
 
     # The file systems are cached globally.  We store
@@ -214,7 +217,8 @@ class HadoopFileSystem(object):
                thrift_port=fs_config.NN_THRIFT_PORT.get(),
                hdfs_port=fs_config.NN_HDFS_PORT.get(),
                security_enabled=fs_config.SECURITY_ENABLED.get(),
-               kerberos_principal=fs_config.NN_KERBEROS_PRINCIPAL.get(),
+               nn_kerberos_principal=fs_config.NN_KERBEROS_PRINCIPAL.get(),
+               dn_kerberos_principal=fs_config.DN_KERBEROS_PRINCIPAL.get(),
                hadoop_bin_path=hadoop_bin_path)
 
 
@@ -567,14 +571,20 @@ class HadoopFileSystem(object):
     return ret
 
   def _connect_dn(self, node):
-    sock = TSocket.TSocket(node.host, node.thriftPort)
-    sock.setTimeout(int(DN_THRIFT_TIMEOUT * 1000))
-    transport = TTransport.TBufferedTransport(sock)
-    protocol = TBinaryProtocol.TBinaryProtocol(transport)
-    client = Datanode.Client(protocol)
+    dn_conf = thrift_util.ConnectionConfig(
+      Datanode.Client,
+      node.host,
+      node.thriftPort,
+      "HDFS Datanode Thrift",
+      use_sasl=self.security_enabled,
+      kerberos_principal=self.dn_kerberos_principal,
+      timeout_seconds=DN_THRIFT_TIMEOUT)
+
+    service, protocol, transport = \
+        thrift_util.connect_to_thrift(dn_conf)
     transport.open()
-    client.close = lambda: transport.close()
-    return client
+    service.close = lambda: transport.close()
+    return service
 
   @staticmethod
   def _unpack_stat(stat):
