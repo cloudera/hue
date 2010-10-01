@@ -115,7 +115,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
                             type=int),
-      NN_KERBEROS_PRINCIPAL=Config("kerberos_principal", help="Kerberos principal for NameNode",
+      NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
                                    default="hdfs", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=bool),
@@ -131,7 +131,12 @@ MR_CLUSTERS = UnspecifiedConfigSection(
     members=dict(
       JT_HOST=Config("jobtracker_host", help="IP for JobTracker"),
       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
-                            type=int))))
+                            type=int),
+      JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
+                                   default="mapred", type=str),
+      SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
+                              default=False, type=bool))
+))
 
 
 def config_validator():

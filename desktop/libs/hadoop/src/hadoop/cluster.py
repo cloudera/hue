@@ -41,8 +41,7 @@ def _make_filesystem(identifier):
 
 def _make_mrcluster(identifier):
   cluster_conf = conf.MR_CLUSTERS[identifier]
-  return LiveJobTracker(cluster_conf.JT_HOST.get(),
-                        cluster_conf.JT_THRIFT_PORT.get())
+  return LiveJobTracker.from_conf(cluster_conf)
 
 FS_CACHE = None
 def get_hdfs(identifier="default"):
