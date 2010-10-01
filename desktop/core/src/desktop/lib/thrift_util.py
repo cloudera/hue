@@ -108,7 +108,7 @@ class ConnectionPooler(object):
           q = Queue.Queue(self.poolsize)
           self.pooldict[(conf.host, conf.port)] = q
           for i in xrange(self.poolsize):
-            client = construct_client(conf)
+            client = construct_superclient(conf)
             client.CID = i
             q.put(client, False)
       finally:
@@ -146,28 +146,42 @@ class ConnectionPooler(object):
     """
     self.pooldict[(host, port)].put(client)
 
-def construct_client(conf):
+def construct_superclient(conf):
   """
   Constructs a thrift client, lazily.
   """
+  service, protocol, transport = connect_to_thrift(conf)
+  return SuperClient(service, transport, timeout_seconds=conf.timeout_seconds)
 
-  def sasl_factory():
-    saslc = sasl.Client()
-    saslc.setAttr("host", conf.host)
-    saslc.setAttr("service", conf.kerberos_principal)
-    saslc.init()
-    return saslc
 
-  logging.info("service: %s   host: %s" % (conf.kerberos_principal, conf.host))
+def connect_to_thrift(conf):
+  """
+  Connect to a thrift endpoint as determined by the 'conf' parameter.
+  Note that this does *not* open the transport.
+
+  Returns a tuple of (service, protocol, transport)
+  """
   sock = TSocket(conf.host, conf.port)
   if conf.timeout_seconds:
     # Thrift trivia: You can do this after the fact with
     # self.wrapped.transport._TBufferedTransport__trans.setTimeout(seconds*1000)
     sock.setTimeout(conf.timeout_seconds*1000.0)
-  transport = TSaslClientTransport(sasl_factory, "GSSAPI", sock)
-  protocol = TBinaryProtocolAccelerated(transport)
+  if conf.use_sasl:
+    def sasl_factory():
+      saslc = sasl.Client()
+      saslc.setAttr("host", conf.host)
+      saslc.setAttr("service", conf.kerberos_principal)
+      saslc.init()
+      return saslc
+
+    transport = TSaslClientTransport(sasl_factory, "GSSAPI", sock)
+  else:
+    transport = TBufferedTransport(sock)
+
+  protocol = TBinaryProtocol(transport)
   service = conf.klass(protocol)
-  return SuperClient(service, transport, timeout_seconds=conf.timeout_seconds)
+  return service, protocol, transport
+
 
 _connection_pool = ConnectionPooler()
 

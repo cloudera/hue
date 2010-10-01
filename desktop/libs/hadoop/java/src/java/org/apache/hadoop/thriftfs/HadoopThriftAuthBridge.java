@@ -199,7 +199,7 @@ class HadoopThriftAuthBridge {
         }
         TSaslServerTransport saslTrans = (TSaslServerTransport)trans;
         String authId = saslTrans.getSaslServer().getAuthorizationID();
-        System.err.println("AUTH ID ======>" + authId);
+        LOG.debug("Authenticated  " + authId + " for Thrift call ");
 
         UserGroupInformation clientUgi = UserGroupInformation.createRemoteUser(authId);
 

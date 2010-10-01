@@ -112,7 +112,6 @@ def test_view_gz():
   try:
     c = make_logged_in_client()
     cluster.fs.setuser(cluster.superuser)
-
     if cluster.fs.isdir("/test-gz-filebrowser"):
       cluster.fs.rmtree('/test-gz-filebrowser/')
 

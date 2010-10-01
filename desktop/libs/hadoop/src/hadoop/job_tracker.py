@@ -46,7 +46,7 @@ def test_jt_configuration(cluster):
     return err
 
   try:
-    jt = LiveJobTracker(cluster.JT_HOST.get(), cluster.JT_THRIFT_PORT.get())
+    jt = LiveJobTracker.from_conf(cluster)
     jt.runtime_info()
   except TTransport.TTransportException:
     msg = 'Failed to contact JobTracker plugin at %s:%s.' % \
@@ -63,10 +63,14 @@ class LiveJobTracker(object):
   In particular, if Thrift returns None for anything, this will throw.
   """
 
-  def __init__(self, host, thrift_port):
+  def __init__(self, host, thrift_port,
+               security_enabled=False,
+               kerberos_principal="mapred"):
     self.client = thrift_util.get_client(
       Jobtracker.Client, host, thrift_port,
       service_name="Hadoop MR JobTracker HUE Plugin",
+      use_sasl=security_enabled,
+      kerberos_principal=kerberos_principal,
       timeout_seconds=JT_THRIFT_TIMEOUT)
     self.host = host
     self.thrift_port = thrift_port
@@ -75,6 +79,15 @@ class LiveJobTracker(object):
     # thread-local.
     self.thread_local = threading.local()
     self.setuser(DEFAULT_USER)
+
+  @classmethod
+  def from_conf(cls, conf):
+    return cls(
+      conf.JT_HOST.get(),
+      conf.JT_THRIFT_PORT.get(),
+      security_enabled=conf.SECURITY_ENABLED.get(),
+      kerberos_principal=conf.JT_KERBEROS_PRINCIPAL.get())
+
 
   def thriftjobid_from_string(self, jobid):
     """The jobid looks like this: job_201001301455_0001"""
