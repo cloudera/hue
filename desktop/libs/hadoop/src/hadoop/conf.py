@@ -114,7 +114,9 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=10090,
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
-                            type=int)
+                            type=int),
+      NN_KERBEROS_PRINCIPAL=Config("kerberos_principal", help="Kerberos principal for NameNode",
+                                   default="hdfs", type=str),
     )
   )
 )

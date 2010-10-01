@@ -193,7 +193,9 @@ public abstract class ThriftHandlerBase implements HadoopServiceBase.Iface {
    */
   protected <T> T assumeUserContextAndExecute(RequestContext ctx, PrivilegedExceptionAction<T> action) throws IOException {
     try {
-      return UserGroupInformation.createProxyUser(ctx.confOptions.get("effective_user"), UserGroupInformation.getLoginUser()).doAs(action);
+      return UserGroupInformation.createProxyUser(
+        ctx.confOptions.get("effective_user"),
+        UserGroupInformation.getCurrentUser()).doAs(action);
     } catch (Throwable e) {
       throw ThriftUtils.toThrift(e);
     }
@@ -202,7 +204,7 @@ public abstract class ThriftHandlerBase implements HadoopServiceBase.Iface {
   protected <T> T assumeUserContextAndExecute(RequestContext ctx, PrivilegedAction<T> action) {
     try {
       return UserGroupInformation.createProxyUser(ctx.confOptions.get("effective_user"),
-          UserGroupInformation.getLoginUser()).doAs(action);
+          UserGroupInformation.getCurrentUser()).doAs(action);
     } catch (java.io.IOException e) {
       // This should only be thrown in the event getLoginUser() fails.
       throw new Error(e);

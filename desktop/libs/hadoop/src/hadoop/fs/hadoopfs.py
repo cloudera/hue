@@ -93,10 +93,11 @@ def test_fs_configuration(fs_config, hadoop_bin_conf):
 
   # Check thrift plugin
   try:
-    fs = HadoopFileSystem(fs_config.NN_HOST.get(),
-                          fs_config.NN_THRIFT_PORT.get(),
-                          fs_config.NN_HDFS_PORT.get(),
-                          hadoop_bin_conf.get())
+    fs = HadoopFileSystem(host=fs_config.NN_HOST.get(),
+                          thrift_port=fs_config.NN_THRIFT_PORT.get(),
+                          hdfs_port=fs_config.NN_HDFS_PORT.get(),
+                          kerberos_principal=fs_config.NN_KERBEROS_PRINCIPAL.get(),
+                          hadoop_bin_path=hadoop_bin_conf.get())
 
     fs.setuser(fs.superuser)
     ls = fs.listdir('/')
@@ -176,7 +177,9 @@ class HadoopFileSystem(object):
   Implementation of Filesystem APIs through Thrift to a Hadoop cluster.
   """
 
-  def __init__(self, host, thrift_port, hdfs_port=8020, hadoop_bin_path="hadoop"):
+  def __init__(self, host, thrift_port, hdfs_port=8020,
+               kerberos_principal="hdfs",
+               hadoop_bin_path="hadoop"):
     """
     @param host hostname or IP of the namenode
     @param thrift_port port on which the Thrift plugin is listening
@@ -188,11 +191,13 @@ class HadoopFileSystem(object):
     self.host = host
     self.thrift_port = thrift_port
     self.hdfs_port = hdfs_port
+    self.kerberos_principal = kerberos_principal
     self.hadoop_bin_path = hadoop_bin_path
     self._resolve_hadoop_path()
 
     self.nn_client = thrift_util.get_client(Namenode.Client, host, thrift_port,
         service_name="HDFS Namenode HUE Plugin",
+        kerberos_principal=kerberos_principal,
         timeout_seconds=NN_THRIFT_TIMEOUT)
 
     # The file systems are cached globally.  We store

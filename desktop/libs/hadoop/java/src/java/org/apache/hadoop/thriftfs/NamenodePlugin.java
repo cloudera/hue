@@ -418,8 +418,8 @@ public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.Namen
       thriftServer.start();
       // The port may have been 0, so we update it.
       conf.set(THRIFT_ADDRESS_PROPERTY, address.getHostName() + ":" + thriftServer.getPort());
-    } catch (java.io.IOException ioe) {
-      throw new RuntimeException("Cannot start Thrift namenode plug-in", ioe);
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot start Thrift namenode plug-in", e);
     }
   }
 

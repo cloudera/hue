@@ -20,6 +20,7 @@
 import socket
 import logging
 import Queue
+import sasl
 import select
 import sys
 import threading
@@ -30,6 +31,7 @@ from thrift.transport.TSocket import TSocket
 from thrift.transport.TTransport import TBufferedTransport, TMemoryBuffer,\
                                         TTransportException
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
+from desktop.lib.thrift_sasl import TSaslClientTransport
 
 # The maximum depth that we will recurse through a "jsonable" structure
 # while converting to thrift. This prevents us from infinite recursion
@@ -64,6 +66,7 @@ class ConnectionPooler(object):
     self.dictlock = threading.Lock()
 
   def get_client(self, klass, host, port, service_name="Unknown",
+                 kerberos_principal="thrift",
                  get_client_timeout=None):
     """
     Could block while we wait for the pool to become non-empty.
@@ -71,7 +74,6 @@ class ConnectionPooler(object):
     @param get_client_timeout: how long (in seconds) to wait on the pool
                                to get a client before failing
     """
-
     # First up, check to see if we have a pool for this endpoint
     if (host,port) not in self.pooldict:
       # Uh-oh, we need to initialise the queue. Take the dict lock.
@@ -93,7 +95,9 @@ class ConnectionPooler(object):
           q = Queue.Queue(self.poolsize)
           self.pooldict[(host, port)] = q
           for i in xrange(self.poolsize):
-            client = construct_client(klass, host, port, service_name)
+            client = construct_client(klass, host, port,
+                                      service_name=service_name,
+                                      kerberos_principal=kerberos_principal)
             client.CID = i
             q.put(client, False)
       finally:
@@ -131,33 +135,56 @@ class ConnectionPooler(object):
     """
     self.pooldict[(host, port)].put(client)
 
-def construct_client(klass, host, port, service_name, timeout_seconds=45):
+def construct_client(klass, host, port, service_name, kerberos_principal="thrift", timeout_seconds=45):
   """
   Constructs a thrift client, lazily.
   """
+
+  def sasl_factory():
+    saslc = sasl.Client()
+    saslc.setAttr("host", host)
+    saslc.setAttr("service", kerberos_principal)
+    saslc.init()
+    return saslc
+
+  logging.info("service: %s   host: %s" % (kerberos_principal, host))
   sock = TSocket(host, port)
   if timeout_seconds:
     # Thrift trivia: You can do this after the fact with
     # self.wrapped.transport._TBufferedTransport__trans.setTimeout(seconds*1000)
     sock.setTimeout(timeout_seconds*1000.0)
-  transport = TBufferedTransport(sock)
+  transport = TSaslClientTransport(sasl_factory, "GSSAPI", sock)
   protocol = TBinaryProtocol(transport)
   service = klass(protocol)
   return SuperClient(service, transport, timeout_seconds=timeout_seconds)
 
 _connection_pool = ConnectionPooler()
 
-def get_client(klass, host, port, service_name, timeout_seconds=None):
-  return PooledClient(klass,host,port,service_name,timeout_seconds)
+def get_client(klass, host, port, service_name, kerberos_principal="thrift", timeout_seconds=None):
+  return PooledClient(klass,host,port,service_name,
+                      kerberos_principal=kerberos_principal,
+                      timeout_seconds=timeout_seconds)
+
+def _grab_transport_from_wrapper(outer_transport):
+  if isinstance(outer_transport, TBufferedTransport):
+    return outer_transport._TBufferedTransport__trans
+  elif isinstance(outer_transport, TSaslClientTransport):
+    return outer_transport._trans
+  else:
+    raise Exception("Unknown transport type: " + outer_transport.__class__)
 
 class PooledClient(object):
   """
   A wrapper for a SuperClient
   """
-  def __init__(self, klass, host, port, service_name = "Unknown", timeout_seconds=None):
+  def __init__(self, klass, host, port,
+               service_name = "Unknown",
+               kerberos_principal="thrift",
+               timeout_seconds=None):
     self.klass = klass
     self.host = host
     self.port = port
+    self.kerberos_principal = kerberos_principal
     self.timeout_seconds = timeout_seconds
     self.service_name = service_name
 
@@ -167,7 +194,9 @@ class PooledClient(object):
 
     # Fetch the thrift client from the pool
     superclient = _connection_pool.get_client(self.klass, self.host, self.port,
-                                              get_client_timeout=self.timeout_seconds)
+                                              kerberos_principal=self.kerberos_principal,
+                                              get_client_timeout=self.timeout_seconds,
+                                              service_name=self.service_name)
 
     res = getattr(superclient, attr)
     if hasattr(res,"__call__"):
@@ -176,7 +205,7 @@ class PooledClient(object):
           try:
             # Poke it to see if it's closed on the other end. This can happen if a connection
             # sits in the connection pool longer than the read timeout of the server.
-            sock = superclient.transport._TBufferedTransport__trans.handle
+            sock = _grab_transport_from_wrapper(superclient.transport).handle
             if sock:
               rlist,wlist,xlist = select.select([sock], [], [], 0)
               if rlist:
@@ -277,9 +306,9 @@ class SuperClient(object):
       self.timeout_seconds = timeout_seconds
       # ugh, None is a valid timeout
       if self.timeout_seconds is not None:
-        self.transport._TBufferedTransport__trans.setTimeout(self.timeout_seconds * 1000)
+        _grab_transport_from_wrapper(self.transport).setTimeout(self.timeout_seconds * 1000)
       else:
-        self.transport._TBufferedTransport__trans.setTimeout(None)
+        _grab_transport_from_wrapper(self.transport).setTimeout(None)
 
 def simpler_string(thrift_obj):
   """

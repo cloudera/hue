@@ -26,10 +26,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
+import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
 
 /**
@@ -45,6 +47,8 @@ public class ThriftPluginServer implements Configurable, Runnable {
   private InetSocketAddress address;
 
   private TProcessorFactory processorFactory;
+  private TTransportFactory transportFactory;
+  private HadoopThriftAuthBridge.Server authBridge;
 
   static final Log LOG = LogFactory.getLog(ThriftPluginServer.class);
 
@@ -56,11 +60,22 @@ public class ThriftPluginServer implements Configurable, Runnable {
   }
 
   public ThriftPluginServer(InetSocketAddress address,
-                            TProcessorFactory processorFactory) {
+                            TProcessorFactory processorFactory)
+    throws TTransportException {
     //options = new TThreadPoolServer.Options();
     port = address.getPort();
     this.address = address;
-    this.processorFactory = processorFactory;
+
+    if (UserGroupInformation.isSecurityEnabled()) {
+      authBridge = new HadoopThriftAuthBridge.Server();
+
+      this.processorFactory = authBridge.wrapProcessorFactory(
+        processorFactory);
+      transportFactory = authBridge.createTransportFactory();
+    } else {
+      this.processorFactory = processorFactory;
+      transportFactory = new TTransportFactory();
+    }
   }
 
   /**
@@ -96,7 +111,7 @@ public class ThriftPluginServer implements Configurable, Runnable {
 
       server = new SanerThreadPoolServer(
         processorFactory, transport,
-        new TTransportFactory(), new TTransportFactory(),
+        transportFactory, transportFactory,
         new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
     }
 
