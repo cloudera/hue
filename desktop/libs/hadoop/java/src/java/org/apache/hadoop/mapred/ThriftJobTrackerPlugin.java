@@ -658,9 +658,9 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
           // The port may have been 0, so we update it.
           conf.set(THRIFT_ADDRESS_PROPERTY, address.getHostName() + ":" +
               thriftServer.getPort());
-        } catch (java.io.IOException ioe) {
-            LOG.warn("Cannot start Thrift jobtracker plug-in",ioe);
-            throw new RuntimeException("Cannot start Thrift jobtracker plug-in", ioe);
+        } catch (Exception  e) {
+            LOG.warn("Cannot start Thrift jobtracker plug-in", e);
+            throw new RuntimeException("Cannot start Thrift jobtracker plug-in", e);
         }
     }
 

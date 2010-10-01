@@ -166,12 +166,12 @@ public class DatanodePlugin
       InetSocketAddress address = NetUtils.createSocketAddr(
         conf.get(THRIFT_ADDRESS_PROPERTY, DEFAULT_THRIFT_ADDRESS));
 
-      thriftServer = new ThriftPluginServer(address,
-                                            new ProcessorFactory());
+      thriftServer = new ThriftPluginServer(
+        address, new ProcessorFactory());
       thriftServer.setConf(conf);
       thriftServer.start();
-    } catch (java.io.IOException ioe) {
-      throw new RuntimeException("Could not start Thrift Datanode Plugin", ioe);
+    } catch (Exception e) {
+      throw new RuntimeException("Could not start Thrift Datanode Plugin", e);
     }
   }
 

@@ -38,6 +38,7 @@ def _make_filesystem(identifier):
       cluster_conf.NN_HOST.get(),
       cluster_conf.NN_THRIFT_PORT.get(),
       cluster_conf.NN_HDFS_PORT.get(),
+      kerberos_principal=cluster_conf.NN_KERBEROS_PRINCIPAL.get(),
       hadoop_bin_path=conf.HADOOP_BIN.get())
     raise Exception("Unknown choice: %s" % choice)
 

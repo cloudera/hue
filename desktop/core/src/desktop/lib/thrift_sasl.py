@@ -35,12 +35,14 @@ class TSaslClientTransport(TTransportBase):
   ERROR = 4
   COMPLETE = 5
 
-  def __init__(self, sasl_client, mechanism, trans):
+  def __init__(self, sasl_client_factory, mechanism, trans):
     self._trans = trans
-    self.sasl = sasl_client
+    self.sasl_client_factory = sasl_client_factory
+    self.sasl = None
     self.mechanism = mechanism
     self.__wbuf = StringIO()
     self.__rbuf = StringIO()
+    self.opened = False
 
   def isOpen(self):
     return self._trans.isOpen()
@@ -48,6 +50,13 @@ class TSaslClientTransport(TTransportBase):
   def open(self):
     if not self._trans.isOpen():
       self._trans.open()
+
+    if self.sasl is not None:
+      raise TTransportException(
+        type=TTransportException.NOT_OPEN,
+        message="Already open!")
+    self.sasl = self.sasl_client_factory()
+
     ret, chosen_mech, initial_response = self.sasl.start(self.mechanism)
     if not ret:
       raise TTransportException(type=TTransportException.NOT_OPEN,
@@ -73,8 +82,7 @@ class TSaslClientTransport(TTransportBase):
 
   def _send_message(self, status, body):
     header = struct.pack(">BI", status, len(body))
-    self._trans.write(header)
-    self._trans.write(body)
+    self._trans.write(header + body)
     self._trans.flush()
 
   def _recv_sasl_message(self):
@@ -94,8 +102,12 @@ class TSaslClientTransport(TTransportBase):
     if not success:
       raise TTransportException(type=TTransportException.UNKNOWN,
                                 message=self.sasl.getError())
-    self._trans.write(struct.pack(">I", len(encoded)))
-    self._trans.write(encoded)
+    # Note stolen from TFramedTransport:
+    # N.B.: Doing this string concatenation is WAY cheaper than making
+    # two separate calls to the underlying socket object. Socket writes in
+    # Python turn out to be REALLY expensive, but it seems to do a pretty
+    # good job of managing string buffer operations without excessive copies
+    self._trans.write(struct.pack(">I", len(encoded)) + encoded)
     self._trans.flush()
     self.__wbuf = StringIO()
 
@@ -110,9 +122,9 @@ class TSaslClientTransport(TTransportBase):
   def _read_frame(self):
     header = self._trans.readAll(4)
     (length,) = struct.unpack(">I", header)
-    print "reading frame len: %d" % length
     self.__rbuf = StringIO(self._trans.readAll(length))
 
 
   def close(self):
-    return self._trans.close()
+    self._trans.close()
+    self.sasl = None
