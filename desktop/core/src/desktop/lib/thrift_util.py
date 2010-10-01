@@ -161,19 +161,19 @@ def connect_to_thrift(conf):
 
   Returns a tuple of (service, protocol, transport)
   """
-  def sasl_factory():
-    saslc = sasl.Client()
-    saslc.setAttr("host", conf.host)
-    saslc.setAttr("service", conf.kerberos_principal)
-    saslc.init()
-    return saslc
-
   sock = TSocket(conf.host, conf.port)
   if conf.timeout_seconds:
     # Thrift trivia: You can do this after the fact with
     # self.wrapped.transport._TBufferedTransport__trans.setTimeout(seconds*1000)
     sock.setTimeout(conf.timeout_seconds*1000.0)
   if conf.use_sasl:
+    def sasl_factory():
+      saslc = sasl.Client()
+      saslc.setAttr("host", conf.host)
+      saslc.setAttr("service", conf.kerberos_principal)
+      saslc.init()
+      return saslc
+
     transport = TSaslClientTransport(sasl_factory, "GSSAPI", sock)
   else:
     transport = TBufferedTransport(sock)
