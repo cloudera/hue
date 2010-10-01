@@ -417,6 +417,7 @@ def display(request, path):
       try:
         contents = GzipFile('', 'r', 0, StringIO(f.read())).read(length)
       except:
+        logging.warn("Could not decompress file at %s" % path, exc_info=True)
         contents = ''
         raise PopupException("Failed to decompress file")
     finally:
