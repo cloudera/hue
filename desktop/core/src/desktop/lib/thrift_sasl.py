@@ -28,7 +28,7 @@ from thrift.protocol import TBinaryProtocol
 import sasl
 import struct
 
-class TSaslClientTransport(TTransportBase):
+class TSaslClientTransport(TTransportBase, CReadableTransport):
   START = 1
   OK = 2
   BAD = 3
@@ -124,7 +124,22 @@ class TSaslClientTransport(TTransportBase):
     (length,) = struct.unpack(">I", header)
     self.__rbuf = StringIO(self._trans.readAll(length))
 
-
   def close(self):
     self._trans.close()
     self.sasl = None
+
+  # Implement the CReadableTransport interface.
+  # Stolen shamelessly from TFramedTransport
+  @property
+  def cstringio_buf(self):
+    return self.__rbuf
+
+  def cstringio_refill(self, prefix, reqlen):
+    # self.__rbuf will already be empty here because fastbinary doesn't
+    # ask for a refill until the previous buffer is empty.  Therefore,
+    # we can start reading new frames immediately.
+    while len(prefix) < reqlen:
+      self.readFrame()
+      prefix += self.__rbuf.getvalue()
+    self.__rbuf = StringIO(prefix)
+    return self.__rbuf
