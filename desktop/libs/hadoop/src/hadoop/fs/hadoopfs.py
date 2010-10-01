@@ -93,11 +93,8 @@ def test_fs_configuration(fs_config, hadoop_bin_conf):
 
   # Check thrift plugin
   try:
-    fs = HadoopFileSystem(host=fs_config.NN_HOST.get(),
-                          thrift_port=fs_config.NN_THRIFT_PORT.get(),
-                          hdfs_port=fs_config.NN_HDFS_PORT.get(),
-                          kerberos_principal=fs_config.NN_KERBEROS_PRINCIPAL.get(),
-                          hadoop_bin_path=hadoop_bin_conf.get())
+    fs = HadoopFileSystem.from_config(
+      fs_config, hadoop_bin_path=hadoop_bin_conf.get())
 
     fs.setuser(fs.superuser)
     ls = fs.listdir('/')
@@ -179,6 +176,7 @@ class HadoopFileSystem(object):
 
   def __init__(self, host, thrift_port, hdfs_port=8020,
                kerberos_principal="hdfs",
+               security_enabled=False,
                hadoop_bin_path="hadoop"):
     """
     @param host hostname or IP of the namenode
@@ -191,14 +189,17 @@ class HadoopFileSystem(object):
     self.host = host
     self.thrift_port = thrift_port
     self.hdfs_port = hdfs_port
+    self.security_enabled = security_enabled
     self.kerberos_principal = kerberos_principal
     self.hadoop_bin_path = hadoop_bin_path
     self._resolve_hadoop_path()
 
-    self.nn_client = thrift_util.get_client(Namenode.Client, host, thrift_port,
-        service_name="HDFS Namenode HUE Plugin",
-        kerberos_principal=kerberos_principal,
-        timeout_seconds=NN_THRIFT_TIMEOUT)
+    self.nn_client = thrift_util.get_client(
+      Namenode.Client, host, thrift_port,
+      service_name="HDFS Namenode HUE Plugin",
+      use_sasl=security_enabled,
+      kerberos_principal=kerberos_principal,
+      timeout_seconds=NN_THRIFT_TIMEOUT)
 
     # The file systems are cached globally.  We store
     # user information in a thread-local variable so that
@@ -206,6 +207,16 @@ class HadoopFileSystem(object):
     self.thread_local = threading.local()
     self.setuser(DEFAULT_USER)
     LOG.debug("Initialized HadoopFS: %s:%d (%s)", host, thrift_port, hadoop_bin_path)
+
+  @classmethod
+  def from_config(cls, fs_config, hadoop_bin_path="hadoop"):
+    return cls(host=fs_config.NN_HOST.get(),
+               thrift_port=fs_config.NN_THRIFT_PORT.get(),
+               hdfs_port=fs_config.NN_HDFS_PORT.get(),
+               security_enabled=fs_config.SECURITY_ENABLED.get(),
+               kerberos_principal=fs_config.NN_KERBEROS_PRINCIPAL.get(),
+               hadoop_bin_path=hadoop_bin_path)
+
 
   def _get_hdfs_base(self):
     return "hdfs://%s:%d" % (self.host, self.hdfs_port) # TODO(todd) fetch the port from the NN thrift
