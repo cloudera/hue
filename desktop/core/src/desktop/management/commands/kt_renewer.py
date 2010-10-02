@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -13,21 +14,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from setuptools import setup, find_packages
 
-setup(
-      name = "desktop",
-      version = "1.0",
-      url = 'http://github.com/cloudera/hue',
-      description = "HUE core",
-      packages = find_packages('src'),
-      package_dir = {'': 'src'},
-      install_requires = ['setuptools'],
+from django.core.management.base import NoArgsCommand
+import desktop.kt_renewer
 
-      entry_points = { 'console_scripts': [ 'supervisor = desktop.supervisor:main',
-                                            'hue = desktop.manage_entry:entry', ],
-                       'desktop.supervisor.specs': [ 'runcpserver = desktop:SUPERVISOR_SPEC',
-                                                     'kt_renewer = desktop.kt_renewer:SPEC',
-                                                     ]
-                       },
-      )
+class Command(NoArgsCommand):
+  """ Starts a daemon which renews Kerberos credentials from a keytab
+  periodically. """
+  def handle_noargs(self, **options):
+    desktop.kt_renewer.run()
