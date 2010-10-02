@@ -23,13 +23,14 @@
 		},
 
 		"mootools-touch": { "track-indirect": "mootools-touch.hash" },
-
+/*
+ * Disabled by todd, 10/1/2010, not working
 		"mootools-table": {
 			"track-indirect": "mootools-table.hash",
 			"from-remote": "anutron",
 			"remotes": ["anutron"]
 		},
-
+*/
 		"art-widgets": {
 			"track-indirect": "art-widgets.hash",
 			"from-remote": "origin",
