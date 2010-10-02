@@ -110,7 +110,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
    * EXCEPTION is also valid.
    */
   private class RunningQueryState {
-    private int state = QueryState.CREATED;
+    private QueryState state = QueryState.CREATED;
     // Thread local used by Hive quite a bit.
     private SessionState sessionState;
     private Throwable exception;
@@ -184,7 +184,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       state = QueryState.COMPILED;
     }
 
-    private void assertState(int expected) {
+    private void assertState(QueryState expected) {
       if (state != expected) {
         throw new IllegalStateException(String.format("Expected %s, but state is: %s",
             expected, state));
@@ -431,10 +431,10 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       // Only one person can access a running query at a time.
       synchronized(this) {
         switch(state) {
-        case QueryState.RUNNING:
+        case RUNNING:
           r.ready = false;
           break;
-        case QueryState.FINISHED:
+        case FINISHED:
           bringUp();
           r.ready = true;
           try {
@@ -443,7 +443,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
             throw new BeeswaxException(e.toString(), logContext.getName(), handle);
           }
           break;
-        case QueryState.EXCEPTION:
+        case EXCEPTION:
           if (exception instanceof BeeswaxException) {
             throw (BeeswaxException) exception;
           } else {
@@ -622,7 +622,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
    * Compiling happens in the current context so we report errors early.
    */
   @Override
-  public QueryHandle query(Query query) throws BeeswaxException {
+  public QueryHandle query(final Query query) throws BeeswaxException {
     // First, create an id and reset the LogContext
     String uuid = UUID.randomUUID().toString();
     final QueryHandle handle = new QueryHandle(uuid, uuid);
@@ -681,7 +681,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
    * Get the query plan for a query.
    */
   @Override
-  public QueryExplanation explain(Query query) throws BeeswaxException, TException {
+  public QueryExplanation explain(final Query query) throws BeeswaxException, TException {
     final String contextName = UUID.randomUUID().toString();
     LogContext lc = LogContext.registerCurrentThread(contextName);
     final RunningQueryState state = new RunningQueryState(query, lc);
@@ -717,7 +717,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
    * @param fromBeginning  If true, rewind to the first row. Otherwise fetch from last position.
    */
   @Override
-  public Results fetch(QueryHandle handle, final boolean fromBeginning)
+  public Results fetch(final QueryHandle handle, final boolean fromBeginning)
       throws QueryNotFoundException, BeeswaxException {
     LogContext.unregisterCurrentThread();
     validateHandle(handle);
@@ -756,7 +756,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
    * @param handle The handle from query()
    */
   @Override
-  public int get_state(QueryHandle handle) throws QueryNotFoundException {
+  public QueryState get_state(final QueryHandle handle) throws QueryNotFoundException {
     LogContext.unregisterCurrentThread();
     validateHandle(handle);
     LogContext.registerCurrentThread(handle.log_context);
