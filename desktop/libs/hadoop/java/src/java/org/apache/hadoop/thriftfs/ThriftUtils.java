@@ -18,9 +18,12 @@
 package org.apache.hadoop.thriftfs;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +41,8 @@ import org.apache.hadoop.thriftfs.api.DatanodeInfo;
 import org.apache.hadoop.thriftfs.api.DatanodeState;
 import org.apache.hadoop.thriftfs.api.IOException;
 import org.apache.hadoop.thriftfs.api.Namenode;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -45,6 +50,9 @@ import org.apache.thrift.transport.TTransport;
 public class ThriftUtils {
   
   static final Log LOG = LogFactory.getLog(ThriftUtils.class);
+
+  static final String HUE_USER_NAME_KEY = "hue.kerberos.principal.shortname";
+  static final String HUE_USER_NAME_DEFAULT = "hue";
 
   public static LocatedBlock fromThrift(Block block) {
     if (block == null) {
@@ -163,6 +171,63 @@ public class ThriftUtils {
       ret.stack += frame.toString() + "\n";
     }
     return ret;
+  }
+
+  public static class SecurityCheckingProxy<T> implements java.lang.reflect.InvocationHandler {
+    private final T wrapped;
+    private final Configuration conf;
+
+    public static <T> T create(Configuration conf, T wrapped, Class<T> iface) {
+      return (T)java.lang.reflect.Proxy.newProxyInstance(
+        iface.getClassLoader(),
+        new Class[] { iface },
+        new SecurityCheckingProxy<T>(wrapped, conf));
+    }
+
+    private SecurityCheckingProxy(T wrapped, Configuration conf) {
+      this.wrapped = wrapped;
+      this.conf = conf;
+    }
+
+    public Object invoke(Object proxy, Method m, Object[] args)
+      throws Throwable
+    {
+      Object result;
+      try {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Call " + wrapped.getClass() + "." + m.getName() +
+                    StringUtils.joinObjects(", ", Arrays.asList(args)));
+        }
+        authorizeCall(m);
+
+	    return m.invoke(wrapped, args);
+      } catch (InvocationTargetException e) {
+	    throw e.getTargetException();
+      }
+    }
+
+    private void authorizeCall(Method m) throws IOException, TException {
+      // TODO: this should use the AccessControlList functionality,
+      // ideally.
+      try {
+        UserGroupInformation caller = UserGroupInformation.getCurrentUser();
+
+        if (!conf.get(HUE_USER_NAME_KEY, HUE_USER_NAME_DEFAULT).equals(
+              caller.getShortUserName()) &&
+            !UserGroupInformation.getLoginUser().getShortUserName().equals(
+              caller.getShortUserName())) {
+
+          String errMsg = "Unauthorized access for user " + caller.getUserName();
+          if (Arrays.asList(m.getExceptionTypes()).contains(IOException.class)) {
+            throw ThriftUtils.toThrift(new Exception(errMsg));
+          } else {
+            throw new TException(errMsg);
+          }
+        }
+      } catch (java.io.IOException ioe) {
+        throw new TException(ioe);
+      }
+    }
   }
 
   /**

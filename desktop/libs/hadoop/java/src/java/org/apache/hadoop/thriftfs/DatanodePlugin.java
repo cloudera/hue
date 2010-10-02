@@ -245,7 +245,12 @@ public class DatanodePlugin
     @Override
     public TProcessor getProcessor(TTransport t) {
       ThriftServerContext context = new ThriftServerContext(t);
-      ThriftHandler impl = new ThriftHandler(context);
+
+      Datanode.Iface impl =
+        ThriftUtils.SecurityCheckingProxy.create(
+          conf,
+          new ThriftHandler(context),
+          Datanode.Iface.class);
       return new Datanode.Processor(impl);
     }
   }

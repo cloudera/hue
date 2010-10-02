@@ -454,7 +454,11 @@ public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.Namen
     @Override
     public TProcessor getProcessor(TTransport t) {
       ThriftServerContext context = new ThriftServerContext(t);
-      ThriftHandler impl = new ThriftHandler(context);
+      Namenode.Iface impl =
+        ThriftUtils.SecurityCheckingProxy.create(
+          conf,
+          new ThriftHandler(context),
+          Namenode.Iface.class);
       return new Namenode.Processor(impl);
     }
   }
