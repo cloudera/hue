@@ -177,7 +177,6 @@ def make_beeswax_query(request, hql, query_form=None):
 
   # Configure running user and group.
   query_msg.hadoop_user = request.user.username
-  query_msg.hadoop_groups = request.user.get_groups()
 
   if query_form is not None:
     for f in query_form.settings.forms:

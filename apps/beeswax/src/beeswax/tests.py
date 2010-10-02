@@ -383,7 +383,6 @@ for x in sys.stdin:
     query_msg.query = 'SELECT * FROM test'
     query_msg.configuration = []
     query_msg.hadoop_user = "test"
-    query_msg.hadoop_groups = ["test"]
     handle = beeswax.db_utils.db_client().query(query_msg)
     query_data = beeswax.models.QueryHistory(server_id=handle.id, log_context=handle.log_context)
     # Get the result in xls. Then translate it into csv.
