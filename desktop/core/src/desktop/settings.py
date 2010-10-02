@@ -249,3 +249,7 @@ DEPENDER_DEBUG = os.getenv("DESKTOP_DEPENDER_DEBUG", "0") not in ["0",""]
 
 # Necessary for South to not futz with tests.  Fixed in South 0.7.1
 SKIP_SOUTH_TESTS = True
+
+# Set up environment variable so Kerberos libraries look at our private
+# ticket cache
+os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
