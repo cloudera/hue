@@ -23,5 +23,24 @@ cd $(dirname $0)
 thrift -I thrift/include -r --gen py:new_style -o ./ thrift/beeswax.thrift
 thrift -I thrift/include -r --gen java:hashcode -o java thrift/beeswax.thrift
 
+# We don't need to have generated code for the metastore, since that's
+# in one of the hive jars that we include
+rm -Rf java/gen-java/com/facebook java/gen-java/org/apache
+
+cat <<EOF
+======================================================================
+NOTE:
+======================================================================
+
+This script does *not* remove old generated files that may not be necessary anymore.
+You should probably do something like:
+ > git rm -Rf java/gen-java
+ > ./regenerate_thrift.sh
+ > git add java/gen-java
+
+======================================================================
+
+EOF
+
 # This is based on thirdparty.
 # thrift -r --gen py:new_style -o ../ ../../../../ext/thirdparty/py/thrift/contrib/fb303/if/fb303.thrift
