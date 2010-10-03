@@ -18,6 +18,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+""" SASL transports for Thrift. """
 
 import sys
 
@@ -36,6 +37,11 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
   COMPLETE = 5
 
   def __init__(self, sasl_client_factory, mechanism, trans):
+    """
+    @param sasl_client_factory: a callable that returns a new sasl.Client object
+    @param mechanism: the SASL mechanism (e.g. "GSSAPI")
+    @param trans: the underlying transport over which to communicate.
+    """
     self._trans = trans
     self.sasl_client_factory = sasl_client_factory
     self.sasl = None
@@ -86,10 +92,10 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
     self._trans.flush()
 
   def _recv_sasl_message(self):
-    header = self._trans.read(5)
+    header = self._trans.readAll(5)
     status, length = struct.unpack(">BI", header)
     if length > 0:
-      payload = self._trans.read(length)
+      payload = self._trans.readAll(length)
     else:
       payload = ""
     return status, payload
@@ -139,7 +145,7 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
     # ask for a refill until the previous buffer is empty.  Therefore,
     # we can start reading new frames immediately.
     while len(prefix) < reqlen:
-      self.readFrame()
+      self._read_frame()
       prefix += self.__rbuf.getvalue()
     self.__rbuf = StringIO(prefix)
     return self.__rbuf

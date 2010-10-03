@@ -30,7 +30,7 @@ from thrift.Thrift import TType
 from thrift.transport.TSocket import TSocket
 from thrift.transport.TTransport import TBufferedTransport, TMemoryBuffer,\
                                         TTransportException
-from thrift.protocol.TBinaryProtocol import TBinaryProtocol, TBinaryProtocolAccelerated
+from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from desktop.lib.thrift_sasl import TSaslClientTransport
 
 # The maximum depth that we will recurse through a "jsonable" structure
@@ -44,10 +44,22 @@ WARN_LEVEL_CALL_DURATION_MS = 5000
 INFO_LEVEL_CALL_DURATION_MS = 1000
 
 class ConnectionConfig(object):
+  """ Struct-like class encapsulating the configuration of a Thrift client. """
   def __init__(self, klass, host, port, service_name,
                use_sasl=False,
                kerberos_principal="thrift",
                timeout_seconds=45):
+    """
+    @param klass The thrift client class
+    @param host Host to connect to
+    @param port Port to connect to
+    @param service_name A human-readable name to describe the service
+    @param use_sasl If true, will use Kerberos over SASL to authenticate
+    @param kerberos_principal The Kerberos service name to connect to.
+              NOTE: for a server like fooservice/foo.blah.com@REALM only
+              specify "fooservice", NOT the full principal name.
+    @param timeout_seconds Timeout for thrift calls
+    """
     self.klass = klass
     self.host = host
     self.port = port
@@ -164,7 +176,7 @@ def connect_to_thrift(conf):
   sock = TSocket(conf.host, conf.port)
   if conf.timeout_seconds:
     # Thrift trivia: You can do this after the fact with
-    # self.wrapped.transport._TBufferedTransport__trans.setTimeout(seconds*1000)
+    # _grab_transport_from_wrapper(self.wrapped.transport).setTimeout(seconds*1000)
     sock.setTimeout(conf.timeout_seconds*1000.0)
   if conf.use_sasl:
     def sasl_factory():
@@ -188,7 +200,7 @@ _connection_pool = ConnectionPooler()
 def get_client(klass, host, port, service_name,
                **kwargs):
   conf = ConnectionConfig(
-    klass,host,port,service_name,
+    klass, host, port, service_name,
     **kwargs)
   return PooledClient(conf)
 

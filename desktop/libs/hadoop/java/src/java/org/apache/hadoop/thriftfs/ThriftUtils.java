@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -47,8 +48,10 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
+
+
 public class ThriftUtils {
-  
+
   static final Log LOG = LogFactory.getLog(ThriftUtils.class);
 
   static final String HUE_USER_NAME_KEY = "hue.kerberos.principal.shortname";
@@ -173,10 +176,16 @@ public class ThriftUtils {
     return ret;
   }
 
-  public static class SecurityCheckingProxy<T> implements java.lang.reflect.InvocationHandler {
+  /**
+   * An invocation proxy that authorizes all calls into the Thrift interface.
+   * This proxy intercepts all method calls on the handler interface, and verifies
+   * that the remote UGI is either (a) the hue user, or (b) another HDFS daemon.
+   */
+  public static class SecurityCheckingProxy<T> implements InvocationHandler {
     private final T wrapped;
     private final Configuration conf;
 
+    @SuppressWarnings("unchecked")
     public static <T> T create(Configuration conf, T wrapped, Class<T> iface) {
       return (T)java.lang.reflect.Proxy.newProxyInstance(
         iface.getClassLoader(),
@@ -195,8 +204,8 @@ public class ThriftUtils {
       Object result;
       try {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Call " + wrapped.getClass() + "." + m.getName() +
-                    StringUtils.joinObjects(", ", Arrays.asList(args)));
+          LOG.debug("Call " + wrapped.getClass() + "." + m.getName()
+                    + "(" + StringUtils.joinObjects(", ", Arrays.asList(args)) + ")");
         }
         authorizeCall(m);
 
@@ -218,9 +227,13 @@ public class ThriftUtils {
               caller.getShortUserName())) {
 
           String errMsg = "Unauthorized access for user " + caller.getUserName();
+          // If we can throw our thrift IOException type, do so, so it goes back
+          // to the client correctly.
           if (Arrays.asList(m.getExceptionTypes()).contains(IOException.class)) {
             throw ThriftUtils.toThrift(new Exception(errMsg));
           } else {
+            // Otherwise we have to just throw the more generic exception, which
+            // won't make it back to the client
             throw new TException(errMsg);
           }
         }
