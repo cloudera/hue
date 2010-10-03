@@ -42,8 +42,6 @@ import org.apache.thrift.transport.TTransportFactory;
 /**
  * Functions that bridge Thrift's SASL transports to Hadoop's
  * SASL callback handlers and authentication classes.
- *
- * This is borrowed from Hive's metastore.
  */
 class HadoopThriftAuthBridge {
   static final Log LOG = LogFactory.getLog(HadoopThriftAuthBridge.class);
@@ -93,38 +91,8 @@ class HadoopThriftAuthBridge {
   public static class Server {
     private final UserGroupInformation realUgi;
 
-    /**
-     * TODO: javadoc
-     */
-    public Server(String keytabFile, String principalConf)
-      throws TTransportException {
-      if (keytabFile == null || keytabFile.isEmpty()) {
-        throw new TTransportException("No keytab specified");
-      }
-      if (principalConf == null || principalConf.isEmpty()) {
-        throw new TTransportException("No principal specified");
-      }
-
-      // Login from the keytab
-      UserGroupInformation ugi;
-      String kerberosName;
-      try {
-        kerberosName = SecurityUtil.getServerPrincipal(
-          principalConf, null);
-        realUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(
-          kerberosName, keytabFile);
-        assert realUgi.isFromKeytab();
-      } catch (IOException ioe) {
-        throw new TTransportException(ioe);
-      }
-    }
-
-    public Server() throws TTransportException {
-      try {
-        realUgi = UserGroupInformation.getLoginUser();
-      } catch (IOException ioe) {
-        throw new TTransportException(ioe);
-      }
+    public Server(UserGroupInformation serverUgi) throws TTransportException {
+      this.realUgi = serverUgi;
       if (realUgi == null || !realUgi.hasKerberosCredentials()) {
         throw new TTransportException("UGI " + realUgi + " has no kerberos credentials");
       }
@@ -161,19 +129,15 @@ class HadoopThriftAuthBridge {
     }
 
     /**
-     * Wrap a TProcessor in such a way that, before processing any RPC, it
-     * assumes the UserGroupInformation of the user authenticated by
-     * the SASL transport.
+     * Wraps a processor factory in a new processor factory that interposes
+     * the TUGIAssumingProcessor wrapper. This is required in order to assume
+     * the remote user UGI for each call.
      */
-    public TProcessor wrapProcessor(TProcessor processor) {
-      return new TUGIAssumingProcessor(processor);
-    }
-
     public TProcessorFactory wrapProcessorFactory(final TProcessorFactory factory) {
       return new TProcessorFactory(null) {
         @Override
         public TProcessor getProcessor(TTransport trans) {
-          return wrapProcessor(factory.getProcessor(trans));
+          return new TUGIAssumingProcessor(factory.getProcessor(trans));
         }
       };
     }

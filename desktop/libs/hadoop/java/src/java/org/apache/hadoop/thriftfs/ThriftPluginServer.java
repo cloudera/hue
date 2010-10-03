@@ -67,7 +67,12 @@ public class ThriftPluginServer implements Configurable, Runnable {
     this.address = address;
 
     if (UserGroupInformation.isSecurityEnabled()) {
-      authBridge = new HadoopThriftAuthBridge.Server();
+      try {
+        authBridge = new HadoopThriftAuthBridge.Server(
+          UserGroupInformation.getLoginUser());
+      } catch (IOException ioe) {
+        throw new TTransportException(ioe);
+      }
 
       this.processorFactory = authBridge.wrapProcessorFactory(
         processorFactory);
