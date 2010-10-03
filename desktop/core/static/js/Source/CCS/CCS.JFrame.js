@@ -705,6 +705,15 @@ CCS.JFrame = new Class({
 			see renderContent
 	*/
 	_setRequestOptions: function(request, options) {
+		/*
+			By default, there's only ever one request running per-jframe.
+			The linkers involved all create a new instance of request every time
+			they are invoked. However, Form.Request re-uses its instance. To prevent
+			that request instance from being "set up" twice, exit if there's already
+			a request and it's already been set up.
+		*/
+		if (this._request && this._request._jframeConfigured) return;
+		request._jframeConfigured = true;
 		request.setOptions($merge({
 			useSpinner: this.options.spinnerCondition.apply(this, [options]),
 			spinnerTarget: this.options.spinnerTarget || this.element,
@@ -712,7 +721,15 @@ CCS.JFrame = new Class({
 			onFailure: this.error.bind(this),
 			evalScripts: false,
 			onRequest: function(){
-				if (this._request) this._request.cancel();
+				/*
+					Here we cancel any running request if we kick off a new one.
+					The exception here is when we are re-using the running request.
+					FormRequest, for instance, reuses a Request instance. So we check
+					that the current request is not the one we're sending; if it is
+					the one we're sending, don't cancel it; only cancel if it's a different
+					one.
+				*/
+				if (this._request && this._request != request) this._request.cancel();
 				this._request = request;
 			}.bind(this),
 			onSuccess: function(requestTxt){
