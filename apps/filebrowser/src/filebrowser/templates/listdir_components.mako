@@ -85,13 +85,13 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
               % if ".." != file['name']:
                 <ul class="fb-item-actions context-menu">
                   % if "dir" == file['type']:
-                    <li class="fb-rmdir-container"><a class="fb-rmdir confirm_and_post" alt="Are you sure you want to remove this directory and its contents?" href="${url('filebrowser.views.rmdir')}?path=${path_enc}&next=${urlencode(current_request_path)}">Remove</a></li>
-                    <li class="fb-rmtree-container"><a class="fb-rmtree confirm_and_post fb-default-rm" alt="Are you sure you want to remove this directory and its contents?" href="${url('filebrowser.views.rmtree')}?path=${path_enc}&next=${urlencode(current_request_path)}">Remove</a></li>
+                    <li class="fb-rmdir-container"><a class="fb-rmdir confirm_and_post" alt="Are you sure you want to delete this directory and its contents?" href="${url('filebrowser.views.rmdir')}?path=${path_enc}&next=${urlencode(current_request_path)}">Delete</a></li>
+                    <li class="fb-rmtree-container"><a class="fb-rmtree confirm_and_post fb-default-rm" alt="Are you sure you want to delete ${display_name} and its contents?" href="${url('filebrowser.views.rmtree')}?path=${path_enc}&next=${urlencode(current_request_path)}">Delete</a></li>
                   % else:
                     <li><a class="fb-viewfile" href="${url('filebrowser.views.view', path=path_enc)}" target="FileViewer">View File</a></li>
                     <li><a class="fb-editfile" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit File</a></li>
                     <li><a class="fb-downloadfile" href="${url('filebrowser.views.download', path=path_enc)}" target="_blank">Download File</a></li>
-                    <li class="fb-rm-container"><a class="fb-rm fb-default-rm confirm_and_post" alt="Are you sure you want to remove this file?" href="${url('filebrowser.views.remove')}?path=${path_enc}&next=${urlencode(current_request_path)}">Remove</a></li>
+                    <li class="fb-rm-container"><a class="fb-rm fb-default-rm confirm_and_post" alt="Are you sure you want to delete ${display_name}?" href="${url('filebrowser.views.remove')}?path=${path_enc}&next=${urlencode(current_request_path)}">Delete</a></li>
                   % endif
                   <li class="fb-rename-container"><a class="fb-rename" href="${url('filebrowser.views.rename')}?src_path=${path_enc}&next=${urlencode(current_request_path)}">Rename</a></li>
                   <li class="fb-chown-container"><a class="fb-chown" href="${url('filebrowser.views.chown') }?path=${path_enc}&user=${file['stats']['user']}&group=${file['stats']['group']}&next=${urlencode(current_request_path)}">Change Owner / Group</a></li>
@@ -102,7 +102,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
                     else:
                       cls = "fb-move-file"
                   %>
-                  <li><a class="fb-move ${cls}" href="${url('filebrowser.views.move')}?src_path=${path_enc}&mode=${stringformat(file['stats']['mode'], "o")}&next=${urlencode(current_request_path)}">Move File</a></li>
+                  <li><a class="fb-move ${cls}" href="${url('filebrowser.views.move')}?src_path=${path_enc}&mode=${stringformat(file['stats']['mode'], "o")}&next=${urlencode(current_request_path)}">Move</a></li>
               </ul>
               % endif
             </div>

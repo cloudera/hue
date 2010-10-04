@@ -71,7 +71,7 @@ class RmTreeForm(forms.Form):
 class MkDirForm(forms.Form):
   op = "mkdir"
   path = PathField(label="Path in which to create the directory")
-  name = PathField(label="The name of the directory to create")
+  name = PathField(label="Directory Name")
 
 class ChownForm(forms.Form):
   op = "chown"
