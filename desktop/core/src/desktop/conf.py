@@ -21,6 +21,7 @@ from desktop.lib.conf import coerce_bool, validate_path
 from desktop.lib.paths import get_desktop_root
 import os
 import socket
+import stat
 
 HTTP_HOST = Config(
   key="http_host",
@@ -331,10 +332,10 @@ def config_validator():
     res.extend(validate_path(KERBEROS.HUE_KEYTAB, is_dir=False))
     # Keytab should not be world or group accessible
     kt_stat = os.stat(KERBEROS.HUE_KEYTAB.get())
-    if stat.S_IMODE(kt_stat) & 0077:
+    if stat.S_IMODE(kt_stat.st_mode) & 0077:
       res.append((KERBEROS.HUE_KEYTAB,
                   "Keytab should have 0600 permissions (has %o)" %
-                  stat.S_IMODE(kt_stat)))
+                  stat.S_IMODE(kt_stat.st_mode)))
 
     res.extend(validate_path(KERBEROS.KINIT_PATH, is_dir=False))
     res.extend(validate_path(KERBEROS.CCACHE_PATH, is_dir=False))
