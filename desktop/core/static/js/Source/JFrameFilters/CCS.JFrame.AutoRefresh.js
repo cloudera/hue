@@ -17,7 +17,7 @@
 ---
 description: An auto refresh filter for Jframe keyed on the meta-refresh tag.
 provides: [CCS.JFrame.AutoRefresh]
-requires: [/CCS.JFrame, More/Date, Table/Table]
+requires: [/CCS.JFrame, More/Date, More/Table]
 script: CCS.JFrame.AutoRefresh.js
 
 ...

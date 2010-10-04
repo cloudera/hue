@@ -221,7 +221,6 @@ def prep_depender_config():
     "../ext/thirdparty/js/more/package.yml",
     "../ext/thirdparty/js/art/package.yml",
     "../ext/thirdparty/js/touch/package.yml",
-    "../ext/thirdparty/js/table/package.yml",
     "../ext/thirdparty/js/color/package.yml",
     "../ext/thirdparty/js/behavior/package.yml",
     "../ext/thirdparty/js/more-behaviors/package.yml",

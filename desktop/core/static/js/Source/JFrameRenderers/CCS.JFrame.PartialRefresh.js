@@ -2,7 +2,7 @@
 ---
 description: Any JFrame response that has a root-level child element with the class .partial_refresh will find all elements that have a property defined for data-partial-id that is unique to the response and only update them. If there is a mismatch in the response such that the number of and ids of partials in the previous state do not match the return state, an alert will be shown the user that the entire view will be updated that they can cancel, if they so choose. 
 provides: [CCS.JFrame.PartialRefresh]
-requires: [/CCS.JFrame, Widgets/ART.Alerts, Table/Table, Widgets/Element.Data]
+requires: [/CCS.JFrame, Widgets/ART.Alerts, More/Table, Widgets/Element.Data]
 script: CCS.JFrame.PartialRefresh.js
 
 ...
