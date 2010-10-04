@@ -238,9 +238,6 @@ table[data-filters*=HtmlTable] td {
 	background: #fff;
 	border: none;
 }
-table[data-filters*=HtmlTable]:not(.treeView) tr:nth-child(odd) td {
-	background-color: #f3f3f3;
-}
 table[data-filters*=HtmlTable] tr.table-tr-odd td {
 	background-color: #f3f3f3;
 }
