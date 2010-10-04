@@ -48,7 +48,7 @@
       % endif
 
       % if editable and view['compression'] == "none":
-        <a class="fv-editFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit This File</a>
+        <a class="fv-editFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit File</a>
       % endif
        <a class="fv-download" data-filters="ArtButton" target="_blank" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.download', path=path_enc)}">Download</a>
        <a class="fv-viewLocation" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View File Location</a>
