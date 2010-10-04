@@ -27,9 +27,9 @@ limitations under the License.
     <div class="jobsub_right_col right_col">
       <div class="jobsub_topsection clearfix">
         <form class="jobsub_filter" data-filters="SubmitOnChange" action="{% url jobsub.list %}" method="get">
-          <span class="filter_text">Filter by owner:</span>
-          <input data-filters="ArtInput, OverText" data-art-input-type="search" name="owner" alt="filter by owner" value="{{ owner }}"/>
-          <input data-filters="ArtInput, OverText" data-art-input-type="search" name="name" alt="filter by name" value="{{ name }}"/>
+          <span class="filter_text">Filter By Owner:</span>
+          <input data-filters="ArtInput, OverText" data-art-input-type="search" name="owner" alt="Filter By Owner" value="{{ owner }}"/>
+          <input data-filters="ArtInput, OverText" data-art-input-type="search" name="name" alt="Filter By Name" value="{{ name }}"/>
           <input class="submit" type="submit"/>
         </form>
       </div>
@@ -52,10 +52,10 @@ limitations under the License.
             <td>
               {{ jobdesign.owner.username }}
               <ul class="context-menu">
-                <li><a title="Launch job with this design" class="run frame_tip" href="{{ jobdesign.submit_url }}">submit to cluster</a></li>
-                <li><a title="Copy design" class="copy frame_tip" href="{{ jobdesign.clone_url }}">copy</a></li>
-                <li><a title="Edit this design" class="edit frame_tip" href="{{ jobdesign.edit_url }}">edit</a></li>
-                <li><a title="Delete this design" alt="Are you sure you want to delete this design?" class="delete frame_tip" href="{{ jobdesign.delete_url }}">delete</a></li>
+                <li><a title="Launch job with this design" class="run frame_tip" href="{{ jobdesign.submit_url }}">Submit to Cluster</a></li>
+                <li><a title="Copy design" class="copy frame_tip" href="{{ jobdesign.clone_url }}">Copy</a></li>
+                <li><a title="Edit this design" class="edit frame_tip" href="{{ jobdesign.edit_url }}">Edit</a></li>
+                <li><a title="Delete this design" alt="Are you sure you want to delete this design?" class="delete frame_tip" href="{{ jobdesign.delete_url }}">Delete</a></li>
               </ul>
             </td>
             <td>{{ jobdesign.name }}</td>
