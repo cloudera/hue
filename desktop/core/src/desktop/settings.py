@@ -217,13 +217,15 @@ DEPENDER_ROOT = get_desktop_root(".")
 
 def prep_depender_config():
   yamls = [
-    "../ext/thirdparty/js/mootools-core/package.yml",
-    "../ext/thirdparty/js/mootools-more/package.yml",
+    "../ext/thirdparty/js/core/package.yml",
+    "../ext/thirdparty/js/more/package.yml",
     "../ext/thirdparty/js/art/package.yml",
-    "../ext/thirdparty/js/mootools-touch/package.yml",
-    "../ext/thirdparty/js/mootools-table/package.yml",
-    "../ext/thirdparty/js/mootools-color/package.yml",
-    "../ext/thirdparty/js/art-widgets/package.yml",
+    "../ext/thirdparty/js/touch/package.yml",
+    "../ext/thirdparty/js/table/package.yml",
+    "../ext/thirdparty/js/color/package.yml",
+    "../ext/thirdparty/js/behavior/package.yml",
+    "../ext/thirdparty/js/more-behaviors/package.yml",
+    "../ext/thirdparty/js/widgets/package.yml",
     "../ext/thirdparty/js/slick/package.yml",
     "core/static/js/package.yml",
     "../ext/thirdparty/js/depender/package.yml",
