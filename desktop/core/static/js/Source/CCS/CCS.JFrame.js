@@ -712,7 +712,7 @@ CCS.JFrame = new Class({
 			that request instance from being "set up" twice, exit if there's already
 			a request and it's already been set up.
 		*/
-		if (this._request && this._request._jframeConfigured) return;
+		if (request._jframeConfigured) return;
 		request._jframeConfigured = true;
 		request.setOptions($merge({
 			useSpinner: this.options.spinnerCondition.apply(this, [options]),
