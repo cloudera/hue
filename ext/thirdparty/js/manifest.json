@@ -25,6 +25,16 @@
 		"clientcide": {
 			"track-indirect": "clientcide.hash"
 		},
+		"behavior": {
+			"track-indirect": "behavior.hash",
+			"from-remote": "anutron",
+			"remotes": ["anutron"]
+		},
+		"more-behaviors": {
+			"track-indirect": "more-behaviors.hash",
+			"from-remote": "anutron",
+			"remotes": ["anutron"]
+		},
 		"mootools-color": {
 			"dir": "color",
 			"track-indirect": "color.hash",
