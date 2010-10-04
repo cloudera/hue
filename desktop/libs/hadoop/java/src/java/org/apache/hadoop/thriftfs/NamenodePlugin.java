@@ -67,7 +67,7 @@ public class NamenodePlugin
    * Default address and port this server will bind to, in case nothing is found
    * in the configuration object.
    */
-  public static final String DEFAULT_THRIFT_ADDRESS = "0.0.0.0:9090";
+  public static final String DEFAULT_THRIFT_ADDRESS = "0.0.0.0:10090";
 
   private NameNode namenode;
 

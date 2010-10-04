@@ -105,7 +105,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
     help="Information about a single HDFS cluster",
     members=dict(
       NN_HOST=Config("namenode_host", help="IP for name node"),
-      NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=9090,
+      NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=10090,
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
                             type=int)

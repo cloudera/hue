@@ -1,0 +1,26 @@
+Hue v1.1, released Oct ??, 2010
+===============================
+
+Hue is a web interface for Hadoop, and a platform for building custom
+applications with a rich framework. The 1.1 is a minor release, largely
+focused on adding security support to Hue, matching the security
+support of Cloudera's Distribution for Hadoop 3, beta 3.
+
+Notable Changes and Caveats
+===========================
+* Hue 1.1 only works with CDH3b3 or newer.  CDH2 and earlier betas of CDH3
+will not work.
+* The default port for the namenode plugins has changed from 9090 to 10090.
+
+
+Application Compatability
+-------------------------
+
+
+List of All Bugs Fixed
+----------------------
+
+
+Project Information
+-------------------
+Homepage: http://github.com/cloudera/hue

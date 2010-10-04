@@ -164,7 +164,7 @@ Add the following configuration properties to `hdfs-site.xml`:
 </property>
 <property>
   <name>dfs.thrift.address</name>
-  <value>0.0.0.0:9090</value>
+  <value>0.0.0.0:10090</value>
 </property>
 -----
 
@@ -251,7 +251,7 @@ You can confirm that the plugins are running correctly by tailing the daemon log
 $ tail --lines=500 /var/log/hadoop-0.20/hadoop*namenode*.log | grep ThriftPlugin
 2009-09-28 16:30:44,337 INFO org.apache.hadoop.thriftfs.ThriftPluginServer: Starting Thrift server
 2009-09-28 16:30:44,419 INFO org.apache.hadoop.thriftfs.ThriftPluginServer:
-Thrift server listening on 0.0.0.0:9090
+Thrift server listening on 0.0.0.0:10090
 ----
 
 [TIP]

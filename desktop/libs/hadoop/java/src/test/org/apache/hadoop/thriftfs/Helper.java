@@ -61,7 +61,7 @@ public class Helper {
   /** Create a configuration object for the unit tests. */
   public static Configuration createConf() {
     Configuration conf = new Configuration();
-    conf.set(NAMENODE_ADDRESS_PROPERTY, "127.0.0.1:9090");
+    conf.set(NAMENODE_ADDRESS_PROPERTY, "127.0.0.1:10090");
     conf.set(DATANODE_ADDRESS_PROPERTY, "127.0.0.1:0");
     conf.set("slave.host.name", "127.0.0.1");
     conf.setStrings("dfs.namenode.plugins", NamenodePlugin.class.getName());

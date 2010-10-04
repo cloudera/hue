@@ -77,7 +77,7 @@ function write_hadoop_config() {
 </property>
 <property>
   <name>dfs.thrift.address</name>
-  <value>${MASTER_IP}:9090</value>
+  <value>${MASTER_IP}:10090</value>
 </property>
 <property>
   <name>jobtracker.thrift.address</name>
