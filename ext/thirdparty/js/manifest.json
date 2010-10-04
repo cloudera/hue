@@ -43,7 +43,7 @@
 		},
 		"art-widgets": {
 			"dir": "widgets",
-			"track-indirect": "art-widgets.hash",
+			"track-indirect": "widgets.hash",
 			"from-remote": "origin",
 			"remotes": ["origin"]
 		},
