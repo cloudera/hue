@@ -35,12 +35,6 @@
 			"dir": "touch",
 			"track-indirect": "touch.hash"
 		},
-		"mootools-table": {
-			"dir": "table",
-			"track-indirect": "table.hash",
-			"from-remote": "anutron",
-			"remotes": ["anutron"]
-		},
 		"art-widgets": {
 			"dir": "widgets",
 			"track-indirect": "widgets.hash",
