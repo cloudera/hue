@@ -36,18 +36,18 @@
               <li class="ccs-inline"><b>Filter Jobs:</b></li>
               <li class="ccs-inline">
                 <select name="state">
-                  <option value="all" ${get_state('all', state_filter)}>All states</option>
-                  <option value="running" ${get_state('running', state_filter)}>running</option>
-                  <option value="completed" ${get_state('completed', state_filter)}>completed</option>
-                  <option value="failed" ${get_state('failed', state_filter)}>failed</option>
-                  <option value="killed" ${get_state('killed', state_filter)}>killed</option>
+                  <option value="all" ${get_state('all', state_filter)}>All States</option>
+                  <option value="running" ${get_state('running', state_filter)}>Running</option>
+                  <option value="completed" ${get_state('completed', state_filter)}>Completed</option>
+                  <option value="failed" ${get_state('failed', state_filter)}>Failed</option>
+                  <option value="killed" ${get_state('killed', state_filter)}>Killed</option>
                 </select>
               </li>
               <li class="ccs-inline">
-                <input type="text" class="jt_filter" data-filters="OverText, ArtInput" data-art-input-type="search" name="user" title="filter on user" value="${user_filter}"/>
+                <input type="text" class="jt_filter" data-filters="OverText, ArtInput" data-art-input-type="search" name="user" title="User Name Filter" value="${user_filter}"/>
               </li>
               <li class="ccs-inline">
-                <input type="text" class="jt_filter" data-filters="OverText, ArtInput" data-art-input-type="search" name="text" title="text filter" value="${text_filter}"/>
+                <input type="text" class="jt_filter" data-filters="OverText, ArtInput" data-art-input-type="search" name="text" title="Text Filter" value="${text_filter}"/>
               </li>
             </form>
           </ul>
