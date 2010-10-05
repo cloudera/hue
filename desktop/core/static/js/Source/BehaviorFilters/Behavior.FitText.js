@@ -24,6 +24,7 @@ script: Behavior.FitText.js
 */
 
 (function(){
+	if (Browser.Engine.trident) return; //disable this for now as it's broken IE; bug #
 	/*
 		implements the FitText filter on an element; attaches to Behavior for events on resize
 		filter - the Behavior filter instance
@@ -115,24 +116,21 @@ script: Behavior.FitText.js
 
 	});
 
-        Behavior.addGlobalPlugin('HtmlTable', 'FitTextResize', function(element, methods) {
-                if(element.hasClass('resizable')) {
-                        htmlTable = element.retrieve('HtmlTable');
-                        htmlTable.addEvent('columnResize', function() {
-                                if(element.hasDataFilter('FitText-Children')) {
-                                        var selector = element.get('data', 'fit-text');
-                                        element.getElements(selector).each(function(el){
-                                                el.retrieve('FitText').fit();
-                                        }, this);
-                                }
-                                element.getElements('[data-filters*=FitText]').each(function(el) {
-                                        el.retrieve('FitText').fit();
-                                });
-                        });
-                }
-        });
-
-        
-
+	Behavior.addGlobalPlugin('HtmlTable', 'FitTextResize', function(element, methods) {
+		if(element.hasClass('resizable')) {
+			htmlTable = element.retrieve('HtmlTable');
+			htmlTable.addEvent('columnResize', function() {
+				if(element.hasDataFilter('FitText-Children')) {
+					var selector = element.get('data', 'fit-text');
+					element.getElements(selector).each(function(el){
+						el.retrieve('FitText').fit();
+					}, this);
+				}
+				element.getElements('[data-filters*=FitText]').each(function(el) {
+					el.retrieve('FitText').fit();
+				});
+			});
+		}
+	});
 
 })();
