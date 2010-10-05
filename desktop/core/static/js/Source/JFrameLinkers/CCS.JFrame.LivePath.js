@@ -46,6 +46,7 @@ script: CCS.JFrame.LivePath.js
 			var okToAdd = action == "toggle" || action == "add";
 			for (path in paths){
 				var state = uri.getData(path);
+				if (window.paused) debugger;
 				if (!state) {
 					uri.setData(path, paths[path]);
 				} else if ($type(state) == "string") {
@@ -54,7 +55,7 @@ script: CCS.JFrame.LivePath.js
 					else if (okToAdd)
 						uri.setData(path, [state, paths[path]]);
 				} else if ($type(state) == "array") {
-					if (state.contains(path) && okToRemove) state.erase(path);
+					if (state.contains(paths[path]) && okToRemove) state.erase(paths[path]);
 					else if (okToAdd) state.push(paths[path]);
 
 					if (state.length) uri.setData(path, state);
