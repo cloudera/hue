@@ -18,10 +18,12 @@
 package org.apache.hadoop.thriftfs;
 
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import javax.security.sasl.SaslException;
 
 import java.io.IOException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -42,6 +44,22 @@ import org.apache.thrift.transport.TTransportFactory;
 /**
  * Functions that bridge Thrift's SASL transports to Hadoop's
  * SASL callback handlers and authentication classes.
+ *
+ * The purpose of these classes is to go between the SASL authenticated
+ * ID (Kerberos principal) and the UserGroupInformation class in the JAAS
+ * context, when making SASL-authenticated thrift connections. Clients
+ * will use the current UGI to authenticate, and servers will create a remote
+ * UGI for the connected user before calling through to RPCs.
+ *
+ * For example, when a kerberos-authenticated Thrift connection comes from
+ * Hue, the SASL transport layer will provide the authenticated principal name to
+ * the server. This class then creates a UGI instance corresponding to that
+ * principal, and calls ugi.doAs(...) to handle the actual RPC -- thus setting
+ * up the security context in such a way that the rest of Hadoop will not have
+ * to make any distinction between this and any other RPC client.
+ *
+ * Note that this class only concerns authentication -- no <em>authorization</em>
+ * is implied.
  */
 class HadoopThriftAuthBridge {
   static final Log LOG = LogFactory.getLog(HadoopThriftAuthBridge.class);
@@ -67,7 +85,7 @@ class HadoopThriftAuthBridge {
           String names[] = SaslRpcServer.splitKerberosName(serverPrincipal);
           if (names.length != 3) {
             throw new IOException(
-              "Kerberos principal name does NOT have the expected hostname part: "
+              "Kerberos principal name not in the format service/host@REALM: "
               + serverPrincipal);
           }
           try {
@@ -111,17 +129,18 @@ class HadoopThriftAuthBridge {
      */
     public TTransportFactory createTransportFactory() throws TTransportException
     {
-      // Parse out the kerberos principal, host, realm.
-      String kerberosName = realUgi.getUserName();
-      final String names[] = SaslRpcServer.splitKerberosName(kerberosName);
+      // Parse out the kerberos shortname, host, realm.
+      String kerberosPrincipal = realUgi.getUserName();
+      final String names[] = SaslRpcServer.splitKerberosName(kerberosPrincipal);
       if (names.length != 3) {
-        throw new TTransportException("Kerberos principal should have 3 parts: " + kerberosName);
+        throw new TTransportException("Kerberos principal should have 3 parts: " +
+                                      kerberosPrincipal);
       }
 
       TSaslServerTransport.Factory transFactory = new TSaslServerTransport.Factory();
       transFactory.addServerDefinition(
         AuthMethod.KERBEROS.getMechanismName(),
-        names[0], names[1],  // two parts of kerberos principal
+        names[0], names[1],  // shortname and host
         SaslRpcServer.SASL_PROPS,
         new SaslRpcServer.SaslGssCallbackHandler());
 
@@ -189,7 +208,6 @@ class HadoopThriftAuthBridge {
         }
       }
     }
-
   }
 
   /**
@@ -242,18 +260,18 @@ class HadoopThriftAuthBridge {
     public void open() throws TTransportException {
       try {
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
-          public Void run() {
-            try {
-              wrapped.open();
-            } catch (TTransportException tte) {
-              // Wrap the transport exception in an RTE, since UGI.doAs() then goes
-              // and unwraps this for us out of the doAs block. We then unwrap one
-              // more time in our catch clause to get back the TTE. (ugh)
-              throw new RuntimeException(tte);
+            public Void run() {
+              try {
+                wrapped.open();
+              } catch (TTransportException tte) {
+                // Wrap the transport exception in an RTE, since UGI.doAs() then goes
+                // and unwraps this for us out of the doAs block. We then unwrap one
+                // more time in our catch clause to get back the TTE. (ugh)
+                throw new RuntimeException(tte);
+              }
+              return null;
             }
-            return null;
-          }
-        });
+          });
       } catch (IOException ioe) {
         assert false : "Never thrown!";
         throw new RuntimeException("Received an ioe we never threw!", ioe);

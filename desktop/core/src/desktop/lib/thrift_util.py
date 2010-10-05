@@ -56,7 +56,7 @@ class ConnectionConfig(object):
     @param service_name A human-readable name to describe the service
     @param use_sasl If true, will use Kerberos over SASL to authenticate
     @param kerberos_principal The Kerberos service name to connect to.
-              NOTE: for a server like fooservice/foo.blah.com@REALM only
+              NOTE: for a service like fooservice/foo.blah.com@REALM only
               specify "fooservice", NOT the full principal name.
     @param timeout_seconds Timeout for thrift calls
     """

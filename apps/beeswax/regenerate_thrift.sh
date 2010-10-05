@@ -34,9 +34,9 @@ NOTE:
 
 This script does *not* remove old generated files that may not be necessary anymore.
 You should probably do something like:
- > git rm -Rf java/gen-java
+ > git rm -rf java/gen-java gen-py
  > ./regenerate_thrift.sh
- > git add java/gen-java
+ > git add java/gen-java gen-py
 
 ======================================================================
 
