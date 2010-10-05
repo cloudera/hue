@@ -25,7 +25,7 @@
 	<link rel="stylesheet" href="/static/css/windows.css" type="text/css" media="screen" charset="utf-8">
 	<link rel="stylesheet" href="/static/css/desktop.css" type="text/css" media="screen" charset="utf-8">
 
-  <script src="/depender/build?client=true&require=dbug,DomReady,Cookie,Element.Dimensions,Element.Style"></script>
+  <script src="/depender/build?client=true&require=ccs-shared/CCS.Request,ccs-shared/CCS.User,ccs-shared/CCS.Desktop,ccs-shared/CCS.Desktop.Config,ccs-shared/CCS.Desktop.FlashMessage,ccs-shared/CCS.Desktop.Keys,ccs-shared/CCS.Login,More/Fx.Elements"></script>
   <!--[if IE 8]>
       <script>
           window.ie8 = true;
@@ -67,105 +67,99 @@
       if (!ie8) alert("Hue does not currently support any version of Internet Explorer other than IE8.");
     }
     var appName = "Hue";
-    Depender.require({
-      scripts: ["CCS.Request", "CCS.User", "CCS.Desktop", "CCS.Desktop.Config", "CCS.Desktop.FlashMessage", 
-        "CCS.Desktop.Keys", "CCS.Login", "StickyWin.PointyTip", "Element.Delegation", "Fx.Tween", "Fx.Elements"],
-      callback: function(){
-        //before fading in the screen, resize the background to match the window size
-        sizer();
-        var bgEls = $('bg').getElements('img');
-        bgEls.push($('bg'));
-        var styles = {};
-        bgEls.each(function(el, i){
-          styles[i.toString()] = { opacity: [0, 1] };
-        });
-        new Fx.Elements(bgEls, {
-          duration: 500
-        }).start(styles);
-        $(document.body).addEvent('click:relay(img.desktop-logo)', rotateBG);
-        
-        Clientcide.setAssetLocation("/static/js/ThirdParty/clientcide/Assets");
-        var growled = {};
-        var launchGrowl = function(component){
-          var appName = CCS.Desktop.getAppName(component);
-          var loading = 'Loading ' + appName;
-          var launching = 'Launching ' + appName;
-          var msg = loading;
-          if (CCS.Desktop.hasLoaded(component)) msg = launching;
-          if (!CCS.Desktop.checkForFlashMessage(loading) && 
-              !CCS.Desktop.checkForFlashMessage(launching) && 
-              !$$('.loadingmsg').length) {
-                growled[component] = CCS.Desktop.flashMessage(msg, 10000);
-          }
-        };
-        var clearGrowl = function(component) {
-          if (growled[component]) {
-            growled[component]();
-            delete growled[component];
-          }
-        };
-        CCS.Desktop.initialize({
-          onBeforeLoad: launchGrowl,
-          onBeforeLaunch: launchGrowl,
-          onAfterLaunch: clearGrowl
-        });
-
-        (function(){
-          $('ccs-loading').fade('out').get('tween').clearChain().chain(function(){
-            $('ccs-loading').destroy();
-          });
-        }).delay(300);
-
-        //when the user logs in
-        CCS.User.withUser(function(user){
-          var bsLoaded;
-          var bootstrapped = function(){
-            if (bsLoaded) return;
-            bsLoaded = true;
-
-            //if there's no desktop to restore
-            var linked = CCS.Desktop.launchLinked();
-            // If a link was opened it chooses how to restore the desktop
-            var restored;
-
-            //we need to delay this slightly for IE; don't ask me why
-            var finalize = function(){
-              if (!linked) {
-                //this is how we hide things in IE because it hates opacity/visibility stuff w/ VML
-                $('ccs-desktop').setStyle('top', -10000);
-                restored = CCS.Desktop.restoreDesktop();
-                $('ccs-desktop').setStyle('top', null);
-              }
-              if (!linked && !restored) {
-                //call the autolaunchers
-                CCS.Desktop.autolaunchers.each(function(fn){
-                  fn();
-                });
-              }
-              $('ccs-profileLink').set('text', user.username).addClass('loggedIn');
-              $(document.body).addClass('ccs-loaded');
-              window.scrollTo(0,0);
-              $('ccs-toolbar').show().tween('opacity', 0, 1);
-              $('ccs-dock').tween('opacity', 0, 1);
-            };
-
-            if (Browser.Engine.trident) finalize.delay(100);
-            else finalize();
-          };
-
-          new Element('script', {
-            src: '/bootstrap.js',
-            events: {
-              load: function() {
-                bootstrapped();
-              },
-              readystatechange: function(){
-                if (['loaded', 'complete'].contains(this.readyState)) bootstrapped();
-              }
-            }
-          }).inject(document.head);
-        });
+    //before fading in the screen, resize the background to match the window size
+    sizer();
+    var bgEls = $('bg').getElements('img');
+    bgEls.push($('bg'));
+    var styles = {};
+    bgEls.each(function(el, i){
+      styles[i.toString()] = { opacity: [0, 1] };
+    });
+    new Fx.Elements(bgEls, {
+      duration: 500
+    }).start(styles);
+    $(document.body).addEvent('click:relay(img.desktop-logo)', rotateBG);
+    
+    Clientcide.setAssetLocation("/static/js/ThirdParty/clientcide/Assets");
+    var growled = {};
+    var launchGrowl = function(component){
+      var appName = CCS.Desktop.getAppName(component);
+      var loading = 'Loading ' + appName;
+      var launching = 'Launching ' + appName;
+      var msg = loading;
+      if (CCS.Desktop.hasLoaded(component)) msg = launching;
+      if (!CCS.Desktop.checkForFlashMessage(loading) && 
+          !CCS.Desktop.checkForFlashMessage(launching) && 
+          !$$('.loadingmsg').length) {
+            growled[component] = CCS.Desktop.flashMessage(msg, 10000);
       }
+    };
+    var clearGrowl = function(component) {
+      if (growled[component]) {
+        growled[component]();
+        delete growled[component];
+      }
+    };
+    CCS.Desktop.initialize({
+      onBeforeLoad: launchGrowl,
+      onBeforeLaunch: launchGrowl,
+      onAfterLaunch: clearGrowl
+    });
+
+    (function(){
+      $('ccs-loading').fade('out').get('tween').clearChain().chain(function(){
+        $('ccs-loading').destroy();
+      });
+    }).delay(300);
+
+    //when the user logs in
+    CCS.User.withUser(function(user){
+      var bsLoaded;
+      var bootstrapped = function(){
+        if (bsLoaded) return;
+        bsLoaded = true;
+
+        //if there's no desktop to restore
+        var linked = CCS.Desktop.launchLinked();
+        // If a link was opened it chooses how to restore the desktop
+        var restored;
+
+        //we need to delay this slightly for IE; don't ask me why
+        var finalize = function(){
+          if (!linked) {
+            //this is how we hide things in IE because it hates opacity/visibility stuff w/ VML
+            $('ccs-desktop').setStyle('top', -10000);
+            restored = CCS.Desktop.restoreDesktop();
+            $('ccs-desktop').setStyle('top', null);
+          }
+          if (!linked && !restored) {
+            //call the autolaunchers
+            CCS.Desktop.autolaunchers.each(function(fn){
+              fn();
+            });
+          }
+          $('ccs-profileLink').set('text', user.username).addClass('loggedIn');
+          $(document.body).addClass('ccs-loaded');
+          window.scrollTo(0,0);
+          $('ccs-toolbar').show().tween('opacity', 0, 1);
+          $('ccs-dock').tween('opacity', 0, 1);
+        };
+
+        if (Browser.Engine.trident) finalize.delay(100);
+        else finalize();
+      };
+
+      new Element('script', {
+        src: '/bootstrap.js',
+        events: {
+          load: function() {
+            bootstrapped();
+          },
+          readystatechange: function(){
+            if (['loaded', 'complete'].contains(this.readyState)) bootstrapped();
+          }
+        }
+      }).inject(document.head);
     });
   });
   </script>
