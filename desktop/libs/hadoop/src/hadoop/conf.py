@@ -120,7 +120,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       DN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for DataNode",
                                    default="hdfs", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
-                              default=False, type=bool),
+                              default=False, type=coerce_bool),
     )
   )
 )
@@ -137,7 +137,7 @@ MR_CLUSTERS = UnspecifiedConfigSection(
       JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
                                    default="mapred", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
-                              default=False, type=bool))
+                              default=False, type=coerce_bool))
 ))
 
 
