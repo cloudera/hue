@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Settings to configure your Hadoop cluster."""
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
 import glob
 import os
 import logging
