@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.security.SaslRpcServer.AuthMethod;
 import org.apache.hadoop.security.*;
+import org.apache.hadoop.security.UserGroupInformation.AuthenticationMethod;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TSaslClientTransport;
 import org.apache.thrift.transport.TSaslServerTransport;
@@ -185,6 +186,7 @@ class HadoopThriftAuthBridge {
         LOG.debug("Authenticated  " + authId + " for Thrift call ");
 
         UserGroupInformation clientUgi = UserGroupInformation.createRemoteUser(authId);
+        clientUgi.setAuthenticationMethod(AuthenticationMethod.KERBEROS);
 
         try {
           return clientUgi.doAs(new PrivilegedExceptionAction<Boolean>() {

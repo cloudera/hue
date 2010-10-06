@@ -209,8 +209,6 @@ KERBEROS = ConfigSection(
   )
 )
 
-      
-
 # See python's documentation for time.tzset for valid values.
 TIME_ZONE = Config(
   key="time_zone",

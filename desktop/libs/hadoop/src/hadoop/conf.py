@@ -117,7 +117,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                             type=int),
       NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
                                    default="hdfs", type=str),
-      DN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for DataNode",
+      DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode",
                                    default="hdfs", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
