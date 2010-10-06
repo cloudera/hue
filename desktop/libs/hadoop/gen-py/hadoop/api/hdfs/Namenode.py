@@ -302,6 +302,8 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
 
   def getDelegationToken(self, ctx, renewer):
     """
+    Get an HDFS delegation token.
+    
     Parameters:
      - ctx
      - renewer
@@ -1154,6 +1156,8 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
 
   def getDelegationToken(self, ctx, renewer):
     """
+    Get an HDFS delegation token.
+    
     Parameters:
      - ctx
      - renewer
@@ -4808,7 +4812,7 @@ class getDelegationToken_result(object):
   """
 
   thrift_spec = (
-    (0, TType.STRUCT, 'success', (ThriftHdfsDelegationToken, ThriftHdfsDelegationToken.thrift_spec), None, ), # 0
+    (0, TType.STRUCT, 'success', (hadoop.api.common.ttypes.ThriftDelegationToken, hadoop.api.common.ttypes.ThriftDelegationToken.thrift_spec), None, ), # 0
     (1, TType.STRUCT, 'err', (hadoop.api.common.ttypes.IOException, hadoop.api.common.ttypes.IOException.thrift_spec), None, ), # 1
   )
 
@@ -4827,7 +4831,7 @@ class getDelegationToken_result(object):
         break
       if fid == 0:
         if ftype == TType.STRUCT:
-          self.success = ThriftHdfsDelegationToken()
+          self.success = hadoop.api.common.ttypes.ThriftDelegationToken()
           self.success.read(iprot)
         else:
           iprot.skip(ftype)

@@ -236,10 +236,6 @@ struct DFSHealthReport {
   8: i32 httpPort
 }
 
-struct ThriftHdfsDelegationToken {
-  1: binary delegationTokenBytes
-}
-
 /** Quota-related error */
 exception QuotaException {
   /** Error message. */
@@ -490,7 +486,10 @@ service Namenode extends common.HadoopServiceBase {
                     /** Thrift port of the datanode */
                     3:  i32 thriftPort),
 
-  ThriftHdfsDelegationToken getDelegationToken(10:common.RequestContext ctx, 1:string renewer) throws(1: common.IOException err)
+  /**
+   * Get an HDFS delegation token.
+   */
+  common.ThriftDelegationToken getDelegationToken(10:common.RequestContext ctx, 1:string renewer) throws(1: common.IOException err)
 }
 
 /** Encapsulates a block data transfer with its CRC */

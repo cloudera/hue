@@ -21,6 +21,7 @@ package org.apache.hadoop.mapred;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
@@ -38,18 +39,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.security.token.delegation.DelegationTokenIdentifier;
+import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.Counters.Counter;
 import org.apache.hadoop.mapred.Counters.Group;
 import org.apache.hadoop.mapred.JobTracker.State;
 import org.apache.hadoop.mapred.TaskStatus.Phase;
 import org.apache.hadoop.mapreduce.TaskType;
 import org.apache.hadoop.net.NetUtils;
+import org.apache.hadoop.security.Credentials;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.thriftfs.ThriftHandlerBase;
 import org.apache.hadoop.thriftfs.ThriftPluginServer;
 import org.apache.hadoop.thriftfs.ThriftServerContext;
 import org.apache.hadoop.thriftfs.ThriftUtils;
 import org.apache.hadoop.thriftfs.api.IOException;
 import org.apache.hadoop.thriftfs.api.RequestContext;
+import org.apache.hadoop.thriftfs.api.ThriftDelegationToken;
 import org.apache.hadoop.thriftfs.jobtracker.api.JobTrackerState;
 import org.apache.hadoop.thriftfs.jobtracker.api.Jobtracker;
 import org.apache.hadoop.thriftfs.jobtracker.api.ThriftClusterStatus;
@@ -1216,6 +1224,23 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
                 return null;
               }
             });
+        }
+
+        @Override
+        public ThriftDelegationToken getDelegationToken(RequestContext ctx, final String renewer)
+            throws IOException, TException {
+          return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<ThriftDelegationToken>() {
+            public ThriftDelegationToken run() throws java.io.IOException {
+              Token<DelegationTokenIdentifier> delegationToken;
+              try {
+                delegationToken = jobTracker.getDelegationToken(new Text(renewer));
+              } catch (InterruptedException e) {
+                throw new java.io.IOException(e);
+              }
+
+              return ThriftUtils.toThrift(delegationToken, JobTracker.getAddress(conf));
+            }
+          });
         }
     }
 

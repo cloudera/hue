@@ -448,28 +448,31 @@ service Jobtracker extends common.HadoopServiceBase {
 	ThriftTaskTrackerStatus getTracker(10: common.RequestContext ctx, 1: string name)
 	          throws(1: TaskTrackerNotFoundException tne),
 
-        /** Get the current time in ms according to the JT */
-        i64 getCurrentTime(10: common.RequestContext ctx),
+  /** Get the current time in ms according to the JT */
+  i64 getCurrentTime(10: common.RequestContext ctx),
 
-        /** Get the xml for a job's configuration, serialised from the local filesystem on the JT */
-        string getJobConfXML(10: common.RequestContext ctx, 1: ThriftJobID jobID)
-                  throws(1: common.IOException err),
+  /** Get the xml for a job's configuration, serialised from the local filesystem on the JT */
+  string getJobConfXML(10: common.RequestContext ctx, 1: ThriftJobID jobID)
+            throws(1: common.IOException err),
 
-	/** Kill a job */
-        void killJob(10: common.RequestContext ctx, 1: ThriftJobID jobID)
-                                   throws(1: common.IOException err, 2: JobNotFoundException jne),
+  /** Kill a job */
+  void killJob(10: common.RequestContext ctx, 1: ThriftJobID jobID)
+                             throws(1: common.IOException err, 2: JobNotFoundException jne),
 
-        /** Kill a task attempt */
-        void killTaskAttempt(10: common.RequestContext ctx, 1: ThriftTaskAttemptID attemptID)
-                                         throws(1: common.IOException err,
-                                                2: TaskAttemptNotFoundException tne,
-                                                3: JobNotFoundException jne),
+  /** Kill a task attempt */
+  void killTaskAttempt(10: common.RequestContext ctx, 1: ThriftTaskAttemptID attemptID)
+                                   throws(1: common.IOException err,
+                                          2: TaskAttemptNotFoundException tne,
+                                          3: JobNotFoundException jne),
 
-        /** Set a job's priority */
-        void setJobPriority(10: common.RequestContext ctx,
-                            1: ThriftJobID jobID,
-                            2: ThriftJobPriority priority)
-            throws(1: common.IOException err, 2: JobNotFoundException jne),
+  /** Set a job's priority */
+  void setJobPriority(10: common.RequestContext ctx,
+                      1: ThriftJobID jobID,
+                      2: ThriftJobPriority priority)
+      throws(1: common.IOException err, 2: JobNotFoundException jne),
+
+  /** Get an MR delegation token. */
+  common.ThriftDelegationToken getDelegationToken(10:common.RequestContext ctx, 1:string renewer) throws(1: common.IOException err)
 }
 
 

@@ -90,10 +90,8 @@ public aspect UgiFixer {
   AppConfigurationEntry[] around(String appName):
     getAppConfigurationEntry(appName) {
       if (!appName.equals("hadoop-simple")) {
-        LOG.warn("getAppConfigurationEntry() called for auth method other than simple: " + appName);
-        return proceed(appName);
-      } else {
-        return JOBSUB_CONF;
+        LOG.warn("getAppConfigurationEntry() called for auth method other than simple, returning JOBSUB_CONF anyway: " + appName);
       }
+      return JOBSUB_CONF;
     }
 }

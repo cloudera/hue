@@ -283,7 +283,13 @@ public class Namenode {
      */
     public void datanodeDown(String name, String storage, int thriftPort) throws TException;
 
-    public ThriftHdfsDelegationToken getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer) throws org.apache.hadoop.thriftfs.api.IOException, TException;
+    /**
+     * Get an HDFS delegation token.
+     * 
+     * @param ctx
+     * @param renewer
+     */
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer) throws org.apache.hadoop.thriftfs.api.IOException, TException;
 
   }
 
@@ -1083,7 +1089,7 @@ public class Namenode {
       return;
     }
 
-    public ThriftHdfsDelegationToken getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer) throws org.apache.hadoop.thriftfs.api.IOException, TException
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer) throws org.apache.hadoop.thriftfs.api.IOException, TException
     {
       send_getDelegationToken(ctx, renewer);
       return recv_getDelegationToken();
@@ -1100,7 +1106,7 @@ public class Namenode {
       oprot_.getTransport().flush();
     }
 
-    public ThriftHdfsDelegationToken recv_getDelegationToken() throws org.apache.hadoop.thriftfs.api.IOException, TException
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken recv_getDelegationToken() throws org.apache.hadoop.thriftfs.api.IOException, TException
     {
       TMessage msg = iprot_.readMessageBegin();
       if (msg.type == TMessageType.EXCEPTION) {
@@ -17986,7 +17992,7 @@ public class Namenode {
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
 
-    public ThriftHdfsDelegationToken success;
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken success;
     public org.apache.hadoop.thriftfs.api.IOException err;
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
@@ -18049,7 +18055,7 @@ public class Namenode {
 
     public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
       put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftHdfsDelegationToken.class)));
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.ThriftDelegationToken.class)));
       put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
           new FieldValueMetaData(TType.STRUCT)));
     }});
@@ -18062,7 +18068,7 @@ public class Namenode {
     }
 
     public getDelegationToken_result(
-      ThriftHdfsDelegationToken success,
+      org.apache.hadoop.thriftfs.api.ThriftDelegationToken success,
       org.apache.hadoop.thriftfs.api.IOException err)
     {
       this();
@@ -18075,7 +18081,7 @@ public class Namenode {
      */
     public getDelegationToken_result(getDelegationToken_result other) {
       if (other.isSetSuccess()) {
-        this.success = new ThriftHdfsDelegationToken(other.success);
+        this.success = new org.apache.hadoop.thriftfs.api.ThriftDelegationToken(other.success);
       }
       if (other.isSetErr()) {
         this.err = new org.apache.hadoop.thriftfs.api.IOException(other.err);
@@ -18091,11 +18097,11 @@ public class Namenode {
       return new getDelegationToken_result(this);
     }
 
-    public ThriftHdfsDelegationToken getSuccess() {
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getSuccess() {
       return this.success;
     }
 
-    public getDelegationToken_result setSuccess(ThriftHdfsDelegationToken success) {
+    public getDelegationToken_result setSuccess(org.apache.hadoop.thriftfs.api.ThriftDelegationToken success) {
       this.success = success;
       return this;
     }
@@ -18145,7 +18151,7 @@ public class Namenode {
         if (value == null) {
           unsetSuccess();
         } else {
-          setSuccess((ThriftHdfsDelegationToken)value);
+          setSuccess((org.apache.hadoop.thriftfs.api.ThriftDelegationToken)value);
         }
         break;
 
@@ -18277,7 +18283,7 @@ public class Namenode {
           switch (fieldId) {
             case SUCCESS:
               if (field.type == TType.STRUCT) {
-                this.success = new ThriftHdfsDelegationToken();
+                this.success = new org.apache.hadoop.thriftfs.api.ThriftDelegationToken();
                 this.success.read(iprot);
               } else { 
                 TProtocolUtil.skip(iprot, field.type);

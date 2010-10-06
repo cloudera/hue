@@ -15,7 +15,9 @@
 // limitations under the License.
 package org.apache.hadoop.security;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.security.Credentials;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -31,5 +33,12 @@ public aspect JobClientTrace {
     RunningJob ret = proceed(conf);
     JobClientTracer.getInstance().submittedJob(ret);
     return ret;
+  }
+
+  void around(Configuration conf, Credentials credentials):
+    call(void JobClient.readTokensFromFiles(Configuration, Credentials)) && args(conf, credentials) {
+    conf.set("mapreduce.job.credentials.binary", System.getenv("HADOOP_TOKEN_FILE_LOCATION"));
+    conf.setBoolean("mapreduce.job.complete.cancel.delegation.tokens", false);
+    proceed(conf, credentials);
   }
 }

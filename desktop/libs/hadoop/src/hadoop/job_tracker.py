@@ -63,13 +63,14 @@ class LiveJobTracker(object):
   In particular, if Thrift returns None for anything, this will throw.
   """
 
-  def __init__(self, host, thrift_port):
+  def __init__(self, host, thrift_port, security_enabled=False):
     self.client = thrift_util.get_client(
       Jobtracker.Client, host, thrift_port,
       service_name="Hadoop MR JobTracker HUE Plugin",
       timeout_seconds=JT_THRIFT_TIMEOUT)
     self.host = host
     self.thrift_port = thrift_port
+    self.security_enabled = security_enabled
     # We allow a single LiveJobTracker to be used across multiple
     # threads by restricting the stateful components to a thread
     # thread-local.
@@ -364,3 +365,8 @@ class LiveJobTracker(object):
     Set a job's priority
     """
     return self.client.setJobPriority(self.thread_local.request_context, jobid, priority)
+
+  def get_delegation_token(self):
+    # TODO(atm): The second argument here should really be the Hue kerberos
+    # principal, which doesn't exist yet. Todd's working on that.
+    return self.client.getDelegationToken(self.thread_local.request_context, 'hadoop')

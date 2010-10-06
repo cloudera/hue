@@ -246,6 +246,16 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
     """
     pass
 
+  def getDelegationToken(self, ctx, renewer):
+    """
+    Get an MR delegation token.
+    
+    Parameters:
+     - ctx
+     - renewer
+    """
+    pass
+
 
 class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   """
@@ -1052,6 +1062,42 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
       raise result.jne
     return
 
+  def getDelegationToken(self, ctx, renewer):
+    """
+    Get an MR delegation token.
+    
+    Parameters:
+     - ctx
+     - renewer
+    """
+    self.send_getDelegationToken(ctx, renewer)
+    return self.recv_getDelegationToken()
+
+  def send_getDelegationToken(self, ctx, renewer):
+    self._oprot.writeMessageBegin('getDelegationToken', TMessageType.CALL, self._seqid)
+    args = getDelegationToken_args()
+    args.ctx = ctx
+    args.renewer = renewer
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_getDelegationToken(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = getDelegationToken_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success != None:
+      return result.success
+    if result.err != None:
+      raise result.err
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "getDelegationToken failed: unknown result");
+
 
 class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor):
   def __init__(self, handler):
@@ -1079,6 +1125,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     self._processMap["killJob"] = Processor.process_killJob
     self._processMap["killTaskAttempt"] = Processor.process_killTaskAttempt
     self._processMap["setJobPriority"] = Processor.process_setJobPriority
+    self._processMap["getDelegationToken"] = Processor.process_getDelegationToken
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
@@ -1387,6 +1434,20 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     except JobNotFoundException, jne:
       result.jne = jne
     oprot.writeMessageBegin("setJobPriority", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_getDelegationToken(self, seqid, iprot, oprot):
+    args = getDelegationToken_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = getDelegationToken_result()
+    try:
+      result.success = self._handler.getDelegationToken(args.ctx, args.renewer)
+    except hadoop.api.common.ttypes.IOException, err:
+      result.err = err
+    oprot.writeMessageBegin("getDelegationToken", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -4547,6 +4608,152 @@ class setJobPriority_result(object):
     if self.jne != None:
       oprot.writeFieldBegin('jne', TType.STRUCT, 2)
       self.jne.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class getDelegationToken_args(object):
+  """
+  Attributes:
+   - ctx
+   - renewer
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'renewer', None, None, ), # 1
+    None, # 2
+    None, # 3
+    None, # 4
+    None, # 5
+    None, # 6
+    None, # 7
+    None, # 8
+    None, # 9
+    (10, TType.STRUCT, 'ctx', (hadoop.api.common.ttypes.RequestContext, hadoop.api.common.ttypes.RequestContext.thrift_spec), None, ), # 10
+  )
+
+  def __init__(self, ctx=None, renewer=None,):
+    self.ctx = ctx
+    self.renewer = renewer
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 10:
+        if ftype == TType.STRUCT:
+          self.ctx = hadoop.api.common.ttypes.RequestContext()
+          self.ctx.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRING:
+          self.renewer = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('getDelegationToken_args')
+    if self.renewer != None:
+      oprot.writeFieldBegin('renewer', TType.STRING, 1)
+      oprot.writeString(self.renewer)
+      oprot.writeFieldEnd()
+    if self.ctx != None:
+      oprot.writeFieldBegin('ctx', TType.STRUCT, 10)
+      self.ctx.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class getDelegationToken_result(object):
+  """
+  Attributes:
+   - success
+   - err
+  """
+
+  thrift_spec = (
+    (0, TType.STRUCT, 'success', (hadoop.api.common.ttypes.ThriftDelegationToken, hadoop.api.common.ttypes.ThriftDelegationToken.thrift_spec), None, ), # 0
+    (1, TType.STRUCT, 'err', (hadoop.api.common.ttypes.IOException, hadoop.api.common.ttypes.IOException.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, success=None, err=None,):
+    self.success = success
+    self.err = err
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRUCT:
+          self.success = hadoop.api.common.ttypes.ThriftDelegationToken()
+          self.success.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.err = hadoop.api.common.ttypes.IOException()
+          self.err.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('getDelegationToken_result')
+    if self.success != None:
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
+      oprot.writeFieldEnd()
+    if self.err != None:
+      oprot.writeFieldBegin('err', TType.STRUCT, 1)
+      self.err.write(oprot)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

@@ -17,7 +17,9 @@
  */
 package org.apache.hadoop.thriftfs;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +29,15 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
+import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.net.NetUtils;
+import org.apache.hadoop.security.Credentials;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
+import org.apache.hadoop.security.token.delegation.AbstractDelegationTokenIdentifier;
 import org.apache.hadoop.thriftfs.api.Block;
 import org.apache.hadoop.thriftfs.api.Constants;
 import org.apache.hadoop.thriftfs.api.ContentSummary;
@@ -36,6 +45,7 @@ import org.apache.hadoop.thriftfs.api.DatanodeInfo;
 import org.apache.hadoop.thriftfs.api.DatanodeState;
 import org.apache.hadoop.thriftfs.api.IOException;
 import org.apache.hadoop.thriftfs.api.Namenode;
+import org.apache.hadoop.thriftfs.api.ThriftDelegationToken;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -188,5 +198,21 @@ public class ThriftUtils {
     t.open();
     TProtocol p = new TBinaryProtocol(t);
     return new Namenode.Client(p);
+  }
+
+  public static ThriftDelegationToken toThrift(Token<? extends AbstractDelegationTokenIdentifier> delegationToken,
+      InetSocketAddress address) throws java.io.IOException {
+    String serviceAddress = InetAddress.getByName(address.getHostName()).getHostAddress() + ":"
+        + address.getPort();
+    delegationToken.setService(new Text(serviceAddress));
+
+    DataOutputBuffer out = new DataOutputBuffer();
+    Credentials ts = new Credentials();
+    ts.addToken(new Text(serviceAddress), delegationToken);
+    ts.writeTokenStorageToStream(out);
+
+    byte[] tokenData = new byte[out.getLength()];
+    System.arraycopy(out.getData(), 0, tokenData, 0, tokenData.length);
+    return new ThriftDelegationToken(tokenData);
   }
 }

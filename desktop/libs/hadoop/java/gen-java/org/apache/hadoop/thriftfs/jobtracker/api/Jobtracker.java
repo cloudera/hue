@@ -210,6 +210,14 @@ public class Jobtracker {
      */
     public void setJobPriority(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, ThriftJobPriority priority) throws org.apache.hadoop.thriftfs.api.IOException, JobNotFoundException, TException;
 
+    /**
+     * Get an MR delegation token.
+     * 
+     * @param ctx
+     * @param renewer
+     */
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer) throws org.apache.hadoop.thriftfs.api.IOException, TException;
+
   }
 
   public static class Client extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.Client implements Iface {
@@ -1038,6 +1046,43 @@ public class Jobtracker {
       return;
     }
 
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer) throws org.apache.hadoop.thriftfs.api.IOException, TException
+    {
+      send_getDelegationToken(ctx, renewer);
+      return recv_getDelegationToken();
+    }
+
+    public void send_getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer) throws TException
+    {
+      oprot_.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.CALL, seqid_));
+      getDelegationToken_args args = new getDelegationToken_args();
+      args.ctx = ctx;
+      args.renewer = renewer;
+      args.write(oprot_);
+      oprot_.writeMessageEnd();
+      oprot_.getTransport().flush();
+    }
+
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken recv_getDelegationToken() throws org.apache.hadoop.thriftfs.api.IOException, TException
+    {
+      TMessage msg = iprot_.readMessageBegin();
+      if (msg.type == TMessageType.EXCEPTION) {
+        TApplicationException x = TApplicationException.read(iprot_);
+        iprot_.readMessageEnd();
+        throw x;
+      }
+      getDelegationToken_result result = new getDelegationToken_result();
+      result.read(iprot_);
+      iprot_.readMessageEnd();
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      if (result.err != null) {
+        throw result.err;
+      }
+      throw new TApplicationException(TApplicationException.MISSING_RESULT, "getDelegationToken failed: unknown result");
+    }
+
   }
   public static class Processor extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.Processor implements TProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(Processor.class.getName());
@@ -1068,6 +1113,7 @@ public class Jobtracker {
       processMap_.put("killJob", new killJob());
       processMap_.put("killTaskAttempt", new killTaskAttempt());
       processMap_.put("setJobPriority", new setJobPriority());
+      processMap_.put("getDelegationToken", new getDelegationToken());
     }
 
     private Iface iface_;
@@ -1594,6 +1640,34 @@ public class Jobtracker {
           return;
         }
         oprot.writeMessageBegin(new TMessage("setJobPriority", TMessageType.REPLY, seqid));
+        result.write(oprot);
+        oprot.writeMessageEnd();
+        oprot.getTransport().flush();
+      }
+
+    }
+
+    private class getDelegationToken implements ProcessFunction {
+      public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
+      {
+        getDelegationToken_args args = new getDelegationToken_args();
+        args.read(iprot);
+        iprot.readMessageEnd();
+        getDelegationToken_result result = new getDelegationToken_result();
+        try {
+          result.success = iface_.getDelegationToken(args.ctx, args.renewer);
+        } catch (org.apache.hadoop.thriftfs.api.IOException err) {
+          result.err = err;
+        } catch (Throwable th) {
+          LOGGER.error("Internal error processing getDelegationToken", th);
+          TApplicationException x = new TApplicationException(TApplicationException.INTERNAL_ERROR, "Internal error processing getDelegationToken");
+          oprot.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
+        oprot.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.REPLY, seqid));
         result.write(oprot);
         oprot.writeMessageEnd();
         oprot.getTransport().flush();
@@ -16351,6 +16425,714 @@ public class Jobtracker {
         sb.append("null");
       } else {
         sb.append(this.jne);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws TException {
+      // check for required fields
+    }
+
+  }
+
+  public static class getDelegationToken_args implements TBase<getDelegationToken_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final TStruct STRUCT_DESC = new TStruct("getDelegationToken_args");
+
+    private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
+    private static final TField RENEWER_FIELD_DESC = new TField("renewer", TType.STRING, (short)1);
+
+    public org.apache.hadoop.thriftfs.api.RequestContext ctx;
+    public String renewer;
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      CTX((short)10, "ctx"),
+      RENEWER((short)1, "renewer");
+
+      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byId.put((int)field._thriftId, field);
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        return byId.get(fieldId);
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+
+    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
+      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      put(_Fields.RENEWER, new FieldMetaData("renewer", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+    }});
+
+    static {
+      FieldMetaData.addStructMetaDataMap(getDelegationToken_args.class, metaDataMap);
+    }
+
+    public getDelegationToken_args() {
+    }
+
+    public getDelegationToken_args(
+      org.apache.hadoop.thriftfs.api.RequestContext ctx,
+      String renewer)
+    {
+      this();
+      this.ctx = ctx;
+      this.renewer = renewer;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public getDelegationToken_args(getDelegationToken_args other) {
+      if (other.isSetCtx()) {
+        this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext(other.ctx);
+      }
+      if (other.isSetRenewer()) {
+        this.renewer = other.renewer;
+      }
+    }
+
+    public getDelegationToken_args deepCopy() {
+      return new getDelegationToken_args(this);
+    }
+
+    @Deprecated
+    public getDelegationToken_args clone() {
+      return new getDelegationToken_args(this);
+    }
+
+    public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
+      return this.ctx;
+    }
+
+    public getDelegationToken_args setCtx(org.apache.hadoop.thriftfs.api.RequestContext ctx) {
+      this.ctx = ctx;
+      return this;
+    }
+
+    public void unsetCtx() {
+      this.ctx = null;
+    }
+
+    /** Returns true if field ctx is set (has been asigned a value) and false otherwise */
+    public boolean isSetCtx() {
+      return this.ctx != null;
+    }
+
+    public void setCtxIsSet(boolean value) {
+      if (!value) {
+        this.ctx = null;
+      }
+    }
+
+    public String getRenewer() {
+      return this.renewer;
+    }
+
+    public getDelegationToken_args setRenewer(String renewer) {
+      this.renewer = renewer;
+      return this;
+    }
+
+    public void unsetRenewer() {
+      this.renewer = null;
+    }
+
+    /** Returns true if field renewer is set (has been asigned a value) and false otherwise */
+    public boolean isSetRenewer() {
+      return this.renewer != null;
+    }
+
+    public void setRenewerIsSet(boolean value) {
+      if (!value) {
+        this.renewer = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case CTX:
+        if (value == null) {
+          unsetCtx();
+        } else {
+          setCtx((org.apache.hadoop.thriftfs.api.RequestContext)value);
+        }
+        break;
+
+      case RENEWER:
+        if (value == null) {
+          unsetRenewer();
+        } else {
+          setRenewer((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public void setFieldValue(int fieldID, Object value) {
+      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case CTX:
+        return getCtx();
+
+      case RENEWER:
+        return getRenewer();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    public Object getFieldValue(int fieldId) {
+      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      switch (field) {
+      case CTX:
+        return isSetCtx();
+      case RENEWER:
+        return isSetRenewer();
+      }
+      throw new IllegalStateException();
+    }
+
+    public boolean isSet(int fieldID) {
+      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getDelegationToken_args)
+        return this.equals((getDelegationToken_args)that);
+      return false;
+    }
+
+    public boolean equals(getDelegationToken_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_ctx = true && this.isSetCtx();
+      boolean that_present_ctx = true && that.isSetCtx();
+      if (this_present_ctx || that_present_ctx) {
+        if (!(this_present_ctx && that_present_ctx))
+          return false;
+        if (!this.ctx.equals(that.ctx))
+          return false;
+      }
+
+      boolean this_present_renewer = true && this.isSetRenewer();
+      boolean that_present_renewer = true && that.isSetRenewer();
+      if (this_present_renewer || that_present_renewer) {
+        if (!(this_present_renewer && that_present_renewer))
+          return false;
+        if (!this.renewer.equals(that.renewer))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public void read(TProtocol iprot) throws TException {
+      TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == TType.STOP) { 
+          break;
+        }
+        _Fields fieldId = _Fields.findByThriftId(field.id);
+        if (fieldId == null) {
+          TProtocolUtil.skip(iprot, field.type);
+        } else {
+          switch (fieldId) {
+            case CTX:
+              if (field.type == TType.STRUCT) {
+                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+                this.ctx.read(iprot);
+              } else { 
+                TProtocolUtil.skip(iprot, field.type);
+              }
+              break;
+            case RENEWER:
+              if (field.type == TType.STRING) {
+                this.renewer = iprot.readString();
+              } else { 
+                TProtocolUtil.skip(iprot, field.type);
+              }
+              break;
+          }
+          iprot.readFieldEnd();
+        }
+      }
+      iprot.readStructEnd();
+
+      // check for required fields of primitive type, which can't be checked in the validate method
+      validate();
+    }
+
+    public void write(TProtocol oprot) throws TException {
+      validate();
+
+      oprot.writeStructBegin(STRUCT_DESC);
+      if (this.renewer != null) {
+        oprot.writeFieldBegin(RENEWER_FIELD_DESC);
+        oprot.writeString(this.renewer);
+        oprot.writeFieldEnd();
+      }
+      if (this.ctx != null) {
+        oprot.writeFieldBegin(CTX_FIELD_DESC);
+        this.ctx.write(oprot);
+        oprot.writeFieldEnd();
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getDelegationToken_args(");
+      boolean first = true;
+
+      sb.append("ctx:");
+      if (this.ctx == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.ctx);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("renewer:");
+      if (this.renewer == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.renewer);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws TException {
+      // check for required fields
+    }
+
+  }
+
+  public static class getDelegationToken_result implements TBase<getDelegationToken_result._Fields>, java.io.Serializable, Cloneable, Comparable<getDelegationToken_result>   {
+    private static final TStruct STRUCT_DESC = new TStruct("getDelegationToken_result");
+
+    private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
+    private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
+
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken success;
+    public org.apache.hadoop.thriftfs.api.IOException err;
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      ERR((short)1, "err");
+
+      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byId.put((int)field._thriftId, field);
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        return byId.get(fieldId);
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+
+    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
+      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.ThriftDelegationToken.class)));
+      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+    }});
+
+    static {
+      FieldMetaData.addStructMetaDataMap(getDelegationToken_result.class, metaDataMap);
+    }
+
+    public getDelegationToken_result() {
+    }
+
+    public getDelegationToken_result(
+      org.apache.hadoop.thriftfs.api.ThriftDelegationToken success,
+      org.apache.hadoop.thriftfs.api.IOException err)
+    {
+      this();
+      this.success = success;
+      this.err = err;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public getDelegationToken_result(getDelegationToken_result other) {
+      if (other.isSetSuccess()) {
+        this.success = new org.apache.hadoop.thriftfs.api.ThriftDelegationToken(other.success);
+      }
+      if (other.isSetErr()) {
+        this.err = new org.apache.hadoop.thriftfs.api.IOException(other.err);
+      }
+    }
+
+    public getDelegationToken_result deepCopy() {
+      return new getDelegationToken_result(this);
+    }
+
+    @Deprecated
+    public getDelegationToken_result clone() {
+      return new getDelegationToken_result(this);
+    }
+
+    public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getSuccess() {
+      return this.success;
+    }
+
+    public getDelegationToken_result setSuccess(org.apache.hadoop.thriftfs.api.ThriftDelegationToken success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public org.apache.hadoop.thriftfs.api.IOException getErr() {
+      return this.err;
+    }
+
+    public getDelegationToken_result setErr(org.apache.hadoop.thriftfs.api.IOException err) {
+      this.err = err;
+      return this;
+    }
+
+    public void unsetErr() {
+      this.err = null;
+    }
+
+    /** Returns true if field err is set (has been asigned a value) and false otherwise */
+    public boolean isSetErr() {
+      return this.err != null;
+    }
+
+    public void setErrIsSet(boolean value) {
+      if (!value) {
+        this.err = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((org.apache.hadoop.thriftfs.api.ThriftDelegationToken)value);
+        }
+        break;
+
+      case ERR:
+        if (value == null) {
+          unsetErr();
+        } else {
+          setErr((org.apache.hadoop.thriftfs.api.IOException)value);
+        }
+        break;
+
+      }
+    }
+
+    public void setFieldValue(int fieldID, Object value) {
+      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      case ERR:
+        return getErr();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    public Object getFieldValue(int fieldId) {
+      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      case ERR:
+        return isSetErr();
+      }
+      throw new IllegalStateException();
+    }
+
+    public boolean isSet(int fieldID) {
+      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getDelegationToken_result)
+        return this.equals((getDelegationToken_result)that);
+      return false;
+    }
+
+    public boolean equals(getDelegationToken_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_err = true && this.isSetErr();
+      boolean that_present_err = true && that.isSetErr();
+      if (this_present_err || that_present_err) {
+        if (!(this_present_err && that_present_err))
+          return false;
+        if (!this.err.equals(that.err))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(getDelegationToken_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getDelegationToken_result typedOther = (getDelegationToken_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      return 0;
+    }
+
+    public void read(TProtocol iprot) throws TException {
+      TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == TType.STOP) { 
+          break;
+        }
+        _Fields fieldId = _Fields.findByThriftId(field.id);
+        if (fieldId == null) {
+          TProtocolUtil.skip(iprot, field.type);
+        } else {
+          switch (fieldId) {
+            case SUCCESS:
+              if (field.type == TType.STRUCT) {
+                this.success = new org.apache.hadoop.thriftfs.api.ThriftDelegationToken();
+                this.success.read(iprot);
+              } else { 
+                TProtocolUtil.skip(iprot, field.type);
+              }
+              break;
+            case ERR:
+              if (field.type == TType.STRUCT) {
+                this.err = new org.apache.hadoop.thriftfs.api.IOException();
+                this.err.read(iprot);
+              } else { 
+                TProtocolUtil.skip(iprot, field.type);
+              }
+              break;
+          }
+          iprot.readFieldEnd();
+        }
+      }
+      iprot.readStructEnd();
+
+      // check for required fields of primitive type, which can't be checked in the validate method
+      validate();
+    }
+
+    public void write(TProtocol oprot) throws TException {
+      oprot.writeStructBegin(STRUCT_DESC);
+
+      if (this.isSetSuccess()) {
+        oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+        this.success.write(oprot);
+        oprot.writeFieldEnd();
+      } else if (this.isSetErr()) {
+        oprot.writeFieldBegin(ERR_FIELD_DESC);
+        this.err.write(oprot);
+        oprot.writeFieldEnd();
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getDelegationToken_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("err:");
+      if (this.err == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.err);
       }
       first = false;
       sb.append(")");

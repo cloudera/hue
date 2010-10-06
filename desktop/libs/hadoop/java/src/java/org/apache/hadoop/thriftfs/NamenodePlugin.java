@@ -56,7 +56,7 @@ import org.apache.hadoop.thriftfs.api.IOException;
 import org.apache.hadoop.thriftfs.api.Namenode;
 import org.apache.hadoop.thriftfs.api.RequestContext;
 import org.apache.hadoop.thriftfs.api.Stat;
-import org.apache.hadoop.thriftfs.api.ThriftHdfsDelegationToken;
+import org.apache.hadoop.thriftfs.api.ThriftDelegationToken;
 import org.apache.thrift.TException;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
@@ -411,25 +411,12 @@ public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.Namen
     }
 
     @Override
-    public ThriftHdfsDelegationToken getDelegationToken(RequestContext ctx, final String renewer) throws IOException,
+    public ThriftDelegationToken getDelegationToken(RequestContext ctx, final String renewer) throws IOException,
         TException {
-      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<ThriftHdfsDelegationToken>() {
-        public ThriftHdfsDelegationToken run() throws java.io.IOException {
-          UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<ThriftDelegationToken>() {
+        public ThriftDelegationToken run() throws java.io.IOException {
           Token<DelegationTokenIdentifier> delegationToken = namenode.getDelegationToken(new Text(renewer));
-
-          InetSocketAddress address = namenode.getNameNodeAddress();
-          String nnAddress = InetAddress.getByName(address.getHostName()).getHostAddress() + ":" + address.getPort();
-          delegationToken.setService(new Text(nnAddress));
-
-          DataOutputBuffer out = new DataOutputBuffer();
-          Credentials ts = new Credentials();
-          ts.addToken(new Text(ugi.getShortUserName()), delegationToken);
-          ts.writeTokenStorageToStream(out);
-
-          byte[] tokenData = new byte[out.getLength()];
-          System.arraycopy(out.getData(), 0, tokenData, 0, tokenData.length);
-          return new ThriftHdfsDelegationToken(tokenData);
+          return ThriftUtils.toThrift(delegationToken, namenode.getNameNodeAddress());
         }
       });
     }

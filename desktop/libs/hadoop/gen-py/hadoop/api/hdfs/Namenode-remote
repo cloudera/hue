@@ -43,7 +43,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print '  void utime(RequestContext ctx, string path, i64 atime, i64 mtime)'
   print '  void datanodeUp(string name, string storage, i32 thriftPort)'
   print '  void datanodeDown(string name, string storage, i32 thriftPort)'
-  print '  ThriftHdfsDelegationToken getDelegationToken(RequestContext ctx, string renewer)'
+  print '  ThriftDelegationToken getDelegationToken(RequestContext ctx, string renewer)'
   print ''
   sys.exit(0)
 

@@ -556,7 +556,7 @@ class HadoopFileSystem(object):
   def get_delegation_token(self):
     # TODO(atm): The second argument here should really be the Hue kerberos
     # principal, which doesn't exist yet. Todd's working on that.
-    return self.nn_client.getDelegationToken(self.request_context, '')
+    return self.nn_client.getDelegationToken(self.request_context, 'hadoop')
 
   def _connect_dn(self, node):
     sock = TSocket.TSocket(node.host, node.thriftPort)
