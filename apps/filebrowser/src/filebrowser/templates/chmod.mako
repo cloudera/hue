@@ -34,21 +34,21 @@ ${comps.header('Change Permissions: ' + path.split('/')[-1])}
       <tbody>
         <tr>
           <td class="fb-label">Read</td>
-          <td>${edit.render_field(form["user_read"], notitle=True)}</td>
-          <td>${edit.render_field(form["group_read"], notitle=True)}</td>
-          <td>${edit.render_field(form["other_read"], notitle=True)}</td>
+          <td>${edit.render_field(form["user_read"], tag="checkbox", button_text=" ", notitle=True)}</td>
+          <td>${edit.render_field(form["group_read"], tag="checkbox", button_text=" ", notitle=True)}</td>
+          <td>${edit.render_field(form["other_read"], tag="checkbox", button_text=" ", notitle=True)}</td>
         </tr>
         <tr>
           <td class="fb-label">Write</td>
-          <td>${edit.render_field(form["user_write"], notitle=True)}</td>
-          <td>${edit.render_field(form["group_write"], notitle=True)}</td>
-          <td>${edit.render_field(form["other_write"], notitle=True)}</td>
+          <td>${edit.render_field(form["user_write"], tag="checkbox", button_text=" ", notitle=True)}</td>
+          <td>${edit.render_field(form["group_write"], tag="checkbox", button_text=" ", notitle=True)}</td>
+          <td>${edit.render_field(form["other_write"], tag="checkbox", button_text=" ", notitle=True)}</td>
         </tr>
         <tr>
           <td class="fb-label">Execute</td>
-          <td>${edit.render_field(form["user_execute"], notitle=True)}</td>
-          <td>${edit.render_field(form["group_execute"], notitle=True)}</td>
-          <td>${edit.render_field(form["other_execute"], notitle=True)}</td>
+          <td>${edit.render_field(form["user_execute"], tag="checkbox", button_text=" ", notitle=True)}</td>
+          <td>${edit.render_field(form["group_execute"], tag="checkbox", button_text=" ", notitle=True)}</td>
+          <td>${edit.render_field(form["other_execute"], tag="checkbox", button_text=" ", notitle=True)}</td>
         </tr>
       </tbody>
     </table>
