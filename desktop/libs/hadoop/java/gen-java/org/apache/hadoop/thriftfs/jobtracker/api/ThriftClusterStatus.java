@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Status of the cluster as viewed by the jobtracker
  */
-public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, java.io.Serializable, Cloneable, Comparable<ThriftClusterStatus> {
+public class ThriftClusterStatus implements TBase<ThriftClusterStatus, ThriftClusterStatus._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftClusterStatus");
 
   private static final TField NUM_ACTIVE_TRACKERS_FIELD_DESC = new TField("numActiveTrackers", TType.I32, (short)1);
@@ -108,12 +111,10 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
     IDENTIFIER((short)19, "identifier"),
     HTTP_PORT((short)20, "httpPort");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -122,7 +123,50 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // NUM_ACTIVE_TRACKERS
+          return NUM_ACTIVE_TRACKERS;
+        case 2: // ACTIVE_TRACKER_NAMES
+          return ACTIVE_TRACKER_NAMES;
+        case 3: // BLACKLISTED_TRACKER_NAMES
+          return BLACKLISTED_TRACKER_NAMES;
+        case 4: // NUM_BLACKLISTED_TRACKERS
+          return NUM_BLACKLISTED_TRACKERS;
+        case 5: // NUM_EXCLUDED_NODES
+          return NUM_EXCLUDED_NODES;
+        case 6: // TASK_TRACKER_EXPIRY_INTERVAL
+          return TASK_TRACKER_EXPIRY_INTERVAL;
+        case 7: // MAP_TASKS
+          return MAP_TASKS;
+        case 8: // REDUCE_TASKS
+          return REDUCE_TASKS;
+        case 9: // MAX_MAP_TASKS
+          return MAX_MAP_TASKS;
+        case 10: // MAX_REDUCE_TASKS
+          return MAX_REDUCE_TASKS;
+        case 11: // STATE
+          return STATE;
+        case 12: // USED_MEMORY
+          return USED_MEMORY;
+        case 13: // MAX_MEMORY
+          return MAX_MEMORY;
+        case 14: // TOTAL_SUBMISSIONS
+          return TOTAL_SUBMISSIONS;
+        case 15: // HAS_RESTARTED
+          return HAS_RESTARTED;
+        case 16: // HAS_RECOVERED
+          return HAS_RECOVERED;
+        case 17: // START_TIME
+          return START_TIME;
+        case 18: // HOSTNAME
+          return HOSTNAME;
+        case 19: // IDENTIFIER
+          return IDENTIFIER;
+        case 20: // HTTP_PORT
+          return HTTP_PORT;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -177,52 +221,52 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
   private static final int __HTTPPORT_ISSET_ID = 14;
   private BitSet __isset_bit_vector = new BitSet(15);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.NUM_ACTIVE_TRACKERS, new FieldMetaData("numActiveTrackers", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.ACTIVE_TRACKER_NAMES, new FieldMetaData("activeTrackerNames", TFieldRequirementType.DEFAULT, 
-        new ListMetaData(TType.LIST, 
-            new FieldValueMetaData(TType.STRING))));
-    put(_Fields.BLACKLISTED_TRACKER_NAMES, new FieldMetaData("blacklistedTrackerNames", TFieldRequirementType.DEFAULT, 
-        new ListMetaData(TType.LIST, 
-            new FieldValueMetaData(TType.STRING))));
-    put(_Fields.NUM_BLACKLISTED_TRACKERS, new FieldMetaData("numBlacklistedTrackers", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.NUM_EXCLUDED_NODES, new FieldMetaData("numExcludedNodes", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.TASK_TRACKER_EXPIRY_INTERVAL, new FieldMetaData("taskTrackerExpiryInterval", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.MAP_TASKS, new FieldMetaData("mapTasks", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.REDUCE_TASKS, new FieldMetaData("reduceTasks", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.MAX_MAP_TASKS, new FieldMetaData("maxMapTasks", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.MAX_REDUCE_TASKS, new FieldMetaData("maxReduceTasks", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.STATE, new FieldMetaData("state", TFieldRequirementType.DEFAULT, 
-        new EnumMetaData(TType.ENUM, JobTrackerState.class)));
-    put(_Fields.USED_MEMORY, new FieldMetaData("usedMemory", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.MAX_MEMORY, new FieldMetaData("maxMemory", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.TOTAL_SUBMISSIONS, new FieldMetaData("totalSubmissions", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.HAS_RESTARTED, new FieldMetaData("hasRestarted", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.BOOL)));
-    put(_Fields.HAS_RECOVERED, new FieldMetaData("hasRecovered", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.BOOL)));
-    put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.HOSTNAME, new FieldMetaData("hostname", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.IDENTIFIER, new FieldMetaData("identifier", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.HTTP_PORT, new FieldMetaData("httpPort", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.NUM_ACTIVE_TRACKERS, new FieldMetaData("numActiveTrackers", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.ACTIVE_TRACKER_NAMES, new FieldMetaData("activeTrackerNames", TFieldRequirementType.DEFAULT, 
+        new ListMetaData(TType.LIST, 
+            new FieldValueMetaData(TType.STRING))));
+    tmpMap.put(_Fields.BLACKLISTED_TRACKER_NAMES, new FieldMetaData("blacklistedTrackerNames", TFieldRequirementType.DEFAULT, 
+        new ListMetaData(TType.LIST, 
+            new FieldValueMetaData(TType.STRING))));
+    tmpMap.put(_Fields.NUM_BLACKLISTED_TRACKERS, new FieldMetaData("numBlacklistedTrackers", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.NUM_EXCLUDED_NODES, new FieldMetaData("numExcludedNodes", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.TASK_TRACKER_EXPIRY_INTERVAL, new FieldMetaData("taskTrackerExpiryInterval", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.MAP_TASKS, new FieldMetaData("mapTasks", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.REDUCE_TASKS, new FieldMetaData("reduceTasks", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.MAX_MAP_TASKS, new FieldMetaData("maxMapTasks", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.MAX_REDUCE_TASKS, new FieldMetaData("maxReduceTasks", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.STATE, new FieldMetaData("state", TFieldRequirementType.DEFAULT, 
+        new EnumMetaData(TType.ENUM, JobTrackerState.class)));
+    tmpMap.put(_Fields.USED_MEMORY, new FieldMetaData("usedMemory", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.MAX_MEMORY, new FieldMetaData("maxMemory", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.TOTAL_SUBMISSIONS, new FieldMetaData("totalSubmissions", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.HAS_RESTARTED, new FieldMetaData("hasRestarted", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.BOOL)));
+    tmpMap.put(_Fields.HAS_RECOVERED, new FieldMetaData("hasRecovered", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.BOOL)));
+    tmpMap.put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.HOSTNAME, new FieldMetaData("hostname", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.IDENTIFIER, new FieldMetaData("identifier", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.HTTP_PORT, new FieldMetaData("httpPort", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftClusterStatus.class, metaDataMap);
   }
 
@@ -339,9 +383,43 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
     return new ThriftClusterStatus(this);
   }
 
-  @Deprecated
-  public ThriftClusterStatus clone() {
-    return new ThriftClusterStatus(this);
+  @Override
+  public void clear() {
+    setNumActiveTrackersIsSet(false);
+    this.numActiveTrackers = 0;
+    this.activeTrackerNames = null;
+    this.blacklistedTrackerNames = null;
+    setNumBlacklistedTrackersIsSet(false);
+    this.numBlacklistedTrackers = 0;
+    setNumExcludedNodesIsSet(false);
+    this.numExcludedNodes = 0;
+    setTaskTrackerExpiryIntervalIsSet(false);
+    this.taskTrackerExpiryInterval = 0;
+    setMapTasksIsSet(false);
+    this.mapTasks = 0;
+    setReduceTasksIsSet(false);
+    this.reduceTasks = 0;
+    setMaxMapTasksIsSet(false);
+    this.maxMapTasks = 0;
+    setMaxReduceTasksIsSet(false);
+    this.maxReduceTasks = 0;
+    this.state = null;
+    setUsedMemoryIsSet(false);
+    this.usedMemory = 0;
+    setMaxMemoryIsSet(false);
+    this.maxMemory = 0;
+    setTotalSubmissionsIsSet(false);
+    this.totalSubmissions = 0;
+    setHasRestartedIsSet(false);
+    this.hasRestarted = false;
+    setHasRecoveredIsSet(false);
+    this.hasRecovered = false;
+    setStartTimeIsSet(false);
+    this.startTime = 0;
+    this.hostname = null;
+    this.identifier = null;
+    setHttpPortIsSet(false);
+    this.httpPort = 0;
   }
 
   public int getNumActiveTrackers() {
@@ -1018,10 +1096,6 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case NUM_ACTIVE_TRACKERS:
@@ -1088,12 +1162,12 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case NUM_ACTIVE_TRACKERS:
       return isSetNumActiveTrackers();
@@ -1137,10 +1211,6 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
       return isSetHttpPort();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -1352,167 +1422,211 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
     int lastComparison = 0;
     ThriftClusterStatus typedOther = (ThriftClusterStatus)other;
 
-    lastComparison = Boolean.valueOf(isSetNumActiveTrackers()).compareTo(isSetNumActiveTrackers());
+    lastComparison = Boolean.valueOf(isSetNumActiveTrackers()).compareTo(typedOther.isSetNumActiveTrackers());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(numActiveTrackers, typedOther.numActiveTrackers);
+    if (isSetNumActiveTrackers()) {
+      lastComparison = TBaseHelper.compareTo(this.numActiveTrackers, typedOther.numActiveTrackers);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetActiveTrackerNames()).compareTo(typedOther.isSetActiveTrackerNames());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetActiveTrackerNames()).compareTo(isSetActiveTrackerNames());
+    if (isSetActiveTrackerNames()) {
+      lastComparison = TBaseHelper.compareTo(this.activeTrackerNames, typedOther.activeTrackerNames);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetBlacklistedTrackerNames()).compareTo(typedOther.isSetBlacklistedTrackerNames());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(activeTrackerNames, typedOther.activeTrackerNames);
+    if (isSetBlacklistedTrackerNames()) {
+      lastComparison = TBaseHelper.compareTo(this.blacklistedTrackerNames, typedOther.blacklistedTrackerNames);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNumBlacklistedTrackers()).compareTo(typedOther.isSetNumBlacklistedTrackers());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetBlacklistedTrackerNames()).compareTo(isSetBlacklistedTrackerNames());
+    if (isSetNumBlacklistedTrackers()) {
+      lastComparison = TBaseHelper.compareTo(this.numBlacklistedTrackers, typedOther.numBlacklistedTrackers);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNumExcludedNodes()).compareTo(typedOther.isSetNumExcludedNodes());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(blacklistedTrackerNames, typedOther.blacklistedTrackerNames);
+    if (isSetNumExcludedNodes()) {
+      lastComparison = TBaseHelper.compareTo(this.numExcludedNodes, typedOther.numExcludedNodes);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTaskTrackerExpiryInterval()).compareTo(typedOther.isSetTaskTrackerExpiryInterval());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetNumBlacklistedTrackers()).compareTo(isSetNumBlacklistedTrackers());
+    if (isSetTaskTrackerExpiryInterval()) {
+      lastComparison = TBaseHelper.compareTo(this.taskTrackerExpiryInterval, typedOther.taskTrackerExpiryInterval);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMapTasks()).compareTo(typedOther.isSetMapTasks());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(numBlacklistedTrackers, typedOther.numBlacklistedTrackers);
+    if (isSetMapTasks()) {
+      lastComparison = TBaseHelper.compareTo(this.mapTasks, typedOther.mapTasks);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetReduceTasks()).compareTo(typedOther.isSetReduceTasks());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetNumExcludedNodes()).compareTo(isSetNumExcludedNodes());
+    if (isSetReduceTasks()) {
+      lastComparison = TBaseHelper.compareTo(this.reduceTasks, typedOther.reduceTasks);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMaxMapTasks()).compareTo(typedOther.isSetMaxMapTasks());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(numExcludedNodes, typedOther.numExcludedNodes);
+    if (isSetMaxMapTasks()) {
+      lastComparison = TBaseHelper.compareTo(this.maxMapTasks, typedOther.maxMapTasks);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMaxReduceTasks()).compareTo(typedOther.isSetMaxReduceTasks());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetTaskTrackerExpiryInterval()).compareTo(isSetTaskTrackerExpiryInterval());
+    if (isSetMaxReduceTasks()) {
+      lastComparison = TBaseHelper.compareTo(this.maxReduceTasks, typedOther.maxReduceTasks);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetState()).compareTo(typedOther.isSetState());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(taskTrackerExpiryInterval, typedOther.taskTrackerExpiryInterval);
+    if (isSetState()) {
+      lastComparison = TBaseHelper.compareTo(this.state, typedOther.state);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetUsedMemory()).compareTo(typedOther.isSetUsedMemory());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetMapTasks()).compareTo(isSetMapTasks());
+    if (isSetUsedMemory()) {
+      lastComparison = TBaseHelper.compareTo(this.usedMemory, typedOther.usedMemory);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMaxMemory()).compareTo(typedOther.isSetMaxMemory());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(mapTasks, typedOther.mapTasks);
+    if (isSetMaxMemory()) {
+      lastComparison = TBaseHelper.compareTo(this.maxMemory, typedOther.maxMemory);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTotalSubmissions()).compareTo(typedOther.isSetTotalSubmissions());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetReduceTasks()).compareTo(isSetReduceTasks());
+    if (isSetTotalSubmissions()) {
+      lastComparison = TBaseHelper.compareTo(this.totalSubmissions, typedOther.totalSubmissions);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHasRestarted()).compareTo(typedOther.isSetHasRestarted());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(reduceTasks, typedOther.reduceTasks);
+    if (isSetHasRestarted()) {
+      lastComparison = TBaseHelper.compareTo(this.hasRestarted, typedOther.hasRestarted);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHasRecovered()).compareTo(typedOther.isSetHasRecovered());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetMaxMapTasks()).compareTo(isSetMaxMapTasks());
+    if (isSetHasRecovered()) {
+      lastComparison = TBaseHelper.compareTo(this.hasRecovered, typedOther.hasRecovered);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStartTime()).compareTo(typedOther.isSetStartTime());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(maxMapTasks, typedOther.maxMapTasks);
+    if (isSetStartTime()) {
+      lastComparison = TBaseHelper.compareTo(this.startTime, typedOther.startTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHostname()).compareTo(typedOther.isSetHostname());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetMaxReduceTasks()).compareTo(isSetMaxReduceTasks());
+    if (isSetHostname()) {
+      lastComparison = TBaseHelper.compareTo(this.hostname, typedOther.hostname);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetIdentifier()).compareTo(typedOther.isSetIdentifier());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(maxReduceTasks, typedOther.maxReduceTasks);
+    if (isSetIdentifier()) {
+      lastComparison = TBaseHelper.compareTo(this.identifier, typedOther.identifier);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHttpPort()).compareTo(typedOther.isSetHttpPort());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetState()).compareTo(isSetState());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(state, typedOther.state);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetUsedMemory()).compareTo(isSetUsedMemory());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(usedMemory, typedOther.usedMemory);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetMaxMemory()).compareTo(isSetMaxMemory());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(maxMemory, typedOther.maxMemory);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetTotalSubmissions()).compareTo(isSetTotalSubmissions());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(totalSubmissions, typedOther.totalSubmissions);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetHasRestarted()).compareTo(isSetHasRestarted());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(hasRestarted, typedOther.hasRestarted);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetHasRecovered()).compareTo(isSetHasRecovered());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(hasRecovered, typedOther.hasRecovered);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetStartTime()).compareTo(isSetStartTime());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(startTime, typedOther.startTime);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetHostname()).compareTo(isSetHostname());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(hostname, typedOther.hostname);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetIdentifier()).compareTo(isSetIdentifier());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(identifier, typedOther.identifier);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetHttpPort()).compareTo(isSetHttpPort());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(httpPort, typedOther.httpPort);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetHttpPort()) {
+      lastComparison = TBaseHelper.compareTo(this.httpPort, typedOther.httpPort);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -1524,189 +1638,186 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case NUM_ACTIVE_TRACKERS:
-            if (field.type == TType.I32) {
-              this.numActiveTrackers = iprot.readI32();
-              setNumActiveTrackersIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case ACTIVE_TRACKER_NAMES:
-            if (field.type == TType.LIST) {
+      switch (field.id) {
+        case 1: // NUM_ACTIVE_TRACKERS
+          if (field.type == TType.I32) {
+            this.numActiveTrackers = iprot.readI32();
+            setNumActiveTrackersIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // ACTIVE_TRACKER_NAMES
+          if (field.type == TType.LIST) {
+            {
+              TList _list51 = iprot.readListBegin();
+              this.activeTrackerNames = new ArrayList<String>(_list51.size);
+              for (int _i52 = 0; _i52 < _list51.size; ++_i52)
               {
-                TList _list51 = iprot.readListBegin();
-                this.activeTrackerNames = new ArrayList<String>(_list51.size);
-                for (int _i52 = 0; _i52 < _list51.size; ++_i52)
-                {
-                  String _elem53;
-                  _elem53 = iprot.readString();
-                  this.activeTrackerNames.add(_elem53);
-                }
-                iprot.readListEnd();
+                String _elem53;
+                _elem53 = iprot.readString();
+                this.activeTrackerNames.add(_elem53);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readListEnd();
             }
-            break;
-          case BLACKLISTED_TRACKER_NAMES:
-            if (field.type == TType.LIST) {
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // BLACKLISTED_TRACKER_NAMES
+          if (field.type == TType.LIST) {
+            {
+              TList _list54 = iprot.readListBegin();
+              this.blacklistedTrackerNames = new ArrayList<String>(_list54.size);
+              for (int _i55 = 0; _i55 < _list54.size; ++_i55)
               {
-                TList _list54 = iprot.readListBegin();
-                this.blacklistedTrackerNames = new ArrayList<String>(_list54.size);
-                for (int _i55 = 0; _i55 < _list54.size; ++_i55)
-                {
-                  String _elem56;
-                  _elem56 = iprot.readString();
-                  this.blacklistedTrackerNames.add(_elem56);
-                }
-                iprot.readListEnd();
+                String _elem56;
+                _elem56 = iprot.readString();
+                this.blacklistedTrackerNames.add(_elem56);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readListEnd();
             }
-            break;
-          case NUM_BLACKLISTED_TRACKERS:
-            if (field.type == TType.I32) {
-              this.numBlacklistedTrackers = iprot.readI32();
-              setNumBlacklistedTrackersIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case NUM_EXCLUDED_NODES:
-            if (field.type == TType.I32) {
-              this.numExcludedNodes = iprot.readI32();
-              setNumExcludedNodesIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case TASK_TRACKER_EXPIRY_INTERVAL:
-            if (field.type == TType.I64) {
-              this.taskTrackerExpiryInterval = iprot.readI64();
-              setTaskTrackerExpiryIntervalIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MAP_TASKS:
-            if (field.type == TType.I32) {
-              this.mapTasks = iprot.readI32();
-              setMapTasksIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case REDUCE_TASKS:
-            if (field.type == TType.I32) {
-              this.reduceTasks = iprot.readI32();
-              setReduceTasksIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MAX_MAP_TASKS:
-            if (field.type == TType.I32) {
-              this.maxMapTasks = iprot.readI32();
-              setMaxMapTasksIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MAX_REDUCE_TASKS:
-            if (field.type == TType.I32) {
-              this.maxReduceTasks = iprot.readI32();
-              setMaxReduceTasksIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case STATE:
-            if (field.type == TType.I32) {
-              this.state = JobTrackerState.findByValue(iprot.readI32());
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case USED_MEMORY:
-            if (field.type == TType.I64) {
-              this.usedMemory = iprot.readI64();
-              setUsedMemoryIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MAX_MEMORY:
-            if (field.type == TType.I64) {
-              this.maxMemory = iprot.readI64();
-              setMaxMemoryIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case TOTAL_SUBMISSIONS:
-            if (field.type == TType.I32) {
-              this.totalSubmissions = iprot.readI32();
-              setTotalSubmissionsIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case HAS_RESTARTED:
-            if (field.type == TType.BOOL) {
-              this.hasRestarted = iprot.readBool();
-              setHasRestartedIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case HAS_RECOVERED:
-            if (field.type == TType.BOOL) {
-              this.hasRecovered = iprot.readBool();
-              setHasRecoveredIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case START_TIME:
-            if (field.type == TType.I64) {
-              this.startTime = iprot.readI64();
-              setStartTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case HOSTNAME:
-            if (field.type == TType.STRING) {
-              this.hostname = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case IDENTIFIER:
-            if (field.type == TType.STRING) {
-              this.identifier = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case HTTP_PORT:
-            if (field.type == TType.I32) {
-              this.httpPort = iprot.readI32();
-              setHttpPortIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // NUM_BLACKLISTED_TRACKERS
+          if (field.type == TType.I32) {
+            this.numBlacklistedTrackers = iprot.readI32();
+            setNumBlacklistedTrackersIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // NUM_EXCLUDED_NODES
+          if (field.type == TType.I32) {
+            this.numExcludedNodes = iprot.readI32();
+            setNumExcludedNodesIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // TASK_TRACKER_EXPIRY_INTERVAL
+          if (field.type == TType.I64) {
+            this.taskTrackerExpiryInterval = iprot.readI64();
+            setTaskTrackerExpiryIntervalIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // MAP_TASKS
+          if (field.type == TType.I32) {
+            this.mapTasks = iprot.readI32();
+            setMapTasksIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 8: // REDUCE_TASKS
+          if (field.type == TType.I32) {
+            this.reduceTasks = iprot.readI32();
+            setReduceTasksIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 9: // MAX_MAP_TASKS
+          if (field.type == TType.I32) {
+            this.maxMapTasks = iprot.readI32();
+            setMaxMapTasksIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 10: // MAX_REDUCE_TASKS
+          if (field.type == TType.I32) {
+            this.maxReduceTasks = iprot.readI32();
+            setMaxReduceTasksIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 11: // STATE
+          if (field.type == TType.I32) {
+            this.state = JobTrackerState.findByValue(iprot.readI32());
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 12: // USED_MEMORY
+          if (field.type == TType.I64) {
+            this.usedMemory = iprot.readI64();
+            setUsedMemoryIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 13: // MAX_MEMORY
+          if (field.type == TType.I64) {
+            this.maxMemory = iprot.readI64();
+            setMaxMemoryIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 14: // TOTAL_SUBMISSIONS
+          if (field.type == TType.I32) {
+            this.totalSubmissions = iprot.readI32();
+            setTotalSubmissionsIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 15: // HAS_RESTARTED
+          if (field.type == TType.BOOL) {
+            this.hasRestarted = iprot.readBool();
+            setHasRestartedIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 16: // HAS_RECOVERED
+          if (field.type == TType.BOOL) {
+            this.hasRecovered = iprot.readBool();
+            setHasRecoveredIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 17: // START_TIME
+          if (field.type == TType.I64) {
+            this.startTime = iprot.readI64();
+            setStartTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 18: // HOSTNAME
+          if (field.type == TType.STRING) {
+            this.hostname = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 19: // IDENTIFIER
+          if (field.type == TType.STRING) {
+            this.identifier = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 20: // HTTP_PORT
+          if (field.type == TType.I32) {
+            this.httpPort = iprot.readI32();
+            setHttpPortIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 
@@ -1863,15 +1974,7 @@ public class ThriftClusterStatus implements TBase<ThriftClusterStatus._Fields>, 
     if (this.state == null) {
       sb.append("null");
     } else {
-      String state_name = state.name();
-      if (state_name != null) {
-        sb.append(state_name);
-        sb.append(" (");
-      }
       sb.append(this.state);
-      if (state_name != null) {
-        sb.append(")");
-      }
     }
     first = false;
     if (!first) sb.append(", ");

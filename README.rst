@@ -62,6 +62,7 @@ Development Prerequisites
     Debian:
       * gcc
       * libmysqlclient-dev
+      * libsasl2-dev
       * libsqlite3-dev
       * libxml2-dev
       * libxslt-dev
@@ -69,6 +70,7 @@ Development Prerequisites
       * python-setuptools
 
     CentOS:
+      * cyrus-sasl-devel
       * gcc
       * libxml2-devel
       * libxslt-devel

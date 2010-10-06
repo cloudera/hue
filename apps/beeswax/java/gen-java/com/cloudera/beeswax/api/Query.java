@@ -10,49 +10,119 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Collections;
-import org.apache.log4j.Logger;
+import java.util.BitSet;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
-public class Query implements TBase, java.io.Serializable, Cloneable {
+public class Query implements TBase<Query, Query._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("Query");
+
   private static final TField QUERY_FIELD_DESC = new TField("query", TType.STRING, (short)1);
   private static final TField CONFIGURATION_FIELD_DESC = new TField("configuration", TType.LIST, (short)3);
   private static final TField HADOOP_USER_FIELD_DESC = new TField("hadoop_user", TType.STRING, (short)4);
   private static final TField HADOOP_GROUPS_FIELD_DESC = new TField("hadoop_groups", TType.LIST, (short)5);
 
   public String query;
-  public static final int QUERY = 1;
   public List<String> configuration;
-  public static final int CONFIGURATION = 3;
   public String hadoop_user;
-  public static final int HADOOP_USER = 4;
   public List<String> hadoop_groups;
-  public static final int HADOOP_GROUPS = 5;
 
-  private final Isset __isset = new Isset();
-  private static final class Isset implements java.io.Serializable {
+  /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+  public enum _Fields implements TFieldIdEnum {
+    QUERY((short)1, "query"),
+    CONFIGURATION((short)3, "configuration"),
+    HADOOP_USER((short)4, "hadoop_user"),
+    HADOOP_GROUPS((short)5, "hadoop_groups");
+
+    private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+    static {
+      for (_Fields field : EnumSet.allOf(_Fields.class)) {
+        byName.put(field.getFieldName(), field);
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, or null if its not found.
+     */
+    public static _Fields findByThriftId(int fieldId) {
+      switch(fieldId) {
+        case 1: // QUERY
+          return QUERY;
+        case 3: // CONFIGURATION
+          return CONFIGURATION;
+        case 4: // HADOOP_USER
+          return HADOOP_USER;
+        case 5: // HADOOP_GROUPS
+          return HADOOP_GROUPS;
+        default:
+          return null;
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, throwing an exception
+     * if it is not found.
+     */
+    public static _Fields findByThriftIdOrThrow(int fieldId) {
+      _Fields fields = findByThriftId(fieldId);
+      if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+      return fields;
+    }
+
+    /**
+     * Find the _Fields constant that matches name, or null if its not found.
+     */
+    public static _Fields findByName(String name) {
+      return byName.get(name);
+    }
+
+    private final short _thriftId;
+    private final String _fieldName;
+
+    _Fields(short thriftId, String fieldName) {
+      _thriftId = thriftId;
+      _fieldName = fieldName;
+    }
+
+    public short getThriftFieldId() {
+      return _thriftId;
+    }
+
+    public String getFieldName() {
+      return _fieldName;
+    }
   }
 
-  public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-    put(QUERY, new FieldMetaData("query", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(CONFIGURATION, new FieldMetaData("configuration", TFieldRequirementType.DEFAULT, 
-        new ListMetaData(TType.LIST, 
-            new FieldValueMetaData(TType.STRING))));
-    put(HADOOP_USER, new FieldMetaData("hadoop_user", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(HADOOP_GROUPS, new FieldMetaData("hadoop_groups", TFieldRequirementType.DEFAULT, 
-        new ListMetaData(TType.LIST, 
-            new FieldValueMetaData(TType.STRING))));
-  }});
+  // isset id assignments
 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.QUERY, new FieldMetaData("query", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.CONFIGURATION, new FieldMetaData("configuration", TFieldRequirementType.DEFAULT, 
+        new ListMetaData(TType.LIST, 
+            new FieldValueMetaData(TType.STRING))));
+    tmpMap.put(_Fields.HADOOP_USER, new FieldMetaData("hadoop_user", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.HADOOP_GROUPS, new FieldMetaData("hadoop_groups", TFieldRequirementType.DEFAULT, 
+        new ListMetaData(TType.LIST, 
+            new FieldValueMetaData(TType.STRING))));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(Query.class, metaDataMap);
   }
 
@@ -98,24 +168,32 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
     }
   }
 
-  @Override
-  public Query clone() {
+  public Query deepCopy() {
     return new Query(this);
+  }
+
+  @Override
+  public void clear() {
+    this.query = null;
+    this.configuration = null;
+    this.hadoop_user = null;
+    this.hadoop_groups = null;
   }
 
   public String getQuery() {
     return this.query;
   }
 
-  public void setQuery(String query) {
+  public Query setQuery(String query) {
     this.query = query;
+    return this;
   }
 
   public void unsetQuery() {
     this.query = null;
   }
 
-  // Returns true if field query is set (has been asigned a value) and false otherwise
+  /** Returns true if field query is set (has been asigned a value) and false otherwise */
   public boolean isSetQuery() {
     return this.query != null;
   }
@@ -145,15 +223,16 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
     return this.configuration;
   }
 
-  public void setConfiguration(List<String> configuration) {
+  public Query setConfiguration(List<String> configuration) {
     this.configuration = configuration;
+    return this;
   }
 
   public void unsetConfiguration() {
     this.configuration = null;
   }
 
-  // Returns true if field configuration is set (has been asigned a value) and false otherwise
+  /** Returns true if field configuration is set (has been asigned a value) and false otherwise */
   public boolean isSetConfiguration() {
     return this.configuration != null;
   }
@@ -168,15 +247,16 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
     return this.hadoop_user;
   }
 
-  public void setHadoop_user(String hadoop_user) {
+  public Query setHadoop_user(String hadoop_user) {
     this.hadoop_user = hadoop_user;
+    return this;
   }
 
   public void unsetHadoop_user() {
     this.hadoop_user = null;
   }
 
-  // Returns true if field hadoop_user is set (has been asigned a value) and false otherwise
+  /** Returns true if field hadoop_user is set (has been asigned a value) and false otherwise */
   public boolean isSetHadoop_user() {
     return this.hadoop_user != null;
   }
@@ -206,15 +286,16 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
     return this.hadoop_groups;
   }
 
-  public void setHadoop_groups(List<String> hadoop_groups) {
+  public Query setHadoop_groups(List<String> hadoop_groups) {
     this.hadoop_groups = hadoop_groups;
+    return this;
   }
 
   public void unsetHadoop_groups() {
     this.hadoop_groups = null;
   }
 
-  // Returns true if field hadoop_groups is set (has been asigned a value) and false otherwise
+  /** Returns true if field hadoop_groups is set (has been asigned a value) and false otherwise */
   public boolean isSetHadoop_groups() {
     return this.hadoop_groups != null;
   }
@@ -225,8 +306,8 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    switch (fieldID) {
+  public void setFieldValue(_Fields field, Object value) {
+    switch (field) {
     case QUERY:
       if (value == null) {
         unsetQuery();
@@ -259,13 +340,11 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
       }
       break;
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
   }
 
-  public Object getFieldValue(int fieldID) {
-    switch (fieldID) {
+  public Object getFieldValue(_Fields field) {
+    switch (field) {
     case QUERY:
       return getQuery();
 
@@ -278,14 +357,17 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
     case HADOOP_GROUPS:
       return getHadoop_groups();
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
-  // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-  public boolean isSet(int fieldID) {
-    switch (fieldID) {
+  /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+  public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
+    switch (field) {
     case QUERY:
       return isSetQuery();
     case CONFIGURATION:
@@ -294,9 +376,8 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
       return isSetHadoop_user();
     case HADOOP_GROUPS:
       return isSetHadoop_groups();
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
   @Override
@@ -378,6 +459,61 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
     return builder.toHashCode();
   }
 
+  public int compareTo(Query other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    Query typedOther = (Query)other;
+
+    lastComparison = Boolean.valueOf(isSetQuery()).compareTo(typedOther.isSetQuery());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetQuery()) {
+      lastComparison = TBaseHelper.compareTo(this.query, typedOther.query);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetConfiguration()).compareTo(typedOther.isSetConfiguration());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetConfiguration()) {
+      lastComparison = TBaseHelper.compareTo(this.configuration, typedOther.configuration);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHadoop_user()).compareTo(typedOther.isSetHadoop_user());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetHadoop_user()) {
+      lastComparison = TBaseHelper.compareTo(this.hadoop_user, typedOther.hadoop_user);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHadoop_groups()).compareTo(typedOther.isSetHadoop_groups());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetHadoop_groups()) {
+      lastComparison = TBaseHelper.compareTo(this.hadoop_groups, typedOther.hadoop_groups);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -387,16 +523,15 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
       if (field.type == TType.STOP) { 
         break;
       }
-      switch (field.id)
-      {
-        case QUERY:
+      switch (field.id) {
+        case 1: // QUERY
           if (field.type == TType.STRING) {
             this.query = iprot.readString();
           } else { 
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case CONFIGURATION:
+        case 3: // CONFIGURATION
           if (field.type == TType.LIST) {
             {
               TList _list0 = iprot.readListBegin();
@@ -413,14 +548,14 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case HADOOP_USER:
+        case 4: // HADOOP_USER
           if (field.type == TType.STRING) {
             this.hadoop_user = iprot.readString();
           } else { 
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case HADOOP_GROUPS:
+        case 5: // HADOOP_GROUPS
           if (field.type == TType.LIST) {
             {
               TList _list3 = iprot.readListBegin();
@@ -439,12 +574,10 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
           break;
         default:
           TProtocolUtil.skip(iprot, field.type);
-          break;
       }
       iprot.readFieldEnd();
     }
     iprot.readStructEnd();
-
 
     // check for required fields of primitive type, which can't be checked in the validate method
     validate();
@@ -463,7 +596,8 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
       oprot.writeFieldBegin(CONFIGURATION_FIELD_DESC);
       {
         oprot.writeListBegin(new TList(TType.STRING, this.configuration.size()));
-        for (String _iter6 : this.configuration)        {
+        for (String _iter6 : this.configuration)
+        {
           oprot.writeString(_iter6);
         }
         oprot.writeListEnd();
@@ -479,7 +613,8 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
       oprot.writeFieldBegin(HADOOP_GROUPS_FIELD_DESC);
       {
         oprot.writeListBegin(new TList(TType.STRING, this.hadoop_groups.size()));
-        for (String _iter7 : this.hadoop_groups)        {
+        for (String _iter7 : this.hadoop_groups)
+        {
           oprot.writeString(_iter7);
         }
         oprot.writeListEnd();
@@ -532,7 +667,6 @@ public class Query implements TBase, java.io.Serializable, Cloneable {
 
   public void validate() throws TException {
     // check for required fields
-    // check that fields of type enum have valid values
   }
 
 }

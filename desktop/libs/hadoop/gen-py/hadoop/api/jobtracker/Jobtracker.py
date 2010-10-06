@@ -9,7 +9,7 @@ import hadoop.api.common.HadoopServiceBase
 from ttypes import *
 from thrift.Thrift import TProcessor
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -23,7 +23,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getJobTrackerName(self, ctx):
     """
     Get the name of the tracker exporting this service
-    
+
     Parameters:
      - ctx
     """
@@ -32,7 +32,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getClusterStatus(self, ctx):
     """
     Get the current cluster status
-    
+
     Parameters:
      - ctx
     """
@@ -41,7 +41,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getQueues(self, ctx):
     """
     Get a list of job queues managed by this tracker
-    
+
     Parameters:
      - ctx
     """
@@ -50,7 +50,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getJob(self, ctx, jobID):
     """
     Get a job by ID
-    
+
     Parameters:
      - ctx
      - jobID
@@ -60,7 +60,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getRunningJobs(self, ctx):
     """
     Get a list of currently running jobs
-    
+
     Parameters:
      - ctx
     """
@@ -69,7 +69,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getCompletedJobs(self, ctx):
     """
     Get a list of completed jobs
-    
+
     Parameters:
      - ctx
     """
@@ -78,7 +78,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getFailedJobs(self, ctx):
     """
     Get a list of failed (due to error, not killed) jobs
-    
+
     Parameters:
      - ctx
     """
@@ -87,7 +87,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getKilledJobs(self, ctx):
     """
     Get a list of killed jobs
-    
+
     Parameters:
      - ctx
     """
@@ -96,7 +96,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getAllJobs(self, ctx):
     """
     Get a list of all failed, completed and running jobs (could be expensive!)
-    
+
     Parameters:
      - ctx
     """
@@ -105,7 +105,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getUserJobCounts(self, ctx, user):
     """
     Get the count of jobs by status for a given user
-    
+
     Parameters:
      - ctx
      - user
@@ -115,7 +115,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getTaskList(self, ctx, jobID, types, states, text, count, offset):
     """
     Get a (possibly incomplete) list of tasks
-    
+
     Parameters:
      - ctx
      - jobID
@@ -130,7 +130,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getTask(self, ctx, taskID):
     """
     Get details of a task
-    
+
     Parameters:
      - ctx
      - taskID
@@ -141,8 +141,8 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
     """
     Get a list of groups of counters attached to the job with provided id.
     This returns the total counters
-    
-    
+
+
     Parameters:
      - ctx
      - jobID
@@ -152,7 +152,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getJobCounterRollups(self, ctx, jobID):
     """
     Return job counters rolled up by map, reduce, and total
-    
+
     Parameters:
      - ctx
      - jobID
@@ -162,7 +162,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getActiveTrackers(self, ctx):
     """
     Get all active trackers
-    
+
     Parameters:
      - ctx
     """
@@ -171,7 +171,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getBlacklistedTrackers(self, ctx):
     """
     Get all blacklisted trackers
-    
+
     Parameters:
      - ctx
     """
@@ -180,7 +180,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getAllTrackers(self, ctx):
     """
     Get all trackers
-    
+
     Parameters:
      - ctx
     """
@@ -189,7 +189,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getTracker(self, ctx, name):
     """
     Get a single task tracker by name
-    
+
     Parameters:
      - ctx
      - name
@@ -199,7 +199,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getCurrentTime(self, ctx):
     """
     Get the current time in ms according to the JT
-    
+
     Parameters:
      - ctx
     """
@@ -208,7 +208,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getJobConfXML(self, ctx, jobID):
     """
     Get the xml for a job's configuration, serialised from the local filesystem on the JT
-    
+
     Parameters:
      - ctx
      - jobID
@@ -218,7 +218,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def killJob(self, ctx, jobID):
     """
     Kill a job
-    
+
     Parameters:
      - ctx
      - jobID
@@ -228,7 +228,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def killTaskAttempt(self, ctx, attemptID):
     """
     Kill a task attempt
-    
+
     Parameters:
      - ctx
      - attemptID
@@ -238,7 +238,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def setJobPriority(self, ctx, jobID, priority):
     """
     Set a job's priority
-    
+
     Parameters:
      - ctx
      - jobID
@@ -249,7 +249,7 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
   def getDelegationToken(self, ctx, renewer):
     """
     Get an MR delegation token.
-    
+
     Parameters:
      - ctx
      - renewer
@@ -267,7 +267,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getJobTrackerName(self, ctx):
     """
     Get the name of the tracker exporting this service
-    
+
     Parameters:
      - ctx
     """
@@ -299,7 +299,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getClusterStatus(self, ctx):
     """
     Get the current cluster status
-    
+
     Parameters:
      - ctx
     """
@@ -331,7 +331,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getQueues(self, ctx):
     """
     Get a list of job queues managed by this tracker
-    
+
     Parameters:
      - ctx
     """
@@ -365,7 +365,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getJob(self, ctx, jobID):
     """
     Get a job by ID
-    
+
     Parameters:
      - ctx
      - jobID
@@ -401,7 +401,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getRunningJobs(self, ctx):
     """
     Get a list of currently running jobs
-    
+
     Parameters:
      - ctx
     """
@@ -433,7 +433,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getCompletedJobs(self, ctx):
     """
     Get a list of completed jobs
-    
+
     Parameters:
      - ctx
     """
@@ -465,7 +465,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getFailedJobs(self, ctx):
     """
     Get a list of failed (due to error, not killed) jobs
-    
+
     Parameters:
      - ctx
     """
@@ -497,7 +497,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getKilledJobs(self, ctx):
     """
     Get a list of killed jobs
-    
+
     Parameters:
      - ctx
     """
@@ -529,7 +529,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getAllJobs(self, ctx):
     """
     Get a list of all failed, completed and running jobs (could be expensive!)
-    
+
     Parameters:
      - ctx
     """
@@ -561,7 +561,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getUserJobCounts(self, ctx, user):
     """
     Get the count of jobs by status for a given user
-    
+
     Parameters:
      - ctx
      - user
@@ -595,7 +595,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getTaskList(self, ctx, jobID, types, states, text, count, offset):
     """
     Get a (possibly incomplete) list of tasks
-    
+
     Parameters:
      - ctx
      - jobID
@@ -641,7 +641,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getTask(self, ctx, taskID):
     """
     Get details of a task
-    
+
     Parameters:
      - ctx
      - taskID
@@ -680,8 +680,8 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
     """
     Get a list of groups of counters attached to the job with provided id.
     This returns the total counters
-    
-    
+
+
     Parameters:
      - ctx
      - jobID
@@ -717,7 +717,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getJobCounterRollups(self, ctx, jobID):
     """
     Return job counters rolled up by map, reduce, and total
-    
+
     Parameters:
      - ctx
      - jobID
@@ -753,7 +753,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getActiveTrackers(self, ctx):
     """
     Get all active trackers
-    
+
     Parameters:
      - ctx
     """
@@ -785,7 +785,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getBlacklistedTrackers(self, ctx):
     """
     Get all blacklisted trackers
-    
+
     Parameters:
      - ctx
     """
@@ -817,7 +817,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getAllTrackers(self, ctx):
     """
     Get all trackers
-    
+
     Parameters:
      - ctx
     """
@@ -849,7 +849,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getTracker(self, ctx, name):
     """
     Get a single task tracker by name
-    
+
     Parameters:
      - ctx
      - name
@@ -885,7 +885,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getCurrentTime(self, ctx):
     """
     Get the current time in ms according to the JT
-    
+
     Parameters:
      - ctx
     """
@@ -917,7 +917,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getJobConfXML(self, ctx, jobID):
     """
     Get the xml for a job's configuration, serialised from the local filesystem on the JT
-    
+
     Parameters:
      - ctx
      - jobID
@@ -953,7 +953,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def killJob(self, ctx, jobID):
     """
     Kill a job
-    
+
     Parameters:
      - ctx
      - jobID
@@ -989,7 +989,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def killTaskAttempt(self, ctx, attemptID):
     """
     Kill a task attempt
-    
+
     Parameters:
      - ctx
      - attemptID
@@ -1027,7 +1027,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def setJobPriority(self, ctx, jobID, priority):
     """
     Set a job's priority
-    
+
     Parameters:
      - ctx
      - jobID
@@ -1065,7 +1065,7 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
   def getDelegationToken(self, ctx, renewer):
     """
     Get an MR delegation token.
-    
+
     Parameters:
      - ctx
      - renewer
@@ -1509,6 +1509,9 @@ class getJobTrackerName_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1564,6 +1567,9 @@ class getJobTrackerName_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1630,6 +1636,9 @@ class getClusterStatus_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1686,6 +1695,9 @@ class getClusterStatus_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1752,6 +1764,9 @@ class getQueues_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1821,6 +1836,9 @@ class getQueues_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1899,6 +1917,9 @@ class getJob_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1968,6 +1989,9 @@ class getJob_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2034,6 +2058,9 @@ class getRunningJobs_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2090,6 +2117,9 @@ class getRunningJobs_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2156,6 +2186,9 @@ class getCompletedJobs_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2212,6 +2245,9 @@ class getCompletedJobs_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2278,6 +2314,9 @@ class getFailedJobs_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2334,6 +2373,9 @@ class getFailedJobs_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2400,6 +2442,9 @@ class getKilledJobs_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2456,6 +2501,9 @@ class getKilledJobs_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2522,6 +2570,9 @@ class getAllJobs_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2578,6 +2629,9 @@ class getAllJobs_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2647,6 +2701,9 @@ class getUserJobCounts_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2703,6 +2760,9 @@ class getUserJobCounts_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2849,6 +2909,9 @@ class getTaskList_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2918,6 +2981,9 @@ class getTaskList_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2988,6 +3054,9 @@ class getTask_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3070,6 +3139,9 @@ class getTask_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3148,6 +3220,9 @@ class getJobCounters_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3217,6 +3292,9 @@ class getJobCounters_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3295,6 +3373,9 @@ class getJobCounterRollups_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3364,6 +3445,9 @@ class getJobCounterRollups_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3430,6 +3514,9 @@ class getActiveTrackers_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3486,6 +3573,9 @@ class getActiveTrackers_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3552,6 +3642,9 @@ class getBlacklistedTrackers_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3608,6 +3701,9 @@ class getBlacklistedTrackers_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3674,6 +3770,9 @@ class getAllTrackers_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3730,6 +3829,9 @@ class getAllTrackers_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3807,6 +3909,9 @@ class getTracker_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3876,6 +3981,9 @@ class getTracker_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3942,6 +4050,9 @@ class getCurrentTime_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -3997,6 +4108,9 @@ class getCurrentTime_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4075,6 +4189,9 @@ class getJobConfXML_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4143,6 +4260,9 @@ class getJobConfXML_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4221,6 +4341,9 @@ class killJob_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4291,6 +4414,9 @@ class killJob_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4369,6 +4495,9 @@ class killTaskAttempt_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4452,6 +4581,9 @@ class killTaskAttempt_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4541,6 +4673,9 @@ class setJobPriority_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4611,6 +4746,9 @@ class setJobPriority_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4688,6 +4826,9 @@ class getDelegationToken_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4757,6 +4898,9 @@ class getDelegationToken_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -4768,5 +4912,3 @@ class getDelegationToken_result(object):
 
   def __ne__(self, other):
     return not (self == other)
-
-

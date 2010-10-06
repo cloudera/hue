@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Generic I/O error
  */
-public class IOException extends Exception implements TBase<IOException._Fields>, java.io.Serializable, Cloneable, Comparable<IOException> {
+public class IOException extends Exception implements TBase<IOException, IOException._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("IOException");
 
   private static final TField MSG_FIELD_DESC = new TField("msg", TType.STRING, (short)1);
@@ -61,12 +64,10 @@ public class IOException extends Exception implements TBase<IOException._Fields>
      */
     CLAZZ((short)3, "clazz");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -75,7 +76,16 @@ public class IOException extends Exception implements TBase<IOException._Fields>
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // MSG
+          return MSG;
+        case 2: // STACK
+          return STACK;
+        case 3: // CLAZZ
+          return CLAZZ;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -114,16 +124,16 @@ public class IOException extends Exception implements TBase<IOException._Fields>
 
   // isset id assignments
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.MSG, new FieldMetaData("msg", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.STACK, new FieldMetaData("stack", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.CLAZZ, new FieldMetaData("clazz", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.MSG, new FieldMetaData("msg", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.STACK, new FieldMetaData("stack", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.CLAZZ, new FieldMetaData("clazz", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(IOException.class, metaDataMap);
   }
 
@@ -160,9 +170,11 @@ public class IOException extends Exception implements TBase<IOException._Fields>
     return new IOException(this);
   }
 
-  @Deprecated
-  public IOException clone() {
-    return new IOException(this);
+  @Override
+  public void clear() {
+    this.msg = null;
+    this.stack = null;
+    this.clazz = null;
   }
 
   /**
@@ -284,10 +296,6 @@ public class IOException extends Exception implements TBase<IOException._Fields>
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case MSG:
@@ -303,12 +311,12 @@ public class IOException extends Exception implements TBase<IOException._Fields>
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case MSG:
       return isSetMsg();
@@ -318,10 +326,6 @@ public class IOException extends Exception implements TBase<IOException._Fields>
       return isSetClazz();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -380,31 +384,41 @@ public class IOException extends Exception implements TBase<IOException._Fields>
     int lastComparison = 0;
     IOException typedOther = (IOException)other;
 
-    lastComparison = Boolean.valueOf(isSetMsg()).compareTo(isSetMsg());
+    lastComparison = Boolean.valueOf(isSetMsg()).compareTo(typedOther.isSetMsg());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(msg, typedOther.msg);
+    if (isSetMsg()) {
+      lastComparison = TBaseHelper.compareTo(this.msg, typedOther.msg);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStack()).compareTo(typedOther.isSetStack());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetStack()).compareTo(isSetStack());
+    if (isSetStack()) {
+      lastComparison = TBaseHelper.compareTo(this.stack, typedOther.stack);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetClazz()).compareTo(typedOther.isSetClazz());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(stack, typedOther.stack);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetClazz()).compareTo(isSetClazz());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(clazz, typedOther.clazz);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetClazz()) {
+      lastComparison = TBaseHelper.compareTo(this.clazz, typedOther.clazz);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -416,35 +430,32 @@ public class IOException extends Exception implements TBase<IOException._Fields>
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case MSG:
-            if (field.type == TType.STRING) {
-              this.msg = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case STACK:
-            if (field.type == TType.STRING) {
-              this.stack = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case CLAZZ:
-            if (field.type == TType.STRING) {
-              this.clazz = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // MSG
+          if (field.type == TType.STRING) {
+            this.msg = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // STACK
+          if (field.type == TType.STRING) {
+            this.stack = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // CLAZZ
+          if (field.type == TType.STRING) {
+            this.clazz = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

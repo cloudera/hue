@@ -111,11 +111,16 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
     help="Information about a single HDFS cluster",
     members=dict(
       NN_HOST=Config("namenode_host", help="IP for name node"),
-      NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=9090,
+      NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=10090,
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
                             type=int),
-      SECURITY_ENABLED=Config('security_enabled', help='True if security is enabled for this HDFS cluster', type=coerce_bool, default=False)
+      NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
+                                   default="hdfs", type=str),
+      DN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for DataNode",
+                                   default="hdfs", type=str),
+      SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
+                              default=False, type=coerce_bool),
     )
   )
 )
@@ -129,10 +134,11 @@ MR_CLUSTERS = UnspecifiedConfigSection(
       JT_HOST=Config("jobtracker_host", help="IP for JobTracker"),
       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
                             type=int),
-      SECURITY_ENABLED=Config('security_enabled', help='True if security is enabled for this MR cluster', type=coerce_bool, default=False)
-    )
-  )
-)
+      JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
+                                   default="mapred", type=str),
+      SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
+                              default=False, type=coerce_bool))
+))
 
 
 def config_validator():

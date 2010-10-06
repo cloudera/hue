@@ -36,7 +36,7 @@ def index(request):
       name = filename.replace('.html', '').replace('.mako', '')
       files.append(dict(
         filename=filename,
-        name= name.capitalize().replace('.', ' '),
+        name= name.capitalize().replace('.', ' ').replace('_', ' '),
         id=name.replace(' ', '-').replace('.', '-')
       ))
   #render the index, passing along the file list
@@ -48,12 +48,16 @@ def index(request):
 
 def show(request, path):
   post_vars = None
-  if (request.POST): post_vars = request.POST.iteritems()
+  if request.POST: post_vars = request.POST.iteritems()
   if request.REQUEST.get('sleep'):
     sleep = int(request.REQUEST.get('sleep'))
     time.sleep(sleep)
+  
   return render(path, request, dict(
-    post_vars = post_vars
+    post_vars = post_vars,
+    get_var = request.REQUEST.get,
+    get_list = request.REQUEST.getlist,
+    request_path = request.path
   ))
   
 def flash(request):
@@ -117,3 +121,98 @@ def forms_with_dependencies(request):
   else:
     form = DepForm()
   return render("forms_with_dependencies.mako", request, dict(form=form, data=data))
+
+class PsLine(object):
+  def __init__(self, user, pid, ppid, pgid, cputime, command):
+    self.user = user
+    self.pid = int(pid)
+    self.ppid = int(ppid)
+    self.pgid = int(pgid)
+    self.cputime = cputime
+    self.command = command
+    self.children = []
+
+def pstree(request):
+  """
+  Draws 'pstree' by using output from ps command.
+
+  GET arguments:
+    subtree: show only pids below this tree
+    show_all: expand the entire tree
+    paths: slash-separated paths that are expanded
+      (can be specified multiple times)
+
+  """
+  import subprocess
+  import urllib
+  import re
+
+  if request.REQUEST.get('sleep'):
+    sleep = int(request.REQUEST.get('sleep'))
+    time.sleep(sleep)
+
+  # Call ps
+  p = subprocess.Popen(args=["ps", "-axwwo", "user,pid,ppid,pgid,cputime,command"], stdout=subprocess.PIPE)
+
+  children = {}
+  first = True
+  if "subtree" in request.GET:
+    subtree = long(request.GET.get("subtree"))
+  else:
+    subtree = None
+  subtree_top = None
+
+  # Parse in the data
+  for row in p.stdout:
+    if first:
+      # skip header line
+      first = False
+      continue
+    data = user, pid, ppid, pgid, cputime, command = re.split("\s+", row.rstrip(), 5)
+    ps = PsLine(*data)
+    if ps.pid == subtree:
+      subtree_top = ps
+    if ps.ppid in children:
+      children[ps.ppid].append(ps)
+    else:
+      children[ps.ppid] = [ps]
+
+  # Utility method to create the tree
+  def fill(root, current_path):
+    root.path = current_path + str(root.pid)
+    root.children = children.get(root.pid, [])
+    for child in root.children:
+      fill(child, root.path + "/")
+
+
+  # Start with init and create the tree
+  assert len(children[0]) == 1
+  top = children[0][0]
+  fill(top, "/")
+  tops = [top]
+
+  # If we're only interested in a subtree, pick that out explicitly
+  if subtree_top:
+    tops = subtree_top.children
+
+  # Methods to manipulate the extant paths list; used by the template.
+  def add(p):
+    paths = list(request.GET.getlist("paths")) # make a copy
+    paths.append(p)
+    query = [urllib.urlencode([("paths", x)]) for x in paths]
+    if subtree:
+      query.append('subtree=' + str(subtree))
+    return request.path + "?" + "&".join(query)
+  def remove(p):
+    paths = list(request.GET.getlist("paths")) # make a copy
+    paths.remove(p)
+    query = [urllib.urlencode([("paths", x)]) for x in paths]
+    if subtree:
+      query.append('subtree=' + str(subtree))
+    return request.path + "?" + "&".join(query)
+
+  paths = request.GET.getlist("paths")
+  return render("html-table.treeview.ajax.mako", request, dict(
+    tops=tops, show_all=request.GET.get("show_all"), 
+    open_paths=paths, request_path=request.path,
+    add=add, remove=remove, depth=request.GET.get('depth', 0)))

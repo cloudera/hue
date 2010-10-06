@@ -1,0 +1,256 @@
+{% comment %}
+Licensed to Cloudera, Inc. under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  Cloudera, Inc. licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+{% endcomment %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+	<head>
+		<title>HtmlTable Tree View</title>
+	</head>
+	<body>
+	<h1 class="ccs-hidden">HtmlTable Tree View</h1>
+	<div class="jframe_padded">
+		
+		<p>The table below will appear to be a tree view table immediately, even before scripts are loaded. It will become interactive once the scripts have loaded. You should be able to click a section's expand arrow to expand it. Keys should work - up and down to navigate, shift + up and down to multiselect, left and right to collapse and expand sections.</p>
+		<table id="tree2" data-filters="HtmlTable" class="selectable treeView multiselect ccs-bordered-table">
+			<thead>
+				<th>Name</th>
+				<th>Date Modified</th>
+				<th>Size</th>
+			</thead>
+				<tbody>
+					<tr class="table-folder table-depth-0">
+						<td>
+							<a class="expand"></a>
+							Documents
+						</td>
+						<td>Jul 10, 2010 1:39pm</td>
+						<td>--</td>
+					</tr>
+						<tr class="ccs-hidden table-depth-1">
+							<td>Resume.pdf</td>
+							<td>Jul 10, 2010 1:39pm</td>
+							<td>--</td>
+						</tr>
+						<tr class="ccs-hidden table-depth-1">
+							<td>notes.txt</td>
+							<td>Jul 10, 2010 1:39pm</td>
+							<td>--</td>
+						</tr>
+						<tr class="ccs-hidden table-folder table-depth-1">
+							<td>
+								<a class="expand"></a>
+								Receipts
+							</td>
+							<td>Jul 10, 2010 1:39pm</td>
+							<td>--</td>
+						</tr>
+								<tr class="ccs-hidden table-depth-2">
+									<td>starbucks.txt</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="ccs-hidden table-depth-2">
+									<td>safeway.txt</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="ccs-hidden table-depth-2">
+									<td>movies.txt</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="ccs-hidden table-folder table-depth-2">
+									<td>
+										<a class="expand"></a>
+										Taxes
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="ccs-hidden table-depth-3">
+									<td>
+										2008 Taxes.pdf
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="ccs-hidden table-depth-3">
+									<td>
+										2009 Taxes.pdf
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="ccs-hidden table-depth-3">
+									<td>
+										2010 Taxes.pdf
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="ccs-hidden table-folder table-depth-2">
+									<td>
+										<a class="expand"></a>
+										Pictures</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="ccs-hidden table-depth-3">
+									<td>
+										Baby.jpg
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="ccs-hidden table-depth-2">
+									<td>
+										Bar.txt
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+						<tr class="table-depth-0">
+							<td>
+								Foo.txt
+							</td>
+							<td>Jul 10, 2010 1:39pm</td>
+							<td>--</td>
+						</tr>
+					</tbody>
+		</table>
+
+		<p>The table below will turn into a treeview on startup. Unlike the table above, none of its rows are hidden on load but only after the HtmlTable filter is applied. Both will appear the same to you, though this one will take longer to build.</p>
+		<table id="tree" data-filters="HtmlTable" class="selectable treeView buildTree ccs-bordered-table buildTree">
+			<thead>
+				<th>Name</th>
+				<th>Date Modified</th>
+				<th>Size</th>
+			</thead>
+				<tbody>
+					<tr class="table-depth-0">
+						<td>
+							Documents
+						</td>
+						<td>Jul 10, 2010 1:39pm</td>
+						<td>--</td>
+					</tr>
+						<tr class="table-depth-1">
+							<td>Resume.pdf</td>
+							<td>Jul 10, 2010 1:39pm</td>
+							<td>--</td>
+						</tr>
+						<tr class="table-depth-1">
+							<td>notes.txt</td>
+							<td>Jul 10, 2010 1:39pm</td>
+							<td>--</td>
+						</tr>
+						<tr class="table-depth-1">
+							<td>
+								Receipts
+							</td>
+							<td>Jul 10, 2010 1:39pm</td>
+							<td>--</td>
+						</tr>
+								<tr class="table-depth-2">
+									<td>starbucks.txt</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="table-depth-2">
+									<td>safeway.txt</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="table-depth-2">
+									<td>movies.txt</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="table-depth-2">
+									<td>
+										Taxes
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="table-depth-3">
+									<td>
+										2008 Taxes.pdf
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="table-depth-3">
+									<td>
+										2009 Taxes.pdf
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="table-depth-3">
+									<td>
+										2010 Taxes.pdf
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="table-depth-2">
+									<td>Pictures</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="table-depth-3">
+									<td>
+										Baby.jpg
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+								<tr class="table-depth-2">
+									<td>
+										Bar.txt
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+							<tr class="table-depth-1">
+								<td>
+									Candy
+								</td>
+								<td>Jul 10, 2010 1:39pm</td>
+								<td>--</td>
+							</tr>
+								<tr class="table-depth-2">
+									<td>
+										Snickers.txt
+									</td>
+									<td>Jul 10, 2010 1:39pm</td>
+									<td>--</td>
+								</tr>
+						<tr class="table-depth-0">
+							<td>
+								Foo.txt
+							</td>
+							<td>Jul 10, 2010 1:39pm</td>
+							<td>--</td>
+						</tr>
+					</tbody>
+		</table>
+	
+	</div>
+	</body>
+</html>

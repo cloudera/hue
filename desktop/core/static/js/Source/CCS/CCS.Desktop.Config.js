@@ -65,6 +65,10 @@ ART.Sheet.define('window.art.browser.logo_header history.art', {
 	'top':32
 }, 'css');
 
+ART.Sheet.define('window.art.browser history.art ul', {
+	'z-index': 101
+}, 'css');
+
 UI.Sheet.define('window.art button.art.wincontrol', {
 	'background-color': ['hsb(0, 0, 100)', 'hsb(0, 0, 85)'],
 	'border-color': ['hsb(0, 0, 60)', 'hsb(0, 0, 50)'],

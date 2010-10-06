@@ -16,7 +16,7 @@
 CCS.Desktop.register({
 	About : {
 		name: 'About Hue',
-		require: ['CCS.JBrowser'],
+		require: ['ccs-shared/CCS.JBrowser'],
 		launch: function(path, options){
 			return new CCS.JBrowser('/about/', $merge({
 				displayHistory: false,

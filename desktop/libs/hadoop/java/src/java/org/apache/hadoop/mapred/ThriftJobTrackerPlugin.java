@@ -666,9 +666,9 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
           // The port may have been 0, so we update it.
           conf.set(THRIFT_ADDRESS_PROPERTY, address.getHostName() + ":" +
               thriftServer.getPort());
-        } catch (java.io.IOException ioe) {
-            LOG.warn("Cannot start Thrift jobtracker plug-in",ioe);
-            throw new RuntimeException("Cannot start Thrift jobtracker plug-in", ioe);
+        } catch (Exception e) {
+            LOG.warn("Cannot start Thrift jobtracker plug-in", e);
+            throw new RuntimeException("Cannot start Thrift jobtracker plug-in", e);
         }
     }
 
@@ -1264,7 +1264,11 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
         @Override
         public TProcessor getProcessor(TTransport t) {
           ThriftServerContext context = new ThriftServerContext(t);
-          ThriftHandler impl = new ThriftHandler(context);
+          Jobtracker.Iface impl =
+            ThriftUtils.SecurityCheckingProxy.create(
+              conf,
+              new ThriftHandler(context),
+              Jobtracker.Iface.class);
           return new Jobtracker.Processor(impl);
         }
     }

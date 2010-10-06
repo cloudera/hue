@@ -1,9 +1,10 @@
 clientcide/
-mootools-core/
-mootools-more/
+core/
+more/
 art/
 slick/
-mootools-touch/
-mootools-color/
-art-widgets/
-mootools-table/
+touch/
+color/
+widgets/
+behavior/
+more-behaviors/

@@ -15,15 +15,18 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
-public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Serializable, Cloneable {
+public class MetricsContext implements TBase<MetricsContext, MetricsContext._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("MetricsContext");
 
   private static final TField NAME_FIELD_DESC = new TField("name", TType.STRING, (short)1);
@@ -43,12 +46,10 @@ public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Se
     PERIOD((short)3, "period"),
     RECORDS((short)4, "records");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -57,7 +58,18 @@ public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Se
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // NAME
+          return NAME;
+        case 2: // IS_MONITORING
+          return IS_MONITORING;
+        case 3: // PERIOD
+          return PERIOD;
+        case 4: // RECORDS
+          return RECORDS;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -99,21 +111,21 @@ public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Se
   private static final int __PERIOD_ISSET_ID = 1;
   private BitSet __isset_bit_vector = new BitSet(2);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
+  static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.STRING)));
-    put(_Fields.IS_MONITORING, new FieldMetaData("isMonitoring", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.IS_MONITORING, new FieldMetaData("isMonitoring", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.BOOL)));
-    put(_Fields.PERIOD, new FieldMetaData("period", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.PERIOD, new FieldMetaData("period", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I32)));
-    put(_Fields.RECORDS, new FieldMetaData("records", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.RECORDS, new FieldMetaData("records", TFieldRequirementType.DEFAULT, 
         new MapMetaData(TType.MAP, 
             new FieldValueMetaData(TType.STRING), 
             new ListMetaData(TType.LIST, 
                 new StructMetaData(TType.STRUCT, MetricsRecord.class)))));
-  }});
-
-  static {
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(MetricsContext.class, metaDataMap);
   }
 
@@ -170,9 +182,14 @@ public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Se
     return new MetricsContext(this);
   }
 
-  @Deprecated
-  public MetricsContext clone() {
-    return new MetricsContext(this);
+  @Override
+  public void clear() {
+    this.name = null;
+    setIsMonitoringIsSet(false);
+    this.isMonitoring = false;
+    setPeriodIsSet(false);
+    this.period = 0;
+    this.records = null;
   }
 
   public String getName() {
@@ -317,10 +334,6 @@ public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Se
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case NAME:
@@ -339,12 +352,12 @@ public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Se
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case NAME:
       return isSetName();
@@ -356,10 +369,6 @@ public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Se
       return isSetRecords();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -419,6 +428,61 @@ public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Se
     return 0;
   }
 
+  public int compareTo(MetricsContext other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    MetricsContext typedOther = (MetricsContext)other;
+
+    lastComparison = Boolean.valueOf(isSetName()).compareTo(typedOther.isSetName());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetName()) {
+      lastComparison = TBaseHelper.compareTo(this.name, typedOther.name);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetIsMonitoring()).compareTo(typedOther.isSetIsMonitoring());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetIsMonitoring()) {
+      lastComparison = TBaseHelper.compareTo(this.isMonitoring, typedOther.isMonitoring);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetPeriod()).compareTo(typedOther.isSetPeriod());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetPeriod()) {
+      lastComparison = TBaseHelper.compareTo(this.period, typedOther.period);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetRecords()).compareTo(typedOther.isSetRecords());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetRecords()) {
+      lastComparison = TBaseHelper.compareTo(this.records, typedOther.records);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -428,67 +492,64 @@ public class MetricsContext implements TBase<MetricsContext._Fields>, java.io.Se
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case NAME:
-            if (field.type == TType.STRING) {
-              this.name = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case IS_MONITORING:
-            if (field.type == TType.BOOL) {
-              this.isMonitoring = iprot.readBool();
-              setIsMonitoringIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PERIOD:
-            if (field.type == TType.I32) {
-              this.period = iprot.readI32();
-              setPeriodIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case RECORDS:
-            if (field.type == TType.MAP) {
+      switch (field.id) {
+        case 1: // NAME
+          if (field.type == TType.STRING) {
+            this.name = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // IS_MONITORING
+          if (field.type == TType.BOOL) {
+            this.isMonitoring = iprot.readBool();
+            setIsMonitoringIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // PERIOD
+          if (field.type == TType.I32) {
+            this.period = iprot.readI32();
+            setPeriodIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // RECORDS
+          if (field.type == TType.MAP) {
+            {
+              TMap _map19 = iprot.readMapBegin();
+              this.records = new HashMap<String,List<MetricsRecord>>(2*_map19.size);
+              for (int _i20 = 0; _i20 < _map19.size; ++_i20)
               {
-                TMap _map19 = iprot.readMapBegin();
-                this.records = new HashMap<String,List<MetricsRecord>>(2*_map19.size);
-                for (int _i20 = 0; _i20 < _map19.size; ++_i20)
+                String _key21;
+                List<MetricsRecord> _val22;
+                _key21 = iprot.readString();
                 {
-                  String _key21;
-                  List<MetricsRecord> _val22;
-                  _key21 = iprot.readString();
+                  TList _list23 = iprot.readListBegin();
+                  _val22 = new ArrayList<MetricsRecord>(_list23.size);
+                  for (int _i24 = 0; _i24 < _list23.size; ++_i24)
                   {
-                    TList _list23 = iprot.readListBegin();
-                    _val22 = new ArrayList<MetricsRecord>(_list23.size);
-                    for (int _i24 = 0; _i24 < _list23.size; ++_i24)
-                    {
-                      MetricsRecord _elem25;
-                      _elem25 = new MetricsRecord();
-                      _elem25.read(iprot);
-                      _val22.add(_elem25);
-                    }
-                    iprot.readListEnd();
+                    MetricsRecord _elem25;
+                    _elem25 = new MetricsRecord();
+                    _elem25.read(iprot);
+                    _val22.add(_elem25);
                   }
-                  this.records.put(_key21, _val22);
+                  iprot.readListEnd();
                 }
-                iprot.readMapEnd();
+                this.records.put(_key21, _val22);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readMapEnd();
             }
-            break;
-        }
-        iprot.readFieldEnd();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

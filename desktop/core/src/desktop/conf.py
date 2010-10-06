@@ -21,6 +21,7 @@ from desktop.lib.conf import coerce_bool, validate_path
 from desktop.lib.paths import get_desktop_root
 import os
 import socket
+import stat
 
 HTTP_HOST = Config(
   key="http_host",
@@ -172,6 +173,44 @@ DATABASE = ConfigSection(
   )
 )
 
+KERBEROS = ConfigSection(
+  key="kerberos",
+  help="""Configuration options for specifying Hue's kerberos integration for
+          secured Hadoop clusters.""",
+  members=dict(
+    HUE_KEYTAB=Config(
+      key='hue_keytab',
+      help="Path to a Kerberos keytab file containing Hue's service credentials.",
+      type=str,
+      default=None),
+    HUE_PRINCIPAL=Config(
+      key='hue_principal',
+      help="Kerberos principal name for hue. Typically 'hue/hostname.foo.com'",
+      type=str,
+      default="hue/%s" % socket.getfqdn()),
+    KEYTAB_REINIT_FREQUENCY=Config(
+      key='reinit_frequency',
+      help="Frequency in seconds with which Hue will renew its keytab",
+      type=int,
+      default=60*60), #1h
+    CCACHE_PATH=Config(
+      key='ccache_path',
+      help="Path to keep kerberos credentials cached",
+      private=True,
+      type=str,
+      default="/tmp/hue_krb5_ccache_%d" % os.geteuid(),
+    ),
+    KINIT_PATH=Config(
+      key='kinit_path',
+      help="Path to kerberos 'kinit' command",
+      type=str,
+      default="kinit", # use PATH!
+    )
+  )
+)
+
+      
+
 # See python's documentation for time.tzset for valid values.
 TIME_ZONE = Config(
   key="time_zone",
@@ -276,13 +315,29 @@ def config_validator():
   if not SECRET_KEY.get():
     res.append((SECRET_KEY, "Secret key should be configured as a random string."))
 
+  # Validate SSL setup
   if SSL_CERTIFICATE.get():
     res.extend(validate_path(SSL_CERTIFICATE, is_dir=False))
     if not SSL_PRIVATE_KEY.get():
       res.append((SSL_PRIVATE_KEY, "SSL private key file should be set to enable HTTPS."))
     else:
       res.extend(validate_path(SSL_PRIVATE_KEY, is_dir=False))
+
+  # Validate encoding
   if not i18n.validate_encoding(DEFAULT_SITE_ENCODING.get()):
     res.append((DEFAULT_SITE_ENCODING, "Encoding not supported."))
+
+  # Validate kerberos
+  if KERBEROS.HUE_KEYTAB.get() is not None:
+    res.extend(validate_path(KERBEROS.HUE_KEYTAB, is_dir=False))
+    # Keytab should not be world or group accessible
+    kt_stat = os.stat(KERBEROS.HUE_KEYTAB.get())
+    if stat.S_IMODE(kt_stat.st_mode) & 0077:
+      res.append((KERBEROS.HUE_KEYTAB,
+                  "Keytab should have 0600 permissions (has %o)" %
+                  stat.S_IMODE(kt_stat.st_mode)))
+
+    res.extend(validate_path(KERBEROS.KINIT_PATH, is_dir=False))
+    res.extend(validate_path(KERBEROS.CCACHE_PATH, is_dir=False))
 
   return res

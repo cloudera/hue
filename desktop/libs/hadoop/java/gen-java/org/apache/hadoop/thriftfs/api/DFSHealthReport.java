@@ -15,19 +15,22 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Information that mirrors the "health report" information available on the
  * NameNode web UI
  */
-public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.Serializable, Cloneable, Comparable<DFSHealthReport> {
+public class DFSHealthReport implements TBase<DFSHealthReport, DFSHealthReport._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("DFSHealthReport");
 
   private static final TField BYTES_TOTAL_FIELD_DESC = new TField("bytesTotal", TType.I64, (short)1);
@@ -87,12 +90,10 @@ public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.
      */
     HTTP_PORT((short)8, "httpPort");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -101,7 +102,26 @@ public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // BYTES_TOTAL
+          return BYTES_TOTAL;
+        case 2: // BYTES_USED
+          return BYTES_USED;
+        case 3: // BYTES_REMAINING
+          return BYTES_REMAINING;
+        case 4: // BYTES_NON_DFS
+          return BYTES_NON_DFS;
+        case 5: // NUM_LIVE_DATA_NODES
+          return NUM_LIVE_DATA_NODES;
+        case 6: // NUM_DEAD_DATA_NODES
+          return NUM_DEAD_DATA_NODES;
+        case 7: // UPGRADE_STATUS
+          return UPGRADE_STATUS;
+        case 8: // HTTP_PORT
+          return HTTP_PORT;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -148,26 +168,26 @@ public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.
   private static final int __HTTPPORT_ISSET_ID = 6;
   private BitSet __isset_bit_vector = new BitSet(7);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.BYTES_TOTAL, new FieldMetaData("bytesTotal", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.BYTES_USED, new FieldMetaData("bytesUsed", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.BYTES_REMAINING, new FieldMetaData("bytesRemaining", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.BYTES_NON_DFS, new FieldMetaData("bytesNonDfs", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.NUM_LIVE_DATA_NODES, new FieldMetaData("numLiveDataNodes", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.NUM_DEAD_DATA_NODES, new FieldMetaData("numDeadDataNodes", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.UPGRADE_STATUS, new FieldMetaData("upgradeStatus", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, UpgradeStatusReport.class)));
-    put(_Fields.HTTP_PORT, new FieldMetaData("httpPort", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.BYTES_TOTAL, new FieldMetaData("bytesTotal", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.BYTES_USED, new FieldMetaData("bytesUsed", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.BYTES_REMAINING, new FieldMetaData("bytesRemaining", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.BYTES_NON_DFS, new FieldMetaData("bytesNonDfs", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.NUM_LIVE_DATA_NODES, new FieldMetaData("numLiveDataNodes", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.NUM_DEAD_DATA_NODES, new FieldMetaData("numDeadDataNodes", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.UPGRADE_STATUS, new FieldMetaData("upgradeStatus", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, UpgradeStatusReport.class)));
+    tmpMap.put(_Fields.HTTP_PORT, new FieldMetaData("httpPort", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(DFSHealthReport.class, metaDataMap);
   }
 
@@ -224,9 +244,23 @@ public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.
     return new DFSHealthReport(this);
   }
 
-  @Deprecated
-  public DFSHealthReport clone() {
-    return new DFSHealthReport(this);
+  @Override
+  public void clear() {
+    setBytesTotalIsSet(false);
+    this.bytesTotal = 0;
+    setBytesUsedIsSet(false);
+    this.bytesUsed = 0;
+    setBytesRemainingIsSet(false);
+    this.bytesRemaining = 0;
+    setBytesNonDfsIsSet(false);
+    this.bytesNonDfs = 0;
+    setNumLiveDataNodesIsSet(false);
+    this.numLiveDataNodes = 0;
+    setNumDeadDataNodesIsSet(false);
+    this.numDeadDataNodes = 0;
+    this.upgradeStatus = null;
+    setHttpPortIsSet(false);
+    this.httpPort = 0;
   }
 
   public long getBytesTotal() {
@@ -511,10 +545,6 @@ public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case BYTES_TOTAL:
@@ -545,12 +575,12 @@ public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case BYTES_TOTAL:
       return isSetBytesTotal();
@@ -570,10 +600,6 @@ public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.
       return isSetHttpPort();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -677,71 +703,91 @@ public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.
     int lastComparison = 0;
     DFSHealthReport typedOther = (DFSHealthReport)other;
 
-    lastComparison = Boolean.valueOf(isSetBytesTotal()).compareTo(isSetBytesTotal());
+    lastComparison = Boolean.valueOf(isSetBytesTotal()).compareTo(typedOther.isSetBytesTotal());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(bytesTotal, typedOther.bytesTotal);
+    if (isSetBytesTotal()) {
+      lastComparison = TBaseHelper.compareTo(this.bytesTotal, typedOther.bytesTotal);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetBytesUsed()).compareTo(typedOther.isSetBytesUsed());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetBytesUsed()).compareTo(isSetBytesUsed());
+    if (isSetBytesUsed()) {
+      lastComparison = TBaseHelper.compareTo(this.bytesUsed, typedOther.bytesUsed);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetBytesRemaining()).compareTo(typedOther.isSetBytesRemaining());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(bytesUsed, typedOther.bytesUsed);
+    if (isSetBytesRemaining()) {
+      lastComparison = TBaseHelper.compareTo(this.bytesRemaining, typedOther.bytesRemaining);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetBytesNonDfs()).compareTo(typedOther.isSetBytesNonDfs());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetBytesRemaining()).compareTo(isSetBytesRemaining());
+    if (isSetBytesNonDfs()) {
+      lastComparison = TBaseHelper.compareTo(this.bytesNonDfs, typedOther.bytesNonDfs);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNumLiveDataNodes()).compareTo(typedOther.isSetNumLiveDataNodes());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(bytesRemaining, typedOther.bytesRemaining);
+    if (isSetNumLiveDataNodes()) {
+      lastComparison = TBaseHelper.compareTo(this.numLiveDataNodes, typedOther.numLiveDataNodes);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNumDeadDataNodes()).compareTo(typedOther.isSetNumDeadDataNodes());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetBytesNonDfs()).compareTo(isSetBytesNonDfs());
+    if (isSetNumDeadDataNodes()) {
+      lastComparison = TBaseHelper.compareTo(this.numDeadDataNodes, typedOther.numDeadDataNodes);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetUpgradeStatus()).compareTo(typedOther.isSetUpgradeStatus());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(bytesNonDfs, typedOther.bytesNonDfs);
+    if (isSetUpgradeStatus()) {
+      lastComparison = TBaseHelper.compareTo(this.upgradeStatus, typedOther.upgradeStatus);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHttpPort()).compareTo(typedOther.isSetHttpPort());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetNumLiveDataNodes()).compareTo(isSetNumLiveDataNodes());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(numLiveDataNodes, typedOther.numLiveDataNodes);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetNumDeadDataNodes()).compareTo(isSetNumDeadDataNodes());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(numDeadDataNodes, typedOther.numDeadDataNodes);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetUpgradeStatus()).compareTo(isSetUpgradeStatus());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(upgradeStatus, typedOther.upgradeStatus);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetHttpPort()).compareTo(isSetHttpPort());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(httpPort, typedOther.httpPort);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetHttpPort()) {
+      lastComparison = TBaseHelper.compareTo(this.httpPort, typedOther.httpPort);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -753,78 +799,75 @@ public class DFSHealthReport implements TBase<DFSHealthReport._Fields>, java.io.
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case BYTES_TOTAL:
-            if (field.type == TType.I64) {
-              this.bytesTotal = iprot.readI64();
-              setBytesTotalIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case BYTES_USED:
-            if (field.type == TType.I64) {
-              this.bytesUsed = iprot.readI64();
-              setBytesUsedIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case BYTES_REMAINING:
-            if (field.type == TType.I64) {
-              this.bytesRemaining = iprot.readI64();
-              setBytesRemainingIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case BYTES_NON_DFS:
-            if (field.type == TType.I64) {
-              this.bytesNonDfs = iprot.readI64();
-              setBytesNonDfsIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case NUM_LIVE_DATA_NODES:
-            if (field.type == TType.I32) {
-              this.numLiveDataNodes = iprot.readI32();
-              setNumLiveDataNodesIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case NUM_DEAD_DATA_NODES:
-            if (field.type == TType.I32) {
-              this.numDeadDataNodes = iprot.readI32();
-              setNumDeadDataNodesIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case UPGRADE_STATUS:
-            if (field.type == TType.STRUCT) {
-              this.upgradeStatus = new UpgradeStatusReport();
-              this.upgradeStatus.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case HTTP_PORT:
-            if (field.type == TType.I32) {
-              this.httpPort = iprot.readI32();
-              setHttpPortIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // BYTES_TOTAL
+          if (field.type == TType.I64) {
+            this.bytesTotal = iprot.readI64();
+            setBytesTotalIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // BYTES_USED
+          if (field.type == TType.I64) {
+            this.bytesUsed = iprot.readI64();
+            setBytesUsedIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // BYTES_REMAINING
+          if (field.type == TType.I64) {
+            this.bytesRemaining = iprot.readI64();
+            setBytesRemainingIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // BYTES_NON_DFS
+          if (field.type == TType.I64) {
+            this.bytesNonDfs = iprot.readI64();
+            setBytesNonDfsIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // NUM_LIVE_DATA_NODES
+          if (field.type == TType.I32) {
+            this.numLiveDataNodes = iprot.readI32();
+            setNumLiveDataNodesIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // NUM_DEAD_DATA_NODES
+          if (field.type == TType.I32) {
+            this.numDeadDataNodes = iprot.readI32();
+            setNumDeadDataNodesIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // UPGRADE_STATUS
+          if (field.type == TType.STRUCT) {
+            this.upgradeStatus = new UpgradeStatusReport();
+            this.upgradeStatus.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 8: // HTTP_PORT
+          if (field.type == TType.I32) {
+            this.httpPort = iprot.readI32();
+            setHttpPortIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

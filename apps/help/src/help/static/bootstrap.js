@@ -16,7 +16,7 @@
 CCS.Desktop.register({
 	Help: {
 		name: 'Help',
-		require: ['Help'],
+		require: ['help/Help'],
 		css: '/help/static/css/dv.css',
 		launch: function(path, options){
 			return new Help(path, options);

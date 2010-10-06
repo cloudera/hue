@@ -11,31 +11,46 @@
 		}
 	},
 	"projects": {
-		"mootools-core": { "track-indirect": "mootools-core.hash" },
-		"mootools-more": { "track-indirect": "mootools-more.hash" },
-		"art": { "track-indirect": "art.hash" },
-		"clientcide": { "track-indirect": "clientcide.hash" },
-
+		"mootools-core": {
+			"dir": "core",
+			"track-indirect": "core.hash"
+		},
+		"mootools-more": {
+			"dir": "more",
+			"track-indirect": "more.hash"
+		},
+		"art": {
+			"track-indirect": "art.hash"
+		},
+		"clientcide": {
+			"track-indirect": "clientcide.hash"
+		},
+		"behavior": {
+			"track-indirect": "behavior.hash",
+			"from-remote": "anutron",
+			"remotes": ["anutron"]
+		},
+		"more-behaviors": {
+			"track-indirect": "more-behaviors.hash",
+			"from-remote": "anutron",
+			"remotes": ["anutron"]
+		},
 		"mootools-color": {
-			"track-indirect": "mootools-color.hash",
+			"dir": "color",
+			"track-indirect": "color.hash",
 			"from-remote": "anutron",
 			"remotes": ["anutron"]
 		},
-
-		"mootools-touch": { "track-indirect": "mootools-touch.hash" },
-
-		"mootools-table": {
-			"track-indirect": "mootools-table.hash",
-			"from-remote": "anutron",
-			"remotes": ["anutron"]
+		"mootools-touch": {
+			"dir": "touch",
+			"track-indirect": "touch.hash"
 		},
-
 		"art-widgets": {
-			"track-indirect": "art-widgets.hash",
+			"dir": "widgets",
+			"track-indirect": "widgets.hash",
 			"from-remote": "origin",
 			"remotes": ["origin"]
 		},
-
 		"slick": {
 			"track-indirect": "slick.hash",
 			"from-remote": "anutron",

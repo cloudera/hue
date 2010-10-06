@@ -239,15 +239,14 @@ table[data-filters*=HtmlTable] td {
 	border: none;
 }
 table[data-filters*=HtmlTable] tr.table-tr-odd td {
-	background: #f3f3f3;
+	background-color: #f3f3f3;
 }
-table[data-filters*=HtmlTable] tr:nth-child(odd) td {
-	background: #f3f3f3;
+table.ccs-bordered-table {
+	width: 98%;
+	margin: 4px 1%;
+	border: 1px solid #888;
 }
-table[data-filters*=HtmlTable] tr.selected td, table[data-filters*=HtmlTable] tr.table-tr-selected td, table[data-filters*=HtmlTable] tr.selected td a, table[data-filters*=HtmlTable] tr.table-tr-selected td a {
-	background-color: #3875d7;
-	color: #fff;
-}
+
 table[data-filters*=HtmlTable].selectable tr:hover > td, table[data-filters*=HtmlTable].selectable tr.table-tr-hovered td,
 	table[data-filters*=HtmlTable].multiselect tr:hover > td, table[data-filters*=HtmlTable].multiselect tr.table-tr-hovered td,
 	table[data-filters*=HtmlTable].selectable tr:hover > td a, table[data-filters*=HtmlTable].selectable tr.table-tr-hovered td a,
@@ -255,6 +254,18 @@ table[data-filters*=HtmlTable].selectable tr:hover > td, table[data-filters*=Htm
 	background-color: #d4e7f8;
 	color: #000;
 	cursor: pointer;
+}
+
+table[data-filters*=HtmlTable] tr.selected td,
+	table[data-filters*=HtmlTable] tr.table-tr-selected td,
+	table[data-filters*=HtmlTable] tr.selected td a,
+	table[data-filters*=HtmlTable] tr.table-tr-selected td a,
+	table[data-filters*=HtmlTable] tr.selected:hover td,
+	table[data-filters*=HtmlTable] tr.table-tr-selected:hover td,
+	table[data-filters*=HtmlTable] tr.selected:hover td a,
+	table[data-filters*=HtmlTable] tr.table-tr-selected:hover td a {
+	background-color: #3875d7;
+	color: #fff;
 }
 table.table-sortable th {
 	cursor: pointer;
@@ -278,7 +289,78 @@ span.table-th-sort-span {
 .table-th-sort-rev span.table-th-sort-span {
 	background: url(/static/art/icons/bullet_arrow_up.png) -4px top no-repeat;
 }
+table[data-filters*=HtmlTable].treeView tr a.expand {
+	display: block;
+	float: left;
+	width: 10px;
+	height: 10px;
+	background: url(/static/art/divots.png);
+	position: relative;
+	top: 4px;
+	left: -4px;
+	text-indent: -200px;
+	overflow: hidden;
+}
+table[data-filters*=HtmlTable].treeView tr.table-expanded a.expand {
+	background: url(/static/art/divots.png) 0px -14px;
+}
 
+.table-th-resizable.table-th-sort span.table-th-sort-span, .table-th-resizable.table-th-sort-rev span.table-th-sort-span {
+        padding-right: 13px;
+}
+
+table.table-resizable th div {
+        position: relative;
+        padding-right: 0px;
+}
+span.table-th-resizer {
+        position: absolute;
+        cursor: col-resize;
+        right: 9px;
+        width: 6px;
+        top: 0px;
+        display: block;
+        height: 100%;
+        z-index: 1;
+}
+
+
+table a.ccs-table_config_link {
+	display: inline-block;
+	float: right;
+	width: 16px;
+	height: 16px;
+	background: url(../art/icons/small_cog.png);
+}
+table form.ccs-table_config {
+	position: absolute;
+	background: #fff;
+	border: 1px solid #777;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	min-width: 200px;
+	right: 25px;
+	top: 5px;
+}
+table form.ccs-table_config label {
+	display: block;
+}
+table form.ccs-table_config label:hover {
+	color: #36f;
+}
+table form.ccs-table_config ul {
+	padding: 2px;
+	max-height: 200px;
+	overflow: auto;
+	border-bottom:1px solid #777;
+}
+table form.ccs-table_config li {
+	padding: 2px;
+}
+table form.ccs-table_config .art {
+	margin: 4px;
+}
 /* stickywin solid; this is the login window styles */
 div.solid-win div.body-left { 
 	background: url(../art/sticky-win-solid-back.png); 

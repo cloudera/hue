@@ -38,7 +38,7 @@ from django.template.defaultfilters import urlencode, escape
             <a class="fb-home ${my_home_disabled}" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.view', path=(home_directory or "/"))}">My Home</a>
             % if cwd_set:
               % if show_upload:
-                <a class="fb-upload" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.upload')}?dest=${path|urlencode}&next=${current_request_path|urlencode}">Upload a File</a>
+                <a class="fb-upload" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.upload')}?dest=${path|urlencode}&next=${current_request_path|urlencode}">Upload Files</a>
               % endif
               <a class="fb-mkdir" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.mkdir')}?path=${path|urlencode}&next=${current_request_path|urlencode}">New Directory</a>
             % endif

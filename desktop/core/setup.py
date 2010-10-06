@@ -26,6 +26,8 @@ setup(
 
       entry_points = { 'console_scripts': [ 'supervisor = desktop.supervisor:main',
                                             'hue = desktop.manage_entry:entry', ],
-                       'desktop.supervisor.specs': [ 'runcpserver = desktop:SUPERVISOR_SPEC' ]
+                       'desktop.supervisor.specs': [ 'runcpserver = desktop:SUPERVISOR_SPEC',
+                                                     'kt_renewer = desktop.kt_renewer:SPEC',
+                                                     ]
                        },
       )

@@ -25,7 +25,7 @@
 <configuration>
 <property>
   <name>dfs.thrift.address</name>
-  <value>0.0.0.0:9090</value>
+  <value>0.0.0.0:10090</value>
   <description>
     The address where the Thrift namenode server will listen to.
     If the port is 0 then the server will start on a free port.

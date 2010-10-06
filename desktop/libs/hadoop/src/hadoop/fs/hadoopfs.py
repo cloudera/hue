@@ -26,6 +26,7 @@ import random
 import stat as statconsts
 import subprocess
 import sys
+import time
 import urlparse
 import tempfile
 import threading
@@ -94,10 +95,8 @@ def test_fs_configuration(fs_config, hadoop_bin_conf):
 
   # Check thrift plugin
   try:
-    fs = HadoopFileSystem(fs_config.NN_HOST.get(),
-                          fs_config.NN_THRIFT_PORT.get(),
-                          fs_config.NN_HDFS_PORT.get(),
-                          hadoop_bin_conf.get())
+    fs = HadoopFileSystem.from_config(
+      fs_config, hadoop_bin_path=hadoop_bin_conf.get())
 
     fs.setuser(fs.superuser)
     ls = fs.listdir('/')
@@ -177,7 +176,11 @@ class HadoopFileSystem(object):
   Implementation of Filesystem APIs through Thrift to a Hadoop cluster.
   """
 
-  def __init__(self, host, thrift_port, hdfs_port=8020, hadoop_bin_path="hadoop", security_enabled=False):
+  def __init__(self, host, thrift_port, hdfs_port=8020,
+               nn_kerberos_principal="hdfs",
+               dn_kerberos_principal="hdfs",
+               security_enabled=False,
+               hadoop_bin_path="hadoop"):
     """
     @param host hostname or IP of the namenode
     @param thrift_port port on which the Thrift plugin is listening
@@ -189,13 +192,19 @@ class HadoopFileSystem(object):
     self.host = host
     self.thrift_port = thrift_port
     self.hdfs_port = hdfs_port
+    self.security_enabled = security_enabled
+    self.nn_kerberos_principal = nn_kerberos_principal
+    self.dn_kerberos_principal = dn_kerberos_principal
     self.hadoop_bin_path = hadoop_bin_path
     self._resolve_hadoop_path()
     self.security_enabled = security_enabled
 
-    self.nn_client = thrift_util.get_client(Namenode.Client, host, thrift_port,
-        service_name="HDFS Namenode HUE Plugin",
-        timeout_seconds=NN_THRIFT_TIMEOUT)
+    self.nn_client = thrift_util.get_client(
+      Namenode.Client, host, thrift_port,
+      service_name="HDFS Namenode HUE Plugin",
+      use_sasl=security_enabled,
+      kerberos_principal=nn_kerberos_principal,
+      timeout_seconds=NN_THRIFT_TIMEOUT)
 
     # The file systems are cached globally.  We store
     # user information in a thread-local variable so that
@@ -203,6 +212,17 @@ class HadoopFileSystem(object):
     self.thread_local = threading.local()
     self.setuser(DEFAULT_USER)
     LOG.debug("Initialized HadoopFS: %s:%d (%s)", host, thrift_port, hadoop_bin_path)
+
+  @classmethod
+  def from_config(cls, fs_config, hadoop_bin_path="hadoop"):
+    return cls(host=fs_config.NN_HOST.get(),
+               thrift_port=fs_config.NN_THRIFT_PORT.get(),
+               hdfs_port=fs_config.NN_HDFS_PORT.get(),
+               security_enabled=fs_config.SECURITY_ENABLED.get(),
+               nn_kerberos_principal=fs_config.NN_KERBEROS_PRINCIPAL.get(),
+               dn_kerberos_principal=fs_config.DN_KERBEROS_PRINCIPAL.get(),
+               hadoop_bin_path=hadoop_bin_path)
+
 
   def _get_hdfs_base(self):
     return "hdfs://%s:%d" % (self.host, self.hdfs_port) # TODO(todd) fetch the port from the NN thrift
@@ -559,14 +579,20 @@ class HadoopFileSystem(object):
     return self.nn_client.getDelegationToken(self.request_context, 'hadoop')
 
   def _connect_dn(self, node):
-    sock = TSocket.TSocket(node.host, node.thriftPort)
-    sock.setTimeout(int(DN_THRIFT_TIMEOUT * 1000))
-    transport = TTransport.TBufferedTransport(sock)
-    protocol = TBinaryProtocol.TBinaryProtocol(transport)
-    client = Datanode.Client(protocol)
+    dn_conf = thrift_util.ConnectionConfig(
+      Datanode.Client,
+      node.host,
+      node.thriftPort,
+      "HDFS Datanode Thrift",
+      use_sasl=self.security_enabled,
+      kerberos_principal=self.dn_kerberos_principal,
+      timeout_seconds=DN_THRIFT_TIMEOUT)
+
+    service, protocol, transport = \
+        thrift_util.connect_to_thrift(dn_conf)
     transport.open()
-    client.close = lambda: transport.close()
-    return client
+    service.close = lambda: transport.close()
+    return service
 
   @staticmethod
   def _unpack_stat(stat):
@@ -767,6 +793,7 @@ class FileUpload(object):
                            "-Dfs.default.name=" + self.fs.uri] + \
                            extra_confs + \
                            ["-put", "-", encode_fs_path(path)]
+
     self.subprocess_env = i18n.make_utf8_env()
 
     if self.fs.security_enabled:

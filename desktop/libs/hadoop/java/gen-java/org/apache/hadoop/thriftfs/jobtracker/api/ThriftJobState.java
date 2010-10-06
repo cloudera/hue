@@ -9,21 +9,16 @@ package org.apache.hadoop.thriftfs.jobtracker.api;
 import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
+
 /**
  * Enum version of the ints in JobStatus
  */
-public enum ThriftJobState implements TEnum{
-    RUNNING(1),
-    SUCCEEDED(2),
-    FAILED(3),
-    PREP(4),
-    KILLED(5);
-
-  private static final Map<Integer, ThriftJobState> BY_VALUE = new HashMap<Integer,ThriftJobState>() {{
-    for(ThriftJobState val : ThriftJobState.values()) {
-      put(val.getValue(), val);
-    }
-  }};
+public enum ThriftJobState implements TEnum {
+  RUNNING(1),
+  SUCCEEDED(2),
+  FAILED(3),
+  PREP(4),
+  KILLED(5);
 
   private final int value;
 
@@ -43,6 +38,19 @@ public enum ThriftJobState implements TEnum{
    * @return null if the value is not found.
    */
   public static ThriftJobState findByValue(int value) { 
-    return BY_VALUE.get(value);
+    switch (value) {
+      case 1:
+        return RUNNING;
+      case 2:
+        return SUCCEEDED;
+      case 3:
+        return FAILED;
+      case 4:
+        return PREP;
+      case 5:
+        return KILLED;
+      default:
+        return null;
+    }
   }
 }

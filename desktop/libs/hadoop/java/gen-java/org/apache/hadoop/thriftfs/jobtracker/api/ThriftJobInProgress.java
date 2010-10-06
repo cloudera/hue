@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Status of *all* jobs, not just currently running ones
  */
-public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, java.io.Serializable, Cloneable {
+public class ThriftJobInProgress implements TBase<ThriftJobInProgress, ThriftJobInProgress._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftJobInProgress");
 
   private static final TField PROFILE_FIELD_DESC = new TField("profile", TType.STRUCT, (short)1);
@@ -78,12 +81,10 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
     LAUNCH_TIME((short)13, "launchTime"),
     TASKS((short)23, "tasks");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -92,7 +93,34 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // PROFILE
+          return PROFILE;
+        case 2: // STATUS
+          return STATUS;
+        case 3: // JOB_ID
+          return JOB_ID;
+        case 4: // DESIRED_MAPS
+          return DESIRED_MAPS;
+        case 5: // DESIRED_REDUCES
+          return DESIRED_REDUCES;
+        case 6: // FINISHED_MAPS
+          return FINISHED_MAPS;
+        case 7: // FINISHED_REDUCES
+          return FINISHED_REDUCES;
+        case 8: // PRIORITY
+          return PRIORITY;
+        case 11: // START_TIME
+          return START_TIME;
+        case 12: // FINISH_TIME
+          return FINISH_TIME;
+        case 13: // LAUNCH_TIME
+          return LAUNCH_TIME;
+        case 23: // TASKS
+          return TASKS;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -139,34 +167,34 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
   private static final int __LAUNCHTIME_ISSET_ID = 6;
   private BitSet __isset_bit_vector = new BitSet(7);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.PROFILE, new FieldMetaData("profile", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftJobProfile.class)));
-    put(_Fields.STATUS, new FieldMetaData("status", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftJobStatus.class)));
-    put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftJobID.class)));
-    put(_Fields.DESIRED_MAPS, new FieldMetaData("desiredMaps", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.DESIRED_REDUCES, new FieldMetaData("desiredReduces", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.FINISHED_MAPS, new FieldMetaData("finishedMaps", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.FINISHED_REDUCES, new FieldMetaData("finishedReduces", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.PRIORITY, new FieldMetaData("priority", TFieldRequirementType.DEFAULT, 
-        new EnumMetaData(TType.ENUM, ThriftJobPriority.class)));
-    put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.FINISH_TIME, new FieldMetaData("finishTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.LAUNCH_TIME, new FieldMetaData("launchTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.TASKS, new FieldMetaData("tasks", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftTaskInProgressList.class)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.PROFILE, new FieldMetaData("profile", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftJobProfile.class)));
+    tmpMap.put(_Fields.STATUS, new FieldMetaData("status", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftJobStatus.class)));
+    tmpMap.put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftJobID.class)));
+    tmpMap.put(_Fields.DESIRED_MAPS, new FieldMetaData("desiredMaps", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.DESIRED_REDUCES, new FieldMetaData("desiredReduces", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.FINISHED_MAPS, new FieldMetaData("finishedMaps", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.FINISHED_REDUCES, new FieldMetaData("finishedReduces", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.PRIORITY, new FieldMetaData("priority", TFieldRequirementType.DEFAULT, 
+        new EnumMetaData(TType.ENUM, ThriftJobPriority.class)));
+    tmpMap.put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.FINISH_TIME, new FieldMetaData("finishTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.LAUNCH_TIME, new FieldMetaData("launchTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.TASKS, new FieldMetaData("tasks", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftTaskInProgressList.class)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftJobInProgress.class, metaDataMap);
   }
 
@@ -243,9 +271,27 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
     return new ThriftJobInProgress(this);
   }
 
-  @Deprecated
-  public ThriftJobInProgress clone() {
-    return new ThriftJobInProgress(this);
+  @Override
+  public void clear() {
+    this.profile = null;
+    this.status = null;
+    this.jobID = null;
+    setDesiredMapsIsSet(false);
+    this.desiredMaps = 0;
+    setDesiredReducesIsSet(false);
+    this.desiredReduces = 0;
+    setFinishedMapsIsSet(false);
+    this.finishedMaps = 0;
+    setFinishedReducesIsSet(false);
+    this.finishedReduces = 0;
+    this.priority = null;
+    setStartTimeIsSet(false);
+    this.startTime = 0;
+    setFinishTimeIsSet(false);
+    this.finishTime = 0;
+    setLaunchTimeIsSet(false);
+    this.launchTime = 0;
+    this.tasks = null;
   }
 
   public ThriftJobProfile getProfile() {
@@ -638,10 +684,6 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case PROFILE:
@@ -684,12 +726,12 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case PROFILE:
       return isSetProfile();
@@ -717,10 +759,6 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
       return isSetTasks();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -852,6 +890,141 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
     return 0;
   }
 
+  public int compareTo(ThriftJobInProgress other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    ThriftJobInProgress typedOther = (ThriftJobInProgress)other;
+
+    lastComparison = Boolean.valueOf(isSetProfile()).compareTo(typedOther.isSetProfile());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetProfile()) {
+      lastComparison = TBaseHelper.compareTo(this.profile, typedOther.profile);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStatus()).compareTo(typedOther.isSetStatus());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetStatus()) {
+      lastComparison = TBaseHelper.compareTo(this.status, typedOther.status);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetJobID()) {
+      lastComparison = TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetDesiredMaps()).compareTo(typedOther.isSetDesiredMaps());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetDesiredMaps()) {
+      lastComparison = TBaseHelper.compareTo(this.desiredMaps, typedOther.desiredMaps);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetDesiredReduces()).compareTo(typedOther.isSetDesiredReduces());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetDesiredReduces()) {
+      lastComparison = TBaseHelper.compareTo(this.desiredReduces, typedOther.desiredReduces);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetFinishedMaps()).compareTo(typedOther.isSetFinishedMaps());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetFinishedMaps()) {
+      lastComparison = TBaseHelper.compareTo(this.finishedMaps, typedOther.finishedMaps);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetFinishedReduces()).compareTo(typedOther.isSetFinishedReduces());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetFinishedReduces()) {
+      lastComparison = TBaseHelper.compareTo(this.finishedReduces, typedOther.finishedReduces);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetPriority()).compareTo(typedOther.isSetPriority());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetPriority()) {
+      lastComparison = TBaseHelper.compareTo(this.priority, typedOther.priority);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStartTime()).compareTo(typedOther.isSetStartTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetStartTime()) {
+      lastComparison = TBaseHelper.compareTo(this.startTime, typedOther.startTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetFinishTime()).compareTo(typedOther.isSetFinishTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetFinishTime()) {
+      lastComparison = TBaseHelper.compareTo(this.finishTime, typedOther.finishTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetLaunchTime()).compareTo(typedOther.isSetLaunchTime());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetLaunchTime()) {
+      lastComparison = TBaseHelper.compareTo(this.launchTime, typedOther.launchTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTasks()).compareTo(typedOther.isSetTasks());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTasks()) {
+      lastComparison = TBaseHelper.compareTo(this.tasks, typedOther.tasks);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -861,109 +1034,106 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case PROFILE:
-            if (field.type == TType.STRUCT) {
-              this.profile = new ThriftJobProfile();
-              this.profile.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case STATUS:
-            if (field.type == TType.STRUCT) {
-              this.status = new ThriftJobStatus();
-              this.status.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case JOB_ID:
-            if (field.type == TType.STRUCT) {
-              this.jobID = new ThriftJobID();
-              this.jobID.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case DESIRED_MAPS:
-            if (field.type == TType.I32) {
-              this.desiredMaps = iprot.readI32();
-              setDesiredMapsIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case DESIRED_REDUCES:
-            if (field.type == TType.I32) {
-              this.desiredReduces = iprot.readI32();
-              setDesiredReducesIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case FINISHED_MAPS:
-            if (field.type == TType.I32) {
-              this.finishedMaps = iprot.readI32();
-              setFinishedMapsIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case FINISHED_REDUCES:
-            if (field.type == TType.I32) {
-              this.finishedReduces = iprot.readI32();
-              setFinishedReducesIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PRIORITY:
-            if (field.type == TType.I32) {
-              this.priority = ThriftJobPriority.findByValue(iprot.readI32());
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case START_TIME:
-            if (field.type == TType.I64) {
-              this.startTime = iprot.readI64();
-              setStartTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case FINISH_TIME:
-            if (field.type == TType.I64) {
-              this.finishTime = iprot.readI64();
-              setFinishTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case LAUNCH_TIME:
-            if (field.type == TType.I64) {
-              this.launchTime = iprot.readI64();
-              setLaunchTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case TASKS:
-            if (field.type == TType.STRUCT) {
-              this.tasks = new ThriftTaskInProgressList();
-              this.tasks.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // PROFILE
+          if (field.type == TType.STRUCT) {
+            this.profile = new ThriftJobProfile();
+            this.profile.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // STATUS
+          if (field.type == TType.STRUCT) {
+            this.status = new ThriftJobStatus();
+            this.status.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // JOB_ID
+          if (field.type == TType.STRUCT) {
+            this.jobID = new ThriftJobID();
+            this.jobID.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // DESIRED_MAPS
+          if (field.type == TType.I32) {
+            this.desiredMaps = iprot.readI32();
+            setDesiredMapsIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // DESIRED_REDUCES
+          if (field.type == TType.I32) {
+            this.desiredReduces = iprot.readI32();
+            setDesiredReducesIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // FINISHED_MAPS
+          if (field.type == TType.I32) {
+            this.finishedMaps = iprot.readI32();
+            setFinishedMapsIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // FINISHED_REDUCES
+          if (field.type == TType.I32) {
+            this.finishedReduces = iprot.readI32();
+            setFinishedReducesIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 8: // PRIORITY
+          if (field.type == TType.I32) {
+            this.priority = ThriftJobPriority.findByValue(iprot.readI32());
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 11: // START_TIME
+          if (field.type == TType.I64) {
+            this.startTime = iprot.readI64();
+            setStartTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 12: // FINISH_TIME
+          if (field.type == TType.I64) {
+            this.finishTime = iprot.readI64();
+            setFinishTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 13: // LAUNCH_TIME
+          if (field.type == TType.I64) {
+            this.launchTime = iprot.readI64();
+            setLaunchTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 23: // TASKS
+          if (field.type == TType.STRUCT) {
+            this.tasks = new ThriftTaskInProgressList();
+            this.tasks.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 
@@ -1074,15 +1244,7 @@ public class ThriftJobInProgress implements TBase<ThriftJobInProgress._Fields>, 
     if (this.priority == null) {
       sb.append("null");
     } else {
-      String priority_name = priority.name();
-      if (priority_name != null) {
-        sb.append(priority_name);
-        sb.append(" (");
-      }
       sb.append(this.priority);
-      if (priority_name != null) {
-        sb.append(")");
-      }
     }
     first = false;
     if (!first) sb.append(", ");

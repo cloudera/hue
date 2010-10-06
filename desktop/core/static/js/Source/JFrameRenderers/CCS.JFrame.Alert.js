@@ -24,7 +24,8 @@ script: CCS.JFrame.Alert.js
 // limitations under the License.
 CCS.JFrame.addGlobalRenderers({
 
-	alert: function(content, options) {
+	alert: function(content) {
+		var options = content.options;
 		//if the contents have an element with .alert_popup *at the root*
 		//then display those contents in an alert
 		var popup = content.elements.filter('.alert_popup')[0];
@@ -34,11 +35,11 @@ CCS.JFrame.addGlobalRenderers({
 		var jframe_renders = popup.hasClass('jframe_renders');
 
 		var target = new Element('div', {'class': 'jframe_alert'}).hide().inject($(this));
-                var popupBehavior = new Behavior({
-                        onError: function(){
-                                dbug.warn.apply(dbug, arguments);
-                        }
-                });
+		var popupBehavior = new Behavior({
+			onError: function(){
+				dbug.warn.apply(dbug, arguments);
+			}
+		});
 		var fillAndShow = function() {
 			if (!jframe_renders) {
 				//if we aren't rendering the jframe, fill the popup
@@ -77,7 +78,7 @@ CCS.JFrame.addGlobalRenderers({
 						}.bind(this));
 					}
 				}
-                                alert.addEvent('destroy', function() {popupBehavior.cleanup(target);});
+				alert.addEvent('destroy', function() {popupBehavior.cleanup(target);});
 				alert.position().show();
 				
 				//if jframe is rendering we remove this event which we're going to add a few lines down

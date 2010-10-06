@@ -535,7 +535,7 @@ def bind_module_config(mod, conf_data):
                        members=members,
                        help=mod.__doc__)
 
-def initialize(modules):
+def initialize(modules, config_dir):
   """
   Set up the GLOBAL_CONFIG variable by loading all configuration
   variables from the given module list.
@@ -544,7 +544,7 @@ def initialize(modules):
   """
   global GLOBAL_CONFIG
   # Import confs
-  conf_data = load_confs()
+  conf_data = load_confs(_configs_from_dir(config_dir))
   sections = {}
   for module in modules:
     section = bind_module_config(module, conf_data)

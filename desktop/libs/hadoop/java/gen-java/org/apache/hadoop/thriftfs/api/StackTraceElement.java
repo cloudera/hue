@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * A single stack frame in a stack dump
  */
-public class StackTraceElement implements TBase<StackTraceElement._Fields>, java.io.Serializable, Cloneable, Comparable<StackTraceElement> {
+public class StackTraceElement implements TBase<StackTraceElement, StackTraceElement._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("StackTraceElement");
 
   private static final TField CLASS_NAME_FIELD_DESC = new TField("className", TType.STRING, (short)1);
@@ -52,12 +55,10 @@ public class StackTraceElement implements TBase<StackTraceElement._Fields>, java
     IS_NATIVE_METHOD((short)5, "isNativeMethod"),
     STRING_REPRESENTATION((short)6, "stringRepresentation");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -66,7 +67,22 @@ public class StackTraceElement implements TBase<StackTraceElement._Fields>, java
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // CLASS_NAME
+          return CLASS_NAME;
+        case 2: // FILE_NAME
+          return FILE_NAME;
+        case 3: // LINE_NUMBER
+          return LINE_NUMBER;
+        case 4: // METHOD_NAME
+          return METHOD_NAME;
+        case 5: // IS_NATIVE_METHOD
+          return IS_NATIVE_METHOD;
+        case 6: // STRING_REPRESENTATION
+          return STRING_REPRESENTATION;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -108,22 +124,22 @@ public class StackTraceElement implements TBase<StackTraceElement._Fields>, java
   private static final int __ISNATIVEMETHOD_ISSET_ID = 1;
   private BitSet __isset_bit_vector = new BitSet(2);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.CLASS_NAME, new FieldMetaData("className", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.FILE_NAME, new FieldMetaData("fileName", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.LINE_NUMBER, new FieldMetaData("lineNumber", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.METHOD_NAME, new FieldMetaData("methodName", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.IS_NATIVE_METHOD, new FieldMetaData("isNativeMethod", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.BOOL)));
-    put(_Fields.STRING_REPRESENTATION, new FieldMetaData("stringRepresentation", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.CLASS_NAME, new FieldMetaData("className", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.FILE_NAME, new FieldMetaData("fileName", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.LINE_NUMBER, new FieldMetaData("lineNumber", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.METHOD_NAME, new FieldMetaData("methodName", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.IS_NATIVE_METHOD, new FieldMetaData("isNativeMethod", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.BOOL)));
+    tmpMap.put(_Fields.STRING_REPRESENTATION, new FieldMetaData("stringRepresentation", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(StackTraceElement.class, metaDataMap);
   }
 
@@ -175,9 +191,16 @@ public class StackTraceElement implements TBase<StackTraceElement._Fields>, java
     return new StackTraceElement(this);
   }
 
-  @Deprecated
-  public StackTraceElement clone() {
-    return new StackTraceElement(this);
+  @Override
+  public void clear() {
+    this.className = null;
+    this.fileName = null;
+    setLineNumberIsSet(false);
+    this.lineNumber = 0;
+    this.methodName = null;
+    setIsNativeMethodIsSet(false);
+    this.isNativeMethod = false;
+    this.stringRepresentation = null;
   }
 
   public String getClassName() {
@@ -375,10 +398,6 @@ public class StackTraceElement implements TBase<StackTraceElement._Fields>, java
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case CLASS_NAME:
@@ -403,12 +422,12 @@ public class StackTraceElement implements TBase<StackTraceElement._Fields>, java
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case CLASS_NAME:
       return isSetClassName();
@@ -424,10 +443,6 @@ public class StackTraceElement implements TBase<StackTraceElement._Fields>, java
       return isSetStringRepresentation();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -513,55 +528,71 @@ public class StackTraceElement implements TBase<StackTraceElement._Fields>, java
     int lastComparison = 0;
     StackTraceElement typedOther = (StackTraceElement)other;
 
-    lastComparison = Boolean.valueOf(isSetClassName()).compareTo(isSetClassName());
+    lastComparison = Boolean.valueOf(isSetClassName()).compareTo(typedOther.isSetClassName());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(className, typedOther.className);
+    if (isSetClassName()) {
+      lastComparison = TBaseHelper.compareTo(this.className, typedOther.className);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetFileName()).compareTo(typedOther.isSetFileName());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetFileName()).compareTo(isSetFileName());
+    if (isSetFileName()) {
+      lastComparison = TBaseHelper.compareTo(this.fileName, typedOther.fileName);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetLineNumber()).compareTo(typedOther.isSetLineNumber());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(fileName, typedOther.fileName);
+    if (isSetLineNumber()) {
+      lastComparison = TBaseHelper.compareTo(this.lineNumber, typedOther.lineNumber);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMethodName()).compareTo(typedOther.isSetMethodName());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetLineNumber()).compareTo(isSetLineNumber());
+    if (isSetMethodName()) {
+      lastComparison = TBaseHelper.compareTo(this.methodName, typedOther.methodName);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetIsNativeMethod()).compareTo(typedOther.isSetIsNativeMethod());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(lineNumber, typedOther.lineNumber);
+    if (isSetIsNativeMethod()) {
+      lastComparison = TBaseHelper.compareTo(this.isNativeMethod, typedOther.isNativeMethod);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStringRepresentation()).compareTo(typedOther.isSetStringRepresentation());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetMethodName()).compareTo(isSetMethodName());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(methodName, typedOther.methodName);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetIsNativeMethod()).compareTo(isSetIsNativeMethod());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(isNativeMethod, typedOther.isNativeMethod);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetStringRepresentation()).compareTo(isSetStringRepresentation());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(stringRepresentation, typedOther.stringRepresentation);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetStringRepresentation()) {
+      lastComparison = TBaseHelper.compareTo(this.stringRepresentation, typedOther.stringRepresentation);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -573,58 +604,55 @@ public class StackTraceElement implements TBase<StackTraceElement._Fields>, java
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case CLASS_NAME:
-            if (field.type == TType.STRING) {
-              this.className = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case FILE_NAME:
-            if (field.type == TType.STRING) {
-              this.fileName = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case LINE_NUMBER:
-            if (field.type == TType.I32) {
-              this.lineNumber = iprot.readI32();
-              setLineNumberIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case METHOD_NAME:
-            if (field.type == TType.STRING) {
-              this.methodName = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case IS_NATIVE_METHOD:
-            if (field.type == TType.BOOL) {
-              this.isNativeMethod = iprot.readBool();
-              setIsNativeMethodIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case STRING_REPRESENTATION:
-            if (field.type == TType.STRING) {
-              this.stringRepresentation = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // CLASS_NAME
+          if (field.type == TType.STRING) {
+            this.className = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // FILE_NAME
+          if (field.type == TType.STRING) {
+            this.fileName = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // LINE_NUMBER
+          if (field.type == TType.I32) {
+            this.lineNumber = iprot.readI32();
+            setLineNumberIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // METHOD_NAME
+          if (field.type == TType.STRING) {
+            this.methodName = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // IS_NATIVE_METHOD
+          if (field.type == TType.BOOL) {
+            this.isNativeMethod = iprot.readBool();
+            setIsNativeMethodIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // STRING_REPRESENTATION
+          if (field.type == TType.STRING) {
+            this.stringRepresentation = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

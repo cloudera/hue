@@ -167,7 +167,22 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       env = {}
       env["HADOOP_CONF_DIR"] = in_conf_dir
       env["HADOOP_OPTS"] = "-Dtest.build.data=%s" % (self.tmpdir, )
-      env["HADOOP_CLASSPATH"] = ':'.join([hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(), hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()])
+      env["HADOOP_CLASSPATH"] = ':'.join([
+        # -- BEGIN JAVA TRIVIA --
+        # Add the -test- jar to the classpath to work around a subtle issue
+        # involving Java classloaders. In brief, hadoop's RunJar class creates
+        # a child classloader with the test jar on it, but the core classes
+        # are loaded by the system classloader. This is fine except that
+        # some classes in the test jar extend package-protected classes in the
+        # core jar. Even though the classes are in the same package name, they
+        # are thus loaded by different classloaders and therefore an IllegalAccessError
+        # prevents the MiniMRCluster from starting. Adding the test jar to the system
+        # classpath prevents this error since then both the MiniMRCluster and the
+        # core classes are loaded by the system classloader.
+        hadoop.conf.HADOOP_TEST_JAR.get(),
+        # -- END JAVA TRIVIA --
+        hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(),
+        hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()])
       env["HADOOP_HEAPSIZE"] = "128"
       env["HADOOP_HOME"] = hadoop.conf.HADOOP_HOME.get()
       env["HADOOP_LOG_DIR"] = self.log_dir

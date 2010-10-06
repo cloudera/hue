@@ -15,12 +15,15 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
@@ -28,7 +31,7 @@ import org.apache.thrift.protocol.*;
  * 
  * Modelled after org.apache.hadoop.hdfs.protocol.DatanodeInfo
  */
-public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serializable, Cloneable, Comparable<DatanodeInfo> {
+public class DatanodeInfo implements TBase<DatanodeInfo, DatanodeInfo._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("DatanodeInfo");
 
   private static final TField NAME_FIELD_DESC = new TField("name", TType.STRING, (short)1);
@@ -141,12 +144,10 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
      */
     MILLIS_SINCE_UPDATE((short)11, "millisSinceUpdate");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -155,7 +156,32 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // NAME
+          return NAME;
+        case 2: // STORAGE_ID
+          return STORAGE_ID;
+        case 3: // HOST
+          return HOST;
+        case 4: // THRIFT_PORT
+          return THRIFT_PORT;
+        case 10: // HTTP_PORT
+          return HTTP_PORT;
+        case 5: // CAPACITY
+          return CAPACITY;
+        case 6: // DFS_USED
+          return DFS_USED;
+        case 7: // REMAINING
+          return REMAINING;
+        case 8: // XCEIVER_COUNT
+          return XCEIVER_COUNT;
+        case 9: // STATE
+          return STATE;
+        case 11: // MILLIS_SINCE_UPDATE
+          return MILLIS_SINCE_UPDATE;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -202,32 +228,32 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
   private static final int __MILLISSINCEUPDATE_ISSET_ID = 6;
   private BitSet __isset_bit_vector = new BitSet(7);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.STORAGE_ID, new FieldMetaData("storageID", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.HOST, new FieldMetaData("host", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.THRIFT_PORT, new FieldMetaData("thriftPort", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.HTTP_PORT, new FieldMetaData("httpPort", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.CAPACITY, new FieldMetaData("capacity", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.DFS_USED, new FieldMetaData("dfsUsed", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.REMAINING, new FieldMetaData("remaining", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.XCEIVER_COUNT, new FieldMetaData("xceiverCount", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.STATE, new FieldMetaData("state", TFieldRequirementType.DEFAULT, 
-        new EnumMetaData(TType.ENUM, DatanodeState.class)));
-    put(_Fields.MILLIS_SINCE_UPDATE, new FieldMetaData("millisSinceUpdate", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.STORAGE_ID, new FieldMetaData("storageID", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.HOST, new FieldMetaData("host", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.THRIFT_PORT, new FieldMetaData("thriftPort", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.HTTP_PORT, new FieldMetaData("httpPort", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.CAPACITY, new FieldMetaData("capacity", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.DFS_USED, new FieldMetaData("dfsUsed", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.REMAINING, new FieldMetaData("remaining", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.XCEIVER_COUNT, new FieldMetaData("xceiverCount", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.STATE, new FieldMetaData("state", TFieldRequirementType.DEFAULT, 
+        new EnumMetaData(TType.ENUM, DatanodeState.class)));
+    tmpMap.put(_Fields.MILLIS_SINCE_UPDATE, new FieldMetaData("millisSinceUpdate", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(DatanodeInfo.class, metaDataMap);
   }
 
@@ -299,9 +325,26 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
     return new DatanodeInfo(this);
   }
 
-  @Deprecated
-  public DatanodeInfo clone() {
-    return new DatanodeInfo(this);
+  @Override
+  public void clear() {
+    this.name = null;
+    this.storageID = null;
+    this.host = null;
+    setThriftPortIsSet(false);
+    this.thriftPort = 0;
+    setHttpPortIsSet(false);
+    this.httpPort = 0;
+    setCapacityIsSet(false);
+    this.capacity = 0;
+    setDfsUsedIsSet(false);
+    this.dfsUsed = 0;
+    setRemainingIsSet(false);
+    this.remaining = 0;
+    setXceiverCountIsSet(false);
+    this.xceiverCount = 0;
+    this.state = null;
+    setMillisSinceUpdateIsSet(false);
+    this.millisSinceUpdate = 0;
   }
 
   /**
@@ -726,10 +769,6 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case NAME:
@@ -769,12 +808,12 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case NAME:
       return isSetName();
@@ -800,10 +839,6 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
       return isSetMillisSinceUpdate();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -934,95 +969,121 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
     int lastComparison = 0;
     DatanodeInfo typedOther = (DatanodeInfo)other;
 
-    lastComparison = Boolean.valueOf(isSetName()).compareTo(isSetName());
+    lastComparison = Boolean.valueOf(isSetName()).compareTo(typedOther.isSetName());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(name, typedOther.name);
+    if (isSetName()) {
+      lastComparison = TBaseHelper.compareTo(this.name, typedOther.name);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStorageID()).compareTo(typedOther.isSetStorageID());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetStorageID()).compareTo(isSetStorageID());
+    if (isSetStorageID()) {
+      lastComparison = TBaseHelper.compareTo(this.storageID, typedOther.storageID);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHost()).compareTo(typedOther.isSetHost());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(storageID, typedOther.storageID);
+    if (isSetHost()) {
+      lastComparison = TBaseHelper.compareTo(this.host, typedOther.host);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetThriftPort()).compareTo(typedOther.isSetThriftPort());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetHost()).compareTo(isSetHost());
+    if (isSetThriftPort()) {
+      lastComparison = TBaseHelper.compareTo(this.thriftPort, typedOther.thriftPort);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHttpPort()).compareTo(typedOther.isSetHttpPort());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(host, typedOther.host);
+    if (isSetHttpPort()) {
+      lastComparison = TBaseHelper.compareTo(this.httpPort, typedOther.httpPort);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCapacity()).compareTo(typedOther.isSetCapacity());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetThriftPort()).compareTo(isSetThriftPort());
+    if (isSetCapacity()) {
+      lastComparison = TBaseHelper.compareTo(this.capacity, typedOther.capacity);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetDfsUsed()).compareTo(typedOther.isSetDfsUsed());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(thriftPort, typedOther.thriftPort);
+    if (isSetDfsUsed()) {
+      lastComparison = TBaseHelper.compareTo(this.dfsUsed, typedOther.dfsUsed);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetRemaining()).compareTo(typedOther.isSetRemaining());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetHttpPort()).compareTo(isSetHttpPort());
+    if (isSetRemaining()) {
+      lastComparison = TBaseHelper.compareTo(this.remaining, typedOther.remaining);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetXceiverCount()).compareTo(typedOther.isSetXceiverCount());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(httpPort, typedOther.httpPort);
+    if (isSetXceiverCount()) {
+      lastComparison = TBaseHelper.compareTo(this.xceiverCount, typedOther.xceiverCount);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetState()).compareTo(typedOther.isSetState());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetCapacity()).compareTo(isSetCapacity());
+    if (isSetState()) {
+      lastComparison = TBaseHelper.compareTo(this.state, typedOther.state);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMillisSinceUpdate()).compareTo(typedOther.isSetMillisSinceUpdate());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(capacity, typedOther.capacity);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetDfsUsed()).compareTo(isSetDfsUsed());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(dfsUsed, typedOther.dfsUsed);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetRemaining()).compareTo(isSetRemaining());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(remaining, typedOther.remaining);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetXceiverCount()).compareTo(isSetXceiverCount());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(xceiverCount, typedOther.xceiverCount);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetState()).compareTo(isSetState());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(state, typedOther.state);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetMillisSinceUpdate()).compareTo(isSetMillisSinceUpdate());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(millisSinceUpdate, typedOther.millisSinceUpdate);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetMillisSinceUpdate()) {
+      lastComparison = TBaseHelper.compareTo(this.millisSinceUpdate, typedOther.millisSinceUpdate);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -1034,98 +1095,95 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case NAME:
-            if (field.type == TType.STRING) {
-              this.name = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case STORAGE_ID:
-            if (field.type == TType.STRING) {
-              this.storageID = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case HOST:
-            if (field.type == TType.STRING) {
-              this.host = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case THRIFT_PORT:
-            if (field.type == TType.I32) {
-              this.thriftPort = iprot.readI32();
-              setThriftPortIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case HTTP_PORT:
-            if (field.type == TType.I32) {
-              this.httpPort = iprot.readI32();
-              setHttpPortIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case CAPACITY:
-            if (field.type == TType.I64) {
-              this.capacity = iprot.readI64();
-              setCapacityIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case DFS_USED:
-            if (field.type == TType.I64) {
-              this.dfsUsed = iprot.readI64();
-              setDfsUsedIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case REMAINING:
-            if (field.type == TType.I64) {
-              this.remaining = iprot.readI64();
-              setRemainingIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case XCEIVER_COUNT:
-            if (field.type == TType.I32) {
-              this.xceiverCount = iprot.readI32();
-              setXceiverCountIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case STATE:
-            if (field.type == TType.I32) {
-              this.state = DatanodeState.findByValue(iprot.readI32());
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MILLIS_SINCE_UPDATE:
-            if (field.type == TType.I64) {
-              this.millisSinceUpdate = iprot.readI64();
-              setMillisSinceUpdateIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // NAME
+          if (field.type == TType.STRING) {
+            this.name = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // STORAGE_ID
+          if (field.type == TType.STRING) {
+            this.storageID = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // HOST
+          if (field.type == TType.STRING) {
+            this.host = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // THRIFT_PORT
+          if (field.type == TType.I32) {
+            this.thriftPort = iprot.readI32();
+            setThriftPortIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 10: // HTTP_PORT
+          if (field.type == TType.I32) {
+            this.httpPort = iprot.readI32();
+            setHttpPortIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // CAPACITY
+          if (field.type == TType.I64) {
+            this.capacity = iprot.readI64();
+            setCapacityIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // DFS_USED
+          if (field.type == TType.I64) {
+            this.dfsUsed = iprot.readI64();
+            setDfsUsedIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // REMAINING
+          if (field.type == TType.I64) {
+            this.remaining = iprot.readI64();
+            setRemainingIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 8: // XCEIVER_COUNT
+          if (field.type == TType.I32) {
+            this.xceiverCount = iprot.readI32();
+            setXceiverCountIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 9: // STATE
+          if (field.type == TType.I32) {
+            this.state = DatanodeState.findByValue(iprot.readI32());
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 11: // MILLIS_SINCE_UPDATE
+          if (field.type == TType.I64) {
+            this.millisSinceUpdate = iprot.readI64();
+            setMillisSinceUpdateIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 
@@ -1239,15 +1297,7 @@ public class DatanodeInfo implements TBase<DatanodeInfo._Fields>, java.io.Serial
     if (this.state == null) {
       sb.append("null");
     } else {
-      String state_name = state.name();
-      if (state_name != null) {
-        sb.append(state_name);
-        sb.append(" (");
-      }
       sb.append(this.state);
-      if (state_name != null) {
-        sb.append(")");
-      }
     }
     first = false;
     if (!first) sb.append(", ");

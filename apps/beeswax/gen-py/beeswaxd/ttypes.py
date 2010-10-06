@@ -9,7 +9,7 @@ import hive_metastore.ttypes
 
 
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -41,6 +41,7 @@ class QueryState(object):
     "FINISHED": 4,
     "EXCEPTION": 5,
   }
+
 
 class Query(object):
   """
@@ -139,6 +140,9 @@ class Query(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -207,6 +211,9 @@ class QueryHandle(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -263,6 +270,9 @@ class QueryExplanation(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -383,6 +393,9 @@ class Results(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -399,7 +412,7 @@ class ResultsMetadata(object):
   """
   Metadata information about the results.
   Applicable only for SELECT.
-  
+
   Attributes:
    - schema: The schema of the results
    - table_dir: The directory containing the results. Not applicable for partition table.
@@ -479,6 +492,9 @@ class ResultsMetadata(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -560,6 +576,9 @@ class BeeswaxException(Exception):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -601,6 +620,9 @@ class QueryNotFoundException(Exception):
     oprot.writeStructBegin('QueryNotFoundException')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -619,7 +641,7 @@ class QueryNotFoundException(Exception):
 class ConfigVariable(object):
   """
   Represents a Hadoop-style configuration variable.
-  
+
   Attributes:
    - key
    - value
@@ -686,6 +708,9 @@ class ConfigVariable(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -697,4 +722,3 @@ class ConfigVariable(object):
 
   def __ne__(self, other):
     return not (self == other)
-

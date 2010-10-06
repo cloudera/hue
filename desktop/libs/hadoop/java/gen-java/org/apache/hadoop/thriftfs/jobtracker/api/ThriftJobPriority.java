@@ -9,21 +9,16 @@ package org.apache.hadoop.thriftfs.jobtracker.api;
 import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
+
 /**
  * Possible job priorities (see ThriftJobStatus)
  */
-public enum ThriftJobPriority implements TEnum{
-    VERY_HIGH(0),
-    HIGH(1),
-    NORMAL(2),
-    LOW(3),
-    VERY_LOW(4);
-
-  private static final Map<Integer, ThriftJobPriority> BY_VALUE = new HashMap<Integer,ThriftJobPriority>() {{
-    for(ThriftJobPriority val : ThriftJobPriority.values()) {
-      put(val.getValue(), val);
-    }
-  }};
+public enum ThriftJobPriority implements TEnum {
+  VERY_HIGH(0),
+  HIGH(1),
+  NORMAL(2),
+  LOW(3),
+  VERY_LOW(4);
 
   private final int value;
 
@@ -43,6 +38,19 @@ public enum ThriftJobPriority implements TEnum{
    * @return null if the value is not found.
    */
   public static ThriftJobPriority findByValue(int value) { 
-    return BY_VALUE.get(value);
+    switch (value) {
+      case 0:
+        return VERY_HIGH;
+      case 1:
+        return HIGH;
+      case 2:
+        return NORMAL;
+      case 3:
+        return LOW;
+      case 4:
+        return VERY_LOW;
+      default:
+        return null;
+    }
   }
 }

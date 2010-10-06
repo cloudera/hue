@@ -80,7 +80,7 @@ class ConfigTest(unittest.TestCase):
             members=dict(HOST = Config("host", help="Hostname for the NN",
                                        required=True),
                          PORT = Config("port", help="Thrift port for the NN",
-                                       type=int, default=9090))))))
+                                       type=int, default=10090))))))
     self.conf = self.conf.bind(
       load_confs([configobj.ConfigObj(infile=StringIO(self.CONF_ONE)),
                   configobj.ConfigObj(infile=StringIO(self.CONF_TWO))]),
@@ -105,7 +105,7 @@ class ConfigTest(unittest.TestCase):
     self.assertEquals(['clustera', 'clusterb'], sorted(self.conf.CLUSTERS.keys()))
     self.assertTrue("clustera" in self.conf.CLUSTERS)
     self.assertEquals("localhost", self.conf.CLUSTERS['clustera'].HOST.get())
-    self.assertEquals(9090, self.conf.CLUSTERS['clustera'].PORT.get())
+    self.assertEquals(10090, self.conf.CLUSTERS['clustera'].PORT.get())
 
   def testFullKeyName(self):
     self.assertEquals(self.conf.REQ.get_fully_qualifying_key(), 'req')
@@ -148,7 +148,7 @@ class ConfigTest(unittest.TestCase):
       self.assertEquals(123, self.conf.CLUSTERS['clustera'].PORT.get())
     finally:
       close()
-    self.assertEquals(9090, self.conf.CLUSTERS['clustera'].PORT.get())
+    self.assertEquals(10090, self.conf.CLUSTERS['clustera'].PORT.get())
 
     # Test something inside a config section that wasn't provided in conf file
     self.assertEquals("baz_default", self.conf.SOME_SECTION.BAZ.get())
@@ -198,7 +198,7 @@ class ConfigTest(unittest.TestCase):
           Hostname for the NN
 
         Key: port (optional)
-          Default: 9090
+          Default: 10090
           Thrift port for the NN
 
     Key: dynamic_default (optional)

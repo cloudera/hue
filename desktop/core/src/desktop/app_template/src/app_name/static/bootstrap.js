@@ -18,7 +18,7 @@ CCS.Desktop.register({
 		name : '${app_name_spaces}',
 		//autolaunch: "/${app_name}/",
 		css : '/${app_name}/static/css/${app_name}.css',
-		require: [ '${app_name_camel}' ],
+		require: [ '${app_name}/${app_name_camel}' ],
 		launch: function(path, options){
 			// application launch code here 
 			// example code below: 

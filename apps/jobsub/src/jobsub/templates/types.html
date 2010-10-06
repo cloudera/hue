@@ -15,12 +15,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-<h2>Create a template</h2>
+<h2>Create a Job Design</h2>
 <ul class="jobsub_new">
 	{% for type, newurl in newlinks %}
-		<li><a href="{{ newurl }}" class="jframe_target(.jobsub_right_col)">new {{ type }}</a></li>
+		<li><a href="{{ newurl }}" class="jframe_target(.jobsub_right_col)">{{ type|capfirst }}</a></li>
 	{% endfor %}
 	{% if show_install_examples %}
-		<li><a href="{% url jobsub.views.setup %}">install examples</a></li>
+		<li><a href="{% url jobsub.views.setup %}">Install Samples</a></li>
 	{% endif %}
 </ul>

@@ -15,12 +15,15 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 public class Jobtracker {
@@ -220,7 +223,69 @@ public class Jobtracker {
 
   }
 
-  public static class Client extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.Client implements Iface {
+  public interface AsyncIface extends org.apache.hadoop.thriftfs.api.HadoopServiceBase .AsyncIface {
+
+    public void getJobTrackerName(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getJobTrackerName_call> resultHandler) throws TException;
+
+    public void getClusterStatus(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getClusterStatus_call> resultHandler) throws TException;
+
+    public void getQueues(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getQueues_call> resultHandler) throws TException;
+
+    public void getJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<AsyncClient.getJob_call> resultHandler) throws TException;
+
+    public void getRunningJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getRunningJobs_call> resultHandler) throws TException;
+
+    public void getCompletedJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getCompletedJobs_call> resultHandler) throws TException;
+
+    public void getFailedJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getFailedJobs_call> resultHandler) throws TException;
+
+    public void getKilledJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getKilledJobs_call> resultHandler) throws TException;
+
+    public void getAllJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getAllJobs_call> resultHandler) throws TException;
+
+    public void getUserJobCounts(org.apache.hadoop.thriftfs.api.RequestContext ctx, String user, AsyncMethodCallback<AsyncClient.getUserJobCounts_call> resultHandler) throws TException;
+
+    public void getTaskList(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, Set<ThriftTaskType> types, Set<ThriftTaskQueryState> states, String text, int count, int offset, AsyncMethodCallback<AsyncClient.getTaskList_call> resultHandler) throws TException;
+
+    public void getTask(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftTaskID taskID, AsyncMethodCallback<AsyncClient.getTask_call> resultHandler) throws TException;
+
+    public void getJobCounters(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<AsyncClient.getJobCounters_call> resultHandler) throws TException;
+
+    public void getJobCounterRollups(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<AsyncClient.getJobCounterRollups_call> resultHandler) throws TException;
+
+    public void getActiveTrackers(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getActiveTrackers_call> resultHandler) throws TException;
+
+    public void getBlacklistedTrackers(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getBlacklistedTrackers_call> resultHandler) throws TException;
+
+    public void getAllTrackers(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getAllTrackers_call> resultHandler) throws TException;
+
+    public void getTracker(org.apache.hadoop.thriftfs.api.RequestContext ctx, String name, AsyncMethodCallback<AsyncClient.getTracker_call> resultHandler) throws TException;
+
+    public void getCurrentTime(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.getCurrentTime_call> resultHandler) throws TException;
+
+    public void getJobConfXML(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<AsyncClient.getJobConfXML_call> resultHandler) throws TException;
+
+    public void killJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<AsyncClient.killJob_call> resultHandler) throws TException;
+
+    public void killTaskAttempt(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftTaskAttemptID attemptID, AsyncMethodCallback<AsyncClient.killTaskAttempt_call> resultHandler) throws TException;
+
+    public void setJobPriority(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, ThriftJobPriority priority, AsyncMethodCallback<AsyncClient.setJobPriority_call> resultHandler) throws TException;
+
+    public void getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer, AsyncMethodCallback<AsyncClient.getDelegationToken_call> resultHandler) throws TException;
+
+  }
+
+  public static class Client extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.Client implements TServiceClient, Iface {
+    public static class Factory implements TServiceClientFactory<Client> {
+      public Factory() {}
+      public Client getClient(TProtocol prot) {
+        return new Client(prot);
+      }
+      public Client getClient(TProtocol iprot, TProtocol oprot) {
+        return new Client(iprot, oprot);
+      }
+    }
+
     public Client(TProtocol prot)
     {
       this(prot, prot);
@@ -239,9 +304,9 @@ public class Jobtracker {
 
     public void send_getJobTrackerName(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getJobTrackerName", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getJobTrackerName", TMessageType.CALL, ++seqid_));
       getJobTrackerName_args args = new getJobTrackerName_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -254,6 +319,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getJobTrackerName failed: out of sequence response");
       }
       getJobTrackerName_result result = new getJobTrackerName_result();
       result.read(iprot_);
@@ -272,9 +340,9 @@ public class Jobtracker {
 
     public void send_getClusterStatus(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getClusterStatus", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getClusterStatus", TMessageType.CALL, ++seqid_));
       getClusterStatus_args args = new getClusterStatus_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -287,6 +355,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getClusterStatus failed: out of sequence response");
       }
       getClusterStatus_result result = new getClusterStatus_result();
       result.read(iprot_);
@@ -305,9 +376,9 @@ public class Jobtracker {
 
     public void send_getQueues(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getQueues", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getQueues", TMessageType.CALL, ++seqid_));
       getQueues_args args = new getQueues_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -320,6 +391,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getQueues failed: out of sequence response");
       }
       getQueues_result result = new getQueues_result();
       result.read(iprot_);
@@ -341,10 +415,10 @@ public class Jobtracker {
 
     public void send_getJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getJob", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getJob", TMessageType.CALL, ++seqid_));
       getJob_args args = new getJob_args();
-      args.ctx = ctx;
-      args.jobID = jobID;
+      args.setCtx(ctx);
+      args.setJobID(jobID);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -357,6 +431,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getJob failed: out of sequence response");
       }
       getJob_result result = new getJob_result();
       result.read(iprot_);
@@ -378,9 +455,9 @@ public class Jobtracker {
 
     public void send_getRunningJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getRunningJobs", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getRunningJobs", TMessageType.CALL, ++seqid_));
       getRunningJobs_args args = new getRunningJobs_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -393,6 +470,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getRunningJobs failed: out of sequence response");
       }
       getRunningJobs_result result = new getRunningJobs_result();
       result.read(iprot_);
@@ -411,9 +491,9 @@ public class Jobtracker {
 
     public void send_getCompletedJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getCompletedJobs", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getCompletedJobs", TMessageType.CALL, ++seqid_));
       getCompletedJobs_args args = new getCompletedJobs_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -426,6 +506,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getCompletedJobs failed: out of sequence response");
       }
       getCompletedJobs_result result = new getCompletedJobs_result();
       result.read(iprot_);
@@ -444,9 +527,9 @@ public class Jobtracker {
 
     public void send_getFailedJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getFailedJobs", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getFailedJobs", TMessageType.CALL, ++seqid_));
       getFailedJobs_args args = new getFailedJobs_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -459,6 +542,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getFailedJobs failed: out of sequence response");
       }
       getFailedJobs_result result = new getFailedJobs_result();
       result.read(iprot_);
@@ -477,9 +563,9 @@ public class Jobtracker {
 
     public void send_getKilledJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getKilledJobs", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getKilledJobs", TMessageType.CALL, ++seqid_));
       getKilledJobs_args args = new getKilledJobs_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -492,6 +578,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getKilledJobs failed: out of sequence response");
       }
       getKilledJobs_result result = new getKilledJobs_result();
       result.read(iprot_);
@@ -510,9 +599,9 @@ public class Jobtracker {
 
     public void send_getAllJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getAllJobs", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getAllJobs", TMessageType.CALL, ++seqid_));
       getAllJobs_args args = new getAllJobs_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -525,6 +614,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getAllJobs failed: out of sequence response");
       }
       getAllJobs_result result = new getAllJobs_result();
       result.read(iprot_);
@@ -543,10 +635,10 @@ public class Jobtracker {
 
     public void send_getUserJobCounts(org.apache.hadoop.thriftfs.api.RequestContext ctx, String user) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getUserJobCounts", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getUserJobCounts", TMessageType.CALL, ++seqid_));
       getUserJobCounts_args args = new getUserJobCounts_args();
-      args.ctx = ctx;
-      args.user = user;
+      args.setCtx(ctx);
+      args.setUser(user);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -559,6 +651,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getUserJobCounts failed: out of sequence response");
       }
       getUserJobCounts_result result = new getUserJobCounts_result();
       result.read(iprot_);
@@ -577,15 +672,15 @@ public class Jobtracker {
 
     public void send_getTaskList(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, Set<ThriftTaskType> types, Set<ThriftTaskQueryState> states, String text, int count, int offset) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getTaskList", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getTaskList", TMessageType.CALL, ++seqid_));
       getTaskList_args args = new getTaskList_args();
-      args.ctx = ctx;
-      args.jobID = jobID;
-      args.types = types;
-      args.states = states;
-      args.text = text;
-      args.count = count;
-      args.offset = offset;
+      args.setCtx(ctx);
+      args.setJobID(jobID);
+      args.setTypes(types);
+      args.setStates(states);
+      args.setText(text);
+      args.setCount(count);
+      args.setOffset(offset);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -598,6 +693,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getTaskList failed: out of sequence response");
       }
       getTaskList_result result = new getTaskList_result();
       result.read(iprot_);
@@ -619,10 +717,10 @@ public class Jobtracker {
 
     public void send_getTask(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftTaskID taskID) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getTask", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getTask", TMessageType.CALL, ++seqid_));
       getTask_args args = new getTask_args();
-      args.ctx = ctx;
-      args.taskID = taskID;
+      args.setCtx(ctx);
+      args.setTaskID(taskID);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -635,6 +733,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getTask failed: out of sequence response");
       }
       getTask_result result = new getTask_result();
       result.read(iprot_);
@@ -659,10 +760,10 @@ public class Jobtracker {
 
     public void send_getJobCounters(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getJobCounters", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getJobCounters", TMessageType.CALL, ++seqid_));
       getJobCounters_args args = new getJobCounters_args();
-      args.ctx = ctx;
-      args.jobID = jobID;
+      args.setCtx(ctx);
+      args.setJobID(jobID);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -675,6 +776,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getJobCounters failed: out of sequence response");
       }
       getJobCounters_result result = new getJobCounters_result();
       result.read(iprot_);
@@ -696,10 +800,10 @@ public class Jobtracker {
 
     public void send_getJobCounterRollups(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getJobCounterRollups", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getJobCounterRollups", TMessageType.CALL, ++seqid_));
       getJobCounterRollups_args args = new getJobCounterRollups_args();
-      args.ctx = ctx;
-      args.jobID = jobID;
+      args.setCtx(ctx);
+      args.setJobID(jobID);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -712,6 +816,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getJobCounterRollups failed: out of sequence response");
       }
       getJobCounterRollups_result result = new getJobCounterRollups_result();
       result.read(iprot_);
@@ -733,9 +840,9 @@ public class Jobtracker {
 
     public void send_getActiveTrackers(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getActiveTrackers", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getActiveTrackers", TMessageType.CALL, ++seqid_));
       getActiveTrackers_args args = new getActiveTrackers_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -748,6 +855,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getActiveTrackers failed: out of sequence response");
       }
       getActiveTrackers_result result = new getActiveTrackers_result();
       result.read(iprot_);
@@ -766,9 +876,9 @@ public class Jobtracker {
 
     public void send_getBlacklistedTrackers(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getBlacklistedTrackers", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getBlacklistedTrackers", TMessageType.CALL, ++seqid_));
       getBlacklistedTrackers_args args = new getBlacklistedTrackers_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -781,6 +891,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getBlacklistedTrackers failed: out of sequence response");
       }
       getBlacklistedTrackers_result result = new getBlacklistedTrackers_result();
       result.read(iprot_);
@@ -799,9 +912,9 @@ public class Jobtracker {
 
     public void send_getAllTrackers(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getAllTrackers", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getAllTrackers", TMessageType.CALL, ++seqid_));
       getAllTrackers_args args = new getAllTrackers_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -814,6 +927,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getAllTrackers failed: out of sequence response");
       }
       getAllTrackers_result result = new getAllTrackers_result();
       result.read(iprot_);
@@ -832,10 +948,10 @@ public class Jobtracker {
 
     public void send_getTracker(org.apache.hadoop.thriftfs.api.RequestContext ctx, String name) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getTracker", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getTracker", TMessageType.CALL, ++seqid_));
       getTracker_args args = new getTracker_args();
-      args.ctx = ctx;
-      args.name = name;
+      args.setCtx(ctx);
+      args.setName(name);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -848,6 +964,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getTracker failed: out of sequence response");
       }
       getTracker_result result = new getTracker_result();
       result.read(iprot_);
@@ -869,9 +988,9 @@ public class Jobtracker {
 
     public void send_getCurrentTime(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getCurrentTime", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getCurrentTime", TMessageType.CALL, ++seqid_));
       getCurrentTime_args args = new getCurrentTime_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -884,6 +1003,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getCurrentTime failed: out of sequence response");
       }
       getCurrentTime_result result = new getCurrentTime_result();
       result.read(iprot_);
@@ -902,10 +1024,10 @@ public class Jobtracker {
 
     public void send_getJobConfXML(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getJobConfXML", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getJobConfXML", TMessageType.CALL, ++seqid_));
       getJobConfXML_args args = new getJobConfXML_args();
-      args.ctx = ctx;
-      args.jobID = jobID;
+      args.setCtx(ctx);
+      args.setJobID(jobID);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -918,6 +1040,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getJobConfXML failed: out of sequence response");
       }
       getJobConfXML_result result = new getJobConfXML_result();
       result.read(iprot_);
@@ -939,10 +1064,10 @@ public class Jobtracker {
 
     public void send_killJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("killJob", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("killJob", TMessageType.CALL, ++seqid_));
       killJob_args args = new killJob_args();
-      args.ctx = ctx;
-      args.jobID = jobID;
+      args.setCtx(ctx);
+      args.setJobID(jobID);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -955,6 +1080,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "killJob failed: out of sequence response");
       }
       killJob_result result = new killJob_result();
       result.read(iprot_);
@@ -976,10 +1104,10 @@ public class Jobtracker {
 
     public void send_killTaskAttempt(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftTaskAttemptID attemptID) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("killTaskAttempt", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("killTaskAttempt", TMessageType.CALL, ++seqid_));
       killTaskAttempt_args args = new killTaskAttempt_args();
-      args.ctx = ctx;
-      args.attemptID = attemptID;
+      args.setCtx(ctx);
+      args.setAttemptID(attemptID);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -992,6 +1120,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "killTaskAttempt failed: out of sequence response");
       }
       killTaskAttempt_result result = new killTaskAttempt_result();
       result.read(iprot_);
@@ -1016,11 +1147,11 @@ public class Jobtracker {
 
     public void send_setJobPriority(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, ThriftJobPriority priority) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("setJobPriority", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("setJobPriority", TMessageType.CALL, ++seqid_));
       setJobPriority_args args = new setJobPriority_args();
-      args.ctx = ctx;
-      args.jobID = jobID;
-      args.priority = priority;
+      args.setCtx(ctx);
+      args.setJobID(jobID);
+      args.setPriority(priority);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -1033,6 +1164,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "setJobPriority failed: out of sequence response");
       }
       setJobPriority_result result = new setJobPriority_result();
       result.read(iprot_);
@@ -1054,10 +1188,10 @@ public class Jobtracker {
 
     public void send_getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.CALL, ++seqid_));
       getDelegationToken_args args = new getDelegationToken_args();
-      args.ctx = ctx;
-      args.renewer = renewer;
+      args.setCtx(ctx);
+      args.setRenewer(renewer);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -1070,6 +1204,9 @@ public class Jobtracker {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getDelegationToken failed: out of sequence response");
       }
       getDelegationToken_result result = new getDelegationToken_result();
       result.read(iprot_);
@@ -1084,6 +1221,823 @@ public class Jobtracker {
     }
 
   }
+  public static class AsyncClient extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.AsyncClient implements AsyncIface {
+    public static class Factory implements TAsyncClientFactory<AsyncClient> {
+      private TAsyncClientManager clientManager;
+      private TProtocolFactory protocolFactory;
+      public Factory(TAsyncClientManager clientManager, TProtocolFactory protocolFactory) {
+        this.clientManager = clientManager;
+        this.protocolFactory = protocolFactory;
+      }
+      public AsyncClient getAsyncClient(TNonblockingTransport transport) {
+        return new AsyncClient(protocolFactory, clientManager, transport);
+      }
+    }
+
+    public AsyncClient(TProtocolFactory protocolFactory, TAsyncClientManager clientManager, TNonblockingTransport transport) {
+      super(protocolFactory, clientManager, transport);
+    }
+
+    public void getJobTrackerName(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getJobTrackerName_call> resultHandler) throws TException {
+      checkReady();
+      getJobTrackerName_call method_call = new getJobTrackerName_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getJobTrackerName_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getJobTrackerName_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getJobTrackerName_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getJobTrackerName", TMessageType.CALL, 0));
+        getJobTrackerName_args args = new getJobTrackerName_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getJobTrackerName();
+      }
+    }
+
+    public void getClusterStatus(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getClusterStatus_call> resultHandler) throws TException {
+      checkReady();
+      getClusterStatus_call method_call = new getClusterStatus_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getClusterStatus_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getClusterStatus_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getClusterStatus_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getClusterStatus", TMessageType.CALL, 0));
+        getClusterStatus_args args = new getClusterStatus_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftClusterStatus getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getClusterStatus();
+      }
+    }
+
+    public void getQueues(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getQueues_call> resultHandler) throws TException {
+      checkReady();
+      getQueues_call method_call = new getQueues_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getQueues_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getQueues_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getQueues_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getQueues", TMessageType.CALL, 0));
+        getQueues_args args = new getQueues_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftJobQueueList getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getQueues();
+      }
+    }
+
+    public void getJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<getJob_call> resultHandler) throws TException {
+      checkReady();
+      getJob_call method_call = new getJob_call(ctx, jobID, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getJob_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftJobID jobID;
+      public getJob_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<getJob_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.jobID = jobID;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getJob", TMessageType.CALL, 0));
+        getJob_args args = new getJob_args();
+        args.setCtx(ctx);
+        args.setJobID(jobID);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftJobInProgress getResult() throws JobNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getJob();
+      }
+    }
+
+    public void getRunningJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getRunningJobs_call> resultHandler) throws TException {
+      checkReady();
+      getRunningJobs_call method_call = new getRunningJobs_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getRunningJobs_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getRunningJobs_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getRunningJobs_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getRunningJobs", TMessageType.CALL, 0));
+        getRunningJobs_args args = new getRunningJobs_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftJobList getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getRunningJobs();
+      }
+    }
+
+    public void getCompletedJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getCompletedJobs_call> resultHandler) throws TException {
+      checkReady();
+      getCompletedJobs_call method_call = new getCompletedJobs_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getCompletedJobs_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getCompletedJobs_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getCompletedJobs_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getCompletedJobs", TMessageType.CALL, 0));
+        getCompletedJobs_args args = new getCompletedJobs_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftJobList getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getCompletedJobs();
+      }
+    }
+
+    public void getFailedJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getFailedJobs_call> resultHandler) throws TException {
+      checkReady();
+      getFailedJobs_call method_call = new getFailedJobs_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getFailedJobs_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getFailedJobs_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getFailedJobs_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getFailedJobs", TMessageType.CALL, 0));
+        getFailedJobs_args args = new getFailedJobs_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftJobList getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getFailedJobs();
+      }
+    }
+
+    public void getKilledJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getKilledJobs_call> resultHandler) throws TException {
+      checkReady();
+      getKilledJobs_call method_call = new getKilledJobs_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getKilledJobs_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getKilledJobs_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getKilledJobs_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getKilledJobs", TMessageType.CALL, 0));
+        getKilledJobs_args args = new getKilledJobs_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftJobList getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getKilledJobs();
+      }
+    }
+
+    public void getAllJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getAllJobs_call> resultHandler) throws TException {
+      checkReady();
+      getAllJobs_call method_call = new getAllJobs_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getAllJobs_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getAllJobs_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getAllJobs_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getAllJobs", TMessageType.CALL, 0));
+        getAllJobs_args args = new getAllJobs_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftJobList getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getAllJobs();
+      }
+    }
+
+    public void getUserJobCounts(org.apache.hadoop.thriftfs.api.RequestContext ctx, String user, AsyncMethodCallback<getUserJobCounts_call> resultHandler) throws TException {
+      checkReady();
+      getUserJobCounts_call method_call = new getUserJobCounts_call(ctx, user, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getUserJobCounts_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String user;
+      public getUserJobCounts_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String user, AsyncMethodCallback<getUserJobCounts_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.user = user;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getUserJobCounts", TMessageType.CALL, 0));
+        getUserJobCounts_args args = new getUserJobCounts_args();
+        args.setCtx(ctx);
+        args.setUser(user);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftUserJobCounts getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getUserJobCounts();
+      }
+    }
+
+    public void getTaskList(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, Set<ThriftTaskType> types, Set<ThriftTaskQueryState> states, String text, int count, int offset, AsyncMethodCallback<getTaskList_call> resultHandler) throws TException {
+      checkReady();
+      getTaskList_call method_call = new getTaskList_call(ctx, jobID, types, states, text, count, offset, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getTaskList_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftJobID jobID;
+      private Set<ThriftTaskType> types;
+      private Set<ThriftTaskQueryState> states;
+      private String text;
+      private int count;
+      private int offset;
+      public getTaskList_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, Set<ThriftTaskType> types, Set<ThriftTaskQueryState> states, String text, int count, int offset, AsyncMethodCallback<getTaskList_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.jobID = jobID;
+        this.types = types;
+        this.states = states;
+        this.text = text;
+        this.count = count;
+        this.offset = offset;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getTaskList", TMessageType.CALL, 0));
+        getTaskList_args args = new getTaskList_args();
+        args.setCtx(ctx);
+        args.setJobID(jobID);
+        args.setTypes(types);
+        args.setStates(states);
+        args.setText(text);
+        args.setCount(count);
+        args.setOffset(offset);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftTaskInProgressList getResult() throws JobNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getTaskList();
+      }
+    }
+
+    public void getTask(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftTaskID taskID, AsyncMethodCallback<getTask_call> resultHandler) throws TException {
+      checkReady();
+      getTask_call method_call = new getTask_call(ctx, taskID, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getTask_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftTaskID taskID;
+      public getTask_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftTaskID taskID, AsyncMethodCallback<getTask_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.taskID = taskID;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getTask", TMessageType.CALL, 0));
+        getTask_args args = new getTask_args();
+        args.setCtx(ctx);
+        args.setTaskID(taskID);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftTaskInProgress getResult() throws JobNotFoundException, TaskNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getTask();
+      }
+    }
+
+    public void getJobCounters(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<getJobCounters_call> resultHandler) throws TException {
+      checkReady();
+      getJobCounters_call method_call = new getJobCounters_call(ctx, jobID, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getJobCounters_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftJobID jobID;
+      public getJobCounters_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<getJobCounters_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.jobID = jobID;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getJobCounters", TMessageType.CALL, 0));
+        getJobCounters_args args = new getJobCounters_args();
+        args.setCtx(ctx);
+        args.setJobID(jobID);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftGroupList getResult() throws JobNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getJobCounters();
+      }
+    }
+
+    public void getJobCounterRollups(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<getJobCounterRollups_call> resultHandler) throws TException {
+      checkReady();
+      getJobCounterRollups_call method_call = new getJobCounterRollups_call(ctx, jobID, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getJobCounterRollups_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftJobID jobID;
+      public getJobCounterRollups_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<getJobCounterRollups_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.jobID = jobID;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getJobCounterRollups", TMessageType.CALL, 0));
+        getJobCounterRollups_args args = new getJobCounterRollups_args();
+        args.setCtx(ctx);
+        args.setJobID(jobID);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftJobCounterRollups getResult() throws JobNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getJobCounterRollups();
+      }
+    }
+
+    public void getActiveTrackers(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getActiveTrackers_call> resultHandler) throws TException {
+      checkReady();
+      getActiveTrackers_call method_call = new getActiveTrackers_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getActiveTrackers_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getActiveTrackers_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getActiveTrackers_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getActiveTrackers", TMessageType.CALL, 0));
+        getActiveTrackers_args args = new getActiveTrackers_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftTaskTrackerStatusList getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getActiveTrackers();
+      }
+    }
+
+    public void getBlacklistedTrackers(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getBlacklistedTrackers_call> resultHandler) throws TException {
+      checkReady();
+      getBlacklistedTrackers_call method_call = new getBlacklistedTrackers_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getBlacklistedTrackers_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getBlacklistedTrackers_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getBlacklistedTrackers_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getBlacklistedTrackers", TMessageType.CALL, 0));
+        getBlacklistedTrackers_args args = new getBlacklistedTrackers_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftTaskTrackerStatusList getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getBlacklistedTrackers();
+      }
+    }
+
+    public void getAllTrackers(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getAllTrackers_call> resultHandler) throws TException {
+      checkReady();
+      getAllTrackers_call method_call = new getAllTrackers_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getAllTrackers_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getAllTrackers_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getAllTrackers_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getAllTrackers", TMessageType.CALL, 0));
+        getAllTrackers_args args = new getAllTrackers_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftTaskTrackerStatusList getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getAllTrackers();
+      }
+    }
+
+    public void getTracker(org.apache.hadoop.thriftfs.api.RequestContext ctx, String name, AsyncMethodCallback<getTracker_call> resultHandler) throws TException {
+      checkReady();
+      getTracker_call method_call = new getTracker_call(ctx, name, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getTracker_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String name;
+      public getTracker_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String name, AsyncMethodCallback<getTracker_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.name = name;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getTracker", TMessageType.CALL, 0));
+        getTracker_args args = new getTracker_args();
+        args.setCtx(ctx);
+        args.setName(name);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftTaskTrackerStatus getResult() throws TaskTrackerNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getTracker();
+      }
+    }
+
+    public void getCurrentTime(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getCurrentTime_call> resultHandler) throws TException {
+      checkReady();
+      getCurrentTime_call method_call = new getCurrentTime_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getCurrentTime_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public getCurrentTime_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<getCurrentTime_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getCurrentTime", TMessageType.CALL, 0));
+        getCurrentTime_args args = new getCurrentTime_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public long getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getCurrentTime();
+      }
+    }
+
+    public void getJobConfXML(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<getJobConfXML_call> resultHandler) throws TException {
+      checkReady();
+      getJobConfXML_call method_call = new getJobConfXML_call(ctx, jobID, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getJobConfXML_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftJobID jobID;
+      public getJobConfXML_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<getJobConfXML_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.jobID = jobID;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getJobConfXML", TMessageType.CALL, 0));
+        getJobConfXML_args args = new getJobConfXML_args();
+        args.setCtx(ctx);
+        args.setJobID(jobID);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getJobConfXML();
+      }
+    }
+
+    public void killJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<killJob_call> resultHandler) throws TException {
+      checkReady();
+      killJob_call method_call = new killJob_call(ctx, jobID, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class killJob_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftJobID jobID;
+      public killJob_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, AsyncMethodCallback<killJob_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.jobID = jobID;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("killJob", TMessageType.CALL, 0));
+        killJob_args args = new killJob_args();
+        args.setCtx(ctx);
+        args.setJobID(jobID);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, JobNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_killJob();
+      }
+    }
+
+    public void killTaskAttempt(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftTaskAttemptID attemptID, AsyncMethodCallback<killTaskAttempt_call> resultHandler) throws TException {
+      checkReady();
+      killTaskAttempt_call method_call = new killTaskAttempt_call(ctx, attemptID, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class killTaskAttempt_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftTaskAttemptID attemptID;
+      public killTaskAttempt_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftTaskAttemptID attemptID, AsyncMethodCallback<killTaskAttempt_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.attemptID = attemptID;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("killTaskAttempt", TMessageType.CALL, 0));
+        killTaskAttempt_args args = new killTaskAttempt_args();
+        args.setCtx(ctx);
+        args.setAttemptID(attemptID);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, TaskAttemptNotFoundException, JobNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_killTaskAttempt();
+      }
+    }
+
+    public void setJobPriority(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, ThriftJobPriority priority, AsyncMethodCallback<setJobPriority_call> resultHandler) throws TException {
+      checkReady();
+      setJobPriority_call method_call = new setJobPriority_call(ctx, jobID, priority, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class setJobPriority_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftJobID jobID;
+      private ThriftJobPriority priority;
+      public setJobPriority_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, ThriftJobPriority priority, AsyncMethodCallback<setJobPriority_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.jobID = jobID;
+        this.priority = priority;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("setJobPriority", TMessageType.CALL, 0));
+        setJobPriority_args args = new setJobPriority_args();
+        args.setCtx(ctx);
+        args.setJobID(jobID);
+        args.setPriority(priority);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, JobNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_setJobPriority();
+      }
+    }
+
+    public void getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer, AsyncMethodCallback<getDelegationToken_call> resultHandler) throws TException {
+      checkReady();
+      getDelegationToken_call method_call = new getDelegationToken_call(ctx, renewer, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getDelegationToken_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String renewer;
+      public getDelegationToken_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer, AsyncMethodCallback<getDelegationToken_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.renewer = renewer;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.CALL, 0));
+        getDelegationToken_args args = new getDelegationToken_args();
+        args.setCtx(ctx);
+        args.setRenewer(renewer);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getDelegationToken();
+      }
+    }
+
+  }
+
   public static class Processor extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.Processor implements TProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(Processor.class.getName());
     public Processor(Iface iface)
@@ -1140,7 +2094,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getJobTrackerName_args args = new getJobTrackerName_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getJobTrackerName", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getJobTrackerName_result result = new getJobTrackerName_result();
         result.success = iface_.getJobTrackerName(args.ctx);
@@ -1156,7 +2120,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getClusterStatus_args args = new getClusterStatus_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getClusterStatus", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getClusterStatus_result result = new getClusterStatus_result();
         result.success = iface_.getClusterStatus(args.ctx);
@@ -1172,7 +2146,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getQueues_args args = new getQueues_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getQueues", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getQueues_result result = new getQueues_result();
         try {
@@ -1200,7 +2184,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getJob_args args = new getJob_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getJob", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getJob_result result = new getJob_result();
         try {
@@ -1228,7 +2222,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getRunningJobs_args args = new getRunningJobs_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getRunningJobs", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getRunningJobs_result result = new getRunningJobs_result();
         result.success = iface_.getRunningJobs(args.ctx);
@@ -1244,7 +2248,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getCompletedJobs_args args = new getCompletedJobs_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getCompletedJobs", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getCompletedJobs_result result = new getCompletedJobs_result();
         result.success = iface_.getCompletedJobs(args.ctx);
@@ -1260,7 +2274,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getFailedJobs_args args = new getFailedJobs_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getFailedJobs", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getFailedJobs_result result = new getFailedJobs_result();
         result.success = iface_.getFailedJobs(args.ctx);
@@ -1276,7 +2300,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getKilledJobs_args args = new getKilledJobs_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getKilledJobs", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getKilledJobs_result result = new getKilledJobs_result();
         result.success = iface_.getKilledJobs(args.ctx);
@@ -1292,7 +2326,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getAllJobs_args args = new getAllJobs_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getAllJobs", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getAllJobs_result result = new getAllJobs_result();
         result.success = iface_.getAllJobs(args.ctx);
@@ -1308,7 +2352,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getUserJobCounts_args args = new getUserJobCounts_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getUserJobCounts", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getUserJobCounts_result result = new getUserJobCounts_result();
         result.success = iface_.getUserJobCounts(args.ctx, args.user);
@@ -1324,7 +2378,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getTaskList_args args = new getTaskList_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getTaskList", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getTaskList_result result = new getTaskList_result();
         try {
@@ -1352,7 +2416,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getTask_args args = new getTask_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getTask", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getTask_result result = new getTask_result();
         try {
@@ -1382,7 +2456,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getJobCounters_args args = new getJobCounters_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getJobCounters", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getJobCounters_result result = new getJobCounters_result();
         try {
@@ -1410,7 +2494,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getJobCounterRollups_args args = new getJobCounterRollups_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getJobCounterRollups", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getJobCounterRollups_result result = new getJobCounterRollups_result();
         try {
@@ -1438,7 +2532,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getActiveTrackers_args args = new getActiveTrackers_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getActiveTrackers", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getActiveTrackers_result result = new getActiveTrackers_result();
         result.success = iface_.getActiveTrackers(args.ctx);
@@ -1454,7 +2558,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getBlacklistedTrackers_args args = new getBlacklistedTrackers_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getBlacklistedTrackers", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getBlacklistedTrackers_result result = new getBlacklistedTrackers_result();
         result.success = iface_.getBlacklistedTrackers(args.ctx);
@@ -1470,7 +2584,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getAllTrackers_args args = new getAllTrackers_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getAllTrackers", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getAllTrackers_result result = new getAllTrackers_result();
         result.success = iface_.getAllTrackers(args.ctx);
@@ -1486,7 +2610,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getTracker_args args = new getTracker_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getTracker", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getTracker_result result = new getTracker_result();
         try {
@@ -1514,7 +2648,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getCurrentTime_args args = new getCurrentTime_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getCurrentTime", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getCurrentTime_result result = new getCurrentTime_result();
         result.success = iface_.getCurrentTime(args.ctx);
@@ -1531,7 +2675,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getJobConfXML_args args = new getJobConfXML_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getJobConfXML", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getJobConfXML_result result = new getJobConfXML_result();
         try {
@@ -1559,7 +2713,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         killJob_args args = new killJob_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("killJob", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         killJob_result result = new killJob_result();
         try {
@@ -1589,7 +2753,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         killTaskAttempt_args args = new killTaskAttempt_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("killTaskAttempt", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         killTaskAttempt_result result = new killTaskAttempt_result();
         try {
@@ -1621,7 +2795,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         setJobPriority_args args = new setJobPriority_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("setJobPriority", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         setJobPriority_result result = new setJobPriority_result();
         try {
@@ -1651,7 +2835,17 @@ public class Jobtracker {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getDelegationToken_args args = new getDelegationToken_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getDelegationToken_result result = new getDelegationToken_result();
         try {
@@ -1677,7 +2871,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJobTrackerName_args implements TBase<getJobTrackerName_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getJobTrackerName_args implements TBase<getJobTrackerName_args, getJobTrackerName_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJobTrackerName_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -1688,12 +2882,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -1702,7 +2894,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -1741,12 +2938,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJobTrackerName_args.class, metaDataMap);
     }
 
@@ -1773,9 +2970,9 @@ public class Jobtracker {
       return new getJobTrackerName_args(this);
     }
 
-    @Deprecated
-    public getJobTrackerName_args clone() {
-      return new getJobTrackerName_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -1815,10 +3012,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -1828,21 +3021,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -1875,6 +3064,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getJobTrackerName_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getJobTrackerName_args typedOther = (getJobTrackerName_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -1884,22 +3098,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -1942,7 +3153,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJobTrackerName_result implements TBase<getJobTrackerName_result._Fields>, java.io.Serializable, Cloneable, Comparable<getJobTrackerName_result>   {
+  public static class getJobTrackerName_result implements TBase<getJobTrackerName_result, getJobTrackerName_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJobTrackerName_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRING, (short)0);
@@ -1953,12 +3164,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -1967,7 +3176,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -2006,12 +3220,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJobTrackerName_result.class, metaDataMap);
     }
 
@@ -2038,9 +3252,9 @@ public class Jobtracker {
       return new getJobTrackerName_result(this);
     }
 
-    @Deprecated
-    public getJobTrackerName_result clone() {
-      return new getJobTrackerName_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public String getSuccess() {
@@ -2080,10 +3294,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -2093,21 +3303,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2148,15 +3354,21 @@ public class Jobtracker {
       int lastComparison = 0;
       getJobTrackerName_result typedOther = (getJobTrackerName_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -2168,21 +3380,18 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRING) {
-                this.success = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRING) {
+              this.success = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -2224,7 +3433,7 @@ public class Jobtracker {
 
   }
 
-  public static class getClusterStatus_args implements TBase<getClusterStatus_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getClusterStatus_args implements TBase<getClusterStatus_args, getClusterStatus_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getClusterStatus_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -2235,12 +3444,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -2249,7 +3456,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -2288,12 +3500,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getClusterStatus_args.class, metaDataMap);
     }
 
@@ -2320,9 +3532,9 @@ public class Jobtracker {
       return new getClusterStatus_args(this);
     }
 
-    @Deprecated
-    public getClusterStatus_args clone() {
-      return new getClusterStatus_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -2362,10 +3574,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -2375,21 +3583,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2422,6 +3626,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getClusterStatus_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getClusterStatus_args typedOther = (getClusterStatus_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2431,22 +3660,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -2489,7 +3715,7 @@ public class Jobtracker {
 
   }
 
-  public static class getClusterStatus_result implements TBase<getClusterStatus_result._Fields>, java.io.Serializable, Cloneable, Comparable<getClusterStatus_result>   {
+  public static class getClusterStatus_result implements TBase<getClusterStatus_result, getClusterStatus_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getClusterStatus_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -2500,12 +3726,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -2514,7 +3738,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -2553,12 +3782,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftClusterStatus.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftClusterStatus.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getClusterStatus_result.class, metaDataMap);
     }
 
@@ -2585,9 +3814,9 @@ public class Jobtracker {
       return new getClusterStatus_result(this);
     }
 
-    @Deprecated
-    public getClusterStatus_result clone() {
-      return new getClusterStatus_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftClusterStatus getSuccess() {
@@ -2627,10 +3856,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -2640,21 +3865,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2695,15 +3916,21 @@ public class Jobtracker {
       int lastComparison = 0;
       getClusterStatus_result typedOther = (getClusterStatus_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -2715,22 +3942,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftClusterStatus();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftClusterStatus();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -2772,7 +3996,7 @@ public class Jobtracker {
 
   }
 
-  public static class getQueues_args implements TBase<getQueues_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getQueues_args implements TBase<getQueues_args, getQueues_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getQueues_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -2783,12 +4007,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -2797,7 +4019,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -2836,12 +4063,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getQueues_args.class, metaDataMap);
     }
 
@@ -2868,9 +4095,9 @@ public class Jobtracker {
       return new getQueues_args(this);
     }
 
-    @Deprecated
-    public getQueues_args clone() {
-      return new getQueues_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -2910,10 +4137,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -2923,21 +4146,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2970,6 +4189,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getQueues_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getQueues_args typedOther = (getQueues_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2979,22 +4223,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -3037,7 +4278,7 @@ public class Jobtracker {
 
   }
 
-  public static class getQueues_result implements TBase<getQueues_result._Fields>, java.io.Serializable, Cloneable, Comparable<getQueues_result>   {
+  public static class getQueues_result implements TBase<getQueues_result, getQueues_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getQueues_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -3051,12 +4292,10 @@ public class Jobtracker {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -3065,7 +4304,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -3104,14 +4350,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobQueueList.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobQueueList.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getQueues_result.class, metaDataMap);
     }
 
@@ -3143,9 +4389,10 @@ public class Jobtracker {
       return new getQueues_result(this);
     }
 
-    @Deprecated
-    public getQueues_result clone() {
-      return new getQueues_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public ThriftJobQueueList getSuccess() {
@@ -3217,10 +4464,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -3233,12 +4476,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -3246,10 +4489,6 @@ public class Jobtracker {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -3299,23 +4538,31 @@ public class Jobtracker {
       int lastComparison = 0;
       getQueues_result typedOther = (getQueues_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -3327,30 +4574,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftJobQueueList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftJobQueueList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -3404,7 +4648,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJob_args implements TBase<getJob_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getJob_args implements TBase<getJob_args, getJob_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJob_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -3418,12 +4662,10 @@ public class Jobtracker {
       CTX((short)10, "ctx"),
       JOB_ID((short)1, "jobID");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -3432,7 +4674,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // JOB_ID
+            return JOB_ID;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -3471,14 +4720,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJob_args.class, metaDataMap);
     }
 
@@ -3510,9 +4759,10 @@ public class Jobtracker {
       return new getJob_args(this);
     }
 
-    @Deprecated
-    public getJob_args clone() {
-      return new getJob_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.jobID = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -3584,10 +4834,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -3600,12 +4846,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -3613,10 +4859,6 @@ public class Jobtracker {
         return isSetJobID();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -3658,6 +4900,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getJob_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getJob_args typedOther = (getJob_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJobID()) {
+        lastComparison = TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -3667,30 +4944,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JOB_ID:
-              if (field.type == TType.STRUCT) {
-                this.jobID = new ThriftJobID();
-                this.jobID.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // JOB_ID
+            if (field.type == TType.STRUCT) {
+              this.jobID = new ThriftJobID();
+              this.jobID.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -3746,7 +5020,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJob_result implements TBase<getJob_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getJob_result implements TBase<getJob_result, getJob_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJob_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -3760,12 +5034,10 @@ public class Jobtracker {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -3774,7 +5046,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -3813,14 +5092,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobInProgress.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobInProgress.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJob_result.class, metaDataMap);
     }
 
@@ -3852,9 +5131,10 @@ public class Jobtracker {
       return new getJob_result(this);
     }
 
-    @Deprecated
-    public getJob_result clone() {
-      return new getJob_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public ThriftJobInProgress getSuccess() {
@@ -3926,10 +5206,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -3942,12 +5218,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -3955,10 +5231,6 @@ public class Jobtracker {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -4000,6 +5272,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getJob_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getJob_result typedOther = (getJob_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4009,30 +5316,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftJobInProgress();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new JobNotFoundException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftJobInProgress();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new JobNotFoundException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -4086,7 +5390,7 @@ public class Jobtracker {
 
   }
 
-  public static class getRunningJobs_args implements TBase<getRunningJobs_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getRunningJobs_args implements TBase<getRunningJobs_args, getRunningJobs_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getRunningJobs_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -4097,12 +5401,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -4111,7 +5413,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -4150,12 +5457,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getRunningJobs_args.class, metaDataMap);
     }
 
@@ -4182,9 +5489,9 @@ public class Jobtracker {
       return new getRunningJobs_args(this);
     }
 
-    @Deprecated
-    public getRunningJobs_args clone() {
-      return new getRunningJobs_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -4224,10 +5531,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -4237,21 +5540,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -4284,6 +5583,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getRunningJobs_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getRunningJobs_args typedOther = (getRunningJobs_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4293,22 +5617,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -4351,7 +5672,7 @@ public class Jobtracker {
 
   }
 
-  public static class getRunningJobs_result implements TBase<getRunningJobs_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getRunningJobs_result implements TBase<getRunningJobs_result, getRunningJobs_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getRunningJobs_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -4362,12 +5683,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -4376,7 +5695,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -4415,12 +5739,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getRunningJobs_result.class, metaDataMap);
     }
 
@@ -4447,9 +5771,9 @@ public class Jobtracker {
       return new getRunningJobs_result(this);
     }
 
-    @Deprecated
-    public getRunningJobs_result clone() {
-      return new getRunningJobs_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftJobList getSuccess() {
@@ -4489,10 +5813,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -4502,21 +5822,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -4549,6 +5865,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getRunningJobs_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getRunningJobs_result typedOther = (getRunningJobs_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4558,22 +5899,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftJobList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftJobList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -4615,7 +5953,7 @@ public class Jobtracker {
 
   }
 
-  public static class getCompletedJobs_args implements TBase<getCompletedJobs_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getCompletedJobs_args implements TBase<getCompletedJobs_args, getCompletedJobs_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getCompletedJobs_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -4626,12 +5964,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -4640,7 +5976,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -4679,12 +6020,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getCompletedJobs_args.class, metaDataMap);
     }
 
@@ -4711,9 +6052,9 @@ public class Jobtracker {
       return new getCompletedJobs_args(this);
     }
 
-    @Deprecated
-    public getCompletedJobs_args clone() {
-      return new getCompletedJobs_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -4753,10 +6094,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -4766,21 +6103,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -4813,6 +6146,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getCompletedJobs_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getCompletedJobs_args typedOther = (getCompletedJobs_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4822,22 +6180,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -4880,7 +6235,7 @@ public class Jobtracker {
 
   }
 
-  public static class getCompletedJobs_result implements TBase<getCompletedJobs_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getCompletedJobs_result implements TBase<getCompletedJobs_result, getCompletedJobs_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getCompletedJobs_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -4891,12 +6246,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -4905,7 +6258,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -4944,12 +6302,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getCompletedJobs_result.class, metaDataMap);
     }
 
@@ -4976,9 +6334,9 @@ public class Jobtracker {
       return new getCompletedJobs_result(this);
     }
 
-    @Deprecated
-    public getCompletedJobs_result clone() {
-      return new getCompletedJobs_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftJobList getSuccess() {
@@ -5018,10 +6376,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -5031,21 +6385,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -5078,6 +6428,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getCompletedJobs_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getCompletedJobs_result typedOther = (getCompletedJobs_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -5087,22 +6462,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftJobList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftJobList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -5144,7 +6516,7 @@ public class Jobtracker {
 
   }
 
-  public static class getFailedJobs_args implements TBase<getFailedJobs_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getFailedJobs_args implements TBase<getFailedJobs_args, getFailedJobs_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getFailedJobs_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -5155,12 +6527,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -5169,7 +6539,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -5208,12 +6583,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getFailedJobs_args.class, metaDataMap);
     }
 
@@ -5240,9 +6615,9 @@ public class Jobtracker {
       return new getFailedJobs_args(this);
     }
 
-    @Deprecated
-    public getFailedJobs_args clone() {
-      return new getFailedJobs_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -5282,10 +6657,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -5295,21 +6666,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -5342,6 +6709,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getFailedJobs_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getFailedJobs_args typedOther = (getFailedJobs_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -5351,22 +6743,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -5409,7 +6798,7 @@ public class Jobtracker {
 
   }
 
-  public static class getFailedJobs_result implements TBase<getFailedJobs_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getFailedJobs_result implements TBase<getFailedJobs_result, getFailedJobs_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getFailedJobs_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -5420,12 +6809,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -5434,7 +6821,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -5473,12 +6865,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getFailedJobs_result.class, metaDataMap);
     }
 
@@ -5505,9 +6897,9 @@ public class Jobtracker {
       return new getFailedJobs_result(this);
     }
 
-    @Deprecated
-    public getFailedJobs_result clone() {
-      return new getFailedJobs_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftJobList getSuccess() {
@@ -5547,10 +6939,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -5560,21 +6948,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -5607,6 +6991,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getFailedJobs_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getFailedJobs_result typedOther = (getFailedJobs_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -5616,22 +7025,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftJobList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftJobList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -5673,7 +7079,7 @@ public class Jobtracker {
 
   }
 
-  public static class getKilledJobs_args implements TBase<getKilledJobs_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getKilledJobs_args implements TBase<getKilledJobs_args, getKilledJobs_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getKilledJobs_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -5684,12 +7090,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -5698,7 +7102,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -5737,12 +7146,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getKilledJobs_args.class, metaDataMap);
     }
 
@@ -5769,9 +7178,9 @@ public class Jobtracker {
       return new getKilledJobs_args(this);
     }
 
-    @Deprecated
-    public getKilledJobs_args clone() {
-      return new getKilledJobs_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -5811,10 +7220,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -5824,21 +7229,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -5871,6 +7272,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getKilledJobs_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getKilledJobs_args typedOther = (getKilledJobs_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -5880,22 +7306,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -5938,7 +7361,7 @@ public class Jobtracker {
 
   }
 
-  public static class getKilledJobs_result implements TBase<getKilledJobs_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getKilledJobs_result implements TBase<getKilledJobs_result, getKilledJobs_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getKilledJobs_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -5949,12 +7372,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -5963,7 +7384,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -6002,12 +7428,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getKilledJobs_result.class, metaDataMap);
     }
 
@@ -6034,9 +7460,9 @@ public class Jobtracker {
       return new getKilledJobs_result(this);
     }
 
-    @Deprecated
-    public getKilledJobs_result clone() {
-      return new getKilledJobs_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftJobList getSuccess() {
@@ -6076,10 +7502,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -6089,21 +7511,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -6136,6 +7554,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getKilledJobs_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getKilledJobs_result typedOther = (getKilledJobs_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -6145,22 +7588,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftJobList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftJobList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -6202,7 +7642,7 @@ public class Jobtracker {
 
   }
 
-  public static class getAllJobs_args implements TBase<getAllJobs_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getAllJobs_args implements TBase<getAllJobs_args, getAllJobs_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getAllJobs_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -6213,12 +7653,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -6227,7 +7665,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -6266,12 +7709,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getAllJobs_args.class, metaDataMap);
     }
 
@@ -6298,9 +7741,9 @@ public class Jobtracker {
       return new getAllJobs_args(this);
     }
 
-    @Deprecated
-    public getAllJobs_args clone() {
-      return new getAllJobs_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -6340,10 +7783,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -6353,21 +7792,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -6400,6 +7835,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getAllJobs_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getAllJobs_args typedOther = (getAllJobs_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -6409,22 +7869,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -6467,7 +7924,7 @@ public class Jobtracker {
 
   }
 
-  public static class getAllJobs_result implements TBase<getAllJobs_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getAllJobs_result implements TBase<getAllJobs_result, getAllJobs_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getAllJobs_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -6478,12 +7935,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -6492,7 +7947,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -6531,12 +7991,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobList.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getAllJobs_result.class, metaDataMap);
     }
 
@@ -6563,9 +8023,9 @@ public class Jobtracker {
       return new getAllJobs_result(this);
     }
 
-    @Deprecated
-    public getAllJobs_result clone() {
-      return new getAllJobs_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftJobList getSuccess() {
@@ -6605,10 +8065,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -6618,21 +8074,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -6665,6 +8117,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getAllJobs_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getAllJobs_result typedOther = (getAllJobs_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -6674,22 +8151,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftJobList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftJobList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -6731,7 +8205,7 @@ public class Jobtracker {
 
   }
 
-  public static class getUserJobCounts_args implements TBase<getUserJobCounts_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getUserJobCounts_args implements TBase<getUserJobCounts_args, getUserJobCounts_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getUserJobCounts_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)1);
@@ -6745,12 +8219,10 @@ public class Jobtracker {
       CTX((short)1, "ctx"),
       USER((short)2, "user");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -6759,7 +8231,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // CTX
+            return CTX;
+          case 2: // USER
+            return USER;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -6798,14 +8277,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.USER, new FieldMetaData("user", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.USER, new FieldMetaData("user", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getUserJobCounts_args.class, metaDataMap);
     }
 
@@ -6837,9 +8316,10 @@ public class Jobtracker {
       return new getUserJobCounts_args(this);
     }
 
-    @Deprecated
-    public getUserJobCounts_args clone() {
-      return new getUserJobCounts_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.user = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -6911,10 +8391,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -6927,12 +8403,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -6940,10 +8416,6 @@ public class Jobtracker {
         return isSetUser();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -6985,6 +8457,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getUserJobCounts_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getUserJobCounts_args typedOther = (getUserJobCounts_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetUser()).compareTo(typedOther.isSetUser());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUser()) {
+        lastComparison = TBaseHelper.compareTo(this.user, typedOther.user);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -6994,29 +8501,26 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case USER:
-              if (field.type == TType.STRING) {
-                this.user = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // USER
+            if (field.type == TType.STRING) {
+              this.user = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -7072,7 +8576,7 @@ public class Jobtracker {
 
   }
 
-  public static class getUserJobCounts_result implements TBase<getUserJobCounts_result._Fields>, java.io.Serializable, Cloneable, Comparable<getUserJobCounts_result>   {
+  public static class getUserJobCounts_result implements TBase<getUserJobCounts_result, getUserJobCounts_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getUserJobCounts_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -7083,12 +8587,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -7097,7 +8599,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -7136,12 +8643,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftUserJobCounts.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftUserJobCounts.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getUserJobCounts_result.class, metaDataMap);
     }
 
@@ -7168,9 +8675,9 @@ public class Jobtracker {
       return new getUserJobCounts_result(this);
     }
 
-    @Deprecated
-    public getUserJobCounts_result clone() {
-      return new getUserJobCounts_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftUserJobCounts getSuccess() {
@@ -7210,10 +8717,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -7223,21 +8726,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -7278,15 +8777,21 @@ public class Jobtracker {
       int lastComparison = 0;
       getUserJobCounts_result typedOther = (getUserJobCounts_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -7298,22 +8803,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftUserJobCounts();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftUserJobCounts();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -7355,7 +8857,7 @@ public class Jobtracker {
 
   }
 
-  public static class getTaskList_args implements TBase<getTaskList_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getTaskList_args implements TBase<getTaskList_args, getTaskList_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getTaskList_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)1);
@@ -7384,12 +8886,10 @@ public class Jobtracker {
       COUNT((short)6, "count"),
       OFFSET((short)7, "offset");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -7398,7 +8898,24 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // CTX
+            return CTX;
+          case 2: // JOB_ID
+            return JOB_ID;
+          case 3: // TYPES
+            return TYPES;
+          case 4: // STATES
+            return STATES;
+          case 5: // TEXT
+            return TEXT;
+          case 6: // COUNT
+            return COUNT;
+          case 7: // OFFSET
+            return OFFSET;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -7440,26 +8957,26 @@ public class Jobtracker {
     private static final int __OFFSET_ISSET_ID = 1;
     private BitSet __isset_bit_vector = new BitSet(2);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
           new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
           new StructMetaData(TType.STRUCT, ThriftJobID.class)));
-      put(_Fields.TYPES, new FieldMetaData("types", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.TYPES, new FieldMetaData("types", TFieldRequirementType.DEFAULT, 
           new SetMetaData(TType.SET, 
               new EnumMetaData(TType.ENUM, ThriftTaskType.class))));
-      put(_Fields.STATES, new FieldMetaData("states", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.STATES, new FieldMetaData("states", TFieldRequirementType.DEFAULT, 
           new SetMetaData(TType.SET, 
               new EnumMetaData(TType.ENUM, ThriftTaskQueryState.class))));
-      put(_Fields.TEXT, new FieldMetaData("text", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.TEXT, new FieldMetaData("text", TFieldRequirementType.DEFAULT, 
           new FieldValueMetaData(TType.STRING)));
-      put(_Fields.COUNT, new FieldMetaData("count", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.COUNT, new FieldMetaData("count", TFieldRequirementType.DEFAULT, 
           new FieldValueMetaData(TType.I32)));
-      put(_Fields.OFFSET, new FieldMetaData("offset", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.OFFSET, new FieldMetaData("offset", TFieldRequirementType.DEFAULT, 
           new FieldValueMetaData(TType.I32)));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getTaskList_args.class, metaDataMap);
     }
 
@@ -7524,9 +9041,17 @@ public class Jobtracker {
       return new getTaskList_args(this);
     }
 
-    @Deprecated
-    public getTaskList_args clone() {
-      return new getTaskList_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.jobID = null;
+      this.types = null;
+      this.states = null;
+      this.text = null;
+      setCountIsSet(false);
+      this.count = 0;
+      setOffsetIsSet(false);
+      this.offset = 0;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -7786,10 +9311,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -7817,12 +9338,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -7840,10 +9361,6 @@ public class Jobtracker {
         return isSetOffset();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -7930,6 +9447,91 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getTaskList_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getTaskList_args typedOther = (getTaskList_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJobID()) {
+        lastComparison = TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTypes()).compareTo(typedOther.isSetTypes());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTypes()) {
+        lastComparison = TBaseHelper.compareTo(this.types, typedOther.types);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetStates()).compareTo(typedOther.isSetStates());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetStates()) {
+        lastComparison = TBaseHelper.compareTo(this.states, typedOther.states);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetText()).compareTo(typedOther.isSetText());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetText()) {
+        lastComparison = TBaseHelper.compareTo(this.text, typedOther.text);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetCount()).compareTo(typedOther.isSetCount());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCount()) {
+        lastComparison = TBaseHelper.compareTo(this.count, typedOther.count);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetOffset()).compareTo(typedOther.isSetOffset());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetOffset()) {
+        lastComparison = TBaseHelper.compareTo(this.offset, typedOther.offset);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -7939,87 +9541,84 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JOB_ID:
-              if (field.type == TType.STRUCT) {
-                this.jobID = new ThriftJobID();
-                this.jobID.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case TYPES:
-              if (field.type == TType.SET) {
+        switch (field.id) {
+          case 1: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // JOB_ID
+            if (field.type == TType.STRUCT) {
+              this.jobID = new ThriftJobID();
+              this.jobID.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3: // TYPES
+            if (field.type == TType.SET) {
+              {
+                TSet _set59 = iprot.readSetBegin();
+                this.types = new HashSet<ThriftTaskType>(2*_set59.size);
+                for (int _i60 = 0; _i60 < _set59.size; ++_i60)
                 {
-                  TSet _set59 = iprot.readSetBegin();
-                  this.types = new HashSet<ThriftTaskType>(2*_set59.size);
-                  for (int _i60 = 0; _i60 < _set59.size; ++_i60)
-                  {
-                    ThriftTaskType _elem61;
-                    _elem61 = ThriftTaskType.findByValue(iprot.readI32());
-                    this.types.add(_elem61);
-                  }
-                  iprot.readSetEnd();
+                  ThriftTaskType _elem61;
+                  _elem61 = ThriftTaskType.findByValue(iprot.readI32());
+                  this.types.add(_elem61);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readSetEnd();
               }
-              break;
-            case STATES:
-              if (field.type == TType.SET) {
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 4: // STATES
+            if (field.type == TType.SET) {
+              {
+                TSet _set62 = iprot.readSetBegin();
+                this.states = new HashSet<ThriftTaskQueryState>(2*_set62.size);
+                for (int _i63 = 0; _i63 < _set62.size; ++_i63)
                 {
-                  TSet _set62 = iprot.readSetBegin();
-                  this.states = new HashSet<ThriftTaskQueryState>(2*_set62.size);
-                  for (int _i63 = 0; _i63 < _set62.size; ++_i63)
-                  {
-                    ThriftTaskQueryState _elem64;
-                    _elem64 = ThriftTaskQueryState.findByValue(iprot.readI32());
-                    this.states.add(_elem64);
-                  }
-                  iprot.readSetEnd();
+                  ThriftTaskQueryState _elem64;
+                  _elem64 = ThriftTaskQueryState.findByValue(iprot.readI32());
+                  this.states.add(_elem64);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readSetEnd();
               }
-              break;
-            case TEXT:
-              if (field.type == TType.STRING) {
-                this.text = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case COUNT:
-              if (field.type == TType.I32) {
-                this.count = iprot.readI32();
-                setCountIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case OFFSET:
-              if (field.type == TType.I32) {
-                this.offset = iprot.readI32();
-                setOffsetIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 5: // TEXT
+            if (field.type == TType.STRING) {
+              this.text = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 6: // COUNT
+            if (field.type == TType.I32) {
+              this.count = iprot.readI32();
+              setCountIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 7: // OFFSET
+            if (field.type == TType.I32) {
+              this.offset = iprot.readI32();
+              setOffsetIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -8142,7 +9741,7 @@ public class Jobtracker {
 
   }
 
-  public static class getTaskList_result implements TBase<getTaskList_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getTaskList_result implements TBase<getTaskList_result, getTaskList_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getTaskList_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -8156,12 +9755,10 @@ public class Jobtracker {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -8170,7 +9767,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -8209,14 +9813,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftTaskInProgressList.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftTaskInProgressList.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getTaskList_result.class, metaDataMap);
     }
 
@@ -8248,9 +9852,10 @@ public class Jobtracker {
       return new getTaskList_result(this);
     }
 
-    @Deprecated
-    public getTaskList_result clone() {
-      return new getTaskList_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public ThriftTaskInProgressList getSuccess() {
@@ -8322,10 +9927,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -8338,12 +9939,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -8351,10 +9952,6 @@ public class Jobtracker {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -8396,6 +9993,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getTaskList_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getTaskList_result typedOther = (getTaskList_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -8405,30 +10037,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftTaskInProgressList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new JobNotFoundException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftTaskInProgressList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new JobNotFoundException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -8482,7 +10111,7 @@ public class Jobtracker {
 
   }
 
-  public static class getTask_args implements TBase<getTask_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getTask_args implements TBase<getTask_args, getTask_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getTask_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)1);
@@ -8496,12 +10125,10 @@ public class Jobtracker {
       CTX((short)1, "ctx"),
       TASK_ID((short)2, "taskID");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -8510,7 +10137,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // CTX
+            return CTX;
+          case 2: // TASK_ID
+            return TASK_ID;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -8549,14 +10183,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.TASK_ID, new FieldMetaData("taskID", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftTaskID.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.TASK_ID, new FieldMetaData("taskID", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftTaskID.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getTask_args.class, metaDataMap);
     }
 
@@ -8588,9 +10222,10 @@ public class Jobtracker {
       return new getTask_args(this);
     }
 
-    @Deprecated
-    public getTask_args clone() {
-      return new getTask_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.taskID = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -8662,10 +10297,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -8678,12 +10309,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -8691,10 +10322,6 @@ public class Jobtracker {
         return isSetTaskID();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -8736,6 +10363,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getTask_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getTask_args typedOther = (getTask_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTaskID()).compareTo(typedOther.isSetTaskID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTaskID()) {
+        lastComparison = TBaseHelper.compareTo(this.taskID, typedOther.taskID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -8745,30 +10407,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case TASK_ID:
-              if (field.type == TType.STRUCT) {
-                this.taskID = new ThriftTaskID();
-                this.taskID.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // TASK_ID
+            if (field.type == TType.STRUCT) {
+              this.taskID = new ThriftTaskID();
+              this.taskID.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -8824,7 +10483,7 @@ public class Jobtracker {
 
   }
 
-  public static class getTask_result implements TBase<getTask_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getTask_result implements TBase<getTask_result, getTask_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getTask_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -8841,12 +10500,10 @@ public class Jobtracker {
       JNF((short)1, "jnf"),
       TNF((short)2, "tnf");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -8855,7 +10512,16 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // JNF
+            return JNF;
+          case 2: // TNF
+            return TNF;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -8894,16 +10560,16 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftTaskInProgress.class)));
-      put(_Fields.JNF, new FieldMetaData("jnf", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-      put(_Fields.TNF, new FieldMetaData("tnf", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftTaskInProgress.class)));
+      tmpMap.put(_Fields.JNF, new FieldMetaData("jnf", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      tmpMap.put(_Fields.TNF, new FieldMetaData("tnf", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getTask_result.class, metaDataMap);
     }
 
@@ -8940,9 +10606,11 @@ public class Jobtracker {
       return new getTask_result(this);
     }
 
-    @Deprecated
-    public getTask_result clone() {
-      return new getTask_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.jnf = null;
+      this.tnf = null;
     }
 
     public ThriftTaskInProgress getSuccess() {
@@ -9046,10 +10714,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -9065,12 +10729,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -9080,10 +10744,6 @@ public class Jobtracker {
         return isSetTnf();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -9134,6 +10794,51 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getTask_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getTask_result typedOther = (getTask_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJnf()).compareTo(typedOther.isSetJnf());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJnf()) {
+        lastComparison = TBaseHelper.compareTo(this.jnf, typedOther.jnf);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTnf()).compareTo(typedOther.isSetTnf());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTnf()) {
+        lastComparison = TBaseHelper.compareTo(this.tnf, typedOther.tnf);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -9143,38 +10848,35 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftTaskInProgress();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JNF:
-              if (field.type == TType.STRUCT) {
-                this.jnf = new JobNotFoundException();
-                this.jnf.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case TNF:
-              if (field.type == TType.STRUCT) {
-                this.tnf = new TaskNotFoundException();
-                this.tnf.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftTaskInProgress();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // JNF
+            if (field.type == TType.STRUCT) {
+              this.jnf = new JobNotFoundException();
+              this.jnf.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // TNF
+            if (field.type == TType.STRUCT) {
+              this.tnf = new TaskNotFoundException();
+              this.tnf.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -9240,7 +10942,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJobCounters_args implements TBase<getJobCounters_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getJobCounters_args implements TBase<getJobCounters_args, getJobCounters_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJobCounters_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -9254,12 +10956,10 @@ public class Jobtracker {
       CTX((short)10, "ctx"),
       JOB_ID((short)1, "jobID");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -9268,7 +10968,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // JOB_ID
+            return JOB_ID;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -9307,14 +11014,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJobCounters_args.class, metaDataMap);
     }
 
@@ -9346,9 +11053,10 @@ public class Jobtracker {
       return new getJobCounters_args(this);
     }
 
-    @Deprecated
-    public getJobCounters_args clone() {
-      return new getJobCounters_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.jobID = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -9420,10 +11128,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -9436,12 +11140,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -9449,10 +11153,6 @@ public class Jobtracker {
         return isSetJobID();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -9494,6 +11194,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getJobCounters_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getJobCounters_args typedOther = (getJobCounters_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJobID()) {
+        lastComparison = TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -9503,30 +11238,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JOB_ID:
-              if (field.type == TType.STRUCT) {
-                this.jobID = new ThriftJobID();
-                this.jobID.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // JOB_ID
+            if (field.type == TType.STRUCT) {
+              this.jobID = new ThriftJobID();
+              this.jobID.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -9582,7 +11314,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJobCounters_result implements TBase<getJobCounters_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getJobCounters_result implements TBase<getJobCounters_result, getJobCounters_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJobCounters_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -9596,12 +11328,10 @@ public class Jobtracker {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -9610,7 +11340,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -9649,14 +11386,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftGroupList.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJobCounters_result.class, metaDataMap);
     }
 
@@ -9688,9 +11425,10 @@ public class Jobtracker {
       return new getJobCounters_result(this);
     }
 
-    @Deprecated
-    public getJobCounters_result clone() {
-      return new getJobCounters_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public ThriftGroupList getSuccess() {
@@ -9762,10 +11500,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -9778,12 +11512,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -9791,10 +11525,6 @@ public class Jobtracker {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -9836,6 +11566,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getJobCounters_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getJobCounters_result typedOther = (getJobCounters_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -9845,30 +11610,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftGroupList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new JobNotFoundException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftGroupList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new JobNotFoundException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -9922,7 +11684,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJobCounterRollups_args implements TBase<getJobCounterRollups_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getJobCounterRollups_args implements TBase<getJobCounterRollups_args, getJobCounterRollups_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJobCounterRollups_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -9936,12 +11698,10 @@ public class Jobtracker {
       CTX((short)10, "ctx"),
       JOB_ID((short)1, "jobID");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -9950,7 +11710,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // JOB_ID
+            return JOB_ID;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -9989,14 +11756,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJobCounterRollups_args.class, metaDataMap);
     }
 
@@ -10028,9 +11795,10 @@ public class Jobtracker {
       return new getJobCounterRollups_args(this);
     }
 
-    @Deprecated
-    public getJobCounterRollups_args clone() {
-      return new getJobCounterRollups_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.jobID = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -10102,10 +11870,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -10118,12 +11882,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -10131,10 +11895,6 @@ public class Jobtracker {
         return isSetJobID();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -10176,6 +11936,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getJobCounterRollups_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getJobCounterRollups_args typedOther = (getJobCounterRollups_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJobID()) {
+        lastComparison = TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -10185,30 +11980,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JOB_ID:
-              if (field.type == TType.STRUCT) {
-                this.jobID = new ThriftJobID();
-                this.jobID.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // JOB_ID
+            if (field.type == TType.STRUCT) {
+              this.jobID = new ThriftJobID();
+              this.jobID.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -10264,7 +12056,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJobCounterRollups_result implements TBase<getJobCounterRollups_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getJobCounterRollups_result implements TBase<getJobCounterRollups_result, getJobCounterRollups_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJobCounterRollups_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -10278,12 +12070,10 @@ public class Jobtracker {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -10292,7 +12082,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -10331,14 +12128,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobCounterRollups.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobCounterRollups.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJobCounterRollups_result.class, metaDataMap);
     }
 
@@ -10370,9 +12167,10 @@ public class Jobtracker {
       return new getJobCounterRollups_result(this);
     }
 
-    @Deprecated
-    public getJobCounterRollups_result clone() {
-      return new getJobCounterRollups_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public ThriftJobCounterRollups getSuccess() {
@@ -10444,10 +12242,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -10460,12 +12254,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -10473,10 +12267,6 @@ public class Jobtracker {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -10518,6 +12308,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getJobCounterRollups_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getJobCounterRollups_result typedOther = (getJobCounterRollups_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -10527,30 +12352,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftJobCounterRollups();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new JobNotFoundException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftJobCounterRollups();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new JobNotFoundException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -10604,7 +12426,7 @@ public class Jobtracker {
 
   }
 
-  public static class getActiveTrackers_args implements TBase<getActiveTrackers_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getActiveTrackers_args implements TBase<getActiveTrackers_args, getActiveTrackers_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getActiveTrackers_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -10615,12 +12437,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -10629,7 +12449,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -10668,12 +12493,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getActiveTrackers_args.class, metaDataMap);
     }
 
@@ -10700,9 +12525,9 @@ public class Jobtracker {
       return new getActiveTrackers_args(this);
     }
 
-    @Deprecated
-    public getActiveTrackers_args clone() {
-      return new getActiveTrackers_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -10742,10 +12567,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -10755,21 +12576,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -10802,6 +12619,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getActiveTrackers_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getActiveTrackers_args typedOther = (getActiveTrackers_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -10811,22 +12653,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -10869,7 +12708,7 @@ public class Jobtracker {
 
   }
 
-  public static class getActiveTrackers_result implements TBase<getActiveTrackers_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getActiveTrackers_result implements TBase<getActiveTrackers_result, getActiveTrackers_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getActiveTrackers_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -10880,12 +12719,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -10894,7 +12731,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -10933,12 +12775,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftTaskTrackerStatusList.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftTaskTrackerStatusList.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getActiveTrackers_result.class, metaDataMap);
     }
 
@@ -10965,9 +12807,9 @@ public class Jobtracker {
       return new getActiveTrackers_result(this);
     }
 
-    @Deprecated
-    public getActiveTrackers_result clone() {
-      return new getActiveTrackers_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftTaskTrackerStatusList getSuccess() {
@@ -11007,10 +12849,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -11020,21 +12858,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -11067,6 +12901,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getActiveTrackers_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getActiveTrackers_result typedOther = (getActiveTrackers_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -11076,22 +12935,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftTaskTrackerStatusList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftTaskTrackerStatusList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -11133,7 +12989,7 @@ public class Jobtracker {
 
   }
 
-  public static class getBlacklistedTrackers_args implements TBase<getBlacklistedTrackers_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getBlacklistedTrackers_args implements TBase<getBlacklistedTrackers_args, getBlacklistedTrackers_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getBlacklistedTrackers_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -11144,12 +13000,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -11158,7 +13012,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -11197,12 +13056,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getBlacklistedTrackers_args.class, metaDataMap);
     }
 
@@ -11229,9 +13088,9 @@ public class Jobtracker {
       return new getBlacklistedTrackers_args(this);
     }
 
-    @Deprecated
-    public getBlacklistedTrackers_args clone() {
-      return new getBlacklistedTrackers_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -11271,10 +13130,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -11284,21 +13139,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -11331,6 +13182,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getBlacklistedTrackers_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getBlacklistedTrackers_args typedOther = (getBlacklistedTrackers_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -11340,22 +13216,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -11398,7 +13271,7 @@ public class Jobtracker {
 
   }
 
-  public static class getBlacklistedTrackers_result implements TBase<getBlacklistedTrackers_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getBlacklistedTrackers_result implements TBase<getBlacklistedTrackers_result, getBlacklistedTrackers_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getBlacklistedTrackers_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -11409,12 +13282,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -11423,7 +13294,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -11462,12 +13338,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftTaskTrackerStatusList.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftTaskTrackerStatusList.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getBlacklistedTrackers_result.class, metaDataMap);
     }
 
@@ -11494,9 +13370,9 @@ public class Jobtracker {
       return new getBlacklistedTrackers_result(this);
     }
 
-    @Deprecated
-    public getBlacklistedTrackers_result clone() {
-      return new getBlacklistedTrackers_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftTaskTrackerStatusList getSuccess() {
@@ -11536,10 +13412,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -11549,21 +13421,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -11596,6 +13464,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getBlacklistedTrackers_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getBlacklistedTrackers_result typedOther = (getBlacklistedTrackers_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -11605,22 +13498,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftTaskTrackerStatusList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftTaskTrackerStatusList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -11662,7 +13552,7 @@ public class Jobtracker {
 
   }
 
-  public static class getAllTrackers_args implements TBase<getAllTrackers_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getAllTrackers_args implements TBase<getAllTrackers_args, getAllTrackers_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getAllTrackers_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -11673,12 +13563,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -11687,7 +13575,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -11726,12 +13619,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getAllTrackers_args.class, metaDataMap);
     }
 
@@ -11758,9 +13651,9 @@ public class Jobtracker {
       return new getAllTrackers_args(this);
     }
 
-    @Deprecated
-    public getAllTrackers_args clone() {
-      return new getAllTrackers_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -11800,10 +13693,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -11813,21 +13702,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -11860,6 +13745,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getAllTrackers_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getAllTrackers_args typedOther = (getAllTrackers_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -11869,22 +13779,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -11927,7 +13834,7 @@ public class Jobtracker {
 
   }
 
-  public static class getAllTrackers_result implements TBase<getAllTrackers_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getAllTrackers_result implements TBase<getAllTrackers_result, getAllTrackers_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getAllTrackers_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -11938,12 +13845,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -11952,7 +13857,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -11991,12 +13901,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftTaskTrackerStatusList.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftTaskTrackerStatusList.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getAllTrackers_result.class, metaDataMap);
     }
 
@@ -12023,9 +13933,9 @@ public class Jobtracker {
       return new getAllTrackers_result(this);
     }
 
-    @Deprecated
-    public getAllTrackers_result clone() {
-      return new getAllTrackers_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public ThriftTaskTrackerStatusList getSuccess() {
@@ -12065,10 +13975,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -12078,21 +13984,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -12125,6 +14027,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getAllTrackers_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getAllTrackers_result typedOther = (getAllTrackers_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -12134,22 +14061,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftTaskTrackerStatusList();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftTaskTrackerStatusList();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -12191,7 +14115,7 @@ public class Jobtracker {
 
   }
 
-  public static class getTracker_args implements TBase<getTracker_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getTracker_args implements TBase<getTracker_args, getTracker_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getTracker_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -12205,12 +14129,10 @@ public class Jobtracker {
       CTX((short)10, "ctx"),
       NAME((short)1, "name");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -12219,7 +14141,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // NAME
+            return NAME;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -12258,14 +14187,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getTracker_args.class, metaDataMap);
     }
 
@@ -12297,9 +14226,10 @@ public class Jobtracker {
       return new getTracker_args(this);
     }
 
-    @Deprecated
-    public getTracker_args clone() {
-      return new getTracker_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.name = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -12371,10 +14301,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -12387,12 +14313,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -12400,10 +14326,6 @@ public class Jobtracker {
         return isSetName();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -12445,6 +14367,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getTracker_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getTracker_args typedOther = (getTracker_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetName()).compareTo(typedOther.isSetName());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetName()) {
+        lastComparison = TBaseHelper.compareTo(this.name, typedOther.name);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -12454,29 +14411,26 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case NAME:
-              if (field.type == TType.STRING) {
-                this.name = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // NAME
+            if (field.type == TType.STRING) {
+              this.name = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -12532,7 +14486,7 @@ public class Jobtracker {
 
   }
 
-  public static class getTracker_result implements TBase<getTracker_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getTracker_result implements TBase<getTracker_result, getTracker_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getTracker_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -12546,12 +14500,10 @@ public class Jobtracker {
       SUCCESS((short)0, "success"),
       TNE((short)1, "tne");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -12560,7 +14512,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // TNE
+            return TNE;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -12599,14 +14558,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftTaskTrackerStatus.class)));
-      put(_Fields.TNE, new FieldMetaData("tne", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftTaskTrackerStatus.class)));
+      tmpMap.put(_Fields.TNE, new FieldMetaData("tne", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getTracker_result.class, metaDataMap);
     }
 
@@ -12638,9 +14597,10 @@ public class Jobtracker {
       return new getTracker_result(this);
     }
 
-    @Deprecated
-    public getTracker_result clone() {
-      return new getTracker_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.tne = null;
     }
 
     public ThriftTaskTrackerStatus getSuccess() {
@@ -12712,10 +14672,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -12728,12 +14684,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -12741,10 +14697,6 @@ public class Jobtracker {
         return isSetTne();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -12786,6 +14738,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getTracker_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getTracker_result typedOther = (getTracker_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTne()).compareTo(typedOther.isSetTne());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTne()) {
+        lastComparison = TBaseHelper.compareTo(this.tne, typedOther.tne);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -12795,30 +14782,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ThriftTaskTrackerStatus();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case TNE:
-              if (field.type == TType.STRUCT) {
-                this.tne = new TaskTrackerNotFoundException();
-                this.tne.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ThriftTaskTrackerStatus();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // TNE
+            if (field.type == TType.STRUCT) {
+              this.tne = new TaskTrackerNotFoundException();
+              this.tne.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -12872,7 +14856,7 @@ public class Jobtracker {
 
   }
 
-  public static class getCurrentTime_args implements TBase<getCurrentTime_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getCurrentTime_args implements TBase<getCurrentTime_args, getCurrentTime_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getCurrentTime_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -12883,12 +14867,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -12897,7 +14879,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -12936,12 +14923,12 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getCurrentTime_args.class, metaDataMap);
     }
 
@@ -12968,9 +14955,9 @@ public class Jobtracker {
       return new getCurrentTime_args(this);
     }
 
-    @Deprecated
-    public getCurrentTime_args clone() {
-      return new getCurrentTime_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -13010,10 +14997,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -13023,21 +15006,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -13070,6 +15049,31 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getCurrentTime_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getCurrentTime_args typedOther = (getCurrentTime_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -13079,22 +15083,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -13137,7 +15138,7 @@ public class Jobtracker {
 
   }
 
-  public static class getCurrentTime_result implements TBase<getCurrentTime_result._Fields>, java.io.Serializable, Cloneable, Comparable<getCurrentTime_result>   {
+  public static class getCurrentTime_result implements TBase<getCurrentTime_result, getCurrentTime_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getCurrentTime_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.I64, (short)0);
@@ -13148,12 +15149,10 @@ public class Jobtracker {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -13162,7 +15161,12 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -13203,12 +15207,12 @@ public class Jobtracker {
     private static final int __SUCCESS_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I64)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I64)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getCurrentTime_result.class, metaDataMap);
     }
 
@@ -13236,9 +15240,10 @@ public class Jobtracker {
       return new getCurrentTime_result(this);
     }
 
-    @Deprecated
-    public getCurrentTime_result clone() {
-      return new getCurrentTime_result(this);
+    @Override
+    public void clear() {
+      setSuccessIsSet(false);
+      this.success = 0;
     }
 
     public long getSuccess() {
@@ -13277,10 +15282,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -13290,21 +15291,17 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -13345,15 +15342,21 @@ public class Jobtracker {
       int lastComparison = 0;
       getCurrentTime_result typedOther = (getCurrentTime_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -13365,22 +15368,19 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.I64) {
-                this.success = iprot.readI64();
-                setSuccessIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.I64) {
+              this.success = iprot.readI64();
+              setSuccessIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -13418,7 +15418,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJobConfXML_args implements TBase<getJobConfXML_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getJobConfXML_args implements TBase<getJobConfXML_args, getJobConfXML_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJobConfXML_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -13432,12 +15432,10 @@ public class Jobtracker {
       CTX((short)10, "ctx"),
       JOB_ID((short)1, "jobID");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -13446,7 +15444,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // JOB_ID
+            return JOB_ID;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -13485,14 +15490,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJobConfXML_args.class, metaDataMap);
     }
 
@@ -13524,9 +15529,10 @@ public class Jobtracker {
       return new getJobConfXML_args(this);
     }
 
-    @Deprecated
-    public getJobConfXML_args clone() {
-      return new getJobConfXML_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.jobID = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -13598,10 +15604,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -13614,12 +15616,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -13627,10 +15629,6 @@ public class Jobtracker {
         return isSetJobID();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -13672,6 +15670,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getJobConfXML_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getJobConfXML_args typedOther = (getJobConfXML_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJobID()) {
+        lastComparison = TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -13681,30 +15714,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JOB_ID:
-              if (field.type == TType.STRUCT) {
-                this.jobID = new ThriftJobID();
-                this.jobID.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // JOB_ID
+            if (field.type == TType.STRUCT) {
+              this.jobID = new ThriftJobID();
+              this.jobID.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -13760,7 +15790,7 @@ public class Jobtracker {
 
   }
 
-  public static class getJobConfXML_result implements TBase<getJobConfXML_result._Fields>, java.io.Serializable, Cloneable, Comparable<getJobConfXML_result>   {
+  public static class getJobConfXML_result implements TBase<getJobConfXML_result, getJobConfXML_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getJobConfXML_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRING, (short)0);
@@ -13774,12 +15804,10 @@ public class Jobtracker {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -13788,7 +15816,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -13827,14 +15862,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getJobConfXML_result.class, metaDataMap);
     }
 
@@ -13866,9 +15901,10 @@ public class Jobtracker {
       return new getJobConfXML_result(this);
     }
 
-    @Deprecated
-    public getJobConfXML_result clone() {
-      return new getJobConfXML_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public String getSuccess() {
@@ -13940,10 +15976,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -13956,12 +15988,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -13969,10 +16001,6 @@ public class Jobtracker {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -14022,23 +16050,31 @@ public class Jobtracker {
       int lastComparison = 0;
       getJobConfXML_result typedOther = (getJobConfXML_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -14050,29 +16086,26 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRING) {
-                this.success = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRING) {
+              this.success = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -14126,7 +16159,7 @@ public class Jobtracker {
 
   }
 
-  public static class killJob_args implements TBase<killJob_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class killJob_args implements TBase<killJob_args, killJob_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("killJob_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -14140,12 +16173,10 @@ public class Jobtracker {
       CTX((short)10, "ctx"),
       JOB_ID((short)1, "jobID");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -14154,7 +16185,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // JOB_ID
+            return JOB_ID;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -14193,14 +16231,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(killJob_args.class, metaDataMap);
     }
 
@@ -14232,9 +16270,10 @@ public class Jobtracker {
       return new killJob_args(this);
     }
 
-    @Deprecated
-    public killJob_args clone() {
-      return new killJob_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.jobID = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -14306,10 +16345,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -14322,12 +16357,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -14335,10 +16370,6 @@ public class Jobtracker {
         return isSetJobID();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -14380,6 +16411,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(killJob_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      killJob_args typedOther = (killJob_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJobID()) {
+        lastComparison = TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -14389,30 +16455,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JOB_ID:
-              if (field.type == TType.STRUCT) {
-                this.jobID = new ThriftJobID();
-                this.jobID.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // JOB_ID
+            if (field.type == TType.STRUCT) {
+              this.jobID = new ThriftJobID();
+              this.jobID.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -14468,7 +16531,7 @@ public class Jobtracker {
 
   }
 
-  public static class killJob_result implements TBase<killJob_result._Fields>, java.io.Serializable, Cloneable, Comparable<killJob_result>   {
+  public static class killJob_result implements TBase<killJob_result, killJob_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("killJob_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -14482,12 +16545,10 @@ public class Jobtracker {
       ERR((short)1, "err"),
       JNE((short)2, "jne");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -14496,7 +16557,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          case 2: // JNE
+            return JNE;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -14535,14 +16603,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-      put(_Fields.JNE, new FieldMetaData("jne", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      tmpMap.put(_Fields.JNE, new FieldMetaData("jne", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(killJob_result.class, metaDataMap);
     }
 
@@ -14574,9 +16642,10 @@ public class Jobtracker {
       return new killJob_result(this);
     }
 
-    @Deprecated
-    public killJob_result clone() {
-      return new killJob_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
+      this.jne = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -14648,10 +16717,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -14664,12 +16729,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
@@ -14677,10 +16742,6 @@ public class Jobtracker {
         return isSetJne();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -14730,23 +16791,31 @@ public class Jobtracker {
       int lastComparison = 0;
       killJob_result typedOther = (killJob_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJne()).compareTo(typedOther.isSetJne());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetJne()).compareTo(isSetJne());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(jne, typedOther.jne);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetJne()) {
+        lastComparison = TBaseHelper.compareTo(this.jne, typedOther.jne);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -14758,30 +16827,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JNE:
-              if (field.type == TType.STRUCT) {
-                this.jne = new JobNotFoundException();
-                this.jne.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // JNE
+            if (field.type == TType.STRUCT) {
+              this.jne = new JobNotFoundException();
+              this.jne.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -14835,7 +16901,7 @@ public class Jobtracker {
 
   }
 
-  public static class killTaskAttempt_args implements TBase<killTaskAttempt_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class killTaskAttempt_args implements TBase<killTaskAttempt_args, killTaskAttempt_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("killTaskAttempt_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -14849,12 +16915,10 @@ public class Jobtracker {
       CTX((short)10, "ctx"),
       ATTEMPT_ID((short)1, "attemptID");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -14863,7 +16927,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // ATTEMPT_ID
+            return ATTEMPT_ID;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -14902,14 +16973,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.ATTEMPT_ID, new FieldMetaData("attemptID", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftTaskAttemptID.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.ATTEMPT_ID, new FieldMetaData("attemptID", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftTaskAttemptID.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(killTaskAttempt_args.class, metaDataMap);
     }
 
@@ -14941,9 +17012,10 @@ public class Jobtracker {
       return new killTaskAttempt_args(this);
     }
 
-    @Deprecated
-    public killTaskAttempt_args clone() {
-      return new killTaskAttempt_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.attemptID = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -15015,10 +17087,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -15031,12 +17099,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -15044,10 +17112,6 @@ public class Jobtracker {
         return isSetAttemptID();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -15089,6 +17153,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(killTaskAttempt_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      killTaskAttempt_args typedOther = (killTaskAttempt_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetAttemptID()).compareTo(typedOther.isSetAttemptID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetAttemptID()) {
+        lastComparison = TBaseHelper.compareTo(this.attemptID, typedOther.attemptID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -15098,30 +17197,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ATTEMPT_ID:
-              if (field.type == TType.STRUCT) {
-                this.attemptID = new ThriftTaskAttemptID();
-                this.attemptID.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ATTEMPT_ID
+            if (field.type == TType.STRUCT) {
+              this.attemptID = new ThriftTaskAttemptID();
+              this.attemptID.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -15177,7 +17273,7 @@ public class Jobtracker {
 
   }
 
-  public static class killTaskAttempt_result implements TBase<killTaskAttempt_result._Fields>, java.io.Serializable, Cloneable, Comparable<killTaskAttempt_result>   {
+  public static class killTaskAttempt_result implements TBase<killTaskAttempt_result, killTaskAttempt_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("killTaskAttempt_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -15194,12 +17290,10 @@ public class Jobtracker {
       TNE((short)2, "tne"),
       JNE((short)3, "jne");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -15208,7 +17302,16 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          case 2: // TNE
+            return TNE;
+          case 3: // JNE
+            return JNE;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -15247,16 +17350,16 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-      put(_Fields.TNE, new FieldMetaData("tne", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-      put(_Fields.JNE, new FieldMetaData("jne", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      tmpMap.put(_Fields.TNE, new FieldMetaData("tne", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      tmpMap.put(_Fields.JNE, new FieldMetaData("jne", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(killTaskAttempt_result.class, metaDataMap);
     }
 
@@ -15293,9 +17396,11 @@ public class Jobtracker {
       return new killTaskAttempt_result(this);
     }
 
-    @Deprecated
-    public killTaskAttempt_result clone() {
-      return new killTaskAttempt_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
+      this.tne = null;
+      this.jne = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -15399,10 +17504,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -15418,12 +17519,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
@@ -15433,10 +17534,6 @@ public class Jobtracker {
         return isSetJne();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -15495,31 +17592,41 @@ public class Jobtracker {
       int lastComparison = 0;
       killTaskAttempt_result typedOther = (killTaskAttempt_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTne()).compareTo(typedOther.isSetTne());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetTne()).compareTo(isSetTne());
+      if (isSetTne()) {
+        lastComparison = TBaseHelper.compareTo(this.tne, typedOther.tne);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJne()).compareTo(typedOther.isSetJne());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(tne, typedOther.tne);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = Boolean.valueOf(isSetJne()).compareTo(isSetJne());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(jne, typedOther.jne);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetJne()) {
+        lastComparison = TBaseHelper.compareTo(this.jne, typedOther.jne);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -15531,38 +17638,35 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case TNE:
-              if (field.type == TType.STRUCT) {
-                this.tne = new TaskAttemptNotFoundException();
-                this.tne.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JNE:
-              if (field.type == TType.STRUCT) {
-                this.jne = new JobNotFoundException();
-                this.jne.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // TNE
+            if (field.type == TType.STRUCT) {
+              this.tne = new TaskAttemptNotFoundException();
+              this.tne.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3: // JNE
+            if (field.type == TType.STRUCT) {
+              this.jne = new JobNotFoundException();
+              this.jne.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -15628,7 +17732,7 @@ public class Jobtracker {
 
   }
 
-  public static class setJobPriority_args implements TBase<setJobPriority_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class setJobPriority_args implements TBase<setJobPriority_args, setJobPriority_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("setJobPriority_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -15653,12 +17757,10 @@ public class Jobtracker {
        */
       PRIORITY((short)2, "priority");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -15667,7 +17769,16 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // JOB_ID
+            return JOB_ID;
+          case 2: // PRIORITY
+            return PRIORITY;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -15706,16 +17817,16 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
-      put(_Fields.PRIORITY, new FieldMetaData("priority", TFieldRequirementType.DEFAULT, 
-          new EnumMetaData(TType.ENUM, ThriftJobPriority.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ThriftJobID.class)));
+      tmpMap.put(_Fields.PRIORITY, new FieldMetaData("priority", TFieldRequirementType.DEFAULT, 
+          new EnumMetaData(TType.ENUM, ThriftJobPriority.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(setJobPriority_args.class, metaDataMap);
     }
 
@@ -15752,9 +17863,11 @@ public class Jobtracker {
       return new setJobPriority_args(this);
     }
 
-    @Deprecated
-    public setJobPriority_args clone() {
-      return new setJobPriority_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.jobID = null;
+      this.priority = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -15866,10 +17979,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -15885,12 +17994,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -15900,10 +18009,6 @@ public class Jobtracker {
         return isSetPriority();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -15954,6 +18059,51 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(setJobPriority_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      setJobPriority_args typedOther = (setJobPriority_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJobID()) {
+        lastComparison = TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPriority()).compareTo(typedOther.isSetPriority());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPriority()) {
+        lastComparison = TBaseHelper.compareTo(this.priority, typedOther.priority);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -15963,37 +18113,34 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JOB_ID:
-              if (field.type == TType.STRUCT) {
-                this.jobID = new ThriftJobID();
-                this.jobID.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PRIORITY:
-              if (field.type == TType.I32) {
-                this.priority = ThriftJobPriority.findByValue(iprot.readI32());
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // JOB_ID
+            if (field.type == TType.STRUCT) {
+              this.jobID = new ThriftJobID();
+              this.jobID.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // PRIORITY
+            if (field.type == TType.I32) {
+              this.priority = ThriftJobPriority.findByValue(iprot.readI32());
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -16049,15 +18196,7 @@ public class Jobtracker {
       if (this.priority == null) {
         sb.append("null");
       } else {
-        String priority_name = priority.name();
-        if (priority_name != null) {
-          sb.append(priority_name);
-          sb.append(" (");
-        }
         sb.append(this.priority);
-        if (priority_name != null) {
-          sb.append(")");
-        }
       }
       first = false;
       sb.append(")");
@@ -16070,7 +18209,7 @@ public class Jobtracker {
 
   }
 
-  public static class setJobPriority_result implements TBase<setJobPriority_result._Fields>, java.io.Serializable, Cloneable, Comparable<setJobPriority_result>   {
+  public static class setJobPriority_result implements TBase<setJobPriority_result, setJobPriority_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("setJobPriority_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -16084,12 +18223,10 @@ public class Jobtracker {
       ERR((short)1, "err"),
       JNE((short)2, "jne");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -16098,7 +18235,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          case 2: // JNE
+            return JNE;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -16137,14 +18281,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-      put(_Fields.JNE, new FieldMetaData("jne", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      tmpMap.put(_Fields.JNE, new FieldMetaData("jne", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(setJobPriority_result.class, metaDataMap);
     }
 
@@ -16176,9 +18320,10 @@ public class Jobtracker {
       return new setJobPriority_result(this);
     }
 
-    @Deprecated
-    public setJobPriority_result clone() {
-      return new setJobPriority_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
+      this.jne = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -16250,10 +18395,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -16266,12 +18407,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
@@ -16279,10 +18420,6 @@ public class Jobtracker {
         return isSetJne();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -16332,23 +18469,31 @@ public class Jobtracker {
       int lastComparison = 0;
       setJobPriority_result typedOther = (setJobPriority_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJne()).compareTo(typedOther.isSetJne());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetJne()).compareTo(isSetJne());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(jne, typedOther.jne);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetJne()) {
+        lastComparison = TBaseHelper.compareTo(this.jne, typedOther.jne);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -16360,30 +18505,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case JNE:
-              if (field.type == TType.STRUCT) {
-                this.jne = new JobNotFoundException();
-                this.jne.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // JNE
+            if (field.type == TType.STRUCT) {
+              this.jne = new JobNotFoundException();
+              this.jne.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -16437,7 +18579,7 @@ public class Jobtracker {
 
   }
 
-  public static class getDelegationToken_args implements TBase<getDelegationToken_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getDelegationToken_args implements TBase<getDelegationToken_args, getDelegationToken_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getDelegationToken_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -16451,12 +18593,10 @@ public class Jobtracker {
       CTX((short)10, "ctx"),
       RENEWER((short)1, "renewer");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -16465,7 +18605,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // RENEWER
+            return RENEWER;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -16504,14 +18651,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.RENEWER, new FieldMetaData("renewer", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.RENEWER, new FieldMetaData("renewer", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getDelegationToken_args.class, metaDataMap);
     }
 
@@ -16543,9 +18690,10 @@ public class Jobtracker {
       return new getDelegationToken_args(this);
     }
 
-    @Deprecated
-    public getDelegationToken_args clone() {
-      return new getDelegationToken_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.renewer = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -16617,10 +18765,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -16633,12 +18777,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -16646,10 +18790,6 @@ public class Jobtracker {
         return isSetRenewer();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -16691,6 +18831,41 @@ public class Jobtracker {
       return 0;
     }
 
+    public int compareTo(getDelegationToken_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getDelegationToken_args typedOther = (getDelegationToken_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetRenewer()).compareTo(typedOther.isSetRenewer());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetRenewer()) {
+        lastComparison = TBaseHelper.compareTo(this.renewer, typedOther.renewer);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -16700,29 +18875,26 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case RENEWER:
-              if (field.type == TType.STRING) {
-                this.renewer = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // RENEWER
+            if (field.type == TType.STRING) {
+              this.renewer = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -16778,7 +18950,7 @@ public class Jobtracker {
 
   }
 
-  public static class getDelegationToken_result implements TBase<getDelegationToken_result._Fields>, java.io.Serializable, Cloneable, Comparable<getDelegationToken_result>   {
+  public static class getDelegationToken_result implements TBase<getDelegationToken_result, getDelegationToken_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getDelegationToken_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -16792,12 +18964,10 @@ public class Jobtracker {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -16806,7 +18976,14 @@ public class Jobtracker {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -16845,14 +19022,14 @@ public class Jobtracker {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.ThriftDelegationToken.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.ThriftDelegationToken.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getDelegationToken_result.class, metaDataMap);
     }
 
@@ -16884,9 +19061,10 @@ public class Jobtracker {
       return new getDelegationToken_result(this);
     }
 
-    @Deprecated
-    public getDelegationToken_result clone() {
-      return new getDelegationToken_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getSuccess() {
@@ -16958,10 +19136,6 @@ public class Jobtracker {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -16974,12 +19148,12 @@ public class Jobtracker {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -16987,10 +19161,6 @@ public class Jobtracker {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -17040,23 +19210,31 @@ public class Jobtracker {
       int lastComparison = 0;
       getDelegationToken_result typedOther = (getDelegationToken_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -17068,30 +19246,27 @@ public class Jobtracker {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new org.apache.hadoop.thriftfs.api.ThriftDelegationToken();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new org.apache.hadoop.thriftfs.api.ThriftDelegationToken();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 

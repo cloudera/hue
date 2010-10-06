@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Container structure for job counts for a given user
  */
-public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, java.io.Serializable, Cloneable, Comparable<ThriftUserJobCounts> {
+public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts, ThriftUserJobCounts._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftUserJobCounts");
 
   private static final TField N_PREP_FIELD_DESC = new TField("nPrep", TType.I32, (short)1);
@@ -49,12 +52,10 @@ public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, 
     N_FAILED((short)4, "nFailed"),
     N_KILLED((short)5, "nKilled");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -63,7 +64,20 @@ public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, 
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // N_PREP
+          return N_PREP;
+        case 2: // N_RUNNING
+          return N_RUNNING;
+        case 3: // N_SUCCEEDED
+          return N_SUCCEEDED;
+        case 4: // N_FAILED
+          return N_FAILED;
+        case 5: // N_KILLED
+          return N_KILLED;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -108,20 +122,20 @@ public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, 
   private static final int __NKILLED_ISSET_ID = 4;
   private BitSet __isset_bit_vector = new BitSet(5);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.N_PREP, new FieldMetaData("nPrep", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.N_RUNNING, new FieldMetaData("nRunning", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.N_SUCCEEDED, new FieldMetaData("nSucceeded", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.N_FAILED, new FieldMetaData("nFailed", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.N_KILLED, new FieldMetaData("nKilled", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.N_PREP, new FieldMetaData("nPrep", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.N_RUNNING, new FieldMetaData("nRunning", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.N_SUCCEEDED, new FieldMetaData("nSucceeded", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.N_FAILED, new FieldMetaData("nFailed", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.N_KILLED, new FieldMetaData("nKilled", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftUserJobCounts.class, metaDataMap);
   }
 
@@ -165,9 +179,18 @@ public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, 
     return new ThriftUserJobCounts(this);
   }
 
-  @Deprecated
-  public ThriftUserJobCounts clone() {
-    return new ThriftUserJobCounts(this);
+  @Override
+  public void clear() {
+    setNPrepIsSet(false);
+    this.nPrep = 0;
+    setNRunningIsSet(false);
+    this.nRunning = 0;
+    setNSucceededIsSet(false);
+    this.nSucceeded = 0;
+    setNFailedIsSet(false);
+    this.nFailed = 0;
+    setNKilledIsSet(false);
+    this.nKilled = 0;
   }
 
   public int getNPrep() {
@@ -330,10 +353,6 @@ public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, 
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case N_PREP:
@@ -355,12 +374,12 @@ public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, 
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case N_PREP:
       return isSetNPrep();
@@ -374,10 +393,6 @@ public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, 
       return isSetNKilled();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -454,47 +469,61 @@ public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, 
     int lastComparison = 0;
     ThriftUserJobCounts typedOther = (ThriftUserJobCounts)other;
 
-    lastComparison = Boolean.valueOf(isSetNPrep()).compareTo(isSetNPrep());
+    lastComparison = Boolean.valueOf(isSetNPrep()).compareTo(typedOther.isSetNPrep());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(nPrep, typedOther.nPrep);
+    if (isSetNPrep()) {
+      lastComparison = TBaseHelper.compareTo(this.nPrep, typedOther.nPrep);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNRunning()).compareTo(typedOther.isSetNRunning());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetNRunning()).compareTo(isSetNRunning());
+    if (isSetNRunning()) {
+      lastComparison = TBaseHelper.compareTo(this.nRunning, typedOther.nRunning);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNSucceeded()).compareTo(typedOther.isSetNSucceeded());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(nRunning, typedOther.nRunning);
+    if (isSetNSucceeded()) {
+      lastComparison = TBaseHelper.compareTo(this.nSucceeded, typedOther.nSucceeded);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNFailed()).compareTo(typedOther.isSetNFailed());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetNSucceeded()).compareTo(isSetNSucceeded());
+    if (isSetNFailed()) {
+      lastComparison = TBaseHelper.compareTo(this.nFailed, typedOther.nFailed);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNKilled()).compareTo(typedOther.isSetNKilled());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(nSucceeded, typedOther.nSucceeded);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetNFailed()).compareTo(isSetNFailed());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(nFailed, typedOther.nFailed);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetNKilled()).compareTo(isSetNKilled());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(nKilled, typedOther.nKilled);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetNKilled()) {
+      lastComparison = TBaseHelper.compareTo(this.nKilled, typedOther.nKilled);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -506,54 +535,51 @@ public class ThriftUserJobCounts implements TBase<ThriftUserJobCounts._Fields>, 
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case N_PREP:
-            if (field.type == TType.I32) {
-              this.nPrep = iprot.readI32();
-              setNPrepIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case N_RUNNING:
-            if (field.type == TType.I32) {
-              this.nRunning = iprot.readI32();
-              setNRunningIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case N_SUCCEEDED:
-            if (field.type == TType.I32) {
-              this.nSucceeded = iprot.readI32();
-              setNSucceededIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case N_FAILED:
-            if (field.type == TType.I32) {
-              this.nFailed = iprot.readI32();
-              setNFailedIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case N_KILLED:
-            if (field.type == TType.I32) {
-              this.nKilled = iprot.readI32();
-              setNKilledIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // N_PREP
+          if (field.type == TType.I32) {
+            this.nPrep = iprot.readI32();
+            setNPrepIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // N_RUNNING
+          if (field.type == TType.I32) {
+            this.nRunning = iprot.readI32();
+            setNRunningIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // N_SUCCEEDED
+          if (field.type == TType.I32) {
+            this.nSucceeded = iprot.readI32();
+            setNSucceededIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // N_FAILED
+          if (field.type == TType.I32) {
+            this.nFailed = iprot.readI32();
+            setNFailedIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // N_KILLED
+          if (field.type == TType.I32) {
+            this.nKilled = iprot.readI32();
+            setNKilledIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

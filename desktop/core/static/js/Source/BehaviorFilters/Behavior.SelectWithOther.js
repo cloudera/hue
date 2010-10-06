@@ -24,27 +24,38 @@ script: Behavior.SelectWithOther.js
 
 Behavior.addGlobalFilters({
 	SelectWithOther: function(element, methods) {
-                //get the 'other' input
-                var other = element.getElement('input').set('alt', 'Enter a custom value').addClass('required').addDataFilter('OverText').hide();
-                //create hint text
-                var ot = new OverText(other);
-                //get the select input
-                var sel = element.getElement('select');
-                //when the select changes, if the user chooses "other"
-                //reveal the input, enable the overtext
-                sel.addEvent('change', function() {
-                        if (sel.getSelected()[0].get('value') == '__other__') {
-                                other.removeClass('ignoreValidation').reveal().get('reveal').chain(function(){
-                                        ot.enable();
-                                });
-                        //else hide and disable the input
-                        } else {
-                                ot.disable();
-                                other.addClass('ignoreValidation').dissolve();
-                        }
-                });
-                this.markForCleanup(element, function(){
-                        ot.destroy();
-                });
+		//get the 'other' input / container
+		var other = element.getElement(element.get('data', 'other-input') || 'input');
+		var input = other;
+		var otherOptions = element.getElements(element.get('data', 'other-options') || 'option[value=__other__]');
+		//if the "other" element is not an input, it must be a container that contains one
+		if (!['input', 'select', 'textarea'].contains(other.get('tag'))) input = other.getElement('input, textarea');
+		other.hide();
+		//get the select input
+		var sel = element.getElement('select');
+		//when the select changes, if the user chooses "other"
+		//reveal the input, enable the overtext
+		sel.addEvent('change', function() {
+			var ot = input.retrieve('OverText');
+			if (otherOptions.contains(sel.getSelected()[0])) {
+				input.removeClass('ignoreValidation');
+				if (ot) {
+					other.get('reveal').chain(function(){
+						ot.enable();
+					});
+				}
+				other.reveal();
+			//else hide and disable the input
+			} else {
+				if (ot) ot.disable();
+				input.addClass('ignoreValidation');
+				other.dissolve();
+			}
+		});
+		if (ot) {
+			this.markForCleanup(element, function(){
+				ot.destroy();
+			});
+		}
 	}
 });

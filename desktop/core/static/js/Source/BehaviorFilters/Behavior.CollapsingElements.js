@@ -24,18 +24,19 @@ script: Behavior.Collapsible.js
 */
 
 Behavior.addGlobalFilters({
+
 	CollapsingElements: function(element, methods) {
-                element.addEvent('click:relay(.collapser)', function(event, clicked) {
-                        event.preventDefault();
-		        var togglers = element.getElements('.collapser');
-		        var sections = element.getElements('.collapsible');
-                        if(togglers.length != sections.length) {
-                                dbug.warn("CollapsingElements filter exiting; togglers length (%s) != sections length (%s)", togglers.length, sections.length);
-                                return;
-                        }
-                        var section = sections[togglers.indexOf(clicked)];
-                        if (section) section.get('reveal').toggle();
-                });
+		element.addEvent('click:relay(.collapser)', function(event, clicked) {
+			event.preventDefault();
+			var togglers = element.getElements('.collapser');
+			var sections = element.getElements('.collapsible');
+			if(togglers.length != sections.length) {
+				dbug.warn("CollapsingElements filter exiting; togglers length (%s) != sections length (%s)", togglers.length, sections.length);
+				return;
+			}
+			var section = sections[togglers.indexOf(clicked)];
+			if (section) section.get('reveal').toggle();
+		});
 	}
 
 });

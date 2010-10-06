@@ -15,12 +15,15 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 public class Namenode {
@@ -293,7 +296,67 @@ public class Namenode {
 
   }
 
-  public static class Client extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.Client implements Iface {
+  public interface AsyncIface extends org.apache.hadoop.thriftfs.api.HadoopServiceBase .AsyncIface {
+
+    public void chmod(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short perms, AsyncMethodCallback<AsyncClient.chmod_call> resultHandler) throws TException;
+
+    public void chown(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, String owner, String group, AsyncMethodCallback<AsyncClient.chown_call> resultHandler) throws TException;
+
+    public void df(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.df_call> resultHandler) throws TException;
+
+    public void enterSafeMode(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.enterSafeMode_call> resultHandler) throws TException;
+
+    public void getBlocks(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long offset, long length, AsyncMethodCallback<AsyncClient.getBlocks_call> resultHandler) throws TException;
+
+    public void getPreferredBlockSize(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, AsyncMethodCallback<AsyncClient.getPreferredBlockSize_call> resultHandler) throws TException;
+
+    public void isInSafeMode(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.isInSafeMode_call> resultHandler) throws TException;
+
+    public void leaveSafeMode(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.leaveSafeMode_call> resultHandler) throws TException;
+
+    public void ls(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, AsyncMethodCallback<AsyncClient.ls_call> resultHandler) throws TException;
+
+    public void mkdirhier(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short perms, AsyncMethodCallback<AsyncClient.mkdirhier_call> resultHandler) throws TException;
+
+    public void refreshNodes(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<AsyncClient.refreshNodes_call> resultHandler) throws TException;
+
+    public void rename(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, String newPath, AsyncMethodCallback<AsyncClient.rename_call> resultHandler) throws TException;
+
+    public void reportBadBlocks(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<Block> blocks, AsyncMethodCallback<AsyncClient.reportBadBlocks_call> resultHandler) throws TException;
+
+    public void stat(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, AsyncMethodCallback<AsyncClient.stat_call> resultHandler) throws TException;
+
+    public void getContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, String Path, AsyncMethodCallback<AsyncClient.getContentSummary_call> resultHandler) throws TException;
+
+    public void multiGetContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<String> paths, AsyncMethodCallback<AsyncClient.multiGetContentSummary_call> resultHandler) throws TException;
+
+    public void setQuota(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long namespaceQuota, long diskspaceQuota, AsyncMethodCallback<AsyncClient.setQuota_call> resultHandler) throws TException;
+
+    public void setReplication(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short replication, AsyncMethodCallback<AsyncClient.setReplication_call> resultHandler) throws TException;
+
+    public void unlink(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, boolean recursive, AsyncMethodCallback<AsyncClient.unlink_call> resultHandler) throws TException;
+
+    public void utime(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long atime, long mtime, AsyncMethodCallback<AsyncClient.utime_call> resultHandler) throws TException;
+
+    public void datanodeUp(String name, String storage, int thriftPort, AsyncMethodCallback<AsyncClient.datanodeUp_call> resultHandler) throws TException;
+
+    public void datanodeDown(String name, String storage, int thriftPort, AsyncMethodCallback<AsyncClient.datanodeDown_call> resultHandler) throws TException;
+
+    public void getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer, AsyncMethodCallback<AsyncClient.getDelegationToken_call> resultHandler) throws TException;
+
+  }
+
+  public static class Client extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.Client implements TServiceClient, Iface {
+    public static class Factory implements TServiceClientFactory<Client> {
+      public Factory() {}
+      public Client getClient(TProtocol prot) {
+        return new Client(prot);
+      }
+      public Client getClient(TProtocol iprot, TProtocol oprot) {
+        return new Client(iprot, oprot);
+      }
+    }
+
     public Client(TProtocol prot)
     {
       this(prot, prot);
@@ -312,11 +375,11 @@ public class Namenode {
 
     public void send_chmod(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short perms) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("chmod", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("chmod", TMessageType.CALL, ++seqid_));
       chmod_args args = new chmod_args();
-      args.ctx = ctx;
-      args.path = path;
-      args.perms = perms;
+      args.setCtx(ctx);
+      args.setPath(path);
+      args.setPerms(perms);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -329,6 +392,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "chmod failed: out of sequence response");
       }
       chmod_result result = new chmod_result();
       result.read(iprot_);
@@ -347,12 +413,12 @@ public class Namenode {
 
     public void send_chown(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, String owner, String group) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("chown", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("chown", TMessageType.CALL, ++seqid_));
       chown_args args = new chown_args();
-      args.ctx = ctx;
-      args.path = path;
-      args.owner = owner;
-      args.group = group;
+      args.setCtx(ctx);
+      args.setPath(path);
+      args.setOwner(owner);
+      args.setGroup(group);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -365,6 +431,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "chown failed: out of sequence response");
       }
       chown_result result = new chown_result();
       result.read(iprot_);
@@ -383,9 +452,9 @@ public class Namenode {
 
     public void send_df(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("df", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("df", TMessageType.CALL, ++seqid_));
       df_args args = new df_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -398,6 +467,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "df failed: out of sequence response");
       }
       df_result result = new df_result();
       result.read(iprot_);
@@ -416,9 +488,9 @@ public class Namenode {
 
     public void send_enterSafeMode(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("enterSafeMode", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("enterSafeMode", TMessageType.CALL, ++seqid_));
       enterSafeMode_args args = new enterSafeMode_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -431,6 +503,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "enterSafeMode failed: out of sequence response");
       }
       enterSafeMode_result result = new enterSafeMode_result();
       result.read(iprot_);
@@ -449,12 +524,12 @@ public class Namenode {
 
     public void send_getBlocks(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long offset, long length) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getBlocks", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getBlocks", TMessageType.CALL, ++seqid_));
       getBlocks_args args = new getBlocks_args();
-      args.ctx = ctx;
-      args.path = path;
-      args.offset = offset;
-      args.length = length;
+      args.setCtx(ctx);
+      args.setPath(path);
+      args.setOffset(offset);
+      args.setLength(length);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -467,6 +542,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getBlocks failed: out of sequence response");
       }
       getBlocks_result result = new getBlocks_result();
       result.read(iprot_);
@@ -488,10 +566,10 @@ public class Namenode {
 
     public void send_getPreferredBlockSize(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getPreferredBlockSize", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getPreferredBlockSize", TMessageType.CALL, ++seqid_));
       getPreferredBlockSize_args args = new getPreferredBlockSize_args();
-      args.ctx = ctx;
-      args.path = path;
+      args.setCtx(ctx);
+      args.setPath(path);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -504,6 +582,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getPreferredBlockSize failed: out of sequence response");
       }
       getPreferredBlockSize_result result = new getPreferredBlockSize_result();
       result.read(iprot_);
@@ -525,9 +606,9 @@ public class Namenode {
 
     public void send_isInSafeMode(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("isInSafeMode", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("isInSafeMode", TMessageType.CALL, ++seqid_));
       isInSafeMode_args args = new isInSafeMode_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -540,6 +621,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "isInSafeMode failed: out of sequence response");
       }
       isInSafeMode_result result = new isInSafeMode_result();
       result.read(iprot_);
@@ -561,9 +645,9 @@ public class Namenode {
 
     public void send_leaveSafeMode(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("leaveSafeMode", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("leaveSafeMode", TMessageType.CALL, ++seqid_));
       leaveSafeMode_args args = new leaveSafeMode_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -576,6 +660,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "leaveSafeMode failed: out of sequence response");
       }
       leaveSafeMode_result result = new leaveSafeMode_result();
       result.read(iprot_);
@@ -594,10 +681,10 @@ public class Namenode {
 
     public void send_ls(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("ls", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("ls", TMessageType.CALL, ++seqid_));
       ls_args args = new ls_args();
-      args.ctx = ctx;
-      args.path = path;
+      args.setCtx(ctx);
+      args.setPath(path);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -610,6 +697,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "ls failed: out of sequence response");
       }
       ls_result result = new ls_result();
       result.read(iprot_);
@@ -631,11 +721,11 @@ public class Namenode {
 
     public void send_mkdirhier(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short perms) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("mkdirhier", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("mkdirhier", TMessageType.CALL, ++seqid_));
       mkdirhier_args args = new mkdirhier_args();
-      args.ctx = ctx;
-      args.path = path;
-      args.perms = perms;
+      args.setCtx(ctx);
+      args.setPath(path);
+      args.setPerms(perms);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -648,6 +738,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "mkdirhier failed: out of sequence response");
       }
       mkdirhier_result result = new mkdirhier_result();
       result.read(iprot_);
@@ -669,9 +762,9 @@ public class Namenode {
 
     public void send_refreshNodes(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("refreshNodes", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("refreshNodes", TMessageType.CALL, ++seqid_));
       refreshNodes_args args = new refreshNodes_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -684,6 +777,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "refreshNodes failed: out of sequence response");
       }
       refreshNodes_result result = new refreshNodes_result();
       result.read(iprot_);
@@ -702,11 +798,11 @@ public class Namenode {
 
     public void send_rename(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, String newPath) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("rename", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("rename", TMessageType.CALL, ++seqid_));
       rename_args args = new rename_args();
-      args.ctx = ctx;
-      args.path = path;
-      args.newPath = newPath;
+      args.setCtx(ctx);
+      args.setPath(path);
+      args.setNewPath(newPath);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -719,6 +815,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "rename failed: out of sequence response");
       }
       rename_result result = new rename_result();
       result.read(iprot_);
@@ -740,10 +839,10 @@ public class Namenode {
 
     public void send_reportBadBlocks(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<Block> blocks) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("reportBadBlocks", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("reportBadBlocks", TMessageType.CALL, ++seqid_));
       reportBadBlocks_args args = new reportBadBlocks_args();
-      args.ctx = ctx;
-      args.blocks = blocks;
+      args.setCtx(ctx);
+      args.setBlocks(blocks);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -756,6 +855,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "reportBadBlocks failed: out of sequence response");
       }
       reportBadBlocks_result result = new reportBadBlocks_result();
       result.read(iprot_);
@@ -774,10 +876,10 @@ public class Namenode {
 
     public void send_stat(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("stat", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("stat", TMessageType.CALL, ++seqid_));
       stat_args args = new stat_args();
-      args.ctx = ctx;
-      args.path = path;
+      args.setCtx(ctx);
+      args.setPath(path);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -790,6 +892,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "stat failed: out of sequence response");
       }
       stat_result result = new stat_result();
       result.read(iprot_);
@@ -811,10 +916,10 @@ public class Namenode {
 
     public void send_getContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, String Path) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getContentSummary", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getContentSummary", TMessageType.CALL, ++seqid_));
       getContentSummary_args args = new getContentSummary_args();
-      args.ctx = ctx;
-      args.Path = Path;
+      args.setCtx(ctx);
+      args.setPath(Path);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -827,6 +932,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getContentSummary failed: out of sequence response");
       }
       getContentSummary_result result = new getContentSummary_result();
       result.read(iprot_);
@@ -848,10 +956,10 @@ public class Namenode {
 
     public void send_multiGetContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<String> paths) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("multiGetContentSummary", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("multiGetContentSummary", TMessageType.CALL, ++seqid_));
       multiGetContentSummary_args args = new multiGetContentSummary_args();
-      args.ctx = ctx;
-      args.paths = paths;
+      args.setCtx(ctx);
+      args.setPaths(paths);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -864,6 +972,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "multiGetContentSummary failed: out of sequence response");
       }
       multiGetContentSummary_result result = new multiGetContentSummary_result();
       result.read(iprot_);
@@ -885,12 +996,12 @@ public class Namenode {
 
     public void send_setQuota(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long namespaceQuota, long diskspaceQuota) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("setQuota", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("setQuota", TMessageType.CALL, ++seqid_));
       setQuota_args args = new setQuota_args();
-      args.ctx = ctx;
-      args.path = path;
-      args.namespaceQuota = namespaceQuota;
-      args.diskspaceQuota = diskspaceQuota;
+      args.setCtx(ctx);
+      args.setPath(path);
+      args.setNamespaceQuota(namespaceQuota);
+      args.setDiskspaceQuota(diskspaceQuota);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -903,6 +1014,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "setQuota failed: out of sequence response");
       }
       setQuota_result result = new setQuota_result();
       result.read(iprot_);
@@ -921,11 +1035,11 @@ public class Namenode {
 
     public void send_setReplication(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short replication) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("setReplication", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("setReplication", TMessageType.CALL, ++seqid_));
       setReplication_args args = new setReplication_args();
-      args.ctx = ctx;
-      args.path = path;
-      args.replication = replication;
+      args.setCtx(ctx);
+      args.setPath(path);
+      args.setReplication(replication);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -938,6 +1052,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "setReplication failed: out of sequence response");
       }
       setReplication_result result = new setReplication_result();
       result.read(iprot_);
@@ -959,11 +1076,11 @@ public class Namenode {
 
     public void send_unlink(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, boolean recursive) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("unlink", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("unlink", TMessageType.CALL, ++seqid_));
       unlink_args args = new unlink_args();
-      args.ctx = ctx;
-      args.path = path;
-      args.recursive = recursive;
+      args.setCtx(ctx);
+      args.setPath(path);
+      args.setRecursive(recursive);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -976,6 +1093,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "unlink failed: out of sequence response");
       }
       unlink_result result = new unlink_result();
       result.read(iprot_);
@@ -997,12 +1117,12 @@ public class Namenode {
 
     public void send_utime(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long atime, long mtime) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("utime", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("utime", TMessageType.CALL, ++seqid_));
       utime_args args = new utime_args();
-      args.ctx = ctx;
-      args.path = path;
-      args.atime = atime;
-      args.mtime = mtime;
+      args.setCtx(ctx);
+      args.setPath(path);
+      args.setAtime(atime);
+      args.setMtime(mtime);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -1015,6 +1135,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "utime failed: out of sequence response");
       }
       utime_result result = new utime_result();
       result.read(iprot_);
@@ -1033,11 +1156,11 @@ public class Namenode {
 
     public void send_datanodeUp(String name, String storage, int thriftPort) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("datanodeUp", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("datanodeUp", TMessageType.CALL, ++seqid_));
       datanodeUp_args args = new datanodeUp_args();
-      args.name = name;
-      args.storage = storage;
-      args.thriftPort = thriftPort;
+      args.setName(name);
+      args.setStorage(storage);
+      args.setThriftPort(thriftPort);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -1050,6 +1173,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "datanodeUp failed: out of sequence response");
       }
       datanodeUp_result result = new datanodeUp_result();
       result.read(iprot_);
@@ -1065,11 +1191,11 @@ public class Namenode {
 
     public void send_datanodeDown(String name, String storage, int thriftPort) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("datanodeDown", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("datanodeDown", TMessageType.CALL, ++seqid_));
       datanodeDown_args args = new datanodeDown_args();
-      args.name = name;
-      args.storage = storage;
-      args.thriftPort = thriftPort;
+      args.setName(name);
+      args.setStorage(storage);
+      args.setThriftPort(thriftPort);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -1082,6 +1208,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "datanodeDown failed: out of sequence response");
       }
       datanodeDown_result result = new datanodeDown_result();
       result.read(iprot_);
@@ -1097,10 +1226,10 @@ public class Namenode {
 
     public void send_getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.CALL, ++seqid_));
       getDelegationToken_args args = new getDelegationToken_args();
-      args.ctx = ctx;
-      args.renewer = renewer;
+      args.setCtx(ctx);
+      args.setRenewer(renewer);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -1113,6 +1242,9 @@ public class Namenode {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getDelegationToken failed: out of sequence response");
       }
       getDelegationToken_result result = new getDelegationToken_result();
       result.read(iprot_);
@@ -1127,6 +1259,837 @@ public class Namenode {
     }
 
   }
+  public static class AsyncClient extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.AsyncClient implements AsyncIface {
+    public static class Factory implements TAsyncClientFactory<AsyncClient> {
+      private TAsyncClientManager clientManager;
+      private TProtocolFactory protocolFactory;
+      public Factory(TAsyncClientManager clientManager, TProtocolFactory protocolFactory) {
+        this.clientManager = clientManager;
+        this.protocolFactory = protocolFactory;
+      }
+      public AsyncClient getAsyncClient(TNonblockingTransport transport) {
+        return new AsyncClient(protocolFactory, clientManager, transport);
+      }
+    }
+
+    public AsyncClient(TProtocolFactory protocolFactory, TAsyncClientManager clientManager, TNonblockingTransport transport) {
+      super(protocolFactory, clientManager, transport);
+    }
+
+    public void chmod(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short perms, AsyncMethodCallback<chmod_call> resultHandler) throws TException {
+      checkReady();
+      chmod_call method_call = new chmod_call(ctx, path, perms, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class chmod_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      private short perms;
+      public chmod_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short perms, AsyncMethodCallback<chmod_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+        this.perms = perms;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("chmod", TMessageType.CALL, 0));
+        chmod_args args = new chmod_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.setPerms(perms);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_chmod();
+      }
+    }
+
+    public void chown(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, String owner, String group, AsyncMethodCallback<chown_call> resultHandler) throws TException {
+      checkReady();
+      chown_call method_call = new chown_call(ctx, path, owner, group, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class chown_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      private String owner;
+      private String group;
+      public chown_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, String owner, String group, AsyncMethodCallback<chown_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+        this.owner = owner;
+        this.group = group;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("chown", TMessageType.CALL, 0));
+        chown_args args = new chown_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.setOwner(owner);
+        args.setGroup(group);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_chown();
+      }
+    }
+
+    public void df(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<df_call> resultHandler) throws TException {
+      checkReady();
+      df_call method_call = new df_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class df_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public df_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<df_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("df", TMessageType.CALL, 0));
+        df_args args = new df_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<Long> getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_df();
+      }
+    }
+
+    public void enterSafeMode(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<enterSafeMode_call> resultHandler) throws TException {
+      checkReady();
+      enterSafeMode_call method_call = new enterSafeMode_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class enterSafeMode_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public enterSafeMode_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<enterSafeMode_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("enterSafeMode", TMessageType.CALL, 0));
+        enterSafeMode_args args = new enterSafeMode_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_enterSafeMode();
+      }
+    }
+
+    public void getBlocks(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long offset, long length, AsyncMethodCallback<getBlocks_call> resultHandler) throws TException {
+      checkReady();
+      getBlocks_call method_call = new getBlocks_call(ctx, path, offset, length, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getBlocks_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      private long offset;
+      private long length;
+      public getBlocks_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long offset, long length, AsyncMethodCallback<getBlocks_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+        this.offset = offset;
+        this.length = length;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getBlocks", TMessageType.CALL, 0));
+        getBlocks_args args = new getBlocks_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.setOffset(offset);
+        args.setLength(length);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<Block> getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getBlocks();
+      }
+    }
+
+    public void getPreferredBlockSize(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, AsyncMethodCallback<getPreferredBlockSize_call> resultHandler) throws TException {
+      checkReady();
+      getPreferredBlockSize_call method_call = new getPreferredBlockSize_call(ctx, path, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getPreferredBlockSize_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      public getPreferredBlockSize_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, AsyncMethodCallback<getPreferredBlockSize_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getPreferredBlockSize", TMessageType.CALL, 0));
+        getPreferredBlockSize_args args = new getPreferredBlockSize_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public long getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getPreferredBlockSize();
+      }
+    }
+
+    public void isInSafeMode(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<isInSafeMode_call> resultHandler) throws TException {
+      checkReady();
+      isInSafeMode_call method_call = new isInSafeMode_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class isInSafeMode_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public isInSafeMode_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<isInSafeMode_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("isInSafeMode", TMessageType.CALL, 0));
+        isInSafeMode_args args = new isInSafeMode_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public boolean getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_isInSafeMode();
+      }
+    }
+
+    public void leaveSafeMode(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<leaveSafeMode_call> resultHandler) throws TException {
+      checkReady();
+      leaveSafeMode_call method_call = new leaveSafeMode_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class leaveSafeMode_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public leaveSafeMode_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<leaveSafeMode_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("leaveSafeMode", TMessageType.CALL, 0));
+        leaveSafeMode_args args = new leaveSafeMode_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_leaveSafeMode();
+      }
+    }
+
+    public void ls(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, AsyncMethodCallback<ls_call> resultHandler) throws TException {
+      checkReady();
+      ls_call method_call = new ls_call(ctx, path, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class ls_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      public ls_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, AsyncMethodCallback<ls_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("ls", TMessageType.CALL, 0));
+        ls_args args = new ls_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<Stat> getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_ls();
+      }
+    }
+
+    public void mkdirhier(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short perms, AsyncMethodCallback<mkdirhier_call> resultHandler) throws TException {
+      checkReady();
+      mkdirhier_call method_call = new mkdirhier_call(ctx, path, perms, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class mkdirhier_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      private short perms;
+      public mkdirhier_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short perms, AsyncMethodCallback<mkdirhier_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+        this.perms = perms;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("mkdirhier", TMessageType.CALL, 0));
+        mkdirhier_args args = new mkdirhier_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.setPerms(perms);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public boolean getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_mkdirhier();
+      }
+    }
+
+    public void refreshNodes(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<refreshNodes_call> resultHandler) throws TException {
+      checkReady();
+      refreshNodes_call method_call = new refreshNodes_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class refreshNodes_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      public refreshNodes_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, AsyncMethodCallback<refreshNodes_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("refreshNodes", TMessageType.CALL, 0));
+        refreshNodes_args args = new refreshNodes_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_refreshNodes();
+      }
+    }
+
+    public void rename(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, String newPath, AsyncMethodCallback<rename_call> resultHandler) throws TException {
+      checkReady();
+      rename_call method_call = new rename_call(ctx, path, newPath, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class rename_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      private String newPath;
+      public rename_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, String newPath, AsyncMethodCallback<rename_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+        this.newPath = newPath;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("rename", TMessageType.CALL, 0));
+        rename_args args = new rename_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.setNewPath(newPath);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public boolean getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_rename();
+      }
+    }
+
+    public void reportBadBlocks(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<Block> blocks, AsyncMethodCallback<reportBadBlocks_call> resultHandler) throws TException {
+      checkReady();
+      reportBadBlocks_call method_call = new reportBadBlocks_call(ctx, blocks, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class reportBadBlocks_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private List<Block> blocks;
+      public reportBadBlocks_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<Block> blocks, AsyncMethodCallback<reportBadBlocks_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.blocks = blocks;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("reportBadBlocks", TMessageType.CALL, 0));
+        reportBadBlocks_args args = new reportBadBlocks_args();
+        args.setCtx(ctx);
+        args.setBlocks(blocks);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_reportBadBlocks();
+      }
+    }
+
+    public void stat(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, AsyncMethodCallback<stat_call> resultHandler) throws TException {
+      checkReady();
+      stat_call method_call = new stat_call(ctx, path, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class stat_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      public stat_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, AsyncMethodCallback<stat_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("stat", TMessageType.CALL, 0));
+        stat_args args = new stat_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public Stat getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_stat();
+      }
+    }
+
+    public void getContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, String Path, AsyncMethodCallback<getContentSummary_call> resultHandler) throws TException {
+      checkReady();
+      getContentSummary_call method_call = new getContentSummary_call(ctx, Path, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getContentSummary_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String Path;
+      public getContentSummary_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String Path, AsyncMethodCallback<getContentSummary_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.Path = Path;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getContentSummary", TMessageType.CALL, 0));
+        getContentSummary_args args = new getContentSummary_args();
+        args.setCtx(ctx);
+        args.setPath(Path);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ContentSummary getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getContentSummary();
+      }
+    }
+
+    public void multiGetContentSummary(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<String> paths, AsyncMethodCallback<multiGetContentSummary_call> resultHandler) throws TException {
+      checkReady();
+      multiGetContentSummary_call method_call = new multiGetContentSummary_call(ctx, paths, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class multiGetContentSummary_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private List<String> paths;
+      public multiGetContentSummary_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, List<String> paths, AsyncMethodCallback<multiGetContentSummary_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.paths = paths;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("multiGetContentSummary", TMessageType.CALL, 0));
+        multiGetContentSummary_args args = new multiGetContentSummary_args();
+        args.setCtx(ctx);
+        args.setPaths(paths);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<ContentSummary> getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_multiGetContentSummary();
+      }
+    }
+
+    public void setQuota(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long namespaceQuota, long diskspaceQuota, AsyncMethodCallback<setQuota_call> resultHandler) throws TException {
+      checkReady();
+      setQuota_call method_call = new setQuota_call(ctx, path, namespaceQuota, diskspaceQuota, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class setQuota_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      private long namespaceQuota;
+      private long diskspaceQuota;
+      public setQuota_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long namespaceQuota, long diskspaceQuota, AsyncMethodCallback<setQuota_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+        this.namespaceQuota = namespaceQuota;
+        this.diskspaceQuota = diskspaceQuota;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("setQuota", TMessageType.CALL, 0));
+        setQuota_args args = new setQuota_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.setNamespaceQuota(namespaceQuota);
+        args.setDiskspaceQuota(diskspaceQuota);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_setQuota();
+      }
+    }
+
+    public void setReplication(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short replication, AsyncMethodCallback<setReplication_call> resultHandler) throws TException {
+      checkReady();
+      setReplication_call method_call = new setReplication_call(ctx, path, replication, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class setReplication_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      private short replication;
+      public setReplication_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, short replication, AsyncMethodCallback<setReplication_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+        this.replication = replication;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("setReplication", TMessageType.CALL, 0));
+        setReplication_args args = new setReplication_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.setReplication(replication);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public boolean getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_setReplication();
+      }
+    }
+
+    public void unlink(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, boolean recursive, AsyncMethodCallback<unlink_call> resultHandler) throws TException {
+      checkReady();
+      unlink_call method_call = new unlink_call(ctx, path, recursive, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class unlink_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      private boolean recursive;
+      public unlink_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, boolean recursive, AsyncMethodCallback<unlink_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+        this.recursive = recursive;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("unlink", TMessageType.CALL, 0));
+        unlink_args args = new unlink_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.setRecursive(recursive);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public boolean getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_unlink();
+      }
+    }
+
+    public void utime(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long atime, long mtime, AsyncMethodCallback<utime_call> resultHandler) throws TException {
+      checkReady();
+      utime_call method_call = new utime_call(ctx, path, atime, mtime, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class utime_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String path;
+      private long atime;
+      private long mtime;
+      public utime_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String path, long atime, long mtime, AsyncMethodCallback<utime_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.path = path;
+        this.atime = atime;
+        this.mtime = mtime;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("utime", TMessageType.CALL, 0));
+        utime_args args = new utime_args();
+        args.setCtx(ctx);
+        args.setPath(path);
+        args.setAtime(atime);
+        args.setMtime(mtime);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_utime();
+      }
+    }
+
+    public void datanodeUp(String name, String storage, int thriftPort, AsyncMethodCallback<datanodeUp_call> resultHandler) throws TException {
+      checkReady();
+      datanodeUp_call method_call = new datanodeUp_call(name, storage, thriftPort, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class datanodeUp_call extends TAsyncMethodCall {
+      private String name;
+      private String storage;
+      private int thriftPort;
+      public datanodeUp_call(String name, String storage, int thriftPort, AsyncMethodCallback<datanodeUp_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.name = name;
+        this.storage = storage;
+        this.thriftPort = thriftPort;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("datanodeUp", TMessageType.CALL, 0));
+        datanodeUp_args args = new datanodeUp_args();
+        args.setName(name);
+        args.setStorage(storage);
+        args.setThriftPort(thriftPort);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_datanodeUp();
+      }
+    }
+
+    public void datanodeDown(String name, String storage, int thriftPort, AsyncMethodCallback<datanodeDown_call> resultHandler) throws TException {
+      checkReady();
+      datanodeDown_call method_call = new datanodeDown_call(name, storage, thriftPort, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class datanodeDown_call extends TAsyncMethodCall {
+      private String name;
+      private String storage;
+      private int thriftPort;
+      public datanodeDown_call(String name, String storage, int thriftPort, AsyncMethodCallback<datanodeDown_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.name = name;
+        this.storage = storage;
+        this.thriftPort = thriftPort;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("datanodeDown", TMessageType.CALL, 0));
+        datanodeDown_args args = new datanodeDown_args();
+        args.setName(name);
+        args.setStorage(storage);
+        args.setThriftPort(thriftPort);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_datanodeDown();
+      }
+    }
+
+    public void getDelegationToken(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer, AsyncMethodCallback<getDelegationToken_call> resultHandler) throws TException {
+      checkReady();
+      getDelegationToken_call method_call = new getDelegationToken_call(ctx, renewer, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getDelegationToken_call extends TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private String renewer;
+      public getDelegationToken_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, String renewer, AsyncMethodCallback<getDelegationToken_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.renewer = renewer;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.CALL, 0));
+        getDelegationToken_args args = new getDelegationToken_args();
+        args.setCtx(ctx);
+        args.setRenewer(renewer);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getResult() throws org.apache.hadoop.thriftfs.api.IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getDelegationToken();
+      }
+    }
+
+  }
+
   public static class Processor extends org.apache.hadoop.thriftfs.api.HadoopServiceBase.Processor implements TProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(Processor.class.getName());
     public Processor(Iface iface)
@@ -1182,7 +2145,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         chmod_args args = new chmod_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("chmod", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         chmod_result result = new chmod_result();
         try {
@@ -1210,7 +2183,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         chown_args args = new chown_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("chown", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         chown_result result = new chown_result();
         try {
@@ -1238,7 +2221,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         df_args args = new df_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("df", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         df_result result = new df_result();
         result.success = iface_.df(args.ctx);
@@ -1254,7 +2247,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         enterSafeMode_args args = new enterSafeMode_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("enterSafeMode", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         enterSafeMode_result result = new enterSafeMode_result();
         try {
@@ -1282,7 +2285,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getBlocks_args args = new getBlocks_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getBlocks", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getBlocks_result result = new getBlocks_result();
         try {
@@ -1310,7 +2323,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getPreferredBlockSize_args args = new getPreferredBlockSize_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getPreferredBlockSize", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getPreferredBlockSize_result result = new getPreferredBlockSize_result();
         try {
@@ -1339,7 +2362,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         isInSafeMode_args args = new isInSafeMode_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("isInSafeMode", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         isInSafeMode_result result = new isInSafeMode_result();
         try {
@@ -1368,7 +2401,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         leaveSafeMode_args args = new leaveSafeMode_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("leaveSafeMode", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         leaveSafeMode_result result = new leaveSafeMode_result();
         try {
@@ -1396,7 +2439,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         ls_args args = new ls_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("ls", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         ls_result result = new ls_result();
         try {
@@ -1424,7 +2477,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         mkdirhier_args args = new mkdirhier_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("mkdirhier", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         mkdirhier_result result = new mkdirhier_result();
         try {
@@ -1453,7 +2516,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         refreshNodes_args args = new refreshNodes_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("refreshNodes", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         refreshNodes_result result = new refreshNodes_result();
         try {
@@ -1481,7 +2554,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         rename_args args = new rename_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("rename", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         rename_result result = new rename_result();
         try {
@@ -1510,7 +2593,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         reportBadBlocks_args args = new reportBadBlocks_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("reportBadBlocks", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         reportBadBlocks_result result = new reportBadBlocks_result();
         try {
@@ -1538,7 +2631,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         stat_args args = new stat_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("stat", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         stat_result result = new stat_result();
         try {
@@ -1566,7 +2669,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getContentSummary_args args = new getContentSummary_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getContentSummary", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getContentSummary_result result = new getContentSummary_result();
         try {
@@ -1594,7 +2707,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         multiGetContentSummary_args args = new multiGetContentSummary_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("multiGetContentSummary", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         multiGetContentSummary_result result = new multiGetContentSummary_result();
         try {
@@ -1622,7 +2745,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         setQuota_args args = new setQuota_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("setQuota", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         setQuota_result result = new setQuota_result();
         try {
@@ -1650,7 +2783,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         setReplication_args args = new setReplication_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("setReplication", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         setReplication_result result = new setReplication_result();
         try {
@@ -1679,7 +2822,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         unlink_args args = new unlink_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("unlink", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         unlink_result result = new unlink_result();
         try {
@@ -1708,7 +2861,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         utime_args args = new utime_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("utime", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         utime_result result = new utime_result();
         try {
@@ -1736,7 +2899,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         datanodeUp_args args = new datanodeUp_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("datanodeUp", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         datanodeUp_result result = new datanodeUp_result();
         iface_.datanodeUp(args.name, args.storage, args.thriftPort);
@@ -1752,7 +2925,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         datanodeDown_args args = new datanodeDown_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("datanodeDown", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         datanodeDown_result result = new datanodeDown_result();
         iface_.datanodeDown(args.name, args.storage, args.thriftPort);
@@ -1768,7 +2951,17 @@ public class Namenode {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getDelegationToken_args args = new getDelegationToken_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getDelegationToken", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getDelegationToken_result result = new getDelegationToken_result();
         try {
@@ -1794,7 +2987,7 @@ public class Namenode {
 
   }
 
-  public static class chmod_args implements TBase<chmod_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class chmod_args implements TBase<chmod_args, chmod_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("chmod_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -1823,12 +3016,10 @@ public class Namenode {
        */
       PERMS((short)2, "perms");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -1837,7 +3028,16 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          case 2: // PERMS
+            return PERMS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -1878,16 +3078,16 @@ public class Namenode {
     private static final int __PERMS_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.PERMS, new FieldMetaData("perms", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I16)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.PERMS, new FieldMetaData("perms", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I16)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(chmod_args.class, metaDataMap);
     }
 
@@ -1925,9 +3125,12 @@ public class Namenode {
       return new chmod_args(this);
     }
 
-    @Deprecated
-    public chmod_args clone() {
-      return new chmod_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
+      setPermsIsSet(false);
+      this.perms = 0;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -2042,10 +3245,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -2061,12 +3260,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -2076,10 +3275,6 @@ public class Namenode {
         return isSetPerms();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2130,6 +3325,51 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(chmod_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      chmod_args typedOther = (chmod_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPerms()).compareTo(typedOther.isSetPerms());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPerms()) {
+        lastComparison = TBaseHelper.compareTo(this.perms, typedOther.perms);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2139,37 +3379,34 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PERMS:
-              if (field.type == TType.I16) {
-                this.perms = iprot.readI16();
-                setPermsIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // PERMS
+            if (field.type == TType.I16) {
+              this.perms = iprot.readI16();
+              setPermsIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -2232,7 +3469,7 @@ public class Namenode {
 
   }
 
-  public static class chmod_result implements TBase<chmod_result._Fields>, java.io.Serializable, Cloneable, Comparable<chmod_result>   {
+  public static class chmod_result implements TBase<chmod_result, chmod_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("chmod_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -2243,12 +3480,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -2257,7 +3492,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -2296,12 +3536,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(chmod_result.class, metaDataMap);
     }
 
@@ -2328,9 +3568,9 @@ public class Namenode {
       return new chmod_result(this);
     }
 
-    @Deprecated
-    public chmod_result clone() {
-      return new chmod_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -2370,10 +3610,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -2383,21 +3619,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2438,15 +3670,21 @@ public class Namenode {
       int lastComparison = 0;
       chmod_result typedOther = (chmod_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -2458,22 +3696,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -2515,7 +3750,7 @@ public class Namenode {
 
   }
 
-  public static class chown_args implements TBase<chown_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class chown_args implements TBase<chown_args, chown_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("chown_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -2553,12 +3788,10 @@ public class Namenode {
        */
       GROUP((short)3, "group");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -2567,7 +3800,18 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          case 2: // OWNER
+            return OWNER;
+          case 3: // GROUP
+            return GROUP;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -2606,18 +3850,18 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.OWNER, new FieldMetaData("owner", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.GROUP, new FieldMetaData("group", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.OWNER, new FieldMetaData("owner", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.GROUP, new FieldMetaData("group", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(chown_args.class, metaDataMap);
     }
 
@@ -2659,9 +3903,12 @@ public class Namenode {
       return new chown_args(this);
     }
 
-    @Deprecated
-    public chown_args clone() {
-      return new chown_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
+      this.owner = null;
+      this.group = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -2815,10 +4062,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -2837,12 +4080,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -2854,10 +4097,6 @@ public class Namenode {
         return isSetGroup();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2917,6 +4156,61 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(chown_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      chown_args typedOther = (chown_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetOwner()).compareTo(typedOther.isSetOwner());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetOwner()) {
+        lastComparison = TBaseHelper.compareTo(this.owner, typedOther.owner);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetGroup()).compareTo(typedOther.isSetGroup());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetGroup()) {
+        lastComparison = TBaseHelper.compareTo(this.group, typedOther.group);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2926,43 +4220,40 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case OWNER:
-              if (field.type == TType.STRING) {
-                this.owner = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case GROUP:
-              if (field.type == TType.STRING) {
-                this.group = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // OWNER
+            if (field.type == TType.STRING) {
+              this.owner = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3: // GROUP
+            if (field.type == TType.STRING) {
+              this.group = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -3044,7 +4335,7 @@ public class Namenode {
 
   }
 
-  public static class chown_result implements TBase<chown_result._Fields>, java.io.Serializable, Cloneable, Comparable<chown_result>   {
+  public static class chown_result implements TBase<chown_result, chown_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("chown_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -3055,12 +4346,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -3069,7 +4358,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -3108,12 +4402,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(chown_result.class, metaDataMap);
     }
 
@@ -3140,9 +4434,9 @@ public class Namenode {
       return new chown_result(this);
     }
 
-    @Deprecated
-    public chown_result clone() {
-      return new chown_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -3182,10 +4476,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -3195,21 +4485,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -3250,15 +4536,21 @@ public class Namenode {
       int lastComparison = 0;
       chown_result typedOther = (chown_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -3270,22 +4562,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -3327,7 +4616,7 @@ public class Namenode {
 
   }
 
-  public static class df_args implements TBase<df_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class df_args implements TBase<df_args, df_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("df_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -3338,12 +4627,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -3352,7 +4639,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -3391,12 +4683,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(df_args.class, metaDataMap);
     }
 
@@ -3423,9 +4715,9 @@ public class Namenode {
       return new df_args(this);
     }
 
-    @Deprecated
-    public df_args clone() {
-      return new df_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -3465,10 +4757,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -3478,21 +4766,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -3525,6 +4809,31 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(df_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      df_args typedOther = (df_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -3534,22 +4843,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -3592,7 +4898,7 @@ public class Namenode {
 
   }
 
-  public static class df_result implements TBase<df_result._Fields>, java.io.Serializable, Cloneable, Comparable<df_result>   {
+  public static class df_result implements TBase<df_result, df_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("df_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
@@ -3603,12 +4909,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -3617,7 +4921,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -3656,13 +4965,13 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new FieldValueMetaData(TType.I64))));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(df_result.class, metaDataMap);
     }
 
@@ -3693,9 +5002,9 @@ public class Namenode {
       return new df_result(this);
     }
 
-    @Deprecated
-    public df_result clone() {
-      return new df_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public int getSuccessSize() {
@@ -3750,10 +5059,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -3763,21 +5068,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -3818,15 +5119,21 @@ public class Namenode {
       int lastComparison = 0;
       df_result typedOther = (df_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -3838,31 +5145,28 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.LIST) {
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.LIST) {
+              {
+                TList _list4 = iprot.readListBegin();
+                this.success = new ArrayList<Long>(_list4.size);
+                for (int _i5 = 0; _i5 < _list4.size; ++_i5)
                 {
-                  TList _list4 = iprot.readListBegin();
-                  this.success = new ArrayList<Long>(_list4.size);
-                  for (int _i5 = 0; _i5 < _list4.size; ++_i5)
-                  {
-                    long _elem6;
-                    _elem6 = iprot.readI64();
-                    this.success.add(_elem6);
-                  }
-                  iprot.readListEnd();
+                  long _elem6;
+                  _elem6 = iprot.readI64();
+                  this.success.add(_elem6);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readListEnd();
               }
-              break;
-          }
-          iprot.readFieldEnd();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -3911,7 +5215,7 @@ public class Namenode {
 
   }
 
-  public static class enterSafeMode_args implements TBase<enterSafeMode_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class enterSafeMode_args implements TBase<enterSafeMode_args, enterSafeMode_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("enterSafeMode_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -3922,12 +5226,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -3936,7 +5238,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -3975,12 +5282,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(enterSafeMode_args.class, metaDataMap);
     }
 
@@ -4007,9 +5314,9 @@ public class Namenode {
       return new enterSafeMode_args(this);
     }
 
-    @Deprecated
-    public enterSafeMode_args clone() {
-      return new enterSafeMode_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -4049,10 +5356,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -4062,21 +5365,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -4109,6 +5408,31 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(enterSafeMode_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      enterSafeMode_args typedOther = (enterSafeMode_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4118,22 +5442,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -4176,7 +5497,7 @@ public class Namenode {
 
   }
 
-  public static class enterSafeMode_result implements TBase<enterSafeMode_result._Fields>, java.io.Serializable, Cloneable, Comparable<enterSafeMode_result>   {
+  public static class enterSafeMode_result implements TBase<enterSafeMode_result, enterSafeMode_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("enterSafeMode_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -4187,12 +5508,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -4201,7 +5520,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -4240,12 +5564,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(enterSafeMode_result.class, metaDataMap);
     }
 
@@ -4272,9 +5596,9 @@ public class Namenode {
       return new enterSafeMode_result(this);
     }
 
-    @Deprecated
-    public enterSafeMode_result clone() {
-      return new enterSafeMode_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -4314,10 +5638,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -4327,21 +5647,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -4382,15 +5698,21 @@ public class Namenode {
       int lastComparison = 0;
       enterSafeMode_result typedOther = (enterSafeMode_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -4402,22 +5724,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -4459,7 +5778,7 @@ public class Namenode {
 
   }
 
-  public static class getBlocks_args implements TBase<getBlocks_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getBlocks_args implements TBase<getBlocks_args, getBlocks_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getBlocks_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -4497,12 +5816,10 @@ public class Namenode {
        */
       LENGTH((short)3, "length");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -4511,7 +5828,18 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          case 2: // OFFSET
+            return OFFSET;
+          case 3: // LENGTH
+            return LENGTH;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -4553,18 +5881,18 @@ public class Namenode {
     private static final int __LENGTH_ISSET_ID = 1;
     private BitSet __isset_bit_vector = new BitSet(2);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.OFFSET, new FieldMetaData("offset", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I64)));
-      put(_Fields.LENGTH, new FieldMetaData("length", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I64)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.OFFSET, new FieldMetaData("offset", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I64)));
+      tmpMap.put(_Fields.LENGTH, new FieldMetaData("length", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I64)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getBlocks_args.class, metaDataMap);
     }
 
@@ -4606,9 +5934,14 @@ public class Namenode {
       return new getBlocks_args(this);
     }
 
-    @Deprecated
-    public getBlocks_args clone() {
-      return new getBlocks_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
+      setOffsetIsSet(false);
+      this.offset = 0;
+      setLengthIsSet(false);
+      this.length = 0;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -4760,10 +6093,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -4782,12 +6111,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -4799,10 +6128,6 @@ public class Namenode {
         return isSetLength();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -4862,6 +6187,61 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(getBlocks_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getBlocks_args typedOther = (getBlocks_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetOffset()).compareTo(typedOther.isSetOffset());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetOffset()) {
+        lastComparison = TBaseHelper.compareTo(this.offset, typedOther.offset);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetLength()).compareTo(typedOther.isSetLength());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetLength()) {
+        lastComparison = TBaseHelper.compareTo(this.length, typedOther.length);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4871,45 +6251,42 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case OFFSET:
-              if (field.type == TType.I64) {
-                this.offset = iprot.readI64();
-                setOffsetIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case LENGTH:
-              if (field.type == TType.I64) {
-                this.length = iprot.readI64();
-                setLengthIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // OFFSET
+            if (field.type == TType.I64) {
+              this.offset = iprot.readI64();
+              setOffsetIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3: // LENGTH
+            if (field.type == TType.I64) {
+              this.length = iprot.readI64();
+              setLengthIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -4979,7 +6356,7 @@ public class Namenode {
 
   }
 
-  public static class getBlocks_result implements TBase<getBlocks_result._Fields>, java.io.Serializable, Cloneable, Comparable<getBlocks_result>   {
+  public static class getBlocks_result implements TBase<getBlocks_result, getBlocks_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getBlocks_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
@@ -4993,12 +6370,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -5007,7 +6382,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -5046,15 +6428,15 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new StructMetaData(TType.STRUCT, Block.class))));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
           new FieldValueMetaData(TType.STRUCT)));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getBlocks_result.class, metaDataMap);
     }
 
@@ -5090,9 +6472,10 @@ public class Namenode {
       return new getBlocks_result(this);
     }
 
-    @Deprecated
-    public getBlocks_result clone() {
-      return new getBlocks_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public int getSuccessSize() {
@@ -5179,10 +6562,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -5195,12 +6574,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -5208,10 +6587,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -5261,23 +6636,31 @@ public class Namenode {
       int lastComparison = 0;
       getBlocks_result typedOther = (getBlocks_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -5289,40 +6672,37 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.LIST) {
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.LIST) {
+              {
+                TList _list8 = iprot.readListBegin();
+                this.success = new ArrayList<Block>(_list8.size);
+                for (int _i9 = 0; _i9 < _list8.size; ++_i9)
                 {
-                  TList _list8 = iprot.readListBegin();
-                  this.success = new ArrayList<Block>(_list8.size);
-                  for (int _i9 = 0; _i9 < _list8.size; ++_i9)
-                  {
-                    Block _elem10;
-                    _elem10 = new Block();
-                    _elem10.read(iprot);
-                    this.success.add(_elem10);
-                  }
-                  iprot.readListEnd();
+                  Block _elem10;
+                  _elem10 = new Block();
+                  _elem10.read(iprot);
+                  this.success.add(_elem10);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readListEnd();
               }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -5383,7 +6763,7 @@ public class Namenode {
 
   }
 
-  public static class getPreferredBlockSize_args implements TBase<getPreferredBlockSize_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getPreferredBlockSize_args implements TBase<getPreferredBlockSize_args, getPreferredBlockSize_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getPreferredBlockSize_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -5403,12 +6783,10 @@ public class Namenode {
        */
       PATH((short)1, "path");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -5417,7 +6795,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -5456,14 +6841,14 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getPreferredBlockSize_args.class, metaDataMap);
     }
 
@@ -5495,9 +6880,10 @@ public class Namenode {
       return new getPreferredBlockSize_args(this);
     }
 
-    @Deprecated
-    public getPreferredBlockSize_args clone() {
-      return new getPreferredBlockSize_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -5575,10 +6961,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -5591,12 +6973,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -5604,10 +6986,6 @@ public class Namenode {
         return isSetPath();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -5649,6 +7027,41 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(getPreferredBlockSize_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getPreferredBlockSize_args typedOther = (getPreferredBlockSize_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -5658,29 +7071,26 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -5736,7 +7146,7 @@ public class Namenode {
 
   }
 
-  public static class getPreferredBlockSize_result implements TBase<getPreferredBlockSize_result._Fields>, java.io.Serializable, Cloneable, Comparable<getPreferredBlockSize_result>   {
+  public static class getPreferredBlockSize_result implements TBase<getPreferredBlockSize_result, getPreferredBlockSize_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getPreferredBlockSize_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.I64, (short)0);
@@ -5750,12 +7160,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -5764,7 +7172,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -5805,14 +7220,14 @@ public class Namenode {
     private static final int __SUCCESS_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I64)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I64)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getPreferredBlockSize_result.class, metaDataMap);
     }
 
@@ -5845,9 +7260,11 @@ public class Namenode {
       return new getPreferredBlockSize_result(this);
     }
 
-    @Deprecated
-    public getPreferredBlockSize_result clone() {
-      return new getPreferredBlockSize_result(this);
+    @Override
+    public void clear() {
+      setSuccessIsSet(false);
+      this.success = 0;
+      this.err = null;
     }
 
     public long getSuccess() {
@@ -5918,10 +7335,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -5934,12 +7347,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -5947,10 +7360,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -6000,23 +7409,31 @@ public class Namenode {
       int lastComparison = 0;
       getPreferredBlockSize_result typedOther = (getPreferredBlockSize_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -6028,30 +7445,27 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.I64) {
-                this.success = iprot.readI64();
-                setSuccessIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.I64) {
+              this.success = iprot.readI64();
+              setSuccessIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -6101,7 +7515,7 @@ public class Namenode {
 
   }
 
-  public static class isInSafeMode_args implements TBase<isInSafeMode_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class isInSafeMode_args implements TBase<isInSafeMode_args, isInSafeMode_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("isInSafeMode_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -6112,12 +7526,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -6126,7 +7538,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -6165,12 +7582,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(isInSafeMode_args.class, metaDataMap);
     }
 
@@ -6197,9 +7614,9 @@ public class Namenode {
       return new isInSafeMode_args(this);
     }
 
-    @Deprecated
-    public isInSafeMode_args clone() {
-      return new isInSafeMode_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -6239,10 +7656,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -6252,21 +7665,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -6299,6 +7708,31 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(isInSafeMode_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      isInSafeMode_args typedOther = (isInSafeMode_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -6308,22 +7742,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -6366,7 +7797,7 @@ public class Namenode {
 
   }
 
-  public static class isInSafeMode_result implements TBase<isInSafeMode_result._Fields>, java.io.Serializable, Cloneable, Comparable<isInSafeMode_result>   {
+  public static class isInSafeMode_result implements TBase<isInSafeMode_result, isInSafeMode_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("isInSafeMode_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.BOOL, (short)0);
@@ -6380,12 +7811,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -6394,7 +7823,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -6435,14 +7871,14 @@ public class Namenode {
     private static final int __SUCCESS_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.BOOL)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.BOOL)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(isInSafeMode_result.class, metaDataMap);
     }
 
@@ -6475,9 +7911,11 @@ public class Namenode {
       return new isInSafeMode_result(this);
     }
 
-    @Deprecated
-    public isInSafeMode_result clone() {
-      return new isInSafeMode_result(this);
+    @Override
+    public void clear() {
+      setSuccessIsSet(false);
+      this.success = false;
+      this.err = null;
     }
 
     public boolean isSuccess() {
@@ -6548,10 +7986,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -6564,12 +7998,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -6577,10 +8011,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -6630,23 +8060,31 @@ public class Namenode {
       int lastComparison = 0;
       isInSafeMode_result typedOther = (isInSafeMode_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -6658,30 +8096,27 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.BOOL) {
-                this.success = iprot.readBool();
-                setSuccessIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.BOOL) {
+              this.success = iprot.readBool();
+              setSuccessIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -6731,7 +8166,7 @@ public class Namenode {
 
   }
 
-  public static class leaveSafeMode_args implements TBase<leaveSafeMode_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class leaveSafeMode_args implements TBase<leaveSafeMode_args, leaveSafeMode_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("leaveSafeMode_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -6742,12 +8177,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -6756,7 +8189,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -6795,12 +8233,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(leaveSafeMode_args.class, metaDataMap);
     }
 
@@ -6827,9 +8265,9 @@ public class Namenode {
       return new leaveSafeMode_args(this);
     }
 
-    @Deprecated
-    public leaveSafeMode_args clone() {
-      return new leaveSafeMode_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -6869,10 +8307,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -6882,21 +8316,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -6929,6 +8359,31 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(leaveSafeMode_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      leaveSafeMode_args typedOther = (leaveSafeMode_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -6938,22 +8393,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -6996,7 +8448,7 @@ public class Namenode {
 
   }
 
-  public static class leaveSafeMode_result implements TBase<leaveSafeMode_result._Fields>, java.io.Serializable, Cloneable, Comparable<leaveSafeMode_result>   {
+  public static class leaveSafeMode_result implements TBase<leaveSafeMode_result, leaveSafeMode_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("leaveSafeMode_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -7007,12 +8459,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -7021,7 +8471,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -7060,12 +8515,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(leaveSafeMode_result.class, metaDataMap);
     }
 
@@ -7092,9 +8547,9 @@ public class Namenode {
       return new leaveSafeMode_result(this);
     }
 
-    @Deprecated
-    public leaveSafeMode_result clone() {
-      return new leaveSafeMode_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -7134,10 +8589,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -7147,21 +8598,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -7202,15 +8649,21 @@ public class Namenode {
       int lastComparison = 0;
       leaveSafeMode_result typedOther = (leaveSafeMode_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -7222,22 +8675,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -7279,7 +8729,7 @@ public class Namenode {
 
   }
 
-  public static class ls_args implements TBase<ls_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class ls_args implements TBase<ls_args, ls_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("ls_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -7299,12 +8749,10 @@ public class Namenode {
        */
       PATH((short)1, "path");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -7313,7 +8761,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -7352,14 +8807,14 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(ls_args.class, metaDataMap);
     }
 
@@ -7391,9 +8846,10 @@ public class Namenode {
       return new ls_args(this);
     }
 
-    @Deprecated
-    public ls_args clone() {
-      return new ls_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -7471,10 +8927,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -7487,12 +8939,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -7500,10 +8952,6 @@ public class Namenode {
         return isSetPath();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -7545,6 +8993,41 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(ls_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      ls_args typedOther = (ls_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -7554,29 +9037,26 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -7632,7 +9112,7 @@ public class Namenode {
 
   }
 
-  public static class ls_result implements TBase<ls_result._Fields>, java.io.Serializable, Cloneable, Comparable<ls_result>   {
+  public static class ls_result implements TBase<ls_result, ls_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("ls_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
@@ -7646,12 +9126,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -7660,7 +9138,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -7699,15 +9184,15 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new StructMetaData(TType.STRUCT, Stat.class))));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
           new FieldValueMetaData(TType.STRUCT)));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(ls_result.class, metaDataMap);
     }
 
@@ -7743,9 +9228,10 @@ public class Namenode {
       return new ls_result(this);
     }
 
-    @Deprecated
-    public ls_result clone() {
-      return new ls_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public int getSuccessSize() {
@@ -7832,10 +9318,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -7848,12 +9330,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -7861,10 +9343,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -7914,23 +9392,31 @@ public class Namenode {
       int lastComparison = 0;
       ls_result typedOther = (ls_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -7942,40 +9428,37 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.LIST) {
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.LIST) {
+              {
+                TList _list12 = iprot.readListBegin();
+                this.success = new ArrayList<Stat>(_list12.size);
+                for (int _i13 = 0; _i13 < _list12.size; ++_i13)
                 {
-                  TList _list12 = iprot.readListBegin();
-                  this.success = new ArrayList<Stat>(_list12.size);
-                  for (int _i13 = 0; _i13 < _list12.size; ++_i13)
-                  {
-                    Stat _elem14;
-                    _elem14 = new Stat();
-                    _elem14.read(iprot);
-                    this.success.add(_elem14);
-                  }
-                  iprot.readListEnd();
+                  Stat _elem14;
+                  _elem14 = new Stat();
+                  _elem14.read(iprot);
+                  this.success.add(_elem14);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readListEnd();
               }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -8036,7 +9519,7 @@ public class Namenode {
 
   }
 
-  public static class mkdirhier_args implements TBase<mkdirhier_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class mkdirhier_args implements TBase<mkdirhier_args, mkdirhier_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("mkdirhier_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -8065,12 +9548,10 @@ public class Namenode {
        */
       PERMS((short)2, "perms");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -8079,7 +9560,16 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          case 2: // PERMS
+            return PERMS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -8120,16 +9610,16 @@ public class Namenode {
     private static final int __PERMS_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.PERMS, new FieldMetaData("perms", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I16)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.PERMS, new FieldMetaData("perms", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I16)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(mkdirhier_args.class, metaDataMap);
     }
 
@@ -8167,9 +9657,12 @@ public class Namenode {
       return new mkdirhier_args(this);
     }
 
-    @Deprecated
-    public mkdirhier_args clone() {
-      return new mkdirhier_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
+      setPermsIsSet(false);
+      this.perms = 0;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -8284,10 +9777,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -8303,12 +9792,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -8318,10 +9807,6 @@ public class Namenode {
         return isSetPerms();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -8372,6 +9857,51 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(mkdirhier_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      mkdirhier_args typedOther = (mkdirhier_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPerms()).compareTo(typedOther.isSetPerms());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPerms()) {
+        lastComparison = TBaseHelper.compareTo(this.perms, typedOther.perms);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -8381,37 +9911,34 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PERMS:
-              if (field.type == TType.I16) {
-                this.perms = iprot.readI16();
-                setPermsIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // PERMS
+            if (field.type == TType.I16) {
+              this.perms = iprot.readI16();
+              setPermsIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -8474,7 +10001,7 @@ public class Namenode {
 
   }
 
-  public static class mkdirhier_result implements TBase<mkdirhier_result._Fields>, java.io.Serializable, Cloneable, Comparable<mkdirhier_result>   {
+  public static class mkdirhier_result implements TBase<mkdirhier_result, mkdirhier_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("mkdirhier_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.BOOL, (short)0);
@@ -8488,12 +10015,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -8502,7 +10027,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -8543,14 +10075,14 @@ public class Namenode {
     private static final int __SUCCESS_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.BOOL)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.BOOL)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(mkdirhier_result.class, metaDataMap);
     }
 
@@ -8583,9 +10115,11 @@ public class Namenode {
       return new mkdirhier_result(this);
     }
 
-    @Deprecated
-    public mkdirhier_result clone() {
-      return new mkdirhier_result(this);
+    @Override
+    public void clear() {
+      setSuccessIsSet(false);
+      this.success = false;
+      this.err = null;
     }
 
     public boolean isSuccess() {
@@ -8656,10 +10190,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -8672,12 +10202,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -8685,10 +10215,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -8738,23 +10264,31 @@ public class Namenode {
       int lastComparison = 0;
       mkdirhier_result typedOther = (mkdirhier_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -8766,30 +10300,27 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.BOOL) {
-                this.success = iprot.readBool();
-                setSuccessIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.BOOL) {
+              this.success = iprot.readBool();
+              setSuccessIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -8839,7 +10370,7 @@ public class Namenode {
 
   }
 
-  public static class refreshNodes_args implements TBase<refreshNodes_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class refreshNodes_args implements TBase<refreshNodes_args, refreshNodes_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("refreshNodes_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -8850,12 +10381,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -8864,7 +10393,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -8903,12 +10437,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(refreshNodes_args.class, metaDataMap);
     }
 
@@ -8935,9 +10469,9 @@ public class Namenode {
       return new refreshNodes_args(this);
     }
 
-    @Deprecated
-    public refreshNodes_args clone() {
-      return new refreshNodes_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -8977,10 +10511,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -8990,21 +10520,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -9037,6 +10563,31 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(refreshNodes_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      refreshNodes_args typedOther = (refreshNodes_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -9046,22 +10597,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -9104,7 +10652,7 @@ public class Namenode {
 
   }
 
-  public static class refreshNodes_result implements TBase<refreshNodes_result._Fields>, java.io.Serializable, Cloneable, Comparable<refreshNodes_result>   {
+  public static class refreshNodes_result implements TBase<refreshNodes_result, refreshNodes_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("refreshNodes_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -9115,12 +10663,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -9129,7 +10675,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -9168,12 +10719,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(refreshNodes_result.class, metaDataMap);
     }
 
@@ -9200,9 +10751,9 @@ public class Namenode {
       return new refreshNodes_result(this);
     }
 
-    @Deprecated
-    public refreshNodes_result clone() {
-      return new refreshNodes_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -9242,10 +10793,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -9255,21 +10802,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -9310,15 +10853,21 @@ public class Namenode {
       int lastComparison = 0;
       refreshNodes_result typedOther = (refreshNodes_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -9330,22 +10879,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -9387,7 +10933,7 @@ public class Namenode {
 
   }
 
-  public static class rename_args implements TBase<rename_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class rename_args implements TBase<rename_args, rename_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("rename_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -9416,12 +10962,10 @@ public class Namenode {
        */
       NEW_PATH((short)2, "newPath");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -9430,7 +10974,16 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          case 2: // NEW_PATH
+            return NEW_PATH;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -9469,16 +11022,16 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.NEW_PATH, new FieldMetaData("newPath", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.NEW_PATH, new FieldMetaData("newPath", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(rename_args.class, metaDataMap);
     }
 
@@ -9515,9 +11068,11 @@ public class Namenode {
       return new rename_args(this);
     }
 
-    @Deprecated
-    public rename_args clone() {
-      return new rename_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
+      this.newPath = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -9633,10 +11188,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -9652,12 +11203,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -9667,10 +11218,6 @@ public class Namenode {
         return isSetNewPath();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -9721,6 +11268,51 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(rename_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      rename_args typedOther = (rename_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetNewPath()).compareTo(typedOther.isSetNewPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetNewPath()) {
+        lastComparison = TBaseHelper.compareTo(this.newPath, typedOther.newPath);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -9730,36 +11322,33 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case NEW_PATH:
-              if (field.type == TType.STRING) {
-                this.newPath = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // NEW_PATH
+            if (field.type == TType.STRING) {
+              this.newPath = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -9828,7 +11417,7 @@ public class Namenode {
 
   }
 
-  public static class rename_result implements TBase<rename_result._Fields>, java.io.Serializable, Cloneable, Comparable<rename_result>   {
+  public static class rename_result implements TBase<rename_result, rename_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("rename_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.BOOL, (short)0);
@@ -9842,12 +11431,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -9856,7 +11443,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -9897,14 +11491,14 @@ public class Namenode {
     private static final int __SUCCESS_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.BOOL)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.BOOL)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(rename_result.class, metaDataMap);
     }
 
@@ -9937,9 +11531,11 @@ public class Namenode {
       return new rename_result(this);
     }
 
-    @Deprecated
-    public rename_result clone() {
-      return new rename_result(this);
+    @Override
+    public void clear() {
+      setSuccessIsSet(false);
+      this.success = false;
+      this.err = null;
     }
 
     public boolean isSuccess() {
@@ -10010,10 +11606,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -10026,12 +11618,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -10039,10 +11631,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -10092,23 +11680,31 @@ public class Namenode {
       int lastComparison = 0;
       rename_result typedOther = (rename_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -10120,30 +11716,27 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.BOOL) {
-                this.success = iprot.readBool();
-                setSuccessIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.BOOL) {
+              this.success = iprot.readBool();
+              setSuccessIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -10193,7 +11786,7 @@ public class Namenode {
 
   }
 
-  public static class reportBadBlocks_args implements TBase<reportBadBlocks_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class reportBadBlocks_args implements TBase<reportBadBlocks_args, reportBadBlocks_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("reportBadBlocks_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -10213,12 +11806,10 @@ public class Namenode {
        */
       BLOCKS((short)1, "blocks");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -10227,7 +11818,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // BLOCKS
+            return BLOCKS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -10266,15 +11864,15 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
           new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.BLOCKS, new FieldMetaData("blocks", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.BLOCKS, new FieldMetaData("blocks", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new StructMetaData(TType.STRUCT, Block.class))));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(reportBadBlocks_args.class, metaDataMap);
     }
 
@@ -10310,9 +11908,10 @@ public class Namenode {
       return new reportBadBlocks_args(this);
     }
 
-    @Deprecated
-    public reportBadBlocks_args clone() {
-      return new reportBadBlocks_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.blocks = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -10405,10 +12004,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -10421,12 +12016,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -10434,10 +12029,6 @@ public class Namenode {
         return isSetBlocks();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -10479,6 +12070,41 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(reportBadBlocks_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      reportBadBlocks_args typedOther = (reportBadBlocks_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetBlocks()).compareTo(typedOther.isSetBlocks());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetBlocks()) {
+        lastComparison = TBaseHelper.compareTo(this.blocks, typedOther.blocks);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -10488,40 +12114,37 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case BLOCKS:
-              if (field.type == TType.LIST) {
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // BLOCKS
+            if (field.type == TType.LIST) {
+              {
+                TList _list16 = iprot.readListBegin();
+                this.blocks = new ArrayList<Block>(_list16.size);
+                for (int _i17 = 0; _i17 < _list16.size; ++_i17)
                 {
-                  TList _list16 = iprot.readListBegin();
-                  this.blocks = new ArrayList<Block>(_list16.size);
-                  for (int _i17 = 0; _i17 < _list16.size; ++_i17)
-                  {
-                    Block _elem18;
-                    _elem18 = new Block();
-                    _elem18.read(iprot);
-                    this.blocks.add(_elem18);
-                  }
-                  iprot.readListEnd();
+                  Block _elem18;
+                  _elem18 = new Block();
+                  _elem18.read(iprot);
+                  this.blocks.add(_elem18);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readListEnd();
               }
-              break;
-          }
-          iprot.readFieldEnd();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -10584,7 +12207,7 @@ public class Namenode {
 
   }
 
-  public static class reportBadBlocks_result implements TBase<reportBadBlocks_result._Fields>, java.io.Serializable, Cloneable, Comparable<reportBadBlocks_result>   {
+  public static class reportBadBlocks_result implements TBase<reportBadBlocks_result, reportBadBlocks_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("reportBadBlocks_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -10595,12 +12218,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -10609,7 +12230,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -10648,12 +12274,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(reportBadBlocks_result.class, metaDataMap);
     }
 
@@ -10680,9 +12306,9 @@ public class Namenode {
       return new reportBadBlocks_result(this);
     }
 
-    @Deprecated
-    public reportBadBlocks_result clone() {
-      return new reportBadBlocks_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -10722,10 +12348,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -10735,21 +12357,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -10790,15 +12408,21 @@ public class Namenode {
       int lastComparison = 0;
       reportBadBlocks_result typedOther = (reportBadBlocks_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -10810,22 +12434,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -10867,7 +12488,7 @@ public class Namenode {
 
   }
 
-  public static class stat_args implements TBase<stat_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class stat_args implements TBase<stat_args, stat_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("stat_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -10887,12 +12508,10 @@ public class Namenode {
        */
       PATH((short)1, "path");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -10901,7 +12520,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -10940,14 +12566,14 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(stat_args.class, metaDataMap);
     }
 
@@ -10979,9 +12605,10 @@ public class Namenode {
       return new stat_args(this);
     }
 
-    @Deprecated
-    public stat_args clone() {
-      return new stat_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -11059,10 +12686,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -11075,12 +12698,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -11088,10 +12711,6 @@ public class Namenode {
         return isSetPath();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -11133,6 +12752,41 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(stat_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      stat_args typedOther = (stat_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -11142,29 +12796,26 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -11220,7 +12871,7 @@ public class Namenode {
 
   }
 
-  public static class stat_result implements TBase<stat_result._Fields>, java.io.Serializable, Cloneable, Comparable<stat_result>   {
+  public static class stat_result implements TBase<stat_result, stat_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("stat_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -11234,12 +12885,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -11248,7 +12897,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -11287,14 +12943,14 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, Stat.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, Stat.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(stat_result.class, metaDataMap);
     }
 
@@ -11326,9 +12982,10 @@ public class Namenode {
       return new stat_result(this);
     }
 
-    @Deprecated
-    public stat_result clone() {
-      return new stat_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public Stat getSuccess() {
@@ -11400,10 +13057,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -11416,12 +13069,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -11429,10 +13082,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -11482,23 +13131,31 @@ public class Namenode {
       int lastComparison = 0;
       stat_result typedOther = (stat_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -11510,30 +13167,27 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new Stat();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new Stat();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -11587,7 +13241,7 @@ public class Namenode {
 
   }
 
-  public static class getContentSummary_args implements TBase<getContentSummary_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getContentSummary_args implements TBase<getContentSummary_args, getContentSummary_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getContentSummary_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -11601,12 +13255,10 @@ public class Namenode {
       CTX((short)10, "ctx"),
       PATH((short)1, "Path");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -11615,7 +13267,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -11654,14 +13313,14 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("Path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("Path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getContentSummary_args.class, metaDataMap);
     }
 
@@ -11693,9 +13352,10 @@ public class Namenode {
       return new getContentSummary_args(this);
     }
 
-    @Deprecated
-    public getContentSummary_args clone() {
-      return new getContentSummary_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.Path = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -11767,10 +13427,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -11783,12 +13439,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -11796,10 +13452,6 @@ public class Namenode {
         return isSetPath();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -11841,6 +13493,41 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(getContentSummary_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getContentSummary_args typedOther = (getContentSummary_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.Path, typedOther.Path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -11850,29 +13537,26 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.Path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.Path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -11928,7 +13612,7 @@ public class Namenode {
 
   }
 
-  public static class getContentSummary_result implements TBase<getContentSummary_result._Fields>, java.io.Serializable, Cloneable, Comparable<getContentSummary_result>   {
+  public static class getContentSummary_result implements TBase<getContentSummary_result, getContentSummary_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getContentSummary_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -11942,12 +13626,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -11956,7 +13638,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -11995,14 +13684,14 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ContentSummary.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ContentSummary.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getContentSummary_result.class, metaDataMap);
     }
 
@@ -12034,9 +13723,10 @@ public class Namenode {
       return new getContentSummary_result(this);
     }
 
-    @Deprecated
-    public getContentSummary_result clone() {
-      return new getContentSummary_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public ContentSummary getSuccess() {
@@ -12108,10 +13798,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -12124,12 +13810,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -12137,10 +13823,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -12190,23 +13872,31 @@ public class Namenode {
       int lastComparison = 0;
       getContentSummary_result typedOther = (getContentSummary_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -12218,30 +13908,27 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new ContentSummary();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new ContentSummary();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -12295,7 +13982,7 @@ public class Namenode {
 
   }
 
-  public static class multiGetContentSummary_args implements TBase<multiGetContentSummary_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class multiGetContentSummary_args implements TBase<multiGetContentSummary_args, multiGetContentSummary_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("multiGetContentSummary_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -12309,12 +13996,10 @@ public class Namenode {
       CTX((short)10, "ctx"),
       PATHS((short)1, "paths");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -12323,7 +14008,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATHS
+            return PATHS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -12362,15 +14054,15 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
           new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATHS, new FieldMetaData("paths", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.PATHS, new FieldMetaData("paths", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new FieldValueMetaData(TType.STRING))));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(multiGetContentSummary_args.class, metaDataMap);
     }
 
@@ -12406,9 +14098,10 @@ public class Namenode {
       return new multiGetContentSummary_args(this);
     }
 
-    @Deprecated
-    public multiGetContentSummary_args clone() {
-      return new multiGetContentSummary_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.paths = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -12495,10 +14188,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -12511,12 +14200,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -12524,10 +14213,6 @@ public class Namenode {
         return isSetPaths();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -12569,6 +14254,41 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(multiGetContentSummary_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      multiGetContentSummary_args typedOther = (multiGetContentSummary_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPaths()).compareTo(typedOther.isSetPaths());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPaths()) {
+        lastComparison = TBaseHelper.compareTo(this.paths, typedOther.paths);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -12578,39 +14298,36 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATHS:
-              if (field.type == TType.LIST) {
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATHS
+            if (field.type == TType.LIST) {
+              {
+                TList _list20 = iprot.readListBegin();
+                this.paths = new ArrayList<String>(_list20.size);
+                for (int _i21 = 0; _i21 < _list20.size; ++_i21)
                 {
-                  TList _list20 = iprot.readListBegin();
-                  this.paths = new ArrayList<String>(_list20.size);
-                  for (int _i21 = 0; _i21 < _list20.size; ++_i21)
-                  {
-                    String _elem22;
-                    _elem22 = iprot.readString();
-                    this.paths.add(_elem22);
-                  }
-                  iprot.readListEnd();
+                  String _elem22;
+                  _elem22 = iprot.readString();
+                  this.paths.add(_elem22);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readListEnd();
               }
-              break;
-          }
-          iprot.readFieldEnd();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -12673,7 +14390,7 @@ public class Namenode {
 
   }
 
-  public static class multiGetContentSummary_result implements TBase<multiGetContentSummary_result._Fields>, java.io.Serializable, Cloneable, Comparable<multiGetContentSummary_result>   {
+  public static class multiGetContentSummary_result implements TBase<multiGetContentSummary_result, multiGetContentSummary_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("multiGetContentSummary_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
@@ -12687,12 +14404,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -12701,7 +14416,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -12740,15 +14462,15 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new StructMetaData(TType.STRUCT, ContentSummary.class))));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
           new FieldValueMetaData(TType.STRUCT)));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(multiGetContentSummary_result.class, metaDataMap);
     }
 
@@ -12784,9 +14506,10 @@ public class Namenode {
       return new multiGetContentSummary_result(this);
     }
 
-    @Deprecated
-    public multiGetContentSummary_result clone() {
-      return new multiGetContentSummary_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public int getSuccessSize() {
@@ -12873,10 +14596,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -12889,12 +14608,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -12902,10 +14621,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -12955,23 +14670,31 @@ public class Namenode {
       int lastComparison = 0;
       multiGetContentSummary_result typedOther = (multiGetContentSummary_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -12983,40 +14706,37 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.LIST) {
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.LIST) {
+              {
+                TList _list24 = iprot.readListBegin();
+                this.success = new ArrayList<ContentSummary>(_list24.size);
+                for (int _i25 = 0; _i25 < _list24.size; ++_i25)
                 {
-                  TList _list24 = iprot.readListBegin();
-                  this.success = new ArrayList<ContentSummary>(_list24.size);
-                  for (int _i25 = 0; _i25 < _list24.size; ++_i25)
-                  {
-                    ContentSummary _elem26;
-                    _elem26 = new ContentSummary();
-                    _elem26.read(iprot);
-                    this.success.add(_elem26);
-                  }
-                  iprot.readListEnd();
+                  ContentSummary _elem26;
+                  _elem26 = new ContentSummary();
+                  _elem26.read(iprot);
+                  this.success.add(_elem26);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readListEnd();
               }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -13077,7 +14797,7 @@ public class Namenode {
 
   }
 
-  public static class setQuota_args implements TBase<setQuota_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class setQuota_args implements TBase<setQuota_args, setQuota_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("setQuota_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -13117,12 +14837,10 @@ public class Namenode {
        */
       DISKSPACE_QUOTA((short)3, "diskspaceQuota");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -13131,7 +14849,18 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          case 2: // NAMESPACE_QUOTA
+            return NAMESPACE_QUOTA;
+          case 3: // DISKSPACE_QUOTA
+            return DISKSPACE_QUOTA;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -13173,18 +14902,18 @@ public class Namenode {
     private static final int __DISKSPACEQUOTA_ISSET_ID = 1;
     private BitSet __isset_bit_vector = new BitSet(2);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.NAMESPACE_QUOTA, new FieldMetaData("namespaceQuota", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I64)));
-      put(_Fields.DISKSPACE_QUOTA, new FieldMetaData("diskspaceQuota", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I64)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.NAMESPACE_QUOTA, new FieldMetaData("namespaceQuota", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I64)));
+      tmpMap.put(_Fields.DISKSPACE_QUOTA, new FieldMetaData("diskspaceQuota", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I64)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(setQuota_args.class, metaDataMap);
     }
 
@@ -13226,9 +14955,14 @@ public class Namenode {
       return new setQuota_args(this);
     }
 
-    @Deprecated
-    public setQuota_args clone() {
-      return new setQuota_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
+      setNamespaceQuotaIsSet(false);
+      this.namespaceQuota = 0;
+      setDiskspaceQuotaIsSet(false);
+      this.diskspaceQuota = 0;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -13382,10 +15116,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -13404,12 +15134,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -13421,10 +15151,6 @@ public class Namenode {
         return isSetDiskspaceQuota();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -13484,6 +15210,61 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(setQuota_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      setQuota_args typedOther = (setQuota_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetNamespaceQuota()).compareTo(typedOther.isSetNamespaceQuota());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetNamespaceQuota()) {
+        lastComparison = TBaseHelper.compareTo(this.namespaceQuota, typedOther.namespaceQuota);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetDiskspaceQuota()).compareTo(typedOther.isSetDiskspaceQuota());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetDiskspaceQuota()) {
+        lastComparison = TBaseHelper.compareTo(this.diskspaceQuota, typedOther.diskspaceQuota);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -13493,45 +15274,42 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case NAMESPACE_QUOTA:
-              if (field.type == TType.I64) {
-                this.namespaceQuota = iprot.readI64();
-                setNamespaceQuotaIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case DISKSPACE_QUOTA:
-              if (field.type == TType.I64) {
-                this.diskspaceQuota = iprot.readI64();
-                setDiskspaceQuotaIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // NAMESPACE_QUOTA
+            if (field.type == TType.I64) {
+              this.namespaceQuota = iprot.readI64();
+              setNamespaceQuotaIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3: // DISKSPACE_QUOTA
+            if (field.type == TType.I64) {
+              this.diskspaceQuota = iprot.readI64();
+              setDiskspaceQuotaIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -13601,7 +15379,7 @@ public class Namenode {
 
   }
 
-  public static class setQuota_result implements TBase<setQuota_result._Fields>, java.io.Serializable, Cloneable, Comparable<setQuota_result>   {
+  public static class setQuota_result implements TBase<setQuota_result, setQuota_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("setQuota_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -13612,12 +15390,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -13626,7 +15402,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -13665,12 +15446,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(setQuota_result.class, metaDataMap);
     }
 
@@ -13697,9 +15478,9 @@ public class Namenode {
       return new setQuota_result(this);
     }
 
-    @Deprecated
-    public setQuota_result clone() {
-      return new setQuota_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -13739,10 +15520,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -13752,21 +15529,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -13807,15 +15580,21 @@ public class Namenode {
       int lastComparison = 0;
       setQuota_result typedOther = (setQuota_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -13827,22 +15606,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -13884,7 +15660,7 @@ public class Namenode {
 
   }
 
-  public static class setReplication_args implements TBase<setReplication_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class setReplication_args implements TBase<setReplication_args, setReplication_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("setReplication_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -13913,12 +15689,10 @@ public class Namenode {
        */
       REPLICATION((short)2, "replication");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -13927,7 +15701,16 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          case 2: // REPLICATION
+            return REPLICATION;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -13968,16 +15751,16 @@ public class Namenode {
     private static final int __REPLICATION_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.REPLICATION, new FieldMetaData("replication", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I16)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.REPLICATION, new FieldMetaData("replication", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I16)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(setReplication_args.class, metaDataMap);
     }
 
@@ -14015,9 +15798,12 @@ public class Namenode {
       return new setReplication_args(this);
     }
 
-    @Deprecated
-    public setReplication_args clone() {
-      return new setReplication_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
+      setReplicationIsSet(false);
+      this.replication = 0;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -14132,10 +15918,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -14151,12 +15933,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -14166,10 +15948,6 @@ public class Namenode {
         return isSetReplication();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -14220,6 +15998,51 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(setReplication_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      setReplication_args typedOther = (setReplication_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetReplication()).compareTo(typedOther.isSetReplication());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetReplication()) {
+        lastComparison = TBaseHelper.compareTo(this.replication, typedOther.replication);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -14229,37 +16052,34 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case REPLICATION:
-              if (field.type == TType.I16) {
-                this.replication = iprot.readI16();
-                setReplicationIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // REPLICATION
+            if (field.type == TType.I16) {
+              this.replication = iprot.readI16();
+              setReplicationIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -14322,7 +16142,7 @@ public class Namenode {
 
   }
 
-  public static class setReplication_result implements TBase<setReplication_result._Fields>, java.io.Serializable, Cloneable, Comparable<setReplication_result>   {
+  public static class setReplication_result implements TBase<setReplication_result, setReplication_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("setReplication_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.BOOL, (short)0);
@@ -14336,12 +16156,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -14350,7 +16168,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -14391,14 +16216,14 @@ public class Namenode {
     private static final int __SUCCESS_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.BOOL)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.BOOL)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(setReplication_result.class, metaDataMap);
     }
 
@@ -14431,9 +16256,11 @@ public class Namenode {
       return new setReplication_result(this);
     }
 
-    @Deprecated
-    public setReplication_result clone() {
-      return new setReplication_result(this);
+    @Override
+    public void clear() {
+      setSuccessIsSet(false);
+      this.success = false;
+      this.err = null;
     }
 
     public boolean isSuccess() {
@@ -14504,10 +16331,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -14520,12 +16343,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -14533,10 +16356,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -14586,23 +16405,31 @@ public class Namenode {
       int lastComparison = 0;
       setReplication_result typedOther = (setReplication_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -14614,30 +16441,27 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.BOOL) {
-                this.success = iprot.readBool();
-                setSuccessIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.BOOL) {
+              this.success = iprot.readBool();
+              setSuccessIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -14687,7 +16511,7 @@ public class Namenode {
 
   }
 
-  public static class unlink_args implements TBase<unlink_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class unlink_args implements TBase<unlink_args, unlink_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("unlink_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -14716,12 +16540,10 @@ public class Namenode {
        */
       RECURSIVE((short)2, "recursive");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -14730,7 +16552,16 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          case 2: // RECURSIVE
+            return RECURSIVE;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -14771,16 +16602,16 @@ public class Namenode {
     private static final int __RECURSIVE_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.RECURSIVE, new FieldMetaData("recursive", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.BOOL)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.RECURSIVE, new FieldMetaData("recursive", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.BOOL)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(unlink_args.class, metaDataMap);
     }
 
@@ -14818,9 +16649,12 @@ public class Namenode {
       return new unlink_args(this);
     }
 
-    @Deprecated
-    public unlink_args clone() {
-      return new unlink_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
+      setRecursiveIsSet(false);
+      this.recursive = false;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -14935,10 +16769,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -14954,12 +16784,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -14969,10 +16799,6 @@ public class Namenode {
         return isSetRecursive();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -15023,6 +16849,51 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(unlink_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      unlink_args typedOther = (unlink_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetRecursive()).compareTo(typedOther.isSetRecursive());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetRecursive()) {
+        lastComparison = TBaseHelper.compareTo(this.recursive, typedOther.recursive);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -15032,37 +16903,34 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case RECURSIVE:
-              if (field.type == TType.BOOL) {
-                this.recursive = iprot.readBool();
-                setRecursiveIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // RECURSIVE
+            if (field.type == TType.BOOL) {
+              this.recursive = iprot.readBool();
+              setRecursiveIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -15125,7 +16993,7 @@ public class Namenode {
 
   }
 
-  public static class unlink_result implements TBase<unlink_result._Fields>, java.io.Serializable, Cloneable, Comparable<unlink_result>   {
+  public static class unlink_result implements TBase<unlink_result, unlink_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("unlink_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.BOOL, (short)0);
@@ -15139,12 +17007,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -15153,7 +17019,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -15194,14 +17067,14 @@ public class Namenode {
     private static final int __SUCCESS_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.BOOL)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.BOOL)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(unlink_result.class, metaDataMap);
     }
 
@@ -15234,9 +17107,11 @@ public class Namenode {
       return new unlink_result(this);
     }
 
-    @Deprecated
-    public unlink_result clone() {
-      return new unlink_result(this);
+    @Override
+    public void clear() {
+      setSuccessIsSet(false);
+      this.success = false;
+      this.err = null;
     }
 
     public boolean isSuccess() {
@@ -15307,10 +17182,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -15323,12 +17194,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -15336,10 +17207,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -15389,23 +17256,31 @@ public class Namenode {
       int lastComparison = 0;
       unlink_result typedOther = (unlink_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -15417,30 +17292,27 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.BOOL) {
-                this.success = iprot.readBool();
-                setSuccessIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.BOOL) {
+              this.success = iprot.readBool();
+              setSuccessIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -15490,7 +17362,7 @@ public class Namenode {
 
   }
 
-  public static class utime_args implements TBase<utime_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class utime_args implements TBase<utime_args, utime_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("utime_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -15528,12 +17400,10 @@ public class Namenode {
        */
       MTIME((short)3, "mtime");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -15542,7 +17412,18 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // PATH
+            return PATH;
+          case 2: // ATIME
+            return ATIME;
+          case 3: // MTIME
+            return MTIME;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -15584,18 +17465,18 @@ public class Namenode {
     private static final int __MTIME_ISSET_ID = 1;
     private BitSet __isset_bit_vector = new BitSet(2);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.ATIME, new FieldMetaData("atime", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I64)));
-      put(_Fields.MTIME, new FieldMetaData("mtime", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I64)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.ATIME, new FieldMetaData("atime", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I64)));
+      tmpMap.put(_Fields.MTIME, new FieldMetaData("mtime", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I64)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(utime_args.class, metaDataMap);
     }
 
@@ -15637,9 +17518,14 @@ public class Namenode {
       return new utime_args(this);
     }
 
-    @Deprecated
-    public utime_args clone() {
-      return new utime_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.path = null;
+      setAtimeIsSet(false);
+      this.atime = 0;
+      setMtimeIsSet(false);
+      this.mtime = 0;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -15791,10 +17677,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -15813,12 +17695,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -15830,10 +17712,6 @@ public class Namenode {
         return isSetMtime();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -15893,6 +17771,61 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(utime_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      utime_args typedOther = (utime_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPath()) {
+        lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetAtime()).compareTo(typedOther.isSetAtime());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetAtime()) {
+        lastComparison = TBaseHelper.compareTo(this.atime, typedOther.atime);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetMtime()).compareTo(typedOther.isSetMtime());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetMtime()) {
+        lastComparison = TBaseHelper.compareTo(this.mtime, typedOther.mtime);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -15902,45 +17835,42 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case PATH:
-              if (field.type == TType.STRING) {
-                this.path = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ATIME:
-              if (field.type == TType.I64) {
-                this.atime = iprot.readI64();
-                setAtimeIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case MTIME:
-              if (field.type == TType.I64) {
-                this.mtime = iprot.readI64();
-                setMtimeIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // PATH
+            if (field.type == TType.STRING) {
+              this.path = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // ATIME
+            if (field.type == TType.I64) {
+              this.atime = iprot.readI64();
+              setAtimeIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3: // MTIME
+            if (field.type == TType.I64) {
+              this.mtime = iprot.readI64();
+              setMtimeIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -16010,7 +17940,7 @@ public class Namenode {
 
   }
 
-  public static class utime_result implements TBase<utime_result._Fields>, java.io.Serializable, Cloneable, Comparable<utime_result>   {
+  public static class utime_result implements TBase<utime_result, utime_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("utime_result");
 
     private static final TField ERR_FIELD_DESC = new TField("err", TType.STRUCT, (short)1);
@@ -16021,12 +17951,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -16035,7 +17963,12 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -16074,12 +18007,12 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(utime_result.class, metaDataMap);
     }
 
@@ -16106,9 +18039,9 @@ public class Namenode {
       return new utime_result(this);
     }
 
-    @Deprecated
-    public utime_result clone() {
-      return new utime_result(this);
+    @Override
+    public void clear() {
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.IOException getErr() {
@@ -16148,10 +18081,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case ERR:
@@ -16161,21 +18090,17 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case ERR:
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -16216,15 +18141,21 @@ public class Namenode {
       int lastComparison = 0;
       utime_result typedOther = (utime_result)other;
 
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -16236,22 +18167,19 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -16293,7 +18221,7 @@ public class Namenode {
 
   }
 
-  public static class datanodeUp_args implements TBase<datanodeUp_args._Fields>, java.io.Serializable, Cloneable, Comparable<datanodeUp_args>   {
+  public static class datanodeUp_args implements TBase<datanodeUp_args, datanodeUp_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("datanodeUp_args");
 
     private static final TField NAME_FIELD_DESC = new TField("name", TType.STRING, (short)1);
@@ -16328,12 +18256,10 @@ public class Namenode {
        */
       THRIFT_PORT((short)3, "thriftPort");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -16342,7 +18268,16 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // NAME
+            return NAME;
+          case 2: // STORAGE
+            return STORAGE;
+          case 3: // THRIFT_PORT
+            return THRIFT_PORT;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -16383,16 +18318,16 @@ public class Namenode {
     private static final int __THRIFTPORT_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.STORAGE, new FieldMetaData("storage", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.THRIFT_PORT, new FieldMetaData("thriftPort", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I32)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.STORAGE, new FieldMetaData("storage", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.THRIFT_PORT, new FieldMetaData("thriftPort", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(datanodeUp_args.class, metaDataMap);
     }
 
@@ -16430,9 +18365,12 @@ public class Namenode {
       return new datanodeUp_args(this);
     }
 
-    @Deprecated
-    public datanodeUp_args clone() {
-      return new datanodeUp_args(this);
+    @Override
+    public void clear() {
+      this.name = null;
+      this.storage = null;
+      setThriftPortIsSet(false);
+      this.thriftPort = 0;
     }
 
     /**
@@ -16553,10 +18491,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case NAME:
@@ -16572,12 +18506,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case NAME:
         return isSetName();
@@ -16587,10 +18521,6 @@ public class Namenode {
         return isSetThriftPort();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -16649,31 +18579,41 @@ public class Namenode {
       int lastComparison = 0;
       datanodeUp_args typedOther = (datanodeUp_args)other;
 
-      lastComparison = Boolean.valueOf(isSetName()).compareTo(isSetName());
+      lastComparison = Boolean.valueOf(isSetName()).compareTo(typedOther.isSetName());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(name, typedOther.name);
+      if (isSetName()) {
+        lastComparison = TBaseHelper.compareTo(this.name, typedOther.name);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetStorage()).compareTo(typedOther.isSetStorage());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetStorage()).compareTo(isSetStorage());
+      if (isSetStorage()) {
+        lastComparison = TBaseHelper.compareTo(this.storage, typedOther.storage);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetThriftPort()).compareTo(typedOther.isSetThriftPort());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(storage, typedOther.storage);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = Boolean.valueOf(isSetThriftPort()).compareTo(isSetThriftPort());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(thriftPort, typedOther.thriftPort);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetThriftPort()) {
+        lastComparison = TBaseHelper.compareTo(this.thriftPort, typedOther.thriftPort);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -16685,36 +18625,33 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case NAME:
-              if (field.type == TType.STRING) {
-                this.name = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case STORAGE:
-              if (field.type == TType.STRING) {
-                this.storage = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case THRIFT_PORT:
-              if (field.type == TType.I32) {
-                this.thriftPort = iprot.readI32();
-                setThriftPortIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // NAME
+            if (field.type == TType.STRING) {
+              this.name = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // STORAGE
+            if (field.type == TType.STRING) {
+              this.storage = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3: // THRIFT_PORT
+            if (field.type == TType.I32) {
+              this.thriftPort = iprot.readI32();
+              setThriftPortIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -16777,7 +18714,7 @@ public class Namenode {
 
   }
 
-  public static class datanodeUp_result implements TBase<datanodeUp_result._Fields>, java.io.Serializable, Cloneable, Comparable<datanodeUp_result>   {
+  public static class datanodeUp_result implements TBase<datanodeUp_result, datanodeUp_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("datanodeUp_result");
 
 
@@ -16786,12 +18723,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
 ;
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -16800,7 +18735,10 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          default:
+            return null;
+        }
       }
 
       /**
@@ -16836,10 +18774,10 @@ public class Namenode {
         return _fieldName;
       }
     }
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(datanodeUp_result.class, metaDataMap);
     }
 
@@ -16856,18 +18794,13 @@ public class Namenode {
       return new datanodeUp_result(this);
     }
 
-    @Deprecated
-    public datanodeUp_result clone() {
-      return new datanodeUp_result(this);
+    @Override
+    public void clear() {
     }
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       }
-    }
-
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
     }
 
     public Object getFieldValue(_Fields field) {
@@ -16876,19 +18809,15 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -16923,6 +18852,10 @@ public class Namenode {
       return 0;
     }
 
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -16932,14 +18865,11 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -16969,7 +18899,7 @@ public class Namenode {
 
   }
 
-  public static class datanodeDown_args implements TBase<datanodeDown_args._Fields>, java.io.Serializable, Cloneable, Comparable<datanodeDown_args>   {
+  public static class datanodeDown_args implements TBase<datanodeDown_args, datanodeDown_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("datanodeDown_args");
 
     private static final TField NAME_FIELD_DESC = new TField("name", TType.STRING, (short)1);
@@ -17004,12 +18934,10 @@ public class Namenode {
        */
       THRIFT_PORT((short)3, "thriftPort");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -17018,7 +18946,16 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 1: // NAME
+            return NAME;
+          case 2: // STORAGE
+            return STORAGE;
+          case 3: // THRIFT_PORT
+            return THRIFT_PORT;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -17059,16 +18996,16 @@ public class Namenode {
     private static final int __THRIFTPORT_ISSET_ID = 0;
     private BitSet __isset_bit_vector = new BitSet(1);
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.STORAGE, new FieldMetaData("storage", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(_Fields.THRIFT_PORT, new FieldMetaData("thriftPort", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I32)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.NAME, new FieldMetaData("name", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.STORAGE, new FieldMetaData("storage", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.THRIFT_PORT, new FieldMetaData("thriftPort", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(datanodeDown_args.class, metaDataMap);
     }
 
@@ -17106,9 +19043,12 @@ public class Namenode {
       return new datanodeDown_args(this);
     }
 
-    @Deprecated
-    public datanodeDown_args clone() {
-      return new datanodeDown_args(this);
+    @Override
+    public void clear() {
+      this.name = null;
+      this.storage = null;
+      setThriftPortIsSet(false);
+      this.thriftPort = 0;
     }
 
     /**
@@ -17229,10 +19169,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case NAME:
@@ -17248,12 +19184,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case NAME:
         return isSetName();
@@ -17263,10 +19199,6 @@ public class Namenode {
         return isSetThriftPort();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -17325,31 +19257,41 @@ public class Namenode {
       int lastComparison = 0;
       datanodeDown_args typedOther = (datanodeDown_args)other;
 
-      lastComparison = Boolean.valueOf(isSetName()).compareTo(isSetName());
+      lastComparison = Boolean.valueOf(isSetName()).compareTo(typedOther.isSetName());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(name, typedOther.name);
+      if (isSetName()) {
+        lastComparison = TBaseHelper.compareTo(this.name, typedOther.name);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetStorage()).compareTo(typedOther.isSetStorage());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetStorage()).compareTo(isSetStorage());
+      if (isSetStorage()) {
+        lastComparison = TBaseHelper.compareTo(this.storage, typedOther.storage);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetThriftPort()).compareTo(typedOther.isSetThriftPort());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(storage, typedOther.storage);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = Boolean.valueOf(isSetThriftPort()).compareTo(isSetThriftPort());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(thriftPort, typedOther.thriftPort);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetThriftPort()) {
+        lastComparison = TBaseHelper.compareTo(this.thriftPort, typedOther.thriftPort);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -17361,36 +19303,33 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case NAME:
-              if (field.type == TType.STRING) {
-                this.name = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case STORAGE:
-              if (field.type == TType.STRING) {
-                this.storage = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case THRIFT_PORT:
-              if (field.type == TType.I32) {
-                this.thriftPort = iprot.readI32();
-                setThriftPortIsSet(true);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 1: // NAME
+            if (field.type == TType.STRING) {
+              this.name = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2: // STORAGE
+            if (field.type == TType.STRING) {
+              this.storage = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3: // THRIFT_PORT
+            if (field.type == TType.I32) {
+              this.thriftPort = iprot.readI32();
+              setThriftPortIsSet(true);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -17453,7 +19392,7 @@ public class Namenode {
 
   }
 
-  public static class datanodeDown_result implements TBase<datanodeDown_result._Fields>, java.io.Serializable, Cloneable, Comparable<datanodeDown_result>   {
+  public static class datanodeDown_result implements TBase<datanodeDown_result, datanodeDown_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("datanodeDown_result");
 
 
@@ -17462,12 +19401,10 @@ public class Namenode {
     public enum _Fields implements TFieldIdEnum {
 ;
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -17476,7 +19413,10 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          default:
+            return null;
+        }
       }
 
       /**
@@ -17512,10 +19452,10 @@ public class Namenode {
         return _fieldName;
       }
     }
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(datanodeDown_result.class, metaDataMap);
     }
 
@@ -17532,18 +19472,13 @@ public class Namenode {
       return new datanodeDown_result(this);
     }
 
-    @Deprecated
-    public datanodeDown_result clone() {
-      return new datanodeDown_result(this);
+    @Override
+    public void clear() {
     }
 
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       }
-    }
-
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
     }
 
     public Object getFieldValue(_Fields field) {
@@ -17552,19 +19487,15 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -17599,6 +19530,10 @@ public class Namenode {
       return 0;
     }
 
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -17608,14 +19543,11 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -17645,7 +19577,7 @@ public class Namenode {
 
   }
 
-  public static class getDelegationToken_args implements TBase<getDelegationToken_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getDelegationToken_args implements TBase<getDelegationToken_args, getDelegationToken_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getDelegationToken_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -17659,12 +19591,10 @@ public class Namenode {
       CTX((short)10, "ctx"),
       RENEWER((short)1, "renewer");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -17673,7 +19603,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // RENEWER
+            return RENEWER;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -17712,14 +19649,14 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
-      put(_Fields.RENEWER, new FieldMetaData("renewer", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.RENEWER, new FieldMetaData("renewer", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getDelegationToken_args.class, metaDataMap);
     }
 
@@ -17751,9 +19688,10 @@ public class Namenode {
       return new getDelegationToken_args(this);
     }
 
-    @Deprecated
-    public getDelegationToken_args clone() {
-      return new getDelegationToken_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.renewer = null;
     }
 
     public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
@@ -17825,10 +19763,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -17841,12 +19775,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -17854,10 +19788,6 @@ public class Namenode {
         return isSetRenewer();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -17899,6 +19829,41 @@ public class Namenode {
       return 0;
     }
 
+    public int compareTo(getDelegationToken_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getDelegationToken_args typedOther = (getDelegationToken_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetRenewer()).compareTo(typedOther.isSetRenewer());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetRenewer()) {
+        lastComparison = TBaseHelper.compareTo(this.renewer, typedOther.renewer);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -17908,29 +19873,26 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case RENEWER:
-              if (field.type == TType.STRING) {
-                this.renewer = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // RENEWER
+            if (field.type == TType.STRING) {
+              this.renewer = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -17986,7 +19948,7 @@ public class Namenode {
 
   }
 
-  public static class getDelegationToken_result implements TBase<getDelegationToken_result._Fields>, java.io.Serializable, Cloneable, Comparable<getDelegationToken_result>   {
+  public static class getDelegationToken_result implements TBase<getDelegationToken_result, getDelegationToken_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getDelegationToken_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -18000,12 +19962,10 @@ public class Namenode {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -18014,7 +19974,14 @@ public class Namenode {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -18053,14 +20020,14 @@ public class Namenode {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.ThriftDelegationToken.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, org.apache.hadoop.thriftfs.api.ThriftDelegationToken.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getDelegationToken_result.class, metaDataMap);
     }
 
@@ -18092,9 +20059,10 @@ public class Namenode {
       return new getDelegationToken_result(this);
     }
 
-    @Deprecated
-    public getDelegationToken_result clone() {
-      return new getDelegationToken_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public org.apache.hadoop.thriftfs.api.ThriftDelegationToken getSuccess() {
@@ -18166,10 +20134,6 @@ public class Namenode {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -18182,12 +20146,12 @@ public class Namenode {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -18195,10 +20159,6 @@ public class Namenode {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -18248,23 +20208,31 @@ public class Namenode {
       int lastComparison = 0;
       getDelegationToken_result typedOther = (getDelegationToken_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = Boolean.valueOf(isSetErr()).compareTo(isSetErr());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      lastComparison = TBaseHelper.compareTo(err, typedOther.err);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -18276,30 +20244,27 @@ public class Namenode {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new org.apache.hadoop.thriftfs.api.ThriftDelegationToken();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new org.apache.hadoop.thriftfs.api.IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new org.apache.hadoop.thriftfs.api.ThriftDelegationToken();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new org.apache.hadoop.thriftfs.api.IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 

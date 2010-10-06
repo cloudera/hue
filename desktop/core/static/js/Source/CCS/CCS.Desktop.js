@@ -24,7 +24,7 @@ script: CCS.Desktop.js
 ...
 */
 CCS.Desktop = {
-	
+
 	options: {
 	//	onBeforeLoad: $empty(componentName)
 	//	onComponentLoaded: $empty(componentName)
@@ -33,7 +33,7 @@ CCS.Desktop = {
 	//	loginUrl: 'login.html', TODO(nutron)
 		append: 'ccs-desktop'
 	},
-	
+
 	initialize: function(options){
 		this.setOptions(options);
 		this.addEvent('desktopReady', this.pollSession.bind(this));
@@ -53,13 +53,13 @@ CCS.Desktop = {
 	 ******************/
 
 	//registers an object of key/value components
-	/* example: 
+	/* example:
 	CCS.Desktop.register({
 		Help: {											//app name
 			name: "Document Viewer", //name to show the user
 			autolaunch: true/false, //if true, the app launches at registration time (startup)
 			css: '/path/to/css/file.css',
-			require: ['DV.Viewer'],								//required js files
+			require: ['packagename/DV.Viewer'],								//required js files
 			launch: function(path){								//function to execute whenever app is launched
 				return new DV.Viewer(dv, path);
 			},
@@ -72,11 +72,47 @@ CCS.Desktop = {
 			help: '/help/help' //url to help document
 		}
 	}); */
-	register: function(components) {
+	register: function(components){
 		$each(components, function(val, key){
 			this.add(key, val);
 		}, this);
 		return this;
+	},
+
+	/*
+		Register several plugins. See addPlugin for details.
+		Example:
+		CCS.Desktop.addPlugins({
+			FileBrowser: {...plugin details},
+			FileEditor: {...plugin details}
+		});
+	*/
+
+	addPlugins: function(components){
+		$each(components, function(val, key){
+			this.addPlugin(key, val);
+		}, this);
+	},
+
+	plugins: {},
+
+	/*
+		Register a plugin for an application (component).
+		Pass in an object with JavaScript and CSS dependencies and an optional launch method.
+		The launch method, if defined, will be passed the instance that is being launched as well as the arguments passed to it at its invocation. You can add numerous plugins to the same app.
+
+		Example:
+		CCS.Desktop.addPlugin('SomeApp', {
+			requires: ['More/Fx.Reveal', 'ccs-shared/Foo'],
+			css: '/plugindir/static/css/plugin.css',
+			launch: function(instance, args){
+				instance.foo();
+			}
+		});
+	*/
+	addPlugin: function(component, options){
+		if (!this.plugins[component]) this.plugins[component] = [];
+		this.plugins[component].push(options);
 	},
 
 	bootstraps: {},
@@ -88,20 +124,31 @@ CCS.Desktop = {
 
 	//adds a single component (string - the app name) and its options (object)
 	//see register example above
-	add: function(component, options) {
+	add: function(component, options){
 		if (!options || this.loaders[component]) return this;
 		this.bootstraps[component] = options;
 		//if there is a custom launch method, set the launcher
 		if (options.launch) this.setLauncher(component, options.launch);
 		this.loaders[component] = function(callback){
+			var plugins = this.plugins[component];
+			var loadCSS = function(url){
+				if (!$$('link').get('href').contains(url)) {
+					new Element('link', {
+						rel: 'stylesheet',
+						media: 'screen',
+						type: 'text/css',
+						href: url
+					}).inject(document.head);
+				}
+			};
 			//if there is a css link, inject it
-			if (options.css && !$$('link').get('href').contains(options.css)) {
-				new Element('link', {
-					rel: 'stylesheet', 
-					media: 'screen', 
-					type: 'text/css', 
-					href: options.css
-				}).inject(document.head);
+			if (options.css) loadCSS(options.css);
+			var requiredScripts = [];
+			if (plugins) {
+				plugins.each(function(plugin){
+					if (plugin.css) loadCSS(plugin.css);
+					if (plugin.require) requiredScripts.combine(plugin.require);
+				});
 			}
 			//if there is an oncomplete method in the options, execute it when the files are loaded
 			var ready = function(){
@@ -112,16 +159,17 @@ CCS.Desktop = {
 				this.loaders[component] = ready;
 			}.bind(this);
 			//if there are dependencies, load them
-			if (options.require) {
+			if (options.require) requiredScripts.combine(options.require);
+			if (requiredScripts.length) {
 				Depender.require({
-					scripts: options.require,
+					scripts: requiredScripts,
 					callback: ready
 				});
 			} else {
 				ready();
 			}
 		}.bind(this);
-		
+
 		if (options.menu) CCS.Dock.addApp(component, options);
 		//if this app is to autolaunch
 		if (options.autolaunch) this.autolaunchers.push(this.launch.bind(this, component));
@@ -130,12 +178,12 @@ CCS.Desktop = {
 
 	autolaunchers: [],
 
-	hasApp: function(component) {
+	hasApp: function(component){
 		return !!this.loaders[component];
 	},
 
 	//configures a launcher (function) for a given component(string)
-	setLauncher: function(component, launcher) {
+	setLauncher: function(component, launcher){
 		this.launchers[component] = launcher;
 	},
 
@@ -156,18 +204,18 @@ CCS.Desktop = {
 		$(instance).addClass('CCS-'+component.toUpperCase());
 		instance.inject($('ccs-desktop'));
 	},
-	
+
 	/*
 		given an instance of a widget, returns the component name for that widget ("FileBrowser", "JobBrowser", etc)
 	*/
-	getAppComponentName: function(instance) {
+	getAppComponentName: function(instance){
 		return instance._ccsComponent;
 	},
 
 	/*
 		given the component name of a widget ("FileBrowser"), return the nice name ("File Browser")
 	*/
-	getAppName: function(component) {
+	getAppName: function(component){
 		var appData = this.bootstraps[component];
 		if (!appData) return null;
 		return this.bootstraps[component].name || component;
@@ -186,7 +234,7 @@ CCS.Desktop = {
 		brings all the windows of a specified application to the foreground
 		component - (string) the application name
 	*/
-	focusComponent: function(component) {
+	focusComponent: function(component){
 		var instances = this.instances[component];
 		if (!instances || !instances.length) return instances || [];
 		if (instances.length == 1) {
@@ -211,7 +259,7 @@ CCS.Desktop = {
 		args - (object) arguments to pass to its launcher
 		callback - (function; optional) an optional callback passed a pointer to the instance created; passed nothing if the launch was not sucessful.
 	*/
-	
+
 	launch: function(component, args, callback){
 		callback = callback || $empty;
 		if (!this.hasApp(component)) {
@@ -221,15 +269,20 @@ CCS.Desktop = {
 			callback();
 			return window.open(args[0], component);
 		}
-		
+
 		args = args ? $splat(args) : [];
 		//if the component has a launcher configured
 		var launch = function(){
 			this.fireEvent('beforeLaunch', component);
 			var launcher = this.launchers[component];
 			//throw errors if we're debugging
-			var attempt = function() {
+			var attempt = function(){
 				var launched = launcher.apply(this, args);
+				if (this.plugins[component]) {
+					this.plugins[component].each(function(plugin){
+						if (plugin.launch) plugin.launch(launched, args);
+					});
+				}
 				this.addInstance(component, launched);
 				var after = function(){
 					this.fireEvent('afterLaunch', component);
@@ -239,7 +292,7 @@ CCS.Desktop = {
 				callback(launched);
 				return launched;
 			}.bind(this);
-			
+
 			return dbug.conditional(attempt, function(e){
 				callback();
 				alert('Sorry, there was an error launching ' + component + '.\n Try again, or contact us for help.');
@@ -266,7 +319,7 @@ CCS.Desktop = {
 	//this.load("FileBrowser")
 	//callback - (function) method to execute when the component loads
 	//_showMessage - (boolean) show a loading message; internal - messages are only showed when the app is launched
-	load: function(component, callback, _showMessage) {
+	load: function(component, callback, _showMessage){
 		dbug.conditional(function(){
 			callback = callback || $empty;
 			if (!this.hasLoaded(component)) {
@@ -282,7 +335,7 @@ CCS.Desktop = {
 		return this;
 	},
 
-	hasLoaded: function(component) {
+	hasLoaded: function(component){
 		return !!this.loadedComponents[component];
 	},
 
@@ -291,10 +344,10 @@ CCS.Desktop = {
 	serialize: function(){
 		var state = {};
 		//loop through all the components for which there are instances
-		$each(this.instances, function(instances, component) {
+		$each(this.instances, function(instances, component){
 			if (!state[component]) state[component] = [];
 			//loop through each instance for the component (all the windows)
-			instances.each(function(instance) {
+			instances.each(function(instance){
 				//if it has a serialize method and it's not destroyed
 				//store its serialization
 				if (instance.serialize && !instance.isDestroyed()) state[component].push(instance.serialize());
@@ -306,7 +359,7 @@ CCS.Desktop = {
 
 	//restores a state to the desktop
 	//states - (object) the state of all the open apps (returned by .serialize())
-	restore: function(states) {
+	restore: function(states){
 		var loaded_component;
 		if (states) {
 			var hidden, msg;
@@ -343,7 +396,7 @@ CCS.Desktop = {
 			//reference count the number of components we're going to load
 			var components_to_load = 0;
 			//iterate over all the components
-			$each(states, function(componentStates, component) {
+			$each(states, function(componentStates, component){
 				if (!this.hasApp(component)) {
 					dbug.warn('could not find application: %s', component);
 					return;
@@ -364,7 +417,7 @@ CCS.Desktop = {
 					//decrement the reference counter
 					components_to_load = components_to_load - 1;
 					//for each app that was open, launch it
-					componentStates.each(function(state) {
+					componentStates.each(function(state){
 						dbug.conditional(function(){
 							var instance = this.launch(component, [state.path, state.options]);
 							if (instance) instance.restore(state);
@@ -409,9 +462,9 @@ CCS.Desktop = {
 		if (this.noSession) return;
 		var hashString = JSON.encode(this.serialize());
 		var jsonRequest = new Request.JSON({
-				url: this.stateUrl, 
-				method: "post", 
-				onFailure:function() {
+				url: this.stateUrl,
+				method: "post",
+				onFailure:function(){
 					$clear(CCS.Desktop.store_periodical);
 				}
 		});
@@ -437,26 +490,26 @@ CCS.Desktop = {
 
 	/*
 		if the window location has a launch instruction, launch the apps per the instruction
-		instruction is a query string value for "launch" with comma separated values of app 
+		instruction is a query string value for "launch" with comma separated values of app
 		names and optional **encoded** urls. Examples:
-		
+
 		http://desktop/?launch=FileBrowser,Health
 		http://desktop/?launch=FileBrowser:/some/path,Heath:/some/other/path%3Fwith%3Dstuff
-		
+
 		The prefered usage is to put the same query string values after the hash:
-		
+
 		http://desktop/#launch=FileBrowser,Health
 		http://desktop/#launch=FileBrowser:/some/path,Heath:/some/other/path%3Fwith%3Dstuff
-		
+
 		If both are specified (a query string AND a hash query string) then the hash version will win.
-		
+
 		An additional parameter can be specified to prevent session restoration:
 
 		http://desktop/?launch=FileBrowser,Health&noSession=true
 		http://desktop/#launch=FileBrowser,Health&noSession=true
-		
+
 		otherwise the previous session is restored and the linked apps are launched with them.
-		
+
 	*/
 	launchLinked: function(){
 		//grab the current window location data
@@ -505,7 +558,7 @@ CCS.Desktop = {
 
 	//This request is synchronous because this method determines whether or not there is a session to restore.  It is a decision point, at which the app continues in one of two ways.
 	//Either restoration, or be initializing the default desktop.  In order to do this synchronously we would need to use callbacks.
-	getState: function() {
+	getState: function(){
 		var result;
 		var jsonRequest = new Request.JSON({
 			url: this.stateUrl,
@@ -525,18 +578,18 @@ CCS.Desktop = {
 			CCS.Desktop.store_periodical = CCS.Desktop.store.periodical(30000, CCS.Desktop);
 		});
 	},
-	
-	showHelp: function(componentOrInstance, url) {
+
+	showHelp: function(componentOrInstance, url){
 		var data = this.getBootstrap(componentOrInstance) || {};
 		if (this.healthInstance && !this.healthInstance.isDestroyed() && (url || data.help)) {
 			this.healthInstance.load({ requestPath: url || data.help }).focus();
 		} else {
-			CCS.Desktop.launch('Help', data.help, function(instance) {
+			CCS.Desktop.launch('Help', data.help, function(instance){
 				if (instance) this.healthInstance = instance;
 			}.bind(this));
 		}
 	}
-	
+
 };
 
 //store the state of the desktop on unload

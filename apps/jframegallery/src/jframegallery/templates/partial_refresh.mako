@@ -16,11 +16,14 @@
 <%!
 from datetime import datetime
 %>
+<%
+count = int(get_var('count', 0))
+%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
   <head>
     <title>Partial Refresh</title>
-    <meta http-equiv="refresh" content="2;/jframegallery/partial_refresh.mako?sleep=1" />
+    <meta http-equiv="refresh" content="2;/jframegallery/partial_refresh.mako?sleep=1&count=${count + 1}" />
   </head>
   <body>
     <div class="jframe_padded partial_refresh">
@@ -29,6 +32,52 @@ from datetime import datetime
       <br/>
       <textarea type="text">you can change this</textarea>
       <p>you can interact with the input above while the blocks with the time stamps update. Note that the button is rendered each time and your input changes aren't.</p>
+      <hr/>
+      <p>
+        The table below will continue to grow until there are 10 rows; the time in each row will update with each refresh.
+      </p>
+      <table class="HtmlTable">
+        <thead>
+          <tr>
+            <th>count</th>
+            <th>current time</th>
+          </tr>
+        </thead>
+        <tbody data-partial-container-id="partials-tbody">
+          <% index = 0 %>
+          % while index < count and index < 10:
+            <tr data-partial-line-id="tr-${index}">
+              <td data-partial-id="index-${index}">${index}</td>
+              <td data-partial-id="time-${index}">${datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</td>
+            </tr>
+            <% index = index + 1 %>
+          % endwhile
+        </tbody>
+      </table>
+      <hr/>
+      <p>
+        The table below will shrink from 10 rows down to zero; the time in each row will update on each refresh.
+      </p>
+      <table class="HtmlTable">
+        <thead>
+          <tr>
+            <th>count</th>
+            <th>current time</th>
+          </tr>
+        </thead>
+        <tbody data-partial-container-id="partials-tbody-down">
+          <%
+            count = 10 - count
+            index = 0 %>
+          % while index < count:
+            <tr data-partial-line-id="tr-down-${index}">
+              <td data-partial-id="index-down-${index}">${index}</td>
+              <td data-partial-id="time-down-${index}">${datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</td>
+            </tr>
+            <% index = index + 1 %>
+          % endwhile
+        </tbody>
+      </table>
     </div>
   </body>
 </html>

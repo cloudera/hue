@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Information about the compilation version of this server
  */
-public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializable, Cloneable, Comparable<VersionInfo> {
+public class VersionInfo implements TBase<VersionInfo, VersionInfo._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("VersionInfo");
 
   private static final TField VERSION_FIELD_DESC = new TField("version", TType.STRING, (short)1);
@@ -52,12 +55,10 @@ public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializ
     URL((short)6, "url"),
     BUILD_VERSION((short)7, "buildVersion");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -66,7 +67,22 @@ public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializ
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // VERSION
+          return VERSION;
+        case 2: // REVISION
+          return REVISION;
+        case 4: // COMPILE_DATE
+          return COMPILE_DATE;
+        case 5: // COMPILING_USER
+          return COMPILING_USER;
+        case 6: // URL
+          return URL;
+        case 7: // BUILD_VERSION
+          return BUILD_VERSION;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -105,22 +121,22 @@ public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializ
 
   // isset id assignments
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.VERSION, new FieldMetaData("version", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.REVISION, new FieldMetaData("revision", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.COMPILE_DATE, new FieldMetaData("compileDate", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.COMPILING_USER, new FieldMetaData("compilingUser", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.URL, new FieldMetaData("url", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.BUILD_VERSION, new FieldMetaData("buildVersion", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.VERSION, new FieldMetaData("version", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.REVISION, new FieldMetaData("revision", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.COMPILE_DATE, new FieldMetaData("compileDate", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.COMPILING_USER, new FieldMetaData("compilingUser", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.URL, new FieldMetaData("url", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.BUILD_VERSION, new FieldMetaData("buildVersion", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(VersionInfo.class, metaDataMap);
   }
 
@@ -172,9 +188,14 @@ public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializ
     return new VersionInfo(this);
   }
 
-  @Deprecated
-  public VersionInfo clone() {
-    return new VersionInfo(this);
+  @Override
+  public void clear() {
+    this.version = null;
+    this.revision = null;
+    this.compileDate = null;
+    this.compilingUser = null;
+    this.url = null;
+    this.buildVersion = null;
   }
 
   public String getVersion() {
@@ -374,10 +395,6 @@ public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializ
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case VERSION:
@@ -402,12 +419,12 @@ public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializ
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case VERSION:
       return isSetVersion();
@@ -423,10 +440,6 @@ public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializ
       return isSetBuildVersion();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -512,55 +525,71 @@ public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializ
     int lastComparison = 0;
     VersionInfo typedOther = (VersionInfo)other;
 
-    lastComparison = Boolean.valueOf(isSetVersion()).compareTo(isSetVersion());
+    lastComparison = Boolean.valueOf(isSetVersion()).compareTo(typedOther.isSetVersion());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(version, typedOther.version);
+    if (isSetVersion()) {
+      lastComparison = TBaseHelper.compareTo(this.version, typedOther.version);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetRevision()).compareTo(typedOther.isSetRevision());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetRevision()).compareTo(isSetRevision());
+    if (isSetRevision()) {
+      lastComparison = TBaseHelper.compareTo(this.revision, typedOther.revision);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCompileDate()).compareTo(typedOther.isSetCompileDate());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(revision, typedOther.revision);
+    if (isSetCompileDate()) {
+      lastComparison = TBaseHelper.compareTo(this.compileDate, typedOther.compileDate);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCompilingUser()).compareTo(typedOther.isSetCompilingUser());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetCompileDate()).compareTo(isSetCompileDate());
+    if (isSetCompilingUser()) {
+      lastComparison = TBaseHelper.compareTo(this.compilingUser, typedOther.compilingUser);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetUrl()).compareTo(typedOther.isSetUrl());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(compileDate, typedOther.compileDate);
+    if (isSetUrl()) {
+      lastComparison = TBaseHelper.compareTo(this.url, typedOther.url);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetBuildVersion()).compareTo(typedOther.isSetBuildVersion());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetCompilingUser()).compareTo(isSetCompilingUser());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(compilingUser, typedOther.compilingUser);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetUrl()).compareTo(isSetUrl());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(url, typedOther.url);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetBuildVersion()).compareTo(isSetBuildVersion());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(buildVersion, typedOther.buildVersion);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetBuildVersion()) {
+      lastComparison = TBaseHelper.compareTo(this.buildVersion, typedOther.buildVersion);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -572,56 +601,53 @@ public class VersionInfo implements TBase<VersionInfo._Fields>, java.io.Serializ
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case VERSION:
-            if (field.type == TType.STRING) {
-              this.version = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case REVISION:
-            if (field.type == TType.STRING) {
-              this.revision = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case COMPILE_DATE:
-            if (field.type == TType.STRING) {
-              this.compileDate = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case COMPILING_USER:
-            if (field.type == TType.STRING) {
-              this.compilingUser = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case URL:
-            if (field.type == TType.STRING) {
-              this.url = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case BUILD_VERSION:
-            if (field.type == TType.STRING) {
-              this.buildVersion = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // VERSION
+          if (field.type == TType.STRING) {
+            this.version = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // REVISION
+          if (field.type == TType.STRING) {
+            this.revision = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // COMPILE_DATE
+          if (field.type == TType.STRING) {
+            this.compileDate = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // COMPILING_USER
+          if (field.type == TType.STRING) {
+            this.compilingUser = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // URL
+          if (field.type == TType.STRING) {
+            this.url = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // BUILD_VERSION
+          if (field.type == TType.STRING) {
+            this.buildVersion = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

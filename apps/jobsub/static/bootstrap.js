@@ -16,7 +16,7 @@
 CCS.Desktop.register({
 	JobSub: {
 		name: 'Job Designer',
-		require: ['CCS.JobSub'],
+		require: ['jobsub/CCS.JobSub'],
 		launch: function(path, options){
 			CCS.Desktop.load("JobBrowser");
 			return new CCS.JobSub(path, options);

@@ -3,26 +3,11 @@
 #
 # DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
 #
-# Licensed to Cloudera, Inc. under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  Cloudera, Inc. licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 from thrift.Thrift import *
 
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -66,6 +51,7 @@ class PreFabLocalizedFiles(object):
   _NAMES_TO_VALUES = {
     "STREAMING": 1,
   }
+
 
 class SubmissionHandle(object):
   """
@@ -115,6 +101,9 @@ class SubmissionHandle(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -216,6 +205,9 @@ class JobData(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -284,6 +276,9 @@ class SubmissionError(Exception):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -302,7 +297,7 @@ class SubmissionError(Exception):
 class LocalizedFile(object):
   """
   File to be copied in a LocalizeFilesStep
-  
+
   Attributes:
    - target_name: Name of file in current directory.
   Framework has the right to make this a symlink.
@@ -370,6 +365,9 @@ class LocalizedFile(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -385,7 +383,7 @@ class LocalizedFile(object):
 class LocalizeFilesStep(object):
   """
   Places files into the working directory of "jobsub plan execution".
-  
+
   Attributes:
    - localize_files
   """
@@ -437,6 +435,9 @@ class LocalizeFilesStep(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -453,7 +454,7 @@ class BinHadoopStep(object):
   """
   Runs bin/hadoop, with enough environment to point at the
   configured cluster, and to assume the correct user.
-  
+
   Attributes:
    - arguments
   """
@@ -504,6 +505,9 @@ class BinHadoopStep(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -519,10 +523,10 @@ class BinHadoopStep(object):
 class SubmissionPlanStep(object):
   """
   A union of all possible steps.
-  
+
   Note: THRIFT-409 (committed Sep 1 09) added support for unions
   to Thrift.  After a thrift release, we could switch to that syntax.
-  
+
   Attributes:
    - localize_files_step: Only one of these fields may be specified!
    - bin_hadoop_step
@@ -579,6 +583,9 @@ class SubmissionPlanStep(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -594,7 +601,7 @@ class SubmissionPlanStep(object):
 class SubmissionPlan(object):
   """
   Plan to be executed by jobsub.
-  
+
   Attributes:
    - name
    - user
@@ -702,6 +709,9 @@ class SubmissionPlan(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)

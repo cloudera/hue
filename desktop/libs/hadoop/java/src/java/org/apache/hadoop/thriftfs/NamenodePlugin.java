@@ -72,7 +72,7 @@ public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.Namen
    * Default address and port this server will bind to, in case nothing is found
    * in the configuration object.
    */
-  public static final String DEFAULT_THRIFT_ADDRESS = "0.0.0.0:9090";
+  public static final String DEFAULT_THRIFT_ADDRESS = "0.0.0.0:10090";
 
   private NameNode namenode;
 
@@ -437,8 +437,8 @@ public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.Namen
       thriftServer.start();
       // The port may have been 0, so we update it.
       conf.set(THRIFT_ADDRESS_PROPERTY, address.getHostName() + ":" + thriftServer.getPort());
-    } catch (java.io.IOException ioe) {
-      throw new RuntimeException("Cannot start Thrift namenode plug-in", ioe);
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot start Thrift namenode plug-in", e);
     }
   }
 
@@ -473,7 +473,11 @@ public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.Namen
     @Override
     public TProcessor getProcessor(TTransport t) {
       ThriftServerContext context = new ThriftServerContext(t);
-      ThriftHandler impl = new ThriftHandler(context);
+      Namenode.Iface impl =
+        ThriftUtils.SecurityCheckingProxy.create(
+          conf,
+          new ThriftHandler(context),
+          Namenode.Iface.class);
       return new Namenode.Processor(impl);
     }
   }

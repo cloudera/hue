@@ -148,7 +148,7 @@
             %endif
             <div class="jt_task_list jt_recent_tasks ccs-inline" style="width: ${task_table_size}">
               <h3>
-                <a class="ccs-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">view all tasks &raquo;</a>
+                <a class="ccs-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
                 Recent Tasks
               </h3>
               <div class="jt_task_list_container">
@@ -165,7 +165,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>id</td>
+                  <td>ID</td>
                   <td>${job.jobId}</td>
                 </tr>
                 <tr>

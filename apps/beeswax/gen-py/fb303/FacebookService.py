@@ -8,14 +8,14 @@ from thrift.Thrift import *
 from ttypes import *
 from thrift.Thrift import TProcessor
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
   fastbinary = None
 
 
-class Iface:
+class Iface(object):
   """
   Standard base service
   """
@@ -53,7 +53,7 @@ class Iface:
   def getCounter(self, key):
     """
     Gets the value of a single counter
-    
+
     Parameters:
      - key
     """
@@ -62,7 +62,7 @@ class Iface:
   def setOption(self, key, value):
     """
     Sets an option
-    
+
     Parameters:
      - key
      - value
@@ -72,7 +72,7 @@ class Iface:
   def getOption(self, key):
     """
     Gets an option
-    
+
     Parameters:
      - key
     """
@@ -88,7 +88,7 @@ class Iface:
     """
     Returns a CPU profile over the given time interval (client and server
     must agree on the profile format).
-    
+
     Parameters:
      - profileDurationInSec
     """
@@ -267,7 +267,7 @@ class Client(Iface):
   def getCounter(self, key):
     """
     Gets the value of a single counter
-    
+
     Parameters:
      - key
     """
@@ -299,7 +299,7 @@ class Client(Iface):
   def setOption(self, key, value):
     """
     Sets an option
-    
+
     Parameters:
      - key
      - value
@@ -331,7 +331,7 @@ class Client(Iface):
   def getOption(self, key):
     """
     Gets an option
-    
+
     Parameters:
      - key
     """
@@ -392,7 +392,7 @@ class Client(Iface):
     """
     Returns a CPU profile over the given time interval (client and server
     must agree on the profile format).
-    
+
     Parameters:
      - profileDurationInSec
     """
@@ -671,6 +671,9 @@ class getName_args(object):
     oprot.writeStructBegin('getName_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -726,6 +729,9 @@ class getName_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -764,6 +770,9 @@ class getVersion_args(object):
     oprot.writeStructBegin('getVersion_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -819,6 +828,9 @@ class getVersion_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -857,6 +869,9 @@ class getStatus_args(object):
     oprot.writeStructBegin('getStatus_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -912,6 +927,9 @@ class getStatus_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -950,6 +968,9 @@ class getStatusDetails_args(object):
     oprot.writeStructBegin('getStatusDetails_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1005,6 +1026,9 @@ class getStatusDetails_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1043,6 +1067,9 @@ class getCounters_args(object):
     oprot.writeStructBegin('getCounters_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1108,6 +1135,9 @@ class getCounters_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1164,6 +1194,9 @@ class getCounter_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1219,6 +1252,9 @@ class getCounter_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1287,6 +1323,9 @@ class setOption_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1325,6 +1364,9 @@ class setOption_result(object):
     oprot.writeStructBegin('setOption_result')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1381,6 +1423,9 @@ class getOption_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1436,6 +1481,9 @@ class getOption_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1474,6 +1522,9 @@ class getOptions_args(object):
     oprot.writeStructBegin('getOptions_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1539,6 +1590,9 @@ class getOptions_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1595,6 +1649,9 @@ class getCpuProfile_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1650,6 +1707,9 @@ class getCpuProfile_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1688,6 +1748,9 @@ class aliveSince_args(object):
     oprot.writeStructBegin('aliveSince_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1743,6 +1806,9 @@ class aliveSince_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1781,6 +1847,9 @@ class reinitialize_args(object):
     oprot.writeStructBegin('reinitialize_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1819,6 +1888,9 @@ class shutdown_args(object):
     oprot.writeStructBegin('shutdown_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1830,5 +1902,3 @@ class shutdown_args(object):
 
   def __ne__(self, other):
     return not (self == other)
-
-
