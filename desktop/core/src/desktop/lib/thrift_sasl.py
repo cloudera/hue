@@ -128,7 +128,12 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
   def _read_frame(self):
     header = self._trans.readAll(4)
     (length,) = struct.unpack(">I", header)
-    self.__rbuf = StringIO(self._trans.readAll(length))
+    encoded = self._trans.readAll(length)
+    success, decoded = self.sasl.decode(encoded)
+    if not success:
+      raise TTransportException(type=TTransportException.UNKNOWN,
+                                message=self.sasl.getError())
+    self.__rbuf = StringIO(decoded)
 
   def close(self):
     self._trans.close()
