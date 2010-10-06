@@ -35,6 +35,18 @@ public aspect JobClientTrace {
     return ret;
   }
 
+  /**
+   * The JobClient assumes that the user is authenticated via kerberos for the
+   * purpose of job submission, and thus that delegation tokens for the NN(s)
+   * can be retrieved. This doesn't work, however, in the case that the job is
+   * actually being submitted to the JT via an MR delegation token, because new
+   * delegation tokens can't be retrieved if one is only authenticated via
+   * delegation tokens. The work-around here is to pre-fetch NN delegation
+   * tokens from jobsubd, and pass them in. We set the
+   * <code>mapreduce.job.credentials.binary</code> here because this happens
+   * immediately before we try to fill the token cache with delegation tokens
+   * from the NN(s).
+   */
   void around(Configuration conf, Credentials credentials):
     call(void JobClient.readTokensFromFiles(Configuration, Credentials)) && args(conf, credentials) {
     conf.set("mapreduce.job.credentials.binary", System.getenv("HADOOP_TOKEN_FILE_LOCATION"));
