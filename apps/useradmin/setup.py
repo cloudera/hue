@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "useradmin",
-      version = "1.0.1",
+      version = "1.0.2",
       author = "HUE",
       url = 'http://github.com/cloudera/hue',
       description = "HUE User Administration",
