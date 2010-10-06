@@ -595,7 +595,12 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
   throws BeeswaxException
   {
     try{
-      UserGroupInformation ugi = UserGroupInformation.createProxyUser(state.query.hadoop_user, UserGroupInformation.getLoginUser());
+      UserGroupInformation ugi;
+      if (UserGroupInformation.isSecurityEnabled())
+        ugi = UserGroupInformation.createProxyUser(state.query.hadoop_user, UserGroupInformation.getLoginUser());
+      else {
+        ugi = UserGroupInformation.createRemoteUser(state.query.hadoop_user);
+      }
       return ugi.doAs(action);
     } catch (UndeclaredThrowableException e) {
       if (e.getUndeclaredThrowable() instanceof PrivilegedActionException) {
