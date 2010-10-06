@@ -60,15 +60,15 @@ $(BLD_DIR_DOC)/release-notes: $(shell find release-notes -name \*.txt)
 sdk: $(BLD_DIR_DOC)/sdk/sdk.html
 $(BLD_DIR_DOC)/sdk/sdk.html: $(shell find sdk -type f)
 	@echo '--- Generating sdk doc at $@'
-	@mkdir -p $@
-	@cp sdk/*.png $@
-	@cp docbook.css $@
+	@mkdir -p $(@D)
+	@cp sdk/*.png $(@D)
+	@cp docbook.css $(@D)
 	@# This is somewhat heinous, but works fine and avoids the need
 	@# to install markdown on developer systems, or depend on building
 	@# out the virtual env to build sdk docs
 	@PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown \
 	  $(DESKTOP_DIR)/core/ext-py/markdown/bin/markdown \
-	  sdk/sdk.md -x toc > $@/sdk.html
+	  sdk/sdk.md -x toc > $@
 	@echo "--- Generated $@"
 
 
