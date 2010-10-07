@@ -1,0 +1,131 @@
+<h1><a name="JobBrowser-IntroducingHueJobBrowser"></a>Introducing Hue Job Browser</h1>
+
+<p>The Hue Job Browser application enables you to examine the Hadoop Map/Reduce jobs running on your Hadoop cluster. Job Browser presents the job and tasks in layers. The top layer is a list of jobs, and you can double-click a job to view a list of that job's tasks. You can then view a task's attempts and the properties of each attempt, such as state, start and end time, and output size. To troubleshoot failed jobs, you can also view the logs of each attempt. For more information about Hadoop Map/Reduce, see the <a href="http://archive.cloudera.com/cdh/3/hadoop-0.20.2+320/mapred_tutorial.html">Hadoop Map/Reduce Tutorial</a>.</p>
+
+<h2><a name="JobBrowser-Contents"></a>Contents</h2>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1286402793260 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1286402793260 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1286402793260 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1286402793260'>
+<ul>
+    <li><a href='#JobBrowser-IntroducingHueJobBrowser'>Introducing Hue Job Browser</a></li>
+    <li><a href='#JobBrowser-JobBrowserInstallationandConfiguration'> Job Browser Installation and Configuration</a></li>
+    <li><a href='#JobBrowser-UsingJobBrowser'>Using Job Browser</a></li>
+<ul>
+    <li><a href='#JobBrowser-StartingJobBrowser'> Starting Job Browser</a></li>
+    <li><a href='#JobBrowser-FilteringtheJobBrowserList'> Filtering the Job Browser List</a></li>
+    <li><a href='#JobBrowser-ViewingJobInformationandLogs'> Viewing Job Information and Logs</a></li>
+    <li><a href='#JobBrowser-ViewingJobOutput'> Viewing Job Output</a></li>
+</ul>
+</ul></div>
+
+<h1><a name="JobBrowser-JobBrowserInstallationandConfiguration"></a><a name="JobBrowser-JobBrowserInstallationandConfiguration"></a>Job Browser Installation and Configuration</h1>
+
+<p>Job Browser is one of the applications that can be installed as part of Hue. For more information about installing Hue, see <a href="https://wiki.cloudera.com/display/DOC/Hue+Installation">https://wiki.cloudera.com/display/DOC/Hue+Installation</a>.</p>
+
+<h1><a name="JobBrowser-UsingJobBrowser"></a>Using Job Browser</h1>
+
+<p>The following sections describe how to start and use Job Browser. </p>
+
+<h2><a name="JobBrowser-StartingJobBrowser"></a><a name="JobBrowser-StartingJobBrowser"></a>Starting Job Browser</h2>
+
+<p>To start Job Browser, click this icon <span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259463.jpg" height="27" width="34" style="border: 0px solid black"/></span> in the application bar at the bottom of the Hue web page. The <b>Job Browser List</b> window opens in the Hue web page.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259462.jpg" height="276" width="718" style="border: 0px solid black"/></span></p>
+
+<h2><a name="JobBrowser-FilteringtheJobBrowserList"></a><a name="JobBrowser-FilteringtheJobBrowserList"></a>Filtering the Job Browser List</h2>
+
+<p><b>To filter the jobs displayed in the Job Browser list:</b></p>
+
+<ol>
+	<li>To filter the jobs by their state (such as <b>Running</b> or <b>Completed</b>), choose a state from the <b>Filter Jobs</b> menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To filter by a user who ran the jobs, enter the user's name in the <b>User Name Filter</b> query box.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To filter by job name, enter the name in the <b>Text Filter</b> query box.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259460.jpg" height="129" width="718" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To clear the filters, choose <b>All States</b> from the <b>Filter Jobs</b> menu and delete any text in the <b>User Name Filter</b> and <b>Text Filter</b> query boxes.</li>
+</ol>
+
+
+<h2><a name="JobBrowser-ViewingJobInformationandLogs"></a><a name="JobBrowser-ViewingJobInformationandLogs"></a>Viewing Job Information and Logs</h2>
+
+<p><b>To view job information and logs:</b></p>
+
+<ol>
+	<li>In the <b>Job Browser</b> window, double-click the job you want to view, or click this icon <span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259461.jpg" height="20" width="20" style="border: 0px solid black"/></span> next to the job.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The recent tasks associated with the job is displayed.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259458.jpg" height="336" width="721" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To view the attempts for a task, double-click the task or click this icon <span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259461.jpg" height="20" width="20" style="border: 0px solid black"/></span> next to the task.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /> 
+The attempts associated with the task are displayed.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259457.jpg" height="227" width="843" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To view information about a task attempt, click the <b>Metadata</b> tab.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The metadata associated with the attempt is displayed.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259459.jpg" height="474" width="717" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To view the Hadoop counters for a task attempt, click the <b>Counters</b> tab.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The counters associated with the attempt is displayed.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259456.jpg" height="251" width="708" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click the <b>Logs</b> tab.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The logs associated with the task attempt is displayed.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259455.jpg" height="468" width="709" style="border: 0px solid black"/></span>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To return to the list of tasks for the current job, click the job number next to <b>Job</b> near the top of the window.</li>
+</ol>
+
+
+<h2><a name="JobBrowser-ViewingJobOutput"></a><a name="JobBrowser-ViewingJobOutput"></a>Viewing Job Output</h2>
+
+<p><b>To view job output:</b></p>
+
+<ol>
+	<li>In the <b>Job Browser</b> window, double-click the job or click this icon <span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259461.jpg" height="20" width="20" style="border: 0px solid black"/></span> next to the job.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To view the output of the job, click the link next to <b>Output</b> at the top of the screen.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/6259458.jpg" height="320" width="723" style="border: 0px solid black"/></span></li>
+</ol>
+
+
+				    					    <br/>
+                        
