@@ -307,7 +307,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       os.kill(self.secondary_proc.pid, signal.SIGKILL)
       self.secondary_proc.wait()
 
-    if CLEANUP_TMP_DIR:
+    if CLEANUP_TMP_DIR != 'false':
       logging.info("Cleaning up self.tmpdir.  Use $MINI_CLUSTER_CLEANUP to avoid.")
       shutil.rmtree(self.tmpdir)
 
