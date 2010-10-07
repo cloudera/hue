@@ -96,8 +96,8 @@ ART.SideBySideSelect = new Class({
 		this.makeRows();
 
 		//click a row, select it; double click, move it
-		this.element.addEvent('click:relay(tr)', this.clickRow.bind(this));
-		this.element.addEvent('dblclick:relay(tr)', function(e, tr){
+		this.element.addEvent('click:relay(tbody tr)', this.clickRow.bind(this));
+		this.element.addEvent('dblclick:relay(tbody tr)', function(e, tr){
 			e.stop();
 			this.moveRow(tr);
 		}.bind(this));
