@@ -35,18 +35,15 @@ var checkLinkerForLivePath = function(anchor, methods){
 Behavior.addGlobalPlugin('HtmlTable', 'HtmlTableLiveTreeKeyboard', function(element, methods){
 	if (!element.hasClass('treeView')) return;
 	var table = element.retrieve('HtmlTable');
+	table.addEvent('onHideRow', function(row){
+		if (row.get('data-partial-line-id')) row.destroy();
+	});
 	table.addEvent('expandSection', function(row){
 		var anchor = row.getElement('.expand');
-		if (!row.retrieve('livetree:loaded')) {
-			row.store('livetree:loaded', true);
-			if (anchor) methods.callClick({ stop: $empty, preventDefault: $empty, stopPropagation: $empty}, anchor, true);
-		} else if (anchor) {
-			checkLinkerForLivePath(anchor, methods);
-		}
+		if (anchor) methods.callClick({ stop: $empty, preventDefault: $empty, stopPropagation: $empty}, anchor, true);
 	}.bind(this));
 	table.addEvent('closeSection', function(row){
 		var anchor = row.getElement('.expand');
-		row.store('livetree:loaded', true);
 		if (anchor) checkLinkerForLivePath(anchor, methods);
 	});
 	$(table).addEvent('click:relay(.expand)', function(event, link){
