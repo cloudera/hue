@@ -225,8 +225,10 @@ CCS.JFrame = new Class({
 					requestPath: path
 				}, options);
 				var spinnerTarget = elem.get('data', 'spinner-target');
-				if (spinnerTarget) spinnerTarget = $(this).getElement(spinnerTarget);
-				options.spinnerTarget = spinnerTarget;
+				if (spinnerTarget) {
+					spinnerTarget = $(this).getElement(spinnerTarget);
+					options.spinnerTarget = spinnerTarget;
+				}
 				this.load(options);
 
 			}
