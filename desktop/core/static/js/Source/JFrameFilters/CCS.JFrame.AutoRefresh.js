@@ -67,7 +67,7 @@ var setupAutoRefresh = function(content) {
 
 	//this method compares to urls to see if they match
 	var compareURI = function(one, two) {
-		return new URI(one).toString() == new URI(two).toString();
+		return new URI(unescape(one)).toString() == new URI(unescape(two)).toString();
 	};
 
 	//this method checks a request to see if it's been spoiled
