@@ -16,16 +16,17 @@
 <%!
 import datetime
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time
+from desktop.lib.django_util import reverse_with_get
 %>
 
 
-<%def name="list_table_chooser(files, path_enc, current_request_path)">
-  ${_table(files, path_enc, current_request_path, 'chooser')}
+<%def name="list_table_chooser(files, path, current_request_path)">
+  ${_table(files, path, current_request_path, 'chooser')}
 </%def>
-<%def name="list_table_browser(files, path_enc, current_request_path, cwd_set=True)">
-  ${_table(files, path_enc, current_request_path, 'view', cwd_set)}
+<%def name="list_table_browser(files, path, current_request_path, cwd_set=True)">
+  ${_table(files, path, current_request_path, 'view', cwd_set)}
 </%def>
-<%def name="_table(files, path_enc, current_request_path, view, cwd_set=False)">
+<%def name="_table(files, path, current_request_path, view, cwd_set=False)">
   <%
   # Sortable takes a while for big lists; skip it in that case.
   if len(files) < 100:
@@ -70,39 +71,39 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
         %>
   ## Since path is in unicode, Django and Mako handle url encoding and
   ## iri encoding correctly for us.
-        <% path_enc = file['path'] %>
+        <% path = file['path'] %>
         <tr class="ccs-no_select fb-item-row ${cls}"
          data-filters="ContextMenu"
          data-context-menu-actions="[{'events':['contextmenu','click:relay(.fb-item-options)'],'menu':'ul.context-menu'}]"
-         data-dblclick-delegate= "{'dblclick_loads':'a.fb-item'}" data-filedata="{'path':'${path_enc}','type':'${file['type']|u}'}">
+         data-dblclick-delegate= "{'dblclick_loads':'a.fb-item'}" data-filedata="{'path':'${path}','type':'${file['type']|u}'}">
           <td class="fb-name">
             <div class="fb-name-container">
               % if "dir" == file['type']:
-                <a ${optional_fit_text | n} class="fb-item fb-dir jframe_ignore" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
+                <a ${optional_fit_text | n} class="fb-item fb-dir jframe_ignore" href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a>
               % else:
-                <a ${optional_fit_text | n} class="fb-item fb-file jframe_ignore" target="FileViewer" href="${url('filebrowser.views.'+view, path=path_enc)}?file_filter=${file_filter}">${display_name}</a>
+                <a ${optional_fit_text | n} class="fb-item fb-file jframe_ignore" target="FileViewer" href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a>
               % endif
               % if ".." != file['name']:
                 <ul class="fb-item-actions context-menu">
                   % if "dir" == file['type']:
-                    <li class="fb-rmdir-container"><a class="fb-rmdir confirm_and_post" alt="Are you sure you want to delete this directory and its contents?" href="${url('filebrowser.views.rmdir')}?path=${path_enc}&next=${urlencode(current_request_path)}">Delete</a></li>
-                    <li class="fb-rmtree-container"><a class="fb-rmtree confirm_and_post fb-default-rm" alt="Are you sure you want to delete ${display_name} and its contents?" href="${url('filebrowser.views.rmtree')}?path=${path_enc}&next=${urlencode(current_request_path)}">Delete</a></li>
+                    <li class="fb-rmdir-container"><a class="fb-rmdir confirm_and_post" alt="Are you sure you want to delete this directory and its contents?" href="${reverse_with_get('filebrowser.views.rmdir', get=dict(path=path,next=current_request_path))}">Delete</a></li>
+                    <li class="fb-rmtree-container"><a class="fb-rmtree confirm_and_post fb-default-rm" alt="Are you sure you want to delete ${display_name} and its contents?" href="${reverse_with_get('filebrowser.views.rmtree', get=dict(path=path,next=current_request_path))}"">Delete</a></li>
                   % else:
-                    <li><a class="fb-viewfile" href="${url('filebrowser.views.view', path=path_enc)}" target="FileViewer">View File</a></li>
-                    <li><a class="fb-editfile" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit File</a></li>
-                    <li><a class="fb-downloadfile" href="${url('filebrowser.views.download', path=path_enc)}" target="_blank">Download File</a></li>
-                    <li class="fb-rm-container"><a class="fb-rm fb-default-rm confirm_and_post" alt="Are you sure you want to delete ${display_name}?" href="${url('filebrowser.views.remove')}?path=${path_enc}&next=${urlencode(current_request_path)}">Delete</a></li>
+                    <li><a class="fb-viewfile" href="${url('filebrowser.views.view', path=urlencode(path))}" target="FileViewer">View File</a></li>
+                    <li><a class="fb-editfile" href="${url('filebrowser.views.edit', path=urlencode(path))}" target="FileEditor">Edit File</a></li>
+                    <li><a class="fb-downloadfile" href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
+                    <li class="fb-rm-container"><a class="fb-rm fb-default-rm confirm_and_post" alt="Are you sure you want to delete ${display_name}?" href="${reverse_with_get('filebrowser.views.remove', get=dict(path=path, next=current_request_path))}">Delete</a></li>
                   % endif
-                  <li class="fb-rename-container"><a class="fb-rename" href="${url('filebrowser.views.rename')}?src_path=${path_enc}&next=${urlencode(current_request_path)}">Rename</a></li>
-                  <li class="fb-chown-container"><a class="fb-chown" href="${url('filebrowser.views.chown') }?path=${path_enc}&user=${file['stats']['user']}&group=${file['stats']['group']}&next=${urlencode(current_request_path)}">Change Owner / Group</a></li>
-                  <li class="fb-chmod-container"><a class="fb-chmod" href="${url('filebrowser.views.chmod')}?path=${path_enc}&mode=${stringformat(file['stats']['mode'], "o")}&next=${urlencode(current_request_path)}">Change Permissions</a></li>
+                  <li class="fb-rename-container"><a class="fb-rename" href="${reverse_with_get('filebrowser.views.rename',get=dict(src_path=path,next=current_request_path))}">Rename</a></li>
+                  <li class="fb-chown-container"><a class="fb-chown" href="${reverse_with_get('filebrowser.views.chown',get=dict(path=path,user=file['stats']['user'],group=file['stats']['group'],next=current_request_path))}}">Change Owner / Group</a></li>
+                  <li class="fb-chmod-container"><a class="fb-chmod" href="${reverse_with_get('filebrowser.views.chmod',get=dict(path=path,mode=stringformat(file['stats']['mode'], "o"),next=current_request_path))}">Change Permissions</a></li>
                   <%
                     if "dir" == file['type']:
                       cls = "fb-move-dir"
                     else:
                       cls = "fb-move-file"
                   %>
-                  <li><a class="fb-move ${cls}" href="${url('filebrowser.views.move')}?src_path=${path_enc}&mode=${stringformat(file['stats']['mode'], "o")}&next=${urlencode(current_request_path)}">Move</a></li>
+                  <li><a class="fb-move ${cls}" href="${reverse_with_get('filebrowser.views.move',get=dict(src_path=path,mode=stringformat(file['stats']['mode'], "o"),next=current_request_path))}">Move</a></li>
               </ul>
               % endif
             </div>

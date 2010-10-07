@@ -21,20 +21,20 @@ import logging
 import re
 import simplejson
 import socket
-import urllib
 import datetime
 
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ungettext, ugettext
 from django.core import urlresolvers, serializers
 from django.conf import settings
+from django.utils.http import urlencode # this version is unicode-friendly
 from django.http import QueryDict, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response as django_render_to_response
 from django.template.loader import render_to_string as django_render_to_string
 from django.template import RequestContext
 from django.db import models
-from desktop.lib import django_mako
 
+from desktop.lib import django_mako
 import desktop.conf
 import desktop.lib.thrift_util
 
@@ -66,7 +66,6 @@ def login_notrequired(func):
   """A decorator for view functions to allow access without login"""
   func.login_notrequired = True
   return func
-
 
 _uri_prefix = None
 def get_desktop_uri_prefix():
@@ -395,7 +394,7 @@ def reverse_with_get(view, args=None, kwargs=None, get=None):
     args = dict()
   url = urlresolvers.reverse(view, args=args, kwargs=kwargs)
   if get is not None and len(get) > 0:
-    params = urllib.urlencode(get)
+    params = urlencode(get)
     url = url + "?" + params
   return url
 

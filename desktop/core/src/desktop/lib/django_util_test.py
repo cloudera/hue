@@ -173,3 +173,6 @@ def test_reverse_with_get():
   assert_equal("/?a=1", reverse_with_get("desktop.views.index", get=dict(a="1")))
   # No GET parameters
   assert_equal("/", reverse_with_get("desktop.views.index", get=dict()))
+
+def test_unicode_ok():
+  assert_equal("/?a=x%C3%A9", reverse_with_get("desktop.views.index", get=dict(a="x" + unichr(233))))
