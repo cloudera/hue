@@ -612,13 +612,13 @@ public class Results implements TBase<Results, Results._Fields>, java.io.Seriali
         case 2: // COLUMNS
           if (field.type == TType.LIST) {
             {
-              TList _list8 = iprot.readListBegin();
-              this.columns = new ArrayList<String>(_list8.size);
-              for (int _i9 = 0; _i9 < _list8.size; ++_i9)
+              TList _list4 = iprot.readListBegin();
+              this.columns = new ArrayList<String>(_list4.size);
+              for (int _i5 = 0; _i5 < _list4.size; ++_i5)
               {
-                String _elem10;
-                _elem10 = iprot.readString();
-                this.columns.add(_elem10);
+                String _elem6;
+                _elem6 = iprot.readString();
+                this.columns.add(_elem6);
               }
               iprot.readListEnd();
             }
@@ -629,13 +629,13 @@ public class Results implements TBase<Results, Results._Fields>, java.io.Seriali
         case 3: // DATA
           if (field.type == TType.LIST) {
             {
-              TList _list11 = iprot.readListBegin();
-              this.data = new ArrayList<String>(_list11.size);
-              for (int _i12 = 0; _i12 < _list11.size; ++_i12)
+              TList _list7 = iprot.readListBegin();
+              this.data = new ArrayList<String>(_list7.size);
+              for (int _i8 = 0; _i8 < _list7.size; ++_i8)
               {
-                String _elem13;
-                _elem13 = iprot.readString();
-                this.data.add(_elem13);
+                String _elem9;
+                _elem9 = iprot.readString();
+                this.data.add(_elem9);
               }
               iprot.readListEnd();
             }
@@ -681,9 +681,9 @@ public class Results implements TBase<Results, Results._Fields>, java.io.Seriali
       oprot.writeFieldBegin(COLUMNS_FIELD_DESC);
       {
         oprot.writeListBegin(new TList(TType.STRING, this.columns.size()));
-        for (String _iter14 : this.columns)
+        for (String _iter10 : this.columns)
         {
-          oprot.writeString(_iter14);
+          oprot.writeString(_iter10);
         }
         oprot.writeListEnd();
       }
@@ -693,9 +693,9 @@ public class Results implements TBase<Results, Results._Fields>, java.io.Seriali
       oprot.writeFieldBegin(DATA_FIELD_DESC);
       {
         oprot.writeListBegin(new TList(TType.STRING, this.data.size()));
-        for (String _iter15 : this.data)
+        for (String _iter11 : this.data)
         {
-          oprot.writeString(_iter15);
+          oprot.writeString(_iter11);
         }
         oprot.writeListEnd();
       }

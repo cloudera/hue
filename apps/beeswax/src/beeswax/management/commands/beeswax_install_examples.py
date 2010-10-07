@@ -49,7 +49,6 @@ import hive_metastore.ttypes
 
 LOG = logging.getLogger(__name__)
 HADOOP_USER = 'hue'
-HADOOP_GRP = 'supergroup'
 
 class InstallException(Exception):
   pass
@@ -141,7 +140,6 @@ def _make_query_msg(hql):
   """
   query_msg = BeeswaxService.Query(query=hql, configuration=[])
   query_msg.hadoop_user = HADOOP_USER
-  query_msg.hadoop_groups = (HADOOP_GRP,)
   return query_msg
 
 

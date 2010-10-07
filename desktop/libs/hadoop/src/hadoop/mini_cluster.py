@@ -59,9 +59,9 @@ MAX_CLUSTER_STARTUP_TIME = 120.0
 
 # users and their groups which are used in Hue tests.
 TEST_USER_GROUP_MAPPING = {
-   'test': ['test'], 'chown_test': ['chown_test'],
+   'test': ['test','users','supergroup'], 'chown_test': ['chown_test'],
    'notsuperuser': ['notsuperuser'], 'gamma': ['gamma'],
-   'webui': ['webui']
+   'webui': ['webui'], 'hue': ['supergroup']
 }
 
 LOGGER=logging.getLogger(__name__)
@@ -123,7 +123,9 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       tmppath('ugm.properties'))
 
     write_config({'hadoop.security.group.mapping': 'org.apache.hadoop.security.StaticUserGroupMapping',
-      'hadoop.security.static.group.mapping.file': tmppath('ugm.properties')}, tmppath('in-conf/core-site.xml'))
+      'hadoop.security.static.group.mapping.file': tmppath('ugm.properties'),
+      'hadoop.proxyuser.%s.groups' % (self.superuser,): 'users,supergroup',
+      'hadoop.proxyuser.%s.hosts' % (self.superuser,): 'localhost'}, tmppath('in-conf/core-site.xml'))
 
     hadoop_policy_keys = ['client', 'client.datanode', 'datanode', 'inter.datanode', 'namenode', 'inter.tracker', 'job.submission', 'task.umbilical', 'refresh.policy', 'admin.operations']
     hadoop_policy_config = {}
@@ -241,7 +243,8 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     write_config(self.config, tmppath("conf/core-site.xml"), 
       ["fs.default.name", "jobclient.completion.poll.interval",
        "fs.checkpoint.period", "fs.checkpoint.dir",
-       'hadoop.security.group.mapping', 'hadoop.security.static.group.mapping.file'])
+       'hadoop.security.group.mapping', 'hadoop.security.static.group.mapping.file',
+       'hadoop.proxyuser.'+self.superuser+'.groups', 'hadoop.proxyuser.'+self.superuser+'.hosts'])
     write_config(self.config, tmppath("conf/hdfs-site.xml"), ["fs.default.name", "dfs.http.address", "dfs.secondary.http.address"])
     # mapred.job.tracker isn't written out into self.config, so we fill
     # that one out more manually.
@@ -250,7 +253,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     write_config(hadoop_policy_config, tmppath('conf/hadoop-policy.xml'))
 
     # Once the config is written out, we can start the 2NN.
-    args = [hadoop.conf.HADOOP_BIN.get(), 
+    args = [hadoop.conf.HADOOP_BIN.get(),
       '--config', self.config_dir,
       'secondarynamenode']
 

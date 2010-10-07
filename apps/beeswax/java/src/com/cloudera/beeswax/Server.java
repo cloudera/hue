@@ -157,8 +157,8 @@ public class Server {
    */
   private static void createDirectoriesAsNecessary() {
     try {
+      LOG.debug("Classpath: " + System.getProperty("java.class.path"));
       HiveConf conf = new HiveConf(Driver.class);
-      conf.set("hadoop.ugi", superUser + ",supergroup");
       FileSystem fs = FileSystem.get(conf);
       Path tmpDir = new Path("/tmp");
       Path metaDir = new Path(conf
@@ -174,7 +174,9 @@ public class Server {
         }
       }
     } catch (IOException e) {
-      LOG.error("Error while trying to check/create /tmp and warehouse directory.", e);
+      HiveConf conf = new HiveConf(Driver.class);
+      LOG.error("Error while trying to check/create /tmp and warehouse directory " + conf
+          .get(HiveConf.ConfVars.METASTOREWAREHOUSE.varname), e);
     }
   }
 

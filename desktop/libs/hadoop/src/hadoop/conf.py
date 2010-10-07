@@ -137,8 +137,10 @@ MR_CLUSTERS = UnspecifiedConfigSection(
       JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
                                    default="mapred", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
-                              default=False, type=coerce_bool))
-))
+                              default=False, type=coerce_bool)
+    )
+  )
+)
 
 
 def config_validator():

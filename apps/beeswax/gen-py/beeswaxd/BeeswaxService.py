@@ -1669,11 +1669,11 @@ class get_default_configuration_result(object):
       if fid == 0:
         if ftype == TType.LIST:
           self.success = []
-          (_etype31, _size28) = iprot.readListBegin()
-          for _i32 in xrange(_size28):
-            _elem33 = ConfigVariable()
-            _elem33.read(iprot)
-            self.success.append(_elem33)
+          (_etype24, _size21) = iprot.readListBegin()
+          for _i25 in xrange(_size21):
+            _elem26 = ConfigVariable()
+            _elem26.read(iprot)
+            self.success.append(_elem26)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -1690,8 +1690,8 @@ class get_default_configuration_result(object):
     if self.success != None:
       oprot.writeFieldBegin('success', TType.LIST, 0)
       oprot.writeListBegin(TType.STRUCT, len(self.success))
-      for iter34 in self.success:
-        iter34.write(oprot)
+      for iter27 in self.success:
+        iter27.write(oprot)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()

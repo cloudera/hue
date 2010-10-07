@@ -108,7 +108,7 @@ def drop_table(request, table):
 
 def read_table(request, table):
   """View function for select * from table"""
-  hql = "SELECT * FROM `%s`" % (table,)
+  hql = "SELECT * FROM %s" % (table,)
   query_msg = make_beeswax_query(request, hql)
   try:
     return execute_directly(request, query_msg, tablename=table)
@@ -177,7 +177,6 @@ def make_beeswax_query(request, hql, query_form=None):
 
   # Configure running user and group.
   query_msg.hadoop_user = request.user.username
-  query_msg.hadoop_groups = request.user.get_groups()
 
   if query_form is not None:
     for f in query_form.settings.forms:
@@ -962,7 +961,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
   """
   # Case 1: The results are straight from an existing table
   if result_meta.in_tablename:
-    hql = 'CREATE TABLE `%s` AS SELECT * FROM `%s`' % (target_table, result_meta.in_tablename)
+    hql = 'CREATE TABLE `%s` AS SELECT * FROM %s' % (target_table, result_meta.in_tablename)
     query_msg = make_beeswax_query(request, hql)
     # Display the CTAS running. Could take a long time.
     return execute_directly(request, query_msg, on_success_url=urlresolvers.reverse(show_tables))

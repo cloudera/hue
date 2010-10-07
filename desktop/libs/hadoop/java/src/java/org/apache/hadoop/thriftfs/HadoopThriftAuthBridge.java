@@ -130,18 +130,17 @@ class HadoopThriftAuthBridge {
      */
     public TTransportFactory createTransportFactory() throws TTransportException
     {
-      // Parse out the kerberos shortname, host, realm.
-      String kerberosPrincipal = realUgi.getUserName();
-      final String names[] = SaslRpcServer.splitKerberosName(kerberosPrincipal);
+      // Parse out the kerberos principal, host, realm.
+      String kerberosName = realUgi.getUserName();
+      final String names[] = SaslRpcServer.splitKerberosName(kerberosName);
       if (names.length != 3) {
-        throw new TTransportException("Kerberos principal should have 3 parts: " +
-                                      kerberosPrincipal);
+        throw new TTransportException("Kerberos principal should have 3 parts: " + kerberosName);
       }
 
       TSaslServerTransport.Factory transFactory = new TSaslServerTransport.Factory();
       transFactory.addServerDefinition(
         AuthMethod.KERBEROS.getMechanismName(),
-        names[0], names[1],  // shortname and host
+        names[0], names[1],  // two parts of kerberos principal
         SaslRpcServer.SASL_PROPS,
         new SaslRpcServer.SaslGssCallbackHandler());
 
@@ -262,18 +261,18 @@ class HadoopThriftAuthBridge {
     public void open() throws TTransportException {
       try {
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
-            public Void run() {
-              try {
-                wrapped.open();
-              } catch (TTransportException tte) {
-                // Wrap the transport exception in an RTE, since UGI.doAs() then goes
-                // and unwraps this for us out of the doAs block. We then unwrap one
-                // more time in our catch clause to get back the TTE. (ugh)
-                throw new RuntimeException(tte);
-              }
-              return null;
+          public Void run() {
+            try {
+              wrapped.open();
+            } catch (TTransportException tte) {
+              // Wrap the transport exception in an RTE, since UGI.doAs() then goes
+              // and unwraps this for us out of the doAs block. We then unwrap one
+              // more time in our catch clause to get back the TTE. (ugh)
+              throw new RuntimeException(tte);
             }
-          });
+            return null;
+          }
+        });
       } catch (IOException ioe) {
         assert false : "Never thrown!";
         throw new RuntimeException("Received an ioe we never threw!", ioe);

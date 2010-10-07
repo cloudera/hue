@@ -33,19 +33,16 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
   private static final TField QUERY_FIELD_DESC = new TField("query", TType.STRING, (short)1);
   private static final TField CONFIGURATION_FIELD_DESC = new TField("configuration", TType.LIST, (short)3);
   private static final TField HADOOP_USER_FIELD_DESC = new TField("hadoop_user", TType.STRING, (short)4);
-  private static final TField HADOOP_GROUPS_FIELD_DESC = new TField("hadoop_groups", TType.LIST, (short)5);
 
   public String query;
   public List<String> configuration;
   public String hadoop_user;
-  public List<String> hadoop_groups;
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements TFieldIdEnum {
     QUERY((short)1, "query"),
     CONFIGURATION((short)3, "configuration"),
-    HADOOP_USER((short)4, "hadoop_user"),
-    HADOOP_GROUPS((short)5, "hadoop_groups");
+    HADOOP_USER((short)4, "hadoop_user");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -66,8 +63,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
           return CONFIGURATION;
         case 4: // HADOOP_USER
           return HADOOP_USER;
-        case 5: // HADOOP_GROUPS
-          return HADOOP_GROUPS;
         default:
           return null;
       }
@@ -119,9 +114,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
             new FieldValueMetaData(TType.STRING))));
     tmpMap.put(_Fields.HADOOP_USER, new FieldMetaData("hadoop_user", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.STRING)));
-    tmpMap.put(_Fields.HADOOP_GROUPS, new FieldMetaData("hadoop_groups", TFieldRequirementType.DEFAULT, 
-        new ListMetaData(TType.LIST, 
-            new FieldValueMetaData(TType.STRING))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(Query.class, metaDataMap);
   }
@@ -132,14 +124,12 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
   public Query(
     String query,
     List<String> configuration,
-    String hadoop_user,
-    List<String> hadoop_groups)
+    String hadoop_user)
   {
     this();
     this.query = query;
     this.configuration = configuration;
     this.hadoop_user = hadoop_user;
-    this.hadoop_groups = hadoop_groups;
   }
 
   /**
@@ -159,13 +149,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
     if (other.isSetHadoop_user()) {
       this.hadoop_user = other.hadoop_user;
     }
-    if (other.isSetHadoop_groups()) {
-      List<String> __this__hadoop_groups = new ArrayList<String>();
-      for (String other_element : other.hadoop_groups) {
-        __this__hadoop_groups.add(other_element);
-      }
-      this.hadoop_groups = __this__hadoop_groups;
-    }
   }
 
   public Query deepCopy() {
@@ -177,7 +160,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
     this.query = null;
     this.configuration = null;
     this.hadoop_user = null;
-    this.hadoop_groups = null;
   }
 
   public String getQuery() {
@@ -267,45 +249,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
     }
   }
 
-  public int getHadoop_groupsSize() {
-    return (this.hadoop_groups == null) ? 0 : this.hadoop_groups.size();
-  }
-
-  public java.util.Iterator<String> getHadoop_groupsIterator() {
-    return (this.hadoop_groups == null) ? null : this.hadoop_groups.iterator();
-  }
-
-  public void addToHadoop_groups(String elem) {
-    if (this.hadoop_groups == null) {
-      this.hadoop_groups = new ArrayList<String>();
-    }
-    this.hadoop_groups.add(elem);
-  }
-
-  public List<String> getHadoop_groups() {
-    return this.hadoop_groups;
-  }
-
-  public Query setHadoop_groups(List<String> hadoop_groups) {
-    this.hadoop_groups = hadoop_groups;
-    return this;
-  }
-
-  public void unsetHadoop_groups() {
-    this.hadoop_groups = null;
-  }
-
-  /** Returns true if field hadoop_groups is set (has been asigned a value) and false otherwise */
-  public boolean isSetHadoop_groups() {
-    return this.hadoop_groups != null;
-  }
-
-  public void setHadoop_groupsIsSet(boolean value) {
-    if (!value) {
-      this.hadoop_groups = null;
-    }
-  }
-
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case QUERY:
@@ -332,14 +275,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
       }
       break;
 
-    case HADOOP_GROUPS:
-      if (value == null) {
-        unsetHadoop_groups();
-      } else {
-        setHadoop_groups((List<String>)value);
-      }
-      break;
-
     }
   }
 
@@ -353,9 +288,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
 
     case HADOOP_USER:
       return getHadoop_user();
-
-    case HADOOP_GROUPS:
-      return getHadoop_groups();
 
     }
     throw new IllegalStateException();
@@ -374,8 +306,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
       return isSetConfiguration();
     case HADOOP_USER:
       return isSetHadoop_user();
-    case HADOOP_GROUPS:
-      return isSetHadoop_groups();
     }
     throw new IllegalStateException();
   }
@@ -420,15 +350,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
         return false;
     }
 
-    boolean this_present_hadoop_groups = true && this.isSetHadoop_groups();
-    boolean that_present_hadoop_groups = true && that.isSetHadoop_groups();
-    if (this_present_hadoop_groups || that_present_hadoop_groups) {
-      if (!(this_present_hadoop_groups && that_present_hadoop_groups))
-        return false;
-      if (!this.hadoop_groups.equals(that.hadoop_groups))
-        return false;
-    }
-
     return true;
   }
 
@@ -450,11 +371,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
     builder.append(present_hadoop_user);
     if (present_hadoop_user)
       builder.append(hadoop_user);
-
-    boolean present_hadoop_groups = true && (isSetHadoop_groups());
-    builder.append(present_hadoop_groups);
-    if (present_hadoop_groups)
-      builder.append(hadoop_groups);
 
     return builder.toHashCode();
   }
@@ -493,16 +409,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
     }
     if (isSetHadoop_user()) {
       lastComparison = TBaseHelper.compareTo(this.hadoop_user, typedOther.hadoop_user);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-    }
-    lastComparison = Boolean.valueOf(isSetHadoop_groups()).compareTo(typedOther.isSetHadoop_groups());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    if (isSetHadoop_groups()) {
-      lastComparison = TBaseHelper.compareTo(this.hadoop_groups, typedOther.hadoop_groups);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -555,23 +461,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case 5: // HADOOP_GROUPS
-          if (field.type == TType.LIST) {
-            {
-              TList _list3 = iprot.readListBegin();
-              this.hadoop_groups = new ArrayList<String>(_list3.size);
-              for (int _i4 = 0; _i4 < _list3.size; ++_i4)
-              {
-                String _elem5;
-                _elem5 = iprot.readString();
-                this.hadoop_groups.add(_elem5);
-              }
-              iprot.readListEnd();
-            }
-          } else { 
-            TProtocolUtil.skip(iprot, field.type);
-          }
-          break;
         default:
           TProtocolUtil.skip(iprot, field.type);
       }
@@ -596,9 +485,9 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
       oprot.writeFieldBegin(CONFIGURATION_FIELD_DESC);
       {
         oprot.writeListBegin(new TList(TType.STRING, this.configuration.size()));
-        for (String _iter6 : this.configuration)
+        for (String _iter3 : this.configuration)
         {
-          oprot.writeString(_iter6);
+          oprot.writeString(_iter3);
         }
         oprot.writeListEnd();
       }
@@ -607,18 +496,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
     if (this.hadoop_user != null) {
       oprot.writeFieldBegin(HADOOP_USER_FIELD_DESC);
       oprot.writeString(this.hadoop_user);
-      oprot.writeFieldEnd();
-    }
-    if (this.hadoop_groups != null) {
-      oprot.writeFieldBegin(HADOOP_GROUPS_FIELD_DESC);
-      {
-        oprot.writeListBegin(new TList(TType.STRING, this.hadoop_groups.size()));
-        for (String _iter7 : this.hadoop_groups)
-        {
-          oprot.writeString(_iter7);
-        }
-        oprot.writeListEnd();
-      }
       oprot.writeFieldEnd();
     }
     oprot.writeFieldStop();
@@ -651,14 +528,6 @@ public class Query implements TBase<Query, Query._Fields>, java.io.Serializable,
       sb.append("null");
     } else {
       sb.append(this.hadoop_user);
-    }
-    first = false;
-    if (!first) sb.append(", ");
-    sb.append("hadoop_groups:");
-    if (this.hadoop_groups == null) {
-      sb.append("null");
-    } else {
-      sb.append(this.hadoop_groups);
     }
     first = false;
     sb.append(")");

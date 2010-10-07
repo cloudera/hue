@@ -6965,14 +6965,14 @@ public class BeeswaxService {
           case 0: // SUCCESS
             if (field.type == TType.LIST) {
               {
-                TList _list16 = iprot.readListBegin();
-                this.success = new ArrayList<ConfigVariable>(_list16.size);
-                for (int _i17 = 0; _i17 < _list16.size; ++_i17)
+                TList _list12 = iprot.readListBegin();
+                this.success = new ArrayList<ConfigVariable>(_list12.size);
+                for (int _i13 = 0; _i13 < _list12.size; ++_i13)
                 {
-                  ConfigVariable _elem18;
-                  _elem18 = new ConfigVariable();
-                  _elem18.read(iprot);
-                  this.success.add(_elem18);
+                  ConfigVariable _elem14;
+                  _elem14 = new ConfigVariable();
+                  _elem14.read(iprot);
+                  this.success.add(_elem14);
                 }
                 iprot.readListEnd();
               }
@@ -6998,9 +6998,9 @@ public class BeeswaxService {
         oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
         {
           oprot.writeListBegin(new TList(TType.STRUCT, this.success.size()));
-          for (ConfigVariable _iter19 : this.success)
+          for (ConfigVariable _iter15 : this.success)
           {
-            _iter19.write(oprot);
+            _iter15.write(oprot);
           }
           oprot.writeListEnd();
         }
