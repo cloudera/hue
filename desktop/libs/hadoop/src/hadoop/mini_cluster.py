@@ -188,6 +188,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       env["HADOOP_HEAPSIZE"] = "128"
       env["HADOOP_HOME"] = hadoop.conf.HADOOP_HOME.get()
       env["HADOOP_LOG_DIR"] = self.log_dir
+      env["USER"] = self.superuser
       if "JAVA_HOME" in os.environ:
         env["JAVA_HOME"] = os.environ["JAVA_HOME"]
       # Wait for the debugger to attach
@@ -240,6 +241,9 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     # which can, in turn, be used for /bin/hadoop.
     self.config_dir = tmppath("conf")
     os.mkdir(self.config_dir)
+
+    hadoop.conf.HADOOP_CONF_DIR.set_for_testing(self.config_dir)
+
     write_config(self.config, tmppath("conf/core-site.xml"), 
       ["fs.default.name", "jobclient.completion.poll.interval",
        "fs.checkpoint.period", "fs.checkpoint.dir",

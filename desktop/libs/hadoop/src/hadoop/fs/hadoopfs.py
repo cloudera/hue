@@ -808,6 +808,9 @@ class FileUpload(object):
     else:
       self.subprocess_env['HADOOP_CLASSPATH'] = hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
 
+    if hadoop.conf.HADOOP_CONF_DIR.get():
+      self.subprocess_env['HADOOP_CONF_DIR'] = hadoop.conf.HADOOP_CONF_DIR.get()
+
     self.path = path
     self.putter = subprocess.Popen(self.subprocess_cmd,
                                    stdin=subprocess.PIPE,
