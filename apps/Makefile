@@ -35,6 +35,7 @@ APPS := about \
 	filebrowser \
 	help \
 	jobbrowser \
+	jobsub \
 	proxy \
 	useradmin
 
