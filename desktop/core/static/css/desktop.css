@@ -266,6 +266,16 @@ div.mask {
 	-webkit-border-radius: 10px;
 	background: #eaeaea;
 	color: #333;
+	position: relative;
+	top: 2px;
+}
+#ccs-dock-status-content a.dock_misconfig {
+	border: none;
+	padding: 0; margin: 0;
+	border-radius: 0px;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	background: none;
 }
 #ccs-dock-status-content a.ccs-dock-status-failed {
 	background: #fa1500;
@@ -278,6 +288,9 @@ div.mask {
 	text-decoration: none;
 	background: #fff;
 	color: #000;
+}
+#ccs-dock-status-content a.dock_misconfig:hover {
+	background: none;
 }
 div.dock-tip div.DefaultPointyTip .pointyWrapper div.top_ur {
 	padding-right: 8px;

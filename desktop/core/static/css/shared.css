@@ -103,8 +103,8 @@
 }
 /* inline block display; makes elements block level, but follows page flow */
 .ccs-shared .ccs-inline, .ccs-shared ul.ccs-inline_list li {
-	display:-moz-inline-box;                /* FF2 */
-	display:inline-block;                   /* webkit and FF3 */
+	display:-moz-inline-box;		/* FF2 */
+	display:inline-block;		   /* webkit and FF3 */
 	#zoom: 1; /* set hasLayout:true to mimic inline-block */
 	#display:inline; 
 	border:0;
@@ -237,6 +237,7 @@ table[data-filters*=HtmlTable] td {
 	line-height: 20px;
 	background: #fff;
 	border: none;
+	overflow: hidden;
 }
 table[data-filters*=HtmlTable] tr.table-tr-odd td {
 	background-color: #f3f3f3;
@@ -304,24 +305,26 @@ table[data-filters*=HtmlTable].treeView tr a.expand {
 table[data-filters*=HtmlTable].treeView tr.table-expanded a.expand {
 	background: url(/static/art/divots.png) 0px -14px;
 }
-
+table[data-filters*=HtmlTable].treeView tbody tr > td:first-child {
+	padding-right: 20px;
+}
 .table-th-resizable.table-th-sort span.table-th-sort-span, .table-th-resizable.table-th-sort-rev span.table-th-sort-span {
-        padding-right: 13px;
+	padding-right: 13px;
 }
 
 table.table-resizable th div {
-        position: relative;
-        padding-right: 0px;
+	position: relative;
+	padding-right: 0px;
 }
 span.table-th-resizer {
-        position: absolute;
-        cursor: col-resize;
-        right: 9px;
-        width: 6px;
-        top: 0px;
-        display: block;
-        height: 100%;
-        z-index: 1;
+	position: absolute;
+	cursor: col-resize;
+	right: 9px;
+	width: 6px;
+	top: 0px;
+	display: block;
+	height: 100%;
+	z-index: 1;
 }
 
 
@@ -659,29 +662,29 @@ OTHER DEALINGS IN THE SOFTWARE.
 .print table {margin-bottom:1.4em;width:100%; border: 1px solid #666;}
 .print table th {
 	background: #dadada;
-        text-align: left;
-        white-space: nowrap;
-        padding: 0px 6px;
-        border-bottom: solid #000;
-        border-width: 0px 1px 1px 0px;
-        height: 16px !important;
-        line-height: 16px !important;
-        font-size: 12px;
-        font-weight: border;
+	text-align: left;
+	white-space: nowrap;
+	padding: 0px 6px;
+	border-bottom: solid #000;
+	border-width: 0px 1px 1px 0px;
+	height: 16px !important;
+	line-height: 16px !important;
+	font-size: 12px;
+	font-weight: border;
 }
 .print table th:last-child {
-        border-right: none;
+	border-right: none;
 }
 
 .print table td {
-        padding: 0px 8px;
-        height: 20px;
-        line-height: 20px;
-        background: #fff;
-        border: none;
+	padding: 0px 8px;
+	height: 20px;
+	line-height: 20px;
+	background: #fff;
+	border: none;
 }
 .print table tr:nth-child(odd) td {
-        background: #f3f3f3;
+	background: #f3f3f3;
 }
 .print th {font-weight:bold;}
 .print thead th {background:#c3d9ff;}
