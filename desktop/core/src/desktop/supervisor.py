@@ -29,8 +29,13 @@ In order to have your application managed by supervisor, you need to add
 an entry_point to your application's egg with the name 'desktop.supervisor.specs'.
 This entry point should point to a SuperviseeSpec instance in your module.
 """
-import daemon
 from daemon.pidlockfile import PIDLockFile
+import daemon
+import exceptions
+import logging
+import optparse
+import os
+import pkg_resources
 import pwd
 import signal
 import string
@@ -38,12 +43,15 @@ import subprocess
 import sys
 import threading
 import time
-import logging
-import os
-import optparse
-import pkg_resources
+
 import desktop.lib.paths
 import desktop.log
+
+# BaseException not available on python 2.4
+try:
+  MyBaseException = exceptions.BaseException
+except AttributeError:
+  MyBaseException = exceptions.Exception
 
 PROC_NAME = 'supervisor'
 LOG = logging.getLogger()
@@ -127,39 +135,46 @@ class Supervisor(threading.Thread):
   def run(self):
     global CHILD_PIDS
 
-    restart_timestamps = []
-    proc_str = " ".join(self.cmdv)
-    LOG.info("Starting process %s" % proc_str)
-    while True:
-      self.state = Supervisor.RUNNING
-      pipe = subprocess.Popen(self.cmdv, close_fds=True,
-                              stdin=file("/dev/null"),
-                              **self.popen_kwargs)
-      LOG.info("Started proceses (pid %s) %s" % (pipe.pid, proc_str))
-      CHILD_PIDS.append(pipe.pid)
-      exitcode = pipe.wait()
-      if exitcode == 0:
-        LOG.info('Command "%s" exited normally.' % (proc_str,))
-        break
-      if exitcode != 0:
-        LOG.warn("Exit code for %s: %d" % (proc_str, exitcode))
-        self.state = Supervisor.ERROR
-      et = time.time()
+    try:
+      restart_timestamps = []
+      proc_str = " ".join(self.cmdv)
+      while True:
+        self.state = Supervisor.RUNNING
+        LOG.info("Starting process %s" % proc_str)
+        pipe = subprocess.Popen(self.cmdv, close_fds=True,
+                                stdin=file("/dev/null"),
+                                **self.popen_kwargs)
+        LOG.info("Started proceses (pid %s) %s" % (pipe.pid, proc_str))
+        CHILD_PIDS.append(pipe.pid)
+        exitcode = pipe.wait()
+        if exitcode == 0:
+          LOG.info('Command "%s" exited normally.' % (proc_str,))
+          self.state = Supervisor.FINISHED
+          return
+        if exitcode != 0:
+          LOG.warn("Exit code for %s: %d" % (proc_str, exitcode))
+          self.state = Supervisor.ERROR
+        et = time.time()
 
-      if SHOULD_STOP:
-        LOG.info("Stopping %s because supervisor exiting" % proc_str)
-        break
-      restart_timestamps.append(et)
-      restart_timestamps = [t for t in restart_timestamps if t > et - TIME_WINDOW]
-      if len(restart_timestamps) > MAX_RESTARTS_IN_WINDOW:
-        earliest_restart = min(restart_timestamps)
-        ago = et - earliest_restart
-        raise Exception(
-          "Process %s has restarted more than %d times in the last %d seconds" % (
-            proc_str, MAX_RESTARTS_IN_WINDOW, int(ago)))
+        if SHOULD_STOP:
+          LOG.info("Stopping %s because supervisor exiting" % proc_str)
+          self.state = Supervisor.FINISHED
+          return
+        restart_timestamps.append(et)
+        restart_timestamps = [t for t in restart_timestamps if t > et - TIME_WINDOW]
+        if len(restart_timestamps) > MAX_RESTARTS_IN_WINDOW:
+          earliest_restart = min(restart_timestamps)
+          ago = et - earliest_restart
+          LOG.error(
+            "Process %s has restarted more than %d times in the last %d seconds" % (
+              proc_str, MAX_RESTARTS_IN_WINDOW, int(ago)))
+          self.state = Supervisor.ERROR
+          return
 
-      LOG.info("Restarting process %s" % proc_str)
-    self.state = Supervisor.FINISHED
+        LOG.error("Process %s exited abnormally. Restarting it." % (proc_str,))
+    except MyBaseException, ex:
+      LOG.exception("Uncaught exception. Supervisor exiting.")
+      self.state = Supervisor.ERROR
 
 
 def shutdown(sups):
@@ -196,7 +211,7 @@ def shutdown(sups):
   sys.exit(1)
 
 def sig_handler(signum, frame):
-  raise Exception("Signal %d received. Exiting" % signum)
+  raise SystemExit("Signal %d received. Exiting" % signum)
 
 def parse_args():
   parser = optparse.OptionParser()
@@ -279,8 +294,9 @@ def main():
       # pid is not actually running
       pidfile_context.break_lock()
     else:
-      raise Exception("Pid file %s indicates that Desktop is already running (pid %d)" %
-                      (pid_file, existing_pid))
+      LOG.error("Pid file %s indicates that Hue is already running (pid %d)" %
+                (pid_file, existing_pid))
+      sys.exit(1)
   elif pidfile_context.is_locked():
     # If there's no pidfile but there is a lock, it's a strange situation,
     # but we should break the lock because it doesn't seem to be actually running
@@ -334,7 +350,7 @@ def main():
       sups.append(sup)
 
     wait_loop(sups, options)
-  except Exception, ex:
+  except MyBaseException, ex:
     LOG.exception("Exception in supervisor main loop")
     shutdown(sups)      # shutdown() exits the process
 
