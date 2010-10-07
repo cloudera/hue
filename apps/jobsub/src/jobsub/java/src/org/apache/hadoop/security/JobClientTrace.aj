@@ -49,8 +49,12 @@ public aspect JobClientTrace {
    */
   void around(Configuration conf, Credentials credentials):
     call(void JobClient.readTokensFromFiles(Configuration, Credentials)) && args(conf, credentials) {
-    conf.set("mapreduce.job.credentials.binary", System.getenv("HADOOP_TOKEN_FILE_LOCATION"));
-    conf.setBoolean("mapreduce.job.complete.cancel.delegation.tokens", false);
+
+    String hadoopTokenFileLocation = System.getenv("HADOOP_TOKEN_FILE_LOCATION");
+    if (hadoopTokenFileLocation != null) {
+      conf.set("mapreduce.job.credentials.binary", System.getenv("HADOOP_TOKEN_FILE_LOCATION"));
+      conf.setBoolean("mapreduce.job.complete.cancel.delegation.tokens", false);
+    }
     proceed(conf, credentials);
   }
 }
