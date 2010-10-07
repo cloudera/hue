@@ -27,14 +27,15 @@ requires:
  - clientcide/Collapsible
  - Widgets/ART.Alerts
  - Widgets/Behavior
- - Widgets/Behavior.Accordion
  - Widgets/Behavior.ArtButton
  - Widgets/Behavior.ArtInput
- - Widgets/Behavior.FormRequest
- - Widgets/Behavior.FormValidator
- - Widgets/Behavior.HtmlTable
- - Widgets/Behavior.OverText
  - Widgets/Behavior.SplitView
+ - More-Behaviors/Behavior.FxAccordion
+ - More-Behaviors/Behavior.FormRequest
+ - More-Behaviors/Behavior.FormValidator
+ - More-Behaviors/Behavior.HtmlTable
+ - More-Behaviors/Behavior.OverText
+ - More-Behaviors/Behavior.Sortable
  - /Behavior.CollapsingElements
  - /Behavior.ContextMenu
  - /Behavior.DataGroupToggle

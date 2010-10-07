@@ -68,30 +68,30 @@
   <head>
     <title>Configurable Columns</title>
   </head>
-  <body>
+  <body data-filters="CollapsingElements">
+    <form action="${request_path}" method="GET" class="ccs-hidden collapsible ccs-table_config">
+      <ul>
+        % for i, option in enumerate(columns):
+          <%
+            checked = ""
+            if option in active_columns:
+              checked = 'checked="checked"'
+          %>
+          <li><label><input type="checkbox" name="show_columns" value="${i}" ${checked}/> ${option}</label></li>
+        % endfor
+      </ul>
+      <a class="ccs-checkAll" data-filters="ArtButton" data-check-group=".ccs-table_config input">checkAll</a>
+      <a class="ccs-checkNone" data-filters="ArtButton" data-check-group=".ccs-table_config input">checkNone</a>
+      <input type="submit" value="Apply" data-filters="ArtButton"/>
+    </form>
     <table data-filters="HtmlTable">
       <thead>
         <tr>
           % for i, col in enumerate(active_columns):
-            % if i == len(active_columns) - 1:
-              <th data-filters="CollapsingElements">
-                <a class="collapser ccs-table_config_link"></a>
+            % if i == 0:
+              <th>
+                <a class="collapser ccs-table_config_link ccs-left"></a>
                 ${col}
-                <form action="${request_path}" method="GET" class="ccs-hidden collapsible ccs-table_config">
-                  <ul>
-                    % for i, option in enumerate(columns):
-                      <%
-                        checked = ""
-                        if option in active_columns:
-                          checked = 'checked="checked"'
-                      %>
-                      <li><label><input type="checkbox" name="show_columns" value="${i}" ${checked}/> ${option}</label></li>
-                    % endfor
-                  </ul>
-                  <a class="ccs-checkAll" data-filters="ArtButton" data-check-group=".ccs-table_config input">checkAll</a>
-                  <a class="ccs-checkNone" data-filters="ArtButton" data-check-group=".ccs-table_config input">checkNone</a>
-                  <input type="submit" value="Apply" data-filters="ArtButton"/>
-                </form>
               </th>
             % else:
               <th>${col}</th>
