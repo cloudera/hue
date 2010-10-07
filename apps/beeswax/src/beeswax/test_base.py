@@ -116,6 +116,8 @@ def get_shared_beeswax_server():
         time.sleep(sleep)
         sleep *= 2
       except:
+        time.sleep(sleep)
+        sleep *= 2
         pass
     if not started:
       raise Exception("Beeswax server took too long to come up.")
@@ -147,8 +149,9 @@ def wait_for_query_to_finish(client, response, max=30.0):
     time.sleep(sleep_time)
     sleep_time = min(1.0, sleep_time * 2) # Capped exponential
     if (time.time() - start) > max:
-      LOG.warning("Query took too long!")
-      raise Exception("Query took too long.")
+      message = "Query took too long! %d seconds" % (time.time() - start,)
+      LOG.warning(message)
+      raise Exception(message)
 
     # Find out url to retry
     match = REFRESH_RE.search(response.content)

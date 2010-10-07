@@ -568,7 +568,7 @@ for x in sys.stdin:
         'save': True
       }
       resp = self.client.post('/beeswax/save_results/%s' % (qid,), save_data, follow=True)
-      wait_for_query_to_finish(self.client, resp, max=60)
+      wait_for_query_to_finish(self.client, resp, max=120)
 
       # Check that data is right. The SELECT may not give us the whole table.
       resp = _make_query(self.client, 'SELECT * FROM %s' % (target_tbl,), wait=True)
