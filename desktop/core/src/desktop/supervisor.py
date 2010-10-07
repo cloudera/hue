@@ -147,7 +147,8 @@ class Supervisor(threading.Thread):
       et = time.time()
 
       if SHOULD_STOP:
-        raise Exception("Stopping %s because supervisor dying" % proc_str)
+        LOG.info("Stopping %s because supervisor exiting" % proc_str)
+        break
       restart_timestamps.append(et)
       restart_timestamps = [t for t in restart_timestamps if t > et - TIME_WINDOW]
       if len(restart_timestamps) > MAX_RESTARTS_IN_WINDOW:
@@ -234,7 +235,7 @@ def drop_privileges():
   """
   we_are_root = os.getuid() == 0
   if not we_are_root:
-    print >>sys.stderr, "[INFO] Not running as root, skipping privilege drop"
+    print >>sys.stdout, "[INFO] Not running as root, skipping privilege drop"
     return
 
   try:
@@ -335,8 +336,7 @@ def main():
     wait_loop(sups, options)
   except Exception, ex:
     LOG.exception("Exception in supervisor main loop")
-    shutdown(sups)
-    return 1
+    shutdown(sups)      # shutdown() exits the process
 
   return 0
 
@@ -350,7 +350,7 @@ def wait_loop(sups, options):
         if sup.state == Supervisor.FINISHED:
           sups.remove(sup)
         else:
-          shutdown(sups)
+          shutdown(sups)        # shutdown() exits the process
 
 
 if __name__ == "__main__":
