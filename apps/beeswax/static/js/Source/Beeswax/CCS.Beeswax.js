@@ -458,7 +458,8 @@ ART.Sheet.define('splitview.bw-editor', {
 			var saveIt = function(){
 				//grab the container of the save as inputs and clone them
 				//(clone them because our windows destroy themselves on hide)
-				var form = saver.clone();
+                                //Hide on clone to ensure that display property is set to none.
+				var form = saver.clone().hide();
 				//prompt the user w/ the form
 				var prompt = this.prompt('Save This Query', form.show(), function(){
 					//replace the saver form with the one the user filled out
