@@ -122,6 +122,8 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
                             type=int),
+      NN_HTTP_PORT=Config("http_port", help="Hadoop HTTP port for the name node", default=50070,
+                            type=int),
       NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
                                    default="hdfs", type=str),
       DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode",
