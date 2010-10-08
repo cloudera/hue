@@ -42,6 +42,7 @@ requires:
  - /CCS.JFrame.NoScroll
  - /CCS.JFrame.PromptAndPost
  - /CCS.JFrame.Refresh
+ - /CCS.JFrame.RefreshWithParams
  - /CCS.JFrame.SubmitLink
  - /CCS.JFrame.Target
 script: CCS.JBrowser.js
