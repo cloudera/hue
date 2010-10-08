@@ -131,9 +131,9 @@ docs:
 
 .PHONY: crepo
 crepo: $(THIRDPARTY_JS_DIR)/manifest.json $(THIRDPARTY_JS_DIR)/*.hash
-#	@echo "--- Synchronizing external dependencies with crepo"
-#	@mkdir -p $(BLD_DIR)
-#	@cd $(THIRDPARTY_JS_DIR) && $(CREPO) sync && \
+	@echo "--- Synchronizing external dependencies with crepo"
+	@mkdir -p $(BLD_DIR)
+	@cd $(THIRDPARTY_JS_DIR) && $(CREPO) sync && \
 	  ($(CREPO) dump-refs > $(ROOT)/VERSION_DATA || true)
 # END DEV ONLY >>>>
 
