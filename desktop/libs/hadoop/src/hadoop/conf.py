@@ -108,7 +108,9 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=9090,
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
-                            type=int)
+                            type=int),
+      NN_HTTP_PORT=Config("http_port", help="Hadoop HTTP port for the name node", default=50070,
+                            type=int),
     )
   )
 )
