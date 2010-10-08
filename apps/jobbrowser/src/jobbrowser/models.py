@@ -413,7 +413,7 @@ class TaskAttempt(object):
                       '%s:%s' % (tracker.host, tracker.httpPort),
                       'tasklog',
                       None,
-                      'taskid=%s' % (self.attemptId,),
+                      'attemptid=%s' % (self.attemptId,),
                       None))
     LOGGER.info('Retrieving %s' % (url,))
     try:

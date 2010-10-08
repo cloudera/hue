@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,13 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -o errexit
-set -o xtrace
+from django.core.management.base import NoArgsCommand
+import desktop.kt_renewer
 
-cd $(dirname $0)
-
-thrift -I include -r --gen py:new_style -o ../ beeswax.thrift
-thrift -I include -r --gen java:hashcode -o ../java beeswax.thrift
-
-# This is based on thirdparty.
-# thrift -r --gen py:new_style -o ../ ../../../../ext/thirdparty/py/thrift/contrib/fb303/if/fb303.thrift
+class Command(NoArgsCommand):
+  """ Starts a daemon which renews Kerberos credentials from a keytab
+  periodically. """
+  def handle_noargs(self, **options):
+    desktop.kt_renewer.run()

@@ -9,18 +9,13 @@ package org.apache.hadoop.thriftfs.jobtracker.api;
 import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
+
 /**
  * States that the jobtracker may be in
  */
-public enum JobTrackerState implements TEnum{
-    INITIALIZING(0),
-    RUNNING(1);
-
-  private static final Map<Integer, JobTrackerState> BY_VALUE = new HashMap<Integer,JobTrackerState>() {{
-    for(JobTrackerState val : JobTrackerState.values()) {
-      put(val.getValue(), val);
-    }
-  }};
+public enum JobTrackerState implements TEnum {
+  INITIALIZING(0),
+  RUNNING(1);
 
   private final int value;
 
@@ -40,6 +35,13 @@ public enum JobTrackerState implements TEnum{
    * @return null if the value is not found.
    */
   public static JobTrackerState findByValue(int value) { 
-    return BY_VALUE.get(value);
+    switch (value) {
+      case 0:
+        return INITIALIZING;
+      case 1:
+        return RUNNING;
+      default:
+        return null;
+    }
   }
 }

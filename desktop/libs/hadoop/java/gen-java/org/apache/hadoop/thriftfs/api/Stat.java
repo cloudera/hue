@@ -15,12 +15,15 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
@@ -28,7 +31,7 @@ import org.apache.thrift.protocol.*;
  * 
  * Modelled after org.apache.hadoop.fs.FileStatus
  */
-public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneable, Comparable<Stat> {
+public class Stat implements TBase<Stat, Stat._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("Stat");
 
   private static final TField PATH_FIELD_DESC = new TField("path", TType.STRING, (short)1);
@@ -128,12 +131,10 @@ public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneabl
      */
     REPLICATION((short)15, "replication");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -142,7 +143,30 @@ public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneabl
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // PATH
+          return PATH;
+        case 2: // IS_DIR
+          return IS_DIR;
+        case 3: // ATIME
+          return ATIME;
+        case 4: // MTIME
+          return MTIME;
+        case 5: // PERMS
+          return PERMS;
+        case 6: // OWNER
+          return OWNER;
+        case 7: // GROUP
+          return GROUP;
+        case 13: // LENGTH
+          return LENGTH;
+        case 14: // BLOCK_SIZE
+          return BLOCK_SIZE;
+        case 15: // REPLICATION
+          return REPLICATION;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -189,30 +213,30 @@ public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneabl
   private static final int __REPLICATION_ISSET_ID = 6;
   private BitSet __isset_bit_vector = new BitSet(7);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.IS_DIR, new FieldMetaData("isDir", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.BOOL)));
-    put(_Fields.ATIME, new FieldMetaData("atime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.MTIME, new FieldMetaData("mtime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.PERMS, new FieldMetaData("perms", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I16)));
-    put(_Fields.OWNER, new FieldMetaData("owner", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.GROUP, new FieldMetaData("group", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.LENGTH, new FieldMetaData("length", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.BLOCK_SIZE, new FieldMetaData("blockSize", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.REPLICATION, new FieldMetaData("replication", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I16)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.IS_DIR, new FieldMetaData("isDir", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.BOOL)));
+    tmpMap.put(_Fields.ATIME, new FieldMetaData("atime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.MTIME, new FieldMetaData("mtime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.PERMS, new FieldMetaData("perms", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I16)));
+    tmpMap.put(_Fields.OWNER, new FieldMetaData("owner", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.GROUP, new FieldMetaData("group", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.LENGTH, new FieldMetaData("length", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.BLOCK_SIZE, new FieldMetaData("blockSize", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.REPLICATION, new FieldMetaData("replication", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I16)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(Stat.class, metaDataMap);
   }
 
@@ -279,9 +303,25 @@ public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneabl
     return new Stat(this);
   }
 
-  @Deprecated
-  public Stat clone() {
-    return new Stat(this);
+  @Override
+  public void clear() {
+    this.path = null;
+    setIsDirIsSet(false);
+    this.isDir = false;
+    setAtimeIsSet(false);
+    this.atime = 0;
+    setMtimeIsSet(false);
+    this.mtime = 0;
+    setPermsIsSet(false);
+    this.perms = 0;
+    this.owner = null;
+    this.group = null;
+    setLengthIsSet(false);
+    this.length = 0;
+    setBlockSizeIsSet(false);
+    this.blockSize = 0;
+    setReplicationIsSet(false);
+    this.replication = 0;
   }
 
   /**
@@ -664,10 +704,6 @@ public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneabl
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case PATH:
@@ -704,12 +740,12 @@ public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneabl
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case PATH:
       return isSetPath();
@@ -733,10 +769,6 @@ public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneabl
       return isSetReplication();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -858,87 +890,111 @@ public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneabl
     int lastComparison = 0;
     Stat typedOther = (Stat)other;
 
-    lastComparison = Boolean.valueOf(isSetPath()).compareTo(isSetPath());
+    lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(path, typedOther.path);
+    if (isSetPath()) {
+      lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetIsDir()).compareTo(typedOther.isSetIsDir());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetIsDir()).compareTo(isSetIsDir());
+    if (isSetIsDir()) {
+      lastComparison = TBaseHelper.compareTo(this.isDir, typedOther.isDir);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetAtime()).compareTo(typedOther.isSetAtime());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(isDir, typedOther.isDir);
+    if (isSetAtime()) {
+      lastComparison = TBaseHelper.compareTo(this.atime, typedOther.atime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMtime()).compareTo(typedOther.isSetMtime());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetAtime()).compareTo(isSetAtime());
+    if (isSetMtime()) {
+      lastComparison = TBaseHelper.compareTo(this.mtime, typedOther.mtime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetPerms()).compareTo(typedOther.isSetPerms());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(atime, typedOther.atime);
+    if (isSetPerms()) {
+      lastComparison = TBaseHelper.compareTo(this.perms, typedOther.perms);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetOwner()).compareTo(typedOther.isSetOwner());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetMtime()).compareTo(isSetMtime());
+    if (isSetOwner()) {
+      lastComparison = TBaseHelper.compareTo(this.owner, typedOther.owner);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetGroup()).compareTo(typedOther.isSetGroup());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(mtime, typedOther.mtime);
+    if (isSetGroup()) {
+      lastComparison = TBaseHelper.compareTo(this.group, typedOther.group);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetLength()).compareTo(typedOther.isSetLength());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetPerms()).compareTo(isSetPerms());
+    if (isSetLength()) {
+      lastComparison = TBaseHelper.compareTo(this.length, typedOther.length);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetBlockSize()).compareTo(typedOther.isSetBlockSize());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(perms, typedOther.perms);
+    if (isSetBlockSize()) {
+      lastComparison = TBaseHelper.compareTo(this.blockSize, typedOther.blockSize);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetReplication()).compareTo(typedOther.isSetReplication());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetOwner()).compareTo(isSetOwner());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(owner, typedOther.owner);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetGroup()).compareTo(isSetGroup());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(group, typedOther.group);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetLength()).compareTo(isSetLength());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(length, typedOther.length);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetBlockSize()).compareTo(isSetBlockSize());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(blockSize, typedOther.blockSize);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetReplication()).compareTo(isSetReplication());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(replication, typedOther.replication);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetReplication()) {
+      lastComparison = TBaseHelper.compareTo(this.replication, typedOther.replication);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -950,91 +1006,88 @@ public class Stat implements TBase<Stat._Fields>, java.io.Serializable, Cloneabl
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case PATH:
-            if (field.type == TType.STRING) {
-              this.path = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case IS_DIR:
-            if (field.type == TType.BOOL) {
-              this.isDir = iprot.readBool();
-              setIsDirIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case ATIME:
-            if (field.type == TType.I64) {
-              this.atime = iprot.readI64();
-              setAtimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MTIME:
-            if (field.type == TType.I64) {
-              this.mtime = iprot.readI64();
-              setMtimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PERMS:
-            if (field.type == TType.I16) {
-              this.perms = iprot.readI16();
-              setPermsIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case OWNER:
-            if (field.type == TType.STRING) {
-              this.owner = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case GROUP:
-            if (field.type == TType.STRING) {
-              this.group = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case LENGTH:
-            if (field.type == TType.I64) {
-              this.length = iprot.readI64();
-              setLengthIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case BLOCK_SIZE:
-            if (field.type == TType.I64) {
-              this.blockSize = iprot.readI64();
-              setBlockSizeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case REPLICATION:
-            if (field.type == TType.I16) {
-              this.replication = iprot.readI16();
-              setReplicationIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // PATH
+          if (field.type == TType.STRING) {
+            this.path = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // IS_DIR
+          if (field.type == TType.BOOL) {
+            this.isDir = iprot.readBool();
+            setIsDirIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // ATIME
+          if (field.type == TType.I64) {
+            this.atime = iprot.readI64();
+            setAtimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // MTIME
+          if (field.type == TType.I64) {
+            this.mtime = iprot.readI64();
+            setMtimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // PERMS
+          if (field.type == TType.I16) {
+            this.perms = iprot.readI16();
+            setPermsIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // OWNER
+          if (field.type == TType.STRING) {
+            this.owner = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // GROUP
+          if (field.type == TType.STRING) {
+            this.group = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 13: // LENGTH
+          if (field.type == TType.I64) {
+            this.length = iprot.readI64();
+            setLengthIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 14: // BLOCK_SIZE
+          if (field.type == TType.I64) {
+            this.blockSize = iprot.readI64();
+            setBlockSizeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 15: // REPLICATION
+          if (field.type == TType.I16) {
+            this.replication = iprot.readI16();
+            setReplicationIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

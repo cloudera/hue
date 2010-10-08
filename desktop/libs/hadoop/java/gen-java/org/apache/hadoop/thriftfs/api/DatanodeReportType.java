@@ -9,16 +9,11 @@ package org.apache.hadoop.thriftfs.api;
 import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
-public enum DatanodeReportType implements TEnum{
-    ALL_DATANODES(1),
-    LIVE_DATANODES(2),
-    DEAD_DATANODES(3);
 
-  private static final Map<Integer, DatanodeReportType> BY_VALUE = new HashMap<Integer,DatanodeReportType>() {{
-    for(DatanodeReportType val : DatanodeReportType.values()) {
-      put(val.getValue(), val);
-    }
-  }};
+public enum DatanodeReportType implements TEnum {
+  ALL_DATANODES(1),
+  LIVE_DATANODES(2),
+  DEAD_DATANODES(3);
 
   private final int value;
 
@@ -38,6 +33,15 @@ public enum DatanodeReportType implements TEnum{
    * @return null if the value is not found.
    */
   public static DatanodeReportType findByValue(int value) { 
-    return BY_VALUE.get(value);
+    switch (value) {
+      case 1:
+        return ALL_DATANODES;
+      case 2:
+        return LIVE_DATANODES;
+      case 3:
+        return DEAD_DATANODES;
+      default:
+        return null;
+    }
   }
 }

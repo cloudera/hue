@@ -8,18 +8,18 @@ from thrift.Thrift import *
 from ttypes import *
 from thrift.Thrift import TProcessor
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
   fastbinary = None
 
 
-class Iface:
+class Iface(object):
   def query(self, query):
     """
     Submit a query and return a handle (QueryHandle). The query runs asynchronously.
-    
+
     Parameters:
      - query
     """
@@ -28,7 +28,7 @@ class Iface:
   def explain(self, query):
     """
     Get the query plan for a query.
-    
+
     Parameters:
      - query
     """
@@ -38,7 +38,7 @@ class Iface:
     """
     Get the results of a query. This is non-blocking. Caller should check
     Results.ready to determine if the results are in yet.
-    
+
     Parameters:
      - query_id
      - start_over
@@ -48,7 +48,7 @@ class Iface:
   def get_state(self, handle):
     """
     Get the state of the query
-    
+
     Parameters:
      - handle
     """
@@ -57,7 +57,7 @@ class Iface:
   def get_results_metadata(self, handle):
     """
     Get the result metadata
-    
+
     Parameters:
      - handle
     """
@@ -66,7 +66,7 @@ class Iface:
   def echo(self, s):
     """
     Used to test connection to server.  A "noop" command.
-    
+
     Parameters:
      - s
     """
@@ -82,7 +82,7 @@ class Iface:
   def get_log(self, context):
     """
     Get the log messages related to the given context.
-    
+
     Parameters:
      - context
     """
@@ -106,7 +106,7 @@ class Client(Iface):
   def query(self, query):
     """
     Submit a query and return a handle (QueryHandle). The query runs asynchronously.
-    
+
     Parameters:
      - query
     """
@@ -140,7 +140,7 @@ class Client(Iface):
   def explain(self, query):
     """
     Get the query plan for a query.
-    
+
     Parameters:
      - query
     """
@@ -175,7 +175,7 @@ class Client(Iface):
     """
     Get the results of a query. This is non-blocking. Caller should check
     Results.ready to determine if the results are in yet.
-    
+
     Parameters:
      - query_id
      - start_over
@@ -213,7 +213,7 @@ class Client(Iface):
   def get_state(self, handle):
     """
     Get the state of the query
-    
+
     Parameters:
      - handle
     """
@@ -247,7 +247,7 @@ class Client(Iface):
   def get_results_metadata(self, handle):
     """
     Get the result metadata
-    
+
     Parameters:
      - handle
     """
@@ -281,7 +281,7 @@ class Client(Iface):
   def echo(self, s):
     """
     Used to test connection to server.  A "noop" command.
-    
+
     Parameters:
      - s
     """
@@ -342,7 +342,7 @@ class Client(Iface):
   def get_log(self, context):
     """
     Get the log messages related to the given context.
-    
+
     Parameters:
      - context
     """
@@ -600,6 +600,9 @@ class query_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -669,6 +672,9 @@ class query_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -726,6 +732,9 @@ class explain_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -795,6 +804,9 @@ class explain_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -864,6 +876,9 @@ class fetch_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -946,6 +961,9 @@ class fetch_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1003,6 +1021,9 @@ class get_state_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1071,6 +1092,9 @@ class get_state_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1128,6 +1152,9 @@ class get_results_metadata_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1197,6 +1224,9 @@ class get_results_metadata_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1253,6 +1283,9 @@ class echo_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1308,6 +1341,9 @@ class echo_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1346,6 +1382,9 @@ class dump_config_args(object):
     oprot.writeStructBegin('dump_config_args')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1401,6 +1440,9 @@ class dump_config_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1457,6 +1499,9 @@ class get_log_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1525,6 +1570,9 @@ class get_log_result(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1581,6 +1629,9 @@ class get_default_configuration_args(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1618,11 +1669,11 @@ class get_default_configuration_result(object):
       if fid == 0:
         if ftype == TType.LIST:
           self.success = []
-          (_etype31, _size28) = iprot.readListBegin()
-          for _i32 in xrange(_size28):
-            _elem33 = ConfigVariable()
-            _elem33.read(iprot)
-            self.success.append(_elem33)
+          (_etype24, _size21) = iprot.readListBegin()
+          for _i25 in xrange(_size21):
+            _elem26 = ConfigVariable()
+            _elem26.read(iprot)
+            self.success.append(_elem26)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -1639,12 +1690,15 @@ class get_default_configuration_result(object):
     if self.success != None:
       oprot.writeFieldBegin('success', TType.LIST, 0)
       oprot.writeListBegin(TType.STRUCT, len(self.success))
-      for iter34 in self.success:
-        iter34.write(oprot)
+      for iter27 in self.success:
+        iter27.write(oprot)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1656,5 +1710,3 @@ class get_default_configuration_result(object):
 
   def __ne__(self, other):
     return not (self == other)
-
-

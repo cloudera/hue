@@ -118,11 +118,14 @@ struct Block {
   /** Generational stamp of this block. */
   4: i64 genStamp,
 
-  /** Offset of the first byte of the block relative to the start of the file */  
-  6: i64 startOffset;
-
   /** List of data nodes with copies  of this block. */
   5: list<DatanodeInfo> nodes,
+
+  /** Offset of the first byte of the block relative to the start of the file */
+  6: i64 startOffset,
+
+  /** The serialized token associated with this block. */
+  7: string token,
 }
 
 /**
@@ -233,7 +236,6 @@ struct DFSHealthReport {
   8: i32 httpPort
 }
 
-
 /** Quota-related error */
 exception QuotaException {
   /** Error message. */
@@ -281,7 +283,7 @@ service Namenode extends common.HadoopServiceBase {
    *   (index 1) The total used space of the file system (in bytes).
    *   (index 2) The available storage of the file system (in bytes).
    */
-  list<i64> df(10: common.RequestContext ctx) throws (1: common.IOException err),
+  list<i64> df(10: common.RequestContext ctx),
 
   /**
    * Enter safe mode.
@@ -299,20 +301,6 @@ service Namenode extends common.HadoopServiceBase {
                         /** Length of the region */
                         3:  i64 length) throws (1: common.IOException err),
   
-  /** Get a report on the system's current data nodes. 
-      Note that ctx is currently ignored by the server. */
-
-  list<DatanodeInfo> getDatanodeReport(10: common.RequestContext ctx,
-                                       /**
-                                        * Type of data nodes to return
-                                        * information about.
-                                        */
-                                       1: DatanodeReportType type)
-                                          throws (1: common.IOException err),
-
-  /** Get a health report of DFS.  Note that ctx is ignored by the server. */
-  DFSHealthReport getHealthReport(10: common.RequestContext ctx) throws (1: common.IOException err),
-
   /**
    * Get the preferred block size for the given file.
    *
@@ -497,6 +485,11 @@ service Namenode extends common.HadoopServiceBase {
                     2:  string storage,
                     /** Thrift port of the datanode */
                     3:  i32 thriftPort),
+
+  /**
+   * Get an HDFS delegation token.
+   */
+  common.ThriftDelegationToken getDelegationToken(10:common.RequestContext ctx, 1:string renewer) throws(1: common.IOException err)
 }
 
 /** Encapsulates a block data transfer with its CRC */

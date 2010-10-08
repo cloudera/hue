@@ -54,6 +54,7 @@ from jobbrowser.views import single_job
 import desktop.lib.django_util
 import hadoop.cluster
 import hadoop.conf
+from hadoop.cluster import all_mrclusters, get_all_hdfs
 import jobsub.conf
 
 LOG = logging.getLogger(__name__)
@@ -226,12 +227,29 @@ class PlanRunner(object):
     env = {      
       'HADOOP_HOME': hadoop.conf.HADOOP_HOME.get(), 
       'HADOOP_OPTS': "-javaagent:%s %s" % (jobsub.conf.ASPECTJWEAVER.get(), java_prop_str),
-      'HADOOP_CLASSPATH': jobsub.conf.ASPECTPATH.get(),
+      'HADOOP_CLASSPATH': ':'.join([jobsub.conf.ASPECTPATH.get(), hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()]),
       'HUE_JOBTRACE_LOG': self.internal_file_name("jobs"),
       'HUE_JOBSUB_USER': self.plan.user,
       'HUE_JOBSUB_GROUPS': ",".join(self.plan.groups),
     }
-    
+
+    delegation_token_files = []
+    all_clusters = []
+    all_clusters += all_mrclusters().values()
+    all_clusters += get_all_hdfs().values()
+    LOG.info("all_clusters: %s" % (repr(all_clusters),))
+    for cluster in all_clusters:
+      if cluster.security_enabled:
+        cluster.setuser(self.plan.user)
+        token = cluster.get_delegation_token()
+        token_file = tempfile.NamedTemporaryFile()
+        token_file.write(token.delegationTokenBytes)
+        token_file.flush()
+        delegation_token_files.append(token_file)
+
+    if delegation_token_files:
+      env['HADOOP_TOKEN_FILE_LOCATION'] = ','.join([token_file.name for token_file in delegation_token_files])
+
     java_home = os.getenv('JAVA_HOME')
     if java_home:
       env["JAVA_HOME"] = java_home
@@ -259,6 +277,8 @@ class PlanRunner(object):
     if 0 != retcode:
       raise Exception("bin/hadoop returned non-zero %d" % retcode)
     LOG.info("bin/hadoop returned %d" % retcode)
+    for token_file in delegation_token_files:
+      token_file.close()
 
 class JobSubmissionServiceImpl(object):
   @coerce_exceptions

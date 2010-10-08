@@ -10,42 +10,110 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Collections;
-import org.apache.log4j.Logger;
+import java.util.BitSet;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
-public class BeeswaxException extends Exception implements TBase, java.io.Serializable, Cloneable {
+public class BeeswaxException extends Exception implements TBase<BeeswaxException, BeeswaxException._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("BeeswaxException");
+
   private static final TField MESSAGE_FIELD_DESC = new TField("message", TType.STRING, (short)1);
   private static final TField LOG_CONTEXT_FIELD_DESC = new TField("log_context", TType.STRING, (short)2);
   private static final TField HANDLE_FIELD_DESC = new TField("handle", TType.STRUCT, (short)3);
 
   public String message;
-  public static final int MESSAGE = 1;
   public String log_context;
-  public static final int LOG_CONTEXT = 2;
   public QueryHandle handle;
-  public static final int HANDLE = 3;
 
-  private final Isset __isset = new Isset();
-  private static final class Isset implements java.io.Serializable {
+  /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+  public enum _Fields implements TFieldIdEnum {
+    MESSAGE((short)1, "message"),
+    LOG_CONTEXT((short)2, "log_context"),
+    HANDLE((short)3, "handle");
+
+    private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+    static {
+      for (_Fields field : EnumSet.allOf(_Fields.class)) {
+        byName.put(field.getFieldName(), field);
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, or null if its not found.
+     */
+    public static _Fields findByThriftId(int fieldId) {
+      switch(fieldId) {
+        case 1: // MESSAGE
+          return MESSAGE;
+        case 2: // LOG_CONTEXT
+          return LOG_CONTEXT;
+        case 3: // HANDLE
+          return HANDLE;
+        default:
+          return null;
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, throwing an exception
+     * if it is not found.
+     */
+    public static _Fields findByThriftIdOrThrow(int fieldId) {
+      _Fields fields = findByThriftId(fieldId);
+      if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+      return fields;
+    }
+
+    /**
+     * Find the _Fields constant that matches name, or null if its not found.
+     */
+    public static _Fields findByName(String name) {
+      return byName.get(name);
+    }
+
+    private final short _thriftId;
+    private final String _fieldName;
+
+    _Fields(short thriftId, String fieldName) {
+      _thriftId = thriftId;
+      _fieldName = fieldName;
+    }
+
+    public short getThriftFieldId() {
+      return _thriftId;
+    }
+
+    public String getFieldName() {
+      return _fieldName;
+    }
   }
 
-  public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-    put(MESSAGE, new FieldMetaData("message", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(LOG_CONTEXT, new FieldMetaData("log_context", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(HANDLE, new FieldMetaData("handle", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, QueryHandle.class)));
-  }});
+  // isset id assignments
 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.MESSAGE, new FieldMetaData("message", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.LOG_CONTEXT, new FieldMetaData("log_context", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING        , "LogContextId")));
+    tmpMap.put(_Fields.HANDLE, new FieldMetaData("handle", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, QueryHandle.class)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(BeeswaxException.class, metaDataMap);
   }
 
@@ -78,24 +146,31 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
     }
   }
 
-  @Override
-  public BeeswaxException clone() {
+  public BeeswaxException deepCopy() {
     return new BeeswaxException(this);
+  }
+
+  @Override
+  public void clear() {
+    this.message = null;
+    this.log_context = null;
+    this.handle = null;
   }
 
   public String getMessage() {
     return this.message;
   }
 
-  public void setMessage(String message) {
+  public BeeswaxException setMessage(String message) {
     this.message = message;
+    return this;
   }
 
   public void unsetMessage() {
     this.message = null;
   }
 
-  // Returns true if field message is set (has been asigned a value) and false otherwise
+  /** Returns true if field message is set (has been asigned a value) and false otherwise */
   public boolean isSetMessage() {
     return this.message != null;
   }
@@ -110,15 +185,16 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
     return this.log_context;
   }
 
-  public void setLog_context(String log_context) {
+  public BeeswaxException setLog_context(String log_context) {
     this.log_context = log_context;
+    return this;
   }
 
   public void unsetLog_context() {
     this.log_context = null;
   }
 
-  // Returns true if field log_context is set (has been asigned a value) and false otherwise
+  /** Returns true if field log_context is set (has been asigned a value) and false otherwise */
   public boolean isSetLog_context() {
     return this.log_context != null;
   }
@@ -133,15 +209,16 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
     return this.handle;
   }
 
-  public void setHandle(QueryHandle handle) {
+  public BeeswaxException setHandle(QueryHandle handle) {
     this.handle = handle;
+    return this;
   }
 
   public void unsetHandle() {
     this.handle = null;
   }
 
-  // Returns true if field handle is set (has been asigned a value) and false otherwise
+  /** Returns true if field handle is set (has been asigned a value) and false otherwise */
   public boolean isSetHandle() {
     return this.handle != null;
   }
@@ -152,8 +229,8 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    switch (fieldID) {
+  public void setFieldValue(_Fields field, Object value) {
+    switch (field) {
     case MESSAGE:
       if (value == null) {
         unsetMessage();
@@ -178,13 +255,11 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
       }
       break;
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
   }
 
-  public Object getFieldValue(int fieldID) {
-    switch (fieldID) {
+  public Object getFieldValue(_Fields field) {
+    switch (field) {
     case MESSAGE:
       return getMessage();
 
@@ -194,23 +269,25 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
     case HANDLE:
       return getHandle();
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
-  // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-  public boolean isSet(int fieldID) {
-    switch (fieldID) {
+  /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+  public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
+    switch (field) {
     case MESSAGE:
       return isSetMessage();
     case LOG_CONTEXT:
       return isSetLog_context();
     case HANDLE:
       return isSetHandle();
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
   @Override
@@ -278,6 +355,51 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
     return builder.toHashCode();
   }
 
+  public int compareTo(BeeswaxException other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    BeeswaxException typedOther = (BeeswaxException)other;
+
+    lastComparison = Boolean.valueOf(isSetMessage()).compareTo(typedOther.isSetMessage());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetMessage()) {
+      lastComparison = TBaseHelper.compareTo(this.message, typedOther.message);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetLog_context()).compareTo(typedOther.isSetLog_context());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetLog_context()) {
+      lastComparison = TBaseHelper.compareTo(this.log_context, typedOther.log_context);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHandle()).compareTo(typedOther.isSetHandle());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetHandle()) {
+      lastComparison = TBaseHelper.compareTo(this.handle, typedOther.handle);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -287,23 +409,22 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
       if (field.type == TType.STOP) { 
         break;
       }
-      switch (field.id)
-      {
-        case MESSAGE:
+      switch (field.id) {
+        case 1: // MESSAGE
           if (field.type == TType.STRING) {
             this.message = iprot.readString();
           } else { 
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case LOG_CONTEXT:
+        case 2: // LOG_CONTEXT
           if (field.type == TType.STRING) {
             this.log_context = iprot.readString();
           } else { 
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case HANDLE:
+        case 3: // HANDLE
           if (field.type == TType.STRUCT) {
             this.handle = new QueryHandle();
             this.handle.read(iprot);
@@ -313,12 +434,10 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
           break;
         default:
           TProtocolUtil.skip(iprot, field.type);
-          break;
       }
       iprot.readFieldEnd();
     }
     iprot.readStructEnd();
-
 
     // check for required fields of primitive type, which can't be checked in the validate method
     validate();
@@ -381,7 +500,6 @@ public class BeeswaxException extends Exception implements TBase, java.io.Serial
 
   public void validate() throws TException {
     // check for required fields
-    // check that fields of type enum have valid values
   }
 
 }

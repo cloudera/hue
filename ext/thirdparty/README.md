@@ -34,6 +34,7 @@ Checked-in third party dependencies
 |Y|PyYAML|3.09|MIT|http://pyyaml.org/wiki/PyYAML|
 |Y|Raphael|MIT|http://raphaeljs.com/index.html|
 |Y|Shakespeares Sonnets|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext97/wssnt10.txt|
+|Y|sasl|0.1.1|Apache|http://pypi.python.org/pypi/sasl/0.1.1|
 |Y|simplejson|2.0.9|MIT|http://pypi.python.org/packages/source/s/simplejson/simplejson-2.0.9.tar.gz|
 |Y|South|0.7|Apache|http://south.aeracode.org/|
 |Y|threadframe|0.2|Python|http://www.majid.info/mylos/stories/2004/06/10/threadframe.html|

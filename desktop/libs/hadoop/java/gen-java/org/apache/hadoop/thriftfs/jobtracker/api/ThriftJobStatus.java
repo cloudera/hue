@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Status of a job
  */
-public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.Serializable, Cloneable, Comparable<ThriftJobStatus> {
+public class ThriftJobStatus implements TBase<ThriftJobStatus, ThriftJobStatus._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("ThriftJobStatus");
 
   private static final TField JOB_ID_FIELD_DESC = new TField("jobID", TType.STRUCT, (short)1);
@@ -80,12 +83,10 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
     PRIORITY((short)9, "priority"),
     SCHEDULING_INFO((short)10, "schedulingInfo");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -94,7 +95,30 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // JOB_ID
+          return JOB_ID;
+        case 2: // MAP_PROGRESS
+          return MAP_PROGRESS;
+        case 3: // REDUCE_PROGRESS
+          return REDUCE_PROGRESS;
+        case 4: // CLEANUP_PROGRESS
+          return CLEANUP_PROGRESS;
+        case 5: // SETUP_PROGRESS
+          return SETUP_PROGRESS;
+        case 6: // RUN_STATE
+          return RUN_STATE;
+        case 7: // START_TIME
+          return START_TIME;
+        case 8: // USER
+          return USER;
+        case 9: // PRIORITY
+          return PRIORITY;
+        case 10: // SCHEDULING_INFO
+          return SCHEDULING_INFO;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -139,30 +163,30 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
   private static final int __STARTTIME_ISSET_ID = 4;
   private BitSet __isset_bit_vector = new BitSet(5);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
-        new StructMetaData(TType.STRUCT, ThriftJobID.class)));
-    put(_Fields.MAP_PROGRESS, new FieldMetaData("mapProgress", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.DOUBLE)));
-    put(_Fields.REDUCE_PROGRESS, new FieldMetaData("reduceProgress", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.DOUBLE)));
-    put(_Fields.CLEANUP_PROGRESS, new FieldMetaData("cleanupProgress", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.DOUBLE)));
-    put(_Fields.SETUP_PROGRESS, new FieldMetaData("setupProgress", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.DOUBLE)));
-    put(_Fields.RUN_STATE, new FieldMetaData("runState", TFieldRequirementType.DEFAULT, 
-        new EnumMetaData(TType.ENUM, ThriftJobState.class)));
-    put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.USER, new FieldMetaData("user", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(_Fields.PRIORITY, new FieldMetaData("priority", TFieldRequirementType.DEFAULT, 
-        new EnumMetaData(TType.ENUM, ThriftJobPriority.class)));
-    put(_Fields.SCHEDULING_INFO, new FieldMetaData("schedulingInfo", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.JOB_ID, new FieldMetaData("jobID", TFieldRequirementType.DEFAULT, 
+        new StructMetaData(TType.STRUCT, ThriftJobID.class)));
+    tmpMap.put(_Fields.MAP_PROGRESS, new FieldMetaData("mapProgress", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.DOUBLE)));
+    tmpMap.put(_Fields.REDUCE_PROGRESS, new FieldMetaData("reduceProgress", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.DOUBLE)));
+    tmpMap.put(_Fields.CLEANUP_PROGRESS, new FieldMetaData("cleanupProgress", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.DOUBLE)));
+    tmpMap.put(_Fields.SETUP_PROGRESS, new FieldMetaData("setupProgress", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.DOUBLE)));
+    tmpMap.put(_Fields.RUN_STATE, new FieldMetaData("runState", TFieldRequirementType.DEFAULT, 
+        new EnumMetaData(TType.ENUM, ThriftJobState.class)));
+    tmpMap.put(_Fields.START_TIME, new FieldMetaData("startTime", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.USER, new FieldMetaData("user", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.PRIORITY, new FieldMetaData("priority", TFieldRequirementType.DEFAULT, 
+        new EnumMetaData(TType.ENUM, ThriftJobPriority.class)));
+    tmpMap.put(_Fields.SCHEDULING_INFO, new FieldMetaData("schedulingInfo", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(ThriftJobStatus.class, metaDataMap);
   }
 
@@ -231,9 +255,23 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
     return new ThriftJobStatus(this);
   }
 
-  @Deprecated
-  public ThriftJobStatus clone() {
-    return new ThriftJobStatus(this);
+  @Override
+  public void clear() {
+    this.jobID = null;
+    setMapProgressIsSet(false);
+    this.mapProgress = 0.0;
+    setReduceProgressIsSet(false);
+    this.reduceProgress = 0.0;
+    setCleanupProgressIsSet(false);
+    this.cleanupProgress = 0.0;
+    setSetupProgressIsSet(false);
+    this.setupProgress = 0.0;
+    this.runState = null;
+    setStartTimeIsSet(false);
+    this.startTime = 0;
+    this.user = null;
+    this.priority = null;
+    this.schedulingInfo = null;
   }
 
   public ThriftJobID getJobID() {
@@ -572,10 +610,6 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case JOB_ID:
@@ -612,12 +646,12 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case JOB_ID:
       return isSetJobID();
@@ -641,10 +675,6 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
       return isSetSchedulingInfo();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -766,87 +796,111 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
     int lastComparison = 0;
     ThriftJobStatus typedOther = (ThriftJobStatus)other;
 
-    lastComparison = Boolean.valueOf(isSetJobID()).compareTo(isSetJobID());
+    lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(jobID, typedOther.jobID);
+    if (isSetJobID()) {
+      lastComparison = TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetMapProgress()).compareTo(typedOther.isSetMapProgress());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetMapProgress()).compareTo(isSetMapProgress());
+    if (isSetMapProgress()) {
+      lastComparison = TBaseHelper.compareTo(this.mapProgress, typedOther.mapProgress);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetReduceProgress()).compareTo(typedOther.isSetReduceProgress());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(mapProgress, typedOther.mapProgress);
+    if (isSetReduceProgress()) {
+      lastComparison = TBaseHelper.compareTo(this.reduceProgress, typedOther.reduceProgress);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCleanupProgress()).compareTo(typedOther.isSetCleanupProgress());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetReduceProgress()).compareTo(isSetReduceProgress());
+    if (isSetCleanupProgress()) {
+      lastComparison = TBaseHelper.compareTo(this.cleanupProgress, typedOther.cleanupProgress);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetSetupProgress()).compareTo(typedOther.isSetSetupProgress());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(reduceProgress, typedOther.reduceProgress);
+    if (isSetSetupProgress()) {
+      lastComparison = TBaseHelper.compareTo(this.setupProgress, typedOther.setupProgress);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetRunState()).compareTo(typedOther.isSetRunState());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetCleanupProgress()).compareTo(isSetCleanupProgress());
+    if (isSetRunState()) {
+      lastComparison = TBaseHelper.compareTo(this.runState, typedOther.runState);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStartTime()).compareTo(typedOther.isSetStartTime());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(cleanupProgress, typedOther.cleanupProgress);
+    if (isSetStartTime()) {
+      lastComparison = TBaseHelper.compareTo(this.startTime, typedOther.startTime);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetUser()).compareTo(typedOther.isSetUser());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetSetupProgress()).compareTo(isSetSetupProgress());
+    if (isSetUser()) {
+      lastComparison = TBaseHelper.compareTo(this.user, typedOther.user);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetPriority()).compareTo(typedOther.isSetPriority());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(setupProgress, typedOther.setupProgress);
+    if (isSetPriority()) {
+      lastComparison = TBaseHelper.compareTo(this.priority, typedOther.priority);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetSchedulingInfo()).compareTo(typedOther.isSetSchedulingInfo());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetRunState()).compareTo(isSetRunState());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(runState, typedOther.runState);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetStartTime()).compareTo(isSetStartTime());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(startTime, typedOther.startTime);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetUser()).compareTo(isSetUser());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(user, typedOther.user);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetPriority()).compareTo(isSetPriority());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(priority, typedOther.priority);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetSchedulingInfo()).compareTo(isSetSchedulingInfo());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(schedulingInfo, typedOther.schedulingInfo);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetSchedulingInfo()) {
+      lastComparison = TBaseHelper.compareTo(this.schedulingInfo, typedOther.schedulingInfo);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -858,90 +912,87 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case JOB_ID:
-            if (field.type == TType.STRUCT) {
-              this.jobID = new ThriftJobID();
-              this.jobID.read(iprot);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case MAP_PROGRESS:
-            if (field.type == TType.DOUBLE) {
-              this.mapProgress = iprot.readDouble();
-              setMapProgressIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case REDUCE_PROGRESS:
-            if (field.type == TType.DOUBLE) {
-              this.reduceProgress = iprot.readDouble();
-              setReduceProgressIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case CLEANUP_PROGRESS:
-            if (field.type == TType.DOUBLE) {
-              this.cleanupProgress = iprot.readDouble();
-              setCleanupProgressIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case SETUP_PROGRESS:
-            if (field.type == TType.DOUBLE) {
-              this.setupProgress = iprot.readDouble();
-              setSetupProgressIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case RUN_STATE:
-            if (field.type == TType.I32) {
-              this.runState = ThriftJobState.findByValue(iprot.readI32());
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case START_TIME:
-            if (field.type == TType.I64) {
-              this.startTime = iprot.readI64();
-              setStartTimeIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case USER:
-            if (field.type == TType.STRING) {
-              this.user = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PRIORITY:
-            if (field.type == TType.I32) {
-              this.priority = ThriftJobPriority.findByValue(iprot.readI32());
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case SCHEDULING_INFO:
-            if (field.type == TType.STRING) {
-              this.schedulingInfo = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // JOB_ID
+          if (field.type == TType.STRUCT) {
+            this.jobID = new ThriftJobID();
+            this.jobID.read(iprot);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // MAP_PROGRESS
+          if (field.type == TType.DOUBLE) {
+            this.mapProgress = iprot.readDouble();
+            setMapProgressIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // REDUCE_PROGRESS
+          if (field.type == TType.DOUBLE) {
+            this.reduceProgress = iprot.readDouble();
+            setReduceProgressIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // CLEANUP_PROGRESS
+          if (field.type == TType.DOUBLE) {
+            this.cleanupProgress = iprot.readDouble();
+            setCleanupProgressIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // SETUP_PROGRESS
+          if (field.type == TType.DOUBLE) {
+            this.setupProgress = iprot.readDouble();
+            setSetupProgressIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // RUN_STATE
+          if (field.type == TType.I32) {
+            this.runState = ThriftJobState.findByValue(iprot.readI32());
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // START_TIME
+          if (field.type == TType.I64) {
+            this.startTime = iprot.readI64();
+            setStartTimeIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 8: // USER
+          if (field.type == TType.STRING) {
+            this.user = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 9: // PRIORITY
+          if (field.type == TType.I32) {
+            this.priority = ThriftJobPriority.findByValue(iprot.readI32());
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 10: // SCHEDULING_INFO
+          if (field.type == TType.STRING) {
+            this.schedulingInfo = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 
@@ -1030,15 +1081,7 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
     if (this.runState == null) {
       sb.append("null");
     } else {
-      String runState_name = runState.name();
-      if (runState_name != null) {
-        sb.append(runState_name);
-        sb.append(" (");
-      }
       sb.append(this.runState);
-      if (runState_name != null) {
-        sb.append(")");
-      }
     }
     first = false;
     if (!first) sb.append(", ");
@@ -1058,15 +1101,7 @@ public class ThriftJobStatus implements TBase<ThriftJobStatus._Fields>, java.io.
     if (this.priority == null) {
       sb.append("null");
     } else {
-      String priority_name = priority.name();
-      if (priority_name != null) {
-        sb.append(priority_name);
-        sb.append(" (");
-      }
       sb.append(this.priority);
-      if (priority_name != null) {
-        sb.append(")");
-      }
     }
     first = false;
     if (!first) sb.append(", ");

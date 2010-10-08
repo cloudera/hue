@@ -26,8 +26,6 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print '   df(RequestContext ctx)'
   print '  void enterSafeMode(RequestContext ctx)'
   print '   getBlocks(RequestContext ctx, string path, i64 offset, i64 length)'
-  print '   getDatanodeReport(RequestContext ctx, DatanodeReportType type)'
-  print '  DFSHealthReport getHealthReport(RequestContext ctx)'
   print '  i64 getPreferredBlockSize(RequestContext ctx, string path)'
   print '  bool isInSafeMode(RequestContext ctx)'
   print '  void leaveSafeMode(RequestContext ctx)'
@@ -45,6 +43,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print '  void utime(RequestContext ctx, string path, i64 atime, i64 mtime)'
   print '  void datanodeUp(string name, string storage, i32 thriftPort)'
   print '  void datanodeDown(string name, string storage, i32 thriftPort)'
+  print '  ThriftDelegationToken getDelegationToken(RequestContext ctx, string renewer)'
   print ''
   sys.exit(0)
 
@@ -57,20 +56,22 @@ http = False
 argi = 1
 
 if sys.argv[argi] == '-h':
-  parts = sys.argv[argi+1].split(':') 
+  parts = sys.argv[argi+1].split(':')
   host = parts[0]
   port = int(parts[1])
   argi += 2
 
 if sys.argv[argi] == '-u':
   url = urlparse(sys.argv[argi+1])
-  parts = url[1].split(':') 
+  parts = url[1].split(':')
   host = parts[0]
   if len(parts) > 1:
     port = int(parts[1])
   else:
     port = 80
   uri = url[2]
+  if url[4]:
+    uri += '?%s' % url[4]
   http = True
   argi += 2
 
@@ -122,18 +123,6 @@ elif cmd == 'getBlocks':
     print 'getBlocks requires 4 args'
     sys.exit(1)
   pp.pprint(client.getBlocks(eval(args[0]),args[1],eval(args[2]),eval(args[3]),))
-
-elif cmd == 'getDatanodeReport':
-  if len(args) != 2:
-    print 'getDatanodeReport requires 2 args'
-    sys.exit(1)
-  pp.pprint(client.getDatanodeReport(eval(args[0]),eval(args[1]),))
-
-elif cmd == 'getHealthReport':
-  if len(args) != 1:
-    print 'getHealthReport requires 1 args'
-    sys.exit(1)
-  pp.pprint(client.getHealthReport(eval(args[0]),))
 
 elif cmd == 'getPreferredBlockSize':
   if len(args) != 2:
@@ -236,5 +225,15 @@ elif cmd == 'datanodeDown':
     print 'datanodeDown requires 3 args'
     sys.exit(1)
   pp.pprint(client.datanodeDown(args[0],args[1],eval(args[2]),))
+
+elif cmd == 'getDelegationToken':
+  if len(args) != 2:
+    print 'getDelegationToken requires 2 args'
+    sys.exit(1)
+  pp.pprint(client.getDelegationToken(eval(args[0]),args[1],))
+
+else:
+  print 'Unrecognized method %s' % cmd
+  sys.exit(1)
 
 transport.close()

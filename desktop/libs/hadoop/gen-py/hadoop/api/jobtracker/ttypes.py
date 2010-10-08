@@ -9,7 +9,7 @@ import hadoop.api.common.ttypes
 
 
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -193,10 +193,11 @@ class ThriftJobState(object):
     "KILLED": 5,
   }
 
+
 class ThriftJobID(object):
   """
   Unique identifier for each job
-  
+
   Attributes:
    - jobTrackerID: Unique id of jobtracker
    - jobID: Unique (to JT) job id
@@ -263,6 +264,9 @@ class ThriftJobID(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -278,7 +282,7 @@ class ThriftJobID(object):
 class ThriftJobQueueInfo(object):
   """
   Description of a job queue
-  
+
   Attributes:
    - queueName
    - schedulingInfo
@@ -333,6 +337,9 @@ class ThriftJobQueueInfo(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -398,6 +405,9 @@ class ThriftJobQueueList(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -413,7 +423,7 @@ class ThriftJobQueueList(object):
 class ThriftCounter(object):
   """
   Counter which represents some custom job metric
-  
+
   Attributes:
    - name
    - displayName
@@ -480,6 +490,9 @@ class ThriftCounter(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -495,7 +508,7 @@ class ThriftCounter(object):
 class ThriftCounterGroup(object):
   """
   Counters are organized by group
-  
+
   Attributes:
    - name
    - displayName
@@ -573,6 +586,9 @@ class ThriftCounterGroup(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -588,7 +604,7 @@ class ThriftCounterGroup(object):
 class ThriftGroupList(object):
   """
   Container structure for counter groups
-  
+
   Attributes:
    - groups
   """
@@ -640,6 +656,9 @@ class ThriftGroupList(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -655,7 +674,7 @@ class ThriftGroupList(object):
 class ThriftJobCounterRollups(object):
   """
   Counters for map tasks only, reduce tasks only, and job-scoped counters
-  
+
   Attributes:
    - mapCounters
    - reduceCounters
@@ -725,6 +744,9 @@ class ThriftJobCounterRollups(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -740,7 +762,7 @@ class ThriftJobCounterRollups(object):
 class ThriftTaskID(object):
   """
   Unique task id
-  
+
   Attributes:
    - jobID: ID of the job to which the task belongs
    - taskType: What kind of task is this?
@@ -820,6 +842,9 @@ class ThriftTaskID(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -835,7 +860,7 @@ class ThriftTaskID(object):
 class ThriftTaskAttemptID(object):
   """
   Unique task attempt id
-  
+
   Attributes:
    - taskID
    - attemptID
@@ -903,6 +928,9 @@ class ThriftTaskAttemptID(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -918,7 +946,7 @@ class ThriftTaskAttemptID(object):
 class ThriftTaskStatus(object):
   """
   Describes the current state of a single attempt
-  
+
   Attributes:
    - taskID
    - progress
@@ -1119,6 +1147,9 @@ class ThriftTaskStatus(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1138,10 +1169,10 @@ class ThriftTaskInProgress(object):
   These are indexed by TaskAttemptID.
   For simplicity, we convert maps keyed on TaskAttemptIDs to maps keyed
   on their string representation.
-  
+
   Assumption: there won't be so many task attempts that retrieving a single task
   will be too expensive.
-  
+
   Attributes:
    - execStartTime
    - execFinishTime
@@ -1389,6 +1420,9 @@ class ThriftTaskInProgress(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1404,7 +1438,7 @@ class ThriftTaskInProgress(object):
 class ThriftTaskTrackerStatus(object):
   """
   TaskTracker status; contains details of individual tasks
-  
+
   Attributes:
    - trackerName
    - host
@@ -1602,6 +1636,9 @@ class ThriftTaskTrackerStatus(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1617,7 +1654,7 @@ class ThriftTaskTrackerStatus(object):
 class ThriftTaskTrackerStatusList(object):
   """
   Container structure for TaskTrackerStatus objects
-  
+
   Attributes:
    - trackers
   """
@@ -1669,6 +1706,9 @@ class ThriftTaskTrackerStatusList(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1684,7 +1724,7 @@ class ThriftTaskTrackerStatusList(object):
 class ThriftJobStatus(object):
   """
   Status of a job
-  
+
   Attributes:
    - jobID
    - mapProgress
@@ -1836,6 +1876,9 @@ class ThriftJobStatus(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1851,7 +1894,7 @@ class ThriftJobStatus(object):
 class ThriftJobProfile(object):
   """
   Job metadata
-  
+
   Attributes:
    - user
    - jobID
@@ -1943,6 +1986,9 @@ class ThriftJobProfile(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -1960,7 +2006,7 @@ class ThriftTaskInProgressList(object):
   Container structure of a list of tasks. This list may have been put together
   according to some selection criteria. That is, it may not correspond to the
   mapTasks, or reduceTasks, etc. It may even contain tasks of different types.
-  
+
   Attributes:
    - tasks: A (possibly incomplete) list of tasks
    - numTotalTasks: The total number of tasks in this full list.
@@ -2024,6 +2070,9 @@ class ThriftTaskInProgressList(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2039,7 +2088,7 @@ class ThriftTaskInProgressList(object):
 class ThriftJobInProgress(object):
   """
   Status of *all* jobs, not just currently running ones
-  
+
   Attributes:
    - profile
    - status
@@ -2229,6 +2278,9 @@ class ThriftJobInProgress(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2244,7 +2296,7 @@ class ThriftJobInProgress(object):
 class ThriftJobList(object):
   """
   Container structure of a list of jobs, in case we ever want to add metadata
-  
+
   Attributes:
    - jobs
   """
@@ -2296,6 +2348,9 @@ class ThriftJobList(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2311,7 +2366,7 @@ class ThriftJobList(object):
 class ThriftUserJobCounts(object):
   """
   Container structure for job counts for a given user
-  
+
   Attributes:
    - nPrep
    - nRunning
@@ -2402,6 +2457,9 @@ class ThriftUserJobCounts(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2417,7 +2475,7 @@ class ThriftUserJobCounts(object):
 class ThriftClusterStatus(object):
   """
   Status of the cluster as viewed by the jobtracker
-  
+
   Attributes:
    - numActiveTrackers
    - activeTrackerNames
@@ -2704,6 +2762,9 @@ class ThriftClusterStatus(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -2745,6 +2806,9 @@ class JobNotFoundException(Exception):
     oprot.writeStructBegin('JobNotFoundException')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -2789,6 +2853,9 @@ class TaskNotFoundException(Exception):
     oprot.writeStructBegin('TaskNotFoundException')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -2833,6 +2900,9 @@ class TaskAttemptNotFoundException(Exception):
     oprot.writeStructBegin('TaskAttemptNotFoundException')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -2877,6 +2947,9 @@ class TaskTrackerNotFoundException(Exception):
     oprot.writeStructBegin('TaskTrackerNotFoundException')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -2891,4 +2964,3 @@ class TaskTrackerNotFoundException(Exception):
 
   def __ne__(self, other):
     return not (self == other)
-

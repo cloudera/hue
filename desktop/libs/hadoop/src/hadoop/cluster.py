@@ -34,17 +34,13 @@ def _make_filesystem(identifier):
     return LocalSubFileSystem(path)
   else:
     cluster_conf = conf.HDFS_CLUSTERS[identifier]
-    return hadoopfs.HadoopFileSystem(
-      cluster_conf.NN_HOST.get(),
-      cluster_conf.NN_THRIFT_PORT.get(),
-      cluster_conf.NN_HDFS_PORT.get(),
+    return hadoopfs.HadoopFileSystem.from_config(
+      cluster_conf,
       hadoop_bin_path=conf.HADOOP_BIN.get())
-    raise Exception("Unknown choice: %s" % choice)
 
 def _make_mrcluster(identifier):
   cluster_conf = conf.MR_CLUSTERS[identifier]
-  return LiveJobTracker(cluster_conf.JT_HOST.get(),
-                        cluster_conf.JT_THRIFT_PORT.get())
+  return LiveJobTracker.from_conf(cluster_conf)
 
 FS_CACHE = None
 def get_hdfs(identifier="default"):

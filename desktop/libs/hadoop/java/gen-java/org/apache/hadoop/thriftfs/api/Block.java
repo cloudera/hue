@@ -15,12 +15,15 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
@@ -28,15 +31,16 @@ import org.apache.thrift.protocol.*;
  * 
  * Modelled after org.apache.hadoop.hdfs.protocol.LocatedBlock
  */
-public class Block implements TBase<Block._Fields>, java.io.Serializable, Cloneable, Comparable<Block> {
+public class Block implements TBase<Block, Block._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("Block");
 
   private static final TField BLOCK_ID_FIELD_DESC = new TField("blockId", TType.I64, (short)1);
   private static final TField PATH_FIELD_DESC = new TField("path", TType.STRING, (short)2);
   private static final TField NUM_BYTES_FIELD_DESC = new TField("numBytes", TType.I64, (short)3);
   private static final TField GEN_STAMP_FIELD_DESC = new TField("genStamp", TType.I64, (short)4);
-  private static final TField START_OFFSET_FIELD_DESC = new TField("startOffset", TType.I64, (short)6);
   private static final TField NODES_FIELD_DESC = new TField("nodes", TType.LIST, (short)5);
+  private static final TField START_OFFSET_FIELD_DESC = new TField("startOffset", TType.I64, (short)6);
+  private static final TField TOKEN_FIELD_DESC = new TField("token", TType.STRING, (short)7);
 
   /**
    * Block ID (unique among all blocks in a filesystem).
@@ -55,13 +59,17 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
    */
   public long genStamp;
   /**
+   * List of data nodes with copies  of this block.
+   */
+  public List<DatanodeInfo> nodes;
+  /**
    * Offset of the first byte of the block relative to the start of the file
    */
   public long startOffset;
   /**
-   * List of data nodes with copies  of this block.
+   * The serialized token associated with this block.
    */
-  public List<DatanodeInfo> nodes;
+  public String token;
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements TFieldIdEnum {
@@ -82,20 +90,22 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
      */
     GEN_STAMP((short)4, "genStamp"),
     /**
+     * List of data nodes with copies  of this block.
+     */
+    NODES((short)5, "nodes"),
+    /**
      * Offset of the first byte of the block relative to the start of the file
      */
     START_OFFSET((short)6, "startOffset"),
     /**
-     * List of data nodes with copies  of this block.
+     * The serialized token associated with this block.
      */
-    NODES((short)5, "nodes");
+    TOKEN((short)7, "token");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -104,7 +114,24 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // BLOCK_ID
+          return BLOCK_ID;
+        case 2: // PATH
+          return PATH;
+        case 3: // NUM_BYTES
+          return NUM_BYTES;
+        case 4: // GEN_STAMP
+          return GEN_STAMP;
+        case 5: // NODES
+          return NODES;
+        case 6: // START_OFFSET
+          return START_OFFSET;
+        case 7: // TOKEN
+          return TOKEN;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -148,23 +175,25 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
   private static final int __STARTOFFSET_ISSET_ID = 3;
   private BitSet __isset_bit_vector = new BitSet(4);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.BLOCK_ID, new FieldMetaData("blockId", TFieldRequirementType.DEFAULT, 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
+  static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.BLOCK_ID, new FieldMetaData("blockId", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.PATH, new FieldMetaData("path", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.STRING)));
-    put(_Fields.NUM_BYTES, new FieldMetaData("numBytes", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.NUM_BYTES, new FieldMetaData("numBytes", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.GEN_STAMP, new FieldMetaData("genStamp", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.GEN_STAMP, new FieldMetaData("genStamp", TFieldRequirementType.DEFAULT, 
         new FieldValueMetaData(TType.I64)));
-    put(_Fields.START_OFFSET, new FieldMetaData("startOffset", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I64)));
-    put(_Fields.NODES, new FieldMetaData("nodes", TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.NODES, new FieldMetaData("nodes", TFieldRequirementType.DEFAULT, 
         new ListMetaData(TType.LIST, 
             new StructMetaData(TType.STRUCT, DatanodeInfo.class))));
-  }});
-
-  static {
+    tmpMap.put(_Fields.START_OFFSET, new FieldMetaData("startOffset", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I64)));
+    tmpMap.put(_Fields.TOKEN, new FieldMetaData("token", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(Block.class, metaDataMap);
   }
 
@@ -176,8 +205,9 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     String path,
     long numBytes,
     long genStamp,
+    List<DatanodeInfo> nodes,
     long startOffset,
-    List<DatanodeInfo> nodes)
+    String token)
   {
     this();
     this.blockId = blockId;
@@ -187,9 +217,10 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     setNumBytesIsSet(true);
     this.genStamp = genStamp;
     setGenStampIsSet(true);
+    this.nodes = nodes;
     this.startOffset = startOffset;
     setStartOffsetIsSet(true);
-    this.nodes = nodes;
+    this.token = token;
   }
 
   /**
@@ -204,7 +235,6 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     }
     this.numBytes = other.numBytes;
     this.genStamp = other.genStamp;
-    this.startOffset = other.startOffset;
     if (other.isSetNodes()) {
       List<DatanodeInfo> __this__nodes = new ArrayList<DatanodeInfo>();
       for (DatanodeInfo other_element : other.nodes) {
@@ -212,15 +242,29 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
       }
       this.nodes = __this__nodes;
     }
+    this.startOffset = other.startOffset;
+    if (other.isSetToken()) {
+      this.token = other.token;
+    }
   }
 
   public Block deepCopy() {
     return new Block(this);
   }
 
-  @Deprecated
-  public Block clone() {
-    return new Block(this);
+  @Override
+  public void clear() {
+    setBlockIdIsSet(false);
+    this.blockId = 0;
+    this.path = null;
+    setNumBytesIsSet(false);
+    this.numBytes = 0;
+    setGenStampIsSet(false);
+    this.genStamp = 0;
+    this.nodes = null;
+    setStartOffsetIsSet(false);
+    this.startOffset = 0;
+    this.token = null;
   }
 
   /**
@@ -340,35 +384,6 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     __isset_bit_vector.set(__GENSTAMP_ISSET_ID, value);
   }
 
-  /**
-   * Offset of the first byte of the block relative to the start of the file
-   */
-  public long getStartOffset() {
-    return this.startOffset;
-  }
-
-  /**
-   * Offset of the first byte of the block relative to the start of the file
-   */
-  public Block setStartOffset(long startOffset) {
-    this.startOffset = startOffset;
-    setStartOffsetIsSet(true);
-    return this;
-  }
-
-  public void unsetStartOffset() {
-    __isset_bit_vector.clear(__STARTOFFSET_ISSET_ID);
-  }
-
-  /** Returns true if field startOffset is set (has been asigned a value) and false otherwise */
-  public boolean isSetStartOffset() {
-    return __isset_bit_vector.get(__STARTOFFSET_ISSET_ID);
-  }
-
-  public void setStartOffsetIsSet(boolean value) {
-    __isset_bit_vector.set(__STARTOFFSET_ISSET_ID, value);
-  }
-
   public int getNodesSize() {
     return (this.nodes == null) ? 0 : this.nodes.size();
   }
@@ -414,6 +429,65 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     }
   }
 
+  /**
+   * Offset of the first byte of the block relative to the start of the file
+   */
+  public long getStartOffset() {
+    return this.startOffset;
+  }
+
+  /**
+   * Offset of the first byte of the block relative to the start of the file
+   */
+  public Block setStartOffset(long startOffset) {
+    this.startOffset = startOffset;
+    setStartOffsetIsSet(true);
+    return this;
+  }
+
+  public void unsetStartOffset() {
+    __isset_bit_vector.clear(__STARTOFFSET_ISSET_ID);
+  }
+
+  /** Returns true if field startOffset is set (has been asigned a value) and false otherwise */
+  public boolean isSetStartOffset() {
+    return __isset_bit_vector.get(__STARTOFFSET_ISSET_ID);
+  }
+
+  public void setStartOffsetIsSet(boolean value) {
+    __isset_bit_vector.set(__STARTOFFSET_ISSET_ID, value);
+  }
+
+  /**
+   * The serialized token associated with this block.
+   */
+  public String getToken() {
+    return this.token;
+  }
+
+  /**
+   * The serialized token associated with this block.
+   */
+  public Block setToken(String token) {
+    this.token = token;
+    return this;
+  }
+
+  public void unsetToken() {
+    this.token = null;
+  }
+
+  /** Returns true if field token is set (has been asigned a value) and false otherwise */
+  public boolean isSetToken() {
+    return this.token != null;
+  }
+
+  public void setTokenIsSet(boolean value) {
+    if (!value) {
+      this.token = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case BLOCK_ID:
@@ -448,14 +522,6 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
       }
       break;
 
-    case START_OFFSET:
-      if (value == null) {
-        unsetStartOffset();
-      } else {
-        setStartOffset((Long)value);
-      }
-      break;
-
     case NODES:
       if (value == null) {
         unsetNodes();
@@ -464,11 +530,23 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
       }
       break;
 
-    }
-  }
+    case START_OFFSET:
+      if (value == null) {
+        unsetStartOffset();
+      } else {
+        setStartOffset((Long)value);
+      }
+      break;
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
+    case TOKEN:
+      if (value == null) {
+        unsetToken();
+      } else {
+        setToken((String)value);
+      }
+      break;
+
+    }
   }
 
   public Object getFieldValue(_Fields field) {
@@ -485,22 +563,25 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     case GEN_STAMP:
       return new Long(getGenStamp());
 
+    case NODES:
+      return getNodes();
+
     case START_OFFSET:
       return new Long(getStartOffset());
 
-    case NODES:
-      return getNodes();
+    case TOKEN:
+      return getToken();
 
     }
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case BLOCK_ID:
       return isSetBlockId();
@@ -510,16 +591,14 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
       return isSetNumBytes();
     case GEN_STAMP:
       return isSetGenStamp();
-    case START_OFFSET:
-      return isSetStartOffset();
     case NODES:
       return isSetNodes();
+    case START_OFFSET:
+      return isSetStartOffset();
+    case TOKEN:
+      return isSetToken();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -571,6 +650,15 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
         return false;
     }
 
+    boolean this_present_nodes = true && this.isSetNodes();
+    boolean that_present_nodes = true && that.isSetNodes();
+    if (this_present_nodes || that_present_nodes) {
+      if (!(this_present_nodes && that_present_nodes))
+        return false;
+      if (!this.nodes.equals(that.nodes))
+        return false;
+    }
+
     boolean this_present_startOffset = true;
     boolean that_present_startOffset = true;
     if (this_present_startOffset || that_present_startOffset) {
@@ -580,12 +668,12 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
         return false;
     }
 
-    boolean this_present_nodes = true && this.isSetNodes();
-    boolean that_present_nodes = true && that.isSetNodes();
-    if (this_present_nodes || that_present_nodes) {
-      if (!(this_present_nodes && that_present_nodes))
+    boolean this_present_token = true && this.isSetToken();
+    boolean that_present_token = true && that.isSetToken();
+    if (this_present_token || that_present_token) {
+      if (!(this_present_token && that_present_token))
         return false;
-      if (!this.nodes.equals(that.nodes))
+      if (!this.token.equals(that.token))
         return false;
     }
 
@@ -605,55 +693,81 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     int lastComparison = 0;
     Block typedOther = (Block)other;
 
-    lastComparison = Boolean.valueOf(isSetBlockId()).compareTo(isSetBlockId());
+    lastComparison = Boolean.valueOf(isSetBlockId()).compareTo(typedOther.isSetBlockId());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(blockId, typedOther.blockId);
+    if (isSetBlockId()) {
+      lastComparison = TBaseHelper.compareTo(this.blockId, typedOther.blockId);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetPath()).compareTo(typedOther.isSetPath());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetPath()).compareTo(isSetPath());
+    if (isSetPath()) {
+      lastComparison = TBaseHelper.compareTo(this.path, typedOther.path);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNumBytes()).compareTo(typedOther.isSetNumBytes());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(path, typedOther.path);
+    if (isSetNumBytes()) {
+      lastComparison = TBaseHelper.compareTo(this.numBytes, typedOther.numBytes);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetGenStamp()).compareTo(typedOther.isSetGenStamp());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetNumBytes()).compareTo(isSetNumBytes());
+    if (isSetGenStamp()) {
+      lastComparison = TBaseHelper.compareTo(this.genStamp, typedOther.genStamp);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetNodes()).compareTo(typedOther.isSetNodes());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(numBytes, typedOther.numBytes);
+    if (isSetNodes()) {
+      lastComparison = TBaseHelper.compareTo(this.nodes, typedOther.nodes);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStartOffset()).compareTo(typedOther.isSetStartOffset());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetGenStamp()).compareTo(isSetGenStamp());
+    if (isSetStartOffset()) {
+      lastComparison = TBaseHelper.compareTo(this.startOffset, typedOther.startOffset);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetToken()).compareTo(typedOther.isSetToken());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(genStamp, typedOther.genStamp);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetStartOffset()).compareTo(isSetStartOffset());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(startOffset, typedOther.startOffset);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetNodes()).compareTo(isSetNodes());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(nodes, typedOther.nodes);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetToken()) {
+      lastComparison = TBaseHelper.compareTo(this.token, typedOther.token);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -665,71 +779,75 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case BLOCK_ID:
-            if (field.type == TType.I64) {
-              this.blockId = iprot.readI64();
-              setBlockIdIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PATH:
-            if (field.type == TType.STRING) {
-              this.path = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case NUM_BYTES:
-            if (field.type == TType.I64) {
-              this.numBytes = iprot.readI64();
-              setNumBytesIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case GEN_STAMP:
-            if (field.type == TType.I64) {
-              this.genStamp = iprot.readI64();
-              setGenStampIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case START_OFFSET:
-            if (field.type == TType.I64) {
-              this.startOffset = iprot.readI64();
-              setStartOffsetIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case NODES:
-            if (field.type == TType.LIST) {
+      switch (field.id) {
+        case 1: // BLOCK_ID
+          if (field.type == TType.I64) {
+            this.blockId = iprot.readI64();
+            setBlockIdIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // PATH
+          if (field.type == TType.STRING) {
+            this.path = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // NUM_BYTES
+          if (field.type == TType.I64) {
+            this.numBytes = iprot.readI64();
+            setNumBytesIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // GEN_STAMP
+          if (field.type == TType.I64) {
+            this.genStamp = iprot.readI64();
+            setGenStampIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // NODES
+          if (field.type == TType.LIST) {
+            {
+              TList _list0 = iprot.readListBegin();
+              this.nodes = new ArrayList<DatanodeInfo>(_list0.size);
+              for (int _i1 = 0; _i1 < _list0.size; ++_i1)
               {
-                TList _list0 = iprot.readListBegin();
-                this.nodes = new ArrayList<DatanodeInfo>(_list0.size);
-                for (int _i1 = 0; _i1 < _list0.size; ++_i1)
-                {
-                  DatanodeInfo _elem2;
-                  _elem2 = new DatanodeInfo();
-                  _elem2.read(iprot);
-                  this.nodes.add(_elem2);
-                }
-                iprot.readListEnd();
+                DatanodeInfo _elem2;
+                _elem2 = new DatanodeInfo();
+                _elem2.read(iprot);
+                this.nodes.add(_elem2);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readListEnd();
             }
-            break;
-        }
-        iprot.readFieldEnd();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 6: // START_OFFSET
+          if (field.type == TType.I64) {
+            this.startOffset = iprot.readI64();
+            setStartOffsetIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 7: // TOKEN
+          if (field.type == TType.STRING) {
+            this.token = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 
@@ -770,6 +888,11 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     oprot.writeFieldBegin(START_OFFSET_FIELD_DESC);
     oprot.writeI64(this.startOffset);
     oprot.writeFieldEnd();
+    if (this.token != null) {
+      oprot.writeFieldBegin(TOKEN_FIELD_DESC);
+      oprot.writeString(this.token);
+      oprot.writeFieldEnd();
+    }
     oprot.writeFieldStop();
     oprot.writeStructEnd();
   }
@@ -799,15 +922,23 @@ public class Block implements TBase<Block._Fields>, java.io.Serializable, Clonea
     sb.append(this.genStamp);
     first = false;
     if (!first) sb.append(", ");
-    sb.append("startOffset:");
-    sb.append(this.startOffset);
-    first = false;
-    if (!first) sb.append(", ");
     sb.append("nodes:");
     if (this.nodes == null) {
       sb.append("null");
     } else {
       sb.append(this.nodes);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("startOffset:");
+    sb.append(this.startOffset);
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("token:");
+    if (this.token == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.token);
     }
     first = false;
     sb.append(")");

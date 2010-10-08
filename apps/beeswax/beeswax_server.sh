@@ -36,7 +36,7 @@ BEESWAX_HIVE_LIB=$BEESWAX_ROOT/hive/lib
 
 echo \$HADOOP_HOME=$HADOOP_HOME
 
-export HADOOP_CLASSPATH=$(find $BEESWAX_HIVE_LIB -name "*.jar" | tr "\n" :):$HIVE_CONF_DIR
+export HADOOP_CLASSPATH=$(find $BEESWAX_HIVE_LIB -name "*.jar" | tr "\n" :):$HIVE_CONF_DIR:$BEESWAX_ROOT/../../desktop/libs/hadoop/static-group-mapping/java-lib/static-group-mapping-1.0.jar
 echo \$HADOOP_CLASSPATH=$HADOOP_CLASSPATH
 
 # Use HADOOP_CONF_DIR to preprend to classpath, to avoid fb303 conflict,

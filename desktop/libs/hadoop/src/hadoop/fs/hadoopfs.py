@@ -26,7 +26,9 @@ import random
 import stat as statconsts
 import subprocess
 import sys
+import time
 import urlparse
+import tempfile
 import threading
 
 from thrift.transport import TTransport
@@ -39,6 +41,7 @@ from desktop.lib.conf import validate_port
 from hadoop.api.hdfs import Namenode, Datanode
 from hadoop.api.hdfs.constants import QUOTA_DONT_SET, QUOTA_RESET
 from hadoop.api.common.ttypes import RequestContext, IOException
+import hadoop.conf
 from hadoop.fs import normpath
 from hadoop.fs.exceptions import PermissionDeniedException
 
@@ -54,7 +57,6 @@ del _tmp_mod
 LOG = logging.getLogger(__name__)
 
 DEFAULT_USER = "webui"
-DEFAULT_GROUPS = ["webui"]
 
 # The number of bytes to read if not specified
 DEFAULT_READ_SIZE = 1024*1024 # 1MB
@@ -93,10 +95,8 @@ def test_fs_configuration(fs_config, hadoop_bin_conf):
 
   # Check thrift plugin
   try:
-    fs = HadoopFileSystem(fs_config.NN_HOST.get(),
-                          fs_config.NN_THRIFT_PORT.get(),
-                          fs_config.NN_HDFS_PORT.get(),
-                          hadoop_bin_conf.get())
+    fs = HadoopFileSystem.from_config(
+      fs_config, hadoop_bin_path=hadoop_bin_conf.get())
 
     fs.setuser(fs.superuser)
     ls = fs.listdir('/')
@@ -176,7 +176,11 @@ class HadoopFileSystem(object):
   Implementation of Filesystem APIs through Thrift to a Hadoop cluster.
   """
 
-  def __init__(self, host, thrift_port, hdfs_port=8020, hadoop_bin_path="hadoop"):
+  def __init__(self, host, thrift_port, hdfs_port=8020,
+               nn_kerberos_principal="hdfs",
+               dn_kerberos_principal="hdfs",
+               security_enabled=False,
+               hadoop_bin_path="hadoop"):
     """
     @param host hostname or IP of the namenode
     @param thrift_port port on which the Thrift plugin is listening
@@ -188,19 +192,37 @@ class HadoopFileSystem(object):
     self.host = host
     self.thrift_port = thrift_port
     self.hdfs_port = hdfs_port
+    self.security_enabled = security_enabled
+    self.nn_kerberos_principal = nn_kerberos_principal
+    self.dn_kerberos_principal = dn_kerberos_principal
     self.hadoop_bin_path = hadoop_bin_path
     self._resolve_hadoop_path()
+    self.security_enabled = security_enabled
 
-    self.nn_client = thrift_util.get_client(Namenode.Client, host, thrift_port,
-        service_name="HDFS Namenode HUE Plugin",
-        timeout_seconds=NN_THRIFT_TIMEOUT)
+    self.nn_client = thrift_util.get_client(
+      Namenode.Client, host, thrift_port,
+      service_name="HDFS Namenode HUE Plugin",
+      use_sasl=security_enabled,
+      kerberos_principal=nn_kerberos_principal,
+      timeout_seconds=NN_THRIFT_TIMEOUT)
 
     # The file systems are cached globally.  We store
     # user information in a thread-local variable so that
     # safety can be preserved there.
     self.thread_local = threading.local()
-    self.setuser(DEFAULT_USER, DEFAULT_GROUPS)
+    self.setuser(DEFAULT_USER)
     LOG.debug("Initialized HadoopFS: %s:%d (%s)", host, thrift_port, hadoop_bin_path)
+
+  @classmethod
+  def from_config(cls, fs_config, hadoop_bin_path="hadoop"):
+    return cls(host=fs_config.NN_HOST.get(),
+               thrift_port=fs_config.NN_THRIFT_PORT.get(),
+               hdfs_port=fs_config.NN_HDFS_PORT.get(),
+               security_enabled=fs_config.SECURITY_ENABLED.get(),
+               nn_kerberos_principal=fs_config.NN_KERBEROS_PRINCIPAL.get(),
+               dn_kerberos_principal=fs_config.DN_KERBEROS_PRINCIPAL.get(),
+               hadoop_bin_path=hadoop_bin_path)
+
 
   def _get_hdfs_base(self):
     return "hdfs://%s:%d" % (self.host, self.hdfs_port) # TODO(todd) fetch the port from the NN thrift
@@ -231,18 +253,13 @@ class HadoopFileSystem(object):
     """
     return self.stats("/")["user"]
 
-  def setuser(self, user, groups=None):
-    # Hadoop UGI *must* have at least one group, so we mirror
-    # the username as a group if not specified
+  def setuser(self, user):
+    # Hadoop determines the groups the user belongs to on the server side.
     self.thread_local.request_context = RequestContext()
-    if not groups:
-      groups = [user]
     if not self.request_context.confOptions:
       self.request_context.confOptions = {}
-    self.thread_local.ugi = ",".join([user] + groups)
-    self.thread_local.request_context.confOptions['hadoop.job.ugi'] = self.thread_local.ugi
+    self.thread_local.request_context.confOptions['effective_user'] = user
     self.thread_local.user = user
-    self.thread_local.groups = groups
 
   @property
   def user(self):
@@ -255,10 +272,6 @@ class HadoopFileSystem(object):
   @property
   def request_context(self):
     return self.thread_local.request_context
-
-  @property
-  def ugi(self):
-    return self.thread_local.ugi
 
   @_coerce_exceptions
   def open(self, path, mode="r", *args, **kwargs):
@@ -559,15 +572,27 @@ class HadoopFileSystem(object):
       ret["space_quota"] = summary.spaceQuota
     return ret
 
+  @_coerce_exceptions
+  def get_delegation_token(self):
+    # TODO(atm): The second argument here should really be the Hue kerberos
+    # principal, which doesn't exist yet. Todd's working on that.
+    return self.nn_client.getDelegationToken(self.request_context, 'hadoop')
+
   def _connect_dn(self, node):
-    sock = TSocket.TSocket(node.host, node.thriftPort)
-    sock.setTimeout(int(DN_THRIFT_TIMEOUT * 1000))
-    transport = TTransport.TBufferedTransport(sock)
-    protocol = TBinaryProtocol.TBinaryProtocol(transport)
-    client = Datanode.Client(protocol)
+    dn_conf = thrift_util.ConnectionConfig(
+      Datanode.Client,
+      node.host,
+      node.thriftPort,
+      "HDFS Datanode Thrift",
+      use_sasl=self.security_enabled,
+      kerberos_principal=self.dn_kerberos_principal,
+      timeout_seconds=DN_THRIFT_TIMEOUT)
+
+    service, protocol, transport = \
+        thrift_util.connect_to_thrift(dn_conf)
     transport.open()
-    client.close = lambda: transport.close()
-    return client
+    service.close = lambda: transport.close()
+    return service
 
   @staticmethod
   def _unpack_stat(stat):
@@ -765,17 +790,34 @@ class FileUpload(object):
       extra_confs.append("-Ddfs.block.size=%d" % block_size)
     self.subprocess_cmd = [self.fs.hadoop_bin_path,
                            "dfs",
-                           "-Dfs.default.name=" + self.fs.uri,
-                           "-Dhadoop.job.ugi=" + self.fs.ugi] + \
+                           "-Dfs.default.name=" + self.fs.uri] + \
                            extra_confs + \
                            ["-put", "-", encode_fs_path(path)]
+
+    self.subprocess_env = i18n.make_utf8_env()
+
+    if self.fs.security_enabled:
+      token = self.fs.get_delegation_token()
+      self.token_file = tempfile.NamedTemporaryFile()
+      self.token_file.write(token.delegationTokenBytes)
+      self.token_file.flush()
+      self.subprocess_env['HADOOP_TOKEN_FILE_LOCATION'] = self.token_file.name
+
+    if self.subprocess_env.has_key('HADOOP_CLASSPATH'):
+      self.subprocess_env['HADOOP_CLASSPATH'] += ':' + hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
+    else:
+      self.subprocess_env['HADOOP_CLASSPATH'] = hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
+
+    if hadoop.conf.HADOOP_CONF_DIR.get():
+      self.subprocess_env['HADOOP_CONF_DIR'] = hadoop.conf.HADOOP_CONF_DIR.get()
+
     self.path = path
     self.putter = subprocess.Popen(self.subprocess_cmd,
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
                                    close_fds=True,
-                                   env=i18n.make_utf8_env(),
+                                   env=self.subprocess_env,
                                    bufsize=WRITE_BUFFER_SIZE)
   @require_open
   def write(self, data):
@@ -789,13 +831,20 @@ class FileUpload(object):
       logging.debug("Saw IOError writing %r" % self.path, exc_info=1)
       if ioe.errno == errno.EPIPE:
         stdout, stderr = self.putter.communicate()
+
+    if self.fs.security_enabled and self.token_file:
+      try:
+        self.token_file.close()
+      except:
+        LOG.warn('Failed to close HDFS delegation token file %s' % (self.token_file.name(),))
+
     self.closed = True
     if stderr:
-      LOG.warn("HDFS FileUpload (cmd='%s')outputted stderr:\n%s" %
-                   (repr(self.subprocess_cmd), stderr))
+      LOG.warn("HDFS FileUpload (cmd='%s', env='%s') outputted stderr:\n%s" %
+                   (repr(self.subprocess_cmd), repr(self.subprocess_env), stderr))
     if stdout:
-      LOG.info("HDFS FileUpload (cmd='%s')outputted stdout:\n%s" %
-                   (repr(self.subprocess_cmd), stdout))
+      LOG.info("HDFS FileUpload (cmd='%s', env='%s') outputted stdout:\n%s" %
+                   (repr(self.subprocess_cmd), repr(self.subprocess_env), stdout))
     if self.putter.returncode != 0:
       raise IOError("hdfs put returned bad code: %d\nstderr: %s" %
                     (self.putter.returncode, stderr))

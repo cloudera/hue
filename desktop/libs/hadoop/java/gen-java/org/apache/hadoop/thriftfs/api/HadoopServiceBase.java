@@ -15,12 +15,15 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 public class HadoopServiceBase {
@@ -44,7 +47,31 @@ public class HadoopServiceBase {
 
   }
 
-  public static class Client implements Iface {
+  public interface AsyncIface {
+
+    public void getVersionInfo(RequestContext ctx, AsyncMethodCallback<AsyncClient.getVersionInfo_call> resultHandler) throws TException;
+
+    public void getRuntimeInfo(RequestContext ctx, AsyncMethodCallback<AsyncClient.getRuntimeInfo_call> resultHandler) throws TException;
+
+    public void getThreadDump(RequestContext ctx, AsyncMethodCallback<AsyncClient.getThreadDump_call> resultHandler) throws TException;
+
+    public void getAllMetrics(RequestContext ctx, AsyncMethodCallback<AsyncClient.getAllMetrics_call> resultHandler) throws TException;
+
+    public void getMetricsContext(RequestContext ctx, String contextName, AsyncMethodCallback<AsyncClient.getMetricsContext_call> resultHandler) throws TException;
+
+  }
+
+  public static class Client implements TServiceClient, Iface {
+    public static class Factory implements TServiceClientFactory<Client> {
+      public Factory() {}
+      public Client getClient(TProtocol prot) {
+        return new Client(prot);
+      }
+      public Client getClient(TProtocol iprot, TProtocol oprot) {
+        return new Client(iprot, oprot);
+      }
+    }
+
     public Client(TProtocol prot)
     {
       this(prot, prot);
@@ -79,9 +106,9 @@ public class HadoopServiceBase {
 
     public void send_getVersionInfo(RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getVersionInfo", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getVersionInfo", TMessageType.CALL, ++seqid_));
       getVersionInfo_args args = new getVersionInfo_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -94,6 +121,9 @@ public class HadoopServiceBase {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getVersionInfo failed: out of sequence response");
       }
       getVersionInfo_result result = new getVersionInfo_result();
       result.read(iprot_);
@@ -112,9 +142,9 @@ public class HadoopServiceBase {
 
     public void send_getRuntimeInfo(RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getRuntimeInfo", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getRuntimeInfo", TMessageType.CALL, ++seqid_));
       getRuntimeInfo_args args = new getRuntimeInfo_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -127,6 +157,9 @@ public class HadoopServiceBase {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getRuntimeInfo failed: out of sequence response");
       }
       getRuntimeInfo_result result = new getRuntimeInfo_result();
       result.read(iprot_);
@@ -145,9 +178,9 @@ public class HadoopServiceBase {
 
     public void send_getThreadDump(RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getThreadDump", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getThreadDump", TMessageType.CALL, ++seqid_));
       getThreadDump_args args = new getThreadDump_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -160,6 +193,9 @@ public class HadoopServiceBase {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getThreadDump failed: out of sequence response");
       }
       getThreadDump_result result = new getThreadDump_result();
       result.read(iprot_);
@@ -178,9 +214,9 @@ public class HadoopServiceBase {
 
     public void send_getAllMetrics(RequestContext ctx) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getAllMetrics", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getAllMetrics", TMessageType.CALL, ++seqid_));
       getAllMetrics_args args = new getAllMetrics_args();
-      args.ctx = ctx;
+      args.setCtx(ctx);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -193,6 +229,9 @@ public class HadoopServiceBase {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getAllMetrics failed: out of sequence response");
       }
       getAllMetrics_result result = new getAllMetrics_result();
       result.read(iprot_);
@@ -214,10 +253,10 @@ public class HadoopServiceBase {
 
     public void send_getMetricsContext(RequestContext ctx, String contextName) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("getMetricsContext", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("getMetricsContext", TMessageType.CALL, ++seqid_));
       getMetricsContext_args args = new getMetricsContext_args();
-      args.ctx = ctx;
-      args.contextName = contextName;
+      args.setCtx(ctx);
+      args.setContextName(contextName);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -230,6 +269,9 @@ public class HadoopServiceBase {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "getMetricsContext failed: out of sequence response");
       }
       getMetricsContext_result result = new getMetricsContext_result();
       result.read(iprot_);
@@ -244,6 +286,183 @@ public class HadoopServiceBase {
     }
 
   }
+  public static class AsyncClient extends TAsyncClient implements AsyncIface {
+    public static class Factory implements TAsyncClientFactory<AsyncClient> {
+      private TAsyncClientManager clientManager;
+      private TProtocolFactory protocolFactory;
+      public Factory(TAsyncClientManager clientManager, TProtocolFactory protocolFactory) {
+        this.clientManager = clientManager;
+        this.protocolFactory = protocolFactory;
+      }
+      public AsyncClient getAsyncClient(TNonblockingTransport transport) {
+        return new AsyncClient(protocolFactory, clientManager, transport);
+      }
+    }
+
+    public AsyncClient(TProtocolFactory protocolFactory, TAsyncClientManager clientManager, TNonblockingTransport transport) {
+      super(protocolFactory, clientManager, transport);
+    }
+
+    public void getVersionInfo(RequestContext ctx, AsyncMethodCallback<getVersionInfo_call> resultHandler) throws TException {
+      checkReady();
+      getVersionInfo_call method_call = new getVersionInfo_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getVersionInfo_call extends TAsyncMethodCall {
+      private RequestContext ctx;
+      public getVersionInfo_call(RequestContext ctx, AsyncMethodCallback<getVersionInfo_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getVersionInfo", TMessageType.CALL, 0));
+        getVersionInfo_args args = new getVersionInfo_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public VersionInfo getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getVersionInfo();
+      }
+    }
+
+    public void getRuntimeInfo(RequestContext ctx, AsyncMethodCallback<getRuntimeInfo_call> resultHandler) throws TException {
+      checkReady();
+      getRuntimeInfo_call method_call = new getRuntimeInfo_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getRuntimeInfo_call extends TAsyncMethodCall {
+      private RequestContext ctx;
+      public getRuntimeInfo_call(RequestContext ctx, AsyncMethodCallback<getRuntimeInfo_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getRuntimeInfo", TMessageType.CALL, 0));
+        getRuntimeInfo_args args = new getRuntimeInfo_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public RuntimeInfo getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getRuntimeInfo();
+      }
+    }
+
+    public void getThreadDump(RequestContext ctx, AsyncMethodCallback<getThreadDump_call> resultHandler) throws TException {
+      checkReady();
+      getThreadDump_call method_call = new getThreadDump_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getThreadDump_call extends TAsyncMethodCall {
+      private RequestContext ctx;
+      public getThreadDump_call(RequestContext ctx, AsyncMethodCallback<getThreadDump_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getThreadDump", TMessageType.CALL, 0));
+        getThreadDump_args args = new getThreadDump_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<ThreadStackTrace> getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getThreadDump();
+      }
+    }
+
+    public void getAllMetrics(RequestContext ctx, AsyncMethodCallback<getAllMetrics_call> resultHandler) throws TException {
+      checkReady();
+      getAllMetrics_call method_call = new getAllMetrics_call(ctx, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getAllMetrics_call extends TAsyncMethodCall {
+      private RequestContext ctx;
+      public getAllMetrics_call(RequestContext ctx, AsyncMethodCallback<getAllMetrics_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getAllMetrics", TMessageType.CALL, 0));
+        getAllMetrics_args args = new getAllMetrics_args();
+        args.setCtx(ctx);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<MetricsContext> getResult() throws IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getAllMetrics();
+      }
+    }
+
+    public void getMetricsContext(RequestContext ctx, String contextName, AsyncMethodCallback<getMetricsContext_call> resultHandler) throws TException {
+      checkReady();
+      getMetricsContext_call method_call = new getMetricsContext_call(ctx, contextName, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class getMetricsContext_call extends TAsyncMethodCall {
+      private RequestContext ctx;
+      private String contextName;
+      public getMetricsContext_call(RequestContext ctx, String contextName, AsyncMethodCallback<getMetricsContext_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.contextName = contextName;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("getMetricsContext", TMessageType.CALL, 0));
+        getMetricsContext_args args = new getMetricsContext_args();
+        args.setCtx(ctx);
+        args.setContextName(contextName);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public MetricsContext getResult() throws IOException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getMetricsContext();
+      }
+    }
+
+  }
+
   public static class Processor implements TProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(Processor.class.getName());
     public Processor(Iface iface)
@@ -285,7 +504,17 @@ public class HadoopServiceBase {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getVersionInfo_args args = new getVersionInfo_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getVersionInfo", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getVersionInfo_result result = new getVersionInfo_result();
         result.success = iface_.getVersionInfo(args.ctx);
@@ -301,7 +530,17 @@ public class HadoopServiceBase {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getRuntimeInfo_args args = new getRuntimeInfo_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getRuntimeInfo", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getRuntimeInfo_result result = new getRuntimeInfo_result();
         result.success = iface_.getRuntimeInfo(args.ctx);
@@ -317,7 +556,17 @@ public class HadoopServiceBase {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getThreadDump_args args = new getThreadDump_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getThreadDump", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getThreadDump_result result = new getThreadDump_result();
         result.success = iface_.getThreadDump(args.ctx);
@@ -333,7 +582,17 @@ public class HadoopServiceBase {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getAllMetrics_args args = new getAllMetrics_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getAllMetrics", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getAllMetrics_result result = new getAllMetrics_result();
         try {
@@ -361,7 +620,17 @@ public class HadoopServiceBase {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         getMetricsContext_args args = new getMetricsContext_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("getMetricsContext", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         getMetricsContext_result result = new getMetricsContext_result();
         try {
@@ -387,7 +656,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getVersionInfo_args implements TBase<getVersionInfo_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getVersionInfo_args implements TBase<getVersionInfo_args, getVersionInfo_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getVersionInfo_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -398,12 +667,10 @@ public class HadoopServiceBase {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -412,7 +679,12 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -451,12 +723,12 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getVersionInfo_args.class, metaDataMap);
     }
 
@@ -483,9 +755,9 @@ public class HadoopServiceBase {
       return new getVersionInfo_args(this);
     }
 
-    @Deprecated
-    public getVersionInfo_args clone() {
-      return new getVersionInfo_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public RequestContext getCtx() {
@@ -525,10 +797,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -538,21 +806,17 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -585,6 +849,31 @@ public class HadoopServiceBase {
       return 0;
     }
 
+    public int compareTo(getVersionInfo_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getVersionInfo_args typedOther = (getVersionInfo_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -594,22 +883,19 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -652,7 +938,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getVersionInfo_result implements TBase<getVersionInfo_result._Fields>, java.io.Serializable, Cloneable, Comparable<getVersionInfo_result>   {
+  public static class getVersionInfo_result implements TBase<getVersionInfo_result, getVersionInfo_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getVersionInfo_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -663,12 +949,10 @@ public class HadoopServiceBase {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -677,7 +961,12 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -716,12 +1005,12 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, VersionInfo.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, VersionInfo.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getVersionInfo_result.class, metaDataMap);
     }
 
@@ -748,9 +1037,9 @@ public class HadoopServiceBase {
       return new getVersionInfo_result(this);
     }
 
-    @Deprecated
-    public getVersionInfo_result clone() {
-      return new getVersionInfo_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public VersionInfo getSuccess() {
@@ -790,10 +1079,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -803,21 +1088,17 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -858,15 +1139,21 @@ public class HadoopServiceBase {
       int lastComparison = 0;
       getVersionInfo_result typedOther = (getVersionInfo_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -878,22 +1165,19 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new VersionInfo();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new VersionInfo();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -935,7 +1219,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getRuntimeInfo_args implements TBase<getRuntimeInfo_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getRuntimeInfo_args implements TBase<getRuntimeInfo_args, getRuntimeInfo_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getRuntimeInfo_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -946,12 +1230,10 @@ public class HadoopServiceBase {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -960,7 +1242,12 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -999,12 +1286,12 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getRuntimeInfo_args.class, metaDataMap);
     }
 
@@ -1031,9 +1318,9 @@ public class HadoopServiceBase {
       return new getRuntimeInfo_args(this);
     }
 
-    @Deprecated
-    public getRuntimeInfo_args clone() {
-      return new getRuntimeInfo_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public RequestContext getCtx() {
@@ -1073,10 +1360,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -1086,21 +1369,17 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -1133,6 +1412,31 @@ public class HadoopServiceBase {
       return 0;
     }
 
+    public int compareTo(getRuntimeInfo_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getRuntimeInfo_args typedOther = (getRuntimeInfo_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -1142,22 +1446,19 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -1200,7 +1501,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getRuntimeInfo_result implements TBase<getRuntimeInfo_result._Fields>, java.io.Serializable, Cloneable, Comparable<getRuntimeInfo_result>   {
+  public static class getRuntimeInfo_result implements TBase<getRuntimeInfo_result, getRuntimeInfo_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getRuntimeInfo_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -1211,12 +1512,10 @@ public class HadoopServiceBase {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -1225,7 +1524,12 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -1264,12 +1568,12 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, RuntimeInfo.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, RuntimeInfo.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getRuntimeInfo_result.class, metaDataMap);
     }
 
@@ -1296,9 +1600,9 @@ public class HadoopServiceBase {
       return new getRuntimeInfo_result(this);
     }
 
-    @Deprecated
-    public getRuntimeInfo_result clone() {
-      return new getRuntimeInfo_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public RuntimeInfo getSuccess() {
@@ -1338,10 +1642,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -1351,21 +1651,17 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -1406,15 +1702,21 @@ public class HadoopServiceBase {
       int lastComparison = 0;
       getRuntimeInfo_result typedOther = (getRuntimeInfo_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -1426,22 +1728,19 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new RuntimeInfo();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new RuntimeInfo();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -1483,7 +1782,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getThreadDump_args implements TBase<getThreadDump_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getThreadDump_args implements TBase<getThreadDump_args, getThreadDump_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getThreadDump_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -1494,12 +1793,10 @@ public class HadoopServiceBase {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -1508,7 +1805,12 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -1547,12 +1849,12 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getThreadDump_args.class, metaDataMap);
     }
 
@@ -1579,9 +1881,9 @@ public class HadoopServiceBase {
       return new getThreadDump_args(this);
     }
 
-    @Deprecated
-    public getThreadDump_args clone() {
-      return new getThreadDump_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public RequestContext getCtx() {
@@ -1621,10 +1923,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -1634,21 +1932,17 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -1681,6 +1975,31 @@ public class HadoopServiceBase {
       return 0;
     }
 
+    public int compareTo(getThreadDump_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getThreadDump_args typedOther = (getThreadDump_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -1690,22 +2009,19 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -1748,7 +2064,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getThreadDump_result implements TBase<getThreadDump_result._Fields>, java.io.Serializable, Cloneable, Comparable<getThreadDump_result>   {
+  public static class getThreadDump_result implements TBase<getThreadDump_result, getThreadDump_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getThreadDump_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
@@ -1759,12 +2075,10 @@ public class HadoopServiceBase {
     public enum _Fields implements TFieldIdEnum {
       SUCCESS((short)0, "success");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -1773,7 +2087,12 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -1812,13 +2131,13 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new StructMetaData(TType.STRUCT, ThreadStackTrace.class))));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getThreadDump_result.class, metaDataMap);
     }
 
@@ -1849,9 +2168,9 @@ public class HadoopServiceBase {
       return new getThreadDump_result(this);
     }
 
-    @Deprecated
-    public getThreadDump_result clone() {
-      return new getThreadDump_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public int getSuccessSize() {
@@ -1906,10 +2225,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -1919,21 +2234,17 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -1974,15 +2285,21 @@ public class HadoopServiceBase {
       int lastComparison = 0;
       getThreadDump_result typedOther = (getThreadDump_result)other;
 
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(isSetSuccess());
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
         return lastComparison;
       }
-      lastComparison = TBaseHelper.compareTo(success, typedOther.success);
-      if (lastComparison != 0) {
-        return lastComparison;
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
       }
       return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -1994,32 +2311,29 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.LIST) {
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.LIST) {
+              {
+                TList _list28 = iprot.readListBegin();
+                this.success = new ArrayList<ThreadStackTrace>(_list28.size);
+                for (int _i29 = 0; _i29 < _list28.size; ++_i29)
                 {
-                  TList _list28 = iprot.readListBegin();
-                  this.success = new ArrayList<ThreadStackTrace>(_list28.size);
-                  for (int _i29 = 0; _i29 < _list28.size; ++_i29)
-                  {
-                    ThreadStackTrace _elem30;
-                    _elem30 = new ThreadStackTrace();
-                    _elem30.read(iprot);
-                    this.success.add(_elem30);
-                  }
-                  iprot.readListEnd();
+                  ThreadStackTrace _elem30;
+                  _elem30 = new ThreadStackTrace();
+                  _elem30.read(iprot);
+                  this.success.add(_elem30);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readListEnd();
               }
-              break;
-          }
-          iprot.readFieldEnd();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -2068,7 +2382,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getAllMetrics_args implements TBase<getAllMetrics_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getAllMetrics_args implements TBase<getAllMetrics_args, getAllMetrics_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getAllMetrics_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -2079,12 +2393,10 @@ public class HadoopServiceBase {
     public enum _Fields implements TFieldIdEnum {
       CTX((short)10, "ctx");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -2093,7 +2405,12 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -2132,12 +2449,12 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, RequestContext.class)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, RequestContext.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getAllMetrics_args.class, metaDataMap);
     }
 
@@ -2164,9 +2481,9 @@ public class HadoopServiceBase {
       return new getAllMetrics_args(this);
     }
 
-    @Deprecated
-    public getAllMetrics_args clone() {
-      return new getAllMetrics_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
     }
 
     public RequestContext getCtx() {
@@ -2206,10 +2523,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -2219,21 +2532,17 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2266,6 +2575,31 @@ public class HadoopServiceBase {
       return 0;
     }
 
+    public int compareTo(getAllMetrics_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getAllMetrics_args typedOther = (getAllMetrics_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2275,22 +2609,19 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -2333,7 +2664,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getAllMetrics_result implements TBase<getAllMetrics_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getAllMetrics_result implements TBase<getAllMetrics_result, getAllMetrics_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getAllMetrics_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
@@ -2347,12 +2678,10 @@ public class HadoopServiceBase {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -2361,7 +2690,14 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -2400,15 +2736,15 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new StructMetaData(TType.STRUCT, MetricsContext.class))));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
           new FieldValueMetaData(TType.STRUCT)));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getAllMetrics_result.class, metaDataMap);
     }
 
@@ -2444,9 +2780,10 @@ public class HadoopServiceBase {
       return new getAllMetrics_result(this);
     }
 
-    @Deprecated
-    public getAllMetrics_result clone() {
-      return new getAllMetrics_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public int getSuccessSize() {
@@ -2533,10 +2870,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -2549,12 +2882,12 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -2562,10 +2895,6 @@ public class HadoopServiceBase {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2607,6 +2936,41 @@ public class HadoopServiceBase {
       return 0;
     }
 
+    public int compareTo(getAllMetrics_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getAllMetrics_result typedOther = (getAllMetrics_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2616,40 +2980,37 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.LIST) {
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.LIST) {
+              {
+                TList _list32 = iprot.readListBegin();
+                this.success = new ArrayList<MetricsContext>(_list32.size);
+                for (int _i33 = 0; _i33 < _list32.size; ++_i33)
                 {
-                  TList _list32 = iprot.readListBegin();
-                  this.success = new ArrayList<MetricsContext>(_list32.size);
-                  for (int _i33 = 0; _i33 < _list32.size; ++_i33)
-                  {
-                    MetricsContext _elem34;
-                    _elem34 = new MetricsContext();
-                    _elem34.read(iprot);
-                    this.success.add(_elem34);
-                  }
-                  iprot.readListEnd();
+                  MetricsContext _elem34;
+                  _elem34 = new MetricsContext();
+                  _elem34.read(iprot);
+                  this.success.add(_elem34);
                 }
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
+                iprot.readListEnd();
               }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -2710,7 +3071,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getMetricsContext_args implements TBase<getMetricsContext_args._Fields>, java.io.Serializable, Cloneable   {
+  public static class getMetricsContext_args implements TBase<getMetricsContext_args, getMetricsContext_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getMetricsContext_args");
 
     private static final TField CTX_FIELD_DESC = new TField("ctx", TType.STRUCT, (short)10);
@@ -2724,12 +3085,10 @@ public class HadoopServiceBase {
       CTX((short)10, "ctx"),
       CONTEXT_NAME((short)1, "contextName");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -2738,7 +3097,14 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // CONTEXT_NAME
+            return CONTEXT_NAME;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -2777,14 +3143,14 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, RequestContext.class)));
-      put(_Fields.CONTEXT_NAME, new FieldMetaData("contextName", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new FieldMetaData("ctx", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, RequestContext.class)));
+      tmpMap.put(_Fields.CONTEXT_NAME, new FieldMetaData("contextName", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getMetricsContext_args.class, metaDataMap);
     }
 
@@ -2816,9 +3182,10 @@ public class HadoopServiceBase {
       return new getMetricsContext_args(this);
     }
 
-    @Deprecated
-    public getMetricsContext_args clone() {
-      return new getMetricsContext_args(this);
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.contextName = null;
     }
 
     public RequestContext getCtx() {
@@ -2890,10 +3257,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case CTX:
@@ -2906,12 +3269,12 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case CTX:
         return isSetCtx();
@@ -2919,10 +3282,6 @@ public class HadoopServiceBase {
         return isSetContextName();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -2964,6 +3323,41 @@ public class HadoopServiceBase {
       return 0;
     }
 
+    public int compareTo(getMetricsContext_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getMetricsContext_args typedOther = (getMetricsContext_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetContextName()).compareTo(typedOther.isSetContextName());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetContextName()) {
+        lastComparison = TBaseHelper.compareTo(this.contextName, typedOther.contextName);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2973,29 +3367,26 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case CTX:
-              if (field.type == TType.STRUCT) {
-                this.ctx = new RequestContext();
-                this.ctx.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case CONTEXT_NAME:
-              if (field.type == TType.STRING) {
-                this.contextName = iprot.readString();
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == TType.STRUCT) {
+              this.ctx = new RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // CONTEXT_NAME
+            if (field.type == TType.STRING) {
+              this.contextName = iprot.readString();
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 
@@ -3051,7 +3442,7 @@ public class HadoopServiceBase {
 
   }
 
-  public static class getMetricsContext_result implements TBase<getMetricsContext_result._Fields>, java.io.Serializable, Cloneable   {
+  public static class getMetricsContext_result implements TBase<getMetricsContext_result, getMetricsContext_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("getMetricsContext_result");
 
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
@@ -3065,12 +3456,10 @@ public class HadoopServiceBase {
       SUCCESS((short)0, "success"),
       ERR((short)1, "err");
 
-      private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
       static {
         for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byId.put((int)field._thriftId, field);
           byName.put(field.getFieldName(), field);
         }
       }
@@ -3079,7 +3468,14 @@ public class HadoopServiceBase {
        * Find the _Fields constant that matches fieldId, or null if its not found.
        */
       public static _Fields findByThriftId(int fieldId) {
-        return byId.get(fieldId);
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
       }
 
       /**
@@ -3118,14 +3514,14 @@ public class HadoopServiceBase {
 
     // isset id assignments
 
-    public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-      put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, MetricsContext.class)));
-      put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
-
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, MetricsContext.class)));
+      tmpMap.put(_Fields.ERR, new FieldMetaData("err", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(getMetricsContext_result.class, metaDataMap);
     }
 
@@ -3157,9 +3553,10 @@ public class HadoopServiceBase {
       return new getMetricsContext_result(this);
     }
 
-    @Deprecated
-    public getMetricsContext_result clone() {
-      return new getMetricsContext_result(this);
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
     }
 
     public MetricsContext getSuccess() {
@@ -3231,10 +3628,6 @@ public class HadoopServiceBase {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-    }
-
     public Object getFieldValue(_Fields field) {
       switch (field) {
       case SUCCESS:
@@ -3247,12 +3640,12 @@ public class HadoopServiceBase {
       throw new IllegalStateException();
     }
 
-    public Object getFieldValue(int fieldId) {
-      return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-    }
-
     /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
     public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
@@ -3260,10 +3653,6 @@ public class HadoopServiceBase {
         return isSetErr();
       }
       throw new IllegalStateException();
-    }
-
-    public boolean isSet(int fieldID) {
-      return isSet(_Fields.findByThriftIdOrThrow(fieldID));
     }
 
     @Override
@@ -3305,6 +3694,41 @@ public class HadoopServiceBase {
       return 0;
     }
 
+    public int compareTo(getMetricsContext_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getMetricsContext_result typedOther = (getMetricsContext_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetErr()) {
+        lastComparison = TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -3314,30 +3738,27 @@ public class HadoopServiceBase {
         if (field.type == TType.STOP) { 
           break;
         }
-        _Fields fieldId = _Fields.findByThriftId(field.id);
-        if (fieldId == null) {
-          TProtocolUtil.skip(iprot, field.type);
-        } else {
-          switch (fieldId) {
-            case SUCCESS:
-              if (field.type == TType.STRUCT) {
-                this.success = new MetricsContext();
-                this.success.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-            case ERR:
-              if (field.type == TType.STRUCT) {
-                this.err = new IOException();
-                this.err.read(iprot);
-              } else { 
-                TProtocolUtil.skip(iprot, field.type);
-              }
-              break;
-          }
-          iprot.readFieldEnd();
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == TType.STRUCT) {
+              this.success = new MetricsContext();
+              this.success.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == TType.STRUCT) {
+              this.err = new IOException();
+              this.err.read(iprot);
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
         }
+        iprot.readFieldEnd();
       }
       iprot.readStructEnd();
 

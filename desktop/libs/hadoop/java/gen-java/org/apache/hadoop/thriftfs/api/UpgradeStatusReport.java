@@ -15,15 +15,18 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
-public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, java.io.Serializable, Cloneable, Comparable<UpgradeStatusReport> {
+public class UpgradeStatusReport implements TBase<UpgradeStatusReport, UpgradeStatusReport._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("UpgradeStatusReport");
 
   private static final TField VERSION_FIELD_DESC = new TField("version", TType.I32, (short)1);
@@ -49,12 +52,10 @@ public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, 
      */
     STATUS_TEXT((short)4, "statusText");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -63,7 +64,18 @@ public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, 
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // VERSION
+          return VERSION;
+        case 2: // PERCENT_COMPLETE
+          return PERCENT_COMPLETE;
+        case 3: // FINALIZED
+          return FINALIZED;
+        case 4: // STATUS_TEXT
+          return STATUS_TEXT;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -106,18 +118,18 @@ public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, 
   private static final int __FINALIZED_ISSET_ID = 2;
   private BitSet __isset_bit_vector = new BitSet(3);
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.VERSION, new FieldMetaData("version", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I32)));
-    put(_Fields.PERCENT_COMPLETE, new FieldMetaData("percentComplete", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.I16)));
-    put(_Fields.FINALIZED, new FieldMetaData("finalized", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.BOOL)));
-    put(_Fields.STATUS_TEXT, new FieldMetaData("statusText", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
-
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.VERSION, new FieldMetaData("version", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I32)));
+    tmpMap.put(_Fields.PERCENT_COMPLETE, new FieldMetaData("percentComplete", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.I16)));
+    tmpMap.put(_Fields.FINALIZED, new FieldMetaData("finalized", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.BOOL)));
+    tmpMap.put(_Fields.STATUS_TEXT, new FieldMetaData("statusText", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(UpgradeStatusReport.class, metaDataMap);
   }
 
@@ -158,9 +170,15 @@ public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, 
     return new UpgradeStatusReport(this);
   }
 
-  @Deprecated
-  public UpgradeStatusReport clone() {
-    return new UpgradeStatusReport(this);
+  @Override
+  public void clear() {
+    setVersionIsSet(false);
+    this.version = 0;
+    setPercentCompleteIsSet(false);
+    this.percentComplete = 0;
+    setFinalizedIsSet(false);
+    this.finalized = false;
+    this.statusText = null;
   }
 
   public int getVersion() {
@@ -299,10 +317,6 @@ public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, 
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case VERSION:
@@ -321,12 +335,12 @@ public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, 
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case VERSION:
       return isSetVersion();
@@ -338,10 +352,6 @@ public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, 
       return isSetStatusText();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -409,39 +419,51 @@ public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, 
     int lastComparison = 0;
     UpgradeStatusReport typedOther = (UpgradeStatusReport)other;
 
-    lastComparison = Boolean.valueOf(isSetVersion()).compareTo(isSetVersion());
+    lastComparison = Boolean.valueOf(isSetVersion()).compareTo(typedOther.isSetVersion());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(version, typedOther.version);
+    if (isSetVersion()) {
+      lastComparison = TBaseHelper.compareTo(this.version, typedOther.version);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetPercentComplete()).compareTo(typedOther.isSetPercentComplete());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetPercentComplete()).compareTo(isSetPercentComplete());
+    if (isSetPercentComplete()) {
+      lastComparison = TBaseHelper.compareTo(this.percentComplete, typedOther.percentComplete);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetFinalized()).compareTo(typedOther.isSetFinalized());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = TBaseHelper.compareTo(percentComplete, typedOther.percentComplete);
+    if (isSetFinalized()) {
+      lastComparison = TBaseHelper.compareTo(this.finalized, typedOther.finalized);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStatusText()).compareTo(typedOther.isSetStatusText());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    lastComparison = Boolean.valueOf(isSetFinalized()).compareTo(isSetFinalized());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(finalized, typedOther.finalized);
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = Boolean.valueOf(isSetStatusText()).compareTo(isSetStatusText());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    lastComparison = TBaseHelper.compareTo(statusText, typedOther.statusText);
-    if (lastComparison != 0) {
-      return lastComparison;
+    if (isSetStatusText()) {
+      lastComparison = TBaseHelper.compareTo(this.statusText, typedOther.statusText);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
     }
     return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
   }
 
   public void read(TProtocol iprot) throws TException {
@@ -453,45 +475,42 @@ public class UpgradeStatusReport implements TBase<UpgradeStatusReport._Fields>, 
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case VERSION:
-            if (field.type == TType.I32) {
-              this.version = iprot.readI32();
-              setVersionIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case PERCENT_COMPLETE:
-            if (field.type == TType.I16) {
-              this.percentComplete = iprot.readI16();
-              setPercentCompleteIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case FINALIZED:
-            if (field.type == TType.BOOL) {
-              this.finalized = iprot.readBool();
-              setFinalizedIsSet(true);
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-          case STATUS_TEXT:
-            if (field.type == TType.STRING) {
-              this.statusText = iprot.readString();
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
-            }
-            break;
-        }
-        iprot.readFieldEnd();
+      switch (field.id) {
+        case 1: // VERSION
+          if (field.type == TType.I32) {
+            this.version = iprot.readI32();
+            setVersionIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 2: // PERCENT_COMPLETE
+          if (field.type == TType.I16) {
+            this.percentComplete = iprot.readI16();
+            setPercentCompleteIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 3: // FINALIZED
+          if (field.type == TType.BOOL) {
+            this.finalized = iprot.readBool();
+            setFinalizedIsSet(true);
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 4: // STATUS_TEXT
+          if (field.type == TType.STRING) {
+            this.statusText = iprot.readString();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

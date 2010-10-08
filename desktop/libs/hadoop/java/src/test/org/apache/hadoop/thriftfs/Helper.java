@@ -20,10 +20,11 @@ package org.apache.hadoop.thriftfs;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import javax.security.auth.login.LoginException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -34,11 +35,11 @@ import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.protocol.FSConstants.DatanodeReportType;
 import org.apache.hadoop.hdfs.protocol.FSConstants.SafeModeAction;
-import org.apache.hadoop.security.UnixUserGroupInformation;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.thriftfs.api.Datanode;
 import org.apache.hadoop.thriftfs.api.DatanodeInfo;
 import org.apache.hadoop.thriftfs.api.RequestContext;
+import org.apache.hadoop.util.StringUtils;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -72,31 +73,25 @@ public class Helper {
     return conf;
   }
 
-  public static RequestContext createRequestContext(boolean superuser) {
+  public static RequestContext createRequestContext(boolean superuser) throws IOException {
     RequestContext ctx = new RequestContext();
     Configuration conf = new Configuration();
 
-    UnixUserGroupInformation ugi;
+    UserGroupInformation ugi;
     if (superuser) {
-      try {
-        ugi = UnixUserGroupInformation.login();
-      } catch (LoginException le) {
-        // we need to be able to determine the superuser for these
-        // tests to work
-        throw new RuntimeException(le);
-      }
+      ugi = UserGroupInformation.getCurrentUser();
     } else {
-      ugi = new UnixUserGroupInformation(
-        TEST_USER, new String[] { TEST_GROUP });
+      ugi = UserGroupInformation.createUserForTesting(TEST_USER, new String[] { TEST_GROUP });
     }
-
-    UnixUserGroupInformation.saveToConf(
-      conf, UnixUserGroupInformation.UGI_PROPERTY_NAME, ugi);
 
     ctx.confOptions = new HashMap<String, String>();
     for (Map.Entry<String, String> entry : conf) {
       ctx.confOptions.put(entry.getKey(), entry.getValue());
     }
+    List<String> groupList = new ArrayList<String>();
+    for (String group : ugi.getGroupNames())
+      groupList.add(group);
+    ctx.confOptions.put("effective_user", ugi.getUserName());
     return ctx;
   }
 

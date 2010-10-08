@@ -9,7 +9,7 @@ import hive_metastore.ttypes
 
 
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TProtocol
 try:
   from thrift.protocol import fastbinary
 except:
@@ -42,13 +42,13 @@ class QueryState(object):
     "EXCEPTION": 5,
   }
 
+
 class Query(object):
   """
   Attributes:
    - query
    - configuration
    - hadoop_user
-   - hadoop_groups
   """
 
   thrift_spec = (
@@ -57,14 +57,12 @@ class Query(object):
     None, # 2
     (3, TType.LIST, 'configuration', (TType.STRING,None), None, ), # 3
     (4, TType.STRING, 'hadoop_user', None, None, ), # 4
-    (5, TType.LIST, 'hadoop_groups', (TType.STRING,None), None, ), # 5
   )
 
-  def __init__(self, query=None, configuration=None, hadoop_user=None, hadoop_groups=None,):
+  def __init__(self, query=None, configuration=None, hadoop_user=None,):
     self.query = query
     self.configuration = configuration
     self.hadoop_user = hadoop_user
-    self.hadoop_groups = hadoop_groups
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -95,16 +93,6 @@ class Query(object):
           self.hadoop_user = iprot.readString();
         else:
           iprot.skip(ftype)
-      elif fid == 5:
-        if ftype == TType.LIST:
-          self.hadoop_groups = []
-          (_etype9, _size6) = iprot.readListBegin()
-          for _i10 in xrange(_size6):
-            _elem11 = iprot.readString();
-            self.hadoop_groups.append(_elem11)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -122,23 +110,19 @@ class Query(object):
     if self.configuration != None:
       oprot.writeFieldBegin('configuration', TType.LIST, 3)
       oprot.writeListBegin(TType.STRING, len(self.configuration))
-      for iter12 in self.configuration:
-        oprot.writeString(iter12)
+      for iter6 in self.configuration:
+        oprot.writeString(iter6)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.hadoop_user != None:
       oprot.writeFieldBegin('hadoop_user', TType.STRING, 4)
       oprot.writeString(self.hadoop_user)
       oprot.writeFieldEnd()
-    if self.hadoop_groups != None:
-      oprot.writeFieldBegin('hadoop_groups', TType.LIST, 5)
-      oprot.writeListBegin(TType.STRING, len(self.hadoop_groups))
-      for iter13 in self.hadoop_groups:
-        oprot.writeString(iter13)
-      oprot.writeListEnd()
-      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -207,6 +191,9 @@ class QueryHandle(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -263,6 +250,9 @@ class QueryExplanation(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -318,20 +308,20 @@ class Results(object):
       elif fid == 2:
         if ftype == TType.LIST:
           self.columns = []
-          (_etype17, _size14) = iprot.readListBegin()
-          for _i18 in xrange(_size14):
-            _elem19 = iprot.readString();
-            self.columns.append(_elem19)
+          (_etype10, _size7) = iprot.readListBegin()
+          for _i11 in xrange(_size7):
+            _elem12 = iprot.readString();
+            self.columns.append(_elem12)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
       elif fid == 3:
         if ftype == TType.LIST:
           self.data = []
-          (_etype23, _size20) = iprot.readListBegin()
-          for _i24 in xrange(_size20):
-            _elem25 = iprot.readString();
-            self.data.append(_elem25)
+          (_etype16, _size13) = iprot.readListBegin()
+          for _i17 in xrange(_size13):
+            _elem18 = iprot.readString();
+            self.data.append(_elem18)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -362,15 +352,15 @@ class Results(object):
     if self.columns != None:
       oprot.writeFieldBegin('columns', TType.LIST, 2)
       oprot.writeListBegin(TType.STRING, len(self.columns))
-      for iter26 in self.columns:
-        oprot.writeString(iter26)
+      for iter19 in self.columns:
+        oprot.writeString(iter19)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.data != None:
       oprot.writeFieldBegin('data', TType.LIST, 3)
       oprot.writeListBegin(TType.STRING, len(self.data))
-      for iter27 in self.data:
-        oprot.writeString(iter27)
+      for iter20 in self.data:
+        oprot.writeString(iter20)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.start_row != None:
@@ -383,6 +373,9 @@ class Results(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -399,7 +392,7 @@ class ResultsMetadata(object):
   """
   Metadata information about the results.
   Applicable only for SELECT.
-  
+
   Attributes:
    - schema: The schema of the results
    - table_dir: The directory containing the results. Not applicable for partition table.
@@ -479,6 +472,9 @@ class ResultsMetadata(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -560,6 +556,9 @@ class BeeswaxException(Exception):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -601,6 +600,9 @@ class QueryNotFoundException(Exception):
     oprot.writeStructBegin('QueryNotFoundException')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __str__(self):
     return repr(self)
@@ -619,7 +621,7 @@ class QueryNotFoundException(Exception):
 class ConfigVariable(object):
   """
   Represents a Hadoop-style configuration variable.
-  
+
   Attributes:
    - key
    - value
@@ -686,6 +688,9 @@ class ConfigVariable(object):
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
+    def validate(self):
+      return
+
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
@@ -697,4 +702,3 @@ class ConfigVariable(object):
 
   def __ne__(self, other):
     return not (self == other)
-

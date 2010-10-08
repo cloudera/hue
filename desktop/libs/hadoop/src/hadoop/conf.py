@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Settings to configure your Hadoop cluster."""
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
 import glob
 import os
 import logging
@@ -98,6 +98,12 @@ HADOOP_PLUGIN_CLASSPATH = Config("hadoop_plugin_classpath",
   dynamic_default=find_jar("../../java-lib/hue-plugins-*.jar", root=os.path.dirname(__file__)),
   private=True)
 
+HADOOP_STATIC_GROUP_MAPPING_CLASSPATH = Config("hadoop_static_group_mapping_classpath",
+  help="[Used only in testing code.] Path to the Hadoop static group mapping jar.",
+  type=str,
+  dynamic_default=find_jar("../../static-group-mapping/java-lib/static-group-mapping-*.jar", root=os.path.dirname(__file__)),
+  private=True)
+
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
   help="One entry for each HDFS cluster",
@@ -108,7 +114,13 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=10090,
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
-                            type=int)
+                            type=int),
+      NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
+                                   default="hdfs", type=str),
+      DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode",
+                                   default="hdfs", type=str),
+      SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
+                              default=False, type=coerce_bool),
     )
   )
 )
@@ -121,7 +133,14 @@ MR_CLUSTERS = UnspecifiedConfigSection(
     members=dict(
       JT_HOST=Config("jobtracker_host", help="IP for JobTracker"),
       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
-                            type=int))))
+                            type=int),
+      JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
+                                   default="mapred", type=str),
+      SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
+                              default=False, type=coerce_bool)
+    )
+  )
+)
 
 
 def config_validator():

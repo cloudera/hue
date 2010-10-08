@@ -15,18 +15,21 @@ import java.util.HashSet;
 import java.util.EnumSet;
 import java.util.Collections;
 import java.util.BitSet;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 /**
  * Context options for every request.
  */
-public class RequestContext implements TBase<RequestContext._Fields>, java.io.Serializable, Cloneable {
+public class RequestContext implements TBase<RequestContext, RequestContext._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("RequestContext");
 
   private static final TField CONF_OPTIONS_FIELD_DESC = new TField("confOptions", TType.MAP, (short)1);
@@ -47,12 +50,10 @@ public class RequestContext implements TBase<RequestContext._Fields>, java.io.Se
      */
     CONF_OPTIONS((short)1, "confOptions");
 
-    private static final Map<Integer, _Fields> byId = new HashMap<Integer, _Fields>();
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
     static {
       for (_Fields field : EnumSet.allOf(_Fields.class)) {
-        byId.put((int)field._thriftId, field);
         byName.put(field.getFieldName(), field);
       }
     }
@@ -61,7 +62,12 @@ public class RequestContext implements TBase<RequestContext._Fields>, java.io.Se
      * Find the _Fields constant that matches fieldId, or null if its not found.
      */
     public static _Fields findByThriftId(int fieldId) {
-      return byId.get(fieldId);
+      switch(fieldId) {
+        case 1: // CONF_OPTIONS
+          return CONF_OPTIONS;
+        default:
+          return null;
+      }
     }
 
     /**
@@ -100,14 +106,14 @@ public class RequestContext implements TBase<RequestContext._Fields>, java.io.Se
 
   // isset id assignments
 
-  public static final Map<_Fields, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new EnumMap<_Fields, FieldMetaData>(_Fields.class) {{
-    put(_Fields.CONF_OPTIONS, new FieldMetaData("confOptions", TFieldRequirementType.DEFAULT, 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
+  static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.CONF_OPTIONS, new FieldMetaData("confOptions", TFieldRequirementType.DEFAULT, 
         new MapMetaData(TType.MAP, 
             new FieldValueMetaData(TType.STRING), 
             new FieldValueMetaData(TType.STRING))));
-  }});
-
-  static {
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(RequestContext.class, metaDataMap);
   }
 
@@ -146,9 +152,9 @@ public class RequestContext implements TBase<RequestContext._Fields>, java.io.Se
     return new RequestContext(this);
   }
 
-  @Deprecated
-  public RequestContext clone() {
-    return new RequestContext(this);
+  @Override
+  public void clear() {
+    this.confOptions = null;
   }
 
   public int getConfOptionsSize() {
@@ -209,10 +215,6 @@ public class RequestContext implements TBase<RequestContext._Fields>, java.io.Se
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    setFieldValue(_Fields.findByThriftIdOrThrow(fieldID), value);
-  }
-
   public Object getFieldValue(_Fields field) {
     switch (field) {
     case CONF_OPTIONS:
@@ -222,21 +224,17 @@ public class RequestContext implements TBase<RequestContext._Fields>, java.io.Se
     throw new IllegalStateException();
   }
 
-  public Object getFieldValue(int fieldId) {
-    return getFieldValue(_Fields.findByThriftIdOrThrow(fieldId));
-  }
-
   /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
   public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
     switch (field) {
     case CONF_OPTIONS:
       return isSetConfOptions();
     }
     throw new IllegalStateException();
-  }
-
-  public boolean isSet(int fieldID) {
-    return isSet(_Fields.findByThriftIdOrThrow(fieldID));
   }
 
   @Override
@@ -269,6 +267,31 @@ public class RequestContext implements TBase<RequestContext._Fields>, java.io.Se
     return 0;
   }
 
+  public int compareTo(RequestContext other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    RequestContext typedOther = (RequestContext)other;
+
+    lastComparison = Boolean.valueOf(isSetConfOptions()).compareTo(typedOther.isSetConfOptions());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetConfOptions()) {
+      lastComparison = TBaseHelper.compareTo(this.confOptions, typedOther.confOptions);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -278,33 +301,30 @@ public class RequestContext implements TBase<RequestContext._Fields>, java.io.Se
       if (field.type == TType.STOP) { 
         break;
       }
-      _Fields fieldId = _Fields.findByThriftId(field.id);
-      if (fieldId == null) {
-        TProtocolUtil.skip(iprot, field.type);
-      } else {
-        switch (fieldId) {
-          case CONF_OPTIONS:
-            if (field.type == TType.MAP) {
+      switch (field.id) {
+        case 1: // CONF_OPTIONS
+          if (field.type == TType.MAP) {
+            {
+              TMap _map4 = iprot.readMapBegin();
+              this.confOptions = new HashMap<String,String>(2*_map4.size);
+              for (int _i5 = 0; _i5 < _map4.size; ++_i5)
               {
-                TMap _map4 = iprot.readMapBegin();
-                this.confOptions = new HashMap<String,String>(2*_map4.size);
-                for (int _i5 = 0; _i5 < _map4.size; ++_i5)
-                {
-                  String _key6;
-                  String _val7;
-                  _key6 = iprot.readString();
-                  _val7 = iprot.readString();
-                  this.confOptions.put(_key6, _val7);
-                }
-                iprot.readMapEnd();
+                String _key6;
+                String _val7;
+                _key6 = iprot.readString();
+                _val7 = iprot.readString();
+                this.confOptions.put(_key6, _val7);
               }
-            } else { 
-              TProtocolUtil.skip(iprot, field.type);
+              iprot.readMapEnd();
             }
-            break;
-        }
-        iprot.readFieldEnd();
+          } else { 
+            TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        default:
+          TProtocolUtil.skip(iprot, field.type);
       }
+      iprot.readFieldEnd();
     }
     iprot.readStructEnd();
 

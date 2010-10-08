@@ -214,6 +214,9 @@ for x in sys.stdin:
     assert_equal(257, response.content.count("\n"))
 
   def test_query_with_udf(self):
+    """
+    Testing query with udf
+    """
     response = _make_query(self.client, "SELECT my_sqrt(foo), my_power(foo, foo) FROM test WHERE foo=4",
       udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'),
         ('my_power', 'org.apache.hadoop.hive.ql.udf.UDFPower')], local=False)
@@ -264,6 +267,9 @@ for x in sys.stdin:
     check_error_in_response(resp)
 
   def test_parameterization(self):
+    """
+    Test parameterization
+    """
     response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", is_parameterized=False)
     # Assert no parameterization was offered
     assert_equal("watch_wait.mako", response.template, "we should have seen the template for a query executing")
@@ -377,7 +383,6 @@ for x in sys.stdin:
     query_msg.query = 'SELECT * FROM test'
     query_msg.configuration = []
     query_msg.hadoop_user = "test"
-    query_msg.hadoop_groups = ["test"]
     handle = beeswax.db_utils.db_client().query(query_msg)
     query_data = beeswax.models.QueryHistory(server_id=handle.id, log_context=handle.log_context)
     # Get the result in xls. Then translate it into csv.
@@ -563,7 +568,7 @@ for x in sys.stdin:
         'save': True
       }
       resp = self.client.post('/beeswax/save_results/%s' % (qid,), save_data, follow=True)
-      wait_for_query_to_finish(self.client, resp, max=60)
+      wait_for_query_to_finish(self.client, resp, max=120)
 
       # Check that data is right. The SELECT may not give us the whole table.
       resp = _make_query(self.client, 'SELECT * FROM %s' % (target_tbl,), wait=True)

@@ -17,19 +17,35 @@
  */
 package org.apache.hadoop.thriftfs;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
+import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.net.NetUtils;
+import org.apache.hadoop.security.Credentials;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
+import org.apache.hadoop.security.token.delegation.AbstractDelegationTokenIdentifier;
+import org.apache.hadoop.net.NetUtils;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.thriftfs.api.Block;
 import org.apache.hadoop.thriftfs.api.Constants;
 import org.apache.hadoop.thriftfs.api.ContentSummary;
@@ -37,13 +53,21 @@ import org.apache.hadoop.thriftfs.api.DatanodeInfo;
 import org.apache.hadoop.thriftfs.api.DatanodeState;
 import org.apache.hadoop.thriftfs.api.IOException;
 import org.apache.hadoop.thriftfs.api.Namenode;
+import org.apache.hadoop.thriftfs.api.ThriftDelegationToken;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
+
+
 public class ThriftUtils {
-  
+
   static final Log LOG = LogFactory.getLog(ThriftUtils.class);
+
+  static final String HUE_USER_NAME_KEY = "hue.kerberos.principal.shortname";
+  static final String HUE_USER_NAME_DEFAULT = "hue";
 
   public static LocatedBlock fromThrift(Block block) {
     if (block == null) {
@@ -65,7 +89,7 @@ public class ThriftUtils {
   }
 
   public static Block toThrift(LocatedBlock block, String path,
-      Map<DatanodeID, Integer> thriftPorts) {
+      Map<DatanodeID, Integer> thriftPorts) throws java.io.IOException {
     if (block == null) {
       return new Block();
     }
@@ -80,7 +104,7 @@ public class ThriftUtils {
 
     org.apache.hadoop.hdfs.protocol.Block b = block.getBlock();
     return new Block(b.getBlockId(), path, b.getNumBytes(),
-                     b.getGenerationStamp(), block.getStartOffset(), nodes);
+                     b.getGenerationStamp(), nodes, block.getStartOffset(), block.getBlockToken().encodeToUrlString());
   }
 
   public static ContentSummary toThrift(org.apache.hadoop.fs.ContentSummary cs, String path) {
@@ -165,6 +189,73 @@ public class ThriftUtils {
   }
 
   /**
+   * An invocation proxy that authorizes all calls into the Thrift interface.
+   * This proxy intercepts all method calls on the handler interface, and verifies
+   * that the remote UGI is either (a) the hue user, or (b) another HDFS daemon.
+   */
+  public static class SecurityCheckingProxy<T> implements InvocationHandler {
+    private final T wrapped;
+    private final Configuration conf;
+
+    @SuppressWarnings("unchecked")
+    public static <T> T create(Configuration conf, T wrapped, Class<T> iface) {
+      return (T)java.lang.reflect.Proxy.newProxyInstance(
+        iface.getClassLoader(),
+        new Class[] { iface },
+        new SecurityCheckingProxy<T>(wrapped, conf));
+    }
+
+    private SecurityCheckingProxy(T wrapped, Configuration conf) {
+      this.wrapped = wrapped;
+      this.conf = conf;
+    }
+
+    public Object invoke(Object proxy, Method m, Object[] args)
+      throws Throwable
+    {
+      Object result;
+      try {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Call " + wrapped.getClass() + "." + m.getName()
+                    + "(" + StringUtils.joinObjects(", ", Arrays.asList(args)) + ")");
+        }
+        authorizeCall(m);
+
+	    return m.invoke(wrapped, args);
+      } catch (InvocationTargetException e) {
+	    throw e.getTargetException();
+      }
+    }
+
+    private void authorizeCall(Method m) throws IOException, TException {
+      // TODO: this should use the AccessControlList functionality,
+      // ideally.
+      try {
+        UserGroupInformation caller = UserGroupInformation.getCurrentUser();
+
+        if (!conf.get(HUE_USER_NAME_KEY, HUE_USER_NAME_DEFAULT).equals(
+              caller.getShortUserName()) &&
+            !UserGroupInformation.getLoginUser().getShortUserName().equals(
+              caller.getShortUserName())) {
+
+          String errMsg = "Unauthorized access for user " + caller.getUserName();
+          // If we can throw our thrift IOException type, do so, so it goes back
+          // to the client correctly.
+          if (Arrays.asList(m.getExceptionTypes()).contains(IOException.class)) {
+            throw ThriftUtils.toThrift(new Exception(errMsg));
+          } else {
+            // Otherwise we have to just throw the more generic exception, which
+            // won't make it back to the client
+            throw new TException(errMsg);
+          }
+        }
+      } catch (java.io.IOException ioe) {
+        throw new TException(ioe);
+      }
+    }
+  }
+
+  /**
    * Creates a Thrift name node client.
    * 
    * @param conf the HDFS instance
@@ -186,8 +277,32 @@ public class ThriftUtils {
     }
 
     TTransport t = new TSocket(addr.getHostName(), addr.getPort());
+    if (UserGroupInformation.isSecurityEnabled()) {
+      t = new HadoopThriftAuthBridge.Client()
+        .createClientTransport(
+          conf.get(DFSConfigKeys.DFS_NAMENODE_USER_NAME_KEY),
+          addr.getHostName(),
+          "KERBEROS", t);
+    }
+
     t.open();
     TProtocol p = new TBinaryProtocol(t);
     return new Namenode.Client(p);
+  }
+
+  public static ThriftDelegationToken toThrift(Token<? extends AbstractDelegationTokenIdentifier> delegationToken,
+      InetSocketAddress address) throws java.io.IOException {
+    String serviceAddress = InetAddress.getByName(address.getHostName()).getHostAddress() + ":"
+        + address.getPort();
+    delegationToken.setService(new Text(serviceAddress));
+
+    DataOutputBuffer out = new DataOutputBuffer();
+    Credentials ts = new Credentials();
+    ts.addToken(new Text(serviceAddress), delegationToken);
+    ts.writeTokenStorageToStream(out);
+
+    byte[] tokenData = new byte[out.getLength()];
+    System.arraycopy(out.getData(), 0, tokenData, 0, tokenData.length);
+    return new ThriftDelegationToken(ByteBuffer.wrap(tokenData));
   }
 }

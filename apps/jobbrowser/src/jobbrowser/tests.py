@@ -67,6 +67,11 @@ class TestJobBrowserWithHadoop(object):
     if not cluster.fs.exists("/user/test"):
       cluster.fs.mkdir("/user/test")
     cluster.fs.chown("/user/test", "test", "test")
+
+    if not cluster.fs.exists("/tmp"):
+      cluster.fs.mkdir("/tmp")
+    cluster.fs.chmod("/tmp", int('777', 8))
+
     cluster.fs.setuser("test")
 
     cls.cluster = cluster
@@ -184,24 +189,17 @@ class TestJobBrowserWithHadoop(object):
     assert_equal(
       response.context['job'].counters['FileSystemCounters']['counters']['FILE_BYTES_WRITTEN'],
       {'map': 44L, 'reduce': 12L, 'displayName': 'FILE_BYTES_WRITTEN', 'name': 'FILE_BYTES_WRITTEN'}
-      )
-    assert_equal(
-      response.context['job'].counters['org.apache.hadoop.mapred.JobInProgress$Counter'],
-      {'displayName': 'Job Counters ',
-       'name': 'org.apache.hadoop.mapred.JobInProgress$Counter',
-       'counters': {
-          'TOTAL_LAUNCHED_MAPS': {
-            'total': 1L,
-            'displayName': 'Launched map tasks',
-            'name': 'TOTAL_LAUNCHED_MAPS'
-            },
-          'TOTAL_LAUNCHED_REDUCES': {
-            'total': 1L,
-            'displayName': 'Launched reduce tasks',
-            'name': 'TOTAL_LAUNCHED_REDUCES'
-            }
-          }
-       })
+    )
+
+    # We can't just check the complete contents of the python map because the
+    # SLOTS_MILLIS_* entries have a variable number of milliseconds from
+    # run-to-run.
+    assert_equal(response.context['job'].counters['org.apache.hadoop.mapred.JobInProgress$Counter']['counters']['TOTAL_LAUNCHED_MAPS']['total'], 1)
+    assert_equal(response.context['job'].counters['org.apache.hadoop.mapred.JobInProgress$Counter']['counters']['TOTAL_LAUNCHED_REDUCES']['total'], 1)
+    assert_equal(response.context['job'].counters['org.apache.hadoop.mapred.JobInProgress$Counter']['counters']['FALLOW_SLOTS_MILLIS_MAPS']['total'], 0)
+    assert_equal(response.context['job'].counters['org.apache.hadoop.mapred.JobInProgress$Counter']['counters']['FALLOW_SLOTS_MILLIS_REDUCES']['total'], 0)
+    assert_true(response.context['job'].counters['org.apache.hadoop.mapred.JobInProgress$Counter']['counters']['SLOTS_MILLIS_MAPS']['total'] > 0)
+    assert_true(response.context['job'].counters['org.apache.hadoop.mapred.JobInProgress$Counter']['counters']['SLOTS_MILLIS_REDUCES']['total'] > 0)
 
     # Check conf keys made it
     assert_equal(response.context['job'].conf_keys['mapredReducerClass'],
@@ -272,4 +270,6 @@ class TestJobBrowserWithHadoop(object):
     # Test dock jobs
     response = self.client.get('/jobbrowser/dock_jobs/')
     assert_true('completed' in response.content)
+    # TODO(atm): I'm pretty sure the following test only passes because of
+    # failed jobs which are run in test_failed_jobs
     assert_true('failed' in response.content)

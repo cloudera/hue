@@ -31,7 +31,6 @@ struct Query {
 
   // User and groups to "act as" for purposes of Hadoop.
   4: string hadoop_user;
-  5: list<string> hadoop_groups;
 }
 
 typedef string LogContextId

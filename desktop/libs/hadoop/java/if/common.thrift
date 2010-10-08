@@ -112,6 +112,10 @@ struct MetricsContext {
   4: map<string, list<MetricsRecord>> records
 }
 
+struct ThriftDelegationToken {
+  1: binary delegationTokenBytes
+}
+
 service HadoopServiceBase {
   /** Return the version information for this server */
   VersionInfo getVersionInfo(10:RequestContext ctx);

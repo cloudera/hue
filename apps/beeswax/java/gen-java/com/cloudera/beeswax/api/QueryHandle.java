@@ -10,37 +10,103 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Collections;
-import org.apache.log4j.Logger;
+import java.util.BitSet;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
-public class QueryHandle implements TBase, java.io.Serializable, Cloneable {
+public class QueryHandle implements TBase<QueryHandle, QueryHandle._Fields>, java.io.Serializable, Cloneable {
   private static final TStruct STRUCT_DESC = new TStruct("QueryHandle");
+
   private static final TField ID_FIELD_DESC = new TField("id", TType.STRING, (short)1);
   private static final TField LOG_CONTEXT_FIELD_DESC = new TField("log_context", TType.STRING, (short)2);
 
   public String id;
-  public static final int ID = 1;
   public String log_context;
-  public static final int LOG_CONTEXT = 2;
 
-  private final Isset __isset = new Isset();
-  private static final class Isset implements java.io.Serializable {
+  /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+  public enum _Fields implements TFieldIdEnum {
+    ID((short)1, "id"),
+    LOG_CONTEXT((short)2, "log_context");
+
+    private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+    static {
+      for (_Fields field : EnumSet.allOf(_Fields.class)) {
+        byName.put(field.getFieldName(), field);
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, or null if its not found.
+     */
+    public static _Fields findByThriftId(int fieldId) {
+      switch(fieldId) {
+        case 1: // ID
+          return ID;
+        case 2: // LOG_CONTEXT
+          return LOG_CONTEXT;
+        default:
+          return null;
+      }
+    }
+
+    /**
+     * Find the _Fields constant that matches fieldId, throwing an exception
+     * if it is not found.
+     */
+    public static _Fields findByThriftIdOrThrow(int fieldId) {
+      _Fields fields = findByThriftId(fieldId);
+      if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+      return fields;
+    }
+
+    /**
+     * Find the _Fields constant that matches name, or null if its not found.
+     */
+    public static _Fields findByName(String name) {
+      return byName.get(name);
+    }
+
+    private final short _thriftId;
+    private final String _fieldName;
+
+    _Fields(short thriftId, String fieldName) {
+      _thriftId = thriftId;
+      _fieldName = fieldName;
+    }
+
+    public short getThriftFieldId() {
+      return _thriftId;
+    }
+
+    public String getFieldName() {
+      return _fieldName;
+    }
   }
 
-  public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-    put(ID, new FieldMetaData("id", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-    put(LOG_CONTEXT, new FieldMetaData("log_context", TFieldRequirementType.DEFAULT, 
-        new FieldValueMetaData(TType.STRING)));
-  }});
+  // isset id assignments
 
+  public static final Map<_Fields, FieldMetaData> metaDataMap;
   static {
+    Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.ID, new FieldMetaData("id", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING)));
+    tmpMap.put(_Fields.LOG_CONTEXT, new FieldMetaData("log_context", TFieldRequirementType.DEFAULT, 
+        new FieldValueMetaData(TType.STRING        , "LogContextId")));
+    metaDataMap = Collections.unmodifiableMap(tmpMap);
     FieldMetaData.addStructMetaDataMap(QueryHandle.class, metaDataMap);
   }
 
@@ -68,24 +134,30 @@ public class QueryHandle implements TBase, java.io.Serializable, Cloneable {
     }
   }
 
-  @Override
-  public QueryHandle clone() {
+  public QueryHandle deepCopy() {
     return new QueryHandle(this);
+  }
+
+  @Override
+  public void clear() {
+    this.id = null;
+    this.log_context = null;
   }
 
   public String getId() {
     return this.id;
   }
 
-  public void setId(String id) {
+  public QueryHandle setId(String id) {
     this.id = id;
+    return this;
   }
 
   public void unsetId() {
     this.id = null;
   }
 
-  // Returns true if field id is set (has been asigned a value) and false otherwise
+  /** Returns true if field id is set (has been asigned a value) and false otherwise */
   public boolean isSetId() {
     return this.id != null;
   }
@@ -100,15 +172,16 @@ public class QueryHandle implements TBase, java.io.Serializable, Cloneable {
     return this.log_context;
   }
 
-  public void setLog_context(String log_context) {
+  public QueryHandle setLog_context(String log_context) {
     this.log_context = log_context;
+    return this;
   }
 
   public void unsetLog_context() {
     this.log_context = null;
   }
 
-  // Returns true if field log_context is set (has been asigned a value) and false otherwise
+  /** Returns true if field log_context is set (has been asigned a value) and false otherwise */
   public boolean isSetLog_context() {
     return this.log_context != null;
   }
@@ -119,8 +192,8 @@ public class QueryHandle implements TBase, java.io.Serializable, Cloneable {
     }
   }
 
-  public void setFieldValue(int fieldID, Object value) {
-    switch (fieldID) {
+  public void setFieldValue(_Fields field, Object value) {
+    switch (field) {
     case ID:
       if (value == null) {
         unsetId();
@@ -137,34 +210,34 @@ public class QueryHandle implements TBase, java.io.Serializable, Cloneable {
       }
       break;
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
   }
 
-  public Object getFieldValue(int fieldID) {
-    switch (fieldID) {
+  public Object getFieldValue(_Fields field) {
+    switch (field) {
     case ID:
       return getId();
 
     case LOG_CONTEXT:
       return getLog_context();
 
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
-  // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-  public boolean isSet(int fieldID) {
-    switch (fieldID) {
+  /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+  public boolean isSet(_Fields field) {
+    if (field == null) {
+      throw new IllegalArgumentException();
+    }
+
+    switch (field) {
     case ID:
       return isSetId();
     case LOG_CONTEXT:
       return isSetLog_context();
-    default:
-      throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
     }
+    throw new IllegalStateException();
   }
 
   @Override
@@ -218,6 +291,41 @@ public class QueryHandle implements TBase, java.io.Serializable, Cloneable {
     return builder.toHashCode();
   }
 
+  public int compareTo(QueryHandle other) {
+    if (!getClass().equals(other.getClass())) {
+      return getClass().getName().compareTo(other.getClass().getName());
+    }
+
+    int lastComparison = 0;
+    QueryHandle typedOther = (QueryHandle)other;
+
+    lastComparison = Boolean.valueOf(isSetId()).compareTo(typedOther.isSetId());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetId()) {
+      lastComparison = TBaseHelper.compareTo(this.id, typedOther.id);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetLog_context()).compareTo(typedOther.isSetLog_context());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetLog_context()) {
+      lastComparison = TBaseHelper.compareTo(this.log_context, typedOther.log_context);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    return 0;
+  }
+
+  public _Fields fieldForId(int fieldId) {
+    return _Fields.findByThriftId(fieldId);
+  }
+
   public void read(TProtocol iprot) throws TException {
     TField field;
     iprot.readStructBegin();
@@ -227,16 +335,15 @@ public class QueryHandle implements TBase, java.io.Serializable, Cloneable {
       if (field.type == TType.STOP) { 
         break;
       }
-      switch (field.id)
-      {
-        case ID:
+      switch (field.id) {
+        case 1: // ID
           if (field.type == TType.STRING) {
             this.id = iprot.readString();
           } else { 
             TProtocolUtil.skip(iprot, field.type);
           }
           break;
-        case LOG_CONTEXT:
+        case 2: // LOG_CONTEXT
           if (field.type == TType.STRING) {
             this.log_context = iprot.readString();
           } else { 
@@ -245,12 +352,10 @@ public class QueryHandle implements TBase, java.io.Serializable, Cloneable {
           break;
         default:
           TProtocolUtil.skip(iprot, field.type);
-          break;
       }
       iprot.readFieldEnd();
     }
     iprot.readStructEnd();
-
 
     // check for required fields of primitive type, which can't be checked in the validate method
     validate();
@@ -300,7 +405,6 @@ public class QueryHandle implements TBase, java.io.Serializable, Cloneable {
 
   public void validate() throws TException {
     // check for required fields
-    // check that fields of type enum have valid values
   }
 
 }

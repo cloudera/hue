@@ -18,8 +18,12 @@
 package org.apache.hadoop.thriftfs;
 
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,37 +32,38 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
+import org.apache.hadoop.hdfs.protocol.DirectoryListing;
 import org.apache.hadoop.hdfs.protocol.FSConstants;
+import org.apache.hadoop.hdfs.protocol.HdfsFileStatus;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.protocol.FSConstants.SafeModeAction;
-import org.apache.hadoop.hdfs.server.namenode.DatanodeDescriptor;
-import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
+import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.net.NetUtils;
+import org.apache.hadoop.security.Credentials;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.thriftfs.api.Block;
 import org.apache.hadoop.thriftfs.api.Constants;
 import org.apache.hadoop.thriftfs.api.ContentSummary;
-import org.apache.hadoop.thriftfs.api.DatanodeInfo;
-import org.apache.hadoop.thriftfs.api.DFSHealthReport;
 import org.apache.hadoop.thriftfs.api.IOException;
 import org.apache.hadoop.thriftfs.api.Namenode;
 import org.apache.hadoop.thriftfs.api.RequestContext;
 import org.apache.hadoop.thriftfs.api.Stat;
-import org.apache.hadoop.thriftfs.api.UpgradeStatusReport;
-import org.apache.hadoop.util.ServicePlugin;
+import org.apache.hadoop.thriftfs.api.ThriftDelegationToken;
 import org.apache.thrift.TException;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.transport.TTransport;
 
-public class NamenodePlugin
-  extends org.apache.hadoop.hdfs.server.namenode.NamenodePlugin
-  implements Configurable {
+public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.NamenodePlugin implements
+    Configurable {
 
   /** Name of the configuration property of the Thrift server address */
   public static final String THRIFT_ADDRESS_PROPERTY = "dfs.thrift.address";
@@ -71,14 +76,12 @@ public class NamenodePlugin
 
   private NameNode namenode;
 
-  private static Map<DatanodeID, Integer> thriftPorts =
-      new HashMap<DatanodeID, Integer>();
+  private static Map<DatanodeID, Integer> thriftPorts = Collections.synchronizedMap(new HashMap<DatanodeID, Integer>());
 
   static final Log LOG = LogFactory.getLog(NamenodePlugin.class);
 
   private Configuration conf;
   private ThriftPluginServer thriftServer;
-
 
   /** Java server-side implementation of the 'Namenode' Thrift interface. */
   class ThriftHandler extends ThriftHandlerBase implements Namenode.Iface {
@@ -87,284 +90,186 @@ public class NamenodePlugin
       super(context);
     }
 
-    public void chmod(RequestContext ctx, String path, short mode) throws IOException, TException {
-      assumeUserContext(ctx);
+    public void chmod(RequestContext ctx, final String path, final short mode) throws IOException {
       LOG.debug("chmod(" + path + ", " + mode + "): Entering");
-      try {
-        namenode.setPermission(path, new FsPermission(mode));
-      } catch (Throwable t) {
-        LOG.info("chmod(" + path + ", " + mode + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+        public Void run() throws java.io.IOException {
+          namenode.setPermission(path, new FsPermission(mode));
+          return null;
+        }
+      });
     }
 
-    public void chown(RequestContext ctx, String path, String owner, String group)
-        throws IOException, TException {
-      assumeUserContext(ctx);
+    public void chown(RequestContext ctx, final String path, final String owner, final String group)
+        throws IOException {
       LOG.debug("chown(" + path + "," + owner + "," + group + "): Entering");
-      try {
-        // XXX Looks like namenode.setOwner() does not complain about this...
-        if (owner == null && group == null) {
-          throw new IllegalArgumentException(
-              "Both 'owner' and 'group' are null");
-        }
-        namenode.setOwner(path, owner, group);
-      } catch (Throwable t) {
-        LOG.info("chown(" + path + "," + owner + "," + group + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
-    }
-
-    public List<Long> df(RequestContext ctx) throws IOException, TException {
-      assumeUserContext(ctx);
-      LOG.debug("Entering df()");
-      try {
-        long[] stats = namenode.getStats();
-        List<Long> ret = new ArrayList<Long>();
-        // capacityTotal
-        ret.add(stats[0]);
-        // capacityUsed
-        ret.add(stats[1]);
-        // capacityRemaining
-        ret.add(stats[2]);
-        LOG.debug("df(): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("df(): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
-    }
-
-    public void enterSafeMode(RequestContext ctx) throws IOException, TException {
-      assumeUserContext(ctx);
-      LOG.debug("enterSafeMode(): Entering");
-      try {
-        namenode.setSafeMode(SafeModeAction.SAFEMODE_ENTER);
-      } catch (Throwable t) {
-        LOG.info("enterSafeMode(): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
-    }
-
-    public List<Block> getBlocks(RequestContext ctx, String path, long offset, long length)
-        throws IOException, TException {
-      assumeUserContext(ctx);
-      LOG.debug("getBlocks(" + path + "," + offset + "," + length
-          + "): Entering");
-      List<Block> ret = new ArrayList<Block>();
-      try {
-        LocatedBlocks blocks = namenode.getBlockLocations(path, offset, length);
-        if (blocks != null) {
-          // blocks may be null if offset is past the end of the file
-          for (LocatedBlock b : blocks.getLocatedBlocks()) {
-            ret.add(ThriftUtils.toThrift(b, path, thriftPorts));
+      assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+        public Void run() throws java.io.IOException {
+          // XXX Looks like namenode.setOwner() does not complain about
+          // this...
+          if (owner == null && group == null) {
+            throw new IllegalArgumentException("Both 'owner' and 'group' are null");
           }
+          namenode.setOwner(path, owner, group);
+          return null;
         }
-        LOG.debug("getBlocks(" + path + "," + offset + "," + length
-            + "): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("getBlocks(" + path + "," + offset + "," + length
-            + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      });
     }
 
-    public DFSHealthReport getHealthReport(RequestContext ctx) throws IOException {
-      // Health report can only be run by the superuser,
-      // but is always available.  Therefore, we ignore ctx.
-      assumeSuperuserContext();
-
-      DFSHealthReport hr = new DFSHealthReport();
-      try {
-        long[] fsnStats = namenode.getStats();
-        hr.bytesTotal = fsnStats[0];
-        hr.bytesRemaining = fsnStats[2];
-        hr.bytesUsed = fsnStats[1];
-        hr.bytesNonDfs = hr.bytesTotal - hr.bytesRemaining - hr.bytesUsed;
-
-        ArrayList<DatanodeDescriptor> live = new ArrayList<DatanodeDescriptor>();
-        ArrayList<DatanodeDescriptor> dead = new ArrayList<DatanodeDescriptor>();
-
-        namenode.getNamesystem().DFSNodesStatus(live, dead);
-
-        hr.numLiveDataNodes = live.size();
-        hr.numDeadDataNodes = dead.size();
-
-        org.apache.hadoop.hdfs.server.common.UpgradeStatusReport usr =
-          namenode.distributedUpgradeProgress(FSConstants.UpgradeAction.DETAILED_STATUS);
-        if (usr != null) {
-          hr.upgradeStatus = new UpgradeStatusReport();
-          hr.upgradeStatus.version = usr.getVersion();
-          hr.upgradeStatus.percentComplete = usr.getUpgradeStatus();
-          hr.upgradeStatus.finalized = usr.isFinalized();
-          hr.upgradeStatus.statusText = usr.getStatusText(true);
+    public List<Long> df(RequestContext ctx) {
+      LOG.debug("Entering df()");
+      return assumeUserContextAndExecute(ctx, new PrivilegedAction<List<Long>>() {
+        public List<Long> run() {
+          long[] stats = namenode.getStats();
+          List<Long> ret = new ArrayList<Long>();
+          // capacityTotal
+          ret.add(stats[0]);
+          // capacityUsed
+          ret.add(stats[1]);
+          // capacityRemaining
+          ret.add(stats[2]);
+          LOG.debug("df(): Returning " + ret);
+          return ret;
         }
-
-        hr.httpPort = namenode.getHttpAddress().getPort();
-      } catch (java.io.IOException ioe) {
-        LOG.info("getHealthReport() failed", ioe);
-        throw ThriftUtils.toThrift(ioe);
-      }
-      return hr;
+      });
     }
 
-    public List<DatanodeInfo> getDatanodeReport(
-      RequestContext ctx, org.apache.hadoop.thriftfs.api.DatanodeReportType type)
-        throws IOException, TException
-    {
-      // Datanode report can only be run by the superuser, therefore, we ignore 
-      // ctx.
-      assumeSuperuserContext();
-
-      LOG.debug("getDatanodeReport(" + type + "): Entering");
-      List<DatanodeInfo> ret = new ArrayList<DatanodeInfo>();
-      try {
-        FSConstants.DatanodeReportType rt;
-        switch (type) {
-        case ALL_DATANODES:
-          rt = FSConstants.DatanodeReportType.ALL;
-          break;
-        case DEAD_DATANODES:
-          rt = FSConstants.DatanodeReportType.DEAD;
-          break;
-        case LIVE_DATANODES:
-          rt = FSConstants.DatanodeReportType.LIVE;
-          break;
-        default:
-          throw new IllegalArgumentException("Invalid report type " + type);
+    public void enterSafeMode(RequestContext ctx) throws IOException {
+      LOG.debug("enterSafeMode(): Entering");
+      assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+        public Void run() throws java.io.IOException {
+          namenode.setSafeMode(SafeModeAction.SAFEMODE_ENTER);
+          return null;
         }
-        for (org.apache.hadoop.hdfs.protocol.DatanodeInfo node : namenode
-            .getDatanodeReport(rt)) {
-          ret.add(ThriftUtils.toThrift(node, thriftPorts));
-        }
-        LOG.debug("getDatanodeReport(" + type + "): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("getDatanodeReport(" + type + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      });
     }
 
-    public long getPreferredBlockSize(RequestContext ctx, String path) throws IOException,
-        TException {
-      assumeUserContext(ctx);
+    public List<Block> getBlocks(RequestContext ctx, final String path, final long offset,
+        final long length) throws IOException {
+      LOG.debug("getBlocks(" + path + "," + offset + "," + length + "): Entering");
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<List<Block>>() {
+        public List<Block> run() throws java.io.IOException {
+          List<Block> ret = new ArrayList<Block>();
+          LocatedBlocks blocks = namenode.getBlockLocations(path, offset, length);
+          if (blocks != null) {
+            // blocks may be null if offset is past the end of the file
+            for (LocatedBlock b : blocks.getLocatedBlocks()) {
+              ret.add(ThriftUtils.toThrift(b, path, thriftPorts));
+            }
+          }
+          LOG.debug("getBlocks(" + path + "," + offset + "," + length + "): Returning " + ret);
+          return ret;
+        }
+      });
+    }
+
+    public long getPreferredBlockSize(RequestContext ctx, final String path) throws IOException {
       LOG.debug("getPreferredBlockSize(" + path + "): Entering");
-      try {
-        long ret = namenode.getPreferredBlockSize(path);
-        LOG.debug("getPreferredBlockSize(" + path + "): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("getPreferredBlockSize(" + path + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Long>() {
+        public Long run() throws java.io.IOException {
+          long ret = namenode.getPreferredBlockSize(path);
+          LOG.debug("getPreferredBlockSize(" + path + "): Returning " + ret);
+          return ret;
+        }
+      });
     }
 
-    public boolean isInSafeMode(RequestContext ctx) throws IOException, TException {
-      assumeUserContext(ctx);
+    public boolean isInSafeMode(RequestContext ctx) throws IOException {
       LOG.debug("isInSafeMode(): Entering");
-      try {
-        boolean ret = namenode.setSafeMode(SafeModeAction.SAFEMODE_GET);
-        LOG.debug("isInSafeMode(): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("isInSafeMode(): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Boolean>() {
+        public Boolean run() throws java.io.IOException {
+          boolean ret = namenode.setSafeMode(SafeModeAction.SAFEMODE_GET);
+          LOG.debug("isInSafeMode(): Returning " + ret);
+          return ret;
+        }
+      });
     }
 
-    public void leaveSafeMode(RequestContext ctx) throws IOException, TException {
-      assumeUserContext(ctx);
+    public void leaveSafeMode(RequestContext ctx) throws IOException {
       LOG.debug("leaveSafeMode(): Entering");
-      try {
-        namenode.setSafeMode(SafeModeAction.SAFEMODE_LEAVE);
-      } catch (Throwable t) {
-        LOG.info("leaveSafeMode(): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+        public Void run() throws java.io.IOException {
+          namenode.setSafeMode(SafeModeAction.SAFEMODE_LEAVE);
+          return null;
+        }
+      });
     }
 
-    public List<Stat> ls(RequestContext ctx, String path) throws IOException, TException {
-      assumeUserContext(ctx);
+    public List<Stat> ls(RequestContext ctx, final String path) throws IOException {
       LOG.debug("ls(" + path + "):Entering");
-      List<Stat> ret = new ArrayList<Stat>();
-      try {
-        FileStatus[] listing = namenode.getListing(path);
-        if (listing == null) {
-          throw new FileNotFoundException("Not found: " + path);
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<List<Stat>>() {
+        public List<Stat> run() throws java.io.IOException {
+          List<Stat> ret = new ArrayList<Stat>();
+          byte[] lastReturnedName = HdfsFileStatus.EMPTY_NAME;
+          DirectoryListing listing;
+          do {
+            listing = namenode.getListing(path, lastReturnedName);
+            if (listing == null) {
+              throw new FileNotFoundException("Not found: " + path);
+            }
+            for (HdfsFileStatus f : listing.getPartialListing()) {
+              ret.add(fileStatusToStat(f, path));
+            }
+            lastReturnedName = listing.getLastName();
+          } while (listing.hasMore());
+          LOG.debug("ls(" + path + "): Returning " + ret);
+          return ret;
         }
-        for (FileStatus f : listing) {
-          ret.add(fileStatusToStat(f));
-        }
-        LOG.debug("ls(" + path + "): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("ls(" + path + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      });
     }
 
-    public boolean mkdirhier(RequestContext ctx, String path, short perms) throws IOException,
-        TException {
-      assumeUserContext(ctx);
+    public boolean mkdirhier(RequestContext ctx, final String path, final short perms)
+        throws IOException {
       LOG.debug("mkdirhier(" + path + ", " + perms + "): Entering");
-      try {
-        boolean ret = namenode.mkdirs(path, new FsPermission(perms));
-        LOG.debug("mkdirhier(" + path + ", " + perms + "): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("mkdirhier(" + path + ", " + perms + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Boolean>() {
+        public Boolean run() throws java.io.IOException {
+          boolean ret = namenode.mkdirs(path, new FsPermission(perms));
+          LOG.debug("mkdirhier(" + path + ", " + perms + "): Returning " + ret);
+          return ret;
+        }
+      });
     }
 
-    public void refreshNodes(RequestContext ctx) throws IOException, TException {
-      assumeUserContext(ctx);
+    public void refreshNodes(RequestContext ctx) throws IOException {
       LOG.debug("refreshNodes(): Entering");
-      try {
-        namenode.refreshNodes();
-      } catch (Throwable t) {
-        LOG.info("refreshNodes(): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+        public Void run() throws java.io.IOException {
+          namenode.refreshNodes();
+          return null;
+        }
+      });
     }
 
-    public boolean rename(RequestContext ctx, String path, String newPath) throws IOException,
-        TException {
-      assumeUserContext(ctx);
+    public boolean rename(RequestContext ctx, final String path, final String newPath)
+        throws IOException {
       LOG.debug("rename(" + path + ", " + newPath + "): Entering");
-      try {
-        boolean ret = namenode.rename(path, newPath);
-        LOG.debug("rename(" + path + ", " + newPath + "): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("rename(" + path + ", " + newPath + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Boolean>() {
+        public Boolean run() throws java.io.IOException {
+          boolean ret = namenode.rename(path, newPath);
+          LOG.debug("rename(" + path + ", " + newPath + "): Returning " + ret);
+          return ret;
+        }
+      });
     }
 
-    public void reportBadBlocks(RequestContext ctx, List<Block> blocks) throws IOException,
-        TException {
-      assumeUserContext(ctx);
+    public void reportBadBlocks(RequestContext ctx, final List<Block> blocks) throws IOException {
       LOG.debug("reportBadBlocks(" + blocks + "): Entering");
-      int n = blocks.size();
-      LocatedBlock[] lb = new LocatedBlock[n];
-      for (int i = 0; i < n; ++i) {
-        lb[i] = ThriftUtils.fromThrift(blocks.get(i));
-      }
-      try {
-        namenode.reportBadBlocks(lb);
-      } catch (Throwable t) {
-        LOG.info("reportBadBlocks(" + blocks + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+        public Void run() throws java.io.IOException {
+          int n = blocks.size();
+          LocatedBlock[] lb = new LocatedBlock[n];
+          for (int i = 0; i < n; ++i) {
+            lb[i] = ThriftUtils.fromThrift(blocks.get(i));
+          }
+          namenode.reportBadBlocks(lb);
+          return null;
+        }
+      });
     }
 
-    public void setQuota(RequestContext ctx, String path, long namespaceQuota, long diskspaceQuota)
-        throws IOException, TException {
-      assumeUserContext(ctx);
-      LOG.debug("setQuota(" + path + "," + namespaceQuota + ","
-          + diskspaceQuota + "): Entering");
+    public void setQuota(RequestContext ctx, final String path, long namespaceQuota,
+        long diskspaceQuota) throws IOException {
+      LOG.debug("setQuota(" + path + "," + namespaceQuota + "," + diskspaceQuota + "): Entering");
       if (namespaceQuota == Constants.QUOTA_DONT_SET) {
         namespaceQuota = FSConstants.QUOTA_DONT_SET;
       }
@@ -377,145 +282,143 @@ public class NamenodePlugin
       if (diskspaceQuota == Constants.QUOTA_RESET) {
         diskspaceQuota = FSConstants.QUOTA_RESET;
       }
-      LOG.debug("setQuota(" + path + "," + namespaceQuota + ","
-          + diskspaceQuota + "): Quota values translated");
-      try {
-        namenode.setQuota(path, namespaceQuota, diskspaceQuota);
-      } catch (Throwable t) {
-        LOG.info("setQuota(" + path + "," + namespaceQuota + ","
-            + diskspaceQuota + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
-    }
-
-    public boolean setReplication(RequestContext ctx, String path, short repl) throws IOException,
-        TException {
-      assumeUserContext(ctx);
-      LOG.debug("setReplication(" + path + "," + repl + "): Entering");
-      try {
-        return namenode.setReplication(path, repl);
-      } catch (Throwable t) {
-        LOG.info("setReplication(" + path + "," + repl + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
-    }
-
-    public Stat stat(RequestContext ctx, String path) throws IOException, TException {
-      assumeUserContext(ctx);
-      LOG.debug("stat(" + path + "): Entering");
-      try {
-        Stat ret = fileStatusToStat(namenode.getFileInfo(path));
-        LOG.debug("stat(" + path + "): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("stat(" + path + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
-    }
-
-    public ContentSummary getContentSummary(RequestContext ctx, String path)
-      throws IOException, TException {
-      assumeUserContext(ctx);
-      LOG.debug("getContentSummary(" + path + "): Entering");
-      try {
-        ContentSummary cs = getContentSummary(path);
-        LOG.debug("getContentSummary(" + path + "): Returning " + cs);
-        return cs;
-      } catch (Throwable t) {
-        LOG.info("getContentSummary(" + path + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
-    }
-
-    public List<ContentSummary> multiGetContentSummary(RequestContext ctx, List<String> paths)
-        throws IOException, TException {
-        assumeUserContext(ctx);
-        LOG.debug("multiGetContentSummary(" + paths + "): Entering");
-        List<ContentSummary> ret = new ArrayList<ContentSummary>();
-        try {
-            for (String path : paths) {
-                ret.add(getContentSummary(path));
-            }
-        } catch (Throwable t) {
-            LOG.info("multiGetContentSummary(" + paths + "): Failed", t);
-            throw ThriftUtils.toThrift(t);
+      final long finalNamespaceQuota = namespaceQuota;
+      final long finalDiskspaceQuota = diskspaceQuota;
+      assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+        public Void run() throws java.io.IOException {
+          LOG.debug("setQuota(" + path + "," + finalNamespaceQuota + "," + finalDiskspaceQuota
+              + "): Quota values translated");
+          namenode.setQuota(path, finalNamespaceQuota, finalDiskspaceQuota);
+          return null;
         }
-        LOG.debug("multiGetContentSummary(" + paths + "): Returning " + ret);
-        return ret;
+      });
+    }
+
+    public boolean setReplication(RequestContext ctx, final String path, final short repl)
+        throws IOException {
+      LOG.debug("setReplication(" + path + "," + repl + "): Entering");
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Boolean>() {
+        public Boolean run() throws java.io.IOException {
+          return namenode.setReplication(path, repl);
+        }
+      });
+    }
+
+    public Stat stat(RequestContext ctx, final String path) throws IOException {
+      LOG.debug("stat(" + path + "): Entering");
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Stat>() {
+        public Stat run() throws java.io.IOException {
+          Stat ret = fileStatusToStat(namenode.getFileInfo(path), path);
+          LOG.debug("stat(" + path + "): Returning " + ret);
+          return ret;
+        }
+      });
+    }
+
+    public ContentSummary getContentSummary(RequestContext ctx, final String path)
+        throws IOException {
+      LOG.debug("getContentSummary(" + path + "): Entering");
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<ContentSummary>() {
+        public ContentSummary run() throws java.io.IOException {
+          ContentSummary cs = getContentSummary(path);
+          LOG.debug("getContentSummary(" + path + "): Returning " + cs);
+          return cs;
+        }
+      });
+    }
+
+    public List<ContentSummary> multiGetContentSummary(RequestContext ctx, final List<String> paths)
+        throws IOException {
+      LOG.debug("multiGetContentSummary(" + paths + "): Entering");
+      return assumeUserContextAndExecute(ctx,
+          new PrivilegedExceptionAction<List<ContentSummary>>() {
+            public List<ContentSummary> run() throws java.io.IOException {
+              List<ContentSummary> ret = new ArrayList<ContentSummary>();
+              for (String path : paths) {
+                ret.add(getContentSummary(path));
+              }
+              LOG.debug("multiGetContentSummary(" + paths + "): Returning " + ret);
+              return ret;
+            }
+          });
     }
 
     private ContentSummary getContentSummary(String path) throws java.io.IOException {
-        try {
-            return ThriftUtils.toThrift(namenode.getContentSummary(path), path);
-        } catch (java.io.IOException e) {
-            LOG.error(e);
-            throw e;
-        }
+      return ThriftUtils.toThrift(namenode.getContentSummary(path), path);
     }
 
-    public boolean unlink(RequestContext ctx, String path, boolean recursive) throws IOException,
-        TException {
-      assumeUserContext(ctx);
+    public boolean unlink(RequestContext ctx, final String path, final boolean recursive)
+        throws IOException {
       LOG.debug("unlink(" + path + "," + recursive + "): Entering");
-      try {
-        boolean ret = namenode.delete(path, recursive);
-        LOG.debug("unlink(" + path + "," + recursive + "): Returning " + ret);
-        return ret;
-      } catch (Throwable t) {
-        LOG.info("unlink(" + path + "," + recursive + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Boolean>() {
+        public Boolean run() throws java.io.IOException, TException {
+          boolean ret = namenode.delete(path, recursive);
+          LOG.debug("unlink(" + path + "," + recursive + "): Returning " + ret);
+          return ret;
+        }
+      });
     }
 
-    public void utime(RequestContext ctx, String path, long atime, long mtime) throws IOException,
-        TException {
-      assumeUserContext(ctx);
+    public void utime(RequestContext ctx, final String path, final long atime, final long mtime)
+        throws IOException {
       LOG.debug("utime(" + path + "," + atime + "," + mtime + "): Entering");
-      if (mtime == -1 && atime == -1) {
-        LOG.debug("utime(" + path + "," + atime + "," + mtime
-            + "): Setting mtime and atime to now");
-        mtime = atime = System.currentTimeMillis();
-      }
-      try {
-        namenode.setTimes(path, mtime, atime);
-      } catch (Throwable t) {
-        LOG.info("utime(" + path + "," + atime + "," + mtime + "): Failed", t);
-        throw ThriftUtils.toThrift(t);
-      }
+      assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+        public Void run() throws java.io.IOException {
+          if (mtime == -1 && atime == -1) {
+            LOG.debug("utime(" + path + "," + atime + "," + mtime
+                + "): Setting mtime and atime to now");
+            long now = System.currentTimeMillis();
+            namenode.setTimes(path, now, now);
+          } else {
+            namenode.setTimes(path, mtime, atime);
+          }
+          return null;
+        }
+      });
     }
 
-    private Stat fileStatusToStat(FileStatus f) throws java.io.IOException {
+    private Stat fileStatusToStat(HdfsFileStatus f, String parentPath) throws java.io.IOException {
       if (f == null) {
         throw new FileNotFoundException();
       }
 
       Stat st = new Stat();
-      st.path = f.getPath().toString();
+      st.path = f.getFullPath(new Path(parentPath)).toString();
       st.isDir = f.isDir();
       st.atime = f.getAccessTime();
       st.mtime = f.getModificationTime();
       st.perms = f.getPermission().toShort();
       st.owner = f.getOwner();
       st.group = f.getGroup();
-      if (! st.isDir) {
+      if (!st.isDir) {
         st.length = f.getLen();
         st.blockSize = f.getBlockSize();
         st.replication = f.getReplication();
       }
       return st;
     }
-    public void datanodeDown(String name, String storage, int thriftPort) throws TException {
+
+    public void datanodeDown(String name, String storage, int thriftPort) {
       DatanodeID dnId = new DatanodeID(name, storage, -1, -1);
-      LOG.info("Datanode " + dnId + ": Thrift port "
-               + thriftPort + " closed");
+      LOG.info("Datanode " + dnId + ": Thrift port " + thriftPort + " closed");
       thriftPorts.remove(dnId);
     }
 
-    public void datanodeUp(String name, String storage, int thriftPort) throws TException {
+    public void datanodeUp(String name, String storage, int thriftPort) {
       DatanodeID dnId = new DatanodeID(name, storage, -1, -1);
-      LOG.info("Datanode " + dnId + ": " +
-               "Thrift port " + thriftPort + " open");
+      LOG.info("Datanode " + dnId + ": " + "Thrift port " + thriftPort + " open");
       thriftPorts.put(dnId, thriftPort);
+    }
+
+    @Override
+    public ThriftDelegationToken getDelegationToken(RequestContext ctx, final String renewer) throws IOException,
+        TException {
+      return assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<ThriftDelegationToken>() {
+        public ThriftDelegationToken run() throws java.io.IOException {
+          Token<DelegationTokenIdentifier> delegationToken = namenode.getDelegationToken(new Text(renewer));
+          return ThriftUtils.toThrift(delegationToken, namenode.getNameNodeAddress());
+        }
+      });
     }
   }
 
@@ -524,19 +427,18 @@ public class NamenodePlugin
 
   @Override
   public void start(Object service) {
-    this.namenode = (NameNode)service;
+    this.namenode = (NameNode) service;
     try {
-      InetSocketAddress address = NetUtils.createSocketAddr(
-        conf.get(THRIFT_ADDRESS_PROPERTY, DEFAULT_THRIFT_ADDRESS));
+      InetSocketAddress address = NetUtils.createSocketAddr(conf.get(THRIFT_ADDRESS_PROPERTY,
+          DEFAULT_THRIFT_ADDRESS));
 
       this.thriftServer = new ThriftPluginServer(address, new ProcessorFactory());
       thriftServer.setConf(conf);
       thriftServer.start();
       // The port may have been 0, so we update it.
-      conf.set(THRIFT_ADDRESS_PROPERTY, address.getHostName() + ":" + 
-          thriftServer.getPort());
-    } catch (java.io.IOException ioe) {
-      throw new RuntimeException("Cannot start Thrift namenode plug-in", ioe);
+      conf.set(THRIFT_ADDRESS_PROPERTY, address.getHostName() + ":" + thriftServer.getPort());
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot start Thrift namenode plug-in", e);
     }
   }
 
@@ -571,7 +473,11 @@ public class NamenodePlugin
     @Override
     public TProcessor getProcessor(TTransport t) {
       ThriftServerContext context = new ThriftServerContext(t);
-      ThriftHandler impl = new ThriftHandler(context);
+      Namenode.Iface impl =
+        ThriftUtils.SecurityCheckingProxy.create(
+          conf,
+          new ThriftHandler(context),
+          Namenode.Iface.class);
       return new Namenode.Processor(impl);
     }
   }

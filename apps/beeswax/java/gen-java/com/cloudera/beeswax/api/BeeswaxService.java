@@ -10,13 +10,21 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Collections;
-import org.apache.log4j.Logger;
+import java.util.BitSet;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.thrift.*;
+import org.apache.thrift.async.*;
 import org.apache.thrift.meta_data.*;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.protocol.*;
 
 public class BeeswaxService {
@@ -51,7 +59,7 @@ public class BeeswaxService {
      * 
      * @param handle
      */
-    public int get_state(QueryHandle handle) throws QueryNotFoundException, TException;
+    public QueryState get_state(QueryHandle handle) throws QueryNotFoundException, TException;
 
     /**
      * Get the result metadata
@@ -84,7 +92,39 @@ public class BeeswaxService {
 
   }
 
-  public static class Client implements Iface {
+  public interface AsyncIface {
+
+    public void query(Query query, AsyncMethodCallback<AsyncClient.query_call> resultHandler) throws TException;
+
+    public void explain(Query query, AsyncMethodCallback<AsyncClient.explain_call> resultHandler) throws TException;
+
+    public void fetch(QueryHandle query_id, boolean start_over, AsyncMethodCallback<AsyncClient.fetch_call> resultHandler) throws TException;
+
+    public void get_state(QueryHandle handle, AsyncMethodCallback<AsyncClient.get_state_call> resultHandler) throws TException;
+
+    public void get_results_metadata(QueryHandle handle, AsyncMethodCallback<AsyncClient.get_results_metadata_call> resultHandler) throws TException;
+
+    public void echo(String s, AsyncMethodCallback<AsyncClient.echo_call> resultHandler) throws TException;
+
+    public void dump_config(AsyncMethodCallback<AsyncClient.dump_config_call> resultHandler) throws TException;
+
+    public void get_log(String context, AsyncMethodCallback<AsyncClient.get_log_call> resultHandler) throws TException;
+
+    public void get_default_configuration(boolean include_hadoop, AsyncMethodCallback<AsyncClient.get_default_configuration_call> resultHandler) throws TException;
+
+  }
+
+  public static class Client implements TServiceClient, Iface {
+    public static class Factory implements TServiceClientFactory<Client> {
+      public Factory() {}
+      public Client getClient(TProtocol prot) {
+        return new Client(prot);
+      }
+      public Client getClient(TProtocol iprot, TProtocol oprot) {
+        return new Client(iprot, oprot);
+      }
+    }
+
     public Client(TProtocol prot)
     {
       this(prot, prot);
@@ -119,9 +159,9 @@ public class BeeswaxService {
 
     public void send_query(Query query) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("query", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("query", TMessageType.CALL, ++seqid_));
       query_args args = new query_args();
-      args.query = query;
+      args.setQuery(query);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -134,6 +174,9 @@ public class BeeswaxService {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "query failed: out of sequence response");
       }
       query_result result = new query_result();
       result.read(iprot_);
@@ -155,9 +198,9 @@ public class BeeswaxService {
 
     public void send_explain(Query query) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("explain", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("explain", TMessageType.CALL, ++seqid_));
       explain_args args = new explain_args();
-      args.query = query;
+      args.setQuery(query);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -170,6 +213,9 @@ public class BeeswaxService {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "explain failed: out of sequence response");
       }
       explain_result result = new explain_result();
       result.read(iprot_);
@@ -191,10 +237,10 @@ public class BeeswaxService {
 
     public void send_fetch(QueryHandle query_id, boolean start_over) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("fetch", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("fetch", TMessageType.CALL, ++seqid_));
       fetch_args args = new fetch_args();
-      args.query_id = query_id;
-      args.start_over = start_over;
+      args.setQuery_id(query_id);
+      args.setStart_over(start_over);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -207,6 +253,9 @@ public class BeeswaxService {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "fetch failed: out of sequence response");
       }
       fetch_result result = new fetch_result();
       result.read(iprot_);
@@ -223,7 +272,7 @@ public class BeeswaxService {
       throw new TApplicationException(TApplicationException.MISSING_RESULT, "fetch failed: unknown result");
     }
 
-    public int get_state(QueryHandle handle) throws QueryNotFoundException, TException
+    public QueryState get_state(QueryHandle handle) throws QueryNotFoundException, TException
     {
       send_get_state(handle);
       return recv_get_state();
@@ -231,21 +280,24 @@ public class BeeswaxService {
 
     public void send_get_state(QueryHandle handle) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("get_state", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("get_state", TMessageType.CALL, ++seqid_));
       get_state_args args = new get_state_args();
-      args.handle = handle;
+      args.setHandle(handle);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
     }
 
-    public int recv_get_state() throws QueryNotFoundException, TException
+    public QueryState recv_get_state() throws QueryNotFoundException, TException
     {
       TMessage msg = iprot_.readMessageBegin();
       if (msg.type == TMessageType.EXCEPTION) {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "get_state failed: out of sequence response");
       }
       get_state_result result = new get_state_result();
       result.read(iprot_);
@@ -267,9 +319,9 @@ public class BeeswaxService {
 
     public void send_get_results_metadata(QueryHandle handle) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("get_results_metadata", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("get_results_metadata", TMessageType.CALL, ++seqid_));
       get_results_metadata_args args = new get_results_metadata_args();
-      args.handle = handle;
+      args.setHandle(handle);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -282,6 +334,9 @@ public class BeeswaxService {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "get_results_metadata failed: out of sequence response");
       }
       get_results_metadata_result result = new get_results_metadata_result();
       result.read(iprot_);
@@ -303,9 +358,9 @@ public class BeeswaxService {
 
     public void send_echo(String s) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("echo", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("echo", TMessageType.CALL, ++seqid_));
       echo_args args = new echo_args();
-      args.s = s;
+      args.setS(s);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -318,6 +373,9 @@ public class BeeswaxService {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "echo failed: out of sequence response");
       }
       echo_result result = new echo_result();
       result.read(iprot_);
@@ -336,7 +394,7 @@ public class BeeswaxService {
 
     public void send_dump_config() throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("dump_config", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("dump_config", TMessageType.CALL, ++seqid_));
       dump_config_args args = new dump_config_args();
       args.write(oprot_);
       oprot_.writeMessageEnd();
@@ -350,6 +408,9 @@ public class BeeswaxService {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "dump_config failed: out of sequence response");
       }
       dump_config_result result = new dump_config_result();
       result.read(iprot_);
@@ -368,9 +429,9 @@ public class BeeswaxService {
 
     public void send_get_log(String context) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("get_log", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("get_log", TMessageType.CALL, ++seqid_));
       get_log_args args = new get_log_args();
-      args.context = context;
+      args.setContext(context);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -383,6 +444,9 @@ public class BeeswaxService {
         TApplicationException x = TApplicationException.read(iprot_);
         iprot_.readMessageEnd();
         throw x;
+      }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "get_log failed: out of sequence response");
       }
       get_log_result result = new get_log_result();
       result.read(iprot_);
@@ -404,9 +468,9 @@ public class BeeswaxService {
 
     public void send_get_default_configuration(boolean include_hadoop) throws TException
     {
-      oprot_.writeMessageBegin(new TMessage("get_default_configuration", TMessageType.CALL, seqid_));
+      oprot_.writeMessageBegin(new TMessage("get_default_configuration", TMessageType.CALL, ++seqid_));
       get_default_configuration_args args = new get_default_configuration_args();
-      args.include_hadoop = include_hadoop;
+      args.setInclude_hadoop(include_hadoop);
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -420,6 +484,9 @@ public class BeeswaxService {
         iprot_.readMessageEnd();
         throw x;
       }
+      if (msg.seqid != seqid_) {
+        throw new TApplicationException(TApplicationException.BAD_SEQUENCE_ID, "get_default_configuration failed: out of sequence response");
+      }
       get_default_configuration_result result = new get_default_configuration_result();
       result.read(iprot_);
       iprot_.readMessageEnd();
@@ -430,8 +497,306 @@ public class BeeswaxService {
     }
 
   }
+  public static class AsyncClient extends TAsyncClient implements AsyncIface {
+    public static class Factory implements TAsyncClientFactory<AsyncClient> {
+      private TAsyncClientManager clientManager;
+      private TProtocolFactory protocolFactory;
+      public Factory(TAsyncClientManager clientManager, TProtocolFactory protocolFactory) {
+        this.clientManager = clientManager;
+        this.protocolFactory = protocolFactory;
+      }
+      public AsyncClient getAsyncClient(TNonblockingTransport transport) {
+        return new AsyncClient(protocolFactory, clientManager, transport);
+      }
+    }
+
+    public AsyncClient(TProtocolFactory protocolFactory, TAsyncClientManager clientManager, TNonblockingTransport transport) {
+      super(protocolFactory, clientManager, transport);
+    }
+
+    public void query(Query query, AsyncMethodCallback<query_call> resultHandler) throws TException {
+      checkReady();
+      query_call method_call = new query_call(query, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class query_call extends TAsyncMethodCall {
+      private Query query;
+      public query_call(Query query, AsyncMethodCallback<query_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.query = query;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("query", TMessageType.CALL, 0));
+        query_args args = new query_args();
+        args.setQuery(query);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public QueryHandle getResult() throws BeeswaxException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_query();
+      }
+    }
+
+    public void explain(Query query, AsyncMethodCallback<explain_call> resultHandler) throws TException {
+      checkReady();
+      explain_call method_call = new explain_call(query, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class explain_call extends TAsyncMethodCall {
+      private Query query;
+      public explain_call(Query query, AsyncMethodCallback<explain_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.query = query;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("explain", TMessageType.CALL, 0));
+        explain_args args = new explain_args();
+        args.setQuery(query);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public QueryExplanation getResult() throws BeeswaxException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_explain();
+      }
+    }
+
+    public void fetch(QueryHandle query_id, boolean start_over, AsyncMethodCallback<fetch_call> resultHandler) throws TException {
+      checkReady();
+      fetch_call method_call = new fetch_call(query_id, start_over, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class fetch_call extends TAsyncMethodCall {
+      private QueryHandle query_id;
+      private boolean start_over;
+      public fetch_call(QueryHandle query_id, boolean start_over, AsyncMethodCallback<fetch_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.query_id = query_id;
+        this.start_over = start_over;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("fetch", TMessageType.CALL, 0));
+        fetch_args args = new fetch_args();
+        args.setQuery_id(query_id);
+        args.setStart_over(start_over);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public Results getResult() throws QueryNotFoundException, BeeswaxException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_fetch();
+      }
+    }
+
+    public void get_state(QueryHandle handle, AsyncMethodCallback<get_state_call> resultHandler) throws TException {
+      checkReady();
+      get_state_call method_call = new get_state_call(handle, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class get_state_call extends TAsyncMethodCall {
+      private QueryHandle handle;
+      public get_state_call(QueryHandle handle, AsyncMethodCallback<get_state_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.handle = handle;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("get_state", TMessageType.CALL, 0));
+        get_state_args args = new get_state_args();
+        args.setHandle(handle);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public QueryState getResult() throws QueryNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_get_state();
+      }
+    }
+
+    public void get_results_metadata(QueryHandle handle, AsyncMethodCallback<get_results_metadata_call> resultHandler) throws TException {
+      checkReady();
+      get_results_metadata_call method_call = new get_results_metadata_call(handle, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class get_results_metadata_call extends TAsyncMethodCall {
+      private QueryHandle handle;
+      public get_results_metadata_call(QueryHandle handle, AsyncMethodCallback<get_results_metadata_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.handle = handle;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("get_results_metadata", TMessageType.CALL, 0));
+        get_results_metadata_args args = new get_results_metadata_args();
+        args.setHandle(handle);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ResultsMetadata getResult() throws QueryNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_get_results_metadata();
+      }
+    }
+
+    public void echo(String s, AsyncMethodCallback<echo_call> resultHandler) throws TException {
+      checkReady();
+      echo_call method_call = new echo_call(s, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class echo_call extends TAsyncMethodCall {
+      private String s;
+      public echo_call(String s, AsyncMethodCallback<echo_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.s = s;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("echo", TMessageType.CALL, 0));
+        echo_args args = new echo_args();
+        args.setS(s);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_echo();
+      }
+    }
+
+    public void dump_config(AsyncMethodCallback<dump_config_call> resultHandler) throws TException {
+      checkReady();
+      dump_config_call method_call = new dump_config_call(resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class dump_config_call extends TAsyncMethodCall {
+      public dump_config_call(AsyncMethodCallback<dump_config_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("dump_config", TMessageType.CALL, 0));
+        dump_config_args args = new dump_config_args();
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_dump_config();
+      }
+    }
+
+    public void get_log(String context, AsyncMethodCallback<get_log_call> resultHandler) throws TException {
+      checkReady();
+      get_log_call method_call = new get_log_call(context, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class get_log_call extends TAsyncMethodCall {
+      private String context;
+      public get_log_call(String context, AsyncMethodCallback<get_log_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.context = context;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("get_log", TMessageType.CALL, 0));
+        get_log_args args = new get_log_args();
+        args.setContext(context);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws QueryNotFoundException, TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_get_log();
+      }
+    }
+
+    public void get_default_configuration(boolean include_hadoop, AsyncMethodCallback<get_default_configuration_call> resultHandler) throws TException {
+      checkReady();
+      get_default_configuration_call method_call = new get_default_configuration_call(include_hadoop, resultHandler, this, protocolFactory, transport);
+      manager.call(method_call);
+    }
+
+    public static class get_default_configuration_call extends TAsyncMethodCall {
+      private boolean include_hadoop;
+      public get_default_configuration_call(boolean include_hadoop, AsyncMethodCallback<get_default_configuration_call> resultHandler, TAsyncClient client, TProtocolFactory protocolFactory, TNonblockingTransport transport) throws TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.include_hadoop = include_hadoop;
+      }
+
+      public void write_args(TProtocol prot) throws TException {
+        prot.writeMessageBegin(new TMessage("get_default_configuration", TMessageType.CALL, 0));
+        get_default_configuration_args args = new get_default_configuration_args();
+        args.setInclude_hadoop(include_hadoop);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public List<ConfigVariable> getResult() throws TException {
+        if (getState() != State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        TMemoryInputTransport memoryTransport = new TMemoryInputTransport(getFrameBuffer().array());
+        TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_get_default_configuration();
+      }
+    }
+
+  }
+
   public static class Processor implements TProcessor {
-    private static final Logger LOGGER = Logger.getLogger(Processor.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Processor.class.getName());
     public Processor(Iface iface)
     {
       iface_ = iface;
@@ -475,7 +840,17 @@ public class BeeswaxService {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         query_args args = new query_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("query", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         query_result result = new query_result();
         try {
@@ -503,7 +878,17 @@ public class BeeswaxService {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         explain_args args = new explain_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("explain", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         explain_result result = new explain_result();
         try {
@@ -531,7 +916,17 @@ public class BeeswaxService {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         fetch_args args = new fetch_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("fetch", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         fetch_result result = new fetch_result();
         try {
@@ -561,12 +956,21 @@ public class BeeswaxService {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         get_state_args args = new get_state_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("get_state", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         get_state_result result = new get_state_result();
         try {
           result.success = iface_.get_state(args.handle);
-          result.__isset.success = true;
         } catch (QueryNotFoundException error) {
           result.error = error;
         } catch (Throwable th) {
@@ -590,7 +994,17 @@ public class BeeswaxService {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         get_results_metadata_args args = new get_results_metadata_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("get_results_metadata", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         get_results_metadata_result result = new get_results_metadata_result();
         try {
@@ -618,7 +1032,17 @@ public class BeeswaxService {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         echo_args args = new echo_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("echo", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         echo_result result = new echo_result();
         result.success = iface_.echo(args.s);
@@ -634,7 +1058,17 @@ public class BeeswaxService {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         dump_config_args args = new dump_config_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("dump_config", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         dump_config_result result = new dump_config_result();
         result.success = iface_.dump_config();
@@ -650,7 +1084,17 @@ public class BeeswaxService {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         get_log_args args = new get_log_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("get_log", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         get_log_result result = new get_log_result();
         try {
@@ -678,7 +1122,17 @@ public class BeeswaxService {
       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
       {
         get_default_configuration_args args = new get_default_configuration_args();
-        args.read(iprot);
+        try {
+          args.read(iprot);
+        } catch (TProtocolException e) {
+          iprot.readMessageEnd();
+          TApplicationException x = new TApplicationException(TApplicationException.PROTOCOL_ERROR, e.getMessage());
+          oprot.writeMessageBegin(new TMessage("get_default_configuration", TMessageType.EXCEPTION, seqid));
+          x.write(oprot);
+          oprot.writeMessageEnd();
+          oprot.getTransport().flush();
+          return;
+        }
         iprot.readMessageEnd();
         get_default_configuration_result result = new get_default_configuration_result();
         result.success = iface_.get_default_configuration(args.include_hadoop);
@@ -692,23 +1146,79 @@ public class BeeswaxService {
 
   }
 
-  public static class query_args implements TBase, java.io.Serializable, Cloneable   {
+  public static class query_args implements TBase<query_args, query_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("query_args");
+
     private static final TField QUERY_FIELD_DESC = new TField("query", TType.STRUCT, (short)1);
 
     public Query query;
-    public static final int QUERY = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      QUERY((short)1, "query");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // QUERY
+            return QUERY;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(QUERY, new FieldMetaData("query", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, Query.class)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.QUERY, new FieldMetaData("query", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, Query.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(query_args.class, metaDataMap);
     }
 
@@ -731,24 +1241,29 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public query_args clone() {
+    public query_args deepCopy() {
       return new query_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.query = null;
     }
 
     public Query getQuery() {
       return this.query;
     }
 
-    public void setQuery(Query query) {
+    public query_args setQuery(Query query) {
       this.query = query;
+      return this;
     }
 
     public void unsetQuery() {
       this.query = null;
     }
 
-    // Returns true if field query is set (has been asigned a value) and false otherwise
+    /** Returns true if field query is set (has been asigned a value) and false otherwise */
     public boolean isSetQuery() {
       return this.query != null;
     }
@@ -759,8 +1274,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case QUERY:
         if (value == null) {
           unsetQuery();
@@ -769,29 +1284,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case QUERY:
         return getQuery();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case QUERY:
         return isSetQuery();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -831,6 +1346,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(query_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      query_args typedOther = (query_args)other;
+
+      lastComparison = Boolean.valueOf(isSetQuery()).compareTo(typedOther.isSetQuery());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetQuery()) {
+        lastComparison = TBaseHelper.compareTo(this.query, typedOther.query);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -840,9 +1380,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case QUERY:
+        switch (field.id) {
+          case 1: // QUERY
             if (field.type == TType.STRUCT) {
               this.query = new Query();
               this.query.read(iprot);
@@ -852,12 +1391,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -894,33 +1431,90 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class query_result implements TBase, java.io.Serializable, Cloneable   {
+  public static class query_result implements TBase<query_result, query_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("query_result");
+
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
     private static final TField ERROR_FIELD_DESC = new TField("error", TType.STRUCT, (short)1);
 
     public QueryHandle success;
-    public static final int SUCCESS = 0;
     public BeeswaxException error;
-    public static final int ERROR = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      ERROR((short)1, "error");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERROR
+            return ERROR;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, QueryHandle.class)));
-      put(ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, QueryHandle.class)));
+      tmpMap.put(_Fields.ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(query_result.class, metaDataMap);
     }
 
@@ -948,24 +1542,30 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public query_result clone() {
+    public query_result deepCopy() {
       return new query_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+      this.error = null;
     }
 
     public QueryHandle getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(QueryHandle success) {
+    public query_result setSuccess(QueryHandle success) {
       this.success = success;
+      return this;
     }
 
     public void unsetSuccess() {
       this.success = null;
     }
 
-    // Returns true if field success is set (has been asigned a value) and false otherwise
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
     public boolean isSetSuccess() {
       return this.success != null;
     }
@@ -980,15 +1580,16 @@ public class BeeswaxService {
       return this.error;
     }
 
-    public void setError(BeeswaxException error) {
+    public query_result setError(BeeswaxException error) {
       this.error = error;
+      return this;
     }
 
     public void unsetError() {
       this.error = null;
     }
 
-    // Returns true if field error is set (has been asigned a value) and false otherwise
+    /** Returns true if field error is set (has been asigned a value) and false otherwise */
     public boolean isSetError() {
       return this.error != null;
     }
@@ -999,8 +1600,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case SUCCESS:
         if (value == null) {
           unsetSuccess();
@@ -1017,34 +1618,34 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case SUCCESS:
         return getSuccess();
 
       case ERROR:
         return getError();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case SUCCESS:
         return isSetSuccess();
       case ERROR:
         return isSetError();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -1098,6 +1699,41 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(query_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      query_result typedOther = (query_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetError()).compareTo(typedOther.isSetError());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetError()) {
+        lastComparison = TBaseHelper.compareTo(this.error, typedOther.error);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -1107,9 +1743,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case SUCCESS:
+        switch (field.id) {
+          case 0: // SUCCESS
             if (field.type == TType.STRUCT) {
               this.success = new QueryHandle();
               this.success.read(iprot);
@@ -1117,7 +1752,7 @@ public class BeeswaxService {
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
-          case ERROR:
+          case 1: // ERROR
             if (field.type == TType.STRUCT) {
               this.error = new BeeswaxException();
               this.error.read(iprot);
@@ -1127,12 +1762,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -1180,28 +1813,83 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class explain_args implements TBase, java.io.Serializable, Cloneable   {
+  public static class explain_args implements TBase<explain_args, explain_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("explain_args");
+
     private static final TField QUERY_FIELD_DESC = new TField("query", TType.STRUCT, (short)1);
 
     public Query query;
-    public static final int QUERY = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      QUERY((short)1, "query");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // QUERY
+            return QUERY;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(QUERY, new FieldMetaData("query", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, Query.class)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.QUERY, new FieldMetaData("query", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, Query.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(explain_args.class, metaDataMap);
     }
 
@@ -1224,24 +1912,29 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public explain_args clone() {
+    public explain_args deepCopy() {
       return new explain_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.query = null;
     }
 
     public Query getQuery() {
       return this.query;
     }
 
-    public void setQuery(Query query) {
+    public explain_args setQuery(Query query) {
       this.query = query;
+      return this;
     }
 
     public void unsetQuery() {
       this.query = null;
     }
 
-    // Returns true if field query is set (has been asigned a value) and false otherwise
+    /** Returns true if field query is set (has been asigned a value) and false otherwise */
     public boolean isSetQuery() {
       return this.query != null;
     }
@@ -1252,8 +1945,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case QUERY:
         if (value == null) {
           unsetQuery();
@@ -1262,29 +1955,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case QUERY:
         return getQuery();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case QUERY:
         return isSetQuery();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -1324,6 +2017,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(explain_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      explain_args typedOther = (explain_args)other;
+
+      lastComparison = Boolean.valueOf(isSetQuery()).compareTo(typedOther.isSetQuery());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetQuery()) {
+        lastComparison = TBaseHelper.compareTo(this.query, typedOther.query);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -1333,9 +2051,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case QUERY:
+        switch (field.id) {
+          case 1: // QUERY
             if (field.type == TType.STRUCT) {
               this.query = new Query();
               this.query.read(iprot);
@@ -1345,12 +2062,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -1387,33 +2102,90 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class explain_result implements TBase, java.io.Serializable, Cloneable   {
+  public static class explain_result implements TBase<explain_result, explain_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("explain_result");
+
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
     private static final TField ERROR_FIELD_DESC = new TField("error", TType.STRUCT, (short)1);
 
     public QueryExplanation success;
-    public static final int SUCCESS = 0;
     public BeeswaxException error;
-    public static final int ERROR = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      ERROR((short)1, "error");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERROR
+            return ERROR;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, QueryExplanation.class)));
-      put(ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, QueryExplanation.class)));
+      tmpMap.put(_Fields.ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(explain_result.class, metaDataMap);
     }
 
@@ -1441,24 +2213,30 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public explain_result clone() {
+    public explain_result deepCopy() {
       return new explain_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+      this.error = null;
     }
 
     public QueryExplanation getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(QueryExplanation success) {
+    public explain_result setSuccess(QueryExplanation success) {
       this.success = success;
+      return this;
     }
 
     public void unsetSuccess() {
       this.success = null;
     }
 
-    // Returns true if field success is set (has been asigned a value) and false otherwise
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
     public boolean isSetSuccess() {
       return this.success != null;
     }
@@ -1473,15 +2251,16 @@ public class BeeswaxService {
       return this.error;
     }
 
-    public void setError(BeeswaxException error) {
+    public explain_result setError(BeeswaxException error) {
       this.error = error;
+      return this;
     }
 
     public void unsetError() {
       this.error = null;
     }
 
-    // Returns true if field error is set (has been asigned a value) and false otherwise
+    /** Returns true if field error is set (has been asigned a value) and false otherwise */
     public boolean isSetError() {
       return this.error != null;
     }
@@ -1492,8 +2271,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case SUCCESS:
         if (value == null) {
           unsetSuccess();
@@ -1510,34 +2289,34 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case SUCCESS:
         return getSuccess();
 
       case ERROR:
         return getError();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case SUCCESS:
         return isSetSuccess();
       case ERROR:
         return isSetError();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -1591,6 +2370,41 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(explain_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      explain_result typedOther = (explain_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetError()).compareTo(typedOther.isSetError());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetError()) {
+        lastComparison = TBaseHelper.compareTo(this.error, typedOther.error);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -1600,9 +2414,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case SUCCESS:
+        switch (field.id) {
+          case 0: // SUCCESS
             if (field.type == TType.STRUCT) {
               this.success = new QueryExplanation();
               this.success.read(iprot);
@@ -1610,7 +2423,7 @@ public class BeeswaxService {
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
-          case ERROR:
+          case 1: // ERROR
             if (field.type == TType.STRUCT) {
               this.error = new BeeswaxException();
               this.error.read(iprot);
@@ -1620,12 +2433,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -1673,34 +2484,92 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class fetch_args implements TBase, java.io.Serializable, Cloneable   {
+  public static class fetch_args implements TBase<fetch_args, fetch_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("fetch_args");
+
     private static final TField QUERY_ID_FIELD_DESC = new TField("query_id", TType.STRUCT, (short)1);
     private static final TField START_OVER_FIELD_DESC = new TField("start_over", TType.BOOL, (short)2);
 
     public QueryHandle query_id;
-    public static final int QUERY_ID = 1;
     public boolean start_over;
-    public static final int START_OVER = 2;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
-      public boolean start_over = false;
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      QUERY_ID((short)1, "query_id"),
+      START_OVER((short)2, "start_over");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // QUERY_ID
+            return QUERY_ID;
+          case 2: // START_OVER
+            return START_OVER;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(QUERY_ID, new FieldMetaData("query_id", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, QueryHandle.class)));
-      put(START_OVER, new FieldMetaData("start_over", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.BOOL)));
-    }});
+    // isset id assignments
+    private static final int __START_OVER_ISSET_ID = 0;
+    private BitSet __isset_bit_vector = new BitSet(1);
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.QUERY_ID, new FieldMetaData("query_id", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, QueryHandle.class)));
+      tmpMap.put(_Fields.START_OVER, new FieldMetaData("start_over", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.BOOL)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(fetch_args.class, metaDataMap);
     }
 
@@ -1714,38 +2583,46 @@ public class BeeswaxService {
       this();
       this.query_id = query_id;
       this.start_over = start_over;
-      this.__isset.start_over = true;
+      setStart_overIsSet(true);
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
     public fetch_args(fetch_args other) {
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
       if (other.isSetQuery_id()) {
         this.query_id = new QueryHandle(other.query_id);
       }
-      __isset.start_over = other.__isset.start_over;
       this.start_over = other.start_over;
     }
 
-    @Override
-    public fetch_args clone() {
+    public fetch_args deepCopy() {
       return new fetch_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.query_id = null;
+      setStart_overIsSet(false);
+      this.start_over = false;
     }
 
     public QueryHandle getQuery_id() {
       return this.query_id;
     }
 
-    public void setQuery_id(QueryHandle query_id) {
+    public fetch_args setQuery_id(QueryHandle query_id) {
       this.query_id = query_id;
+      return this;
     }
 
     public void unsetQuery_id() {
       this.query_id = null;
     }
 
-    // Returns true if field query_id is set (has been asigned a value) and false otherwise
+    /** Returns true if field query_id is set (has been asigned a value) and false otherwise */
     public boolean isSetQuery_id() {
       return this.query_id != null;
     }
@@ -1760,26 +2637,27 @@ public class BeeswaxService {
       return this.start_over;
     }
 
-    public void setStart_over(boolean start_over) {
+    public fetch_args setStart_over(boolean start_over) {
       this.start_over = start_over;
-      this.__isset.start_over = true;
+      setStart_overIsSet(true);
+      return this;
     }
 
     public void unsetStart_over() {
-      this.__isset.start_over = false;
+      __isset_bit_vector.clear(__START_OVER_ISSET_ID);
     }
 
-    // Returns true if field start_over is set (has been asigned a value) and false otherwise
+    /** Returns true if field start_over is set (has been asigned a value) and false otherwise */
     public boolean isSetStart_over() {
-      return this.__isset.start_over;
+      return __isset_bit_vector.get(__START_OVER_ISSET_ID);
     }
 
     public void setStart_overIsSet(boolean value) {
-      this.__isset.start_over = value;
+      __isset_bit_vector.set(__START_OVER_ISSET_ID, value);
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case QUERY_ID:
         if (value == null) {
           unsetQuery_id();
@@ -1796,34 +2674,34 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case QUERY_ID:
         return getQuery_id();
 
       case START_OVER:
         return new Boolean(isStart_over());
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case QUERY_ID:
         return isSetQuery_id();
       case START_OVER:
         return isSetStart_over();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -1877,6 +2755,41 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(fetch_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      fetch_args typedOther = (fetch_args)other;
+
+      lastComparison = Boolean.valueOf(isSetQuery_id()).compareTo(typedOther.isSetQuery_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetQuery_id()) {
+        lastComparison = TBaseHelper.compareTo(this.query_id, typedOther.query_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetStart_over()).compareTo(typedOther.isSetStart_over());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetStart_over()) {
+        lastComparison = TBaseHelper.compareTo(this.start_over, typedOther.start_over);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -1886,9 +2799,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case QUERY_ID:
+        switch (field.id) {
+          case 1: // QUERY_ID
             if (field.type == TType.STRUCT) {
               this.query_id = new QueryHandle();
               this.query_id.read(iprot);
@@ -1896,22 +2808,20 @@ public class BeeswaxService {
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
-          case START_OVER:
+          case 2: // START_OVER
             if (field.type == TType.BOOL) {
               this.start_over = iprot.readBool();
-              this.__isset.start_over = true;
+              setStart_overIsSet(true);
             } else { 
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -1955,38 +2865,97 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class fetch_result implements TBase, java.io.Serializable, Cloneable   {
+  public static class fetch_result implements TBase<fetch_result, fetch_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("fetch_result");
+
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
     private static final TField ERROR_FIELD_DESC = new TField("error", TType.STRUCT, (short)1);
     private static final TField ERROR2_FIELD_DESC = new TField("error2", TType.STRUCT, (short)2);
 
     public Results success;
-    public static final int SUCCESS = 0;
     public QueryNotFoundException error;
-    public static final int ERROR = 1;
     public BeeswaxException error2;
-    public static final int ERROR2 = 2;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      ERROR((short)1, "error"),
+      ERROR2((short)2, "error2");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERROR
+            return ERROR;
+          case 2: // ERROR2
+            return ERROR2;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, Results.class)));
-      put(ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-      put(ERROR2, new FieldMetaData("error2", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, Results.class)));
+      tmpMap.put(_Fields.ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      tmpMap.put(_Fields.ERROR2, new FieldMetaData("error2", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(fetch_result.class, metaDataMap);
     }
 
@@ -2019,24 +2988,31 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public fetch_result clone() {
+    public fetch_result deepCopy() {
       return new fetch_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+      this.error = null;
+      this.error2 = null;
     }
 
     public Results getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(Results success) {
+    public fetch_result setSuccess(Results success) {
       this.success = success;
+      return this;
     }
 
     public void unsetSuccess() {
       this.success = null;
     }
 
-    // Returns true if field success is set (has been asigned a value) and false otherwise
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
     public boolean isSetSuccess() {
       return this.success != null;
     }
@@ -2051,15 +3027,16 @@ public class BeeswaxService {
       return this.error;
     }
 
-    public void setError(QueryNotFoundException error) {
+    public fetch_result setError(QueryNotFoundException error) {
       this.error = error;
+      return this;
     }
 
     public void unsetError() {
       this.error = null;
     }
 
-    // Returns true if field error is set (has been asigned a value) and false otherwise
+    /** Returns true if field error is set (has been asigned a value) and false otherwise */
     public boolean isSetError() {
       return this.error != null;
     }
@@ -2074,15 +3051,16 @@ public class BeeswaxService {
       return this.error2;
     }
 
-    public void setError2(BeeswaxException error2) {
+    public fetch_result setError2(BeeswaxException error2) {
       this.error2 = error2;
+      return this;
     }
 
     public void unsetError2() {
       this.error2 = null;
     }
 
-    // Returns true if field error2 is set (has been asigned a value) and false otherwise
+    /** Returns true if field error2 is set (has been asigned a value) and false otherwise */
     public boolean isSetError2() {
       return this.error2 != null;
     }
@@ -2093,8 +3071,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case SUCCESS:
         if (value == null) {
           unsetSuccess();
@@ -2119,13 +3097,11 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case SUCCESS:
         return getSuccess();
 
@@ -2135,23 +3111,25 @@ public class BeeswaxService {
       case ERROR2:
         return getError2();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case SUCCESS:
         return isSetSuccess();
       case ERROR:
         return isSetError();
       case ERROR2:
         return isSetError2();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -2219,6 +3197,51 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(fetch_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      fetch_result typedOther = (fetch_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetError()).compareTo(typedOther.isSetError());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetError()) {
+        lastComparison = TBaseHelper.compareTo(this.error, typedOther.error);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetError2()).compareTo(typedOther.isSetError2());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetError2()) {
+        lastComparison = TBaseHelper.compareTo(this.error2, typedOther.error2);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2228,9 +3251,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case SUCCESS:
+        switch (field.id) {
+          case 0: // SUCCESS
             if (field.type == TType.STRUCT) {
               this.success = new Results();
               this.success.read(iprot);
@@ -2238,7 +3260,7 @@ public class BeeswaxService {
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
-          case ERROR:
+          case 1: // ERROR
             if (field.type == TType.STRUCT) {
               this.error = new QueryNotFoundException();
               this.error.read(iprot);
@@ -2246,7 +3268,7 @@ public class BeeswaxService {
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
-          case ERROR2:
+          case 2: // ERROR2
             if (field.type == TType.STRUCT) {
               this.error2 = new BeeswaxException();
               this.error2.read(iprot);
@@ -2256,12 +3278,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -2321,28 +3341,83 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class get_state_args implements TBase, java.io.Serializable, Cloneable   {
+  public static class get_state_args implements TBase<get_state_args, get_state_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("get_state_args");
+
     private static final TField HANDLE_FIELD_DESC = new TField("handle", TType.STRUCT, (short)1);
 
     public QueryHandle handle;
-    public static final int HANDLE = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      HANDLE((short)1, "handle");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // HANDLE
+            return HANDLE;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(HANDLE, new FieldMetaData("handle", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, QueryHandle.class)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.HANDLE, new FieldMetaData("handle", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, QueryHandle.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(get_state_args.class, metaDataMap);
     }
 
@@ -2365,24 +3440,29 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public get_state_args clone() {
+    public get_state_args deepCopy() {
       return new get_state_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.handle = null;
     }
 
     public QueryHandle getHandle() {
       return this.handle;
     }
 
-    public void setHandle(QueryHandle handle) {
+    public get_state_args setHandle(QueryHandle handle) {
       this.handle = handle;
+      return this;
     }
 
     public void unsetHandle() {
       this.handle = null;
     }
 
-    // Returns true if field handle is set (has been asigned a value) and false otherwise
+    /** Returns true if field handle is set (has been asigned a value) and false otherwise */
     public boolean isSetHandle() {
       return this.handle != null;
     }
@@ -2393,8 +3473,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case HANDLE:
         if (value == null) {
           unsetHandle();
@@ -2403,29 +3483,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case HANDLE:
         return getHandle();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case HANDLE:
         return isSetHandle();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -2465,6 +3545,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(get_state_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_state_args typedOther = (get_state_args)other;
+
+      lastComparison = Boolean.valueOf(isSetHandle()).compareTo(typedOther.isSetHandle());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetHandle()) {
+        lastComparison = TBaseHelper.compareTo(this.handle, typedOther.handle);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2474,9 +3579,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case HANDLE:
+        switch (field.id) {
+          case 1: // HANDLE
             if (field.type == TType.STRUCT) {
               this.handle = new QueryHandle();
               this.handle.read(iprot);
@@ -2486,12 +3590,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -2528,34 +3630,98 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class get_state_result implements TBase, java.io.Serializable, Cloneable   {
+  public static class get_state_result implements TBase<get_state_result, get_state_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("get_state_result");
+
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.I32, (short)0);
     private static final TField ERROR_FIELD_DESC = new TField("error", TType.STRUCT, (short)1);
 
-    public int success;
-    public static final int SUCCESS = 0;
+    /**
+     * 
+     * @see QueryState
+     */
+    public QueryState success;
     public QueryNotFoundException error;
-    public static final int ERROR = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
-      public boolean success = false;
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      /**
+       * 
+       * @see QueryState
+       */
+      SUCCESS((short)0, "success"),
+      ERROR((short)1, "error");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERROR
+            return ERROR;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.I32)));
-      put(ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new EnumMetaData(TType.ENUM, QueryState.class)));
+      tmpMap.put(_Fields.ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(get_state_result.class, metaDataMap);
     }
 
@@ -2563,12 +3729,11 @@ public class BeeswaxService {
     }
 
     public get_state_result(
-      int success,
+      QueryState success,
       QueryNotFoundException error)
     {
       this();
       this.success = success;
-      this.__isset.success = true;
       this.error = error;
     }
 
@@ -2576,53 +3741,70 @@ public class BeeswaxService {
      * Performs a deep copy on <i>other</i>.
      */
     public get_state_result(get_state_result other) {
-      __isset.success = other.__isset.success;
-      this.success = other.success;
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
       if (other.isSetError()) {
         this.error = new QueryNotFoundException(other.error);
       }
     }
 
-    @Override
-    public get_state_result clone() {
+    public get_state_result deepCopy() {
       return new get_state_result(this);
     }
 
-    public int getSuccess() {
+    @Override
+    public void clear() {
+      this.success = null;
+      this.error = null;
+    }
+
+    /**
+     * 
+     * @see QueryState
+     */
+    public QueryState getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(int success) {
+    /**
+     * 
+     * @see QueryState
+     */
+    public get_state_result setSuccess(QueryState success) {
       this.success = success;
-      this.__isset.success = true;
+      return this;
     }
 
     public void unsetSuccess() {
-      this.__isset.success = false;
+      this.success = null;
     }
 
-    // Returns true if field success is set (has been asigned a value) and false otherwise
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
     public boolean isSetSuccess() {
-      return this.__isset.success;
+      return this.success != null;
     }
 
     public void setSuccessIsSet(boolean value) {
-      this.__isset.success = value;
+      if (!value) {
+        this.success = null;
+      }
     }
 
     public QueryNotFoundException getError() {
       return this.error;
     }
 
-    public void setError(QueryNotFoundException error) {
+    public get_state_result setError(QueryNotFoundException error) {
       this.error = error;
+      return this;
     }
 
     public void unsetError() {
       this.error = null;
     }
 
-    // Returns true if field error is set (has been asigned a value) and false otherwise
+    /** Returns true if field error is set (has been asigned a value) and false otherwise */
     public boolean isSetError() {
       return this.error != null;
     }
@@ -2633,13 +3815,13 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case SUCCESS:
         if (value == null) {
           unsetSuccess();
         } else {
-          setSuccess((Integer)value);
+          setSuccess((QueryState)value);
         }
         break;
 
@@ -2651,34 +3833,34 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case SUCCESS:
         return getSuccess();
 
       case ERROR:
         return getError();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case SUCCESS:
         return isSetSuccess();
       case ERROR:
         return isSetError();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -2694,12 +3876,12 @@ public class BeeswaxService {
       if (that == null)
         return false;
 
-      boolean this_present_success = true;
-      boolean that_present_success = true;
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
       if (this_present_success || that_present_success) {
         if (!(this_present_success && that_present_success))
           return false;
-        if (this.success != that.success)
+        if (!this.success.equals(that.success))
           return false;
       }
 
@@ -2719,10 +3901,10 @@ public class BeeswaxService {
     public int hashCode() {
       HashCodeBuilder builder = new HashCodeBuilder();
 
-      boolean present_success = true;
+      boolean present_success = true && (isSetSuccess());
       builder.append(present_success);
       if (present_success)
-        builder.append(success);
+        builder.append(success.getValue());
 
       boolean present_error = true && (isSetError());
       builder.append(present_error);
@@ -2730,6 +3912,41 @@ public class BeeswaxService {
         builder.append(error);
 
       return builder.toHashCode();
+    }
+
+    public int compareTo(get_state_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_state_result typedOther = (get_state_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetError()).compareTo(typedOther.isSetError());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetError()) {
+        lastComparison = TBaseHelper.compareTo(this.error, typedOther.error);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
     }
 
     public void read(TProtocol iprot) throws TException {
@@ -2741,17 +3958,15 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case SUCCESS:
+        switch (field.id) {
+          case 0: // SUCCESS
             if (field.type == TType.I32) {
-              this.success = iprot.readI32();
-              this.__isset.success = true;
+              this.success = QueryState.findByValue(iprot.readI32());
             } else { 
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
-          case ERROR:
+          case 1: // ERROR
             if (field.type == TType.STRUCT) {
               this.error = new QueryNotFoundException();
               this.error.read(iprot);
@@ -2761,12 +3976,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -2777,7 +3990,7 @@ public class BeeswaxService {
 
       if (this.isSetSuccess()) {
         oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
-        oprot.writeI32(this.success);
+        oprot.writeI32(this.success.getValue());
         oprot.writeFieldEnd();
       } else if (this.isSetError()) {
         oprot.writeFieldBegin(ERROR_FIELD_DESC);
@@ -2794,14 +4007,10 @@ public class BeeswaxService {
       boolean first = true;
 
       sb.append("success:");
-      String success_name = QueryState.VALUES_TO_NAMES.get(this.success);
-      if (success_name != null) {
-        sb.append(success_name);
-        sb.append(" (");
-      }
-      sb.append(this.success);
-      if (success_name != null) {
-        sb.append(")");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
       }
       first = false;
       if (!first) sb.append(", ");
@@ -2818,31 +4027,83 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
-      if (isSetSuccess() && !QueryState.VALID_VALUES.contains(success)){
-        throw new TProtocolException("The field 'success' has been assigned the invalid value " + success);
-      }
     }
 
   }
 
-  public static class get_results_metadata_args implements TBase, java.io.Serializable, Cloneable   {
+  public static class get_results_metadata_args implements TBase<get_results_metadata_args, get_results_metadata_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("get_results_metadata_args");
+
     private static final TField HANDLE_FIELD_DESC = new TField("handle", TType.STRUCT, (short)1);
 
     public QueryHandle handle;
-    public static final int HANDLE = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      HANDLE((short)1, "handle");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // HANDLE
+            return HANDLE;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(HANDLE, new FieldMetaData("handle", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, QueryHandle.class)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.HANDLE, new FieldMetaData("handle", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, QueryHandle.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(get_results_metadata_args.class, metaDataMap);
     }
 
@@ -2865,24 +4126,29 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public get_results_metadata_args clone() {
+    public get_results_metadata_args deepCopy() {
       return new get_results_metadata_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.handle = null;
     }
 
     public QueryHandle getHandle() {
       return this.handle;
     }
 
-    public void setHandle(QueryHandle handle) {
+    public get_results_metadata_args setHandle(QueryHandle handle) {
       this.handle = handle;
+      return this;
     }
 
     public void unsetHandle() {
       this.handle = null;
     }
 
-    // Returns true if field handle is set (has been asigned a value) and false otherwise
+    /** Returns true if field handle is set (has been asigned a value) and false otherwise */
     public boolean isSetHandle() {
       return this.handle != null;
     }
@@ -2893,8 +4159,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case HANDLE:
         if (value == null) {
           unsetHandle();
@@ -2903,29 +4169,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case HANDLE:
         return getHandle();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case HANDLE:
         return isSetHandle();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -2965,6 +4231,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(get_results_metadata_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_results_metadata_args typedOther = (get_results_metadata_args)other;
+
+      lastComparison = Boolean.valueOf(isSetHandle()).compareTo(typedOther.isSetHandle());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetHandle()) {
+        lastComparison = TBaseHelper.compareTo(this.handle, typedOther.handle);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -2974,9 +4265,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case HANDLE:
+        switch (field.id) {
+          case 1: // HANDLE
             if (field.type == TType.STRUCT) {
               this.handle = new QueryHandle();
               this.handle.read(iprot);
@@ -2986,12 +4276,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -3028,33 +4316,90 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class get_results_metadata_result implements TBase, java.io.Serializable, Cloneable   {
+  public static class get_results_metadata_result implements TBase<get_results_metadata_result, get_results_metadata_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("get_results_metadata_result");
+
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRUCT, (short)0);
     private static final TField ERROR_FIELD_DESC = new TField("error", TType.STRUCT, (short)1);
 
     public ResultsMetadata success;
-    public static final int SUCCESS = 0;
     public QueryNotFoundException error;
-    public static final int ERROR = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      ERROR((short)1, "error");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERROR
+            return ERROR;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new StructMetaData(TType.STRUCT, ResultsMetadata.class)));
-      put(ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new StructMetaData(TType.STRUCT, ResultsMetadata.class)));
+      tmpMap.put(_Fields.ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(get_results_metadata_result.class, metaDataMap);
     }
 
@@ -3082,24 +4427,30 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public get_results_metadata_result clone() {
+    public get_results_metadata_result deepCopy() {
       return new get_results_metadata_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+      this.error = null;
     }
 
     public ResultsMetadata getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(ResultsMetadata success) {
+    public get_results_metadata_result setSuccess(ResultsMetadata success) {
       this.success = success;
+      return this;
     }
 
     public void unsetSuccess() {
       this.success = null;
     }
 
-    // Returns true if field success is set (has been asigned a value) and false otherwise
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
     public boolean isSetSuccess() {
       return this.success != null;
     }
@@ -3114,15 +4465,16 @@ public class BeeswaxService {
       return this.error;
     }
 
-    public void setError(QueryNotFoundException error) {
+    public get_results_metadata_result setError(QueryNotFoundException error) {
       this.error = error;
+      return this;
     }
 
     public void unsetError() {
       this.error = null;
     }
 
-    // Returns true if field error is set (has been asigned a value) and false otherwise
+    /** Returns true if field error is set (has been asigned a value) and false otherwise */
     public boolean isSetError() {
       return this.error != null;
     }
@@ -3133,8 +4485,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case SUCCESS:
         if (value == null) {
           unsetSuccess();
@@ -3151,34 +4503,34 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case SUCCESS:
         return getSuccess();
 
       case ERROR:
         return getError();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case SUCCESS:
         return isSetSuccess();
       case ERROR:
         return isSetError();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -3232,6 +4584,41 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(get_results_metadata_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_results_metadata_result typedOther = (get_results_metadata_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetError()).compareTo(typedOther.isSetError());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetError()) {
+        lastComparison = TBaseHelper.compareTo(this.error, typedOther.error);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -3241,9 +4628,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case SUCCESS:
+        switch (field.id) {
+          case 0: // SUCCESS
             if (field.type == TType.STRUCT) {
               this.success = new ResultsMetadata();
               this.success.read(iprot);
@@ -3251,7 +4637,7 @@ public class BeeswaxService {
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
-          case ERROR:
+          case 1: // ERROR
             if (field.type == TType.STRUCT) {
               this.error = new QueryNotFoundException();
               this.error.read(iprot);
@@ -3261,12 +4647,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -3314,28 +4698,83 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class echo_args implements TBase, java.io.Serializable, Cloneable   {
+  public static class echo_args implements TBase<echo_args, echo_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("echo_args");
+
     private static final TField S_FIELD_DESC = new TField("s", TType.STRING, (short)1);
 
     public String s;
-    public static final int S = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      S((short)1, "s");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // S
+            return S;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(S, new FieldMetaData("s", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.S, new FieldMetaData("s", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(echo_args.class, metaDataMap);
     }
 
@@ -3358,24 +4797,29 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public echo_args clone() {
+    public echo_args deepCopy() {
       return new echo_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.s = null;
     }
 
     public String getS() {
       return this.s;
     }
 
-    public void setS(String s) {
+    public echo_args setS(String s) {
       this.s = s;
+      return this;
     }
 
     public void unsetS() {
       this.s = null;
     }
 
-    // Returns true if field s is set (has been asigned a value) and false otherwise
+    /** Returns true if field s is set (has been asigned a value) and false otherwise */
     public boolean isSetS() {
       return this.s != null;
     }
@@ -3386,8 +4830,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case S:
         if (value == null) {
           unsetS();
@@ -3396,29 +4840,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case S:
         return getS();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case S:
         return isSetS();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -3458,6 +4902,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(echo_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      echo_args typedOther = (echo_args)other;
+
+      lastComparison = Boolean.valueOf(isSetS()).compareTo(typedOther.isSetS());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetS()) {
+        lastComparison = TBaseHelper.compareTo(this.s, typedOther.s);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -3467,9 +4936,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case S:
+        switch (field.id) {
+          case 1: // S
             if (field.type == TType.STRING) {
               this.s = iprot.readString();
             } else { 
@@ -3478,12 +4946,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -3520,28 +4986,83 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class echo_result implements TBase, java.io.Serializable, Cloneable   {
+  public static class echo_result implements TBase<echo_result, echo_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("echo_result");
+
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRING, (short)0);
 
     public String success;
-    public static final int SUCCESS = 0;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(echo_result.class, metaDataMap);
     }
 
@@ -3564,24 +5085,29 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public echo_result clone() {
+    public echo_result deepCopy() {
       return new echo_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public String getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(String success) {
+    public echo_result setSuccess(String success) {
       this.success = success;
+      return this;
     }
 
     public void unsetSuccess() {
       this.success = null;
     }
 
-    // Returns true if field success is set (has been asigned a value) and false otherwise
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
     public boolean isSetSuccess() {
       return this.success != null;
     }
@@ -3592,8 +5118,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case SUCCESS:
         if (value == null) {
           unsetSuccess();
@@ -3602,29 +5128,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case SUCCESS:
         return getSuccess();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case SUCCESS:
         return isSetSuccess();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -3664,6 +5190,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(echo_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      echo_result typedOther = (echo_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -3673,9 +5224,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case SUCCESS:
+        switch (field.id) {
+          case 0: // SUCCESS
             if (field.type == TType.STRING) {
               this.success = iprot.readString();
             } else { 
@@ -3684,12 +5234,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -3725,18 +5273,74 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class dump_config_args implements TBase, java.io.Serializable, Cloneable   {
+  public static class dump_config_args implements TBase<dump_config_args, dump_config_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("dump_config_args");
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-    }});
 
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+;
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(dump_config_args.class, metaDataMap);
     }
 
@@ -3749,31 +5353,34 @@ public class BeeswaxService {
     public dump_config_args(dump_config_args other) {
     }
 
-    @Override
-    public dump_config_args clone() {
+    public dump_config_args deepCopy() {
       return new dump_config_args(this);
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
+    @Override
+    public void clear() {
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
       }
+
+      switch (field) {
+      }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -3799,6 +5406,21 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(dump_config_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      dump_config_args typedOther = (dump_config_args)other;
+
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -3808,16 +5430,13 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
+        switch (field.id) {
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -3842,28 +5461,83 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class dump_config_result implements TBase, java.io.Serializable, Cloneable   {
+  public static class dump_config_result implements TBase<dump_config_result, dump_config_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("dump_config_result");
+
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRING, (short)0);
 
     public String success;
-    public static final int SUCCESS = 0;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(dump_config_result.class, metaDataMap);
     }
 
@@ -3886,24 +5560,29 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public dump_config_result clone() {
+    public dump_config_result deepCopy() {
       return new dump_config_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public String getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(String success) {
+    public dump_config_result setSuccess(String success) {
       this.success = success;
+      return this;
     }
 
     public void unsetSuccess() {
       this.success = null;
     }
 
-    // Returns true if field success is set (has been asigned a value) and false otherwise
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
     public boolean isSetSuccess() {
       return this.success != null;
     }
@@ -3914,8 +5593,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case SUCCESS:
         if (value == null) {
           unsetSuccess();
@@ -3924,29 +5603,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case SUCCESS:
         return getSuccess();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case SUCCESS:
         return isSetSuccess();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -3986,6 +5665,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(dump_config_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      dump_config_result typedOther = (dump_config_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -3995,9 +5699,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case SUCCESS:
+        switch (field.id) {
+          case 0: // SUCCESS
             if (field.type == TType.STRING) {
               this.success = iprot.readString();
             } else { 
@@ -4006,12 +5709,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -4047,28 +5748,83 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class get_log_args implements TBase, java.io.Serializable, Cloneable   {
+  public static class get_log_args implements TBase<get_log_args, get_log_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("get_log_args");
+
     private static final TField CONTEXT_FIELD_DESC = new TField("context", TType.STRING, (short)1);
 
     public String context;
-    public static final int CONTEXT = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      CONTEXT((short)1, "context");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // CONTEXT
+            return CONTEXT;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(CONTEXT, new FieldMetaData("context", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CONTEXT, new FieldMetaData("context", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING          , "LogContextId")));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(get_log_args.class, metaDataMap);
     }
 
@@ -4091,24 +5847,29 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public get_log_args clone() {
+    public get_log_args deepCopy() {
       return new get_log_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.context = null;
     }
 
     public String getContext() {
       return this.context;
     }
 
-    public void setContext(String context) {
+    public get_log_args setContext(String context) {
       this.context = context;
+      return this;
     }
 
     public void unsetContext() {
       this.context = null;
     }
 
-    // Returns true if field context is set (has been asigned a value) and false otherwise
+    /** Returns true if field context is set (has been asigned a value) and false otherwise */
     public boolean isSetContext() {
       return this.context != null;
     }
@@ -4119,8 +5880,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case CONTEXT:
         if (value == null) {
           unsetContext();
@@ -4129,29 +5890,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case CONTEXT:
         return getContext();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case CONTEXT:
         return isSetContext();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -4191,6 +5952,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(get_log_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_log_args typedOther = (get_log_args)other;
+
+      lastComparison = Boolean.valueOf(isSetContext()).compareTo(typedOther.isSetContext());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetContext()) {
+        lastComparison = TBaseHelper.compareTo(this.context, typedOther.context);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4200,9 +5986,8 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case CONTEXT:
+        switch (field.id) {
+          case 1: // CONTEXT
             if (field.type == TType.STRING) {
               this.context = iprot.readString();
             } else { 
@@ -4211,12 +5996,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -4253,33 +6036,90 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class get_log_result implements TBase, java.io.Serializable, Cloneable   {
+  public static class get_log_result implements TBase<get_log_result, get_log_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("get_log_result");
+
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.STRING, (short)0);
     private static final TField ERROR_FIELD_DESC = new TField("error", TType.STRUCT, (short)1);
 
     public String success;
-    public static final int SUCCESS = 0;
     public QueryNotFoundException error;
-    public static final int ERROR = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      ERROR((short)1, "error");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERROR
+            return ERROR;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRING)));
-      put(ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.STRUCT)));
-    }});
+    // isset id assignments
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRING)));
+      tmpMap.put(_Fields.ERROR, new FieldMetaData("error", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(get_log_result.class, metaDataMap);
     }
 
@@ -4307,24 +6147,30 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public get_log_result clone() {
+    public get_log_result deepCopy() {
       return new get_log_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+      this.error = null;
     }
 
     public String getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(String success) {
+    public get_log_result setSuccess(String success) {
       this.success = success;
+      return this;
     }
 
     public void unsetSuccess() {
       this.success = null;
     }
 
-    // Returns true if field success is set (has been asigned a value) and false otherwise
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
     public boolean isSetSuccess() {
       return this.success != null;
     }
@@ -4339,15 +6185,16 @@ public class BeeswaxService {
       return this.error;
     }
 
-    public void setError(QueryNotFoundException error) {
+    public get_log_result setError(QueryNotFoundException error) {
       this.error = error;
+      return this;
     }
 
     public void unsetError() {
       this.error = null;
     }
 
-    // Returns true if field error is set (has been asigned a value) and false otherwise
+    /** Returns true if field error is set (has been asigned a value) and false otherwise */
     public boolean isSetError() {
       return this.error != null;
     }
@@ -4358,8 +6205,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case SUCCESS:
         if (value == null) {
           unsetSuccess();
@@ -4376,34 +6223,34 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case SUCCESS:
         return getSuccess();
 
       case ERROR:
         return getError();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case SUCCESS:
         return isSetSuccess();
       case ERROR:
         return isSetError();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -4457,6 +6304,41 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(get_log_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_log_result typedOther = (get_log_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetError()).compareTo(typedOther.isSetError());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetError()) {
+        lastComparison = TBaseHelper.compareTo(this.error, typedOther.error);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4466,16 +6348,15 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case SUCCESS:
+        switch (field.id) {
+          case 0: // SUCCESS
             if (field.type == TType.STRING) {
               this.success = iprot.readString();
             } else { 
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
-          case ERROR:
+          case 1: // ERROR
             if (field.type == TType.STRUCT) {
               this.error = new QueryNotFoundException();
               this.error.read(iprot);
@@ -4485,12 +6366,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -4538,29 +6417,85 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class get_default_configuration_args implements TBase, java.io.Serializable, Cloneable   {
+  public static class get_default_configuration_args implements TBase<get_default_configuration_args, get_default_configuration_args._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("get_default_configuration_args");
+
     private static final TField INCLUDE_HADOOP_FIELD_DESC = new TField("include_hadoop", TType.BOOL, (short)1);
 
     public boolean include_hadoop;
-    public static final int INCLUDE_HADOOP = 1;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
-      public boolean include_hadoop = false;
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      INCLUDE_HADOOP((short)1, "include_hadoop");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // INCLUDE_HADOOP
+            return INCLUDE_HADOOP;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(INCLUDE_HADOOP, new FieldMetaData("include_hadoop", TFieldRequirementType.DEFAULT, 
-          new FieldValueMetaData(TType.BOOL)));
-    }});
+    // isset id assignments
+    private static final int __INCLUDE_HADOOP_ISSET_ID = 0;
+    private BitSet __isset_bit_vector = new BitSet(1);
 
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
     static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.INCLUDE_HADOOP, new FieldMetaData("include_hadoop", TFieldRequirementType.DEFAULT, 
+          new FieldValueMetaData(TType.BOOL)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(get_default_configuration_args.class, metaDataMap);
     }
 
@@ -4572,46 +6507,53 @@ public class BeeswaxService {
     {
       this();
       this.include_hadoop = include_hadoop;
-      this.__isset.include_hadoop = true;
+      setInclude_hadoopIsSet(true);
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
     public get_default_configuration_args(get_default_configuration_args other) {
-      __isset.include_hadoop = other.__isset.include_hadoop;
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
       this.include_hadoop = other.include_hadoop;
     }
 
-    @Override
-    public get_default_configuration_args clone() {
+    public get_default_configuration_args deepCopy() {
       return new get_default_configuration_args(this);
+    }
+
+    @Override
+    public void clear() {
+      setInclude_hadoopIsSet(false);
+      this.include_hadoop = false;
     }
 
     public boolean isInclude_hadoop() {
       return this.include_hadoop;
     }
 
-    public void setInclude_hadoop(boolean include_hadoop) {
+    public get_default_configuration_args setInclude_hadoop(boolean include_hadoop) {
       this.include_hadoop = include_hadoop;
-      this.__isset.include_hadoop = true;
+      setInclude_hadoopIsSet(true);
+      return this;
     }
 
     public void unsetInclude_hadoop() {
-      this.__isset.include_hadoop = false;
+      __isset_bit_vector.clear(__INCLUDE_HADOOP_ISSET_ID);
     }
 
-    // Returns true if field include_hadoop is set (has been asigned a value) and false otherwise
+    /** Returns true if field include_hadoop is set (has been asigned a value) and false otherwise */
     public boolean isSetInclude_hadoop() {
-      return this.__isset.include_hadoop;
+      return __isset_bit_vector.get(__INCLUDE_HADOOP_ISSET_ID);
     }
 
     public void setInclude_hadoopIsSet(boolean value) {
-      this.__isset.include_hadoop = value;
+      __isset_bit_vector.set(__INCLUDE_HADOOP_ISSET_ID, value);
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case INCLUDE_HADOOP:
         if (value == null) {
           unsetInclude_hadoop();
@@ -4620,29 +6562,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case INCLUDE_HADOOP:
         return new Boolean(isInclude_hadoop());
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case INCLUDE_HADOOP:
         return isSetInclude_hadoop();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -4682,6 +6624,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(get_default_configuration_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_default_configuration_args typedOther = (get_default_configuration_args)other;
+
+      lastComparison = Boolean.valueOf(isSetInclude_hadoop()).compareTo(typedOther.isSetInclude_hadoop());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetInclude_hadoop()) {
+        lastComparison = TBaseHelper.compareTo(this.include_hadoop, typedOther.include_hadoop);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4691,24 +6658,21 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case INCLUDE_HADOOP:
+        switch (field.id) {
+          case 1: // INCLUDE_HADOOP
             if (field.type == TType.BOOL) {
               this.include_hadoop = iprot.readBool();
-              this.__isset.include_hadoop = true;
+              setInclude_hadoopIsSet(true);
             } else { 
               TProtocolUtil.skip(iprot, field.type);
             }
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -4739,29 +6703,84 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }
 
-  public static class get_default_configuration_result implements TBase, java.io.Serializable, Cloneable   {
+  public static class get_default_configuration_result implements TBase<get_default_configuration_result, get_default_configuration_result._Fields>, java.io.Serializable, Cloneable   {
     private static final TStruct STRUCT_DESC = new TStruct("get_default_configuration_result");
+
     private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.LIST, (short)0);
 
     public List<ConfigVariable> success;
-    public static final int SUCCESS = 0;
 
-    private final Isset __isset = new Isset();
-    private static final class Isset implements java.io.Serializable {
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
     }
 
-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+    // isset id assignments
+
+    public static final Map<_Fields, FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, FieldMetaData> tmpMap = new EnumMap<_Fields, FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
           new ListMetaData(TType.LIST, 
               new StructMetaData(TType.STRUCT, ConfigVariable.class))));
-    }});
-
-    static {
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
       FieldMetaData.addStructMetaDataMap(get_default_configuration_result.class, metaDataMap);
     }
 
@@ -4788,9 +6807,13 @@ public class BeeswaxService {
       }
     }
 
-    @Override
-    public get_default_configuration_result clone() {
+    public get_default_configuration_result deepCopy() {
       return new get_default_configuration_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
     }
 
     public int getSuccessSize() {
@@ -4812,15 +6835,16 @@ public class BeeswaxService {
       return this.success;
     }
 
-    public void setSuccess(List<ConfigVariable> success) {
+    public get_default_configuration_result setSuccess(List<ConfigVariable> success) {
       this.success = success;
+      return this;
     }
 
     public void unsetSuccess() {
       this.success = null;
     }
 
-    // Returns true if field success is set (has been asigned a value) and false otherwise
+    /** Returns true if field success is set (has been asigned a value) and false otherwise */
     public boolean isSetSuccess() {
       return this.success != null;
     }
@@ -4831,8 +6855,8 @@ public class BeeswaxService {
       }
     }
 
-    public void setFieldValue(int fieldID, Object value) {
-      switch (fieldID) {
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
       case SUCCESS:
         if (value == null) {
           unsetSuccess();
@@ -4841,29 +6865,29 @@ public class BeeswaxService {
         }
         break;
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
     }
 
-    public Object getFieldValue(int fieldID) {
-      switch (fieldID) {
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
       case SUCCESS:
         return getSuccess();
 
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
-    public boolean isSet(int fieldID) {
-      switch (fieldID) {
+    /** Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
       case SUCCESS:
         return isSetSuccess();
-      default:
-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
       }
+      throw new IllegalStateException();
     }
 
     @Override
@@ -4903,6 +6927,31 @@ public class BeeswaxService {
       return builder.toHashCode();
     }
 
+    public int compareTo(get_default_configuration_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_default_configuration_result typedOther = (get_default_configuration_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
     public void read(TProtocol iprot) throws TException {
       TField field;
       iprot.readStructBegin();
@@ -4912,19 +6961,18 @@ public class BeeswaxService {
         if (field.type == TType.STOP) { 
           break;
         }
-        switch (field.id)
-        {
-          case SUCCESS:
+        switch (field.id) {
+          case 0: // SUCCESS
             if (field.type == TType.LIST) {
               {
-                TList _list16 = iprot.readListBegin();
-                this.success = new ArrayList<ConfigVariable>(_list16.size);
-                for (int _i17 = 0; _i17 < _list16.size; ++_i17)
+                TList _list12 = iprot.readListBegin();
+                this.success = new ArrayList<ConfigVariable>(_list12.size);
+                for (int _i13 = 0; _i13 < _list12.size; ++_i13)
                 {
-                  ConfigVariable _elem18;
-                  _elem18 = new ConfigVariable();
-                  _elem18.read(iprot);
-                  this.success.add(_elem18);
+                  ConfigVariable _elem14;
+                  _elem14 = new ConfigVariable();
+                  _elem14.read(iprot);
+                  this.success.add(_elem14);
                 }
                 iprot.readListEnd();
               }
@@ -4934,12 +6982,10 @@ public class BeeswaxService {
             break;
           default:
             TProtocolUtil.skip(iprot, field.type);
-            break;
         }
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
 
       // check for required fields of primitive type, which can't be checked in the validate method
       validate();
@@ -4952,8 +6998,9 @@ public class BeeswaxService {
         oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
         {
           oprot.writeListBegin(new TList(TType.STRUCT, this.success.size()));
-          for (ConfigVariable _iter19 : this.success)          {
-            _iter19.write(oprot);
+          for (ConfigVariable _iter15 : this.success)
+          {
+            _iter15.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -4981,7 +7028,6 @@ public class BeeswaxService {
 
     public void validate() throws TException {
       // check for required fields
-      // check that fields of type enum have valid values
     }
 
   }

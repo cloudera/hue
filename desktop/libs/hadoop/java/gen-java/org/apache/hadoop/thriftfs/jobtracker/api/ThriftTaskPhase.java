@@ -9,19 +9,14 @@ package org.apache.hadoop.thriftfs.jobtracker.api;
 import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
-public enum ThriftTaskPhase implements TEnum{
-    STARTING(0),
-    MAP(1),
-    SHUFFLE(2),
-    SORT(3),
-    REDUCE(4),
-    CLEANUP(5);
 
-  private static final Map<Integer, ThriftTaskPhase> BY_VALUE = new HashMap<Integer,ThriftTaskPhase>() {{
-    for(ThriftTaskPhase val : ThriftTaskPhase.values()) {
-      put(val.getValue(), val);
-    }
-  }};
+public enum ThriftTaskPhase implements TEnum {
+  STARTING(0),
+  MAP(1),
+  SHUFFLE(2),
+  SORT(3),
+  REDUCE(4),
+  CLEANUP(5);
 
   private final int value;
 
@@ -41,6 +36,21 @@ public enum ThriftTaskPhase implements TEnum{
    * @return null if the value is not found.
    */
   public static ThriftTaskPhase findByValue(int value) { 
-    return BY_VALUE.get(value);
+    switch (value) {
+      case 0:
+        return STARTING;
+      case 1:
+        return MAP;
+      case 2:
+        return SHUFFLE;
+      case 3:
+        return SORT;
+      case 4:
+        return REDUCE;
+      case 5:
+        return CLEANUP;
+      default:
+        return null;
+    }
   }
 }

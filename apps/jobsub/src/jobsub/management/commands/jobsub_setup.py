@@ -32,13 +32,15 @@ from hadoop import cluster
 import hadoop.conf
 import jobsub.conf
 
+LOG = logging.getLogger(__name__)
+
 class Command(NoArgsCommand):
   """Creates file system for testing."""
   def handle_noargs(self, **options):
     remote_fs = cluster.get_hdfs()
     if hasattr(remote_fs, "setuser"):
-      remote_fs.setuser("hue", ["supergroup"])
-    logging.info("Using remote fs: %s" % str(remote_fs))
+      remote_fs.setuser(remote_fs.superuser)
+    LOG.info("Using remote fs: %s" % str(remote_fs))
 
     # Copy over examples/ and script_templates/ directories
     for dirname in ("examples", "script_templates"):
@@ -113,8 +115,10 @@ def copy_dir(local_dir, remote_fs, remote_dir):
 
 def copy_file(local_src, remote_fs, remote_dst):
   if remote_fs.exists(remote_dst):
-    logging.info("%s already exists.  Skipping." % remote_dst)
+    LOG.info("%s already exists.  Skipping." % remote_dst)
     return
+  else:
+    LOG.info("%s does not exist. trying to copy" % remote_dst)
     
   if os.path.isfile(local_src):
     src = file(local_src)
@@ -122,10 +126,10 @@ def copy_file(local_src, remote_fs, remote_dst):
       dst = remote_fs.open(remote_dst, "w")
       try:
         shutil.copyfileobj(src, dst)
-        logging.info("Copied %s -> %s" % (local_src, remote_dst))
+        LOG.info("Copied %s -> %s" % (local_src, remote_dst))
       finally:
         dst.close()
     finally:
       src.close()
   else:
-    logging.info("Skipping %s (not a file)" % local_src)
+    LOG.info("Skipping %s (not a file)" % local_src)
