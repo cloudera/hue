@@ -43,6 +43,7 @@ sources: [
   Source/JFrameLinkers/CCS.JFrame.NoScroll.js,
   Source/JFrameLinkers/CCS.JFrame.PromptAndPost.js,
   Source/JFrameLinkers/CCS.JFrame.Refresh.js,
+  Source/JFrameLinkers/CCS.JFrame.RefreshWithParams.js,
   Source/JFrameLinkers/CCS.JFrame.SubmitLink.js,
   Source/JFrameLinkers/CCS.JFrame.Target.js,
   Source/Native/String.CCS.js,
