@@ -367,6 +367,9 @@ form.ccs-table_config ul {
 *[data-filters*=Sortable] > * {
 	cursor: move;
 }
+*[data-filters*=Sortable] .clone {
+	z-index: 1;
+}
 form.ccs-table_config li {
 	padding: 2px;
 	border: 1px solid #ccc;
