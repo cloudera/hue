@@ -19,6 +19,7 @@ import logging
 import threading
 
 import django.contrib.auth.views
+from django.core.exceptions import SuspiciousOperation
 
 from django.core import urlresolvers
 from django.contrib.auth import authenticate, login, get_backends
@@ -66,7 +67,12 @@ def get_current_users():
   a dictionary of the user's IP address and last access time"""
   current_users = { }
   for session in Session.objects.all():
-    uid = session.get_decoded().get(django.contrib.auth.SESSION_KEY)
+    try:
+      uid = session.get_decoded().get(django.contrib.auth.SESSION_KEY)
+    except SuspiciousOperation:
+      # If secret_key changed, this resolution won't work.
+      uid = None
+
     if uid is not None:
       try:
         userobj = User.objects.get(pk=uid)
