@@ -16,7 +16,7 @@ There is also a companion SDK guide that describes how to develop
 new Hue applications:
 http://archive.cloudera.com/cdh3/hue/sdk/sdk.html[Hue SDK Documentation]
 
-IMPORTANT: Hue requires the Cloudera Distribution for Hadoop (CDH), version 2 or 3.
+IMPORTANT: Hue requires the Cloudera Distribution for Hadoop (CDH), version 3 (beta 3).
 
 .Conventions Used in this Guide:
 * Commands that must be run with +root+ permission have a +#+ command prompt.
@@ -34,7 +34,7 @@ on _every_ machine that's running Hadoop daemons.
 === Install CDH2 or CDH3
 
 To use Hue, you must be running the Cloudera Distribution for Hadoop
-with a version number of at least `0.20.1+133`. If you are not running this
+with a version number of at least `0.20.2+731`. If you are not running this
 version of CDH or later, upgrade your cluster before proceeding.
 
 === Install Hue
@@ -87,7 +87,7 @@ that user's home directory, or in a directory within `/usr/local`.
 ==== Install Hadoop Plugins
 
 In order to communicate with Hadoop, Hue requires a plug-in jar that you must
-install and configure. This jar is: `desktop/libs/hadoop/java-lib/hue-plugins-0.9.jar`,
+install and configure. This jar is: `desktop/libs/hadoop/java-lib/hue-plugins-*.jar`,
 relative to the Hue installation directory.
 
 Run these commands to create a symlink your Hadoop lib directory
