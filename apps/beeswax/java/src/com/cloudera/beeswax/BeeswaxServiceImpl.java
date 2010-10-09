@@ -28,6 +28,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -483,25 +484,33 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
      * @param executor
      * @param lc
      */
-    void submitTo(ExecutorService executor, final LogContext lc) {
+    void submitTo(ExecutorService executor, final LogContext lc)
+      throws java.io.IOException {
+      final UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
+
       final RunningQueryState state = this;
       executor.submit(new Runnable() {
         @Override
         public void run() {
-          try {
-            lc.registerCurrentThread();
-            try {
-              Hive.closeCurrent();
-              Hive.get(state.hiveConf);
-            } catch (HiveException ex) {
-              throw new RuntimeException(ex);
+          ugi.doAs(new PrivilegedAction<Void>() {
+            public Void run() {
+              try {
+                lc.registerCurrentThread();
+                try {
+                  Hive.closeCurrent();
+                  Hive.get(state.hiveConf);
+                } catch (HiveException ex) {
+                  throw new RuntimeException(ex);
+                }
+                state.bringUp();
+                state.execute();
+              } catch (Throwable t) {
+                LOG.error("Exception while processing query", t);
+                state.saveException(t);
+              }
+              return null;
             }
-            state.bringUp();
-            state.execute();
-          } catch (Throwable t) {
-            LOG.error("Exception while processing query", t);
-            state.saveException(t);
-          }
+          });
         }
       });
     }
