@@ -188,7 +188,7 @@ class TestJobBrowserWithHadoop(object):
     # unless we change SleepJob
     assert_equal(
       response.context['job'].counters['FileSystemCounters']['counters']['FILE_BYTES_WRITTEN'],
-      {'map': 44L, 'reduce': 12L, 'displayName': 'FILE_BYTES_WRITTEN', 'name': 'FILE_BYTES_WRITTEN'}
+      {'map': 21493L, 'reduce': 21462L, 'displayName': 'FILE_BYTES_WRITTEN', 'name': 'FILE_BYTES_WRITTEN'}
     )
 
     # We can't just check the complete contents of the python map because the
