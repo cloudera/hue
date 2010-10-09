@@ -23,8 +23,9 @@ from desktop.supervisor import DjangoCommandSupervisee
 from desktop.conf import KERBEROS as CONF
 
 LOG = logging.getLogger(__name__)
-
 SPEC = DjangoCommandSupervisee("kt_renewer")
+
+NEED_KRB181_WORKAROUND=None
 
 def renew_from_kt():
   cmdv = [CONF.KINIT_PATH.get(),
@@ -38,6 +39,35 @@ def renew_from_kt():
   if ret != 0:
     LOG.error("Couldn't reinit from keytab!")
     sys.exit(ret)
+
+  global NEED_KRB181_WORKAROUND
+  if NEED_KRB181_WORKAROUND is None:
+    NEED_KRB181_WORKAROUND = detect_conf_var()
+  if NEED_KRB181_WORKAROUND:
+    perform_krb181_workaround()
+
+def perform_krb181_workaround():
+  LOG.debug("Working around krb 181 issue by renewing ticket")
+  cmdv = [CONF.KINIT_PATH.get(),
+          "-R",
+          "-c", CONF.CCACHE_PATH.get()]
+  ret = subprocess.call(cmdv)
+  if ret != 0:
+    LOG.error("Couldn't renew kerberos ticket in order to work around Kerberos 1.8.1 issue")
+    sys.exit(ret)
+
+def detect_conf_var():
+  """Return true if the ticket cache contains "conf" information as is found
+  in ticket caches of Kerboers 1.8.1 or later. This is incompatible with the
+  Sun Java Krb5LoginModule in Java6, so we need to take an action to work
+  around it.
+  """
+  try:
+    f = file(CONF.CCACHE_PATH.get(), "rb")
+    data = f.read()
+    return "X-CACHECONF:" in data
+  finally:
+    f.close()
 
 def run():
   if CONF.HUE_KEYTAB.get() is None:
