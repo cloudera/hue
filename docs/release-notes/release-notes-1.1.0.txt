@@ -42,12 +42,6 @@ for passing security credentials. A few low level APIs have changed, but most
 applications should not be affected.
 
 
-Known Issues
-------------
-* HUE-258. Hue file upload always creates files as hue user when running against insecure cluster
-* HUE-259. Beeswax doesn't work with Hadoop security enabled
-
-
 List of All Bugs Fixed
 ----------------------
 * HUE-139. Changing JFrame to allow Alert and Prompt to use their own Behavior instances
@@ -115,6 +109,8 @@ List of All Bugs Fixed
 * HUE-252. Revert "No Ticket. Moving depender requirements into a single statement for index.mako."
 * HUE-253. Query Save As dialog appears empty
 * HUE-255. Create ability to refresh the current view with additional get parameters
+* HUE-258. Hue file upload always creates files as hue user when running against insecure cluster
+* HUE-259. Beeswax doesn't work with Hadoop security enabled
 * Adding a demo for resizable HtmlTable columns.
 * Adding some images for status display across apps.
 * Auto refresh filter url compare method needed to escape the urls to compare them.
