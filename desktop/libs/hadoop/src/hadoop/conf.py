@@ -104,6 +104,13 @@ HADOOP_STATIC_GROUP_MAPPING_CLASSPATH = Config("hadoop_static_group_mapping_clas
   dynamic_default=find_jar("../../static-group-mapping/java-lib/static-group-mapping-*.jar", root=os.path.dirname(__file__)),
   private=True)
 
+SUDO_SHELL_JAR = Config("hadoop_sudo_shell_jar",
+  help="Tool that allows a proxy user UGI to be used to upload files.",
+  type=str,
+  dynamic_default=find_jar("../../sudo-shell/java-lib/sudo-shell-*.jar",
+                           root=os.path.dirname(__file__)),
+  private=True)
+
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
   help="One entry for each HDFS cluster",

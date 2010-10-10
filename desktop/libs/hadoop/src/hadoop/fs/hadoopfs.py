@@ -789,19 +789,14 @@ class FileUpload(object):
     if block_size:
       extra_confs.append("-Ddfs.block.size=%d" % block_size)
     self.subprocess_cmd = [self.fs.hadoop_bin_path,
-                           "dfs",
+                           "jar",
+                           hadoop.conf.SUDO_SHELL_JAR.get(),
+                           self.fs.user,
                            "-Dfs.default.name=" + self.fs.uri] + \
                            extra_confs + \
                            ["-put", "-", encode_fs_path(path)]
 
     self.subprocess_env = i18n.make_utf8_env()
-
-    if self.fs.security_enabled:
-      token = self.fs.get_delegation_token()
-      self.token_file = tempfile.NamedTemporaryFile()
-      self.token_file.write(token.delegationTokenBytes)
-      self.token_file.flush()
-      self.subprocess_env['HADOOP_TOKEN_FILE_LOCATION'] = self.token_file.name
 
     if self.subprocess_env.has_key('HADOOP_CLASSPATH'):
       self.subprocess_env['HADOOP_CLASSPATH'] += ':' + hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
@@ -831,12 +826,6 @@ class FileUpload(object):
       logging.debug("Saw IOError writing %r" % self.path, exc_info=1)
       if ioe.errno == errno.EPIPE:
         stdout, stderr = self.putter.communicate()
-
-    if self.fs.security_enabled and self.token_file:
-      try:
-        self.token_file.close()
-      except:
-        LOG.warn('Failed to close HDFS delegation token file %s' % (self.token_file.name(),))
 
     self.closed = True
     if stderr:

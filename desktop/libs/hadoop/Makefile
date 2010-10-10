@@ -51,10 +51,16 @@ STATIC_GROUP_MAPPING_BUILD := $(STATIC_GROUP_MAPPING_DIR)/build
 STATIC_GROUP_MAPPING_LIB := $(STATIC_GROUP_MAPPING_DIR)/java-lib
 STATIC_GROUP_MAPPING := $(STATIC_GROUP_MAPPING_LIB)/static-group-mapping-$(DESKTOP_VERSION).jar
 
-compile: $(PLUGIN) $(STATIC_GROUP_MAPPING)
+SUDO_SHELL_DIR := $(realpath .)/sudo-shell
+SUDO_SHELL_SRC := $(SUDO_SHELL_DIR)/src
+SUDO_SHELL_BUILD := $(SUDO_SHELL_DIR)/build
+SUDO_SHELL_LIB := $(SUDO_SHELL_DIR)/java-lib
+SUDO_SHELL := $(SUDO_SHELL_LIB)/sudo-shell-$(DESKTOP_VERSION).jar
+
+compile: $(PLUGIN) $(STATIC_GROUP_MAPPING) $(SUDO_SHELL)
 
 clean::
-	rm -Rf $(PLUGIN_JAVA_LIB) $(STATIC_GROUP_MAPPING_LIB)
+	rm -Rf $(PLUGIN_JAVA_LIB) $(STATIC_GROUP_MAPPING_LIB) $(SUDO_SHELL_LIB)
 
 ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
 PLUGIN_OPTS := -Dbuild.dir=$(BLD_DIR_PLUGINS) \
@@ -81,6 +87,15 @@ $(STATIC_GROUP_MAPPING): $(shell find $(STATIC_GROUP_MAPPING_SRC))
 	cd $(STATIC_GROUP_MAPPING_DIR) && ant $(ANT_OPTS) $(STATIC_GROUP_MAPPING_OPTS) jar
 	cp $(STATIC_GROUP_MAPPING_BUILD)/$(notdir $(STATIC_GROUP_MAPPING)) $(STATIC_GROUP_MAPPING)
 
+SUDO_SHELL_OPTS := -Dbuild.dir=$(SUDO_SHELL_BUILD) \
+         -Dhadoop.home=$(HADOOP_HOME) \
+         -Dsudo-shell.version=$(DESKTOP_VERSION)
+
+$(SUDO_SHELL): $(shell find $(SUDO_SHELL_SRC))
+	mkdir -p $(SUDO_SHELL_LIB)
+	@echo "--- Building sudo fsshell tool"
+	cd $(SUDO_SHELL_DIR) && ant $(ANT_OPTS) $(SUDO_SHELL_OPTS) jar
+	cp $(SUDO_SHELL_BUILD)/$(notdir $(SUDO_SHELL)) $(SUDO_SHELL)
 #
 # Tell the `bdist' target to exclude our java source.
 #
