@@ -19,6 +19,12 @@ import org.apache.hadoop.fs.FsShell;
 import org.apache.hadoop.security.UserGroupInformation;
 import java.security.PrivilegedExceptionAction;
 
+/**
+ * Tool that allows a user with proxyuser privileges to act on behalf
+ * of another user on HDFS. Hue currently uses this tool in order to
+ * upload files using the "-put" shell command on behalf of the logged-in
+ * user.
+ */
 public class SudoFsShell {
   private static void usage() {
     System.err.println("usage: SudoFsShell <username> <shell args ...>");
@@ -32,7 +38,7 @@ public class SudoFsShell {
 
     String username = args[0];
     final String shellArgs[] = new String[args.length - 1];
-    System.arraycopy(args, 1, shellArgs, 0, args.length-1);
+    System.arraycopy(args, 1, shellArgs, 0, args.length - 1);
 
     UserGroupInformation sudoUgi;
     if (UserGroupInformation.isSecurityEnabled()) {
