@@ -19,6 +19,7 @@ body>.ccs-error-popup {
 }
 #bg {
 	width: 100%;
+	height: 100%;
 	position: absolute;
 	opacity: 0;
 	filter: alpha(opacity=0);
@@ -32,7 +33,6 @@ body>.ccs-error-popup {
 	-ms-filter: inherit;
 }
 #bg .desktop-logo {
-	cursor:pointer;
 	opacity: inherit;
 	filter: inherit;
 	-ms-filter: inherit;
@@ -41,6 +41,7 @@ body>.ccs-error-popup {
 	position: fixed;
 	bottom: 60px;
 	right: 30px;
+	z-index: 1;
 }
 
 
@@ -432,4 +433,46 @@ input[type=submit] {
 	width: 16px;
 	height: 16px;
 	background: url(/static/art/icons/grey_cross.png);
+}
+
+
+.desktop-menu {
+	font-family: Arial;
+	font-size: 13px;
+	list-style: none;
+	margin: 0;
+	padding: 5px 1px;
+}
+
+.desktop-menu li {
+	padding: 0;
+	margin: 0;
+}
+
+.desktop-menu a {
+	outline: none;
+	margin: 0;
+	display: block;
+	padding: 2px 16px;
+	text-decoration: none;
+	color: #222;
+}
+.desktop-menu a.current {
+	font-weight: bold;
+	background-color: #ccc;
+}
+.desktop-menu a.selected {
+	color: #fff;
+	background: url(/static/art/context-menu-bg.png);
+	text-shadow: 0px 1px 1px #0e4f9c;
+	text-decoration:none;
+}
+
+.desktop-menu li.menu-separator {
+	height: 4px;
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 4px;
+}
+.desktop-menu li.menu-separator a {
+	display: none;
 }

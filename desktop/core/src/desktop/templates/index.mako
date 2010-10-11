@@ -16,16 +16,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
 <html>
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=8" />
-	<title>Hue</title>
-	<link rel="shortcut icon" href="/static/art/favicon_solid.png" type="image/x-icon" /> 
-	<link rel="icon" href="/static/art/favicon_solid.png" type="image/x-icon" />
-	<link rel="stylesheet" href="/static/css/shared.css" type="text/css" media="screen" title="no title" charset="utf-8">
-	<link rel="stylesheet" href="/static/css/reset.css" type="text/css" media="screen" charset="utf-8">
-	<link rel="stylesheet" href="/static/css/windows.css" type="text/css" media="screen" charset="utf-8">
-	<link rel="stylesheet" href="/static/css/desktop.css" type="text/css" media="screen" charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=8" />
+  <title>Hue</title>
+  <link rel="shortcut icon" href="/static/art/favicon_solid.png" type="image/x-icon" /> 
+  <link rel="icon" href="/static/art/favicon_solid.png" type="image/x-icon" />
+  <link rel="stylesheet" href="/static/css/shared.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  <link rel="stylesheet" href="/static/css/reset.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="/static/css/windows.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="/static/css/desktop.css" type="text/css" media="screen" charset="utf-8">
 
-  <script src="/depender/build?client=true&require=dbug,DomReady,Cookie,Element.Dimensions,Element.Style"></script>
+  <script src="/depender/build?client=true&require=dbug,DomReady,Cookie,Element.Dimensions,Element.Style,CCS.Desktop.BackgroundManager,Cookie"></script>
   <!--[if IE 8]>
       <script>
           window.ie8 = true;
@@ -34,33 +34,13 @@
   <script>
   
   window.addEvent('domready', function(){
-    //this method automatically sizes the desktop image to fill the screen
-    var sizer = function(){
-      //get the backgrounds (there may be more than one if rotation is in process)
-      var bgs = $('bg').getElements('.desktop-bg');
-      //get the window dimensions
-      var size = window.getSize();
-      //if the aspect ratio of the window is > 1.6
-      if (size.x/size.y > 1.6) {
-        //then set the width of the image to equal the window
-        bgs.setStyles({
-          width: size.x,
-          height: 'auto'
-        });
-      } else {
-        //else set the height to match the window
-        bgs.setStyles({
-          width: 'auto',
-          height: size.y
-        });
-      }
-    };
-    //when the window is resized, resize the background
-    window.addEvent('resize', sizer);
-    
     if (Browser.Engine.trident) {
+      //if we're in IE, there's a note about the fact that Hue doesn't love IE
+      //add a click handler for hiding this note.
       $('closeWarning').addEvent('click', function(){
+        //store the preference
         Cookie.write('desktop-browser-warned', true);
+        //remove the class (which hides the warning)
         $(document.body).removeClass('warned');
       });
       if (!Cookie.read('desktop-browser-warned')) $(document.body).addClass('warned');
@@ -68,26 +48,32 @@
     }
     var appName = "Hue";
     Depender.require({
-      scripts: ["CCS.Request", "CCS.User", "CCS.Desktop", "CCS.Desktop.Config", "CCS.Desktop.FlashMessage", 
+      scripts: ["CCS.Request", "CCS.User", "CCS.Desktop.Config", "CCS.Desktop.FlashMessage",
         "CCS.Desktop.Keys", "CCS.Login", "StickyWin.PointyTip", "Element.Delegation", "Fx.Tween", "Fx.Elements"],
       callback: function(){
-        //before fading in the screen, resize the background to match the window size
-        sizer();
+        //get the background images
         var bgEls = $('bg').getElements('img');
+        //include the background container
         bgEls.push($('bg'));
         var styles = {};
+        //loop through each and create an effect that fades them from 0 to 1 opacity
         bgEls.each(function(el, i){
           styles[i.toString()] = { opacity: [0, 1] };
         });
+        //fade them in
         new Fx.Elements(bgEls, {
           duration: 500
         }).start(styles);
-        $(document.body).addEvent('click:relay(img.desktop-logo)', rotateBG);
         
+        //configure the clientcide assets location.
         Clientcide.setAssetLocation("/static/js/ThirdParty/clientcide/Assets");
         var growled = {};
+        //add a notification for when apps are launched
         var launchGrowl = function(component){
+          //get the app name ("File Browser" from "filebrowser")
           var appName = CCS.Desktop.getAppName(component);
+          //show the appropriate flash message; if it's loaded then we're just "launching"
+          //else show "loading"
           var loading = 'Loading ' + appName;
           var launching = 'Launching ' + appName;
           var msg = loading;
@@ -109,7 +95,7 @@
           onBeforeLaunch: launchGrowl,
           onAfterLaunch: clearGrowl
         });
-
+        //fade out the ccs-loading message
         (function(){
           $('ccs-loading').fade('out').get('tween').clearChain().chain(function(){
             $('ccs-loading').destroy();
@@ -119,7 +105,9 @@
         //when the user logs in
         CCS.User.withUser(function(user){
           var bsLoaded;
+          //this method runs once the bootstrap is run and the apps are registered
           var bootstrapped = function(){
+            //ensure it only runs once
             if (bsLoaded) return;
             bsLoaded = true;
 
@@ -142,29 +130,37 @@
                   fn();
                 });
               }
+              //display the user as logged in
               $('ccs-profileLink').set('text', user.username).addClass('loggedIn');
               $(document.body).addClass('ccs-loaded');
               window.scrollTo(0,0);
+              //fade in the toolbar
               $('ccs-toolbar').show().tween('opacity', 0, 1);
+              //and the dock
               $('ccs-dock').tween('opacity', 0, 1);
             };
 
+            //IE needs a brief delay
             if (Browser.Engine.trident) finalize.delay(100);
             else finalize();
           };
 
+          //load the bootstraps
           new Element('script', {
             src: '/bootstrap.js',
             events: {
+              //on load call the bootstrapped method above
               load: function() {
                 bootstrapped();
               },
+              //IE requires you monitor the readystate yourself for script tags
               readystatechange: function(){
                 if (['loaded', 'complete'].contains(this.readyState)) bootstrapped();
               }
             }
           }).inject(document.head);
         });
+
       }
     });
   });
@@ -179,50 +175,9 @@
   </script>
 </head>
 <body>
+  <ul id="desktop-menu" class="desktop-menu" style="position:absolute; top: -100000px;">
+  </ul>
   <div id="bg">
-    <script>
-      (function(){
-        var NUMBER_OF_BACKGROUNDS = 13; //number of backgrounds in /static/art/desktops
-        var r = $random(1, NUMBER_OF_BACKGROUNDS);
-        //inject a random background
-        document.write('<img src="/static/art/desktops/' + r + '.jpg" class="desktop-bg"><img src="/static/art/desktops/' + r + '.logo.png" class="desktop-logo">');
-        //background rotation function
-        this.rotateBG = function(){
-          //grab the images there now
-          var bg = $('bg').getElement('.desktop-bg');
-          var logo = $('bg').getElement('.desktop-logo');
-          //pick a new random one
-          if (r < NUMBER_OF_BACKGROUNDS) r++;
-          else r = 1;
-          //inject them
-          new Element('img', {
-            src: '/static/art/desktops/' + r + '.logo.png',
-            'class': 'desktop-logo'
-          }).inject($('bg'), 'top');
-          new Element('img', {
-            src: '/static/art/desktops/' + r + '.jpg',
-            'class': 'desktop-bg',
-            styles: bg.getStyles('width', 'height'),
-            events: {
-              load: function(){
-                //after they load, crossfade
-                new Fx.Elements([bg, logo], {duration: 500}).start({
-                  '0': {
-                    'opacity': 0
-                  },
-                  '1': {
-                    'opacity': 0
-                  }
-                }).chain(function(){
-                  bg.destroy();
-                  logo.destroy();
-                });
-              }
-            }
-          }).inject($('bg'), 'top');
-        };
-      })();
-    </script>
   </div>
   <div id="browserWarn">Hue is best experienced in <a target="browsers" href="http://getfirefox.com">Mozilla Firefox</a>, <a target="browsers" href="http://www.apple.com/safari/">Apple Safari</a>, or <a target="browsers" href="http://www.google.com/chrome">Google Chrome</a> <a id="closeWarning"></a></div>
   <div id="ccs-desktop" class="ccs-shared">
@@ -260,8 +215,14 @@
   </div>
 
     <script>
+    (function(){
+      var state = CCS.Desktop.getState();
+      var options = {};
+      if (state.background) options.current = state.background;
+      new BackgroundManager($('bg'), $('desktop-menu'), options);
       if (Browser.Engine.trident) $(document.body).addClass('IEroot');
       $(document.body).addClass(Browser.Engine.name);
+    })();
     </script>
 </body>
 </html>

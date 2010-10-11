@@ -47,6 +47,7 @@ CCS.Desktop = {
 	launchers: {},
 	loadedComponents: {},
 	stateUrl: "prefs/state",
+	prefsUrl: "prefs/",
 
 	/******************
 	 * PUBLIC METHODS
@@ -360,8 +361,9 @@ CCS.Desktop = {
 	//restores a state to the desktop
 	//states - (object) the state of all the open apps (returned by .serialize())
 	restore: function(states){
+		this.states = $H(JSON.decode(states));
 		var loaded_component;
-		if (states) {
+		if (this.states.getLength()) {
 			var hidden, msg;
 			//hider obscures the desktop while it loads apps
 			var hider = function(){
@@ -396,7 +398,7 @@ CCS.Desktop = {
 			//reference count the number of components we're going to load
 			var components_to_load = 0;
 			//iterate over all the components
-			$each(states, function(componentStates, component){
+			this.states.each(function(componentStates, component){
 				if (!this.hasApp(component)) {
 					dbug.warn('could not find application: %s', component);
 					return;
@@ -551,24 +553,27 @@ CCS.Desktop = {
 			this.resetAndRefresh();
 			return;
 		}
-		var state = JSON.decode(this.getState(), true);
-		this.restore(state);
-		return !!state;
+		this.prefs = this.getState();
+		if (this.prefs) this.restore(this.prefs.state);
+		return !!this.prefs && this.prefs.state;
 	},
 
 	//This request is synchronous because this method determines whether or not there is a session to restore.  It is a decision point, at which the app continues in one of two ways.
 	//Either restoration, or be initializing the default desktop.  In order to do this synchronously we would need to use callbacks.
 	getState: function(){
+		//only get this once; it's syncronous
+		if (this._fetchedState) return this._fetchedState;
 		var result;
 		var jsonRequest = new Request.JSON({
-			url: this.stateUrl,
+			url: this.prefsUrl,
 			async: false,
-			method: "post",
+			method: "get",
 			onSuccess: function(data){
 				result = data;
 			}
 		});
 		jsonRequest.send();
+		this._fetchedState = result;
 		return result;
 	},
 
