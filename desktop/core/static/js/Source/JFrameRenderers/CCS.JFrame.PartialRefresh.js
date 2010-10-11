@@ -345,10 +345,10 @@ script: CCS.JFrame.PartialRefresh.js
 			if (!partials[id]) {
 				//get its line; assume that we have to remove that, too
 				var line = getPartialLine(partial);
+				if (line) linesToDestroy[line.get('data', 'partial-line-id')] = line;
 				if (enableLog) dbug.log('destroying %s', id, line);
 				//destroy the partial
 				destroyPartial(id, jState, behavior);
-				linesToDestroy[line.get('data', 'partial-line-id')] = line;
 			}
 		});
 		for (id in linesToDestroy) {
