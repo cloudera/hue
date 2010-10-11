@@ -18,7 +18,7 @@
 description: CCS Configuration Options
 provides: [CCS]
 requires: [clientcide/StickyWin, Widgets/ART.Popup, Core/Element.Event, Core/Request.HTML,
-  More/Spinner, Core/Selectors, More/URI]
+  More/Spinner, Core/Selectors, More/URI, More/HtmlTable.Resize]
 script: CCS.js
 
 ...
@@ -31,6 +31,7 @@ Request.implement({
 		noCache: true
 	}
 });
+
 Spinner.implement({
 	options: {
 		fxOptions: {
@@ -118,6 +119,13 @@ StickyWin.Stacker.implement({
 });
 StickyWin.WM.setOptions({
 	zIndexBase: 10003
+});
+HtmlTable.implement({
+
+	options: {
+		setStylesOnStartup: false
+	}
+
 });
 
 //allows for selectors like $$('[data-foo-bar]'); TODO: move this up at some point. Note that it'll be in Moo 1.3
