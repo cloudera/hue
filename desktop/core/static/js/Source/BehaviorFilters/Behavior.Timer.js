@@ -28,12 +28,13 @@ Behavior.addGlobalFilters({
 
 	Timer: function(element, methods){
 		var start = element.getData('start-time');
+		var showSeconds = element.hasClass('showSeconds');
 		if (start) start = Date.parse(start);
 		else start = new Date();
 		var timer = (function(){
 			var now = new Date();
 			var diff = start.diff(now, 'second');
-			if (diff > 60) element.set('html', start.timeDiffInWords());
+			if (diff > 60 || !showSeconds) element.set('html', start.timeDiffInWords());
 			else element.set('html', diff + ' sec');
 		}).periodical(100);
 		this.markForCleanup(element, function(){
