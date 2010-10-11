@@ -59,6 +59,7 @@ requires:
  - /Behavior.SubmitOnChange
  - /Behavior.Tabs
  - /Behavior.Tips
+ - /Behavior.Timer
  - /CCS
 
 script: CCS.JFrame.js
