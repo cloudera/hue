@@ -25,11 +25,14 @@ script: CCS.Error.js
 CCS.error = function(caption, message){
 	message = message || "unknown";
 	if (['element', 'string'].contains($type(message))) {
-		return ART.alert(caption || 'Woops!', message || 'Something has gone horribly, horribly wrong.', $empty, {
+		var alerter =  ART.alert(caption || 'Woops!', message || 'Something has gone horribly, horribly wrong.', function(){
+			alerter.keyboard.relinquish();
+		}, {
 				width: 400,
 				height: 150,
 				mask: true
 		}).inject(document.body);
+		return alerter;
 	} else {
 		dbug.log('not alerting message, as it\'s not a string or element', caption, message);
 	}
