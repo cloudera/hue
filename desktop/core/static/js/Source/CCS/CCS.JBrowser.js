@@ -172,7 +172,8 @@ script: CCS.JBrowser.js
 				events: {
 					mousedown: function(e){
 						//prevent clicks to the toolbar element from starting the drag behavior attached to the entire header
-						if (!$(e.target).match('.draggable') && !$(e.target).getParent('.draggable')) e.stopPropagation();
+						//note that OBJECT tags in IE won't give you a .match method - they aren't extended
+						if ($(e.target).match && !$(e.target).match('.draggable') && !$(e.target).getParent('.draggable')) e.stopPropagation();
 					}
 				}
 			}).inject(this.header);
