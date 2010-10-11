@@ -26,7 +26,9 @@ script: CCS.JFrame.HideParent.js
 CCS.JFrame.addGlobalLinkers({
 
 	'[data-hide-parent]': function(event, link){
-		link.getParent(link.getData('hide-parent')).hide();
+		var parent = link.getParent(link.getData('hide-parent'));
+		if (parent) parent.hide();
+		else dbug.warn('could not locate parent element to hide', link);
 	}
 
 });
