@@ -37,6 +37,7 @@ requires:
  - /CCS.JFrame.Chooser
  - /CCS.JFrame.ConfirmAndPost
  - /CCS.JFrame.FakeRefresh
+ - /CCS.JFrame.HideParent
  - /CCS.JFrame.LivePath
  - /CCS.JFrame.Nav
  - /CCS.JFrame.NoScroll

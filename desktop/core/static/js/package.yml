@@ -38,6 +38,7 @@ sources: [
   Source/JFrameLinkers/CCS.JFrame.Chooser.js,
   Source/JFrameLinkers/CCS.JFrame.ConfirmAndPost.js,
   Source/JFrameLinkers/CCS.JFrame.FakeRefresh.js,
+  Source/JFrameLinkers/CCS.JFrame.HideParent.js,
   Source/JFrameLinkers/CCS.JFrame.LivePath.js,
   Source/JFrameLinkers/CCS.JFrame.Nav.js,
   Source/JFrameLinkers/CCS.JFrame.NoScroll.js,
