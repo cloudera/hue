@@ -348,6 +348,17 @@ form.ccs-table_config {
 	top: 5px;
 	z-index: 10;
 }
+.ccs-shared .ccs-resize_handle {
+	position: absolute;
+	bottom: 2px;
+	right: 2px;
+	background: url(../art/resize-handle.png);
+	text-indent: -200px;
+	overflow: hidden;
+	width: 7px;
+	height: 7px;
+	cursor: se-resize;
+}
 form.ccs-table_config label {
 	display: block;
 }
@@ -356,9 +367,15 @@ form.ccs-table_config label:hover {
 }
 form.ccs-table_config ul {
 	padding: 2px;
-	max-height: 125px;
+	height: 125px;
+	min-width: 200px;
 	overflow: auto;
 	border-bottom:1px solid #777;
+}
+*[data-filters*=Sortable] {
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
 }
 *[data-filters*=Sortable] .sorting {
 	cursor: pointer;
@@ -370,14 +387,17 @@ form.ccs-table_config ul {
 *[data-filters*=Sortable] .clone {
 	z-index: 1;
 }
-form.ccs-table_config li {
-	padding: 2px;
+form.ccs-table_config li, .ccs-sort_handle {
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	padding: 2px 2px 2px 14px;
 	border: 1px solid #ccc;
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 	margin-bottom: 2px;
-	background: #fff;
+	background: #fff url(../art/sortable-handle.png) 5px 50% no-repeat;
 }
 form.ccs-table_config li input {
 	margin-right: 6px;
