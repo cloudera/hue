@@ -72,5 +72,6 @@ sources: [
   Source/BehaviorFilters/Behavior.SubmitOnChange.js,
   Source/BehaviorFilters/Behavior.Tabs.js,
   Source/BehaviorFilters/Behavior.Tips.js,
+  Source/BehaviorFilters/Behavior.Timer.js,
 ]
 version: Unknown
