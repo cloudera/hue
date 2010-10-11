@@ -35,6 +35,7 @@ requires:
  - More-Behaviors/Behavior.FormValidator
  - More-Behaviors/Behavior.HtmlTable
  - More-Behaviors/Behavior.OverText
+ - More-Behaviors/Behavior.Resizable
  - More-Behaviors/Behavior.Sortable
  - /Behavior.CollapsingElements
  - /Behavior.ContextMenu
