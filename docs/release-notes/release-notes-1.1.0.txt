@@ -111,6 +111,7 @@ List of All Bugs Fixed
 * HUE-255. Create ability to refresh the current view with additional get parameters
 * HUE-258. Hue file upload always creates files as hue user when running against insecure cluster
 * HUE-259. Beeswax doesn't work with Hadoop security enabled
+* HUE-267. prod install should not require ant
 * Adding a demo for resizable HtmlTable columns.
 * Adding some images for status display across apps.
 * Auto refresh filter url compare method needed to escape the urls to compare them.

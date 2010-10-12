@@ -62,6 +62,7 @@ compile: $(PLUGIN) $(STATIC_GROUP_MAPPING) $(SUDO_SHELL)
 clean::
 	rm -Rf $(PLUGIN_JAVA_LIB) $(STATIC_GROUP_MAPPING_LIB) $(SUDO_SHELL_LIB)
 
+# Build the plugin jar iff the source is present
 ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
 PLUGIN_OPTS := -Dbuild.dir=$(BLD_DIR_PLUGINS) \
 	       -Dhadoop.home=$(HADOOP_HOME) \
@@ -77,6 +78,8 @@ $(PLUGIN):
 	$(error Cannot build hadoop plugin without source)
 endif
 
+# Build the static group mapping jar iff the source is present
+ifneq (,$(wildcard $(STATIC_GROUP_MAPPING_SRC)))
 STATIC_GROUP_MAPPING_OPTS := -Dbuild.dir=$(STATIC_GROUP_MAPPING_BUILD) \
          -Dhadoop.home=$(HADOOP_HOME) \
          -Dstatic-group-mapping.version=$(DESKTOP_VERSION)
@@ -86,7 +89,13 @@ $(STATIC_GROUP_MAPPING): $(shell find $(STATIC_GROUP_MAPPING_SRC))
 	@echo "--- Building static UserGroupMappingService"
 	cd $(STATIC_GROUP_MAPPING_DIR) && ant $(ANT_OPTS) $(STATIC_GROUP_MAPPING_OPTS) jar
 	cp $(STATIC_GROUP_MAPPING_BUILD)/$(notdir $(STATIC_GROUP_MAPPING)) $(STATIC_GROUP_MAPPING)
+else
+$(STATIC_GROUP_MAPPING):
+	$(error Cannot build static-group-mapping jar without source)
+endif
 
+# Build the sudo shell jar iff the source is present
+ifneq (,$(wildcard $(SUDO_SHELL_SRC)))
 SUDO_SHELL_OPTS := -Dbuild.dir=$(SUDO_SHELL_BUILD) \
          -Dhadoop.home=$(HADOOP_HOME) \
          -Dsudo-shell.version=$(DESKTOP_VERSION)
@@ -96,9 +105,16 @@ $(SUDO_SHELL): $(shell find $(SUDO_SHELL_SRC))
 	@echo "--- Building sudo fsshell tool"
 	cd $(SUDO_SHELL_DIR) && ant $(ANT_OPTS) $(SUDO_SHELL_OPTS) jar
 	cp $(SUDO_SHELL_BUILD)/$(notdir $(SUDO_SHELL)) $(SUDO_SHELL)
+else
+$(SUDO_SHELL):
+	$(error cannot build sudo-shell jar without source)
+endif
+
 #
 # Tell the `bdist' target to exclude our java source.
 #
 BDIST_EXCLUDES += \
 	--exclude=java \
+	--exclude=static-group-mapping/src \
+	--exclude=sudo-shell/src \
 	--exclude=regenerate-thrift.sh
