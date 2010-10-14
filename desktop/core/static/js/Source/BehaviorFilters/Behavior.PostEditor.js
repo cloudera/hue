@@ -17,14 +17,14 @@
 ---
 description: Creates a SimplePostEditor of any textarea with PostEditor in its data-filters property. 
 provides: [Behavior.PostEditor]
-requires: [Widgets/Behavior, /CCS.PostEditor.Simple]
+requires: [Widgets/Behavior, clientcide/PostEditor]
 script: Behavior.PostEditor.js
 ...
 */
 
 Behavior.addGlobalFilters({
         PostEditor: function(element, methods) {
-                var postEditor = new CCS.PostEditor.Simple(element);
+                var postEditor = new PostEditor(element);
         }
 });
 

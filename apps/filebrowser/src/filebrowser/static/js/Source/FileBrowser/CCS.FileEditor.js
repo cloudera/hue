@@ -3,7 +3,7 @@
 
 description: File Editor
 provides: [CCS.FileEditor]
-requires: [ccs-shared/CCS.JBrowser, ccs-shared/CCS.PostEditor.Simple, /CCS.FileBrowser]
+requires: [ccs-shared/CCS.JBrowser, clientcide/PostEditor, /CCS.FileBrowser]
 script: CCS.FileEditor.js
 
 ...

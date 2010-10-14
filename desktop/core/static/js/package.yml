@@ -49,7 +49,6 @@ sources: [
   Source/Native/String.CCS.js,
   Source/Native/Element.Data.js,
   Source/StaticThirdParty/DynamicTextarea.js,
-  Source/CCS/CCS.PostEditor.Simple.js,
   Source/UI/ART.SideBySideSelect.js,
   Source/BehaviorFilters/Behavior.CollapsingElements.js,
   Source/BehaviorFilters/Behavior.ContextMenu.js,
