@@ -955,10 +955,9 @@ CCS.JFrame = new Class({
 		this._resetOverflow(target);
 
 		//if we're injecting into the main content body, cleanup and scrollto the top
-		if (target == this.content && !options.noScroll) {
-			this.scroller.toTop();
-			this._sweep(target);
-		}
+		if (!options.noScroll) this.scroller.toTop();
+                if (target == this.content) this._sweep(target);
+
 
 		//if we're injecting into the main content body apply the view classes and remove the old one
 		if (target == this.content) {
