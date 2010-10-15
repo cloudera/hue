@@ -20,7 +20,7 @@
 #include "saslwrapper.h"
 #include <sasl/sasl.h>
 #include <sstream>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <iostream>
