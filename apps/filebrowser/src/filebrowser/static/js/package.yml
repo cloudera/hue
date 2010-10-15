@@ -2,4 +2,4 @@ copyright: Apache License v2.0
 version: 0.9
 description: File Browser
 name: filebrowser
-sources: [Source/FileBrowser/CCS.FileBrowser.js, Source/FileBrowser/CCS.FileViewer.js, Source/FileBrowser/CCS.FileEditor.js, Source/Native/Number.Files.js]
+sources: [Source/FileBrowser/CCS.FileBrowser.js, Source/FileBrowser/CCS.FileViewer.js, Source/FileBrowser/CCS.FileEditor.js]
