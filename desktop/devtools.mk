@@ -19,7 +19,6 @@
 
 # May require download from PyPI or whereever
 DEVTOOLS += \
-	django-debug-toolbar \
 	ipdb \
 	ipython \
 	nose \

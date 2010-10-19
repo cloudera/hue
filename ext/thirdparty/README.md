@@ -48,7 +48,6 @@ Downloaded third party dependencies during build
 
 |Re-distributed|Project|Version|License|Source URL|
 |--------------|-------|-------|-------|----------|
-|Y|Django_debug_toolbar|0.7.0|BSD|http://github.com/robhudson/django-debug-toolbar/tarball/0.7.0|
 |Y|ipython|0.10|BSD|http://ipython.scipy.org/dist|
 |Y|MooTools-Core|?|MIT|http://mootools.net/download|
 |Y|Nose|0.11.1|LGPL|http://somethingaboutorange.com/mrl/projects/nose/0.11.1/|
