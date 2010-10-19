@@ -37,6 +37,8 @@ class Command(NoArgsCommand):
       env['HADOOP_CONF_DIR'] = hadoop.conf.HADOOP_CONF_DIR.get()
     if beeswax.conf.BEESWAX_HIVE_CONF_DIR.get():
       env['HIVE_CONF_DIR'] = beeswax.conf.BEESWAX_HIVE_CONF_DIR.get()
+    if beeswax.conf.BEESWAX_SERVER_HEAPSIZE.get():
+      env['HADOOP_HEAPSIZE'] = beeswax.conf.BEESWAX_SERVER_HEAPSIZE.get()
     bin = beeswax.conf.BEESWAX_SERVER_BIN.get()
 
     # Host that desktop is running on

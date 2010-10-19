@@ -50,6 +50,13 @@ BEESWAX_SERVER_BIN = Config(
   private=True,
   default=os.path.join(os.path.dirname(__file__), "..", "..", "beeswax_server.sh"))
 
+BEESWAX_SERVER_HEAPSIZE = Config(
+  key="beeswax_server_heapsize",
+  help="Maximum Java heapsize (in megabytes) used by Beeswax Server.  " + \
+    "Note that the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh " + \
+    "may override this setting.",
+  default=None)
+
 BEESWAX_HIVE_CONF_DIR = Config(
   key='hive_conf_dir',
   help='Hive configuration directory, where hive-site.xml is located',
