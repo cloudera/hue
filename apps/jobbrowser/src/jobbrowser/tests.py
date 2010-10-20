@@ -183,13 +183,11 @@ class TestJobBrowserWithHadoop(object):
 
     # Check some counters for single job.
     counters = response.context['job'].counters
-
-    # These counters may be a bit dependent on current sleep task impl, but should be stable
-    # unless we change SleepJob
-    assert_equal(
-      response.context['job'].counters['FileSystemCounters']['counters']['FILE_BYTES_WRITTEN'],
-      {'map': 21493L, 'reduce': 21462L, 'displayName': 'FILE_BYTES_WRITTEN', 'name': 'FILE_BYTES_WRITTEN'}
-    )
+    counters_file_bytes_written = counters['FileSystemCounters']['counters']['FILE_BYTES_WRITTEN']
+    assert_true(counters_file_bytes_written['map'] > 0)
+    assert_true(counters_file_bytes_written['reduce'] > 0)
+    assert_equal(counters_file_bytes_written['displayName'], 'FILE_BYTES_WRITTEN')
+    assert_equal(counters_file_bytes_written['displayName'], 'FILE_BYTES_WRITTEN')
 
     # We can't just check the complete contents of the python map because the
     # SLOTS_MILLIS_* entries have a variable number of milliseconds from
