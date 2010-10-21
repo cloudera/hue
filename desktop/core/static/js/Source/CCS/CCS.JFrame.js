@@ -37,6 +37,7 @@ requires:
  - More-Behaviors/Behavior.OverText
  - More-Behaviors/Behavior.Resizable
  - More-Behaviors/Behavior.Sortable
+ - /Behavior.Autocomplete
  - /Behavior.CollapsingElements
  - /Behavior.ContextMenu
  - /Behavior.DataGroupToggle

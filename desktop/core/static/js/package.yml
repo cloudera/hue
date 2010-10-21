@@ -52,6 +52,7 @@ sources: [
   Source/Native/Element.Data.js,
   Source/StaticThirdParty/DynamicTextarea.js,
   Source/UI/ART.SideBySideSelect.js,
+  Source/BehaviorFilters/Behavior.Autocomplete.js,
   Source/BehaviorFilters/Behavior.CollapsingElements.js,
   Source/BehaviorFilters/Behavior.ContextMenu.js,
   Source/BehaviorFilters/Behavior.DataGroupToggle.js,
