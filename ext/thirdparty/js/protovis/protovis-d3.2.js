@@ -7914,7 +7914,7 @@ pv.Mark.prototype.mouse = function() {
   var x = pv.event.pageX || 0,
       y = pv.event.pageY || 0,
       n = this.root.canvas();
-
+  
   // Calculate pageX/Y if missing and clientX/Y available
   /*
         CLOUDERA CHANGE:
@@ -7926,9 +7926,12 @@ pv.Mark.prototype.mouse = function() {
     y = pv.event.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) - (doc && doc.clientTop  || body && body.clientTop  || 0);
   }
 
+ 
   do {
-    x -= n.offsetLeft;
-    y -= n.offsetTop;
+    /*  CLOUDERA CHANGE */
+    //Accomodate for the possibility that the current offset parent (n) is in a scrolled object.
+        x -= (n.offsetLeft - n.scrollLeft);
+        y -= (n.offsetTop - n.scrollTop);
   } while (n = n.offsetParent);
 
   /* Compute the inverse transform of all enclosing panels. */

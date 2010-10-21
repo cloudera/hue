@@ -236,6 +236,14 @@ HueChart.Data = new Class({
                 return this.dataObjects;
         },
 
+        //Uses the protovis pv.normalize function to return an array containing values which sum to 1
+        //Essentially returns an array containing the percentage that each dataObject's field value
+        //contributes to the sum of the dataObjects' array field values.
+
+        getNormalizedForField: function(field) {
+                pv.normalize(this.dataObjects, function(d) { return d[field]; });        
+        },
+
         getLength: function() {
                 return this.dataObjects.length;
         },
