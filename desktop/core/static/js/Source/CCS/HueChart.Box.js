@@ -80,7 +80,7 @@ HueChart.Box = new Class({
                         //Add position indicator if enabled
                         if (this.options.positionIndicator) this.setPositionIndicator(vis);
                         //If there's an event, add the event bar to capture these events.
-                        if (this.$events.pointMouseOut && this.$events.pointMouseOver) this.addEventBar(vis);
+                        if (this.$events.pointMouseOut && this.$events.pointMouseOver || this.$events.pointClick) this.addEventBar(vis);
                 }.bind(this));
         },
         
@@ -192,28 +192,39 @@ HueChart.Box = new Class({
         addEventBar: function(vis) {
                 //Create functions which handle the graph specific aspects of the event and call the event arguments.
                 var outVisFn = function() {
-                        this.selected_index = -1;
                         this.fireEvent('pointMouseOut');
                         return vis;
                 }.bind(this);
-                var moveVisFn = function() {
+                var getDataIndexFromMouse = function() {
                         //Convert the mouse's xValue into its corresponding data value on the xScale. 
                         var mx = this.xScale.invert(vis.mouse().x);
                         //Search the data for the index of the element at this data value.
-                        i = pv.search(this.data.getObjects().map(function(d){ return d[this.options.xField]; }.bind(this)), Math.round(mx));
+                        var i = pv.search(this.data.getObjects().map(function(d){ return d[this.options.xField]; }.bind(this)), Math.round(mx));
                         //Adjust for ProtoVis search
                         i = i < 0 ? (-i - 2) : i;
-                        //Set selected index and run moveFn if the item exists
-                        if(i >= 0 && i < this.data.getLength()) {
-                                this.selected_index = i;
-                                this.fireEvent('pointMouseOver', this.data.getObjects()[this.selected_index]);
+                        return (i >= 0 && i < this.data.getLength() ? i : null);
+                }.bind(this);
+                var moveVisFn = function() {
+                        var dataIndex = getDataIndexFromMouse();
+                        //Fire pointMouseOver if the item exists
+                        if(dataIndex) {
+                                this.fireEvent('pointMouseOver', [this.data.getObjects()[dataIndex], dataIndex]);
+                        }
+                        return vis;
+                }.bind(this);
+                var clickFn = function() {
+                        var dataIndex = getDataIndexFromMouse();
+                        //Fire pointClick if the item exists
+                        if(dataIndex != null) {
+                                this.fireEvent('pointClick', [ this.data.getObjects()[dataIndex], dataIndex ]);
                         }
                         return vis;
                 }.bind(this);
                 vis.add(pv.Bar)
                         .fillStyle("rgba(0,0,0,.001)")
                         .event("mouseout", outVisFn)
-                        .event("mousemove", moveVisFn);
+                        .event("mousemove", moveVisFn)
+                        .event("click", clickFn);
         }
         
 });
