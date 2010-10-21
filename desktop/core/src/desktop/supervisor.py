@@ -32,6 +32,7 @@ This entry point should point to a SuperviseeSpec instance in your module.
 from daemon.pidlockfile import PIDLockFile
 import daemon
 import exceptions
+import grp
 import logging
 import optparse
 import os
@@ -61,9 +62,10 @@ LOG = logging.getLogger()
 TIME_WINDOW = 120
 MAX_RESTARTS_IN_WINDOW = 3
 
-# User to setuid down to for any supervisees that don't have the
-# drop_root option set to False
+# User and group to setuid/setgid down to for any supervisees that don't have
+# the drop_root option set to False
 SETUID_USER = "hue"
+SETGID_GROUP = "hue"
 
 # The entry point group in which to find processes to supervise.
 ENTRY_POINT_GROUP = "desktop.supervisor.specs"
@@ -259,8 +261,15 @@ def drop_privileges():
     print >>sys.stderr, "[ERROR] Couldn't get user information for user " + SETUID_USER
     raise
 
-  os.setuid(pw.pw_uid)
+  try:
+    gr = grp.getgrnam(SETGID_GROUP)
+  except:
+    print >>sys.stderr, "[ERROR] Couldn't get group information for group " + SETGID_GROUP
+    raise
 
+  # gid has to be set first
+  os.setgid(gr.gr_gid)
+  os.setuid(pw.pw_uid)
 
 def _init_log(log_dir):
   """Initialize logging configuration"""
