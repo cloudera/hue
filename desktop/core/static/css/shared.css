@@ -106,7 +106,7 @@
 	display:-moz-inline-box;		/* FF2 */
 	display:inline-block;		   /* webkit and FF3 */
 	#zoom: 1; /* set hasLayout:true to mimic inline-block */
-	#display:inline; 
+	#display:inline;
 	border:0;
 	padding:0;
 	vertical-align:middle;
@@ -121,7 +121,7 @@
 	background: url(../art/divots.png) -11px -11px no-repeat;
 }
 /* tabbed layout */
-/* .ccs-tabs, a ul; container for the tabs 
+/* .ccs-tabs, a ul; container for the tabs
 
 <ul class="tabs">
 <li><span>Tab 1</span></li>
@@ -406,12 +406,12 @@ form.ccs-table_config .art {
 	margin: 4px;
 }
 /* stickywin solid; this is the login window styles */
-div.solid-win div.body-left { 
-	background: url(../art/sticky-win-solid-back.png); 
-	width: 16px !important; 
-	overflow: visible; 
-	position: relative; 
-	z-index: 1; 
+div.solid-win div.body-left {
+	background: url(../art/sticky-win-solid-back.png);
+	width: 16px !important;
+	overflow: visible;
+	position: relative;
+	z-index: 1;
 }
 div.solid-win div.body {
 	position: relative;
@@ -419,7 +419,7 @@ div.solid-win div.body {
 	padding: 10px 16px 1px 0px;
 	background: url(../art/sticky-win-solid-back.png) top right;
 }
-div.solid-win div.bottom { 
+div.solid-win div.bottom {
 	z-index: 0;
 	background: url(../art/sticky-win-solid-back.png) bottom left;
 	width: 16px !important;
@@ -427,7 +427,7 @@ div.solid-win div.bottom {
 	position: relative;
 	clear: both;
 }
-div.solid-win div.bottom_lr { 
+div.solid-win div.bottom_lr {
 	position: relative;
 	left: 16px;
 	background: url(../art/sticky-win-solid-back.png) bottom right;
@@ -540,7 +540,7 @@ div.jframe_default h5 { font-size: 105%; margin-bottom: 0.3em; padding-top: 8px;
 /* button bar */
 input[data-filters*=ArtButton] {
 	padding: 0px 0px 0px 0px;
-	/* webkit madness: 
+	/* webkit madness:
 		put this padding statement in place and buttons are still padding 0/8/0/8px
 		add the border: 0px statement below
 		and they all go to 0/0/0/0px
@@ -603,7 +603,7 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 	display:-moz-inline-box;		/* FF2 */
 	display:inline-block;		   /* webkit and FF3 */
 	#zoom: 1; /* set hasLayout:true to mimic inline-block */
-	#display:inline; 
+	#display:inline;
 	border:0;
 	padding:0;
 	vertical-align:middle;
@@ -754,3 +754,56 @@ OTHER DEALINGS IN THE SOFTWARE.
 .print .error a {color:#8a1f11;}
 .print .notice a {color:#514721;}
 .print .success a {color:#264409;}
+
+/* autocompleter styles from clientcide */
+
+.ccs-shared ul.autocompleter-choices
+{
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border: 1px solid #7c7c7c;
+	border-left-color: #c3c3c3;
+	border-right-color: #c3c3c3;
+	border-bottom-color#ddd;
+	background-color: #fff;
+	text-align: left;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	z-index: 50;
+	background-color: #fff;
+}
+
+.ccs-shared ul.autocompleter-choices li
+{
+	position: relative;
+	margin: -2px 0 0 0;
+	padding: 0.2em 1.5em 0.2em 1em;
+	display: block;
+	float: none !important;
+	cursor: pointer;
+	font-weight: normal;
+	white-space: nowrap;
+	font-size: 1em;
+	line-height: 1.5em;
+}
+
+.ccs-shared ul.autocompleter-choices li.autocompleter-selected
+{
+	background-color: #444;
+	color: #fff;
+}
+
+.ccs-shared ul.autocompleter-choices span.autocompleter-queried
+{
+	display: inline;
+	float: none;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+}
+
+.ccs-shared ul.autocompleter-choices li.autocompleter-selected span.autocompleter-queried
+{
+	color: #9FCFFF;
+}

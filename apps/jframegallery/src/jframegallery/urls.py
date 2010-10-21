@@ -19,6 +19,7 @@ from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('jframegallery',
   url(r'^$', 'views.index'),
+  url(r'^autocomplete$', 'views.autocomplete'),
   url(r'^flash.redirect.*$', 'views.flash_redirect'),
   url(r'^flash.*$', 'views.flash'),
   url(r'^error_404.*$', 'views.error_404'),
