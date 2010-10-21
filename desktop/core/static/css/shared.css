@@ -106,7 +106,7 @@
 	display:-moz-inline-box;		/* FF2 */
 	display:inline-block;		   /* webkit and FF3 */
 	#zoom: 1; /* set hasLayout:true to mimic inline-block */
-	#display:inline;
+	#display:inline; 
 	border:0;
 	padding:0;
 	vertical-align:middle;
@@ -121,7 +121,7 @@
 	background: url(../art/divots.png) -11px -11px no-repeat;
 }
 /* tabbed layout */
-/* .ccs-tabs, a ul; container for the tabs
+/* .ccs-tabs, a ul; container for the tabs 
 
 <ul class="tabs">
 <li><span>Tab 1</span></li>
@@ -406,12 +406,12 @@ form.ccs-table_config .art {
 	margin: 4px;
 }
 /* stickywin solid; this is the login window styles */
-div.solid-win div.body-left {
-	background: url(../art/sticky-win-solid-back.png);
-	width: 16px !important;
-	overflow: visible;
-	position: relative;
-	z-index: 1;
+div.solid-win div.body-left { 
+	background: url(../art/sticky-win-solid-back.png); 
+	width: 16px !important; 
+	overflow: visible; 
+	position: relative; 
+	z-index: 1; 
 }
 div.solid-win div.body {
 	position: relative;
@@ -419,7 +419,7 @@ div.solid-win div.body {
 	padding: 10px 16px 1px 0px;
 	background: url(../art/sticky-win-solid-back.png) top right;
 }
-div.solid-win div.bottom {
+div.solid-win div.bottom { 
 	z-index: 0;
 	background: url(../art/sticky-win-solid-back.png) bottom left;
 	width: 16px !important;
@@ -427,7 +427,7 @@ div.solid-win div.bottom {
 	position: relative;
 	clear: both;
 }
-div.solid-win div.bottom_lr {
+div.solid-win div.bottom_lr { 
 	position: relative;
 	left: 16px;
 	background: url(../art/sticky-win-solid-back.png) bottom right;
@@ -540,7 +540,7 @@ div.jframe_default h5 { font-size: 105%; margin-bottom: 0.3em; padding-top: 8px;
 /* button bar */
 input[data-filters*=ArtButton] {
 	padding: 0px 0px 0px 0px;
-	/* webkit madness:
+	/* webkit madness: 
 		put this padding statement in place and buttons are still padding 0/8/0/8px
 		add the border: 0px statement below
 		and they all go to 0/0/0/0px
@@ -603,7 +603,7 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 	display:-moz-inline-box;		/* FF2 */
 	display:inline-block;		   /* webkit and FF3 */
 	#zoom: 1; /* set hasLayout:true to mimic inline-block */
-	#display:inline;
+	#display:inline; 
 	border:0;
 	padding:0;
 	vertical-align:middle;
@@ -755,55 +755,91 @@ OTHER DEALINGS IN THE SOFTWARE.
 .print .notice a {color:#514721;}
 .print .success a {color:#264409;}
 
-/* autocompleter styles from clientcide */
 
-.ccs-shared ul.autocompleter-choices
-{
-	position: absolute;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-	border: 1px solid #7c7c7c;
-	border-left-color: #c3c3c3;
-	border-right-color: #c3c3c3;
-	border-bottom-color#ddd;
-	background-color: #fff;
-	text-align: left;
-	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-	z-index: 50;
-	background-color: #fff;
-}
 
-.ccs-shared ul.autocompleter-choices li
-{
-	position: relative;
-	margin: -2px 0 0 0;
-	padding: 0.2em 1.5em 0.2em 1em;
+/* @group CSS Components */
+
+/*Forces something display:block to flow within text */
+.ccs-shared .txtIcon { display: inline-block !important; }
+
+/* @group tGraph */
+/*
+<span class=tGraph>
+	<span>
+		<b>Text Content</b>
+		<i style="width:33%"></i>
+	</span>
+</span>
+*/
+
+.ccs-shared .tGraph {
 	display: block;
-	float: none !important;
-	cursor: pointer;
+	position: relative;
+	text-align: center;
+	overflow: hidden;
+	margin: auto 0 auto 0;
+	
+	background: url(../art/mr_stripes.gif) repeat-x 0 1px;
+	height: 16px;
+	font-size: 11px;
+}
+.ccs-shared .tGraph span {
+	position: relative;
+	display: block;
+	height: 14px;
+	width: auto;
+	border: 1px solid transparent;
+}
+.ccs-shared .tGraph b {
+	display: block;
+	text-align: center;
+	position: relative;
+	z-index: 1;
 	font-weight: normal;
-	white-space: nowrap;
-	font-size: 1em;
-	line-height: 1.5em;
-}
-
-.ccs-shared ul.autocompleter-choices li.autocompleter-selected
-{
-	background-color: #444;
 	color: #fff;
+	border: 1px solid transparent;
+	line-height: 11px;
+	height: 12px;
+}
+.ccs-shared .tGraph i {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #fff url(../art/mr_stripes.gif) repeat-x 0 -14px;
 }
 
-.ccs-shared ul.autocompleter-choices span.autocompleter-queried
-{
-	display: inline;
-	float: none;
-	font-weight: bold;
-	margin: 0;
-	padding: 0;
-}
+/*Animate the tGraph bar 'value' on load*/
 
-.ccs-shared ul.autocompleter-choices li.autocompleter-selected span.autocompleter-queried
-{
-	color: #9FCFFF;
+.ccs-shared .tGraph i {
+	-webkit-transition: width 0.5s ease-out, height 0.5s ease-out;
+	-moz-transition: width 0.5s ease-out, height 0.5s ease-out;
+	-o-transition: width 0.5s ease-out, height 0.5s ease-out;
+	transition: width 0.5s ease-out, height 0.5s ease-out;
 }
+.ccs-shared.loading .tGraph:not(.v) i,
+.ccs-shared .loading .tGraph:not(.v) i{ width:0 !important; }
+
+/*Coloring*/
+
+.ccs-shared .tGraph span { border-color: #2e4398; text-shadow: #425abc .75px 1px 1px; }
+.ccs-shared .tGraph b { border-color: #fff; }
+
+.ccs-shared .tGraph.priorityLow { background-position: 0 -41px; }
+.ccs-shared .tGraph.priorityLow i { background-position: 0 -28px; }
+.ccs-shared .tGraph.priorityLow span { border-color: #5b932f; text-shadow: #5b932f .75px 1px 1px; }
+
+.ccs-shared .tGraph.priorityHigh { background-position: 0 -69px; }
+.ccs-shared .tGraph.priorityHigh i { background-position: 0 -56px; }
+.ccs-shared .tGraph.priorityHigh span { border-color: #a33537; text-shadow: #bd4747 .75px 1px 1px; }
+
+/*Give it some extra padding when flowed into text content*/
+.ccs-shared .txtIcon.tGraph b,
+.ccs-shared .txtIcon .tGraph b { padding: 0 1ex; }
+
+/* @end tGraph */
+
+
+
+/* @end CSS Components */
