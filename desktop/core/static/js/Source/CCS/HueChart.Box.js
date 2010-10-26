@@ -46,6 +46,7 @@ HueChart.Box = new Class({
                 onPointMouseOut: function that should be run when the mouse is moved out of the chart
                 onPointMouseOver: function that should be run when the mouse is moved over a datapoint, takes the dataPoint and index as arguments
                 onPointClick: function that should be run when the mouse is clicked on a datapoint, takes the dataPoint and index as arguments
+                onSpanSelect: function that should be run when a segment of the chart is selected.  Takes a left object and a right object as arguments, each of which contains the corresponding index and data object. 
                 */
         },
         
@@ -79,8 +80,11 @@ HueChart.Box = new Class({
                         if (this.options.labels) this.setLabels(vis);
                         //Add position indicator if enabled
                         if (this.options.positionIndicator) this.setPositionIndicator(vis);
-                        //If there's an event, add the event bar to capture these events.
-                        if (this.$events.pointMouseOut && this.$events.pointMouseOver || this.$events.pointClick) this.addEventBar(vis);
+                        //Create panel for capture of events
+                        this.eventPanel = vis.add(pv.Panel);
+                        //If there's a mouse event, add the functionality to capture these events.
+                        if (this.hasEvent('pointMouseOut') && this.hasEvent('pointMouseOver') || this.hasEvent('pointClick')) this.addMouseEvents(vis);
+                        if (this.hasEvent('spanSelect')) this.makeSelectable(vis);
                 }.bind(this));
         },
         
@@ -187,25 +191,26 @@ HueChart.Box = new Class({
                                 else return null;
                         });
         },
-        
-        //Add bar detecting mouse events.
-        addEventBar: function(vis) {
+
+        getDataIndexFromX: function(x) {
+                //Convert the passedin in xValue into its corresponding data value on the xScale. 
+                var mx = this.xScale.invert(x);
+                //Search the data for the index of the element at this data value.
+                var i = pv.search(this.getData(true).getObjects().map(function(d){ return d[this.options.xField]; }.bind(this)), Math.round(mx));
+                //Adjust for ProtoVis search
+                i = i < 0 ? (-i - 2) : i;
+                return (i >= 0 && i < this.getData(true).getLength() ? i : null);
+        },
+         
+        //Add handlers to detect mouse events.
+        addMouseEvents: function(vis) {
                 //Create functions which handle the graph specific aspects of the event and call the event arguments.
                 var outVisFn = function() {
                         this.fireEvent('pointMouseOut');
                         return vis;
                 }.bind(this);
-                var getDataIndexFromMouse = function() {
-                        //Convert the mouse's xValue into its corresponding data value on the xScale. 
-                        var mx = this.xScale.invert(vis.mouse().x);
-                        //Search the data for the index of the element at this data value.
-                        var i = pv.search(this.data.getObjects().map(function(d){ return d[this.options.xField]; }.bind(this)), Math.round(mx));
-                        //Adjust for ProtoVis search
-                        i = i < 0 ? (-i - 2) : i;
-                        return (i >= 0 && i < this.data.getLength() ? i : null);
-                }.bind(this);
                 var moveVisFn = function() {
-                        var dataIndex = getDataIndexFromMouse();
+                        var dataIndex = this.getDataIndexFromX(vis.mouse().x);
                         //Fire pointMouseOver if the item exists
                         if(dataIndex) {
                                 this.fireEvent('pointMouseOver', [this.getData(true).getObjects()[dataIndex], dataIndex]);
@@ -213,21 +218,77 @@ HueChart.Box = new Class({
                         return vis;
                 }.bind(this);
                 var clickFn = function() {
-                        var dataIndex = getDataIndexFromMouse();
-                        //Fire pointClick if the item exists
-                        if(dataIndex != null) {
-                                this.fireEvent('pointClick', [ this.data.getObjects()[dataIndex], dataIndex ]);
+                        //Only click if the movement is clearly not a drag.
+                        if (this.selectState && this.selectState.dx < 2) {
+                                var dataIndex = this.getDataIndexFromX(vis.mouse().x);
+                                //Fire pointClick if the item exists
+                                if(dataIndex != null) {
                                         this.fireEvent('pointClick', [ this.getData(true).getObjects()[dataIndex], dataIndex ]);
+                                }
+                                return vis;
                         }
-                        return vis;
                 }.bind(this);
-                vis.add(pv.Bar)
-                        .fillStyle("rgba(0,0,0,.001)")
+
+                this.eventPanel
+                        .events("all")
                         .event("mouseout", outVisFn)
                         .event("mousemove", moveVisFn)
                         .event("click", clickFn);
-        }
+
+        },
+
+        makeSelectable: function(){
+                this.selectState = {x: 0, dx: 0};
+                this.eventPanel
+                        .data([this.selectState])
+                        .event("mousedown", pv.Behavior.select())
+                        .event("mouseup", function() {
+                                if (this.selectState.dx > 2) {
+                                        //Get edges of selected area.
+                                         var leftEdge = this.adjustToGraph('x', this.selectState.x);
+                                         var rightEdge = this.adjustToGraph('x', this.selectState.x + this.selectState.dx);
+                                         //Get corresponding indexes for edges of selected area.
+                                         var leftIndex = this.getDataIndexFromX(leftEdge);
+                                         var rightIndex = this.getDataIndexFromX(rightEdge);
+                                         var leftObj = { index: leftIndex, data: this.getData(true).getObjects()[leftIndex] };
+                                         var rightObj = { index: rightIndex, data: this.getData(true).getObjects()[rightIndex] };
+                                         this.fireEvent('spanSelect', [leftObj, rightObj]);
+                                }
+                        }.bind(this));
+                
+                //Add a bar to display the selected state.
+                this.eventPanel.add(pv.Bar)
+                        .left(function(d) { return this.adjustToGraph('x', this.selectState.x); }.bind(this))
+                        //If d.dx has a value greater than 0...meaning we're in the middle of a
+                        //drag, adjust the width value to the graph.
+                        //Otherwise give it a width of 0. 
+                        .width(function(d) { return this.selectState.dx > 0 ? this.adjustToGraph('x', this.selectState.x + this.selectState.dx) - this.selectState.x : 0; 
+                        }.bind(this))
+                        .fillStyle("rgba(255, 128, 128, .4)");
+        },
         
+        //Adjusts a point to the graph.  Ie...if you give it a point that's greater than or less than
+        //points in the graph, it will reset it to points within the graph.
+        //This is easily accomplished using the range of the graphing scales.
+        adjustToGraph: function(axis, point){
+                var scale;
+                switch(axis){
+                        case 'x': scale = this.xScale;
+                                    break;
+                        case 'y': scale = this.yScale;
+                                    break;
+                        //Return if axis is not x or y.
+                        default: return;
+                }
+                //scale.range() returns an array of two values.
+                //The first is the low end of the range, while the second is the highest.
+                var low = scale.range()[0];
+                var high = scale.range()[1];
+                //Return low or high is the value is outside their interval.  Otherwise, return point.
+                if (point < low) return low;
+                if (point > high) return high;
+                return point;
+        }
 });
 
 

@@ -127,15 +127,41 @@ HueChart = new Class({
         //Sets selected data index
         setSelectedIndex: function(index) {
                 this.selected_index = index;
-        } 
+        },
+
+        //Set the currentData, which is the data currently being displayed, assuming it is different from the base data.  Should be a subset of the main data object. 
+        setCurrentData: function(data) {
+                this.currentData = new HueChart.Data(data);
+        },
+        
+        //Return a data object.
+        //current- (boolean) if true and there is a currentData object, return the currentData object.
+        //Otherwise, return the base data object.
+        getData: function(current) {
+                if (current && this.currentData) return this.currentData;
+                return this.data;
+        },
+        
+        //Delete this.currentData to reset data to the base data.
+        resetData: function() {
+                delete this.currentData;
+        },
+
+        //Check that there is an event handler registered for an event
+        hasEvent: function(name) {
+                return this.$events[name] && this.$events[name].length;
+        }
 });
 
 //Wrapper for data object to be charted.
 //Adds various functions on the data.
 HueChart.Data = new Class({
         
-        initialize: function(dataArray) {
-                this.dataObjects = dataArray;
+        initialize: function(data) {
+                //Check if it's a HC.Data object, and return the data if it is. 
+                if(data._getExtreme) return data;
+                //Otherwise, set the dataObjects property to data.
+                this.dataObjects = data;
         },
         
         //Function to sort by dates and convert date strings into date objects.
@@ -247,11 +273,19 @@ HueChart.Data = new Class({
         getLength: function() {
                 return this.dataObjects.length;
         },
+
+        //Return a HueChart.Data object containing the dataObjects from the first index to the last index.
+        //Optional argument flatArray - boolean.  If true, will return a flatArray object. 
+        getRange: function(first, last, flatArray) {
+                var sliced = this.dataObjects.slice(first, last);
+                if (flatArray) return sliced;
+                return new HueChart.Data(sliced);
+        },
         
         //Need to figure out an answer for this.  This is very date specific.  
         //Possibly need to genericize a bit more.
         /* Get Ticks --
-                take this data array and give me back an array of data objects to use as ticks.
+                take this data array and give me back an array of data objects to use as ticks (lines representing scale).
                 this array should contain no more than num_ticks values.
                 the increment in which the values should be shown is timespan
         */
@@ -260,6 +294,10 @@ HueChart.Data = new Class({
         createTickArray: function(numTicks, timespan) {
                 //Get the largest number of seconds.
                 var mostSeconds = this.dataObjects.getLast().seconds_from_first;
+                //Get the smallest number of seconds.
+                var leastSeconds = this.dataObjects[0].seconds_from_first;
+                //Get the total number of seconds spanned by the array.
+                var totalSeconds = mostSeconds - leastSeconds;
                 var secondsInSpan;
                 //Choose the timespan -- currently only day
                 switch (timespan) {
@@ -269,22 +307,37 @@ HueChart.Data = new Class({
                 }
                 var xTicks = [];
                 //If the number of ticks that would be generated for the timespan is less than the number of ticks requested, use the current data array.
-                if (mostSeconds/secondsInSpan <= numTicks) {
+                if (totalSeconds/secondsInSpan <= numTicks) {
                         xTicks = this.dataObjects;
                 } else {
                 //Generate ticks.
                         //Calculate the size of the increment between ticks to produce the number of ticks. 
-                        var dateIncrement = mostSeconds/numTicks;
+                        //Find number of timespans in an increment.
+                        var spansInIncrement = parseInt((totalSeconds/secondsInSpan)/numTicks, 10);
+                        //Find secondsToIncrement each value by
+                        var secondsInIncrement = spansInIncrement * secondsInSpan; 
                         var firstDate = this.dataObjects[0].sample_date;
+                        var firstSeconds = this.dataObjects[0].seconds_from_first;
                         //Add ticks to the xTicks array.
                         //Sample date - firstDate cloned and incremented by the increment times the iteration number.
                         //Seconds_from_first - dateIncrement multiplied by the iteration number.
                         for (var i = 0; i <= numTicks; i++) {
                                 xTicks.push({
-                                        sample_date: firstDate.clone().increment('second', dateIncrement * i),
-                                        seconds_from_first: dateIncrement * i
+                                        sample_date: firstDate.clone().increment('second', secondsInIncrement * i),
+                                        seconds_from_first: firstSeconds + (secondsInIncrement * i)
                                 });
                         }
+                        //Center tick marks.
+                        var lastTick = xTicks.getLast();
+                        var lastDataPoint = this.dataObjects.getLast();
+                        //Get the number of spans between the lastDataPoint and the lastTick
+                        var spansAtEnd = (lastDataPoint.seconds_from_first - lastTick.seconds_from_first)/secondsInSpan;
+                        //Get number of spans to move ticks forward to result in evenly spaced, centered ticks.
+                        var centerAdjustment = parseInt(spansAtEnd/2, 10);
+                        xTicks.each(function(tick) {
+                                tick.sample_date.increment('second', secondsInSpan * centerAdjustment);
+                                tick.seconds_from_first += secondsInSpan * centerAdjustment;
+                        });
                 }
                 return xTicks;
         }
