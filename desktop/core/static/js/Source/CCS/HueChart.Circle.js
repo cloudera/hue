@@ -44,19 +44,19 @@ HueChart.Circle = new Class({
                 this.radius = this.options.radius || this.width/2;
                 this.addEvent('setupChart', function(vis) {
                         this.addGraph(vis);
-                        this.addEventBar(vis);
+                        if(this.hasEvent('wedgeOut') && this.hasEvent('wedgeOver') || this.hasEvent('wedgeClick')) this.addEventBar(vis);
                 });
         },
 
         addGraph: function(vis) {
-                var valueSum = this.data.getSeriesSum(this.options.graphField);
+                var valueSum = this.getData(false).getSeriesSum(this.options.graphField);
                 //Put selected index, color array, and hue chart in scope
                 var get_selected_index = this.getSelectedIndex.bind(this);
                 var colorArray = this.options.colorArray;
                 var hueChart = this;
                 vis.add(pv.Wedge)
                         //Data is the array of contained within the HueChart.Data object.
-                        .data(this.data.getObjects())
+                        .data(this.getData(false).getObjects())
                         //Bottom of the wedge space is the radius
                         .bottom(this.radius)
                         //Left of the wedge space is the radius
@@ -80,9 +80,9 @@ HueChart.Circle = new Class({
                 //Base vector is vector pointing straight up.
                 var baseVector = {x: 0, y: this.radius};
                 //Shortcut to data array
-                var dataArray = this.data.getObjects();
+                var dataArray = this.getData(false).getObjects();
                 //Calculate sum of graph values
-                var valueSum = this.data.getSeriesSum(this.options.graphField);
+                var valueSum = this.getData(false).getSeriesSum(this.options.graphField);
                 //Shortcut to graphField
                 var graphField = this.options.graphField;
                 //Add an invisible bar to catch events

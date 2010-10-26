@@ -35,7 +35,7 @@ HueChart.Line = new Class({
                         //Add a line to the visualization, connecting points produced from the data object.
                         vis.add(pv.Line)
                                 //Using as data, this.data.getObjects.
-                                .data(this.data.getObjects())
+                                .data(this.getData(true).getObjects())
                                 //Closures used because the function argument isn't executed until the render phase.
                                 //Color the line, based on a color in the colarArray.
                                 .strokeStyle(function(itemIndex) {
