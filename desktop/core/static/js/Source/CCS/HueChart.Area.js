@@ -31,7 +31,7 @@ HueChart.Area = new Class({
         setScales: function(vis) {
                 this.parent();
                 //Scale with peakSum as max, since this is a stacked chart.
-                var peakSum = this.data.getPeakSum(this.options.series);
+                var peakSum = this.getData(true).getPeakSum(this.options.series);
                 //Start yScale range from 0, rather than from the bottom padding, since the areas will be stacked on top of one another.
                 this.yScale = pv.Scale.linear(0, peakSum * 1.2).range(0, (this.height - (this.options.topPadding + this.options.bottomPadding)));
                 //Create yScaleTicks which has a domain which goes up to a function of peakSum and a range from the bottomPadding, to the bottom of the topPadding. 
@@ -53,9 +53,9 @@ HueChart.Area = new Class({
                 stack = stack.bottom(this.options.bottomPadding)
                         //Using as layers the values in the this.series array.
                         .layers(this.options.series)
-                        //And as values the this.data array
-                        .values(this.data.getObjects())
-                        //The two commands below will be run this.series.length * this.data.length times.
+                        //And as values the this.getData() array
+                        .values(this.getData(true).getObjects())
+                        //The two commands below will be run this.series.length * this.getData().length times.
                         //The x-value, in pixels, is calculated as a conversion of the data object's xField value using the xScale.
                         .x(function(d) {
                                 return this.xScale(d[this.options.xField]);
