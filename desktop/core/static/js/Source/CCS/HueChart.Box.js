@@ -60,11 +60,11 @@ HueChart.Box = new Class({
                 if(this.options.xIsDate) {
                         //If the xField is a date property, prepare the dates for sorting
                         //Change the xField to the new property designed for sorting dates
-                        this.data.prepareDates(this.options.xField);
+                        this.getData(true).prepareDates(this.options.xField);
                         this.options.xField = 'seconds_from_first';
                 } else {
                         //Otherwise sort by the x property.
-                        this.data.sortByProperty(this.options.xField);
+                        this.getData(true).sortByProperty(this.options.xField);
                 }
                 //When the setupChart event is fired, the full ProtoVis visualization is being set up, in preparation for render.
                 //The addGraph function is responsible for adding the actual representation of the data, be that a group of lines, or a group of area graphs.
@@ -87,10 +87,10 @@ HueChart.Box = new Class({
         //Set the scales which will be used to convert data values into positions for graph objects
         setScales: function(vis) {
                 //Get the minimum and maximum x values.
-                var xMin = this.data.getMinValue(this.options.xField);
-                var xMax = this.data.getMaxValue(this.options.xField);
+                var xMin = this.getData(true).getMinValue(this.options.xField);
+                var xMax = this.getData(true).getMaxValue(this.options.xField);
                 //Get the maximum of the values that are to be graphed
-                var maxValue = this.data.getMaxValue(this.options.series);
+                var maxValue = this.getData(true).getMaxValue(this.options.series);
                 this.xScale = pv.Scale.linear(xMin, xMax).range(this.options.leftPadding, this.width - this.options.rightPadding);
                 this.yScale = pv.Scale.linear(0, maxValue * 1.2).range(this.options.bottomPadding, (this.height - (this.options.topPadding)));
         },
@@ -99,7 +99,7 @@ HueChart.Box = new Class({
         setTicks:function(vis) {
                 //Add X-Ticks.
                 //Create tick array.
-                var xTicks = (this.options.xIsDate ? this.data.createTickArray(7, 'day') : this.xScale.ticks(7));
+                var xTicks = (this.options.xIsDate ? this.getData(true).createTickArray(7, 'day') : this.xScale.ticks(7));
                 //Create rules (lines intended to denote scale)
                 vis.add(pv.Rule)
                         //Use the tick array as data.
@@ -174,7 +174,7 @@ HueChart.Box = new Class({
                 get_selected_index = this.getSelectedIndex.bind(this);
                 //Add a thin black bar which is approximately the height of the graphing area for each item on the graph.
                 vis.add(pv.Bar)
-                        .data(this.data.getObjects())
+                        .data(this.getData(true).getObjects())
                         .left(function(d) { 
                                 return this.xScale(d[this.options.xField]); 
                         }.bind(this))
@@ -208,7 +208,7 @@ HueChart.Box = new Class({
                         var dataIndex = getDataIndexFromMouse();
                         //Fire pointMouseOver if the item exists
                         if(dataIndex) {
-                                this.fireEvent('pointMouseOver', [this.data.getObjects()[dataIndex], dataIndex]);
+                                this.fireEvent('pointMouseOver', [this.getData(true).getObjects()[dataIndex], dataIndex]);
                         }
                         return vis;
                 }.bind(this);
@@ -217,6 +217,7 @@ HueChart.Box = new Class({
                         //Fire pointClick if the item exists
                         if(dataIndex != null) {
                                 this.fireEvent('pointClick', [ this.data.getObjects()[dataIndex], dataIndex ]);
+                                        this.fireEvent('pointClick', [ this.getData(true).getObjects()[dataIndex], dataIndex ]);
                         }
                         return vis;
                 }.bind(this);
