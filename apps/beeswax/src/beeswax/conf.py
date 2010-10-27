@@ -16,8 +16,7 @@
 # limitations under the License.
 """Configuration options for the Hive UI (Beeswax)."""
 from desktop.lib.conf import Config
-import desktop.lib.paths
-import os
+import os.path
 
 BEESWAX_SERVER_HOST = Config(
   key="beeswax_server_host",
@@ -60,7 +59,7 @@ BEESWAX_SERVER_HEAPSIZE = Config(
 BEESWAX_HIVE_CONF_DIR = Config(
   key='hive_conf_dir',
   help='Hive configuration directory, where hive-site.xml is located',
-  default=desktop.lib.paths.get_desktop_root('conf'))
+  default='/etc/hive/conf')
 
 LOCAL_EXAMPLES_DATA_DIR = Config(
   key='local_examples_data_dir',
