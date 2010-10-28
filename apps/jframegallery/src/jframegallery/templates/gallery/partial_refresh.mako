@@ -23,7 +23,7 @@ count = int(get_var('count', 0))
 <html>
   <head>
     <title>Partial Refresh</title>
-    <xmeta http-equiv="refresh" content="2;/jframegallery/partial_refresh.mako?sleep=1&count=${count + 1}" />
+    <xmeta http-equiv="refresh" content="2;{{request_path}}?sleep=1&count=${count + 1}" />
   </head>
   <body>
     <div class="jframe_padded highlight-partial-updates">

@@ -63,90 +63,90 @@ ART.Sheet.define('splitview.bw-editor', {
 					description: 'Open the selected item.'
 				}
 			});
-                        this.jframe.addBehaviors({
-                                // breadcrumb pattern; has to set z-index programatically for layout
-                                'Breadcrumb': function(element, methods) {
-                                        var items = element.getElements('li');
-                                        items.reverse().each(function(item, i){
-                                                item.setStyle('z-index', i+1);
-                                        });
-                                },
+			this.jframe.addBehaviors({
+				// breadcrumb pattern; has to set z-index programatically for layout
+				'Breadcrumb': function(element, methods) {
+					var items = element.getElements('li');
+					items.reverse().each(function(item, i){
+						item.setStyle('z-index', i+1);
+					});
+				},
 				//breadcrumb form; displays a breadcrumb that grows as you fill out the form
-                                'BreadcrumbForm': function(element, methods) {
-                                /*
-                                        The element is a UL with LI items for each breadcrumb; looks like this:
-                                        <ul data-filters="Breadcrumb, BreadcrumbForm" class="clearfix" data-bc-sections=".ccs-bc-section" data-bc-form="form">
-                                                <li><a href="#step1">One</a></li>
-                                                <li><a href="#step2">Two</a></li>
-                                                <li><a href="#step3">Ect</a></li>
-                                        </ul>
-                                        
-                                        it has a data-bc-sections definition which is a selector to select the sections that correlate to the bc links
-                                        it has a data-bc-form selector that correlates to the form for this bc form.
-                                */
-                                        container = methods.getContentElement();
-                                        var items = element.getElements('li');
-                                        var form = container.getElement(element.get('data', 'bc-form')) || container.getElement('form');
-                                        var sections = container.getElements(element.get('data', 'bc-sections'));
-                                        //extend tab swapper; we need to manage things like OverText and FormValidator when we change sections
-                                        var TS = new Class({
-                                                Extends: TabSwapper,
-                                                showSection: function(index) {
-                                                        //we validate the form when the user pages forward and not on the first display when this.now is still undefined
-                                                        //(where this.now is the current index of the TabSwapper; it's undefined on init)
-                                                        var validate = index > this.now && this.now != undefined;
-                                                        if (!validate) {
-                                                                //reset the error state
-                                                                form.get('validator').reset();
-                                                                if (this.now != undefined) items[this.now].removeClass('ccs-bc-error');
-                                                        }
-                                                        if (!validate || getValidator(form).validate()) {
-                                                                //show the section if we're valid
-                                                                this.parent(index);
-                                                                //show the overtext that might have been hidden
-                                                                OverText.update();
-                                                        }
-                                                        return this;
-                                                }
-                                        });
+				'BreadcrumbForm': function(element, methods) {
+				/*
+					The element is a UL with LI items for each breadcrumb; looks like this:
+					<ul data-filters="Breadcrumb, BreadcrumbForm" class="clearfix" data-bc-sections=".ccs-bc-section" data-bc-form="form">
+						<li><a href="#step1">One</a></li>
+						<li><a href="#step2">Two</a></li>
+						<li><a href="#step3">Ect</a></li>
+					</ul>
+					
+					it has a data-bc-sections definition which is a selector to select the sections that correlate to the bc links
+					it has a data-bc-form selector that correlates to the form for this bc form.
+				*/
+					container = methods.getContentElement();
+					var items = element.getElements('li');
+					var form = container.getElement(element.get('data', 'bc-form')) || container.getElement('form');
+					var sections = container.getElements(element.get('data', 'bc-sections'));
+					//extend tab swapper; we need to manage things like OverText and FormValidator when we change sections
+					var TS = new Class({
+						Extends: TabSwapper,
+						showSection: function(index) {
+							//we validate the form when the user pages forward and not on the first display when this.now is still undefined
+							//(where this.now is the current index of the TabSwapper; it's undefined on init)
+							var validate = index > this.now && this.now != undefined;
+							if (!validate) {
+								//reset the error state
+								form.get('validator').reset();
+								if (this.now != undefined) items[this.now].removeClass('ccs-bc-error');
+							}
+							if (!validate || getValidator(form).validate()) {
+								//show the section if we're valid
+								this.parent(index);
+								//show the overtext that might have been hidden
+								OverText.update();
+							}
+							return this;
+						}
+					});
 
-                                        //get the form validator and add an event for when elements are validated
-                                        //if the element fails, get the nav item and breadcrumb section and add an error class for styling
-                                        getValidator(form).addEvents({
-                                                elementValidate: function(valid, field){
-                                                        var section = field.getParent(element.get('data', 'bc-sections'));
-                                                        var nav = items[sections.indexOf(section)];
-                                                        if (valid) nav.removeClass('ccs-bc-error');
-                                                        else nav.addClass('ccs-bc-error');
-                                                }
-                                        });
+					//get the form validator and add an event for when elements are validated
+					//if the element fails, get the nav item and breadcrumb section and add an error class for styling
+					getValidator(form).addEvents({
+						elementValidate: function(valid, field){
+							var section = field.getParent(element.get('data', 'bc-sections'));
+							var nav = items[sections.indexOf(section)];
+							if (valid) nav.removeClass('ccs-bc-error');
+							else nav.addClass('ccs-bc-error');
+						}
+					});
 
-                                        //create our modified tabswapper
-                                        var tabs = new TS({
-                                                tabs: items,
-                                                sections: sections,
-                                                smooth: true
-                                        });
-                                        //find any sections with an element with the class .ccs-multipart-next and make that
-                                        //next button change tabs; note that this is the only way the user can progress forward (for now)
-                                        //todo: add some keyboard love; enter, tab, arrows, etc.
-                                        sections.each(function(section, i) {
-                                                section.getElements('.ccs-multipart-next').addEvent('click', function(e){
-                                                        e.stop();
-                                                        if (getValidator(form).validate()) tabs.show(i+1);
-                                                });
-                                        });
-                                }
-                        });
-                        this.jframe.addBehaviorPlugin('SelectWithOther', 'SelectWithOtherValidation', function(element, methods) {
-                                //adds validation upon hiding the 'other' field
-                                var select = element.getElement('select');
-                                select.addEvent('change', function() {
-                                        if(!select.getSelected()[0].get('value') == '__other__') {
-                                                getValidator(element.getParent('form')).validate();
-                                        }
-                                });
-                        });
+					//create our modified tabswapper
+					var tabs = new TS({
+						tabs: items,
+						sections: sections,
+						smooth: true
+					});
+					//find any sections with an element with the class .ccs-multipart-next and make that
+					//next button change tabs; note that this is the only way the user can progress forward (for now)
+					//todo: add some keyboard love; enter, tab, arrows, etc.
+					sections.each(function(section, i) {
+						section.getElements('.ccs-multipart-next').addEvent('click', function(e){
+							e.stop();
+							if (getValidator(form).validate()) tabs.show(i+1);
+						});
+					});
+				}
+			});
+			this.jframe.addBehaviorPlugin('SelectWithOther', 'SelectWithOtherValidation', function(element, methods) {
+				//adds validation upon hiding the 'other' field
+				var select = element.getElement('select');
+				select.addEvent('change', function() {
+					if(!select.getSelected()[0].get('value') == '__other__') {
+						getValidator(element.getParent('form')).validate();
+					}
+				});
+			});
 			this.jframe.addFilters({
 				visible: function(container){
 					if(!container.get('html').contains('ccs-visible')) return;
@@ -458,7 +458,7 @@ ART.Sheet.define('splitview.bw-editor', {
 			var saveIt = function(){
 				//grab the container of the save as inputs and clone them
 				//(clone them because our windows destroy themselves on hide)
-                                //Hide on clone to ensure that display property is set to none.
+				//Hide on clone to ensure that display property is set to none.
 				var form = saver.clone().hide();
 				//prompt the user w/ the form
 				var prompt = this.prompt('Save This Query', form.show(), function(){
