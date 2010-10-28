@@ -18,26 +18,11 @@ limitations under the License.
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 	<head>
-		<title>Post-load prompt popup</title>
+		<title>Ajax Spinner Target</title>
 	</head>
 	<body>
-		{% if post_vars %}
-			<div class="jframe_padded">
-				You submitted the following values:
-				<ul>
-					{% for post_var, val in post_vars %}
-					 <li>{{post_var}}: {{val}}</li>
-					{% endfor %}
-				</ul>
-			</div>
-		{% else %}
-		<div class="prompt_popup">
-				I'm a post-load prompt. Enter a value please.
-				<form action="/jframegallery/post-load.prompt.popup.html" method="post" style="margin: 6px 0px 0px;">
-					<input type="text" name="prompt_value"/>
-					<input type="submit" class="ccs-hidden" name="submit"/>
-				</form>
+		<div class="jframe_padded">
+			<a style="display:block; border: 1px solid #000; width: 100px; padding: 50px 10px; text-align:center;" href="{{request_path}}?sleep=1" data-spinner-target=".spinnerTarget" class="spinnerTarget">Click to reload with the spinner only on this box</a>
 		</div>
-		{% endif %}
 	</body>
 </html>
