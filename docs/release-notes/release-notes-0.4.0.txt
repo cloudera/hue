@@ -78,7 +78,7 @@ IMPROVEMENTS
 
 - Usage without Hadoop
 
-  Cloudera Desktop will run if Hadoop is unavaible, though
+  Cloudera Desktop will run if Hadoop is unavailable, though
   some applications will be limited in functionality.
 
 - Frontend Javascript Performance and Compatibility
@@ -101,7 +101,7 @@ KEY BUG FIXES
 
 KNOWN BUGS
 
-- After a succesful upload with Linux's flash player (which may warn you about
+- After a successful upload with Linux's flash player (which may warn you about
   hanging your computer), the upload screen does not clear.  Click the red
   (x) button to clear it.
 
