@@ -35,7 +35,7 @@ See apps/hello/src/hello/hello_test.py for an example.
 Helpful command-line tricks
 ===========================
 
-To run tests that do no depend on Hadoop, use:
+To run tests that do not depend on Hadoop, use:
   build/env/bin/hue test fast
 
 To run all tests, use:

@@ -115,7 +115,7 @@ Now Hue should be running on http://localhost:8000.
 
 Setting up Hadoop
 =================
-In order to start up a pseudodistributed cluster with the plugins enabled,
+In order to start up a pseudo-distributed cluster with the plugins enabled,
 run::
 
     $ ./tools/scripts/configure-hadoop.sh all

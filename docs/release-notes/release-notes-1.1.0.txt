@@ -35,7 +35,7 @@ will not work.
 * The default port for the namenode plugins has changed from 9090 to 10090.
 
 
-Application Compatability
+Application Compatibility
 -------------------------
 The core Hadoop communication layer (to HDFS and JobTracker) now has support
 for passing security credentials. A few low level APIs have changed, but most

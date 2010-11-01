@@ -24,7 +24,7 @@ browsers. To highlight some other key areas:
 * Improved documentation.
 
 
-Application Compatability
+Application Compatibility
 -------------------------
 
 The Hadoop file system library (+hadoop.fs.hadoopfs+) now takes and returns

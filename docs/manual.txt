@@ -80,7 +80,7 @@ $ HADOOP_HOME=/path/to/hadoop-0.20 PREFIX=/path/to/install/into make install
 ----
 
 You can install Hue anywhere on your system - it does not need root permission
-although additional thirdparty SDK applications may.
+although additional third-party SDK applications may.
 It is a good practice to create a new user for Hue and either install Hue in
 that user's home directory, or in a directory within `/usr/local`.
 

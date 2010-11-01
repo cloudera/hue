@@ -722,7 +722,7 @@ You can see we register our application with HUE. This does several things, but 
 		Calculator : {
 			name : 'calculator',
 
-The name is declared twice. The first time you declare it it's a property of the object we pass to the register method. The name here has to be a string with no spaces or punctuation (other than underscores). Typically it's a mixed case value, but it doesn't really matter as the user never sees it. It is a key that you'll use if you do a lot of customizing and debugging though, and it also is used as the CCS class your app is given (like ".calculator").
+The name is declared twice. The first time you declare it it's a property of the object we pass to the register method. The name here has to be a string with no spaces or punctuation (other than underscores). Typically it's a mixed case value, but it doesn't really matter as the user never sees it. It is a key that you'll use if you do a lot of customizing and debugging though, and it also is used as the CSS class your app is given (like ".calculator").
 
 The second line though, "name: 'app_name'" defines the value that users see. You'll probably want to customize this. For example, the app key for the file browser is "FileBrowser" but the name defined for the users is "File Browser". This name shows up, for example, when the user mouses over the icon in the dock.
 
@@ -772,7 +772,7 @@ We'll talk a bit more about JavaScript in a bit, but one of the things the HUE S
 * Tool tips
 * etc
 
-Adding these kinds of things to your application require only that you use prescribed DOM structures with specific attributes. For example, let's say you wanted to have a sortable table in your response. All that you would need to do is write your template to output your table with the following HTML structure:
+Adding these kinds of things to your application requires only that you use prescribed DOM structures with specific attributes. For example, let's say you wanted to have a sortable table in your response. All that you would need to do is write your template to output your table with the following HTML structure:
 
 	<table class="ccs-data_table selectable sortable" cellpadding="0" cellspacing="0">
 		<thead>
@@ -965,7 +965,7 @@ If you're going to dive into JavaScript, you'll want to familiarize yourself wit
 
 #### Extending CCS.JBrowser
 
-The default boostrap for your application invokes your app like this:
+The default bootstrap for your application invokes your app like this:
 
 	return new Calculator(path || '/calculator/', options);
 

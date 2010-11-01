@@ -9,7 +9,7 @@ KEY BUG FIXES
 - The tarball build now succeeds if a previous version's 
   Cloudera Desktop plugins are installed.
 
-- Error messages are propogated correctly in Python 2.4.
+- Error messages are propagated correctly in Python 2.4.
 
 - Desktop can now run on port 80.
 
@@ -17,6 +17,6 @@ KEY BUG FIXES
 
 KNOWN BUGS
 
-- After a succesful upload with Linux's flash player (which may warn you about
+- After a successful upload with Linux's flash player (which may warn you about
   hanging your computer), the upload screen does not clear.  Click the red
   (x) button to clear it.
