@@ -28,8 +28,8 @@ CCS.JFrame.addGlobalFilters({
 
 	toggleHistory: function(container) {
 		var win = this.getWindow();
-		if (!win.history) return;
-		var defaultState = this.getWindow().options.displayHistory;
+		if (!win || !win.history) return;
+		var defaultState = win.options.displayHistory;
 		var history = win.history;
 		var hiding = container.get('html').contains('ccs-hide_history');
 		var showing = container.get('html').contains('ccs-show_history');
