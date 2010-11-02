@@ -105,7 +105,12 @@ script: CCS.JFrame.PartialRefresh.js
 				return;
 			}
 			//get the partials in the containers
-			var partials = getPartials(new Element('div').adopt(partialContainers), true);
+			var partialContainer = new Element('div').adopt(partialContainers),
+			    //we need a copy of this for later when we sort stuff
+			    untouchedPartialContainer = partialContainer.clone(true, true),
+			    //get the partials from the container
+			    partials = getPartials(partialContainer, true);
+
 			//if the options aren't defined or if we didn't auto refresh, reset and
 			//return (fall through to other renderers)
 			if (!options || !(options.autorefreshed || options.forcePartial)) {
@@ -147,6 +152,15 @@ script: CCS.JFrame.PartialRefresh.js
 
 			//apply all the jframe magic to our filtered content
 			if (enableLog) dbug.log('applying filters');
+
+			//it's faster to render this stuff outside the live DOM, apparently
+			//so store the scroll offset and pop it out, leaving a placeholder
+			var container = $(this);
+			var scroll = container.getParent().getScroll();
+			var s = new Element('span').inject(container, 'after');
+			container.dispose();
+
+
 			//filters expect to be handed an object (content) that has various properties of the
 			//response; the meta tags, the script tags, and elements that were in the body, etc.
 			//because we want to run the elements we're updating through the filters, we overwrite
@@ -154,19 +168,40 @@ script: CCS.JFrame.PartialRefresh.js
 			//updated and then apply the filters.
 			content.elements = checkedPartials.renderedPartials;
 			this.applyFilters(checkedPartials.target, content);
-
 			//now loop through the partials again and inject them into the DOM structure from the response
 			//replacing the original partial with the cloned one
 			restorePartials(checkedPartials.partialClones, partials);
+			//finally put the partials into the real DOM
+			var success = injectPartials(partials, jState, checkedPartials.partialClones, this.behavior, container);
 
-			var success = injectPartials(partials, jState, checkedPartials.renderedIds, this.behavior, $(this));
-			if (!success) return;
+			if (!success) {
+				//if there was a failure, we put the container back and exit to the normal renderer
+				s.parentNode.replaceChild(container, s);
+				return;
+			}
 
+			//sort the contents in the "real" container with the order from the response
+			sortPartials(untouchedPartialContainer, container);
+
+			//remove any partials that were in the previous response but not in the recent one
 			cleanRemainingParitals(partials, jState, this.behavior);
 
+			//put the container back in the live DOM
+			s.parentNode.replaceChild(container, s);
+			container.getParent().scrollTo(scroll.x, scroll.y);
 			//we've updated the display, so tell filters that are waiting that they may need to update their display, too
 			this.behavior.fireEvent('show');
 			//prevent other renderers from handling the response
+
+
+			//after a second, remove the updated designation
+			(function(){
+				var els = $(this).getElements('.partial-refresh-updated');
+				for (var i = 0; i < els.length; i++){
+					els[i].removeClass('partial-refresh-updated');
+				}
+			}).delay(1000, this);
+
 			return true;
 		}
 
@@ -188,25 +223,29 @@ script: CCS.JFrame.PartialRefresh.js
 	//if *store* == true, then store this state on each element as the original,
 	//unaltered response
 	var getPartials = function(container, store) {
-		if (!container.innerHTML.contains('data-partial-id')) return {};
 		var partials = {};
+		//if there are no partial elements, return now
+		if (!container.innerHTML.contains('data-partial-id')) return partials;
 		//get all the elements with a partial id
-		container.getElements('[data-partial-id]').each(function(partial){
+		var partial,
+		    els = container.getElements('[data-partial-id]');
+		for (var i = 0; i < els.length; i++){
+			partial = els[i];
 			//store a pointer to that element to return it
-			partials[partial.get('data', 'partial-id')] = partial;
+			partials[partial.getAttribute('data-partial-id')] = partial;
 			//if instructed to, store the original state of the response before it was altered by any filter
 			if (store) partial.store('partialRefresh:unaltered', partial.innerHTML);
-		});
-		return $H(partials);
+		}
+		return partials;
 	};
 
 	var processPartials = function(content, jState){
 		var toProcess = getPartials(new Element('div').adopt(content.elements), true);
 		//if there are partials already, merge the result
 		if (jState.partials) {
-			toProcess.each(function(partial, id){
-				jState.partials[id] = partial;
-			});
+			for (id in toProcess) {
+				jState.partials[id] = toProcess[id].store('partialRefresh:unaltered', toProcess[id].innerHTML);
+			}
 		//else there were no partials in the previous response; so assign these.
 		} else {
 			jState.partials = toProcess;
@@ -215,14 +254,14 @@ script: CCS.JFrame.PartialRefresh.js
 
 	var checkPartials = function(partials, jState){
 		var data = {
-			renderedIds: {},
 			renderedPartials: new Elements(),
 			partialClones: {},
 			target: new Element('div')
 		};
 		//loop through the partials and figure out which ones need updating so that we can 
 		//run only those through the filters
-		partials.each(function(partial, id) {
+		for (id in partials){
+			var partial = partials[id];
 			if (enableLog) dbug.log('considering %s for update', id);
 			//get the corresponding element in the dom
 			var before = jState.partials[id];
@@ -231,17 +270,16 @@ script: CCS.JFrame.PartialRefresh.js
 				if (enableLog) dbug.log('preparing %s for update', id);
 				//we must preserve the DOM structure to be able to find partial containers and partial lines
 				//so clone the partial for rendering
-				var clone = partial.clone(true, true);
-				data.target.adopt(clone);
+				var clone = document.id(partial.cloneNode(true));
+				data.target.appendChild(clone);
 				//we need an array of these elements for when we call applyFilters below, which expects
 				//content.elements to be an array of the elements returned in the response
 				data.renderedPartials.push(clone);
-				data.renderedIds[id] = true;
 				//we also need a key/value map of all the clones for quick lookups when we put them back
 				//into the response DOM
 				data.partialClones[id] = clone;
 			}
-		});
+		}
 		return data;
 	};
 
@@ -257,8 +295,7 @@ script: CCS.JFrame.PartialRefresh.js
 			container: partial.getParent('[data-partial-container-id]')
 		};
 		if (containers.container) {
-			containers.DOMcontainer = container.getElement('[data-partial-container-id=' + 
-			  containers.container.get('data', 'partial-container-id') + ']');
+			containers.DOMcontainer = getMatchFromDOM(containers.container, container, 'data-partial-container-id');
 		}
 		return containers;
 	};
@@ -272,10 +309,8 @@ script: CCS.JFrame.PartialRefresh.js
 	var destroyPartial = function(id, jState, behavior){
 		//get the element
 		var element = jState.partials[id];
-		//clean up its behaviors
-		behavior.cleanup(element);
-		//destroy the element
-		element.destroy();
+
+		clean(element, behavior);
 		//delete it from the jState
 		delete jState.partials[id];
 	};
@@ -285,13 +320,15 @@ script: CCS.JFrame.PartialRefresh.js
 	//were cloned from. This allows us to retain the DOM structure of the response, while
 	//only running through the filters the elements that need it.
 	var restorePartials = function(clones, partials){
+		var count = 0;
 		for (id in clones) {
 			if (enableLog) dbug.log('replacing target with clone: ', id);
 			var clone = clones[id],
 			    partial = partials[id];
 			//because we're replacing, we need to copy over thier original HTML state for the checksum
 			clone.store('partialRefresh:unaltered', partial.retrieve('partialRefresh:unaltered'));
-			clone.replaces(partial);
+			count++;
+			partial.parentNode.replaceChild(clone, partial);
 			//and then update the pointer as the clone is now the rendered partial
 			partials[id] = clone;
 		}
@@ -299,10 +336,13 @@ script: CCS.JFrame.PartialRefresh.js
 
 	var injectPartials = function(partials, jState, rendered, behavior, container) {
 		var insertedPartials = {},
+		    partial,
 		    prevId;
 		if (enableLog) dbug.log('iterating over partials for injection');
 		//iterate over all the partials to inject them into the live DOM
-		return partials.every(function(partial, id){
+		var result = true;
+		for (id in partials) {
+			partial = partials[id];
 			if (enableLog) dbug.log('considering %s for injection', id);
 			//if it's in a line that's been injected, skip it
 			//if it was passed through the renderers, it means that it needs an update or insertion
@@ -312,22 +352,27 @@ script: CCS.JFrame.PartialRefresh.js
 				//if there's a corresponding partial already in the DOM, replace it
 				if (before) {
 					if (enableLog) dbug.log('performing update for %s', id);
-					partial.replaces(before);
-					destroyPartial(id, jState, behavior);
+					// partial.addClass('partial-refresh-updated partial-refresh-transitionable').replaces(before);
+					partial.addClass('partial-refresh-updated partial-refresh-transitionable').replaces(before);
+					clean(before, behavior);
 				} else {
 					//else it's not in the DOM
 					//look to see if this partial is in a line item (for example, the tr for a td that is a partial)
 					var line = getPartialLine(partial);
 					//if there is no line, inject it into the DOM in the container
-					var success = line ? injectPartialLine(partial, line, container, insertedPartials)
-					    : injectPartial(partial, jState.partials[prevId], container);
-					if (!success) return false;
+					var success;
+					if (line) success = injectPartialLine(partial, line, container, insertedPartials);
+					else success = injectPartial(jState, partial, prevId, container);
+					if (!success) {
+						result = false;
+						break;
+					}
 				}
 			}
 			if (rendered[id]) jState.partials[id] = partial;
 			prevId = id;
-			return true;
-		}, this);
+		}
+		return result;
 	};
 
 	//given a line, destroy it
@@ -340,27 +385,29 @@ script: CCS.JFrame.PartialRefresh.js
 	var cleanRemainingParitals = function(partials, jState, behavior){
 		var linesToDestroy = {};
 		//for any partials that were in the DOM but not in the response, remove them
-		jState.partials.each(function(partial, id){
+		for (id in jState.partials) {
+			partial = jState.partials[id];
 			//if the partial is in the DOM but not the response
 			if (!partials[id]) {
 				//get its line; assume that we have to remove that, too
 				var line = getPartialLine(partial);
-				if (line) linesToDestroy[line.get('data', 'partial-line-id')] = line;
+				if (line) linesToDestroy[line.getAttribute('data-partial-line-id')] = line;
 				if (enableLog) dbug.log('destroying %s', id, line);
 				//destroy the partial
 				destroyPartial(id, jState, behavior);
 			}
-		});
+		}
 		for (id in linesToDestroy) {
 			destroyLine(linesToDestroy[id], behavior);
 		}
 	};
 
-	var injectPartial = function(partial, previousPartial, container){
-		if (prevId) {
-			if (enableLog) dbug.log('injecting line for %s after previous item (%s)', id, prevId);
+	var injectPartial = function(jState, partial, prevId, container){
+		var previousPartial = jState.partials[prevId];
+		if (previousPartial) {
+			if (enableLog) dbug.log('injecting line for %s after previous item (%s)', id, previousPartial);
 			//if this isn't the first one, inject it after the previous id
-			partial.inject(jState.partials[prevId], 'after');
+			partial.inject(previousPartial, 'after');
 		} else {
 			//find the container and inject it as the first item there
 			var containers = getPartialContainers(partial, container);
@@ -382,8 +429,9 @@ script: CCS.JFrame.PartialRefresh.js
 		//get the previous line (from the response)
 		var prevLine = line.getPrevious('[data-partial-line-id]'),
 		    prevLineInDOM;
+
 		//now find it's counterpart in the live DOM
-		if (prevLine) prevLineInDOM = container.getElement('[data-partial-line-id=' + prevLine.get('data', 'partial-line-id') + ']');
+		if (prevLine) prevLineInDOM = container.getElement('[data-partial-line-id=' + prevLine.getAttribute('data-partial-line-id') + ']');
 		//if it's there, inject this line after it
 		if (prevLineInDOM) {
 			if (enableLog) dbug.log('injecting line (%o) after previous line (%o)', line, prevLine);
@@ -401,10 +449,74 @@ script: CCS.JFrame.PartialRefresh.js
 			}
 		}
 		//store the fact that we just injected all the partials in this line
-		line.getElements('[data-partial-id]').each(function(partial){
-			insertedPartials[partial.get('data', 'partial-id')] = true;
+		line.getElements('[data-partial-id]').each(function(p){
+			p.addClass('partial-refresh-updated partial-refresh-transitionable');
+			insertedPartials[p.getAttribute('data-partial-id')] = true;
 		});
 		return true;
+	};
+
+	var getMatchFromDOM = function(element, DOM, property){
+		return DOM.getElement('[' + property + '=' + element.getAttribute(property) + ']');
+	};
+
+	var getPartialId = function(el){
+		return el.getAttribute('data-partial-line-id') || el.getAttribute('data-partial-id');
+	};
+
+
+	var sortPartials = function(partialsContainer, container) {
+		partialsContainer.getElements('.ordered_partial_refresh').each(function(ordered){
+			var DOMtwin = getMatchFromDOM(ordered, container, 'data-partial-container-id');
+			var kids = ordered.getChildren('[data-partial-line-id]', '[data-partial-id]');
+			var DOMkidIds = {};
+			var DOMkids = DOMtwin.getChildren('[data-partial-line-id]', '[data-partial-id]');
+			for (var DOMkid = 0; DOMkid < DOMkids.length; DOMkid++){
+				DOMkidIds[getPartialId(DOMkids[DOMkid])] = DOMkids[DOMkid];
+			}
+			for (var kid = 0; kid < kids.length; kid++){
+				var id = getPartialId(kids[kid]);
+				DOMkidIds[id].inject(DOMtwin);
+			}
+		});
+	};
+
+	var toGC = [], gcTimer;
+	var clean = function(element, behavior){
+		if (!gcTimer) gcTimer = gc.periodical(100);
+		toGC.push({
+			element: element, behavior: behavior
+		});
+	};
+
+	//this is a "threadsafe" garbage collection routine
+	//if we call element.destroy on, say, 1000 nodes, the MooTools gc goes through
+	//all of them at once. This version does them in batches, releasing the thread
+	//as it goes.
+	var gc = function(){
+		if (toGC.length) {
+			var i = 0;
+			if (enableLog) dbug.log("removing %s of %s elements", Math.max(100, toGC.length/10), toGC.length);
+			while (toGC.length && i < Math.max(100, toGC.length/100)) {
+				var data = toGC.shift();
+				//clean up its behaviors
+				data.behavior.cleanup(data.element);
+				//destroy the element
+				destroy(data.element);
+				i++;
+			}
+			if (enableLog) dbug.info('remaining elements to clean: ', toGC.length);
+			if (i == 0) clearInterval(gcTimer);
+		}
+	};
+
+	//implementing a custom destroy method; this is slightly faster than the MooTools version
+	//but doesn't do some of it's less-important garbage collection
+	var destroy = function(el){
+		for (var i = 0; i < el.childNodes.length; i++) {
+			destroy(el.childNodes[i]);
+		}
+		if (el.removeEvents) el.removeEvents();
 	};
 
 })();
