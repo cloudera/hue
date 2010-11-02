@@ -361,7 +361,7 @@ CCS.Desktop = {
 	//restores a state to the desktop
 	//states - (object) the state of all the open apps (returned by .serialize())
 	restore: function(states){
-		this.states = $H(JSON.decode(states));
+		this.states = $H(JSON.decode(unescape(states)));
 		var loaded_component;
 		if (this.states.getLength()) {
 			var hidden, msg;
@@ -462,7 +462,7 @@ CCS.Desktop = {
 	//stores the current desktop state
 	store: function(){
 		if (this.noSession) return;
-		var hashString = JSON.encode(this.serialize());
+		var hashString = escape(JSON.encode(this.serialize()));
 		var jsonRequest = new Request.JSON({
 				url: this.stateUrl,
 				method: "post",

@@ -957,7 +957,7 @@ CCS.JFrame = new Class({
 
 		//if we're injecting into the main content body, cleanup and scrollto the top
 		if (!options.noScroll) this.scroller.toTop();
-                if (target == this.content) this._sweep(target);
+		if (target == this.content) this._sweep(target);
 
 
 		//if we're injecting into the main content body apply the view classes and remove the old one
