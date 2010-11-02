@@ -202,8 +202,6 @@ window.addEvent('domready', function(){
 	});
 });
 
-Selectors.Pseudo.widget = function() { return this.get && (!! this.get("widget")); };
-
 //Although implement checks for a pre-existing implementation of the method, it has to be forced for IE to overwrite the MooTools version.
 //Thus, the IE check.
 if (Browser.Engine.trident) {
