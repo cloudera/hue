@@ -893,3 +893,14 @@ ul.autocompleter-choices li.autocompleter-selected span.autocompleter-queried
 {
 	color: #9FCFFF;
 }
+
+.partial-refresh-transitionable {
+	-webkit-transition: color 1s ease-in-out, background-color 1s ease-in-out;
+	-moz-transition: color 1s ease-in-out, background-color 1s ease-in-out;
+	-o-transition: color 1s ease-in-out, background-color 1s ease-in-out;
+	transition: color 1s ease-in-out, background-color 1s ease-in-out;
+}
+.partial-refresh-updated {
+	color: #238500;
+	background-color: #FAFCAE;
+}

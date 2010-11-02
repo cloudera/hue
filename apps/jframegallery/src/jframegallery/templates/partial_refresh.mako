@@ -39,7 +39,7 @@ count = int(get_var('count', 0))
       <table class="HtmlTable">
         <thead>
           <tr>
-            <th>count</th>
+            <th>index</th>
             <th>current time</th>
           </tr>
         </thead>
@@ -54,30 +54,58 @@ count = int(get_var('count', 0))
           % endwhile
         </tbody>
       </table>
-      <hr/>
-      <p>
-        The table below will shrink from 10 rows down to zero; the time in each row will update on each refresh.
-      </p>
-      <table class="HtmlTable">
-        <thead>
-          <tr>
-            <th>count</th>
-            <th>current time</th>
-          </tr>
-        </thead>
-        <tbody data-partial-container-id="partials-tbody-down">
-          <%
-            count = 10 - count
-            index = 0 %>
-          % while index < count:
-            <tr data-partial-line-id="tr-down-${index}">
-              <td data-partial-id="index-down-${index}">${index}</td>
-              <td data-partial-id="time-down-${index}">${datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</td>
-            </tr>
-            <% index = index + 1 %>
-          % endwhile
-        </tbody>
-      </table>
+     <hr/>
+     <p>
+       The table below will shrink from 10 rows down to zero; the time in each row will update on each refresh.
+     </p>
+     <table class="HtmlTable">
+       <thead>
+         <tr>
+           <th>index</th>
+           <th>current time</th>
+         </tr>
+       </thead>
+       <tbody data-partial-container-id="partials-tbody-down">
+         <%
+           count = 10 - count
+           index = 0 %>
+         % while index < count:
+           <tr data-partial-line-id="tr-down-${index}">
+             <td data-partial-id="index-down-${index}">${index}</td>
+             <td data-partial-id="time-down-${index}">${datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</td>
+           </tr>
+           <% index = index + 1 %>
+         % endwhile
+       </tbody>
+     </table>
+     <hr/>
+     <p>
+       The table below will rotate, moving the top row to the bottom each time the view updates. This tests partial refresh's ability to deal with order changes on the server side.
+     </p>
+     <table class="HtmlTable">
+       <thead>
+         <tr>
+           <th>index</th>
+           <th>current time</th>
+         </tr>
+       </thead>
+       <tbody data-partial-container-id="partials-tbody-rotate" class="ordered_partial_refresh">
+         <%
+           rows = 0
+           show = 10
+            %>
+         % while rows < show:
+           <%
+             index = (count+rows)%show
+           %>
+           <tr data-partial-line-id="tr-rotate-${index}">
+             <td data-partial-id="index-rotate-${index}">${index}</td>
+             <td data-partial-id="time-rotate-${index}">${datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</td>
+           </tr>
+           <% rows = rows + 1 %>
+         % endwhile
+       </tbody>
+     </table>
     </div>
   </body>
 </html>
