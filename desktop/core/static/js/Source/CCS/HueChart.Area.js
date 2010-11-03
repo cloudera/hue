@@ -56,9 +56,9 @@ HueChart.Area = new Class({
                         //And as values the this.getData() array
                         .values(this.getData(true).getObjects())
                         //The two commands below will be run this.series.length * this.getData().length times.
-                        //The x-value, in pixels, is calculated as a conversion of the data object's xField value using the xScale.
+                        //The x-value, in pixels, is calculated as a conversion of the data object's xProperty value using the xScale.
                         .x(function(d) {
-                                return this.xScale(d[this.options.xField]);
+                                return this.xScale(d[this.options.xProperty]);
                         }.bind(this))
                         //The y-value, in pixels, is calculated as a conversion of the data object's layer field value using the yScale.
                         .y(function(d, layer) {

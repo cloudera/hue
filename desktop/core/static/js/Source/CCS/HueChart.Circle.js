@@ -24,9 +24,10 @@ HueChart.Circle = new Class({
         Extends: HueChart,
 
         options: {
-                selectedColor: '#fff'
+                selectedColor: '#fff',
                 //radius: null the radius of the chart, (will default to width/2)
-                //graphField: '' // the field in the data object that should be graphed,
+                graphProperty: 'data', // the property in the data object that should be graphed,
+                nameProperty: null // the property in the data object that should be used to name each wedge
                 /*
                 onWedgeOver: function to be executed when the mouse is moved over a wedge of the chart, 
                 onWedgeOut: function to be executed when the mouse is moved off of a wedge of the chart,
@@ -36,10 +37,6 @@ HueChart.Circle = new Class({
 
         initialize: function(element, options) {
                 this.parent(element, options);
-                var requiredOptions = ["graphField"];
-                requiredOptions.each(function(opt) {
-                        if (!$defined(this.options[opt])) console.error("The required option " + opt + " is missing from a HueChart.Box instantiation.");
-                }.bind(this));
                 this.selected_index = -1;
                 this.radius = this.options.radius || this.width/2;
                 this.addEvent('setupChart', function(vis) {
@@ -49,7 +46,7 @@ HueChart.Circle = new Class({
         },
 
         addGraph: function(vis) {
-                var valueSum = this.getData(false).getSeriesSum(this.options.graphField);
+                var valueSum = this.getData(false).getSeriesSum(this.options.graphProperty);
                 //Put selected index, color array, and hue chart in scope
                 var get_selected_index = this.getSelectedIndex.bind(this);
                 var colorArray = this.options.colorArray;
@@ -63,9 +60,9 @@ HueChart.Circle = new Class({
                         .left(this.radius)
                         //The outer radius is the radius
                         .outerRadius(this.radius)
-                        //The angle is a normalized value summing to 2PI based on the values in the graphField. 
+                        //The angle is a normalized value summing to 2PI based on the values in the graphProperty. 
                         .angle(function(d) { 
-                                return (d[this.options.graphField]/valueSum) * 2 * Math.PI; 
+                                return (d[this.options.graphProperty]/valueSum) * 2 * Math.PI; 
                         }.bind(this))
                         //Fill with white if selected, otherwise use corresponding value in colorArray
                         .fillStyle(function() {
@@ -82,9 +79,9 @@ HueChart.Circle = new Class({
                 //Shortcut to data array
                 var dataArray = this.getData(false).getObjects();
                 //Calculate sum of graph values
-                var valueSum = this.getData(false).getSeriesSum(this.options.graphField);
-                //Shortcut to graphField
-                var graphField = this.options.graphField;
+                var valueSum = this.getData(false).getSeriesSum(this.options.graphProperty);
+                //Shortcut to graphProperty
+                var graphProperty = this.options.graphProperty;
                 //Add an invisible bar to catch events
                 vis.add(pv.Bar)
                         //Left of bar at 0
@@ -126,7 +123,7 @@ HueChart.Circle = new Class({
                                 var angleSums = [];
                                 for (var i = 0; i < dataArray.length; i++) {
                                         //Calculate angle -- previousAngle (angleSums[i-1] plus the latest angle. 
-                                        newAngle = (angleSums[i -1] || 0) + ((dataArray[i][graphField]/valueSum) * 2 * Math.PI); 
+                                        newAngle = (angleSums[i -1] || 0) + ((dataArray[i][graphProperty]/valueSum) * 2 * Math.PI); 
                                         angleSums.push(newAngle);
                                 }
 

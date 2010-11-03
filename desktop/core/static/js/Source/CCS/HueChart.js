@@ -54,31 +54,25 @@ HueChart = new Class({
                 //The font which will be used for the axis labels.
                 labelFont: '14px sans-serif',
                 //The height of the x axis rules
-                /*width: the initial width of the chart (required),
-                  height: the initial height of the chart (required),
-                  dataTable: the table containing the chart data,
-                  dataObject: array of data objects,
-                  One of dataTable or dataObject is required
-                  onSetupChart: function that runs when the protovis rendering information is being set up, but before the protovis object is rendered, takes the protovis objects as an argument
+                width: 200, //the initial width of the chart 
+                height: 200, //the initial height of the chart 
+                dataTable: null, //table containing the chart data
+                dataObject: [], //array of data objects
+                //One of dataTable or dataObject is required
+                /*
+                onSetupChart: function that runs when the protovis rendering information is being set up, but before the protovis object is rendered, takes the protovis objects as an argument
                 */
                   bottomPadding: 0, // the padding between the bottom of the element, and the bottom of the graph,
                   topPadding: 0, // the padding between the top of the element, and the left of the graph,
                   leftPadding: 0, // the padding between the left of the element, and the left of the graph,
-                  rightPadding: 0 // the padding between the right of the element, and the right of the graph,
+                  rightPadding: 0, // the padding between the right of the element, and the right of the graph,
+                  url: "noUrl" //the url of the page. this will be used as a key in the colorManager
         },
 
 
         initialize: function(element, options) {
                 this.setOptions(options);
                 this.element = document.id(element);
-                //Check for required options
-                var requiredOptions = ["width", "height"];
-                requiredOptions.each(function(opt) {
-                        if (!$defined(this.options[opt])) console.error("The required option " + opt + " is missing from a HueChart instantiation.");
-                }.bind(this));
-                if (!(this.options.dataTable || this.options.dataObject)) {
-                        console.error("There is a HueChart instantiation which has no data source.");
-                }
                 //Width and height will potentially change often, make them instance variables.
                 this.width = this.options.width;
                 this.height = this.options.height;
@@ -166,10 +160,24 @@ HueChart.Data = new Class({
         
         //Function to sort by dates and convert date strings into date objects.
         //Also creates seconds_from_first, a useful integer value for graphing.
+        //Accepts date formats parsable in Native/Date.js, or integral ms values.
         prepareDates: function(dateProperty) {
                 //Convert date string to date object.
                 this.dataObjects.each(function(d) {
-                        d[dateProperty] = new Date().parse(d[dateProperty]);
+                        //Attempt to parse the date
+                        //Doing it here rather than using Date().parse because we need
+                        //to understand whether or not it is parseable and react to that.
+                        var unParsed = d[dateProperty]; 
+                        var parsed;
+                        Date.parsePatterns.some(function(pattern){
+                                var bits = pattern.re.exec(unParsed);
+                                return (bits) ? (parsed = pattern.handler(bits)) : false;
+                        });
+                        if (parsed) {
+                                d[dateProperty] = parsed;
+                        } else {
+                                d[dateProperty] =  new Date().parse(parseInt(unParsed, 10));
+                        }
                 });
                 //Sort data by date property.
                 this.sortByProperty(dateProperty);
@@ -288,23 +296,19 @@ HueChart.Data = new Class({
                 take this data array and give me back an array of data objects to use as ticks (lines representing scale).
                 this array should contain no more than num_ticks values.
                 the increment in which the values should be shown is timespan
+                the dateProperty is the property in the data object which contains the date
         */
         //Currently requires the dates in the data object to be exact days.
 
-        createTickArray: function(numTicks, timespan) {
+        createTickArray: function(numTicks, timespan, dateProperty) {
                 //Get the largest number of seconds.
                 var mostSeconds = this.dataObjects.getLast().seconds_from_first;
                 //Get the smallest number of seconds.
                 var leastSeconds = this.dataObjects[0].seconds_from_first;
                 //Get the total number of seconds spanned by the array.
                 var totalSeconds = mostSeconds - leastSeconds;
-                var secondsInSpan;
-                //Choose the timespan -- currently only day
-                switch (timespan) {
-                        case 'day': 
-                                secondsInSpan = 86400;
-                                break;
-                }
+                //Get the number of seconds from Date.js
+                var secondsInSpan = Date.units[timespan]()/1000;
                 var xTicks = [];
                 //If the number of ticks that would be generated for the timespan is less than the number of ticks requested, use the current data array.
                 if (totalSeconds/secondsInSpan <= numTicks) {
@@ -316,16 +320,16 @@ HueChart.Data = new Class({
                         var spansInIncrement = parseInt((totalSeconds/secondsInSpan)/numTicks, 10);
                         //Find secondsToIncrement each value by
                         var secondsInIncrement = spansInIncrement * secondsInSpan; 
-                        var firstDate = this.dataObjects[0].sample_date;
+                        var firstDate = this.dataObjects[0][dateProperty];
                         var firstSeconds = this.dataObjects[0].seconds_from_first;
                         //Add ticks to the xTicks array.
                         //Sample date - firstDate cloned and incremented by the increment times the iteration number.
                         //Seconds_from_first - dateIncrement multiplied by the iteration number.
                         for (var i = 0; i <= numTicks; i++) {
-                                xTicks.push({
-                                        sample_date: firstDate.clone().increment('second', secondsInIncrement * i),
-                                        seconds_from_first: firstSeconds + (secondsInIncrement * i)
-                                });
+                                var tickObject = {};
+                                tickObject[dateProperty] = firstDate.clone().increment('second', secondsInIncrement * i);
+                                tickObject.seconds_from_first = firstSeconds + (secondsInIncrement * i);
+                                xTicks.push(tickObject);
                         }
                         //Center tick marks.
                         var lastTick = xTicks.getLast();
@@ -335,7 +339,7 @@ HueChart.Data = new Class({
                         //Get number of spans to move ticks forward to result in evenly spaced, centered ticks.
                         var centerAdjustment = parseInt(spansAtEnd/2, 10);
                         xTicks.each(function(tick) {
-                                tick.sample_date.increment('second', secondsInSpan * centerAdjustment);
+                                tick[dateProperty].increment('second', secondsInSpan * centerAdjustment);
                                 tick.seconds_from_first += secondsInSpan * centerAdjustment;
                         });
                 }
