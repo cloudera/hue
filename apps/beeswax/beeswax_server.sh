@@ -37,7 +37,9 @@ BEESWAX_HIVE_LIB=$BEESWAX_ROOT/hive/lib
 echo \$HADOOP_HOME=$HADOOP_HOME
 
 export HADOOP_CLASSPATH=$(find $BEESWAX_HIVE_LIB -name "*.jar" | tr "\n" :):$HIVE_CONF_DIR:$BEESWAX_ROOT/../../desktop/libs/hadoop/static-group-mapping/java-lib/static-group-mapping-1.1.0.jar
+export HADOOP_OPTS="-Dlog4j.configuration=log4j.properties"
 echo \$HADOOP_CLASSPATH=$HADOOP_CLASSPATH
+echo \$HADOOP_OPTS=$HADOOP_OPTS
 
 # Use HADOOP_CONF_DIR to preprend to classpath, to avoid fb303 conflict,
 # and to force hive-default to correspond to the Hive version we have.
@@ -49,7 +51,7 @@ fi
 if [ -f $HADOOP_CONF_DIR/hadoop-env.sh ]; then
   . $HADOOP_CONF_DIR/hadoop-env.sh
 fi
-export HADOOP_CONF_DIR=${BEESWAX_HIVE_LIB}/hive-default-xml-0.5.0.jar:${HADOOP_CONF_DIR}:$(find $BEESWAX_HIVE_LIB -name "libfb303.jar" | head -1)
+export HADOOP_CONF_DIR=$BEESWAX_ROOT/../../desktop/conf:${BEESWAX_HIVE_LIB}/hive-default-xml-0.5.0.jar:${HADOOP_CONF_DIR}:$(find $BEESWAX_HIVE_LIB -name "libfb303.jar" | head -1)
 echo \$HADOOP_CONF_DIR=$HADOOP_CONF_DIR
 
 # Note: I've had trouble running this with just "java -jar" with the classpath
