@@ -65,3 +65,15 @@ LOCAL_EXAMPLES_DATA_DIR = Config(
   key='local_examples_data_dir',
   default=os.path.join(os.path.dirname(__file__), "..", "..", "data"),
   help='The local filesystem path containing the beeswax examples')
+
+BEESWAX_SERVER_CONN_TIMEOUT = Config(
+  key='beeswax_server_conn_timeout',
+  default=120,
+  type=int,
+  help='Timeout in seconds for thrift calls to beeswax service')
+
+METASTORE_CONN_TIMEOUT= Config(
+  key='metastore_conn_timeout',
+  default=10,
+  type=int,
+  help='Timeouts in seconds for thrift calls to the hive metastore. This timeout should take into account that the metastore could talk to an external DB')
