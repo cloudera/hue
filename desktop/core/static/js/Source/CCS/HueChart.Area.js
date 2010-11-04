@@ -41,7 +41,6 @@ HueChart.Area = new Class({
         //Build stacked area graph.
         addGraph: function(vis) {
                 //Put colorArray in scope for fillStyle fn.
-                var colorArray = this.options.colorArray;
                 var stack = vis.add(pv.Layout.Stack);
                 /*  [{'date': 10, 'series1': 5, 'series2': 10, 'series3': 15},
                      {'date': 20, 'series1': 7, 'series2': 14, 'series3': 21},
@@ -70,9 +69,9 @@ HueChart.Area = new Class({
                 //The stack is a layout which says, for every layer defined (above), add an area graph, offsetting it based on the layers below.
                 //Appears as a signle contiguous object, but is actually a bunch of different area graphs.
                 stack.layer.add(pv.Area)
-                        .fillStyle(function() {
-                                return colorArray[this.parent.index % colorArray.length];
-                        });
+                        .fillStyle(function(d, layer) {
+                                return this.getColor(layer);
+                        }.bind(this));
         }
 
 });

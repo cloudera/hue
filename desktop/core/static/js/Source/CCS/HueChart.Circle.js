@@ -64,9 +64,9 @@ HueChart.Circle = new Class({
                         .angle(function(d) { 
                                 return (d[this.options.graphProperty]/valueSum) * 2 * Math.PI; 
                         }.bind(this))
-                        //Fill with white if selected, otherwise use corresponding value in colorArray
-                        .fillStyle(function() {
-                                return this.index == get_selected_index() ? hueChart.options.selectedColor : colorArray[this.index % colorArray.length];
+                        //Fill with white if selected, otherwise use value from colorManager 
+                        .fillStyle(function(d) {
+                                return this.index == get_selected_index() ? hueChart.options.selectedColor : hueChart.getColor($pick(d[hueChart.options.nameProperty], this.index));
                         }).event("click", function(d) {
                                 hueChart.fireEvent('wedgeClick', [d, this.index]);
                         });                
