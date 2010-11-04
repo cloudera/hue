@@ -19,7 +19,7 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
 
 <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
 
-<div class="view partial_refresh" id="watch_wait">
+<div class="view" id="watch_wait">
   <div class="resizable" data-filters="SplitView">
     <div class="left_col">
       ${util.render_query_context(query_context)}
@@ -39,7 +39,7 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
       %>
       <dt class="ccs-dt_cap">${mr_jobs}</dt>
         <dd class="ccs-dd_bottom bw-actions">
-          <ul data-partial-id="num_jobs">
+          <ul data-single-partial-id="num_jobs">
             % if n_jobs > 0:
               <h3 class="ccs-hidden">This query launched ${n_jobs} ${mr_jobs}:</h3>
               <ul class="beeswax_hadoop_job_links">
@@ -64,7 +64,7 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
         <ul class="tab_sections ccs-clear">
           <li>
             <h3 class="ccs-hidden">Server Log</h3>
-            <pre data-partial-id="log">${log}</pre>
+            <pre data-single-partial-id="log">${log}</pre>
           </li>
           <li>
             <pre>${query.query}</pre>

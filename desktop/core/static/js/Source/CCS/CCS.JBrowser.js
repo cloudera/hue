@@ -44,6 +44,7 @@ requires:
  - /CCS.JFrame.PromptAndPost
  - /CCS.JFrame.Refresh
  - /CCS.JFrame.RefreshWithParams
+ - /CCS.JFrame.SplitViewLinkers
  - /CCS.JFrame.SubmitLink
  - /CCS.JFrame.Target
 script: CCS.JBrowser.js
