@@ -201,7 +201,6 @@ def db_client():
       res = self._client.get_results_metadata(*args, **kwargs)
       return _decode_struct_attr(res, 'table_dir')
 
-  import ipdb;ipdb.set_trace()
   client = thrift_util.get_client(BeeswaxService.Client,
                                 conf.BEESWAX_SERVER_HOST.get(),
                                 conf.BEESWAX_SERVER_PORT.get(),
