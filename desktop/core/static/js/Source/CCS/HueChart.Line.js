@@ -37,15 +37,15 @@ HueChart.Line = new Class({
                                 //Using as data, this.data.getObjects.
                                 .data(this.getData(true).getObjects())
                                 //Closures used because the function argument isn't executed until the render phase.
-                                //Color the line, based on a color in the colarArray.
+                                //Color the line, based on the color returned by the colorManager.
                                 .strokeStyle(function(itemIndex) {
                                         return function() {
-                                                return this.options.colorArray[itemIndex % this.options.colorArray.length];
+                                                return this.getColor(this.options.series[itemIndex]);
                                         }.bind(this);
                                 }.bind(this)(itemIndex))
                                 //For each data object, create a point with its left position at the data object's xField value scaled to pixels and its bottom position at the data object's value for this series scaled to pixels.
                                 .left(function(d) {
-                                        return this.xScale(d[this.options.xField]);
+                                        return this.xScale(d[this.options.xProperty]);
                                 }.bind(this))
                                 .bottom(function(itemIndex) {
                                         return function(d) {

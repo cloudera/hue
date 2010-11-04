@@ -17,12 +17,16 @@ requires:
 - Core/Options
 - ccs-shared/Number.Files
 - More/Element.Shortcuts
+- ccs-shared/HueChart.GroupValueManager
 
 provides: [ HueChart ]
 
 ...
 */
 //
+
+(function() {
+var colorManager = GroupValueManager; 
 HueChart = new Class({
 
         Implements: [Events, Options],
@@ -84,6 +88,10 @@ HueChart = new Class({
                 } else {
                         this.data = new HueChart.Data(this.options.dataObject);
                 }
+
+                //Setup color manager
+                this.colorManager = colorManager;
+                this.colorManager.define(this.options.url, this.options.colorArray);
         },
 
         //Resize graph to width and height.
@@ -144,6 +152,11 @@ HueChart = new Class({
         //Check that there is an event handler registered for an event
         hasEvent: function(name) {
                 return this.$events[name] && this.$events[name].length;
+        },
+
+        //Get color given a series
+        getColor: function(series) {
+                return this.colorManager.get(this.options.url, series);
         }
 });
 
@@ -164,20 +177,9 @@ HueChart.Data = new Class({
         prepareDates: function(dateProperty) {
                 //Convert date string to date object.
                 this.dataObjects.each(function(d) {
-                        //Attempt to parse the date
-                        //Doing it here rather than using Date().parse because we need
-                        //to understand whether or not it is parseable and react to that.
-                        var unParsed = d[dateProperty]; 
-                        var parsed;
-                        Date.parsePatterns.some(function(pattern){
-                                var bits = pattern.re.exec(unParsed);
-                                return (bits) ? (parsed = pattern.handler(bits)) : false;
-                        });
-                        if (parsed) {
-                                d[dateProperty] = parsed;
-                        } else {
-                                d[dateProperty] =  new Date().parse(parseInt(unParsed, 10));
-                        }
+                        //Check if dateProperty value is parsable as string.  
+                        //Parse as string if it is, otherwise parse as ms value.
+                        d[dateProperty] = new Date().parse(Date.isParsable(d[dateProperty]) ? d[dateProperty] : parseInt(d[dateProperty], 10));
                 });
                 //Sort data by date property.
                 this.sortByProperty(dateProperty);
@@ -372,4 +374,4 @@ HueChart.buildData = function(table) {
         });
         return data;
 };
-
+})();
