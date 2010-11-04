@@ -27,9 +27,11 @@ limitations under the License.
 		<p>The table below will appear to be a tree view table immediately, even before scripts are loaded. It will become interactive once the scripts have loaded. You should be able to click a section's expand arrow to expand it. Keys should work - up and down to navigate, shift + up and down to multiselect, left and right to collapse and expand sections.</p>
 		<table id="tree2" data-filters="HtmlTable" class="selectable treeView multiselect ccs-bordered-table">
 			<thead>
-				<th>Name</th>
-				<th>Date Modified</th>
-				<th>Size</th>
+				<tr>
+					<th>Name</th>
+					<th>Date Modified</th>
+					<th>Size</th>
+				</tr>
 			</thead>
 				<tbody>
 					<tr class="table-folder table-depth-0">
@@ -136,9 +138,11 @@ limitations under the License.
 		<p>The table below will turn into a treeview on startup. Unlike the table above, none of its rows are hidden on load but only after the HtmlTable filter is applied. Both will appear the same to you, though this one will take longer to build.</p>
 		<table id="tree" data-filters="HtmlTable" class="selectable treeView buildTree ccs-bordered-table buildTree">
 			<thead>
-				<th>Name</th>
-				<th>Date Modified</th>
-				<th>Size</th>
+				<tr>
+					<th>Name</th>
+					<th>Date Modified</th>
+					<th>Size</th>
+				</tr>
 			</thead>
 				<tbody>
 					<tr class="table-depth-0">

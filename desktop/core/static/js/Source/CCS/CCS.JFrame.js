@@ -17,7 +17,7 @@
 ---
 description: JFrame--Configurable "container" for simple HTML pages, within the CCS framework.
 provides: [CCS.JFrame]
-requires: 
+requires:
  - Core/Request
  - More/Element.Delegation
  - More/Elements.From
@@ -89,7 +89,7 @@ CCS.JFrame = new Class({
 		redirectAfterRender: empty(redirectedTo, originalRequestedURL), //after content is rendered
 		size: {
 			width: ,
-			height: 
+			height:
 		},
 
 		**/
@@ -189,7 +189,7 @@ CCS.JFrame = new Class({
 
 /*
 	
-	the JFrame callClick event invokes the click handler for links/elements, matching against any JFrameLinkers and, 
+	the JFrame callClick event invokes the click handler for links/elements, matching against any JFrameLinkers and,
 	if none are found, running the default click handler (which is to load the link's href, if defined, into the JFrame).
 	event - (*object*) the event object that was fired; a click, usually
 	link - (*element*) typically an anchor tag, though that's not a requirement
@@ -277,7 +277,7 @@ CCS.JFrame = new Class({
 		}, options);
 		this.fireEvent('request', [options.requestPath, options.userData, options]);
 		var req = new Request();
-		this._setRequestOptions(req, 
+		this._setRequestOptions(req,
 			$merge(options, {
 				method: options.method || 'get',
 				url: new URI(options.requestPath).toString()
@@ -312,9 +312,9 @@ CCS.JFrame = new Class({
 
 	/*
 	options:
-		content: content to render (html, dom element, or $$ collection of dom elements), 
-		responsePath: the path to this content, 
-		title: the title for the frame for this content, 
+		content: content to render (html, dom element, or $$ collection of dom elements),
+		responsePath: the path to this content,
+		title: the title for the frame for this content,
 		userData: data to be passed along to the loadComplete event,
 		target: dom element or id to fill with content; defaults to this.content
 		suppressLoadComplete: (boolean) if true, the loadComplete event is not fired
@@ -341,7 +341,7 @@ CCS.JFrame = new Class({
 		everything else: used to pass along options to filters, renderers, etc.
 		
 	views:
-		The content of a JFrame request is searched for the first element with the class "view". 
+		The content of a JFrame request is searched for the first element with the class "view".
 		If found, the id of this element is treated as the current view. This id is stripped (all
 		Desktop apps do not use ids, as there may be more than one of them). The data object passed
 		to the loadComplete event and the callback in the options contains this view (the value of
@@ -364,18 +364,12 @@ CCS.JFrame = new Class({
 		These elements are referenced in the data passed to the loadComplete callback as the toolbar and footer
 		for the current view. This allows you to do special things to the navigation. By default, JBrowser
 		injects the contents of this toolbar into the area above the content and the footer content into
-		the footer. By simply putting links and other elements into a div with the class "toolbar" it 
+		the footer. By simply putting links and other elements into a div with the class "toolbar" it
 		will be added to the header (and the same for the footer).
 		You must include the toolbar / footer in every response for it to remain there.
 	*/
 	renderContent: function(options){
 		var content = {};
-		var filter = function(elements, selector){
-			if (!elements.length) return elements;
-			var first = elements[0];
-			var holder = new Element('div').adopt(elements);
-			return first.getParent().getElements(selector);
-		};
 		if ($(options.content)) {
 			//if the content is an element, cast it into an Elements array
 			content.elements = $$($(options.content));
@@ -383,11 +377,10 @@ CCS.JFrame = new Class({
 			//if it's a string, parse it
 			content = this._parseContent(options.content);
 		} else {
-			//the only other valid option is that it's an array of elements, 
+			//the only other valid option is that it's an array of elements,
 			//cast it into an Elements array in case it's just a vanilla array
 			content.elements = $$(options.content);
 		}
-		if (options.filter) content.elements = filter(content.elements, options.filter);
 		//determine view and view element
 		var view,
 		    viewElement = content.elements.filter('.view')[0] || content.elements.getElement('.view')[0];
@@ -531,7 +524,7 @@ CCS.JFrame = new Class({
 
 	//Applies all the behavior filters for an element.
 	//element - (element) an element to apply the filters registered with this Behavior instance to.
-	//behavior - (behavior object) behavior instance to use 
+	//behavior - (behavior object) behavior instance to use
 	//force - (boolean; optional) passed through to applyBehavior (see it for docs)
 	applyBehaviors: function(element, behavior, force){
 		behavior.apply(element, force);
@@ -582,7 +575,7 @@ CCS.JFrame = new Class({
 
 	/*
 		linkers are custom event handlers for links that match a specific selector. Ideally, the selector is just a classname.
-		When any link in a jFrame is clicked, it is checked against all registered linkers. If no matches are found, the link 
+		When any link in a jFrame is clicked, it is checked against all registered linkers. If no matches are found, the link
 		is handled by jFrame and loads new content. If there is a match, the matcher's function handles the event.
 		selector - (*string*) a css selector that the link is tested against.
 		fn - (*function*) callback that handles links that match the selector
@@ -815,8 +808,8 @@ CCS.JFrame = new Class({
 			error: error,
 			blankWindowWithError: blankWindowWithError,
 			previousPath: previousPath
-		}, options || {}); 
-		this.behavior.fireEvent('load', loadOptions); 
+		}, options || {});
+		this.behavior.fireEvent('load', loadOptions);
 	},
 
 	/*
@@ -858,7 +851,7 @@ CCS.JFrame = new Class({
 
 	/*
 		filters:
-		Filters are functions that are called every time the contents of the jFrame is updated. 
+		Filters are functions that are called every time the contents of the jFrame is updated.
 		The method defined is passed the container and can then apply its own logic to the contents
 		of that container. The name specified is not used, except that you can overwrite a filter
 		by using the same name.
@@ -910,8 +903,8 @@ CCS.JFrame = new Class({
 			viewElement - (*element*; optional) if defined, the element for the view
 		
 		Iterates over all the renderers for this instance (including global renderers on the JFrame prototype, which
-		includes the default renderer). Each renderer may inspect the content and elect to handle it instead of the 
-		default handler. If it handles it and wishes to prevent the default handler, the renderer returns *true*, 
+		includes the default renderer). Each renderer may inspect the content and elect to handle it instead of the
+		default handler. If it handles it and wishes to prevent the default handler, the renderer returns *true*,
 		otherwise, if it returns *false* (or nothing) the default handler will fill the contents and set up events
 		and filters, linkers, etc. as usual.
 	*/
@@ -942,7 +935,7 @@ CCS.JFrame = new Class({
 	
 	/*
 		the default renderer, if no other renderers apply
-		this is the default behavior for jframe which fills the content of the window and updates 
+		this is the default behavior for jframe which fills the content of the window and updates
 		the history (if history is enabled). It also picks out the view if there is one defined
 		as well as assigns the toolbar to the callback object for JBrowser to do with it what it will.
 		Finally, it calls the callback in the options (if specified) and fires the loadComplete event.
@@ -951,6 +944,13 @@ CCS.JFrame = new Class({
 		var options = content.options;
 		//store the path as the current one
 		if (!options.retainPath) this.currentPath = options.responsePath || this.currentPath;
+
+		if (options.filter) {
+			if (!content.elements.length) return content.elements;
+			var holder = new Element('div').adopt(content.elements);
+			content.elements = holder.getElements(options.filter);
+		}
+
 		//grab the target
 		var target = options.target ? $$(options.target)[0] || this.content : this.content;
 		this._resetOverflow(target);

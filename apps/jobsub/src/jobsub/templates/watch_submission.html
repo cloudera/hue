@@ -23,9 +23,9 @@ limitations under the License.
 	{% endif %}
 {% endblock %}
 {% block content %}
-	<div id="jobsub_output" class="view partial_refresh">
+	<div id="jobsub_output" class="view">
 		<h1>Job - {{ submission.name }}</h1>
-		<b class="state{% if completed %} complete {% endif %}" data-partial-id="0">
+		<b class="state{% if completed %} complete {% endif %}" data-single-partial-id="0">
 			{% if completed %}
 				status: finished
 			{% else %}
@@ -36,17 +36,17 @@ limitations under the License.
 		</b>
 		<div class="jframe_padded" data-filters="SizeTo" data-size-to-height="-74">
 			<h2 class="jobsub_output_links_header">Launched Jobs</h2>
-			<ul class="jobsub_output_links" data-partial-id="1">
+			<ul class="jobsub_output_links" data-single-partial-id="1">
 				{% for j in jobs %}
 					<li><a href="{% url single_job jobid=j %}" target="JobBrowser">{{ j }}</a>
 				{% endfor %}
 			</ul>
 
 			<h2 class="jobsub_output_stout_header">Last 10KB of stdout:</h2>
-			<pre class="jobsub_output_stout" data-partial-id="2">{{ job_data.stdout_tail }}</pre>
+			<pre class="jobsub_output_stout" data-single-partial-id="2">{{ job_data.stdout_tail }}</pre>
 
 			<h2 class="jobsub_output_sterr_header">Last 10KB of stderr:</h2>
-			<pre class="jobsub_output_sterr" data-partial-id="3">{{ job_data.stderr_tail }}</pre>
+			<pre class="jobsub_output_sterr" data-single-partial-id="3">{{ job_data.stderr_tail }}</pre>
 		</div>
 	</div>
 {% endblock %}

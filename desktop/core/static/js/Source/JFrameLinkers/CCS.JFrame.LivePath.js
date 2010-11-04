@@ -46,7 +46,6 @@ script: CCS.JFrame.LivePath.js
 			var okToAdd = action == "toggle" || action == "add";
 			for (path in paths){
 				var state = uri.getData(path);
-				if (window.paused) debugger;
 				if (!state) {
 					uri.setData(path, paths[path]);
 				} else if ($type(state) == "string") {

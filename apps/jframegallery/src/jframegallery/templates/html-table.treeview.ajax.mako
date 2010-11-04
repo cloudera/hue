@@ -37,10 +37,10 @@
     <meta http-equiv="refresh" content="5" />
   </head>
   <body>
-    <div class="jframe_padded partial_refresh"> 
+    <div class="jframe_padded"> 
       <input value="you can put some text in here to verify that the whole view doesn't refresh" style="width: 500px;"/>
       <p><a href="${request_path}?show_all=true">Show everything</a> || <a href="${request_path}">back to top</a></p>
-      <table data-filters="HtmlTable" class="selectable treeView" style="border: 1px solid #999; width: 98%">
+      <table data-filters="HtmlTable" class="selectable treeView highlight-partial-updates" style="border: 1px solid #999; width: 98%">
 
       <%def name="create_row(node, depth, path)">
         <%
