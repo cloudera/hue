@@ -35,12 +35,6 @@ from beeswaxd.ttypes import BeeswaxException, QueryHandle, QueryNotFoundExceptio
 
 LOG = logging.getLogger(__name__)
 
-# Timeouts in seconds for thrift calls to beeswax service and the
-# hive metastore. The metastore could talk to an external DB, hence
-# the larger timeout.
-BEESWAX_SERVER_THRIFT_TIMEOUT = 10
-METASTORE_THRIFT_TIMEOUT = 10
-
 def execute_directly(user, query_msg, design=None, notify=False):
   """
   execute_directly(user, query_msg [,design]) -> QueryHistory object
@@ -207,11 +201,12 @@ def db_client():
       res = self._client.get_results_metadata(*args, **kwargs)
       return _decode_struct_attr(res, 'table_dir')
 
+  import ipdb;ipdb.set_trace()
   client = thrift_util.get_client(BeeswaxService.Client,
                                 conf.BEESWAX_SERVER_HOST.get(),
                                 conf.BEESWAX_SERVER_PORT.get(),
                                 service_name="Beeswax (Hive UI) Server",
-                                timeout_seconds=BEESWAX_SERVER_THRIFT_TIMEOUT)
+                                timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
   return UnicodeBeeswaxClient(client)
 
 
@@ -306,7 +301,7 @@ def meta_client():
                                 conf.BEESWAX_META_SERVER_HOST.get(),
                                 conf.BEESWAX_META_SERVER_PORT.get(),
                                 service_name="Hive Metadata (Hive UI) Server",
-                                timeout_seconds=METASTORE_THRIFT_TIMEOUT)
+                                timeout_seconds=conf.METASTORE_CONN_TIMEOUT.get())
   return UnicodeMetastoreClient(client)
 
 
