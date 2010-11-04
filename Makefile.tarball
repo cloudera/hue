@@ -21,7 +21,6 @@
 PROD_INCLUDES := \
 	apps \
 	desktop \
-	example-hadoop-confs \
 	ext/thirdparty \
 	LICENSE.txt \
 	Makefile* \
