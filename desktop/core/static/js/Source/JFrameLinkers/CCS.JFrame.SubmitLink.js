@@ -24,12 +24,31 @@ script: CCS.JFrame.SubmitLink.js
 ...
 */
 
+;(function(){
+
+function getFormForElement(el){
+	var formSelector = el.get('data-form') || 'form';
+	var form = el.getParent(formSelector) || this.getWindowElement().getElement(formSelector);
+	if (!form){
+		if (formSelector) dbug.error('Cannot find data-form="' +formSelector+ '" for ccs-submit_form');
+		else dbug.error('Cannot find FORM parent of ccs-submit_form');
+	}
+	return form;
+}
+
+
 CCS.JFrame.addGlobalLinkers({
 	/*
-		submit the form that the element is in.
+		submit the form that the element is in
+		or the form that it specifies
 	*/
-	'.ccs-submit_form': function(event, el) {
-		el.getParent('form').retrieve('form.request').setOptions({extraData: el.getJSONData('extra-data')}).send();
+	'.ccs-submit_form': function(event, el){
+		var rq = getFormForElement.call(this, el).retrieve('form.request');
+		if (rq) rq.setOptions({extraData:el.getJSONData('extra-data')}).send();
+		else dbug.error('Form Request not found');
 	}
 
 });
+
+
+}());
