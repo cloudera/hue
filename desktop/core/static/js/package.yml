@@ -71,6 +71,7 @@ sources: [
   Source/BehaviorFilters/Behavior.HtmlTableCheckSelected.js,
   Source/BehaviorFilters/Behavior.HtmlTableChromeHack.js,
   Source/BehaviorFilters/Behavior.HtmlTableKeyboard.js,
+  Source/BehaviorFilters/Behavior.HtmlTableKeyboardKids.js,
   Source/BehaviorFilters/Behavior.HtmlTableLiveTreeKeyboard.js,
   Source/BehaviorFilters/Behavior.HtmlTableMultiSelectMenu.js,
   Source/BehaviorFilters/Behavior.HtmlTableRestore.js,

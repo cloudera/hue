@@ -46,6 +46,7 @@ requires:
  - /Behavior.HtmlTableCheckSelected
  - /Behavior.HtmlTableChromeHack
  - /Behavior.HtmlTableKeyboard
+ - /Behavior.HtmlTableKeyboardKids
  - /Behavior.HtmlTableLiveTreeKeyboard
  - /Behavior.HtmlTableMultiSelectMenu
  - /Behavior.HtmlTableRestore
