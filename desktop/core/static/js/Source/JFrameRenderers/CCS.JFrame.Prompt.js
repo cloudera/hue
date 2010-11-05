@@ -76,7 +76,7 @@ CCS.JFrame.addGlobalRenderers({
 			form.addEvent('submit', function(){
 				prompt.hide();
 			});
-			var inputs = form.getElements('input, textarea');
+			var inputs = form.getElements('input[type=text], textarea');
 			var focused;
 			inputs.some(function(input){
 				if (focused) return;
