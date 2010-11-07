@@ -1,7 +1,0 @@
-.. _topics-http-generic-views:
-
-=============
-Generic views
-=============
-
-See :ref:`ref-generic-views`.

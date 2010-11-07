@@ -1,0 +1,20 @@
+Metadata-Version: 1.0
+Name: django-extensions
+Version: 0.5
+Summary: Extensions for Django
+Home-page: http://code.google.com/p/django-command-extensions/
+Author: Michael Trier
+Author-email: mtrier@gmail.com
+License: New BSD License
+Description: django-extensions bundles several useful
+        additions for Django projects. See the project page for more information:
+        http://code.google.com/p/django-command-extensions/
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Utilities

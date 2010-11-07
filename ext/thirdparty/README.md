@@ -13,9 +13,9 @@ Checked-in third party dependencies
 |Y|Clientcide|?|MIT|http://www.clientcide.com/js|
 |Y|ConfigObj|4.6.0|BSD|http://www.voidspace.org.uk/python/configobj.html|
 |Y|ctypes|1.0.2|MIT|http://pypi.python.org/pypi/ctypes|
-|Y|Django|1.0.2|BSD|http://www.djangoproject.com/download/1.0.2/tarball/|
+|Y|Django|1.2.3|BSD|http://www.djangoproject.com/download/1.2.3/tarball/|
 |Y|Django_cpserver|19739bea057d824d9cd6c10c4caec622e8e1c0b9|BSD|http://github.com/lincolnloop/django-cpserver/|
-|Y|Django Extensions|0.4.1|New BSD|http://django-command-extensions.googlecode.com/files/django-extensions-0.4.1.tar.gz|
+|Y|Django Extensions|0.5|New BSD|http://pypi.python.org/pypi/django-extensions/0.5|
 |Y|Django_nose (part of basie)|?|MIT|http://code.basieproject.org/trunk/apps/django_nose/nose_runner.py|
 |Y|elementtree|1.2.6-20050316|Python(MIT)|http://effbot.org/downloads#elementtree|
 |Y|enum|0.4.4|Python|http://pypi.python.org/pypi/enum/|
