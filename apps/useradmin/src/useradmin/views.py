@@ -104,38 +104,41 @@ def edit_user(request, username=None):
   if request.method == 'POST':
     form = UserChangeForm(request.POST, instance=instance)
     if form.is_valid(): # All validation rules pass
-      #
-      # Check for 3 more conditions:
-      # (1) A user cannot inactivate oneself;
-      # (2) Non-superuser cannot promote himself; and
-      # (3) The last active superuser cannot demote/inactivate himself.
-      #
-      form_is_super = form.cleaned_data["is_superuser"]
-      form_is_active = form.cleaned_data["is_active"]
-      if request.user.username == username and not form_is_active:
-        raise MessageException("You cannot make yourself inactive.")
-
-      global __users_lock
-      __users_lock.acquire()
-      try:
-        if form.instance.is_superuser:
-          if not form_is_super or not form_is_active:
-            # Is there any other active superuser left?
-            all_active_su = User.objects.filter(is_superuser__exact = True,
-                                                is_active__exact = True)
-            num_active_su = all_active_su.count()
-            assert num_active_su >= 1, "No active superuser configured"
-            if num_active_su == 1:
-              raise MessageException("You cannot remove the last active "
-                                     "superuser from the configuration.")
-        else:
-          if form_is_super and not request.user.is_superuser:
-            raise MessageException("You cannot make yourself a superuser.")
-
-        # All ok
+      if instance is None:
         form.save()
-      finally:
-        __users_lock.release()
+      else:
+        #
+        # Check for 3 more conditions:
+        # (1) A user cannot inactivate oneself;
+        # (2) Non-superuser cannot promote himself; and
+        # (3) The last active superuser cannot demote/inactivate himself.
+        #
+        if request.user.username == username and not form.instance.is_active:
+          raise MessageException("You cannot make yourself inactive.")
+
+        global __users_lock
+        __users_lock.acquire()
+        try:
+          # form.instance (and instance) now carry the new data
+          orig = User.objects.get(username=username)
+          if orig.is_superuser:
+            if not form.instance.is_superuser or not form.instance.is_active:
+              # Is there any other active superuser left?
+              all_active_su = User.objects.filter(is_superuser__exact = True,
+                                                  is_active__exact = True)
+              num_active_su = all_active_su.count()
+              assert num_active_su >= 1, "No active superuser configured"
+              if num_active_su == 1:
+                raise MessageException("You cannot remove the last active "
+                                       "superuser from the configuration.")
+          else:
+            if form.instance.is_superuser and not request.user.is_superuser:
+              raise MessageException("You cannot make yourself a superuser.")
+
+          # All ok
+          form.save()
+        finally:
+          __users_lock.release()
 
       request.path = urlresolvers.reverse(list_users)
       return list_users(request)

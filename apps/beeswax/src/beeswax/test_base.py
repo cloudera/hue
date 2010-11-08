@@ -228,14 +228,20 @@ def verify_history(client, fragment, design=None, reverse=False):
   """
   Verify that the query fragment and/or design are in the query history.
   If reverse is True, verify the opposite.
-  Return the size of the history.
+  Return the size of the history; -1 if we fail to determine it.
   """
   resp = client.get('/beeswax/query_history')
   my_assert = reverse and assert_false or assert_true
   my_assert(fragment in resp.content)
   if design:
     my_assert(design in resp.content)
-  return len(resp.context['page'].object_list)
+
+  context = resp.context
+  if context:
+    return len(context['page'].object_list)
+  else:
+    LOG.warn('Cannot find history size. Response context is None')
+    return -1
 
 
 class BeeswaxSampleProvider(object):
