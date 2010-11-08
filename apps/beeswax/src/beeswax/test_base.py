@@ -236,12 +236,18 @@ def verify_history(client, fragment, design=None, reverse=False):
   if design:
     my_assert(design in resp.content)
 
-  context = resp.context
-  if context:
-    return len(context['page'].object_list)
-  else:
-    LOG.warn('Cannot find history size. Response context is None')
-    return -1
+  if resp.context:
+    try:
+      return len(resp.context['page'].object_list)
+    except KeyError:
+      pass
+
+  # This could happen if we issue multiple requests in parallel.
+  # The capturing of Django response context is not thread safe.
+  # Also see:
+  #   http://docs.djangoproject.com/en/1.2/topics/testing/#testing-responses
+  LOG.warn('Cannot find history size. Response context clobbered')
+  return -1
 
 
 class BeeswaxSampleProvider(object):
