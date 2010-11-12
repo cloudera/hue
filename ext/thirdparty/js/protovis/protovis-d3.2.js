@@ -6207,7 +6207,19 @@ pv.SvgScene.wedge = function(scenes) {
 /**
  *
  */
-pv.VmlScene = {};
+pv.VmlScene = {
+        
+        events: [
+        "onmousedown",
+        "onmouseup",
+        "onclick",
+        "ondblclick",
+        "onmousewheel",
+        "onmouseover",
+        "onmouseout",
+        "onmousemove"
+        ]
+};
 
 /**
  *
@@ -6261,9 +6273,7 @@ pv.VmlScene.dispatch = pv.listener(function(e) {
   var t = e.srcElement.$scene;
   if (t) {
     var type = e.type;
-
     /* TODO: mousewheel fixes? */
-
     if (pv.Mark.dispatch(type, t.scenes, t.index)) e.returnValue = false;
   }
 });
@@ -6641,13 +6651,17 @@ pv.VmlScene.panel = function(scenes) {
       g = s.canvas.firstChild;
       if (!g) {
         s.canvas.appendChild(g = this.create("v:group"));
-        g.onclick
+        /*g.onclick
             = g.onmousedown
             = g.onmouseup
             = g.onmousemove
             = g.onmouseout
             = g.onmouseover
-            = pv.VmlScene.dispatch;
+            = pv.VmlScene.dispatch;*/
+        for (var j = 0; j < this.events.length; j++) {
+                g.attachEvent(this.events[j], this.dispatch);
+        }
+            
       }
       scenes.$g = g;
       g.style.position = "relative";
@@ -15104,9 +15118,9 @@ pv.Behavior.select = function() {
     pv.Mark.dispatch("selectend", scene, index);
     scene = null;
   }
-
-  pv.listen(window, "mousemove", mousemove);
-  pv.listen(window, "mouseup", mouseup);
+  
+  pv.listen(window.document.documentElement, "mousemove", mousemove);
+  pv.listen(window.document.documentElement, "mouseup", mouseup);
   return mousedown;
 };
 /**

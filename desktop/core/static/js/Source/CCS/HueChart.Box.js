@@ -86,9 +86,10 @@ HueChart.Box = new Class({
                         //Add position indicator if enabled
                         if (this.options.positionIndicator) this.setPositionIndicator(vis);
                         //Create panel for capture of events
-                        this.eventPanel = vis.add(pv.Panel);
+                        this.eventPanel = vis.add(pv.Panel).fillStyle("rgba(0,0,0,.001)");
                         //If there's a mouse event, add the functionality to capture these events.
-                        if (this.hasEvent('pointMouseOut') && this.hasEvent('pointMouseOver') || this.hasEvent('pointClick')) this.addMouseEvents(vis);
+                        //if (this.hasEvent('pointMouseOut') && this.hasEvent('pointMouseOver') || this.hasEvent('pointClick')) this.addMouseEvents(vis);
+                        this.addMouseEvents(vis);
                         if (this.hasEvent('spanSelect')) this.makeSelectable(vis);
                 }.bind(this));
         },

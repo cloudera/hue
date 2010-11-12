@@ -179,7 +179,13 @@ HueChart.Data = new Class({
                 this.dataObjects.each(function(d) {
                         //Check if dateProperty value is parsable as string.  
                         //Parse as string if it is, otherwise parse as ms value.
-                        d[dateProperty] = new Date().parse(Date.isParsable(d[dateProperty]) ? d[dateProperty] : parseInt(d[dateProperty], 10));
+                        var parseResult = Date.parse(d[dateProperty]);
+                        if (parseResult.isValid()) {
+                                d[dateProperty] = parseResult;
+                        } else {
+                                parseResult = Date.parse(d[dateProperty].toInt());
+                                if (parseResult.isValid()) d[dateProperty] = parseResult;
+                        } 
                 });
                 //Sort data by date property.
                 this.sortByProperty(dateProperty);
@@ -365,7 +371,7 @@ HueChart.buildData = function(table) {
                return header.get('text');
         });
         //Iterate through table row and cells.
-        $$(table.getElements('tr')).each(function(row) {
+        $$(table.getElements('tbody tr')).each(function(row) {
                 var datum = {};
                 $$(row.getElements('td')).each(function(cell, i) {
                        datum[headers[i]] = cell.get('text'); 
