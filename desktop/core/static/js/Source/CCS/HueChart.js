@@ -66,10 +66,12 @@ HueChart = new Class({
                 /*
                 onSetupChart: function that runs when the protovis rendering information is being set up, but before the protovis object is rendered, takes the protovis objects as an argument
                 */
-                  bottomPadding: 0, // the padding between the bottom of the element, and the bottom of the graph,
+                padding:[0], //the array of padding values.  Accepts between 1 and 4 values, in CSS TRBL format.  Also allows named padding values below.
+                  //If there are named values, they will supercede the result from the padding array.  
+                  /*bottomPadding: 0, // the padding between the bottom of the element, and the bottom of the graph,
                   topPadding: 0, // the padding between the top of the element, and the left of the graph,
                   leftPadding: 0, // the padding between the left of the element, and the left of the graph,
-                  rightPadding: 0, // the padding between the right of the element, and the right of the graph,
+                  rightPadding: 0, // the padding between the right of the element, and the right of the graph,*/
                   url: "noUrl" //the url of the page. this will be used as a key in the colorManager
         },
 
@@ -80,7 +82,12 @@ HueChart = new Class({
                 //Width and height will potentially change often, make them instance variables.
                 this.width = this.options.width;
                 this.height = this.options.height;
-                
+                //Process padding array with named values -- interpreted in same way CSS side-oriented values are.
+                this.options.padding = $splat(this.options.padding[0]);
+                this.options.topPadding = $pick(this.options.topPadding, this.options.padding[0]);
+                this.options.rightPadding = $pick(this.options.rightPadding, this.options.padding[1], this.options.padding[0]);
+                this.options.bottomPadding = $pick(this.options.bottomPadding, this.options.padding[2], this.options.padding[0]);
+                this.options.leftPadding = $pick(this.options.leftPadding, this.options.padding[3], this.options.padding[1], this.options.padding[0]);
                 var table = document.id(this.options.dataTable);
                 if (table) {
                         this.data = new HueChart.Data(HueChart.buildData(table));
@@ -91,6 +98,7 @@ HueChart = new Class({
 
                 //Setup color manager
                 this.colorManager = colorManager;
+                console.log(this.options.url);
                 this.colorManager.define(this.options.url, this.options.colorArray);
         },
 

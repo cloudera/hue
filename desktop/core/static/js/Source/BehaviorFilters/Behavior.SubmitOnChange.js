@@ -19,7 +19,7 @@
 
 description: Makes any form with the data-filter SubmitOnChange submit itself whenever any input is changed.
 provides: [Behavior.SubmitOnChange]
-requires: [Widgets/Behavior]
+requires: [Widgets/Behavior, Core/Browser]
 script: Behavior.SubmitOnChange.js
 
 ...
@@ -30,9 +30,14 @@ script: Behavior.SubmitOnChange.js
 var setupInput = function(input, form, cleanupElement){
 	var events = {
 		change: function(e){
-			if (e) form.fireEvent('submit', e);
+                        if (e) form.fireEvent('submit', e);
 			else form.fireEvent('submit');
 		},
+                click: function(event) {
+                        if ((input.get('type') == 'checkbox') && Browser.Engine.name == "trident") {
+                                form.fireEvent('submit', event);
+                        }
+                }, 
 		keydown: function(e) {
 			if (e.key == 'enter' && document.id(e.target).get('tag') != 'textarea') form.fireEvent('submit', e);
 		}
