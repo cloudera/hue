@@ -83,7 +83,7 @@ HueChart = new Class({
                 this.width = this.options.width;
                 this.height = this.options.height;
                 //Process padding array with named values -- interpreted in same way CSS side-oriented values are.
-                this.options.padding = $splat(this.options.padding[0]);
+                this.options.padding = $splat(this.options.padding);
                 this.options.topPadding = $pick(this.options.topPadding, this.options.padding[0]);
                 this.options.rightPadding = $pick(this.options.rightPadding, this.options.padding[1], this.options.padding[0]);
                 this.options.bottomPadding = $pick(this.options.bottomPadding, this.options.padding[2], this.options.padding[0]);
