@@ -48,7 +48,7 @@ def message_test():
 def cross_request_flash_messages_test():
   c = make_logged_in_client()
   assert_equal(None, c.session.get('flashMessages'))
-  c.get('/jframegallery/flash.html')
+  c.get('/jframegallery/gallery/flash.html')
   assert_equal(3, len(c.session['flashMessages']))
   response = c.get('/jframegallery/', dict(format="embed"))
   assert_equal(3, len(simplejson.loads(response["X-Hue-Flash-Messages"])))
@@ -58,5 +58,5 @@ def cross_request_flash_messages_test():
   
 def missing_slash_test():
   c = make_logged_in_client()
-  response = c.get('/jframegallery')
+  response = c.get('/accounts/logout')
   assert_equal(301, response.status_code) # redirect
