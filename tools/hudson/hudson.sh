@@ -18,6 +18,9 @@
 set -e
 set -x
 
+# CDH3b3 requires tight umask setting.
+umask 0022
+
 BINDIR=$(dirname $0)
 HUE_ROOT=$PWD
 
