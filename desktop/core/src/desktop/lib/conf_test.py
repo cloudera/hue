@@ -18,10 +18,10 @@
 import configobj
 from cStringIO import StringIO
 import logging
-import unittest
 import re
 
 from desktop.lib.conf import *
+from nose.tools import assert_true, assert_false, assert_equals, assert_raises
 
 def my_dynamic_default():
   """
@@ -29,8 +29,8 @@ def my_dynamic_default():
   """
   return 3 + 4
 
-class ConfigTest(unittest.TestCase):
-  """Unit tests for this module."""
+class TestConfig(object):
+  """Unit tests for the configuration module."""
 
   # Some test configurations to load
   CONF_ONE="""
@@ -49,9 +49,10 @@ class ConfigTest(unittest.TestCase):
   host="philipscomputer"
   """
 
-  def setUp(self):
+  @classmethod
+  def setup_class(cls):
     logging.basicConfig(level=logging.DEBUG)
-    self.conf = ConfigSection(
+    cls.conf = ConfigSection(
       members=dict(
         FOO           = Config("foo",
                                help="A vanilla configuration param",
@@ -81,102 +82,109 @@ class ConfigTest(unittest.TestCase):
                                        required=True),
                          PORT = Config("port", help="Thrift port for the NN",
                                        type=int, default=10090))))))
-    self.conf = self.conf.bind(
-      load_confs([configobj.ConfigObj(infile=StringIO(self.CONF_ONE)),
-                  configobj.ConfigObj(infile=StringIO(self.CONF_TWO))]),
+    cls.conf = cls.conf.bind(
+      load_confs([configobj.ConfigObj(infile=StringIO(cls.CONF_ONE)),
+                  configobj.ConfigObj(infile=StringIO(cls.CONF_TWO))]),
       prefix='')
 
-  def testDynamicDefault(self):
-    self.assertEquals(7, self.conf.DYNAMIC_DEF.get())
+  def test_type_safety(self):
+    assert_raises(ValueError, Config, key="test_type", type=42)
+    assert_raises(ValueError, Config, key="test_type", type=str, default=42)
+    assert_raises(ValueError, Config, key="test_type", default=False)
+    bool_conf = Config("bool_conf", type=bool)
+    assert_true(bool_conf.type == coerce_bool)
 
-  def testLoad(self):
-    self.assertEquals(123, self.conf.FOO.get())
-    self.assertEquals(456, self.conf.BAR.get())
-    self.assertEquals(345, self.conf.REQ.get())
+  def test_dynamic_default(self):
+    assert_equals(7, self.conf.DYNAMIC_DEF.get())
 
-    self.assertEquals(None, self.conf.OPT_NOT_THERE.get())
-    self.assertRaises(KeyError, self.conf.REQ_NOT_THERE.get)
+  def test_load(self):
+    assert_equals(123, self.conf.FOO.get())
+    assert_equals(456, self.conf.BAR.get())
+    assert_equals(345, self.conf.REQ.get())
 
-  def testListValues(self):
-    self.assertEquals(["a","b","c"], self.conf.LIST.get())
+    assert_equals(None, self.conf.OPT_NOT_THERE.get())
+    assert_raises(KeyError, self.conf.REQ_NOT_THERE.get)
 
-  def testSections(self):
-    self.assertEquals(2, len(self.conf.CLUSTERS))
-    self.assertEquals(['clustera', 'clusterb'], sorted(self.conf.CLUSTERS.keys()))
-    self.assertTrue("clustera" in self.conf.CLUSTERS)
-    self.assertEquals("localhost", self.conf.CLUSTERS['clustera'].HOST.get())
-    self.assertEquals(10090, self.conf.CLUSTERS['clustera'].PORT.get())
+  def test_list_values(self):
+    assert_equals(["a","b","c"], self.conf.LIST.get())
 
-  def testFullKeyName(self):
-    self.assertEquals(self.conf.REQ.get_fully_qualifying_key(), 'req')
-    self.assertEquals(self.conf.CLUSTERS.get_fully_qualifying_key(), 'clusters')
-    self.assertEquals(self.conf.CLUSTERS['clustera'].get_fully_qualifying_key(),
+  def test_sections(self):
+    assert_equals(2, len(self.conf.CLUSTERS))
+    assert_equals(['clustera', 'clusterb'], sorted(self.conf.CLUSTERS.keys()))
+    assert_true("clustera" in self.conf.CLUSTERS)
+    assert_equals("localhost", self.conf.CLUSTERS['clustera'].HOST.get())
+    assert_equals(10090, self.conf.CLUSTERS['clustera'].PORT.get())
+
+  def test_full_key_name(self):
+    assert_equals(self.conf.REQ.get_fully_qualifying_key(), 'req')
+    assert_equals(self.conf.CLUSTERS.get_fully_qualifying_key(), 'clusters')
+    assert_equals(self.conf.CLUSTERS['clustera'].get_fully_qualifying_key(),
                       'clusters.clustera')
-    self.assertEquals(self.conf.CLUSTERS['clustera'].HOST.get_fully_qualifying_key(),
+    assert_equals(self.conf.CLUSTERS['clustera'].HOST.get_fully_qualifying_key(),
                       'clusters.clustera.host')
 
-  def testSetForTesting(self):
+  def test_set_for_testing(self):
     # Test base case
-    self.assertEquals(123, self.conf.FOO.get())
+    assert_equals(123, self.conf.FOO.get())
     # Override with 456
     close_foo = self.conf.FOO.set_for_testing(456)
     try:
-      self.assertEquals(456, self.conf.FOO.get())
+      assert_equals(456, self.conf.FOO.get())
       # Check nested overriding
       close_foo2 = self.conf.FOO.set_for_testing(789)
       try:
-        self.assertEquals(789, self.conf.FOO.get())
+        assert_equals(789, self.conf.FOO.get())
       finally:
         close_foo2()
 
       # Check that we pop the stack appropriately.
-      self.assertEquals(456, self.conf.FOO.get())
+      assert_equals(456, self.conf.FOO.get())
       # Check default values
       close_foo3 = self.conf.FOO.set_for_testing(present=False)
       try:
-        self.assertEquals(None, self.conf.FOO.get())
+        assert_equals(None, self.conf.FOO.get())
       finally:
         close_foo3()
     finally:
       close_foo()
     # Check that it got set back correctly
-    self.assertEquals(123, self.conf.FOO.get())
+    assert_equals(123, self.conf.FOO.get())
 
     # Test something inside an unspecified config setting with a default
     close = self.conf.CLUSTERS['clustera'].PORT.set_for_testing(123)
     try:
-      self.assertEquals(123, self.conf.CLUSTERS['clustera'].PORT.get())
+      assert_equals(123, self.conf.CLUSTERS['clustera'].PORT.get())
     finally:
       close()
-    self.assertEquals(10090, self.conf.CLUSTERS['clustera'].PORT.get())
+    assert_equals(10090, self.conf.CLUSTERS['clustera'].PORT.get())
 
     # Test something inside a config section that wasn't provided in conf file
-    self.assertEquals("baz_default", self.conf.SOME_SECTION.BAZ.get())
+    assert_equals("baz_default", self.conf.SOME_SECTION.BAZ.get())
     close = self.conf.SOME_SECTION.BAZ.set_for_testing("hello")
     try:
-      self.assertEquals("hello", self.conf.SOME_SECTION.BAZ.get())
+      assert_equals("hello", self.conf.SOME_SECTION.BAZ.get())
     finally:
       close()
-    self.assertEquals("baz_default", self.conf.SOME_SECTION.BAZ.get())
+    assert_equals("baz_default", self.conf.SOME_SECTION.BAZ.get())
 
 
   def test_coerce_bool(self):
-    self.assertEquals(False, coerce_bool(False))
-    self.assertEquals(False, coerce_bool("False"))
-    self.assertEquals(False, coerce_bool("false"))
-    self.assertEquals(False, coerce_bool("0"))
-    self.assertEquals(True, coerce_bool("True"))
-    self.assertEquals(True, coerce_bool("true"))
-    self.assertEquals(True, coerce_bool("1"))
-    self.assertEquals(True, coerce_bool(True))
-    self.assertRaises(Exception, coerce_bool, tuple("foo"))
+    assert_equals(False, coerce_bool(False))
+    assert_equals(False, coerce_bool("FaLsE"))
+    assert_equals(False, coerce_bool("no"))
+    assert_equals(False, coerce_bool("0"))
+    assert_equals(True, coerce_bool("TrUe"))
+    assert_equals(True, coerce_bool("YES"))
+    assert_equals(True, coerce_bool("1"))
+    assert_equals(True, coerce_bool(True))
+    assert_raises(Exception, coerce_bool, tuple("foo"))
 
-  def testPrintHelp(self):    
+  def test_print_help(self):
     out = StringIO()
     self.conf.print_help(out=out, skip_header=True)
     out = out.getvalue().strip()
-    self.assertFalse("dontseeme" in out)
-    self.assertEquals(re.sub("^    (?m)", "", """
+    assert_false("dontseeme" in out)
+    assert_equals(re.sub("^    (?m)", "", """
     Key: bar (optional)
       Default: 456
       Config with default
@@ -214,4 +222,3 @@ class ConfigTest(unittest.TestCase):
     Key: req (required)
       A required config
     """).strip(), out)
-

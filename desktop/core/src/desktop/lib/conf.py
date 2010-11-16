@@ -15,14 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.paths import get_desktop_root, get_build_dir
-
-import configobj
-import logging
-import os
-import textwrap
-import sys
-
 """
 The application configuration framework. The user of the framework uses
 * Config
@@ -69,11 +61,25 @@ application's conf.py. During startup, Desktop binds configuration files to your
 variables.
 """
 
+# The Config object unfortunately has a kwarg called "type", and everybody is
+# using it. So instead of breaking compatibility, we make a "pytype" alias.
+pytype = type
+
+from desktop.lib.paths import get_desktop_root, get_build_dir
+
+import configobj
+import logging
+import os
+import textwrap
+import sys
+
 # Magical object for use as a "symbol"
 _ANONYMOUS = ("_ANONYMOUS")
 
 # a BoundContainer(BoundConfig) object which has all of the application's configs as members
 GLOBAL_CONFIG = None
+
+LOG = logging.getLogger(__name__)
 
 __all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool"]
 
@@ -170,16 +176,29 @@ class Config(object):
     @param dynamic_default a lambda to use to calculate the default
     @param required whether this must be set
     @param help     some text to print out for help
-    @param type     a callable that coerces a string into the expected type.
+    @param type    a callable that coerces a string into the expected type.
                     str is the default. Should raise an exception in the case
                     that it cannot be coerced.
     @param private  if True, does not emit help text
     """
+    if not callable(type):
+      raise ValueError("%s: The type argument '%s()' is not callable" % (key, type))
+
     if default is not None and dynamic_default is not None:
-      raise Exception("Cannot specify both dynamic_default and default for key %s" % key)
+      raise ValueError("Cannot specify both dynamic_default and default for key %s" % key)
 
     if dynamic_default is not None and not dynamic_default.__doc__ and not private:
-      raise Exception("Dynamic defaults must have __doc__ defined!")
+      raise ValueError("Dynamic default '%s' must have __doc__ defined!" % (key,))
+
+    if pytype(default) in (int, long, float, complex, bool) and \
+          not isinstance(type(default), pytype(default)):
+      raise ValueError("%s: '%s' does not match that of the default value %r (%s)"
+                      % (key, type, default, pytype(default)))
+
+    if type == bool:
+      LOG.warn("%s is of type bool. Resetting it as type 'coerce_bool'."
+               " Please fix it permanently" % (key,))
+      type = coerce_bool
 
     self.key = key
     self.default_value = default
@@ -460,11 +479,11 @@ def _configs_from_dir(conf_dir):
   for filename in sorted(os.listdir(conf_dir)):
     if filename.startswith(".") or not filename.endswith('.ini'):
       continue
-    logging.debug("Loading configuration from: %s" % filename)
+    LOG.debug("Loading configuration from: %s" % filename)
     try:
       conf = configobj.ConfigObj(os.path.join(conf_dir, filename))
     except configobj.ConfigObjError, ex:
-      logging.error("Error in configuration file '%s': %s" %
+      LOG.error("Error in configuration file '%s': %s" %
                     (os.path.join(conf_dir, filename), ex))
       raise
     conf['DEFAULT'] = dict(desktop_root=get_desktop_root(), build_dir=get_build_dir())
@@ -564,13 +583,18 @@ def is_anonymous(key):
   return key == _ANONYMOUS
 
 def coerce_bool(value):
-  if type(value) == bool:
+  if isinstance(value, bool):
     return value
-  if value in ("false", "False", "0", "no", "off", "", None):
+
+  try:
+    upper = value.upper()
+  except:
+    upper = value
+  if upper in ("FALSE", "0", "NO", "OFF", "NAY", "", None):
     return False
-  if value in ("true", "True", "1", "yes", "on"):
+  if upper in ("TRUE", "1", "YES", "ON", "YEA"):
     return True
-  raise Exception("Could not coerce boolean value: " + str(value))
+  raise Exception("Could not coerce %r to boolean value" % (value,))
 
 
 def validate_path(confvar, is_dir=None):
