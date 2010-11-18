@@ -169,12 +169,12 @@ CCS.JFrame = new Class({
 		configureRequest - configures a passed in request to be have its response rendered within JFrame..
 		request - (* request object *) request object to be configured
 	*/
-	configureRequest: function(request){
-		this._setRequestOptions(request, {
+	configureRequest: function(request, options){
+		this._setRequestOptions(request, $merge({
 			onSuccess: function(nodes, elements, text){
-				this._requestSuccessHandler(request, text);
+				this._requestSuccessHandler(request, text, options);
 			}.bind(this)
-		});
+		}, options));
 	},
 
 

@@ -57,6 +57,17 @@ limitations under the License.
 			</div>
 			<hr/>
 			<a href="/jframegallery/gallery/partial_refresh.mako" data-ajax-target=".nothing_here">This is also an ajax link, but it's target is not found, so it falls back to being a regular link.</a>
+
+			<p>This form submits to the box below it:</p>
+			<form action="/jframegallery/gallery/post-load.prompt.popup.html" method="post" style="margin: 6px 0px 0px;" data-ajax-target=".ajax_form_target">
+				enter a value: <input type="text" name="prompt_value"/>
+				<input type="submit" class="jframe-hidden" name="submit"/>
+			</form>
+			<div style="border: 1px solid #000; padding: 10px; margin: 10px 0px; max-height: 100px; overflow:auto;">
+				<div class="ajax_form_target">
+				</div>
+			</div>
+
 		</div>
 	</body>
 </html>
