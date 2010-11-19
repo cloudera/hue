@@ -98,7 +98,6 @@ HueChart = new Class({
 
                 //Setup color manager
                 this.colorManager = colorManager;
-                console.log(this.options.url);
                 this.colorManager.define(this.options.url, this.options.colorArray);
         },
 
@@ -138,7 +137,8 @@ HueChart = new Class({
         setSelectedIndex: function(index) {
                 this.selected_index = index;
         },
-
+        
+        
         //Set the currentData, which is the data currently being displayed, assuming it is different from the base data.  Should be a subset of the main data object. 
         setCurrentData: function(data) {
                 this.currentData = new HueChart.Data(data);

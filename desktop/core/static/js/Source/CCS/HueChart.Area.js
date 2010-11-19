@@ -36,6 +36,37 @@ HueChart.Area = new Class({
                 this.yScale = pv.Scale.linear(0, peakSum * 1.2).range(0, (this.height - (this.options.topPadding + this.options.bottomPadding)));
                 //Create yScaleTicks which has a domain which goes up to a function of peakSum and a range from the bottomPadding, to the bottom of the topPadding. 
                 this.yScaleTicks = pv.Scale.linear(0, peakSum * 1.2).range(this.options.bottomPadding, this.height-this.options.topPadding);
+                //Defining a yValueReverse function there, since it is so closely related to the scale.
+                //This function reverses a value returned by yScale.invert to a value that corresponds to the scale from 0 to peakSum, rather than from peakSum to 0.
+                this.yValueReverse = function(reversedValue) {
+                        //Account for difference between top and bottom padding.
+                        var paddingBasedDifference = this.yScaleTicks.invert(this.options.bottomPadding-this.options.topPadding) - this.yScaleTicks.invert(0);
+                        return ((reversedValue - peakSum * 1.2) * -1) - paddingBasedDifference;
+                };
+        },
+
+        getYRange: function(y) {
+                return this.parent(y, this.yScaleTicks);
+        },
+        getDataSeriesFromPointAndY: function(dataPoint, y) {
+                var yRange = this.getYRange(y);
+                var yCenter = (yRange[0] + yRange[1])/2;
+                //Create array of series peaks
+                var seriesPeaks = [];
+                for (var i = 0; i < this.options.series.length; i++) {
+                        //Calculate peak -- previousPeak (seriesPeaks[i-1] plus the latest value.
+                        newPeak = (seriesPeaks[i - 1] || 0).toFloat() + (dataPoint[this.options.series[i]].toFloat());
+                        seriesPeaks.push(newPeak);
+                }
+                //Return series and value if the center of the range is greater than the sum of previous values, but less than that sum plus the next value.
+                var toReturn = null;
+                for (i = 0; i < this.options.series.length; i++) {
+                        lastPeak = seriesPeaks[i - 1] || 0;
+                        if (seriesPeaks[i] > yCenter && yCenter > lastPeak) {
+                                toReturn = {'name' : this.options.series[i], 'value': dataPoint[this.options.series[i]] };
+                        }
+                }
+                return toReturn;
         },
 
         //Build stacked area graph.

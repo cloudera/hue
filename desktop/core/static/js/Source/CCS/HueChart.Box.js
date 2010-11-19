@@ -48,12 +48,15 @@ HueChart.Box = new Class({
                 xTickHeight: 10, //the height of the xTick marks.
                 labels:{x:"X", y: "Y"}, //the labels that should be used for each axis
                 selectColor: "rgba(255, 128, 128, .4)", //the color that should be used to fill selections in this chart
-                positionIndicatorColor: "black", //color that should be used to show the position of the selected index, when using the position indicator
+                selectedIndicatorColor: "black", //color that should be used to show the position of the selected index, when using the position indicator
+                highlightedIndicatorColor: "rgba(255, 255, 255, .5)",
                 yType: 'string' //the type of value that is being graphed on the y-axis
                 /*
                 onPointMouseOut: function that should be run when the mouse is moved out of the chart
                 onPointMouseOver: function that should be run when the mouse is moved over a datapoint, takes the dataPoint and index as arguments
                 onPointClick: function that should be run when the mouse is clicked on a datapoint, takes the dataPoint and index as arguments
+                onSeriesMouseOver: function that should be run when the mouse is moved over a dataSeries, takes an object containing the seriesName and value at that point as argument.
+                onSeriesClick: function that should be run when the mouse is clicked on a data series, takes an object containing the seriesName and value at that as an argument.
                 onSpanSelect: function that should be run when a segment of the chart is selected.  Takes a left object and a right object as arguments, each of which contains the corresponding index and data object. 
                 */
         },
@@ -61,6 +64,7 @@ HueChart.Box = new Class({
         initialize: function(element, options) {
                 this.parent(element, options);
                 this.selected_index = -1;
+                this.highlighted_index = -1;
                 if(this.options.dates.x) {
                         //If the xProperty is a date property, prepare the dates for sorting
                         //Change the xProperty to the new property designed for sorting dates
@@ -84,7 +88,7 @@ HueChart.Box = new Class({
                         //Add axis labels if enabled
                         if (this.options.showLabels) this.setLabels(vis);
                         //Add position indicator if enabled
-                        if (this.options.positionIndicator) this.setPositionIndicator(vis);
+                        if (this.options.positionIndicator) this.setPositionIndicators(vis);
                         //Create panel for capture of events
                         this.eventPanel = vis.add(pv.Panel).fillStyle("rgba(0,0,0,.001)");
                         //If there's a mouse event, add the functionality to capture these events.
@@ -103,6 +107,12 @@ HueChart.Box = new Class({
                 var maxValue = this.getData(true).getMaxValue(this.options.series);
                 this.xScale = pv.Scale.linear(xMin, xMax).range(this.options.leftPadding, this.width - this.options.rightPadding);
                 this.yScale = pv.Scale.linear(0, maxValue * 1.2).range(this.options.bottomPadding, (this.height - (this.options.topPadding)));
+                //Defining a yValueReverse function here, since it is so closely related to the scale.
+                //This function reverses a value returned by yScale.invert to a value that corresponds to the scale from 0 to maxValue, rathen than from maxValue to 0.
+                this.yValueReverse = function(reversedValue) {
+                        var paddingBasedDifference = this.yScale.invert(this.options.bottomPadding - this.options.topPadding) - this.yScale.invert(0);
+                        return ((reversedValue - maxValue * 1.2) * -1) - paddingBasedDifference;
+                };
         },
         
         //Draw the X and Y tick marks.
@@ -151,7 +161,7 @@ HueChart.Box = new Class({
                         .left(this.options.leftPadding)
                         //The bottom of the rule should be at the tickScale.ticks value scaled to pixels.
                         .bottom(function(d) {return tickScale(d);}.bind(this))
-                        //The width of the rule should be the width minuis the hoizontal padding.
+                        //The width of the rule should be the width minus the hoizontal padding.
                         .width(this.width - this.options.leftPadding - this.options.rightPadding + 1)
                         .strokeStyle(this.options.tickColor)
                         //Add label to the left which shows the number of bytes.
@@ -178,12 +188,14 @@ HueChart.Box = new Class({
                         .bottom(0);
         },
 
-        //Add a bar which indicates the position which is currently selected on the bar graph.
-        setPositionIndicator: function(vis) {
+        //Add bars which indicate the positions which are currently selected and/or highlighted on the box graph.
+        setPositionIndicators: function(vis) {
                 //Put selected_index in scope.
                 get_selected_index = this.getSelectedIndex.bind(this);
-                var indicatorColor = this.options.positionIndicatorColor;
-                //Add a thin black bar which is approximately the height of the graphing area for each item on the graph.
+                get_highlighted_index = this.getHighlightedIndex.bind(this);
+                var selectedColor = this.options.selectedIndicatorColor;
+                var highlightedColor = this.options.highlightedIndicatorColor;
+                //Add a thin bar which is approximately the height of the graphing area for each item on the graph.
                 vis.add(pv.Bar)
                         .data(this.getData(true).getObjects())
                         .left(function(d) { 
@@ -192,10 +204,10 @@ HueChart.Box = new Class({
                         .height(this.height - (this.options.bottomPadding + this.options.topPadding))
                         .bottom(this.options.bottomPadding)
                         .width(2)
-                        //Show bar if its index is selected, otherwise hide it.
-                        
+                        //Show bar if its index is selected or highlighted, otherwise hide it.
                         .fillStyle(function() {
-                                if(this.index == get_selected_index()) return indicatorColor;
+                                if (this.index == get_selected_index()) return selectedColor;
+                                if (this.index == get_highlighted_index()) return highlightedColor;
                                 else return null;
                         });
         },
@@ -209,34 +221,61 @@ HueChart.Box = new Class({
                 i = i < 0 ? (-i - 2) : i;
                 return (i >= 0 && i < this.getData(true).getLength() ? i : null);
         },
+
+        getYRange: function(y, inversionScale) {
+                var scale = inversionScale || this.yScale;
+                var yBuffer = 5; //Pixel buffer for usability.
+                //Must use yValueReverse to reverse the mouse value because drawing happens from the bottom up.  Mouse position is from the top down.
+                var invertedYValue = scale.invert(y);
+                //Since range will be inverted, the array goes from greatest to least initially.
+                var invertedYRange = [scale.invert(y + yBuffer), scale.invert(y - yBuffer)];
+                var yValue = this.yValueReverse(invertedYValue); 
+                //Convert the inverted yRange to a non-inverted yRange.
+                var yRange = invertedYRange.map(function(value) { return this.yValueReverse(value); }.bind(this));
+                return yRange;
+        },
+
+        getDataSeriesFromPointAndY: function(dataPoint, y) {
+                var yRange = this.getYRange(y);
+                //Find closest y-values
+                this.options.series.each(function(item) {
+                        if(yRange[0] < dataPoint[item] && dataPoint[item] < yRange[1]) {
+                                return {'name': item, 'value': dataPoint[item]};
+                        }  
+                });
+                return null;
+        },
          
         //Add handlers to detect mouse events.
         addMouseEvents: function(vis) {
+                //Function that controls the search for data points and fires mouse positioning events. 
+                var mousePositionEvent = function(eventName, position) {
+                        var dataIndex = this.getDataIndexFromX(position.x);
+                        if(dataIndex != null) {
+                                var dataPoint = this.getData(true).getObjects()[dataIndex];
+                                this.fireEvent('point' + eventName.capitalize(), [ dataPoint, dataIndex ]);
+                                var dataSeries = this.getDataSeriesFromPointAndY(dataPoint, position.y);
+                                this.fireEvent('series' + eventName.capitalize(), dataSeries);
+                        }
+                }.bind(this);
                 //Create functions which handle the graph specific aspects of the event and call the event arguments.
                 var outVisFn = function() {
                         this.fireEvent('pointMouseOut');
                         return vis;
                 }.bind(this);
                 var moveVisFn = function() {
-                        var dataIndex = this.getDataIndexFromX(vis.mouse().x);
-                        //Fire pointMouseOver if the item exists
-                        if(dataIndex) {
-                                this.fireEvent('pointMouseOver', [this.getData(true).getObjects()[dataIndex], dataIndex]);
-                        }
+                        mousePositionEvent('mouseOver', vis.mouse());
                         return vis;
                 }.bind(this);
                 var clickFn = function() {
                         //Only click if the movement is clearly not a drag.
                         if (!this.selectState || this.selectState.dx < 2) {
-                                var dataIndex = this.getDataIndexFromX(vis.mouse().x);
-                                //Fire pointClick if the item exists
-                                if(dataIndex != null) {
-                                        this.fireEvent('pointClick', [ this.getData(true).getObjects()[dataIndex], dataIndex ]);
-                                }
+                                mousePositionEvent('click', vis.mouse());
                                 return vis;
                         }
                 }.bind(this);
 
+                
                 this.eventPanel
                         .events("all")
                         .event("mouseout", outVisFn)
@@ -296,7 +335,18 @@ HueChart.Box = new Class({
                 if (point < low) return low;
                 if (point > high) return high;
                 return point;
+        },
+        
+        //Returns highlighted data index
+        getHighlightedIndex: function() {
+                return this.highlighted_index;
+        },
+
+        //Sets higlighted data index
+        setHighlightedIndex: function(index) {
+                this.highlighted_index = index;
         }
+
 });
 })();
 
