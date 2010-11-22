@@ -633,7 +633,45 @@ Takes a multi-select box and makes it so you can click to move elements from a s
 	-webkit-box-shadow: 0px -1px 3px #aaa;
 	-moz-box-shadow: 0px -1px 3px #aaa;
 }
-/* -----------------------------------------------------------------------
+
+.huechart .tip-wrap {
+        width: 139px;
+        z-index: 13000;
+}
+
+.huechart .tip-title {
+        -moz-border-radius-topleft: 5px;
+        -moz-border-radius-topright: 5px;
+        font-weight: bold;
+        font-size: 11px;
+        margin: 0;
+        color: #9FD4FF;
+        padding: 4px 8px 0px;
+        background: black;
+        opacity: .8;
+        filter: alpha(opacity=80);
+}
+
+.huechart .tip-text {
+        -moz-border-radius-bottomleft: 5px;
+        -moz-border-radius-bottomright: 5px;
+        font-size: 11px;
+        padding: 0px 8px 8px;
+        background: black;
+        color: white;
+        opacity: .8;
+        filter: alpha(opacity=80);
+        text-align: center;
+}
+
+.huechart .tip-series-color {
+        width: 3px;
+        height: 3px;
+        border: 1px solid white;
+        padding: 2px;
+        display: inline-block;
+        margin-right: 5px;
+}/* -----------------------------------------------------------------------
 
 
  Blueprint CSS Framework 0.9

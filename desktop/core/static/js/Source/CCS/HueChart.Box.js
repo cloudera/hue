@@ -17,6 +17,7 @@ requires:
 - Core/Options
 - ccs-shared/Number.Files
 - ccs-shared/HueChart
+- More/DynamicTips
 
 provides: [ HueChart.Box ]
 
@@ -50,7 +51,8 @@ HueChart.Box = new Class({
                 selectColor: "rgba(255, 128, 128, .4)", //the color that should be used to fill selections in this chart
                 selectedIndicatorColor: "black", //color that should be used to show the position of the selected index, when using the position indicator
                 highlightedIndicatorColor: "rgba(255, 255, 255, .5)",
-                yType: 'string' //the type of value that is being graphed on the y-axis
+                yType: 'string', //the type of value that is being graphed on the y-axis,
+                showPointValue: false //show the value at the point when moused over
                 /*
                 onPointMouseOut: function that should be run when the mouse is moved out of the chart
                 onPointMouseOver: function that should be run when the mouse is moved over a datapoint, takes the dataPoint and index as arguments
@@ -75,6 +77,15 @@ HueChart.Box = new Class({
                 } else {
                         //Otherwise sort by the x property.
                         this.getData(true).sortByProperty(this.options.xProperty);
+                }
+                //Create tip to show if showPointValue is true.
+                if (this.options.showPointValue) {
+                        this.tip = new DynamicTips(this.element, {
+                                className: 'huechart tip-wrap',
+                                title: $lambda("Title"),
+                                text: $lambda("Text")
+                        });
+                        this.addEvent('seriesMouseOver', this.updatePointValue);
                 }
                 //When the setupChart event is fired, the full ProtoVis visualization is being set up, in preparation for render.
                 //The addGraph function is responsible for adding the actual representation of the data, be that a group of lines, or a group of area graphs.
@@ -238,11 +249,12 @@ HueChart.Box = new Class({
         getDataSeriesFromPointAndY: function(dataPoint, y) {
                 var yRange = this.getYRange(y);
                 //Find closest y-values
-                this.options.series.each(function(item) {
+                for (var i = 0; i < this.options.series.length; i++) {
+                        var item = this.options.series[i];
                         if(yRange[0] < dataPoint[item] && dataPoint[item] < yRange[1]) {
                                 return {'name': item, 'value': dataPoint[item]};
                         }  
-                });
+                }
                 return null;
         },
          
@@ -255,6 +267,7 @@ HueChart.Box = new Class({
                                 var dataPoint = this.getData(true).getObjects()[dataIndex];
                                 this.fireEvent('point' + eventName.capitalize(), [ dataPoint, dataIndex ]);
                                 var dataSeries = this.getDataSeriesFromPointAndY(dataPoint, position.y);
+
                                 this.fireEvent('series' + eventName.capitalize(), dataSeries);
                         }
                 }.bind(this);
@@ -336,7 +349,24 @@ HueChart.Box = new Class({
                 if (point > high) return high;
                 return point;
         },
-        
+
+        updatePointValue: function(series) {
+                if (series != null) {
+                        var tipColor = new Element('div', {'class': 'tip-series-color'});
+                        var tipBlock = new Element('div', {'class': 'tip-block'});
+                        tipBlock.set('text', series.name);
+                        tipColor.inject(tipBlock, 'top');
+                        tipColor.setStyle('background-color', this.getColor(series.name));
+                        this.tip.setTitle(tipBlock);
+                        this.tip.setText(this.options.yType == 'bytes' ? series.value.toInt().convertFileSize() : series.value);
+                        var tipElem = this.tip.toElement();
+                        if(!tipElem.getParent() || !document.body.hasChild(tipElem))tipElem.dispose();
+                        this.tip.show();
+                } else {
+                        this.tip.hide();
+                }
+        }, 
+
         //Returns highlighted data index
         getHighlightedIndex: function() {
                 return this.highlighted_index;
@@ -345,8 +375,15 @@ HueChart.Box = new Class({
         //Sets higlighted data index
         setHighlightedIndex: function(index) {
                 this.highlighted_index = index;
-        }
+        },
 
+        //Do any cleanup necessary of chart
+        destroy: function() {
+                if(this.tip) {
+                         this.tip.toElement().destroy();
+                         delete this.tip;
+                }
+        } 
 });
 })();
 
