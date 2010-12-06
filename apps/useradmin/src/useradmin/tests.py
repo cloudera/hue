@@ -42,7 +42,12 @@ def test_user_admin():
   # Just check that this comes back
   response = c.get('/useradmin/edit/test')
   # Edit it, to add a first and last name
-  response = c.post('/useradmin/edit/test', dict(username="test", first_name="Tom", last_name="Tester", is_superuser="True", is_active="True"))
+  response = c.post('/useradmin/edit/test',
+                    dict(username="test",
+                         first_name="Tom",
+                         last_name="Tester",
+                         is_superuser="True",
+                         is_active="True"))
   # Now make sure that those were materialized
   response = c.get('/useradmin/edit/test')
   assert_equal("Tom", response.context["form"].instance.first_name)
@@ -53,6 +58,11 @@ def test_user_admin():
                         is_superuser=False, is_active=True))
   assert_true("You cannot remove" in response.content,
               "Shouldn't be able to remove the last superuser")
+  # Shouldn't be able to delete the last superuser
+  response = c.post('/useradmin/delete/test', {})
+  assert_true("You cannot remove" in response.content,
+              "Shouldn't be able to delete the last superuser")
+
   # Let's try changing the password
   response = c.post('/useradmin/edit/test', dict(username="test", first_name="Tom", last_name="Tester", is_superuser=True, password1="foo", password2="foobar"))
   assert_equal(["Passwords do not match."], response.context["form"]["password2"].errors, "Should have complained about mismatched password")
