@@ -218,7 +218,7 @@
     (function(){
       var state = CCS.Desktop.getState();
       var options = {};
-      if (state.background) options.current = state.background;
+      if (state && state.background) options.current = state.background;
       new BackgroundManager($('bg'), $('desktop-menu'), options);
       if (Browser.Engine.trident) $(document.body).addClass('IEroot');
       $(document.body).addClass(Browser.Engine.name);
