@@ -198,7 +198,7 @@ KERBEROS = ConfigSection(
       help="Path to keep kerberos credentials cached",
       private=True,
       type=str,
-      default="/tmp/hue_krb5_ccache_%d" % os.geteuid(),
+      default="/tmp/hue_krb5_ccache",
     ),
     KINIT_PATH=Config(
       key='kinit_path',
