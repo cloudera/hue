@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv=Content-type content="text/html; charset=utf-8">
+	<title>OOCSS Component: ButtonBar.Paginator </title>
+
+	<link rel=stylesheet href="/static/css/reset.css">
+	<link rel=stylesheet href="/static/css/shared.css">
+	<link rel=stylesheet href="/static/oocss/Icon.css">
+	<link rel=stylesheet href="/static/oocss/Button.css">
+	<link rel=stylesheet href="/static/oocss/ButtonBar.css">
+	<link rel=stylesheet href="/static/oocss/ButtonBar.Paginator.css">
+
+	<link rel=stylesheet href="../../../../../../desktop/core/static/css/reset.css">
+	<link rel=stylesheet href="../../../../../../desktop/core/static/css/shared.css">
+	<link rel=stylesheet href="../../../../../../desktop/core/static/oocss/Icon.css">
+	<link rel=stylesheet href="../../../../../../desktop/core/static/oocss/Button.css">
+	<link rel=stylesheet href="../../../../../../desktop/core/static/oocss/ButtonBar.css">
+	<link rel=stylesheet href="../../../../../../desktop/core/static/oocss/ButtonBar.Paginator.css">
+
+</head>
+<body>
+<div class="print oocss-gallery" style="padding:2ex">
+
+	<h1>Paginator ButtonBar</h1>
+	<p>ButtonBar subclass. Adds a few special rules for the paginator bar component.</p>
+
+	<div class="ButtonBar Paginator">
+		<a href="" class="Button roundLeft"><i class="Icon iFirst">First</i></a>
+		<a href="" class="Button"><i class="Icon iBack">Back</i></a>
+		<a href="" class="Button"><i class="Icon iRefresh">Refresh</i></a>
+		<form action=""><input class=round size=5 value=page1><input type=submit class=ccs-hidden value=Go /></form>
+		<a href="" class="Button"><i class="Icon iNext">Next</i></a>
+		<a href="" class="Button roundRight"><i class="Icon iLast">Last</i></a>
+	</div>
+
+	<div class="ButtonBar Paginator">
+		<a href="" class="disabled Button roundLeft"><i class="Icon iFirst">First</i></a>
+		<a href="" class="disabled Button"><i class="Icon iBack">Back</i></a>
+		<a href="" class="disabled Button"><i class="Icon iRefresh">Refresh</i></a>
+		<form action=""><input class=round size=5 value=page1><input type=submit class=ccs-hidden value=Go /></form>
+		<a href="" class="disabled Button"><i class="Icon iNext">Next</i></a>
+		<a href="" class="disabled Button roundRight"><i class="Icon iLast">Last</i></a>
+		
+		<em>".Button.disabled"</em>
+	</div>
+
+	<div class="notFocused">
+
+		<div class="ButtonBar Paginator">
+			<a href="" class="Button roundLeft"><i class="Icon iFirst">First</i></a>
+			<a href="" class=Button><i class="Icon iBack">Back</i></a>
+			<a href="" class=Button><i class="Icon iRefresh">Refresh</i></a>
+			<form action=""><input class=round size=5 value=page1><input type=submit class=ccs-hidden value=Go /></form>
+			<a href="" class=Button><i class="Icon iNext">Next</i></a>
+			<a href="" class="Button roundRight"><i class="Icon iLast">Last</i></a>
+			
+			<em>".notFocused .Button"</em>
+		</div>
+
+	</div>
+
+</div>
+</body>
+</html>

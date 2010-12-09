@@ -9,7 +9,8 @@
 	font-size: 12px;
 }
 /* all links default styles */
-.ccs-shared a {
+.ccs-shared a:visited,
+.ccs-shared a:link {
 	color: #3e528c;
 	text-decoration: none;
 	cursor: pointer;
@@ -18,7 +19,8 @@
 .ccs-shared .jframe_ignore a {
 	text-decoration: none;
 }
-.ccs-shared a.disabled {
+.ccs-shared a:visited.disabled,
+.ccs-shared a:link.disabled {
 	text-decoration: none;
 	color: #000;
 }
@@ -27,7 +29,8 @@
 	color: #999;
 	cursor: pointer;
 }
-.ccs-shared a:hover {
+.ccs-shared a:visited:hover,
+.ccs-shared a:link:hover {
 	text-decoration: underline;
 }
 /* all imgs default styles */
@@ -719,8 +722,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 .print p {margin:0 0 1.5em;}
 .print p img.left {float:left;margin:1.5em 1.5em 1.5em 0;padding:0;}
 .print p img.right {float:right;margin:1.5em 0 1.5em 1.5em;}
-.print a:focus, .print a:hover {color:#000;}
-.print a {color:#009;text-decoration:underline;}
+.print a:visited:focus,
+.print a:visited:hover,
+.print a:link:focus,
+.print a:link:hover {color:#000;}
+.print a:visited,
+.print a:link {color:#009;text-decoration:underline;}
 .print blockquote {margin:1.5em;color:#666;font-style:italic;}
 .print strong {font-weight:bold;}
 .print em, .print dfn {font-style:italic;}
