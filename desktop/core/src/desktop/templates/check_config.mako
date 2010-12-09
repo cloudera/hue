@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-from desktop.lib.conf import BoundContainer
+from desktop.lib.conf import BoundConfig
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -37,10 +37,18 @@ from desktop.lib.conf import BoundContainer
       <h3>Potential misconfiguration detected. Please fix and restart HUE.</h3>
       <dl>
       % for confvar, error in error_list:
-        <dt><code>${confvar.get_fully_qualifying_key()}</code></dt>
+        <dt>
+          <code>
+            % if isinstance(confvar, str):
+              ${confvar | n}
+            % else:
+              ${confvar.get_fully_qualifying_key()}
+            % endif
+          </code>
+        </dt>
         <dd>
           ## Doesn't make sense to print the value of a BoundContainer
-          % if not isinstance(confvar, BoundContainer):
+          % if type(confvar) is BoundConfig:
             Current value: <code>${confvar.get()}</code><br/>
           % endif
           ${error | n}

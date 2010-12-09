@@ -53,7 +53,7 @@ def entry():
 
     # See if this command belongs to a disabled app
     commands = { }
-    skipped_apps = sum([ app.django_apps for app in appmanager.SKIPPED_APPS ], [])
+    skipped_apps = sum([ app.django_apps for app in appmanager.BROKEN_APPS ], [])
     for app_name in skipped_apps:
       try:
         path = find_management_module(app_name)

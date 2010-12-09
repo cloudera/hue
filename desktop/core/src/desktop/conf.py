@@ -16,6 +16,7 @@
 # limitations under the License.
 """General configuration for core Desktop features (authentication, etc)"""
 
+from desktop import appmanager
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
 from desktop.lib.conf import coerce_bool, validate_path
 from desktop.lib.paths import get_desktop_root
@@ -337,5 +338,8 @@ def config_validator():
 
     res.extend(validate_path(KERBEROS.KINIT_PATH, is_dir=False))
     res.extend(validate_path(KERBEROS.CCACHE_PATH, is_dir=False))
+
+  for broken_app in appmanager.BROKEN_APPS:
+    res.append(('Working Hadoop', 'App %s requires Hadoop but Hadoop is not present.' % (broken_app,)))
 
   return res

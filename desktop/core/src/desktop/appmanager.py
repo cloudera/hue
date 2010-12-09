@@ -38,7 +38,7 @@ LOG = logging.getLogger(__name__)
 ######################################################################
 
 # List of DesktopModuleInfo that have been loaded and skipped
-SKIPPED_APPS = None
+BROKEN_APPS = None
 DESKTOP_LIBS = None
 DESKTOP_APPS = None
 DESKTOP_MODULES = [ ]           # Sum of APPS and LIBS
@@ -201,30 +201,34 @@ def load_apps():
   """
   global DESKTOP_MODULES
   global DESKTOP_APPS
-  global SKIPPED_APPS
 
   if DESKTOP_APPS is not None:
     raise Exception("load_apps already has been called!")
   DESKTOP_APPS = []
-  SKIPPED_APPS = []
-
-  hadoop_ok = desktop.lib.apputil.has_hadoop()
 
   for sdk_app in pkg_resources.iter_entry_points("desktop.sdk.application"):
     m = sdk_app.load()
     dmi = DesktopModuleInfo(m)
-    # If there is no hadoop installation, skips apps that requires hadoop
-    if not hadoop_ok:
-      app_settings = dmi.settings
-      # <app_module>.settings.REQUIRES_HADOOP is True by default
-      if app_settings is None or getattr(app_settings, 'REQUIRES_HADOOP', True):
-        LOG.warn('Skipping app %s because Hadoop is not found' % (sdk_app,))
-        SKIPPED_APPS.append(dmi)
-        continue
     DESKTOP_APPS.append(dmi)
 
   LOG.debug("Loaded Desktop Applications: " + ", ".join(a.name for a in DESKTOP_APPS))
   DESKTOP_MODULES += DESKTOP_APPS
+
+def determine_broken_apps():
+  global DESKTOP_APPS
+  global BROKEN_APPS
+  BROKEN_APPS = []
+
+  hadoop_ok = desktop.lib.apputil.has_hadoop()
+  # If there is no hadoop installation, note which apps were loaded which
+  # require Hadoop.
+  if not hadoop_ok:
+    for dmi in DESKTOP_APPS:
+      app_settings = dmi.settings
+      # <app_module>.settings.REQUIRES_HADOOP is True by default
+      if app_settings is None or getattr(app_settings, 'REQUIRES_HADOOP', True):
+        LOG.warn('App %s requires Hadoop but Hadoop not present.' % (dmi,))
+        BROKEN_APPS.append(dmi)
 
 def get_desktop_module(name):
   """

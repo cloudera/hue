@@ -151,11 +151,11 @@ PYLINTRC = get_desktop_root('.pylintrc')
 # Part 4: Installation of apps
 ############################################################
 
+_config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))
+
 # Libraries are loaded and configured before the apps
 appmanager.load_libs()
 _lib_conf_modules = filter(None, [app.conf for app in appmanager.DESKTOP_LIBS])
-_config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))
-conf.initialize(_lib_conf_modules, _config_dir)
 
 appmanager.load_apps()
 for app in appmanager.DESKTOP_APPS:
@@ -166,7 +166,11 @@ logging.debug("Installed Django modules: %s" % ",".join(map(str, appmanager.DESK
 # Load app configuration
 _app_conf_modules = filter(None, [app.conf for app in appmanager.DESKTOP_APPS])
 _app_conf_modules.append(desktop.conf)
+
+conf.initialize(_lib_conf_modules, _config_dir)
 conf.initialize(_app_conf_modules, _config_dir)
+
+appmanager.determine_broken_apps()
 
 # Now that we've loaded the desktop conf, set the django DEBUG mode based on the conf.
 DEBUG = desktop.conf.DJANGO_DEBUG_MODE.get()
