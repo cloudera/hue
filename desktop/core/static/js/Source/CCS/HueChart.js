@@ -26,7 +26,35 @@ provides: [ HueChart ]
 //
 
 (function() {
-var colorManager = GroupValueManager; 
+var colorManager = GroupValueManager;
+
+Date.extend({
+        spans: ['ms', 'second', 'minute', 'hour', 'day'],
+        subspan: function(span) {
+                return this.spans[this.spans.indexOf(span) - 1];
+        }
+});
+
+Date.implement({
+        truncateTo: function(target) {
+                //Set value of spans below truncation target to 0
+                var subspan = Date.subspan(target);
+                var subspanIndex = Date.spans.indexOf(subspan);
+                var toZero = Date.spans.slice(0, subspanIndex + 1);
+                var truncated = 0;
+                toZero.each(function(zeroee) {
+                        //Zeroees stores the plural version of zeroee, used in get and set
+                        var zeroees = zeroee;
+                        if (zeroee != 'ms') {
+                                zeroees += 's';
+                        }
+                        truncated += Date.units[zeroee]() * this.get(zeroees);
+                        this.set(zeroees, 0);
+                }.bind(this));       
+                return truncated;
+        }
+});
+
 HueChart = new Class({
 
         Implements: [Events, Options],
@@ -180,31 +208,39 @@ HueChart.Data = new Class({
         },
         
         //Function to sort by dates and convert date strings into date objects.
-        //Also creates seconds_from_first, a useful integer value for graphing.
+        //Also creates ms_from_first, a useful integer value for graphing.
         //Accepts date formats parsable in Native/Date.js, or integral ms values.
         prepareDates: function(dateProperty) {
-                //Convert date string to date object.
+                //Convert date string in each object to date object
                 this.dataObjects.each(function(d) {
-                        //Check if dateProperty value is parsable as string.  
-                        //Parse as string if it is, otherwise parse as ms value.
-                        var parseResult = Date.parse(d[dateProperty]);
-                        if (parseResult.isValid()) {
-                                d[dateProperty] = parseResult;
-                        } else {
-                                parseResult = Date.parse(d[dateProperty].toInt());
-                                if (parseResult.isValid()) d[dateProperty] = parseResult;
-                        } 
-                });
+                        d[dateProperty] = this.parseDate(d[dateProperty]);
+                }.bind(this));
                 //Sort data by date property.
                 this.sortByProperty(dateProperty);
                 //Store first date for comparison.
                 var firstDate = this.dataObjects[0][dateProperty];
-                //Create seconds from first, for comparison sake.
+                this.getMsFromFirst = function(dateObject) {
+                        return firstDate.diff(dateObject, 'ms'); 
+                };
+                //Create ms from first, for comparison sake.
                 this.dataObjects.each(function(d) {
-                        d.seconds_from_first = firstDate.diff(d[dateProperty], 'second');
-                });
+                        d.ms_from_first = this.getMsFromFirst(d[dateProperty]);
+                }.bind(this));
         },
         
+        //Parse date -- accepts date formats parsable in Native/Date.js, or integral ms values.
+        parseDate: function(d) {
+                //Check if dateProperty value is parsable as string.
+                //Parse as string if it is, otherwise parse as ms value.
+                var parseResult = Date.parse(d);
+                if (parseResult.isValid()) {
+                        return parseResult;
+                } else {
+                        parseResult = Date.parse(d.toInt());
+                        if (parseResult.isValid()) return parseResult;
+                }
+        },
+
         //Sort data by some property within it.
         sortByProperty: function(property) {
                 this.dataObjects.sort(function(a, b) {
@@ -317,46 +353,63 @@ HueChart.Data = new Class({
         //Currently requires the dates in the data object to be exact days.
 
         createTickArray: function(numTicks, timespan, dateProperty) {
-                //Get the largest number of seconds.
-                var mostSeconds = this.dataObjects.getLast().seconds_from_first;
-                //Get the smallest number of seconds.
-                var leastSeconds = this.dataObjects[0].seconds_from_first;
-                //Get the total number of seconds spanned by the array.
-                var totalSeconds = mostSeconds - leastSeconds;
-                //Get the number of seconds from Date.js
-                var secondsInSpan = Date.units[timespan]()/1000;
+                //Get the largest number of ms.
+                var mostMs = this.dataObjects.getLast().ms_from_first;
+                //Get the smallest number of ms.
+                var leastMs = this.dataObjects[0].ms_from_first;
+                //Get the total number of ms spanned by the array.
+                var totalMs = mostMs - leastMs;
+                //Get the number of ms from Date.js
+                var msInSpan = Date.units[timespan]();
                 var xTicks = [];
-                //If the number of ticks that would be generated for the timespan is less than the number of ticks requested, use the current data array.
-                if (totalSeconds/secondsInSpan <= numTicks) {
+                //The number of spans contained in the total span of ms 
+                var spansContained = totalMs/msInSpan;
+                //If the number of ticks that would be generated for the timespan is less than the number of ticks requested and the number of dataObjects is less than the number of ticks, use the current data array.
+                if (spansContained <= numTicks && this.dataObjects.length < numTicks) {
                         xTicks = this.dataObjects;
                 } else {
                 //Generate ticks.
                         //Calculate the size of the increment between ticks to produce the number of ticks. 
                         //Find number of timespans in an increment.
-                        var spansInIncrement = parseInt((totalSeconds/secondsInSpan)/numTicks, 10);
-                        //Find secondsToIncrement each value by
-                        var secondsInIncrement = spansInIncrement * secondsInSpan; 
+                        var spansInIncrement = Math.ceil(spansContained/numTicks);
+                        //Find msToIncrement each value by
+                        var msInIncrement = spansInIncrement * msInSpan; 
                         var firstDate = this.dataObjects[0][dateProperty];
-                        var firstSeconds = this.dataObjects[0].seconds_from_first;
+                        var firstMs = this.dataObjects[0].ms_from_first;
                         //Add ticks to the xTicks array.
                         //Sample date - firstDate cloned and incremented by the increment times the iteration number.
-                        //Seconds_from_first - dateIncrement multiplied by the iteration number.
-                        for (var i = 0; i <= numTicks; i++) {
+                        //Ms_from_first - dateIncrement multiplied by the iteration number.
+                        for (var i = 0; i <= Math.min(numTicks, spansContained); i++) {
                                 var tickObject = {};
-                                tickObject[dateProperty] = firstDate.clone().increment('second', secondsInIncrement * i);
-                                tickObject.seconds_from_first = firstSeconds + (secondsInIncrement * i);
+                                tickObject[dateProperty] = firstDate.clone().increment('ms', msInIncrement * i);
+                                tickObject.ms_from_first = firstMs + (msInIncrement * i);
                                 xTicks.push(tickObject);
                         }
+                        //Ensure tick is exactly on timespan
+                        xTicks.each(function(tick) {
+                                //Truncate the date to timespan and get the amount of the subspan which was truncated
+                                var msToTruncate = tick[dateProperty].truncateTo(timespan);
+                                //Adjust ms from first by subtracting the number of ms in the truncated subspans
+                                tick.ms_from_first -= msToTruncate; 
+                        });
+                        var lastDataPoint = this.dataObjects.getLast();
+                        //Filter xTicks to only contain numbers on chart
+                        xTicks = xTicks.filter(function(tick) {
+                                if(tick.ms_from_first >= 0 && lastDataPoint.ms_from_first >= tick.ms_from_first) return true; 
+                        });
                         //Center tick marks.
                         var lastTick = xTicks.getLast();
-                        var lastDataPoint = this.dataObjects.getLast();
+                        var firstDataPoint = this.dataObjects[0];
+                        var firstTick = xTicks[0];
                         //Get the number of spans between the lastDataPoint and the lastTick
-                        var spansAtEnd = (lastDataPoint.seconds_from_first - lastTick.seconds_from_first)/secondsInSpan;
+                        var spansAtEnd = (lastDataPoint.ms_from_first - lastTick.ms_from_first)/msInSpan;
+                        //Get the number of spans between the firstDataPoint and the firstTick
+                        var spansAtBeginning = (firstTick.ms_from_first - firstDataPoint.ms_from_first)/msInSpan; 
                         //Get number of spans to move ticks forward to result in evenly spaced, centered ticks.
-                        var centerAdjustment = parseInt(spansAtEnd/2, 10);
+                        var centerAdjustment = parseInt((spansAtEnd - spansAtBeginning)/2, 10);
                         xTicks.each(function(tick) {
-                                tick[dateProperty].increment('second', secondsInSpan * centerAdjustment);
-                                tick.seconds_from_first += secondsInSpan * centerAdjustment;
+                                tick[dateProperty].increment('ms', msInSpan * centerAdjustment);
+                                tick.ms_from_first += msInSpan * centerAdjustment;
                         });
                 }
                 return xTicks;
@@ -388,4 +441,5 @@ HueChart.buildData = function(table) {
         });
         return data;
 };
+
 })();

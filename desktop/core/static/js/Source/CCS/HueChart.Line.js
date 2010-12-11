@@ -22,6 +22,10 @@ HueChart.Line = new Class({
 
         Extends: HueChart.Box,
 
+        options: {
+                lineWidth: 3 //Width of the lines in the chart
+        },
+
         initialize: function(element, options) {
                 this.parent(element, options);
                 this.render();
@@ -53,7 +57,7 @@ HueChart.Line = new Class({
                                         }.bind(this);
                                 }.bind(this)(itemIndex))
                                 //Make the line's width 3 pixels.
-                                .lineWidth(3);
+                                .lineWidth(this.options.lineWidth);
                 }
         }
 });

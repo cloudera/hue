@@ -14862,8 +14862,8 @@ pv.Behavior.drag = function() {
     scene = null;
   }
 
-  pv.listen(window, "mousemove", mousemove);
-  pv.listen(window, "mouseup", mouseup);
+  pv.listen(window.document.documentElement, "mousemove", mousemove);
+  pv.listen(window.document.documentElement, "mouseup", mouseup);
   return mousedown;
 };
 /**
@@ -15223,8 +15223,8 @@ pv.Behavior.resize = function(side) {
     scene = null;
   }
 
-  pv.listen(window, "mousemove", mousemove);
-  pv.listen(window, "mouseup", mouseup);
+  pv.listen(window.document.documentElement, "mousemove", mousemove);
+  pv.listen(window.document.documentElement, "mouseup", mouseup);
   return mousedown;
 };
 /**
