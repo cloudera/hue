@@ -35,6 +35,7 @@ dist/
 # Crepo fetched them
 ext/thirdparty/js/art-widgets/
 ext/thirdparty/js/mootools-table/
+ext/thirdparty/js/jframe/
 
 # Make product
 desktop/core/ext-py/lxml/src/lxml/lxml-version.h

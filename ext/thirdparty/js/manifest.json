@@ -1,13 +1,8 @@
 {
+	"default-remote":"origin",
 	"remotes": {
 		"origin": { 
 			"fetch": "git://github.com/cloudera/%(name)s.git"
-		},
-		"anutron": {
-			"fetch": "git://github.com/anutron/%(name)s.git"
-		},
-		"mootools": {
-			"fetch": "git://github.com/mootools/%(name)s.git"
 		}
 	},
 	"projects": {
@@ -26,20 +21,14 @@
 			"track-indirect": "clientcide.hash"
 		},
 		"behavior": {
-			"track-indirect": "behavior.hash",
-			"from-remote": "origin",
-			"remotes": ["origin"]
+			"track-indirect": "behavior.hash"
 		},
 		"more-behaviors": {
-			"track-indirect": "more-behaviors.hash",
-			"from-remote": "anutron",
-			"remotes": ["anutron"]
+			"track-indirect": "more-behaviors.hash"
 		},
 		"mootools-color": {
 			"dir": "color",
-			"track-indirect": "color.hash",
-			"from-remote": "anutron",
-			"remotes": ["anutron"]
+			"track-indirect": "color.hash"
 		},
 		"mootools-touch": {
 			"dir": "touch",
@@ -47,14 +36,13 @@
 		},
 		"art-widgets": {
 			"dir": "widgets",
-			"track-indirect": "widgets.hash",
-			"from-remote": "origin",
-			"remotes": ["origin"]
+			"track-indirect": "widgets.hash"
+		},
+		"jframe": {
+			"track-indirect": "jframe.hash"
 		},
 		"slick": {
-			"track-indirect": "slick.hash",
-			"from-remote": "anutron",
-			"remotes": ["anutron"]
+			"track-indirect": "slick.hash"
 		}
 	}
 }

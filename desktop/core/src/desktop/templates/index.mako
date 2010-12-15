@@ -18,7 +18,7 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=8" />
   <title>Hue</title>
-  <link rel="shortcut icon" href="/static/art/favicon_solid.png" type="image/x-icon" /> 
+  <link rel="shortcut icon" href="/static/art/favicon_solid.png" type="image/x-icon" />
   <link rel="icon" href="/static/art/favicon_solid.png" type="image/x-icon" />
   <link rel="stylesheet" href="/static/css/shared.css" type="text/css" media="screen" title="no title" charset="utf-8">
   <link rel="stylesheet" href="/static/css/reset.css" type="text/css" media="screen" charset="utf-8">

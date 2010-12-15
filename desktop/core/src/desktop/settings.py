@@ -232,7 +232,8 @@ def prep_depender_config():
     "../ext/thirdparty/js/slick/package.yml",
     "core/static/js/package.yml",
     "../ext/thirdparty/js/depender/package.yml",
-    "../ext/thirdparty/js/fittext/package.yml"
+    "../ext/thirdparty/js/fittext/package.yml",
+    "../ext/thirdparty/js/jframe/package.yml",
   ]
   scripts_json = [
     ("clientcide",  "../ext/thirdparty/js/clientcide/Source/scripts.json"),
