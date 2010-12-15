@@ -8,6 +8,10 @@
 	font-family: "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS", Helvetica, Arial, sans-serif;
 	font-size: 12px;
 }
+.hue-shared .view {
+	height: inherit;
+	width: inherit;
+}
 /* all links default styles */
 .ccs-shared a:visited,
 .ccs-shared a:link {

@@ -15,10 +15,10 @@
 // limitations under the License.
 /*
 ---
-description: Opens a CCS.FileChooser for any element with the ccs-choose_file, ccs-choose_dir, or ccs-choose_path  class and places the chosen path in the input field whose "name" attribute is equal to the data stored in  the "chooseFor" attribute of the element.
-provides: [CCS.JFrame.Chooser]
-requires: [/CCS.JFrame]
-script: CCS.JFrame.Chooser.js
+description: Opens a Hue.FileChooser for any element with the hue-choose_file, hue-choose_dir, or hue-choose_path  class and places the chosen path in the input field whose "name" attribute is equal to the data stored in  the "chooseFor" attribute of the element.
+provides: [Hue.JFrame.Chooser, CCS.JFrame.Chooser]
+requires: [/Hue.JFrame]
+script: Hue.JFrame.Chooser.js
 ...
 */
 
@@ -35,14 +35,14 @@ var chooser = function(filter){
 		//Stop link from its standard action
 		e.preventDefault();
 		var targetName = link.get('data-chooseFor');
-		var parent = link.getParent('form') || $(this.parentWidget);
+		var jbrowser = this.getWindow();
+		var parent = link.getParent('form') || $(jbrowser);
 		var targetInput = parent.getElement('input[name=' + targetName + ']');
-		var jbrowser = this.parentWidget;
-		//use parent widget to get jbrowser for CCS.chooseFile
-		//CCS.chooseFile creates an ART alert which contains a FileChooser from which teh user can select a file.
+		//use parent widget to get jbrowser for Hue.chooseFile
+		//Hue.chooseFile creates an ART alert which contains a FileChooser from which teh user can select a file.
 		//The function argument is the callback which is called after the OK button in the ART alert is clicked.
-		CCS.Desktop.load("FileBrowser", function(){
-			CCS.chooseFile(jbrowser, '/', caption[filter], function(data){
+		Hue.Desktop.load("FileBrowser", function(){
+			Hue.chooseFile(jbrowser, '/', caption[filter], function(data){
 				targetInput.set('value', data.path);
 				targetInput.fireEvent('change');
 				//hide overtext on targetInput
@@ -55,10 +55,14 @@ var chooser = function(filter){
 	};
 };
 
-CCS.JFrame.addGlobalLinkers({
-	'.ccs-choose_file': chooser('file'),
-	'.ccs-choose_dir': chooser('dir'),
-	'.ccs-choose_path': chooser('any')
+Hue.JFrame.addGlobalLinkers({
+	'.hue-choose_file': chooser('file'),
+	'.hue-choose_dir': chooser('dir'),
+	'.hue-choose_path': chooser('any'),
+	//deprecated
+	'.hue-choose_file': chooser('file'),
+	'.hue-choose_dir': chooser('dir'),
+	'.hue-choose_path': chooser('any')
 });
 
 })();
