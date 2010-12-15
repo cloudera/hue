@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="/static/oocss/Grid.css">
   <link rel="stylesheet" href="/static/oocss/Icon.css">
 
-  <script src="/depender/build?client=true&require=dbug,DomReady,Cookie,Element.Dimensions,Element.Style,CCS.Desktop.BackgroundManager,Cookie,Clientcide"></script>
+  <script src="/depender/build?client=true&require=clientcide/dbug,Core/DomReady,Core/Cookie,Core/Element.Dimensions,Core/Element.Style,ccs-shared/CCS.Desktop.BackgroundManager,Core/Cookie,clientcide/Clientcide,ccs-shared/CCS.Request,ccs-shared/CCS.User,ccs-shared/CCS.Desktop.Config,JFrame/MooTools.Config,JFrame/FlashMessage,JFrame/JFrame.Keys,ccs-shared/CCS.Login,clientcide/StickyWin.PointyTip,More/Element.Delegation,Core/Fx.Tween"></script>
   <!--[if IE 8]>
       <script>
           window.ie8 = true;
@@ -55,8 +55,7 @@
     }
     var appName = "Hue";
     Depender.require({
-      scripts: ["CCS.Request", "CCS.User", "CCS.Desktop.Config", "CCS.Desktop.FlashMessage",
-        "CCS.Desktop.Keys", "CCS.Login", "StickyWin.PointyTip", "Element.Delegation", "Fx.Tween", "Fx.Elements"],
+      scripts: ["More/Fx.Elements"],
       callback: function(){
         //get the background images
         var bgEls = $('bg').getElements('img');
@@ -85,10 +84,10 @@
           var launching = 'Launching ' + appName;
           var msg = loading;
           if (CCS.Desktop.hasLoaded(component)) msg = launching;
-          if (!CCS.Desktop.checkForFlashMessage(loading) && 
-              !CCS.Desktop.checkForFlashMessage(launching) && 
+          if (!FlashMessage.checkForFlashMessage(loading) && 
+              !FlashMessage.checkForFlashMessage(launching) && 
               !$$('.loadingmsg').length) {
-                growled[component] = CCS.Desktop.flashMessage(msg, 10000);
+                growled[component] = FlashMessage.flash(msg, 10000);
           }
         };
         var clearGrowl = function(component) {

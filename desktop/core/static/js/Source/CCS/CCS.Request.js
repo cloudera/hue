@@ -17,7 +17,7 @@
 ---
 description: Refactor of MooTools Request to manage Desktop logins
 provides: [CCS.Request]
-requires: [More/Class.Refactor, /CCS.Error, Core/Request.JSON, Core/Request.HTML]
+requires: [JFrame/JFrame.Request]
 script: CCS.Request.js
 
 ...
@@ -32,7 +32,6 @@ script: CCS.Request.js
 (function() {
 	var loginFormInstance = undefined;
 	var pendingRequests = [];
-
 	var refactoring = {
 		
 		options: {

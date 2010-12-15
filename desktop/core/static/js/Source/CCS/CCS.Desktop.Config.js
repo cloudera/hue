@@ -23,110 +23,11 @@ script: CCS.Desktop.Config.js
 ...
 */
 
-HtmlTable.implement({
-	options: {
-		classNoSort: 'noSort'
-	}
-});
-
-//by default, make all StickyWin instances load inside of div#ccs-desktop
-StickyWin.implement({
-	options: {
-		inject: {
-			target: 'ccs-desktop'
-		}
-	},
-	destroyOnClose: true
-});
-
-//same for ART.Popup instances
-ART.Popup.implement({
-	destroyOnClose: true,
-	options: {
-		cascaded: true
-	}
-});
-ART.Sheet.define('window.art', {
-	'min-height': 88,
-	'width':800
-});
-
-ART.Sheet.define('window.art.browser.logo_header', {
-	'header-height': 90,
-	'header-overflow': 'visible',
-	'min-width': 620
-});
-
-ART.Sheet.define('window.art.browser.logo_header history.art', {
-	'padding': [0, 8, 0, 70]
-});
-
-ART.Sheet.define('window.art.browser.logo_header history.art', {
-	'top':32
-}, 'css');
-
-ART.Sheet.define('window.art.browser history.art ul', {
-	'z-index': 101
-}, 'css');
-
-UI.Sheet.define('window.art button.art.wincontrol', {
-	'background-color': ['hsb(0, 0, 100)', 'hsb(0, 0, 85)'],
-	'border-color': ['hsb(0, 0, 60)', 'hsb(0, 0, 50)'],
-	'font-family': 'Moderna',
-	'font-size': 13,
-	'font-color': 'black'
-});
-
-(function(){
-	var button = {
-		'height': 19,
-		'width': 22,
-		'padding': [0, 0, 0, 0],
-		'float': 'left',
-		'marginLeft': -1,
-		'corner-radius-top-right': 4,
-		'corner-radius-bottom-right': 4,
-		'corner-radius-top-left': 0,
-		'corner-radius-bottom-left': 0,
-		'glyph': ART.Glyphs.refresh,
-		'glyph-stroke': 0,
-		'glyph-fill': true,
-		'glyph-height': 12,
-		'glyph-width': 12,
-		'glyph-top': 4,
-		'glyph-left': 5
-	};
-	var large = {
-		'height': 24,
-		'width': 24,
-		'glyph-top': 6,
-		'glyph-left': 6
-	};
-	ART.Sheet.define('button.art.ccs-refresh', button);
-	ART.Sheet.define('button.art.ccs-refresh.large', large);
-	button.glyph = ART.Glyphs.triangleLeft;
-	button['glyph-top'] = 5;
-	button['glyph-left'] = 6;
-	ART.Sheet.define('button.art.ccs-back', button);
-	ART.Sheet.define('button.art.ccs-back.large', large);
-	button.glyph = ART.Glyphs.triangleRight;
-	button['glyph-left'] = 8;
-	ART.Sheet.define('button.art.ccs-next', button);
-	ART.Sheet.define('button.art.ccs-next.large', large);
-})();
-
-if (Browser.Engine.trident) {
-	UI.Sheet.define('window.art:dragging', {
-		'background-color': hsb(202, 20, 38, 1)
-	});
-}
-
-
 window.addEvent('domready', function(){
 	$(document.body).addEvent('contextmenu', function(e){
 		if (!dbug.enabled) e.preventDefault();
 	});
-	
+
 	//this sizer method will ensure that windows are always reachable and ever larger than the window
 	//(so you can always reach it's bottom corner to resize it)
 	var sizer = function(){
@@ -176,46 +77,7 @@ window.addEvent('domready', function(){
 		window.scrollTo(0,0);
 	});
 
-	//given an element, determine if it's cool to double click and select text within it
-	var canSelectOnDblClick = function(elem) {
-		//if it's a textarea or input, go for it
-		if (elem.match('input') || elem.match('textarea')) return true;
-		//otherwise, we only allow double click selection inside of window contents
-		if (elem.getParent('.jframe_contents')) {
-			//except if the double clicked element is inside an html table that has selectable rows
-			var parentTable = elem.getParent('[data-filters*=HtmlTable]');
-			if(parentTable && (parentTable.hasClass('.selectable') || parentTable.hasClass('.multiselect'))){
-				return false;
-			}
-			//or if the element is part of a double click action
-			if(elem.match('[data-dblclick-delegate]') || elem.getParent('[data-dblclick-delegate]')) return false;
-			return true;
-		}
-		return false;
-	};
-	
-	$(document.body).addEvent('dblclick', function(e){
-		if(!canSelectOnDblClick(e.target)){ 
-			if(document.selection && document.selection.empty) document.selection.empty();
-			else if(window.getSelection) window.getSelection().removeAllRanges();
-		}
-	});
 });
-
-//Although implement checks for a pre-existing implementation of the method, it has to be forced for IE to overwrite the MooTools version.
-//Thus, the IE check.
-if (Browser.Engine.trident) {
-	Array.implement({
-		forEach: function(fn, bind){
-			var len = this.length;
-			for (var i=0; i < len; i++) {
-				if(i in this) fn.call(bind, this[i], i, this);
-			}
-		}       
-	}, true);
-
-	Array.alias('forEach', 'each', true); 
-}
 
 // Monkey-patch the dbug.* functions to also log their events to the server. We don't want to
 // crush the server either with too-many or too-frequent messages, so we only send every 5 seconds,
