@@ -51,6 +51,11 @@
 			"from-remote": "origin",
 			"remotes": ["origin"]
 		},
+		"jframe": {
+			"track-indirect": "jframe.hash",
+			"from-remote": "anutron",
+			"remotes": ["anutron"]
+		},
 		"slick": {
 			"track-indirect": "slick.hash",
 			"from-remote": "anutron",
