@@ -89,11 +89,17 @@ class MiniHadoopCluster(object):
     self.num_datanodes = num_datanodes
     self.num_tasktrackers = num_tasktrackers
 
-  def start(self):
+  def start(self, extra_classpath_entries=None, extra_configs=None):
     """
     Start a cluster as a subprocess.
     """
     self.tmpdir = tempfile.mkdtemp()
+
+    if not extra_classpath_entries:
+      extra_classpath_entries = []
+
+    if not extra_configs:
+      extra_configs = {}
 
     def tmppath(filename):
       """Creates paths in tmpdir."""
@@ -122,10 +128,15 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     _write_static_group_mapping(TEST_USER_GROUP_MAPPING,
       tmppath('ugm.properties'))
 
-    write_config({'hadoop.security.group.mapping': 'org.apache.hadoop.security.StaticUserGroupMapping',
+    core_configs = {'hadoop.security.group.mapping': 'org.apache.hadoop.security.StaticUserGroupMapping',
       'hadoop.security.static.group.mapping.file': tmppath('ugm.properties'),
       'hadoop.proxyuser.%s.groups' % (self.superuser,): 'users,supergroup',
-      'hadoop.proxyuser.%s.hosts' % (self.superuser,): 'localhost'}, tmppath('in-conf/core-site.xml'))
+      'hadoop.proxyuser.%s.hosts' % (self.superuser,): 'localhost',
+      'dfs.namenode.plugins': 'org.apache.hadoop.thriftfs.NamenodePlugin',
+      'dfs.datanode.plugins': 'org.apache.hadoop.thriftfs.DatanodePlugin',
+      'mapred.jobtracker.plugins': 'org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin'}
+    core_configs.update(extra_configs)
+    write_config(core_configs, tmppath('in-conf/core-site.xml'))
 
     hadoop_policy_keys = ['client', 'client.datanode', 'datanode', 'inter.datanode', 'namenode', 'inter.tracker', 'job.submission', 'task.umbilical', 'refresh.policy', 'admin.operations']
     hadoop_policy_config = {}
@@ -147,9 +158,6 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         "-D", "mapred.local.dir=%s/mapred/local" % self.tmpdir,
         "-D", "mapred.system.dir=/mapred/system",
         "-D", "mapred.temp.dir=/mapred/temp",
-        "-D", "dfs.namenode.plugins=org.apache.hadoop.thriftfs.NamenodePlugin",
-        "-D", "dfs.datanode.plugins=org.apache.hadoop.thriftfs.DatanodePlugin",
-        "-D", "mapred.jobtracker.plugins=org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin",
         "-D", "jobclient.completion.poll.interval=100",
         "-D", "jobclient.progress.monitor.poll.interval=100",
         "-D", "fs.checkpoint.period=1",
@@ -184,7 +192,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         hadoop.conf.HADOOP_TEST_JAR.get(),
         # -- END JAVA TRIVIA --
         hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(),
-        hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()])
+        hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()] + extra_classpath_entries)
       env["HADOOP_HEAPSIZE"] = "128"
       env["HADOOP_HOME"] = hadoop.conf.HADOOP_HOME.get()
       env["HADOOP_LOG_DIR"] = self.log_dir
