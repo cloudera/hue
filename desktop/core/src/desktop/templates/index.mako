@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="/static/css/reset.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="/static/css/windows.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="/static/css/desktop.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="/static/oocss/Button.css" type="text/css" media="screen" charset="utf-8">
 
   <link rel="stylesheet" href="/static/oocss/Button.css">
   <link rel="stylesheet" href="/static/oocss/Bar.css">
