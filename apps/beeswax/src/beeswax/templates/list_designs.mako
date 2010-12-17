@@ -22,7 +22,7 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
 
 <div id="list_designs" class="view">
   ${comps.pagination(page)}
-  <h2 class="ccs-hidden">Saved Queries:</h2>
+  <h2 class="jframe-hidden">Saved Queries:</h2>
   <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
@@ -40,7 +40,7 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
       <%
         may_edit = user == design.owner
       %>
-      <tr data-dblclick-delegate="{'dblclick_loads':'.bw-query_edit, .bw-query_clone'}" class="ccs-no_select ccs-help_links_small"
+      <tr data-dblclick-delegate="{'dblclick_loads':'.bw-query_edit, .bw-query_clone'}" class="jframe-no_select hue-help_links_small"
       data-filters="ContextMenu"
       data-context-menu-actions="[{'events':['contextmenu','click:relay(a.bw-options)'],'menu':'ul.context-menu'}]">
         <td>
@@ -55,7 +55,7 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
           % endif
           
           
-          <ul class="ccs-hidden context-menu">
+          <ul class="jframe-hidden context-menu">
             % if may_edit:
               % if design.type == models.SavedQuery.REPORT:
                 <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" class="bw-query_edit frame_tip" title="Edit this report.">Edit</a></li>
@@ -70,7 +70,7 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
         </td>
         <td>
           % if design.desc:
-           <p class="ccs-inline" data-filters="InfoTip">${design.desc}</p>
+           <p class="jframe-inline" data-filters="InfoTip">${design.desc}</p>
           % endif
         </td>
         <td>${design.owner.username}</td>

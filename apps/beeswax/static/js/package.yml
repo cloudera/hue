@@ -2,4 +2,4 @@ copyright: Apache License v2.0
 version: 0.9
 description: Beeswax, a Hive UI
 name: beeswax
-sources: [Source/Beeswax/CCS.Beeswax.js]
+sources: [Source/Beeswax/Hue.Beeswax.js]

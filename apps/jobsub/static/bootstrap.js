@@ -13,17 +13,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-CCS.Desktop.register({
+Hue.Desktop.register({
 	JobSub: {
 		name: 'Job Designer',
-		require: ['jobsub/CCS.JobSub'],
+		require: ['jobsub/Hue.JobSub'],
 		launch: function(path, options){
-			CCS.Desktop.load("JobBrowser");
-			return new CCS.JobSub(path, options);
+			Hue.Desktop.load("JobBrowser");
+			return new Hue.JobSub(path, options);
 		},
 		css: '/jobsub/static/css/jobsub.css',
 		menu: {
-			id: 'ccs-filebrowser-menu',
+			id: 'hue-filebrowser-menu',
 			img: {
 				src: '/jobsub/static/art/icon.png'
 			}

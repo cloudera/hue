@@ -17,16 +17,16 @@
 ---
 description: Help Application
 provides: [Help]
-requires: [ccs-shared/CCS.JBrowser]
+requires: [JFrame/JFrame.Browser]
 script: Help.js
 ...
 */
 var Help = new Class({
 
-	Extends: CCS.JBrowser,
+	Extends: Hue.JBrowser,
 
 	options: {
-		className: 'art browser ccs-help',
+		className: 'art browser hue-help',
 		historyOptions: {
 			editable: false
 		},
@@ -44,6 +44,6 @@ var Help = new Class({
 				return path.replace('/help/', '');
 			}
 		});
-		if (!CCS.Desktop.helpInstance || CCS.Desktop.helpInstance.isDestroyed()) CCS.Desktop.helpInstance = this;
+		if (!Hue.Desktop.helpInstance || Hue.Desktop.helpInstance.isDestroyed()) Hue.Desktop.helpInstance = this;
 	}
 });

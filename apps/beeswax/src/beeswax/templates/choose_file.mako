@@ -25,7 +25,7 @@ ${wrappers.head('Choose a File')}
 </div>
 <div class="view" id="choose-file">
     <div class="bw-choose-file">
-      <div class="ccs-bc-section">
+      <div class="hue-bc-section">
           <a name="step1"></a>
             <form action="${action}" method="POST">
               <dt>Step 1: Name Your Table and Choose A File</dt>
@@ -55,7 +55,7 @@ ${wrappers.head('Choose a File')}
                     alt="/user/user_name/data_dir",
                   ),
                   help="The HDFS path to the file that you would like to base this new table definition on.  It can be compressed (gzip) or not.")}
-                <a class="ccs-choose_file" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height' : 16, 'top' : 3, 'left' : 6 }" data-chooseFor="path">Choose File</a>
+                <a class="hue-choose_file" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height' : 16, 'top' : 3, 'left' : 6 }" data-chooseFor="path">Choose File</a>
                 <div class="bw-import_data">
                   ${comps.field(file_form["do_import"],
                     render_default=True,
@@ -63,10 +63,10 @@ ${wrappers.head('Choose a File')}
                   )}
                 </div>
                 ## TODO(marcus): Button style?
-                <a class="ccs-multipart-next ccs-submit_form ccs-visible" style="display:none" data-extra-data="{'submit_file' : 'Step 2: Choose Your Delimiter'}">
+                <a class="hue-multipart-next jframe-submit_form jframe-visible" style="display:none" data-extra-data="{'submit_file' : 'Step 2: Choose Your Delimiter'}">
                   Step 2: Choose Your Delimiter&raquo;
                 </a>
-                  <input type="submit" name="submit_file" value="Step 2: Choose Your Delimiter" class="ccs-hidden ccs-submit_form ccs-multipart-next ccs-visible"/>
+                  <input type="submit" name="submit_file" value="Step 2: Choose Your Delimiter" class="jframe-hidden jframe-submit_form hue-multipart-next jframe-visible"/>
               </dl>
             </form>
           </dd>

@@ -13,16 +13,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-CCS.Desktop.register({
+Hue.Desktop.register({
 	FileBrowser: {
 		name: 'File Browser',
 		css: '/filebrowser/static/css/fb.css',
-		require: ['filebrowser/CCS.FileBrowser'],
+		require: ['filebrowser/Hue.FileBrowser'],
 		launch: function(path, options){
-			return new CCS.FileBrowser(path || 'filebrowser/view/?default_to_home=1', options);
+			return new Hue.FileBrowser(path || 'filebrowser/view/?default_to_home=1', options);
 		},
 		menu: {
-			id: 'ccs-filebrowser-menu',
+			id: 'hue-filebrowser-menu',
 			img: {
 				src: '/filebrowser/static/art/icon.png'
 			}
@@ -33,9 +33,9 @@ CCS.Desktop.register({
 		name: 'File Viewer',
 		css: '/filebrowser/static/css/fb.css',
 		launch: function(path, options){
-			return new CCS.FileViewer(path, options);
+			return new Hue.FileViewer(path, options);
 		},
-		require: ['CCS.FileViewer'],
+		require: ['Hue.FileViewer'],
 		help: '/help/filebrowser/'
 		
 	},
@@ -43,9 +43,9 @@ CCS.Desktop.register({
 		name: 'File Editor',
 		css: '/filebrowser/static/css/fb.css',
 		launch: function(path, options){
-			return new CCS.FileEditor(path, options);
+			return new Hue.FileEditor(path, options);
 		},
-		require: ['CCS.FileEditor'],
+		require: ['Hue.FileEditor'],
 		help: '/help/filebrowser/'
 	}
 });

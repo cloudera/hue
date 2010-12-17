@@ -18,13 +18,13 @@
 
 script: ${app_name_camel}.js
 
-description: Defines ${app_name_camel}; a Hue application that extends CCS.JBrowser.
+description: Defines ${app_name_camel}; a Hue application that extends Hue.JBrowser.
 
 authors:
 - Unknown
 
 requires:
-- ccs-shared/CCS.JBrowser
+- JFrame/JFrame.Browser
 
 provides: [${app_name_camel}]
 
@@ -36,7 +36,7 @@ ART.Sheet.define('window.art.browser.${app_name}', {
 
 var ${app_name_camel} = new Class({
 
-	Extends: CCS.JBrowser,
+	Extends: Hue.JBrowser,
 
 	options: {
 		className: 'art browser logo_header ${app_name}'

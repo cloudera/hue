@@ -8,7 +8,7 @@
   "clientcide": {
     "scripts": "/static/js/ThirdParty/clientcide/Source"
   },
-  "ccs-shared": {
+  "hue-shared": {
     "scripts": "/static/js/Source"
   },
   "subtletemplates": {

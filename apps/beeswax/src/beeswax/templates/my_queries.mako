@@ -31,7 +31,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
       <li><span>Recent Run Queries</span></li>
     </ul>
 
-    <ul class="tab_sections ccs-clear">
+    <ul class="tab_sections jframe-clear">
       <li>
         <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
           <thead>
@@ -46,7 +46,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
             from beeswax import models
           %>
           % for design in q_page.object_list:
-            <tr data-dblclick-delegate="{'dblclick_loads':'.bw-query_edit, .bw-query_clone'}" class="ccs-no_select ccs-help_links_small"
+            <tr data-dblclick-delegate="{'dblclick_loads':'.bw-query_edit, .bw-query_clone'}" class="jframe-no_select hue-help_links_small"
             data-filters="ContextMenu"
             data-context-menu-actions="[{'events':['contextmenu','click:relay(a.bw-options)'],'menu':'ul.context-menu'}]">
               <td>
@@ -56,7 +56,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
                   <a href="${ url('beeswax.views.execute_query', design_id=design.id) }">${design.name}</a>
                 % endif
 
-                <ul class="ccs-hidden context-menu">
+                <ul class="jframe-hidden context-menu">
                   % if design.type == models.SavedQuery.REPORT:
                     <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" class="bw-query_edit frame_tip" title="Edit this report.">Edit</a></li>
                   % else:
@@ -69,7 +69,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
               </td>
               <td>
                 % if design.desc:
-                 <p class="ccs-inline" data-filters="InfoTip">${design.desc}</p>
+                 <p class="jframe-inline" data-filters="InfoTip">${design.desc}</p>
                 % endif
               </td>
               <td>
@@ -116,12 +116,12 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
               design = query.design
               qcontext = views.make_query_context('design', design.id)
             %>
-            <tr data-dblclick-delegate="{'dblclick_loads':'.bw-view_result'}" class="ccs-no_select ccs-help_links_small">
+            <tr data-dblclick-delegate="{'dblclick_loads':'.bw-view_result'}" class="jframe-no_select hue-help_links_small">
               <td>${query.submission_date.strftime("%x %X")}</td>
               ## TODO (bc): Only showing HQL (not REPORT)
               <td><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" class="bw-view_query">${design.name}</a></td>
               <td>
-                <p class="ccs-inline" data-filters="InfoTip">
+                <p class="jframe-inline" data-filters="InfoTip">
                   % if len(query.query) > 100:
                     <code>${collapse_whitespace(query.query[:100])}...</code>
                   % else:

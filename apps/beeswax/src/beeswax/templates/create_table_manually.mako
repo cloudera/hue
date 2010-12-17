@@ -17,7 +17,7 @@
 <%namespace name="wrappers" file="header_footer.mako" />
 ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
 <div class="toolbar">
-  <ul class="clearfix" data-filters="Breadcrumb, BreadcrumbForm" data-bc-sections=".ccs-bc-section" data-bc-form="form">
+  <ul class="clearfix" data-filters="Breadcrumb, BreadcrumbForm" data-bc-sections=".hue-bc-section" data-bc-form="form">
     <li><a href="#step1">Name</a></li>
     <li><a href="#step2">Record Format</a></li>
     <li><a href="#step3">Serialization</a></li>
@@ -30,7 +30,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
   <form action="#" method="POST" class="jframe_padded" data-filters="FormValidator">
     <dl class="bw-table-setup">
 
-  <div class="ccs-bc-section">
+  <div class="hue-bc-section">
         <a name="step1"></a>
         <dt>Step 1: Create Your Table</dt>
         <dd>
@@ -53,11 +53,11 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               ),
               help="Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
           </dl>
-          <a href="#step2" class="ccs-multipart-next">Step 2: Choose Your Record Format &raquo;</a>
+          <a href="#step2" class="hue-multipart-next">Step 2: Choose Your Record Format &raquo;</a>
         </dd>
       </div>
 
-      <div class="ccs-bc-section">
+      <div class="hue-bc-section">
         <a name="step2"></a>
         <dt>Step 2: Choose Your Record Format</dt>
         <dd>
@@ -80,7 +80,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                   % endif
                 >
               </label>
-              <div class="ccs-errors"></div>
+              <div class="jframe-errors"></div>
             </dt>
             <dd>Data files use delimiters, like commas (CSV) or tabs.</dd>
             <dt class="bw-format-SerDe relays" data-filters="DataGroupToggle" data-group-toggle="{'group': '.bw-config-data li', 'show':'.bw-serde-options'}">
@@ -95,17 +95,17 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
             </dt>
             <dd>Enter a specialized serialization implementation.</dd>
           </dl>
-          <a href="#step3" class="ccs-multipart-next">Step 3: Configure Record Serialization &raquo;</a>
+          <a href="#step3" class="hue-multipart-next">Step 3: Configure Record Serialization &raquo;</a>
         </dd>
       </div>
 
-      <div class="ccs-bc-section">
+      <div class="hue-bc-section">
         <a name="step3"></a>
         <dt>Step 3: Configure Record Serialization</dt>
         <dd>
           <ul class="bw-config-data">
             <li class="bw-delim-options">
-              <p class="ccs-hidden">If your records are delimited, please configure these fields:</p>
+              <p class="jframe-hidden">If your records are delimited, please configure these fields:</p>
               Hive only supports single-character delimiters.
               <dl>
                 ${comps.field(table_form["field_terminator"], render_default=True, help=r'Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.', dd_attrs=dict(data_filters="SelectWithOther"))}
@@ -114,7 +114,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               </dl>
             </li>
             <li class="bw-serde-options">
-              <p class="ccs-hidden">If you're using SerDe data, please configure these fields:</p>
+              <p class="jframe-hidden">If you're using SerDe data, please configure these fields:</p>
               <dl>
                 ${comps.field(table_form["serde_name"],
                   help="Enter the Java Classname of your SerDe. <em>e.g.</em>, org.apache.hadoop.hive.contrib.serde2.RegexSerDe",
@@ -138,11 +138,11 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               </dl>
             </li>
           </ul>
-          <a href="#step4" class="ccs-multipart-next">Step 4: Choose a File Format &raquo;</a>
+          <a href="#step4" class="hue-multipart-next">Step 4: Choose a File Format &raquo;</a>
         </dd>
       </div>
 
-      <div class="ccs-bc-section">
+      <div class="hue-bc-section">
         <a name="step4"></a>
         <dt>Step 4: Choose a File Format</dt>
         <dd>
@@ -157,7 +157,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               klass="bw-file_formats",
               notitle=True
             )}
-            <div class="ccs-hidden bw-io_formats">
+            <div class="jframe-hidden bw-io_formats">
               ${comps.field(table_form["input_format_class"],
                 help="Java Class to read data",
                 attrs=dict(
@@ -174,11 +174,11 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               )}
             </div>
           </dl>
-          <a href="#step5" class="ccs-multipart-next">Step 5: Choose Where To Save Your Table &raquo;</a>
+          <a href="#step5" class="hue-multipart-next">Step 5: Choose Where To Save Your Table &raquo;</a>
         </dd>
       </div>
 
-      <div class="ccs-bc-section">
+      <div class="hue-bc-section">
         <a name="step5"></a>
         <dt>Step 5: Choose Where Your Table's Data is Stored</dt>
         <dd class="bw-file_location">
@@ -189,7 +189,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                 help="Store your table in the default location (controlled by Hive, and typically <code>/user/hive/warehouse/table_name</code>)."
               )}
             </div>
-            <div class="bw-external_loc ccs-hidden">
+            <div class="bw-external_loc jframe-hidden">
               ${comps.field(table_form["external_location"],
                 help="Enter the path (on HDFS) to your table's data location",
                 attrs=dict(
@@ -197,14 +197,14 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                   data_filters="OverText",
                   alt='/user/user_name/data_dir'
                 )
-              )}<a class="ccs-choose_file" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 3, 'left': 6 }" data-chooseFor="table-external_location">Choose File</a>
+              )}<a class="hue-choose_file" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 3, 'left': 6 }" data-chooseFor="table-external_location">Choose File</a>
             </div>
           </dl>
-          <a href="#step6" class="ccs-multipart-next">Final Step: Configure Table Columns &raquo;</a>
+          <a href="#step6" class="hue-multipart-next">Final Step: Configure Table Columns &raquo;</a>
         </dd>
       </div>
 
-      <div class="ccs-bc-section">
+      <div class="hue-bc-section">
         <a name="step6"></a>
         <dt>Final Step: Configure Table Columns</dt>
         <dd>
@@ -213,7 +213,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               <div class="bw-column">
                 <dt class="bw-column_header bw-inactive">
                   <input name="${form["column_name"].html_name | n}" value="${form["column_name"].data or ''}" class="required bw-column_name" alt="Column Name" data-filters="OverText"/>
-                  <p class="ccs-inline" data-filters="HelpTip" data-help-direction="1">
+                  <p class="jframe-inline" data-filters="HelpTip" data-help-direction="1">
                     Column name must be single words that start
                     with a letter or a digit.
                   </p>
@@ -223,7 +223,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                 </dt>
                 <dd class="bw-column">
                   <dl>
-                    <div class="bw-col_type ccs-inline">
+                    <div class="bw-col_type jframe-inline">
                       ${comps.field(form["column_type"],
                         render_default=True,
                         help="Type for this column.  Certain advanced types (namely, structs) are not exposed in this interface.",
@@ -233,7 +233,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                       )}
                     </div>
                     % if is_partition_form == False: 
-                      <div class="bw-array_type ccs-inline">
+                      <div class="bw-array_type jframe-inline">
                         ${comps.field(
                             form["array_type"],
                             render_default=True,
@@ -241,10 +241,10 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                           )}
                       </div>
                       <div class="bw-map_data">
-                        <div class="bw-map_key_type ccs-inline">
+                        <div class="bw-map_key_type jframe-inline">
                           ${comps.field(form["map_key_type"], render_default=True, help="Type of the map keys.")}
                         </div>
-                        <div class="bw-map_value_type ccs-inline">
+                        <div class="bw-map_value_type jframe-inline">
                           ${comps.field(form["map_value_type"], render_default=True, help="Type of the map values.")}
                         </div>
                       </div>
@@ -296,10 +296,10 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
 </dl>
 
   <div style="display:none">
-    <div class="beeswax_column_form_template ccs-hidden" style="display: none">
+    <div class="beeswax_column_form_template jframe-hidden" style="display: none">
       ${render_column(columns_form.empty_form())}
     </div>
-    <div class="beeswax_partition_form_template ccs-hidden" style="display: none">
+    <div class="beeswax_partition_form_template jframe-hidden" style="display: none">
       ${render_column(partitions_form.empty_form(), true)}
     </div>
   </div>

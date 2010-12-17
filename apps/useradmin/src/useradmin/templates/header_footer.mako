@@ -18,7 +18,7 @@
 	<head>
 		<title>${title}</title>
 	</head>
-	<body class="ccs-shared">
+	<body class="hue-shared">
 	<div class="toolbar">
 	  <a href="/useradmin/"><img src="/useradmin/static/art/useradmin-logo.png" width="33" height="33" alt="Hue User Admin" class="useradmin_logo"></a>
 	</div>

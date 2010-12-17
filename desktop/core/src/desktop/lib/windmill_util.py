@@ -27,14 +27,14 @@ def logged_in_client(user='test', passwd='test', client=None):
     client = WindmillTestClient(__name__)
   client.open(url=windmill.settings['TEST_URL'] + '?clearSession=true')
   client.waits.forPageLoad()
-  client.waits.forElement(classname='ccs-loaded')
-  if client.execJS(js="!!$('ccs-login')")["output"]:
-    client.waits.forElement(classname='ccs-username')
-    client.click(jquery='(".ccs-username")[0]')
-    client.type(classname='ccs-username', text=user)
-    client.click(classname='ccs-password')
-    client.type(classname='ccs-password', text=passwd)
-    client.click(classname='ccs-continue')
+  client.waits.forElement(classname='hue-loaded')
+  if client.execJS(js="!!$('hue-login')")["output"]:
+    client.waits.forElement(classname='hue-username')
+    client.click(jquery='(".hue-username")[0]')
+    client.type(classname='hue-username', text=user)
+    client.click(classname='hue-password')
+    client.type(classname='hue-password', text=passwd)
+    client.click(classname='hue-continue')
   # Health dashboard launches at login; ideally we'd have a 
   # better "ready" notification.
   time.sleep(2.0) # TODO: Hacky sleep!
@@ -45,10 +45,10 @@ def logout(client):
   """
     logs the user out of desktop
   """
-  client.click(jquery='("#ccs-logout a")[0]')
+  client.click(jquery='("#hue-logout a")[0]')
   # TODO(philip,nutron): Occasional bug.
   # We've seen the login box never show up.  This doesn't
   # trigger test failures, because we open the first page
   # at every test, but ideally we should assert that the login
   # box appears again.
-  # client.waits.forElement(timeout='2000', classname='ccs-username')
+  # client.waits.forElement(timeout='2000', classname='hue-username')

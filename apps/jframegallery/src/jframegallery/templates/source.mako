@@ -33,7 +33,7 @@
 	      </ul>
 	    </div>
 	    <div class="right_col jframe_padded">
-	      <ul class="ccs-clear">
+	      <ul class="jframe-clear">
 		## Template data
 		<li class="section">
 		  <h3>Source for HTML</h3>

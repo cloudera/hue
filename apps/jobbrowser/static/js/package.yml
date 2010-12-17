@@ -2,4 +2,4 @@ copyright: Apache License v2.0
 version: 0.9
 description: Job Browser
 name: jobbrowser
-sources: [Source/JobBrowser/CCS.JobBrowser.js, Source/JobBrowser/CCS.JobBrowser.Poller.js]
+sources: [Source/JobBrowser/Hue.JobBrowser.js, Source/JobBrowser/Hue.JobBrowser.Poller.js]

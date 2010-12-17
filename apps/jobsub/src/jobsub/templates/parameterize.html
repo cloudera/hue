@@ -19,7 +19,7 @@ limitations under the License.
 {% block title %}Submit Job: {{ job_design.name }}{% endblock %}
 {% block content %}
 	<div class="prompt_popup">
-		<h1 class="ccs-hidden">Submit Job: {{ job_design.name }} </h1>
+		<h1 class="jframe-hidden">Submit Job: {{ job_design.name }} </h1>
 		<div class="jobsub_parameterize" id="view">
 			<dl class="jobsub_parameterize_description clearfix">
 				<dt>Job Name</dt>
@@ -32,10 +32,10 @@ limitations under the License.
 			
 			<form action="{% url jobsub.views.submit_design job_design.id %}" method="POST" enctype="multipart/form-data">
 			{{ form.render_parameterization }}
-			<dl class="ccs-hidden">
+			<dl class="jframe-hidden">
 				<dt>&nbsp;</dt>
 				<dd class="jobsub_edit_save">
-					<input type="submit" name="submitter" value="Start Job" class="ccs-submit"/>
+					<input type="submit" name="submitter" value="Start Job" class="hue-submit"/>
 				</dd>
 			</dl>
 			</form>

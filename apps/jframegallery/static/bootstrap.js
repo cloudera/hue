@@ -13,16 +13,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-CCS.Desktop.register({
+Hue.Desktop.register({
 	JFrameGallery: {
 		name: 'JFrame Gallery',
-		require: ['jframe-gallery/CCS.JFrameGallery'],
+		require: ['jframe-gallery/Hue.JFrameGallery'],
 		css: '/jframegallery/static/css/jframegallery.css',
 		launch: function(path, options){
-			return new CCS.JFrameGallery(path, options);
+			return new Hue.JFrameGallery(path, options);
 		},
 		menu: {
-			id: 'ccs-jframegallery-menu',
+			id: 'hue-jframegallery-menu',
 			img: {
 				src: '/jframegallery/static/art/jframegallery.png'
 			}

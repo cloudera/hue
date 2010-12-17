@@ -26,7 +26,7 @@
         <option>B</option>
         <option value="__other__">Other</option>
         </select>
-        <input name="other" class="ccs-hidden"  data-filters="OverText" alt="Enter a custom value">
+        <input name="other" class="jframe-hidden"  data-filters="OverText" alt="Enter a custom value">
       </div>
       <hr/>
       <div data-filters="SelectWithOther" data-other-input=".otherContainer" data-other-options="option[value=null]">
@@ -35,7 +35,7 @@
         <option>B</option>
         <option value="null">Other</option>
         </select>
-        <div class="otherContainer ccs-hidden">
+        <div class="otherContainer jframe-hidden">
           <input name="other" data-filters="OverText" alt="Enter a custom value">
         <div>
       </div>

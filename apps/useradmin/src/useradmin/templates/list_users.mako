@@ -35,7 +35,7 @@ ${wrappers.head()}
             <td>${user.last_name}</td>
             <td>${user.email}</td>
             <td>
-              <span class="ccs-hidden">
+              <span class="jframe-hidden">
                 ${int(user.last_login.strftime("%s"))}
               </span>
               ${user.last_login.strftime('%c')}

@@ -49,12 +49,12 @@ from django.template.defaultfilters import urlencode, escape
 </%def>
 
 <%def name="footer()">
-      <div class="fb-uploader ccs-hidden">
+      <div class="fb-uploader jframe-hidden">
         <a class="fb-cancel-upload">Close</a>
         <ul class="fb-upload-list"></ul>
 
         <div class="fb-noflash">If you are experiencing flash errors due to uploading,
-          you can <a target="ccs_upload" href="${ url('filebrowser.views.upload') }">upload without flash</a>.
+          you can <a target="hue_upload" href="${ url('filebrowser.views.upload') }">upload without flash</a>.
         </div>
       </div>
     </body>

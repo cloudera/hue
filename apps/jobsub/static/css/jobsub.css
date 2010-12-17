@@ -179,7 +179,7 @@ ul.jobsub_new li a:hover {
 .jobsub_edit_save input {
 	width: auto !important;
 }
-.jobsub_edit_save .ccs-submit {
+.jobsub_edit_save .hue-submit {
 	float:right;
 }
 .jobsub_edit .jobsub_toggler a {
@@ -264,7 +264,7 @@ ul.jobsub_new li a:hover {
 	margin-left: 8px;
 	padding: 0px;
 }
-.jobsub_output li a {
+.hue-shared .jobsub_output li a {
 	display: block;
 	padding: 4px;
 	margin: 4px;

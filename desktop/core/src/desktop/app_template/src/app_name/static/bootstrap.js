@@ -13,7 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-CCS.Desktop.register({
+Hue.Desktop.register({
 	${app_name_camel} : {
 		name : '${app_name_spaces}',
 		//autolaunch: "/${app_name}/",
@@ -25,7 +25,7 @@ CCS.Desktop.register({
 			return new ${app_name_camel}(path || '/${app_name}/', options);
 		},
 		menu: {
-			id: 'ccs-${app_name}-menu',
+			id: 'hue-${app_name}-menu',
 			img: {
 				// Replace this with a real icon!
 				// ideally a 55x55 transparent png

@@ -32,13 +32,13 @@
       </div>
 
       <div data-filters="Tabs">
-        <ul class="tabs jtv_tabs ccs-right clearfix">
+        <ul class="tabs jtv_tabs jframe-right clearfix">
           <li><span>Attempts</span></li>
           <li><span>Metadata</span></li>
           <li><span>Counters</span></li>
         </ul>
 
-        <ul class="tab_sections ccs-clear">
+        <ul class="tab_sections jframe-clear">
           <li>
             <table border="0" cellpadding="0" cellspacing="0" data-filters="HtmlTable" class="jt_meta_table sortable selectable">
               <thead>

@@ -20,16 +20,16 @@ ${comps.header('Rename: ' + src_path.split('/')[-1])}
 
 <div class="prompt_popup">
 <form action="/filebrowser/rename?next=${next|u}" method="POST" enctype="multipart/form-data">
-  <h4 class="ccs-hidden">Renaming: ${src_path}</h4>
+  <h4 class="jframe-hidden">Renaming: ${src_path}</h4>
   <dl>
     ${edit.render_field(form["src_path"], hidden=True)}
     ${edit.render_field(form["dest_path"], notitle=True)}
   </dl>
-  <input class="ccs-hidden" type="submit" value="Submit" />
+  <input class="jframe-hidden" type="submit" value="Submit" />
 </form>
 </div>
 
-<div class="ccs-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
+<div class="jframe-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
 
 
 ${comps.footer()}

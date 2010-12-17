@@ -13,12 +13,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-CCS.Desktop.register({
+Hue.Desktop.register({
 	About : {
 		name: 'About Hue',
-		require: ['ccs-shared/CCS.JBrowser'],
+		require: ['hue-shared/Hue.JBrowser'],
 		launch: function(path, options){
-			return new CCS.JBrowser('/about/', $merge({
+			return new Hue.JBrowser('/about/', $merge({
 				displayHistory: false,
 				width: 350
 			}, options));
@@ -27,5 +27,5 @@ CCS.Desktop.register({
 });
 
 window.addEvent('domready', function(){
-	$$('img.ccs-swoosh')[0].addEvent('click', CCS.Desktop.launch.bind(CCS.Desktop, 'About') );
+	$$('img.hue-swoosh')[0].addEvent('click', Hue.Desktop.launch.bind(Hue.Desktop, 'About') );
 });

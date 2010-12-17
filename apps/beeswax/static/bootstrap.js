@@ -13,16 +13,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-CCS.Desktop.register({
+Hue.Desktop.register({
 	Beeswax: {
 		name: 'Beeswax for Hive',
-		require: ['beeswax/CCS.Beeswax'],
+		require: ['beeswax/Hue.Beeswax'],
 		launch: function(path, options) {
-			return new CCS.Beeswax(path, options);
+			return new Hue.Beeswax(path, options);
 		},
 		css: '/beeswax/static/css/beeswax.css',
 		menu: {
-			id: 'ccs-beeswax-menu',
+			id: 'hue-beeswax-menu',
 			img: {
 				src: '/beeswax/static/art/beeswax-logo.png'
 			}

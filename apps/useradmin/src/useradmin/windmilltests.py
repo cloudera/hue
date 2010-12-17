@@ -21,7 +21,7 @@ def test_user_creation():
   client = logged_in_client()
 
   # launch useradmin
-  client.click(id='ccs-useradmin-menu')
+  client.click(id='hue-useradmin-menu')
   client.waits.forElement(jquery='(".useradmin")[0]', timeout='2000')
 
   # click add user and add "windmill_joe" user
@@ -43,7 +43,7 @@ def test_user_creation():
   client = logged_in_client()
 
   # launch useradmin
-  client.click(id='ccs-useradmin-menu')
+  client.click(id='hue-useradmin-menu')
   client.waits.forElement(jquery='(".useradmin")[0]', timeout='2000')
 
   # delete the user

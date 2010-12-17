@@ -37,7 +37,7 @@
           <dd>${str(field) | n}</dd>
           % if len(field.errors):
             <dt>&nbsp;</dt>
-            <dd class="ccs-error validation-advice">
+            <dd class="jframe-error validation-advice">
                ${str(field.errors) | n}
              </dd>
            % endif

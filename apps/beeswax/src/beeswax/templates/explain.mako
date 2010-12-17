@@ -24,12 +24,12 @@ ${wrappers.head('Query Explanation', section='saved queries')}
     </div>
     <div class="right_col jframe_padded">
       <div data-filters="Tabs">
-        <ul class="toolbar bw-results_tabs tabs ccs-right clearfix">
+        <ul class="toolbar bw-results_tabs tabs jframe-right clearfix">
           <li><span>Explanation</span></li>
           <li><span>Query</span></li>
         </ul>
 
-        <ul class="tab_sections ccs-clear">
+        <ul class="tab_sections jframe-clear">
           <li>
             <pre>${explanation}</pre>
           </li>

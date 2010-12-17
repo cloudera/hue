@@ -24,7 +24,7 @@ ${wrappers.head(toolbar=True)}
 </div>
 
 <!-- Web 1.0 index for debugging -->
-<div class="ccs-hidden">
+<div class="jframe-hidden">
   <ul>
     <li><a href="${ url('beeswax.views.install_examples') }">Install examples</a></li>
     <br/>

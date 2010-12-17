@@ -693,18 +693,18 @@ By default, all windows in HUE have a the same basic look and feel. If you don't
 
 Before we can change the style of our application's window, we need to change the way our application is invoked. By default, our bootstrap.js file looks like this:
 
-	CCS.Desktop.register({
+	Hue.Desktop.register({
 		Calculator : {
 			name : 'Calculator',
 			css : '/calculator/static/css/calculator.css',
-			require: [ /* put required js assets here	 example: */ 'CCS.JBrowser' ],
+			require: [ /* put required js assets here	 example: */ 'JFrame/JFrame.Browser' ],
 			launch: function(path, options){
 				// application launch code here
 				// example code below:
 				return new Calculator(path || '/calculator/', options);
 			},
 			menu: {
-				id: 'ccs-calculator-menu',
+				id: 'hue-calculator-menu',
 				img: {
 					// Replace this with a real icon!
 					src: '/calculator/static/art/calculator.png'
@@ -715,7 +715,7 @@ Before we can change the style of our application's window, we need to change th
 
 Let's walk through this line by line.
 
-	CCS.Desktop.register({
+	Hue.Desktop.register({
 
 You can see we register our application with HUE. This does several things, but principally it tells the HUE environment that your app exists and how to invoke it as well as what dependencies it has. By default, you can see that we tell it about the following:
 
@@ -730,9 +730,9 @@ The second line though, "name: 'app_name'" defines the value that users see. You
 
 This is pretty straightforward. Your application has its own dedicated css file that is included. If you don't have any styles you can comment this out. You cannot include more than one css file.
 
-	require: [ /* put required js assets here	 example: */ 'CCS.JBrowser' ],
+	require: [ /* put required js assets here	 example: */ 'JFrame/JFrame.Browser' ],
 
-Here's where things get interesting. By default, our application only requires the file CCS.JBrowser.js, which gives us all our default application functionality. There's really no reason to change this unless you want to add more JavaScript functionality; we'll cover how to do that in the next section. For now, let's leave this one alone and we'll revisit it later.
+Here's where things get interesting. By default, our application only requires the file JFrame/JFrame.Browser.js, which gives us all our default application functionality. There's really no reason to change this unless you want to add more JavaScript functionality; we'll cover how to do that in the next section. For now, let's leave this one alone and we'll revisit it later.
 
 	launch: function(path, options){
 		// application launch code here
@@ -743,13 +743,13 @@ Here's where things get interesting. By default, our application only requires t
 This defines the function that is executed when your application is launched. There are a few important requirements here:
 
 * Your application will always be passed a path and, maybe, an object with options (but not likely).
-* Your application will always return an object. In the default example it returns an instance of CCS.JBrowser
-* If your application returns something else, it must be an object that inherits the properties of CCS.JBrowser
+* Your application will always return an object. In the default example it returns an instance of JFrame.Browser
+* If your application returns something else, it must be an object that inherits the properties of JFrame.Browser
 
 Finally, we have the menu icon:
 
 	menu: {
-		id: 'ccs-calculator-menu',
+		id: 'hue-calculator-menu',
 		img: {
 			// Replace this with a real icon!
 			src: '/calculator/static/art/calculator.png'
@@ -774,7 +774,7 @@ We'll talk a bit more about JavaScript in a bit, but one of the things the HUE S
 
 Adding these kinds of things to your application requires only that you use prescribed DOM structures with specific attributes. For example, let's say you wanted to have a sortable table in your response. All that you would need to do is write your template to output your table with the following HTML structure:
 
-	<table class="ccs-data_table selectable sortable" cellpadding="0" cellspacing="0">
+	<table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
 		<thead>
 			<tr>
 				<th>ID</th>
@@ -807,7 +807,7 @@ If this were the entirety of your HTML structure, you would get a view like this
 
 ![Sortable Table](htmltable.png)
 
-The key to get this layout is to have a table with the CSS classes `css-data_table` and, optionally, adding onto that the CSS classes `selectable` and `sortable`. It's also important that your table have both `thead` and `tbody` tags.
+The key to get this layout is to have a table with the property `data-filters` set to `HtmlTable` and, optionally, adding onto that the CSS classes `selectable` and `sortable`. It's also important that your table have both `thead` and `tbody` tags.
 
 This mechanism for inspecting the HTML response for key structures is at the heart of front-end development with the HUE SDK. When you want to write your own behaviors, you'll be best served to write your logic into as many of these types as patterns as possible.
 
@@ -817,21 +817,21 @@ There are many patterns available in the SDK for your use with more added regula
 
 ### How HTML, Links, Forms, etc Work
 
-The JavaScript class that does this HTML inspection is called CCS.JFrame (which we'll refer to from here on as just 'JFrame'). You can think of JFrame as a JavaScript implementation of an IFrame (hence its name). JFrame requests your app's home page and injects the HTML response into the body of the application window (another class called CCS.JBrowser, which we'll just call 'JBrowser'). This is roughly equivalent to opening a web browser and requesting an html document from the internet. All the links within the response will, when clicked, load their corresponding HTML into the JFrame, just as an Iframe would. The same goes for forms.
+The JavaScript class that does this HTML inspection is called JFrame. You can think of JFrame as a JavaScript implementation of an IFrame (hence its name). JFrame requests your app's home page and injects the HTML response into the body of the application window (another class called JFrame.Browser). This is roughly equivalent to opening a web browser and requesting an html document from the internet. All the links within the response will, when clicked, load their corresponding HTML into the JFrame, just as an Iframe would. The same goes for forms.
 
-As a result, if you write your "web 1.0" application and load it into a JBrowser's JFrame, all the links and forms will work as you would expect them to.
+As a result, if you write your "web 1.0" application and load it into a JFrame.Browser's JFrame, all the links and forms will work as you would expect them to.
 
 #### Launching Other HUE Applications
 
 The HUE SDK provides an easy way to spawn other applications from within your own. All that is required is that any link you wish have spawn another app have a `target` value defined for that app's name (the non-nice name, so the File Browser's app name is FileBrowser). These names aren't always obvious. The easiest way to find a manifest is to open [http://localhost:8000/bootstrap.js](http://localhost:8000/bootstrap.js) in your browser and look at all the application registrations. For example, here's the bootstrap for the *About* application (which just shows you information about what version of HUE you are running):
 
 	/* about */
-	CCS.Desktop.register({
+	Hue.Desktop.register({
 		About : {
 			name: 'About HUE',
-			require: ['CCS.JBrowser'],
+			require: ['JFrame.Browser'],
 			launch: function(path, options){
-				return new CCS.JBrowser('/about/', $merge({
+				return new JFrame.Browser('/about/', $merge({
 					displayHistory: false,
 					width: 350
 				}, options));
@@ -898,13 +898,13 @@ To get HTML into the navigation area of your application you simply give the con
 
 	<div class="toolbar">
 		<a href="/filebrowser/view/"><img src="/filebrowser/static/art/icon_large.png" class="fb_icon"/></a>
-		<div class="fb-actions ccs-button_bar">
-			<a class="fb-upload ccs-art_button" data-icon-styles="{'width' : 16, 'height': 16}" href="/filebrowser/upload?dest=/&next=/filebrowser/view/">Upload a File</a>
-			<a class="fb-mkdir ccs-art_button" data-icon-styles="{'width' : 16, 'height': 16}" href="/filebrowser/mkdir?path=/&next=/filebrowser/view/">New Directory</a>
+		<div data-filters="ButtonBar" class="fb-actions">
+			<a data-filters="ArtButton" class="fb-upload" data-icon-styles="{'width' : 16, 'height': 16}" href="/filebrowser/upload?dest=/&next=/filebrowser/view/">Upload a File</a>
+			<a data-filters="ArtButton" class="fb-mkdir" data-icon-styles="{'width' : 16, 'height': 16}" href="/filebrowser/mkdir?path=/&next=/filebrowser/view/">New Directory</a>
 		</div>
 	</div>
 
-There are some other things going on here - the button styling is achieved by wrapping buttons in the `ccs-button_bar` CSS class and the buttons themselves are styled with more CSS properties and even some custom values for the icon styles (the little images in the button next to the text). Let's gloss over these for now and just focus on the toolbar aspect itself.
+There are some other things going on here - the button styling is achieved by `data-filters="ArtButton"` the buttons themselves are styled with more CSS properties and even some custom values for the icon styles (the little images in the button next to the text). Let's gloss over these for now and just focus on the toolbar aspect itself.
 
 When JFrame retrieves your HTML from the server it looks in the response for any of these `toolbar` elements and when it finds them it moves them into the header. Every time JFrame loads a new page the header is emptied and filled anew. Thus if you want your icon to always be present, you need to have it in every response. In this case, we've also wrapped it in a link to go to the root view of the File Browser app, which makes it act something like a "home" button.
 
@@ -920,11 +920,11 @@ You can think of JFrame as being the portion of your application window between 
 
 ![File Browser](file_browser.png)
 
-If you were to wrap your HTML response in a DIV and give it a CSS class that was different for each view of your application with the purpose of styling it, you'd discover that you wouldn't be able to style the content that got moved into the header of the application window. This is because the JavaScript class that manages that window (JBrowser) is the thing that actually moves content out of JFrame and into its header (a JBrowser has a JFrame, but JFrame doesn't have any real knowledge that it's in a JBrowser).
+If you were to wrap your HTML response in a DIV and give it a CSS class that was different for each view of your application with the purpose of styling it, you'd discover that you wouldn't be able to style the content that got moved into the header of the application window. This is because the JavaScript class that manages that window (JFrame.Browser) is the thing that actually moves content out of JFrame and into its header (a JFrame.Browser has a JFrame, but JFrame doesn't have any real knowledge that it's in a JFrame.Browser).
 
 So if you want to style your header or any of your other content depending on which view of your application is displayed you instead define that view by wrapping your response with a special DIV. This DIV is given the CSS class `view` and is a root level node (i.e. its direct parent is the BODY tag). You can give it additional classes if you want to, but these will only wrap the content area when it is displayed. In addition to the `view` CSS class, you assign this DIV an ID - one of the very few places where it's ok to use IDs. When such a response comes back, JFrame finds it and passes along the value assigned to the ID of this element as the "view" *and removes the ID attribute from the DOM element*. When JFrame renders your response, this ID will *not* be present.
 
-Instead, JBrowser takes this ID and assigns it as a class name to the element that contains both the header and the body of your application. In this manner you can have styles that will affect both your header and body, despite the fact that these are split apart.
+Instead, JFrame.Browser takes this ID and assigns it as a class name to the element that contains both the header and the body of your application. In this manner you can have styles that will affect both your header and body, despite the fact that these are split apart.
 
 Here's what that HTML might look like:
 
@@ -963,13 +963,13 @@ At this point it's worth noting that HUE uses the [MooTools](http://mootools.net
 
 If you're going to dive into JavaScript, you'll want to familiarize yourself with the MooTools Core ([docs](http://mootools.net/docs), [tutorial](http://mootorial.com)) and maybe the MooTools More and Clientcide libraries. MooTools ART is what does all the button and window rendering, but it's still undocumented. We'll try and cover the basics of what you'll need to know about that library later on in this walk-through.
 
-#### Extending CCS.JBrowser
+#### Extending JFrame.Browser
 
 The default bootstrap for your application invokes your app like this:
 
 	return new Calculator(path || '/calculator/', options);
 
-To customize your application, we need to extend the CCS.JBrowser class to create our own custom implementation. When you provision your application, we will already have an extension defined for you.
+To customize your application, we need to extend the JFrame.Browser class to create our own custom implementation. When you provision your application, we will already have an extension defined for you.
 
 Inside your application you'll find a JavaScript directory already provisioned for you in */static/js/*. In that directory you'll find a file called *package.yml*. This file is a manifest of the contents of your application's JavaScript. By default it points to a single JavaScript source file in Source/YourAppName.js. If you add more JavaScript source files, be sure to update the package.yml file so that HUE can properly load your JavaScript. Whenever you change the JavaScript dependencies for your application, you need to restart the Django server unless you have the `DESKTOP_DEPENDER_DEBUG` environment variable set to have it run in "live" mode (see note below on Debugging Tips and Tricks).
 
@@ -982,7 +982,7 @@ The YAML manifest file lists the names of all the files in a package, the packag
 
 	copyright: 2010
 	description: Shared components for HUE
-	name: ccs-shared
+	name: hue-shared
 	sources: [Source/Path/To/A/JS/File.js, Source/Path/To/Another/JS/File.js, etc]
 	version: 0.4.0
 
@@ -995,7 +995,7 @@ To understand the JavaScript file headers, let's look at the one we created for 
 
 	script: Calculator.js
 
-	description: Defines Calculator; a HUE application that extends CCS.JBrowser.
+	description: Defines Calculator; a HUE application that extends JFrame.Browser.
 
 	license: MIT-style license
 
@@ -1003,7 +1003,7 @@ To understand the JavaScript file headers, let's look at the one we created for 
 	- Unknown
 
 	requires:
-	- ccs-shared/CCS.JBrowser
+	- JFrame/JFrame.Browser
 
 	provides: [Calculator]
 
@@ -1016,10 +1016,10 @@ This is the beginning of our application's JavaScript. It is a YAML fragment tha
 * description: a simple description
 * license: the license granted to the user of this script
 * authors: a list of authors; since we don't know who you are, we default to "Unknown"
-* requires: a list of package/source files on which our script depends. As you can see, this file, by default, only requires the `CCS.JBrowser` source from the ccs-shared package.
+* requires: a list of package/source files on which our script depends. As you can see, this file, by default, only requires the `JFrame.Browser` source from the hue-shared package.
 * provides: a list of components that our script provides. A script can provide more than one, which gives you the option of eventually splitting it up if you so choose. Typically every public method, variable, and class defined in a script is in this list.
 
-Note that class dependencies cascade; by requiring `CCS.JBrowser` you get all of its dependencies. If, for example, you needed something out of MooTools Core, you'd look in it's package.yaml (at *ext/mootools-core/package.yaml*) to see its manifest and its name (`core`) and then look in any file for what it provides. The same is true of all the other packages in HUE.
+Note that class dependencies cascade; by requiring `JFrame.Browser` you get all of its dependencies. If, for example, you needed something out of MooTools Core, you'd look in it's package.yaml (at *ext/mootools-core/package.yaml*) to see its manifest and its name (`core`) and then look in any file for what it provides. The same is true of all the other packages in HUE.
 
 Perhaps a simpler method is to drop to your shell and execute the following:
 
@@ -1028,12 +1028,12 @@ Perhaps a simpler method is to drop to your shell and execute the following:
 This command is useful in two ways: first, it will list all the files available to HUE and secondly it will validate that all the files required are found and that there are no circular references. So if we wanted to require, say, Swiff.js from MooTools Core, we could alter our script header thusly:
 
 	requires:
-	- ccs-shared/CCS.JBrowser
-	- core/Swiff
+	- JFarme/JFrame.Browser
+	- Core/Swiff
 
 #### Styling the Application Window
 
-CCS.JBrowser is an extension of a MooTools plugin called ART.Browser found in the MooTools ART library, specifically in its widgets collection. You can see the version of this running in HUE at [http://github.com/cloudera/art-widgets/](http://github.com/cloudera/art-widgets/). This codebase is still in beta and is light on documentation. That's ok, we'll try and tell you what you need to know here.
+JFrame.Browser is an extension of a MooTools plugin called ART.Browser found in the MooTools ART library, specifically in its widgets collection. You can see the version of this running in HUE at [http://github.com/cloudera/art-widgets/](http://github.com/cloudera/art-widgets/). This codebase is still in beta and is light on documentation. That's ok, we'll try and tell you what you need to know here.
 
 The most important thing to know about styling ART.Window is how ART.Sheet works. Every component in ART has a CSS selector applied to it, and its styles are derived from values assigned to ART.Sheet. Let's look at the default styles that come with ART.Browser.
 
@@ -1092,7 +1092,7 @@ The only things that really interest us for the purpose of this demo are the sty
 
 	var Calculator = new Class({
 
-		Extends: CCS.JBrowser,
+		Extends: JFrame.Browser,
 
 		options: {
 			className: 'browser calculator'
@@ -1106,9 +1106,9 @@ To put the logo in the header, as well as, perhaps, other things like toolbar bu
 
 #### Customizing Your Application's Behavior
 
-In the previous section we touched on CCS.JBrowser, which is the JavaScript class that generates an application window in HUE. This window is empty - just a header, a footer, a content area, and an optional history navigation. To load content into it, every instance of CCS.JBrowser has an instance of another class called CCS.JFrame (which we discussed earlier).
+In the previous section we touched on JFrame.Browser, which is the JavaScript class that generates an application window in HUE. This window is empty - just a header, a footer, a content area, and an optional history navigation. To load content into it, every instance of JFrame.Browser has an instance of another class called JFrame (which we discussed earlier).
 
-To customize your application you'll need to add new code to your extension of JBrowser to do additional things when that instance's JFrame changes state.
+To customize your application you'll need to add new code to your extension of JFrame.Browser to do additional things when that instance's JFrame changes state.
 
 ##### Adding Logic to the Load Event
 
@@ -1118,7 +1118,7 @@ Let's say whenever your application loads you wanted to alert the user (which wo
 
 	var Calculator = new Class({
 
-		Extends: CCS.JBrowser,
+		Extends: JFrame.Browser,
 
 		options: {
 			className: 'browser calculator'
@@ -1126,11 +1126,11 @@ Let's say whenever your application loads you wanted to alert the user (which wo
 
 		//your app will possibly be passed two arguments, a path, and an object called options
 		initialize: function(path, options) {
-			//this.parent calls this initialize method on the superclass, in this case, CCS.JBrowser
+			//this.parent calls this initialize method on the superclass, in this case, JFrame.Browser
 			//note that if the path isn't specified, we have a default path, /calculator/
 			this.parent(path || '/calculator/', options);
 
-			//now let's customize our application. We'll add an event listener for JBrowser's custom 'load' event
+			//now let's customize our application. We'll add an event listener for JFrame.Browser's custom 'load' event
 			this.addEvent('load', function(){
 				alert('I just loaded this url: ' + this.currentPath);
 			}.bind(this)); //don't forget to bind your function to this instance (see below)
@@ -1138,9 +1138,9 @@ Let's say whenever your application loads you wanted to alert the user (which wo
 
 		etc
 
-In the example above we have a standard CCS.JBrowser extension. It states that it extends CCS.JBrowser, defines a custom className for itself and has an initialize method that invokes the initialize method of CCS.JBrowser using the this.parent method. Then we customize the behavior, adding an function callback to the load event. Because our function references a property of our JBrowser instance, we need to bind "this" to our function. We then reference a JFrame property for the current url that's loaded.
+In the example above we have a standard JFrame.Browser extension. It states that it extends JFrame.Browser, defines a custom className for itself and has an initialize method that invokes the initialize method of JFrame.Browser using the this.parent method. Then we customize the behavior, adding an function callback to the load event. Because our function references a property of our JFrame.Browser instance, we need to bind "this" to our function. We then reference a JFrame property for the current url that's loaded.
 
-There are a lot of other tools that JFrame and JBrowser provide that allow you to customize your application. Many of them don't require you to write any JavaScript at all.
+There are a lot of other tools that JFrame and JFrame.Browser provide that allow you to customize your application. Many of them don't require you to write any JavaScript at all.
 
 ##### Running JavaScript For Specific Views
 
@@ -1185,9 +1185,9 @@ Let's digest this a bit. First, there's a bit of magic going on with the `$(this
 
 As a side note, our click event handler above would benefit greatly from event delegation. We'll touch on this later when we discuss another bit of JFrame magic: linkers.
 
-##### Events provided by JFrame and JBrowser
+##### Events provided by JFrame and JFrame.Browser
 
-In your extension of JBrowser you can easily attach event logic to when new content loads as illustrated in the previous example. JBrowser also inherits the following events from its ancestor classes in the ART collection of classes:
+In your extension of JFrame.Browser you can easily attach event logic to when new content loads as illustrated in the previous example. JFrame.Browser also inherits the following events from its ancestor classes in the ART collection of classes:
 
 * minimize, maximize - the window has been minimized or maximized
 * resize:start, resize:move, resize:end - the various states of window resizing
@@ -1200,14 +1200,14 @@ In your extension of JBrowser you can easily attach event logic to when new cont
 * disable - the window is now in the background
 * destroy - the window is destroyed and removed from the DOM (by default, this occurs when it is hidden)
 
-In addition to these events, every instance of JBrowser has a pointer to its JFrame (as `this.jframe`). JFrame provides the following events:
+In addition to these events, every instance of JFrame.Browser has a pointer to its JFrame (as `this.jframe`). JFrame provides the following events:
 
 * request - called when a request is made; passed the URL that was requested
 * beforeRenderer - a callback executed before any renderers applied; passed a content object and an options object - see the section on renderers
 * afterRenderer - a callback executed after the renderers have been applied, passed the same content and options objects as above
 * loadError - a callback executed when the request fails, passed along an error message that has *already* been displayed to the user
 
-You can attach logic to any of the events above, but it's highly unlikely that you'll need to use any other than the `load` event on JBrowser. Most of the time though you'll be better off using JFrame renderers, linkers, and filters.
+You can attach logic to any of the events above, but it's highly unlikely that you'll need to use any other than the `load` event on JFrame.Browser. Most of the time though you'll be better off using JFrame renderers, linkers, and filters.
 
 ##### JFrame Render Phases: Renderers, Filters, and Linkers
 
@@ -1225,7 +1225,7 @@ Renderers are what they sound like; they are code that take the HTML returned by
 * finds the "view" element and removes its ID
 * applies all its linkers (we'll get to this in a sec)
 * applies all its filters (ditto)
-* finds any toolbar elements in the response and passes them along to JBrowser to add to its header
+* finds any toolbar elements in the response and passes them along to JFrame.Browser to add to its header
 * injects the HTML into the main content area, destroying the old content
 
 It's unlikely that you'll write your own, so we'll not cover how to do that in this tutorial, but it's useful to know what's going on. In the SDK we only have two other renderers; Alert and Prompt. These are their own renderers because they don't do the things listed above. The alert renderer, for example, displays an alert above the previous content and when the user dismisses it they are looking at the previous state. The prompt renderer is similar, except that the "Cancel" button restores the previous state, while the "Ok" button submits the form in the prompt and loads a new page (using the default renderer).
@@ -1269,15 +1269,15 @@ And here's the html that produces it (this is the entire template that generated
 		</head>
 		<body>
 			<div class="jframe_padded">
-				<div class="ccs-tab_ui">
-					<ul class="ccs-tabs ccs-right clearfix">
+				<div data-filters="Tabs">
+					<ul class="tabs jframe-right clearfix">
 						<li><span>Tab 1</span></li>
 						<li><span>Tab 2</span></li>
 					</ul>
 				</div>
-				<ul class="ccs-tab_sections ccs-clear" style="border-top: 1px solid #999; padding: 10px">
+				<ul class="tab_sections jframe-clear" style="border-top: 1px solid #999; padding: 10px">
 					<li>
-						<p>I'm the section for Tab 1. Note that my UL has both a .ccs-tab_sections class but also a .ccs-clear; that's because the tabs are aligned to the right, so we need to clear that float.</p>
+						<p>I'm the section for Tab 1. Note that my UL has both a .tab_sections class but also a .jframe-clear; that's because the tabs are aligned to the right, so we need to clear that float.</p>
 						<p>
 							(cropping out the rest of the text for space)
 						</p>
@@ -1293,50 +1293,41 @@ And here's the html that produces it (this is the entire template that generated
 
 And here's the Javascript that adds that filter:
 
-	CCS.JFrame.addGlobalFilters({
+	Behavior.addGlobalFilters({
 
-		tabs: function(container) {
-			if (!container.get('html').test('ccs-tab_ui')) return;
-			container.getElements('.ccs-tab_ui').each(function(tabGroup){
-				var tabs = tabGroup.getElements('.ccs-tabs>li');
-				var sections = tabGroup.getElements('.ccs-tab_sections>li');
-				if (tabs.length != sections.length) {
-					dbug.warn('warning; sections and sections are not of equal number. tabs: %o, sections: %o', tabs, sections);
-					return;
-				}
-				var ts = new TabSwapper({
-					tabs: tabs,
-					sections: sections,
-					smooth: true,
-					smoothSize: true
-				});
-				tabGroup.store('TabSwapper', ts);
-			}, this);
+		Tabs: function(element, behaviorAPI) {
+			var tabs = element.getElements(element.get('data', 'tabs-selector') || '.tabs>li');
+			var sections = element.getElements(element.get('data', 'sections-selector') || '.tab_sections>li');
+			if (tabs.length != sections.length || tabs.length == 0) {
+				behaviorAPI.error('warning; sections and sections are not of equal number. tabs: %o, sections: %o', tabs, sections);
+				return;
+			}
+			var ts = new TabSwapper({
+				tabs: tabs,
+				sections: sections,
+				smooth: true,
+				smoothSize: true
+			});
+			element.store('TabSwapper', ts);
 		}
 
 	});
 
 There are a few interesting things going on here. Let's walk through the JavaScript.
 
-	CCS.JFrame.addGlobalFilters({
-	  tabs: function(container) {
+	Behavior.addGlobalFilters({
+		Tabs: function(element, behaviorAPI) {
 
-Here we're adding a global filter that affects all JFrames. You should probably only add filters to your own application(s) (many of our own applications add their own locally in the same manner). The SDK adds some global ones for all applications. The name isn't really that important; it's mostly used for providing useful debugging when there's an error (so we can log which filter failed).
+Here we're adding a global filter that affects all JFrames's instances of Behavior. You should probably only add filters to your own application(s) (many of our own applications add their own locally in the same manner). The SDK adds some global ones for all applications. The name isn't really that important; it's mostly used for providing useful debugging when there's an error (so we can log which filter failed).
 
-		if (!container.get('html').test('ccs-tab_ui')) return;
+			var tabs = element.getElements(element.get('data', 'tabs-selector') || '.tabs>li');
+			var sections = element.getElements(element.get('data', 'sections-selector') || '.tab_sections>li');
+			if (tabs.length != sections.length || tabs.length == 0) {
 
-In the code above we check to see if our HTML contains a string match. We could try and select any elements that match the selector, but this is more expensive. Doing a quick string check allows us to exit quickly if there is no match.
-
-In this next section we find the containers of each of the tab components, loop through them and find the tabs themselves, and the corresponding sections that the tabs are supposed to show.
-
-		container.getElements('.ccs-tab_ui').each(function(tabGroup){
-			var tabs = tabGroup.getElements('.ccs-tabs>li');
-			var sections = tabGroup.getElements('.ccs-tab_sections>li');
-
-If the tabs and the sections they are supposed to show don't match in count, something is probably wrong. We throw a warning to the console (via the [dbug](http://www.clientcide.com/docs/Core/dbug) wrapper). This won't show up to the user, but if we enable the debugger, we'll see the complaint. In this case, our HTML should degrade; the UI may look ugly, but all the HTML will be visible.
+In the code above we check to see if our HTML structure works; if there's not an equal number of sections and tabs, something's wrong. We throw a warning to the console (via the [dbug](http://www.clientcide.com/docs/Core/dbug) wrapper). This won't show up to the user, but if we enable the debugger, we'll see the complaint. In this case, our HTML should degrade; the UI may look ugly, but all the HTML will be visible.
 
 			if (tabs.length != sections.length) {
-				dbug.warn('warning; sections and sections are not of equal number. tabs: %o, sections: %o', tabs, sections);
+				behaviorAPI.error('warning; sections and sections are not of equal number. tabs: %o, sections: %o', tabs, sections);
 				return;
 			}
 
@@ -1354,7 +1345,7 @@ The last thing we do (and this isn't a requirement) is store a reference to the 
 			tabGroup.store('TabSwapper', ts);
 		}, this);
 
-This storage of the instance on the element it enhances is really just there convenience. Actually, most MooTools classes do this for you (TabSwapper doesn't because it takes as arguments the tabs and sections, not the container, so there is no *one* element that it is bound to, unlike our pattern here were we have a wrapper). By storing this reference, we can retrieve it in our own application code (`$(this).getElement('.ccs-tab_ui').retrieve('TabSwapper')`) and call its methods.
+This storage of the instance on the element it enhances is really just there convenience. Actually, most MooTools classes do this for you (TabSwapper doesn't because it takes as arguments the tabs and sections, not the container, so there is no *one* element that it is bound to, unlike our pattern here were we have a wrapper). By storing this reference, we can retrieve it in our own application code (`$(this).getElement('[data-filters*=Tabs]').retrieve('TabSwapper')`) and call its methods.
 
 Now whenever our JFrame receives an HTML response it will grep the response and, if it finds our marker, apply this pattern. In this way, we imbue the HTML response with functionality. Our application code needs only to format its HTML in this predefined way. This makes the code highly reusable; future applications that you write don't need to repeat this programming effort; they need only implement this filter.
 
@@ -1370,7 +1361,7 @@ Here's a quick example of a hot-key in HUE - in this case, from the File Browser
 			shortcut: 'enter',
 			handler: function(e){
 				//get the file list table
-				var table = $(this).getElement('.ccs-data_table');
+				var table = $(this).getElement('[data-filters*=HtmlTable]');
 				if (!table) return;
 				//retrieve its instance of the HtmlTable class
 				hTable = table.retrieve('HtmlTable');
@@ -1391,7 +1382,10 @@ You can add as many as you like, but be cautious of how certain keys can affect 
 
 HUE provides a simple way for you to display temporary messages to the viewer. You simply invoke the following JavaScript:
 
-	CCS.Desktop.flashMessage(messages, duration);
+	Hue.Desktop.flashMessage({
+		message: message,
+		duration: duration
+	});
 
 The `messages` argument can be a single message (a string) or an array of strings. The duration is an integer representing the number of milliseconds to wait before hiding it. It defaults to 4.5 seconds.
 
@@ -1450,7 +1444,7 @@ Most of the time you don't need to do this, but it does come up. When in doubt, 
 
 ##### Including Other JavaScript Frameworks
 
-It is possible to include other JavaScript frameworks to do your development. You'll still need to write a minimum of MooTools style JavaScript to set up your extension of JBrowser, but after that you can do what you like. To do this you'll need to configure a version of that library to work with our dependency system and then require those files in your application's header. The only known restraint is that you cannot include another JavaScript library that alters native JavaScript prototypes (Prototype.js being the only real known conflict). jQuery, Dojo, YUI, etc are all fine. Including them represents an additional burden for your users to download, and they also make it harder for us to support you, but its your call.
+It is possible to include other JavaScript frameworks to do your development. You'll still need to write a minimum of MooTools style JavaScript to set up your extension of JFrame.Browser, but after that you can do what you like. To do this you'll need to configure a version of that library to work with our dependency system and then require those files in your application's header. The only known restraint is that you cannot include another JavaScript library that alters native JavaScript prototypes (Prototype.js being the only real known conflict). jQuery, Dojo, YUI, etc are all fine. Including them represents an additional burden for your users to download, and they also make it harder for us to support you, but its your call.
 
 ### Adding dynamic data to the "status bar"
 

@@ -19,5 +19,5 @@ from desktop.lib.windmill_util import logged_in_client
 def test_${app_name}():
   """ launches the default view for ${app_name} """
   client = logged_in_client()
-  client.click(id='ccs-${app_name}-menu')
-  client.waits.forElement(classname='CCS-${app_name.upper()}', timeout='2000')  
+  client.click(id='hue-${app_name}-menu')
+  client.waits.forElement(classname='Hue-${app_name.upper()}', timeout='2000')  

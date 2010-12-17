@@ -44,7 +44,7 @@ ${wrappers.head("Beeswax: Query History", section='history')}
 
 <div class="toolbar">
   <div class="bw-input-filter">
-    <input type="text" class="ccs-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
+    <input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
       title="Filter by Name"
       data-filter-elements="tbody tr" value=""/>
   </div>
@@ -83,7 +83,7 @@ ${wrappers.head("Beeswax: Query History", section='history')}
     % endif
   </div>
 
-  <h3 class="ccs-hidden">Query History:</h3>
+  <h3 class="jframe-hidden">Query History:</h3>
   <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
@@ -106,11 +106,11 @@ ${wrappers.head("Beeswax: Query History", section='history')}
         if design:
           qcontext = views.make_query_context('design', design.id)
       %>
-      <tr data-dblclick-delegate="{'dblclick_loads':'.bw-view_result'}" class="ccs-no_select ccs-help_links_small">
+      <tr data-dblclick-delegate="{'dblclick_loads':'.bw-view_result'}" class="jframe-no_select hue-help_links_small">
         <td>${query.submission_date.strftime("%x %X")}</td>
         <td>${show_saved_query(design, query)}</td>
         <td>
-          <p class="ccs-inline" data-filters="InfoTip">
+          <p class="jframe-inline" data-filters="InfoTip">
             % if len(query.query) > 100:
               <code>${collapse_whitespace(query.query[:100])}...</code>
             % else:

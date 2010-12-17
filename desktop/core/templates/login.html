@@ -15,24 +15,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-<div id="ccs-flogin">
+<div id="hue-flogin">
   <form action="/accounts/login_ajax" method="post">
     <img class="hue-login_logo" src="/static/art/hue-login-logo.png" width="61" height="56" alt="Hue Login Logo"/>
-    <input alt="your username" type="text" name="username" class="ccs-username" tabIndex="1"/>
-    <img src="/static/art/error.png" width="14" height="14" alt="Error" class="ccs-errorImg"/>
-    <input alt="your password" type="password" name="password" class="ccs-password" tabIndex="2" />
-    <input type="submit" class="ccs-submit ccs-continue" name="continue" value="continue" title="continue"/>
-    <img src="/static/art/login-spinner.gif" class="ccs-spinner" width="16" height="16" alt="loading..."/>
-    <img src="/static/art/password-help.png" width="76" height="5" alt="Password Help" id="ccs-pwhelp" tabIndex="3">
+    <input alt="your username" type="text" name="username" class="hue-username" tabIndex="1"/>
+    <img src="/static/art/error.png" width="14" height="14" alt="Error" class="jframe-errorImg"/>
+    <input alt="your password" type="password" name="password" class="hue-password" tabIndex="2" />
+    <input type="submit" class="hue-submit hue-continue" name="continue" value="continue" title="continue"/>
+    <img src="/static/art/login-spinner.gif" class="hue-spinner" width="16" height="16" alt="loading..."/>
+    <img src="/static/art/password-help.png" width="76" height="5" alt="Password Help" id="hue-pwhelp" tabIndex="3">
   </form>
 </div>
-<div id="ccs-restore-option">
-	Restore my last session: <input type="checkbox" checked="true" name="ccs-restore-option" value="restore">
+<div id="hue-restore-option">
+	Restore my last session: <input type="checkbox" checked="true" name="hue-restore-option" value="restore">
 </div>
 <script>
 	//if there is a session to restore, show the option
 	window.addEvent('domready', function(){
-		var option = $('ccs-restore-option');
+		var option = $('hue-restore-option');
 		option.addEvent('mousedown', function(e){
 			e.stop();
 			if ($(e.target) == option) {
@@ -46,7 +46,7 @@ limitations under the License.
 	});
 </script>
 {%if first_login_ever %}
-  <div id="ccs-flogin-first">
+  <div id="hue-flogin-first">
     <p>Since this is your first time logging in,
     please pick any username and password.</p>
     <p style="margin-bottom: 0px;"><em>Be sure to remember these, as they

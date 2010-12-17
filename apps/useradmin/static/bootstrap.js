@@ -13,17 +13,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-CCS.Desktop.register({
+Hue.Desktop.register({
 	UserAdmin: {
 		name: 'User Admin',
 		libs: '/useradmin/static/js/libs.json',
-		require: ['useradmin/CCS.UserAdmin'],
+		require: ['useradmin/Hue.UserAdmin'],
 		launch: function(path, options) {
-			return new CCS.UserAdmin(path || '/useradmin/', options);
+			return new Hue.UserAdmin(path || '/useradmin/', options);
 		},
 		css: '/useradmin/static/css/useradmin.css',
 		menu: {
-			id: 'ccs-useradmin-menu',
+			id: 'hue-useradmin-menu',
 			img: {
 				src: '/useradmin/static/art/useradmin-logo.png'
 			}

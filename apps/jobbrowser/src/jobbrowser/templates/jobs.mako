@@ -28,13 +28,13 @@
     % if len(jobs) > 0 or filtered:
       ${comps.header("Job Browser", toolbar=False)}
       <div id="job_browser_list" class="view">
-        <h1 class="ccs-hidden">Jobs</h1>
+        <h1 class="jframe-hidden">Jobs</h1>
         <div class="toolbar">
           <a href="/jobbrowser/jobs/"><img src="/jobbrowser/static/art/icon_large.png" class="jt_icon"/></a>
           <ul class="jt_filters">
             <form class="jt_filter_form" data-filters="SubmitOnChange" method="get" action="/jobbrowser/jobs/">
-              <li class="ccs-inline"><b>Filter Jobs:</b></li>
-              <li class="ccs-inline">
+              <li class="jframe-inline"><b>Filter Jobs:</b></li>
+              <li class="jframe-inline">
                 <select name="state">
                   <option value="all" ${get_state('all', state_filter)}>All States</option>
                   <option value="running" ${get_state('running', state_filter)}>Running</option>
@@ -43,10 +43,10 @@
                   <option value="killed" ${get_state('killed', state_filter)}>Killed</option>
                 </select>
               </li>
-              <li class="ccs-inline">
+              <li class="jframe-inline">
                 <input type="text" class="jt_filter" data-filters="OverText, ArtInput" data-art-input-type="search" name="user" title="User Name Filter" value="${user_filter}"/>
               </li>
-              <li class="ccs-inline">
+              <li class="jframe-inline">
                 <input type="text" class="jt_filter" data-filters="OverText, ArtInput" data-art-input-type="search" name="text" title="Text Filter" value="${text_filter}"/>
               </li>
             </form>

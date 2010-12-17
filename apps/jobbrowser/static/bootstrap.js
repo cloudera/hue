@@ -13,16 +13,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-CCS.Desktop.register({
+Hue.Desktop.register({
 	JobBrowser: {
 		name: 'Job Browser',
 		css: '/jobbrowser/static/css/jobbrowser.css',
-		require: ["jobbrowser/CCS.JobBrowser"],
+		require: ["jobbrowser/Hue.JobBrowser"],
 		launch: function(path, options){
-			return new CCS.JobBrowser(path, options);
+			return new Hue.JobBrowser(path, options);
 		},
 		menu: {
-			id: 'ccs-jobbrowser-menu',
+			id: 'hue-jobbrowser-menu',
 			img: {
 				src: '/jobbrowser/static/art/jobbrowser-small.png'
 			}
@@ -31,9 +31,9 @@ CCS.Desktop.register({
 	}
 });
 Depender.require({
-	scripts: ["CCS.JobBrowser.Poller"],
+	scripts: ["Hue.JobBrowser.Poller"],
 	callback: function(){
-		if (Cookie.read('activateJobsPoller') != "false") CCS.User.withUser(CCS.Dock.startJobsPoll);
-		else CCS.Dock.statusContent.set('html', 'poller paused');
+		if (Cookie.read('activateJobsPoller') != "false") Hue.User.withUser(Hue.Dock.startJobsPoll);
+		else Hue.Dock.statusContent.set('html', 'poller paused');
 	}
 });

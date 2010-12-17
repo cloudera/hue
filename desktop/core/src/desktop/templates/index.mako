@@ -24,7 +24,8 @@
   <link rel="stylesheet" href="/static/css/reset.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="/static/css/windows.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="/static/css/desktop.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="/static/oocss/Button.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="/static/css/hue-deprecated.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="/static/js/ThirdParty/jframe/Assets/jframe.css" type="text/css" media="screen" charset="utf-8">
 
   <link rel="stylesheet" href="/static/oocss/Button.css">
   <link rel="stylesheet" href="/static/oocss/Bar.css">
@@ -32,7 +33,7 @@
   <link rel="stylesheet" href="/static/oocss/Grid.css">
   <link rel="stylesheet" href="/static/oocss/Icon.css">
 
-  <script src="/depender/build?client=true&require=clientcide/dbug,Core/DomReady,Core/Cookie,Core/Element.Dimensions,Core/Element.Style,ccs-shared/CCS.Desktop.BackgroundManager,Core/Cookie,clientcide/Clientcide,ccs-shared/CCS.Request,ccs-shared/CCS.User,ccs-shared/CCS.Desktop.Config,JFrame/MooTools.Config,JFrame/FlashMessage,JFrame/JFrame.Keys,ccs-shared/CCS.Login,clientcide/StickyWin.PointyTip,More/Element.Delegation,Core/Fx.Tween"></script>
+  <script src="/depender/build?client=true&require=hue-shared/Hue,hue-shared/Hue.Desktop.BackgroundManager,hue-shared/Hue.Desktop.Config,hue-shared/Hue.JFrame.Target,hue-shared/Hue.Login,hue-shared/Hue.Request,hue-shared/Hue.User"></script>
   <!--[if IE 8]>
       <script>
           window.ie8 = true;
@@ -77,13 +78,13 @@
         //add a notification for when apps are launched
         var launchGrowl = function(component){
           //get the app name ("File Browser" from "filebrowser")
-          var appName = CCS.Desktop.getAppName(component);
+          var appName = Hue.Desktop.getAppName(component);
           //show the appropriate flash message; if it's loaded then we're just "launching"
           //else show "loading"
           var loading = 'Loading ' + appName;
           var launching = 'Launching ' + appName;
           var msg = loading;
-          if (CCS.Desktop.hasLoaded(component)) msg = launching;
+          if (Hue.Desktop.hasLoaded(component)) msg = launching;
           if (!FlashMessage.checkForFlashMessage(loading) && 
               !FlashMessage.checkForFlashMessage(launching) && 
               !$$('.loadingmsg').length) {
@@ -96,20 +97,20 @@
             delete growled[component];
           }
         };
-        CCS.Desktop.initialize({
+        Hue.Desktop.initialize({
           onBeforeLoad: launchGrowl,
           onBeforeLaunch: launchGrowl,
           onAfterLaunch: clearGrowl
         });
-        //fade out the ccs-loading message
+        //fade out the hue-loading message
         (function(){
-          $('ccs-loading').fade('out').get('tween').clearChain().chain(function(){
-            $('ccs-loading').destroy();
+          $('hue-loading').fade('out').get('tween').clearChain().chain(function(){
+            $('hue-loading').destroy();
           });
         }).delay(300);
 
         //when the user logs in
-        CCS.User.withUser(function(user){
+        Hue.User.withUser(function(user){
           var bsLoaded;
           //this method runs once the bootstrap is run and the apps are registered
           var bootstrapped = function(){
@@ -118,7 +119,7 @@
             bsLoaded = true;
 
             //if there's no desktop to restore
-            var linked = CCS.Desktop.launchLinked();
+            var linked = Hue.Desktop.launchLinked();
             // If a link was opened it chooses how to restore the desktop
             var restored;
 
@@ -126,24 +127,24 @@
             var finalize = function(){
               if (!linked) {
                 //this is how we hide things in IE because it hates opacity/visibility stuff w/ VML
-                $('ccs-desktop').setStyle('top', -10000);
-                restored = CCS.Desktop.restoreDesktop();
-                $('ccs-desktop').setStyle('top', null);
+                $('hue-desktop').setStyle('top', -10000);
+                restored = Hue.Desktop.restoreDesktop();
+                $('hue-desktop').setStyle('top', null);
               }
               if (!linked && !restored) {
                 //call the autolaunchers
-                CCS.Desktop.autolaunchers.each(function(fn){
+                Hue.Desktop.autolaunchers.each(function(fn){
                   fn();
                 });
               }
               //display the user as logged in
-              $('ccs-profileLink').set('text', user.username).addClass('loggedIn');
-              $(document.body).addClass('ccs-loaded');
+              $('hue-profileLink').set('text', user.username).addClass('loggedIn');
+              $(document.body).addClass('hue-loaded');
               window.scrollTo(0,0);
               //fade in the toolbar
-              $('ccs-toolbar').show().tween('opacity', 0, 1);
+              $('hue-toolbar').show().tween('opacity', 0, 1);
               //and the dock
-              $('ccs-dock').tween('opacity', 0, 1);
+              $('hue-dock').tween('opacity', 0, 1);
             };
 
             //IE needs a brief delay
@@ -186,15 +187,15 @@
   <div id="bg">
   </div>
   <div id="browserWarn">Hue is best experienced in <a target="browsers" href="http://getfirefox.com">Mozilla Firefox</a>, <a target="browsers" href="http://www.apple.com/safari/">Apple Safari</a>, or <a target="browsers" href="http://www.google.com/chrome">Google Chrome</a> <a id="closeWarning"></a></div>
-  <div id="ccs-desktop" class="ccs-shared">
-    <div id="ccs-topnav">
-      <div id="ccs-toolbar">
-        <img src="/static/art/favicon.png" width="16" height="16" class="ccs-swoosh">
+  <div id="hue-desktop" class="hue-shared">
+    <div id="hue-topnav">
+      <div id="hue-toolbar">
+        <img src="/static/art/favicon.png" width="16" height="16" class="hue-swoosh">
         <span>
           Hi
-          <span id="ccs-profileLink"></span>
+          <span id="hue-profileLink"></span>
 
-          <span id="ccs-logout">
+          <span id="hue-logout">
             [<a href="/accounts/logout">logout</a>]
           </span>
         </span>
@@ -203,26 +204,26 @@
         </a>
       </div>
     </div>
-    <div id="ccs-dock">
-      <div id="ccs-dock-content">
-        <div id="ccs-dock-status" class="ccs-inline">
-          <div id="ccs-dock-status-content">
+    <div id="hue-dock">
+      <div id="hue-dock-content">
+        <div id="hue-dock-status" class="hue-inline">
+          <div id="hue-dock-status-content">
           </div>
         </div>
-        <span id="ccs-dock-icons">
+        <span id="hue-dock-icons">
         </span>
       </div>
     </div>
-    <div id="ccs-loading">Launching Hue</div>
-    <a id="ccs-feedback" href="${feedback_url}" target="_blank"><img src="/static/art/feedback-tab.png" width="76" height="26"/></a>
+    <div id="hue-loading">Launching Hue</div>
+    <a id="hue-feedback" href="${feedback_url}" target="_blank"><img src="/static/art/feedback-tab.png" width="76" height="26"/></a>
   </div>
-  <div class="alert_popup ccs-error-popup">
+  <div class="alert_popup hue-error-popup">
     Warning, an AJAX request was made for the Hue desktop which cannot be loaded into an application window. Typically this means that a link clicked has no <em>href</em> value. Please notify the application's author.
   </div>
 
     <script>
     (function(){
-      var state = CCS.Desktop.getState();
+      var state = Hue.Desktop.getState();
       var options = {};
       if (state && state.background) options.current = state.background;
       new BackgroundManager($('bg'), $('desktop-menu'), options);
