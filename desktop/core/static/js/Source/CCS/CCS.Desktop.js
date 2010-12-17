@@ -138,7 +138,7 @@ CCS.Desktop = {
 						rel: 'stylesheet',
 						media: 'screen',
 						type: 'text/css',
-						href: url
+						href: new URI(url).setData('noCache', new Date().toString())
 					}).inject(document.head);
 				}
 			};
