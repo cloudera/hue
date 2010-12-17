@@ -78,6 +78,7 @@ Behavior.addGlobalFilters({
 					parent.hide();
 				}
 			});
+			element.fireEvent('filter', parents);
 		};
 		var inputValue = element.get('value');
 		//if there's a predefined value on startup, run the filter

@@ -75,6 +75,7 @@ sources: [
   Source/BehaviorFilters/Behavior.HtmlTableMultiSelectMenu.js,
   Source/BehaviorFilters/Behavior.HtmlTableRestore.js,
   Source/BehaviorFilters/Behavior.HtmlTableUpdate.js,
+  Source/BehaviorFilters/Behavior.InputFilterHtmlTableZebra.js,
   Source/BehaviorFilters/Behavior.MultiChecks.js,
   Source/BehaviorFilters/Behavior.PostEditor.js,
   Source/BehaviorFilters/Behavior.SelectWithOther.js,

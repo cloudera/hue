@@ -51,6 +51,7 @@ requires:
  - /Behavior.HtmlTableMultiSelectMenu
  - /Behavior.HtmlTableRestore
  - /Behavior.HtmlTableUpdate
+ - /Behavior.InputFilterHtmlTableZebra
  - /Behavior.MultiChecks
  - /Behavior.PostEditor
  - /Behavior.SelectWithOther
