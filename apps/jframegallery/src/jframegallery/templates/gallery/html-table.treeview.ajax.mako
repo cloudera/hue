@@ -56,9 +56,9 @@
           data-partial-line-id="pstree-line-${node.pid}">
           <td style="max-width:400px">
             % if path in open_paths:
-              <a href="${remove(path)}" class="ccs-hidden">collapse</a>
+              <a href="${remove(path)}" class="jframe-hidden">collapse</a>
             % elif node.children:
-              <a href="${add(path)}" class="ccs-hidden">expand</a>
+              <a href="${add(path)}" class="jframe-hidden">expand</a>
             % endif
 
             % if node.children:
@@ -66,7 +66,7 @@
                 data-spinner-target=".pstree-${node.pid}"
                 data-livepath-toggle="${urllib.urlencode([('paths', node.path)])}"
                 data-ajax-after=".pstree-${node.pid}" data-ajax-filter="tbody tr">subset</a>
-              <a href="${request_path}?subtree=${node.pid}" class="sub ccs-hidden">browse</a>
+              <a href="${request_path}?subtree=${node.pid}" class="sub jframe-hidden">browse</a>
             % endif
 
             <div style="overflow:hidden; white-space:nowrap;" data-filters="FitText">${node.command}</div></td>

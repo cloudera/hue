@@ -3,7 +3,7 @@
 .clearfix:after {content: "."; display: block; height: 0; clear: both; visibility: hidden;}
 
 /* wrapper for all css */
-.ccs-shared {
+.hue-shared {
 	position: relative;
 	font-family: "Lucida Grande", "Lucida Sans Unicode", "Trebuchet MS", Helvetica, Arial, sans-serif;
 	font-size: 12px;
@@ -13,103 +13,103 @@
 	width: inherit;
 }
 /* all links default styles */
-.ccs-shared a:visited,
-.ccs-shared a:link {
+.hue-shared a:visited,
+.hue-shared a:link {
 	color: #3e528c;
 	text-decoration: none;
 	cursor: pointer;
 	outline: none;
 }
-.ccs-shared .jframe_ignore a {
+.hue-shared .jframe_ignore a {
 	text-decoration: none;
 }
-.ccs-shared a:visited.disabled,
-.ccs-shared a:link.disabled {
+.hue-shared a:visited.disabled,
+.hue-shared a:link.disabled {
 	text-decoration: none;
 	color: #000;
 }
-.ccs-shared ul.context-menu a.disabled {
+.hue-shared ul.context-menu a.disabled {
 	text-decoration: none;
 	color: #999;
 	cursor: pointer;
 }
-.ccs-shared a:visited:hover,
-.ccs-shared a:link:hover {
+.hue-shared a:visited:hover,
+.hue-shared a:link:hover {
 	text-decoration: underline;
 }
 /* all imgs default styles */
-.ccs-shared img {
+.hue-shared img {
 	border: 0px;
 }
 /* all paragraph default styles */
-.ccs-shared p {
+.hue-shared p {
 	margin-bottom: 12px;
 }
 /* all input and form element default styles */
-.ccs-shared input, .ccs-shared textarea {
+.hue-shared input, .hue-shared textarea {
 	padding: 2px;
 }
-.ccs-shared label {
+.hue-shared label {
 	cursor: pointer;
 }
-.ccs-shared pre {
+.hue-shared pre {
 	font-family: monaco, courier;
 }
 /* errors */
-.ccs-error {
+.jframe-error {
 	color: #900;
 }
 
 /* all em default styles */
-.ccs-shared em, .ccs-shared i {
+.hue-shared em, .hue-shared i {
 	font-style: italic;
 }
 /* all code default styles */
-.ccs-shared .ccs-code, .ccs-shared.ccs-code, .ccs-code {
+.hue-shared .hue-code, .hue-shared.hue-code, .hue-code {
 	font-family: "Andale Mono", "Monaco", "Courier New" !important;
 }
 /* text is not selectable; good for double click actions like links to prevent the double click from selecting
 		note that the user cannot select this text even if that's their intention; use sparingly */
-.ccs-no_select, .ccs-no_select * {
+.jframe-no_select, .jframe-no_select * {
 	user-select: none;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 }
 /* OverText - input lables using OverText.js from MooTools More */
-.ccs-shared label.overTxtLabel {
+.hue-shared label.overTxtLabel {
 	font-size: 11px;
 	color: #999;
 	margin-top: 3px;
 }
-.ccs-shared label.OverText-ArtInput {
+.hue-shared label.OverText-ArtInput {
 	margin-top: 0px;
 }
 /* clear both sides of floats */
-.ccs-shared .ccs-clear {
+.hue-shared .jframe-clear {
 	clear:both;
 }
 /* center text */
-.ccs-shared .ccs-center {
+.hue-shared .hue-center {
 	text-align: center;
 }
 /* float left */
-.ccs-shared .ccs-left {
+.hue-shared .jframe-left {
 	float: left;
 }
 /* float right */
-.ccs-shared .ccs-right {
+.hue-shared .jframe-right {
 	float: right;
 }
 /* not displayed */
-.ccs-shared .ccs-hidden {
+.hue-shared .jframe-hidden {
 	display: none;
 }
 /* cursor pointer to connote clickability */
-.ccs-shared .ccs-pointer {
+.hue-shared .hue-pointer {
 	cursor:pointer;
 }
 /* inline block display; makes elements block level, but follows page flow */
-.ccs-shared .ccs-inline, .ccs-shared ul.ccs-inline_list li {
+.hue-shared .jframe-inline, .hue-shared ul.jframe-inline_list li {
 	display:-moz-inline-box;		/* FF2 */
 	display:inline-block;		   /* webkit and FF3 */
 	#zoom: 1; /* set hasLayout:true to mimic inline-block */
@@ -121,14 +121,14 @@
 	position: relative;
 }
 /* down divot image */
-.ccs-shared .ccs-down_divot {
+.hue-shared .hue-down_divot {
 	width: 11px;
 	height: 11px;
 	display: block;
 	background: url(../art/divots.png) -11px -11px no-repeat;
 }
 /* tabbed layout */
-/* .ccs-tabs, a ul; container for the tabs 
+/* .hue-tabs, a ul; container for the tabs 
 
 <ul class="tabs">
 <li><span>Tab 1</span></li>
@@ -142,22 +142,22 @@
 </ul>
 
 */
-.ccs-shared ul.tabs {
+.hue-shared ul.tabs {
 	margin: none;
 	padding: none;
 }
-.ccs-shared .right_col pre {
+.hue-shared .right_col pre {
 	overflow: visible;
 }
-.ccs-shared .right_col ul.tab_sections {
+.hue-shared .right_col ul.tab_sections {
 	overflow: visible;
 }
 
-.ccs-shared ul.tab_sections {
+.hue-shared ul.tab_sections {
 	overflow: visible;
 }
 /* the tab elements, li elements */
-.ccs-shared .tabs li {
+.hue-shared .tabs li {
 	cursor: pointer;
 	height: 19px;
 	line-height: 19px;
@@ -174,22 +174,22 @@
 	left: 6px;
 	padding: 1px 6px 0px 0px;
 }
-.ccs-shared .tabs > li {
+.hue-shared .tabs > li {
 	list-style: none;
 	float: left;
 }
-.ccs-shared .tabs li.tabSelected {
+.hue-shared .tabs li.tabSelected {
 	color: #000;
 	background: url(/static/art/tabs.png) left 38px;
 }
-.ccs-shared .tabs li.tabSelected span {
+.hue-shared .tabs li.tabSelected span {
 	background: url(/static/art/tabs.png) right 38px;
 }
-.ccs-shared .tabs li:hover {
+.hue-shared .tabs li:hover {
 	color: #000;
 	background: url(/static/art/tabs.png) left 19px;
 }
-.ccs-shared .tabs li:hover span {
+.hue-shared .tabs li:hover span {
 	background: url(/static/art/tabs.png) right 19px;
 }
 
@@ -249,7 +249,7 @@ table[data-filters*=HtmlTable] td {
 table[data-filters*=HtmlTable] tr.table-tr-odd td {
 	background-color: #f3f3f3;
 }
-table.ccs-bordered-table {
+table.hue-bordered-table {
 	width: 98%;
 	margin: 4px 1%;
 	border: 1px solid #888;
@@ -335,7 +335,7 @@ span.table-th-resizer {
 }
 
 
-table a.ccs-table_config_link {
+table a.hue-table_config_link {
 	display: inline-block;
 	width: 16px;
 	height: 16px;
@@ -343,7 +343,7 @@ table a.ccs-table_config_link {
 	background: no-repeat 50% 50% url(../art/icons/small_cog.png);
 	position: relative;
 }
-.ccs-table_config {
+.hue-table_config {
 	position: absolute;
 	background: #fff;
 	border: 1px solid #777;
@@ -355,7 +355,7 @@ table a.ccs-table_config_link {
 	top: 5px;
 	z-index: 10;
 }
-.ccs-shared .ccs-resize_handle {
+.hue-shared .jframe-resize_handle {
 	position: absolute;
 	bottom: 2px;
 	right: 2px;
@@ -366,13 +366,13 @@ table a.ccs-table_config_link {
 	height: 7px;
 	cursor: se-resize;
 }
-.ccs-table_config label {
+.hue-table_config label {
 	display: block;
 }
-.ccs-table_config label:hover {
+.hue-table_config label:hover {
 	color: #36f;
 }
-.ccs-table_config ul {
+.hue-table_config ul {
 	padding: 2px;
 	height: 125px;
 	min-width: 200px;
@@ -394,7 +394,7 @@ table a.ccs-table_config_link {
 *[data-filters*=Sortable] .clone {
 	z-index: 1;
 }
-.ccs-table_config li, .ccs-sort_handle {
+.hue-table_config li, .hue-sort_handle {
 	user-select: none;
 	-moz-user-select: none;
 	-webkit-user-select: none;
@@ -406,10 +406,10 @@ table a.ccs-table_config_link {
 	margin-bottom: 2px;
 	background: #fff url(../art/sortable-handle.png) 5px 50% no-repeat;
 }
-.ccs-table_config li input {
+.hue-table_config li input {
 	margin-right: 6px;
 }
-.ccs-table_config .art {
+.hue-table_config .art {
 	margin: 4px;
 }
 /* stickywin solid; this is the login window styles */
@@ -420,7 +420,8 @@ div.solid-win div.body-left {
 	position: relative; 
 	z-index: 1; 
 }
-div.solid-win div.body { position: relative;
+div.solid-win div.body {
+	position: relative;
 	left: 16px;
 	padding: 10px 16px 1px 0px;
 	background: url(../art/sticky-win-solid-back.png) top right;
@@ -508,9 +509,9 @@ div.jframe_default h5 { font-size: 105%; margin-bottom: 0.3em; padding-top: 8px;
 			}
 		]
 	
-	Note that you can have more than one right click menu per container. This allows a table row to be right clicked and show a different menu if the user right clicks, say, an image vs a link or different td elements. See CCS.ContextMenu.js.
+	Note that you can have more than one right click menu per container. This allows a table row to be right clicked and show a different menu if the user right clicks, say, an image vs a link or different td elements. See Hue.ContextMenu.js.
 */
-.ccs-shared ul.context-menu {
+.hue-shared ul.context-menu {
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
@@ -522,25 +523,25 @@ div.jframe_default h5 { font-size: 105%; margin-bottom: 0.3em; padding-top: 8px;
 	display: none;
 	overflow: visible;
 }
-.ccs-shared ul.context-menu * {
+.hue-shared ul.context-menu * {
 	white-space: nowrap;
 }
 
-.ccs-shared ul.context-menu li {
+.hue-shared ul.context-menu li {
 	border-bottom: 1px solid #ccc;
 	padding: 3px;
 }
-.ccs-shared table[data-filters*=HtmlTable] tr.table-tr-selected td ul.context-menu li a {
+.hue-shared table[data-filters*=HtmlTable] tr.table-tr-selected td ul.context-menu li a {
 	color: #000;
 	background-color: #fff;
 	text-decoration: none;
 }
-.ccs-shared .context-menu li:hover, .ccs-shared table[data-filters*=HtmlTable] tr.table-tr-selected td ul.context-menu li:hover a, .ccs-shared ul.context-menu li:hover a {
+.hue-shared .context-menu li:hover, .hue-shared table[data-filters*=HtmlTable] tr.table-tr-selected td ul.context-menu li:hover a, .hue-shared ul.context-menu li:hover a {
 	text-decoration: none;
 	background-color: #333;
 	color: #fff;
 }
-.ccs-shared ul.context-menu li:last-child {
+.hue-shared ul.context-menu li:last-child {
 	border: none;
 }
 /* button bar */
@@ -554,15 +555,15 @@ input[data-filters*=ArtButton] {
 	border: 0px;
 	vertical-align: bottom;
 }
-.ccs-shared [data-filters*=ArtButtonBar] a {
+.hue-shared [data-filters*=ArtButtonBar] a {
 	float: left;
 	height: 19px;
 }
 
-.ccs-shared [data-filters*=ArtButtonBar] li {
+.hue-shared [data-filters*=ArtButtonBar] li {
 	margin-right: 0 !important;
 }
-.ccs-shared a[data-filters*=ArtButton] {
+.hue-shared a[data-filters*=ArtButton] {
 	vertical-align: top;
 }
 /* side by side select */
@@ -808,7 +809,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 /* @group CSS Components */
 
 /*Forces something display:block to flow within text */
-.ccs-shared .txtIcon { display: inline-block !important; }
+.hue-shared .txtIcon { display: inline-block !important; }
 
 /* @group tGraph */
 /*
@@ -820,7 +821,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 </span>
 */
 
-.ccs-shared .tGraph {
+.hue-shared .tGraph {
 	display: block;
 	position: relative;
 	text-align: center;
@@ -831,14 +832,14 @@ OTHER DEALINGS IN THE SOFTWARE.
 	height: 16px;
 	font-size: 11px;
 }
-.ccs-shared .tGraph span {
+.hue-shared .tGraph span {
 	position: relative;
 	display: block;
 	height: 14px;
 	width: auto;
 	border: 1px solid transparent;
 }
-.ccs-shared .tGraph b {
+.hue-shared .tGraph b {
 	display: block;
 	text-align: center;
 	position: relative;
@@ -849,7 +850,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 	line-height: 11px;
 	height: 12px;
 }
-.ccs-shared .tGraph i {
+.hue-shared .tGraph i {
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -860,31 +861,31 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 /*Animate the tGraph bar 'value' on load*/
 
-.ccs-shared .tGraph i {
+.hue-shared .tGraph i {
 	-webkit-transition: width 0.5s ease-out, height 0.5s ease-out;
 	-moz-transition: width 0.5s ease-out, height 0.5s ease-out;
 	-o-transition: width 0.5s ease-out, height 0.5s ease-out;
 	transition: width 0.5s ease-out, height 0.5s ease-out;
 }
-.ccs-shared.loading .tGraph:not(.v) i,
-.ccs-shared .loading .tGraph:not(.v) i{ width:0 !important; }
+.hue-shared.loading .tGraph:not(.v) i,
+.hue-shared .loading .tGraph:not(.v) i{ width:0 !important; }
 
 /*Coloring*/
 
-.ccs-shared .tGraph span { border-color: #2e4398; text-shadow: #425abc .75px 1px 1px; }
-.ccs-shared .tGraph b { border-color: #fff; }
+.hue-shared .tGraph span { border-color: #2e4398; text-shadow: #425abc .75px 1px 1px; }
+.hue-shared .tGraph b { border-color: #fff; }
 
-.ccs-shared .tGraph.priorityLow { background-position: 0 -41px; }
-.ccs-shared .tGraph.priorityLow i { background-position: 0 -28px; }
-.ccs-shared .tGraph.priorityLow span { border-color: #5b932f; text-shadow: #5b932f .75px 1px 1px; }
+.hue-shared .tGraph.priorityLow { background-position: 0 -41px; }
+.hue-shared .tGraph.priorityLow i { background-position: 0 -28px; }
+.hue-shared .tGraph.priorityLow span { border-color: #5b932f; text-shadow: #5b932f .75px 1px 1px; }
 
-.ccs-shared .tGraph.priorityHigh { background-position: 0 -69px; }
-.ccs-shared .tGraph.priorityHigh i { background-position: 0 -56px; }
-.ccs-shared .tGraph.priorityHigh span { border-color: #a33537; text-shadow: #bd4747 .75px 1px 1px; }
+.hue-shared .tGraph.priorityHigh { background-position: 0 -69px; }
+.hue-shared .tGraph.priorityHigh i { background-position: 0 -56px; }
+.hue-shared .tGraph.priorityHigh span { border-color: #a33537; text-shadow: #bd4747 .75px 1px 1px; }
 
 /*Give it some extra padding when flowed into text content*/
-.ccs-shared .txtIcon.tGraph b,
-.ccs-shared .txtIcon .tGraph b { padding: 0 1ex; }
+.hue-shared .txtIcon.tGraph b,
+.hue-shared .txtIcon .tGraph b { padding: 0 1ex; }
 
 /* @end tGraph */
 

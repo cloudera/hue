@@ -16,10 +16,10 @@
 <%namespace name="wrappers" file="header_footer.mako" />
 <%namespace name="util" file="util.mako" />
 ${wrappers.head('Hive Configuration Variables', section='hive configuration')}
-<h1 class="ccs-hidden">Hive Configuration Variables</h1>
+<h1 class="jframe-hidden">Hive Configuration Variables</h1>
 <div class="toolbar">
   <div class="bw-input-filter">
-    <input type="text" class="ccs-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
+    <input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
       title="Filter by Name"
       data-filter-elements="tbody tr" value=""/>
   </div>

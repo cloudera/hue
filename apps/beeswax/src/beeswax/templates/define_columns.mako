@@ -28,12 +28,12 @@ ${wrappers.head('Define Columns')}
 <div class="view" id="define-columns">
   <div class="bw-define-columns">
     <form action="${action}" method="POST">
-      <div class="ccs-hidden">
+      <div class="jframe-hidden">
         ${util.render_form(file_form)}
         ${util.render_form(delim_form)}
         ${str(column_formset.management_form) | n}
       </div>
-      <div class="ccs-bc-section">
+      <div class="hue-bc-section">
       <dt> Step 3: Define Your Columns </dt>
       <%
         n_rows = len(fields_list)
@@ -45,7 +45,7 @@ ${wrappers.head('Define Columns')}
           <br/>
           <dt> </dt>
           <dd>
-            <table class="row_headers ccs-visible" style="display:none">
+            <table class="row_headers jframe-visible" style="display:none">
               % for i in range(n_rows):
                 <tr><td> Row ${i + 1} </td></tr>
               % endfor
@@ -57,7 +57,7 @@ ${wrappers.head('Define Columns')}
               <table class="data_table">
                 % for i, row in enumerate(fields_list[:n_rows]):
                   <tr>
-                    <td class="ccs-hidden"> Row ${i + 1} </td>
+                    <td class="jframe-hidden"> Row ${i + 1} </td>
                     % for val in row:
                       <td>${val}</td>
                     % endfor
@@ -83,10 +83,10 @@ ${wrappers.head('Define Columns')}
             </div>
           </dd>
           </dl>
-          <a class="ccs-submit_form ccs-visible ccs-multipart-next" data-extra-data="{'submit_create': 'Finish Creating Table'}" style="display:none">
+          <a class="jframe-submit_form jframe-visible hue-multipart-next" data-extra-data="{'submit_create': 'Finish Creating Table'}" style="display:none">
           Finish Creating Table
           </a>
-          <input type="submit" name="submit_create" value="Finish Creating Table" class="ccs-hidden"/>
+          <input type="submit" name="submit_create" value="Finish Creating Table" class="jframe-hidden"/>
           <br/><br/><br/>
         </dd>
       </div>

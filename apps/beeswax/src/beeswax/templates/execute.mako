@@ -23,12 +23,12 @@
 
 <%def name="query()">
   <dl class="bw-query">
-    <dt class="bw-query_header clearfix ccs-help_links_small">
+    <dt class="bw-query_header clearfix hue-help_links_small">
       % if design and not design.is_auto and design.name:
         <label>
           ${design.name}
           % if design.desc:
-            <p class="ccs-inline" data-filters="InfoTip" data-help-direction="6">${design.desc}</p>
+            <p class="jframe-inline" data-filters="InfoTip" data-help-direction="6">${design.desc}</p>
           % endif
         </label>
       % else:
@@ -76,8 +76,8 @@ ${wrappers.head('Hive Query', section='query')}
 % if error_message:
 <div class="alert_popup jframe_renders">
   <dl class="bw-query_error">
-    <dt class="ccs-dt_cap">Your Query Has the Following Error(s):</dt>
-    <dd class="ccs-dd_bottom ccs-error">
+    <dt class="hue-dt_cap">Your Query Has the Following Error(s):</dt>
+    <dd class="hue-dd_bottom jframe-error">
       <div class="validation-advice">
         ${error_message}
       </div>
@@ -103,8 +103,8 @@ ${wrappers.head('Hive Query', section='query')}
       <div class="left_col" style="width: ${width}px;">
         <a name="settings"></a>
         <dl class="jframe_padded bw-query_settings">
-          <dt class="ccs-dt_cap">Hive Settings</dt>
-          <dd class="ccs-dd_bottom">
+          <dt class="hue-dt_cap">Hive Settings</dt>
+          <dd class="hue-dd_bottom">
             <dl>
               % for i, f in enumerate(form.settings.forms):
                 % if i > 0:
@@ -129,12 +129,12 @@ ${wrappers.head('Hive Query', section='query')}
               % endfor
               <div class="bw-query_settings_add">
                 <button id="id_settings-add" value="True" name="settings-add" type="submit">+</button>
-                <div class="ccs-hidden">${str(form.settings.management_form) | n }</div>
+                <div class="jframe-hidden">${str(form.settings.management_form) | n }</div>
               </div>
             </dl>
           </dd>
-          <dt class="ccs-dt_cap">File Resources</dt>
-          <dd class="ccs-dd_bottom">
+          <dt class="hue-dt_cap">File Resources</dt>
+          <dd class="hue-dd_bottom">
             <dl>
               % for i, f in enumerate(form.file_resources.forms):
                 % if i > 0:
@@ -153,19 +153,19 @@ ${wrappers.head('Hive Query', section='query')}
                   alt="/user/foo/udf.jar",
                   data_filters="OverText",
                 ))}
-                <div class="ccs-button_subbar_below clearfix">
-                  <a class="ccs-choose_file" data-filters="ArtButton" data-chooseFor="${f['path'].html_name | n}" data-icon-styles="{'width':16, 'height':16, 'top':2}">Choose a File</a>
+                <div class="jframe-button_subbar_below clearfix">
+                  <a class="hue-choose_file" data-filters="ArtButton" data-chooseFor="${f['path'].html_name | n}" data-icon-styles="{'width':16, 'height':16, 'top':2}">Choose a File</a>
                 </div>
                 ${comps.field(f['_exists'], hidden=True)}
               % endfor
               <div class="bw-query_settings_add">
                 <button id="id_file_resources-add" value="True" name="file_resources-add" type="submit">+</button>
-                <div class="ccs-hidden">${str(form.file_resources.management_form) | n }</div>
+                <div class="jframe-hidden">${str(form.file_resources.management_form) | n }</div>
               </div>
             </dl>
           </dd>
-          <dt class="ccs-dt_cap">User-defined Functions</dt>
-          <dd class="ccs-dd_bottom">
+          <dt class="hue-dt_cap">User-defined Functions</dt>
+          <dd class="hue-dd_bottom">
             <dl>
               % for i, f in enumerate(form.functions.forms):
                 % if i > 0:
@@ -191,13 +191,13 @@ ${wrappers.head('Hive Query', section='query')}
               % endfor
               <div class="bw-query_settings_add">
                 <button id="id_functions-add" value="True" name="functions-add" type="submit">+</button>
-                <div class="ccs-hidden">${str(form.functions.management_form) | n }</div>
+                <div class="jframe-hidden">${str(form.functions.management_form) | n }</div>
               </div>
             </dl>
           </dd>
-          <dt class="ccs-dt_cap">Parameterization</dt>
-          <dd class="ccs-dd_bottom">
-            <dl class="ccs-bw_parameters">
+          <dt class="hue-dt_cap">Parameterization</dt>
+          <dd class="hue-dd_bottom">
+            <dl class="hue-bw_parameters">
               ${comps.field(form.query["is_parameterized"],
                   notitle = True,
                   tag = "checkbox",
@@ -209,9 +209,9 @@ ${wrappers.head('Hive Query', section='query')}
               )}
             </dl>
           </dd>
-          <dt class="ccs-dt_cap">Email Notification</dt>
-          <dd class="ccs-dd_bottom">
-            <dl class="ccs-bw_parameters">
+          <dt class="hue-dt_cap">Email Notification</dt>
+          <dd class="hue-dd_bottom">
+            <dl class="hue-bw_parameters">
           ${comps.field(form.query["email_notify"],
                         notitle = True,
                         tag = "checkbox",
@@ -232,7 +232,7 @@ ${wrappers.head('Hive Query', section='query')}
 
         % if error_messages or log:
           <div data-filters="Tabs">
-            <ul class="toolbar bw-results_tabs ccs-right clearfix tabs" data-filters="Tabs">
+            <ul class="toolbar bw-results_tabs jframe-right clearfix tabs" data-filters="Tabs">
               <li><span>Query</span></li>
               % if error_message or log:
               <li><span>
@@ -242,7 +242,7 @@ ${wrappers.head('Hive Query', section='query')}
               </span></li>
               % endif
             </ul>
-            <ul class="tab_sections ccs-clear">
+            <ul class="tab_sections jframe-clear">
               <li>
                 ${query()}
               </li>

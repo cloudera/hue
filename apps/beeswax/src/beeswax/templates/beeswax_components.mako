@@ -60,14 +60,14 @@
   if klass:
     classes.append(klass)
   if hidden: 
-    classes.append("ccs-hidden")
+    classes.append("jframe-hidden")
   cls = ' '.join(classes)
 
   title_classes = []
   if title_klass:
     title_classes.append(title_klass)
   if notitle or hidden:
-    title_classes.append("ccs-hidden")
+    title_classes.append("jframe-hidden")
   titlecls = ' '.join(title_classes)
 %>
   % if field.is_hidden:
@@ -89,11 +89,11 @@
         % endif
       % endif
       % if help:
-        <p class="ccs-inline" data-filters="HelpTip" ${make_attr_str(help_attrs) | n}>${help}</p>
+        <p class="jframe-inline" data-filters="HelpTip" ${make_attr_str(help_attrs) | n}>${help}</p>
       % endif
     </dd>
     % if len(field.errors):
-      <dd class="beeswax_error ccs-error">
+      <dd class="beeswax_error jframe-error">
          ${unicode(field.errors) | n}
        </dd>
     % endif

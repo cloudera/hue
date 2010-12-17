@@ -52,14 +52,14 @@
       % endif
        <a class="fv-download" data-filters="ArtButton" target="_blank" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.download', path=path_enc)}">Download</a>
        <a class="fv-viewLocation" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View File Location</a>
-       <a class="ccs-refresh large" data-filters="ArtButton">Refresh</a>
+       <a class="jframe-refresh large" data-filters="ArtButton">Refresh</a>
     </div>
   </div>
   <div class="fv-navhead">
     % if not view['compression'] or view['compression'] == "none":
       <div class="fv-navStatus">
         <form data-filters="SubmitOnChange" class="fv-changeBytesForm" action="${url('filebrowser.views.view', path=path_enc)}" method="GET">
-          <span class="fv-bold">Viewing Bytes:</span><a class="fv-editBytes ccs-inline" title="Enter Bytes"></a>
+          <span class="fv-bold">Viewing Bytes:</span><a class="fv-editBytes jframe-inline" title="Enter Bytes"></a>
           <input name="begin" value="${view['offset'] + 1}"/>
           -
           <input value="${view['end']}" name="end"/> of
@@ -87,10 +87,10 @@
               last =  "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, stats['size']-(stats['size'] % view['length']), view['length'], stats['size']-(stats['size'] % view['length']) + 1, stats['size'])
         %>
         ###DEFINE REL
-        <a class="ccs-inline fv-firstBlock" data-filters="PointyTip" ${first}>First Block</a>
-        <a class="ccs-inline fv-prevBlock" data-filters="PointyTip" ${prev}>Previous Block</a>
-        <a class="ccs-inline fv-nextBlock" data-filters="PointyTip" ${next}>Next Block</a>
-        <a class="ccs-inline fv-lastBlock" data-filters="PointyTip" ${last}>Last Block</a>
+        <a class="jframe-inline fv-firstBlock" data-filters="PointyTip" ${first}>First Block</a>
+        <a class="jframe-inline fv-prevBlock" data-filters="PointyTip" ${prev}>Previous Block</a>
+        <a class="jframe-inline fv-nextBlock" data-filters="PointyTip" ${next}>Next Block</a>
+        <a class="jframe-inline fv-lastBlock" data-filters="PointyTip" ${last}>Last Block</a>
       </div>
     % endif
   </div>

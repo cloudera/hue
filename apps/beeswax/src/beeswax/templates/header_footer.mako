@@ -30,7 +30,7 @@ def is_selected(section, matcher):
   <head>
     <title>${title}</title>
   </head>
-  <body class="ccs-shared">
+  <body class="hue-shared">
   <div class="toolbar">
     <a href="${ url('beeswax.views.index') }"><img src="/beeswax/static/art/beeswax-logo.png" width="55" height="55" alt="Beeswax" class="beeswax_logo"></a>
     % if toolbar:
@@ -55,11 +55,11 @@ def is_selected(section, matcher):
         class="bw-nav_icon bw-config_nav ${is_selected(section, 'hive configuration')}" data-filters="ArtButton"
         data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Settings</a>
       </li>
-      <li><a class="ccs-refresh large" data-filters="ArtButton">Refresh</a></li>
+      <li><a class="jframe-refresh large" data-filters="ArtButton">Refresh</a></li>
     </ul>
     % endif
   </div>
-  <hr class="ccs-hidden"/>
+  <hr class="jframe-hidden"/>
 </%def>
 
 <%def name="foot()">

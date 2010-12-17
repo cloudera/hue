@@ -14,7 +14,7 @@ body {
 	padding: 0px;
 	font-size: 12px;
 }
-body>.ccs-error-popup {
+body>.hue-error-popup {
 	display: none;
 }
 #bg {
@@ -67,7 +67,7 @@ input[type="submit"]:focus, input[type="button"]:focus {
 	outline : none;
 }
 
-#ccs-desktop {
+#hue-desktop {
 	height: 0px;
 	overflow: visible;
 	top: 24px;
@@ -78,7 +78,7 @@ form, div, li, dt, dd, p {
 	position: relative;
 }
 /* top toolbar */
-#ccs-topnav {
+#hue-topnav {
 	position: fixed;
 	top: 0px;
 	left: 0px;
@@ -86,7 +86,7 @@ form, div, li, dt, dd, p {
 	z-index: 10001;
 	visibility:hidden;
 }
-#ccs-toolbar {
+#hue-toolbar {
 	display: none;
 	background: url(../art/toolbar-back.png) repeat-x;
 	height: 20px;
@@ -98,47 +98,47 @@ form, div, li, dt, dd, p {
 	color: #5a5a5a;
 	z-index: 10000;
 }
-#ccs-toolbar span {
+#hue-toolbar span {
 	font-size: 13px;
 }
-#ccs-toolbar a {
+#hue-toolbar a {
 	color: #5a5a5a;
 	font-weight: bold;
 }
-#ccs-toolbar #ccs-logout, #ccs-toolbar #ccs-logout a {
+#hue-toolbar #hue-logout, #hue-toolbar #hue-logout a {
 	color: #999;
 	font-weight: normal;
 	font-size: 9px;
 }
-#ccs-toolbar #ccs-logout {
+#hue-toolbar #hue-logout {
 	position: relative;
 	top: -1px;
 	margin-left: 6px;
 }
-#ccs-toolbar img.ccs-swoosh {
+#hue-toolbar img.hue-swoosh {
 	position: absolute;
 	top: 4px;
 	left: 5px;
 	cursor: pointer;
 }
 /* feedback */
-a#ccs-feedback {
+a#hue-feedback {
 	position:fixed;
 	bottom: 0px;
 	left: 5px;
 	cursor: pointer;
 	z-index: 10003;
 }
-a#ccs-feedback img {
+a#hue-feedback img {
 	display: block;
 }
 /* tips */
-p.ccs-tip-example {
+p.hue-tip-example {
 	margin: 0px;
 	padding-bottom: 2px;
 	font-style: italic;
 }
-ul.ccs-errors li {
+ul.hue-errors li {
 	background:transparent url(/site_media/art/error.png) no-repeat scroll 0 0;
 	color:#666666;
 	font-weight:bold;
@@ -146,24 +146,24 @@ ul.ccs-errors li {
 	margin-bottom: 3px;
 }
 /* cluster list */
-div.ccs-submenu-list {
+div.hue-submenu-list {
 	width: 200px;
 	background: #fff;
 	border: 1px solid #666;
 	padding: 10px;
 }
-div.ccs-submenu-list h1 {
+div.hue-submenu-list h1 {
 	font-size:12px;
 }
 /* icon zoomers */
-a.ccs-lb-thumb {
+a.hue-lb-thumb {
 	position: relative;
 	display: block;
 	clear:both;
 	padding: 0 8px;
 	margin-bottom: 4px;
 }
-#ccs-loading {
+#hue-loading {
 	background: #111;
 	opacity: 0.8;
 	filter: alpha(opacity=80);
@@ -208,7 +208,7 @@ div.mask {
 }
 
 /* doc */
-#ccs-dock {
+#hue-dock {
 	visibility: hidden;
 	position: fixed;
 	bottom: 0px;
@@ -218,9 +218,10 @@ div.mask {
 	left: 10%;
 	z-index: 10;
 }
-#ccs-dock #ccs-dock-status {
+#hue-dock #hue-dock-status {
 	height: 45px;
 	border-style: solid;
+	border: 0;
 	border-right: 1px solid #c5c5c5;
 	min-width: 200px;
 	position: absolute;
@@ -228,7 +229,7 @@ div.mask {
 	line-height: 45px;
 	left: 0px;
 }
-#ccs-dock #ccs-dock-content {
+#hue-dock #hue-dock-content {
 	text-align: right;
 	height: 45px;
 	border-style: solid;
@@ -241,23 +242,23 @@ div.mask {
 	background: #dbdbdb;
 	width: 100%;
 }
-#ccs-dock img.ccs-icon {
+#hue-dock img.hue-icon {
 	height: 35px;
 	width: 35px;
 	opacity: 0.8;
 	padding: 4px;
 	cursor: pointer;
 }
-#ccs-dock img.ccs-icon:hover {
+#hue-dock img.hue-icon:hover {
 	opacity: 1;
 }
-#ccs-dock img.ccs-icon-active {
+#hue-dock img.hue-icon-active {
 	opacity: 1;
 }
-#ccs-dock-status-content {
+#hue-dock-status-content {
 	padding: 0px 10px;
 }
-#ccs-dock-status-content a {
+#hue-dock-status-content a {
 	border: 1px solid;
 	border-color: #c2c2c2 #939393 #5e5e5e #adadad;
 	line-height: 12px;
@@ -271,7 +272,7 @@ div.mask {
 	position: relative;
 	top: 2px;
 }
-#ccs-dock-status-content a.dock_misconfig {
+#hue-dock-status-content a.dock_misconfig {
 	border: none;
 	padding: 0; margin: 0;
 	border-radius: 0px;
@@ -279,19 +280,19 @@ div.mask {
 	-webkit-border-radius: 0px;
 	background: none;
 }
-#ccs-dock-status-content a.ccs-dock-status-failed {
+#hue-dock-status-content a.hue-dock-status-failed {
 	background: #fa1500;
 	color: #fff;
 }
-#ccs-dock-status-content a.ccs-dock-status-completed {
+#hue-dock-status-content a.hue-dock-status-completed {
 	background: #06d307;
 }
-#ccs-dock-status-content a:hover {
+#hue-dock-status-content a:hover {
 	text-decoration: none;
 	background: #fff;
 	color: #000;
 }
-#ccs-dock-status-content a.dock_misconfig:hover {
+#hue-dock-status-content a.dock_misconfig:hover {
 	background: none;
 }
 div.dock-tip div.DefaultPointyTip .pointyWrapper div.top_ur {
@@ -322,7 +323,7 @@ div.dock-tip div.DefaultPointyTip .pointyWrapper div.top_ur {
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 }
-#ccs-shortcut_list {
+#hue-shortcut_list {
 	z-index: 10003;
 	background: #fff;
 	border: 2px solid #555;
@@ -406,7 +407,7 @@ input[type=submit] {
 #browserWarn {
 	display: none;
 }
-.warned #ccs-topnav {
+.warned #hue-topnav {
 	top: 28px;
 }
 .warned #browserWarn {

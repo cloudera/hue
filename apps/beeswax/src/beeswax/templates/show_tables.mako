@@ -25,10 +25,10 @@ ${wrappers.head("Beeswax: Table List", section='tables')}
   </div>
 
 <div id="show_tables" class="view">
-  <h2 class="ccs-hidden">Tables</h2>
+  <h2 class="jframe-hidden">Tables</h2>
   <div class="toolbar">
     <div class="bw-input-filter">
-      <input type="text" class="ccs-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
+      <input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
         title="Filter by Name"
         data-filter-elements="td.bw-tables_table" data-filter-parents="tr" value=""/>
     </div>
@@ -42,10 +42,10 @@ ${wrappers.head("Beeswax: Table List", section='tables')}
     </thead>
     <tbody>
       % for table in tables:
-        <tr data-dblclick-delegate="{'dblclick_loads':'.bw-tables_table a'}" class="ccs-no_select">
-          <td class="bw-tables_table ccs-no_select">
+        <tr data-dblclick-delegate="{'dblclick_loads':'.bw-tables_table a'}" class="jframe-no_select">
+          <td class="bw-tables_table jframe-no_select">
             <a href="${ url("beeswax.views.describe_table", table=table) }">${ table }</a>
-            <!-- <p class="ccs-inline" data-filters="HelpTip">TODO</p> -->
+            <!-- <p class="jframe-inline" data-filters="HelpTip">TODO</p> -->
           </td>
           <td class="bw-tables_browse"><a href="${ url("beeswax.views.read_table", table=table) }">Browse Data</a></td>
         </tr>

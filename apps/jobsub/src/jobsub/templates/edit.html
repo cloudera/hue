@@ -29,7 +29,7 @@ limitations under the License.
 				<h1>Job Design Editor</h1>
 
 				{% if message %}
-				<div align="center" class="ccs-error">{{message}}</div>
+				<div align="center" class="jframe-error">{{message}}</div>
 				{% endif %}
 
 				<h2>Job Design Editor: {{form.name}} Job</h2>
@@ -65,8 +65,8 @@ limitations under the License.
 					</dl>
 					{{ form.render_edit }}
 					<div class="jobsub_edit_save">
-							<input type="submit" name="submit" value="Save" class="ccs-submit"/>
-							<label><input type="checkbox" name="save_submit" class="ccs-checkbox"/> Submit upon save.</label>
+							<input type="submit" name="submit" value="Save" class="hue-submit"/>
+							<label><input type="checkbox" name="save_submit"/> Submit upon save.</label>
 					</div>
 				</form>
 			</div>

@@ -69,7 +69,7 @@
     <title>Configurable Columns</title>
   </head>
   <body data-filters="CollapsingElements">
-    <form action="${request_path}" method="GET" class="ccs-hidden collapsible ccs-table_config">
+    <form action="${request_path}" method="GET" class="jframe-hidden collapsible hue-table_config">
       <ul>
         % for i, option in enumerate(columns):
           <%
@@ -80,8 +80,8 @@
           <li><label><input type="checkbox" name="show_columns" value="${i}" ${checked}/> ${option}</label></li>
         % endfor
       </ul>
-      <a class="ccs-checkAll" data-filters="ArtButton" data-check-group=".ccs-table_config input">checkAll</a>
-      <a class="ccs-checkNone" data-filters="ArtButton" data-check-group=".ccs-table_config input">checkNone</a>
+      <a class="jframe-checkAll" data-filters="ArtButton" data-check-group=".hue-table_config input">checkAll</a>
+      <a class="jframe-checkNone" data-filters="ArtButton" data-check-group=".hue-table_config input">checkNone</a>
       <input type="submit" value="Apply" data-filters="ArtButton"/>
     </form>
     <table data-filters="HtmlTable">
@@ -90,7 +90,7 @@
           % for i, col in enumerate(active_columns):
             % if i == 0:
               <th>
-                <a class="collapser ccs-table_config_link ccs-left"></a>
+                <a class="collapser hue-table_config_link jframe-left"></a>
                 ${col}
               </th>
             % else:

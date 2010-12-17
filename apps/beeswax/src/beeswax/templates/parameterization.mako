@@ -30,7 +30,7 @@ else:
   ${comps.field(field)}
 % endfor
 </dl>
-<input class="ccs-hidden" type="submit">
+<input class="jframe-hidden" type="submit">
 </form>
 </div>
 ${wrappers.foot()}

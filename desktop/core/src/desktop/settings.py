@@ -231,6 +231,7 @@ def prep_depender_config():
     "../ext/thirdparty/js/widgets/package.yml",
     "../ext/thirdparty/js/slick/package.yml",
     "core/static/js/package.yml",
+    "core/static/js/ccs.package.yml",
     "../ext/thirdparty/js/depender/package.yml",
     "../ext/thirdparty/js/fittext/package.yml",
     "../ext/thirdparty/js/jframe/package.yml",

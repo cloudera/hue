@@ -18,10 +18,10 @@ limitations under the License.
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="prompt_popup">
-	<h1 class="ccs-hidden">Are you sure?</h1>
+	<h1 class="jframe-hidden">Are you sure?</h1>
 	<form action="{{ url }}" method="POST">
 		{{title}}
-		<input type="submit" value="Yes" class="ccs-hidden">
+		<input type="submit" value="Yes" class="jframe-hidden">
 	</form>
 </div>
 {% endblock %}

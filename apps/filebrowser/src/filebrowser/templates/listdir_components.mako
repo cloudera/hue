@@ -72,7 +72,7 @@ from desktop.lib.django_util import reverse_with_get
   ## Since path is in unicode, Django and Mako handle url encoding and
   ## iri encoding correctly for us.
         <% path = file['path'] %>
-        <tr class="ccs-no_select fb-item-row ${cls}"
+        <tr class="jframe-no_select fb-item-row ${cls}"
          data-filters="ContextMenu"
          data-context-menu-actions="[{'events':['contextmenu','click:relay(.fb-item-options)'],'menu':'ul.context-menu'}]"
          data-dblclick-delegate= "{'dblclick_loads':'a.fb-item'}" data-filedata="{'path':'${path}','type':'${file['type']|u}'}">

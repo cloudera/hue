@@ -1,0 +1,34 @@
+copyright: Apache License v2.0
+description: DEPRECATED NAMESPACE REFERENCES FOR CCS JS FILES
+name: ccs-shared
+sources: [
+  Source/Fx/Fx.Shake.js,
+  Source/Deprecated/CCS.Desktop.FlashMessage.js,
+  Source/Deprecated/CCS.JBrowser.js,
+  Source/Deprecated/CCS.JFrame.js,
+  Source/Deprecated/CCS.JFrame.Deprecated.js,
+  Source/Hue/Hue.js,
+  Source/Hue/Hue.Desktop.js,
+  Source/Hue/Hue.Desktop.Config.js,
+  Source/Hue/Hue.Desktop.BackgroundManager.js,
+  Source/Hue/Hue.Dock.js,
+  Source/Hue/Hue.Login.js,
+  Source/Hue/Hue.Request.js,
+  Source/Hue/Hue.SolidWindow.js,
+  Source/Hue/Hue.User.js,
+  Source/Hue/HueChart.js,
+  Source/Hue/HueChart.Box.js,
+  Source/Hue/HueChart.Area.js,
+  Source/Hue/HueChart.Line.js,
+  Source/Hue/HueChart.Circle.js,
+  Source/Hue/HueChart.GroupValueManager.js,
+  Source/UI/StickyWin.UI.Solid.js,
+  Source/UI/ThumbTack.js,
+  Source/JFrameLinkers/Hue.JFrame.Target.js,
+  Source/JFrameLinkers/Hue.JFrame.Chooser.js,
+  Source/Native/String.Hue.js,
+  Source/Native/Number.Files.js,
+  Source/StaticThirdParty/DynamicTextarea.js,
+
+]
+version: Unknown

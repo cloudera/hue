@@ -43,13 +43,13 @@
 <form class="fe-editForm" method="post" action="${url('filebrowser.views.save_file')}">
     ${edit.render_field(form["path"], hidden=True, notitle=True)}
     ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
-    <h2 class="ccs-hidden">${form["contents"].label_tag() | n}</h2>
+    <h2 class="jframe-hidden">${form["contents"].label_tag() | n}</h2>
     <div class="fe-divResize" data-filters="SizeTo" data-size-to-width="100%" data-size-to-height="100%">${edit.render_field(form["contents"], tag="textarea", notitle=True, attrs=dict(
       data_filters="SizeTo, PostEditor",
       data_size_to_width="-20",
       data_size_to_height="100%")) | n}</div>
-    <input class="ccs-hidden" type="submit" name="save" value="saveAs">
-    <input class="ccs-hidden" type="submit" name="save" value="save">
+    <input class="jframe-hidden" type="submit" name="save" value="saveAs">
+    <input class="jframe-hidden" type="submit" name="save" value="save">
 </form>
 </body>
 </html>

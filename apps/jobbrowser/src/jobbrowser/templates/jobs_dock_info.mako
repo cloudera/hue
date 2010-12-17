@@ -17,7 +17,7 @@
   jobs:
   % for state in ['running', 'failed', 'completed']:
     % if jobs.get(state) > 0:
-      <a href="${url('jobbrowser.views.jobs')}?user=${user.username}&state=${state}" target="JobBrowser" class="ccs-inline ccs-dock-status-${state}">${jobs.get(state)} ${state}</a>
+      <a href="${url('jobbrowser.views.jobs')}?user=${user.username}&state=${state}" target="JobBrowser" class="jframe-inline hue-dock-status-${state}">${jobs.get(state)} ${state}</a>
     % endif
   % endfor
 % endif

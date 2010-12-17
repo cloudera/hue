@@ -13,7 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-CCS.Desktop.register({
+Hue.Desktop.register({
 	Help: {
 		name: 'Help',
 		require: ['help/Help'],
@@ -22,7 +22,7 @@ CCS.Desktop.register({
 			return new Help(path, options);
 		},
 		menu: {
-			id: 'ccs-filebrowser-menu',
+			id: 'hue-filebrowser-menu',
 			img: {
 				src: '/help/static/art/help.png'
 			}

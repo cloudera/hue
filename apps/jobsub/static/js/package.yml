@@ -2,4 +2,4 @@ copyright: Apache License v2.0
 version: 0.9
 description: Job Designer
 name: jobsub
-sources: [Source/JobSub/CCS.JobSub.js]
+sources: [Source/JobSub/Hue.JobSub.js]

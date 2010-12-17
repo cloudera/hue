@@ -174,7 +174,7 @@ def is_jframe_request(request):
   embeddable contents, and expects an HTTP response
   with some extra headers set in return.
   The extra headers are set in JFrameMiddleware.
-  See also CCS.JFrame.js.
+  See also Hue.JFrame.js.
   """
   return request.META.get('HTTP_X_HUE_JFRAME') or \
       request.GET.get("format") == "embed"

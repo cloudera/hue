@@ -21,5 +21,5 @@ def test_launch_about_app():
     launches the about app
   """
   client = logged_in_client()
-  client.click(jquery='("img.ccs-swoosh")[0]')
-  client.waits.forElement(classname='CCS-ABOUT', timeout='2000')
+  client.click(jquery='("img.hue-swoosh")[0]')
+  client.waits.forElement(classname='Hue-ABOUT', timeout='2000')

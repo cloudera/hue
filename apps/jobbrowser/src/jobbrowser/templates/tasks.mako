@@ -43,12 +43,12 @@
 
 
   <div id="job_browser_task_list" class="view">
-    <h1 class="ccs-hidden">Tasks for Job ${jobid}</h1>
+    <h1 class="jframe-hidden">Tasks for Job ${jobid}</h1>
     <div class="toolbar">
       <a href="/jobbrowser/jobs/"><img src="/jobbrowser/static/art/icon_large.png" class="jt_icon"/></a>
       <ul class="jt_filters">
         <form class="jtv_filter_form" data-filters="SubmitOnChange" method="get" action="/jobbrowser/jobs/${jobid}/tasks">
-          <li class="ccs-inline">
+          <li class="jframe-inline">
             <select name="taskstate">
               <option value="">All states</option>
               <option value="succeeded" ${selected('succeeded', taskstate)}>succeeded</option>
@@ -58,7 +58,7 @@
               <option value="pending" ${selected('pending', taskstate)}>pending</option>
             </select>
           </li>
-          <li class="ccs-inline">
+          <li class="jframe-inline">
             <select name="tasktype">
               <option value="">All types</option>
               <option value="map" ${selected('map', tasktype)}>maps</option>
@@ -67,7 +67,7 @@
               <option value="job_setup" ${selected('job_setup', tasktype)}>setups</option>
             </select>
           </li>
-          <li class="ccs-inline">
+          <li class="jframe-inline">
             <input type="text" name="tasktext" class="jtv_filter" data-filters="OverText, ArtInput" data-art-input-type="search" title="text filter"
               % if tasktext:
                 value="${tasktext}"
@@ -110,7 +110,7 @@
       </table>
     </div>
     <div class="jtv-pagination">
-      <div class="jtv-pagination_count ccs-inline">
+      <div class="jtv-pagination_count jframe-inline">
         Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} tasks
       </div>
       <div class="jtv_offset_controls">

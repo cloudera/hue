@@ -19,13 +19,13 @@
     <title>${title}</title>
   </head>
   <body>
-    <div class="alert_popup ccs-error-popup" data-filters="CollapsingElements">
+    <div class="alert_popup jframe-error-popup" data-filters="CollapsingElements">
         <code>
         ${message}
         </code>
         % if detail:
         <a><div class="collapser">Click for Details</div></a>
-        <div id="data_one" class="ccs-hidden collapsible">
+        <div id="data_one" class="jframe-hidden collapsible">
           <p>${detail or ""}</p>
           <p><a href="${request.path}" target="_blank"><img src="/static/art/icons/link.png" alt="[Backend Link (debugging)]"></a></p>
         </div>

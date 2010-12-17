@@ -24,13 +24,13 @@ def test_dblclick_delegates():
   client = logged_in_client()
   launch_jframe_gallery(client)
   client.click(id='double-click-delegator')
-  client.waits.forElement(jquery='(".CCS-JFRAMEGALLERY .dblme")[0]')
+  client.waits.forElement(jquery='(".Hue-JFRAMEGALLERY .dblme")[0]')
   client.doubleClick(classname='dblme')
-  client.waits.forElement(jquery='(".CCS-JFRAMEGALLERY .alert")[0]')
-  client.asserts.assertJS(js="$$('.CCS-JFRAMEGALLERY .mask').length")
-  client.waits.forElement(jquery='(".CCS-JFRAMEGALLERY .alert")[0]')
-  client.click(jquery="('.CCS-JFRAMEGALLERY .closeWin')[0]")
-  client.asserts.assertJS(js="!$$('.CCS-JFRAMEGALLERY .closeWin').length")
+  client.waits.forElement(jquery='(".Hue-JFRAMEGALLERY .alert")[0]')
+  client.asserts.assertJS(js="$$('.Hue-JFRAMEGALLERY .mask').length")
+  client.waits.forElement(jquery='(".Hue-JFRAMEGALLERY .alert")[0]')
+  client.click(jquery="('.Hue-JFRAMEGALLERY .closeWin')[0]")
+  client.asserts.assertJS(js="!$$('.Hue-JFRAMEGALLERY .closeWin').length")
   
 
 def test_context_menu():
@@ -40,13 +40,13 @@ def test_context_menu():
   client = logged_in_client()
   launch_jframe_gallery(client)
   client.click(id='context-menu')
-  client.waits.forElement(jquery='(".CCS-JFRAMEGALLERY .show-options")[0]')
+  client.waits.forElement(jquery='(".Hue-JFRAMEGALLERY .show-options")[0]')
   #simulating right click, as windmill doesn't provide a mechanism for doing so
   #and it's regular (left) click event doesn't include page location information.
   client.execJS(js="$$('[data-filters*=ContextMenu]')[0].fireEvent('contextmenu', new Event({type: 'click', page: {x: 20, y: 20}}))")
-  client.asserts.assertJS(js='document.getElement(\'div.CCS-JFRAMEGALLERY .cm-one\').isVisible()')
-  client.click(jquery='(".CCS-JFRAMEGALLERY")[0]')
-  client.asserts.assertJS(js='!document.getElement(\'div.CCS-JFRAMEGALLERY .cm-one\').isVisible()')
+  client.asserts.assertJS(js='document.getElement(\'div.Hue-JFRAMEGALLERY .cm-one\').isVisible()')
+  client.click(jquery='(".Hue-JFRAMEGALLERY")[0]')
+  client.asserts.assertJS(js='!document.getElement(\'div.Hue-JFRAMEGALLERY .cm-one\').isVisible()')
 
 def test_collapser():
   client = logged_in_client()
@@ -77,8 +77,8 @@ def launch_jframe_gallery(client):
   """
     launches the jframe gallery
   """
-  client.click(id='ccs-jframegallery-menu')
-  client.waits.forElement(classname='CCS-JFRAMEGALLERY')
+  client.click(id='hue-jframegallery-menu')
+  client.waits.forElement(classname='Hue-JFRAMEGALLERY')
   return client
 
 def test_login_logout():
@@ -94,8 +94,8 @@ def test_frame_tips():
   client = logged_in_client()
   launch_jframe_gallery(client)
   client.click(id='frame-tips')
-  client.mouseOver(jquery='(".CCS-JFRAMEGALLERY .frame_tip")[1]')
-  client.asserts.assertJS(js='document.getElement(\'div.CCS-JFRAMEGALLERY .footer-text\').get(\'html\') == "link #2"')
+  client.mouseOver(jquery='(".Hue-JFRAMEGALLERY .frame_tip")[1]')
+  client.asserts.assertJS(js='document.getElement(\'div.Hue-JFRAMEGALLERY .footer-text\').get(\'html\') == "link #2"')
 
 
 def test_post_load_alert():
@@ -106,14 +106,14 @@ def test_post_load_alert():
   launch_jframe_gallery(client)
   
   client.click(id='post-load-alert-popup')
-  client.waits.forElement(jquery='(".CCS-JFRAMEGALLERY .alert")[0]')
-  client.asserts.assertJS(js="$$('.CCS-JFRAMEGALLERY .mask').length")
-  client.click(jquery="('.CCS-JFRAMEGALLERY .mask')[0]")
-  client.asserts.assertJS(js="!$$('.CCS-JFRAMEGALLERY .mask').length")
+  client.waits.forElement(jquery='(".Hue-JFRAMEGALLERY .alert")[0]')
+  client.asserts.assertJS(js="$$('.Hue-JFRAMEGALLERY .mask').length")
+  client.click(jquery="('.Hue-JFRAMEGALLERY .mask')[0]")
+  client.asserts.assertJS(js="!$$('.Hue-JFRAMEGALLERY .mask').length")
   client.click(id='post-load-alert-popup')
-  client.waits.forElement(jquery='(".CCS-JFRAMEGALLERY .alert")[0]')
-  client.click(jquery="('.CCS-JFRAMEGALLERY .closeWin')[0]")
-  client.asserts.assertJS(js="!$$('.CCS-JFRAMEGALLERY .closeWin').length")
+  client.waits.forElement(jquery='(".Hue-JFRAMEGALLERY .alert")[0]')
+  client.click(jquery="('.Hue-JFRAMEGALLERY .closeWin')[0]")
+  client.asserts.assertJS(js="!$$('.Hue-JFRAMEGALLERY .closeWin').length")
 
 def test_post_load_prompt():
   """
@@ -123,13 +123,13 @@ def test_post_load_prompt():
   launch_jframe_gallery(client)
   
   client.click(id='post-load-prompt-popup')
-  client.waits.forElement(jquery='(".CCS-JFRAMEGALLERY .confirm")[0]')
+  client.waits.forElement(jquery='(".Hue-JFRAMEGALLERY .confirm")[0]')
   
   client.click(name='prompt_value')
   client.type(text='blah', name='prompt_value')
-  client.click(jquery="('.CCS-JFRAMEGALLERY .closeWin')[1]")
-  client.waits.forElement(jquery="('.CCS-JFRAMEGALLERY .jframe_padded ul li')[0]")
-  client.asserts.assertTextIn(jquery="('.CCS-JFRAMEGALLERY .jframe_padded ul li')[0]", validator='blah')
+  client.click(jquery="('.Hue-JFRAMEGALLERY .closeWin')[1]")
+  client.waits.forElement(jquery="('.Hue-JFRAMEGALLERY .jframe_padded ul li')[0]")
+  client.asserts.assertTextIn(jquery="('.Hue-JFRAMEGALLERY .jframe_padded ul li')[0]", validator='blah')
 
 def test_split_view():
   """
@@ -140,10 +140,10 @@ def test_split_view():
   launch_jframe_gallery(client)
 
   client.click(id='splitview')
-  client.waits.forElement(jquery="('.CCS-JFRAMEGALLERY [data-filters*=SplitView]')[0]")
-  client.asserts.assertJS(js="$$('.CCS-JFRAMEGALLERY .art-splitview-left')[0].getStyle('width') == '200px'")
-  client.dragDropElem(jquery="('.CCS-JFRAMEGALLERY .art-splitview-splitter')[0]", pixels='-100,0')
-  client.asserts.assertJS(js="$$('.CCS-JFRAMEGALLERY .art-splitview-left')[0].getStyle('width') == '101px'")
+  client.waits.forElement(jquery="('.Hue-JFRAMEGALLERY [data-filters*=SplitView]')[0]")
+  client.asserts.assertJS(js="$$('.Hue-JFRAMEGALLERY .art-splitview-left')[0].getStyle('width') == '200px'")
+  client.dragDropElem(jquery="('.Hue-JFRAMEGALLERY .art-splitview-splitter')[0]", pixels='-100,0')
+  client.asserts.assertJS(js="$$('.Hue-JFRAMEGALLERY .art-splitview-left')[0].getStyle('width') == '101px'")
   
   
 def test_flash_messaging():

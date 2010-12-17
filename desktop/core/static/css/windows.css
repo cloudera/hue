@@ -1,30 +1,30 @@
-div.solid-win a.ccs-close {
+div.solid-win a.hue-close {
 	float: right;
 }
 /* login popup */
-#ccs-flogin {
+#hue-flogin {
 	visibility: hidden;
 }
-.solid-win #ccs-flogin {
+.solid-win #hue-flogin {
 	visibility: visible;
 }
-#ccs-login {
+#hue-login {
 	text-align: center;
 }
-#ccs-login .hue-login_logo {
+#hue-login .hue-login_logo {
 	position :absolute;
 	left: -37px;
 	position:absolute;
 	top: -49px;
 }
-#ccs-login div.body-left {
+#hue-login div.body-left {
 	position: relative;
 	z-index:1;
 }
-#ccs-login input.ccs-username {
+#hue-login input.hue-username {
 	margin-top: 20px;
 }
-#ccs-login input.ccs-continue  {
+#hue-login input.hue-continue  {
 	position: absolute;
 	cursor: pointer;
 	z-index: 1;
@@ -36,51 +36,51 @@ div.solid-win a.ccs-close {
 	background: url(/static/art/blue-continue.png) top left;
 	text-indent: -200px;
 }
-.IEroot #ccs-login input.ccs-continue {
+.IEroot #hue-login input.hue-continue {
 	font-size: 0;
 	color: #fff;
 	display:block;
 	line-height:0;
 	bottom: -44px;
 }
-.IEroot #ccs-login div.body-left {
+.IEroot #hue-login div.body-left {
 	float: left;
 }
-#ccs-login.ccs-loading input.ccs-continue {
+#hue-login.hue-loading input.hue-continue {
 	background: url(/static/art/blue-continue.png) left -74px;
 }
-#ccs-login #ccs-pwhelp {
+#hue-login #hue-pwhelp {
 	cursor: pointer;
 	position: absolute;
 	left: 0px;
 	bottom: -34px;
 }
-#ccs-login input {
+#hue-login input {
 	clear: both;
 	display: block;
 	margin: 6px auto;
 	width: 165px;
 }
-#ccs-login img.ccs-spinner {
+#hue-login img.hue-spinner {
 	display: none;
 }
-#ccs-login.ccs-loading img.ccs-spinner {
+#hue-login.hue-loading img.hue-spinner {
 	display: block;
 	bottom:-31px;
 	left:92px;
 	position:absolute;
 	z-index:2;
 }
-#ccs-login img.ccs-errorImg {
+#hue-login img.jframe-errorImg {
 	display:none;
 	right: 14px;
 	margin-top: 3px;
 	position: absolute;
 }
-#ccs-login.ccs-error img.ccs-errorImg {
+#hue-login.jframe-error img.jframe-errorImg {
 	display: block;
 }
-#ccs-restore-option {
+#hue-restore-option {
 	position: fixed;
 	top: 5px;
 	right: 5px;
@@ -95,18 +95,18 @@ div.solid-win a.ccs-close {
 	-webkit-border-radius: 4px;
 	cursor: pointer;
 }
-#ccs-restore-option:hover {
+#hue-restore-option:hover {
 	background: #111;
 	opacity: 1;
 	filter: alpha(opacity=100);
 }
-#ccs-login #ccs-restore-option input {
+#hue-login #hue-restore-option input {
 	display: inline;
 	clear: none;
 	width: auto;
 	margin: 0;
 }
-.art-window div.ccs-window-toolbar, .art-window div.toolbar {
+.art-window div.jframe-window-toolbar, .art-window div.toolbar {
 	position: absolute;
 	width:100%;
 	height: 0px;

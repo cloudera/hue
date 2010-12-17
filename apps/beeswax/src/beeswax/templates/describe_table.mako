@@ -46,14 +46,14 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
       <div class="jframe_padded">
         <dl>
           % if table.parameters.get("comment", False):
-            <dt class="ccs-dt_cap">Description</dt>
-            <dd class="ccs-dd_bottom">${ table.parameters.get("comment") }</dd>
+            <dt class="hue-dt_cap">Description</dt>
+            <dd class="hue-dd_bottom">${ table.parameters.get("comment") }</dd>
           % endif
-          <dt class="ccs-dt_cap">Actions</dt>
-          <dd class="ccs-dd_bottom bw-actions">
+          <dt class="hue-dt_cap">Actions</dt>
+          <dd class="hue-dd_bottom bw-actions">
             <ul>
-              <li class="ccs-clear" data-filters="CollapsingElements"><a class="bw-load_data collapser">Import Data</a>
-                  <div class="collapsible ccs-hidden">
+              <li class="jframe-clear" data-filters="CollapsingElements"><a class="bw-load_data collapser">Import Data</a>
+                  <div class="collapsible jframe-hidden">
                     <form action="${ url("beeswax.views.load_table", table=table_name) }">
                       <dl>
                         <div class="bw-dataNote">
@@ -67,7 +67,7 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
                           data_filters="OverText",
                           alt='/user/data'))}
                         <div class="clearfix" data-filters="ArtButtonBar">
-                          <a class="ccs-choose_file" data-filters="ArtButton" 
+                          <a class="hue-choose_file" data-filters="ArtButton" 
                             data-icon-styles="{'width': 16, 'height': 16, 'top': 1, 'left': 4 }" data-chooseFor="path">Choose File</a>
                           <input type="submit" class="bw-loadSubmit" data-filters="ArtButton" value="Submit"/>
                         </div>
@@ -82,14 +82,14 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
                     </form>
                   </div>
               </li>
-              <li class="ccs-clear"><a href="${ url("beeswax.views.read_table", table=table_name) }" class="bw-browse_data">Browse Data</a></li>
-              <li class="ccs-clear"><a href="${ url("beeswax.views.drop_table", table=table_name) }" class="bw-drop_table">Drop Table</a></li>
-              <li class="ccs-clear"><a href="${hdfs_link}" target="FileBrowser" class="tip bw-location_link" data-filters="PointyTip" data-tip-direction="11" rel="${ table.sd.location }">View File Location</a></li>
+              <li class="jframe-clear"><a href="${ url("beeswax.views.read_table", table=table_name) }" class="bw-browse_data">Browse Data</a></li>
+              <li class="jframe-clear"><a href="${ url("beeswax.views.drop_table", table=table_name) }" class="bw-drop_table">Drop Table</a></li>
+              <li class="jframe-clear"><a href="${hdfs_link}" target="FileBrowser" class="tip bw-location_link" data-filters="PointyTip" data-tip-direction="11" rel="${ table.sd.location }">View File Location</a></li>
             </ul>
           </dd>
         </dl>
       </div>
-    </div>dd
+    </div>
     <div class="right_col">
       <div data-filters="Tabs">
         <ul class="toolbar tabs">
@@ -101,7 +101,7 @@ ${wrappers.head("Beeswax Table Metadata: " + table.tableName, section='tables')}
             <li><span>Partition Columns</span></li>
           % endif
         </ul>
-        <ul class="tab_sections ccs-clear">
+        <ul class="tab_sections jframe-clear">
           % if top_rows is not None:
             <li class="bw-table_sample">
               <table data-filters="HtmlTable" cellpadding="0" cellspacing="0">

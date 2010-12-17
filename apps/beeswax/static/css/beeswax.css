@@ -1,5 +1,5 @@
-/* potential ccs styles */
-div.beeswax dt.ccs-dt_cap {
+/* potential hue styles */
+div.beeswax dt.hue-dt_cap {
 	text-shadow: 1px 1px #666;
 	background: #999;
 	padding: 4px 8px;
@@ -12,7 +12,7 @@ div.beeswax dt.ccs-dt_cap {
 	margin: 8px 0px 0px;
 }
 
-div.beeswax dd.ccs-dd_bottom {
+div.beeswax dd.hue-dd_bottom {
 	border: 1px solid #999;
 	border-radius: 0px 0px 2px 2px;
 	-moz-border-radius: 0px 0px 2px 2px;
@@ -62,7 +62,7 @@ div.beeswax a.bw-history_nav {
 div.beeswax a.bw-config_nav {
 	background: url(/static/art/icons/cog.png) no-repeat;
 }
-div.beeswax a.ccs-refresh.large {
+div.beeswax a.jframe-refresh.large {
 	height: 25px;
 }
 div.beeswax .bw-nav li {
@@ -137,7 +137,7 @@ div.beeswax ul[data-filters*=Breadcrumb] li {
 div.beeswax ul[data-filters*=Breadcrumb] li.tabSelected {
 	background: url(../art/breadcrumb.png) right -23px;
 }
-div.beeswax ul[data-filters*=Breadcrumb] li.ccs-bc-error {
+div.beeswax ul[data-filters*=Breadcrumb] li.hue-bc-error {
 	background: url(../art/breadcrumb.png) right 23px;
 }
 div.beeswax ul[data-filters*=Breadcrumb] li:first-child {
@@ -157,39 +157,39 @@ div.beeswax ul[data-filters*=Breadcrumb] li a:hover {
 }
 
 /* breadcrumb form*/
-div.beeswax div.ccs-bc-section dt {
+div.beeswax div.hue-bc-section dt {
 	font-size: 18px;
 	font-weight: bold;
 }
-div.beeswax div.ccs-bc-section {
+div.beeswax div.hue-bc-section {
 	background: url(../art/icon_huge.png) no-repeat;
 	min-height: 165px;
 	padding-left: 170px;
 	padding-top: 10px;
 	margin-bottom:40px;
 }
-div.beeswax div.ccs-bc-section dl dt {
+div.beeswax div.hue-bc-section dl dt {
 	font-size: 16px;
 	margin-top: 4px;
 }
-div.beeswax div.ccs-bc-section input {
+div.beeswax div.hue-bc-section input {
 	font-size: 16px;
 	width: 250px;
 }
-div.beeswax div.ccs-bc-section label.overTxtLabel {
+div.beeswax div.hue-bc-section label.overTxtLabel {
 	font-size: 12px;
 	margin-top: 6px;
 }
-div.beeswax .ccs-select-with-other input {
+div.beeswax .hue-select-with-other input {
 	display: none;
 }
-div.beeswax .ccs-select-with-other select {
+div.beeswax .hue-select-with-other select {
 	font-size: 16px;
 	width: 250px;
 }
 
 /* multi-part form */
-div.beeswax a.ccs-multipart-next, div.beeswax .bw-add_column button, div.beeswax input.bw-create_table_submit {
+div.beeswax a.hue-multipart-next, div.beeswax .bw-add_column button, div.beeswax input.bw-create_table_submit {
 	font-size: 16px;
 	font-weight: bold;
 	color: #457396;
@@ -204,7 +204,7 @@ div.beeswax a.ccs-multipart-next, div.beeswax .bw-add_column button, div.beeswax
 	right: 15px;
 	margin-top: 8px;
 }
-a.ccs-multipart-next:hover, div.beeswax .bw-add_column button:hover, div.beeswax input.bw-create_table_submit:hover {
+a.hue-multipart-next:hover, div.beeswax .bw-add_column button:hover, div.beeswax input.bw-create_table_submit:hover {
 	text-decoration: none;
 	color: #003f6f;
 	text-shadow: 1px 1px #d0e6f7;
@@ -212,7 +212,7 @@ a.ccs-multipart-next:hover, div.beeswax .bw-add_column button:hover, div.beeswax
 	background: #75bcf1;
 }
 /* create table form */
-div.beeswax dl.bw-table-setup .ccs-help_link, div.beeswax div.bw-choose-file .ccs-help_link {
+div.beeswax dl.bw-table-setup .hue-help_link, div.beeswax div.bw-choose-file .hue-help_link {
 	position: relative;
 	top: -4px;
 	padding-left: 1px;
@@ -259,7 +259,7 @@ div.beeswax ul.bw-config-data dl dt {
 div.beeswax .bw-delim-options input {
 	margin: 5px 0;
 }
-div.beeswax .bw-file_formats input, div.beeswax .ccs-bc-section input[type=checkbox] {
+div.beeswax .bw-file_formats input, div.beeswax .hue-bc-section input[type=checkbox] {
 	position: absolute;
 	top: -10000px;
 }
@@ -331,7 +331,7 @@ div.beeswax table.delimiter_preview tbody td {
 div.beeswax .bw-select_delim dt {
 	padding: 5px 0px;
 }
-div.beeswax .bw-select_delim a.ccs-help_link {
+div.beeswax .bw-select_delim a.hue-help_link {
 	margin-bottom: 4px;
 }
 div.beeswax .bw-default_location label, div.beeswax .bw-import_data label, div.beeswax .bw-confirm_delim label, div.beeswax .bw-show_hive label {
@@ -349,13 +349,13 @@ div.beeswax .bw-import_data a {
 div.beeswax .bw-show_hive a {
 	margin-top: 8px;
 }
-div.beeswax .bw-file_formats label.ccs-bw-selected, div.beeswax .bw-format dt.ccs-bw-selected label, div.beeswax .bw-default_location .ccs-bw-selected, div.beeswax .bw-partition_key label.ccs-bw-selected,	div.beeswax .bw-show_hive label.ccs-bw-selected, div.beeswax .bw-import_data label.ccs-bw-selected {
+div.beeswax .bw-file_formats label.hue-bw-selected, div.beeswax .bw-format dt.hue-bw-selected label, div.beeswax .bw-default_location .hue-bw-selected, div.beeswax .bw-partition_key label.hue-bw-selected,	div.beeswax .bw-show_hive label.hue-bw-selected, div.beeswax .bw-import_data label.hue-bw-selected {
 	color: #003f6f;
 	text-shadow: 1px 1px #d0e6f7;
 	border: 1px solid #003f6f;
 	background: #75bcf1 url(../art/checkback.png) 6px 8px no-repeat;
 }
-div.beeswax .bw-partition_key label.ccs-bw-selected {
+div.beeswax .bw-partition_key label.hue-bw-selected {
 	background: #75bcf1 url(../art/checkback.png) 6px 3px no-repeat;;
 }
 div.beeswax .bw-file_formats dt {
@@ -492,14 +492,14 @@ div.beeswax .bw-columns .bw-column_header label.overTxtLabel {
 	color: #457396;
 	margin-top: 0;
 }
-div.beeswax .bw-columns .bw-inactive a.ccs-help_link {
+div.beeswax .bw-columns .bw-inactive a.hue-help_link {
 	display: none;
 }
 /* body */
-div.beeswax div.ccs-bc-section .bw-column dt, div.beeswax div.ccs-bc-section .bw-column input, div.beeswax div.ccs-bc-section .bw-column label {
+div.beeswax div.hue-bc-section .bw-column dt, div.beeswax div.hue-bc-section .bw-column input, div.beeswax div.hue-bc-section .bw-column label {
 	font-size: 12px;
 }
-div.beeswax div.ccs-bc-section .bw-column .ccs-help_link {
+div.beeswax div.hue-bc-section .bw-column .hue-help_link {
 	top: -2px;
 }
 div.beeswax .bw-array_type {
@@ -553,7 +553,7 @@ div.beeswax .bw-partition_key label {
 	width:150px;
 	margin: 8px 0 !important;
 }
-div.beeswax .bw-partition_key a.ccs-help_link {
+div.beeswax .bw-partition_key a.hue-help_link {
 	left: 190px;
 	margin-top: 4px;
 	position: absolute;
@@ -626,7 +626,7 @@ div.beeswax td.bw-tables_browse {
 	padding-left: 30px !important;
 	width: 100px;
 }
-div.beeswax .ccs-help_links_small a.ccs-help_link {
+div.beeswax .hue-help_links_small a.hue-help_link {
 /*	float: right;
 	font-size: 9px;
 	width: 10px;
@@ -679,7 +679,7 @@ div.beeswax .bw-actions ul li a:hover {
 	background-color: #75bcf1;
 }
 
-div.beeswax a.ccs-choose_file {
+div.beeswax a.hue-choose_file {
 	margin-top: 5px;
 	padding: 6px 10px 6px 25px;
 	height: 20px;
@@ -787,7 +787,7 @@ div.beeswax .bw-actions ul li a.bw-download_csv {
 div.beeswax .bw-actions ul li a.bw-download_xls {
 	background: #9acef5 url(/static/art/led-icons/doc_excel_table.png) no-repeat 4px 50%;
 }
-div.beeswax .ccs-window-toolbar .tabs {
+div.beeswax .jframe-window-toolbar .tabs {
 	right: 7px;
 	position: absolute;
 	top: 69px;
@@ -821,7 +821,7 @@ div.beeswax .watch_results .bw-save_query_results a[data-filters*=ArtButton] {
 div.beeswax .watch_results .bw-save_query_results div[data-filters*=ArtButton] {
 	margin-top: 5px;
 }
-div.beeswax .watch_results .bw-save_query_results a.ccs-choose_file {
+div.beeswax .watch_results .bw-save_query_results a.hue-choose_file {
 	background: url(/static/art/icons/folder.png);
 }
 div.beeswax .bw-save {
@@ -861,7 +861,7 @@ div.beeswax .bw-query div.validation-advice {
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 }
-div.beeswax .bw-query .ccs-error {
+div.beeswax .bw-query .jframe-error {
 	background-color: lightYellow !important;
 }
 div.beeswax .bw-error_tab_msg {
@@ -899,7 +899,7 @@ div.beeswax .bw-query_header label {
 	float: left;
 	font-size: 14px;
 }
-div.beeswax .bw-query_header a.ccs-help_link {
+div.beeswax .bw-query_header a.hue-help_link {
 	margin-left: 4px;
 }
 div.beeswax .bw-query_header {
@@ -936,7 +936,7 @@ div.beeswax .bw-query_settings input, div.beeswax .bw-query_settings select {
 	width: 90%;
 	width: -moz-available;
 }
-div.beeswax .bw-query_settings a.ccs-choose_file {
+div.beeswax .bw-query_settings a.hue-choose_file {
 	position: relative;
 	top: -1px;
 }
@@ -998,10 +998,10 @@ div.beeswax .bw-query_settings .bw-query_settings_add button {
 	right: -1px;
 }
 
-div.beeswax .ccs-bw_parameters {
+div.beeswax .hue-bw_parameters {
 	margin-top: 0px !important;
 }
-div.beeswax .ccs-bw_parameters input {
+div.beeswax .hue-bw_parameters input {
 	width: auto;
 	margin-right: 10px;
 }
@@ -1125,7 +1125,7 @@ div.beeswax .bw-options {
 /*
 	my queries
 */
-div.beeswax .ccs-window-toolbar ul.bw-my_queries_tabs {
+div.beeswax .jframe-window-toolbar ul.bw-my_queries_tabs {
 	left: 77px;
 }
 div.beeswax .bw-view_more {

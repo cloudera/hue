@@ -19,16 +19,16 @@ ${comps.header('Upload Files')}
 
 <div class="prompt_popup">
 <form action="/filebrowser/upload?next=${next|u}" method="POST" enctype="multipart/form-data">
-  <h4 class="ccs-hidden">Upload Files</h4>
+  <h4 class="jframe-hidden">Upload Files</h4>
   <dl>
     ${edit.render_field(form["dest"], hidden=True)}
     ${edit.render_field(form["file"], render_default=True, notitle=True)}
   </dl>
-  <input class="ccs-hidden" type="submit" value="Submit" />
+  <input class="jframe-hidden" type="submit" value="Submit" />
 </form>
 </div>
 
-<div class="ccs-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
+<div class="jframe-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
 
 
 ${comps.footer()}

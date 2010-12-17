@@ -114,13 +114,13 @@
       </div>
 
       <div data-filters="Tabs">
-        <ul class="tabs jtv_tabs ccs-right clearfix">
+        <ul class="tabs jtv_tabs jframe-right clearfix">
           <li><span>Tasks</span></li>
           <li><span>Metadata</span></li>
           <li><span>Counters</span></li>
         </ul>
 
-        <ul class="tab_sections ccs-clear">
+        <ul class="tab_sections jframe-clear">
           <li>
             <div class="jt_mr_display">
               <dl class="jtv_graph">
@@ -136,9 +136,9 @@
               task_table_size = '49%' 
             %>
             %if failed_tasks:
-            <div class="jt_task_list jt_failed_tasks ccs-inline" style="width: ${task_table_size};">
+            <div class="jt_task_list jt_failed_tasks jframe-inline" style="width: ${task_table_size};">
               <h3>
-                <a class="ccs-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">view failed tasks &raquo;</a>
+                <a class="jframe-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">view failed tasks &raquo;</a>
                 Failed Tasks
               </h3>
               <div class="jt_task_list_container">
@@ -146,9 +146,9 @@
               </div>
             </div>
             %endif
-            <div class="jt_task_list jt_recent_tasks ccs-inline" style="width: ${task_table_size}">
+            <div class="jt_task_list jt_recent_tasks jframe-inline" style="width: ${task_table_size}">
               <h3>
-                <a class="ccs-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
+                <a class="jframe-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
                 Recent Tasks
               </h3>
               <div class="jt_task_list_container">

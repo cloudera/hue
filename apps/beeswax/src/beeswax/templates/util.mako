@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%def name="render_error(err)">
-  <div class="ccs-error">
+  <div class="jframe-error">
     ${unicode(err) | n}
   </div>
 </%def>
@@ -26,7 +26,7 @@
     <dt>${field.label_tag() | n}</dt>
     <dd>${unicode(field) | n}</dd>
     % if len(field.errors):
-      <dd class="ccs-error">
+      <dd class="jframe-error">
         ${render_error(field.errors)}
       </dd>
     % endif

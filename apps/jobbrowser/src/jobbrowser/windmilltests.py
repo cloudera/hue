@@ -19,6 +19,6 @@ from desktop.lib.windmill_util import logged_in_client
 def test_launch():
   """ Simply opens and closes JobBrowser. """
   client = logged_in_client()
-  client.click(id='ccs-jobbrowser-menu')
+  client.click(id='hue-jobbrowser-menu')
   client.waits.forElement(jquery='(".close")[0]', timeout='300')
   client.click(jquery='(".close")[0]')

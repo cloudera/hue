@@ -13,7 +13,7 @@
 		"clientcide": {
 			"scripts": "../ext/thirdparty/js/clientcide/Source"
 		},
-		"ccs-shared": {
+		"hue-shared": {
 			"scripts": "core/static/js/Source"
 		},
 		"fancyupload": {
@@ -37,7 +37,7 @@
 		"slick": {
 			"scripts": "../ext/thirdparty/js/art/assets/slick/Source"
 		},
-		"ccs-ui": {
+		"hue-ui": {
 			"scripts": "core-apps/UI/static/js/Source"
 		},
 		"jobbrowser": {

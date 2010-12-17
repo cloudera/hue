@@ -27,7 +27,7 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
 <%def name="selection(name, choices, current_value, other_key=None)">
     <% seen = False %>
     % if len(choices) == 0:
-      <select name="${name}" class="ccs-hidden">
+      <select name="${name}" class="jframe-hidden">
     % else:
       <select name="${name}">
     % endif
@@ -50,7 +50,7 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
     </select>
     % if is_superuser:
       % if seen or not current_value:
-        <input name="${other_key}" class="ccs-hidden">
+        <input name="${other_key}" class="jframe-hidden">
       % else:
         <input name="${other_key}" value="${current_value}">
       % endif
@@ -59,7 +59,7 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
 
 <div class="prompt_popup">
 <form action="/filebrowser/chown?next=${next|u}" method="POST" enctype="multipart/form-data">
-  <h4 class="ccs-hidden">Change Owner / Group: ${path}</h4>
+  <h4 class="jframe-hidden">Change Owner / Group: ${path}</h4>
   <dl class="fb-side-by-side">
     ${edit.render_field(form["path"], hidden=True)}
 
@@ -80,12 +80,12 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
       % endif
     </dd>
   </dl>
-  <input class="ccs-hidden" type="submit" value="Submit" />
+  <input class="jframe-hidden" type="submit" value="Submit" />
 </form>
 <p>Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</p>
 </div>
 
-<div class="ccs-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
+<div class="jframe-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
 
 
 ${comps.footer()}

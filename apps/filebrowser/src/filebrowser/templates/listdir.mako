@@ -22,7 +22,7 @@ from django.template.defaultfilters import escape, stringformat, date, time
 ${comps.header(path, current_request_path, cwd_set=cwd_set, show_upload=show_upload)}
 
   <div id="dirlist" class="view">
-    <h1 class="ccs-hidden">${path|escape}</h1>
+    <h1 class="jframe-hidden">${path|escape}</h1>
     ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
   </div>
 ${comps.footer()}

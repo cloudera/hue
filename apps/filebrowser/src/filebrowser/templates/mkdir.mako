@@ -20,16 +20,16 @@ ${comps.header('Create Directory')}
 
 <div class="prompt_popup">
 <form action="/filebrowser/mkdir?next=${next|u}" method="POST" enctype="multipart/form-data">
-  <h4 class="ccs-hidden">Create Directory}</h4>
+  <h4 class="jframe-hidden">Create Directory}</h4>
   <dl>
     ${edit.render_field(form["path"], hidden=True)}
     ${edit.render_field(form["name"])}
   </dl>
-  <input class="ccs-hidden" type="submit" value="Submit" />
+  <input class="jframe-hidden" type="submit" value="Submit" />
 </form>
 </div>
 
-<div class="ccs-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
+<div class="jframe-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
 
 
 ${comps.footer()}
