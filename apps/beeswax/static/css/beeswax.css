@@ -334,7 +334,7 @@ div.beeswax .bw-select_delim dt {
 div.beeswax .bw-select_delim a.ccs-help_link {
 	margin-bottom: 4px;
 }
-div.beeswax .bw-default_location label, div.beeswax .bw-import_data label, div.beeswax .bw-confirm_delim label,  div.beeswax .bw-show_hive label {
+div.beeswax .bw-default_location label, div.beeswax .bw-import_data label, div.beeswax .bw-confirm_delim label, div.beeswax .bw-show_hive label {
 	float: left;
 }
 div.beeswax .bw-default_location, div.beeswax .bw-external_loc, div.beeswax .bw-import_data {
@@ -349,7 +349,7 @@ div.beeswax .bw-import_data a {
 div.beeswax .bw-show_hive a {
 	margin-top: 8px;
 }
-div.beeswax .bw-file_formats label.ccs-bw-selected, div.beeswax .bw-format dt.ccs-bw-selected label, div.beeswax .bw-default_location .ccs-bw-selected, div.beeswax .bw-partition_key label.ccs-bw-selected,  div.beeswax .bw-show_hive label.ccs-bw-selected, div.beeswax .bw-import_data label.ccs-bw-selected {
+div.beeswax .bw-file_formats label.ccs-bw-selected, div.beeswax .bw-format dt.ccs-bw-selected label, div.beeswax .bw-default_location .ccs-bw-selected, div.beeswax .bw-partition_key label.ccs-bw-selected,	div.beeswax .bw-show_hive label.ccs-bw-selected, div.beeswax .bw-import_data label.ccs-bw-selected {
 	color: #003f6f;
 	text-shadow: 1px 1px #d0e6f7;
 	border: 1px solid #003f6f;
@@ -1171,4 +1171,11 @@ div.beeswax .list_history .bw-show_group a {
 	background:url("/static/art/icons/bullet_add.png") no-repeat scroll 0 0 transparent;
 	height:18px;
 	padding:4px 8px;
+}
+
+/* header */
+div.beeswax div.bw-input-filter {
+	position: absolute;
+	right: 16px;
+	top: 57px;
 }

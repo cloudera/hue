@@ -17,6 +17,13 @@
 <%namespace name="util" file="util.mako" />
 ${wrappers.head('Hive Configuration Variables', section='hive configuration')}
 <h1 class="ccs-hidden">Hive Configuration Variables</h1>
+<div class="toolbar">
+  <div class="bw-input-filter">
+    <input type="text" class="ccs-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
+      title="Filter by Name"
+      data-filter-elements="tbody tr" value=""/>
+  </div>
+</div>
 <table class="sortable" data-filters="HtmlTable" cellpadding="0" cellspacing="0">
   <thead>
     <tr>

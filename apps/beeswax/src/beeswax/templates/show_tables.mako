@@ -26,7 +26,13 @@ ${wrappers.head("Beeswax: Table List", section='tables')}
 
 <div id="show_tables" class="view">
   <h2 class="ccs-hidden">Tables</h2>
-
+  <div class="toolbar">
+    <div class="bw-input-filter">
+      <input type="text" class="ccs-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
+        title="Filter by Name"
+        data-filter-elements="td.bw-tables_table" data-filter-parents="tr" value=""/>
+    </div>
+  </div>
   <table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
     <thead>
       <tr>
