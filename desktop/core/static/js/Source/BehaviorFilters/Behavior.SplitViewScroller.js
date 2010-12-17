@@ -49,6 +49,6 @@ Behavior.addGlobalPlugin('SplitView', 'SplitViewScroller', function(element, met
 	};
 	el.addEvent('click:relay([href*=#])', tabAnchorScroller);
 	this.markForCleanup(element, function() {
-		el.removeEvent('click:relay([href*=#]', tabEnchorScroller);
+		el.removeEvent('click:relay([href*=#]', tabAnchorScroller);
 	});
 });

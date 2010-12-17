@@ -339,7 +339,7 @@ table a.ccs-table_config_link {
 	background: no-repeat 50% 50% url(../art/icons/small_cog.png);
 	position: relative;
 }
-form.ccs-table_config {
+.ccs-table_config {
 	position: absolute;
 	background: #fff;
 	border: 1px solid #777;
@@ -362,13 +362,13 @@ form.ccs-table_config {
 	height: 7px;
 	cursor: se-resize;
 }
-form.ccs-table_config label {
+.ccs-table_config label {
 	display: block;
 }
-form.ccs-table_config label:hover {
+.ccs-table_config label:hover {
 	color: #36f;
 }
-form.ccs-table_config ul {
+.ccs-table_config ul {
 	padding: 2px;
 	height: 125px;
 	min-width: 200px;
@@ -390,7 +390,7 @@ form.ccs-table_config ul {
 *[data-filters*=Sortable] .clone {
 	z-index: 1;
 }
-form.ccs-table_config li, .ccs-sort_handle {
+.ccs-table_config li, .ccs-sort_handle {
 	user-select: none;
 	-moz-user-select: none;
 	-webkit-user-select: none;
@@ -402,10 +402,10 @@ form.ccs-table_config li, .ccs-sort_handle {
 	margin-bottom: 2px;
 	background: #fff url(../art/sortable-handle.png) 5px 50% no-repeat;
 }
-form.ccs-table_config li input {
+.ccs-table_config li input {
 	margin-right: 6px;
 }
-form.ccs-table_config .art {
+.ccs-table_config .art {
 	margin: 4px;
 }
 /* stickywin solid; this is the login window styles */
@@ -416,8 +416,7 @@ div.solid-win div.body-left {
 	position: relative; 
 	z-index: 1; 
 }
-div.solid-win div.body {
-	position: relative;
+div.solid-win div.body { position: relative;
 	left: 16px;
 	padding: 10px 16px 1px 0px;
 	background: url(../art/sticky-win-solid-back.png) top right;
@@ -445,7 +444,7 @@ div.jframe_wrapper {
 	height: 100%;
 }
 div.jframe_contents {
-	min-height: 100%;
+	height: 100%;
 }
 div.jframe_default h1, h2, h3, h4, h5 {
 	padding: 0;
