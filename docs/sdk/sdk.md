@@ -1475,6 +1475,7 @@ things (like configuration changes), this is not sufficient.	Restart the server 
 		`$ DESKTOP_DEPENDER_DEBUG=1 build/env/bin/hue runserver_plus`
 
 * We highly recommend developing with the [Firebug](http://getfirebug.com) debugging plugin for Firefox. With it enabled, you can use a utility called [dbug](http://www.clientcide.com/docs/Core/dbug) which wraps Firebug commands. This allows you to leave debug statements in your code and display them on demand. In particular, typing in `dbug.cookie()` in Firebug will set a cookie in your browser that will turn these statements on until you type that command again to toggle them off. You'll see some of our own debugging statements and you can add your own. In the future, entering this state may also provide access to additional debugging features.
+* When the dbug state is enabled in the browser, right clicking on elements is re-enabled which makes element inspection a little easier in Firebug.
 
 <!--
 
