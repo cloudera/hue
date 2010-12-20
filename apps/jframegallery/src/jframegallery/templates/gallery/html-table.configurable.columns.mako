@@ -63,7 +63,7 @@
         active_columns.append(columns[int(col)])
 %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!DOCTYPE html>
 <html>
   <head>
     <title>Configurable Columns</title>

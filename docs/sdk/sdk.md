@@ -263,7 +263,7 @@ As you may have guessed, we're going to build a small calculator
 application.	Edit `calculator/src/calculator/templates/index.mako`
 to include a simple form:
 
-		<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+		<!DOCTYPE html>
 		<html>
 			<head>
 				<title>calculator</title>
@@ -1262,7 +1262,7 @@ If renderers are at the beginning of the handling of HTML responses, and linkers
 
 And here's the html that produces it (this is the entire template that generated that screenshot):
 
-	<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+	<!DOCTYPE html>
 	<html>
 		<head>
 			<title>Tabs</title>

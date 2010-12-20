@@ -19,7 +19,7 @@ from datetime import datetime
 <%
 count = int(get_var('count', 0))
 %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!DOCTYPE html>
 <html>
   <head>
     <title>Partial Refresh</title>

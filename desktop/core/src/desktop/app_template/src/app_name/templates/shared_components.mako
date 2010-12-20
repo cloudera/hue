@@ -23,7 +23,7 @@ import datetime
 from django.template.defaultfilters import urlencode, escape
 ${'%>'}
 ${'<%'}def name="header(title='${app_name}', toolbar=True)">
-  <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+  <!DOCTYPE html>
   <html>
     <head>
       <title>${'$'}{title}</title>
