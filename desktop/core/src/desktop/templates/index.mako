@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="/static/oocss/Grid.css">
   <link rel="stylesheet" href="/static/oocss/Icon.css">
 
-  <script src="/depender/build?client=true&require=hue-shared/Hue,hue-shared/Hue.Desktop.BackgroundManager,hue-shared/Hue.Desktop.Config,hue-shared/Hue.JFrame.Target,hue-shared/Hue.Login,hue-shared/Hue.Request,hue-shared/Hue.User"></script>
+  <script src="/depender/build?client=true&require=hue-shared/DesktopLoader"></script>
   <!--[if IE 8]>
       <script>
           window.ie8 = true;
@@ -88,7 +88,10 @@
           if (!FlashMessage.checkForFlashMessage(loading) && 
               !FlashMessage.checkForFlashMessage(launching) && 
               !$$('.loadingmsg').length) {
-                growled[component] = FlashMessage.flash(msg, 10000);
+                growled[component] = FlashMessage.flash({
+                  message: msg, 
+                  duration: 10000
+                });
           }
         };
         var clearGrowl = function(component) {
