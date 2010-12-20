@@ -7,6 +7,7 @@ sources: [
   Source/Deprecated/CCS.JBrowser.js,
   Source/Deprecated/CCS.JFrame.js,
   Source/Deprecated/CCS.JFrame.Deprecated.js,
+  Source/Hue/DesktopLoader.js,
   Source/Hue/Hue.js,
   Source/Hue/Hue.Desktop.js,
   Source/Hue/Hue.Desktop.Config.js,
