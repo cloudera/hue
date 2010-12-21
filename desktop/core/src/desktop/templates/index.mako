@@ -26,8 +26,8 @@
   <link rel="stylesheet" href="/static/css/desktop.css" type="text/css" media="screen" charset="utf-8">
 
   <link rel="stylesheet" href="/static/oocss/Button.css">
-  <link rel="stylesheet" href="/static/oocss/ButtonBar.css">
-  <link rel="stylesheet" href="/static/oocss/ButtonBar.Paginator.css">
+  <link rel="stylesheet" href="/static/oocss/Bar.css">
+  <link rel="stylesheet" href="/static/oocss/Bar.Paginator.css">
   <link rel="stylesheet" href="/static/oocss/Grid.css">
   <link rel="stylesheet" href="/static/oocss/Icon.css">
 
