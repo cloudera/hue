@@ -27,18 +27,21 @@ script: Behavior.SubmitOnChange.js
 
 (function(){
 
-var setupInput = function(input, form, cleanupElement){
+var setupInput = function(input, cleanupElement){
 	var events = {
 		change: function(e){
-                        if (e) form.fireEvent('submit', e);
+			var form = input.getParent('form');
+			if (e) form.fireEvent('submit', e);
 			else form.fireEvent('submit');
 		},
-                click: function(event) {
-                        if ((input.get('type') == 'checkbox') && Browser.Engine.name == "trident") {
-                                form.fireEvent('submit', event);
-                        }
-                }, 
+				click: function(event) {
+						var form = input.getParent('form');
+						if ((input.get('type') == 'checkbox') && Browser.Engine.name == "trident") {
+							form.fireEvent('submit', event);
+						}
+				}, 
 		keydown: function(e) {
+			var form = input.getParent('form');
 			if (e.key == 'enter' && document.id(e.target).get('tag') != 'textarea') form.fireEvent('submit', e);
 		}
 	};
@@ -64,10 +67,10 @@ Behavior.addGlobalFilters({
 
 	SubmitOnChange: function(element, methods) {
 		if (['input', 'select', 'textarea'].contains(element.get('tag'))) {
-			setupInput.call(this, element, element.getParent('form'), element);
+			setupInput.call(this, element);
 		} else {
 			element.getElements('input, select, textarea').each(function(el){
-				setupInput.call(this, el, element, element);
+				setupInput.call(this, el, element);
 			}, this);
 		}
 	}
