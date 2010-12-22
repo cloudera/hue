@@ -153,6 +153,9 @@ CCS.JFrame = new Class({
 			}.bind(this)
 		});
 		this.addEvent('resize', this.behavior.resize.bind(this.behavior));
+		this.addEvent('livePathUpdate', function(uri) {
+			this.behavior.fireEvent('livePathUpdate', uri);
+		}.bind(this));
 		this.addBehaviors(this.options.behaviors);
 
 		this.element.addClass('jframe_wrapper').addClass('ccs-shared');

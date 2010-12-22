@@ -27,15 +27,15 @@ script: CCS.JFrame.LivePath.js
 	CCS.JFrame.addGlobalLinkers({
 
 		'[data-livepath-toggle]': function(event, link){
-			this.currentPath = updateLivePath(link, this.currentPath);
+			this.currentPath = updateLivePath.call(this, link, this.currentPath);
 		},
 		//these are a bit silly, but mootools 1.2 selector engine doesn't support
 		//complex selectors for element.match, so we have to do a bit of repetition here
 		'[data-livepath-add]': function(event, link){
-			this.currentPath = updateLivePath(link, this.currentPath);
+			this.currentPath = updateLivePath.call(this, link, this.currentPath);
 		},
 		'[data-livepath-remove]': function(event, link){
-			this.currentPath = updateLivePath(link, this.currentPath);
+			this.currentPath = updateLivePath.call(this, link, this.currentPath);
 		}
 
 	});
@@ -76,6 +76,7 @@ script: CCS.JFrame.LivePath.js
 			remove = remove.parseQueryString();
 			setData(uri, remove, 'toggle');
 		}
+		this.fireEvent('livePathUpdate', uri);
 		return uri.toString();
 	};
 

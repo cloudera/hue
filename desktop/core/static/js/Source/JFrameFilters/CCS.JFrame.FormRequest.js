@@ -30,7 +30,10 @@ CCS.JFrame.addGlobalFilters({
 		//get all forms in the response
 		container.getElements('form').each(function(form){
 			//set their action url and add the FormRequest filter
-			form.set('action', new URI(form.get('action'), {base: this.currentPath})).addDataFilter("FormRequest");
+			if(form.get('action')){
+				form.set('action', new URI(form.get('action'), {base: this.currentPath}));
+			}
+			form.addDataFilter("FormRequest");
 		}, this);
 	}
 
@@ -63,10 +66,20 @@ Behavior.addGlobalPlugin('FormRequest', 'JFrameFormRequest', function(element, m
 	});
 	//configure its request to use JFrame's response handler
 	methods.configureRequest(formRequest.request, options);
+	//if the element does not initially have an action, update its action to the new path, on livePathUpdate
+	var pathUpdate = function(uri) {
+		element.set('action', uri);
+	};
+	if (!element.get('action')){
+		methods.addEvent('livePathUpdate', pathUpdate);
+	}
 	formRequest.addEvent('send', function(form, query){
 		formRequest.request.setOptions({
 			formAction: form.get('action'),
 			formData: query
 		});
+	});
+	this.markForCleanup(element, function() {
+		methods.removeEvent('livePathUpdate', pathUpdate);
 	});
 });
