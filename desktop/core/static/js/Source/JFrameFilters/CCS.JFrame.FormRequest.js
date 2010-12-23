@@ -32,6 +32,9 @@ CCS.JFrame.addGlobalFilters({
 			//set their action url and add the FormRequest filter
 			if(form.get('action')){
 				form.set('action', new URI(form.get('action'), {base: this.currentPath}));
+			} else {
+				form.set('action', new URI(this.currentPath));
+				form.set('data', 'live-path', true);
 			}
 			form.addDataFilter("FormRequest");
 		}, this);
@@ -70,7 +73,7 @@ Behavior.addGlobalPlugin('FormRequest', 'JFrameFormRequest', function(element, m
 	var pathUpdate = function(uri) {
 		element.set('action', uri);
 	};
-	if (!element.get('action')){
+	if (element.get('data', 'live-path')){
 		methods.addEvent('livePathUpdate', pathUpdate);
 	}
 	formRequest.addEvent('send', function(form, query){
