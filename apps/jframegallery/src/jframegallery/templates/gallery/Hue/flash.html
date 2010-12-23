@@ -18,26 +18,15 @@ limitations under the License.
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Post-load prompt popup</title>
+		<title>JFrame Gallery</title>
 	</head>
 	<body>
-		{% if post_vars %}
-			<div class="jframe_padded">
-				You submitted the following values:
-				<ul>
-					{% for post_var, val in post_vars %}
-					 <li>{{post_var}}: {{val}}</li>
-					{% endfor %}
-				</ul>
-			</div>
-		{% else %}
-		<div class="prompt_popup">
-				I'm a post-load prompt. Enter a value please.
-				<form action="{{request_path}}" method="post" style="margin: 6px 0px 0px;">
-					<input type="text" name="prompt_value"/>
-					<input type="submit" class="jframe-hidden" name="submit"/>
-				</form>
+		<div class="jframe_padded">
+			<h1>Flash Messaging Testing.</h1>
+			<p>You should see some messages on the desktop. They zoom away after about 2 seconds. These were set in the controller (views.py) using the following syntax:</p>
+			<code><pre>request.flash.put('just a test')
+request.flash.put('another growl test')
+request.flash.put('yet another message to bubble up.')</pre></code>
 		</div>
-		{% endif %}
 	</body>
 </html>

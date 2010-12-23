@@ -19,39 +19,39 @@
     <title>JFrame Gallery Source -- ${name}</title>
     </head>
     <body>
-      <div class="jf-src_view">
-	<div data-filters="Tabs" data-tabs-selector=".tab" data-sections-selector=".section">
-	  <div data-filters="SplitView">
-	    <div class="left_col jframe_padded">
-	      <ul>
-		<li class="tab html-tab"><a>HTML/Template</a></li>
-		%for js_name in js_data.iterkeys():
-		  <li class="tab">
-		    <a>${js_name}</a>
-		  </li>
-		%endfor
-	      </ul>
-	    </div>
-	    <div class="right_col jframe_padded">
-	      <ul class="jframe-clear">
-		## Template data
-		<li class="section">
-		  <h3>Source for HTML</h3>
-		  <hr/>
-		  ${data|n}
-		</li>
-		## JS data
-		%for js_name, js in js_data.iteritems():
-		  <li class="section">
-		    <h3>Source for <code>${js_name}</code></h3>
-		    <hr/>
-		    ${js|n}
-		  </li>
-		%endfor
-	      </ul>
-	    </div>
-	  </div>
-	</div>
+      <div class="jf-src_view view" id="source">
+        <div data-filters="Tabs" data-tabs-selector=".tab" data-sections-selector=".section">
+          <div data-filters="SplitView">
+            <div class="left_col jframe_padded">
+              <ul>
+                <li class="tab html-tab"><a>HTML/Template</a></li>
+                %for js_name in js_data.iterkeys():
+                  <li class="tab">
+                    <a>${js_name}</a>
+                  </li>
+                %endfor
+              </ul>
+            </div>
+            <div class="right_col jframe_padded">
+              <ul class="jframe-clear">
+                ## Template data
+                <li class="section">
+                  <h3>Source for HTML</h3>
+                  <hr/>
+                  ${data|n}
+                </li>
+                ## JS data
+                %for js_name, js in js_data.iteritems():
+                  <li class="section">
+                    <h3>Source for <code>${js_name}</code></h3>
+                    <hr/>
+                    ${js|n}
+                  </li>
+                %endfor
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </body>
 </html>

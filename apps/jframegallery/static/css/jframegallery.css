@@ -9,9 +9,10 @@
 }
 
 .jframe-gallery .jf-buttonbar {
-	position: relative;
-	top: 0px;
-	left: 70px;
+	position: absolute;
+	right: 20px;
+	top: 3px;
+	width: 85px;
 }
 
 .jframe-gallery .jf-src_view .tabSelected {
@@ -21,6 +22,27 @@
 .jframe-gallery .jf-src_view .html-tab {
 	margin-bottom: 5px;
 }
+
+.jframe-gallery .index a {
+	background: url(/static/art/led-icons/folder.png) no-repeat 4px 2px;
+	padding: 3px 2px 3px 24px;
+	display: block;
+}
+
+.jframe-gallery .index li:hover {
+	background: #DED3A2;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+}
+
+.jframe-gallery .file a {
+	background: url(/static/art/led-icons/tag.png) no-repeat 4px 2px;
+}
+.jframe-gallery .index a:hover {
+	text-decoration: none;
+}
+
 
 /*
  * Styles from Pygments
