@@ -56,6 +56,7 @@ class DependerData(object):
       scripts_json = []
 
     self.packages = {}
+    self.package_aliases = {}
     self.unqualified_components = {}
 
     self.script_json_packages = []
@@ -71,6 +72,9 @@ class DependerData(object):
       if p.key in self.packages:
         raise Exception("Duplicate package: " + p.key)
       self.packages[p.key] = p
+      if hasattr(self.packages[p.key], 'aliases'):
+        for alias in self.packages[p.key].aliases:
+          self.package_aliases[alias] = p.key
       for component_name, file_data in p.components.iteritems():
         self.unqualified_components.setdefault(component_name, []).append(file_data)
 
@@ -123,6 +127,10 @@ class DependerData(object):
       for c, fd in sorted(package.components.iteritems()):
         out += "\t\t%s (%s)\n" % (c, fd.filename)
 
+    out += "\tAliases:\n"
+    for alias, package in sorted(self.package_aliases.items()):
+      out += "\t\t%s (%s)\n" % (alias, package)
+
     LOG.info(out)
 
     for p in self.packages.values():
@@ -140,6 +148,8 @@ class DependerData(object):
     Retrieves a FileData object given (package, component) pair.
     """
     pkg_key, component_key = id
+    if pkg_key in self.package_aliases:
+      pkg_key = self.package_aliases[pkg_key]
     if pkg_key not in self.packages:
       raise Exception("Package not found while looking for id: %s " % repr(id))
     p = self.packages[pkg_key]
@@ -318,6 +328,11 @@ class YamlPackageData(object):
     except:
       LOG.exception("Could not parse: " + package_filename)
       raise
+
+    self.aliases = []
+    if "aliases" in self.metadata:
+      self.aliases = self.metadata["aliases"]
+
     rootdir = os.path.dirname(package_filename)
     self.key = self.metadata["name"]
     for source_file in self.metadata["sources"]:

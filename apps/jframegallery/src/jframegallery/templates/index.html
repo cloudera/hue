@@ -18,14 +18,30 @@ limitations under the License.
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 	<head>
-		<title>JFrame Gallery</title>
+		<title>JFrame Gallery
+			{% if current_path %}
+				:: {{current_path}}
+			{% endif %}
+		</title>
 	</head>
 	<body>
-		<div class="jframe_padded">
-			<h1>Gallery pages:</h1>
-			<ul>
+		<div class="jframe_padded view" id="index">
+			<h1>Gallery pages
+				{% if current_path %}
+					in {{current_path}}
+				{% endif %}
+			</h1>
+			<ul class="index">
+				{% if subdir %}
+					<li class="dir"><a href="/jframegallery/{{parent_dir}}">..</a></li>
+				{% endif %}
+
+				{% for dir in dirs %}
+					<li class="dir"><a href="/jframegallery/{{dir.filename}}">{{dir.name}}</a></li>
+				{% endfor %}
+
 				{% for file in files %}
-					<li><a href="/jframegallery/{{file.filename}}" id="{{file.id}}">{{file.name}}</a></li>
+					<li class="file"><a href="/jframegallery/{{file.filename}}">{{file.name}}</a></li>
 				{% endfor %}
 			</ul>
 		</div>

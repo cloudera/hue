@@ -18,9 +18,7 @@
 from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('jframegallery',
-  url(r'^$', 'views.index'),
   url(r'^source/(?P<path>.*)$', 'views.view_source'),
-  url(r'^gallery/autocomplete$', 'views.autocomplete'),
   url(r'^gallery/flash.redirect.*$', 'views.flash_redirect'),
   url(r'^gallery/flash.*$', 'views.flash'),
   url(r'^gallery/error_404.*$', 'views.error_404'),
@@ -28,11 +26,11 @@ urlpatterns = patterns('jframegallery',
   url(r'^gallery/error_real_500.*$', 'views.error_real_500'),
   url(r'^gallery/error_python.*$', 'views.error_python'),
   url(r'^gallery/error_redirect.*$', 'views.error_redirect'),
-  url(r'^gallery/redirect_301.*$', 'views.redirect_301'),
+  url(r'^gallery/redirect_301$', 'views.redirect_301'),
   url(r'^gallery/forwarding.*$', 'views.forwarding'),
   url(r'^gallery/error_message_exception.*$', 'views.error_message_exception'),
   url(r'^gallery/error_popup_exception.*$', 'views.error_popup_exception'),
   url(r'^gallery/forms_with_dependencies.*$', 'views.forms_with_dependencies'),
-  url(r'^gallery/html-table.treeview.ajax.*$', 'views.pstree'),
-  url(r'^gallery/(?P<path>.*)$', 'views.show')
+  url(r'^asset/(?P<path>.*)$', 'views.index'),
+  url(r'^(?P<path>.*)$', 'views.index'),
 )

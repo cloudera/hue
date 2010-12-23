@@ -23,6 +23,10 @@ script: Hue.JFrameGallery.js
 ...
 */
 
+ART.Sheet.define('window.art.jframe-gallery', {
+	'footer-height': 28
+});
+
 Hue.JFrameGallery = new Class({
 
 	Extends: Hue.JBrowser,
@@ -37,7 +41,7 @@ Hue.JFrameGallery = new Class({
 	initialize: function(path, options){
 		this.parent(path || '/jframegallery/', options);
 
-		this.addEvent('load', function(){
+		this.addEvent('load', function(view){
 			this.toolbar.adopt(
 				new Element('a', {
 					href: '/jframegallery/',
@@ -46,49 +50,31 @@ Hue.JFrameGallery = new Class({
 			);
 
 			/* Inject demo/source button bar */
-			var path = this.jframe.currentPath;
-			var do_inject = false;
-			var demopath;
-			var sourcepath;
+			var currentPath = this.jframe.currentPath,
+			    path;
 
-			if (path.indexOf('/jframegallery/gallery') === 0) {
+			if (currentPath.indexOf('/jframegallery/gallery') === 0) {
 				/* This is the view of a demo */
-				demopath = path;
-				sourcepath = path.replace('/jframegallery/gallery', '/jframegallery/source');
-				do_inject = true;
-			} else if (path.indexOf('/jframegallery/source') === 0) {
+				path = currentPath.replace('/jframegallery/gallery', '/jframegallery/source');
+			} else if (currentPath.indexOf('/jframegallery/source') === 0) {
 				/* This is the view of a demo source */
-				demopath = path.replace('/jframegallery/source', '/jframegallery/gallery');
-				sourcepath = path;
-				do_inject = true;
+				path = currentPath.replace('/jframegallery/source', '/jframegallery/gallery');
 			}
 
-			if (do_inject) {
+			if (path) {
+				var button = new Element('a', {
+					href: path,
+					'class': 'jf-button',
+					'data-filters': 'ArtButton',
+					'text': view == "source" ? "View Demo" : "View Source"
+				});
 				var buttonBar = new Element('ul', {
 					'class': 'jf-buttonbar',
 					'data-filters': 'ArtButtonBar'
-				});
-
-				var demoLink = new Element('a', {
-					href: demopath,
-					'class': 'jf-button',
-					'data-filters': 'ArtButton',
-					'text': "View Demo"
-				});
-
-				var sourceLink = new Element('a', {
-					href: sourcepath,
-					'class': 'jf-button',
-					'data-filters': 'ArtButton',
-					'text': "View Source"
-				});
-
-				buttonBar.adopt(new Element('li').adopt(demoLink));
-				buttonBar.adopt(new Element('li').adopt(sourceLink));
-				this.toolbar.adopt(buttonBar);
-				this.jframe.behavior.apply(this.toolbar);
+				}).adopt(new Element('li').adopt(button));
+				this.footerText.adopt(buttonBar);
+				this.jframe.behavior.apply(this.footerText);
 			}
-			sourcepath = "foo";
 		}.bind(this));
 	}
 

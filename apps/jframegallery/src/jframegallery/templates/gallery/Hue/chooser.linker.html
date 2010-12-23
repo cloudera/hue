@@ -15,19 +15,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-<!DOCTYPE html>
 <html>
-	<head>
-		<title>Collapsibles</title>
-	</head>
-	<body>
-	<h1>Collapsibles</h1>
-	<ul data-filters="CollapsingElements">
-          <li>
-                  <div id="collapser_one" class="collapser">Click here! (1)</div><div id="data_one" class="collapsible">Data (1)</div>
-          </li>
-          <li>
-                  <div class="collapser">Click here! (2)</div><div class="collapsible">Data (2)</div>
-          </li>
-	</body>
+<head>
+  <title>File Chooser Filter</title>
+</head>
+<body>
+  <div class="jframe_padded">
+    <p>Choose a File (Can't Choose Directory)
+    <input type="text" name="file"/><a class="hue-choose_file" data-filters="ArtButton" data-chooseFor="file">Save As</a>
+    <p>Choose a Directory (Can't Choose Path)
+    <input type="text" name="dir"/><a class="hue-choose_dir" data-filters="ArtButton" data-chooseFor="dir">Save As</a>
+    <p>Choose a Path (Can Choose Either Directory or Path)
+    <input type="text" name="path"/><a class="hue-choose_path" data-filters="ArtButton" data-chooseFor="path">Save As</a>
+  </div>
+</body>
 </html>

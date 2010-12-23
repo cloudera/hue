@@ -17,19 +17,17 @@ limitations under the License.
 {% endcomment %}
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Form Validation</title>
-	</head>
-	<body>
-		<div class="jframe_padded">
-			<form data-filters="FormValidator">
-				<dl>
-					<dt>required input:</dt>
-					<dd><input type="text" class="required"></dd>
-					<dt>validate email address</dt>
-					<dd><input type="text" class="validate-email"></dd>
-				</dl>
-			</form>
-		</div>
-	</body>
+  <head>
+    <title>Errors</title>
+  </head>
+  <body>
+    <div class="jframe_padded">
+      <p>
+      The first time you visit this page, you should see X.  If you click
+      on refresh, you should see Y.</p>
+      <p><big><big><div id="test_letter">{{ letter }}</div></big></big></p>
+      <p>(The backend is simulating a forward by updating
+      the path.)</p>
+    </div>
+  </body>
 </html>
