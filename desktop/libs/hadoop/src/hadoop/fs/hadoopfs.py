@@ -799,9 +799,9 @@ class FileUpload(object):
     self.subprocess_env = i18n.make_utf8_env()
 
     if self.subprocess_env.has_key('HADOOP_CLASSPATH'):
-      self.subprocess_env['HADOOP_CLASSPATH'] += ':' + hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
+      self.subprocess_env['HADOOP_CLASSPATH'] += ':' + hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()
     else:
-      self.subprocess_env['HADOOP_CLASSPATH'] = hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()
+      self.subprocess_env['HADOOP_CLASSPATH'] = hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()
 
     if hadoop.conf.HADOOP_CONF_DIR.get():
       self.subprocess_env['HADOOP_CONF_DIR'] = hadoop.conf.HADOOP_CONF_DIR.get()

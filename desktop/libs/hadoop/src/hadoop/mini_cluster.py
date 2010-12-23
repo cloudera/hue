@@ -89,14 +89,11 @@ class MiniHadoopCluster(object):
     self.num_datanodes = num_datanodes
     self.num_tasktrackers = num_tasktrackers
 
-  def start(self, extra_classpath_entries=None, extra_configs=None):
+  def start(self, extra_configs=None):
     """
     Start a cluster as a subprocess.
     """
     self.tmpdir = tempfile.mkdtemp()
-
-    if not extra_classpath_entries:
-      extra_classpath_entries = []
 
     if not extra_configs:
       extra_configs = {}
@@ -192,7 +189,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         hadoop.conf.HADOOP_TEST_JAR.get(),
         # -- END JAVA TRIVIA --
         hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(),
-        hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()] + extra_classpath_entries)
+        hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()])
       env["HADOOP_HEAPSIZE"] = "128"
       env["HADOOP_HOME"] = hadoop.conf.HADOOP_HOME.get()
       env["HADOOP_LOG_DIR"] = self.log_dir

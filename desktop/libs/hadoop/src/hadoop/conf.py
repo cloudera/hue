@@ -98,8 +98,8 @@ HADOOP_PLUGIN_CLASSPATH = Config("hadoop_plugin_classpath",
   dynamic_default=find_jar("../../java-lib/hue-plugins-*.jar", root=os.path.dirname(__file__)),
   private=True)
 
-HADOOP_STATIC_GROUP_MAPPING_CLASSPATH = Config("hadoop_static_group_mapping_classpath",
-  help="[Used only in testing code.] Path to the Hadoop static group mapping jar.",
+HADOOP_EXTRA_CLASSPATH_STRING = Config('hadoop_extra_classpath_entries',
+  help='[Used only in testing code.] String to add to the end of the HADOOP_CLASSPATH environment variable when calling bin/hadoop.',
   type=str,
   dynamic_default=find_jar("../../static-group-mapping/java-lib/static-group-mapping-*.jar", root=os.path.dirname(__file__)),
   private=True)

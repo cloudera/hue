@@ -227,7 +227,7 @@ class PlanRunner(object):
     env = {      
       'HADOOP_HOME': hadoop.conf.HADOOP_HOME.get(), 
       'HADOOP_OPTS': "-javaagent:%s %s" % (jobsub.conf.ASPECTJWEAVER.get(), java_prop_str),
-      'HADOOP_CLASSPATH': ':'.join([jobsub.conf.ASPECTPATH.get(), hadoop.conf.HADOOP_STATIC_GROUP_MAPPING_CLASSPATH.get()]),
+      'HADOOP_CLASSPATH': ':'.join([jobsub.conf.ASPECTPATH.get(), hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()]),
       'HUE_JOBTRACE_LOG': self.internal_file_name("jobs"),
       'HUE_JOBSUB_USER': self.plan.user,
       'HUE_JOBSUB_GROUPS': ",".join(self.plan.groups),
