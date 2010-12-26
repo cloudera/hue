@@ -36,7 +36,12 @@ BEESWAX_HIVE_LIB=$BEESWAX_ROOT/hive/lib
 
 echo \$HADOOP_HOME=$HADOOP_HOME
 
-export HADOOP_CLASSPATH=$(find $BEESWAX_HIVE_LIB -name "*.jar" | tr "\n" :):$HIVE_CONF_DIR:$BEESWAX_ROOT/../../desktop/libs/hadoop/static-group-mapping/java-lib/static-group-mapping-1.1.0.jar
+export HADOOP_CLASSPATH=$(find $BEESWAX_HIVE_LIB -name "*.jar" | tr "\n" :):$HIVE_CONF_DIR
+
+if [ -n "$HADOOP_EXTRA_CLASSPATH_STRING" ]; then
+  export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$HADOOP_EXTRA_CLASSPATH_STRING
+fi
+
 export HADOOP_OPTS="-Dlog4j.configuration=log4j.properties"
 echo \$HADOOP_CLASSPATH=$HADOOP_CLASSPATH
 echo \$HADOOP_OPTS=$HADOOP_OPTS

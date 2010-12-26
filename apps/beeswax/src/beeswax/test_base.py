@@ -69,6 +69,7 @@ def _start_server(cluster):
     'HADOOP_HOME': hadoop.conf.HADOOP_HOME.get(),
     'HADOOP_CONF_DIR': cluster.config_dir,
     'HIVE_CONF_DIR': beeswax.conf.BEESWAX_HIVE_CONF_DIR.get(),
+    'HADOOP_EXTRA_CLASSPATH_STRING': hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()
   }
   if os.getenv("JAVA_HOME"):
     env["JAVA_HOME"] = os.getenv("JAVA_HOME")
