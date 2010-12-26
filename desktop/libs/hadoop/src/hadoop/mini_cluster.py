@@ -56,6 +56,14 @@ USE_STDERR=os.environ.get("MINI_CLUSTER_USE_STDERR", False)
 CLEANUP_TMP_DIR=os.environ.get("MINI_CLUSTER_CLEANUP", True)
 # How long to wait for cluster to start up.  (seconds)
 MAX_CLUSTER_STARTUP_TIME = 120.0
+# Class to use for the cluster's GMSP.
+CLUSTER_GMSP = 'org.apache.hadoop.security.StaticUserGroupMapping'
+# List of classes to be used as plugins for the NN of the cluster.
+CLUSTER_NN_PLUGINS = 'org.apache.hadoop.thriftfs.NamenodePlugin'
+# List of classes to be used as plugins for the JT of the cluster.
+CLUSTER_JT_PLUGINS = 'org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin'
+# List of classes to be used as plugins for the DN(s) of the cluster.
+CLUSTER_DN_PLUGINS = 'org.apache.hadoop.thriftfs.DatanodePlugin'
 
 # users and their groups which are used in Hue tests.
 TEST_USER_GROUP_MAPPING = {
@@ -125,13 +133,13 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     _write_static_group_mapping(TEST_USER_GROUP_MAPPING,
       tmppath('ugm.properties'))
 
-    core_configs = {'hadoop.security.group.mapping': 'org.apache.hadoop.security.StaticUserGroupMapping',
+    core_configs = {'hadoop.security.group.mapping': CLUSTER_GMSP,
       'hadoop.security.static.group.mapping.file': tmppath('ugm.properties'),
       'hadoop.proxyuser.%s.groups' % (self.superuser,): 'users,supergroup',
       'hadoop.proxyuser.%s.hosts' % (self.superuser,): 'localhost',
-      'dfs.namenode.plugins': 'org.apache.hadoop.thriftfs.NamenodePlugin',
-      'dfs.datanode.plugins': 'org.apache.hadoop.thriftfs.DatanodePlugin',
-      'mapred.jobtracker.plugins': 'org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin'}
+      'dfs.namenode.plugins': CLUSTER_NN_PLUGINS,
+      'dfs.datanode.plugins': CLUSTER_DN_PLUGINS,
+      'mapred.jobtracker.plugins': CLUSTER_JT_PLUGINS}
     core_configs.update(extra_configs)
     write_config(core_configs, tmppath('in-conf/core-site.xml'))
 
