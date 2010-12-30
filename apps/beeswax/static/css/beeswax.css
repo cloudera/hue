@@ -844,7 +844,9 @@ div.beeswax .bw-query-field {
 	color: #fff;
 	background: #333;
 	padding: 0;
+	outline:none
 }
+
 div.beeswax .bw-query dd.bw-query_bottom {
 	background: #333;
 	border: 1px solid #333;
