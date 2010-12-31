@@ -397,7 +397,7 @@ ART.Sheet.define('splitview.bw-editor', {
 			var count = count_input.get('value').toInt();
 			count_input.set('value', count + 1);
 			//create a new column from the template
-			var column = Elements.from(this.columnTemplates[type].replace("TEMPLATE", count, 'g'))[0];
+			var column = Elements.from(this.columnTemplates[type].replace(/TEMPLATE/g, count))[0];
 			//store some metadata about it, inject it into the list.
 			column.store('bw:col-type', type).store('bw:col-count', count);
 			column.hide().inject($(this).getElement('.bw-' + type + '-forms'));
@@ -425,9 +425,10 @@ ART.Sheet.define('splitview.bw-editor', {
 			column.getElements('input, select, textarea').addClass('ignoreValidation');
 			column.getParent('form').validate();
 			column.dissolve();
+                        var column_id = column.retrieve('bw:col-count');
 			new Element('input', {
 				'type': 'hidden',
-				'name': 'columns-' + column.retrieve('bw:col-count') + '-_deleted',
+				'name': 'columns-' + (column_id == null ? "0" : column_id)  + '-_deleted',
 				'value': 'True'
 			}).inject(column);
 		},
