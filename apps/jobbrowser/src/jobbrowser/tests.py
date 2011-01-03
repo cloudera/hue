@@ -21,7 +21,7 @@ from nose.tools import assert_true, assert_false, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop import mini_cluster
-from jobsub.models import JobDesign
+from jobsub.models import JobDesign, Submission
 from jobsub.tests import parse_out_id, watch_till_complete
 from jobsub.views import in_process_jobsubd
 from jobsubd.ttypes import SubmissionHandle
@@ -119,8 +119,9 @@ class TestJobBrowserWithHadoop(object):
     # Submit the job
     design_id = response.context["saved"]
     response = self.client.post("/jobsub/submit/%d" % design_id)
-    job_id = parse_out_id(response)
-    response = watch_till_complete(self.client, job_id, timeout_sec=120)
+    watch_id = parse_out_id(response)
+    response = watch_till_complete(self.client, watch_id, timeout_sec=120)
+    job_id = Submission.objects.get(id=watch_id).submission_handle.id
     hadoop_job_id = get_hadoop_job_id(self.jobsubd, job_id)
 
     # The single job view should have the failed task table
@@ -170,8 +171,9 @@ class TestJobBrowserWithHadoop(object):
                                                             num_mappers=1,
                                                             num_reducers=1,
                                                             reduce_sleep_time_millis=1))
-    job_id = parse_out_id(response)
-    response = watch_till_complete(self.client, job_id)
+    watch_id = parse_out_id(response)
+    response = watch_till_complete(self.client, watch_id)
+    job_id = Submission.objects.get(id=watch_id).submission_handle.id
     hadoop_job_id = get_hadoop_job_id(self.jobsubd, job_id)
 
     # All jobs page
