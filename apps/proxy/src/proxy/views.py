@@ -49,6 +49,29 @@ def check_host_port(host, port):
 
   return False
 
+def check_blacklist(host, port, path):
+  """
+  Return true if this host:port path combo is allowed to be proxied.
+  """
+  blacklist = conf.BLACKLIST.get()
+  if not blacklist:
+    return True
+
+  # Make a canonical path, since "/forbidden//path" (string) does not match
+  # "/forbidden/path" (regex).
+  has_trailing_slash = path.endswith('/')
+  path_elems = path.split('/')
+  path_elems = [ p for p in path_elems if p ]
+  canon_url = "%s:%s/%s" % (host, port, '/'.join(path_elems))
+  if has_trailing_slash:
+    canon_url += '/'
+
+  for regexp in blacklist:
+    if regexp.match(canon_url):
+      return False
+  return True
+
+
 def proxy(request, host, port, path):
   """
   Proxies an HTTP request by fetching the data
@@ -60,6 +83,9 @@ def proxy(request, host, port, path):
     raise MessageException(
       ("%s:%d is not whitelisted for reverse proxying, nor a daemon that Cluster Health " +
        "is aware of.  Contact your administrator.") % (host, port))
+  if not check_blacklist(host, port, path):
+    raise MessageException(
+      "Access to %s:%s%s is blocked. Contact your administrator." % (host, port, path))
 
   # The tuple here is: (scheme, netloc, path, params, query, fragment).
   # We don't support params or fragment.

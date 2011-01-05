@@ -23,6 +23,7 @@ import StringIO
 
 from nose.tools import assert_true, assert_false
 from django.test.client import Client
+from desktop.lib.django_test_util import make_logged_in_client
 
 from proxy.views import _rewrite_links
 import proxy.conf
@@ -114,6 +115,29 @@ def test_proxy_post():
     assert_true("foo2=bar" in response_post.content)
   finally:
     finish()
+
+def test_blacklist():
+  client = make_logged_in_client('test')
+  finish_confs = [
+    proxy.conf.WHITELIST.set_for_testing(r"localhost:\d*"),
+    proxy.conf.BLACKLIST.set_for_testing(r"localhost:\d*/(foo|bar)/fred/"),
+  ]
+  try:
+    # Request 1: Hit the blacklist
+    resp = client.get('/proxy/localhost/1234//foo//fred/')
+    assert_true("is blocked" in resp.content)
+
+    # Request 2: This is not a match
+    httpd, finish = run_test_server()
+    try:
+      resp = client.get('/proxy/localhost/%s//foo//fred_ok' % (httpd.server_port,))
+      assert_true("Hello there" in resp.content)
+    finally:
+      finish()
+  finally:
+    for fin in finish_confs:
+      fin()
+
 
 class UrlLibFileWrapper(StringIO.StringIO):
   """
