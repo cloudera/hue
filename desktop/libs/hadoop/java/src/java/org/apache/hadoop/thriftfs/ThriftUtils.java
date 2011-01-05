@@ -66,8 +66,8 @@ public class ThriftUtils {
 
   static final Log LOG = LogFactory.getLog(ThriftUtils.class);
 
-  static final String HUE_USER_NAME_KEY = "hue.kerberos.principal.shortname";
-  static final String HUE_USER_NAME_DEFAULT = "hue";
+  public static final String HUE_USER_NAME_KEY = "hue.kerberos.principal.shortname";
+  public static final String HUE_USER_NAME_DEFAULT = "hue";
 
   public static LocatedBlock fromThrift(Block block) {
     if (block == null) {
