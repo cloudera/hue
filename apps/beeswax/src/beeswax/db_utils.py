@@ -25,6 +25,7 @@ import time
 
 from beeswax import conf
 from beeswax import models
+from beeswax import hive_site
 from beeswax.models import QueryHistory
 from beeswaxd import BeeswaxService
 
@@ -296,11 +297,12 @@ def meta_client():
       self._encode_partition(new_part)
       return self._client.alter_partition(db_name, tbl_name, new_part)
 
+  _, host, port = hive_site.get_metastore()
   client = thrift_util.get_client(ThriftHiveMetastore.Client,
-                                conf.BEESWAX_META_SERVER_HOST.get(),
-                                conf.BEESWAX_META_SERVER_PORT.get(),
-                                service_name="Hive Metadata (Hive UI) Server",
-                                timeout_seconds=conf.METASTORE_CONN_TIMEOUT.get())
+                                  host,
+                                  port,
+                                  service_name="Hive Metastore Server",
+                                  timeout_seconds=conf.METASTORE_CONN_TIMEOUT.get())
   return UnicodeMetastoreClient(client)
 
 
