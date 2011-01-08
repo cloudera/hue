@@ -37,7 +37,6 @@ script: CCS.JFrame.LivePath.js
 		'[data-livepath-remove]': function(event, link){
 			this.currentPath = updateLivePath.call(this, link, this.currentPath);
 		}
-
 	});
 
 	var updateLivePath = function(link, currentPath){
@@ -62,19 +61,32 @@ script: CCS.JFrame.LivePath.js
 				}
 			}
 		};
+		
+		var getDataObject = function(dataString) {
+			var dataObject;
+			if (dataString == "true") {
+				dataObject = {};
+				dataObject[link.get('name')] = link.get('value');
+			} else {
+				dataObject = dataString.parseQueryString();
+			}
+			return dataObject;
+		};
+		
 		var toggle = link.get('data', 'livepath-toggle'),
 		    add = link.get('data', 'livepath-add'),
 		    remove = link.get('data', 'livepath-remove'),
 		    uri = new URI(currentPath);
 		if (toggle) {
-			toggle = toggle.parseQueryString();
+			toggle = getDataObject(toggle);
 			setData(uri, toggle, 'toggle');
+			
 		} else if (add) {
-			add = add.parseQueryString();
+			add = getDataObject(add);
 			setData(uri, add, 'add');
 		} else if (remove) {
-			remove = remove.parseQueryString();
-			setData(uri, remove, 'toggle');
+			remove = getDataObject(remove);
+			setData(uri, remove, 'remove');
 		}
 		this.fireEvent('livePathUpdate', uri);
 		return uri.toString();
