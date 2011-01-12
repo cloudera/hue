@@ -27,8 +27,8 @@
 		},
 		"behavior": {
 			"track-indirect": "behavior.hash",
-			"from-remote": "anutron",
-			"remotes": ["anutron"]
+			"from-remote": "origin",
+			"remotes": ["origin"]
 		},
 		"more-behaviors": {
 			"track-indirect": "more-behaviors.hash",
