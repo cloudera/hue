@@ -39,7 +39,10 @@ HueChart.Box = new Class({
 				dates: {x: false, y: false}, //is the data in an axis a date ? 
 				dateSpans:{x: null}, //if an axis is a date, what time span should the tick marks for that axis be shown in
 				positionIndicator: false, //should the position indicator be shown ?
-				ticks: {x: false, y: false}, //should tick marks be shown ?
+				ticks: {x: false, y: false, orientation: 'absolute'}, //should tick marks be shown ?
+					//Orientation options are:
+						// 'absolute' -- meaning they are actual dates
+						// 'relative' -- meaning they are timespans from the first date
 				showLabels: false, //should axis labels be shown ?
 				tickColor: "#555", //the color of the tick marks
 				tickDateFormats: {
@@ -173,14 +176,42 @@ HueChart.Box = new Class({
 				};
 		},
 		
+		//Returns fn to control the tick label string
+		_getXTickDisplayFn: function(xTicks, tickOrientation, getXValue) {
+			//Function will return the correct xValue dependent on whether or not x is a date
+			//Define getTickLabel function based on possible states.
+			if (this.options.dates.x) {
+				var dateProperty = this.dateProperty;
+				//If these are absolute dates, just show the date and use the default getValue fn.
+				if (tickOrientation == 'absolute') {
+					var tickFormat = this.options.tickDateFormats[xTicks.unit];
+					return function(d) {
+						return d[dateProperty].format(tickFormat);
+					};
+				}
+				//If they are relative dates
+				if (tickOrientation == 'relative') {
+					return function(d) {
+						return d.label;
+					};
+				}
+			} else {
+				return function(d) {
+					return getXValue(d);
+				};
+			}
+		},
 		//Draw the X and Y tick marks.
 		setTicks:function(vis) {
+
 				if (this.options.ticks.x) {
 						//Add X-Ticks.
 						//Create tick array.
-						var xTicks = (this.options.dates.x ? this.getData(true).getTicks(10, this.dateProperty) : this.xScale.ticks(7));
-						//Function will return the correct xValue dependent on whether or not x is a date
-						var getXValue = getXValueFn(this.options.dates.x ? this.xProperty : null);
+						var tickOrientation = this.options.ticks.orientation;
+						var tickMethod = 'get' + tickOrientation.capitalize() + 'Ticks';
+						var xTicks = (this.options.dates.x ? this.getData(true)[tickMethod](10, this.dateProperty) : this.xScale.ticks(7));
+						var getValue = getXValueFn(this.options.dates.x ? this.xProperty : null);
+						var getTickLabel = this._getXTickDisplayFn(xTicks, tickOrientation, getValue);
 						//Create rules (lines intended to denote scale)
 						vis.add(pv.Rule)
 								//Use the tick array as data.
@@ -188,23 +219,14 @@ HueChart.Box = new Class({
 								//The bottom of the rule should be at the bottomPadding - the height of the rule.
 								.bottom(this.options.bottomPadding - this.options.xTickHeight)
 								//The left of the rule should be at the data object's xProperty value scaled to pixels.
-								.left(function(d) { return this.xScale(getXValue(d)); }.bind(this))
+								.left(function(d) { return this.xScale(getValue(d)); }.bind(this))
 								//Set the height of the rule to the xTickHeight
 								.height(this.options.xTickHeight)
 								.strokeStyle(this.options.tickColor)
 								//Add label to bottom of each rule
 								.anchor("bottom").add(pv.Label)
-										.text(function(d) {
-												//If the option is a date, format the date property field.
-												//Otherwise, simply show it.
-												if(this.options.dates.x) {
-														return d[this.dateProperty].format(this.options.tickDateFormats[xTicks.unit]);
-												} else {
-														return getXValue(d);
-												}
-										}.bind(this));
+										.text(function(d) { return getTickLabel(d);}.bind(this));
 				}
-				
 				if (this.options.ticks.y) {
 						//Add Y-Ticks
 						//Calculate number of yTicks to show.
@@ -227,7 +249,7 @@ HueChart.Box = new Class({
 								.strokeStyle(this.options.tickColor)
 								//Add label to the left which shows the number of bytes.
 								.anchor("left").add(pv.Label)
-										.text(function(d) { 
+										.text(function(d) {
 												if(this.options.yType == 'bytes') return d.convertFileSize();
 												return d;
 										}.bind(this));
@@ -236,7 +258,7 @@ HueChart.Box = new Class({
 		
 		//Add X and Y axis labels.
 		setLabels: function(vis) {
-				//Add Y-Label to center of chart. 
+				//Add Y-Label to center of chart.
 				vis.anchor("center").add(pv.Label)
 						.textAngle(-Math.PI/2)
 						.text(this.options.labels.y)

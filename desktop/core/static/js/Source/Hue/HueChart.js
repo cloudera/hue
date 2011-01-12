@@ -365,20 +365,36 @@ HueChart.Data = new Class({
 		
 		
 		dataMsProperty: "ms",
+
+		getAbsoluteTicks: function(maxTickCount, dateProperty, startMs, endMs) {
+			return this._getTicks(maxTickCount, dateProperty, true, startMs, endMs);
+		},
+
+		getRelativeTicks: function(maxTickCount, dateProperty, startMs, endMs) {
+			return this._getTicks(maxTickCount, dateProperty, false, startMs, endMs);
+		},
+
 		/* getTicks --
 				Returns an array of data objects to be marked as ticks on the domain (x) axis.
 				Arguments:
 				maxTickCount (integer) - the upper bound on size of the return array
 				dateProperty (string) - the property which stores date objects
+				absolute (boolean) - determines whether the ticks are absolute values based on the time, or relative values indexed on the first time
 				startMs (integer) - milliseconds since some reference time
 				endMs (integer) - milliseconds since the same reference time
 		*/
-		getTicks: function(maxTickCount, dateProperty, startMs, endMs) {
+		_getTicks: function(maxTickCount, dateProperty, absolute, startMs, endMs) {
 			var maxIntervalCount = maxTickCount + 1;
+
 			
 			if (!$defined(startMs)) {
 				startMs = this.dataObjects[0][this.dataMsProperty];
 				endMs = this.dataObjects.getLast()[this.dataMsProperty];
+			}
+
+			if (!absolute) {
+				endMs = endMs - startMs;
+				startMs = 0;
 			}
 			
 			var domainMs = endMs - startMs;
@@ -404,7 +420,16 @@ HueChart.Data = new Class({
 				}
 			
 			var ticksMs = [];
-			
+			var getTickLabel = function(tickObj) {
+				var diffMs = tickObj[this.dataMsProperty] - startMs;
+				var numUnits = diffMs/unitMs;
+				return numUnits + " " + unit + (unit == 'ms' ? "" : numUnits > 1 ? "s" : "");
+			}.bind(this);
+
+			var makeRelative = function(tickObj) {
+				tickObj.label = getTickLabel(tickObj);
+				tickObj[this.dataMsProperty] += this.dataObjects[0][this.dataMsProperty];
+			}.bind(this);
 			if (i < uniformUnitsLength) {
 				// Broke free from uniform unit loop; selected unit has uniform intervals.
 				// Get tick marks with intervals aligned at 0 mod intervalMs
@@ -414,6 +439,7 @@ HueChart.Data = new Class({
 					tickObject = {};
 					tickObject[this.dataMsProperty] = tickMs;
 					tickObject[dateProperty] = tickDate;
+					if(!absolute) makeRelative(tickObject);
 					tickMs += intervalMs;
 					tickDate = tickDate.clone().increment('ms', intervalMs);
 					ticksMs.push(tickObject);
@@ -469,6 +495,7 @@ HueChart.Data = new Class({
 					dateMs = date.valueOf();
 					tickObject[this.dataMsProperty] = dateMs;
 					tickObject[dateProperty] = date.clone();
+					if (!absolute) makeRelative(tickObject);
 					ticksMs.push(tickObject);
 					date.increment(unit, interval);
 				} while (dateMs < endMs);
