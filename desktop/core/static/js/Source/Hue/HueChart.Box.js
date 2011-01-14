@@ -13,6 +13,7 @@ authors:
 requires:
 - protovis/Protovis
 - More/Date
+- More/Tips
 - Core/Events
 - Core/Options
 - /Number.Files
@@ -83,7 +84,7 @@ HueChart.Box = new Class({
 				if (this.hasData()) this.initializeData();
 				//Create tip to show if showPointValue is true.
 				if (this.options.showPointValue) {
-						this.tip = new DynamicTips(this.element, {
+						this.tip = new Tips(this.element, {
 								className: 'huechart tip-wrap',
 								title: $lambda("Title"),
 								text: $lambda("Text"),
