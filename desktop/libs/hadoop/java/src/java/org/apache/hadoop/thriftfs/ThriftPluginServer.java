@@ -52,7 +52,7 @@ public class ThriftPluginServer implements Configurable, Runnable {
 
   static final Log LOG = LogFactory.getLog(ThriftPluginServer.class);
 
-  static final int SOCKET_READ_TIMEOUT = 2000; // 2sec
+  static final int SOCKET_READ_TIMEOUT = 5000; // 5sec
 
   static {
     Configuration.addDefaultResource("thriftfs-default.xml");
@@ -85,7 +85,7 @@ public class ThriftPluginServer implements Configurable, Runnable {
 
   /**
    * Start processing requests.
-   * 
+   *
    * @throws IllegalStateException if the server has already been started.
    * @throws IOException on network errors.
    */
@@ -106,7 +106,10 @@ public class ThriftPluginServer implements Configurable, Runnable {
       } else {
         sock.bind(address);
       }
-      TServerTransport transport = new TServerSocket(sock, SOCKET_READ_TIMEOUT);
+
+      int socketTimeout = conf.getInt("dfs.thrift.socket.timeout", SOCKET_READ_TIMEOUT);
+
+      TServerTransport transport = new TServerSocket(sock, socketTimeout);
       SanerThreadPoolServer.Options options = new SanerThreadPoolServer.Options();
       options.minWorkerThreads = conf.getInt("dfs.thrift.threads.min", 5);
       options.maxWorkerThreads = conf.getInt("dfs.thrift.threads.max", 20);
