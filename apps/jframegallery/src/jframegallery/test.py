@@ -29,8 +29,11 @@ from desktop.lib.django_test_util import make_logged_in_client
 LOG = logging.getLogger(__name__)
 CWD = os.path.dirname(__file__)
 
+
+
+"""
 def _get_all_gallery_files():
-  """Return a list of files in the gallery directory"""
+  Return a list of files in the gallery directory
   gallery_dir = os.path.join(CWD, 'templates', 'gallery')
   return os.listdir(gallery_dir)
 
@@ -60,3 +63,4 @@ def test_galleries():
 
     # Check that the source renders
     cli.get(source_url)
+"""
