@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.Vector;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
@@ -56,10 +55,8 @@ import org.apache.hadoop.hive.ql.exec.FetchTask;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.hadoop.hive.ql.parse.BaseSemanticAnalyzer;
-import org.apache.hadoop.hive.ql.parse.ExplainSemanticAnalyzer;
-import org.apache.hadoop.hive.ql.plan.fetchWork;
-import org.apache.hadoop.hive.ql.plan.tableDesc;
+import org.apache.hadoop.hive.ql.plan.FetchWork;
+import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.processors.CommandProcessor;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorFactory;
 import org.apache.hadoop.hive.ql.QueryPlan;
@@ -215,9 +212,9 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
         CommandProcessor p = CommandProcessorFactory.get(tokens[0]);
         int res;
         if (p instanceof Driver) {
-          res = p.run(cmd);
+          res = p.run(cmd).getResponseCode();
         } else {
-          res = p.run(cmd1);
+          res = p.run(cmd1).getResponseCode();
         }
         if (res != 0) {
           throwException(new RuntimeException(getErrorStreamAsString()));
@@ -323,7 +320,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     }
 
     private void materializeResults(Results r, boolean startOver) throws IOException {
-      if (driver.getPlan().getPlan().getFetchTask() == null) {
+      if (driver.getPlan().getFetchTask() == null) {
         // This query is never going to return anything.
         r.has_more = false;
         r.setData(Collections.<String>emptyList());
@@ -333,11 +330,12 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
 
       if (startOver) {
         // This is totally inappropriately reaching into internals.
-        driver.getPlan().getPlan().getFetchTask().initialize(hiveConf,
-            driver.getPlan());
+        driver.getPlan().getFetchTask().initialize(hiveConf,
+            driver.getPlan(), null);
         startRow = 0;
       }
-      Vector<String> v = new Vector<String>();
+
+      ArrayList<String> v = new ArrayList<String>();
       r.setData(v);
       r.has_more = driver.getResults(v);
       r.start_row = startRow;
@@ -365,8 +363,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
         LOG.error("Error getting schema for query: " + query.query, ex);
       }
 
-      fetchWork work = getFetchWork();
-      tableDesc desc = work.getTblDesc();
+      FetchWork work = getFetchWork();
+      TableDesc desc = work.getTblDesc();
       String tabledir = null;
       String tablename = null;
       String sep = null;
@@ -383,19 +381,15 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     }
 
     /**
-     * Get the fetchWork. Only SELECTs have them.
+     * Get the FetchWork. Only SELECTs have them.
      */
-    synchronized private fetchWork getFetchWork() {
+    synchronized private FetchWork getFetchWork() {
       QueryPlan plan = driver.getPlan();
       FetchTask fetchTask = null;
       if (plan != null) {
-        BaseSemanticAnalyzer sem = plan.getPlan();
-        if (sem.getFetchTask() != null) {
-          if (!sem.getFetchTaskInit()) {
-            sem.setFetchTaskInit(true);
-            sem.getFetchTask().initialize(hiveConf, plan);
-          }
-          fetchTask = (FetchTask) sem.getFetchTask();
+        fetchTask = plan.getFetchTask();
+        if (fetchTask != null) {
+          fetchTask.initialize(hiveConf, plan, null);
         }
       }
 
@@ -403,7 +397,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
         return null;
       }
 
-      fetchWork work = (fetchWork) fetchTask.getWork();
+      FetchWork work = fetchTask.getWork();
       return work;
     }
 
@@ -412,16 +406,13 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       // By manipulating the query, this will make errors harder to find.
       query.query = "EXPLAIN " + query.query;
       checkedCompile();
-      if (!(driver.getPlan().getPlan() instanceof ExplainSemanticAnalyzer)) {
-        throwException(new RuntimeException("Expected explain plan."));
-      }
 
       int ret;
       if (0 != (ret = driver.execute())) {
         throwException(new RuntimeException("Failed to execute: EXPLAIN " + ret));
       }
       StringBuilder sb = new StringBuilder();
-      Vector<String> v = new Vector<String>();
+      ArrayList<String> v = new ArrayList<String>();
       try {
         while (driver.getResults(v)) {
           for (String s : v) {
