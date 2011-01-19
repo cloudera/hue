@@ -563,6 +563,7 @@ Hue.Desktop = CCS.Desktop = {
 	getState: function(){
 		//only get this once; it's syncronous
 		if (this._fetchedState) return this._fetchedState;
+		if (!Hue.User.isLoggedIn()) return null;
 		var result;
 		var jsonRequest = new Request.JSON({
 			url: this.prefsUrl,

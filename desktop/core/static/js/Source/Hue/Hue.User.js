@@ -51,6 +51,11 @@ script: Hue.User.js
 					}).send();
 				}
 			}
+		},
+
+		isLoggedIn: function(){
+			return !!data;
 		}
+
 	};
 })();
