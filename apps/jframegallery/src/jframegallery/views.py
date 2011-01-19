@@ -40,7 +40,7 @@ LOG = logging.getLogger(__name__)
 
 _CWD = os.path.dirname(__file__)
 
-_GALLERY_DIR = 'gallery/Hue'
+_GALLERY_DIR = 'gallery'
 
 EXTERNAL_PATHS = dict(
   jframe_demos = _GALLERY_DIR + '/JFrame_Demos',
