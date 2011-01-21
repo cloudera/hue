@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "filebrowser",
-      version = "1.1.0",
+      version = "1.2.0",
       author = "HUE",
       url = 'http://github.com/cloudera/hue',
       description = "HDFS browser",

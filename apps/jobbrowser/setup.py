@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "jobbrowser",
-      version = "1.1.0",
+      version = "1.2.0",
       url = 'http://github.com/cloudera/hue',
       author = "HUE",
       description = "Hadoop Job Browser",
