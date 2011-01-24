@@ -10,7 +10,7 @@ individual users.
 
 This guide describes how to install and configure a Hue tarball. For
 information about installing Hue packages, see
-https://wiki.cloudera.com/display/DOC/Installing+Hue[Installing Hue].
+https://wiki.cloudera.com/display/DOC/Hue+Installation[Installing Hue].
 
 There is also a companion SDK guide that describes how to develop
 new Hue applications:
@@ -22,20 +22,20 @@ IMPORTANT: Hue requires the Cloudera Distribution for Hadoop (CDH), version 3 (b
 * Commands that must be run with +root+ permission have a +#+ command prompt.
 * Commands that do not require +root+ permission have a +$+ command prompt.
 
-== Installation Instructions
+== Hue Installation Instructions
 
 The following instructions describe how to install the Hue tarball on a
-multi-node cluster.  You must install CDH2 or CDH3 first and update some
+multi-node cluster.  You must install CDH first and update some
 Hadoop configuration files before installing Hue.
 
-IMPORTANT: You'll need to install the Hue Plug-ins
+IMPORTANT: You'll need to install the Hue plugins
 on _every_ machine that's running Hadoop daemons.
 
-=== Install CDH2 or CDH3
+=== Install CDH3
 
-To use Hue, you must be running the Cloudera Distribution for Hadoop
-with a version number of at least `0.20.2+731`. If you are not running this
-version of CDH or later, upgrade your cluster before proceeding.
+To use Hue, you must install and run CDH3 Beta 3, version 0.20.2+737 or later. 
+If you are not running this version of CDH or later, upgrade your 
+cluster before proceeding.
 
 === Install Hue
 
@@ -86,7 +86,7 @@ that user's home directory, or in a directory within `/usr/local`.
 
 ==== Install Hadoop Plugins
 
-In order to communicate with Hadoop, Hue requires a plug-in jar that you must
+In order to communicate with Hadoop, Hue requires a plugin jar that you must
 install and configure. This jar is: `desktop/libs/hadoop/java-lib/hue-plugins-*.jar`,
 relative to the Hue installation directory.
 
@@ -100,8 +100,21 @@ $ ln -s /usr/local/hue/desktop/libs/hadoop/java-lib/hue*jar .
 # Restart Hadoop
 ----
 
-NOTE: On a multi-node cluster, you must install the plug-in jar on every
+NOTE: On a multi-node cluster, you must install the plugin jar on every
 node.  You do not need to install all of the Hue components on every node.
+
+
+==== Specifying the Secret Key
+
+For security, you should also specify the secret key that is used for secure hashing in the session store.
+
+Open the `/etc/hue/hue.ini` configuration file. In the `desktop` section, enter a long series of random characters (30 to 60 characters is recommended). 
+----
+[desktop]
+secret_key=qpbdxoewsqlkhztybvfidtvwekftusgdlofbcfghaswuicmqp
+----
+
+NOTE: If you don't specify a secret key, Hue will run but it will also display error messages telling you to set the secret key.
 
 ==== Restart Hadoop
 
@@ -153,13 +166,13 @@ Add the following configuration properties to `hdfs-site.xml`:
 <property>
   <name>dfs.namenode.plugins</name>
   <value>org.apache.hadoop.thriftfs.NamenodePlugin</value>
-  <description>Comma-separated list of namenode plug-ins to be activated.
+  <description>Comma-separated list of namenode plugins to be activated.
   </description>
 </property>
 <property>
   <name>dfs.datanode.plugins</name>
   <value>org.apache.hadoop.thriftfs.DatanodePlugin</value>
-  <description>Comma-separated list of datanode plug-ins to be activated.
+  <description>Comma-separated list of datanode plugins to be activated.
   </description>
 </property>
 <property>
@@ -180,7 +193,7 @@ Add the following configuration properties to mapred-site.xml:
 <property>
   <name>mapred.jobtracker.plugins</name>
   <value>org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin</value>
-  <description>Comma-separated list of jobtracker plug-ins to be activated.
+  <description>Comma-separated list of jobtracker plugins to be activated.
   </description>
 </property>
 ----
@@ -240,6 +253,11 @@ Unfortunately, when the variable is unset, you'll end up
 with directories named `/tmp/hadoop-user_name-${hue.suffix}` in
 `/tmp`.  The job submission daemon, however, will still work.
 
+IMPORTANT: The Beeswax server writes into a local directory on the Hue machine 
+that is specified by `hadoop.tmp.dir` to unpack its jars. That directory 
+needs to be writable by the `hue` user, which is the default user who starts 
+Beeswax Server, or else Beeswax server will not start. You may also make that 
+directory world-writable.
 
 === Restart Your Hadoop Cluster
 
@@ -576,10 +594,9 @@ Google Chrome and Safari work as well.
 
 === Feedback
 
-Hue is currently at version 0.9.  Your feedback is welcome.
-The best way to send feedback is to join the
-https://groups.google.com/a/cloudera.org/group/hue-user[mailing list], and send e-mail,
-to mailto:hue-user@cloudera.org[hue-user@cloudera.org].
+Your feedback is welcome. The best way to send feedback is to join the
+https://groups.google.com/a/cloudera.org/group/hue-user[mailing list], and 
+send e-mail, to mailto:hue-user@cloudera.org[hue-user@cloudera.org].
 
 === Reporting Bugs
 
