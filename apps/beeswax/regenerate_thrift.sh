@@ -21,11 +21,11 @@ set -o xtrace
 cd $(dirname $0)
 
 thrift -I thrift/include -r --gen py:new_style -o ./ thrift/beeswax.thrift
-thrift -I thrift/include -r --gen java:hashcode -o java thrift/beeswax.thrift
+thrift -I thrift/include -r --gen java:hashcode -o java/src/main thrift/beeswax.thrift
 
 # We don't need to have generated code for the metastore, since that's
 # in one of the hive jars that we include
-rm -Rf java/gen-java/com/facebook java/gen-java/org/apache
+rm -Rf java/src/main/gen-java/com/facebook java/src/main/gen-java/org/apache
 
 cat <<EOF
 ======================================================================
@@ -34,9 +34,9 @@ NOTE:
 
 This script does *not* remove old generated files that may not be necessary anymore.
 You should probably do something like:
- > git rm -rf java/gen-java gen-py
+ > git rm -rf java/src/main/gen-java gen-py
  > ./regenerate_thrift.sh
- > git add java/gen-java gen-py
+ > git add java/src/main/gen-java gen-py
 
 ======================================================================
 
