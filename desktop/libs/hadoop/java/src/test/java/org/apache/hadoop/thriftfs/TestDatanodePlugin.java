@@ -98,7 +98,7 @@ public class TestDatanodePlugin  {
     BlockData blockData = datanode.readBlock(ctx, b, 0, 32);
     LOG.debug("Read block: " + blockData);
     assertEquals("0000 - Thirty-two bytes in a row",
-        new String(blockData.data));
+                 new String(blockData.getData()));
 
     createFile(BLOCK_SIZE + 32);
     blocks = namenode.getBlocks(ctx, testFile, 0, BLOCK_SIZE + 32);
@@ -111,20 +111,20 @@ public class TestDatanodePlugin  {
 
     blockData = datanode.readBlock(ctx, b, 0, BLOCK_SIZE);
     assertEquals(BLOCK_SIZE, blockData.length);
-    String data = new String(blockData.data);
+    String data = new String(blockData.getData());
     assertTrue(data.startsWith("0000 - Thirty-two bytes in a row"));
     assertTrue(data.endsWith("0255 - Thirty-two bytes in a row"));
 
     blockData = datanode.readBlock(ctx, b, 32, 32);
     assertEquals(32, blockData.length);
     assertEquals("0001 - Thirty-two bytes in a row",
-        new String(blockData.data));
+                 new String(blockData.getData()));
 
     b = blocks.get(1);
     blockData = datanode.readBlock(ctx, b, 0, 32);
     assertEquals(32, blockData.length);
     assertEquals("0256 - Thirty-two bytes in a row",
-        new String(blockData.data));
+                 new String(blockData.getData()));
   }
 
   private void createFile(int length) throws Exception {

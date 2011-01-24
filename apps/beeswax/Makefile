@@ -28,7 +28,7 @@ include $(ROOT)/Makefile.sdk
 ###################################
 
 BEESWAX_ROOT := $(realpath .)
-BLD_DIR_BEESWAX=$(BEESWAX_ROOT)/build/java
+BLD_DIR_BEESWAX=$(BEESWAX_ROOT)/java/target
 BEESWAX_JAVA_LIB := $(BEESWAX_ROOT)/java-lib
 BEESWAX_HIVE_LIB := $(BEESWAX_ROOT)/hive/lib
 
@@ -52,10 +52,9 @@ BEESWAX_OPTS := -Dbuild.dir=$(BLD_DIR_BEESWAX) \
 	        -Dhive.lib=$(BEESWAX_HIVE_LIB)
 $(BEESWAX): $(shell find $(BEESWAX_JAVA_DIR))
 	@echo "--- Building Desktop beeswax"
-	cd $(BEESWAX_JAVA_DIR) && ant $(ANT_OPTS) $(BEESWAX_OPTS) jar test-jar
+	cd $(BEESWAX_JAVA_DIR) && mvn clean install -DskipTests
 	@mkdir -p $(BEESWAX_JAVA_LIB)
-	@cp $(BLD_DIR_BEESWAX)/jar/BeeswaxServer.jar $@
-	@cp $(BLD_DIR_BEESWAX)/jar/BeeswaxTest.jar $(BEESWAX_JAVA_LIB)/BeeswaxTest.jar
+	@cp $(BLD_DIR_BEESWAX)/beeswax-server-$(MAVEN_VERSION).jar $@
 
 else
 $(BEESWAX):

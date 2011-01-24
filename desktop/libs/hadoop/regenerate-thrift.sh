@@ -23,5 +23,5 @@ set -x
 cd $(dirname $0)
 for i in java/if/*.thrift; do
   thrift -gen py:new_style $i
-  thrift -o java -gen java $i
+  thrift -o java/src/main -gen java $i
 done

@@ -43,17 +43,17 @@ PLUGIN_DIR := $(realpath .)
 PLUGIN_JAVA_LIB := $(PLUGIN_DIR)/java-lib
 PLUGIN_JAVA_DIR := $(PLUGIN_DIR)/java
 PLUGIN := $(PLUGIN_JAVA_LIB)/hue-plugins-$(DESKTOP_VERSION).jar
-BLD_DIR_PLUGINS := $(PLUGIN_DIR)/build/java
+BLD_DIR_PLUGINS := $(PLUGIN_DIR)/java/target
 
 STATIC_GROUP_MAPPING_DIR := $(realpath .)/static-group-mapping
 STATIC_GROUP_MAPPING_SRC := $(STATIC_GROUP_MAPPING_DIR)/src
-STATIC_GROUP_MAPPING_BUILD := $(STATIC_GROUP_MAPPING_DIR)/build
+STATIC_GROUP_MAPPING_BUILD := $(STATIC_GROUP_MAPPING_DIR)/target
 STATIC_GROUP_MAPPING_LIB := $(STATIC_GROUP_MAPPING_DIR)/java-lib
 STATIC_GROUP_MAPPING := $(STATIC_GROUP_MAPPING_LIB)/static-group-mapping-$(DESKTOP_VERSION).jar
 
 SUDO_SHELL_DIR := $(realpath .)/sudo-shell
 SUDO_SHELL_SRC := $(SUDO_SHELL_DIR)/src
-SUDO_SHELL_BUILD := $(SUDO_SHELL_DIR)/build
+SUDO_SHELL_BUILD := $(SUDO_SHELL_DIR)/target
 SUDO_SHELL_LIB := $(SUDO_SHELL_DIR)/java-lib
 SUDO_SHELL := $(SUDO_SHELL_LIB)/sudo-shell-$(DESKTOP_VERSION).jar
 
@@ -71,8 +71,8 @@ PLUGIN_OPTS := -Dbuild.dir=$(BLD_DIR_PLUGINS) \
 $(PLUGIN): $(shell find $(PLUGIN_JAVA_DIR) )
 	mkdir -p $(PLUGIN_JAVA_LIB)
 	@echo "--- Building Hadoop plugins"
-	cd $(PLUGIN_JAVA_DIR) && ant $(ANT_OPTS) $(PLUGIN_OPTS) jar
-	cp $(BLD_DIR_PLUGINS)/$(notdir $(PLUGIN)) $(PLUGIN)
+	cd $(PLUGIN_JAVA_DIR) && mvn clean install -DskipTests
+	cp $(BLD_DIR_PLUGINS)/hue-plugins-$(MAVEN_VERSION).jar $(PLUGIN)
 else
 $(PLUGIN):
 	$(error Cannot build hadoop plugin without source)
@@ -87,8 +87,8 @@ STATIC_GROUP_MAPPING_OPTS := -Dbuild.dir=$(STATIC_GROUP_MAPPING_BUILD) \
 $(STATIC_GROUP_MAPPING): $(shell find $(STATIC_GROUP_MAPPING_SRC))
 	mkdir -p $(STATIC_GROUP_MAPPING_LIB)
 	@echo "--- Building static UserGroupMappingService"
-	cd $(STATIC_GROUP_MAPPING_DIR) && ant $(ANT_OPTS) $(STATIC_GROUP_MAPPING_OPTS) jar
-	cp $(STATIC_GROUP_MAPPING_BUILD)/$(notdir $(STATIC_GROUP_MAPPING)) $(STATIC_GROUP_MAPPING)
+	cd $(STATIC_GROUP_MAPPING_DIR) && mvn clean install -DskipTests
+	cp $(STATIC_GROUP_MAPPING_BUILD)/static-group-mapping-$(MAVEN_VERSION).jar $(STATIC_GROUP_MAPPING)
 else
 $(STATIC_GROUP_MAPPING):
 	$(error Cannot build static-group-mapping jar without source)
@@ -103,8 +103,8 @@ SUDO_SHELL_OPTS := -Dbuild.dir=$(SUDO_SHELL_BUILD) \
 $(SUDO_SHELL): $(shell find $(SUDO_SHELL_SRC))
 	mkdir -p $(SUDO_SHELL_LIB)
 	@echo "--- Building sudo fsshell tool"
-	cd $(SUDO_SHELL_DIR) && ant $(ANT_OPTS) $(SUDO_SHELL_OPTS) jar
-	cp $(SUDO_SHELL_BUILD)/$(notdir $(SUDO_SHELL)) $(SUDO_SHELL)
+	cd $(SUDO_SHELL_DIR) && mvn clean install -DskipTests
+	cp $(SUDO_SHELL_BUILD)/sudo-shell-$(MAVEN_VERSION).jar $(SUDO_SHELL)
 else
 $(SUDO_SHELL):
 	$(error cannot build sudo-shell jar without source)

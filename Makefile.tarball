@@ -26,6 +26,7 @@ PROD_INCLUDES := \
 	Makefile* \
 	tools/app_reg \
 	tools/virtual-bootstrap \
+    maven \
 	VERSION_DATA
 
 PROD_EXCLUDES := \
