@@ -168,7 +168,7 @@ def wait_for_query_to_finish(client, response, max=30.0):
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True, max=30.0, **kwargs):
+               is_parameterized=True, **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -221,7 +221,7 @@ def make_query(client, query, submission_type="Execute",
   response = client.post("/beeswax/execute", parameters, **kwargs)
 
   if wait:
-    return wait_for_query_to_finish(client, response, max)
+    return wait_for_query_to_finish(client, response)
   return response
 
 

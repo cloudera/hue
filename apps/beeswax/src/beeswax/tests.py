@@ -52,11 +52,11 @@ CSV_LINK_PAT = re.compile('/beeswax/download/\d+/csv')
 def _make_query(client, query, submission_type="Execute",
                 udfs=None, settings=None, resources=[],
                 wait=False, name=None, desc=None, local=True,
-                is_parameterized=True, max=30.0, **kwargs):
+                is_parameterized=True, **kwargs):
   """Wrapper around the real make_query"""
   res = make_query(client, query, submission_type,
                    udfs, settings, resources,
-                   wait, name, desc, local, is_parameterized, max, **kwargs)
+                   wait, name, desc, local, is_parameterized, **kwargs)
   # Should be in the history if it's submitted.
   if submission_type == 'Execute':
     fragment = collapse_whitespace(smart_str(query[:20]))
@@ -136,7 +136,7 @@ for x in sys.stdin:
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     # Check that we actually got a compressed output
     files = self.cluster.fs.listdir("/user/hive/warehouse/test2")
-    assert_true(len(files) >= 1)
+    assert_equal(1, len(files))
     assert_true(files[0].endswith(".deflate"))
     # And check that the name is right...
     assert_true("test_query_with_setting" in [ x.profile.name for x in self.cluster.jt.all_jobs().jobs ])
@@ -529,13 +529,10 @@ for x in sys.stdin:
       # Check that data is right
       if verify:
         target_ls = self.cluster.fs.listdir(target_dir)
-        assert_true(len(target_ls) >= 1)
-        data_buf = ""
-        for target in target_ls:
-          target_file = self.cluster.fs.open(target_dir + '/' + target)
-          data_buf += target_file.read()
-          target_file.close()
-
+        assert_equal(1, len(target_ls))
+        target_file = self.cluster.fs.open(target_dir + '/' + target_ls[0])
+        data_buf = target_file.read()
+        target_file.close()
         assert_equal(256, len(data_buf.strip().split('\n')))
         assert_true('255' in data_buf)
       return resp
@@ -544,13 +541,13 @@ for x in sys.stdin:
 
     # Not supported. SELECT *. (Result dir is same as table dir.)
     hql = "SELECT * FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/1', verify=False)
     assert_true('not supported' in resp.content)
 
     # SELECT columns. (Result dir is in /tmp.)
     hql = "SELECT foo, bar FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/2')
     # Results has a link to the FB
     assert_true('Query results stored in' in resp.content)
@@ -558,7 +555,7 @@ for x in sys.stdin:
 
     # Not supported. Partition tables
     hql = "SELECT * FROM test_partitions"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/3', verify=False)
     assert_true('not supported' in resp.content)
 
@@ -578,8 +575,7 @@ for x in sys.stdin:
       wait_for_query_to_finish(self.client, resp, max=120)
 
       # Check that data is right. The SELECT may not give us the whole table.
-      resp = _make_query(self.client, 'SELECT * FROM %s' % (target_tbl,), wait=True,
-                        local=False)
+      resp = _make_query(self.client, 'SELECT * FROM %s' % (target_tbl,), wait=True)
       for i in xrange(90):
         assert_equal([str(i), '0x%x' % (i,)], resp.context['results'][i])
 
@@ -587,12 +583,12 @@ for x in sys.stdin:
 
     # SELECT *. (Result dir is same as table dir.)
     hql = "SELECT * FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True)
     save_and_verify(resp, TARGET_TBL_ROOT + '_1')
 
     # SELECT columns. (Result dir is in /tmp.)
     hql = "SELECT foo, bar FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True)
     save_and_verify(resp, TARGET_TBL_ROOT + '_2')
 
 

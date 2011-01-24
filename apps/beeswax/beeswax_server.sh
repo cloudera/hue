@@ -56,7 +56,7 @@ fi
 if [ -f $HADOOP_CONF_DIR/hadoop-env.sh ]; then
   . $HADOOP_CONF_DIR/hadoop-env.sh
 fi
-export HADOOP_CONF_DIR=$BEESWAX_ROOT/../../desktop/conf:${BEESWAX_HIVE_LIB}/hive-default-xml-0.6.0.jar:${HADOOP_CONF_DIR}:$(find $BEESWAX_HIVE_LIB -name "thrift-fb303-0.5.0.jar" | head -1)
+export HADOOP_CONF_DIR=$BEESWAX_ROOT/../../desktop/conf:${BEESWAX_HIVE_LIB}/hive-default-xml-0.5.0.jar:${HADOOP_CONF_DIR}:$(find $BEESWAX_HIVE_LIB -name "libfb303.jar" | head -1)
 echo \$HADOOP_CONF_DIR=$HADOOP_CONF_DIR
 
 # Note: I've had trouble running this with just "java -jar" with the classpath
