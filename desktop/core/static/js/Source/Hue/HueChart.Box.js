@@ -30,6 +30,23 @@ var getXValueFn = function(field) {
 		};
 };
 
+/*
+	HueChart.Tips
+		Small extension to HueChart.
+		Issue is that HueChart.Box needs complete control over the hiding and showing of tips.
+		Tips, by default, shows a tip whenever the element in question is rolled over.
+		Adding this parameter, means that the Tips.show method will only
+		 be called when it is present, and it isn't present in the Tips.elementEnter invocation of			Tips.show.
+*/
+HueChart.Tips = new Class({
+	Extends: Tips,
+
+	show: function(element, actualShow) {
+		debugger;
+		if (actualShow) this.parent(element);
+	}
+});
+
 HueChart.Box = new Class({
 
 		Extends: HueChart,
@@ -49,7 +66,7 @@ HueChart.Box = new Class({
 					'ms': "%I:%M:%z %p",
 					'second': "%I:%M %p",
 					'minute': "%I:%M %p",
-					'hour': "%H %p",
+					'hour': "%I %p",
 					'day': "%m %D",
 					'month': "%m",
 					'year': "%Y"
@@ -87,11 +104,10 @@ HueChart.Box = new Class({
 				if (this.hasData()) this.initializeData();
 				//Create tip to show if showPointValue is true.
 				if (this.options.showPointValue) {
-						this.tip = new Tips(this.element, {
+						this.tip = new HueChart.Tips(this.element, {
 								className: 'huechart tip-wrap',
 								title: $lambda("Title"),
-								text: $lambda("Text"),
-								showOnEnter: false
+								text: $lambda("Text")
 						});
 						this.tip.hide();
 						this.addEvent('seriesMouseOver', this.updatePointValue);
@@ -518,10 +534,10 @@ HueChart.Box = new Class({
 						tipColor.inject(tipBlock, 'top');
 						tipColor.setStyle('background-color', this.getColor(series.name));
 						this.tip.setTitle(tipBlock);
-						this.tip.setText(this.options.yType == 'bytes' ? series.value.toInt().convertFileSize() : series.value);
+						this.tip.setText(this.options.yType == 'bytes' ? series.value.toInt().convertFileSize() : String(series.value));
 						var tipElem = this.tip.toElement();
 						if(!tipElem.getParent() || !document.body.hasChild(tipElem))tipElem.dispose();
-						this.tip.show();
+						this.tip.show(this.element, true);
 				} else {
 						this.tip.hide();
 				}
