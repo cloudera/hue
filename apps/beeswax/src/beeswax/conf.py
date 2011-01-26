@@ -54,7 +54,7 @@ BEESWAX_SERVER_HEAPSIZE = Config(
   help="Maximum Java heapsize (in megabytes) used by Beeswax Server.  " + \
     "Note that the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh " + \
     "may override this setting.",
-  default=None)
+  default="1000")
 
 BEESWAX_HIVE_CONF_DIR = Config(
   key='hive_conf_dir',
