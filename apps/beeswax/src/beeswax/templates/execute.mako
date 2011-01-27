@@ -129,7 +129,7 @@ ${wrappers.head('Hive Query', section='query')}
               % endfor
               <div class="bw-query_settings_add">
                 <button id="id_settings-add" value="True" name="settings-add" type="submit">+</button>
-                <div class="jframe-hidden">${str(form.settings.management_form) | n }</div>
+                <div class="jframe-hidden">${unicode(form.settings.management_form) | n }</div>
               </div>
             </dl>
           </dd>
@@ -160,7 +160,7 @@ ${wrappers.head('Hive Query', section='query')}
               % endfor
               <div class="bw-query_settings_add">
                 <button id="id_file_resources-add" value="True" name="file_resources-add" type="submit">+</button>
-                <div class="jframe-hidden">${str(form.file_resources.management_form) | n }</div>
+                <div class="jframe-hidden">${unicode(form.file_resources.management_form) | n }</div>
               </div>
             </dl>
           </dd>
@@ -191,7 +191,7 @@ ${wrappers.head('Hive Query', section='query')}
               % endfor
               <div class="bw-query_settings_add">
                 <button id="id_functions-add" value="True" name="functions-add" type="submit">+</button>
-                <div class="jframe-hidden">${str(form.functions.management_form) | n }</div>
+                <div class="jframe-hidden">${unicode(form.functions.management_form) | n }</div>
               </div>
             </dl>
           </dd>

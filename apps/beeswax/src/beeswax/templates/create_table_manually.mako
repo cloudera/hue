@@ -218,7 +218,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                     with a letter or a digit.
                   </p>
                   <div class="bw-remove_column">
-                    ${str(form["_deleted"]) | n}
+                    ${unicode(form["_deleted"]) | n}
                   </div>
                 </dt>
                 <dd class="bw-column">
@@ -249,7 +249,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                         </div>
                       </div>
                     % endif
-                    ${str(form["_exists"]) | n}
+                    ${unicode(form["_exists"]) | n}
                     
                   </dl>
                 </dd>
@@ -262,7 +262,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
               %endfor
             </div>
             <div class="bw-add_column">
-              ${str(columns_form.management_form) | n}
+              ${unicode(columns_form.management_form) | n}
             </div>
             <h2>Partitions</h2>
               ## See http://wiki.apache.org/hadoop/Hive/Tutorial
@@ -284,7 +284,7 @@ ${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
                 % endfor
               </div>
               <div class="bw-add_partition bw-add_column">
-                ${str(partitions_form.management_form) | n}
+                ${unicode(partitions_form.management_form) | n}
               </div>
           </dl>
           <input type="submit" class="bw-create_table_submit">

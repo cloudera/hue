@@ -34,7 +34,7 @@ Error: <b>${error_message}</b>
 
     ## columns management form
     Add column:
-    ${str(mform.columns.management_form) | n}
+    ${unicode(mform.columns.management_form) | n}
 
     ## colums formset errors
     % for err in mform.columns.non_form_errors():
@@ -73,12 +73,12 @@ Error: <b>${error_message}</b>
 	% endfor
       </tr></table>
       % endfor
-      ${str(formset.management_form) | n }
+      ${unicode(formset.management_form) | n }
     </%def>
 
     <%def name="render_union_mform(umform, level)">
       <div style="margin-left:${level * 30}px;">
-	${str(umform.mgmt) | n}
+	${unicode(umform.mgmt) | n}
 	${util.render_form(umform.bool)}
 	<div style="border-width:1px; border-style:solid; border-color:black">
 	${render_conds_formset(umform.conds)}

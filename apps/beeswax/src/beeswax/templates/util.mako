@@ -38,7 +38,7 @@
   % for f in formset.forms:
     ${render_form(f)}
   % endfor
-  ${str(formset.management_form) | n }
+  ${unicode(formset.management_form) | n }
   </dl>
 </%def>
 

@@ -31,7 +31,7 @@ ${wrappers.head('Define Columns')}
       <div class="jframe-hidden">
         ${util.render_form(file_form)}
         ${util.render_form(delim_form)}
-        ${str(column_formset.management_form) | n}
+        ${unicode(column_formset.management_form) | n}
       </div>
       <div class="hue-bc-section">
       <dt> Step 3: Define Your Columns </dt>
@@ -75,7 +75,7 @@ ${wrappers.head('Define Columns')}
                         render_default=True,
                         help="Type for this column",
                       )}
-                      ${str(form["_exists"]) | n}
+                      ${unicode(form["_exists"]) | n}
                     </td>
                   %endfor
                 </tr>

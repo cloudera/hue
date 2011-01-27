@@ -34,11 +34,11 @@
       <dl>
         <%def name="render_field(field)">
           <dt>${field.label_tag() | n}</dt>
-          <dd>${str(field) | n}</dd>
+          <dd>${unicode(field) | n}</dd>
           % if len(field.errors):
             <dt>&nbsp;</dt>
             <dd class="jframe-error validation-advice">
-               ${str(field.errors) | n}
+               ${unicode(field.errors) | n}
              </dd>
            % endif
         </%def>

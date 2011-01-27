@@ -25,13 +25,13 @@
     </p>
     <form action="${url("jframegallery.views.forms_with_dependencies")}" method="post" class="dependency_form jframe_padded {'deps':${form.render_dep_metadata()|n}}">
       % if len(form.non_field_errors()):
-        ${str(form.non_field_errors()) | n}
+        ${unicode(form.non_field_errors()) | n}
       % endif
       % for field in form:
         <dt>${field.label_tag() | n}</dt>
-        <dd>${str(field) | n}
+        <dd>${unicode(field) | n}
           % if len(field.errors):
-            ${str(field.errors) | n}
+            ${unicode(field.errors) | n}
           % endif
         </dd>
       % endfor

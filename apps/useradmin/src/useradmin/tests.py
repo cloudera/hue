@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,14 +17,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Tests for "user admin"
+"""
+Tests for "user admin"
+"""
 
-from nose.tools import assert_true, assert_equal, assert_false
-from nose.plugins.attrib import attr
+from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from django.contrib.auth.models import User
-from hadoop import mini_cluster
+from django.utils.encoding import smart_unicode
 
 def reset_all_users():
   """Reset to a clean state by deleting all users"""
@@ -44,17 +47,17 @@ def test_user_admin():
   # Edit it, to add a first and last name
   response = c.post('/useradmin/edit/test',
                     dict(username="test",
-                         first_name="Tom",
-                         last_name="Tester",
+                         first_name=u"Inglés",
+                         last_name=u"Español",
                          is_superuser="True",
                          is_active="True"))
   # Now make sure that those were materialized
   response = c.get('/useradmin/edit/test')
-  assert_equal("Tom", response.context["form"].instance.first_name)
-  assert_true("Tester" in response.content)
+  assert_equal(smart_unicode("Inglés"), response.context["form"].instance.first_name)
+  assert_true("Español" in response.content)
   # Shouldn't be able to demote to non-superuser
   response = c.post('/useradmin/edit/test', dict(username="test",
-                        first_name="Tom", last_name="Tester",
+                        first_name=u"Inglés", last_name=u"Español",
                         is_superuser=False, is_active=True))
   assert_true("You cannot remove" in response.content,
               "Shouldn't be able to remove the last superuser")
@@ -103,7 +106,7 @@ def test_user_admin():
   # Regular user should not be able to self-promote to superuser
   response = c_reg.post('/useradmin/edit/test_user_creation',
                         dict(username = "test_user_creation",
-                        first_name = "Hello",
+                        first_name = "OLÁ",
                         is_superuser = True,
                         is_active = True))
   assert_true("You cannot" in response.content,
