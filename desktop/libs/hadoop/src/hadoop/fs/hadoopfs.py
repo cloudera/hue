@@ -140,6 +140,7 @@ def test_fs_configuration(fs_config, hadoop_bin_conf):
       r_file.read()
     except Exception:
       msg = 'Failed to read file. Are all datanodes configured with the HUE plugin?'
+      LOG.exception(msg)
       res.append((fs_config, msg))
   finally:
     # Cleanup. Ignore if file not found.
