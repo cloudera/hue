@@ -73,7 +73,8 @@ HueChart = new Class({
 				  topPadding: 0, // the padding between the top of the element, and the left of the graph,
 				  leftPadding: 0, // the padding between the left of the element, and the left of the graph,
 				  rightPadding: 0, // the padding between the right of the element, and the right of the graph,*/
-				  url: "noUrl" //the url of the page. this will be used as a key in the colorManager
+				  url: "noUrl", //the url of the page. this will be used as a key in the colorManager,
+				  noDataText: 'There is not enough data to render a chart.' //The text that will be displayed in the case that there is not enough data to display a chart.
 		},
 
 
@@ -126,7 +127,22 @@ HueChart = new Class({
 						.height(this.height);
 				this.vis.$dom = this.element.empty();
 				this.fireEvent('setupChart', this.vis);
-				this.vis.render();
+		},
+
+		renderHasNoData: function() {
+			this.element.setStyles({
+				width: this.width,
+				height: this.height
+			});
+			var emptyElement = new Element('div', {
+				text: this.options.noDataText,
+				styles: {
+					textAlign: 'center',
+					top: this.height/2,
+					fontSize: '16px',
+					fontWeight: 'bold'
+				}
+			}).inject(this.element);
 		},
 		
 		//Returns selected data index
@@ -372,6 +388,12 @@ HueChart.Data = new Class({
 
 		getRelativeTicks: function(maxTickCount, dateProperty, startMs, endMs) {
 			return this._getTicks(maxTickCount, dateProperty, false, startMs, endMs);
+		},
+		
+		getDataSeries: function(series) {
+			return this.dataObjects.filter(function (dataObj) {
+				return Hash.has(dataObj, series);
+			});
 		},
 
 		/* getTicks --

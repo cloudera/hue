@@ -23,7 +23,8 @@ HueChart.Line = new Class({
 		Extends: HueChart.Box,
 
 		options: {
-				lineWidth: 3 //Width of the lines in the chart
+				lineWidth: 3, //Width of the lines in the chart
+				showDot: false //Show a dot on each point of the line
 		},
 
 		initialize: function(element, options) {
@@ -36,10 +37,12 @@ HueChart.Line = new Class({
 				//In effort to maintain same data structure for lines and stacked charts, iterating
 				//through the series and adding a line using each series for its data points.
 				for (var itemIndex = 0; itemIndex < this.series.length; itemIndex++) {
+						var series = this.series[itemIndex];
+						var dataSeries = this.getData(true).getDataSeries(series);
 						//Add a line to the visualization, connecting points produced from the data object.
 						vis.add(pv.Line)
 								//Using as data, this.data.getObjects.
-								.data(this.getData(true).getObjects())
+								.data($lambda(dataSeries))
 								//Closures used because the function argument isn't executed until the render phase.
 								//Color the line, based on the color returned by the colorManager.
 								.strokeStyle(function(itemIndex) {
@@ -57,7 +60,11 @@ HueChart.Line = new Class({
 										}.bind(this);
 								}.bind(this)(itemIndex))
 								//Make the line's width 3 pixels.
-								.lineWidth(this.options.lineWidth);
+								.lineWidth(this.options.lineWidth)
+							.add(pv.Dot)
+							.strokeStyle('gray')
+							.size(this.options.showDot ? 5 : 0)
+							.lineWidth(1);
 				}
 		}
 });

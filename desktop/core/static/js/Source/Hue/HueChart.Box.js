@@ -137,14 +137,27 @@ HueChart.Box = new Class({
 							if (this.hasEvent('pointMouseOut') && this.hasEvent('pointMouseOver') || this.hasEvent('pointClick') || this.options.showPointValue) this.addMouseEvents(vis);
 							//If there is a selection or drag event of any sort make the graph selectable.
 							if (this.selectable) this.makeSelectable(vis);
+							vis.render();
+						} else {
+							this.renderHasNoData();
 						}
 				}.bind(this));
+		},
+		
+		//Redefining to reflect the fact that one data point is not sufficient to render a line
+		hasData: function() {
+			return this.getData().getLength() > 1;
 		},
 
 		initializeData: function() {
 				this.series = [];
-				Hash.each(this.getData(true).getObjects()[0], function(value, key) {
-					if (!this.series.contains(key) && key != this.options.xProperty) this.series.push(key);
+				//Initialize dataSeries
+				dataObjs = this.getData(true).getObjects();
+				//Iterate through the data objects to create a list of the data series.
+				dataObjs.each(function(obj) {
+					Hash.each(obj, function(value, key) {
+						if (!this.series.contains(key) && key != this.options.xProperty) this.series.push(key);
+					}.bind(this));
 				}.bind(this));
 				if(this.options.dates.x) {
 						//If the xProperty is a date property, prepare the dates for sorting
