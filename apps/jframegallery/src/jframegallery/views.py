@@ -222,7 +222,7 @@ def flash(request):
   request.flash.put('another growl test')
   request.flash.put('yet another message to bubble up.')
 
-  return render(os.path.join(_GALLERY_DIR, 'flash.html'), request, dict())
+  return render(os.path.join(_GALLERY_DIR, 'JFrame_Demos/Flash_messages/flash.html'), request, dict())
 
 def flash_redirect(request):
   sleeper(request)
@@ -233,7 +233,7 @@ def forwarding(request):
   sleeper(request)
   letter = request.GET.get("letter", "X");
   request.path = urlresolvers.reverse("jframegallery.views.forwarding") + '?letter=Y'
-  return render(os.path.join(_GALLERY_DIR, 'forwarding.html'),
+  return render(os.path.join(_GALLERY_DIR, 'Hue/forwarding.html'),
                 request, dict(letter=letter))
 
 def error_404(request):
@@ -259,7 +259,7 @@ def error_redirect(request):
 
 def redirect_301(request):
   sleeper(request)
-  return HttpResponseRedirect("/jframegallery/gallery/redirect.html")
+  return HttpResponseRedirect("/jframegallery/gallery/Hue/redirect.html")
 
 def error_message_exception(request):
   sleeper(request)
@@ -289,5 +289,5 @@ def forms_with_dependencies(request):
       data = repr(form.cleaned_data)
   else:
     form = DepForm()
-  return render(os.path.join(_GALLERY_DIR, "forms_with_dependencies.mako"),
+  return render(os.path.join(_GALLERY_DIR, "Hue/forms_with_dependencies.mako"),
                 request, dict(form=form, data=data))
