@@ -123,14 +123,14 @@ HueChart.Box = new Class({
 						if(this.hasData()) {
 							//Set up the scales which will be used to convert values into positions for graphing.
 							this.setScales(vis);
-							//Add representation of the data.
-							this.addGraph(vis);
 							//Add tick marks (rules on side and bottom) if enabled
 							if (this.options.ticks.x || this.options.ticks.y) this.setTicks(vis);
 							//Add axis labels if enabled
 							if (this.options.showLabels) this.setLabels(vis);
 							//Add position indicator if enabled
 							if (this.options.positionIndicator) this.setPositionIndicators(vis);
+							//Add representation of the data.
+							this.addGraph(vis);
 							//Create panel for capture of events
 							this.eventPanel = vis.add(pv.Panel).fillStyle("rgba(0,0,0,.001)");
 							//If there's a mouse event, add the functionality to capture these events.

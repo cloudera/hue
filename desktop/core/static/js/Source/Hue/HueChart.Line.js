@@ -62,9 +62,14 @@ HueChart.Line = new Class({
 								//Make the line's width 3 pixels.
 								.lineWidth(this.options.lineWidth)
 							.add(pv.Dot)
-							.strokeStyle('gray')
-							.size(this.options.showDot ? 5 : 0)
-							.lineWidth(1);
+								.strokeStyle('white')
+								.fillStyle(function(itemIndex) {
+										return function() {
+												return this.getColor(this.series[itemIndex]);
+										}.bind(this);
+								}.bind(this)(itemIndex))
+								.size(this.options.showDot ? 5 : 0)
+								.lineWidth(1);
 				}
 		}
 });
