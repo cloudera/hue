@@ -42,7 +42,6 @@ HueChart.Tips = new Class({
 	Extends: Tips,
 
 	show: function(element, actualShow) {
-		debugger;
 		if (actualShow) this.parent(element);
 	}
 });
