@@ -228,7 +228,9 @@ class SampleDesign(object):
     except models.SavedQuery.DoesNotExist:
       model = models.SavedQuery(owner=django_user, name=self.name)
       model.type = self.type
-      model.data = self.data
+      # The data field needs to be a string. The sample file writes it
+      # as json (without encoding into a string) for readability.
+      model.data = simplejson.dumps(self.data)
       model.desc = self.desc
       model.save()
       LOG.info('Successfully installed sample design: %s' % (self.name,))
