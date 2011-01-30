@@ -1060,7 +1060,7 @@ def install_examples(request):
         request.flash.put('Installed Beeswax examples.')
     except Exception, err:
       LOG.exception(err)
-      raise PopupException(err)
+      raise PopupException("Error installing examples", detail=err)
 
     return format_preserving_redirect(request, '/beeswax/tables')
 

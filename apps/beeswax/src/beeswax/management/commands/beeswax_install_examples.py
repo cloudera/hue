@@ -114,8 +114,7 @@ class Command(NoArgsCommand):
 
     for table_dict in table_list:
       table = SampleTable(table_dict)
-      if not table.install(django_user):
-        raise InstallException('Failed to install sample table %s' % (table.name,))
+      table.install(django_user)
     LOG.info('Successfully created sample tables with data')
 
   def _install_reports(self, django_user):
@@ -128,8 +127,7 @@ class Command(NoArgsCommand):
 
     for design_dict in design_list:
       design = SampleDesign(design_dict)
-      if not design.install(django_user):
-        raise InstallException('Failed to install sample query %s' % (design.name,))
+      design.install(django_user)
     LOG.info('Successfully installed all sample queries')
 
 
@@ -161,34 +159,37 @@ class SampleTable(object):
       raise ValueError(msg)
 
   def install(self, django_user):
-    return self.create(django_user) and self.load(django_user)
+    self.create(django_user)
+    self.load(django_user)
 
   def create(self, django_user):
     """
-    Create in Hive. Returns True/False.
+    Create in Hive. Raise InstallException on failure.
     """
     # Create table
     LOG.info('Creating table "%s"' % (self.name,))
     try:
       # Already exists?
       tables = db_utils.meta_client().get_table("default", self.name)
-      LOG.error('Table "%s" already exists' % (self.name,))
-      return False
+      msg = 'Table "%s" already exists' % (self.name,)
+      LOG.error(msg)
+      raise InstallException(msg)
     except hive_metastore.ttypes.NoSuchObjectException:
       query_msg = _make_query_msg(self.hql)
       try:
         results = db_utils.execute_and_wait(django_user, query_msg)
         if not results:
-          LOG.error('Error creating table %s: Operation timeout' % (self.name,))
-          return False
+          msg = 'Error creating table %s: Operation timeout' % (self.name,)
+          LOG.error(msg)
+          raise InstallException(msg)
       except BeeswaxException, ex:
-        LOG.error('Error creating table %s: %s' % (self.name, ex))
-        return False
-      return True
+        msg = 'Error creating table %s: %s' % (self.name, ex)
+        LOG.error(msg)
+        raise InstallException(msg)
 
   def load(self, django_user):
     """
-    Load data into table.
+    Load data into table. Raise InstallException on failure.
     """
     LOAD_HQL = \
       """
@@ -202,12 +203,13 @@ class SampleTable(object):
     try:
       results = db_utils.execute_and_wait(django_user, query_msg)
       if not results:
-        LOG.error('Error loading table %s: Operation timeout' % (self.name,))
-        return False
+        msg = 'Error loading table %s: Operation timeout' % (self.name,)
+        LOG.error(msg)
+        raise InstallException(msg)
     except BeeswaxException, ex:
-      LOG.error('Error loading table %s: %s' % (self.name, ex))
-      return False
-    return True
+      msg = 'Error loading table %s: %s' % (self.name, ex)
+      LOG.error(msg)
+      raise InstallException(msg)
 
 
 class SampleDesign(object):
@@ -219,12 +221,16 @@ class SampleDesign(object):
     self.data = data_dict['data']
 
   def install(self, django_user):
+    """
+    Install design. Raise InstallException on failure.
+    """
     LOG.info('Installing sample design: %s' % (self.name,))
     try:
       # Don't overwrite
       model = models.SavedQuery.objects.get(owner=django_user, name=self.name)
-      LOG.error('Sample design %s already exists' % (self.name,))
-      return False
+      msg = 'Sample design %s already exists' % (self.name,)
+      LOG.error(msg)
+      raise InstallException(msg)
     except models.SavedQuery.DoesNotExist:
       model = models.SavedQuery(owner=django_user, name=self.name)
       model.type = self.type
@@ -234,4 +240,3 @@ class SampleDesign(object):
       model.desc = self.desc
       model.save()
       LOG.info('Successfully installed sample design: %s' % (self.name,))
-      return True
