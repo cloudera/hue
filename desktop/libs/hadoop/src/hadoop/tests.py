@@ -26,6 +26,7 @@ from nose.plugins.attrib import attr
 import desktop.views
 
 from desktop.lib.django_test_util import make_logged_in_client
+from hadoop import cluster
 from hadoop import conf
 from hadoop import confparse
 from hadoop import mini_cluster
@@ -164,3 +165,25 @@ def test_config_validator_more():
     for old_conf in reset:
       old_conf()
     cluster.shutdown()
+
+
+def test_non_default_cluster():
+  NON_DEFAULT_NAME = 'non_default'
+  cluster.clear_caches()
+  reset = (
+    conf.HDFS_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
+    conf.MR_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
+  )
+  try:
+    # This is indeed the only hdfs/mr cluster
+    assert_equal(1, len(cluster.get_all_hdfs()))
+    assert_equal(1, len(cluster.all_mrclusters()))
+    assert_true(cluster.get_hdfs(NON_DEFAULT_NAME))
+    assert_true(cluster.get_mrcluster(NON_DEFAULT_NAME))
+
+    cli = make_logged_in_client()
+    # That we can get to a view without errors means that the middlewares work
+    cli.get('/about')
+  finally:
+    for old_conf in reset:
+      old_conf()

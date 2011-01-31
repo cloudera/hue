@@ -48,6 +48,17 @@ def get_filesystem(name):
   _init_filesystems()
   return _filesystems[name]
 
+def get_default_hdfs():
+  """
+  Return the (name, fs) for the default hdfs.
+  Return (None, None) if no hdfs cluster configured
+  """
+  _init_filesystems()
+  for name, fs in _filesystems.iteritems():
+    # Return the first HDFS encountered
+    if fs.uri.startswith('hdfs'):
+      return name, fs
+  return None, None
 
 def reset():
   """

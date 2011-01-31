@@ -176,6 +176,10 @@ class LocalSubFileSystem(object):
   rmtree = _wrap(shutil.rmtree)
   chown = _wrap(os.chown, paths=[0], users=[1], groups=[2])
 
+  @property
+  def uri(self):
+    return self.name
+
   def stats(self, path, raise_on_fnf=True):
     path = self._resolve_path(path)
     try:

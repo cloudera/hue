@@ -123,22 +123,20 @@ class ClusterMiddleware(object):
     if "fs" in view_kwargs:
       del view_kwargs["fs"]
 
-    if not fs_ref:
-      fs_ref = "default"
-    try:
-      request.fs = fsmanager.get_filesystem(fs_ref)
-      request.fs_ref = fs_ref
-    except KeyError:
-      if fs_ref == "default" and not has_hadoop:
-        request.fs = None
-      else:
-        raise
+    if fs_ref is None:
+      request.fs_ref, request.fs = fsmanager.get_default_hdfs()
+    else:
+      try:
+        request.fs = fsmanager.get_filesystem(fs_ref)
+        request.fs_ref = fs_ref
+      except KeyError:
+        raise KeyError('Cannot find filesystem called "%s"' % (fs_ref,))
 
     if request.user.is_authenticated() and request.fs is not None:
       request.fs.setuser(request.user.username)
 
     if request.user.is_authenticated() and has_hadoop:
-      request.jt = cluster.get_mrcluster()
+      request.jt = cluster.get_default_mrcluster()
       if request.jt is not None:
         request.jt.setuser(request.user.username)
     else:

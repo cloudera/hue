@@ -59,6 +59,18 @@ def get_all_hdfs():
   return FS_CACHE
 
 MR_CACHE = None
+
+def get_default_mrcluster():
+  global MR_CACHE
+  try:
+    return get_mrcluster()
+  except KeyError:
+    # Return an arbitrary cluster
+    candidates = all_mrclusters()
+    if candidates:
+      return candidates.values()[0]
+    return None
+
 def get_mrcluster(identifier="default"):
   global MR_CACHE
   all_mrclusters()
