@@ -628,7 +628,7 @@ for x in sys.stdin:
     # Now it should complain
     resp = self.client.post('/beeswax/install_examples')
     assert_true("error" in resp.content)
-    assert_true("Failed to install sample table" in resp.content)
+    assert_true("already exists" in resp.content)
 
 
   def test_create_table_generation(self):
