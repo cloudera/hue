@@ -53,7 +53,7 @@ ${wrappers.head("Beeswax: Query History", section='history')}
   ${comps.pagination(page)}
 
   <div class="bw-show_group toolbar">
-      Show: 
+      Show:
     % if filter_params.get('user') == '_all':
       <%
         my_querydict = filter_params.copy()
@@ -100,11 +100,13 @@ ${wrappers.head("Beeswax: Query History", section='history')}
       from beeswax import models, views
     %>
     % for query in page.object_list:
-      <% 
+      <%
         qcontext = ""
-        design = query.design 
-        if design:
+	try:
+	  design = query.design
           qcontext = views.make_query_context('design', design.id)
+	except:
+	  pass
       %>
       <tr data-dblclick-delegate="{'dblclick_loads':'.bw-view_result'}" class="jframe-no_select hue-help_links_small">
         <td>${query.submission_date.strftime("%x %X")}</td>
@@ -121,7 +123,7 @@ ${wrappers.head("Beeswax: Query History", section='history')}
         <td>${query.owner}</td>
         <td>${models.QueryHistory.STATE[query.last_state]}</td>
         <td class="bw-query_result">
-          % if query.last_state != models.QueryHistory.STATE.expired.index:
+          % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
             <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" class="bw-view_result" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 2}">Results</a>
           % else:
             ~
