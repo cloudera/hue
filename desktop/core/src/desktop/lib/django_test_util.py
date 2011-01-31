@@ -18,13 +18,14 @@
 Common utilities for testing Desktop django apps.
 """
 
-import django.test.client
-import simplejson
-from django.contrib.auth.models import User, Group
-
-import re
-import nose.tools
 import logging
+import re
+import simplejson
+
+import django.test.client
+from django.contrib.auth.models import User
+
+import nose.tools
 
 class Client(django.test.client.Client):
   """
@@ -40,8 +41,8 @@ def assert_ok_response(response):
 
   Returns the response.
   """
-  assert_true(200, response.status_code)
-  return reponse
+  nose.tools.assert_true(200, response.status_code)
+  return response
 
 def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False):
   """

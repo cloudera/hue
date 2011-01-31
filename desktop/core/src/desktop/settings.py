@@ -146,6 +146,12 @@ LOGIN_REDIRECT_URL = "/"
 
 PYLINTRC = get_desktop_root('.pylintrc')
 
+# Insert our HDFS upload handler
+FILE_UPLOAD_HANDLERS = (
+  'hadoop.fs.upload.HDFSfileUploadHandler',
+  'django.core.files.uploadhandler.MemoryFileUploadHandler',
+  'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+)
 
 ############################################################
 # Part 4: Installation of apps

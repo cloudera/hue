@@ -130,6 +130,8 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                                    default="hdfs", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
+      TEMP_DIR=Config("temp_dir", help="HDFS directory for temporary files",
+                      default='/tmp', type=str),
     )
   )
 )

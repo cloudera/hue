@@ -22,7 +22,7 @@ ${comps.header('Upload Files')}
   <h4 class="jframe-hidden">Upload Files</h4>
   <dl>
     ${edit.render_field(form["dest"], hidden=True)}
-    ${edit.render_field(form["file"], render_default=True, notitle=True)}
+    ${edit.render_field(form["hdfs_file"], render_default=True, notitle=True)}
   </dl>
   <input class="jframe-hidden" type="submit" value="Submit" />
 </form>

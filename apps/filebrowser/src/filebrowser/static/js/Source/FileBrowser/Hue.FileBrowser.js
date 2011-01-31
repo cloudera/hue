@@ -585,7 +585,7 @@ Hue.FileBrowser.Uploader = new Class({
 			//container: null
 			path: '/static/js/ThirdParty/digitarald-fancyupload/source/Swiff.Uploader.swf',
 			//this is the key for the file in the POST params
-			fieldName: 'file',
+			fieldName: 'hdfs_file',
 			method: 'post',
 			appendCookieData: true
 		}
