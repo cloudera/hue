@@ -95,7 +95,7 @@ from desktop.lib.django_util import reverse_with_get
                     <li class="fb-rm-container"><a class="fb-rm fb-default-rm confirm_and_post" alt="Are you sure you want to delete ${display_name}?" href="${reverse_with_get('filebrowser.views.remove', get=dict(path=path, next=current_request_path))}">Delete</a></li>
                   % endif
                   <li class="fb-rename-container"><a class="fb-rename" href="${reverse_with_get('filebrowser.views.rename',get=dict(src_path=path,next=current_request_path))}">Rename</a></li>
-                  <li class="fb-chown-container"><a class="fb-chown" href="${reverse_with_get('filebrowser.views.chown',get=dict(path=path,user=file['stats']['user'],group=file['stats']['group'],next=current_request_path))}}">Change Owner / Group</a></li>
+                  <li class="fb-chown-container"><a class="fb-chown" href="${reverse_with_get('filebrowser.views.chown',get=dict(path=path,user=file['stats']['user'],group=file['stats']['group'],next=current_request_path))}">Change Owner / Group</a></li>
                   <li class="fb-chmod-container"><a class="fb-chmod" href="${reverse_with_get('filebrowser.views.chmod',get=dict(path=path,mode=stringformat(file['stats']['mode'], "o"),next=current_request_path))}">Change Permissions</a></li>
                   <%
                     if "dir" == file['type']:
