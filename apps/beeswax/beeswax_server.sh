@@ -61,5 +61,6 @@ echo \$HADOOP_CONF_DIR=$HADOOP_CONF_DIR
 
 # Note: I've had trouble running this with just "java -jar" with the classpath
 # determined with a seemingly appropriate find command.
+echo CWD=$(pwd)
 echo Executing $HADOOP_HOME/bin/hadoop jar $BEESWAX_JAR "$@"
 exec $HADOOP_HOME/bin/hadoop jar $BEESWAX_JAR "$@"

@@ -34,6 +34,7 @@ Expects 2 files in the beeswax.conf.LOCAL_EXAMPLES_DATA_DIR:
 
 import logging
 import os
+import pwd
 import simplejson
 
 from django.core.management.base import NoArgsCommand
@@ -48,7 +49,19 @@ from beeswaxd.ttypes import BeeswaxException
 import hive_metastore.ttypes
 
 LOG = logging.getLogger(__name__)
-HADOOP_USER = 'hue'
+DEFAULT_INSTALL_USER = 'hue'
+
+def get_install_user():
+  """Use the DEFAULT_INSTALL_USER if it exists, else try the current user"""
+  try:
+    pwd.getpwnam(DEFAULT_INSTALL_USER)
+    return DEFAULT_INSTALL_USER
+  except KeyError:
+    pw_struct = pwd.getpwuid(os.geteuid())
+    LOG.info("Default sample installation user '%s' does not exist. Using '%s'"
+             % (DEFAULT_INSTALL_USER, pw_struct.pw_name))
+    return pw_struct.pw_name
+
 
 class InstallException(Exception):
   pass
@@ -137,7 +150,7 @@ def _make_query_msg(hql):
   Need to run query as a valid hadoop user. Use hue:supergroup
   """
   query_msg = BeeswaxService.Query(query=hql, configuration=[])
-  query_msg.hadoop_user = HADOOP_USER
+  query_msg.hadoop_user = get_install_user()
   return query_msg
 
 
