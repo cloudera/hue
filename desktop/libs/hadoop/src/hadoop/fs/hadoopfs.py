@@ -181,7 +181,8 @@ class HadoopFileSystem(object):
                nn_kerberos_principal="hdfs",
                dn_kerberos_principal="hdfs",
                security_enabled=False,
-               hadoop_bin_path="hadoop"):
+               hadoop_bin_path="hadoop",
+               temp_dir='/tmp'):
     """
     @param host hostname or IP of the namenode
     @param thrift_port port on which the Thrift plugin is listening
@@ -189,6 +190,7 @@ class HadoopFileSystem(object):
     @param hadoop_bin_path path to find the hadoop wrapper script on the
                            installed system - default is fine if it is in
                            the user's PATH env
+    @param temp_dir Temporary directory, for mktemp()
     """
     self.host = host
     self.thrift_port = thrift_port
@@ -199,6 +201,7 @@ class HadoopFileSystem(object):
     self.hadoop_bin_path = hadoop_bin_path
     self._resolve_hadoop_path()
     self.security_enabled = security_enabled
+    self._temp_dir = temp_dir
 
     self.nn_client = thrift_util.get_client(
       Namenode.Client, host, thrift_port,
@@ -407,6 +410,24 @@ class HadoopFileSystem(object):
   def chown(self, path, user, group):
     path = encode_fs_path(path)
     self.nn_client.chown(self.request_context, normpath(path), user, group)
+
+  @_coerce_exceptions
+  def mktemp(self, subdir='', prefix='tmp'):
+    """
+    mktemp(prefix) ->  <temp_dir>/subdir/prefix.<rand>
+    Return a unique temporary filename with prefix in the cluster's temp dir.
+    """
+    RANDOM_BITS = 64
+
+    base = self.join(self._temp_dir, subdir)
+    if not self.isdir(base):
+      self.mkdir(base)
+
+    while True:
+      name = prefix + '.' + str(random.getrandbits(RANDOM_BITS))
+      candidate = self.join(base, name)
+      if not self.exists(candidate):
+        return candidate
 
   @_coerce_exceptions
   def get_namenode_info(self):
@@ -817,6 +838,7 @@ class FileUpload(object):
                                    bufsize=WRITE_BUFFER_SIZE)
   @require_open
   def write(self, data):
+    """May raise IOError, particularly EPIPE"""
     self.putter.stdin.write(data)
 
   @require_open

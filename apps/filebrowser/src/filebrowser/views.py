@@ -627,31 +627,58 @@ def upload_flash(request):
 
 def upload(request):
   """
-  Handles file uploads.
+  A wrapper around the actual upload view function to clean up the
+  temporary file afterwards.
+  """
+  try:
+    return _upload(request)
+  finally:
+    if request.method == 'POST':
+      try:
+        upload_file = request.FILES['hdfs_file']
+        upload_file.remove()
+      except KeyError:
+        pass
 
-  Django has a hook for "upload handlers" that could make this more
-  efficient.  Currently Django will store files greater than 2.5MB in
-  a temp directory.  We could implement an upload handler to
-  send data right through to the destination.
-
-  http://docs.djangoproject.com/en/1.0/topics/http/file-uploads/#upload-handlers
+def _upload(request):
+  """
+  Handles file uploads. The uploaded file is stored in HDFS. We just
+  need to rename it to the right path.
   """
   if request.method == 'POST':
     form = UploadForm(request.POST, request.FILES)
-    if form.is_valid():
-      # Bit of a wart that form.file doesn't give you the file,
-      # and you have to do form.files.get("file").
-      file = form.files.get("file")
+    if not form.is_valid():
+      logger.error("Error in upload form: %s" % (form.errors,))
+    else:
+      uploaded_file = request.FILES['hdfs_file']
       dest = form.cleaned_data["dest"]
       if request.fs.isdir(dest):
-        assert posixpath.sep not in file.name
-        dest = posixpath.join(dest, file.name)
-      output = request.fs.open(dest, "w")
+        assert posixpath.sep not in uploaded_file.name
+        dest = request.fs.join(dest, uploaded_file.name)
+
+      # Temp file is created by superuser. Chown the file.
+      tmp_file = uploaded_file.get_temp_path()
+      username = request.user.username
       try:
-        for chunk in file.chunks():
-          output.write(chunk)
+        try:
+          request.fs.setuser(request.fs.superuser)
+          request.fs.chmod(tmp_file, 0644)
+          request.fs.chown(tmp_file, username, username)
+        except IOError, ex:
+          msg = 'Failed to chown uploaded file ("%s") as superuser %s' % \
+                (tmp_file, request.fs.superuser)
+          logger.exception(msg)
+          raise PopupException(msg, detail=str(ex))
       finally:
-        output.close()
+        request.fs.setuser(username)
+
+      # Move the file to where it belongs
+      try:
+        request.fs.rename(uploaded_file.get_temp_path(), dest)
+      except IOError, ex:
+        raise PopupException(
+            'Failed to rename uploaded temporary file ("%s") to "%s": %s' %
+            (tmp_file, dest, ex))
 
       dest_stats = request.fs.stats(dest)
       return render_with_toolbars('upload_done.mako', request, {

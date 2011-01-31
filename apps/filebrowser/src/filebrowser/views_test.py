@@ -305,3 +305,34 @@ def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
       cluster.fs.remove(filename)
     except Exception, ex:
       LOG.error('Failed to remove %s: %s' % (filename, ex))
+
+
+@attr('requires_hadoop')
+def test_upload():
+  """Test file upload"""
+  cluster = mini_cluster.shared_cluster(conf=True)
+  try:
+    USER_NAME = cluster.fs.superuser
+    cluster.fs.setuser(USER_NAME)
+    DEST = "/tmp/fb-upload-test"
+    client = make_logged_in_client(USER_NAME)
+
+    # Just upload the current python file
+    resp = client.post('/filebrowser/upload',
+                       dict(dest=DEST, hdfs_file=file(__file__)))
+
+    assert_true("Upload Complete" in resp.content)
+    stats = cluster.fs.stats(DEST)
+    assert_equal(stats['user'], USER_NAME)
+    assert_equal(stats['group'], USER_NAME)
+
+    f = cluster.fs.open(DEST)
+    actual = f.read()
+    expected = file(__file__).read()
+    assert_equal(actual, expected)
+  finally:
+    try:
+      cluster.fs.remove(DEST)
+    except Exception, ex:
+      pass
+    cluster.shutdown()
