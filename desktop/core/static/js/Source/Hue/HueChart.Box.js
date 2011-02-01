@@ -351,14 +351,15 @@ HueChart.Box = new Class({
 
 		getDataSeriesFromPointAndY: function(dataPoint, y) {
 				var yRange = this.getYRange(y);
+				var seriesList = [];
 				//Find closest y-values
 				for (var i = 0; i < this.series.length; i++) {
 						var item = this.series[i];
 						if(yRange[0] < dataPoint[item] && dataPoint[item] < yRange[1]) {
-								return {'name': item, 'value': dataPoint[item]};
-						}  
+								seriesList.push({'name': item, 'value': dataPoint[item]});
+						}
 				}
-				return null;
+				return seriesList;
 		},
 		 
 		//Add handlers to detect mouse events.
@@ -370,8 +371,7 @@ HueChart.Box = new Class({
 								var dataPoint = this.getData(true).getObjects()[dataIndex];
 								this.fireEvent('point' + eventName.capitalize(), [ dataPoint, dataIndex ]);
 								var dataSeries = this.getDataSeriesFromPointAndY(dataPoint, position.y);
-
-								this.fireEvent('series' + eventName.capitalize(), dataSeries);
+								this.fireEvent('series' + eventName.capitalize(), [dataSeries]);
 						}
 				}.bind(this);
 				//Create functions which handle the graph specific aspects of the event and call the event arguments.
@@ -538,18 +538,27 @@ HueChart.Box = new Class({
 		},
 		
 		//Updates the display of the currently visible tip
-		updatePointValue: function(series) {
-				if (series != null) {
+		updatePointValue: function(seriesList) {
+				if (seriesList.length > 0) {
+					var tipList = new Element('div');
+					seriesList.each(function(series) {
+						var tipBlock = new Element('div', {'class': 'tip-series'});
 						var tipColor = new Element('div', {'class': 'tip-series-color'});
-						var tipBlock = new Element('div', {'class': 'tip-block'});
-						tipBlock.set('text', series.name);
+						var tipText = new Element('div', {'class': 'tip-series-value'});
+						var tipSeriesName = new Element('span', {'class': 'tip-series-name'});
+						tipSeriesName.set('text', series.name);
+						tipSeriesName.inject(tipBlock, 'top');
 						tipColor.inject(tipBlock, 'top');
 						tipColor.setStyle('background-color', this.getColor(series.name));
-						this.tip.setTitle(tipBlock);
-						this.tip.setText(this.options.yType == 'bytes' ? series.value.toInt().convertFileSize() : String(series.value));
-						var tipElem = this.tip.toElement();
-						if(!tipElem.getParent() || !document.body.hasChild(tipElem))tipElem.dispose();
-						this.tip.show(this.element, true);
+						tipText.set('text', this.options.yType == 'bytes' ? series.value.toInt().convertFileSize() : String(series.value));
+						tipText.inject(tipBlock, 'bottom');
+						tipBlock.inject(tipList, 'bottom');
+					}.bind(this));
+					this.tip.setTitle('');
+					this.tip.setText(tipList);
+					var tipElem = this.tip.toElement();
+					if(!tipElem.getParent() || !document.body.hasChild(tipElem)) tipElem.dispose();
+					this.tip.show(this.element, true);
 				} else {
 						this.tip.hide();
 				}
