@@ -109,11 +109,15 @@ div.solid-win div.bottom_lr {
 	font-weight: bold;
 	font-size: 11px;
 	margin: 0;
-	color: #9FD4FF;
 	padding: 4px 8px 0px;
 	background: black;
 	opacity: .8;
 	filter: alpha(opacity=80);
+}
+
+.huechart .tip-series-name {
+	color: #9FD4FF;
+	font-weight: bold;
 }
 
 .huechart .tip-text {
@@ -125,7 +129,6 @@ div.solid-win div.bottom_lr {
 	color: white;
 	opacity: .8;
 	filter: alpha(opacity=80);
-	text-align: center;
 }
 
 .huechart .tip-series-color {
@@ -133,6 +136,12 @@ div.solid-win div.bottom_lr {
 	height: 3px;
 	border: 1px solid white;
 	padding: 2px;
+	top: 4px;
 	display: inline-block;
 	margin-right: 5px;
+	float: left;
+}
+
+.huechart .tip-series-value {
+	text-align: center;
 }
