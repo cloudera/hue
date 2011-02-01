@@ -854,7 +854,6 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
 
                 JobStatus[] allJobs = jobTracker.getAllJobs();
                 for (JobStatus js : allJobs) {
-                  System.out.println("jid: " + js.getJobId() + " js: " + js.getRunState());
                     if (!js.getUsername().equals(user))
                         continue;
                     switch (js.getRunState()) {
