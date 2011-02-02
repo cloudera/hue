@@ -19,58 +19,56 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
 
 <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
 
-<div class="view" id="watch_wait">
-  <div class="resizable" data-filters="SplitView">
-    <div class="left_col">
-      ${util.render_query_context(query_context)}
-      <dl class="jframe_padded">
-        % if download_urls:
-        <dt class="hue-dt_cap">Downloads</dt>
-        <dd class="hue-dd_bottom bw-actions">
-          <ul>
-            <li><a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a>
-            <li><a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a>
-          </ul>
-        </dd>
-        % endif
-      <%
-        n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
-        mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
-      %>
-      <dt class="hue-dt_cap">${mr_jobs}</dt>
-        <dd class="hue-dd_bottom bw-actions">
-          <ul data-single-partial-id="num_jobs">
-            % if n_jobs > 0:
-              <h3 class="jframe-hidden">This query launched ${n_jobs} ${mr_jobs}:</h3>
-              <ul class="beeswax_hadoop_job_links">
-                % for jobid in hadoop_jobs:
-                <li><a href="${url("jobbrowser.views.single_job", jobid=jobid)}" target="JobBrowser" class="bw-hadoop_job">${jobid.replace("job_", "")}</a></li>
-                % endfor
-              </ul>
-            % else:
-              <p class="bw-no_jobs">No Hadoop jobs were launched in running this query.</p>
-            % endif 
-          </ul>
-        </dd>
-      </dl>
-    </div>
-    <div class="right_col jframe_padded">
-      <div data-filters="Tabs">
-        <ul class="toolbar bw-results_tabs tabs jframe-right clearfix">
-          <li><span>Log</span></li>
-          <li><span>Query</span></li>
+<div class="view resizable" id="watch_wait" data-filters="SplitView">
+  <div class="left_col">
+    ${util.render_query_context(query_context)}
+    <dl class="jframe_padded">
+      % if download_urls:
+      <dt class="hue-dt_cap">Downloads</dt>
+      <dd class="hue-dd_bottom bw-actions">
+        <ul>
+          <li><a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a>
+          <li><a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a>
         </ul>
+      </dd>
+      % endif
+    <%
+      n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
+      mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
+    %>
+    <dt class="hue-dt_cap">${mr_jobs}</dt>
+      <dd class="hue-dd_bottom bw-actions">
+        <ul data-single-partial-id="num_jobs">
+          % if n_jobs > 0:
+            <h3 class="jframe-hidden">This query launched ${n_jobs} ${mr_jobs}:</h3>
+            <ul class="beeswax_hadoop_job_links">
+              % for jobid in hadoop_jobs:
+              <li><a href="${url("jobbrowser.views.single_job", jobid=jobid)}" target="JobBrowser" class="bw-hadoop_job">${jobid.replace("job_", "")}</a></li>
+              % endfor
+            </ul>
+          % else:
+            <p class="bw-no_jobs">No Hadoop jobs were launched in running this query.</p>
+          % endif 
+        </ul>
+      </dd>
+    </dl>
+  </div>
+  <div class="right_col jframe_padded">
+    <div data-filters="Tabs">
+      <ul class="toolbar bw-results_tabs tabs jframe-right clearfix">
+        <li><span>Log</span></li>
+        <li><span>Query</span></li>
+      </ul>
 
-        <ul class="tab_sections jframe-clear">
-          <li>
-            <h3 class="jframe-hidden">Server Log</h3>
-            <pre data-single-partial-id="log">${log}</pre>
-          </li>
-          <li>
-            <pre>${query.query}</pre>
-          </li>
-        </ul>
-    </div>
+      <ul class="tab_sections jframe-clear">
+        <li>
+          <h3 class="jframe-hidden">Server Log</h3>
+          <pre data-single-partial-id="log">${log}</pre>
+        </li>
+        <li>
+          <pre>${query.query}</pre>
+        </li>
+      </ul>
   </div>
 </div>
 ${wrappers.foot()}

@@ -17,27 +17,25 @@
 <%namespace name="wrappers" file="header_footer.mako" />
 <%namespace name="util" file="util.mako" />
 ${wrappers.head('Query Explanation', section='saved queries')}
-<div class="view" id="watch_wait">
-  <div class="resizable" data-filters="SplitView">
-    <div class="left_col">
-      ${util.render_query_context(query_context)}
-    </div>
-    <div class="right_col jframe_padded">
-      <div data-filters="Tabs">
-        <ul class="toolbar bw-results_tabs tabs jframe-right clearfix">
-          <li><span>Explanation</span></li>
-          <li><span>Query</span></li>
-        </ul>
+<div class="view, resizable" id="watch_wait" data-filters="SplitView">
+  <div class="left_col">
+    ${util.render_query_context(query_context)}
+  </div>
+  <div class="right_col jframe_padded">
+    <div data-filters="Tabs">
+      <ul class="toolbar bw-results_tabs tabs jframe-right clearfix">
+        <li><span>Explanation</span></li>
+        <li><span>Query</span></li>
+      </ul>
 
-        <ul class="tab_sections jframe-clear">
-          <li>
-            <pre>${explanation}</pre>
-          </li>
-          <li>
-            <pre>${query}</pre>
-          </li>
-        </ul>
-      </div>
+      <ul class="tab_sections jframe-clear">
+        <li>
+          <pre>${explanation}</pre>
+        </li>
+        <li>
+          <pre>${query}</pre>
+        </li>
+      </ul>
     </div>
   </div>
 </div>
