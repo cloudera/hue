@@ -137,21 +137,12 @@ def list_designs(request, saved=None):
   """
   show_install_examples = request.user.is_superuser and not jobsub_setup.Command().has_been_setup()
   data = JobDesign.objects.order_by('-last_modified')
-  owner = request.GET.get("owner")
-  name = request.GET.get('name')
+  owner = request.GET.get("owner", "")
+  name = request.GET.get('name', "")
   if owner:
-    try:
-      user = User.objects.get(username=owner)
-      data = data.filter(owner=user)
-    except User.DoesNotExist:
-      data = []
-  else:
-    owner = ""
-
+    data = data.filter(owner__username__icontains=owner)
   if name:
     data = data.filter(name__icontains=name)
-  else:
-    name = ''
 
   newlinks = [ (type, urlresolvers.reverse("jobsub.new", kwargs=dict(type=type))) for type in interface.registry ]
 
