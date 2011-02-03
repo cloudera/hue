@@ -161,6 +161,12 @@ def test_job_design_cycle():
   assert_true('test2' in [ job_design.name for job_design in response.context['jobdesigns'] ])
   assert_false('newjob1' in [job_design.name for job_design in response.context['jobdesigns'] ])
 
+  # Combined filters
+  response = c.get('/jobsub/', dict(owner="est2", name="tes"))
+  assert_false('test1' in [ job_design.name for job_design in response.context['jobdesigns'] ])
+  assert_true('test2' in [ job_design.name for job_design in response.context['jobdesigns'] ])
+  assert_false('newjob1' in [job_design.name for job_design in response.context['jobdesigns'] ])
+
   response = c.get('/jobsub/', dict(name='doesnotexist'))
   assert_equal(0, len(response.context['jobdesigns']))
 
