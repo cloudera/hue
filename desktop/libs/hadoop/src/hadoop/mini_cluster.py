@@ -140,7 +140,6 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       'dfs.namenode.plugins': CLUSTER_NN_PLUGINS,
       'dfs.datanode.plugins': CLUSTER_DN_PLUGINS,
       'mapred.jobtracker.plugins': CLUSTER_JT_PLUGINS}
-    core_configs.update(extra_configs)
     write_config(core_configs, tmppath('in-conf/core-site.xml'))
 
     hadoop_policy_keys = ['client', 'client.datanode', 'datanode', 'inter.datanode', 'namenode', 'inter.tracker', 'job.submission', 'task.umbilical', 'refresh.policy', 'admin.operations']
@@ -179,6 +178,11 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         "-D", "hadoop.security.authorization=true",
         "-D", "hadoop.policy.file=%s/hadoop-policy.xml" % in_conf_dir,
       ]
+
+      for key,value in extra_configs.iteritems():
+        args.append("-D")
+        args.append(key + "=" + value)
+
       env = {}
       env["HADOOP_CONF_DIR"] = in_conf_dir
       env["HADOOP_OPTS"] = "-Dtest.build.data=%s" % (self.tmpdir, )
