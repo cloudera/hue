@@ -64,6 +64,10 @@ CLUSTER_NN_PLUGINS = 'org.apache.hadoop.thriftfs.NamenodePlugin'
 CLUSTER_JT_PLUGINS = 'org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin'
 # List of classes to be used as plugins for the DN(s) of the cluster.
 CLUSTER_DN_PLUGINS = 'org.apache.hadoop.thriftfs.DatanodePlugin'
+# MR Task Scheduler. By default use the FIFO scheduler
+CLUSTER_TASK_SCHEDULER='org.apache.hadoop.mapred.JobQueueTaskScheduler'
+# MR queue names
+CLUSTER_QUEUE_NAMES='default'
 
 # users and their groups which are used in Hue tests.
 TEST_USER_GROUP_MAPPING = {
@@ -141,6 +145,10 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       'dfs.datanode.plugins': CLUSTER_DN_PLUGINS,
       'mapred.jobtracker.plugins': CLUSTER_JT_PLUGINS}
     write_config(core_configs, tmppath('in-conf/core-site.xml'))
+
+    write_config({'mapred.jobtracker.taskScheduler': CLUSTER_TASK_SCHEDULER,
+                  'mapred.queue.names': CLUSTER_QUEUE_NAMES},
+                 tmppath('in-conf/mapred-site.xml'))
 
     hadoop_policy_keys = ['client', 'client.datanode', 'datanode', 'inter.datanode', 'namenode', 'inter.tracker', 'job.submission', 'task.umbilical', 'refresh.policy', 'admin.operations']
     hadoop_policy_config = {}
@@ -269,8 +277,8 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     write_config(self.config, tmppath("conf/hdfs-site.xml"), ["fs.default.name", "dfs.http.address", "dfs.secondary.http.address"])
     # mapred.job.tracker isn't written out into self.config, so we fill
     # that one out more manually.
-    write_config({ "mapred.job.tracker": "localhost:%d" % self.jobtracker_port },
-      tmppath("conf/mapred-site.xml"))
+    write_config({ 'mapred.job.tracker': 'localhost:%d' % self.jobtracker_port },
+                 tmppath("conf/mapred-site.xml"))
     write_config(hadoop_policy_config, tmppath('conf/hadoop-policy.xml'))
 
     # Once the config is written out, we can start the 2NN.
