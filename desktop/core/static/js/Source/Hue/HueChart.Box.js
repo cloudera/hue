@@ -41,6 +41,11 @@ var getXValueFn = function(field) {
 HueChart.Tips = new Class({
 	Extends: Tips,
 
+	options: {
+		showDelay: 0,
+		hideDelay: 0
+	},
+
 	show: function(element, actualShow) {
 		if (actualShow) this.parent(element);
 	}

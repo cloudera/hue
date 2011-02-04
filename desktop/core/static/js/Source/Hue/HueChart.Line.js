@@ -24,7 +24,10 @@ HueChart.Line = new Class({
 
 		options: {
 				lineWidth: 3, //Width of the lines in the chart
-				showDot: false //Show a dot on each point of the line
+				dot: {
+					strokeColor: '#fff', //the color of the line around the dot at each data point
+					size: 0
+				}
 		},
 
 		initialize: function(element, options) {
@@ -40,7 +43,7 @@ HueChart.Line = new Class({
 						var series = this.series[itemIndex];
 						var dataSeries = this.getData(true).getDataSeries(series);
 						//Add a line to the visualization, connecting points produced from the data object.
-						vis.add(pv.Line)
+						var visLine = vis.add(pv.Line)
 								//Using as data, this.data.getObjects.
 								.data($lambda(dataSeries))
 								//Closures used because the function argument isn't executed until the render phase.
@@ -60,16 +63,18 @@ HueChart.Line = new Class({
 										}.bind(this);
 								}.bind(this)(itemIndex))
 								//Make the line's width 3 pixels.
-								.lineWidth(this.options.lineWidth)
-							.add(pv.Dot)
-								.strokeStyle('white')
+								.lineWidth(this.options.lineWidth);
+						if (this.options.dot.size) {
+							visLine.add(pv.Dot)
+								.strokeStyle(this.options.dot.strokeColor)
 								.fillStyle(function(itemIndex) {
 										return function() {
 												return this.getColor(this.series[itemIndex]);
 										}.bind(this);
 								}.bind(this)(itemIndex))
-								.size(this.options.showDot ? 5 : 0)
+								.size(this.options.dot.size)
 								.lineWidth(1);
+						}
 				}
 		}
 });
