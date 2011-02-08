@@ -103,21 +103,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.cloudera.beeswax.Server</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
         <executions>
-          <execution>
-            <id>default-package</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <archive>
-                <manifest>
-                  <mainClass>com.cloudera.beeswax.Server</mainClass>
-                </manifest>
-              </archive>
-            </configuration>
-          </execution>
           <execution>
             <id>test-package</id>
             <phase>package</phase>
