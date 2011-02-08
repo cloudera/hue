@@ -112,7 +112,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
   private class RunningQueryState {
     private QueryState state = QueryState.CREATED;
     // Thread local used by Hive quite a bit.
-    private SessionState sessionState;
+    private CleanableSessionState sessionState;
     private Throwable exception;
     private Driver driver;
     private ByteArrayOutputStream errStream = new ByteArrayOutputStream();
@@ -179,9 +179,13 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     }
 
     synchronized public void compile() throws BeeswaxException {
-      assertState(QueryState.INITIALIZED);
-      checkedCompile();
-      state = QueryState.COMPILED;
+      try {
+        assertState(QueryState.INITIALIZED);
+        checkedCompile();
+        state = QueryState.COMPILED;
+      } finally {
+        cleanSessionState();
+      }
     }
 
     private void assertState(QueryState expected) {
@@ -267,8 +271,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       }
       hiveConf.setClassLoader(loader);
       Thread.currentThread().setContextClassLoader(loader);
-      SessionState.start(hiveConf); // this is thread-local
-      this.sessionState = SessionState.get();
+      this.sessionState = new CleanableSessionState(hiveConf);
+      SessionState.start(this.sessionState);
 
       // If this work has a LogContext, associate the children output to the logContext
       OutputStream lcOutStream = null;
@@ -426,6 +430,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       } finally {
         // Don't let folks re-use the state object.
         state = QueryState.FINISHED;
+        cleanSessionState();
       }
       return new QueryExplanation(sb.toString());
     }
@@ -446,6 +451,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
             materializeResults(r, fromBeginning);
           } catch (IOException e) {
             throw new BeeswaxException(e.toString(), logContext.getName(), handle);
+          } finally {
+            cleanSessionState();
           }
           break;
         case EXCEPTION:
@@ -498,12 +505,18 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
               } catch (Throwable t) {
                 LOG.error("Exception while processing query", t);
                 state.saveException(t);
+              } finally {
+                cleanSessionState();
               }
               return null;
             }
           });
         }
       });
+    }
+
+    private void cleanSessionState() {
+      ((CleanableSessionState) SessionState.get()).destroyHiveHistory();
     }
   }
 
