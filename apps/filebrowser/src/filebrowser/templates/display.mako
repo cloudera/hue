@@ -74,17 +74,17 @@
         <%
           base_url = url('filebrowser.views.view', path=path_enc)
           if view['offset'] == 0:
-              first = "style='visibility:hidden'"
-              prev = "style='visibility:hidden'"
+              first = "style=visibility:hidden"
+              prev = "style=visibility:hidden"
           else:
-              first = "href='%s?offset=0&length=%d&compression=none' title='1 - %d'" %(base_url, view['length'], min(view['length'], stats['size']))
-              prev =  "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, max(0, view['offset']-view['length']), view['length'], max(0, view['offset']-view['length']) + 1, min(max(0, view['offset'] - view['length']) + view['length'], stats['size']))
+              first = "href=%s?offset=0&length=%d&compression=none title=1 - %d" %(base_url, view['length'], min(view['length'], stats['size']))
+              prev =  "href=%s?offset=%d&length=%d&compression=none title=%d - %d" %(base_url, max(0, view['offset']-view['length']), view['length'], max(0, view['offset']-view['length']) + 1, min(max(0, view['offset'] - view['length']) + view['length'], stats['size']))
           if view['offset'] + view['length'] >= stats['size']:
-              next = "style='visibility:hidden'"
-              last = "style='visibility:hidden'"
+              next = "style=visibility:hidden"
+              last = "style=visibility:hidden"
           else:
-              next = "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, view['offset'] + view['length'], view['length'], view['offset'] + view['length'] + 1, view['offset'] + (2 * view['length']))
-              last =  "href='%s?offset=%d&length=%d&compression=none' title='%d - %d'" %(base_url, stats['size']-(stats['size'] % view['length']), view['length'], stats['size']-(stats['size'] % view['length']) + 1, stats['size'])
+              next = "href=%s?offset=%d&length=%d&compression=none title=%d - %d" %(base_url, view['offset'] + view['length'], view['length'], view['offset'] + view['length'] + 1, view['offset'] + (2 * view['length']))
+              last =  "href=%s?offset=%d&length=%d&compression=none title=%d - %d" %(base_url, stats['size']-(stats['size'] % view['length']), view['length'], stats['size']-(stats['size'] % view['length']) + 1, stats['size'])
         %>
         ###DEFINE REL
         <a class="jframe-inline fv-firstBlock" data-filters="PointyTip" ${first}>First Block</a>
