@@ -42,10 +42,10 @@ compile: $(BEESWAX)
 
 ifneq (,$(HAVE_JAVA_SRC))
 
-# If we have the source, remove it for clean
+# If we have the source, remove the java-lib
 clean::
 	rm -Rf $(BEESWAX_JAVA_LIB)
-
+	cd $(BEESWAX_JAVA_DIR) && mvn clean || :
 
 BEESWAX_OPTS := -Dbuild.dir=$(BLD_DIR_BEESWAX) \
 	        -Dhadoop.home=$(HADOOP_HOME) \
@@ -60,7 +60,6 @@ else
 $(BEESWAX):
 	$(error Cannot build beeswax jars without source)
 endif
-
 
 #
 # Tell the `bdist' target to exclude our java source.
