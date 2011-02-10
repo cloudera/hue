@@ -181,7 +181,6 @@ apps: desktop
 ###################################
 INSTALL_CORE_FILES = \
 	Makefile* $(wildcard *.mk) \
-	example* \
 	ext \
 	tools/app_reg \
 	tools/virtual-bootstrap \
