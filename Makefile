@@ -130,7 +130,7 @@ docs:
 # Development use crepo to fetch thirdparty dependencies.
 
 .PHONY: crepo
-crepo: $(THIRDPARTY_JS_DIR)/manifest.json $(THIRDPARTY_JS_DIR)/*.hash parent-pom
+crepo: $(THIRDPARTY_JS_DIR)/manifest.json $(THIRDPARTY_JS_DIR)/*.hash
 	@echo "--- Synchronizing external dependencies with crepo"
 	@mkdir -p $(BLD_DIR)
 	@cd $(THIRDPARTY_JS_DIR) && $(CREPO) sync && \
@@ -164,7 +164,7 @@ $(BLD_DIR_ENV)/stamp:
 .PHONY: desktop
 
 # <<<< DEV ONLY
-desktop: crepo
+desktop: crepo parent-pom
 # END DEV ONLY >>>>
 desktop: virtual-env
 	@$(MAKE) -C desktop
@@ -256,6 +256,11 @@ distclean: clean
 	@rm -rf $(BLD_DIR)
 	@$(MAKE) -C desktop distclean
 	@$(MAKE) -C apps distclean
+
+.PHONY: ext-clean
+ext-clean:
+	@$(MAKE) -C desktop ext-clean
+	@$(MAKE) -C apps ext-clean
 
 # <<<< DEV ONLY
 ###############################################

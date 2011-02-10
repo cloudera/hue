@@ -179,9 +179,11 @@ COMMON_EXCLUDES := \
 	  --exclude=.\*.sw[op] \
 	  --exclude=~\* \
 	  --exclude=.gitignore \
-	  --exclude=tag
+	  --exclude=tag \
+	  --exclude=target
 
-SDIST_EXCLUDES += $(COMMON_EXCLUDES)
+
+SDIST_EXCLUDES += $(COMMON_EXCLUDES) --exclude=java-lib
 BDIST_EXCLUDES += $(COMMON_EXCLUDES) --exclude=ext-py
 
 SDIST_DIR := $(BUILD_DIR)/sdist/$(APP_FULL_NAME)

@@ -100,6 +100,10 @@ DISTCLEAN_TARGETS := $(APPS:%=.recursive-distclean/%)
 .recursive-distclean/%: %
 	$(MAKE) -C $< distclean
 
+EXT_CLEAN_TARGETS := $(APPS:%=.recursive-ext-clean/%)
+.recursive-ext-clean/%: %
+	$(MAKE) -C $< ext-clean
+
 .PHONY: env-install
 env-install: $(ENV_INSTALL_TARGETS)
 
@@ -109,6 +113,9 @@ clean: $(CLEAN_TARGETS)
 
 .PHONY: distclean
 distclean: clean $(DISTCLEAN_TARGETS)
+
+.PHONY: ext-clean
+ext-clean: $(EXT_CLEAN_TARGETS)
 
 
 #

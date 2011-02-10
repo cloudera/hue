@@ -24,22 +24,29 @@ PROD_INCLUDES := \
 	ext/thirdparty \
 	LICENSE.txt \
 	Makefile* \
+	maven \
 	tools/app_reg \
 	tools/virtual-bootstrap \
-    maven \
 	VERSION_DATA
 
+# Check for things in BDIST_EXCLUDES in various apps
 PROD_EXCLUDES := \
-        Makefile.tarball \
-	desktop/apps/jframegallery \
-	desktop/apps/beeswax \
+	apps/beeswax/java \
+	apps/beeswax/thrift \
+	apps/hello \
+	apps/jframegallery \
+	apps/jobsub/src/jobsub/java \
+	build \
 	desktop/conf \
 	desktop/desktop.db \
-	desktop/apps/hello \
-	desktop/apps/visualizer \
 	desktop/devtools.mk \
+	desktop/libs/hadoop/java \
+	desktop/libs/hadoop/regenerate-thrift.sh \
+	desktop/libs/hadoop/static-group-mapping/src \
+	desktop/libs/hadoop/sudo-shell/src \
+	ext/thirdparty/js/manifest.json \
 	ext/thirdparty/README.md \
-	ext/thirdparty/js/manifest.json
+        Makefile.tarball
 
 # Macro to remove things we don't want to package
 define remove_devtree_exclusions
@@ -48,7 +55,10 @@ define remove_devtree_exclusions
 		      -name '.*~' -o \
 		      -name '.#*' -o \
 		      -name '.pylintrc' -o \
+		      -name 'build' -o \
+		      -name 'logs' -o \
 		      -name 'tags' -o \
+		      -name 'target' -o \
 		      -name 'desktop.db' -o \
 		      -name 'app.reg' -o \
 		      -name '*.py[co]' -o \
@@ -69,7 +79,7 @@ $(BLD_DIR_PROD_TGZ): $(BLD_DIR_PROD)
 	@echo "--- Generated $(BLD_DIR_PROD_TGZ)"
 
 .PHONY: $(BLD_DIR_PROD)
-$(BLD_DIR_PROD): crepo docs
+$(BLD_DIR_PROD): apps crepo docs
 	@echo "--- Preparing general distribution tree at $@"
 	@rm -rf $@
 	@mkdir -p $@
@@ -89,6 +99,8 @@ $(BLD_DIR_PROD): crepo docs
 	@$(call STRIP_DEV, $(ROOT)/Makefile.vars.priv, $(BLD_DIR_PROD)/Makefile.vars.priv)
 	@$(call STRIP_DEV, $(APPS_DIR)/Makefile, $(BLD_DIR_PROD)/apps/Makefile)
 	@$(call STRIP_DEV, $(DESKTOP_DIR)/Makefile, $(BLD_DIR_PROD)/desktop/Makefile)
-	@cd $(BLD_DIR_PROD) && make distclean
+	@echo "---- Removing build directories"
+	find $(BLD_DIR_PROD) -name build -prune -exec rm -rf {} \;
+	@$(MAKE) -C $(BLD_DIR_PROD) ext-clean
 
 # END DEV ONLY >>>>

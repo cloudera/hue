@@ -83,6 +83,7 @@ install-source-parts:
 ################################################
 CLEAN_TARGETS := $(APPS:%=.recursive-clean/%)
 DISTCLEAN_TARGETS := $(APPS:%=.recursive-distclean/%)
+EXT_CLEAN_TARGETS := $(APPS:%=.recursive-ext-clean/%)
 
 clean: $(CLEAN_TARGETS)
 .recursive-clean/%:
@@ -93,3 +94,7 @@ distclean: $(DISTCLEAN_TARGETS)
 .recursive-distclean/%:
 	@$(MAKE) -C $* distclean
 	@$(APP_REG) --remove $* ||:
+
+ext-clean: $(EXT_CLEAN_TARGETS)
+.recursive-ext-clean/%:
+	@$(MAKE) -C $* ext-clean
