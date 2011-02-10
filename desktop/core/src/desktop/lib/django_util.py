@@ -398,12 +398,12 @@ def reverse_with_get(view, args=None, kwargs=None, get=None):
     url = url + "?" + params
   return url
 
-def humanize_duration(seconds, abbreviate=False):
+def humanize_duration(seconds, abbreviate=False, separator=','):
   d = datetime.datetime.fromtimestamp(0)
   now = datetime.datetime.fromtimestamp(seconds)
-  return timesince(d, now, abbreviate)
+  return timesince(d, now, abbreviate, separator)
 
-def timesince(d=None, now=None, abbreviate=False):
+def timesince(d=None, now=None, abbreviate=False, separator=','):
   """
   Takes two datetime objects and returns the time between d and now
   as a nicely formatted string, e.g. "10 minutes".  If d occurs after now,
@@ -476,7 +476,7 @@ def timesince(d=None, now=None, abbreviate=False):
     count2 = (since - (seconds * count)) // seconds2
     if count2 != 0:
       if abbreviate:
-        s += ugettext(', %(number)d%(type)s') % {'number': count2, 'type': name2(count2)}
+        s += ugettext('%(separator)s %(number)d%(type)s') % {'separator': separator, 'number': count2, 'type': name2(count2)}
       else:
-        s += ugettext(', %(number)d %(type)s') % {'number': count2, 'type': name2(count2)}
+        s += ugettext('%(separator)s %(number)d %(type)s') % {'separator': separator, 'number': count2, 'type': name2(count2)}
   return s
