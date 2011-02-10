@@ -31,6 +31,7 @@ from django.http import HttpResponseRedirect
 from desktop.log.access import access_warn, access_log_level
 from desktop.views import register_status_bar_view
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority
+from hadoop.api.jobtracker.ttypes import TaskTrackerNotFoundException
 
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker, Cluster
 
@@ -196,7 +197,11 @@ def single_task_attempt(request, jobid, taskid, attemptid):
   except KeyError:
     raise KeyError("Cannot find attempt '%s' in task" % (attemptid,))
 
-  logs = [ section.strip() for section in attempt.get_task_log() ]
+  try:
+    logs = [ section.strip() for section in attempt.get_task_log() ]
+  except TaskTrackerNotFoundException:
+    # Three entries for stdout, stderr and syslog
+    logs = [ "Failed to retrieve log. TaskTracker not found." ] * 3
   return render("attempt.mako", request,
     {
       "attempt":attempt,

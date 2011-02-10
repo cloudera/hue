@@ -391,9 +391,10 @@ class TaskAttempt(object):
       return tracker
     except ttypes.TaskTrackerNotFoundException, e:
       LOGGER.warn("Tracker %s not found: %s" % (self.taskTrackerId, e))
-      all_trackers = self.task.jt.all_task_trackers()
-      for t in all_trackers.trackers:
-        LOGGER.debug("Available tracker: %s" % t.trackerName)
+      if LOGGER.isEnabledFor(logging.DEBUG):
+        all_trackers = self.task.jt.all_task_trackers()
+        for t in all_trackers.trackers:
+          LOGGER.debug("Available tracker: %s" % (t.trackerName,))
       raise ttypes.TaskTrackerNotFoundException(
                           "Cannot lookup TaskTracker '%s'" % (self.taskTrackerId,))
 
