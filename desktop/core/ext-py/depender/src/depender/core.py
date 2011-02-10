@@ -131,7 +131,7 @@ class DependerData(object):
     for alias, package in sorted(self.package_aliases.items()):
       out += "\t\t%s (%s)\n" % (alias, package)
 
-    LOG.info(out)
+    LOG.debug(out)
 
     for p in self.packages.values():
       for f in p.files:

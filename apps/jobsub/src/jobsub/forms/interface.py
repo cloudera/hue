@@ -41,7 +41,7 @@ class JobSubForm(object):
       name = dict["name"]
       if name in registry:
         raise Exception("Multiply defined form type %s: %s." % (clsname, name))
-      LOG.info("Registered jobsub plugin: %s->%s" % (name, clsname))
+      LOG.debug("Registered jobsub plugin: %s->%s" % (name, clsname))
       registry[name] = cls
 
 class JobSubFormInterface(object):
