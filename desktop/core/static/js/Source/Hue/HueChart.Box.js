@@ -105,7 +105,7 @@ HueChart.Box = new Class({
 				this.highlighted_index = -1;
 				//Build initial list of data series
 				//Initialize data object
-				if (this.hasData()) this.initializeData();
+				if (this.hasData()) this.initializeData(this.options.metadata);
 				//Create tip to show if showPointValue is true.
 				if (this.options.showPointValue) {
 						this.tip = new HueChart.Tips(this.element, {
@@ -154,16 +154,22 @@ HueChart.Box = new Class({
 			return this.getData().getLength() > 1;
 		},
 
-		initializeData: function() {
-				this.series = [];
-				//Initialize dataSeries
-				dataObjs = this.getData(true).getObjects();
-				//Iterate through the data objects to create a list of the data series.
-				dataObjs.each(function(obj) {
-					Hash.each(obj, function(value, key) {
-						if (!this.series.contains(key) && key != this.options.xProperty) this.series.push(key);
+		initializeData: function(metadata) {
+				if (metadata) {
+					 this.metadata = metadata;
+					 this.series = Hash.getKeys(metadata);
+				} else {
+					delete this.metadata;
+					this.series = [];
+					//Initialize dataSeries
+					dataObjs = this.getData(true).getObjects();
+					//Iterate through the data objects to create a list of the data series.
+					dataObjs.each(function(obj) {
+						Hash.each(obj, function(value, key) {
+							if (!this.series.contains(key) && key != this.options.xProperty) this.series.push(key);
+						}.bind(this));
 					}.bind(this));
-				}.bind(this));
+				}
 				if(this.options.dates.x) {
 						//If the xProperty is a date property, prepare the dates for sorting
 						//Change the xProperty to the new property designed for sorting dates
@@ -176,7 +182,16 @@ HueChart.Box = new Class({
 						this.xProperty = this.options.xProperty;
 						this.getData(true).sortByProperty(this.xProperty);
 				}
-
+		},
+		
+		//If series is not defined, returns true if there is metadata defined for the chart, false otherwise.
+		//If series is defined, returns true if there is metadata defined for the chart and within that metadata there is an entry for the series in question.
+		hasMetadata: function(series) {
+			var hasMeta = $defined(this.metadata);
+			if ($defined(series)) {
+				hasMeta = hasMeta & Hash.has(this.metadata, series);
+			}
+			return hasMeta;
 		},
 
 		//Add data -- redefined to add series to the array of series
@@ -348,7 +363,7 @@ HueChart.Box = new Class({
 				var invertedYValue = scale.invert(y);
 				//Since range will be inverted, the array goes from greatest to least initially.
 				var invertedYRange = [scale.invert(y + yBuffer), scale.invert(y - yBuffer)];
-				var yValue = this.yValueReverse(invertedYValue); 
+				var yValue = this.yValueReverse(invertedYValue);
 				//Convert the inverted yRange to a non-inverted yRange.
 				var yRange = invertedYRange.map(function(value) { return this.yValueReverse(value); }.bind(this));
 				return yRange;

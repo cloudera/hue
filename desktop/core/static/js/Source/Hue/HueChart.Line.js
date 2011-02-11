@@ -39,8 +39,21 @@ HueChart.Line = new Class({
 		addGraph: function(vis) {
 				//In effort to maintain same data structure for lines and stacked charts, iterating
 				//through the series and adding a line using each series for its data points.
+				var valueToPV = {'continuous': 'linear', 'discrete':'step-after'};
+				//Get interpolation from metadata and convert to ProtoVis value
+				var getInterpolation = function(series) {
+					var interpolation = 'linear';
+					if (this.hasMetadata(series)) {
+						metaValue = this.metadata[series]['interpolation'];
+						if ($defined(metaValue)) interpolation = valueToPV[metaValue];
+					}
+					return interpolation;
+				}.bind(this);
+
+				var hasMetadata = $defined(this.metadata);
 				for (var itemIndex = 0; itemIndex < this.series.length; itemIndex++) {
 						var series = this.series[itemIndex];
+						var interpolation = getInterpolation(series);
 						var dataSeries = this.getData(true).getDataSeries(series);
 						//Add a line to the visualization, connecting points produced from the data object.
 						var visLine = vis.add(pv.Line)
@@ -62,6 +75,7 @@ HueChart.Line = new Class({
 												return this.yScale(d[this.series[itemIndex]]);
 										}.bind(this);
 								}.bind(this)(itemIndex))
+								.interpolate(interpolation)
 								//Make the line's width 3 pixels.
 								.lineWidth(this.options.lineWidth);
 						if (this.options.dot.size) {

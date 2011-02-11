@@ -156,10 +156,10 @@ HueChart = new Class({
 		},
 		
 		//Change full data object
-		setData: function(data) {
+		setData: function(data, metadata) {
 				this.data = new HueChart.Data(data);
 				delete this.currentData;
-				if (this.hasData() && this.initializeData) this.initializeData();
+				if (this.hasData() && this.initializeData) this.initializeData(metadata);
 		},
 
 		//Set the currentData, which is the data currently being displayed, assuming it is different from the base data.  Should be a subset of the main data object. 
