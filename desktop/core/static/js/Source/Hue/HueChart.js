@@ -157,7 +157,7 @@ HueChart = new Class({
 		
 		//Change full data object
 		setData: function(data, metadata) {
-				this.data = new HueChart.Data(data);
+				this.data = new HueChart.Data(data || []);
 				delete this.currentData;
 				if (this.hasData() && this.initializeData) this.initializeData(metadata);
 		},
