@@ -61,11 +61,7 @@ compile: $(PLUGIN) $(STATIC_GROUP_MAPPING) $(SUDO_SHELL)
 
 # Build the plugin jar iff the source is present
 ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
-PLUGIN_OPTS := -Dbuild.dir=$(BLD_DIR_PLUGINS) \
-	       -Dhadoop.home=$(HADOOP_HOME) \
-	       -Dplugins.version=$(DESKTOP_VERSION)
-
-$(PLUGIN): $(shell find $(PLUGIN_JAVA_DIR) )
+$(PLUGIN): $(shell find $(PLUGIN_JAVA_DIR) -type f)
 	mkdir -p $(PLUGIN_JAVA_LIB)
 	@echo "--- Building Hadoop plugins"
 	cd $(PLUGIN_JAVA_DIR) && mvn clean install -DskipTests
@@ -81,11 +77,7 @@ endif
 
 # Build the static group mapping jar iff the source is present
 ifneq (,$(wildcard $(STATIC_GROUP_MAPPING_SRC)))
-STATIC_GROUP_MAPPING_OPTS := -Dbuild.dir=$(STATIC_GROUP_MAPPING_BUILD) \
-         -Dhadoop.home=$(HADOOP_HOME) \
-         -Dstatic-group-mapping.version=$(DESKTOP_VERSION)
-
-$(STATIC_GROUP_MAPPING): $(shell find $(STATIC_GROUP_MAPPING_SRC))
+$(STATIC_GROUP_MAPPING): $(shell find $(STATIC_GROUP_MAPPING_SRC) -type f)
 	mkdir -p $(STATIC_GROUP_MAPPING_LIB)
 	@echo "--- Building static UserGroupMappingService"
 	cd $(STATIC_GROUP_MAPPING_DIR) && mvn clean install -DskipTests
@@ -101,11 +93,7 @@ endif
 
 # Build the sudo shell jar iff the source is present
 ifneq (,$(wildcard $(SUDO_SHELL_SRC)))
-SUDO_SHELL_OPTS := -Dbuild.dir=$(SUDO_SHELL_BUILD) \
-         -Dhadoop.home=$(HADOOP_HOME) \
-         -Dsudo-shell.version=$(DESKTOP_VERSION)
-
-$(SUDO_SHELL): $(shell find $(SUDO_SHELL_SRC))
+$(SUDO_SHELL): $(shell find $(SUDO_SHELL_SRC) -type f)
 	mkdir -p $(SUDO_SHELL_LIB)
 	@echo "--- Building sudo fsshell tool"
 	cd $(SUDO_SHELL_DIR) && mvn clean install -DskipTests
