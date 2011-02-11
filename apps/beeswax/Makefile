@@ -47,10 +47,7 @@ clean::
 	rm -Rf $(BEESWAX_JAVA_LIB)
 	cd $(BEESWAX_JAVA_DIR) && mvn clean || :
 
-BEESWAX_OPTS := -Dbuild.dir=$(BLD_DIR_BEESWAX) \
-	        -Dhadoop.home=$(HADOOP_HOME) \
-	        -Dhive.lib=$(BEESWAX_HIVE_LIB)
-$(BEESWAX): $(shell find $(BEESWAX_JAVA_DIR))
+$(BEESWAX): $(shell find $(BEESWAX_JAVA_DIR) -type f)
 	@echo "--- Building Desktop beeswax"
 	cd $(BEESWAX_JAVA_DIR) && mvn clean install -DskipTests
 	@mkdir -p $(BEESWAX_JAVA_LIB)
