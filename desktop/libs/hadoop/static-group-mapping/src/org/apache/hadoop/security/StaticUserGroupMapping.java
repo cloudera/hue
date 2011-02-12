@@ -66,6 +66,16 @@ public class StaticUserGroupMapping implements GroupMappingServiceProvider {
     return userGroupMapping.get(user);
   }
 
+  @Override
+  public void cacheGroupsRefresh() throws IOException {
+    // does nothing in this provider of user to groups mapping
+  }
+
+  @Override
+  public void cacheGroupsAdd(List<String> groups) throws IOException {
+    // does nothing in this provider of user to groups mapping
+  }
+
   public static void main(String[] args) {
     for (Entry<String, List<String>> ugi : userGroupMapping.entrySet()) {
       System.out.println(ugi.getKey() + " : " + ugi.getValue().size() + " : "
