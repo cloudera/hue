@@ -21,7 +21,7 @@
 # If not specified, it uses the $CDH variable to select an archive location.
 #
 
-CDH_URL=${CDH_URL:-http://archive.cloudera.com/cdh/3/hadoop-0.20.2+737.tar.gz}
+CDH_URL=${CDH_URL:-http://nightly.cloudera.com/cdh/3/hadoop-0.20.2-CDH3B4-SNAPSHOT.tar.gz}
 
 CDH_TGZ=$(basename $CDH_URL)
 CDH_VERSION=${CDH_TGZ/.tar.gz/}
