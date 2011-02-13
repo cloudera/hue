@@ -100,7 +100,7 @@ class ConnectionPooler(object):
                                to get a client before failing
     """
     # First up, check to see if we have a pool for this endpoint
-    if (conf.host, conf.port) not in self.pooldict:
+    if _get_pool_key(conf) not in self.pooldict:
       # Uh-oh, we need to initialise the queue. Take the dict lock.
       # Note that this is 'double-checked locking'.
 
@@ -116,9 +116,9 @@ class ConnectionPooler(object):
 
       self.dictlock.acquire()
       try:
-        if (conf.host, conf.port) not in self.pooldict:
+        if _get_pool_key(conf) not in self.pooldict:
           q = Queue.Queue(self.poolsize)
-          self.pooldict[(conf.host, conf.port)] = q
+          self.pooldict[_get_pool_key(conf)] = q
           for i in xrange(self.poolsize):
             client = construct_superclient(conf)
             client.CID = i
@@ -137,7 +137,7 @@ class ConnectionPooler(object):
         this_round_timeout = None
 
       try:
-        connection = self.pooldict[(conf.host, conf.port)].get(
+        connection = self.pooldict[_get_pool_key(conf)].get(
           block=True, timeout=this_round_timeout)
       except Queue.Empty:
         has_waited_for = time.time() - start_pool_get_time
@@ -150,13 +150,20 @@ class ConnectionPooler(object):
 
     return connection
 
-  def return_client(self, host, port, client):
+  def return_client(self, conf, client):
     """
     Add a client back to its pool. It's an error to
     pass back a client that was not retrieved from a pool, and
     you might well get an exception for doing so.
     """
-    self.pooldict[(host, port)].put(client)
+    self.pooldict[_get_pool_key(conf)].put(client)
+
+def _get_pool_key(conf):
+   """
+   Given a ConnectionConfig, return the tuple used as the key in the dictionary
+   of connections by the ConnectionPooler class.
+   """
+   return (conf.klass, conf.host, conf.port)
 
 def construct_superclient(conf):
   """
@@ -226,10 +233,10 @@ class PooledClient(object):
     # Fetch the thrift client from the pool
     superclient = _connection_pool.get_client(self.conf)
 
-    res = getattr(superclient, attr)
-    if hasattr(res,"__call__"):
-      def wrapper(*args, **kwargs):
-        try:
+    try:
+      res = getattr(superclient, attr)
+      if hasattr(res,"__call__"):
+        def wrapper(*args, **kwargs):
           try:
             # Poke it to see if it's closed on the other end. This can happen if a connection
             # sits in the connection pool longer than the read timeout of the server.
@@ -253,10 +260,10 @@ class PooledClient(object):
               self.conf.service_name, self.conf.host, self.conf.port, str(e))
             e.response_data = dict(code="THRIFT_EXCEPTION", message=msg, data="")
             raise
-        finally:
-          _connection_pool.return_client(self.conf.host,self.conf.port,superclient)
-      return wrapper
-    return res
+        return wrapper
+      return res
+    finally:
+      _connection_pool.return_client(self.conf, superclient)
 
 
 
