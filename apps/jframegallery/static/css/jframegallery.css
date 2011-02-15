@@ -23,7 +23,7 @@
 	margin-bottom: 5px;
 }
 
-.jframe-gallery .index a {
+.jframe-gallery .jframe_contents.index a {
 	background: url(/static/art/led-icons/folder.png) no-repeat 4px 2px;
 	padding: 3px 2px 3px 24px;
 	display: block;
