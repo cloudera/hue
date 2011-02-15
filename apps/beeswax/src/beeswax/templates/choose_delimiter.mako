@@ -54,8 +54,9 @@ ${wrappers.head('Choose a Delimiter')}
                     </div>
                   % endif
                   <div class="bw-select_delim" class="jframe-hidden">
+		  <dl>
                     ${comps.field(delim_form["delimiter"], render_default=True, help=r'Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.', dd_attrs=dict(data_filters='SelectWithOther'))}
-
+		  </dl>
                     <input class="jframe-hidden" type="submit" value="Preview" name="submit_preview"/>
                     <input class="jframe-hidden" type="submit" value="Select this Delimiter" name="submit_delim"/>
                   </div>
@@ -86,8 +87,9 @@ ${wrappers.head('Choose a Delimiter')}
               </a>
               <input type="submit" name="submit_delim" value="Step 3: Define Your Columns" class="jframe-hidden"/>
             </dd>
-          </div>
+	    </dl>
         </form>
       </div>
+    </div>
 </div>
 ${wrappers.foot()}
