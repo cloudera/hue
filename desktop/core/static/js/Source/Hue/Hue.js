@@ -32,6 +32,18 @@ JFrame.Browser.implement({
 		help: function(){
 			var help = $(this).getElement('a[target=Help].help');
 			Hue.Desktop.showHelp(this, help ? help.get('href') : null);
+		},
+		link: function(){
+			this.prompt('Application Location', '<input type="text" style="width:350px" name="path" value="' + new URI(this.jframe.currentPath).toString() + '">', function(newPath){
+				this.load({requestPath: unescape(newPath.split('path=')[1]) });
+			}.bind(this), {
+				onShow: function(){
+					var input = $(this).getElement('input').addEvent('focus', function(){
+						this.select();
+					});
+					input.select.delay(100, input);
+				}
+			});
 		}
 	}
 
