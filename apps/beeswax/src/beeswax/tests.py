@@ -224,7 +224,7 @@ for x in sys.stdin:
     assert_equal(["2.0", "256.0"], response.context["results"][0])
     log = response.context['log']
     assert_true('ql.Driver: Total MapReduce jobs' in log, 'Captured log from Driver')
-    assert_true('exec.ExecDriver: Starting Job = job_' in log, 'Captured log from MapRedTask')
+    assert_true('exec.MapRedTask: Starting Job = job_' in log, 'Captured log from MapRedTask')
     # Test job extraction while we're at it
     assert_equal(1, len(response.context["hadoop_jobs"]), "Should have started 1 job and extracted it.")
 
