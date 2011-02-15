@@ -557,6 +557,24 @@ HueChart.Box = new Class({
 				return point;
 		},
 		
+		//Given a series object, return the value that should be displayed
+		getValueForDisplay: function(seriesObject) {
+			//If metadata exists
+			if(this.hasMetadata(seriesObject.name)) {
+				var metadata = this.metadata[seriesObject.name];
+				//And amplitude exists in metadata
+				if ($defined(metadata.amplitude)){
+					//Multiply the charting value by amplitude and return
+					return String(seriesObject.value.toInt() * metadata['amplitude']);
+				}
+			} else {
+				//Format bytes properly
+				if (this.options.yType == 'bytes') {
+					return seriesObject.value.toInt().convertFileSize();
+				}
+			}
+			return String(seriesObject.value);
+		},
 		//Updates the display of the currently visible tip
 		updatePointValue: function(seriesList) {
 				if (seriesList.length > 0) {
@@ -570,7 +588,7 @@ HueChart.Box = new Class({
 						tipSeriesName.inject(tipBlock, 'top');
 						tipColor.inject(tipBlock, 'top');
 						tipColor.setStyle('background-color', this.getColor(series.name));
-						tipText.set('text', this.options.yType == 'bytes' ? series.value.toInt().convertFileSize() : String(series.value));
+						tipText.set('text', this.getValueForDisplay(series));
 						tipText.inject(tipBlock, 'bottom');
 						tipBlock.inject(tipList, 'bottom');
 					}.bind(this));
