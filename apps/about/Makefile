@@ -20,5 +20,5 @@ ifeq ($(ROOT),)
   $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
 endif
 
-APP_FULL_NAME = hue-about-$(APP_VERSION)
+APP_NAME = hue-about
 include $(ROOT)/Makefile.sdk

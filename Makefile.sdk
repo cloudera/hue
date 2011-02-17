@@ -48,13 +48,16 @@
 
 include $(ROOT)/Makefile.vars
 
+SETUPTOOLS_NAME := $(shell python setup.py --name)
+
 APP_ROOT := $(realpath .)
-APP_NAME ?= $(notdir $(APP_ROOT))
+APP_NAME ?= $(SETUPTOOLS_NAME)
 APP_VERSION ?= $(shell python setup.py --version)
 APP_FULL_NAME ?= $(APP_NAME)-$(APP_VERSION)
 
+
 BUILD_DIR := $(APP_ROOT)/build
-EGG_INFO_DIR := $(APP_ROOT)/src/$(APP_NAME).egg-info
+EGG_INFO_DIR := $(APP_ROOT)/src/$(SETUPTOOLS_NAME).egg-info
 
 .PHONY: default
 default::
