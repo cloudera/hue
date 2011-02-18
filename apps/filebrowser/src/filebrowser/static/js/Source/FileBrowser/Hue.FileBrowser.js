@@ -195,7 +195,8 @@ ART.Sheet.define('window.filechooser.browser', {
 					}
 				});
 			} else {
-				$(this).getElement('.fb-upload').set('target', '_blank');
+				var uploader = $(this).getElement('.fb-upload');
+				if (uploader) uploader.set('target', '_blank');
 			}
 		},
 
@@ -215,7 +216,8 @@ ART.Sheet.define('window.filechooser.browser', {
 				//note we have a very short delay here; the DOM needs a moment to be there or else you sometimes
 				//get the error "obj.CallFunction is not a function" which means that the JS can't communicate with
 				//the swf file
-				this.makeUploader($(this).getElement('.fb-upload').get('href').toURI().get('data').dest);
+				var uploader = $(this).getElement('.fb-upload');
+				if (uploader) this.makeUploader(uploader.get('href').toURI().get('data').dest);
 			}).delay(10, this);
 
 		},
