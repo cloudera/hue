@@ -40,7 +40,7 @@
     % endfor
   </div>
 % endif
-<form class="fe-editForm" method="post" action="${url('filebrowser.views.save_file')}">
+<form class="fe-editForm noReset" method="post" action="${url('filebrowser.views.save_file')}">
     ${edit.render_field(form["path"], hidden=True, notitle=True)}
     ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
     <h2 class="jframe-hidden">${form["contents"].label_tag() | n}</h2>
