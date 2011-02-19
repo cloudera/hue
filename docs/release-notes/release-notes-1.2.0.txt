@@ -1,10 +1,10 @@
-Hue v1.2.0, released Feb XX, 2011
+Hue v1.2.0, released Feb 21, 2011
 =================================
 
 Hue is a web interface for Hadoop, and a platform for building custom
 applications with a rich framework. The 1.2.0 is a minor release, largely
 focused on bug fixes and compatibility with the upcoming release of Cloudera's
-Distribution for Hadoop 3, beta 4.
+Distribution for Apache Hadoop 3, beta 4.
 
 Notable Changes and Caveats
 ---------------------------
@@ -13,7 +13,7 @@ Notable changes:
 
 * Upgraded Django to 1.2
 * Many HueChart improvements and bug fixes
-* Upgraded included Hive from 0.5 to 0.6
+* Upgraded included Hive from 0.5 to 0.7
 * Beeswax no longer leaks file descriptors
 * Renamed all JavaScript references of "CCS" to "Hue"
 
@@ -21,7 +21,7 @@ Caveats:
 
 * Hue 1.2.0 only works with CDH3b4 or newer. CDH2 and earlier versions of CDH3
 will not work.
-* The included version of Hive has been upgraded from 0.5 to 0.6. This version
+* The included version of Hive has been upgraded from 0.5 to 0.7. This version
 of Hive has changed the format for the metastore. Upgrading Hue 1.2 will require
 you to upgrade your metastore version using the upgrade scripts included with
 Hive.
@@ -129,6 +129,11 @@ List of All Bugs Fixed
 * HUE-264. Add a timer filter that increments up every second.
 * HUE-335.  Hue throws 'background is not defined' error on start in IE.
 * HUE-351. Move Behavior.SubmitOnChange form search to click/change event.
+* HUE-461. Clicking the Save As button in the file editor causes all changes to be thrown away. (cherry picked from commit 3e260cd1509390092a5e1c161d4cb59fb584c987)
+* HUE-471. Document Hive upgrade (cherry picked from commit e46985cf66b5ae5e1752d0be382abd455cda042e)
+* HUE-478. Add the Hive 0.7 metastore upgrade scripts to Hue (cherry picked from commit 54f17f7e24e5c387f8a5a4d3b203e7c999a6e20c)
+* HUE-476. Upgrade beeswax's Hive jars to Hive 0.7 from Hive 0.6.
+* HUE-470. Thrift connection pooler breaks if thrift service inheritance is used (cherry picked from commit 03a91700c91501b4f5be6fe28f9daf9a8cf944a0)
 
 Project Information
 -------------------
