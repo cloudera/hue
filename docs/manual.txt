@@ -4,8 +4,8 @@ Hue Tarball Installation Guide
 == Introduction
 
 Hue is a graphical user interface to operate and develop applications for
-Hadoop. Hue applications are collected into a desktop-style environment and
-delivered as a Web application, requiring no additional installation for
+Apache Hadoop. Hue applications are collected into a desktop-style environment
+and delivered as a Web application, requiring no additional installation for
 individual users.
 
 This guide describes how to install and configure a Hue tarball. For
@@ -16,8 +16,8 @@ There is also a companion SDK guide that describes how to develop
 new Hue applications:
 http://archive.cloudera.com/cdh3/hue/sdk/sdk.html[Hue SDK Documentation]
 
-IMPORTANT: Hue requires the Cloudera Distribution for Hadoop (CDH),
-version 3 (beta 3).
+IMPORTANT: Hue requires the Hadoop contained in Cloudera's Distribution for
+Apache Hadoop (CDH), version 3 Beta 4.
 
 .Conventions Used in this Guide:
 * Commands that must be run with +root+ permission have a +#+ command prompt.
@@ -32,11 +32,11 @@ Hadoop configuration files before installing Hue.
 IMPORTANT: You'll need to install the Hue plugins
 on _every_ machine that's running Hadoop daemons.
 
-=== Install CDH3
+=== Install Hadoop from CDH3
 
-To use Hue, you must install and run CDH3 Beta 3, version 0.20.2+737 or later.
-If you are not running this version of CDH or later, upgrade your
-cluster before proceeding.
+To use Hue, you must install and run Hadoop from CDH3 Beta 4 or later.  If you
+are not running this version of CDH or later, upgrade your cluster before
+proceeding.
 
 === Install Hue
 
@@ -585,7 +585,7 @@ This section includes documentation specific to built-in Hue applications.
 
 ==== Introduction
 
-Beeswax is an application that is a component within Hue and helps you use
+Beeswax is an application that is a component within Hue that helps you use
 Hive to query your data.
 
 ==== Installation
@@ -594,7 +594,7 @@ Beeswax is installed as part of Hue.
 
 ==== Hive Configuration
 
-Beeswax, the Hive interface in Hue, includes Hive 0.5.  You do
+Beeswax, the Hive interface in Hue, includes Hive 0.7.  You do
 not need an existing Hive installation.
 
 Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
@@ -602,6 +602,17 @@ Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
 `hive-site.xml`).  Make sure this location exists and is writable by
 the users whom you expect to be creating tables.  `/tmp` (on the local file
 system) must be world-writable, as Hive makes extensive use of it.
+
+[NOTE]
+If you used the embedded Hive MetaStore functionality of Beeswax in Hue from
+versions prior to Hue 1.2, read this section. Hue 1.2 includes changes in the
+Hive MetaStore schema that are part of the Hive 0.7 release. If you want to use
+Beeswax in Hue 1.2, it is imperative that you upgrade the Hive MetaStore schema
+by running the appropriate schema upgrade script located in the
+apps/beeswax/hive/scripts/metastore/upgrade directory in the Hue installation.
+Scripts for Derby and MySQL databases are available. If you are using a
+different database for your MetaStore, you will need to provide your own
+upgrade script.
 
 ==== Configuration
 
