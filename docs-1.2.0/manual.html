@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Hue Tarball Installation Guide</title><link rel="stylesheet" href="docbook.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /></head><body><div xml:lang="en" class="article" title="Hue Tarball Installation Guide" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="id485431"></a>Hue Tarball Installation Guide</h2></div></div><hr /></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#_introduction">1. Introduction</a></span></dt><dt><span class="section"><a href="#_hue_installation_instructions">2. Hue Installation Instructions</a></span></dt><dd><dl><dt><span class="section"><a href="#_install_hadoop_from_cdh3">2.1. Install Hadoop from CDH3</a></span></dt><dt><span class="section"><a href="#_install_hue">2.2. Install Hue</a></span></dt><dt><span class="section"><a href="#_configuring_hadoop_for_hue">2.3. Configuring Hadoop for Hue</a></span></dt><dt><span class="section"><a href="#_further_hadoop_configuration_and_caveats">2.4. Further Hadoop Configuration and Caveats</a></span></dt><dt><span class="section"><a href="#_restart_your_hadoop_cluster">2.5. Restart Your Hadoop Cluster</a></span></dt></dl></dd><dt><span class="section"><a href="#_configuring_hue">3. Configuring Hue</a></span></dt><dd><dl><dt><span class="section"><a href="#_web_server_configuration">3.1. Web Server Configuration</a></span></dt><dt><span class="section"><a href="#_authentication">3.2. Authentication</a></span></dt><dt><span class="section"><a href="#_configuring_hue_for_ssl">3.3. Configuring Hue for SSL</a></span></dt><dt><span class="section"><a href="#_pointing_hue_to_your_master_nodes">3.4. Pointing Hue to Your Master Nodes</a></span></dt></dl></dd><dt><span class="section"><a href="#_starting_hue_from_the_tarball">4. Starting Hue from the Tarball</a></span></dt><dt><span class="section"><a href="#_administering_hue">5. Administering Hue</a></span></dt><dd><dl><dt><span class="section"><a href="#_hue_processes">5.1. Hue Processes</a></span></dt><dt><span class="section"><a href="#_hue_logging">5.2. Hue Logging</a></span></dt><dt><span class="section"><a href="#_the_hue_database">5.3. The Hue Database</a></span></dt></dl></dd><dt><span class="section"><a href="#_hue_applications">6. Hue Applications</a></span></dt><dd><dl><dt><span class="section"><a href="#_beeswax_the_hive_ui">6.1. Beeswax, the Hive UI</a></span></dt></dl></dd><dt><span class="section"><a href="#usage">7. Using Hue</a></span></dt><dd><dl><dt><span class="section"><a href="#_supported_browsers">7.1. Supported Browsers</a></span></dt><dt><span class="section"><a href="#_feedback">7.2. Feedback</a></span></dt><dt><span class="section"><a href="#_reporting_bugs">7.3. Reporting Bugs</a></span></dt></dl></dd></dl></div><div class="section" title="1. Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_introduction"></a>1. Introduction</h2></div></div></div><p>Hue is a graphical user interface to operate and develop applications for
+Apache Hadoop. Hue applications are collected into a desktop-style environment
+and delivered as a Web application, requiring no additional installation for
+individual users.</p><p>This guide describes how to install and configure a Hue tarball. For
+information about installing Hue packages, see
+<a class="ulink" href="https://wiki.cloudera.com/display/DOC/Hue+Installation" target="_top">Installing Hue</a>.</p><p>There is also a companion SDK guide that describes how to develop
+new Hue applications:
+<a class="ulink" href="http://archive.cloudera.com/cdh3/hue/sdk/sdk.html" target="_top">Hue SDK Documentation</a></p><div class="important" title="Important" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Important"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="images/important.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>Hue requires the Hadoop contained in Cloudera’s Distribution for
+Apache Hadoop (CDH), version 3 Beta 4.</p></td></tr></table></div><div class="itemizedlist" title="Conventions Used in this Guide:"><p class="title"><b>Conventions Used in this Guide:</b></p><ul class="itemizedlist" type="disc"><li class="listitem">
+Commands that must be run with <code class="literal">root</code> permission have a <code class="literal">#</code> command prompt.
+</li><li class="listitem">
+Commands that do not require <code class="literal">root</code> permission have a <code class="literal">$</code> command prompt.
+</li></ul></div></div><div class="section" title="2. Hue Installation Instructions"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_hue_installation_instructions"></a>2. Hue Installation Instructions</h2></div></div></div><p>The following instructions describe how to install the Hue tarball on a
+multi-node cluster.  You must install CDH first and update some
+Hadoop configuration files before installing Hue.</p><div class="important" title="Important" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Important"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="images/important.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>You’ll need to install the Hue plugins
+on <span class="emphasis"><em>every</em></span> machine that’s running Hadoop daemons.</p></td></tr></table></div><div class="section" title="2.1. Install Hadoop from CDH3"><div class="titlepage"><div><div><h3 class="title"><a id="_install_hadoop_from_cdh3"></a>2.1. Install Hadoop from CDH3</h3></div></div></div><p>To use Hue, you must install and run Hadoop from CDH3 Beta 4 or later.  If you
+are not running this version of CDH or later, upgrade your cluster before
+proceeding.</p></div><div class="section" title="2.2. Install Hue"><div class="titlepage"><div><div><h3 class="title"><a id="_install_hue"></a>2.2. Install Hue</h3></div></div></div><p>Hue consists of a web service that runs on a special node in your cluster.
+Choose one node where you want to run Hue. This guide refers to that node as
+the <span class="emphasis"><em>Hue Server</em></span>. For optimal performance, this should be one of the nodes
+within your cluster, though it can be a remote node as long as there are no
+overly restrictive firewalls. For small clusters of less than 10 nodes,
+you can use your existing master node as the Hue Server.</p><p>You can download the Hue tarball here:
+<a class="ulink" href="http://github.com/cloudera/hue/downloads/" target="_top">http://github.com/cloudera/hue/downloads/</a></p><div class="section" title="2.2.1. Hue Dependencies"><div class="titlepage"><div><div><h4 class="title"><a id="_hue_dependencies"></a>2.2.1. Hue Dependencies</h4></div></div></div><p>Hue employs some Python modules which use native code and requires
+certain development libraries be installed on your system. To install from the
+tarball, you must have the following installed:</p><div class="table"><a id="id484836"></a><p class="title"><b>Table 1. Required Dependencies</b></p><div class="table-contents"><table summary="Required Dependencies" cellpadding="4px" style="border-collapse: collapse;border-top: 3px solid #527bbd; border-bottom: 3px solid #527bbd; "><colgroup><col align="left" /><col align="left" /></colgroup><thead><tr><th style="border-bottom: 1px solid #527bbd; " align="left">
+    Redhat
+    </th><th style="border-bottom: 1px solid #527bbd; " align="left">
+    Debian
+    </th></tr></thead><tbody><tr><td style="border-bottom: 1px solid #527bbd; " align="left">
+    gcc
+    </td><td style="border-bottom: 1px solid #527bbd; " align="left">
+    gcc
+    </td></tr><tr><td style="border-bottom: 1px solid #527bbd; " align="left">
+    libxml2-devel
+    </td><td style="border-bottom: 1px solid #527bbd; " align="left">
+    libxml2-dev
+    </td></tr><tr><td style="border-bottom: 1px solid #527bbd; " align="left">
+    libxslt-devel
+    </td><td style="border-bottom: 1px solid #527bbd; " align="left">
+    libxslt-dev
+    </td></tr><tr><td style="border-bottom: 1px solid #527bbd; " align="left">
+    mysql-devel
+    </td><td style="border-bottom: 1px solid #527bbd; " align="left">
+    libmysqlclient-dev
+    </td></tr><tr><td style="border-bottom: 1px solid #527bbd; " align="left">
+    python-devel
+    </td><td style="border-bottom: 1px solid #527bbd; " align="left">
+    python-dev
+    </td></tr><tr><td style="border-bottom: 1px solid #527bbd; " align="left">
+    python-setuptools
+    </td><td style="border-bottom: 1px solid #527bbd; " align="left">
+    python-setuptools
+    </td></tr><tr><td style="border-bottom: 1px solid #527bbd; " align="left">
+    sqlite-devel
+    </td><td style="border-bottom: 1px solid #527bbd; " align="left">
+    libsqlite3-dev
+    </td></tr><tr><td style="" align="left">
+    ant
+    </td><td style="" align="left">
+    ant
+    </td></tr></tbody></table></div></div><br class="table-break" /></div><div class="section" title="2.2.2. Build"><div class="titlepage"><div><div><h4 class="title"><a id="_build"></a>2.2.2. Build</h4></div></div></div><p>Configure <code class="literal">$HADOOP_HOME</code> and <code class="literal">$PREFIX</code> with the path of your Hadoop
+installation and the path where you want to install Hue by running:</p><pre class="screen">$ HADOOP_HOME=/path/to/hadoop-0.20 PREFIX=/path/to/install/into make install</pre><p>You can install Hue anywhere on your system - it does not need root permission
+although additional third-party SDK applications may.
+It is a good practice to create a new user for Hue and either install Hue in
+that user’s home directory, or in a directory within <code class="literal">/usr/local</code>.</p></div><div class="section" title="2.2.3. Install Hadoop Plugins"><div class="titlepage"><div><div><h4 class="title"><a id="_install_hadoop_plugins"></a>2.2.3. Install Hadoop Plugins</h4></div></div></div><p>In order to communicate with Hadoop, Hue requires a plugin jar that you must
+install and configure. This jar is:</p><p><code class="literal">desktop/libs/hadoop/java-lib/hue-plugins-*.jar</code></p><p>relative to the Hue installation directory.</p><p>Run these commands to create a symlink your Hadoop lib directory
+(<code class="literal">/usr/lib/hadoop-0.20/lib</code> if you installed CDH via a Debian or RPM package)
+to this jar:</p><pre class="screen">$ cd /usr/lib/hadoop/lib
+$ ln -s /usr/local/hue/desktop/libs/hadoop/java-lib/hue*jar .
+# Restart Hadoop</pre><div class="note" title="Note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>On a multi-node cluster, you must install the plugin jar on every
+node.  You do not need to install all of the Hue components on every node.</p></td></tr></table></div></div><div class="section" title="2.2.4. Restart Hadoop"><div class="titlepage"><div><div><h4 class="title"><a id="_restart_hadoop"></a>2.2.4. Restart Hadoop</h4></div></div></div><p>After making the changes in your Hadoop configuration, restart the
+Hadoop daemons:</p><pre class="screen"># /etc/init.d/hadoop-0.20-datanode restart
+# /etc/init.d/hadoop-0.20-namenode restart
+# /etc/init.d/hadoop-0.20-jobtracker restart
+# /etc/init.d/hadoop-0.20-secondarynamenode restart
+# /etc/init.d/hadoop-0.20-tasktracker restart</pre></div><div class="section" title="2.2.5. Starting Hue"><div class="titlepage"><div><div><h4 class="title"><a id="_starting_hue"></a>2.2.5. Starting Hue</h4></div></div></div><p>To start Hue, use <code class="literal">build/env/bin/supervisor</code>.  This will start
+several subprocesses, corresponding to the different Hue components.</p></div><div class="section" title="2.2.6. Troubleshooting the Hue Tarball Installation"><div class="titlepage"><div><div><h4 class="title"><a id="_troubleshooting_the_hue_tarball_installation"></a>2.2.6. Troubleshooting the Hue Tarball Installation</h4></div></div></div><p title="Q: I moved my Hue installation from one directory to another and now Hue no"><b>Q: I moved my Hue installation from one directory to another and now Hue no. </b>longer functions correctly.</p><p>A: Due to the use of absolute paths by some Python packages, you must run a
+series of commands if you move your Hue installation. In the new location, run:</p><pre class="screen">$ rm app.reg
+$ rm -r build
+$ make apps</pre><p title="Q: Why does &quot;make install&quot; compile other pieces of software?"><b>Q: Why does "make install" compile other pieces of software? </b>A: In order to ensure that Hue is stable on a variety of distributions and
+architectures, it installs a Python virtual environment which includes its
+dependencies. This ensures that the software can depend on specific versions
+of various Python libraries and you don’t have to be concerned about missing
+software components.</p></div></div><div class="section" title="2.3. Configuring Hadoop for Hue"><div class="titlepage"><div><div><h3 class="title"><a id="_configuring_hadoop_for_hue"></a>2.3. Configuring Hadoop for Hue</h3></div></div></div><p>Hue requires that you install and configure some plugins in your
+Hadoop installation. In order to enable the plugins, you must make some
+small additions to your configuration files. Make these configuration changes
+on each node in your cluster by editing the following files
+in: <code class="literal">/etc/hadoop-0.20/conf/</code></p><div class="section" title="2.3.1. hdfs-site.xml"><div class="titlepage"><div><div><h4 class="title"><a id="_literal_hdfs_site_xml_literal"></a>2.3.1. <code class="literal">hdfs-site.xml</code></h4></div></div></div><p>Add the following configuration properties to <code class="literal">hdfs-site.xml</code>:</p><pre class="screen">&lt;property&gt;
+  &lt;name&gt;dfs.namenode.plugins&lt;/name&gt;
+  &lt;value&gt;org.apache.hadoop.thriftfs.NamenodePlugin&lt;/value&gt;
+  &lt;description&gt;Comma-separated list of namenode plugins to be activated.
+  &lt;/description&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;dfs.datanode.plugins&lt;/name&gt;
+  &lt;value&gt;org.apache.hadoop.thriftfs.DatanodePlugin&lt;/value&gt;
+  &lt;description&gt;Comma-separated list of datanode plugins to be activated.
+  &lt;/description&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;dfs.thrift.address&lt;/name&gt;
+  &lt;value&gt;0.0.0.0:10090&lt;/value&gt;
+&lt;/property&gt;</pre></div><div class="section" title="2.3.2. mapred-site.xml"><div class="titlepage"><div><div><h4 class="title"><a id="_literal_mapred_site_xml_literal"></a>2.3.2. <code class="literal">mapred-site.xml</code></h4></div></div></div><p>Add the following configuration properties to mapred-site.xml:</p><pre class="screen">&lt;property&gt;
+  &lt;name&gt;jobtracker.thrift.address&lt;/name&gt;
+  &lt;value&gt;0.0.0.0:9290&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+  &lt;name&gt;mapred.jobtracker.plugins&lt;/name&gt;
+  &lt;value&gt;org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin&lt;/value&gt;
+  &lt;description&gt;Comma-separated list of jobtracker plugins to be activated.
+  &lt;/description&gt;
+&lt;/property&gt;</pre></div><div class="section" title="2.3.3. hadoop-metrics.properties"><div class="titlepage"><div><div><h4 class="title"><a id="_literal_hadoop_metrics_properties_literal"></a>2.3.3. <code class="literal">hadoop-metrics.properties</code></h4></div></div></div><p>To enable full monitoring in the Health application, the metrics
+contexts must not be NullContext. You can configure <code class="literal">hadoop-metrics.properties</code>
+as shown below:</p><pre class="screen"># Exposes /metrics URL endpoint for metrics information.
+dfs.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
+mapred.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
+jvm.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
+rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext</pre></div></div><div class="section" title="2.4. Further Hadoop Configuration and Caveats"><div class="titlepage"><div><div><h3 class="title"><a id="_further_hadoop_configuration_and_caveats"></a>2.4. Further Hadoop Configuration and Caveats</h3></div></div></div><div class="section" title="2.4.1. HADOOP_CLASSPATH Caveat"><div class="titlepage"><div><div><h4 class="title"><a id="_literal_hadoop_classpath_literal_caveat"></a>2.4.1. <code class="literal">HADOOP_CLASSPATH</code> Caveat</h4></div></div></div><p>If you are setting <code class="literal">$HADOOP_CLASSPATH</code> in your <code class="literal">hadoop-env.sh</code>, be sure
+to set it in such a way that user-specified options are preserved.  For example:</p><p>Correct:</p><pre class="screen"># HADOOP_CLASSPATH=&lt;your_additions&gt;:$HADOOP_CLASSPATH</pre><p>Incorrect:</p><pre class="screen"># HADOOP_CLASSPATH=&lt;your_additions&gt;</pre><p>This enables certain components of Hue to add to
+Hadoop’s classpath using the environment variable.</p></div><div class="section" title="2.4.2. hadoop.tmp.dir"><div class="titlepage"><div><div><h4 class="title"><a id="_literal_hadoop_tmp_dir_literal"></a>2.4.2. <code class="literal">hadoop.tmp.dir</code></h4></div></div></div><p>If your users are likely to be submitting jobs both using Hue and from the
+same machine via the command line interface, they will be doing so as the <code class="literal">hue</code>
+user if they’re using Hue and via their own user account on the command line.
+This leads to some contention on the directory specified by <code class="literal">hadoop.tmp.dir</code>,
+which defaults to <code class="literal">/tmp/hadoop-${user.name}</code>. Specifically, <code class="literal">hadoop.tmp.dir</code>
+is used to unpack jars in <code class="literal">bin/hadoop jar</code>. One work around to this is
+to set <code class="literal">hadoop.tmp.dir</code> to <code class="literal">/tmp/hadoop-${user.name}-${hue.suffix}</code> in the
+core-site.xml file:</p><pre class="screen">&lt;property&gt;
+  &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;
+  &lt;value&gt;/tmp/hadoop-${user.name}${hue.suffix}&lt;/value&gt;
+&lt;/property&gt;</pre><p>Unfortunately, when the variable is unset, you’ll end up
+with directories named <code class="literal">/tmp/hadoop-user_name-${hue.suffix}</code> in
+<code class="literal">/tmp</code>.  The job submission daemon, however, will still work.</p><div class="important" title="Important" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Important"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="images/important.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>The Beeswax server writes into a local directory on the Hue machine
+that is specified by <code class="literal">hadoop.tmp.dir</code> to unpack its jars. That directory
+needs to be writable by the <code class="literal">hue</code> user, which is the default user who starts
+Beeswax Server, or else Beeswax server will not start. You may also make that
+directory world-writable.</p></td></tr></table></div></div></div><div class="section" title="2.5. Restart Your Hadoop Cluster"><div class="titlepage"><div><div><h3 class="title"><a id="_restart_your_hadoop_cluster"></a>2.5. Restart Your Hadoop Cluster</h3></div></div></div><p>Restart all of the daemons in your cluster so that the plugins can be loaded.</p><p>You can confirm that the plugins are running correctly by tailing the daemon
+logs:</p><pre class="screen">$ tail --lines=500 /var/log/hadoop-0.20/hadoop*namenode*.log | grep ThriftPlugin
+2009-09-28 16:30:44,337 INFO org.apache.hadoop.thriftfs.ThriftPluginServer: Starting Thrift server
+2009-09-28 16:30:44,419 INFO org.apache.hadoop.thriftfs.ThriftPluginServer:
+Thrift server listening on 0.0.0.0:10090</pre><div class="tip" title="Configuring Your Firewall for Hue" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Tip: Configuring Your Firewall for Hue"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="images/tip.png" /></td><th align="left">Configuring Your Firewall for Hue</th></tr><tr><td align="left" valign="top"><p>Hue currently requires that the machines within your cluster can connect to
+each other freely over TCP. The machines outside your cluster must be able to
+open TCP port 8088 on the Hue Server to interact with the system.</p></td></tr></table></div></div></div><div class="section" title="3. Configuring Hue"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_configuring_hue"></a>3. Configuring Hue</h2></div></div></div><p>Hue ships with a default configuration that will work for
+pseudo-distributed clusters.  If you are running on a real cluster, you must
+make a few changes to the <code class="literal">/etc/hue/hue.ini</code> configuration file. The
+following sections describe the key configuration options you must make to
+configure Hue.</p><div class="tip" title="Listing all Configuration Options" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Tip: Listing all Configuration Options"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="images/tip.png" /></td><th align="left">Listing all Configuration Options</th></tr><tr><td align="left" valign="top"><p>To list all available configuration options, run:</p><pre class="screen">/usr/share/hue/build/env/bin/hue config_help | less</pre><p>This commands outlines the various sections and options in the configuration,
+and provides help and information on the default values.</p></td></tr></table></div><div class="tip" title="Viewing Current Configuration Options" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Tip: Viewing Current Configuration Options"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="images/tip.png" /></td><th align="left">Viewing Current Configuration Options</th></tr><tr><td align="left" valign="top"><p>To view the current configuration from within Hue, open:</p><pre class="screen">http://&lt;hue&gt;/dump_config</pre></td></tr></table></div><div class="tip" title="Using Multiple Files to Store Your Configuration" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Tip: Using Multiple Files to Store Your Configuration"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="images/tip.png" /></td><th align="left">Using Multiple Files to Store Your Configuration</th></tr><tr><td align="left" valign="top"><p>Hue loads and merges all of the files with extension <code class="literal">.ini</code>
+located in the <code class="literal">/etc/hue/conf/</code> directory.  Files that are alphabetically later
+take precedence.</p></td></tr></table></div><div class="section" title="3.1. Web Server Configuration"><div class="titlepage"><div><div><h3 class="title"><a id="_web_server_configuration"></a>3.1. Web Server Configuration</h3></div></div></div><p>Hue uses the CherryPy web server.  You can use the following options to
+change the IP address and port that the web server listens on. The default
+setting is port 8088 on all configured IP addresses.</p><pre class="screen"># Webserver listens on this address and port
+http_host=0.0.0.0
+http_port=8088</pre><div class="section" title="3.1.1. Specifying the Secret Key"><div class="titlepage"><div><div><h4 class="title"><a id="_specifying_the_secret_key"></a>3.1.1. Specifying the Secret Key</h4></div></div></div><p>For security, you should also specify the secret key that is used for secure
+hashing in the session store.</p><p>Open the <code class="literal">/etc/hue/hue.ini</code> configuration file. In the <code class="literal">desktop</code> section, enter
+a long series of random characters (30 to 60 characters is recommended).</p><pre class="screen">[desktop]
+secret_key=jFE93j;2[290-eiw.KEiwN2s3['d;/.q[eIW^y#e=+Iei*@Mn&lt;qW5o</pre><div class="note" title="Note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>If you don’t specify a secret key, your session cookies will not be
+secure. Hue will run but it will also display error messages telling you to
+set the secret key.</p></td></tr></table></div></div></div><div class="section" title="3.2. Authentication"><div class="titlepage"><div><div><h3 class="title"><a id="_authentication"></a>3.2. Authentication</h3></div></div></div><p>By default, the first user who logs in to Hue can choose any
+username and password and becomes an administrator automatically.  This
+user can create other user and administrator accounts.  User information is
+stored in the Django database in the Django backend.</p><p>The authentication system is pluggable. For more information, see the
+<a class="ulink" href="http://archive.cloudera.com/cdh3/hue/sdk/sdk.html" target="_top">Hue SDK Documentation</a>.</p></div><div class="section" title="3.3. Configuring Hue for SSL"><div class="titlepage"><div><div><h3 class="title"><a id="_configuring_hue_for_ssl"></a>3.3. Configuring Hue for SSL</h3></div></div></div><p>You can configure Hue to serve over HTTPS.  To do so, you must install
+"pyOpenSSL" within Hue’s context and configure your keys.</p><p>To install <code class="literal">pyOpenSSL</code>, from the root of your Hue installation path,
+do the following steps:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+Run this command:
+</li></ol></div><pre class="screen">$ ./build/env/bin/easy_install pyOpenSSL</pre><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+Configure Hue to use your private key by adding the following
+options to the <code class="literal">/etc/hue/hue.ini</code> configuration file:
+</li></ol></div><pre class="screen">ssl_certificate=/path/to/certificate
+ssl_private_key=/path/to/key</pre><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+Ideally, you would have an appropriate key signed by a Certificate Authority.
+If you’re just testing, you can create a self-signed key using the <code class="literal">openssl</code>
+command that may be installed on your system:
+</li></ol></div><pre class="screen"># Create a key
+$ openssl genrsa 1024 &gt; host.key
+# Create a self-signed certificate
+$ openssl req -new -x509 -nodes -sha1 -key host.key &gt; host.cert</pre><div class="note" title="Self-signed Certificates and File Uploads" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note: Self-signed Certificates and File Uploads"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png" /></td><th align="left">Self-signed Certificates and File Uploads</th></tr><tr><td align="left" valign="top"><p>To upload files using the Hue File Browser over HTTPS requires
+using a proper SSL Certificate.  Self-signed certificates don’t
+work.</p></td></tr></table></div></div><div class="section" title="3.4. Pointing Hue to Your Master Nodes"><div class="titlepage"><div><div><h3 class="title"><a id="_pointing_hue_to_your_master_nodes"></a>3.4. Pointing Hue to Your Master Nodes</h3></div></div></div><p>If your Hadoop cluster contains multiple nodes, you should configure
+Hue to point to the external hostnames of your NameNode and
+JobTracker.  To do so, change the <code class="literal">namenode_host</code> and <code class="literal">jobtracker_host</code>
+lines in the <code class="literal">/etc/hue/hue.ini</code> configuration file. Refer to the inline comments
+in the configuration file for more information.</p></div></div><div class="section" title="4. Starting Hue from the Tarball"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_starting_hue_from_the_tarball"></a>4. Starting Hue from the Tarball</h2></div></div></div><p>After your cluster is running with the plugins enabled, you can start Hue on
+your Hue Server by running:</p><pre class="screen"># build/env/bin/supervisor</pre><p>Your Hue installation is now running.</p></div><div class="section" title="5. Administering Hue"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_administering_hue"></a>5. Administering Hue</h2></div></div></div><p>Now that you’ve installed and started Hue, you can feel free to skip ahead
+to the <a class="link" href="#usage" title="7. Using Hue">Using Hue</a> section. Administrators may want to refer to this
+section for more details about managing and operating a Hue installation.</p><div class="section" title="5.1. Hue Processes"><div class="titlepage"><div><div><h3 class="title"><a id="_hue_processes"></a>5.1. Hue Processes</h3></div></div></div><div class="section" title="5.1.1. Process Hierarchy"><div class="titlepage"><div><div><h4 class="title"><a id="_process_hierarchy"></a>5.1.1. Process Hierarchy</h4></div></div></div><p>A script called <code class="literal">supervisor</code> manages all Hue processes. The supervisor is a
+watchdog process — its only purpose is to spawn and monitor other processes.
+A standard Hue installation starts and monitors the following processes:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+<code class="literal">runcpserver</code> - a web server based on CherryPy that provides the core web
+functionality of Hue
+</li><li class="listitem">
+<code class="literal">jobsubd</code> - a daemon which handles submission of jobs to Hadoop
+</li><li class="listitem">
+<code class="literal">beeswax server</code> - a daemon that manages concurrent Hive queries
+</li></ul></div><p>If you have installed other applications into your Hue instance, you may see
+other daemons running under the supervisor as well.</p><p>You can see the supervised processes running in the output of <code class="literal">ps -f -u hue</code>:</p><pre class="screen">UID        PID  PPID  C STIME TTY          TIME CMD
+hue       8685  8679  0 Aug05 ?        00:01:39 /usr/share/hue/build/env/bin/python /usr/share/hue/build/env/bin/desktop runcpserver
+hue       8693  8679  0 Aug05 ?        00:00:01 /usr/share/hue/build/env/bin/python /usr/share/hue/build/env/bin/desktop jobsubd
+hue       8695  8679  0 Aug05 ?        00:00:06 /usr/java/jdk1.6.0_14/bin/java -Xmx1000m -Dhadoop.log.dir=/usr/lib/hadoop-0.20/logs -Dhadoop.log.file=hadoop.log ...</pre><p>Note that the supervisor automatically restarts these processes if they fail for
+any reason. If the processes fail repeatedly within a short time, the supervisor
+itself shuts down.</p></div></div><div class="section" title="5.2. Hue Logging"><div class="titlepage"><div><div><h3 class="title"><a id="_hue_logging"></a>5.2. Hue Logging</h3></div></div></div><p>The Hue logs are found in <code class="literal">/var/log/hue</code>. Inside the log directory you can find:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+An <code class="literal">access.log</code> file, which contains a log for all requests against the Hue
+web server.
+</li><li class="listitem">
+A <code class="literal">supervisor.log</code> file, which contains log information for the supervisor
+process.
+</li><li class="listitem">
+A <code class="literal">supervisor.out</code> file, which contains the stdout and stderr for the
+supervisor process.
+</li><li class="listitem">
+A <code class="literal">.log</code> file for each supervised process described above, which contains
+the logs for that process.
+</li><li class="listitem">
+A <code class="literal">.out</code> file for each supervised process described above, which contains
+the stdout and stderr for that process.
+</li></ul></div><p>If users on your cluster have problems running Hue, you can often find error
+messages in these log files. If you are unable to start Hue from the init
+script, the <code class="literal">supervisor.log</code> log file can often contain clues.</p><div class="section" title="5.2.1. Viewing Recent Log Messages through your Web Browser"><div class="titlepage"><div><div><h4 class="title"><a id="_viewing_recent_log_messages_through_your_web_browser"></a>5.2.1. Viewing Recent Log Messages through your Web Browser</h4></div></div></div><p>In addition to logging <code class="literal">INFO</code> level messages to the <code class="literal">logs</code> directory, the Hue
+web server keeps a small buffer of log messages at all levels in memory. You can
+view these logs by visiting <code class="literal">http://myserver:8088/logs</code>. The <code class="literal">DEBUG</code> level
+messages shown can sometimes be helpful in troubleshooting issues.</p></div></div><div class="section" title="5.3. The Hue Database"><div class="titlepage"><div><div><h3 class="title"><a id="_the_hue_database"></a>5.3. The Hue Database</h3></div></div></div><p>Hue requires a SQL database to store small amounts of data, including user
+account information as well as history of job submissions and Hive queries.
+By default, Hue is configured to use the embedded database SQLite for this
+purpose, and should require no configuration or management by the administrator.
+However, MySQL is the recommended database to use; this section contains
+instructions for configuring Hue to access MySQL and other databases.</p><div class="section" title="5.3.1. Inspecting the Hue Database"><div class="titlepage"><div><div><h4 class="title"><a id="_inspecting_the_hue_database"></a>5.3.1. Inspecting the Hue Database</h4></div></div></div><p>The default SQLite database used by Hue is located in:</p><pre class="literallayout">`/usr/share/hue/desktop/desktop.db`.</pre><p>You can inspect this database from the command line using the <code class="literal">sqlite3</code>
+program. For example:</p><pre class="screen"># sqlite3 /usr/share/hue/desktop/desktop.db
+SQLite version 3.6.22
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite&gt; select username from auth_user;
+admin
+test
+sample
+sqlite&gt;</pre><p>It is strongly recommended that you avoid making any modifications to the
+database directly using SQLite, though this trick can be useful for management
+or troubleshooting.</p></div><div class="section" title="5.3.2. Backing up the Hue Database"><div class="titlepage"><div><div><h4 class="title"><a id="_backing_up_the_hue_database"></a>5.3.2. Backing up the Hue Database</h4></div></div></div><p>If you use the default SQLite database, then copy the <code class="literal">desktop.db</code> file to
+another node for backup. It is recommended that you back it up on a regular
+schedule, and also that you back it up before any upgrade to a new version of
+Hue.</p></div><div class="section" title="5.3.3. Configuring Hue to Access Another Database"><div class="titlepage"><div><div><h4 class="title"><a id="_configuring_hue_to_access_another_database"></a>5.3.3. Configuring Hue to Access Another Database</h4></div></div></div><p>Although SQLite is the default database type, some advanced users may prefer
+to have Hue access an alternate database type. Note that if you elect to
+configure Hue to use an external database, upgrades may require more manual
+steps in the future.</p><p>The following instructions are for MySQL, though you can also configure Hue to
+work with other common databases such as PostgreSQL and Oracle.</p><div class="note" title="Tested Database Backends" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note: Tested Database Backends"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png" /></td><th align="left">Tested Database Backends</th></tr><tr><td align="left" valign="top"><p>Note that Hue has only been tested with SQLite and MySQL database backends.</p></td></tr></table></div><div class="section" title="5.3.3.1. Configuring Hue to Store Data in MySQL"><div class="titlepage"><div><div><h5 class="title"><a id="_configuring_hue_to_store_data_in_mysql"></a>5.3.3.1. Configuring Hue to Store Data in MySQL</h5></div></div></div><p>To configure Hue to store data in MySQL:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+Create a new database in MySQL and grant privileges to a Hue user to manage
+this database.
+</li></ol></div><pre class="screen">mysql&gt; create database hue;
+Query OK, 1 row affected (0.01 sec)
+mysql&gt; grant all on hue.* to 'hue'@'localhost' identified by 'secretpassword';
+Query OK, 0 rows affected (0.00 sec)</pre><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+Shut down Hue if it is running.
+</li><li class="listitem">
+To migrate your existing data to MySQL, use the following command to dump the
+existing database data to a text file. Note that using the ".json" extension
+is required.
+</li></ol></div><pre class="screen">$ /usr/share/hue/build/env/bin/hue dumpdata &gt; &lt;some-temporary-file&gt;.json</pre><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+Open the <code class="literal">/etc/hue/hue.ini</code> file in a text editor. Directly below the
+<code class="literal">[[database]]</code> line, add the following options (and modify accordingly for
+your MySQL setup):
+</li></ol></div><pre class="screen">host=localhost
+port=3306
+engine=mysql
+user=hue
+password=secretpassword
+name=hue</pre><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+Install the Python drivers for MySQL into Hue’s environment:
+</li></ol></div><pre class="screen"># su - hue -s /bin/bash
+$ /usr/share/hue/build/env/bin/easy_install MySQL-python</pre><p><code class="literal">easy_install</code> will access the Internet to find MySQL-python.
+If you don’t have network access, you may specify a path
+to a tarball (such as <code class="literal">/tmp/MySQL-python-1.2.2.tar.gz</code>) instead.
+6. As the Hue user, configure Hue to load the existing data and create the
+necessary database tables:</p><pre class="screen">$ /usr/share/hue/build/env/bin/hue syncdb --noinput
+$ mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
+$ /usr/share/hue/build/env/bin/hue loaddata &lt;temporary-file-containing-dumped-data&gt;.json</pre><p>Your system is now configured and you can start the Hue server as normal.</p></div></div></div></div><div class="section" title="6. Hue Applications"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_hue_applications"></a>6. Hue Applications</h2></div></div></div><p>This section includes documentation specific to built-in Hue applications.</p><div class="section" title="6.1. Beeswax, the Hive UI"><div class="titlepage"><div><div><h3 class="title"><a id="_beeswax_the_hive_ui"></a>6.1. Beeswax, the Hive UI</h3></div></div></div><div class="section" title="6.1.1. Introduction"><div class="titlepage"><div><div><h4 class="title"><a id="_introduction_2"></a>6.1.1. Introduction</h4></div></div></div><p>Beeswax is an application that is a component within Hue that helps you use
+Hive to query your data.</p></div><div class="section" title="6.1.2. Installation"><div class="titlepage"><div><div><h4 class="title"><a id="_installation"></a>6.1.2. Installation</h4></div></div></div><p>Beeswax is installed as part of Hue.</p></div><div class="section" title="6.1.3. Hive Configuration"><div class="titlepage"><div><div><h4 class="title"><a id="_hive_configuration"></a>6.1.3. Hive Configuration</h4></div></div></div><p>Beeswax, the Hive interface in Hue, includes Hive 0.7.  You do
+not need an existing Hive installation.</p><p>Your Hive data is stored in HDFS, normally under <code class="literal">/user/hive/warehouse</code>
+(or any path you specify as <code class="literal">hive.metastore.warehouse.dir</code> in your
+<code class="literal">hive-site.xml</code>).  Make sure this location exists and is writable by
+the users whom you expect to be creating tables.  <code class="literal">/tmp</code> (on the local file
+system) must be world-writable, as Hive makes extensive use of it.</p><div class="note" title="Note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>If you used the embedded Hive MetaStore functionality of Beeswax in Hue from
+versions prior to Hue 1.2, read this section. Hue 1.2 includes changes in the
+Hive MetaStore schema that are part of the Hive 0.7 release. If you want to use
+Beeswax in Hue 1.2, it is imperative that you upgrade the Hive MetaStore schema
+by running the appropriate schema upgrade script located in the
+apps/beeswax/hive/scripts/metastore/upgrade directory in the Hue installation.
+Scripts for Derby and MySQL databases are available. If you are using a
+different database for your MetaStore, you will need to provide your own
+upgrade script.</p></td></tr></table></div></div><div class="section" title="6.1.4. Configuration"><div class="titlepage"><div><div><h4 class="title"><a id="_configuration"></a>6.1.4. Configuration</h4></div></div></div><div class="section" title="6.1.4.1. No Existing Hive Installation"><div class="titlepage"><div><div><h5 class="title"><a id="_no_existing_hive_installation"></a>6.1.4.1. No Existing Hive Installation</h5></div></div></div><p>Familiarize yourself with the configuration options in
+<code class="literal">hive-site.xml</code> (see
+<a class="ulink" href="http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration" target="_top">http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration</a>).
+Having a <code class="literal">hive-site.xml</code> is optional but often useful, particularly on setting
+up a <a class="ulink" href="http://wiki.apache.org/hadoop/Hive/AdminManual/MetastoreAdmin" target="_top">metastore</a>.
+You may store the <code class="literal">hive-site.xml</code> in <code class="literal">/etc/hue/conf</code>, or instruct
+Beeswax to locate it using the <code class="literal">hive_conf_dir</code> configuration variable.  See
+<code class="literal">/etc/hue/conf/hue-beeswax.ini</code>.</p></div><div class="section" title="6.1.4.2. Existing Hive Installation"><div class="titlepage"><div><div><h5 class="title"><a id="_existing_hive_installation"></a>6.1.4.2. Existing Hive Installation</h5></div></div></div><p>In <code class="literal">/etc/hue/conf/hue-beeswax.ini</code>, modify <code class="literal">hive_conf_dir</code> to point to the
+directory containing <code class="literal">hive-site.xml</code>.</p></div></div></div></div><div class="section" title="7. Using Hue"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="usage"></a>7. Using Hue</h2></div></div></div><p>After installation, you can use Hue by navigating to <code class="literal">http://myserver:8088/</code>.
+The following login screen appears:</p><p><span class="inlinemediaobject"><img src="images/login.png" alt="images/login.png" /></span></p><p>Launch applications on the bottom-right.
+<span class="inlinemediaobject"><img src="images/open-apps.png" alt="images/open-apps.png" /></span></p><p>The Help application guides users through the various installed applications.</p><div class="section" title="7.1. Supported Browsers"><div class="titlepage"><div><div><h3 class="title"><a id="_supported_browsers"></a>7.1. Supported Browsers</h3></div></div></div><p>Hue is primarily tested on Firefox 3.5 and Firefox 3.6, on Windows, Mac, and
+Linux. Google Chrome and Safari work as well.</p></div><div class="section" title="7.2. Feedback"><div class="titlepage"><div><div><h3 class="title"><a id="_feedback"></a>7.2. Feedback</h3></div></div></div><p>Your feedback is welcome. The best way to send feedback is to join the
+<a class="ulink" href="https://groups.google.com/a/cloudera.org/group/hue-user" target="_top">mailing list</a>, and
+send e-mail, to <a class="ulink" href="mailto:hue-user@cloudera.org" target="_top">hue-user@cloudera.org</a>.</p></div><div class="section" title="7.3. Reporting Bugs"><div class="titlepage"><div><div><h3 class="title"><a id="_reporting_bugs"></a>7.3. Reporting Bugs</h3></div></div></div><p>If you find that something doesn’t work, it’ll often be helpful to include logs
+from your server.  These are available at the <code class="literal">/logs</code> URL on Hue’s web server
+(not part of the graphical Hue UI).  Please download the logs as a zip (or cut
+and paste the ones that look relevant) and send those with your bug reports.
+<span class="inlinemediaobject"><img src="images/logs.png" alt="images/logs.png" /></span></p></div></div></div></body></html>
