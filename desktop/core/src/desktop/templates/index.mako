@@ -202,7 +202,7 @@
             [<a href="/accounts/logout">logout</a>]
           </span>
         </span>
-        <a id="hotkeys" title="show keyboard shortcuts">
+        <a class="hotkeys" id="hotkeys" title="show keyboard shortcuts">
           <img src="/static/art/shortcut.png"> Shortcuts
         </a>
       </div>
