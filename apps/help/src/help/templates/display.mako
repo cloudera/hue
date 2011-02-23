@@ -19,16 +19,18 @@
 </head>
 <body>
   <div class="resizable" data-filters="SplitView">
-    <div class="left_col jframe_padded">
-      <h2>Index</h2>
-      <ul>
-        % for app in apps:
-          <li><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
-        % endfor
-      </ul>
+    <div class="left_col">
+      <div class="jframe_padded">
+        <h2>Index</h2>
+        <ul>
+          % for app in apps:
+            <li><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
+          % endfor
+        </ul>
+      </div>
     </div>
-    <div class="right_col jframe_padded">
-      <div id="contents">${content|n}</div>
+    <div class="right_col">
+      <div class="jframe_padded">${content|n}</div>
     </div>
   </div>
 </body>
