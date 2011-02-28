@@ -78,6 +78,11 @@
         <version>${hive.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.hadoop.hive</groupId>
+        <artifactId>hive-common</artifactId>
+        <version>${hive.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
@@ -126,6 +131,12 @@
         <artifactId>libthrift</artifactId>
         <version>0.5.0-cdh</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.thrift</groupId>
+        <artifactId>libfb303</artifactId>
+        <version>0.5.0-cdh</version>
+      </dependency>
+
 
     </dependencies>
   </dependencyManagement>

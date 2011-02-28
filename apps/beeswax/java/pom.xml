@@ -52,6 +52,18 @@
       <artifactId>hive-exec</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.hadoop.hive</groupId>
+      <artifactId>hive-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.thrift</groupId>
+      <artifactId>libthrift</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.thrift</groupId>
+      <artifactId>libfb303</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -123,4 +135,3 @@
     </plugins>
   </build>
 </project>
-      

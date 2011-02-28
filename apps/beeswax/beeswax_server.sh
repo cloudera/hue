@@ -24,19 +24,29 @@ if [ -z "$HADOOP_HOME" ]; then
   exit 1
 fi
 
+echo \$HADOOP_HOME=$HADOOP_HOME
+
 if [ -z "$HIVE_CONF_DIR" ]; then
   echo "\$HIVE_CONF_DIR must be specified" 1>&2
   exit 1
 fi
 
+echo \$HIVE_CONF_DIR=$HIVE_CONF_DIR
+
+if [ -z "$HIVE_HOME" ]; then
+  echo "\$HIVE_HOME not specified. Defaulting to $HIVE_CONF_DIR/.." 1>&2
+  export HIVE_HOME=$HIVE_CONF_DIR/..
+  exit 1
+fi
+
+echo \$HIVE_HOME=$HIVE_HOME
+
 
 BEESWAX_ROOT=$(dirname $0)
 BEESWAX_JAR=$BEESWAX_ROOT/java-lib/BeeswaxServer.jar
-BEESWAX_HIVE_LIB=$BEESWAX_ROOT/hive/lib
+HIVE_LIB=$HIVE_HOME/lib
 
-echo \$HADOOP_HOME=$HADOOP_HOME
-
-export HADOOP_CLASSPATH=$(find $BEESWAX_HIVE_LIB -name "*.jar" | tr "\n" :)
+export HADOOP_CLASSPATH=$(find $HIVE_LIB -name "*.jar" | tr "\n" :)
 
 if [ -n "$HADOOP_EXTRA_CLASSPATH_STRING" ]; then
   export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$HADOOP_EXTRA_CLASSPATH_STRING
@@ -56,7 +66,8 @@ fi
 if [ -f $HADOOP_CONF_DIR/hadoop-env.sh ]; then
   . $HADOOP_CONF_DIR/hadoop-env.sh
 fi
-export HADOOP_CONF_DIR=$HIVE_CONF_DIR:${BEESWAX_HIVE_LIB}/hive-default-xml-0.7.0-CDH3B4-SNAPSHOT.jar:${HADOOP_CONF_DIR}:$(find $BEESWAX_HIVE_LIB -name "thrift-fb303-0.5.0.jar" | head -1)
+
+export HADOOP_CONF_DIR=$HIVE_CONF_DIR:$BEESWAX_ROOT/../../desktop/conf:$HADOOP_CONF_DIR
 echo \$HADOOP_CONF_DIR=$HADOOP_CONF_DIR
 
 # Note: I've had trouble running this with just "java -jar" with the classpath
