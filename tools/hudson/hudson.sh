@@ -39,6 +39,7 @@ else
 fi
 
 build_hadoop
+build_hive
 
 make apps
 

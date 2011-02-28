@@ -21,7 +21,7 @@
 # If not specified, it uses the $CDH variable to select an archive location.
 #
 
-CDH_URL=${CDH_URL:-http://nightly.cloudera.com/cdh/3/hadoop-0.20.2-CDH3B4-SNAPSHOT.tar.gz}
+CDH_URL=${CDH_URL:-http://archive.cloudera.com/cdh/3/hadoop-0.20.2-CDH3B4.tar.gz}
 
 CDH_TGZ=$(basename $CDH_URL)
 CDH_VERSION=${CDH_TGZ/.tar.gz/}
@@ -40,4 +40,26 @@ build_hadoop() {
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
   export HADOOP_HOME="$HADOOP_DIR/${CDH_VERSION}"
+}
+
+HIVE_URL=${HIVE_URL:-http://archive.cloudera.com/cdh/3/hive-0.7.0-CDH3B4.tar.gz}
+
+HIVE_TGZ=$(basename $HIVE_URL)
+HIVE_VERSION=${HIVE_TGZ/.tar.gz/}
+HIVE_CACHE="$HOME/.hue_cache/${HIVE_TGZ}"
+
+build_hive() {
+  if [ ! -f $HOME/.hue_cache ]; then
+    mkdir -p $HOME/.hue_cache
+    echo "Downloading $HIVE_URL..."
+    wget $HIVE_URL -O $HIVE_CACHE
+  fi
+
+  HIVE_DIR=$HUE_ROOT/ext/hive
+
+  mkdir -p $HIVE_DIR
+  echo "Unpacking $HIVE_CACHE to $HIVE_DIR"
+  tar -C $HIVE_DIR -xzf $HIVE_CACHE
+  export HIVE_HOME="$HIVE_DIR/${HIVE_VERSION}"
+  export HIVE_CONF_DIR=$HIVE_HOME/conf
 }

@@ -69,6 +69,7 @@ def _start_server(cluster):
     'HADOOP_HOME': hadoop.conf.HADOOP_HOME.get(),
     'HADOOP_CONF_DIR': cluster.config_dir,
     'HIVE_CONF_DIR': beeswax.conf.BEESWAX_HIVE_CONF_DIR.get(),
+    'HIVE_HOME' : beeswax.conf.BEESWAX_HIVE_HOME_DIR.get(),
     'HADOOP_EXTRA_CLASSPATH_STRING': hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()
   }
   if os.getenv("JAVA_HOME"):
@@ -81,16 +82,27 @@ def _start_server(cluster):
 
 
 def get_shared_beeswax_server():
+  # Copy hive-default.xml from BEESWAX_HIVE_CONF_DIR before it is set to
+  # /my/bogus/path
+  default_xml = file(beeswax.conf.BEESWAX_HIVE_CONF_DIR.get()+"/hive-default.xml").read()
+
   finish = (
     beeswax.conf.BEESWAX_SERVER_HOST.set_for_testing("localhost"),
     beeswax.conf.BEESWAX_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT),
     beeswax.conf.BEESWAX_META_SERVER_HOST.set_for_testing("localhost"),
     beeswax.conf.BEESWAX_META_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT + 1),
     # Use a bogus path to avoid loading the normal hive-site.xml
-    beeswax.conf.BEESWAX_HIVE_CONF_DIR.set_for_testing('/my/bogus/path'),
+    beeswax.conf.BEESWAX_HIVE_CONF_DIR.set_for_testing('/my/bogus/path')
   )
 
   cluster = mini_cluster.shared_cluster(conf=True)
+
+  # Copy hive-default.xml into the mini_cluster's conf dir, which happens to be
+  # in the cluster's tmpdir. This tmpdir is determined during the mini_cluster
+  # startup, during which BEESWAX_HIVE_CONF_DIR needs to be set to
+  # /my/bogus/path. Hence the step of writing to memory.
+  # hive-default.xml will get picked up by the beeswax_server during startup
+  file(cluster.tmpdir+"/conf/hive-default.xml", 'w').write(default_xml)
 
   global _SHARED_BEESWAX_SERVER_PROCESS
   if _SHARED_BEESWAX_SERVER_PROCESS is None:

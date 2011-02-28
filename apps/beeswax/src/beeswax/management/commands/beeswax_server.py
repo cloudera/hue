@@ -35,6 +35,8 @@ class Command(NoArgsCommand):
     env['HADOOP_HOME'] = hadoop.conf.HADOOP_HOME.get()
     if hadoop.conf.HADOOP_CONF_DIR.get():
       env['HADOOP_CONF_DIR'] = hadoop.conf.HADOOP_CONF_DIR.get()
+    if beeswax.conf.BEESWAX_HIVE_HOME_DIR.get():
+      env['HIVE_HOME'] = beeswax.conf.BEESWAX_HIVE_HOME_DIR.get()
     if beeswax.conf.BEESWAX_HIVE_CONF_DIR.get():
       env['HIVE_CONF_DIR'] = beeswax.conf.BEESWAX_HIVE_CONF_DIR.get()
     if beeswax.conf.BEESWAX_SERVER_HEAPSIZE.get():
