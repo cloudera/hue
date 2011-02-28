@@ -69,6 +69,8 @@ CLUSTER_TASK_SCHEDULER='org.apache.hadoop.mapred.JobQueueTaskScheduler'
 # MR queue names
 CLUSTER_QUEUE_NAMES='default'
 
+STARTUP_CONFIGS={}
+
 # users and their groups which are used in Hue tests.
 TEST_USER_GROUP_MAPPING = {
    'test': ['test','users','supergroup'], 'chown_test': ['chown_test'],
@@ -144,6 +146,8 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       'dfs.namenode.plugins': CLUSTER_NN_PLUGINS,
       'dfs.datanode.plugins': CLUSTER_DN_PLUGINS,
       'mapred.jobtracker.plugins': CLUSTER_JT_PLUGINS}
+
+    extra_configs.update(STARTUP_CONFIGS)
     write_config(core_configs, tmppath('in-conf/core-site.xml'))
 
     write_config({'mapred.jobtracker.taskScheduler': CLUSTER_TASK_SCHEDULER,
@@ -219,7 +223,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       # Wait for the debugger to attach
       if DEBUG_HADOOP:
         env["HADOOP_OPTS"] = env.get("HADOOP_OPTS", "") + " -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9999"
-        
+
       if USE_STDERR:
         stderr=sys.stderr
       else:
