@@ -28,7 +28,7 @@ from desktop.lib.conf import BoundContainer, is_anonymous
 <ul>
 % for app in sorted(apps, key=lambda app: app.name.lower()):
   % if hasattr(app, "urls_imported") and app.urls_imported:
-    <li><a href="/${app.name}/">${app.name}</a></li>
+    <li><a href="/${app.name}/">${app.display_name}</a></li>
   % else:
     <li>${app.name}</li>
   % endif
