@@ -356,13 +356,16 @@ HueChart.Box = new Class({
 				}
 		},
 
+		invertYValue: function(y) {
+			return this.yScale.invert(y);
+		},
+
 		getYRange: function(y, inversionScale) {
-				var scale = inversionScale || this.yScale;
 				var yBuffer = 5; //Pixel buffer for usability.
 				//Must use yValueReverse to reverse the mouse value because drawing happens from the bottom up.  Mouse position is from the top down.
-				var invertedYValue = scale.invert(y);
+				var invertedYValue = this.invertYValue(y);
 				//Since range will be inverted, the array goes from greatest to least initially.
-				var invertedYRange = [scale.invert(y + yBuffer), scale.invert(y - yBuffer)];
+				var invertedYRange = [this.invertYValue(y + yBuffer), this.invertYValue(y - yBuffer)];
 				var yValue = this.yValueReverse(invertedYValue);
 				//Convert the inverted yRange to a non-inverted yRange.
 				var yRange = invertedYRange.map(function(value) { return this.yValueReverse(value); }.bind(this));
@@ -426,9 +429,21 @@ HueChart.Box = new Class({
 				return argArray.map(function(point) {
 						var toGraph = this.adjustToGraph(axis, point);
 						var index = this.getDataIndexFromPoint(axis, toGraph);
-						return { index: index, data: this.getData(true).getObjects()[index] };
+						var pointValue = this.getValueFromPoint(axis, point);
+						return { index: index, data: this.getData(true).getObjects()[index], pointValue: pointValue };
 				}.bind(this));
 				
+		},
+		
+		getValueFromPoint: function(axis, point) {
+			switch (axis) {
+				case 'x':
+					return this.xScale.invert(point);
+					break;
+				case 'y':
+					return this.invertYValue(point);
+					break;
+			}
 		},
 		
 		//Make selection in graph draggable
