@@ -45,9 +45,10 @@ HueChart.Area = new Class({
 				};
 		},
 
-		getYRange: function(y) {
-				return this.parent(y, this.yScaleTicks);
+		invertYValue: function(y) {
+			return this.yScaleTicks.invert(y);
 		},
+
 		getDataSeriesFromPointAndY: function(dataPoint, y) {
 				var yRange = this.getYRange(y);
 				var yCenter = (yRange[0] + yRange[1])/2;
