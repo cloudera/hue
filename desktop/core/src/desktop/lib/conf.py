@@ -522,7 +522,7 @@ def _bind_module_members(module, data, section):
   return members
 
 
-def bind_module_config(mod, conf_data):
+def bind_module_config(mod, conf_data, config_key):
   """Binds the configuration for the module to the given data.
 
   conf_data is a dict-like structure in which the configuration data
@@ -532,6 +532,9 @@ def bind_module_config(mod, conf_data):
     - if the name of the module is bar, it should be a section [bar]
     - if the module has a CONFIGURATION_SECTION attribute, that attribute
       should be a string, and determines the section name.
+
+  config_key is the key that should map to the configuration.
+  It's used to allow renaming of configurations.
 
   For example, for the module "hello.world.conf", type(conf_data['hello.world'])
   should be dict-like and contain the configuration for the hello.world
@@ -548,7 +551,12 @@ def bind_module_config(mod, conf_data):
   else:
     section = mod.__name__
 
-  bind_data = conf_data.get(section, {})
+  if config_key is None:
+    bind_data = conf_data.get(section, {})
+  else:
+    section = config_key
+    bind_data = conf_data.get(config_key, {})
+
   members = _bind_module_members(mod, bind_data, section)
   return ConfigSection(section,
                        members=members,
@@ -566,7 +574,7 @@ def initialize(modules, config_dir):
   conf_data = load_confs(_configs_from_dir(config_dir))
   sections = {}
   for module in modules:
-    section = bind_module_config(module, conf_data)
+    section = bind_module_config(module['module'], conf_data, module['config_key'])
     sections[section.key] = section
 
   GLOBAL_HELP = "(root of all configuration)"

@@ -161,7 +161,7 @@ _config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))
 
 # Libraries are loaded and configured before the apps
 appmanager.load_libs()
-_lib_conf_modules = filter(None, [app.conf for app in appmanager.DESKTOP_LIBS])
+_lib_conf_modules = [dict(module=app.conf, config_key=None) for app in appmanager.DESKTOP_LIBS if app.conf is not None]
 
 appmanager.load_apps()
 for app in appmanager.DESKTOP_APPS:
@@ -170,8 +170,8 @@ for app in appmanager.DESKTOP_APPS:
 logging.debug("Installed Django modules: %s" % ",".join(map(str, appmanager.DESKTOP_MODULES)))
 
 # Load app configuration
-_app_conf_modules = filter(None, [app.conf for app in appmanager.DESKTOP_APPS])
-_app_conf_modules.append(desktop.conf)
+_app_conf_modules = [dict(module=app.conf, config_key=app.config_key) for app in appmanager.DESKTOP_APPS if app.conf is not None]
+_app_conf_modules.append(dict(module=desktop.conf, config_key=None))
 
 conf.initialize(_lib_conf_modules, _config_dir)
 conf.initialize(_app_conf_modules, _config_dir)

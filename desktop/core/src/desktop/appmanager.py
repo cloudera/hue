@@ -91,8 +91,18 @@ class DesktopModuleInfo(object):
     module.  Static directories, settings, urls, etc.
     will be found based on that module.
     """
+
+    # For clarification purposes, all of these different names need a
+    # bit of explanation. The name is the actual name of the application.
+    # The display name is used by dump_config, and will either be the
+    # app name or the config key, if the config key has been defined in the
+    # app's settings.  Mostly, it's around for consistency's sake.
+    # The nice name is just a more formal name, i.e. useradmin might 
+    # have a nice name of User Administration Tool, or something 
+    # similarly flowery.
     self.module = module
     self.name = module.__name__
+    self.display_name = module.__name__
 
     # Set up paths
     module_root = os.path.dirname(module.__file__)
@@ -100,11 +110,14 @@ class DesktopModuleInfo(object):
 
     # Load application settings
     self._load_settings_module(module.__name__ + ".settings")
-
+    
     if hasattr(self.settings, "NICE_NAME"):
       self.nice_name = self.settings.NICE_NAME
     else:
       self.nice_name = self.name
+
+    if self.config_key is not None:
+      self.display_name = self.config_key
 
     # Look for static directory in two places:
     new_style, old_style = [ os.path.abspath(p) for p in [
@@ -131,6 +144,7 @@ class DesktopModuleInfo(object):
     s = _import_module_or_none(module_name)
     if s is not None:
       self.django_apps = getattr(s, 'DJANGO_APPS', [])
+      self.config_key = getattr(s, 'CONFIG_KEY', None)
       self.depender_yamls = \
           [self._resolve_appdir_path(p) for p in getattr(s, 'DEPENDER_PACKAGE_YMLS', [])]
       self.depender_jsons = \
@@ -138,6 +152,7 @@ class DesktopModuleInfo(object):
            for depname, p in getattr(s, 'DEPENDER_SCRIPTS_JSON', [])]
     else:
       self.django_apps = []
+      self.config_key = None 
       self.depender_yamls = []
       self.depender_jsons = []
 
