@@ -44,6 +44,7 @@ requires: [
   hue-shared/Hue.Desktop.Config,
   hue-shared/Hue.JFrame.Target,
   hue-shared/Hue.Login,
+  hue-shared/Hue.Profiler,
   hue-shared/Hue.Request,
   hue-shared/Hue.User,
   hue-shared/CCS.JFrame, #These CCS.* files are all just deprecated namespaces; here for backwards compat

@@ -15,6 +15,7 @@ sources: [
   Source/Hue/Hue.Desktop.BackgroundManager.js,
   Source/Hue/Hue.Dock.js,
   Source/Hue/Hue.Login.js,
+  Source/Hue/Hue.Profiler.js,
   Source/Hue/Hue.Request.js,
   Source/Hue/Hue.SolidWindow.js,
   Source/Hue/Hue.User.js,
