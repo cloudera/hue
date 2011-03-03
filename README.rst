@@ -56,8 +56,8 @@ Development Prerequisites
 1. On your host system, you need to have the python "virtualenv" package
    installed.
 
-2. Also, you'll need these library development packages installed on your
-   system:
+2. Also, you'll need these library development packages and tools installed on
+   your system:
 
     Debian:
       * gcc
@@ -66,14 +66,17 @@ Development Prerequisites
       * libsqlite3-dev
       * libxml2-dev
       * libxslt-dev
+      * maven2
       * python-dev
       * python-setuptools
+      * python-simplejson
 
     CentOS:
       * cyrus-sasl-devel
       * gcc
       * libxml2-devel
       * libxslt-devel
+      * maven2
       * mysql
       * mysql-devel
       * python-devel
