@@ -64,9 +64,11 @@ Redhat,Debian
 gcc,gcc
 libxml2-devel,libxml2-dev
 libxslt-devel,libxslt-dev
+cyrus-sasl-devel,libsasl2-dev
 mysql-devel,libmysqlclient-dev
 python-devel,python-dev
 python-setuptools,python-setuptools
+python-simplejson,python-simplejson
 sqlite-devel,libsqlite3-dev
 ant,ant
 ~~~~~~~~~~
