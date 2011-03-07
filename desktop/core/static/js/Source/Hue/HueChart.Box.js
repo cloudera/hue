@@ -580,7 +580,7 @@ HueChart.Box = new Class({
 				//And amplitude exists in metadata
 				if ($defined(metadata.amplitude)){
 					//Multiply the charting value by amplitude and return
-					return String(seriesObject.value.toInt() * metadata['amplitude']);
+					return String(seriesObject.value.toFloat() * metadata['amplitude']);
 				}
 			} else {
 				//Format bytes properly
