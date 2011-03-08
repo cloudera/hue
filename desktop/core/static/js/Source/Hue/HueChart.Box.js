@@ -71,7 +71,7 @@ HueChart.Box = new Class({
 					'second': "%I:%M %p",
 					'minute': "%I:%M %p",
 					'hour': "%I %p",
-					'day': "%m %D",
+					'day': "%b %D",
 					'month': "%m",
 					'year': "%Y"
 				},
@@ -574,21 +574,22 @@ HueChart.Box = new Class({
 		
 		//Given a series object, return the value that should be displayed
 		getValueForDisplay: function(seriesObject) {
+			var value = seriesObject.value;
 			//If metadata exists
 			if(this.hasMetadata(seriesObject.name)) {
 				var metadata = this.metadata[seriesObject.name];
 				//And amplitude exists in metadata
 				if ($defined(metadata.amplitude)){
-					//Multiply the charting value by amplitude and return
-					return String(seriesObject.value.toFloat() * metadata['amplitude']);
+					//Multiply the charting value by amplitude
+					value = seriesObject.value.toFloat() * metadata['amplitude'];
 				}
 			} else {
-				//Format bytes properly
+				//Format bytes properly and return
 				if (this.options.yType == 'bytes') {
 					return seriesObject.value.toInt().convertFileSize();
 				}
 			}
-			return String(seriesObject.value);
+			return String(value.round(2));
 		},
 		//Updates the display of the currently visible tip
 		updatePointValue: function(seriesList) {
