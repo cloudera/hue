@@ -210,8 +210,8 @@ HueChart.Box = new Class({
 		//Set the scales which will be used to convert data values into positions for graph objects
 		setScales: function(vis) {
 				//Get the minimum and maximum x values.
-				var xMin = this.getData(true).getMinValue(this.xProperty);
-				var xMax = this.getData(true).getMaxValue(this.xProperty);
+				var xMin = this.hasMetadata('chartStartTime') ? this.metadata.chartStartTime : this.getData(true).getMinValue(this.xProperty);
+				var xMax = this.hasMetadata('chartEndTime') ? this.metadata.chartEndTime : this.getData(true).getMaxValue(this.xProperty);
 				//Get the maximum of the values that are to be graphed
 				var maxValue = this.getData(true).getMaxValue(this.series);
 				this.xScale = pv.Scale.linear(xMin, xMax).range(this.options.leftPadding, this.width - this.options.rightPadding);
@@ -257,7 +257,12 @@ HueChart.Box = new Class({
 						//Create tick array.
 						var tickOrientation = this.options.ticks.orientation;
 						var tickMethod = 'get' + tickOrientation.capitalize() + 'Ticks';
-						var xTicks = (this.options.dates.x ? this.getData(true)[tickMethod](10, this.dateProperty) : this.xScale.ticks(7));
+						var chartStart = null, chartEnd = null;
+						if (this.hasMetadata()) {
+							chartStart = this.metadata.chartStartTime;
+							chartEnd = this.metadata.chartEndTime;
+						}
+						var xTicks = (this.options.dates.x ? this.getData(true)[tickMethod](10, this.dateProperty, chartStart, chartEnd) : this.xScale.ticks(7));
 						var getValue = getXValueFn(this.options.dates.x ? this.xProperty : null);
 						var getTickLabel = this._getXTickDisplayFn(xTicks, tickOrientation, getValue);
 						//Create rules (lines intended to denote scale)
