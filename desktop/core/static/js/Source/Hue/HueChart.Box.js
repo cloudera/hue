@@ -60,7 +60,7 @@ HueChart.Box = new Class({
 				dates: {x: false, y: false}, //is the data in an axis a date ? 
 				dateSpans:{x: null}, //if an axis is a date, what time span should the tick marks for that axis be shown in
 				positionIndicator: false, //should the position indicator be shown ?
-				ticks: {x: false, y: false, orientation: 'absolute'}, //should tick marks be shown ?
+				ticks: {x: false, y: false, orientation: 'absolute', shortenY: true}, //should tick marks be shown ?
 					//Orientation options are:
 						// 'absolute' -- meaning they are actual dates
 						// 'relative' -- meaning they are timespans from the first date
@@ -288,24 +288,35 @@ HueChart.Box = new Class({
 						//In some box-style charts, there is a need to have a different scale for yTicks and for y values.
 						//If there is a scale defined for yTicks, use it, otherwise use the standard yScale.
 						var tickScale = this.yScaleTicks || this.yScale;
+						var ticks = tickScale.ticks(yTickCount > 1 ? yTickCount : 2);
+						//Convert ticks to tickObject containing value and label
+						ticks = ticks.map(function(tick) {
+							var tickObject = {};
+							tickObject.value = tick;
+							var label = tick;
+							if (this.options.yType == 'bytes') {
+								label = tick.convertFileSize();
+							} else {
+								if(this.options.ticks.shortenY) label = tick.shortString();
+							};
+							tickObject.label = label;
+							return tickObject;
+						}.bind(this));
 						//Create rules
 						vis.add(pv.Rule)
 								//Always show at least two ticks.
 								//tickScale.ticks returns an array of values which are evenly spaced to be used as tick marks.
-								.data(tickScale.ticks(yTickCount > 1 ? yTickCount : 2))
+								.data(ticks)
 								//The left side of the rule should be at leftPadding pixels.
 								.left(this.options.leftPadding)
 								//The bottom of the rule should be at the tickScale.ticks value scaled to pixels.
-								.bottom(function(d) {return tickScale(d);}.bind(this))
+								.bottom(function(tick) {return tickScale(tick.value);}.bind(this))
 								//The width of the rule should be the width minus the hoizontal padding.
 								.width(this.width - this.options.leftPadding - this.options.rightPadding + 1)
 								.strokeStyle(this.options.tickColor)
 								//Add label to the left which shows the number of bytes.
 								.anchor("left").add(pv.Label)
-										.text(function(d) {
-												if(this.options.yType == 'bytes') return d.convertFileSize();
-												return d;
-										}.bind(this));
+										.text(function(tick) { return tick.label; });
 				}
 		},
 		
@@ -645,6 +656,17 @@ HueChart.Box = new Class({
 						 delete this.tip;
 				}
 		} 
+});
+
+Number.implement('shortString', function() {
+	var numKsToAbbreviation = ['', 'k','m', 'b', 't'];
+	var base = this;
+	var numKs = 0;
+	while (base > 1000) {
+		base /= 1000;
+		numKs++;
+	}
+	return base + numKsToAbbreviation[numKs];
 });
 })();
 
