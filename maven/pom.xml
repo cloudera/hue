@@ -42,10 +42,10 @@
   </licenses>
 
   <properties>
-    <hadoop.version>0.20.2-cdh3u0-SNAPSHOT</hadoop.version>
+    <hadoop.version>0.20.2-CDH3B4</hadoop.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
-    <hive.version>0.7.0-cdh3u0-SNAPSHOT</hive.version>
+    <hive.version>0.7.0-CDH3B4</hive.version>
   </properties>
 
   <organization>
