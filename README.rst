@@ -181,3 +181,36 @@ the python bindings like so::
 .. note::
     This file is in reStructuredText. You may run
     ``rst2html README.rst > README.html`` to produce a HTML.
+
+
+Profiling Hue Apps
+==================
+Hue has a profiling system built in, which can be used to analyze server-side
+performance of applications.  To enable profiling::
+
+    $ build/env/bin/hue runprofileserver
+
+Then, access the page that you want to profile.  This will create files like
+/tmp/useradmin.users.000072ms.2011-02-21T13:03:39.745851.prof.  The format for
+the file names is /tmp/<app_module>.<page_url>.<time_taken>.<timestamp>.prof.
+
+Hue uses the hotshot profiling library for instrumentation.  The documentation
+for this library is located at: http://docs.python.org/library/hotshot.html.
+
+To make use of the profiling data quickly, you can create a script that does
+the following::
+
+    #!/usr/bin/python
+    import hotshot.stats
+    import sys
+
+    stats = hotshot.stats.load(sys.argv[1])
+    stats.sort_stats('cumulative', 'calls')
+    stats.print_stats(100)
+
+This script takes in a .prof file, and orders function calls by the cumulative
+time spent in that function, followed by the number of times the function was
+called, and then prints out the top 100 time-wasters.  For information on the
+other stats available, take a look at this website:
+http://docs.python.org/library/profile.html#pstats.Stats
+
