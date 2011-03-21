@@ -52,6 +52,7 @@ from jobsubd.ttypes import SubmissionHandle, JobData, State, SubmissionError, Pr
 from jobsub.server_models import ServerSubmissionState
 from jobbrowser.views import single_job
 import desktop.lib.django_util
+from desktop.lib import i18n
 import hadoop.cluster
 import hadoop.conf
 from hadoop.cluster import all_mrclusters, get_all_hdfs
@@ -227,10 +228,12 @@ class PlanRunner(object):
     env = {      
       'HADOOP_HOME': hadoop.conf.HADOOP_HOME.get(), 
       'HADOOP_OPTS': "-javaagent:%s %s" % (jobsub.conf.ASPECTJWEAVER.get(), java_prop_str),
-      'HADOOP_CLASSPATH': ':'.join([jobsub.conf.ASPECTPATH.get(), hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()]),
+      'HADOOP_CLASSPATH': ':'.join([jobsub.conf.ASPECTPATH.get(),
+                                    hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()]),
       'HUE_JOBTRACE_LOG': self.internal_file_name("jobs"),
       'HUE_JOBSUB_USER': self.plan.user,
       'HUE_JOBSUB_GROUPS': ",".join(self.plan.groups),
+      'LANG': os.getenv('LANG', i18n.get_site_encoding()),
     }
 
     delegation_token_files = []
