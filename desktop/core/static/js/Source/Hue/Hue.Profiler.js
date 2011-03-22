@@ -107,6 +107,7 @@ script: Hue.Profiler.js
 	if (dbug.profileEnabled){
 		Behavior = Class.refactor(Behavior, {
 			apply: function(container, force){
+				dbug.log('Applying behaviors to container: ', container);
 				var result = this.previous.apply(this, arguments);
 				dbug.logAllReports('behavior filters', true);
 				return result;
