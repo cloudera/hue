@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from setuptools import setup, find_packages
+from hueversion import VERSION
 
 setup(
       name = "useradmin",
-      version = "1.2.0",
+      version = VERSION,
       author = "HUE",
       url = 'http://github.com/cloudera/hue',
       description = "HUE User Administration",
