@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from setuptools import setup, find_packages
+from hueversion import VERSION
 
 setup(
       name = "jobsub",
-      version = "1.2.0",
+      version = VERSION,
       url = 'http://github.com/cloudera/hue',
       author = "HUE",
       description = "Hadoop Job Submission",
