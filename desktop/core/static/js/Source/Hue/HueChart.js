@@ -92,7 +92,7 @@ HueChart = new Class({
 				this.options.leftPadding = $pick(this.options.leftPadding, this.options.padding[3], this.options.padding[1], this.options.padding[0]);
 				var table = document.id(this.options.dataTable);
 				if (table) {
-						this.data = new HueChart.Data(HueChart.buildData(table));
+						this.data = new HueChart.Data(HueChart.buildDataFromTable(table));
 						table.hide();
 				} else {
 						this.data = new HueChart.Data(this.options.dataObject);

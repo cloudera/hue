@@ -60,11 +60,11 @@ HueChart.Area = new Class({
 						seriesPeaks.push(newPeak);
 				}
 				//Return series and value if the center of the range is greater than the sum of previous values, but less than that sum plus the next value.
-				var toReturn = null;
+				var toReturn = [];
 				for (i = 0; i < this.series.length; i++) {
 						lastPeak = seriesPeaks[i - 1] || 0;
 						if (seriesPeaks[i] > yCenter && yCenter > lastPeak) {
-								toReturn = {'name' : this.series[i], 'value': dataPoint[this.series[i]] };
+								toReturn.push({'name' : this.series[i], 'value': dataPoint[this.series[i]] });
 						}
 				}
 				return toReturn;
