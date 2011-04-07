@@ -60,9 +60,9 @@ Hue.JFrame.addGlobalLinkers({
 	'.hue-choose_dir': chooser('dir'),
 	'.hue-choose_path': chooser('any'),
 	//deprecated
-	'.hue-choose_file': chooser('file'),
-	'.hue-choose_dir': chooser('dir'),
-	'.hue-choose_path': chooser('any')
+	'.ccs-choose_file': chooser('file'),
+	'.ccs-choose_dir': chooser('dir'),
+	'.ccs-choose_path': chooser('any')
 });
 
 })();
