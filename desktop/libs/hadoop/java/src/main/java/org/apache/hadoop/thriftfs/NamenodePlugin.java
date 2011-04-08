@@ -65,9 +65,6 @@ import org.apache.thrift.transport.TTransport;
 public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.NamenodePlugin implements
     Configurable {
 
-  /** Name of the configuration property of the Thrift server address */
-  public static final String THRIFT_ADDRESS_PROPERTY = "dfs.thrift.address";
-
   /**
    * Default address and port this server will bind to, in case nothing is found
    * in the configuration object.
@@ -427,16 +424,19 @@ public class NamenodePlugin extends org.apache.hadoop.hdfs.server.namenode.Namen
 
   @Override
   public void start(Object service) {
+    ThriftUtils.initConfigResource();
     this.namenode = (NameNode) service;
     try {
-      InetSocketAddress address = NetUtils.createSocketAddr(conf.get(THRIFT_ADDRESS_PROPERTY,
-          DEFAULT_THRIFT_ADDRESS));
+      InetSocketAddress address = NetUtils.createSocketAddr(
+          conf.get(ThriftFsConfig.DFS_THRIFT_ADDR_KEY,
+                   DEFAULT_THRIFT_ADDRESS));
 
       this.thriftServer = new ThriftPluginServer(address, new ProcessorFactory());
       thriftServer.setConf(conf);
       thriftServer.start();
       // The port may have been 0, so we update it.
-      conf.set(THRIFT_ADDRESS_PROPERTY, address.getHostName() + ":" + thriftServer.getPort());
+      conf.set(ThriftFsConfig.DFS_THRIFT_ADDR_KEY,
+               address.getHostName() + ":" + thriftServer.getPort());
     } catch (Exception e) {
       throw new RuntimeException("Cannot start Thrift namenode plug-in", e);
     }

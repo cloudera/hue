@@ -54,11 +54,6 @@ public class ThriftPluginServer implements Configurable, Runnable {
 
   static final int SOCKET_READ_TIMEOUT = 5000; // 5sec
 
-  static {
-    Configuration.addDefaultResource("thriftfs-default.xml");
-    Configuration.addDefaultResource("thriftfs-site.xml");
-  }
-
   public ThriftPluginServer(InetSocketAddress address,
                             TProcessorFactory processorFactory)
     throws TTransportException {
@@ -107,15 +102,17 @@ public class ThriftPluginServer implements Configurable, Runnable {
         sock.bind(address);
       }
 
-      int socketTimeout = conf.getInt("dfs.thrift.socket.timeout", SOCKET_READ_TIMEOUT);
+      int socketTimeout = conf.getInt(ThriftFsConfig.DFS_THRIFT_SOCKET_TIMEOUT_KEY,
+                                      SOCKET_READ_TIMEOUT);
 
       TServerTransport transport = new TServerSocket(sock, socketTimeout);
       SanerThreadPoolServer.Options options = new SanerThreadPoolServer.Options();
-      options.minWorkerThreads = conf.getInt("dfs.thrift.threads.min", 5);
-      options.maxWorkerThreads = conf.getInt("dfs.thrift.threads.max", 20);
-      options.stopTimeoutVal = conf.getInt("dfs.thrift.timeout", 60);
+      options.minWorkerThreads = conf.getInt(ThriftFsConfig.DFS_THRIFT_THREADS_MIN_KEY, 5);
+      options.maxWorkerThreads = conf.getInt(ThriftFsConfig.DFS_THRIFT_THREADS_MAX_KEY, 20);
+      options.stopTimeoutVal = conf.getInt(ThriftFsConfig.DFS_THRIFT_TIMEOUT_KEY, 60);
       options.stopTimeoutUnit = TimeUnit.SECONDS;
-      options.queueSize = conf.getInt("dfs.thrift.queue.size", 4*options.maxWorkerThreads);
+      options.queueSize = conf.getInt(ThriftFsConfig.DFS_THRIFT_QUEUE_SIZE_KEY,
+                                      4*options.maxWorkerThreads);
 
       server = new SanerThreadPoolServer(
         processorFactory, transport,

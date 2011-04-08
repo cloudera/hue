@@ -48,10 +48,6 @@ public class DatanodePlugin
   extends org.apache.hadoop.hdfs.server.datanode.DatanodePlugin
   implements Configurable {
 
-
-  /** Name of the configuration property of the Thrift server address */
-  public static final String THRIFT_ADDRESS_PROPERTY =
-      "dfs.thrift.datanode.address";
   /**
    * Default address and port this server will bind to, in case nothing is found
    * in the configuration object.
@@ -161,10 +157,11 @@ public class DatanodePlugin
 
   @Override
   public void start(Object service) {
+    ThriftUtils.initConfigResource();
     this.datanode = (DataNode)service;
     try {
       InetSocketAddress address = NetUtils.createSocketAddr(
-        conf.get(THRIFT_ADDRESS_PROPERTY, DEFAULT_THRIFT_ADDRESS));
+        conf.get(ThriftFsConfig.DFS_THRIFT_DATANODE_ADDR_KEY, DEFAULT_THRIFT_ADDRESS));
 
       thriftServer = new ThriftPluginServer(
         address, new ProcessorFactory());
