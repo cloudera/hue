@@ -447,13 +447,7 @@ public class TestNamenodePlugin {
     assertEquals(UserGroupInformation.getCurrentUser().getUserName(),
                  fs.getFileStatus(byCurrentPath).getOwner());
 
-    // With a null context (eg clients that don't support this), should be
-    // the current user
     assertTrue(fs.delete(byCurrentPath, true));
-    namenode.mkdirhier(null, "/test-by-current", (short)0755);
-    assertEquals(UserGroupInformation.getCurrentUser().getUserName(),
-                 fs.getFileStatus(byCurrentPath).getOwner());
-
 
     // Dir made by unprivelegedCtx should be owned by the test user
     namenode.mkdirhier(unprivilegedCtx, "/test-by-other", (short)0755);

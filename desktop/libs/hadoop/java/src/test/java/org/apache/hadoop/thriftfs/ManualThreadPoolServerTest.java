@@ -32,6 +32,7 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.transport.TTransport;
+import org.apache.thrift.transport.TTransportException;
 
 /**
  * Manually test driver for futzing with the SanerThreadPoolServer-based
@@ -41,7 +42,8 @@ import org.apache.thrift.transport.TTransport;
  */
 public class ManualThreadPoolServerTest {
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args)
+        throws TTransportException, IOException {
     if (args.length != 3) {
       System.err.println("Arguments: minThreads maxThreads, queueSize");
       System.exit(1);
