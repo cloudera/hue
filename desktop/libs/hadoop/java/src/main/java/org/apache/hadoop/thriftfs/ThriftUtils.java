@@ -69,6 +69,10 @@ public class ThriftUtils {
   public static final String HUE_USER_NAME_KEY = "hue.kerberos.principal.shortname";
   public static final String HUE_USER_NAME_DEFAULT = "hue";
 
+  public static void initConfigResource() {
+    Configuration.addDefaultResource("thriftfs-site.xml");
+  }
+
   public static LocatedBlock fromThrift(Block block) {
     if (block == null) {
       return null;
@@ -263,7 +267,8 @@ public class ThriftUtils {
    */
   public static Namenode.Client createNamenodeClient(Configuration conf)
       throws Exception {
-    String s = conf.get(NamenodePlugin.THRIFT_ADDRESS_PROPERTY, NamenodePlugin.DEFAULT_THRIFT_ADDRESS);
+    String s = conf.get(ThriftFsConfig.DFS_THRIFT_ADDR_KEY,
+                        NamenodePlugin.DEFAULT_THRIFT_ADDRESS);
     // TODO(todd) use fs.default.name here if set to 0.0.0.0 - but share this with the code in
     // SecondaryNameNode that does the same
     InetSocketAddress addr = NetUtils.createSocketAddr(s);
@@ -276,6 +281,7 @@ public class ThriftUtils {
       addr = new InetSocketAddress(nnAddr.getAddress(), addr.getPort());
     }
 
+    LOG.info("Creating NameNode client against " + addr);
     TTransport t = new TSocket(addr.getHostName(), addr.getPort());
     if (UserGroupInformation.isSecurityEnabled()) {
       t = new HadoopThriftAuthBridge.Client()

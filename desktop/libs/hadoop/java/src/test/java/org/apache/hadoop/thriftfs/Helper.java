@@ -39,6 +39,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.thriftfs.api.Datanode;
 import org.apache.hadoop.thriftfs.api.DatanodeInfo;
 import org.apache.hadoop.thriftfs.api.RequestContext;
+import org.apache.hadoop.thriftfs.ThriftFsConfig;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -50,20 +51,14 @@ import org.apache.thrift.transport.TTransport;
  */
 public class Helper {
 
-  public static final String NAMENODE_ADDRESS_PROPERTY =
-    org.apache.hadoop.thriftfs.NamenodePlugin.THRIFT_ADDRESS_PROPERTY;
-
-  public static final String DATANODE_ADDRESS_PROPERTY =
-    org.apache.hadoop.thriftfs.DatanodePlugin.THRIFT_ADDRESS_PROPERTY;
-
   public static final String TEST_USER="hadoop";
   public static final String TEST_GROUP="supergroup";
 
   /** Create a configuration object for the unit tests. */
   public static Configuration createConf() {
     Configuration conf = new Configuration();
-    conf.set(NAMENODE_ADDRESS_PROPERTY, "127.0.0.1:10090");
-    conf.set(DATANODE_ADDRESS_PROPERTY, "127.0.0.1:0");
+    conf.set(ThriftFsConfig.DFS_THRIFT_ADDR_KEY, "127.0.0.1:10090");
+    conf.set(ThriftFsConfig.DFS_THRIFT_DATANODE_ADDR_KEY, "127.0.0.1:0");
     conf.set("slave.host.name", "127.0.0.1");
     conf.setStrings("dfs.namenode.plugins", NamenodePlugin.class.getName());
     conf.setStrings("dfs.datanode.plugins", DatanodePlugin.class.getName());
