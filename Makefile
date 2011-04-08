@@ -266,10 +266,14 @@ ext-clean:
 ###############################################
 # Misc (some used by automated test scripts)
 ###############################################
-test:
+
+java-test:
+	mvn -f desktop/libs/hadoop/java/pom.xml test
+
+test: java-test
 	DESKTOP_DEBUG=1 $(BLD_DIR_BIN)/hue test fast --with-xunit
 
-test-slow:
+test-slow: java-test
 	DESKTOP_DEBUG=1 $(BLD_DIR_BIN)/hue test all --with-xunit --with-cover
 	$(BLD_DIR_BIN)/coverage xml
 
