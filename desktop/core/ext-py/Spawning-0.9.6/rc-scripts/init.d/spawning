@@ -1,0 +1,91 @@
+#!/sbin/runscript
+# Copyright 2009 Ludvig Ericson
+# Distributed under the terms of the 3-clause BSD license
+
+[[ -z "${SPAWN_BIN}" ]] && SPAWN_BIN="$(which spawning)"
+PIDFILE="/var/run/${SVCNAME}.pid"
+
+opts="${opts} reload"
+
+depend() {
+	need net
+}
+
+check_params() {
+	if [[ "${SVCNAME}" == "spawning" && -z "${I_KNOW}" ]]; then
+		ewarn "It is highly recommended to use a symbolic link for this"
+		ewarn "script and start via that instead. This allows you to run"
+		ewarn "multiple spawn services simultaneously. To do this, simply:"
+		ewarn
+		ewarn "  ln -s /etc/init.d/spawning /etc/init.d/spawning.mysvc"
+		ewarn "  cp /etc/conf.d/spawning /etc/conf.d/spawning.mysvc"
+		ewarn
+		ewarn "If you don't want to be bothered by this message, set I_KNOW=yes"
+		ewarn "in your configuration file."
+		ewarn
+	fi
+
+	if [[ -z "${SPAWN_BIN}" ]]; then
+		eerror "Couldn't find spawning binary and no explicit"
+		eerror "path set in configuration file."
+		return 1
+	fi
+
+	for CONF_VAR in WSGI_APP HOST PORT ERROR_LOG; do
+		if [[ -z "$(eval echo \$${CONF_VAR})" ]]; then
+			eerror "Required configuration variable ${CONF_VAR} not"
+			eerror "set in configuration file."
+			return 1
+		fi
+	done
+
+	if [[ ! -z "${WORKERS}" && -z "${NUM_WORKERS}" ]]; then
+		eerror "WORKERS has changed name to NUM_WORKERS, please update"
+		eerror "your configuration file(s) accordingly."
+		return 1
+	fi
+}
+
+start() {
+	ebegin "Starting ${SVCNAME} on ${HOST}:${PORT}"
+	local OPTS
+
+	check_params || return 1
+
+	OPTS="${OPTS} --host ${HOST} --port ${PORT}"
+	[[ ! -z "${NUM_PROCS}" ]] && OPTS="${OPTS} --processes ${NUM_PROCS}"
+	if [[ ! -z "${NUM_THREADS}" ]]; then
+		OPTS="${OPTS} --threads ${NUM_THREADS}"
+	elif [[ ! -z "${NUM_WORKERS}" ]]; then
+		OPTS="${OPTS} --workers ${NUM_WORKERS}"
+	fi
+	OPTS="${OPTS} --access-log ${ACCESS_LOG:-/dev/null}"
+
+	[[ ! -z "${CHUID}" ]]		&& OPTS="${OPTS} --chuid ${CHUID}"
+	[[ ! -z "${FACTORY}" ]]		&& OPTS="${OPTS} --factory ${FACTORY}"
+	[[ ! -z "${WATCH}" ]]		&& OPTS="${OPTS} --watch ${WATCH}"
+	[[ ! -z "${MAX_MEMORY}" ]]	&& OPTS="${OPTS} --max-memory ${MAX_MEMORY}"
+	[[ ! -z "${MAX_AGE}" ]]		&& OPTS="${OPTS} --max-age ${MAX_AGE}"
+	OPTS="${OPTS} ${EXTRA_OPTS}"
+
+	start-stop-daemon --start --pidfile "${PIDFILE}" \
+		--exec "${SPAWN_BIN}" --env PYTHONPATH="${PYTHON_LIBS}" -- \
+			--daemonize --pidfile "${PIDFILE}" \
+			--stderr "${ERROR_LOG}" --stdout "${INFO_LOG:-/dev/null}" \
+			${OPTS} ${WSGI_APP}
+	eend $?
+}
+
+stop() {
+	check_params || return 1
+	ebegin "Stopping ${SVCNAME}"
+	start-stop-daemon --stop --pidfile "${PIDFILE}" --signal INT
+	eend $?
+}
+
+reload() {
+	check_params || return 1
+	ebegin "Telling ${SVCNAME} to reload itself"
+	kill -HUP "$(cat ${PIDFILE})"
+	eend $?
+}

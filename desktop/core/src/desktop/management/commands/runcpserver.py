@@ -49,8 +49,8 @@ class Command(BaseCommand):
         from django.conf import settings
         from django.utils import translation
 
-        if not conf.ENABLE_CHERRYPY_SERVER.get():
-          logging.info("Desktop is configured to not start CherryPy server.")
+        if not conf.ENABLE_SERVER.get():
+          logging.info("Hue is configured to not start its own web server.")
           sys.exit(0)
 
         # Activate the current language, because it won't get activated later.

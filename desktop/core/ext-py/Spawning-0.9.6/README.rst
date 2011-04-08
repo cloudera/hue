@@ -1,0 +1,108 @@
+Spawning is a fast, easy to use, and flexible HTTP server for hosting python web applications which conform to the WSGI interface.
+
+Spawning uses eventlet to do non-blocking I/O for http requests and responses. This means the server will scale to a large number of idle keep-alive connections easily. Spawning can be configured to use multiple OS processes and either POSIX threads or eventlet's green threads, which are implemented using greenlet.
+
+Spawning is open source software, licensed under the MIT license. If you wish to contribute to development, please check out the source from http://github.com/rtyler/Spawning/ and either submit patches or fork spawning and submit a pull request.
+
+Single or Multiple Process
+==========================
+
+If your wsgi applications store state in memory, Spawning can be configured to run only one Python process. In this configuration your application state will be available to all requests but your application will not be able to take full advantage of multiple processors. Using multiple processes will take advantage of all processors and thus should be used for applications which do not share state.
+
+Single or Multiple Worker Thread
+================================================================
+
+If your wsgi applications perform a certain subset of blocking calls which have been monkeypatched by eventlet to cooperate instead (such as operations in the socket module), you can configure each process to run only a single main thread and cooperate using eventlet's green threads instead. This can be useful if your application needs to scale to a large number of simultaneous open connections, such as a COMET server or an application which uses AJAX polling. However, most existing wsgi applications will probably perform blocking operations (for example, calling database adapter libraries which perform blocking socket operations). Therefore, for most wsgi applications a combination of multiple processes and multiple threads will be ideal.
+
+Graceful Code Reloading
+=======================
+Spawning can watch all Python files that are imported into sys.modules for changes and performs a graceful reload on change. To enable this behavior, specify --reload=dev on the command line.  Old processes are told to stop accepting requests and finish any outstanding requests they are servicing, and shutdown. Meanwhile, new processes are started and begin accepting requests and servicing them with the new code. At no point will users of your site see "connection refused" errors because the server is continuously listening during reload.
+
+Running spawning
+================
+
+Spawning can be used to launch a wsgi application from the command line using the "spawn" script, or using Python Paste. To use with paste, specify use = egg:Spawning in the [server:main] section of a paste ini file.
+
+Spawning can also be used to run a Django application by using --factory=spawning.django_factory.config_factory.
+
+Examples of running spawning
+============================
+
+Run the wsgi application callable called "my_wsgi_application" inside the my_wsgi_module.py file::
+
+  % spawning my_wsgi_module.my_wsgi_application
+
+Run whatever is configured inside of the paste-style configuration file development.ini. Equivalent to using paster serve with an ini file configured to use Spawning as the server::
+
+  % spawning --factory=spawning.paste_factory.config_factory development.ini
+
+Run the Django app mysite::
+
+  % spawning --factory=spawning.django_factory.config_factory mysite.settings
+
+Run the wsgi application wrapped with some middleware. Pass as many middleware strings as desired after the wsgi application name::
+
+  % spawning my_wsgi_module.my_wsgi_application other_wsgi_module.some_wsgi_middleware
+
+Run the wsgi application on port 80, with 4 processes each using a threadpool of size 8::
+
+  % sudo spawning --port=80 --processes=4 --threads=8 my_wsgi_module.my_wsgi_application
+
+Use a threadpool of size 0, which indicates that eventlet monkeypatching should be performed and wsgi applications should all be called in the same thread. Useful for writing a comet-style application where a lot of requests are simply waiting on a server-side event or internal network io to complete::
+
+  % spawning --processes=4 --threads=0 my_wsgi_module.my_comet_application
+
+Additional Useful Arguments
+===========================
+
+-l ACCESS_LOG_FILE, --access-log-file=ACCESS_LOG_FILE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    The file to log access log lines to. If not given, log
+    to stdout. Pass /dev/null to discard logs.
+
+-c, --coverage
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    If given, gather coverage data from the running
+    program and make the coverage report available from
+    the /_coverage url. See the figleaf docs for more
+    info: http://darcs.idyll.org/~t/projects/figleaf/doc/
+
+-m MAX_MEMORY, --max-memory=MAX_MEMORY
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    If given, the maximum amount of memory this instance
+    of Spawning is allowed to use. If all of the processes
+    started by this Spawning controller use more than this
+    amount of memory, send a SIGHUP to the controller to
+    get the children to restart.
+
+-a MAX_AGE, --max-age=MAX_AGE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    If given, the maximum amount of time (in seconds) an
+    instance of spawning_child is allowed to run. Once
+    this time limit has expired a SIGHUP will be sent to
+    spawning_controller, causing it to restart all of the
+    child processes.
+
+--status-port=PORT, --status-host=HOST
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    If given, starts up a small web service to give 
+    health status reports on the Spawning server.  The 
+    service listens on two urls, 
+    
+    * http://status_host:status_port/status
+    * http://status_host:status_port/status.json
+    
+    The first is an HTML page that displays the status
+    of the server in a human-pleasing manner.  The .json
+    url is a JSON formatting of the same data.
+    
+    The status web service is only started if the 
+    --status-port option is supplied and different than
+    the service port.  --status-host is useful if
+    monitoring happens on a different ip address than
+    web application requests.

@@ -1,0 +1,8 @@
+copyright: Apache License v2.0
+version: 0.1
+description: Unknown
+name: shell
+sources: [
+Source/Shell/Shell.js,
+Source/Shell/Poller.js
+]

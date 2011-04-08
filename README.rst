@@ -62,6 +62,7 @@ Development Prerequisites
     Debian:
       * asciidoc
       * gcc
+      * g++
       * libmysqlclient-dev
       * libsasl2-dev
       * libsqlite3-dev

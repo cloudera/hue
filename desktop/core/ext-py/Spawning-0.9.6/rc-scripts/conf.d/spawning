@@ -1,0 +1,67 @@
+# Python Spawning configuration
+
+# DO NOT MODIFY THIS FILE DIRECTLY! CREATE A COPY AND MODIFY THAT INSTEAD!
+
+# Spawning factory name.
+# If you're using Django, you should use:
+#FACTORY=spawning.django_factory.config_factory.
+# If you're using Paste, you should use:
+#FACTORY=spawning.paste_factory.config_factory
+# Or, for regular WSGI, the default is:
+#FACTORY=spawning.wsgi_factory.config_factory
+
+# The WSGI application you want to spawn.
+# This means different things with different factories, for example with
+# Django, the WSGI_APP should be the Django settings module to load.
+WSGI_APP=
+
+# Serve on <HOST>:<PORT>
+HOST=0.0.0.0
+PORT=8080
+
+# Change to user (and group if given). `[user[:group]]`
+#CHUID=
+
+# A colon-separated list of the Python path.
+#PYTHON_LIBS=/usr/local/lib/my-python-packages
+
+# stderr is redirected to ERROR_LOG. The status output from the workers, among
+# other things, will end up there.
+ERROR_LOG=/var/log/spawning/error.log
+
+# stdout is redirected to INFO_LOG.
+INFO_LOG=/var/log/spawning/info.log
+
+# The access log is written separately from stdout and stderr.
+ACCESS_LOG=/var/log/spawning/access.log
+
+# Concurrency model.
+
+# Choose either forks (NUM_WORKERS) or threads (NUM_THREADS).
+# NUM_WORKERS defines the number of forks to make a process-based pool out of.
+#NUM_WORKERS=10
+#NUM_THREADS=0
+
+# NUM_THREADS defines the number of threads to make a thread-based pool out of.
+#NUM_THREADS=10
+#NUM_WORKERS=0
+
+# NUM_PROCS defines the number of forks to make, each fork has its own
+# NUM_WORKERS and NUM_THREADS.
+#NUM_PROCS=1
+
+# Maximum age in seconds of a worker before it's restarted.
+#MAX_AGE=
+
+# Maximum memory usage of _all_ workers before it's restarted.
+# Counts resident set size (RSS) in kilobytes, see ps(1).
+#MAX_MEMORY=
+
+# Watch file. When the file changes, Spawning reloads.
+#WATCH=
+
+# Extra options to pass to Spawning.
+#EXTRA_OPTS=
+
+# Path to Spawning binary.
+#SPAWN_BIN=

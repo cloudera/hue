@@ -20,7 +20,9 @@ Checked-in third party dependencies
 |Y|Django_nose (part of basie)|?|MIT|http://code.basieproject.org/trunk/apps/django_nose/nose_runner.py|
 |Y|elementtree|1.2.6-20050316|Python(MIT)|http://effbot.org/downloads#elementtree|
 |Y|enum|0.4.4|Python|http://pypi.python.org/pypi/enum/|
+|Y|eventlet|0.9.14|MIT|http://pypi.python.org/pypi/eventlet/|
 |Y|FancyUpload|3.0|MIT|http://github.com/digitarald/digitarald-fancyupload/tarball/3.0|
+|Y|greenlet|0.3.1|MIT|http://pypi.python.org/pypi/greenlet/|
 |Y|lockfile|0.8|MIT|http://smontanaro.dyndns.org/python/lockfile-0.8.tar.gz|
 |Y|lxml|2.2.2|BSD|http://codespeak.net/lxml/|
 |Y|Mako|0.3.4|MIT|http://makotemplates.org/|
@@ -39,6 +41,7 @@ Checked-in third party dependencies
 |Y|sasl|0.1.1|Apache|http://pypi.python.org/pypi/sasl/0.1.1|
 |Y|simplejson|2.0.9|MIT|http://pypi.python.org/packages/source/s/simplejson/simplejson-2.0.9.tar.gz|
 |Y|South|0.7|Apache|http://south.aeracode.org/|
+|Y|Spawning|0.9.6|MIT|http://pypi.python.org/pypi/Spawning/0.9.6/|
 |Y|threadframe|0.2|Python|http://www.majid.info/mylos/stories/2004/06/10/threadframe.html|
 |Y|Thrift|?|Apache|http://incubator.apache.org/thrift/download/|
 |Y|Twisted|8.2.0|MIT|http://twistedmatrix.com/trac/|

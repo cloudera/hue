@@ -1,0 +1,181 @@
+--work in progress--
+
+Introduction
+------------
+Twisted provides solid foundation for asynchronous programming in Python.
+Eventlet makes asynchronous programming look like synchronous, thus
+achieving higher signal-to-noise ratio than traditional twisted programs have.
+
+Eventlet on top of twisted provides:
+ * stable twisted
+ * usable and readable synchronous style
+ * existing twisted code can be used without any changes
+ * existing blocking code can be used after trivial changes applied
+
+NOTE: the maintainer of Eventlet's Twisted support no longer supports it; it still exists but may have had some breakage along the way.  Please treat it as experimental, and if you'd like to maintain it, please do!
+
+Eventlet features:
+
+ * utilities for spawning and controlling greenlet execution:
+   api.spawn, api.kill, proc module
+ * utilities for communicating between greenlets:
+   event.Event, queue.Queue, semaphore.Semaphore
+ * standard Python modules that won't block the reactor:
+   eventlet.green package
+ * utilities specific to twisted hub:
+   eventlet.twistedutil package
+
+
+Getting started with eventlet on twisted
+----------------------------------------
+
+This section will only mention stuff that may be useful but it
+won't explain in details how to use it. For that, refer to the
+docstrings of the modules and the examples.
+
+There are 2 ways of using twisted with eventlet, one that is
+familiar to twisted developers and another that is familiar
+to eventlet developers:
+
+ 1. explicitly start the main loop in the main greenlet;
+ 2. implicitly start the main loop in a dedicated greenlet.
+
+To enable (1), add this line at the top of your program:
+from eventlet.twistedutil import join_reactor
+then start the reactor as you would do in a regular twisted application.
+
+For (2) just make sure that you have reactor installed before using
+any of eventlet functions. Otherwise a non-twisted hub will be selected
+and twisted code won't work.
+
+Most of examples/twisted_* use twisted style with the exception of
+twisted_client.py and twisted_srvconnector.py. All of the non-twisted
+examples in examples directory use eventlet-style (they work with any
+of eventlet's hubs, not just twisted-based).
+
+Eventlet implements "blocking" operations by switching to the main loop
+greenlet, thus it's impossible to call a blocking function when you are
+already in the main loop. Therefore one must be cautious in a twisted
+callback, calling only a non-blocking subset of eventlet API here. The
+following functions won't unschedule the current greenlet and are safe
+to call from anywhere:
+
+1. Greenlet creation functions: api.spawn, proc.spawn,
+   twistedutil.deferToGreenThread and others based on api.spawn.
+
+2. send(), send_exception(), poll(), ready() methods of event.Event
+   and queue.Queue.
+
+3. wait(timeout=0) is identical to poll(). Currently only Proc.wait
+   supports timeout parameter.
+
+4. Proc.link/link_value/link_exception
+
+Other classes that use these names should follow the convention.
+
+For an example on how to take advantage of eventlet in a twisted
+application using deferToGreenThread see examples/twisted_http_proxy.py
+
+Although eventlet provides eventlet.green.socket module that implements
+interface of the standard Python socket, there's also a way to use twisted's
+network code in a synchronous fashion via GreenTransport class.
+A GreenTransport interface is reminiscent of socket but it's not a drop-in
+replacement. It combines features of TCPTransport and Protocol in a single
+object:
+
+ * all of transport methods (like getPeer()) are available directly on
+   a GreenTransport instance; in addition, underlying transport object
+   is available via 'transport' attribute;
+ * write method is overriden: it may block if transport write buffer is full;
+ * read() and recv() methods are provided to retrieve the data from protocol
+   synchronously.
+
+To make a GreenTransport instance use twistedutil.protocol.GreenClientCreator
+(usage is similar to that of twisted.internet.protocol.ClientCreator)
+
+For an example on how to get a connected GreenTransport instance,
+see twisted_client.py, twisted_srvconnect.py or twisted_portforward.py.
+For an example on how to use GreenTransport for incoming connections,
+see twisted_server.py, twisted_portforward.py.
+
+
+also
+* twistedutil.block_on - wait for a deferred to fire
+  block_on(reactor.callInThread(func, args))
+* twistedutil.protocol.basic.LineOnlyReceiverTransport - a green transport
+  variant built on top of LineOnlyReceiver protocol. Demonstrates how
+  to convert a protocol to a synchronous mode.
+
+
+Coroutines
+----------
+
+To understand how eventlet works, one has to understand how to use greenlet:
+http://codespeak.net/py/dist/greenlet.html
+
+Essential points
+
+* There always exists MAIN greenlet
+* Every greenlet except MAIN has a parent. MAIN therefore could be detected as g.parent is None
+* When greenlet is finished it's return value is propagated to the parent (i.e. switch() call
+  in the parent greenlet returns it)
+* When an exception leaves a greelen, it's propagated to the parent (i.e. switch() in the parent
+  re-raises it) unless it's a subclass of GreenletExit, which is returned as a value.
+* parent can be reassigned (by simply setting 'parent' attribute). A cycle would be detected and
+  rejected with ValueError
+
+
+Note, that there's no scheduler of any sort; if a coroutine wants to be
+scheduled again it must take care of it itself. As an application developer,
+however, you don't need to worry about it as that's what eventlet does behind
+the scenes. The cost of that is that you should not use greenlet's switch() and
+throw() methods, they will likely leave the current greenlet unscheduled
+forever. Eventlet also takes advantage of greenlet's `parent' attribute,
+so you should not meddle with it either.
+
+
+How does eventlet work
+----------------------
+
+Twisted's reactor and eventlet's hub are very similar in what they do.
+Both continuously perform polling on the list of registered descriptors
+and each time a specific event is fired, the associated callback function
+is called. In addition, both maintain a list of scheduled calls.
+
+Polling is performed by the main loop - a function that both reactor and hub have.
+When twisted calls user's callback it's expected to return almost immediately,
+without any blocking I/O calls.
+
+Eventlet runs the main loop in a dedicated greenlet (MAIN_LOOP). It is the same
+greenlet as MAIN if you use join_reactor. Otherwise it's a separate greenlet
+started implicitly. The execution is organized in a such way that the switching
+always involves MAIN_LOOP. All of functions in eventlet that appear "blocking"
+use the following algorithm:
+
+1. register a callback that switches back to the current greenlet when
+   an event of interest happens
+2. switch to the MAIN_LOOP
+
+For example, here's what eventlet's socket recv() does:
+
+= blocking operation RECV on socket d =
+
+user's greenlet (USER)             main loop's greenlet (MAIN_LOOP)
+      |
+(inside d.recv() call)
+      |
+add_descriptor(d, RECV)
+      |
+data=MAIN_LOOP.switch() ---------> poll for events
+  ^---------------------\               |
+                        |              ... ---------------------------> may execute other greenlets here
+                        |               |
+                        |          event RECV on descriptor d?
+                        |               |
+                        |          d.remove_descriptor(d, RECV)
+                        |               |
+                        |          data = d.recv() # calling blocking op that will return immediately
+                        |               |
+                        \--------- USER.switch(data) # argument data here becomes return value in user's switch
+  return data
+
