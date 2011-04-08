@@ -1,0 +1,9 @@
+Authors
+
+ - Donovan Preston (creator)
+ - Ben Bangert (contributor)
+ - Ludvig Ericson (contributor)
+ - Elliot Murphy (contributor)
+ - Steve 'Ashcrow' Milner (contributor)
+ - Ryan Williams (contributor)
+ - R. Tyler Croy (current maintainer)

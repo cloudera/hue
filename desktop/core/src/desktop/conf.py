@@ -24,6 +24,12 @@ import os
 import socket
 import stat
 
+USE_CHERRYPY_SERVER = Config(
+  key="use_cherrypy_server",
+  help="If set to true, CherryPy will be used. Otherwise, Spawning will be used as the webserver.",
+  type=coerce_bool,
+  default=False)
+
 HTTP_HOST = Config(
   key="http_host",
   help="HTTP Host to bind to",
@@ -42,9 +48,9 @@ SSL_PRIVATE_KEY = Config(
   key="ssl_private_key",
   help="Filename of SSL RSA Private Key",
   default=None)
-ENABLE_CHERRYPY_SERVER = Config(
-  key="enable_cherrypy_server",
-  help="If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container.",
+ENABLE_SERVER = Config(
+  key="enable_server",
+  help="If set to false, runserver will not actually start the web server.  Used if Apache is being used as a WSGI container.",
   type=coerce_bool,
   default=True)
 CHERRYPY_SERVER_THREADS = Config(

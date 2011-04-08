@@ -1,0 +1,115 @@
+0.9
+====
+    - Remove the unnecessary dependency on eventlet.jsonhttp. This makes spawning work with eventlet 0.9, which removed jsonhttp and put it in another library. (fzzzy)
+    - Preserve the order of sys.path. (verterok)
+    - Work around a python deadlock bug with forked child processes (statik)
+
+0.9.1: Fix news file to move entries from 0.8.13 to 0.9 since I decided to call this release 0.9.
+
+0.9.2: Fix a small typo in the preserve order of sys.path patch from 0.9 that would cause spawning to crash. (schmir)
+
+0.9.3:
+    - Add the ability to disallow HTTP Keepalive via --no-keepalive
+    - Enable "progressive" spawning and reaping of children processes; in
+      effect the parent will receive a signal from children about their
+      impending death and the parent will spin up a new child while the old one
+      expires
+    - SIGHUP to the parent will cause it to cycle children without itself dying
+
+0.9.4:
+    - Script for spawning renamed from "spawn" to "spawning" to avoid confusion
+    - Use O_APPEND when opening files when daemonizing
+    - Debian/Ubuntu init.d scripts using start-stop-daemon
+    - spawning.util module added to house methods that don't belong elsewhere
+    - Update Spawning to use newer Eventlet API calls
+    - Properly handle errors when calling `setproctitle`
+    - Allow optional `eventlet.backdoor` bound to localhost
+    - Operate more cleanly with Eventlet's websockets support with changes to
+      eventlet.tpool integration
+    - Avoid passing certain objects through `eventlet.tpool.Proxy` when using
+      threads for a performance gain
+    - Prevent leaking pipes when handling children processes
+
+
+0.9.5:
+    - Fixed a number of issues with reloading of Spawning children
+    - Added /_sysinfo to provide information about the machine
+    - Added health page that listens on a different port from the controller,
+      providing HTML and JSON formatted information about children
+    - Introduced a basic logfile analyzer for processsing Spawning logs for
+      further information not provided by the health page
+
+
+
+0.8
+====
+
+Fixed a problem where eventlet monkeypatching was inappropriately installed in child processes which use threads. This would result in certain operations (primarily DNS lookup operations) resulting in a greenlet "cannot switch to another thread" exception.
+
+Changed the paste factory to use 10 worker threads by default, to match the paste default. Previously if the paste ini file did not mention how many worker threads to use, spawning would default to 0 and switch into cooperative, non-blocking mode.
+
+Added a deadman timeout to child processes which have been told to exit and are waiting for outstanding requests to finish. If the timeout expires before all requests have completed, we assume the process is hung and kill -9 it. The default timeout is 120 seconds.
+
+If an i/o child process dies with an exit code other than 0, the controller decides something must have gone horribly wrong and restarts all of the children.
+
+0.8.1: Fix a bug where the reloader didn't work with paster serve.
+
+0.8.2: In the svn reloader, watch both spawning's directory and the directory of the wsgi application we are serving. Also, fix the django_factory which was broken by 0.8.
+
+0.8.3: For all svn repositories the svn reloader is watching, also watch any svn:externals repositories contained therein.
+
+0.8.4: Fixed a bug where the controller process dying unexpectedly (such as from a kill -9) would cause the children to have an exception but then keep running forever, preventing any other processes from using the ports again in the future.
+
+0.8.5: Fixed a bug in the svn reloader where files that svn reported as 'not under version control' would cause the reloader to crash and exit immediately. I now use svn's exit code instead of sniffing svn's output, which should also help avoid problems for anyone who is using a localized copy of svn, or if svn ever changes the content of these messages.
+
+0.8.6: Fix a file descriptor leak that occurred when the controller reloaded. If your code changed enough times over the lifetime of the server (thousands of times) it would eventually run out of file descriptors and refuse to start up. Now the number of file descriptors stays constant no matter how many times the server restarts.
+
+0.8.7:
+  - In the svn reloader process, check to see if the controller is still alive, and if not, just exit.
+  - Don't hold on to the web port at all in the reloader_svn process.
+  - Add an exponential backoff to the controller's "panic" restart. Before spawning would restart as fast as possible; now it backs off the time between restarts.
+  - If we can't import the wsgi app, panic.
+  - If we can't fork a child process (out of memory), panic.
+
+0.8.8:
+  - Added --access-log-file command line option to allow writing access logs to someplace other than stdout. Useful for redirecting to /dev/null for speed
+  - Correctly extract the child's exit code and clean up the logging of child exit events.
+  - Add coverage gathering using figleaf if the --coverage command line option is given. When gathering coverage, the figleaf report can be downloaded from the /_coverage url.
+  - Add a --max-memory option to limit the total amount of memory spawning will use. If this is exceeded a SIGHUP will be sent to the controller causing the children to restart.
+  - Add a --max-age option to limit the total amount of time a spawning child is allowed to run. After the time limit is exceeded a SIGHUP will be sent to the controller to cause the children to restart.
+  - Instead of just passing the PYTHONPATH environment variable through to the children, construct the PYTHONPATH from the contents of sys.path.
+  - Instead of just trying to run 'spawn' with /usr/bin/env when restarting, just run sys.executable -m spawning.spawning_controller, making it more likely that the controller will run correctly when restarting.
+  - Add a --verbose option and change the default startup procedure to not log the detailed dictionary of configuration information.
+
+0.8.9: Minor release which provides compatibility with running servers which are using 0.8.7. With 0.8.8, any running servers which are upgraded from 0.8.7->0.8.8 will crash with a KeyError and need to be restarted manually.
+
+0.8.10: When spawning starts up, add the current working directory to sys.path if it is not already there. Also, when calculating the PYTHONPATH to give to the child from sys.path, remove any path which does not exist, preventing setuptools "DistributionNotFound" errors.
+
+0.8.11:
+    - Added Python 2.4 compatibility. (kiorky)
+    - Added license headers to all source files. (statik)
+    - Print exceptions to stderr instead of stdout. (lericson)
+    - Don't assume every OSError the controller process gets is EINTR. (lericson)
+    - Added simple daemonizing support. (lericson)
+    - Added an OpenRC init script. (lericson)
+    - Added an explicit manifest. (lericson)
+
+0.8.12:
+    - Remove the processpool implementation added in 0.7 because an equivalent setup can be achieved using controller processes and 1 thread; now we can just talk about the 'number of processes' and 'number of threads' instead of having two levels of different kind of processes when using the processpool. (fzzzy)
+    - Minor release to fix the explicit manifest and OpenRC init script added in the last release. (lericson)
+    - When running under 2.6 we no longer produce a deprecation warning about the removal of the sets module. (fzzzy)
+
+
+
+
+
+0.7
+====
+
+Added django_factory.
+
+Add an optional worker processpool which can be used as an equivalent to the worker threadpool.
+
+Added command-line script to launch a wsgi application, 'spawn'.
+
+	spawn mymodule.my_wsgi_app

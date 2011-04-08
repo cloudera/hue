@@ -1,0 +1,71 @@
+Maintainer (i.e., Who To Hassle If You Find Bugs)
+-------------------------------------------------
+Ryan Williams, rdw on Freenode, breath@alum.mit.edu
+
+Original Authors
+----------------
+* Bob Ippolito
+* Donovan Preston
+
+Contributors
+------------
+* AG Projects
+* Chris AtLee
+* R\. Tyler Ballance
+* Denis Bilenko
+* Mike Barton
+* Patrick Carlisle
+* Ben Ford
+* Andrew Godwin
+* Brantley Harris
+* Gregory Holt
+* Joe Malicki
+* Chet Murthy
+* Eugene Oden
+* radix
+* Scott Robinson
+* Tavis Rudd
+* Sergey Shepelev
+* Chuck Thier
+* Nick V
+* Daniele Varrazzo
+* Ryan Williams
+
+Linden Lab Contributors
+-----------------------
+* John Beisley
+* Tess Chu
+* Nat Goodspeed
+* Dave Kaprielian
+* Kartic Krishnamurthy
+* Bryan O'Sullivan
+* Kent Quirk
+* Ryan Williams
+
+Thanks To
+---------
+* AdamKG, giving the hint that invalid argument errors were introduced post-0.9.0
+* Luke Tucker, bug report regarding wsgi + webob
+* Taso Du Val, reproing an exception squelching bug, saving children's lives  ;-)
+* Luci Stanescu, for reporting twisted hub bug
+* Marcus Cavanaugh, for test case code that has been incredibly useful in tracking down bugs
+* Brian Brunswick, for many helpful questions and suggestions on the mailing list
+* Cesar Alaniz, for uncovering bugs of great import
+* the grugq, for contributing patches, suggestions, and use cases
+* Ralf Schmitt, for wsgi/webob incompatibility bug report and suggested fix
+* Benoit Chesneau, bug report on green.os and patch to fix it
+* Slant, better iterator implementation in tpool
+* Ambroff, nice pygtk hub example
+* Michael Carter, websocket patch to improve location handling
+* Marcin Bachry, nice repro of a bug and good diagnosis leading to the fix
+* David Ziegler, reporting issue #53
+* Favo Yang, twisted hub patch
+* Schmir, patch that fixes readline method with chunked encoding in wsgi.py, advice on patcher
+* Slide, for open-sourcing gogreen
+* Holger Krekel, websocket example small fix
+* mikepk, debugging MySQLdb/tpool issues
+* Malcolm Cleaton, patch for Event exception handling
+* Alexey Borzenkov, for finding and fixing issues with Windows error detection (#66, #69), reducing dependencies in zeromq hub (#71)
+* Anonymous, finding and fixing error in websocket chat example (#70)
+* Edward George, finding and fixing an issue in the [e]poll hubs (#74)
+* Ruijun Luo, figuring out incorrect openssl import for wrap_ssl (#73)

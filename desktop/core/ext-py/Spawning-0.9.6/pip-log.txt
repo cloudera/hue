@@ -1,0 +1,167 @@
+Downloading/unpacking distribute
+  Getting page http://pypi.python.org/simple/distribute
+  URLs to search for versions for distribute:
+  * http://pypi.python.org/simple/distribute/
+  Getting page http://packages.python.org/distribute
+  Analyzing links from page http://pypi.python.org/simple/distribute/
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.6.tar.gz#md5=a0a7541a8169d73842e4bb88d79cf8d3 (from http://pypi.python.org/simple/distribute/), version: 0.6.6
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.7.tar.gz#md5=b79b9422b1ea517bf3b43e277e9c813a (from http://pypi.python.org/simple/distribute/), version: 0.6.7
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.8.tar.gz#md5=c0c6a6b273234cb2cf8c4f82612e375c (from http://pypi.python.org/simple/distribute/), version: 0.6.8
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.10.tar.gz#md5=99fb4b3e4ef0861bba11aa1905e89fed (from http://pypi.python.org/simple/distribute/), version: 0.6.10
+    Skipping link http://pypi.python.org/packages/2.6/d/distribute/distribute-0.6-py2.6.egg#md5=89c46c2ed0c756dd278acc1482aa12f1 (from http://pypi.python.org/simple/distribute/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.4/d/distribute/distribute-0.6-py2.4.egg#md5=8fc3eb887ee98c506c38838955f9eee2 (from http://pypi.python.org/simple/distribute/); unknown archive format: .egg
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.4.tar.gz#md5=7a963679fddc64a0e363b2ccf8024952 (from http://pypi.python.org/simple/distribute/), version: 0.6.4
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.1.tar.gz#md5=e6224b1da4636dd8ae53407fc67bb35b (from http://pypi.python.org/simple/distribute/), version: 0.6.1
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.9.tar.gz#md5=5b1a2fde063a361aa241f98e0f9e1931 (from http://pypi.python.org/simple/distribute/), version: 0.6.9
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.2.tar.gz#md5=8e612376b1a0e4dfddcbcaefcc14515e (from http://pypi.python.org/simple/distribute/), version: 0.6.2
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.3.tar.gz#md5=3940fd02a763f001014296cfec5e69f2 (from http://pypi.python.org/simple/distribute/), version: 0.6.3
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.5.tar.gz#md5=ebe726123b35c1efbf5f7fc83116e3a1 (from http://pypi.python.org/simple/distribute/), version: 0.6.5
+    Found link http://pypi.python.org/packages/source/d/distribute/distribute-0.6.tar.gz#md5=698b898596fc35c95dbda8332cfca08b (from http://pypi.python.org/simple/distribute/), version: 0.6
+    Skipping link http://pypi.python.org/packages/2.5/d/distribute/distribute-0.6-py2.5.egg#md5=d87f6492c53d192c62e0334859d18b59 (from http://pypi.python.org/simple/distribute/); unknown archive format: .egg
+    Skipping link http://pypi.python.org/packages/2.3/d/distribute/distribute-0.6-py2.3.egg#md5=66d06db7fc91227585f81b0b27b07bab (from http://pypi.python.org/simple/distribute/); unknown archive format: .egg
+    Skipping link http://packages.python.org/distribute (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/1 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/10 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/12 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/13 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/16 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/18 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/3 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/31 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/40 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/49 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/5 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/50 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/52 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/56 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/6 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/7 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/8 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issue/9 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bitbucket.org/tarek/distribute/issues/ (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bugs.python.org/setuptools/issue2 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bugs.python.org/setuptools/issue20 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bugs.python.org/setuptools/issue33 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bugs.python.org/setuptools/issue39 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bugs.python.org/setuptools/issue40 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bugs.python.org/setuptools/issue41 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://bugs.python.org/setuptools/issue44 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://code.google.com/p/unladen-swallow/source/detail?spec=svn875&amp;r=719 (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://mail.python.org/mailman/listinfo/distutils-sig (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://packages.python.org (from http://pypi.python.org/simple/distribute/); not a file
+    Skipping link http://python-distribute.org/distribute_setup_3k.py (from http://pypi.python.org/simple/distribute/); unknown archive format: .py
+    Skipping link http://python-distribute.org/distribute_setup.py (from http://pypi.python.org/simple/distribute/); unknown archive format: .py
+    Found link http://bitbucket.org/tarek/distribute/get/0.6-maintenance.zip#egg=distribute-dev (from http://pypi.python.org/simple/distribute/), version: dev
+  Analyzing links from page http://packages.python.org/distribute/
+    Skipping link http://packages.python.org/distribute/_static/nature.css (from http://packages.python.org/distribute/); unknown archive format: .css
+    Skipping link http://packages.python.org/distribute/_static/pygments.css (from http://packages.python.org/distribute/); unknown archive format: .css
+    Skipping link http://packages.python.org/distribute/ (from http://packages.python.org/distribute/); not a file
+    Skipping link http://packages.python.org/distribute/roadmap.html (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/genindex.html (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/#welcome-to-distribute-s-documentation (from http://packages.python.org/distribute/); not a file
+    Skipping link http://pixane.com (from http://packages.python.org/distribute/); not a file
+    Skipping link http://packages.python.org/distribute/roadmap.html#x (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/roadmap.html#id1 (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/python3.html (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/python3.html#distribute-as-help-during-porting (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/python3.html#distributing-python-3-modules (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/python3.html#advanced-features (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/python3.html#note-on-compatibility-with-setuptools (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/using.html (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/setuptools.html (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/setuptools.html#developer-s-guide (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/setuptools.html#command-reference (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/setuptools.html#extending-and-reusing-distribute (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/easy_install.html (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/easy_install.html#using-easy-install (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/easy_install.html#reference-manual (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/easy_install.html#history (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/easy_install.html#future-plans (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/pkg_resources.html (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/pkg_resources.html#overview (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/pkg_resources.html#api-reference (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/#indices-and-tables (from http://packages.python.org/distribute/); not a file
+    Skipping link http://packages.python.org/distribute/modindex.html (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/search.html (from http://packages.python.org/distribute/); unknown archive format: .html
+    Skipping link http://packages.python.org/distribute/_sources/index.txt (from http://packages.python.org/distribute/); unknown archive format: .txt
+    Skipping link http://pypi.python.org/pypi/distribute (from http://packages.python.org/distribute/); not a file
+    Skipping link http://sphinx.pocoo.org/ (from http://packages.python.org/distribute/); not a file
+  Using version 0.6.10 (newest of versions: 0.6.10, 0.6.9, 0.6.8, 0.6.7, 0.6.6, 0.6.5, 0.6.4, 0.6.3, 0.6.2, 0.6.1, 0.6, dev)
+  Downloading from URL http://pypi.python.org/packages/source/d/distribute/distribute-0.6.10.tar.gz#md5=99fb4b3e4ef0861bba11aa1905e89fed (from http://pypi.python.org/simple/distribute/)
+  Running setup.py egg_info for package distribute
+    /usr/lib/python2.6/site-packages/Pyrex/Compiler/Errors.py:17: DeprecationWarning: BaseException.message has been deprecated as of Python 2.6
+      self.message = message
+    running egg_info
+    creating pip-egg-info/distribute.egg-info
+    writing pip-egg-info/distribute.egg-info/PKG-INFO
+    writing top-level names to pip-egg-info/distribute.egg-info/top_level.txt
+    writing dependency_links to pip-egg-info/distribute.egg-info/dependency_links.txt
+    writing entry points to pip-egg-info/distribute.egg-info/entry_points.txt
+    writing pip-egg-info/distribute.egg-info/PKG-INFO
+    writing top-level names to pip-egg-info/distribute.egg-info/top_level.txt
+    writing dependency_links to pip-egg-info/distribute.egg-info/dependency_links.txt
+    writing entry points to pip-egg-info/distribute.egg-info/entry_points.txt
+    writing manifest file 'pip-egg-info/distribute.egg-info/SOURCES.txt'
+    warning: manifest_maker: standard file '-c' not found
+    reading manifest file 'pip-egg-info/distribute.egg-info/SOURCES.txt'
+    reading manifest template 'MANIFEST.in'
+    writing manifest file 'pip-egg-info/distribute.egg-info/SOURCES.txt'
+Installing collected packages: distribute
+  Running setup.py install for distribute
+    Running command /home/tyler/envs/spawning/bin/python -c "import setuptools; __file__='/home/tyler/envs/spawning/build/distribute/setup.py'; execfile('/home/tyler/envs/spawning/build/distribute/setup.py')" install --single-version-externally-managed --record /tmp/pip-NyB_Gl-record/install-record.txt --install-headers /home/tyler/envs/spawning/lib/include
+    /usr/lib/python2.6/site-packages/Pyrex/Compiler/Errors.py:17: DeprecationWarning: BaseException.message has been deprecated as of Python 2.6
+      self.message = message
+    Before install bootstrap.
+    Scanning installed packages
+    Setuptools installation detected at /home/tyler/envs/spawning/lib/python2.6/site-packages/setuptools-0.6c11-py2.6.egg
+    Egg installation
+    Patching...
+    Renaming /home/tyler/envs/spawning/lib/python2.6/site-packages/setuptools-0.6c11-py2.6.egg into /home/tyler/envs/spawning/lib/python2.6/site-packages/setuptools-0.6c11-py2.6.egg.OLD.1272815129.25
+    Patched done.
+    Relaunching...
+    Traceback (most recent call last):
+      File "<string>", line 1, in <module>
+    NameError: name 'install' is not defined
+    Complete output from command /home/tyler/envs/spawning/bin/python -c "import setuptools; __file__='/home/tyler/envs/spawning/build/distribute/setup.py'; execfile('/home/tyler/envs/spawning/build/distribute/setup.py')" install --single-version-externally-managed --record /tmp/pip-NyB_Gl-record/install-record.txt --install-headers /home/tyler/envs/spawning/lib/include:
+    /usr/lib/python2.6/site-packages/Pyrex/Compiler/Errors.py:17: DeprecationWarning: BaseException.message has been deprecated as of Python 2.6
+
+  self.message = message
+
+Before install bootstrap.
+
+Scanning installed packages
+
+Setuptools installation detected at /home/tyler/envs/spawning/lib/python2.6/site-packages/setuptools-0.6c11-py2.6.egg
+
+Egg installation
+
+Patching...
+
+Renaming /home/tyler/envs/spawning/lib/python2.6/site-packages/setuptools-0.6c11-py2.6.egg into /home/tyler/envs/spawning/lib/python2.6/site-packages/setuptools-0.6c11-py2.6.egg.OLD.1272815129.25
+
+Patched done.
+
+Relaunching...
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+
+NameError: name 'install' is not defined
+
+----------------------------------------
+Command /home/tyler/envs/spawning/bin/python -c "import setuptools; __file__='/home/tyler/envs/spawning/build/distribute/setup.py'; execfile('/home/tyler/envs/spawning/build/distribute/setup.py')" install --single-version-externally-managed --record /tmp/pip-NyB_Gl-record/install-record.txt --install-headers /home/tyler/envs/spawning/lib/include failed with error code 1
+Exception information:
+Traceback (most recent call last):
+  File "/home/tyler/envs/spawning/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/basecommand.py", line 115, in main
+    self.run(options, args)
+  File "/home/tyler/envs/spawning/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/commands/install.py", line 157, in run
+    requirement_set.install(install_options)
+  File "/home/tyler/envs/spawning/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/req.py", line 1165, in install
+    requirement.install(install_options)
+  File "/home/tyler/envs/spawning/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/req.py", line 533, in install
+    cwd=self.source_dir, filter_stdout=self._filter_install, show_stdout=False)
+  File "/home/tyler/envs/spawning/lib/python2.6/site-packages/pip-0.6.3-py2.6.egg/pip/__init__.py", line 207, in call_subprocess
+    % (command_desc, proc.returncode))
+InstallationError: Command /home/tyler/envs/spawning/bin/python -c "import setuptools; __file__='/home/tyler/envs/spawning/build/distribute/setup.py'; execfile('/home/tyler/envs/spawning/build/distribute/setup.py')" install --single-version-externally-managed --record /tmp/pip-NyB_Gl-record/install-record.txt --install-headers /home/tyler/envs/spawning/lib/include failed with error code 1
