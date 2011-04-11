@@ -737,7 +737,7 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
         /** Returns job by id (including task info) */
         public ThriftJobInProgress getJob(RequestContext ctx, ThriftJobID jobID) throws JobNotFoundException {
             final JobID jid = JTThriftUtils.fromThrift(jobID);
-            JobInProgress job = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobInProgress>() {
+            final JobInProgress job = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobInProgress>() {
               public JobInProgress run() {
                 return jobTracker.getJob(jid);
               }
@@ -745,7 +745,12 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             if (job == null) {
               throw new JobNotFoundException();
             }
-            return JTThriftUtils.toThrift(job, jobTracker);
+
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobInProgress>() {
+              public ThriftJobInProgress run() {
+                return JTThriftUtils.toThrift(job, jobTracker);
+              }
+            });
         }
 
         /** Returns all running jobs (does not include task info) */
@@ -1152,9 +1157,20 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             if (job == null) {
                 throw new JobNotFoundException();
             }
-            JobID jid = JTThriftUtils.fromThrift(jobID);
+
             try {
-                jobTracker.killJob(jid);
+                final JobID jid = JTThriftUtils.fromThrift(jobID);
+
+                assumeUserContextAndExecute(ctx, new PrivilegedExceptionAction<Void>() {
+                    public Void run() throws JobNotFoundException {
+                        try {
+                            jobTracker.killJob(jid);
+                        } catch (java.io.IOException e) {
+                            throw new JobNotFoundException();
+                        }
+                        return null;
+                    }
+                });
             } catch (Throwable t) {
                 LOG.info("killJob failed", t);
                 throw ThriftUtils.toThrift(t);
