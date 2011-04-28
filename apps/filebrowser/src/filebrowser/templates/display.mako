@@ -43,6 +43,10 @@
         <a class="fv-viewGzip" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">Preview As Gzip</a>
       % endif
 
+      % if view['compression'] != "avro" and path.endswith('.avro'):
+        <a class="fv-viewAvro" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro">Preview As Avro</a>
+      % endif
+
       % if view['compression'] and view['compression'] != "none":
         <a class="fv-viewGzip" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none">Stop preview</a>
       % endif
@@ -56,7 +60,7 @@
     </div>
   </div>
   <div class="fv-navhead">
-    % if not view['compression'] or view['compression'] == "none":
+    % if not view['compression'] or view['compression'] in ("none", "avro"):
       <div class="fv-navStatus">
         <form data-filters="SubmitOnChange" class="fv-changeBytesForm" action="${url('filebrowser.views.view', path=path_enc)}" method="GET">
           <span class="fv-bold">Viewing Bytes:</span><a class="fv-editBytes jframe-inline" title="Enter Bytes"></a>

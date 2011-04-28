@@ -8,6 +8,7 @@ Checked-in third party dependencies
 |Re-distributed|Project|Version|License|Source URL|
 |--------------|-------|-------|-------|----------|
 |Y|A Midsummer Nights Dream by Shakespeare|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext98/2ws1710.txt|
+|Y|Avro|1.5.0|ASL2|http://avro.apache.org/|
 |Y|Beaker|1.4.2|BSD|http://beaker.groovie.org/|
 |Y|CherryPy|3.1.2|BSD|http://www.cherrypy.org/|
 |Y|Clientcide|?|MIT|http://www.clientcide.com/js|

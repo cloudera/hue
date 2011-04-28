@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: avro
+Version: 1.5.0
+Summary: Avro is a serialization and RPC framework.
+Home-page: http://hadoop.apache.org/avro
+Author: Apache Avro
+Author-email: avro-dev@hadoop.apache.org
+License: Apache License 2.0
+Description: UNKNOWN
+Keywords: avro serialization rpc
+Platform: UNKNOWN
