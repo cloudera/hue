@@ -36,6 +36,7 @@ from django.utils.http import http_date, urlquote
 from django.utils.html import escape
 from cStringIO import StringIO
 from gzip import GzipFile
+from avro import datafile, io
 
 from desktop.lib import i18n
 from desktop.lib.django_util import make_absolute, render_json
@@ -400,34 +401,12 @@ def display(request, path):
   if length > MAX_CHUNK_SIZE_BYTES:
     raise PopupException("Cannot request chunks greater than %d bytes" % MAX_CHUNK_SIZE_BYTES)
 
-  # Auto gzip detection, unless we are explicitly told to view binary
-  if not compression and mode != 'binary':
-    if path.endswith('.gz') and detect_gzip(request.fs.open(path).read(2)):
-      compression = 'gzip'
-      offset = 0
-    else:
-      compression = 'none'
-
-  f = request.fs.open(path)
-
-  if compression == 'gzip':
-    if offset and offset != 0:
-      raise PopupException("We don't support offset and gzip Compression")
-    try:
-      try:
-        contents = GzipFile('', 'r', 0, StringIO(f.read())).read(length)
-      except:
-        logging.warn("Could not decompress file at %s" % path, exc_info=True)
-        contents = ''
-        raise PopupException("Failed to decompress file")
-    finally:
-      f.close()
-  else:
-    try:
-      f.seek(offset)
-      contents = f.read(length)
-    finally:
-      f.close()
+  # Do not decompress in binary mode.
+  if mode == 'binary':
+    compression = 'none'
+  # Read out based on meta.
+  compression, offset, length, contents = \
+    read_contents(compression, path, request.fs, offset, length)
 
   # Get contents as string for text mode, or at least try
   uni_contents = None
@@ -471,11 +450,104 @@ def display(request, path):
 
   return render_with_toolbars("display.mako", request, data)
 
+def read_contents(codec_type, path, fs, offset, length):
+  """
+  Reads contents of a passed path, by appropriately decoding the data.
+  Arguments:
+     codec_type - The type of codec to use to decode. (Auto-detected if None).
+     path - The path of the file to read.
+     fs - The FileSystem instance to use to read.
+     offset - Offset to seek to before read begins.
+     length - Amount of bytes to read after offset.
+     Returns: A tuple of codec_type, offset, length and contents read.
+  """
+  # Auto codec detection for [gzip, avro, none]
+  # Only done when codec_type is unset
+  if not codec_type:
+    if path.endswith('.gz') and detect_gzip(fs.open(path).read(2)):
+      codec_type = 'gzip'
+      offset = 0
+    elif path.endswith('.avro') and detect_avro(fs.open(path).read(3)):
+      codec_type = 'avro'
+    else:
+      codec_type = 'none'
+
+  f = fs.open(path)
+  contents = ''
+
+  if codec_type == 'gzip':
+    contents = _read_gzip(fs, path, offset, length)
+  elif codec_type == 'avro':
+    contents = _read_avro(fs, path, offset, length)
+  else:
+    # for 'none' type.
+    contents = _read_simple(fs, path, offset, length)
+
+  return (codec_type, offset, length, contents)
+
+def _read_avro(fs, path, offset, length):
+  contents = ''
+  try:
+    fhandle = fs.open(path)
+    try:
+      fhandle.seek(offset)
+      data_file_reader = datafile.DataFileReader(fhandle, io.DatumReader())
+      contents_list = []
+      read_start = fhandle.tell()
+      # Iterate over the entire sought file.
+      for datum in data_file_reader:
+        read_length = fhandle.tell() - read_start
+        if read_length > length and len(contents_list) > 0:
+          break
+        else:
+          datum_str = str(datum) + "\n"
+          contents_list.append(datum_str)
+      data_file_reader.close()
+      contents = "".join(contents_list)
+    except:
+      logging.warn("Could not read avro file at %s" % path, exc_info=True)
+      raise PopupException("Failed to read Avro file")
+  finally:
+    fhandle.close()
+  return contents
+
+def _read_gzip(fs, path, offset, length):
+  contents = ''
+  if offset and offset != 0:
+    raise PopupException("We don't support offset and gzip Compression")
+  try:
+    fhandle = fs.open(path)
+    try:
+      contents = GzipFile('', 'r', 0, StringIO(fhandle.read())).read(length)
+    except:
+      logging.warn("Could not decompress file at %s" % path, exc_info=True)
+      raise PopupException("Failed to decompress file")
+  finally:
+    fhandle.close()
+  return contents
+
+def _read_simple(fs, path, offset, length):
+  contents = ''
+  try:
+    fhandle = fs.open(path)
+    try:
+      fhandle.seek(offset)
+      contents = fhandle.read(length)
+    except:
+      logging.warn("Could not read file at %s" % path, exc_info=True)
+      raise PopupException("Failed to read file")
+  finally:
+    fhandle.close()
+  return contents
+
 def detect_gzip(contents):
-  ''' This is a silly small function which checks to see if the file is Gzip'''
-  if contents[:2] == '\x1f\x8b':
-    return True
-  return False
+  '''This is a silly small function which checks to see if the file is Gzip'''
+  return contents[:2] == '\x1f\x8b'
+
+def detect_avro(contents):
+  '''This is a silly small function which checks to see if the file is Avro'''
+  # Check if the first three bytes are 'O', 'b' and 'j'
+  return contents[:3] == '\x4F\x62\x6A'
 
 def _calculate_navigation(offset, length, size):
   """
@@ -730,4 +802,4 @@ def truncate(toTruncate, charsToKeep=50):
     truncated = toTruncate[:charsToKeep] + "..."
     return truncated
   else:
-    return toTruncate 
+    return toTruncate

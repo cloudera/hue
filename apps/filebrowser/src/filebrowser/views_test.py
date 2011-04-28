@@ -20,6 +20,7 @@ Tests for filebrowser views
 """
 from nose.plugins.attrib import attr
 from hadoop import mini_cluster
+from avro import schema, datafile, io
 from desktop.lib.django_test_util import make_logged_in_client
 from nose.tools import assert_true, assert_false, assert_equal
 import logging
@@ -105,6 +106,65 @@ def test_listdir():
       pass      # Don't let cleanup errors mask earlier failures
     cluster.shutdown()
 
+@attr('requires_hadoop')
+def test_view_avro():
+  cluster = mini_cluster.shared_cluster(conf=True)
+  try:
+    c = make_logged_in_client()
+    cluster.fs.setuser(cluster.superuser)
+    if cluster.fs.isdir("/test-avro-filebrowser"):
+      cluster.fs.rmtree('/test-avro-filebrowser/')
+
+    cluster.fs.mkdir('/test-avro-filebrowser/')
+
+    test_schema = schema.parse("""
+      {
+        "name": "test",
+        "type": "record",
+        "fields": [
+          { "name": "name", "type": "string" },
+          { "name": "integer", "type": "int" }
+        ]
+      }
+    """)
+
+    f = cluster.fs.open('/test-avro-filebrowser/test-view.avro', "w")
+    data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(),
+                                                writers_schema=test_schema,
+                                                codec='deflate')
+    dummy_datum = {
+      'name': 'Test',
+      'integer': 10,
+    }
+    data_file_writer.append(dummy_datum)
+    data_file_writer.close()
+
+    # autodetect
+    response = c.get('/filebrowser/view/test-avro-filebrowser/test-view.avro')
+    assert_equal(response.context['view']['contents'], "{u'integer': 10, u'name': u'Test'}\n")
+
+    # offsetting should work as well
+    response = c.get('/filebrowser/view/test-avro-filebrowser/test-view.avro?offset=1')
+    assert_true(response.context.has_key('view'))
+
+    f = cluster.fs.open('/test-avro-filebrowser/test-view2.avro', "w")
+    f.write("hello")
+    f.close()
+
+    # we shouldn't autodetect non avro files
+    response = c.get('/filebrowser/view/test-avro-filebrowser/test-view2.avro')
+    assert_equal(response.context['view']['contents'], "hello")
+
+    # we should fail to do a bad thing if they specify compression when it's not set.
+    response = c.get('/filebrowser/view/test-avro-filebrowser/test-view2.avro?compression=gzip')
+    assert_false(response.context.has_key('view'))
+
+  finally:
+    try:
+      cluster.fs.rmtree('/test-avro-filebrowser/')
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+    cluster.shutdown()
 
 @attr('requires_hadoop')
 def test_view_gz():

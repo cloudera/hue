@@ -424,7 +424,7 @@ div.fileviewer .fv-viewLocation {
 	background: url(/static/art/icons/folder_go.png) left 50%;
 }
 
-div.fileviewer .fv-viewGzip {
+div.fileviewer .fv-viewGzip .fv-viewAvro {
 	background: url(/static/art/icons/page_white_zip.png) left 50%;
 }
 
