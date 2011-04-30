@@ -59,6 +59,9 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   This is similar, but not quite the same as djagno.contrib.auth.forms.UserChangeForm
   and UserCreationForm.
   """
+  username = forms.RegexField(label="Username", max_length=30, regex=r'^[\w]+$',
+          help_text = "Required. 30 characters or fewer. Letters and digits only.",
+          error_messages = {'invalid': "This value may contain only letters and numbers."})
   password1 = forms.CharField(label="Password", widget=forms.PasswordInput, required=False)
   password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput, required=False)
 
