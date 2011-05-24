@@ -111,6 +111,13 @@ SUDO_SHELL_JAR = Config("hadoop_sudo_shell_jar",
                            root=os.path.dirname(__file__)),
   private=True)
 
+CREDENTIALS_MERGER_JAR = Config("hadoop_credentials_merger_jar",
+  help="Tool that is capable of merging multiple files containing delegation tokens into one.",
+  type=str,
+  dynamic_default=find_jar("../../credentials-merger/java-lib/credentials-merger-*.jar",
+                           root=os.path.dirname(__file__)),
+  private=True)
+
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
   help="One entry for each HDFS cluster",

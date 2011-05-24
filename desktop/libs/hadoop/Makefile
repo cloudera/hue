@@ -57,7 +57,13 @@ SUDO_SHELL_BUILD := $(SUDO_SHELL_DIR)/target
 SUDO_SHELL_LIB := $(SUDO_SHELL_DIR)/java-lib
 SUDO_SHELL := $(SUDO_SHELL_LIB)/sudo-shell-$(DESKTOP_VERSION).jar
 
-compile: $(PLUGIN) $(STATIC_GROUP_MAPPING) $(SUDO_SHELL)
+CREDENTIALS_MERGER_DIR := $(realpath .)/credentials-merger
+CREDENTIALS_MERGER_SRC := $(CREDENTIALS_MERGER_DIR)/src
+CREDENTIALS_MERGER_BUILD := $(CREDENTIALS_MERGER_DIR)/target
+CREDENTIALS_MERGER_LIB := $(CREDENTIALS_MERGER_DIR)/java-lib
+CREDENTIALS_MERGER := $(CREDENTIALS_MERGER_LIB)/credentials-merger-$(DESKTOP_VERSION).jar
+
+compile: $(PLUGIN) $(STATIC_GROUP_MAPPING) $(SUDO_SHELL) $(CREDENTIALS_MERGER)
 
 # Build the plugin jar iff the source is present
 ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
@@ -105,6 +111,22 @@ clean::
 else
 $(SUDO_SHELL):
 	$(error cannot build sudo-shell jar without source)
+endif
+
+# Build the credentials merger jar iff the source is present
+ifneq (,$(wildcard $(CREDENTIALS_MERGER_SRC)))
+$(CREDENTIALS_MERGER): $(shell find $(CREDENTIALS_MERGER_SRC) -type f)
+	mkdir -p $(CREDENTIALS_MERGER_LIB)
+	@echo "--- Building credentials merger tool"
+	cd $(CREDENTIALS_MERGER_DIR) && mvn clean install -DskipTests
+	cp $(CREDENTIALS_MERGER_BUILD)/credentials-merger-$(MAVEN_VERSION).jar $(CREDENTIALS_MERGER)
+
+clean::
+	rm -rf $(CREDENTIALS_MERGER_LIB)
+	cd $(CREDENTIALS_MERGER_DIR) && mvn clean ||:
+else
+$(CREDENTAILS_MERGER):
+	$(error cannot build credentials merger jar without source)
 endif
 
 #

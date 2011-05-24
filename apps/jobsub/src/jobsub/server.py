@@ -236,52 +236,64 @@ class PlanRunner(object):
       'LANG': os.getenv('LANG', i18n.get_site_encoding()),
     }
 
-    delegation_token_files = []
     all_clusters = []
     all_clusters += all_mrclusters().values()
     all_clusters += get_all_hdfs().values()
-    LOG.info("all_clusters: %s" % (repr(all_clusters),))
-    for cluster in all_clusters:
-      if cluster.security_enabled:
-        cluster.setuser(self.plan.user)
-        token = cluster.get_delegation_token()
-        token_file = tempfile.NamedTemporaryFile()
-        token_file.write(token.delegationTokenBytes)
-        token_file.flush()
-        delegation_token_files.append(token_file)
-
-    if delegation_token_files:
-      env['HADOOP_TOKEN_FILE_LOCATION'] = ','.join([token_file.name for token_file in delegation_token_files])
-
-    java_home = os.getenv('JAVA_HOME')
-    if java_home:
-      env["JAVA_HOME"] = java_home
-    for k, v in env.iteritems():
-      assert v is not None, "Environment key %s missing value." % k
-
-    args = [ hadoop.conf.HADOOP_BIN.get() ]
-    if hadoop.conf.HADOOP_CONF_DIR.get():
-      args.append("--config")
-      args.append(hadoop.conf.HADOOP_CONF_DIR.get())
-
-    args += step.arguments
-    LOG.info("Starting %s.  (Env: %s)", repr(args), repr(env))
-    LOG.info("Running: %s" % " ".join(args))
-    self.pipe = subprocess.Popen(
-      args,
-      stdin=None,
-      cwd=self.work_dir,
-      stdout=self.stdout,
-      stderr=self.stderr,
-      shell=False,
-      close_fds=True,
-      env=env)
-    retcode = self.pipe.wait()
-    if 0 != retcode:
-      raise Exception("bin/hadoop returned non-zero %d" % retcode)
-    LOG.info("bin/hadoop returned %d" % retcode)
-    for token_file in delegation_token_files:
-      token_file.close()
+    delegation_token_files = []
+    merged_token_file = tempfile.NamedTemporaryFile()
+    try:
+      LOG.debug("all_clusters: %s" % (repr(all_clusters),))
+      for cluster in all_clusters:
+        if cluster.security_enabled:
+          cluster.setuser(self.plan.user)
+          token = cluster.get_delegation_token()
+          token_file = tempfile.NamedTemporaryFile()
+          token_file.write(token.delegationTokenBytes)
+          token_file.flush()
+          delegation_token_files.append(token_file)
+  
+      java_home = os.getenv('JAVA_HOME')
+      if java_home:
+        env["JAVA_HOME"] = java_home
+      for k, v in env.iteritems():
+        assert v is not None, "Environment key %s missing value." % k
+  
+      base_args = [ hadoop.conf.HADOOP_BIN.get() ]
+      if hadoop.conf.HADOOP_CONF_DIR.get():
+        base_args.append("--config")
+        base_args.append(hadoop.conf.HADOOP_CONF_DIR.get())
+  
+      if delegation_token_files:
+        args = list(base_args) # Make a copy of the base args.
+        args += ['jar', hadoop.conf.CREDENTIALS_MERGER_JAR.get(), merged_token_file.name]
+        args += [token_file.name for token_file in delegation_token_files]
+        LOG.debug("merging credentials files with comand: '%s'" % (' '.join(args),))
+        merge_pipe = subprocess.Popen(args, shell=False, close_fds=True)
+        retcode = merge_pipe.wait()
+        if 0 != retcode:
+          raise Exception("bin/hadoop returned non-zero %d while trying to merge credentials" % (retcode,))
+        env['HADOOP_TOKEN_FILE_LOCATION'] = merged_token_file.name
+  
+      args = list(base_args) # Make a copy of the base args.
+      args += step.arguments
+      LOG.info("Starting %s.  (Env: %s)", repr(args), repr(env))
+      LOG.info("Running: %s" % " ".join(args))
+      self.pipe = subprocess.Popen(
+        args,
+        stdin=None,
+        cwd=self.work_dir,
+        stdout=self.stdout,
+        stderr=self.stderr,
+        shell=False,
+        close_fds=True,
+        env=env)
+      retcode = self.pipe.wait()
+      if 0 != retcode:
+        raise Exception("bin/hadoop returned non-zero %d" % retcode)
+      LOG.info("bin/hadoop returned %d" % retcode)
+    finally:
+      for token_file in delegation_token_files + [merged_token_file]:
+        token_file.close()
 
 class JobSubmissionServiceImpl(object):
   @coerce_exceptions
