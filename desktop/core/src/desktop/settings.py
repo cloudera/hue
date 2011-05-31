@@ -191,17 +191,24 @@ TEMPLATE_DEBUG = DEBUG
 if os.getenv('DESKTOP_DB_CONFIG'):
   conn_string = os.getenv('DESKTOP_DB_CONFIG')
   logging.debug("DESKTOP_DB_CONFIG SET: %s" % (conn_string))
-  (DATABASE_ENGINE, DATABASE_NAME, TEST_DATABASE_NAME, DATABASE_USER,
-    DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT) = conn_string.split(':')
+  default_db = dict(zip(
+    ["ENGINE", "NAME", "TEST__NAME", "USER", "PASSWORD", "HOST", "PORT"],
+    conn_string.split(':')))
 else:
-  DATABASE_ENGINE = desktop.conf.DATABASE.ENGINE.get()
-  DATABASE_NAME = desktop.conf.DATABASE.NAME.get()
-  DATABASE_USER = desktop.conf.DATABASE.USER.get()
-  DATABASE_PASSWORD = desktop.conf.DATABASE.PASSWORD.get()
-  DATABASE_HOST = desktop.conf.DATABASE.HOST.get()
-  DATABASE_PORT = desktop.conf.DATABASE.PORT.get()
-  # DB used for tests
-  TEST_DATABASE_NAME = get_desktop_root('desktop-test.db')
+  default_db = {
+    "ENGINE" : desktop.conf.DATABASE.ENGINE.get(),
+    "NAME" : desktop.conf.DATABASE.NAME.get(),
+    "USER" : desktop.conf.DATABASE.USER.get(),
+    "PASSWORD" : desktop.conf.DATABASE.PASSWORD.get(),
+    "HOST" : desktop.conf.DATABASE.HOST.get(),
+    "PORT" : desktop.conf.DATABASE.PORT.get(),
+    # DB used for tests
+    "TEST_NAME" : get_desktop_root('desktop-test.db')
+  }
+
+DATABASES = {
+  'default': default_db
+}
 
 TIME_ZONE = desktop.conf.TIME_ZONE.get()
 # Desktop supports only one authentication backend.
