@@ -78,7 +78,8 @@
       </ul>
     </div>
     <div data-filters="SizeTo" data-size-to-height="-30" style="overflow: auto">
-      <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
+      ## Use fit-text because the task state can be a very long string
+      <table data-filters="HtmlTable" class="selectable" data-fit-text="td" cellpadding="0" cellspacing="0">
         <thead>
            <tr>
              <th>Task ID</th>
