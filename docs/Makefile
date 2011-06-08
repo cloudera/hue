@@ -48,7 +48,7 @@ $(BLD_DIR_DOC): sdk release-notes $(DOC_FILES)
 
 .PHONY: release-notes
 release-notes: $(BLD_DIR_DOC)/release-notes
-$(BLD_DIR_DOC)/release-notes: $(shell find release-notes -name \*.txt)
+$(BLD_DIR_DOC)/release-notes: $(wildcard release-notes/*.txt)
 	@echo '--- Generating release notes at $@'
 	@mkdir -p $@
 	@for i in $? ; do asciidoc $$i ; done
