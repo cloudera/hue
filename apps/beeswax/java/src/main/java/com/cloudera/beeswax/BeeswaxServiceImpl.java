@@ -52,6 +52,7 @@ import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Schema;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.exec.FetchTask;
+import org.apache.hadoop.hive.ql.exec.TaskFactory;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -333,9 +334,14 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       }
 
       if (startOver) {
+        // We need to make a new FetchTask. Every time we fetch, the current
+        // FetchTask's internal states change. (E.g. it keeps a current fetch
+        // count to implement the LIMIT clause.)
         // This is totally inappropriately reaching into internals.
-        driver.getPlan().getFetchTask().initialize(hiveConf,
-            driver.getPlan(), null);
+        FetchWork work = driver.getPlan().getFetchTask().getWork();
+        FetchTask ft = (FetchTask) TaskFactory.get(work, hiveConf);
+        ft.initialize(hiveConf, driver.getPlan(), null);
+        driver.getPlan().setFetchTask(ft);
         startRow = 0;
       }
 
