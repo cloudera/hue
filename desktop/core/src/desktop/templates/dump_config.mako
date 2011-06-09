@@ -25,23 +25,26 @@ from desktop.lib.conf import BoundContainer, is_anonymous
 <h1>Hue Configuration</h1>
 <ul><li>Configuration files located in <code>${conf_dir}</code></li></ul>
 <h2>Installed applications</h2>
-<ul>
 % for app in sorted(apps, key=lambda app: app.name.lower()):
-  % if hasattr(app, "urls_imported") and app.urls_imported:
-    <li><a href="/${app.name}/">${app.display_name}</a></li>
-  % else:
-    <li>${app.name}</li>
-  % endif
+${app.name}
 % endfor
 </ul>
 
+<h2>Configuration Sections</h2>
+% for obj in top_level.get().values():
+  <a href="#${obj.config.key}">${obj.config.key}</a>
+% endfor
+
 <h2>Configuration Variables</h2>
-<%def name="recurse(config_obj)">
+<%def name="recurse(config_obj, depth=0)">
 <dl>
   <dt>
   % if is_anonymous(config_obj.config.key):
     <i>(default section)</i>
   % else:
+    % if depth == 1:
+      <a name=${config_obj.config.key}></a>
+    % endif
     ${config_obj.config.key}
   % endif
   </dt>
@@ -55,7 +58,7 @@ from desktop.lib.conf import BoundContainer, is_anonymous
       if v.config.private and not show_private:
         continue
 %>
-    ${recurse(v)}
+    ${recurse(v, depth + 1)}
     % endfor
   % else:
     <p>${str(config_obj.get())}</p>
