@@ -382,6 +382,18 @@ for x in sys.stdin:
       answer = [ int(data.strip('"')) for data in csv.split()[1:] ]
       assert_equal( [ i + 1, i + 2 ], answer)
 
+  def test_data_export_limit_clause(self):
+    limit = 3
+    query_msg = BeeswaxService.Query()
+    query_msg.query = 'SELECT foo FROM test limit %d' % (limit,)
+    query_msg.configuration = []
+    query_msg.hadoop_user = "test"
+    handle = beeswax.db_utils.db_client().query(query_msg)
+    query_data = beeswax.models.QueryHistory(server_id=handle.id, log_context=handle.log_context)
+    # Get the result in csv. Should have 3 + 1 header row.
+    csv_resp = beeswax.data_export.download(query_data, 'csv')
+    assert_equal(len(csv_resp.content.strip().split('\n')), limit + 1)
+
   def test_data_export(self):
     query_msg = BeeswaxService.Query()
     query_msg.query = 'SELECT * FROM test'

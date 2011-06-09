@@ -55,6 +55,10 @@ desktop/core/ext-py/lxml/src/lxml/lxml-version.h
 # Common utility alias
 /d
 
+# Intellij project files
+.idea/
+*.iml
+
 # Database of running server
 desktop/desktop.db
 app.reg
