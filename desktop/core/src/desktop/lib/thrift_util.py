@@ -43,6 +43,26 @@ MAX_RECURSION_DEPTH = 50
 WARN_LEVEL_CALL_DURATION_MS = 5000
 INFO_LEVEL_CALL_DURATION_MS = 1000
 
+class LifoQueue(Queue.Queue):
+    '''
+    Variant of Queue that retrieves most recently added entries first.
+
+    This LIFO Queue is included in python2.7 (or 2.6) and later,
+    but it's a simple subclass, so we "backport" it here.
+    '''
+
+    def _init(self, maxsize):
+        self.queue = []
+
+    def _qsize(self, len=len):
+        return len(self.queue)
+
+    def _put(self, item):
+        self.queue.append(item)
+
+    def _get(self):
+        return self.queue.pop()
+
 class ConnectionConfig(object):
   """ Struct-like class encapsulating the configuration of a Thrift client. """
   def __init__(self, klass, host, port, service_name,
@@ -117,7 +137,7 @@ class ConnectionPooler(object):
       self.dictlock.acquire()
       try:
         if _get_pool_key(conf) not in self.pooldict:
-          q = Queue.Queue(self.poolsize)
+          q = LifoQueue(self.poolsize)
           self.pooldict[_get_pool_key(conf)] = q
           for i in xrange(self.poolsize):
             client = construct_superclient(conf)
@@ -246,7 +266,10 @@ class PooledClient(object):
               if rlist:
                 # the socket is readable, meaning there is either data from a previous call
                 # (i.e our protocol is out of sync), or the connection was shut down on the
-                # remote side. Either way, we need to reopen the connection
+                # remote side. Either way, we need to reopen the connection.
+                # If the socket was closed remotely, btw, socket.read() will return
+                # an empty string.  This is a fairly normal condition, btw, since
+                # there are timeouts on both the server and client sides.
                 superclient.transport.close()
                 superclient.transport.open()
 
