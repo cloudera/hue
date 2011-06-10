@@ -116,15 +116,15 @@ from desktop.lib.django_util import reverse_with_get
           %>
           <td class="fb-filesize">
             % if "dir" == file['type']:
-              <span data-sort-number="${sortValue}">~</span>
+              <span data-sort-numeric="${sortValue}">~</span>
             % else:
-              <span data-sort-number="${sortValue}">${file['stats']['size']|filesizeformat}</span>
+              <span data-sort-numeric="${sortValue}">${file['stats']['size']|filesizeformat}</span>
             % endif
           </td>
           <td class="fb-user">${file['stats']['user']}</td>
           <td class="fb-group">${file['stats']['group']}</td>
           <td class="fb-perm">${file['rwx']}</td>
-          <td class="fb-date">${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime']))}</td>
+          <td class="fb-date"><span data-sort-numeric="${file['stats']['mtime']}">${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime']))}</span></td>
           <td class="fb-option-links">
             % if ".." != file['name']:
               <a class="fb-item-options">options</a>
