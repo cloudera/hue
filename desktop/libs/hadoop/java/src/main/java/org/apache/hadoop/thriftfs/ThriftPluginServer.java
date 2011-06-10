@@ -107,7 +107,7 @@ public class ThriftPluginServer implements Configurable, Runnable {
 
       TServerTransport transport = new TServerSocket(sock, socketTimeout);
       SanerThreadPoolServer.Options options = new SanerThreadPoolServer.Options();
-      options.minWorkerThreads = conf.getInt(ThriftFsConfig.DFS_THRIFT_THREADS_MIN_KEY, 5);
+      options.minWorkerThreads = conf.getInt(ThriftFsConfig.DFS_THRIFT_THREADS_MIN_KEY, 10);
       options.maxWorkerThreads = conf.getInt(ThriftFsConfig.DFS_THRIFT_THREADS_MAX_KEY, 20);
       options.stopTimeoutVal = conf.getInt(ThriftFsConfig.DFS_THRIFT_TIMEOUT_KEY, 60);
       options.stopTimeoutUnit = TimeUnit.SECONDS;
