@@ -60,6 +60,7 @@ Development Prerequisites
    your system:
 
     Debian:
+      * asciidoc
       * gcc
       * libmysqlclient-dev
       * libsasl2-dev
@@ -72,6 +73,7 @@ Development Prerequisites
       * python-simplejson
 
     CentOS:
+      * asciidoc
       * cyrus-sasl-devel
       * gcc
       * libxml2-devel
