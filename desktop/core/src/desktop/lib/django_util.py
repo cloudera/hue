@@ -42,6 +42,9 @@ import desktop.lib.thrift_util
 DJANGO = 'django'
 MAKO = 'mako'
 
+# This is what Debian allows. See chkname.c in shadow.
+USERNAME_RE_RULE = "[^-:\s][^:\s]*"
+
 class Encoder(simplejson.JSONEncoder):
   """
   Automatically encodes JSON for Django models and
@@ -61,6 +64,8 @@ class Encoder(simplejson.JSONEncoder):
 
     return simplejson.JSONEncoder.default(self, o)
 
+def get_username_re_rule():
+  return USERNAME_RE_RULE
 
 def login_notrequired(func):
   """A decorator for view functions to allow access without login"""

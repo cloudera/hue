@@ -16,10 +16,13 @@
 # limitations under the License.
 
 from django.conf.urls.defaults import patterns, url
+from desktop.lib.django_util import get_username_re_rule
+
+username_re = get_username_re_rule()
 
 urlpatterns = patterns('useradmin',
   url(r'^$', 'views.list_users'),
-  url(r'^edit/(?P<username>\w+)$', 'views.edit_user'),
+  url(r'^edit/(?P<username>%s)$' % (username_re,), 'views.edit_user'),
   url(r'^new$', 'views.edit_user', name="useradmin.new"),
-  url(r'^delete/(?P<username>\w+)$', 'views.delete_user'),
+  url(r'^delete/(?P<username>%s)$' % (username_re,), 'views.delete_user'),
 )
