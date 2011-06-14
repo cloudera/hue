@@ -21,6 +21,9 @@
 Tests for "user admin"
 """
 
+import HTMLParser
+import urllib
+
 from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -32,7 +35,25 @@ def reset_all_users():
   for user in User.objects.all():
     user.delete()
 
+def _unescape(html):
+  return HTMLParser.HTMLParser().unescape(html)
+
+
+def test_invalid_username():
+  BAD_NAMES = ('-foo', 'foo:o', 'foo o', ' foo')
+
+  c = make_logged_in_client(username="test", is_superuser=True)
+
+  for bad_name in BAD_NAMES:
+    assert_true(c.get('/useradmin/new'))
+    response = c.post('/useradmin/new', dict(username=bad_name, password1="test", password2="test"))
+    assert_true('not allowed' in response.context["form"].errors['username'][0])
+
+
 def test_user_admin():
+  FUNNY_NAME = '~`!@#$%^&*()_-+={}[]|\;"<>?/,.'
+  FUNNY_NAME_QUOTED = urllib.quote(FUNNY_NAME)
+
   reset_all_users()
   c = make_logged_in_client(username="test", is_superuser=True)
 
@@ -84,48 +105,51 @@ def test_user_admin():
   assert_equal({ 'username': ["User with this Username already exists."]}, response.context["form"].errors)
 
   # Create a new regular user (for real)
-  response = c.post('/useradmin/new', dict(username="test_user_creation", password1="test", password2="test", is_active="True"))
+  response = c.post('/useradmin/new', dict(username=FUNNY_NAME,
+                                           password1="test",
+                                           password2="test",
+                                           is_active="True"))
   response = c.get('/useradmin/')
-  assert_true("test_user_creation" in response.content)
+  assert_true(FUNNY_NAME in _unescape(response.content))
   assert_true(len(response.context["users"]) > 1)
   assert_true("Hue Users" in response.content)
 
   # Check permissions by logging in as the new user
-  c_reg = make_logged_in_client(username="test_user_creation", password="test")
+  c_reg = make_logged_in_client(username=FUNNY_NAME, password="test")
   # Regular user should be able to modify oneself
-  response = c_reg.post('/useradmin/edit/test_user_creation',
-                        dict(username = "test_user_creation",
-                        first_name = "Hello",
-                        is_active = True))
-  response = c_reg.get('/useradmin/edit/test_user_creation')
+  response = c_reg.post('/useradmin/edit/%s' % (FUNNY_NAME_QUOTED,),
+                        dict(username = FUNNY_NAME,
+                             first_name = "Hello",
+                             is_active = True))
+  response = c_reg.get('/useradmin/edit/%s' % (FUNNY_NAME_QUOTED,))
   assert_equal("Hello", response.context["form"].instance.first_name)
   # Can't edit other people.
   response = c_reg.post("/useradmin/delete/test")
   assert_true("You must be a superuser" in response.content,
               "Regular user can't edit other people")
   # Regular user should not be able to self-promote to superuser
-  response = c_reg.post('/useradmin/edit/test_user_creation',
-                        dict(username = "test_user_creation",
-                        first_name = "OLÁ",
-                        is_superuser = True,
-                        is_active = True))
+  response = c_reg.post('/useradmin/edit/%s' % (FUNNY_NAME_QUOTED,),
+                        dict(username = FUNNY_NAME,
+                             first_name = "OLÁ",
+                             is_superuser = True,
+                             is_active = True))
   assert_true("You cannot" in response.content,
               "Regular users can't self-promote to superuser")
 
   # Revert to regular "test" user, that has superuser powers.
   c_su = make_logged_in_client()
-  # Inactivate "test_user_creation"
-  c_su.post('/useradmin/edit/test_user_creation',
-                        dict(username = "test_user_creation",
-                        first_name = "Hello",
-                        is_active = False))
-  # Now make sure "test_user_creation" can't log back in
-  response = c_reg.get('/useradmin/edit/test_user_creation')
+  # Inactivate FUNNY_NAME
+  c_su.post('/useradmin/edit/%s' % (FUNNY_NAME_QUOTED,),
+                        dict(username = FUNNY_NAME,
+                             first_name = "Hello",
+                             is_active = False))
+  # Now make sure FUNNY_NAME can't log back in
+  response = c_reg.get('/useradmin/edit/%s' % (FUNNY_NAME_QUOTED,))
   assert_true(response.status_code == 302 and "login" in response["location"],
               "Inactivated user gets redirected to login page")
 
   # Delete that regular user
-  response = c_su.post('/useradmin/delete/test_user_creation')
+  response = c_su.post('/useradmin/delete/%s' % (FUNNY_NAME_QUOTED,))
   assert_true("Hue Users" in response.content)
   # You shouldn't be able to create a user without a password
   response = c_su.post('/useradmin/new', dict(username="test"))

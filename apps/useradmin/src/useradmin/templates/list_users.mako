@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="wrappers" file="header_footer.mako" />
+<% import urllib %>
 
 ${wrappers.head()}
     <div id="useradmin_userlist" class="view">
@@ -41,8 +42,8 @@ ${wrappers.head()}
               ${user.last_login.strftime('%c')}
             </td>
             <td>
-              <a title="Edit ${user.username}" class="edit frame_tip" href="${ url('useradmin.views.edit_user', username=user.username) }">Edit</a>
-              <a title="Delete ${user.username}" class="delete frame_tip confirm_and_post" alt="Are you sure you want to delete ${user.username}?" href="${ url('useradmin.views.delete_user', username=user.username) }">Delete</a>
+              <a title="Edit ${user.username}" class="edit frame_tip" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">Edit</a>
+              <a title="Delete ${user.username}" class="delete frame_tip confirm_and_post" alt="Are you sure you want to delete ${user.username}?" href="${ url('useradmin.views.delete_user', username=urllib.quote(user.username)) }">Delete</a>
             </td>
           </tr>
         % endfor

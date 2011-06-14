@@ -22,7 +22,7 @@ import django
 import threading
 from django import forms
 from django.contrib.auth.models import User
-from desktop.lib.django_util import render, PopupException
+from desktop.lib.django_util import get_username_re_rule, render, PopupException
 from django.core import urlresolvers
 
 __users_lock = threading.Lock()
@@ -59,9 +59,12 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   This is similar, but not quite the same as djagno.contrib.auth.forms.UserChangeForm
   and UserCreationForm.
   """
-  username = forms.RegexField(label="Username", max_length=30, regex=r'^[\w]+$',
-          help_text = "Required. 30 characters or fewer. Letters and digits only.",
-          error_messages = {'invalid': "This value may contain only letters and numbers."})
+  username = forms.RegexField(
+      label="Username",
+      max_length=30,
+      regex='^%s$' % (get_username_re_rule(),),
+      help_text = "Required. 30 characters or fewer. No whitespaces or colons.",
+      error_messages = {'invalid': "Whitespaces and ':' not allowed" })
   password1 = forms.CharField(label="Password", widget=forms.PasswordInput, required=False)
   password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput, required=False)
 

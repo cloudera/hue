@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="wrappers" file="header_footer.mako" />
+<% import urllib %>
 
   % if username:
     ${wrappers.head('Edit User: ' + username + ' -- Hue Users')}
@@ -30,7 +31,7 @@
         Create User 
       % endif
     </h1>
-    <form action="${action}" method="POST" class="jframe_padded">
+    <form action="${urllib.quote(action)}" method="POST" class="jframe_padded">
       <dl>
         <%def name="render_field(field)">
           <dt>${field.label_tag() | n}</dt>
