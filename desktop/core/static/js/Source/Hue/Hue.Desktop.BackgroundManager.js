@@ -56,9 +56,7 @@ var BackgroundManager = new Class({
 		//and these are static colors
 		backgroundColors: {
 			'Solid Grey': '#444',
-			'Rich Blue': '#2f6390',
-			'Grey Green': '#5F7D5F',
-			'Khaki': '#E0DCAD'
+			'Rich Blue': '#0f6191'
 		},
 		//current is the background to show
 		//by default it returns a random background image
@@ -68,7 +66,12 @@ var BackgroundManager = new Class({
 			return $H(this.options.backgroundImages).getKeys().getRandom();
 		},
 		//element to inject the menu into
-		target: 'hue-desktop'
+		target: 'hue-desktop',
+		"default": 'Rich Blue',
+		backgroundColorsLogos: {
+			'Solid Grey': 'pencil_tips',
+			'Rich Blue': 'pencil_tips'
+		}
 	},
 	//where to get the background prefs from the server
 	prefsUrl: "prefs/background",
@@ -78,12 +81,12 @@ var BackgroundManager = new Class({
 		this.list = $(list);
 		this.container = $(container);
 		//get the current /startup state
-		this.current = $lambda(this.options.current).apply(this);
+		this.current = $lambda(this.options["default"]).apply(this);
 		//if the value is a color
 		if (this.options.backgroundColors[this.current]) {
-			//create an image for the hue logo, chosen at random from the background images
+			//create an image for the hue logo.
 			new Element('img', {
-				src: '/static/art/desktops/' + $H(this.options.backgroundImages).getValues().getRandom() + '.logo.png',
+				src: '/static/art/desktops/'+this.options.backgroundColorsLogos[this.current]+'.logo.png',
 				'class': 'desktop-logo'
 			}).inject(this.container, 'top');
 			//set the bg color
@@ -164,16 +167,28 @@ var BackgroundManager = new Class({
 			//fade the bg color
 			this.container.tween('background-color', this.options.backgroundColors[name]);
 			var bg = this.container.getElement('.desktop-bg');
-			// if there's a bg image, fade it out.
-			if (bg) {
-				if (noFx){
-					bg.setStyle('opacity', 0).setStyle('visibility', 'visible');
-				} else {
-					bg.tween('opacity', 0).get('tween').chain(function(){
-						bg.setStyle('visibility', 'visible');
+			var logo = this.container.getElement('.desktop-logo');
+
+			new Element('img', {
+				src: '/static/art/desktops/' + this.options.backgroundColorsLogos[this.current] + '.logo.png',
+				'class': 'desktop-logo'
+			}).inject(this.container, 'top').addEvents({
+				load: function(){
+					var itemsToFadeOut = [logo];
+					if (bg) {
+						itemsToFadeOut.push(bg);
+					}
+					itemsToFadeOut.each(function(item){
+						if (noFx) {
+							item.setStyle('opacity', 0).setStyle('visibility', 'visible');
+						} else {
+							item.tween('opacity', 0).get('tween').chain(function(){
+								item.setStyle('visibility', 'visible');
+							});
+						}
 					});
 				}
-			}
+			});
 		} else {
 			//key error
 			dbug.warn('could not load background preference: ', name);
