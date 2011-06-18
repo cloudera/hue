@@ -111,7 +111,9 @@ def test_rest():
   for item in shell.conf.SHELL_TYPES.keys():
     nice_name = shell.conf.SHELL_TYPES[item].nice_name.get().strip()
     assert nice_name in response.content
-    shell_types_available.append(item)
+    command = shell.conf.SHELL_TYPES[item].command.get().strip().split()
+    if utils.executable_exists(command):
+      shell_types_available.append(item)
 
   if not shell_types_available:
     return
