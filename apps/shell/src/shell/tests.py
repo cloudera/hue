@@ -64,7 +64,7 @@ class TestServer(threading.Thread):
       return ['Dummy response\r\n']
     eventlet.wsgi.server(eventlet.listen(('',55555)), dummy_server)
 
-class TestRequest():
+class TestRequest(object):
   def __init__(self):
     self.POST = {}
     self.DICT = {}
