@@ -80,7 +80,7 @@ TEST_USER_GROUP_MAPPING = {
 
 LOGGER=logging.getLogger(__name__)
 
-def _find_unused_port():
+def find_unused_port():
   """
   Finds a port that's available.
   Unfortunately, this port may not be available by the time
@@ -178,13 +178,13 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         "-D", "jobclient.progress.monitor.poll.interval=100",
         "-D", "fs.checkpoint.period=1",
         # For a reason I don't fully understand, this must be 0.0.0.0 and not 'localhost'
-        "-D", "dfs.secondary.http.address=0.0.0.0:%d" % _find_unused_port(),
+        "-D", "dfs.secondary.http.address=0.0.0.0:%d" % find_unused_port(),
         # We bind the NN's thrift interface to a port we find here.
         # This is suboptimal, since there's a race.  Alas, if we don't
         # do this here, the datanodes fail to discover the namenode's thrift
         # address, and there's a race there
-        "-D", "dfs.thrift.address=localhost:%d" % _find_unused_port(),
-        "-D", "jobtracker.thrift.address=localhost:%d" % _find_unused_port(),
+        "-D", "dfs.thrift.address=localhost:%d" % find_unused_port(),
+        "-D", "jobtracker.thrift.address=localhost:%d" % find_unused_port(),
         # Jobs realize they have finished faster with this timeout.
         "-D", "jobclient.completion.poll.interval=50",
         "-D", "hadoop.security.authorization=true",

@@ -246,17 +246,23 @@ class PooledClient(object):
   def __init__(self, conf):
     self.conf = conf
 
-  def __getattr__(self,attr):
+  def __getattr__(self, attr):
     if attr in self.__dict__:
       return self.__dict__[attr]
 
     # Fetch the thrift client from the pool
     superclient = _connection_pool.get_client(self.conf)
 
-    try:
-      res = getattr(superclient, attr)
-      if hasattr(res,"__call__"):
-        def wrapper(*args, **kwargs):
+    res = getattr(superclient, attr)
+    if not callable(res):
+      # It's a simple attribute. We can put the superclient back in the pool.
+      _connection_pool.return_client(self.conf, superclient)
+      return res
+    else:
+      # It's gonna be a thrift call. Add wrapping logic to reopen the transport,
+      # and return the connection to the pool when done.
+      def wrapper(*args, **kwargs):
+        try:
           try:
             # Poke it to see if it's closed on the other end. This can happen if a connection
             # sits in the connection pool longer than the read timeout of the server.
@@ -283,10 +289,9 @@ class PooledClient(object):
               self.conf.service_name, self.conf.host, self.conf.port, str(e))
             e.response_data = dict(code="THRIFT_EXCEPTION", message=msg, data="")
             raise
-        return wrapper
-      return res
-    finally:
-      _connection_pool.return_client(self.conf, superclient)
+        finally:
+          _connection_pool.return_client(self.conf, superclient)
+      return wrapper
 
 
 
