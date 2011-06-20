@@ -53,5 +53,6 @@ struct TestManyTypes {
 
 
 service TestService {
-  i32 ping(1:i32 input)
+  // Multiply the input by 2 and return the result
+  i32 ping(1:i32 input);
 }
