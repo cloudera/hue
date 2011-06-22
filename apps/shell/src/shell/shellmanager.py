@@ -24,6 +24,7 @@ import cStringIO
 import desktop.lib.i18n
 import errno
 import eventlet
+import hadoop.conf
 import logging
 import pty
 import pwd
@@ -51,6 +52,12 @@ class NewShellInterrupt(Exception):
   """
   def __init__(self, new_shell_pairs):
     self.new_shell_pairs = new_shell_pairs
+
+class MergeToolException(Exception):
+  """
+  We need this exception to indicate that the delegation tokens merge tool failed.
+  """
+  pass
 
 class Shell(object):
   """
@@ -83,8 +90,9 @@ class Shell(object):
 
     delegation_token_files = self._get_delegation_tokens(username, delegation_token_dir)
     if delegation_token_files:
-      delegation_token_files = [token_file.name for token_file in delegation_token_files]
-      subprocess_env[constants.HADOOP_TOKEN_FILE_LOCATION] = ','.join(delegation_token_files)
+      merged_token_file = self._merge_delegation_tokens(delegation_token_files, delegation_token_dir)
+      delegation_token_files = [merged_token_file]
+      subprocess_env[constants.HADOOP_TOKEN_FILE_LOCATION] = merged_token_file.name
 
     try:
       LOG.debug("Starting subprocess with command '%s' and environment '%s'" %
@@ -115,6 +123,23 @@ class Shell(object):
     self.last_output_sent = False
     self.remove_at_next_iteration = False
     self.destroyed = False
+
+  def _merge_delegation_tokens(self, delegation_token_files, delegation_token_dir):
+    """
+    Use the Credentials Merger utility to combine the delegation token files into one delegation token file.
+    Returns the NamedTemporaryFile that contains the combined delegation tokens.
+    """
+    merged_token_file = tempfile.NamedTemporaryFile(dir=delegation_token_dir)
+    merge_tool_args = [hadoop.conf.HADOOP_BIN.get(), 'jar']
+    merge_tool_args += [hadoop.conf.CREDENTIALS_MERGER_JAR.get(), merged_token_file.name]
+    merge_tool_args += [token_file.name for token_file in delegation_token_files]
+    LOG.debug("Merging credentials files with command: '%s'" % (' '.join(merge_tool_args)))
+    merge_process = subprocess.Popen(merge_tool_args, stderr=subprocess.PIPE, shell=False, close_fds=True)
+    retcode = merge_process.wait()
+    if retcode != 0:
+      LOG.error("Failed to merge credentials :'%s'..." % (merge_process.stderr.readline(),))
+      raise MergeToolException("bin/hadoop return non-zero %d while trying to merge credentials" % (retcode,))
+    return merged_token_file
 
   def _get_delegation_tokens(self, username, delegation_token_dir):
     """
@@ -472,7 +497,7 @@ class ShellManager(object):
     try:
       LOG.debug("Trying to create a %s shell for user %s" % (shell_name, username))
       shell_instance = Shell(command, shell_id, username, self._delegation_token_dir)
-    except (OSError, ValueError, KeyError):
+    except (OSError, ValueError, KeyError, MergeToolException):
       LOG.exception("Could not create %s shell for '%s'" % (shell_name, username))
       return { constants.SHELL_CREATE_FAILED : True }
 
