@@ -44,6 +44,7 @@ requires: [
   hue-shared/Hue.Desktop.Config,
   hue-shared/Hue.JFrame.Target,
   hue-shared/Hue.JFrame.Chooser,
+  hue-shared/Hue.JFrame.ConfirmUnencodeAndPost,
   hue-shared/Hue.Login,
   hue-shared/Hue.Profiler,
   hue-shared/Hue.Request,

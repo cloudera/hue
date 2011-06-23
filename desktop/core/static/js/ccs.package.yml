@@ -26,6 +26,7 @@ sources: [
   Source/UI/ThumbTack.js,
   Source/JFrameLinkers/Hue.JFrame.Target.js,
   Source/JFrameLinkers/Hue.JFrame.Chooser.js,
+  Source/JFrameLinkers/Hue.JFrame.ConfirmUnencodeAndPost.js,
   Source/Native/String.Hue.js,
   Source/Native/Number.Files.js,
   Source/StaticThirdParty/DynamicTextarea.js,
