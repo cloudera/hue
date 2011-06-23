@@ -43,7 +43,7 @@ ${wrappers.head()}
             </td>
             <td>
               <a title="Edit ${user.username}" class="edit frame_tip" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">Edit</a>
-              <a title="Delete ${user.username}" class="delete frame_tip confirm_and_post" alt="Are you sure you want to delete ${user.username}?" href="${ url('useradmin.views.delete_user', username=urllib.quote(user.username)) }">Delete</a>
+              <a title="Delete ${user.username}" class="delete frame_tip confirm_unencode_and_post" alt="Are you sure you want to delete ${user.username}?" href="${ url('useradmin.views.delete_user', username=urllib.quote_plus(user.username)) }">Delete</a>
             </td>
           </tr>
         % endfor

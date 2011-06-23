@@ -106,7 +106,7 @@
         <dl>
           <dt>Kill Job:</dt>
           <dd>
-          <a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" class="frame_tip jt_kill confirm_and_post" title="Kill this job">kill</a>
+          <a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" class="frame_tip jt_kill confirm_unencode_and_post" title="Kill this job">kill</a>
           </dd>
         </dl>
         % endif

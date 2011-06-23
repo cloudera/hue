@@ -97,7 +97,7 @@
               <td>
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                   % if request.user.is_superuser or request.user.username == job.user:
-                    <a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" class="frame_tip jt_kill confirm_and_post" title="Kill this job">kill</a>
+                    <a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" class="frame_tip jt_kill confirm_unencode_and_post" title="Kill this job">kill</a>
                   % endif
                 % endif
               </td>
