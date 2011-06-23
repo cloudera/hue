@@ -536,46 +536,37 @@ Note that Hue has only been tested with SQLite and MySQL database backends.
 To configure Hue to store data in MySQL:
 
 1. Create a new database in MySQL and grant privileges to a Hue user to manage
-this database.
-----
-mysql> create database hue;
-Query OK, 1 row affected (0.01 sec)
-mysql> grant all on hue.* to 'hue'@'localhost' identified by 'secretpassword';
-Query OK, 0 rows affected (0.00 sec)
-----
+   this database.
+
+  mysql> create database hue;
+  Query OK, 1 row affected (0.01 sec)
+  mysql> grant all on hue.* to 'hue'@'localhost' identified by 'secretpassword';
+  Query OK, 0 rows affected (0.00 sec)
+
 2. Shut down Hue if it is running.
 3. To migrate your existing data to MySQL, use the following command to dump the
-existing database data to a text file. Note that using the ".json" extension
-is required.
-----
-$ /usr/share/hue/build/env/bin/hue dumpdata > <some-temporary-file>.json
-----
+   existing database data to a text file. Note that using the ".json" extension
+   is required.
+
+  $ /usr/share/hue/build/env/bin/hue dumpdata > <some-temporary-file>.json
+
 4. Open the `/etc/hue/hue.ini` file in a text editor. Directly below the
-`[[database]]` line, add the following options (and modify accordingly for
-your MySQL setup):
-----
-host=localhost
-port=3306
-engine=mysql
-user=hue
-password=secretpassword
-name=hue
-----
-5. Install the Python drivers for MySQL into Hue's environment:
-----
-# su - hue -s /bin/bash
-$ /usr/share/hue/build/env/bin/easy_install MySQL-python
-----
-`easy_install` will access the Internet to find MySQL-python.
-If you don't have network access, you may specify a path
-to a tarball (such as `/tmp/MySQL-python-1.2.2.tar.gz`) instead.
-6. As the Hue user, configure Hue to load the existing data and create the
-necessary database tables:
-----
-$ /usr/share/hue/build/env/bin/hue syncdb --noinput
-$ mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
-$ /usr/share/hue/build/env/bin/hue loaddata <temporary-file-containing-dumped-data>.json
-----
+   `[[database]]` line, add the following options (and modify accordingly for
+   your MySQL setup):
+
+  host=localhost
+  port=3306
+  engine=mysql
+  user=hue
+  password=secretpassword
+  name=hue
+
+5. As the Hue user, configure Hue to load the existing data and create the
+   necessary database tables:
+
+  $ /usr/share/hue/build/env/bin/hue syncdb --noinput
+  $ mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
+  $ /usr/share/hue/build/env/bin/hue loaddata <temporary-file-containing-dumped-data>.json
 
 Your system is now configured and you can start the Hue server as normal.
 
