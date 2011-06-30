@@ -53,6 +53,7 @@ class LifoQueue(Queue.Queue):
 
     def _init(self, maxsize):
         self.queue = []
+        self.maxsize = maxsize
 
     def _qsize(self, len=len):
         return len(self.queue)
