@@ -20,7 +20,7 @@ setup(
       name = "jobbrowser",
       version = VERSION,
       url = 'http://github.com/cloudera/hue',
-      author = "HUE",
+      author = "Hue",
       description = "Hadoop Job Browser",
       packages = find_packages('src'),
       package_dir = {'': 'src'},

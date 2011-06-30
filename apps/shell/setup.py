@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from setuptools import setup, find_packages
+from hueversion import VERSION
 import os
 
 def expand_package_data(src_dirs, strip=""):
@@ -27,7 +28,7 @@ def expand_package_data(src_dirs, strip=""):
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 setup(
   name = "shell",
-  version = "0.1",
+  version = VERSION,
   url = 'http://github.com/cloudera/hue',
   description = 'Shell interface in Hue',
   author = 'Hue',

@@ -19,9 +19,9 @@ from hueversion import VERSION
 setup(
       name = "help",
       version = VERSION,
-      author = "HUE",
+      author = "Hue",
       url = 'http://github.com/cloudera/hue',
-      description = "HUE Help",
+      description = "Hue Help",
       packages = find_packages('src'),
       package_dir = {'': 'src'},
       install_requires = ['setuptools', 'desktop'],

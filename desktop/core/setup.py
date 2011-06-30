@@ -20,7 +20,7 @@ setup(
       name = "desktop",
       version = VERSION,
       url = 'http://github.com/cloudera/hue',
-      description = "HUE core",
+      description = "Hue core",
       packages = find_packages('src'),
       package_dir = {'': 'src'},
       install_requires = ['setuptools'],
