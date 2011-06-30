@@ -48,11 +48,11 @@
 
 include $(ROOT)/Makefile.vars
 
-SETUPTOOLS_NAME := $(shell python setup.py --name)
+SETUPTOOLS_NAME = $(shell $(ENV_PYTHON) setup.py --name)
 
 APP_ROOT := $(realpath .)
 APP_NAME ?= $(SETUPTOOLS_NAME)
-APP_VERSION ?= $(shell python setup.py --version)
+APP_VERSION ?= $(shell $(ENV_PYTHON) setup.py --version)
 APP_FULL_NAME ?= $(APP_NAME)-$(APP_VERSION)
 
 
