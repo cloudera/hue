@@ -19,9 +19,9 @@ from hueversion import VERSION
 setup(
       name = "beeswax",
       version = VERSION,
-      author = "HUE",
+      author = "Hue",
       url = 'http://github.com/cloudera/hue',
-      description = "Hive Interface on HUE",
+      description = "Hive Interface on Hue",
       packages = find_packages('src') + find_packages('gen-py'),
       package_dir = {'hive_metastore': 'gen-py', 'beeswaxd': 'gen-py', 'fb303': 'gen-py', '': 'src'},
       install_requires = ['setuptools', 'desktop'],

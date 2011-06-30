@@ -19,7 +19,7 @@ from hueversion import VERSION
 setup(
       name = "filebrowser",
       version = VERSION,
-      author = "HUE",
+      author = "Hue",
       url = 'http://github.com/cloudera/hue',
       description = "HDFS browser",
       packages = find_packages('src'),

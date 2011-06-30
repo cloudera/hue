@@ -19,7 +19,7 @@ from hueversion import VERSION
 setup(
       name = "about",
       version = VERSION,
-      author = "HUE",
+      author = "Hue",
       url = 'http://github.com/cloudera/hue',
       description = "Displays 'about' info for easier trouble-shooting",
       packages = find_packages('src'),
