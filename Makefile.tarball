@@ -27,6 +27,7 @@ PROD_INCLUDES := \
 	maven \
 	tools/app_reg \
 	tools/virtual-bootstrap \
+	VERSION \
 	VERSION_DATA
 
 # Check for things in BDIST_EXCLUDES in various apps

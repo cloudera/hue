@@ -53,10 +53,7 @@ namespace.  See ``apps/hello/src/hello/urls.py`` for an example.
 
 Development Prerequisites
 ===========================
-1. On your host system, you need to have the python "virtualenv" package
-   installed.
-
-2. Also, you'll need these library development packages and tools installed on
+1. Also, you'll need these library development packages and tools installed on
    your system:
 
     Debian:
@@ -70,7 +67,6 @@ Development Prerequisites
       * libxslt-dev
       * maven2
       * python-dev
-      * python-setuptools
       * python-simplejson
 
     CentOS:
@@ -83,7 +79,6 @@ Development Prerequisites
       * mysql
       * mysql-devel
       * python-devel
-      * python-setuptools
       * python-simplejson (for the crepo tool)
       * sqlite-devel
 
@@ -95,7 +90,7 @@ Development Prerequisites
       * simplejson (easy_install)
       * sqlite3
 
-3. You need to have crepo installed, and preferably on your path. If it is not
+2. You need to have crepo installed, and preferably on your path. If it is not
    on your path, set the environment variable ``CREPO`` to point to ``crepo.py``
    from that distribution. You can clone crepo from
    http://github.com/cloudera/crepo.git somewhere else on your system.
