@@ -21,7 +21,6 @@
 Tests for "user admin"
 """
 
-import HTMLParser
 import urllib
 
 from nose.tools import assert_true, assert_equal
@@ -34,9 +33,6 @@ def reset_all_users():
   """Reset to a clean state by deleting all users"""
   for user in User.objects.all():
     user.delete()
-
-def _unescape(html):
-  return HTMLParser.HTMLParser().unescape(html)
 
 
 def test_invalid_username():
@@ -110,7 +106,7 @@ def test_user_admin():
                                            password2="test",
                                            is_active="True"))
   response = c.get('/useradmin/')
-  assert_true(FUNNY_NAME in _unescape(response.content))
+  assert_true(FUNNY_NAME_QUOTED in response.content)
   assert_true(len(response.context["users"]) > 1)
   assert_true("Hue Users" in response.content)
 
