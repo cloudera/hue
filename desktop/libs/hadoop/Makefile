@@ -42,7 +42,7 @@ env-install: compile ext-env-install
 PLUGIN_DIR := $(realpath .)
 PLUGIN_JAVA_LIB := $(PLUGIN_DIR)/java-lib
 PLUGIN_JAVA_DIR := $(PLUGIN_DIR)/java
-PLUGIN := $(PLUGIN_JAVA_LIB)/hue-plugins-$(DESKTOP_VERSION).jar
+PLUGIN := $(PLUGIN_JAVA_LIB)/hue-plugins-$(MAVEN_VERSION).jar
 BLD_DIR_PLUGINS := $(PLUGIN_DIR)/java/target
 
 STATIC_GROUP_MAPPING_DIR := $(realpath .)/static-group-mapping
