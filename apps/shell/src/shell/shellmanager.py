@@ -43,7 +43,7 @@ from hadoop.cluster import all_mrclusters, get_all_hdfs
 
 LOG = logging.getLogger(__name__)
 
-_SETUID_PROG = os.path.join(os.path.dirname(__file__), 'setuid')
+_SETUID_PROG = os.path.join(os.path.dirname(__file__), 'build', 'setuid')
 
 class NewShellInterrupt(Exception):
   """
