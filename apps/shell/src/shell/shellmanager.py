@@ -447,8 +447,6 @@ class ShellManager(object):
       for key, shell_instance in self._shells.iteritems():
         if shell_instance.last_output_sent or shell_instance.remove_at_next_iteration:
           keys_to_pop.append(key)
-        elif shell_instance.subprocess.poll() is not None:
-          keys_to_pop.append(key)
         else:
           difftime = current_time - shell_instance.time_received
           if difftime >= shell.conf.SHELL_TIMEOUT.get():
