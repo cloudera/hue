@@ -26,7 +26,7 @@ clean:: remove_setuid
 
 .PHONY: setuid
 setuid:
-	make -C src/shell setuid
+	make -C src/shell
 
 .PHONY: remove_setuid
 remove_setuid:

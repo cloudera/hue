@@ -45,7 +45,7 @@ LOG = logging.getLogger(__name__)
 SHELL_OUTPUT_LOGGER = logging.getLogger("shell_output")
 SHELL_INPUT_LOGGER = logging.getLogger("shell_input")
 
-_SETUID_PROG = os.path.join(os.path.dirname(__file__), 'setuid')
+_SETUID_PROG = os.path.join(os.path.dirname(__file__), 'build', 'setuid')
 
 class NewShellInterrupt(Exception):
   """
