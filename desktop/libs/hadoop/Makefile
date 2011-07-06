@@ -42,7 +42,6 @@ env-install: compile ext-env-install
 PLUGIN_DIR := $(realpath .)
 PLUGIN_JAVA_LIB := $(PLUGIN_DIR)/java-lib
 PLUGIN_JAVA_DIR := $(PLUGIN_DIR)/java
-PLUGIN := $(PLUGIN_JAVA_LIB)/hue-plugins-$(DESKTOP_VERSION).jar
 BLD_DIR_PLUGINS := $(PLUGIN_DIR)/java/target
 
 STATIC_GROUP_MAPPING_DIR := $(realpath .)/static-group-mapping
@@ -63,21 +62,21 @@ CREDENTIALS_MERGER_BUILD := $(CREDENTIALS_MERGER_DIR)/target
 CREDENTIALS_MERGER_LIB := $(CREDENTIALS_MERGER_DIR)/java-lib
 CREDENTIALS_MERGER := $(CREDENTIALS_MERGER_LIB)/credentials-merger-$(DESKTOP_VERSION).jar
 
-compile: $(PLUGIN) $(STATIC_GROUP_MAPPING) $(SUDO_SHELL) $(CREDENTIALS_MERGER)
+compile: $(DESKTOP_PLUGIN_JAR) $(STATIC_GROUP_MAPPING) $(SUDO_SHELL) $(CREDENTIALS_MERGER)
 
 # Build the plugin jar iff the source is present
 ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
-$(PLUGIN): $(shell find $(PLUGIN_JAVA_DIR) -type f)
+$(DESKTOP_PLUGIN_JAR): $(shell find $(PLUGIN_JAVA_DIR) -type f)
 	mkdir -p $(PLUGIN_JAVA_LIB)
 	@echo "--- Building Hadoop plugins"
 	cd $(PLUGIN_JAVA_DIR) && mvn clean install -DskipTests
-	cp $(BLD_DIR_PLUGINS)/hue-plugins-$(MAVEN_VERSION).jar $(PLUGIN)
+	cp $(BLD_DIR_PLUGINS)/hue-plugins-$(MAVEN_VERSION).jar $(DESKTOP_PLUGIN_JAR)
 
 clean::
 	rm -rf $(PLUGIN_JAVA_LIB)
 	cd $(PLUGIN_JAVA_DIR) && mvn clean ||:
 else
-$(PLUGIN):
+$(DESKTOP_PLUGIN_JAR):
 	$(error Cannot build hadoop plugin without source)
 endif
 
