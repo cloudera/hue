@@ -63,14 +63,7 @@ class Shell(object):
   """
   A class to encapsulate I/O with a shell subprocess.
   """
-  def __init__(self, shell_command, shell_id, username, delegation_token_dir):
-    subprocess_env = {}
-    env = desktop.lib.i18n.make_utf8_env()
-    for item in constants.PRESERVED_ENVIRONMENT_VARIABLES:
-      value = env.get(item)
-      if value:
-        subprocess_env[item] = value
-
+  def __init__(self, shell_command, subprocess_env, shell_id, username, delegation_token_dir):
     try:
       user_info = pwd.getpwnam(username)
     except KeyError:
@@ -365,7 +358,6 @@ class ShellManager(object):
   """
   def __init__(self):
     self._shells = {} # Keys are (username, shell_id) tuples. Each user has his/her own set of shell ids.
-    shell_types = [] # List of available shell types. For each shell type, we have a nice name (e.g. "Python Shell") and a short name (e.g. "python")
     self._command_by_short_name = {} # Map each short name to its command (e.g. ["pig", "-l", "/dev/null"])
     self._meta = {} # Map usernames to utils.UserMetadata objects
     self._greenlets_by_hid = {} # Map each Hue Instance ID (HID) to greenlet currently fetching output for that HID.
@@ -373,19 +365,13 @@ class ShellManager(object):
     self._greenlets_to_notify = {} # For each PID, maintain a set of greenlets who are also interested in the output from that process, but are not doing the select.
     self._shells_by_fds = {} # Map each file descriptor to the Shell instance whose output it represents.
     self._greenlet_interruptable = {} # For each greenlet, store if it can be safely interrupted.
+    self._env_by_short_name = {} # Map each short name to a dictionary which contains the environment for shells of that type.
 
     self._delegation_token_dir = shell.conf.SHELL_DELEGATION_TOKEN_DIR.get()
     if not os.path.exists(self._delegation_token_dir):
       os.mkdir(self._delegation_token_dir)
 
-    for item in shell.conf.SHELL_TYPES.keys():
-      command = shell.conf.SHELL_TYPES[item].command.get().strip().split()
-      nice_name = shell.conf.SHELL_TYPES[item].nice_name.get().strip()
-      executable_exists = utils.executable_exists(command)
-      if executable_exists:
-        self._command_by_short_name[item] = command
-      shell_types.append({ constants.NICE_NAME: nice_name, constants.KEY_NAME: item, constants.EXISTS:executable_exists })
-    self.shell_types = shell_types
+    self._parse_configs()
     eventlet.spawn_after(1, self._handle_periodic)
 
   @classmethod
@@ -393,6 +379,22 @@ class ShellManager(object):
     if not hasattr(cls, "_global_instance"):
       cls._global_instance = cls()
     return cls._global_instance
+
+  def _parse_configs(self):
+    shell_types = [] # List of available shell types. For each shell type, we have a nice name (e.g. "Python Shell") and a short name (e.g. "python")
+    for item in shell.conf.SHELL_TYPES.keys():
+      env_for_shell = { constants.HADOOP_HOME: hadoop.conf.HADOOP_HOME.get() }
+      command = shell.conf.SHELL_TYPES[item].command.get().strip().split()
+      nice_name = shell.conf.SHELL_TYPES[item].nice_name.get().strip()
+      executable_exists = utils.executable_exists(command)
+      if executable_exists:
+        self._command_by_short_name[item] = command
+        conf_shell_env = shell.conf.SHELL_TYPES[item].environment
+        for env_variable in conf_shell_env.keys():
+          env_for_shell[env_variable] = conf_shell_env[env_variable].value.get()
+        self._env_by_short_name[item] = env_for_shell
+      shell_types.append({ constants.NICE_NAME: nice_name, constants.KEY_NAME: item, constants.EXISTS:executable_exists })
+    self.shell_types = shell_types
 
   def available_shell_types(self, user):
     username = user.username
@@ -494,7 +496,10 @@ class ShellManager(object):
     shell_id = user_metadata.get_next_id()
     try:
       LOG.debug("Trying to create a %s shell for user %s" % (shell_name, username))
-      shell_instance = Shell(command, shell_id, username, self._delegation_token_dir)
+      # Let's make a copy of the subprocess's environment since the Shell constructor will modify
+      # the dictionary we pass in.
+      subprocess_env = self._env_by_short_name.get(shell_name, {}).copy()
+      shell_instance = Shell(command, subprocess_env, shell_id, username, self._delegation_token_dir)
     except (OSError, ValueError, KeyError, MergeToolException):
       LOG.exception("Could not create %s shell for '%s'" % (shell_name, username))
       return { constants.SHELL_CREATE_FAILED : True }
