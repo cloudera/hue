@@ -22,41 +22,74 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
 import shell.utils as utils
 
 SHELL_TYPES = UnspecifiedConfigSection(
-                           key='shelltypes',
-                           each=ConfigSection(members=dict(
-                               nice_name=Config(key='nice_name', required=True),
-                               command=Config(key='command', required=True),
-                               help_doc=Config(key='help', required=False))))
+  key='shelltypes',
+  each=ConfigSection(
+    members=dict(
+      nice_name=Config(
+        key='nice_name',
+        required=True
+      ),
+      command=Config(
+        key='command',
+        required=True
+      ),
+      help_doc=Config(
+        key='help',
+        required=False
+      ),
+      environment=UnspecifiedConfigSection(
+        key='environment',
+        each=ConfigSection(
+          members=dict(
+            value=Config(
+              key='value',
+              required=True
+            ),
+            doc=Config(
+              key='doc',
+              required=False
+            )
+          )
+        )
+      )
+    )
+  )
+)
 
 SHELL_BUFFER_AMOUNT = Config(
   key="shell_buffer_amount",
   help="Configure the number of output characters buffered for each shell",
   default=524288,
-  type=int)
+  type=int
+)
 
 SHELL_TIMEOUT = Config(
   key="shell_timeout",
   help="Number of seconds to keep shells open for users",
   default=600,
-  type=int)
+  type=int
+)
 
 SHELL_WRITE_BUFFER_LIMIT = Config(
   key="shell_write_buffer_limit",
   help="Number of bytes of commands to buffer for users",
   default=10000,
-  type=int)
+  type=int
+)
 
 SHELL_OS_READ_AMOUNT = Config(
   key="shell_os_read_amount",
   help="Number of bytes to read from child subprocess at a time",
   default=40960,
-  type=int)
+  type=int
+)
 
 SHELL_DELEGATION_TOKEN_DIR = Config(
   key="shell_delegation_token_dir",
   help="The directory to store the temporary delegation tokens used by shell subprocesses",
   default="/tmp/hue_shell_delegation_tokens",
-  type=str)
+  type=str
+)
 
 def config_validator():
   """

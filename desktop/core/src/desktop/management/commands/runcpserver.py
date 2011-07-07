@@ -32,7 +32,7 @@ CPSERVER_OPTIONS = {
   'server_name': 'localhost',
   'threads': conf.CHERRYPY_SERVER_THREADS.get(),
   'daemonize': False, # supervisor does this for us
-    'workdir': None,
+  'workdir': None,
   'pidfile': None,
   'server_user': conf.SERVER_USER.get(),
   'server_group': conf.SERVER_GROUP.get(),
