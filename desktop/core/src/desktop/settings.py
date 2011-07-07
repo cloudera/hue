@@ -31,6 +31,8 @@ import pkg_resources
 HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
 NICE_NAME = "Hue"
 
+ENV_HUE_PROCESS_NAME = "HUE_PROCESS_NAME"
+
 ############################################################
 # Part 1: Logging and imports.
 ############################################################
@@ -40,8 +42,11 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 # Start basic logging as soon as possible.
-_proc = os.path.basename(len(sys.argv) > 1 and sys.argv[1] or sys.argv[0])
-desktop.log.basic_logging(_proc)
+if ENV_HUE_PROCESS_NAME not in os.environ:
+  _proc = os.path.basename(len(sys.argv) > 1 and sys.argv[1] or sys.argv[0])
+  os.environ[ENV_HUE_PROCESS_NAME] = _proc
+
+desktop.log.basic_logging(os.environ[ENV_HUE_PROCESS_NAME])
 
 logging.info("Welcome to Hue " + HUE_DESKTOP_VERSION)
 
