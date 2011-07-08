@@ -27,7 +27,7 @@ SPAWNING_SERVER_HELP = r"""
 """
 
 SPAWNING_SERVER_OPTIONS = {
-  'access_log_file': None,
+  'access_log_file': os.devnull,
   'backdoor': None,
   'chuid': None,
   'coverage': None,
