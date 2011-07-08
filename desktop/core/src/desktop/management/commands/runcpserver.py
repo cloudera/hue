@@ -14,133 +14,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# a thirdparty project
 
-import sys, os, logging
+import logging
 from django.core.management.base import BaseCommand
-
 from desktop import conf
+from desktop import supervisor
+import os
+import sys
 
-
-CPSERVER_HELP = r"""
-  Run Hue using the CherryPy WSGI server.
+SERVER_HELP = r"""
+  Run Hue using either the CherryPy server or the Spawning server, based on
+  the current configuration.
 """
 
-CPSERVER_OPTIONS = {
-  'host': conf.HTTP_HOST.get(),
-  'port': conf.HTTP_PORT.get(),
-  'server_name': 'localhost',
-  'threads': conf.CHERRYPY_SERVER_THREADS.get(),
-  'daemonize': False, # supervisor does this for us
-  'workdir': None,
-  'pidfile': None,
-  'server_user': conf.SERVER_USER.get(),
-  'server_group': conf.SERVER_GROUP.get(),
-  'ssl_certificate': conf.SSL_CERTIFICATE.get(),
-  'ssl_private_key': conf.SSL_PRIVATE_KEY.get()
-}
-
+LOG = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-    help = "CherryPy Server for Desktop."
-    args = ""
+  help = "Web server for Hue."
 
-    def handle(self, *args, **options):
-        from django.conf import settings
-        from django.utils import translation
+  def handle(self, *args, **options):
+    runserver()
 
-        if not conf.ENABLE_SERVER.get():
-          logging.info("Hue is configured to not start its own web server.")
-          sys.exit(0)
+  def usage(self, subcommand):
+    return SERVER_HELP
 
-        # Activate the current language, because it won't get activated later.
-        try:
-            translation.activate(settings.LANGUAGE_CODE)
-        except AttributeError:
-            pass
-        runcpserver(args)
-        
-    def usage(self, subcommand):
-        return CPSERVER_HELP
-
-def change_uid_gid(uid, gid=None):
-    """Try to change UID and GID to the provided values.
-    UID and GID are given as names like 'nobody' not integer.
-
-    Src: http://mail.mems-exchange.org/durusmail/quixote-users/4940/1/
-    """
-    if not os.geteuid() == 0:
-        # Do not try to change the gid/uid if not root.
-        return
-    (uid, gid) = get_uid_gid(uid, gid)
-    os.setgid(gid)
-    os.setuid(uid)
-
-def get_uid_gid(uid, gid=None):
-    """Try to change UID and GID to the provided values.
-    UID and GID are given as names like 'nobody' not integer.
-
-    Src: http://mail.mems-exchange.org/durusmail/quixote-users/4940/1/
-    """
-    import pwd, grp
-    uid, default_grp = pwd.getpwnam(uid)[2:4]
-    if gid is None:
-        gid = default_grp
-    else:
-        try:
-            gid = grp.getgrnam(gid)[2]            
-        except KeyError:
-            gid = default_grp
-    return (uid, gid)
-
-def drop_privileges_if_necessary(options):
-  if os.geteuid() == 0 and options['server_user'] and options['server_group']:
-    #ensure the that the daemon runs as specified user
-    change_uid_gid(options['server_user'], options['server_group'])
-
-def start_server(options):
-    """
-    Start CherryPy server
-    """
-    from desktop.lib.wsgiserver import CherryPyWSGIServer as Server
-    from django.core.handlers.wsgi import WSGIHandler
-    # Translogger wraps a WSGI app with Apache-style combined logging.
-    server = Server(
-        (options['host'], int(options['port'])),
-        WSGIHandler(),
-        int(options['threads']), 
-        options['server_name']
-    )
-    if options['ssl_certificate'] and options['ssl_private_key']:
-        server.ssl_certificate = options['ssl_certificate']
-        server.ssl_private_key = options['ssl_private_key']  
-    try:
-        server.bind_server()
-        drop_privileges_if_necessary(options)
-        server.listen_and_loop()
-    except KeyboardInterrupt:
-        server.stop()
-
-
-def runcpserver(argset=[], **kwargs):
-    # Get the options
-    options = CPSERVER_OPTIONS.copy()
-    options.update(kwargs)
-    for x in argset:
-        if "=" in x:
-            k, v = x.split('=', 1)
-        else:
-            k, v = x, True
-        options[k.lower()] = v
-    
-    if "help" in options:
-        print CPSERVER_HELP
-        return
-
-    # Start the webserver
-    print 'starting server with options %s' % options
-    start_server(options)
-
+def runserver():
+  script_name = "runspawningserver"
+  if conf.USE_CHERRYPY_SERVER.get():
+    script_name = "runcherrypyserver"
+  cmdv = supervisor.DjangoCommandSupervisee(script_name).cmdv
+  os.execv(cmdv[0], cmdv)
+  LOG.error("Failed to exec '%s' with argument '%s'" % (cmdv[0], cmdv[1],))
+  sys.exit(-1)
 
 if __name__ == '__main__':
-    runcpserver(sys.argv[1:])
+  runserver()

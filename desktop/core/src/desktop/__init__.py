@@ -17,4 +17,4 @@
 from desktop.supervisor import DjangoCommandSupervisee
 
 SUPERVISOR_SPEC = DjangoCommandSupervisee(
-  "runserver", drop_root=False)
+  "runcpserver", drop_root=False)
