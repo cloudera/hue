@@ -79,7 +79,7 @@ $(BLD_DIR_PROD): apps crepo docs
 	@echo "--- Preparing general distribution tree at $@"
 	@rm -rf $@
 	@mkdir -p $@
-	tar -h -cf - $(PROD_INCLUDES) | tar -C $(BLD_DIR_PROD) -xf -
+	tar -cf - $(PROD_INCLUDES) | tar -C $(BLD_DIR_PROD) -xf -
 
 	@echo "---- Removing exclusions"
 	@for i in $(PROD_EXCLUDES) ; do rm -rf $(BLD_DIR_PROD)/$$i ; done
