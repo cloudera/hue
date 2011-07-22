@@ -198,20 +198,6 @@ Add the following configuration properties to mapred-site.xml:
 </property>
 ----
 
-==== `hadoop-metrics.properties`
-
-To enable full monitoring in the Health application, the metrics
-contexts must not be NullContext. You can configure `hadoop-metrics.properties`
-as shown below:
-
-----
-# Exposes /metrics URL endpoint for metrics information.
-dfs.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
-mapred.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
-jvm.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
-rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
-----
-
 === Further Hadoop Configuration and Caveats
 
 ==== `HADOOP_CLASSPATH` Caveat
