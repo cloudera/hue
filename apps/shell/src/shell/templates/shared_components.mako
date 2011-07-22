@@ -11,7 +11,7 @@ from django.template.defaultfilters import urlencode, escape
     <body>
       <div class="toolbar">
         <a href="${url('shell.views.index')}"><img src="/shell/static/art/shell.png" class="shell_icon"/></a>
-        % if toolbar:
+        % if toolbar and shells:
           <div class="nav_menu">
           % if len(shells) == 1:
             % if shells[0]["exists"]:
