@@ -47,7 +47,7 @@ if python -V 2>&1 | grep -q -v 2.4; then
   # Install pylint from our archive
   build/env/bin/easy_install \
     -f http://archive.cloudera.com/desktop-sdk-python-packages/ \
-    -H pypi.python.org,archive.cloudera.com pylint
+    -H archive.cloudera.com pylint
   build/env/bin/hue runpylint all -- -f parseable > PYLINT.txt
 fi
 
