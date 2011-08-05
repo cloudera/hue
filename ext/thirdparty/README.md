@@ -42,6 +42,7 @@ Checked-in third party dependencies
 |Y|simplejson|2.0.9|MIT|http://pypi.python.org/packages/source/s/simplejson/simplejson-2.0.9.tar.gz|
 |Y|South|0.7|Apache|http://south.aeracode.org/|
 |Y|Spawning|0.9.6|MIT|http://pypi.python.org/pypi/Spawning/0.9.6/|
+|Y|ssl|1.15|Python|http://pypi.python.org/pypi/ssl/1.15|
 |Y|threadframe|0.2|Python|http://www.majid.info/mylos/stories/2004/06/10/threadframe.html|
 |Y|Thrift|?|Apache|http://incubator.apache.org/thrift/download/|
 |Y|Twisted|8.2.0|MIT|http://twistedmatrix.com/trac/|
