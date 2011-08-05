@@ -1,0 +1,13 @@
+setup.py
+Makefile
+MANIFEST
+ssl/__init__.py
+ssl/_ssl2.c
+ssl/2.3.6/socketmodule.h
+ssl/2.5.1/socketmodule.h
+test/badcert.pem
+test/badkey.pem
+test/keycert.pem
+test/nullcert.pem
+test/test_ssl.py
+test/https_svn_python_org_root.pem
