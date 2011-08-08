@@ -57,6 +57,7 @@ Development Prerequisites
    your system:
 
     Debian:
+      * ant
       * asciidoc
       * gcc
       * g++
@@ -70,9 +71,11 @@ Development Prerequisites
       * python-simplejson
 
     CentOS:
+      * ant
       * asciidoc
       * cyrus-sasl-devel
       * gcc
+      * gcc-c++
       * libxml2-devel
       * libxslt-devel
       * maven2
