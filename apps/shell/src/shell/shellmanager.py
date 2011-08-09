@@ -42,6 +42,8 @@ from eventlet.green import time
 from hadoop.cluster import all_mrclusters, get_all_hdfs
 
 LOG = logging.getLogger(__name__)
+SHELL_OUTPUT_LOGGER = logging.getLogger("shell_output")
+SHELL_INPUT_LOGGER = logging.getLogger("shell_input")
 
 _SETUID_PROG = os.path.join(os.path.dirname(__file__), 'setuid')
 
@@ -75,7 +77,7 @@ class Shell(object):
     try:
       tty.setraw(parent)
     except tty.error:
-      LOG.debug("Could not set parent fd to raw mode, user will see echoed input.")
+      LOG.debug("Could not set parent fd to raw mode, user will see duplicated input.")
 
     subprocess_env[constants.HOME] = user_info.pw_dir
     command_to_use = [_SETUID_PROG, str(user_info.pw_uid), str(user_info.pw_gid)]
@@ -97,6 +99,12 @@ class Shell(object):
       os.close(child)
       raise
 
+    msg_format =  "%s - shell_id:%s pid:%d - args:%s"
+    msg_args = (username, shell_id, p.pid, ' '.join(command_to_use))
+    msg = msg_format % msg_args
+    SHELL_OUTPUT_LOGGER.info(msg)
+    SHELL_INPUT_LOGGER.info(msg)
+
     # State that shouldn't be touched by any other classes.
     self._output_buffer_length = 0
     self._commands = []
@@ -110,6 +118,7 @@ class Shell(object):
 
     # State that's accessed by other classes.
     self.shell_id = shell_id
+    self.username = username
     # Timestamp that is updated on shell creation and on every output request. Used so that we know
     # when to kill the shell.
     self.time_received = time.time()
@@ -202,13 +211,10 @@ class Shell(object):
 
     Returns a dictionary with {return_code: bool}.
     """
-    LOG.debug("Command received for pid %d : '%s'" % (self.pid, repr(command),))
     # TODO(bc): Track the buffer size to avoid calling getvalue() every time
     if len(self._write_buffer.getvalue()) >= shell.conf.SHELL_WRITE_BUFFER_LIMIT.get():
-      LOG.debug("Write buffer too full, dropping command")
       return { constants.BUFFER_EXCEEDED : True }
     else:
-      LOG.debug("Write buffer has room. Adding command to end of write buffer.")
       self._append_to_write_buffer(command)
       eventlet.spawn_n(self._write_child_when_able)
       return { constants.SUCCESS : True }
@@ -274,8 +280,10 @@ class Shell(object):
       if e.errno == errno.EINTR:
         eventlet.spawn_n(self._write_child_when_able)
       elif e.errno != errno.EAGAIN:
-        format_str = "Encountered error while writing to process with PID %d:%s"
-        LOG.error(format_str % (self.pid, e))
+        error_str = "%s - shell_id:%s pid:%d - Error writing to subprocess:%s" %\
+                                  (self.username, self.shell_id, self.pid, e,)
+        LOG.error(error_str)
+        SHELL_INPUT_LOGGER.error(error_str)
         self.mark_for_cleanup()
     else: # This else clause is on the try/except above, not the if/elif
       if bytes_written != len(buffer_contents):
@@ -320,7 +328,8 @@ class Shell(object):
         pass
       elif e.errno != errno.EAGAIN:
         format_str = "Encountered error while reading from process with PID %d : %s"
-        LOG.error( format_str % (self.subprocess.pid, e))
+        LOG.error(format_str % (self.pid, e))
+        SHELL_OUTPUT_LOGGER.error(format_str % (self.pid, e))
         self.mark_for_cleanup()
     else:
       more_available = length >= shell.conf.SHELL_OS_READ_AMOUNT.get()
@@ -343,12 +352,17 @@ class Shell(object):
       os.close(self._child_fd)
 
       try:
-        LOG.debug("Sending SIGKILL to process with PID %d" % (self.subprocess.pid,))
-        os.kill(self.subprocess.pid, signal.SIGKILL)
-        # We could try figure out which exit statuses are fine and which ones are errors.
-        # But that would be difficult to do correctly since os.wait might block.
+        LOG.debug("Sending SIGKILL to process with PID %d" % (self.pid,))
+        os.kill(self.pid, signal.SIGKILL)
+        _, exitcode = os.waitpid(self.pid, 0)
+        msg = "%s - shell_id:%s pid:%d - Exited with status %d" % (self.username, self.shell_id, self.pid, exitcode)
       except OSError:
-        pass # This means the subprocess was already killed, which happens if the command was "quit"
+        msg = "%s - shell_id:%s pid:%d - Killed successfully" % (self.username, self.shell_id, self.pid,)
+        # This means the subprocess was already killed, which happens if the command was "quit"
+        # This can also happen if the waitpid call results in an error, which we don't care about.
+      LOG.info(msg)
+      SHELL_OUTPUT_LOGGER.info(msg)
+      SHELL_INPUT_LOGGER.info(msg)
     finally:
       self.destroyed = True
 
@@ -495,16 +509,17 @@ class ShellManager(object):
     user_metadata = self._meta[username]
     shell_id = user_metadata.get_next_id()
     try:
-      LOG.debug("Trying to create a %s shell for user %s" % (shell_name, username))
+      msg = "%s - shell_id:%s - Creating %s shell with command '%s'" % (username, shell_id, shell_name, repr(command))
+      LOG.debug(msg)
       # Let's make a copy of the subprocess's environment since the Shell constructor will modify
       # the dictionary we pass in.
       subprocess_env = self._env_by_short_name.get(shell_name, {}).copy()
       shell_instance = Shell(command, subprocess_env, shell_id, username, self._delegation_token_dir)
     except (OSError, ValueError, KeyError, MergeToolException):
-      LOG.exception("Could not create %s shell for '%s'" % (shell_name, username))
+      LOG.exception("%s - shell_id:%s - Could not create %s shell" % (username, shell_id, shell_name))
       return { constants.SHELL_CREATE_FAILED : True }
 
-    LOG.debug("Shell successfully created")
+    LOG.debug("%s - shell_id:%s pid:%d - Shell successfully created" % (username, shell_id, shell_instance.pid))
     user_metadata.increment_count()
     self._shells[(username, shell_id)] = shell_instance
     self._shells_by_fds[shell_instance._fd] = shell_instance
@@ -516,10 +531,10 @@ class ShellManager(object):
     """
     shell_instance = self._shells.get((username, shell_id))
     if not shell_instance:
-      response = "User '%s' has no shell with ID '%s'" % (username, shell_id)
+      response = "%s - shell_id:%s - No such shell exists" % (username, shell_id)
     else:
       shell_instance.mark_for_cleanup()
-      response = "Shell successfully killed"
+      response = "%s - shell_id:%s - Shell successfully marked for cleanup" % (username, shell_id)
     LOG.debug(response)
     return response
 
@@ -707,7 +722,7 @@ class ShellManager(object):
         if cached_output:
           result[shell_id] = cached_output
       else:
-        LOG.warn("User '%s' has no shell with ID '%s'" % (username, shell_id))
+        LOG.warn("%s - shell_id:%s - No such shell exists" % (username, shell_id))
         result[shell_id] = { constants.NO_SHELL_EXISTS: True }
 
     return result
