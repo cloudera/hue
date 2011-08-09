@@ -17,12 +17,16 @@
 
 from desktop.lib.django_util import render
 from django.http import HttpResponse
+import logging
 import simplejson
 import shell.conf
 import shell.constants as constants
 import shell.utils as utils
 from shell.shellmanager import ShellManager
 import sys
+
+SHELL_OUTPUT_LOGGER = logging.getLogger("shell_output")
+SHELL_INPUT_LOGGER = logging.getLogger("shell_input")
 
 def _running_with_spawning(request):
   return 'eventlet.input' in request.META
@@ -49,6 +53,8 @@ def create(request):
     key_name = request.POST.get(constants.KEY_NAME, "")
   else:
     key_name = request.GET.get(constants.KEY_NAME, "")
+  SHELL_INPUT_LOGGER.info("%s %s - Create '%s' shell" %
+                (request.META.get('REMOTE_ADDR'), user.username, key_name))
   result = shell_manager.try_create(user, key_name)
   if request.method == "POST":
     return HttpResponse(simplejson.dumps(result), mimetype="application/json")
@@ -68,6 +74,8 @@ def kill_shell(request):
   shell_manager = ShellManager.global_instance()
   username = request.user.username
   shell_id = request.POST[constants.SHELL_ID]
+  SHELL_INPUT_LOGGER.info("%s %s - shell_id:%s - Kill shell" %
+                 (request.META.get('REMOTE_ADDR'), username, shell_id))
   result = shell_manager.kill_shell(username, shell_id)
   return HttpResponse(result)
 
@@ -78,7 +86,15 @@ def restore_shell(request):
   shell_manager = ShellManager.global_instance()
   username = request.user.username
   shell_id = request.POST[constants.SHELL_ID]
+  SHELL_OUTPUT_LOGGER.info("%s %s - shell_id:%s - Attempting restore" %
+                      (request.META.get('REMOTE_ADDR'), username, shell_id))
   result = shell_manager.get_previous_output(username, shell_id)
+  log_output = {}
+  if constants.OUTPUT in result:
+    log_output[constants.OUTPUT] = result[constants.OUTPUT]
+  log_output = repr(log_output)
+  SHELL_OUTPUT_LOGGER.info("%s %s - shell_id:%s - Restore output: '%s'" %
+              (request.META.get('REMOTE_ADDR'), username, shell_id, log_output ))
   return HttpResponse(simplejson.dumps(result), mimetype="application/json")
 
 def process_command(request):
@@ -89,6 +105,8 @@ def process_command(request):
   username = request.user.username
   shell_id = request.POST[constants.SHELL_ID]
   command = request.POST.get(constants.COMMAND, "")
+  SHELL_INPUT_LOGGER.info("%s %s - shell_id:%s - Command:'%s'" %
+              (request.META.get('REMOTE_ADDR'), username, shell_id, command))
   result = shell_manager.process_command(username, shell_id, command)
   return HttpResponse(simplejson.dumps(result), mimetype="application/json")
 
@@ -104,6 +122,12 @@ def retrieve_output(request):
   except ValueError:
     shell_pairs = []
   result = shell_manager.retrieve_output(username, hue_instance_id, shell_pairs)
+  for key, value in result.iteritems():
+    if isinstance(value, dict) and constants.OUTPUT in value:
+      log_format = '%s %s - shell_id:%s - Output: "%s"'
+      log_args = (request.META.get('REMOTE_ADDR'), username, key,
+                                        repr(value[constants.OUTPUT]))
+      SHELL_OUTPUT_LOGGER.info(log_format % log_args)
   return HttpResponse(simplejson.dumps(result), mimetype="application/json")
 
 def add_to_output(request):
