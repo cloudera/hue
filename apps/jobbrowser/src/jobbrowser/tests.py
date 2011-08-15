@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import time
+import re
 
 from nose.tools import assert_true, assert_false, assert_equal
 
@@ -44,9 +45,17 @@ def test_format_counter_name():
   assert_equal("A Bbb Ccc", views.format_counter_name("A_BBB_CCC"))
 
 
-def get_hadoop_job_id(jobsubd, jobsub_id):
+def get_hadoop_job_id(jobsubd, jobsub_id, timeout_sec=60):
   handle = SubmissionHandle(id=jobsub_id)
   job_data = jobsubd.client.get_job_data(handle)
+
+  start = time.time()
+  while len(job_data.hadoop_job_ids) == 0:
+    assert_true(time.time() - start < timeout_sec,
+        "Timed out waiting for job to start")
+    time.sleep(1)
+    job_data = jobsubd.client.get_job_data(handle)
+
   return job_data.hadoop_job_ids[0]
 
 
@@ -225,7 +234,6 @@ class TestJobBrowserWithHadoop(object):
                                                             num_reducers=2000,
                                                             reduce_sleep_time_millis=1))
     job_id = parse_out_id(response)
-    time.sleep(15)                      # 15 seconds should be enough to start the job
     hadoop_job_id = get_hadoop_job_id(self.jobsubd, job_id)
 
     client2 = make_logged_in_client('test_non_superuser', is_superuser=False)
@@ -233,9 +241,19 @@ class TestJobBrowserWithHadoop(object):
     assert_equal("Permission denied.  User test_non_superuser cannot delete user test's job.",
       response.context["error"])
 
-    self.client.post('/jobbrowser/jobs/%s/kill' % (hadoop_job_id,))
+    # Make sure that the first map task succeeds before moving on
+    # This will keep us from hitting timing-related failures
+    first_mapper = hadoop_job_id.replace('job', 'task') + '_m_000000'
+    start = time.time()
+    timeout_sec = 60
+    while first_mapper not in \
+        self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=succeeded' % (hadoop_job_id,)).content:
+      time.sleep(1)
+      # If this assert fails, something has probably really failed
+      assert_true(time.time() - start < timeout_sec,
+          "Timed out waiting for first mapper to complete")
 
-  
+    self.client.post('/jobbrowser/jobs/%s/kill' % (hadoop_job_id,))
 
     # It should say killed
     response = self.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))
@@ -256,6 +274,7 @@ class TestJobBrowserWithHadoop(object):
     assert_true('killed' in response.content)
 
     # The first task should've succeeded
+    # We use a different method of checking success for this one
     early_task_id = hadoop_job_id.replace('job', 'task') + '_m_000000'
     response = self.client.get('/jobbrowser/jobs/%s/tasks/%s' % (hadoop_job_id, early_task_id))
     assert_true('succeed' in response.content)
