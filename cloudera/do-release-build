@@ -1,0 +1,19 @@
+#!/bin/bash
+# Copyright (c) 2011 Cloudera, inc
+#
+# Performs a release build
+
+set -ex
+
+# Do the build
+BIN_DIR=$(readlink -f $(dirname $0))
+RELEASE_DIR=$BIN_DIR/..
+
+cd $RELEASE_DIR
+make prod
+pushd build/release/prod/
+  mv hue-1.2.0 hue-${FULL_VERSION}
+  tar -czf hue-${FULL_VERSION}.tar.gz hue-${FULL_VERSION}
+popd
+
+cp build/release/prod/hue-${FULL_VERSION}.tar.gz build/
