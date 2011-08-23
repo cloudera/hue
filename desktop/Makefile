@@ -84,8 +84,8 @@ $(DESKTOP_DB): $(BLD_DIR_BIN)/hue
 	  rm -f $@ ; \
 	fi
 	@echo "--- Syncing/updating database at $@"
-	@$(BLD_DIR_BIN)/hue syncdb --noinput
-	@$(BLD_DIR_BIN)/hue migrate
+	@$(ENV_PYTHON) $(BLD_DIR_BIN)/hue syncdb --noinput
+	@$(ENV_PYTHON) $(BLD_DIR_BIN)/hue migrate
 
 # Targets that simply recurse into all of the applications
 ENV_INSTALL_TARGETS := $(APPS:%=.recursive-env-install/%)
