@@ -16,7 +16,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="X-UA-Compatible" content="IE=8" />
+## This meta tag tells IE to use IE8's rendering engine if possible
+## and Google Chrome Frame if it's installed.
+  <meta http-equiv="X-UA-Compatible" content="IE=8,chrome=1" />
   <title>Hue</title>
   <link rel="shortcut icon" href="/static/art/favicon_solid.png" type="image/x-icon" />
   <link rel="icon" href="/static/art/favicon_solid.png" type="image/x-icon" />
