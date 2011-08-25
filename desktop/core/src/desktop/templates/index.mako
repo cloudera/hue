@@ -44,15 +44,6 @@
   <script>
   window.addEvent('domready', function(){
     if (Browser.Engine.trident) {
-      //if we're in IE, there's a note about the fact that Hue doesn't love IE
-      //add a click handler for hiding this note.
-      $('closeWarning').addEvent('click', function(){
-        //store the preference
-        Cookie.write('desktop-browser-warned', true);
-        //remove the class (which hides the warning)
-        $(document.body).removeClass('warned');
-      });
-      if (!Cookie.read('desktop-browser-warned')) $(document.body).addClass('warned');
       if (!ieOkay) alert("Hue does not currently support any version of Internet Explorer earlier than IE8.");
     }
     var appName = "Hue";
