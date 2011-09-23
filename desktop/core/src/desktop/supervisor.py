@@ -39,12 +39,12 @@ import os
 import pkg_resources
 import pwd
 import signal
-import string
 import subprocess
 import sys
 import threading
 import time
 
+import desktop.lib.daemon_utils
 import desktop.lib.paths
 import desktop.log
 
@@ -66,6 +66,8 @@ MAX_RESTARTS_IN_WINDOW = 3
 # the drop_root option set to False
 SETUID_USER = "hue"
 SETGID_GROUP = "hue"
+g_user_uid = None       # We figure out the numeric uid/gid later
+g_user_gid = None
 
 # The entry point group in which to find processes to supervise.
 ENTRY_POINT_GROUP = "desktop.supervisor.specs"
@@ -240,6 +242,17 @@ def get_supervisees():
   eps = list(pkg_resources.iter_entry_points(ENTRY_POINT_GROUP))
   return dict((ep.name, ep.load()) for ep in eps)
 
+
+def setup_user_info():
+  """Translate the user/group info into uid/gid."""
+  if os.geteuid() != 0:
+    return
+
+  global g_user_uid, g_user_gid
+  g_user_uid, g_user_gid = \
+      desktop.lib.daemon_utils.get_uid_gid(SETUID_USER, SETGID_GROUP)
+
+
 def drop_privileges():
   """Drop root privileges down to the specified SETUID_USER.
 
@@ -271,9 +284,12 @@ def drop_privileges():
   os.setgid(gr.gr_gid)
   os.setuid(pw.pw_uid)
 
+
 def _init_log(log_dir):
   """Initialize logging configuration"""
   desktop.log.basic_logging(PROC_NAME, log_dir)
+  if os.geteuid() == 0:
+    desktop.log.chown_log_dir(g_user_uid, g_user_gid)
 
 
 def main():
@@ -292,6 +308,8 @@ def main():
 
   if not os.path.exists(log_dir):
     os.makedirs(log_dir)
+
+  setup_user_info()
 
   pid_file = os.path.abspath(os.path.join(root, options.pid_file))
   pidfile_context = TimeOutPIDLockFile(pid_file, LOCKFILE_TIMEOUT)
