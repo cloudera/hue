@@ -37,6 +37,8 @@ DATE_FORMAT = '%d/%b/%Y %H:%M:%S %z'
 
 CONF_RE = re.compile('%LOG_DIR%|%PROC_NAME%')
 
+_log_dir = None
+
 def _read_log_conf(proc_name, log_dir):
   """
   _read_log_conf(proc_name, log_dir) -> StringIO or None
@@ -71,6 +73,24 @@ def _find_console_stream_handler(logger):
   return None
 
 
+def chown_log_dir(uid, gid):
+  """
+  chown all files in the log dir to this user and group.
+  Should only be called after loggic has been setup.
+  Return success
+  """
+  if _log_dir is None:
+    return False
+  try:
+    os.chown(_log_dir, uid, gid)
+    for entry in os.listdir(_log_dir):
+      os.chown(os.path.join(_log_dir, entry), uid, gid)
+    return True
+  except OSError, ex:
+    print >> sys.stderr, 'Failed to chown log directory %s: ex' % (_log_dir, ex)
+    return False
+
+
 def basic_logging(proc_name, log_dir=None):
   """
   Configure logging for the program ``proc_name``:
@@ -95,6 +115,10 @@ def basic_logging(proc_name, log_dir=None):
     except OSError, err:
       print >> sys.stderr, 'Failed to create log directory "%s": %s' % (log_dir, err)
       raise err
+
+  # Remember where our log directory is
+  global _log_dir
+  _log_dir = log_dir
 
   log_conf = _read_log_conf(proc_name, log_dir)
   if log_conf is not None:
