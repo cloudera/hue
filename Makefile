@@ -141,7 +141,7 @@ crepo: $(THIRDPARTY_JS_DIR)/manifest.json $(THIRDPARTY_JS_DIR)/*.hash
 # Install parent POM
 ###################################
 parent-pom:
-	cd $(ROOT)/maven && mvn install
+	cd $(ROOT)/maven && mvn install $(MAVEN_OPTIONS)
 
 .PHONY: parent-pom
 
@@ -268,7 +268,7 @@ ext-clean:
 ###############################################
 
 java-test:
-	mvn -f desktop/libs/hadoop/java/pom.xml test
+	mvn -f desktop/libs/hadoop/java/pom.xml test $(MAVEN_OPTIONS)
 
 test: java-test
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue test fast --with-xunit
