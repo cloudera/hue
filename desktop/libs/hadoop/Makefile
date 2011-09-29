@@ -69,12 +69,12 @@ ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
 $(DESKTOP_PLUGIN_JAR): $(shell find $(PLUGIN_JAVA_DIR) -type f)
 	mkdir -p $(PLUGIN_JAVA_LIB)
 	@echo "--- Building Hadoop plugins"
-	cd $(PLUGIN_JAVA_DIR) && mvn clean install -DskipTests
+	cd $(PLUGIN_JAVA_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
 	cp $(BLD_DIR_PLUGINS)/hue-plugins-$(MAVEN_VERSION).jar $(DESKTOP_PLUGIN_JAR)
 
 clean::
 	rm -rf $(PLUGIN_JAVA_LIB)
-	cd $(PLUGIN_JAVA_DIR) && mvn clean ||:
+	cd $(PLUGIN_JAVA_DIR) && mvn clean $(MAVEN_OPTIONS) ||:
 else
 $(DESKTOP_PLUGIN_JAR):
 	$(error Cannot build hadoop plugin without source)
@@ -85,12 +85,12 @@ ifneq (,$(wildcard $(STATIC_GROUP_MAPPING_SRC)))
 $(STATIC_GROUP_MAPPING): $(shell find $(STATIC_GROUP_MAPPING_SRC) -type f)
 	mkdir -p $(STATIC_GROUP_MAPPING_LIB)
 	@echo "--- Building static UserGroupMappingService"
-	cd $(STATIC_GROUP_MAPPING_DIR) && mvn clean install -DskipTests
+	cd $(STATIC_GROUP_MAPPING_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
 	cp $(STATIC_GROUP_MAPPING_BUILD)/static-group-mapping-$(MAVEN_VERSION).jar $(STATIC_GROUP_MAPPING)
 
 clean::
 	rm -rf $(STATIC_GROUP_MAPPING_LIB)
-	cd $(STATIC_GROUP_MAPPING_DIR) && mvn clean ||:
+	cd $(STATIC_GROUP_MAPPING_DIR) && mvn clean $(MAVEN_OPTIONS) ||:
 else
 $(STATIC_GROUP_MAPPING):
 	$(error Cannot build static-group-mapping jar without source)
@@ -101,12 +101,12 @@ ifneq (,$(wildcard $(SUDO_SHELL_SRC)))
 $(SUDO_SHELL): $(shell find $(SUDO_SHELL_SRC) -type f)
 	mkdir -p $(SUDO_SHELL_LIB)
 	@echo "--- Building sudo fsshell tool"
-	cd $(SUDO_SHELL_DIR) && mvn clean install -DskipTests
+	cd $(SUDO_SHELL_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
 	cp $(SUDO_SHELL_BUILD)/sudo-shell-$(MAVEN_VERSION).jar $(SUDO_SHELL)
 
 clean::
 	rm -rf $(SUDO_SHELL_LIB)
-	cd $(SUDO_SHELL_DIR) && mvn clean ||:
+	cd $(SUDO_SHELL_DIR) && mvn clean $(MAVEN_OPTIONS) ||:
 else
 $(SUDO_SHELL):
 	$(error cannot build sudo-shell jar without source)
@@ -117,12 +117,12 @@ ifneq (,$(wildcard $(CREDENTIALS_MERGER_SRC)))
 $(CREDENTIALS_MERGER): $(shell find $(CREDENTIALS_MERGER_SRC) -type f)
 	mkdir -p $(CREDENTIALS_MERGER_LIB)
 	@echo "--- Building credentials merger tool"
-	cd $(CREDENTIALS_MERGER_DIR) && mvn clean install -DskipTests
+	cd $(CREDENTIALS_MERGER_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
 	cp $(CREDENTIALS_MERGER_BUILD)/credentials-merger-$(MAVEN_VERSION).jar $(CREDENTIALS_MERGER)
 
 clean::
 	rm -rf $(CREDENTIALS_MERGER_LIB)
-	cd $(CREDENTIALS_MERGER_DIR) && mvn clean ||:
+	cd $(CREDENTIALS_MERGER_DIR) && mvn clean $(MAVEN_OPTIONS) ||:
 else
 $(CREDENTAILS_MERGER):
 	$(error cannot build credentials merger jar without source)
