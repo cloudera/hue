@@ -57,6 +57,8 @@ class Command(NoArgsCommand):
       str(dt_host),
       '--desktop-port',
       str(desktop.conf.HTTP_PORT.get()),
+      '--query-lifetime',
+      str(beeswax.conf.BEESWAX_RUNNING_QUERY_LIFETIME.get()),
     ]
 
     # Running on HTTPS?

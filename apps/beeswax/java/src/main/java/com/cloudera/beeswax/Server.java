@@ -58,6 +58,7 @@ public class Server {
   private static String dtHost = "";
   private static int dtPort = -1;
   private static boolean dtHttps = false;
+  private static long qlifetime = BeeswaxServiceImpl.RUNNING_QUERY_LIFETIME;
 
   /**
    * Parse command line options.
@@ -71,6 +72,11 @@ public class Server {
     Option metastoreOpt = new Option("m", "metastore", true, "port to use for metastore");
     metastoreOpt.setRequired(false);
     options.addOption(metastoreOpt);
+
+    Option queryLifetimeOpt = new Option("l", "query-lifetime", true,
+        "query lifetime");
+    queryLifetimeOpt.setRequired(false);
+    options.addOption(queryLifetimeOpt);
 
     Option beeswaxOpt = new Option("b", "beeswax", true, "port to use for beeswax");
     beeswaxOpt.setRequired(true);
@@ -111,6 +117,8 @@ public class Server {
         dtPort = parsePort(opt);
       } else if (opt.getOpt() == "s") {
         dtHttps = true;
+      } else if (opt.getOpt() == "l") {
+        qlifetime = Long.valueOf(opt.getValue());
       }
     }
   }
@@ -185,14 +193,16 @@ public class Server {
    */
   private static void serveBeeswax(int port) throws TTransportException {
     TServerTransport serverTransport = new TServerSocket(port);
-    BeeswaxService.Iface impl = new BeeswaxServiceImpl(dtHost, dtPort, dtHttps);
+    BeeswaxService.Iface impl = new BeeswaxServiceImpl(dtHost, dtPort, dtHttps,
+        qlifetime);
     Processor processor = new BeeswaxService.Processor(impl);
     TThreadPoolServer.Options options = new TThreadPoolServer.Options();
     TServer server = new TThreadPoolServer(processor, serverTransport,
         new TTransportFactory(), new TTransportFactory(),
         new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
     LOG.info("Starting beeswax server on port " + port + ", talking back to Desktop at " +
-             dtHost + ":" + dtPort);
+             dtHost + ":" + dtPort + ", lifetime of queries set to " + qlifetime);
+
     server.serve();
   }
 

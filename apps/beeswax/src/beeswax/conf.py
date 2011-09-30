@@ -84,3 +84,9 @@ METASTORE_CONN_TIMEOUT= Config(
   default=10,
   type=int,
   help='Timeouts in seconds for thrift calls to the hive metastore. This timeout should take into account that the metastore could talk to an external DB')
+
+BEESWAX_RUNNING_QUERY_LIFETIME = Config(
+  key='beeswax_running_query_lifetime',
+  default=604800000L, # 7*24*60*60*1000 (1 week)
+  type=long,
+  help='Time in seconds for beeswax to persist queries in its cache.')

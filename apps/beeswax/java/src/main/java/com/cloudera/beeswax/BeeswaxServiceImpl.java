@@ -90,10 +90,13 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
 
   private String notifyUrl;
 
+  // lifetime of a running query.
+  private long queryLifetime;
+
   /** Mapping between configuration variable names and descriptions. */
   private ConfigDescriptions configDescriptions = ConfigDescriptions.get();
 
-  private static final long RUNNING_QUERY_LIFETIME = 7*24*60*60*1000;  // 1 week
+  public static final long RUNNING_QUERY_LIFETIME = 7*24*60*60*1000;  // 1 week
   private static final long EVICTION_INTERVAL = 3*60*60*1000;  // 3 hours
   private static final String NOTIFY_URL_BASE = "/beeswax/query_cb/done/";
 
@@ -316,6 +319,12 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
           }
         }
       } finally {
+        // driver.plan.inputs and driver.plan.roottasks contains lots of
+        // pointers to memory; nullify them to allow for garbage collection.
+        synchronized (this) {
+          driver.getPlan().getInputs().clear();
+          driver.getPlan().getRootTasks().clear();
+        }
         notifyDone(this);
       }
     }
@@ -557,17 +566,31 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     }
   }
 
+  /**
+   * Create a new BeeswaxServiceImpl with default query lifetime.
+   *
+   * @param dtHost The Hue host (ip or hostname).
+   * @param dtPort The port Desktop runs on.
+   * @param dtHttps Whether Desktop is running https.
+   */
+  public BeeswaxServiceImpl(String dtHost, int dtPort, boolean dtHttps) {
+    this(dtHost, dtPort, dtHttps, RUNNING_QUERY_LIFETIME);
+  }
 
   /**
    * Create a new BeeswaxServiceImpl.
-   * @param dtHost  The Hue host (ip or hostname).
-   * @param dtPort  The port Desktop runs on.
-   * @param dtHttps  Whether Desktop is running https.
+   *
+   * @param dtHost The Hue host (ip or hostname).
+   * @param dtPort The port Desktop runs on.
+   * @param dtHttps Whether Desktop is running https.
+   * @param queryLifetime The life time of a cached query.
    */
-  public BeeswaxServiceImpl(String dtHost, int dtPort, boolean dtHttps) {
+  public BeeswaxServiceImpl(String dtHost, int dtPort, boolean dtHttps,
+      long queryLifetime) {
     LogContext.initLogCapture();
     this.executor = Executors.newCachedThreadPool(new NamingThreadFactory("Beeswax-%d"));
     this.runningQueries = new ConcurrentHashMap<String, RunningQueryState>();
+    this.queryLifetime = queryLifetime;
 
     String protocol;
     if (dtHttps) {
@@ -599,7 +622,9 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
             long now = System.currentTimeMillis();
             for (Map.Entry<String, RunningQueryState> entry : runningQueries.entrySet()) {
               RunningQueryState rqState = entry.getValue();
-              if (rqState.getAtime() + RUNNING_QUERY_LIFETIME < now) {
+              //safe guard against small value of lifetime, only clean FINISHED or EXCEPTION state
+              if ((rqState.state == QueryState.FINISHED || rqState.state == QueryState.EXCEPTION )
+                    && rqState.getAtime() + getQueryLifetime() < now) {
                 String id = entry.getKey();
                 runningQueries.remove(id);
                 LOG.debug("Removed " + rqState.toString());
@@ -607,7 +632,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
               }
             }
 
-            LogContext.garbageCollect(RUNNING_QUERY_LIFETIME);
+            LogContext.garbageCollect(getQueryLifetime());
 
             long wakeup = now + EVICTION_INTERVAL;
             while (System.currentTimeMillis() < wakeup) {
@@ -875,5 +900,13 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       ret.add(cv);
     }
     return ret;
+  }
+
+  public long getQueryLifetime() {
+    return queryLifetime;
+  }
+
+  public void setQueryLifetime(long queryLifetime) {
+    this.queryLifetime = queryLifetime;
   }
 }
