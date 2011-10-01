@@ -1037,10 +1037,14 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             }
 
             ThriftJobCounterRollups ret = new ThriftJobCounterRollups();
+            Counters mapCounters = new Counters();
+            jip.getMapCounters(mapCounters);
+            Counters reduceCounters = new Counters();
+            jip.getReduceCounters(reduceCounters);
             ret.mapCounters = new ThriftGroupList(
-                JTThriftUtils.toThrift(jip.getMapCounters()));
+                JTThriftUtils.toThrift(mapCounters));
             ret.reduceCounters = new ThriftGroupList(
-                JTThriftUtils.toThrift(jip.getReduceCounters()));
+                JTThriftUtils.toThrift(reduceCounters));
             ret.jobCounters = new ThriftGroupList(
                 JTThriftUtils.toThrift(jip.getJobCounters()));
 
