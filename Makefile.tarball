@@ -27,6 +27,7 @@ PROD_INCLUDES := \
 	maven \
 	tools/app_reg \
 	tools/virtual-bootstrap \
+	tools/relocatable.sh \
 	VERSION \
 	VERSION_DATA
 
