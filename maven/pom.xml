@@ -17,7 +17,7 @@
    limitations under the License.
 -->
 
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.cloudera</groupId>
@@ -42,10 +42,10 @@
   </licenses>
 
   <properties>
-    <hadoop.version>0.20.2-cdh3u0</hadoop.version>
+    <hadoop.version>0.20.2-cdh3u2-SNAPSHOT</hadoop.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
-    <hive.version>0.7.0-cdh3u0</hive.version>
+    <hive.version>0.7.1-cdh3u2-SNAPSHOT</hive.version>
   </properties>
 
   <organization>
@@ -58,6 +58,19 @@
    <developerConnection>scm:git:git@github.com:cloudera/hue.git</developerConnection>
    <url>https://github.com/cloudera/hue</url>
   </scm>  
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <tagBase>https://svn.apache.org/repos/asf/maven/components/releases</tagBase>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <dependencyManagement>
     <dependencies>
