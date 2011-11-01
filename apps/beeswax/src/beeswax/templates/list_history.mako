@@ -42,49 +42,47 @@ ${wrappers.head("Beeswax: Query History", section='history')}
   % endif
 </%def>
 
-<div class="toolbar">
-  <div class="bw-input-filter">
-    <input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
-      title="Filter by Name"
-      data-filter-elements="tbody tr" value=""/>
-  </div>
+<h1>History</h1>
+
+<div class="sidebar">
+	<div class="well">
+		<h6>Actions</h6>
+	    % if filter_params.get('user') == '_all':
+	      <%
+	        my_querydict = filter_params.copy()
+	        my_querydict['user'] = request.user.username
+	      %>
+	   <a href="?${my_querydict.urlencode()}">Show my queries</a>
+	 % else:
+	      <%
+	        my_querydict = filter_params.copy()
+	        my_querydict['user'] = '_all'
+	      %>
+	      <a href="?${my_querydict.urlencode()}">Show everyone's queries</a>
+	    % endif
+	
+	 % if filter_params.get('auto_query', None):
+	      <%
+	        my_querydict = filter_params.copy()
+	        my_querydict['auto_query'] = ''
+	      %>
+	      <a href="?${my_querydict.urlencode()}" class="bw-show_group_noauto" data-filters="ArtButton">Show user queries</a>
+	    % else:
+	      <%
+	        my_querydict = filter_params.copy()
+	        my_querydict['auto_query'] = 'on'
+	      %>
+	      <a href="?${my_querydict.urlencode()}" class="bw-show_group_auto" data-filters="ArtButton">Show auto actions</a>
+	    % endif
+    </div>
 </div>
-<div id="list_history" class="view">
-  ${comps.pagination(page)}
 
-  <div class="bw-show_group toolbar">
-      Show:
-    % if filter_params.get('user') == '_all':
-      <%
-        my_querydict = filter_params.copy()
-        my_querydict['user'] = request.user.username
-      %>
-      <a href="?${my_querydict.urlencode()}" class="bw-show_group_mine" data-filters="ArtButton">mine</a>
-    % else:
-      <%
-        my_querydict = filter_params.copy()
-        my_querydict['user'] = '_all'
-      %>
-      <a href="?${my_querydict.urlencode()}" class="bw-show_group_all" data-filters="ArtButton">everyone's</a>
-    % endif
 
-    % if filter_params.get('auto_query', None):
-      <%
-        my_querydict = filter_params.copy()
-        my_querydict['auto_query'] = ''
-      %>
-      <a href="?${my_querydict.urlencode()}" class="bw-show_group_noauto" data-filters="ArtButton">user queries</a>
-    % else:
-      <%
-        my_querydict = filter_params.copy()
-        my_querydict['auto_query'] = 'on'
-      %>
-      <a href="?${my_querydict.urlencode()}" class="bw-show_group_auto" data-filters="ArtButton">auto actions</a>
-    % endif
-  </div>
+<div class="content">
+ 
 
-  <h3 class="jframe-hidden">Query History:</h3>
-  <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
+  
+  <table class="datatables">
     <thead>
       <tr>
         <th>Time</th>
@@ -133,6 +131,26 @@ ${wrappers.head("Beeswax: Query History", section='history')}
     % endfor
     </tbody>
   </table>
-
+ ${comps.pagination(page)}
 </div>
+<!-- <div>
+  <div class="bw-input-filter">
+    <input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
+      title="Filter by Name"
+      data-filter-elements="tbody tr" value=""/>
+  </div> -->
+</div>
+
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$(".tabs").tabs();
+		$(".datatables").dataTable({
+			"bPaginate": false,
+		    "bLengthChange": false,
+			"bInfo": false,
+			"bFilter": false
+		});
+
+	});
+</script>
 ${wrappers.foot()}

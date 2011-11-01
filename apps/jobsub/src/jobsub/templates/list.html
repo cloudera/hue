@@ -17,6 +17,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% block title %}Job Design List{% endblock %}
+{% block nav %}
+	<li><a href="{% url jobsub.views.list_designs %}" class="selected">Job List</a></li>
+	<li><a href="{% url jobsub.views.watch %}">History</a></li>
+{% endblock %}
 {% block content %}
 <div id="jobsub_joblist jobsub_col_wrapper" class="view" data-filters="SplitView">
   <h1>Job Designer: Job Designs</h1>

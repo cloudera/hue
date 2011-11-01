@@ -14,41 +14,43 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="comps" file="jobbrowser_components.mako" />
-${comps.header("Tracker " + tracker.trackerId + " :: Job Browser")}
-<div id="job_browser_tracker" class="view">
-  <h1>Tracker at ${ tracker.host } on port ${ tracker.httpPort }</h1>
-  <div class="jframe_padded">
-    <dl class="tracker_meta">
-      <dt>ID</dt>
-      <dd>${ tracker.trackerId }</dd>
-      <dt>Last heard from at</dt>
-      <dd>${ tracker.lastSeenFormatted }.</dd>
-    </dl>
-  </div>
-    <h2>Memory Metrics</h2>
-  <div class="jframe_padded">
-    <dl class="tracker_meta">
-      <dt>Total virtual memory:</dt>
-      <dd>${tracker.totalVirtualMemory }</dd>
-      <dt>Total physical memory: </dt>
-      <dd>${tracker.totalPhysicalMemory }</dd>
-      <dt>Available space: </dt>
-      <dd>${tracker.availableSpace}</dd>
-    </dl>
-  </div>
+${comps.header("Tracker " + tracker.trackerId + " - Job Browser", "Task Trackers", "Tracker details")}
+<div>
+	<h1>Tracker at ${ tracker.host } on port ${ tracker.httpPort }</h1>
+	<div>
+		<dl>
+			<dt>ID</dt>
+			<dd>${ tracker.trackerId }</dd>
+			<dt>Last heard from at</dt>
+			<dd>${ tracker.lastSeenFormatted }.</dd>
+		</dl>
+	</div>
+	
+	<h2>Memory Metrics</h2>
+	<div>
+		<dl>
+			<dt>Total virtual memory:</dt>
+			<dd>${tracker.totalVirtualMemory }</dd>
+			<dt>Total physical memory: </dt>
+			<dd>${tracker.totalPhysicalMemory }</dd>
+			<dt>Available space: </dt>
+			<dd>${tracker.availableSpace}</dd>
+		</dl>
+	</div>
 
-    <h2>Map and Reduce</h2>
-  <div class="jframe_padded">
-    <dl class="tracker_meta">
-      <dt>Map count:</dt>
-      <dd>${tracker.mapCount}</dd>
-      <dt>Reduce count:</dt>
-      <dd>${tracker.reduceCount}</dd>
-      <dt>Max map tasks:</dt>
-      <dd>${tracker.maxMapTasks}</dd>
-      <dt>Max reduce tasks:</dt>
-      <dd>${tracker.maxReduceTasks}</dd>
-    </dl>
-  </div>
+	<h2>Map and Reduce</h2>
+	<div>
+		<dl>
+			<dt>Map count:</dt>
+			<dd>${tracker.mapCount}</dd>
+			<dt>Reduce count:</dt>
+			<dd>${tracker.reduceCount}</dd>
+			<dt>Max map tasks:</dt>
+			<dd>${tracker.maxMapTasks}</dd>
+			<dt>Max reduce tasks:</dt>
+			<dd>${tracker.maxReduceTasks}</dd>
+		</dl>
+	</div>
 </div>
+
 ${comps.footer()}

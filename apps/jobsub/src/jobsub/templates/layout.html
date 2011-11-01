@@ -15,17 +15,70 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-	<head>
-		<title>{% block title %}{% endblock %} :: Job Designer :: </title>
-		{%block head %}{% endblock %}
-	</head>
-	<body class="hue-shared">
-		<div class="toolbar">
-			<a class="jobsub_joblist" href="{% url jobsub.views.list_designs %}">Job List</a>
-			<a class="jobsub_history" href="{% url jobsub.views.watch %}">History</a>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>{% block title %}{% endblock %} - Job Designer</title>
+	{%block head %}{% endblock %}
+	<link rel="stylesheet" href="/static/ext/css/bootstrap.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<link rel="stylesheet" href="/static/css/jhue.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	
+	<style type="text/css">
+      body {
+        padding-top: 100px;
+      }
+    </style>
+	<script src="/static/ext/js/jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/js/Source/jHue/jquery.showusername.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/ext/js/bootstrap-tabs.js" type="text/javascript" charset="utf-8"></script>	
+
+	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function(){
+			$("#username").showUsername();
+			$("input:text[placeholder]").simplePlaceholder();
+			$(".submitter").keydown(function(e){
+				if (e.keyCode==13){
+					$(this).closest("form").submit();
+				}
+			}).change(function(){
+				$(this).closest("form").submit();
+			});
+		});
+	</script>
+	
+</head>
+<body>
+	<div class="topbar">
+		<div class="topbar-inner">
+			<div class="container-fluid">
+				<a class="brand" href="#">jHue</a>
+				<ul class="nav">
+					<li><a href="/beeswax">Beeswax</a></li>
+					<li><a href="/jobbrowser/jobs/">Job Browser</a></li>
+					<li class="active"><a href="/jobsub/">Job Designer</a></li>
+				</ul>
+				<p class="pull-right">Logged in as <a id="username" href="/accounts/logout">xxx</a></p>
+			</div>
 		</div>
+	</div>
+	<div class="menubar">
+		<div class="menubar-inner">
+			<div class="container-fluid">
+				<ul class="nav">
+					{%block nav %}{% endblock %}
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
 		{% block content %}{% endblock %}
-	</body>
+	</div>
+</body>
 </html>

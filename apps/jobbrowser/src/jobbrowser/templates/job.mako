@@ -22,20 +22,22 @@
 %>
 
 <%def name="task_table(tasks)">
-  <table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
+  <table class="taskTable">
     <thead>
       <tr>
         <th>Tasks</th>
-        <th colspan="2">Type</th>
+        <th>Type</th>
+		<th>&nbsp;</th>
       </tr>
     </thead>
     <tbody>
       % for task in tasks:
-        <tr data-dblclick-delegate="{'dblclick_loads':'.view_task'}">
-          <td class="task_table_id">${task.taskId_short}</td>
-          <td class="task_table_type">${task.taskType}</td>
-          <td class="jtask_view_col"><a class="frame_tip jtask_view jt_slide_right view_task" title="View this task"
-                 href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }">View</a></td>
+        <tr>
+			<td>${task.taskId_short}</td>
+			<td>${task.taskType}</td>
+          	<td>
+				<a title="View this task" href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }">View</a>
+			</td>
         </tr>
       % endfor
     </tbody>
@@ -74,7 +76,7 @@
     % endfor
 </%def>
 
-  ${comps.header("Job: " + job.jobId + " :: Job Browser")}
+  ${comps.header("Job: " + job.jobId + " - Job Browser", "Jobs", "Job Details")}
     
     <div id="job_browser_job" class="view jframe_padded">
       <div class="jtv_meta_top clearfix">
@@ -96,7 +98,7 @@
             dir_name = basename.split('/')[-1]
           %>
           % if location_url != None:
-            <a class="jt-output_dir" href="${location_url}" title="${output_dir}" target="FileBrowser">${dir_name}</a>
+            <a href="${location_url}" title="${output_dir}" target="FileBrowser">${dir_name}</a>
           % else:
             ${dir_name}
           % endif
@@ -106,114 +108,187 @@
         <dl>
           <dt>Kill Job:</dt>
           <dd>
-          <a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" class="frame_tip jt_kill confirm_unencode_and_post" title="Kill this job">kill</a>
+          <a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" title="Kill this job">Kill</a>
           </dd>
         </dl>
         % endif
 
       </div>
 
-      <div data-filters="Tabs">
-        <ul class="tabs jtv_tabs jframe-right clearfix">
-          <li><span>Tasks</span></li>
-          <li><span>Metadata</span></li>
-          <li><span>Counters</span></li>
-        </ul>
+		<ul class="tabs">
+			<li class="active"><a href="#tasks">Tasks</a></li>
+			<li><a href="#metadata">Metadata</a></li>
+			<li><a href="#counters">Counters</a></li>
+		</ul>
 
-        <ul class="tab_sections jframe-clear">
-          <li>
-            <div class="jt_mr_display">
-              <dl class="jtv_graph">
-                <dt>Maps:</dt>
-                <dd>${comps.mr_graph_maps(job)}</dd>
-                <dt>Reduces:</dt>
-                <dd>${comps.mr_graph_reduces(job, right_border=True)}</dd>
-              </dl>
-            </div>
-            <% 
-            task_table_size = '100%'
-            if failed_tasks:
-              task_table_size = '49%' 
-            %>
-            %if failed_tasks:
-            <div class="jt_task_list jt_failed_tasks jframe-inline" style="width: ${task_table_size};">
-              <h3>
-                <a class="jframe-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">view failed tasks &raquo;</a>
-                Failed Tasks
-              </h3>
-              <div class="jt_task_list_container">
-                ${task_table(failed_tasks)}
-              </div>
-            </div>
-            %endif
-            <div class="jt_task_list jt_recent_tasks jframe-inline" style="width: ${task_table_size}">
-              <h3>
-                <a class="jframe-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
-                Recent Tasks
-              </h3>
-              <div class="jt_task_list_container">
-                ${task_table(recent_tasks)}
-              </div>
-            </div>
-            
-          </li>
-          <li>
-            <table data-filters="HtmlTable" class="jt_meta_table sortable" cellpadding="0" cellspacing="0">
-              <thead>
-                <th>Name</th>
-                <th>Value</th>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>ID</td>
-                  <td>${job.jobId}</td>
-                </tr>
-                <tr>
-                  <td>User</td>
-                  <td>${job.user}</td>
-                </tr>
-                <tr>
-                  <td>Maps</td>
-                  <td>${job.finishedMaps} of ${job.desiredMaps}</td>
-                </tr>
-                <tr>
-                  <td>Reduces</td>
-                  <td>${job.finishedReduces} of ${job.desiredReduces}</td>
-                </tr>
-                <tr>
-                  <td>Started</td>
-                  <td>${job.startTimeFormatted}</td>
-                </tr>
-                <tr>
-                  <td>Ended</td>
-                  <td>${job.finishTimeFormatted}</td>
-                </tr>
-                <tr>
-                  <td>Duration</td>
-                  <td>${job.duration}</td>
-                </tr>
-                <tr>
-                  <td>Status</td>
-                  <td>${job.status}</td>
-                </tr>
-                ${rows_for_conf_vars(job.conf_keys)}
-              <tr>
-                <td colspan="2" class="jt-raw_delimiter">Raw Configuration:</td>
-              </tr>
-              % for key, value in sorted(job.full_job_conf.items()):
-                <tr>
-                  <td>${key}</td>
-                  <td>${value}</td>
-                </tr>
-              % endfor
-              </tbody>
-            </table>
-          </li>
-          <li>
-            ${comps.job_counters(job.counters)}
-          </li>
-        </ul>
-      </div>
+		<div class="pill-content">
+			<div class="active" id="tasks">
+				<dl>
+	                <dt>Maps:</dt>
+	                <dd>${comps.mr_graph_maps(job)}</dd>
+	                <dt>Reduces:</dt>
+	                <dd>${comps.mr_graph_reduces(job, right_border=True)}</dd>
+	              </dl>
+	            %if failed_tasks:
+	            <div>
+	              <h3>
+	                <a href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">View Failed Tasks &raquo;</a>
+	                Failed Tasks
+	              </h3>
+	              <div class="jt_task_list_container">
+	                ${task_table(failed_tasks)}
+	              </div>
+	            </div>
+	            %endif
+	            <div>
+					<a style="float:right;margin-right:10px" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
+	              <h3>
+	                Recent Tasks
+	              </h3>
+	              <div class="jt_task_list_container">
+	                ${task_table(recent_tasks)}
+	              </div>
+	            </div>
+	
+			</div>
+			<div id="metadata">
+				<div class="toolbar">
+					<form>
+						<b>Filter metadata:</b>
+						<ul>
+							<li>
+								<input type="text" id="metadataFilter" title="Text Filter" placeholder="Text Filter"/>
+							</li>
+						</ul>
+					</form>
+		        </div>
+				 <table id="metadataTable">
+		              <thead>
+		                <th>Name</th>
+		                <th>Value</th>
+		              </thead>
+		              <tbody>
+		                <tr>
+		                  <td>ID</td>
+		                  <td>${job.jobId}</td>
+		                </tr>
+		                <tr>
+		                  <td>User</td>
+		                  <td>${job.user}</td>
+		                </tr>
+		                <tr>
+		                  <td>Maps</td>
+		                  <td>${job.finishedMaps} of ${job.desiredMaps}</td>
+		                </tr>
+		                <tr>
+		                  <td>Reduces</td>
+		                  <td>${job.finishedReduces} of ${job.desiredReduces}</td>
+		                </tr>
+		                <tr>
+		                  <td>Started</td>
+		                  <td>${job.startTimeFormatted}</td>
+		                </tr>
+		                <tr>
+		                  <td>Ended</td>
+		                  <td>${job.finishTimeFormatted}</td>
+		                </tr>
+		                <tr>
+		                  <td>Duration</td>
+		                  <td>${job.duration}</td>
+		                </tr>
+		                <tr>
+		                  <td>Status</td>
+		                  <td>${job.status}</td>
+		                </tr>
+		                ${rows_for_conf_vars(job.conf_keys)}
+		             
+		              </tbody>
+		            </table>
+					<h3>Raw configuration:</h3>
+				 <table id="rawConfigurationTable">
+		              <thead>
+		                <th>Name</th>
+		                <th>Value</th>
+		              </thead>
+		              <tbody>
+
+		              % for key, value in sorted(job.full_job_conf.items()):
+		                <tr>
+		                  <td width="20%">${key}</td>
+		                  <td>
+							<div class="wordbreak">
+								${value}
+							</div>
+						  </td>
+		                </tr>
+		              % endfor
+		              </tbody>
+		            </table>
+
+			</div>
+			<div id="counters">
+				${comps.job_counters(job.counters)}
+			</div>
+		</div>
+
+		<script type="text/javascript" charset="utf-8">
+			$(document).ready(function(){
+				$(".tabs").tabs();
+				$(".taskTable").dataTable({
+					"bPaginate": false,
+				    "bLengthChange": false,
+					"bInfo": false,
+					"bAutoWidth": false,
+					"aoColumns": [ 
+						{ "sWidth": "40%" },
+						{ "sWidth": "40%" },
+						{ "sWidth": "20%" }
+					]
+				});
+				var _metadataTable = $("#metadataTable").dataTable({
+					"bPaginate": false,
+				    "bLengthChange": false,
+					"bInfo": false,
+					"bAutoWidth": false,
+					"aoColumns": [ 
+						{ "sWidth": "30%" },
+						{ "sWidth": "70%" }
+					]
+				});
+				var _rawConfigurationTable = $("#rawConfigurationTable").dataTable({
+					"bPaginate": false,
+				    "bLengthChange": false,
+					"bInfo": false,
+					"bAutoWidth": false,
+					"aoColumns": [ 
+						{ "sWidth": "30%" },
+						{ "sWidth": "70%" }
+					]
+				});
+				
+				$("#metadataFilter").keydown(function(){
+					_metadataTable.fnFilter($(this).val());
+					_rawConfigurationTable.fnFilter($(this).val());
+				});
+				
+				$(".jobCountersTable").dataTable({
+					"bPaginate": false,
+				    "bLengthChange": false,
+					"bInfo": false,
+					"bAutoWidth": false,
+					"aoColumns": [ 
+						{ "sWidth": "40%" },
+						{ "sWidth": "20%" },
+						{ "sWidth": "20%" },
+						{ "sWidth": "20%" }
+					]
+				});
+
+				$(".dataTables_wrapper").css("min-height","0");
+				$(".dataTables_filter").hide();
+
+			});
+		</script>
 
 
     ${comps.footer()}

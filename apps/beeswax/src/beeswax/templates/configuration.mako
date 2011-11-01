@@ -16,15 +16,15 @@
 <%namespace name="wrappers" file="header_footer.mako" />
 <%namespace name="util" file="util.mako" />
 ${wrappers.head('Hive Configuration Variables', section='hive configuration')}
-<h1 class="jframe-hidden">Hive Configuration Variables</h1>
+<h1>Settings</h1>
 <div class="toolbar">
   <div class="bw-input-filter">
-    <input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
+    <!--input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
       title="Filter by Name"
-      data-filter-elements="tbody tr" value=""/>
+      data-filter-elements="tbody tr" value=""/-->
   </div>
 </div>
-<table class="sortable" data-filters="HtmlTable" cellpadding="0" cellspacing="0">
+<table class="datatables">
   <thead>
     <tr>
       <th>Key</th>
@@ -40,4 +40,15 @@ ${wrappers.head('Hive Configuration Variables', section='hive configuration')}
     % endfor
   </tbody>
 </table>
+
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$(".datatables").dataTable({
+			"bPaginate": false,
+		    "bLengthChange": false,
+		    "bFilter": false,
+			"bInfo": false,
+		});
+	});
+</script>
 ${wrappers.foot()}

@@ -121,7 +121,7 @@
   ${pageref(page.num_pages())}
 </%def>
 <%def name="pagination(page)">
-  <div class="toolbar bw-designs_toolbar bw-navigation">
+  <div>
     <p class="bw-showing_msg">Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} items</p>
     <div class="bw-nav_links">
       <a title="Beginning of List" ${toppage(page)} class="bw-firstBlock">Beginning of List</a>
