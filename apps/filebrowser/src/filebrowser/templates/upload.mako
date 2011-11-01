@@ -14,21 +14,48 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
-<%namespace name="comps" file="fb_components.mako" />
-${comps.header('Upload Files')}
-
-<div class="prompt_popup">
-<form action="/filebrowser/upload?next=${next|u}" method="POST" enctype="multipart/form-data">
-  <h4 class="jframe-hidden">Upload Files</h4>
-  <dl>
-    ${edit.render_field(form["dest"], hidden=True)}
-    ${edit.render_field(form["hdfs_file"], render_default=True, notitle=True)}
-  </dl>
-  <input class="jframe-hidden" type="submit" value="Submit" />
-</form>
-</div>
-
-<div class="jframe-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
+<%namespace name="wrappers" file="header_footer.mako" />
+${wrappers.head('Upload Files', 'upload', show_new_directory=False, show_side_bar=False)}
+<script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />        
 
 
-${comps.footer()}
+
+
+
+      <div class="well">
+          <form action="/filebrowser/upload?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked">
+          <h1>Upload Files</h1>
+         <div id="file-uploader">
+		<noscript>
+			<p>Please enable JavaScript to use file uploader.</p>
+			<!-- or put a simple form for upload here -->
+		</noscript>
+	</div>
+        </form>
+      </div>
+
+    <!--<span class="alert-message block-message info">Go back to where you were: <a href="/filebrowser/view${next}">${next}</a>.</span>-->
+
+ <script>
+        function createUploader(){
+            var uploader = new qq.FileUploader({
+                element: document.getElementById('file-uploader'),
+                action: '/filebrowser/upload',
+                params:{
+                    dest: '${next}',
+                    fileFieldLabel: 'hdfs_file'
+                },
+                onComplete:function(id, fileName, responseJSON){
+                    window.location = "/filebrowser/view${next}";
+                },
+                debug: true
+            });
+        }
+
+        // in your app create uploader as soon as the DOM is ready
+        // don't wait for the window to load
+        window.onload = createUploader;
+    </script>            
+
+${wrappers.foot()}

@@ -1,0 +1,39 @@
+# Translations template for PROJECT.
+# Copyright (C) 2012 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-01-30 16:44-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/useradmin/templates/list_users.mako:31
+msgid "Username"
+msgstr ""
+
+#: src/useradmin/templates/list_users.mako:32
+msgid "First Name"
+msgstr ""
+
+#: src/useradmin/templates/list_users.mako:33
+msgid "Last Name"
+msgstr ""
+
+#: src/useradmin/templates/list_users.mako:34
+msgid "E-mail"
+msgstr ""
+
+#: src/useradmin/templates/list_users.mako:35
+msgid "Last Login"
+msgstr ""
+

@@ -13,10 +13,14 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+  from desktop.views import commonheader, commonfooter
+%>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-  ${comps.header("Task Attempt: " + attempt.attemptId + ":: Job Browser")}
-
+${commonheader("Task Attempt: " + attempt.attemptId + ":: Job Browser", "jobbrowser")}
+<div class="container-fluid">
+	<h1>Task Attempt: ${attempt.attemptId} :: Job Browser</h1>
     <div id="job_browser_job" class="view jframe_padded">
       <div class="jtv_meta_top clearfix">
         <dl>
@@ -142,5 +146,5 @@ ${ line | h,trim }
           </li>
         </ul>
       </div>
-
-    ${comps.footer()}
+</div>
+${commonfooter()}

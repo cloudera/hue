@@ -15,21 +15,23 @@
 ## limitations under the License.
 <%!
 from django.template.defaultfilters import timesince
+from desktop.views import commonheader, commonfooter
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head("Beeswax: Queries", section='saved queries')}
-
-<div id="list_designs" class="view">
-  ${comps.pagination(page)}
-  <h2 class="jframe-hidden">Saved Queries:</h2>
-  <table data-filters="HtmlTable" class="selectable" cellpadding="0" cellspacing="0">
+<%namespace name="layout" file="layout.mako" />
+${commonheader("Beeswax: Queries", "beeswax", "100px")}
+${layout.menubar(section='saved queries')}
+<div class="container-fluid">
+<h1>Beeswax: Queries</h1>
+  <table class="datatables">
     <thead>
       <tr>
-        <th colspan="2">Name</th>
+        <th>Name</th>
+		<th>Description</th>
         <th>Owner</th>
         <th>Type</th>
-        <th colspan="2">Last Modified</th>
+        <th>Last Modified</th>
+		<th></th>
       </tr>
     </thead>
     <tbody>
@@ -40,9 +42,7 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
       <%
         may_edit = user == design.owner
       %>
-      <tr data-dblclick-delegate="{'dblclick_loads':'.bw-query_edit, .bw-query_clone'}" class="jframe-no_select hue-help_links_small"
-      data-filters="ContextMenu"
-      data-context-menu-actions="[{'events':['contextmenu','click:relay(a.bw-options)'],'menu':'ul.context-menu'}]">
+      <tr>
         <td>
           % if may_edit:
             % if design.type == models.SavedQuery.REPORT:
@@ -53,24 +53,10 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
           % else:
             ${design.name}
           % endif
-          
-          
-          <ul class="jframe-hidden context-menu">
-            % if may_edit:
-              % if design.type == models.SavedQuery.REPORT:
-                <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" class="bw-query_edit frame_tip" title="Edit this report.">Edit</a></li>
-              % else:
-                <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" class="bw-query_edit frame_tip" title="Edit this query.">Edit</a></li>
-              % endif
-              <li><a href="${ url('beeswax.views.delete_design', design_id=design.id) }" class="bw-query_delete frame_tip" title="Delete this query.">Delete</a></li>
-              <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" class="bw-query_history frame_tip" title="View the usage history of this query.">Usage History</a></li>
-            % endif
-            <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" class="bw-query_clone frame_tip" title="Copy this query.">Clone</a></li>
-          </ul>
         </td>
         <td>
           % if design.desc:
-           <p class="jframe-inline" data-filters="InfoTip">${design.desc}</p>
+           <p>${design.desc}</p>
           % endif
         </td>
         <td>${design.owner.username}</td>
@@ -85,11 +71,64 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
           ${ timesince(design.mtime) } ago
         </td>
         <td>
-          <a class="bw-options">options</a>
+	      	% if may_edit:
+			<a class="btn small contextEnabler" data-menuid="${design.id}">Options</a>
+			<ul class="contextMenu" id="menu${design.id}">
+	             % if design.type == models.SavedQuery.REPORT:
+	               <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report." class="contextItem">Edit</a></li>
+	             % else:
+	               <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="Edit this query." class="contextItem">Edit</a></li>
+	             % endif
+	             <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query." class="contextItem confirmationModal">Delete</a></li>
+	             <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
+			</ul>
+	        % endif
         </td>
       </tr>
     % endfor
     </tbody>
   </table>
+${comps.pagination(page)}
+
+
+<div id="deleteQuery" class="modal hide fade">
+	<form id="deleteQueryForm" action="" method="POST">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3 id="deleteQueryMessage">Confirm action</h3>
+	</div>
+	<div class="modal-footer">
+		<input type="submit" class="btn primary" value="Yes"/>
+		<a href="#" class="btn secondary hideModal">No</a>
+	</div>
+	</form>
 </div>
-${wrappers.foot()}
+</div>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$(".tabs").tabs();
+		$(".datatables").dataTable({
+			"bPaginate": false,
+		    "bLengthChange": false,
+			"bInfo": false,
+			"bFilter": false
+		});
+		$(".contextEnabler").jHueContextMenu();
+		$("#deleteQuery").modal({
+			backdrop: "static",
+			keyboard: true
+		});
+		$(".confirmationModal").live("click", function(){
+			$.getJSON($(this).attr("data-confirmation-url"), function(data){
+				$("#deleteQueryForm").attr("action", data.url);
+				$("#deleteQueryMessage").text(data.title);
+			});
+			$("#deleteQuery").modal("show");
+		});
+		$(".hideModal").click(function(){
+			$("#deleteQuery").modal("hide");
+		});
+	});
+</script>
+
+${commonfooter()}

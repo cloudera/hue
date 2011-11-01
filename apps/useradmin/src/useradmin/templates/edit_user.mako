@@ -13,43 +13,46 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
 <% import urllib %>
-
+<div class="container-fluid">
   % if username:
-    ${wrappers.head('Edit User: ' + username + ' -- Hue Users')}
+	${commonheader('Edit User: ' + username + ' -- Hue Users', "useradmin")}
+	<h1>Edit User: ${username} -- Hue Users</h1>
   % else:
-    ${wrappers.head('Create User -- Hue Users')}
+    ${commonheader('Create User -- Hue Users', "useradmin")}
+    <h1>Create User -- Hue Users</h1>
   % endif
-
-
-    <div id="useradmin_edituser" class="view">
-    <h1>
-      % if username:
-        Edit User: ${username}
-      % else:
-        Create User 
-      % endif
-    </h1>
-    <form action="${urllib.quote(action)}" method="POST" class="jframe_padded">
-      <dl>
+	<form action="${urllib.quote(action)}" method="POST" class="jframe_padded">
+		<fieldset>
+			<legend> 
+			  % if username:
+		        Edit User: ${username}
+		      % else:
+		        Create User 
+		      % endif
+			</legend>
         <%def name="render_field(field)">
-          <dt>${field.label_tag() | n}</dt>
-          <dd>${unicode(field) | n}</dd>
-          % if len(field.errors):
-            <dt>&nbsp;</dt>
-            <dd class="jframe-error validation-advice">
-               ${unicode(field.errors) | n}
-             </dd>
-           % endif
-        </%def>
-        % for field in form:
-	  ${render_field(field)}
-        % endfor
-        <dt>&nbsp;</dt>
-        <dd class="save">
-          <input type="submit" value="Save"/>
-        </dd>
-      </dl>
-    </form>
-${wrappers.foot()}
+			<div class="clearfix">
+				${field.label_tag() | n}
+				<div class="input">
+					${unicode(field) | n}
+				</div>
+				% if len(field.errors):
+					${unicode(field.errors) | n}
+				% endif
+			</div>
+		</%def>
+          
+		% for field in form:
+			${render_field(field)}
+		% endfor
+        </fieldset>
+		<div class="actions">
+			<input type="submit" value="Save" class="btn primary"/>
+		</div>
+	</form>
+</div>
+${commonfooter()}

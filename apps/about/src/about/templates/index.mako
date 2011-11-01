@@ -13,24 +13,27 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<!DOCTYPE html>
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+${commonheader("About jHue", "about", "100px")}
+	<div class="menubar">
+		<div class="menubar-inner">
+			<div class="container-fluid">
+				<ul class="nav">
+					<li><a href="${url("desktop.views.dump_config")}">Configuration</a></li>
+					<li><a href="${url("desktop.views.check_config")}">Check for misconfiguration</a></li>
+					<li><a href="${url("desktop.views.log_view")}">Server Logs</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title>About - Hue</title>
-</head>
-
-<body>
-	<center>
 		<img src="/static/art/help/logo.png" />
-		<p>Hue</p>
-		<p>${version}</p>
-                <p>&nbsp;</p>
-                <p><a target="_blank" href="${url("desktop.views.dump_config")}">Configuration</a></p>
-                <p><a target="_blank" href="${url("desktop.views.check_config")}">Check for Misconfiguration</a></p>
-                <p><a target="_blank" href="${url("desktop.views.log_view")}">Server Logs</a></p>
-	</center>
-</body>
+		<p>Hue ${version}</p>
 
-</html>
+	</div>
+
+${commonfooter()}

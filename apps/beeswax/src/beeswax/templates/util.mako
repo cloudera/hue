@@ -56,17 +56,16 @@
   % if query_context:
     % if query_context[0] == 'table':
       <% tablename = query_context[1] %>
-      <h2>Table:
-      <a href="${ url('beeswax.views.describe_table', tablename) }" class="bw-query_link">${tablename}</a></h2>
+      <a href="${ url('beeswax.views.describe_table', tablename) }" class="bw-query_link">${tablename}</a>
     % elif query_context[0] == 'design':
       <% design = query_context[1] %>
       % if design.is_auto:
-        <h2><a href="${ url('beeswax.views.execute_query', design.id)}" class="bw-query_link">Unsaved Query</a></h2>
+		<a href="${ url('beeswax.views.execute_query', design.id)}" class="bw-query_link">Unsaved Query</a>
       % else:
-        <h2><a href="${ url('beeswax.views.execute_query', design.id)}" class="bw-query_link">${design.name}</a></h2>
+        <a href="${ url('beeswax.views.execute_query', design.id)}" class="bw-query_link">${design.name}</a>
       % endif
     % else:
-      <h2>Query Results</h2>
+      Query Results
     % endif
   % endif
 </%def>

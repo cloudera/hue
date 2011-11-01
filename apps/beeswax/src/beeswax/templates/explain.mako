@@ -13,30 +13,36 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from desktop.views import commonheader, commonfooter
+%>
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${wrappers.head('Query Explanation', section='saved queries')}
-<div class="view, resizable" id="watch_wait" data-filters="SplitView">
-  <div class="left_col">
-    ${util.render_query_context(query_context)}
-  </div>
-  <div class="right_col jframe_padded">
-    <div data-filters="Tabs">
-      <ul class="toolbar bw-results_tabs tabs jframe-right clearfix">
-        <li><span>Explanation</span></li>
-        <li><span>Query</span></li>
-      </ul>
+${commonheader("Query Explanation", "beeswax", "100px")}
+${layout.menubar(section='saved queries')}
 
-      <ul class="tab_sections jframe-clear">
-        <li>
-          <pre>${explanation}</pre>
-        </li>
-        <li>
-          <pre>${query}</pre>
-        </li>
-      </ul>
-    </div>
-  </div>
+<div class="container-fluid">
+	<h1>Query Explanation: ${util.render_query_context(query_context)}</h1>
+
+	<ul class="tabs">
+		<li class="active"><a href="#explanation">Explanation</a></li>
+      	<li><a href="#query">Query</a></li>
+	</ul>
+    
+	<div class="tab-content">
+		<div class="active tab-pane" id="explanation">
+			<pre>${explanation}</pre>
+		</div>
+		<div class="tab-pane" id="query">
+			<pre>${query}</pre>
+		</div>
+	</div>
+	
+	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function(){
+			$(".tabs").tabs();
+		});
+	</script>
 </div>
-${wrappers.foot()}
+${commonfooter()}

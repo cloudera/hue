@@ -13,11 +13,15 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-
-${wrappers.head("Beeswax: Query History", section='history')}
+${commonheader("Beeswax: Create table from file", "beeswax", "100px")}
+${layout.menubar(section='history')}
+<div class="container-fluid">
 % if error_msg:
 <h4>${error_msg}</h4>
 % endif
@@ -27,4 +31,5 @@ ${wrappers.head("Beeswax: Query History", section='history')}
   <input type="submit" name="save" value="Save"/>
   <input type="submit" name="cancel" value="Cancel"/>
 </form>
-${wrappers.foot()}
+</div>
+${commonfooter()}

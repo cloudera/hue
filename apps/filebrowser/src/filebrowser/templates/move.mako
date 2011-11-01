@@ -14,22 +14,23 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
-<%namespace name="comps" file="fb_components.mako" />
-${comps.header('Move: ' + src_path.split('/')[-1])}
 
-
-<div class="prompt_popup">
-<form action="/filebrowser/move?next=${next|u}" method="POST" enctype="multipart/form-data">
-  <h4 class="jframe-hidden">Move: ${src_path}</h4>
-  <dl>
-    ${edit.render_field(form["src_path"], hidden=True)}
-    ${edit.render_field(form["dest_path"], notitle=True)}
-  </dl>
-  <input class="jframe-hidden" type="submit" value="Submit" />
+<form id="moveForm" action="/filebrowser/move?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3>Move: ${src_path}</h3>
+    </div>
+    <div class="change-owner-modal-body clearfix" >
+        <div style="padding-left: 15px;">
+        ${edit.render_field(form["src_path"], hidden=True)}
+        ${edit.render_field(form["dest_path"], notitle=True, klass="xlarge")}
+        </div>
+    </div>
+    <div class="modal-footer">
+		<div id="moveNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
+        	<p><strong>Sorry, name is required.</strong>
+    	</div>
+        <input class="btn primary" type="submit" value="Submit"/>
+        <a class="btn" onclick="$('#moveModal').modal('hide');">Cancel</a>
+    </div>
 </form>
-</div>
-
-<div class="jframe-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
-
-
-${comps.footer()}

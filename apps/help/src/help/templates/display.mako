@@ -13,25 +13,22 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<html>
-<head>
-  <title>${title}</title>
-</head>
-<body>
-  <div class="resizable" data-filters="SplitView">
-    <div class="left_col">
-      <div class="jframe_padded">
-        <h2>Index</h2>
-        <ul>
-          % for app in apps:
-            <li><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
-          % endfor
-        </ul>
-      </div>
-    </div>
-    <div class="right_col">
-      <div class="jframe_padded">${content|n}</div>
-    </div>
-  </div>
-</body>
-</html>
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+${commonheader("jHue Help", "help", "100px")}
+	<div class="menubar">
+		<div class="menubar-inner">
+			<div class="container-fluid">
+				<ul class="nav">
+					% for app in apps:
+				        <li><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
+				      % endfor
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="container-fluid">
+		${content|n}
+	</div>
+${commonfooter()}

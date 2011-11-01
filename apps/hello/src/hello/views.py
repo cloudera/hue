@@ -22,7 +22,7 @@ from hello import conf
 
 def hello(request):
   # Use render from django_util so that ?format=json works.
-  return render("hello.html", request, {"greeting": conf.GREETING.get()})
+  return render("hello.mako", request, {"greeting": conf.GREETING.get()})
 
 def goodbye(request):
-  return render("hello.html", request, {"greeting": "goodbye"})
+  return render("hello.mako", request, {"greeting": "goodbye"})

@@ -14,50 +14,29 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-<%def name="header(title, toolbar=True)">
-  <html>
-    <head>
-      <title>${title}</title>
-    </head>
-    <body>
-      % if toolbar: 
-      <div class="toolbar">
-        <a href="/jobbrowser/jobs/"><img src="/jobbrowser/static/art/icon_large.png" class="jt_icon"/></a>
-      </div>
-      % endif
-</%def>
-
-<%def name="footer()">
-    </body>
-  </html>
-</%def>
-
-
 <%def name="task_counters(counters)">
 <%
   from jobbrowser.views import format_counter_name
 %>
-    <table data-filters="HtmlTable" class="jt_counter_table">
-      <thead>
-         <tr>
-           <th class="jt_counter_display_name">Counter Name</th>
-           <th class="jt_counter_total">Value</th>   
-        </tr>
-      </thead>
-      <tbody>
-      % for group in counters.groups:
-        <tr>
-          <td colspan="4" class="jt_counter_group_name">${format_counter_name(group.displayName)}</td>
-        </tr>
-      % for name, counter in sorted(group.counters.iteritems()):
-       <tr>
-          <td class="jt_counter_display_name">${format_counter_name(counter.displayName)}</td>
-          <td class="jt_counter_total">${counter.value}</td>
-        </tr>
-      % endfor
-      % endfor
+	% for group in counters.groups:
+		<h3>${format_counter_name(group.displayName)}</h3>
+	    <table class="taskCountersTable">
+	      <thead>
+	         <tr>
+	           <th>Counter Name</th>
+	           <th>Value</th>   
+	        </tr>
+	      </thead>
+	      <tbody>
+	      % for name, counter in sorted(group.counters.iteritems()):
+	       <tr>
+	          <td class="jt_counter_display_name">${format_counter_name(counter.displayName)}</td>
+	          <td class="jt_counter_total">${counter.value}</td>
+	        </tr>
+	      % endfor
       </tbody>
      </table>
+      % endfor
 </%def>
 
 <%def name="job_counters(counters)">
@@ -65,36 +44,37 @@
   from jobbrowser.views import format_counter_name
 %>
 
-    <table data-filters="HtmlTable" class="jt_counter_table">
+	% for group in counters.itervalues():
+      <h3>${format_counter_name(group['displayName'])}</h3>
+	  <table class="jobCountersTable">
       <thead>
          <tr>
-           <th class="jt_counter_display_name">Name</th>
-           <th class="jt_counter_maps_total">Maps Total</th>
-           <th class="jt_counter_reduces_total">Reduces Total</th>
-           <th class="jt_counter_total">Total</th>   
+           <th>Name</th>
+           <th>Maps Total</th>
+           <th>Reduces Total</th>
+           <th>Total</th>   
         </tr>
       </thead>
       <tbody>
-      % for group in counters.itervalues():
-        <tr>
-          <td colspan="4" class="jt_counter_group_name">${format_counter_name(group['displayName'])}</td>
-        </tr>
-      % for name, counter in sorted(group['counters'].iteritems()):
-      <%
-        map_count = counter.get('map', 0)
-        reduce_count = counter.get('reduce', 0)
-        job_count = counter.get('job', 0)
-      %>
-       <tr>
-          <td class="jt_counter_display_name">${format_counter_name(counter.get('displayName', 'n/a'))}</td>
-          <td class="jt_counter_maps_total">${map_count}</td>
-          <td class="jt_counter_reduces_total">${reduce_count}</td>
-          <td class="jt_counter_total">${map_count + reduce_count + job_count}</td>
-        </tr>
-      % endfor
-      % endfor
-      </tbody>
-     </table>
+		 % for name, counter in sorted(group['counters'].iteritems()):
+	      <%
+	        map_count = counter.get('map', 0)
+	        reduce_count = counter.get('reduce', 0)
+	        job_count = counter.get('job', 0)
+	      %>
+	       <tr>
+	          <td>${format_counter_name(counter.get('displayName', 'n/a'))}</td>
+	          <td>${map_count}</td>
+	          <td>${reduce_count}</td>
+	          <td>${map_count + reduce_count + job_count}</td>
+	        </tr>
+	      % endfor
+			</tbody>
+	     </table>
+	% endfor
+    
+
+   
 </%def>
 
 <%def name="mr_graph(job)">

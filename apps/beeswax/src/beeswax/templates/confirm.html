@@ -15,13 +15,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-{% block title %}{{ title }}{% endblock %}
 {% block content %}
-<div class="prompt_popup">
-	<h1 class="jframe-hidden">Are you sure?</h1>
-	<form action="{{ url }}" method="POST">
-		{{title}}
-		<input type="submit" value="Yes" class="jframe-hidden">
-	</form>
+<form action="{{ url }}" method="POST">>
+<div class="modal-header">
+	<a href="#" class="close">&times;</a>
+	<h3>Confirm action</h3>
 </div>
+<div class="modal-body">  
+  <div class="alert-message block-message warning">
+        {{title}}
+  </div>
+</div>
+<div class="modal-footer">
+	<input type="submit" class="btn primary" value="Yes"/>
+	<a href="#" class="btn secondary hideModal">No</a>
+</div>
+</form>
 {% endblock %}

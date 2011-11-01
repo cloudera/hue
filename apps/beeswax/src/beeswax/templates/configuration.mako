@@ -13,18 +13,23 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${wrappers.head('Hive Configuration Variables', section='hive configuration')}
-<h1 class="jframe-hidden">Hive Configuration Variables</h1>
+${commonheader("Hive Configuration Variables", "beeswax", "100px")}
+${layout.menubar(section='hive configuration')}
+<div class="container-fluid">
+<h1>Hive Configuration Variables</h1>
 <div class="toolbar">
   <div class="bw-input-filter">
-    <input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
+    <!--input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
       title="Filter by Name"
-      data-filter-elements="tbody tr" value=""/>
+      data-filter-elements="tbody tr" value=""/-->
   </div>
 </div>
-<table class="sortable" data-filters="HtmlTable" cellpadding="0" cellspacing="0">
+<table class="datatables">
   <thead>
     <tr>
       <th>Key</th>
@@ -40,4 +45,15 @@ ${wrappers.head('Hive Configuration Variables', section='hive configuration')}
     % endfor
   </tbody>
 </table>
-${wrappers.foot()}
+</div>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$(".datatables").dataTable({
+			"bPaginate": false,
+		    "bLengthChange": false,
+		    "bFilter": false,
+			"bInfo": false,
+		});
+	});
+</script>
+${commonfooter()}

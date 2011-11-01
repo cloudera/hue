@@ -13,12 +13,17 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
-<%! from urllib import quote %>
-<%! from filebrowser.views import location_to_url %>
-${wrappers.head("Beeswax Table Partitions: " + table.tableName, section='tables')}
+<%! 
+  from urllib import quote
+  from filebrowser.views import location_to_url 
+  from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
+${commonheader("Beeswax Table Partitions: " + table.tableName, "beeswax", "100px")}
+${layout.menubar(section='tables')}
 
-<h2>Partitions</h2>
+<div class="container-fluid">
+<h1>Partitions</h1>
 
 <table>
 <tr>
@@ -47,4 +52,5 @@ ${wrappers.head("Beeswax Table Partitions: " + table.tableName, section='tables'
   <tr><td>Table has no partitions.</td></tr>
 % endif
 </table>
-${wrappers.foot()}
+</div>
+${commonfooter()}

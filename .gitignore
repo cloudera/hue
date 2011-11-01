@@ -1,9 +1,13 @@
 # OS X nonsense
 .DS_Store
+._*
 
 # Python compiled files
 *.pyc
 *.pyo
+
+# Language compiled files
+*.mo
 
 # vim tmp files
 .*.swp

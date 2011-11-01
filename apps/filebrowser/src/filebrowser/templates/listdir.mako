@@ -16,13 +16,23 @@
 <%!
 import datetime
 from django.template.defaultfilters import escape, stringformat, date, time
+from desktop.views import commonheader, commonfooter
 %>
-<%namespace name="comps" file="fb_components.mako" />
-<%namespace name="dir" file="listdir_components.mako" />
-${comps.header(path, current_request_path, cwd_set=cwd_set, show_upload=show_upload)}
 
-  <div id="dirlist" class="view">
-    <h1 class="jframe-hidden">${path|escape}</h1>
+<%namespace name="dir" file="listdir_components.mako" />
+
+${commonheader('File Browser', 'filebrowser')}
+<div class="container-fluid">
+	<h1>File Browser</h1>
+	% if breadcrumbs:
+		<ul class="breadcrumb">
+			% for breadcrumb_item in breadcrumbs:
+			<li><a href="/filebrowser/view${breadcrumb_item['url']}">${breadcrumb_item['label']}</a> <span class="divider">/</span></li>
+			% endfor
+		</ul>
+	%endif
+    <div id="dirlist" class="view">
     ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
-  </div>
-${comps.footer()}
+    </div>
+</div>
+${commonfooter()}

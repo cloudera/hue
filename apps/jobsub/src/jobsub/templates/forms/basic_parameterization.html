@@ -7,7 +7,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,24 +15,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-<dl class="clearfix">
+<div>
 {% for field in form %}
-  <dt>{{ field.label }}</dt>
-  <dd>
-      <div>
-        {{ field|safe }}
-      </div>
-      {% if field.help_text %}
-      <p>
-        {{ field.help_text|safe}}
-      </p>
-      {% endif %}
+<label>{{ field.label }}</label>
 
-      <div class="jobsub_errors">{{ field.errors }}</div>
+<div>
+    {{ field|safe }}
+</div>
+{% if field.help_text %}
+<div>
+    {{ field.help_text|safe}}
+</div>
+{% endif %}
+{% if field.errors %}
+<div class="alert-message">{{ field.errors }}</div>
+{% endif %}
 
-      {% ifequal field.label "Output" %}
-      <!-- Filechoose would go here; also for "Input" -->
-      {% endifequal %}
-  </dd>
+{% ifequal field.label "Output" %}
+<!-- Filechoose would go here; also for "Input" -->
+{% endifequal %}
+
 {% endfor %}
-</dl>
+</div>

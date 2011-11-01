@@ -13,18 +13,12 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="comps" file="fb_components.mako" />
 <%namespace name="dir" file="listdir_components.mako" />
-<html>
-  <head>
-    <title>${path}</title>
-  </head>
-  <body>
-    <div class="toolbar">
+
       <div class="fb-actions" data-filters="ArtButtonBar">
         <a class="fb-upload" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height' : 16}" href="${url('filebrowser.views.upload')}?dest=${path|u}&next=${current_request_path|u}">Upload Files</a>
         <a class="fb-mkdir" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.mkdir')}?path=${path|u}&next=${current_request_path|u}">New Directory</a>
       </div>
-    </div>
+
     ${dir.list_table_chooser(files, path_enc, current_request_path)}
-${comps.footer()}
+

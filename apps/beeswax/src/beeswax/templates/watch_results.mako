@@ -13,23 +13,44 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
-${wrappers.head("Beeswax: Query Results", section='query')}
-
-<div class="view resizable" id="watch_results" data-filters="SplitView">
-  <div class="left_col">
-    ${util.render_query_context(query_context)}
-      <dl class="jframe_padded">
-        % if download_urls:
-          ## Download results
-          <dt class="hue-dt_cap">Actions</dt>
-          <dd class="hue-dd_bottom bw-actions">
-            <ul>
-              <li><a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a>
-              <li><a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a>
-              <li data-filters="CollapsingElements"><a class="bw-save collapser jframe_ignore" href="${url('beeswax.views.save_results', query.id)}">Save</a>
+${commonheader("Beeswax: Query Results", "beeswax", "100px")}
+${layout.menubar(section='query')}
+<div class="container-fluid">
+<h1>Beeswax: Query Results: ${util.render_query_context(query_context)}</h1>
+<div class="sidebar withTitle">
+	<div class="well">
+		% if download_urls:
+		<h6>Downloads</h6>
+		<ul>
+			<li><a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a></li>
+			<li><a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a></li>
+			<li><a href="${url('beeswax.views.save_results', query.id)}">Save</a></li>
+		</ul>
+ 		% endif
+        <%
+          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
+          mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
+        %>
+	 	% if n_jobs > 0:
+			<h6>${mr_jobs} (${n_jobs})</h6>
+	             
+			% for jobid in hadoop_jobs:
+			<a href="${url("jobbrowser.views.single_job", jobid=jobid)}" class="bw-hadoop_job">${jobid.replace("job_", "")}</a><br/>
+			% endfor
+		% else:
+			<h6>${mr_jobs}</h6>
+			<p class="bw-no_jobs">No Hadoop jobs were launched in running this query.</p>
+		% endif 
+	</div>
+</div>
+<div class="content">
+	
                 <div class="collapsible jframe-hidden bw-save_query_results" style="display:none" data-filters="Accordion"> 
                   <form action="${url('beeswax.views.save_results', query.id) }" method="POST">
                     ## Writing the save_target fields myself so I can match them to their respective text input fields.
@@ -55,94 +76,84 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
                     <input type="submit" value="Save" name="save" data-filters="ArtButton"> 
                   </form>
                 </div>
-              </li>
-            </ul>
-          </dd>
-        % endif
-        <%
-          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
-          mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
-        %>
-        <dt class="hue-dt_cap">${mr_jobs}</dt>
-        <dd class="hue-dd_bottom bw-actions">
-          <ul>
-            % if n_jobs > 0:
-              <h3 class="jframe-hidden">This query launched ${n_jobs} ${mr_jobs}:</h3>
-              <ul class="beeswax_hadoop_job_links">
-                % for jobid in hadoop_jobs:
-                <li><a href="${url("jobbrowser.views.single_job", jobid=jobid)}" target="JobBrowser" class="bw-hadoop_job">${jobid.replace("job_", "")}</a></li>
-                % endfor
-              </ul>
-            % else:
-              <p class="bw-no_jobs">No Hadoop jobs were launched in running this query.</p>
-            % endif 
-          </ul>
-        </dd>
-      </dl>
-  </div>
-  <div class="right_col">
-    <div data-filters="Tabs">
-        <ul class="toolbar bw-results_tabs tabs jframe-right clearfix">
-          <li><span>
-              % if error:
-                Error
-              % else:
-                Results
-              % endif
-            </span></li>
-          <li><span>Query</span></li>
-          <li><span>Log</span></li>
-        </ul>
 
-      <ul class="tab_sections jframe-clear">
-        <li>
-          % if error:
-            <div class="jframe-error jframe_padded">
-              <h3 class="jframe-hidden">Error!</h3> 
-              <pre>${error_message}</pre>
-            </div>
-          % else:
-            <div class="bw-result_nav toolbar">
-              % if has_more:
-                <a href="${ url('beeswax.views.view_results', query.id, next_row) }" title="Next page" class="bw-nextBlock">[next]</a>
-              % endif
-              % if start_row != 0:
-                <a href="${ url('beeswax.views.view_results', query.id, 0) }" title="Back to first row" class="bw-firstBlock">[top]</a>
-              % endif
-            </div>
-            % if expected_first_row != start_row:
-              <div class="bw-result_warning">Warning:</i> Page offset may have incremented since last view.</div>
-            % endif
-            <table data-filters="HtmlTable" cellpadding="0" cellspacing="0">
-              <thead>
-                <tr>
-                  <th>-</th>
-                  % for col in columns:
-                    <th>${col}</th>
-                  % endfor
-                </tr>
-              </thead>
-              <tbody>
-                % for i, row in enumerate(results):
-                <tr>
-                  <td>${start_row + i}</td>
-                  % for item in row:
-                    <td>${ item }</td>
-                  % endfor
-                </tr>
-                % endfor
-              </tbody>
-            </table>
-          % endif
-        </li>
-        <li class="jframe_padded">
-          <pre>${query.query}</pre>
-        </li>
-        <li class="jframe_padded">
-          <pre>${log}</pre>
-        </li>
-      </ul>
-    </div>
-  </div>
+				<ul class="tabs">
+					<li class="active"><a href="#results">
+		  			%if error:
+			            Error
+					%else:
+						Results
+					%endif
+					</a></li>
+					<li><a href="#query">Query</a></li>
+					<li><a href="#log">Log</a></li>
+				</ul>
+	
+				<div class="tab-content">
+					<div class="active tab-pane" id="results">
+					% if error:
+		            <div class="jframe-error jframe_padded">
+		              <h3 class="jframe-hidden">Error!</h3> 
+		              <pre>${error_message}</pre>
+		            </div>
+          			% else:
+            		<div class="bw-result_nav toolbar">
+		              % if has_more:
+		                <a href="${ url('beeswax.views.view_results', query.id, next_row) }" title="Next page" class="bw-nextBlock">[next]</a>
+		              % endif
+		              % if start_row != 0:
+		                <a href="${ url('beeswax.views.view_results', query.id, 0) }" title="Back to first row" class="bw-firstBlock">[top]</a>
+		              % endif
+		            </div>
+		            % if expected_first_row != start_row:
+		              <div class="bw-result_warning">Warning:</i> Page offset may have incremented since last view.</div>
+		            % endif
+            		<table class="resultTable" cellpadding="0" cellspacing="0">
+		              <thead>
+		                <tr>
+		                  <th>-</th>
+		                  % for col in columns:
+		                    <th>${col}</th>
+		                  % endfor
+		                </tr>
+		              </thead>
+		              <tbody>
+		                % for i, row in enumerate(results):
+		                <tr>
+		                  <td>${start_row + i}</td>
+		                  % for item in row:
+		                    <td>${ item }</td>
+		                  % endfor
+		                </tr>
+		                % endfor
+		              </tbody>
+		            </table>
+		          % endif
+				</div>
+				<div class="tab-pane" id="query">
+					
+						<pre>${query.query}</pre>
+					
+				</div>
+				<div class="tab-pane" id="log">
+					<pre>${log}</pre>
+				</div>
+			</div>
+
 </div>
-${wrappers.foot()}
+</div>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$(".tabs").tabs();
+		$(".resultTable").dataTable({
+			"bPaginate": false,
+		    "bLengthChange": false,
+			"bInfo": false
+		});
+		$(".dataTables_wrapper").css("min-height","0");
+		$(".dataTables_filter").hide();
+
+	});
+</script>
+
+${commonfooter()}

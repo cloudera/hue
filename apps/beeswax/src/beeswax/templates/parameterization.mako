@@ -13,9 +13,14 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from desktop.views import commonheader, commonfooter
+%>
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head('Parameterize Hive Query')}
+<%namespace name="layout" file="layout.mako" />
+${commonheader("Parameterize Hive Query", "beeswax", "100px")}
+${layout.menubar()}
+<div class="container-fluid">
 <div class="prompt_popup">
 Please specify parameters for this query.
 <%
@@ -33,4 +38,5 @@ else:
 <input class="jframe-hidden" type="submit">
 </form>
 </div>
-${wrappers.foot()}
+</div>
+${commonfooter()}

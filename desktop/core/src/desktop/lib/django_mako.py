@@ -63,7 +63,7 @@ class DesktopLookup(TemplateCollection):
                             module_directory=os.path.join(self.module_dir, app),
                             output_encoding=OUTPUT_ENCODING,
                             encoding_errors=ENCODING_ERRORS,
-                            default_filters=['unicode', 'h'], # autoescape HTML, disable with |n
+                            default_filters=['unicode'], 
                             imports=IMPORTS)
     # TODO(philip): Make a django_aware default filter, that understands
     # django safe strings.  See http://www.makotemplates.org/docs/filtering.html.
