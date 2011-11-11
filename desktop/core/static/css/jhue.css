@@ -119,6 +119,13 @@
 }
 
 
+code {
+	line-height:1.4em;
+}
+.noPadding {
+	padding:0;
+}
+
 /*
  *  File:         demo_table.css
  *  CVS:          $Id$

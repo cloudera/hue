@@ -14,22 +14,20 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
-<%namespace name="comps" file="fb_components.mako" />
-${comps.header('Move: ' + src_path.split('/')[-1])}
+<%namespace name="wrappers" file="header_footer.mako" />
+${wrappers.head('Move: ' + src_path.split('/')[-1])}
 
+<h1>Move: ${src_path}</h1>
+<form action="/filebrowser/move?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked">
 
-<div class="prompt_popup">
-<form action="/filebrowser/move?next=${next|u}" method="POST" enctype="multipart/form-data">
-  <h4 class="jframe-hidden">Move: ${src_path}</h4>
-  <dl>
+  <div class="well">
     ${edit.render_field(form["src_path"], hidden=True)}
     ${edit.render_field(form["dest_path"], notitle=True)}
-  </dl>
-  <input class="jframe-hidden" type="submit" value="Submit" />
+    <div>
+        <input class="btn primary" type="submit" value="Submit" />
+        <a class="btn" href="${next|u}">Cancel</a>
+    </div>
+  </div>
+
 </form>
-</div>
-
-<div class="jframe-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
-
-
-${comps.footer()}
+${wrappers.foot()}

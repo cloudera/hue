@@ -7,7 +7,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,29 +16,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {# Currently very generic form for jar submission #}
-<dl class="jobsub_basic clearfix">
 
-	<dt>{{ form.jarfile.label }}</dt>
-	<dd class="jobsub_file">
-			<div class="jobsub_input">
-				{{ form.jarfile|safe }}
-			</div>
-			<p>
-				{{ form.jarfile.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.jarfile.errors }}</div>
-	</dd>
 
-	<dt>{{ form.arguments.label }}</dt>
-	<dd class="jobsub_paths">
-		<div class="jobsub_input">
-			{{ form.arguments|safe }}
-			<a class="hue-choose_file" data-filters="ArtButton" data-chooseFor="jarfile">...</a>
-		</div>
-		<p>
-			{{ form.arguments.help_text|safe}}
-		</p>
-		<div class="jobsub_errors">{{ form.arguments.errors }}</div>
-	</dd>
+<label>{{ form.jarfile.label }}</label>
+<div>
+    <div class="jobsub_input">
+        {{ form.jarfile|safe }}
+    </div>
+    <p>
+        {{ form.jarfile.help_text|safe}}
+    </p>
 
-</dl>
+    <div class="jobsub_errors">{{ form.jarfile.errors }}</div>
+</div>
+
+<label>{{ form.arguments.label }}</label>
+<div>
+    <div class="jobsub_input">
+        {{ form.arguments|safe }}
+        <a class="btn">...</a>
+    </div>
+    <p>
+        {{ form.arguments.help_text|safe}}
+    </p>
+
+    <div class="jobsub_errors">{{ form.arguments.errors }}</div>
+</div>
+
+

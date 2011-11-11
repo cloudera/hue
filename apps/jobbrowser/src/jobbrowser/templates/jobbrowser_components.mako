@@ -30,7 +30,7 @@
         padding-top: 60px;
       }
     </style>
-	<script src="/static/ext/js/jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/js/Source/jHue/jquery.showusername.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
@@ -59,9 +59,12 @@
 			<div class="container-fluid">
 				<a class="brand" href="#">jHue</a>
 				<ul class="nav">
-					<li><a href="/beeswax/">Beeswax</a></li>
-					<li class="active"><a href="/jobbrowser/jobs/">Job Browser</a></li>
+					<li><a href="/beeswax">Beeswax</a></li>
+					<li><a href="/filebrowser/">File Browser</a></li>
 					<li><a href="/jobsub/">Job Designer</a></li>
+					<li class="active"><a href="/jobbrowser/jobs/">Job Browser</a></li>
+					<li><a href="/useradmin/">User Admin</a></li>
+					<li><a href="/help/">Help</a></li>
 				</ul>
 				<p class="pull-right">Logged in as <a id="username" href="/accounts/logout">xxx</a></p>
 			</div>

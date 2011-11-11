@@ -36,24 +36,24 @@
 
           <div class="clearfix">
             <div class="input">
-              <textarea class="xxlarge" rows="5"
+              <textarea class="span12" rows="9"
 		        placeholder="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
             </div>
-          </div><!-- /clearfix -->
+          </div>
         </fieldset>
 		 % if len(form.query["query"].errors):
-	          <div class="validation-advice">
+	          <div class="validation-advice ">
 	             ${unicode(form.query["query"].errors) | n}
 	          </div>
 	        % endif
 		<div class="actions">
-			<input type="submit" name="button-submit" value="Execute" class="btn primary"/>
+			<a id="executeQuery" class="btn primary">Execute</a>
 			% if design and not design.is_auto and design.name:
-            <input type="submit" name="saveform-save" value="Save" class="btn"/>
+            <a id="saveQuery" class="btn">Save</a>
           	% endif
-          	<input type="submit" name="saveform-saveas" value="Save As..." class="btn" />
+          	<a id="saveQueryAs" class="btn">Save as...</a>
           
-			<input type="submit" name="button-explain" value="Explain" class="btn" />
+			<a id="explainQuery" class="btn">Explain</a>
 			&nbsp; or <a href="${ url('beeswax.views.execute_query') }">create a new query</a>
 		</div>
           
@@ -72,162 +72,140 @@
 
 
 ${wrappers.head('Hive Query', section='query')}
-<h1>Query Editor</h1>
-% if error_message:
-<div class="alert_popup jframe_renders">
-  <dl class="bw-query_error">
-    <dt class="hue-dt_cap">Your Query Has the Following Error(s):</dt>
-    <dd class="hue-dd_bottom jframe-error">
-      <div class="validation-advice">
-        ${error_message}
-      </div>
-      % if log:
-        <div class="bw-error_tab_msg">
-          (click the <b>Error Log</b> tab above the editor input for details)
-        </div>
-      % endif
-    </dd>
-  </dl>
-</div>
-% endif
 <div class="sidebar">
 	<div class="well">
-		<h6>Advanced settings</h6>
-		<h5>Hive settings</h5>
-		<h5>File Resources</h5>
-		<h5>User-defined Functions</h5>
-		<h5>Parametrization</h5>
-		<h5>Email Notification</h5>
-    </div>
-</div>
+	<form id="advancedSettingsForm" action="${action}" method="POST" class="form-stacked noPadding">
+		<h4>Advanced settings</h4>
+		<h6>Hive settings</h6>
+		% for i, f in enumerate(form.settings.forms):
+		% if i > 0:
+			<hr/>
+		% endif
+		
+		<div class="clearfix">
+			${comps.label(f['key'])}
+			<div class="input">
+				${comps.field(f['key'], attrs=dict(
+					placeholder="mapred.reduce.tasks",
+					klass="span3 settingsField"
+				))}
+			</div>
+		</div>
+		
+		<div class="clearfix">
+			${comps.label(f['value'])}
+			<div class="input">
+				${comps.field(f['value'], attrs=dict(
+					placeholder="1",
+					klass="span3"
+				))}
+			</div>
+		</div>
+		<div class="clearfix">
+			${comps.field(f['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
+				type="submit",
+				title="Delete this setting",
+				klass="btn small danger settingsDelete"
+			), value=True)}	
+		</div>
+		${comps.field(f['_exists'], hidden=True)}
+	    % endfor
+		<div class="clearfix">
+			<a class="btn small" data-form-prefix="settings">Add</a>
+		</div>
 
-<div class="content">
-<div class="view" id="execute">
-  <form action="${action}" method="POST" class="form-stacked">
-    <div class="resizable" data-filters="SplitView">
-
-	<%
-      if form.settings.forms or form.file_resources.forms or form.functions.forms:
-        width = 230
-      else:
-        width = 0
-    %>
-
-	    
-
-    <div class="left_col" style="width: ${width}px;display:none">
-      <a name="settings"></a>
-      <dl class="jframe_padded bw-query_settings">
-        <dt class="hue-dt_cap">Hive Settings</dt>
-        <dd class="hue-dd_bottom">
-          <dl>
-            % for i, f in enumerate(form.settings.forms):
-              % if i > 0:
-                <hr/>
-              % endif
-              ${comps.field(f['key'], attrs=dict(
-                alt="mapred.reduce.tasks",
-                data_filters="OverText"
-              ))}
-              <div class="bw-query_settings_delete">
-                ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
-                    type="submit",
-                    title="Delete this setting"
-                  ), value=True)}
-              </div>
-
-              ${comps.field(f['value'], attrs=dict(
-                alt="1",
-                data_filters="OverText",
-              ))}
-              ${comps.field(f['_exists'], hidden=True)}
-            % endfor
-            <div class="bw-query_settings_add">
-              <button id="id_settings-add" value="True" name="settings-add" type="submit">+</button>
-              <div class="jframe-hidden">${unicode(form.settings.management_form) | n }</div>
-            </div>
-          </dl>
-        </dd>
-        <dt class="hue-dt_cap">File Resources</dt>
-        <dd class="hue-dd_bottom">
-          <dl>
-            % for i, f in enumerate(form.file_resources.forms):
+		
+		<h6>File Resources</h6>
+		 % for i, f in enumerate(form.file_resources.forms):
               % if i > 0:
                 <hr/>
               % endif
 
-              ${comps.field(f['type'], render_default=True)}
-              <div class="bw-query_settings_delete">
-                ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
-                    type="submit",
-                    title="Delete this setting"
-                  ), value=True)}
-              </div>
+			<div class="clearfix">
+				${comps.label(f['type'])}
+				<div class="input">
+					${comps.field(f['type'], render_default=True, attrs=dict(
+						klass="span3"
+					))}
+				</div>
+			</div>
+			
+			<div class="clearfix">
+				${comps.label(f['path'])}
+				<div class="input">
+					${comps.field(f['path'], attrs=dict(
+						placeholder="/user/foo/udf.jar",
+						klass="span3 file_resourcesField"
+					))}
+				</div>
+			</div>
+			<div class="clearfix">
+				<a href="#" data-filechooser-destination="${f['path'].html_name | n}" class="btn small">Choose a File</a>
 
-              ${comps.field(f['path'], attrs=dict(
-                alt="/user/foo/udf.jar",
-                data_filters="OverText",
-              ))}
-              <div class="jframe-button_subbar_below clearfix">
-                <a class="hue-choose_file" data-filters="ArtButton" data-chooseFor="${f['path'].html_name | n}" data-icon-styles="{'width':16, 'height':16, 'top':2}">Choose a File</a>
-              </div>
-              ${comps.field(f['_exists'], hidden=True)}
+				${comps.field(f['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
+					type="submit",
+					title="Delete this setting",
+					klass="btn small danger file_resourcesDelete"
+				), value=True)}
+				
+				${comps.field(f['_exists'], hidden=True)}
+			</div>
             % endfor
-            <div class="bw-query_settings_add">
-              <button id="id_file_resources-add" value="True" name="file_resources-add" type="submit">+</button>
-              <div class="jframe-hidden">${unicode(form.file_resources.management_form) | n }</div>
-            </div>
-          </dl>
-        </dd>
-        <dt class="hue-dt_cap">User-defined Functions</dt>
-        <dd class="hue-dd_bottom">
-          <dl>
-            % for i, f in enumerate(form.functions.forms):
-              % if i > 0:
-                <hr/>
-              % endif
+			<div class="clearfix">
+				<a class="btn small" data-form-prefix="file_resources">Add</a>
+			</div>
 
-              ${comps.field(f['name'], attrs=dict(
-                alt="myFunction",
-                data_filters="OverText",
-              ))}
-              <div class="bw-query_settings_delete">
-                ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
-                    type="submit",
-                    title="Delete this setting"
-                  ), value=True)}
-              </div>
+		<h6>User-defined Functions</h6>
+		% for i, f in enumerate(form.functions.forms):
+          % if i > 0:
+            <hr/>
+          % endif
 
-              ${comps.field(f['class_name'], attrs=dict(
-                alt="com.acme.example",
-                data_filters="OverText",
-              ))}
-              ${comps.field(f['_exists'], hidden=True)}
-            % endfor
-            <div class="bw-query_settings_add">
-              <button id="id_functions-add" value="True" name="functions-add" type="submit">+</button>
-              <div class="jframe-hidden">${unicode(form.functions.management_form) | n }</div>
-            </div>
-          </dl>
-        </dd>
-        <dt class="hue-dt_cap">Parameterization</dt>
-        <dd class="hue-dd_bottom">
-          <dl class="hue-bw_parameters">
-            ${comps.field(form.query["is_parameterized"],
-                notitle = True,
-                tag = "checkbox",
-                button_text = "Enable Parameterization", 
-                help = "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.",
-                help_attrs= dict(
-                  data_help_direction='11'
-                )
-            )}
-          </dl>
-        </dd>
-        <dt class="hue-dt_cap">Email Notification</dt>
-        <dd class="hue-dd_bottom">
-          <dl class="hue-bw_parameters">
-        ${comps.field(form.query["email_notify"],
+			<div class="clearfix">
+				${comps.label(f['name'])}
+				<div class="input">
+					${comps.field(f['name'], attrs=dict(
+						placeholder="myFunction",
+						klass="span3 functionsField"
+					))}
+				</div>
+			</div>
+			<div class="clearfix">
+				${comps.label(f['class_name'])}
+				<div class="input">
+					${comps.field(f['class_name'], attrs=dict(
+						placeholder="com.acme.example",
+						klass="span3"
+					))}
+				</div>
+			</div>
+
+    		<div class="clearfix">
+				${comps.field(f['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
+					type="submit",
+					title="Delete this setting",
+					klass="btn small danger"
+				), value=True)}
+			</div>
+         
+          ${comps.field(f['_exists'], hidden=True)}
+        % endfor
+		<div class="clearfix">
+			<a class="btn small" data-form-prefix="functions">Add</a>
+		</div>
+		
+		<h6>Parametrization</h6>
+		${comps.field(form.query["is_parameterized"],
+            notitle = True,
+            tag = "checkbox",
+            button_text = "Enable Parameterization", 
+            help = "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.",
+            help_attrs= dict(
+              data_help_direction='11'
+            )
+        )}
+		<h6>Email Notification</h6>
+		${comps.field(form.query["email_notify"],
                       notitle = True,
                       tag = "checkbox",
                       button_text = "Email me on complete",
@@ -236,50 +214,159 @@ ${wrappers.head('Hive Query', section='query')}
                         data_help_direction='11'
                       )
                      )}
-          </dl>
-        </dd>
-      </dl>
+		<input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
+	</form>
     </div>
+</div>
 
-      <div class="right_col">
+<div class="content">
+	<h1>Query Editor</h1>
+	<div class="form-stacked">
+		% if error_message:
+			<div class="alert-message block-message error">
+				<p><strong>Your Query Has the Following Error(s):</strong></p>
+				<p>${error_message}</p>
+				% if log:
+					<small>click the <b>Error Log</b> tab below for details</small>
+				% endif
+			</div>
+		% endif
+	
         % if on_success_url:
           <input type="hidden" name="on_success_url" value="${on_success_url}"/>
         % endif
 
         % if error_messages or log:
-          <div data-filters="Tabs">
-            <ul class="toolbar bw-results_tabs jframe-right clearfix tabs" data-filters="Tabs">
-              <li><span>Query</span></li>
-              % if error_message or log:
-              <li><span>
-                % if log:
-                  Error Log
-                % endif
-              </span></li>
-              % endif
-            </ul>
-            <ul class="tab_sections jframe-clear">
-              <li>
-                ${query()}
-              </li>
-              % if error_message or log:
-                <li class="bw-results_log jframe_padded">
-                  % if log:
-                    <pre>${log}</pre>
-                  % endif
-                </li>
-              % endif
-            </ul>
-          </div>
-        % else:
-          ${query()}
-        % endif
-
-      </div>
-
-    </div>
-
-    </div>
-  </form>
+			<ul class="tabs">
+				<li class="active"><a href="#queryPane">Query</a></li>
+				% if error_message or log:
+              	<li><a href="#errorPane">
+					% if log:
+						Error Log
+					% else:
+						&nbsp;
+	                % endif
+				</a></li>
+				% endif
+			</ul>
+            
+			<div class="tab-content">
+				<div class="active tab-pane" id="queryPane">
+					${query()}
+				</div>
+				% if error_message or log:
+					<div class="tab-pane" id="errorPane">
+					% if log:
+						<pre>${log}</pre>
+					% endif
+					</div>
+				% endif
+			</div>
+		% else:
+			${query()}
+		% endif
+	</div>
 </div>
+
+
+
+<div id="chooseFile" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3>Choose a file</h3>
+	</div>
+	<div class="modal-body">  
+		<div id="filechooser">
+		</div>
+	</div>
+	<div class="modal-footer">
+	</div>
+</div>
+
+<style>
+	#filechooser {
+		height:100px;
+		overflow-y:scroll;
+	}
+</style>
+
+
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$(".tabs").tabs();
+		$("*[rel=popover]").popover({
+			offset: 10
+		});
+		// hack!!!
+		$("select").addClass("span3");
+		
+		$("a[data-form-prefix]").each(function(){
+			var _prefix = $(this).attr("data-form-prefix");
+			var _nextID = 0;
+			if ($("."+_prefix+"Field").length){
+				_nextID= ($("."+_prefix+"Field").last().attr("name").substr(_prefix.length+1).split("-")[0]*1)+1;
+			}
+			$("<input>").attr("type","hidden").attr("name",_prefix+"-next_form_id").attr("value",_nextID).appendTo($("#advancedSettingsForm"));
+			$("."+_prefix+"Delete").click(function(e){
+				e.preventDefault();
+				$("input[name="+_prefix+"-add]").attr("value","");
+				$("<input>").attr("type","hidden").attr("name", $(this).attr("name")).attr("value","True").appendTo($("#advancedSettingsForm"));
+				checkAndSubmit();
+			});
+		});
+		
+		$("a[data-form-prefix]").click(function(){
+			var _prefix = $(this).attr("data-form-prefix");
+			$("<input>").attr("type","hidden").attr("name",_prefix+"-add").attr("value","True").appendTo($("#advancedSettingsForm"));
+			checkAndSubmit();
+		});
+		
+		$("a[data-filechooser-destination]").click(function(){
+			var _destination = $(this).attr("data-filechooser-destination");
+			$("#filechooser").jHueFileChooser({
+				onFileChoose: function(filePath){
+					$("input[name='"+_destination+"']").val(filePath);
+					$("#chooseFile").modal("hide");
+				}
+			});
+			$("#chooseFile").modal("show");
+		});
+		
+		$("#executeQuery").click(function(){
+			$("<input>").attr("type","hidden").attr("name","button-submit").attr("value","Execute").appendTo($("#advancedSettingsForm"));
+			checkAndSubmit();
+		});
+		
+		$("#saveQuery").click(function(){
+			$("<input>").attr("type","hidden").attr("name","saveform-save").attr("value","Save").appendTo($("#advancedSettingsForm"));
+			checkAndSubmit();
+		});
+		
+		$("#saveQueryAs").click(function(){
+			$("<input>").attr("type","hidden").attr("name","saveform-saveas").attr("value","Save As...").appendTo($("#advancedSettingsForm"));
+			checkAndSubmit();
+		});
+		
+		$("#explainQuery").click(function(){
+			$("<input>").attr("type","hidden").attr("name","button-explain").attr("value","Explain").appendTo($("#advancedSettingsForm"));
+			checkAndSubmit();
+		});
+		
+		$("#queryField").change(function(){
+			$(".query").val($(this).val());
+		});
+				
+		function checkAndSubmit(){
+			$(".query").val($("#queryField").val());
+			$("#advancedSettingsForm").submit();
+		}
+		
+		$("#chooseFile").modal({
+			keyboard: true,
+			backdrop: true
+		})
+	});
+</script>
+
+
 ${wrappers.foot()}

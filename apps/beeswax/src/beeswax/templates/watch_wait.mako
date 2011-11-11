@@ -19,16 +19,18 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
 
 <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
 
-<h1>${util.render_query_context(query_context)}</h1>
+
 <div class="sidebar">
 	<div class="well">
 		% if download_urls:
 		<h6>Downloads</h6>
-		<a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a><br/>
-		<a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a><br/>
-		<a class="bw-save collapser jframe_ignore" href="${url('beeswax.views.save_results', query.id)}">Save</a><br/>
+		<ul>
+			<li><a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a></li>
+			<li><a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a></li>
+			<li><a class="bw-save collapser jframe_ignore" href="${url('beeswax.views.save_results', query.id)}">Save</a></li>
+		</ul>
 		%endif
-		<br/>
+
 		<%
           n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
           mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
@@ -49,17 +51,17 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
 
 
 <div class="content">
-	
+	<h1>Waiting for results: ${util.render_query_context(query_context)}</h1>
 	<ul class="tabs">
 		<li class="active"><a href="#log">Log</a></li>
 		<li><a href="#query">Query</a></li>
 	</ul>
   
-   	<div class="pill-content">
-		<div class="active" id="log">
+   	<div class="tab-content">
+		<div class="active tab-pane" id="log">
 			<pre>${log}</pre>
 		</div>
-		<div id="query">
+		<div class="tab-pane" id="query">
 			<pre>${query.query}</pre>
 		</div>
 	</div>
@@ -68,8 +70,6 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		$(".tabs").tabs();
-	
-
 	});
 </script>
 ${wrappers.foot()}

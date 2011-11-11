@@ -32,8 +32,8 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
 	</ul>
 	
 
-		<div class="pill-content">
-			<div class="active" id="recentSavedQueries">
+		<div class="tab-content">
+			<div class="active tab-pane" id="recentSavedQueries">
 	
 				 <table class="datatables">
 			          <thead>
@@ -96,7 +96,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
 			        % endif
 			</div>
 			
-			<div id="recentRunQueries">
+			<div class="tab-pane" id="recentRunQueries">
 				<table class="datatables">
 		          <thead>
 		            <tr>

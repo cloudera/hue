@@ -22,17 +22,14 @@
   path_enc = urlencode(path)
   dirname_enc = urlencode(dirname)
 %>
-<html>
-<head><title>${truncate(filename)} :: File Editor</title></head>
-<body>
-<div class="toolbar">
-  <div class="fe-path">${truncate(path, 91)}</div>
-  <div class="fe-buttons" data-filters="ArtButtonBar">
-    <a class="fe-viewLocation" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View Location</a>
-  </div>
-</div>
+<%namespace name="wrappers" file="header_footer.mako" />
+${wrappers.head('${truncate(filename)} :: File Editor', show_upload=False, show_new_directory=False)}
+<div class="toolbar"><a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View Location</a></div>
+<h1>${truncate(path, 91)}</h1>
+
+
 % if form.errors:
-  <div class="alert_popup">
+  <div class="alert-message">
     % for field in form:
       % if len(field.errors):
        ${unicode(field.errors) | n}
@@ -40,17 +37,19 @@
     % endfor
   </div>
 % endif
-<form class="fe-editForm noReset" method="post" action="${url('filebrowser.views.save_file')}">
-    ${edit.render_field(form["path"], hidden=True, notitle=True)}
-    ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
-    <h2 class="jframe-hidden">${form["contents"].label_tag() | n}</h2>
-    <div class="fe-divResize" data-filters="SizeTo" data-size-to-width="100%" data-size-to-height="100%">${edit.render_field(form["contents"], tag="textarea", notitle=True, attrs=dict(
-      data_filters="SizeTo, PostEditor",
-      data_size_to_width="-20",
-      data_size_to_height="100%")) | n}</div>
-    <input class="jframe-hidden" type="submit" name="save" value="saveAs">
-    <input class="jframe-hidden" type="submit" name="save" value="save">
+<form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
+<div class="well" >
+
+        ${edit.render_field(form["path"], hidden=True, notitle=True)}
+        ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
+        
+        <div style="width: 100%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", notitle=True, attrs=dict(
+          style="width:100%; height:400px;")) | n}</div>
+        <input class="btn primary" type="submit" name="save" value="save">
+        <input class="btn" type="submit" name="save" value="saveAs">
+
+
+</div>
 </form>
-</body>
-</html>
+${wrappers.foot()}
 

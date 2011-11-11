@@ -7,7 +7,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,186 +15,216 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
-	<dl class="jobsub_basic clearfix">
 
-		<dt>{{ form.input.label }}</dt>
-		<dd class="jobsub_multiinput jobsub_paths">
-				<div class="jobsub_input">
-					{{ form.input|safe }}
-				</div>
-				<p>
-					{{ form.input.help_text }}
-				</p>
-				<div class="jobsub_errors">
-				{{ form.input.errors }}
-				</div>
-		</dd>
 
-		<dt>{{ form.output.label }}</dt>
-		<dd class="jobsub_paths">
-			<div class="jobsub_input">
-				{{ form.output|safe }}
-			</div>
-			<p>
-				{{ form.output.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.output.errors }}</div>
-		</dd>
+<label>{{ form.input.label }}</label>
+<div class="jobsub_multiinput jobsub_paths">
+    <div class="jobsub_input">
+        {{ form.input|safe }}
+    </div>
+    <p>
+        {{ form.input.help_text }}
+    </p>
 
-		<dt>{{ form.mapper_cmd.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.mapper_cmd|safe }}
-			</div>
-			<p>
-				{{ form.mapper_cmd.help_text|safe}}
-			</p>
-				<div class="jobsub_errors">{{ form.mapper_cmd.errors }}</div>
-		</dd>
+    <div class="jobsub_errors">
+        {{ form.input.errors }}
+    </div>
+</div>
 
-		<dt>{{ form.reducer_cmd.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.reducer_cmd|safe }}
-				
-			</div>
-			<p>
-				{{ form.reducer_cmd.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.reducer_cmd.errors }}</div>
-		</dd>
-			
-		<dt>{{ form.num_reduce_tasks.label }}</dt>
-		<dd>
-			<div class="jobsub_input">
-				{{ form.num_reduce_tasks|safe }}
-			</div>
-			<p>
-				{{ form.num_reduce_tasks.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.num_reduce_tasks.errors }}</div>
-		</dd>
+<label>{{ form.output.label }}</label>
+<div class="jobsub_paths">
+    <div class="jobsub_input">
+        {{ form.output|safe }}
+    </div>
+    <p>
+        {{ form.output.help_text|safe}}
+    </p>
 
-		<dt>{{ form.cache_files.label }}</dt>
-		<dd class="jobsub_multiinput jobsub_paths">
-			<div class="jobsub_input">
-				{{ form.cache_files|safe }}
-				
-			</div>
-			<p>
-				{{ form.cache_files.help_text|safe}}
-			</p>
-			<div class="jobsub_errors">{{ form.cache_files.errors }}</div>
-		</dd>
+    <div class="jobsub_errors">{{ form.output.errors }}</div>
+</div>
 
-	</dl>
+<label>{{ form.mapper_cmd.label }}</label>
+<div>
+    <div class="jobsub_input">
+        {{ form.mapper_cmd|safe }}
+    </div>
+    <p>
+        {{ form.mapper_cmd.help_text|safe}}
+    </p>
 
-	<div data-filters="CollapsingElements">
-          <dl class="jobsub_toggler clearfix">
-                  <dt></dt>
-                  <dd>
-                          <a class="jobsub_toggle_advanced collapser">Show Advanced Options</a>
-                  </dd>
-          </dl>
-          <dl class="jobsub_advanced clearfix collapsible">
-                  <dt>{{ form.mapper_class.label }}</dt>
-                  <dd>
-                          <div class="jobsub_input">
-                                  {{ form.mapper_class|safe }}
-                          </div>
-                          <p>
-                                  {{ form.mapper_class.help_text|safe}}
-                          </p>
-                          <div class="jobsub_errors">{{ form.mapper_class.errors }}</div>
-                  </dd>
+    <div class="jobsub_errors">{{ form.mapper_cmd.errors }}</div>
+</div>
 
-                  <dt>{{ form.combiner_class.label }}</dt>
-                  <dd>
-                          <div class="jobsub_input">
-                                  {{ form.combiner_class|safe }}
-                          </div>
-                          <p>
-                                  {{ form.combiner_class.help_text|safe}}
-                          </p>
-                          <div class="jobsub_errors">{{ form.jobsub_input.errors }}</div>
-                  </dd>
+<label>{{ form.reducer_cmd.label }}</label>
+<div>
+    <div class="jobsub_input">
+        {{ form.reducer_cmd|safe }}
 
-                  <dt>{{ form.reducer_class.label }}</dt>
-                  <dd>
-                          <div class="jobsub_input">
-                                  {{ form.reducer_class|safe }}
-                          </div>
-                          <p>
-                                  {{ form.reducer_class.help_text|safe}}
-                          </p>
-                          <div class="jobsub_errors">{{ form.reducer_class.errors }}</div>
-                  </dd>
+    </div>
+    <p>
+        {{ form.reducer_cmd.help_text|safe}}
+    </p>
 
-                  <dt>{{ form.inputformat_class.label }}</dt>
-                  <dd>
-                          <div class="jobsub_input">
-                                  {{ form.inputformat_class|safe }}
-                          </div>
-                          <p>
-                                  {{ form.inputformat_class.help_text|safe}}
-                          </p>
-                          <div class="jobsub_errors">{{ form.inputformat_class.errors }}</div>
-                  </dd>
+    <div class="jobsub_errors">{{ form.reducer_cmd.errors }}</div>
+</div>
 
-                  <dt>{{ form.outputformat_class.label }}</dt>
-                  <dd>
-                          <div class="jobsub_input">
-                                  {{ form.outputformat_class|safe }}
-                          </div>
-                          <p>
-                                  {{ form.outputformat_class.help_text|safe}}
-                          </p>
-                          <div class="jobsub_errors">{{ form.outputformat_class.errors }}</div>
-                  </dd>
+<label>{{ form.num_reduce_tasks.label }}</label>
+<div>
+    <div class="jobsub_input">
+        {{ form.num_reduce_tasks|safe }}
+    </div>
+    <p>
+        {{ form.num_reduce_tasks.help_text|safe}}
+    </p>
 
-                  <dt>{{ form.partitioner_class.label }}</dt>
-                  <dd>
-                          <div class="jobsub_input">
-                                  {{ form.partitioner_class|safe }}
-                          </div>
-                          <p>
-                                  {{ form.partitioner_class.help_text|safe}}
-                          </p>
-                          <div class="jobsub_errors">{{ form.partitioner_class.errors }}</div>
-                  </dd>
+    <div class="jobsub_errors">{{ form.num_reduce_tasks.errors }}</div>
+</div>
 
-                  <dt>{{ form.inputreader.label }}</dt>
-                  <dd>
-                          <div class="jobsub_input">
-                                  {{ form.inputreader|safe }}
-                          </div>
-                          <p>
-                                  {{ form.inputreader.help_text|safe}}
-                          </p>
-                          <div class="jobsub_errors">{{ form.inputreader.errors }}</div>
-                  </dd>
+<label>{{ form.cache_files.label }}</label>
+<div class="jobsub_multiinput jobsub_paths">
+    <div class="jobsub_input">
+        {{ form.cache_files|safe }}
 
-                  <dt>{{ form.cache_archives.label }}</dt>
-                  <dd>
-                          <div class="jobsub_input">
-                                  {{ form.cache_archives|safe }}
-                          </div>
-                          <p>
-                                  {{ form.cache_archives.help_text|safe }}
-                          </p>
-                          <div class="jobsub_errors">{{ form.cache_archives.errors }}</div>
-                  </dd>
+    </div>
+    <p>
+        {{ form.cache_files.help_text|safe}}
+    </p>
 
-                  <dt>{{ form.hadoop_properties.label }}</dt>
-                  <dd>
-                          <div class="jobsub_input">
-                                  {{ form.hadoop_properties|safe }}
-                          </div>
-                          <p>
-                                  {{ form.hadoop_properties.help_text|safe}}
-                          </p>
-                          <div class="jobsub_errors">{{ form.hadoop_properties.errors }}</div>
-                  </dd>
+    <div class="jobsub_errors">{{ form.cache_files.errors }}</div>
+</div>
 
-          </dl>
+
+<a class="jobsub_toggle_advanced btn">Show Advanced Options</a>
+
+
+<div class="advanced_options" style="visibility: collapse; display: none;">
+    <label>{{ form.mapper_class.label }}</label>
+
+    <div>
+        <div class="jobsub_input">
+            {{ form.mapper_class|safe }}
         </div>
+        <p>
+            {{ form.mapper_class.help_text|safe}}
+        </p>
+
+        <div class="jobsub_errors">{{ form.mapper_class.errors }}</div>
+    </div>
+
+    <label>{{ form.combiner_class.label }}</label>
+
+    <div>
+        <div class="jobsub_input">
+            {{ form.combiner_class|safe }}
+        </div>
+        <p>
+            {{ form.combiner_class.help_text|safe}}
+        </p>
+
+        <div class="jobsub_errors">{{ form.jobsub_input.errors }}</div>
+    </div>
+
+    <label>{{ form.reducer_class.label }}</label>
+
+    <div>
+        <div class="jobsub_input">
+            {{ form.reducer_class|safe }}
+        </div>
+        <p>
+            {{ form.reducer_class.help_text|safe}}
+        </p>
+
+        <div class="jobsub_errors">{{ form.reducer_class.errors }}</div>
+    </div>
+
+    <label>{{ form.inputformat_class.label }}</label>
+
+    <div>
+        <div class="jobsub_input">
+            {{ form.inputformat_class|safe }}
+        </div>
+        <p>
+            {{ form.inputformat_class.help_text|safe}}
+        </p>
+
+        <div class="jobsub_errors">{{ form.inputformat_class.errors }}</div>
+    </div>
+
+    <label>{{ form.outputformat_class.label }}</label>
+
+    <div>
+        <div class="jobsub_input">
+            {{ form.outputformat_class|safe }}
+        </div>
+        <p>
+            {{ form.outputformat_class.help_text|safe}}
+        </p>
+
+        <div class="jobsub_errors">{{ form.outputformat_class.errors }}</div>
+    </div>
+
+    <label>{{ form.partitioner_class.label }}</label>
+
+    <div>
+        <div class="jobsub_input">
+            {{ form.partitioner_class|safe }}
+        </div>
+        <p>
+            {{ form.partitioner_class.help_text|safe}}
+        </p>
+
+        <div class="jobsub_errors">{{ form.partitioner_class.errors }}</div>
+    </div>
+
+    <label>{{ form.inputreader.label }}</label>
+
+    <div>
+        <div class="jobsub_input">
+            {{ form.inputreader|safe }}
+        </div>
+        <p>
+            {{ form.inputreader.help_text|safe}}
+        </p>
+
+        <div class="jobsub_errors">{{ form.inputreader.errors }}</div>
+    </div>
+
+    <label>{{ form.cache_archives.label }}</label>
+
+    <div>
+        <div class="jobsub_input">
+            {{ form.cache_archives|safe }}
+        </div>
+        <p>
+            {{ form.cache_archives.help_text|safe }}
+        </p>
+
+        <div class="jobsub_errors">{{ form.cache_archives.errors }}</div>
+    </div>
+
+    <label>{{ form.hadoop_properties.label }}</label>
+
+    <div>
+        <div class="jobsub_input">
+            {{ form.hadoop_properties|safe }}
+        </div>
+        <p>
+            {{ form.hadoop_properties.help_text|safe}}
+        </p>
+
+        <div class="jobsub_errors">{{ form.hadoop_properties.errors }}</div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $('.jobsub_toggle_advanced').click(function() {
+        if ($('.advanced_options').css('visibility') == 'collapse'){
+            $('.advanced_options').css('visibility', 'visible').css('display', 'block');
+            $('.jobsub_toggle_advanced').html('Hide Advanced Options');
+        }else{
+            $('.advanced_options').css('visibility', 'collapse').css('display', 'none');
+            $('.jobsub_toggle_advanced').html('Show Advanced Options');
+        }
+    });
+</script>

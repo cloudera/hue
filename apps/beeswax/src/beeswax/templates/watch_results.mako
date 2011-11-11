@@ -17,21 +17,21 @@
 <%namespace name="util" file="util.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 ${wrappers.head("Beeswax: Query Results", section='query')}
-<h1>${util.render_query_context(query_context)}</h1>
+
 <div class="sidebar">
 	<div class="well">
 		% if download_urls:
 		<h6>Downloads</h6>
-		<a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a><br/>
-		<a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a><br/>
-		<a class="bw-save collapser jframe_ignore" href="${url('beeswax.views.save_results', query.id)}">Save</a><br/>
-		
-		<br/>
-		<%
+		<ul>
+			<li><a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a></li>
+			<li><a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a></li>
+			<li><a href="${url('beeswax.views.save_results', query.id)}">Save</a></li>
+		</ul>
+ 		% endif
+        <%
           n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
           mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
         %>
-        
 	 	% if n_jobs > 0:
 			<h6>${mr_jobs} (${n_jobs})</h6>
 	             
@@ -45,9 +45,7 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
 	</div>
 </div>
 <div class="content">
-  <div class="left_col">
-    
-      <dl class="jframe_padded">
+	<h1>Query results: ${util.render_query_context(query_context)}</h1>
                 <div class="collapsible jframe-hidden bw-save_query_results" style="display:none" data-filters="Accordion"> 
                   <form action="${url('beeswax.views.save_results', query.id) }" method="POST">
                     ## Writing the save_target fields myself so I can match them to their respective text input fields.
@@ -73,76 +71,69 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
                     <input type="submit" value="Save" name="save" data-filters="ArtButton"> 
                   </form>
                 </div>
-              </li>
-            </ul>
-          </dd>
-        % endif
-        
-      </dl>
-  </div>
 
-	<ul class="tabs">
-		<li class="active"><a href="#results">
-		  %if error:
-            Error
-          %else:
-            Results
-          %endif
-	</a></li>
-		<li><a href="#query">Query</a></li>
-		<li><a href="#log">Log</a></li>
-	</ul>
+				<ul class="tabs">
+					<li class="active"><a href="#results">
+		  			%if error:
+			            Error
+					%else:
+						Results
+					%endif
+					</a></li>
+					<li><a href="#query">Query</a></li>
+					<li><a href="#log">Log</a></li>
+				</ul>
 	
-	<div class="pill-content">
-		<div class="active" id="results">
-			% if error:
-            <div class="jframe-error jframe_padded">
-              <h3 class="jframe-hidden">Error!</h3> 
-              <pre>${error_message}</pre>
-            </div>
-          % else:
-            <div class="bw-result_nav toolbar">
-              % if has_more:
-                <a href="${ url('beeswax.views.view_results', query.id, next_row) }" title="Next page" class="bw-nextBlock">[next]</a>
-              % endif
-              % if start_row != 0:
-                <a href="${ url('beeswax.views.view_results', query.id, 0) }" title="Back to first row" class="bw-firstBlock">[top]</a>
-              % endif
-            </div>
-            % if expected_first_row != start_row:
-              <div class="bw-result_warning">Warning:</i> Page offset may have incremented since last view.</div>
-            % endif
-            <table class="resultTable" cellpadding="0" cellspacing="0">
-              <thead>
-                <tr>
-                  <th>-</th>
-                  % for col in columns:
-                    <th>${col}</th>
-                  % endfor
-                </tr>
-              </thead>
-              <tbody>
-                % for i, row in enumerate(results):
-                <tr>
-                  <td>${start_row + i}</td>
-                  % for item in row:
-                    <td>${ item }</td>
-                  % endfor
-                </tr>
-                % endfor
-              </tbody>
-            </table>
-          % endif
-		</div>
-		<div id="query">
-			<div>
-			<pre>${query.query}</pre>
+				<div class="tab-content">
+					<div class="active tab-pane" id="results">
+					% if error:
+		            <div class="jframe-error jframe_padded">
+		              <h3 class="jframe-hidden">Error!</h3> 
+		              <pre>${error_message}</pre>
+		            </div>
+          			% else:
+            		<div class="bw-result_nav toolbar">
+		              % if has_more:
+		                <a href="${ url('beeswax.views.view_results', query.id, next_row) }" title="Next page" class="bw-nextBlock">[next]</a>
+		              % endif
+		              % if start_row != 0:
+		                <a href="${ url('beeswax.views.view_results', query.id, 0) }" title="Back to first row" class="bw-firstBlock">[top]</a>
+		              % endif
+		            </div>
+		            % if expected_first_row != start_row:
+		              <div class="bw-result_warning">Warning:</i> Page offset may have incremented since last view.</div>
+		            % endif
+            		<table class="resultTable" cellpadding="0" cellspacing="0">
+		              <thead>
+		                <tr>
+		                  <th>-</th>
+		                  % for col in columns:
+		                    <th>${col}</th>
+		                  % endfor
+		                </tr>
+		              </thead>
+		              <tbody>
+		                % for i, row in enumerate(results):
+		                <tr>
+		                  <td>${start_row + i}</td>
+		                  % for item in row:
+		                    <td>${ item }</td>
+		                  % endfor
+		                </tr>
+		                % endfor
+		              </tbody>
+		            </table>
+		          % endif
+				</div>
+				<div class="tab-pane" id="query">
+					
+						<pre>${query.query}</pre>
+					
+				</div>
+				<div class="tab-pane" id="log">
+					<pre>${log}</pre>
+				</div>
 			</div>
-		</div>
-		<div id="log">
-			<pre>${log}</pre>
-		</div>
-	</div>
 
 </div>
 

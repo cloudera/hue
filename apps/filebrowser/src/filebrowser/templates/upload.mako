@@ -14,21 +14,21 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
-<%namespace name="comps" file="fb_components.mako" />
-${comps.header('Upload Files')}
+<%namespace name="wrappers" file="header_footer.mako" />
+${wrappers.head('Upload Files', 'upload', show_new_directory=False)}
 
-<div class="prompt_popup">
-<form action="/filebrowser/upload?next=${next|u}" method="POST" enctype="multipart/form-data">
-  <h4 class="jframe-hidden">Upload Files</h4>
-  <dl>
-    ${edit.render_field(form["dest"], hidden=True)}
-    ${edit.render_field(form["hdfs_file"], render_default=True, notitle=True)}
-  </dl>
-  <input class="jframe-hidden" type="submit" value="Submit" />
-</form>
-</div>
+<h1>Upload Files</h1>
+    <form action="/filebrowser/upload?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked">
 
-<div class="jframe-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
+      <div class="well">
+        ${edit.render_field(form["hdfs_file"], render_default=True, notitle=True)}
+        ${edit.render_field(form["dest"], hidden=True)}
+        <div>
+            <input class="btn primary" type="submit" value="Submit" />
+            <a class="btn" href="/filebrowser/view${next}">Cancel</a>
+        </div>
+      </div>
+    </form>
+    <!--<span class="alert-message block-message info">Go back to where you were: <a href="/filebrowser/view${next}">${next}</a>.</span>-->
 
-
-${comps.footer()}
+${wrappers.foot()}

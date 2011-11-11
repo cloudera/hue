@@ -19,10 +19,11 @@ limitations under the License.
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="prompt_popup">
-	<h1>Are you sure?</h1>
+	<h1>Please confirm</h1>
 	<form action="{{ url }}" method="POST">
-		{{title}}
-		<input type="submit" value="Yes" class="jframe-hidden">
+		<h3 style="display: inline;">{{title}}</h3>
+		<input type="submit" value="Yes" class="btn danger">
+        <a href="/jobsub/" class="btn">No</a>
 	</form>
 </div>
 {% endblock %}

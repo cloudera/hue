@@ -42,46 +42,43 @@ ${wrappers.head("Beeswax: Query History", section='history')}
   % endif
 </%def>
 
-<h1>History</h1>
-
 <div class="sidebar">
 	<div class="well">
 		<h6>Actions</h6>
+		<ul>
 	    % if filter_params.get('user') == '_all':
 	      <%
 	        my_querydict = filter_params.copy()
 	        my_querydict['user'] = request.user.username
 	      %>
-	   <a href="?${my_querydict.urlencode()}">Show my queries</a>
-	 % else:
+		<li><a href="?${my_querydict.urlencode()}">Show my queries</a></li>
+	 	% else:
 	      <%
 	        my_querydict = filter_params.copy()
 	        my_querydict['user'] = '_all'
 	      %>
-	      <a href="?${my_querydict.urlencode()}">Show everyone's queries</a>
+	      <li><a href="?${my_querydict.urlencode()}">Show everyone's queries</a></li>
 	    % endif
 	
-	 % if filter_params.get('auto_query', None):
+	 	% if filter_params.get('auto_query', None):
 	      <%
 	        my_querydict = filter_params.copy()
 	        my_querydict['auto_query'] = ''
 	      %>
-	      <a href="?${my_querydict.urlencode()}" class="bw-show_group_noauto" data-filters="ArtButton">Show user queries</a>
+	      <li><a href="?${my_querydict.urlencode()}" class="bw-show_group_noauto" data-filters="ArtButton">Show user queries</a></li>
 	    % else:
 	      <%
 	        my_querydict = filter_params.copy()
 	        my_querydict['auto_query'] = 'on'
 	      %>
-	      <a href="?${my_querydict.urlencode()}" class="bw-show_group_auto" data-filters="ArtButton">Show auto actions</a>
+	      <li><a href="?${my_querydict.urlencode()}" class="bw-show_group_auto" data-filters="ArtButton">Show auto actions</a></li>
 	    % endif
     </div>
 </div>
 
 
 <div class="content">
- 
-
-  
+  <h1>History</h1>
   <table class="datatables">
     <thead>
       <tr>

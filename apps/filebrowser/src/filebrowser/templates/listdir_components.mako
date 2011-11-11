@@ -40,7 +40,7 @@ from desktop.lib.django_util import reverse_with_get
   else:
     optional_fit_text = ''
   %>
-  <table data-filters="HtmlTable" class="fb-file-list selectable ${optional_sortable}" cellpadding="0" cellspacing="0">
+  <table class="datatables">
     <thead>
       <tr>
         % if cwd_set:
@@ -52,7 +52,8 @@ from desktop.lib.django_util import reverse_with_get
         <th>User</th>
         <th>Group</th>
         <th>Permissions</th>
-        <th colspan="2">Date</th>
+        <th>Date</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -72,40 +73,15 @@ from desktop.lib.django_util import reverse_with_get
   ## Since path is in unicode, Django and Mako handle url encoding and
   ## iri encoding correctly for us.
         <% path = file['path'] %>
-        <tr class="jframe-no_select fb-item-row ${cls}"
-         data-filters="ContextMenu"
-         data-context-menu-actions="[{'events':['contextmenu','click:relay(.fb-item-options)'],'menu':'ul.context-menu'}]"
-         data-dblclick-delegate= "{'dblclick_loads':'a.fb-item'}" data-filedata="{'path':'${path}','type':'${file['type']|u}'}">
-          <td class="fb-name">
-            <div class="fb-name-container">
+        <tr>
+          <td>
+            <div>
               % if "dir" == file['type']:
-                <a ${optional_fit_text | n} class="fb-item fb-dir jframe_ignore" href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a>
+                <h3><a ${optional_fit_text | n} href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a></h3>
               % else:
-                <a ${optional_fit_text | n} class="fb-item fb-file jframe_ignore" target="FileViewer" href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a>
+                <h3><a ${optional_fit_text | n} href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a></h3>
               % endif
-              % if ".." != file['name']:
-                <ul class="fb-item-actions context-menu">
-                  % if "dir" == file['type']:
-                    <li class="fb-rmdir-container"><a class="fb-rmdir confirm_unencode_and_post" alt="Are you sure you want to delete this directory and its contents?" href="${reverse_with_get('filebrowser.views.rmdir', get=dict(path=path,next=current_request_path))}">Delete</a></li>
-                    <li class="fb-rmtree-container"><a class="fb-rmtree confirm_unencode_and_post fb-default-rm" alt="Are you sure you want to delete ${display_name} and its contents?" href="${reverse_with_get('filebrowser.views.rmtree', get=dict(path=path,next=current_request_path))}"">Delete</a></li>
-                  % else:
-                    <li><a class="fb-viewfile" href="${url('filebrowser.views.view', path=urlencode(path))}" target="FileViewer">View File</a></li>
-                    <li><a class="fb-editfile" href="${url('filebrowser.views.edit', path=urlencode(path))}" target="FileEditor">Edit File</a></li>
-                    <li><a class="fb-downloadfile" href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
-                    <li class="fb-rm-container"><a class="fb-rm fb-default-rm confirm_unencode_and_post" alt="Are you sure you want to delete ${display_name}?" href="${reverse_with_get('filebrowser.views.remove', get=dict(path=path, next=current_request_path))}">Delete</a></li>
-                  % endif
-                  <li class="fb-rename-container"><a class="fb-rename" href="${reverse_with_get('filebrowser.views.rename',get=dict(src_path=path,next=current_request_path))}">Rename</a></li>
-                  <li class="fb-chown-container"><a class="fb-chown" href="${reverse_with_get('filebrowser.views.chown',get=dict(path=path,user=file['stats']['user'],group=file['stats']['group'],next=current_request_path))}">Change Owner / Group</a></li>
-                  <li class="fb-chmod-container"><a class="fb-chmod" href="${reverse_with_get('filebrowser.views.chmod',get=dict(path=path,mode=stringformat(file['stats']['mode'], "o"),next=current_request_path))}">Change Permissions</a></li>
-                  <%
-                    if "dir" == file['type']:
-                      cls = "fb-move-dir"
-                    else:
-                      cls = "fb-move-file"
-                  %>
-                  <li><a class="fb-move ${cls}" href="${reverse_with_get('filebrowser.views.move',get=dict(src_path=path,mode=stringformat(file['stats']['mode'], "o"),next=current_request_path))}">Move</a></li>
-              </ul>
-              % endif
+
             </div>
           </td>
           <%
@@ -114,24 +90,48 @@ from desktop.lib.django_util import reverse_with_get
             else:
               sortValue = file['stats']['size']
           %>
-          <td class="fb-filesize">
+          <td>
             % if "dir" == file['type']:
-              <span data-sort-numeric="${sortValue}">~</span>
+              <span>~</span>
             % else:
-              <span data-sort-numeric="${sortValue}">${file['stats']['size']|filesizeformat}</span>
+              <span>${file['stats']['size']|filesizeformat}</span>
             % endif
           </td>
-          <td class="fb-user">${file['stats']['user']}</td>
-          <td class="fb-group">${file['stats']['group']}</td>
-          <td class="fb-perm">${file['rwx']}</td>
-          <td class="fb-date"><span data-sort-numeric="${file['stats']['mtime']}">${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime']))}</span></td>
-          <td class="fb-option-links">
-            % if ".." != file['name']:
-              <a class="fb-item-options">options</a>
-            % endif
+          <td>${file['stats']['user']}</td>
+          <td>${file['stats']['group']}</td>
+          <td>${file['rwx']}</td>
+          <td><span>${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime']))}</span></td>
+          <td>
+             % if ".." != file['name']:
+
+                  % if "dir" == file['type']:
+                    <a class="btn danger small" href="${reverse_with_get('filebrowser.views.rmdir', get=dict(path=path,next=current_request_path))}">Delete</a></li>
+                    <a class="btn danger small" href="${reverse_with_get('filebrowser.views.rmtree', get=dict(path=path,next=current_request_path))}"">Delete Recursively</a>
+                  % else:
+                    <a class="btn small" href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a>
+                    <a class="btn small" href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a>
+                    <a class="btn small" href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a>
+                    <a class="btn small" href="${reverse_with_get('filebrowser.views.remove', get=dict(path=path, next=current_request_path))}">Delete</a>
+                  % endif
+                  <a class="btn small" href="${reverse_with_get('filebrowser.views.rename',get=dict(src_path=path,next=current_request_path))}">Rename</a>
+                  <a class="btn small" href="${reverse_with_get('filebrowser.views.chown',get=dict(path=path,user=file['stats']['user'],group=file['stats']['group'],next=current_request_path))}">Change Owner / Group</a>
+                  <a class="btn small" href="${reverse_with_get('filebrowser.views.chmod',get=dict(path=path,mode=stringformat(file['stats']['mode'], "o"),next=current_request_path))}">Change Permissions</a>
+                  <a class="btn small" href="${reverse_with_get('filebrowser.views.move',get=dict(src_path=path,mode=stringformat(file['stats']['mode'], "o"),next=current_request_path))}">Move</a>
+
+              % endif
           </td>
         </tr>
       % endfor
     </tbody>
   </table>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$(".datatables").dataTable({
+			"bPaginate": false,
+		    "bLengthChange": false,
+		    "bFilter": false,
+			"bInfo": false
+		});
+	});
+</script>
 </%def>

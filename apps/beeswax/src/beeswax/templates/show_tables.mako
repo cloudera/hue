@@ -15,28 +15,20 @@
 ## limitations under the License.
 <%namespace name="wrappers" file="header_footer.mako" />
 ${wrappers.head("Beeswax: Table List", section='tables')}
-  <h1>Tables</h1>
 <div class="sidebar">
 	<div class="well">
 		<h6>Actions</h6>
-		% if not examples_installed:
-        <a href="${ url('beeswax.views.install_examples') }">Install samples</a><br/>
-      % endif
-      	<a href="${ url('beeswax.create_table.index') }">Create a new table</a><br/><br/>
+		<ul>
+			% if not examples_installed:
+        	<li><a href="#" data-controls-modal="installSamples" data-backdrop="true" data-keyboard="true">Install samples</a></li>
+      		% endif
+      		<li><a href="${ url('beeswax.create_table.index') }">Create a new table</a></li>
+		</ul>
     </div>
 </div>
 
 <div class="content">
-
-
-  <!--div class="toolbar">
-    <div class="bw-input-filter">
-      <input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
-        title="Filter by Name"
-        data-filter-elements="td.bw-tables_table" data-filter-parents="tr" value=""/>
-    </div>
-  </div-->
-
+	<h1>Tables</h1>
   <table class="datatables">
     <thead>
       <tr>
@@ -59,18 +51,46 @@ ${wrappers.head("Beeswax: Table List", section='tables')}
 		<div class="span16">&nbsp;</div>
 	</div>
 </div>
-
+% if not examples_installed:
+<div id="installSamples" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3>Install samples</h3>
+	</div>
+	<div class="modal-body">  
+	  <div id="installSamplesMessage" class="alert-message block-message warning">
+	        
+	  </div>
+	</div>
+	<div class="modal-footer">
+		<a href="#" id="installSamplesBtn" class="btn primary" value="Yes"/>
+		<a href="#" class="btn secondary hideModal">No</a>
+	</div>
+</div>
+% endif
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-		$(".tabs").tabs();
 		$(".datatables").dataTable({
 			"bPaginate": false,
 		    "bLengthChange": false,
 			"bInfo": false,
 			"bFilter": false
 		});
-
+		% if not examples_installed:
+		$.getJSON("${ url('beeswax.views.install_examples') }",function(data){
+			$("#installSamplesMessage").text(data.title);
+		});
+		$(".hideModal").click(function(){
+			$(this).closest(".modal").modal("hide");
+		});
+		$("#installSamplesBtn").click(function(){
+			$.post("${ url('beeswax.views.install_examples') }", {submit:"Submit"}).error(function(){
+				$("#installSamplesMessage").removeClass("warning").addClass("error").text("There was an error processing your request.");
+			});
+		});
+		% endif
 	});
 </script>
+
 ${wrappers.foot()}

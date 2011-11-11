@@ -28,7 +28,7 @@
         padding-top: 100px;
       }
     </style>
-	<script src="/static/ext/js/jquery/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>	
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
@@ -50,9 +50,12 @@
 			<div class="container-fluid">
 				<a class="brand" href="#">jHue</a>
 				<ul class="nav">
-					<li><a href="/beeswax/">Beeswax</a></li>
-					<li><a href="/jobbrowser/jobs/">Job Browser</a></li>
+					<li><a href="/beeswax">Beeswax</a></li>
+					<li><a href="/filebrowser/">File Browser</a></li>
 					<li><a href="/jobsub/">Job Designer</a></li>
+					<li><a href="/jobbrowser/jobs/">Job Browser</a></li>
+					<li><a href="/useradmin/">User Admin</a></li>
+					<li><a href="/help/">Help</a></li>
 				</ul>
 			</div>
 		</div>

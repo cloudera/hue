@@ -113,7 +113,7 @@ def view(request, path):
     return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=home_dir_path)))
 
   if request.fs.isdir(path):
-    return listdir(request, path)
+    return listdir(request, path, False)
   elif request.fs.isfile(path):
     return display(request, path)
   else:
@@ -269,7 +269,7 @@ def _do_newfile_save(fs, path, data, encoding):
     new_file.close()
 
 
-def listdir(request, path):
+def listdir(request, path, chooser):
   """
   Implements directory listing (or index).
 
@@ -307,13 +307,31 @@ def listdir(request, path):
     stats.insert(0, parent_stat)
 
   data['files'] = [_massage_stats(request, stat) for stat in stats]
-  return render_with_toolbars('listdir.mako', request, data)
+  if chooser:
+    return render_with_toolbars('chooser.mako', request, data)
+  else:
+    return render_with_toolbars('listdir.mako', request, data)
 
 def chooser(request, path):
   """
   Returns the html to JFrame that will display a file prompt.
   """
-  return view(request, path)
+  """return view(request, path)"""
+
+
+  """Dispatches viewing of a path to either index() or fileview(), depending on type."""
+
+  # default_to_home is set in bootstrap.js
+  home_dir_path = request.user.get_home_directory()
+  if request.GET.get('default_to_home') and request.fs.isdir(home_dir_path):
+    return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=home_dir_path)))
+
+  if request.fs.isdir(path):
+    return listdir(request, path, True)
+  elif request.fs.isfile(path):
+    return display(request, path)
+  else:
+    raise Http404("File not found: %s" % escape(path))
 
 def _massage_stats(request, stats):
   """

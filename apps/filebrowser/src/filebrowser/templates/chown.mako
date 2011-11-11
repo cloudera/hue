@@ -14,8 +14,8 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
-<%namespace name="comps" file="fb_components.mako" />
-${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
+<%namespace name="wrappers" file="header_footer.mako" />
+${wrappers.head('Change Owner / Group: ' + path.split('/')[-1])}
 <%! from desktop.lib.django_util import extract_field_data %>
 
 <%
@@ -56,36 +56,33 @@ ${comps.header('Change Owner / Group: ' + path.split('/')[-1])}
       % endif
     % endif
 </%def>
+<h1>Change Owner / Group: ${path}</h1>
 
-<div class="prompt_popup">
-<form action="/filebrowser/chown?next=${next|u}" method="POST" enctype="multipart/form-data">
-  <h4 class="jframe-hidden">Change Owner / Group: ${path}</h4>
-  <dl class="fb-side-by-side">
+<form action="/filebrowser/chown?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked">
+  <div class="well">
     ${edit.render_field(form["path"], hidden=True)}
 
-    <dt><label>User</label></dt>
-    <dd data-filters="${select_filter}">
+    <label>User</label>
+
       % if is_superuser:
         ${ selection("user", form.all_users, extract_field_data(form["user"]), "user_other") }
       % else:
         ${ selection("user", [extract_field_data(form['user'])], extract_field_data(form["user"])) }
       % endif
-    </dd>
-    <dt><label>Group</label></dt>
-    <dd data-filters="${select_filter}">
+
+    <label>Group</label>
+
       % if is_superuser:
         ${ selection("group", form.all_groups, extract_field_data(form["group"]), "group_other") }
       % else:
         ${ selection("group", [group for group in form.all_groups if group in extra_params['current_user'].get_groups()], extract_field_data(form["group"])) }
       % endif
-    </dd>
-  </dl>
-  <input class="jframe-hidden" type="submit" value="Submit" />
+    <div style="padding-top: 10px;">
+        <input class="btn primary" type="submit" value="Submit" />
+        <a class="btn" href="${next|u}">Cancel</a>
+    </div>
+  </div>
+
 </form>
-<p>Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</p>
-</div>
-
-<div class="jframe-hidden">Go back to where you were: <a href="${next|u}">${next}</a>.</div>
-
-
-${comps.footer()}
+<p class="alert-message block-message info">Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</p>
+${wrappers.foot()}

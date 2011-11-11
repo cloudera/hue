@@ -8,7 +8,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,41 +18,53 @@ limitations under the License.
 {% endcomment %}
 {% block title %}Job History{% endblock %}
 {% block head %}
-  <meta http-equiv="refresh" content="5" />
+<meta http-equiv="refresh" content="5"/>
 {% endblock %}
 {% block nav %}
-	<li><a href="{% url jobsub.views.list_designs %}">Job List</a></li>
-	<li><a href="{% url jobsub.views.watch %}" class="selected">History</a></li>
+<li><a href="{% url jobsub.views.list_designs %}">Job List</a></li>
+<li><a href="{% url jobsub.views.watch %}" class="selected">History</a></li>
 {% endblock %}
 {% block content %}
-  <div id="jobsub_history" class="view">
-    <h1>Recently Launched Jobs</h1>
-    <table data-filters="HtmlTable" class="selectable sortable">
-      <thead>
-        <tr>
-          <th>Owner</th>
-          <th>Name</th>
-          <th>Submitted</th>
-          <th colspan=2>Last known state</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for submission in submissions %}
-          <tr data-dblclick-delegate= "{'dblclick_loads':'a'}">
-            <td>{{ submission.owner }}</td>
-            <td>{{ submission.name }}</td>
-            <td>
-              <span class="jobsub_actual_date" style="display: none">{{ submission.submission_date|date:"U" }}</span>
-              {{ submission.submission_date|timesince }} ago
-            </td>
-            <td>{{ submission.last_seen_state_as_string }}</td>
-            <td><a href="{{ submission.watch_url }}" class="jobsub_watch">watch progress</a></td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% if more %}
-      <a href="/jobsub/watch/?offset={{ offset }}&limit={{ limit|add:"20" }}" class="jobsub_more">See more</a>
-    {% endif %}
-  </div>
+
+<h1>Recently Launched Jobs</h1>
+<table class="datatables">
+    <thead>
+    <tr>
+        <th>Owner</th>
+        <th>Name</th>
+        <th>Submitted</th>
+        <th>Last known state</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for submission in submissions %}
+    <tr>
+        <td>{{ submission.owner }}</td>
+        <td>{{ submission.name }}</td>
+        <td>
+            <span class="jobsub_actual_date" style="display: none">{{ submission.submission_date|date:"U" }}</span>
+            {{ submission.submission_date|timesince }} ago
+        </td>
+        <td>{{ submission.last_seen_state_as_string }}</td>
+        <td><a href="{{ submission.watch_url }}" class="btn">Watch Progress</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% if more %}
+<a href="/jobsub/watch/?offset={{ offset }}&limit={{ limit|add:"20" }}" class="jobsub_more">See more</a>
+{% endif %}
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $(".datatables").dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bInfo": false
+        });
+    });
+</script>
+
 {% endblock %}
