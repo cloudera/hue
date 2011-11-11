@@ -29,7 +29,7 @@
 
 		<style type="text/css">
 	      body {
-	        padding-top: 100px;
+	        padding-top: 60px;
 	      }
 	    </style>
 		<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>

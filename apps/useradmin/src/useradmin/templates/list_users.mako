@@ -17,15 +17,16 @@
 <% import urllib %>
 
 ${wrappers.head()}
-    <div id="useradmin_userlist" class="view">
-      <table data-filters="HtmlTable" class="sortable" cellpadding="0" cellspacing="0">
+	<h1>jHue Users</h1>
+      <table class="datatables">
         <thead>
           <tr>
             <th>Username</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>E-mail</th>
-            <th colspan="2">Last Login</th>
+            <th>Last Login</th>
+			<th>&nbsp;</th>
           </tr>
         </head>
         <tbody>
@@ -36,19 +37,30 @@ ${wrappers.head()}
             <td>${user.last_name}</td>
             <td>${user.email}</td>
             <td>
-              <span class="jframe-hidden">
-                ${int(user.last_login.strftime("%s"))}
-              </span>
               ${user.last_login.strftime('%c')}
             </td>
             <td>
-              <a title="Edit ${user.username}" class="edit frame_tip" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">Edit</a>
-              <a title="Delete ${user.username}" class="delete frame_tip confirm_unencode_and_post" alt="Are you sure you want to delete ${user.username}?" href="${ url('useradmin.views.delete_user', username=urllib.quote_plus(user.username)) }">Delete</a>
+              <a title="Edit ${user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">Edit</a>
+              <a title="Delete ${user.username}" class="btn small" alt="Are you sure you want to delete ${user.username}?" href="${ url('useradmin.views.delete_user', username=urllib.quote_plus(user.username)) }">Delete</a>
             </td>
           </tr>
         % endfor
         </tbody>
       </table>
-      <a class="useradmin_add_user" href="${ url('useradmin.views.edit_user') }">Add User</a>
-    </div>
+      <a class="btn primary" href="${ url('useradmin.views.edit_user') }">Add User</a>
+
+	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function(){
+			$(".datatables").dataTable({
+				"bPaginate": false,
+			    "bLengthChange": false,
+				"bInfo": false,
+				"bFilter": false
+			});
+			$(".dataTables_wrapper").css("min-height","0");
+			$(".dataTables_filter").hide();
+
+		});
+	</script>
+
 ${wrappers.foot()}

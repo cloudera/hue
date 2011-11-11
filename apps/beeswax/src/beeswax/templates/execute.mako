@@ -285,7 +285,7 @@ ${wrappers.head('Hive Query', section='query')}
 
 <style>
 	#filechooser {
-		height:100px;
+		min-height:100px;
 		overflow-y:scroll;
 	}
 </style>
