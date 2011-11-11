@@ -16,19 +16,41 @@
 <%namespace name="edit" file="editor_components.mako" />
 <%namespace name="wrappers" file="header_footer.mako" />
 ${wrappers.head('Upload Files', 'upload', show_new_directory=False)}
+<script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />        
+
 
 <h1>Upload Files</h1>
     <form action="/filebrowser/upload?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked">
 
       <div class="well">
-        ${edit.render_field(form["hdfs_file"], render_default=True, notitle=True)}
-        ${edit.render_field(form["dest"], hidden=True)}
-        <div>
-            <input class="btn primary" type="submit" value="Submit" />
-            <a class="btn" href="/filebrowser/view${next}">Cancel</a>
-        </div>
+         <div id="file-uploader-demo1">
+		<noscript>
+			<p>Please enable JavaScript to use file uploader.</p>
+			<!-- or put a simple form for upload here -->
+		</noscript>
+	</div>
+        
       </div>
     </form>
     <!--<span class="alert-message block-message info">Go back to where you were: <a href="/filebrowser/view${next}">${next}</a>.</span>-->
+
+ <script>
+        function createUploader(){
+            var uploader = new qq.FileUploader({
+                element: document.getElementById('file-uploader-demo1'),
+                action: '/filebrowser/upload',
+                params:{
+                    dest: '${next}',
+                    fileFieldLabel: 'hdfs_file'
+                },
+                debug: true
+            });
+        }
+
+        // in your app create uploader as soon as the DOM is ready
+        // don't wait for the window to load
+        window.onload = createUploader;
+    </script>            
 
 ${wrappers.foot()}
