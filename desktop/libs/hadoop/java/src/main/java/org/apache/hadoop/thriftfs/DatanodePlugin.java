@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.PrivilegedExceptionAction;
 import java.util.zip.CRC32;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -189,6 +190,7 @@ public class DatanodePlugin
           Namenode.Client namenode = null;
           String name = datanode.dnRegistration.getName();
           String storageId = datanode.dnRegistration.getStorageID();
+          Random random = null;
 
           while (register) {
             try {
@@ -200,9 +202,15 @@ public class DatanodePlugin
               LOG.info("Datanode " + name + " registered Thrift port " +
                        thriftServer.getPort());
             } catch (Throwable t) {
-              LOG.info("Datanode registration failed", t);
+              // Try again in 30-90 seconds
+              if (random == null) {
+                random = new Random();
+              }
+              long sleepTime = (long) (30 + 60.0 * random.nextFloat());
+              LOG.info("Datanode registration failed. Will retry again in " + sleepTime + " seconds", t);
+              namenode = null;
               try {
-                Thread.sleep(1000);
+                Thread.sleep(sleepTime * 1000);
               } catch (InterruptedException e) {}
             }
           }
