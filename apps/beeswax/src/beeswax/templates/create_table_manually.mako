@@ -15,293 +15,532 @@
 ## limitations under the License.
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head('Create a Table', toolbar=has_tables, section='new table')}
-<div class="toolbar">
-  <ul class="clearfix" data-filters="Breadcrumb, BreadcrumbForm" data-bc-sections=".hue-bc-section" data-bc-form="form">
-    <li><a href="#step1">Name</a></li>
-    <li><a href="#step2">Record Format</a></li>
-    <li><a href="#step3">Serialization</a></li>
-    <li><a href="#step4">File Format</a></li>
-    <li><a href="#step5">Location</a></li>
-    <li><a href="#step6">Columns</a></li>
-  </ul>
+${wrappers.head("Beeswax: Create table manually", section='tables')}
+<div class="sidebar">
+	<div class="well">
+		<h6>Actions</h6>
+		<ul>
+      		<li><a href="${ url('beeswax.create_table.import_wizard')}">Create a new table from file</a></li>
+			<li><a href="${ url('beeswax.create_table.create_table')}">Create a new table manually</a></li>
+		</ul>
+    </div>
 </div>
-<div id="table-setup" class="view">
-  <form action="#" method="POST" class="jframe_padded" data-filters="FormValidator">
-    <dl class="bw-table-setup">
 
-  <div class="hue-bc-section">
-        <a name="step1"></a>
-        <dt>Step 1: Create Your Table</dt>
-        <dd>
-          <p>Let's start with a name and description for where we'll store your data.</p>
-          <dl class="clearfix">
-            ${comps.field(table_form["name"], attrs=dict(
-                klass='required bw-validate-name',
-                data_filters="OverText",
-                alt='table_name',
-              ),
-              help="Name of the new table.  Table names must be globally unique.  Table names tend to correspond as well to the directory where the data will be stored.",
-              help_attrs=dict(
-                data_help_direction='1'
-              )
-            )}
-            ${comps.field(table_form["comment"], attrs=dict(
-                klass='bw-table-comment',
-                data_filters="OverText",
-                alt='Optional'
-              ),
-              help="Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
-          </dl>
-          <a href="#step2" class="hue-multipart-next">Step 2: Choose Your Record Format &raquo;</a>
-        </dd>
-      </div>
 
-      <div class="hue-bc-section">
-        <a name="step2"></a>
-        <dt>Step 2: Choose Your Record Format</dt>
-        <dd>
-          <p>Individual records are broken up into columns
-          either with delimiters (e.g., CSV or TSV) or using
-          a specific serialization / deserialization (SerDe) implementation.
-          (One common specialized SerDe is for parsing out columns with a regular
-          expression.)
-          </p>
-          <dl class="bw-format clearfix">
-            <% 
-              selected = table_form["row_format"].data or table_form["row_format"].field.initial
-            %>
-            <dt class="bw-format-delimited relays" data-filters="DataGroupToggle" data-group-toggle="{'group': '.bw-config-data li', 'show':'.bw-delim-options'}">
-              <label>
-                Delimited
-                <input type="radio" name="table-row_format" value="Delimited" class="validate-one-required:'.bw-format'" title="Please choose one of these record formats." data-error-container=''
-                  % if selected == "Delimited":
-                    checked
-                  % endif
-                >
-              </label>
-              <div class="jframe-errors"></div>
-            </dt>
-            <dd>Data files use delimiters, like commas (CSV) or tabs.</dd>
-            <dt class="bw-format-SerDe relays" data-filters="DataGroupToggle" data-group-toggle="{'group': '.bw-config-data li', 'show':'.bw-serde-options'}">
-              <label>
-                SerDe
-                <input type="radio" name="table-row_format" value="SerDe"
-                  % if selected == "SerDe":
-                    checked
-                  % endif
-                >
-              </label>
-            </dt>
-            <dd>Enter a specialized serialization implementation.</dd>
-          </dl>
-          <a href="#step3" class="hue-multipart-next">Step 3: Configure Record Serialization &raquo;</a>
-        </dd>
-      </div>
+<div class="content">
+	<h1>Create a new table manually</h1>
+	<ul class="pills">
+		<li class="active"><a href="#step1" class="step">Step 1: Name</a></li>
+	    <li><a href="#step2" class="step">Step 2: Record Format</a></li>
+	    <li><a href="#step3" class="step">Step 3: Serialization</a></li>
+	    <li><a href="#step4" class="step">Step 4: File Format</a></li>
+	    <li><a href="#step5" class="step">Step 5: Location</a></li>
+	    <li><a href="#step6" class="step">Step 6: Columns</a></li>
+	</ul>
+	<br/>
+	<form action="#" method="POST" id="mainForm">
+		<div id="step1" class="stepDetails">
+			<fieldset>
+				<legend>Create your table</legend>
+				<div class="clearfix">
+					<div class="input">
+						<span>Let's start with a name and description for where we'll store your data.</span>
+					</div>
+				</div>
+				<div class="clearfix">
+					${comps.label(table_form["name"])}
+					<div class="input">
+						${comps.field(table_form["name"], attrs=dict(
+							placeholder='table_name',
+			              )
+			            )}
+						<span class="help-block">
+						Name of the new table.  Table names must be globally unique.  Table names tend to correspond as well to the directory where the data will be stored.
+						</span>
+					</div>
+				</div>
+				<div class="clearfix">
+					${comps.label(table_form["comment"])}
+					<div class="input">
+						${comps.field(table_form["comment"], attrs=dict(
+							placeholder='Optional',
+			              )
+			            )}
+						<span class="help-block">
+						Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.
+						</span>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+		<div id="step2" class="stepDetails hidden">
+			<fieldset>
+				<legend>Choose Your Record Format</legend>
+				<div class="clearfix">
+					<div class="input">
+						<span>Individual records are broken up into columns
+				          either with delimiters (e.g., CSV or TSV) or using
+				          a specific serialization / deserialization (SerDe) implementation.
+				          (One common specialized SerDe is for parsing out columns with a regular
+				          expression.)</span>
+					</div>
+				</div>
+				<% 
+	              selected = table_form["row_format"].data or table_form["row_format"].field.initial
+	            %>
+				<div class="clearfix">
+					<label id="formatRadio">Record format</label>
+					<div class="input">
+						<ul class="inputs-list">
+							<li>
+								<label>
+			                    	<input type="radio" name="table-row_format" value="Delimited" 
+					                  % if selected == "Delimited":
+					                    checked
+					                  % endif
+					                >
+									<span>Delimited</span>
+								</label>
+								<span class="help-block">
+								Data files use delimiters, like commas (CSV) or tabs.
+								</span>
+			                </li>
+							<li>
+								<label>
+			                    	<input type="radio" name="table-row_format" value="SerDe" 
+					                  % if selected == "SerDe":
+					                    checked
+					                  % endif
+					                >
+									<span>SerDe</span>
+								</label>
+								<span class="help-block">
+								Enter a specialized serialization implementation.
+								</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+		<div id="step3" class="stepDetails hidden">
+			<fieldset>
+				<legend>Configure Record Serialization</legend>
+				<div id="step3Delimited" class="stepDetailsInner">
+					<div class="clearfix">
+						<div class="input">
+							<span>Hive only supports single-character delimiters. </span>
+						</div>
+					</div>
+					<div class="clearfix">
+						${comps.label(table_form["field_terminator"])}
+						<div class="input">
+							${comps.field(table_form["field_terminator"], render_default=True)}
+							<span class="help-block">
+							Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.
+							</span>
+						</div>
+					</div>
+					<div class="clearfix">
+						${comps.label(table_form["collection_terminator"])}
+						<div class="input">
+							${comps.field(table_form["collection_terminator"], render_default=True)}
+							<span class="help-block">
+							Use for array types.
+							</span>
+						</div>
+					</div>
+					<div class="clearfix">
+						${comps.label(table_form["map_key_terminator"])}
+						<div class="input">
+							${comps.field(table_form["map_key_terminator"], render_default=True)}
+							<span class="help-block">
+							Use for map types.
+							</span>
+						</div>
+					</div>
+				</div>
+				<div id="step3SerDe" class="hidden stepDetailsInner">
+					<div class="clearfix">
+						${comps.label(table_form["serde_name"])}
+						<div class="input">
+							${comps.field(table_form["serde_name"], attrs=dict(
+								placeholder='com.acme.hive.SerDe',
+				              )
+				            )}
+							<span class="help-block">
+							Enter the Java Classname of your SerDe. <em>e.g.</em>, org.apache.hadoop.hive.contrib.serde2.RegexSerDe
+							</span>
+						</div>
+					</div>
+					<div class="clearfix">
+						${comps.label(table_form["serde_properties"])}
+						<div class="input">
+							${comps.field(table_form["serde_properties"], attrs=dict(
+								placeholder='"prop" = "value", "prop2" = "value2"',
+				              )
+				            )}
+							<span class="help-block">
+							Properties to pass to the (de)serialization mechanism. <em>e.g.,</em>, "input.regex" = "([^ ]*) ([^ ]*) ([^ ]*) (-|\\[[^\\]]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*)(?: ([^ \"]*|\"[^\"]*\") ([^ \"]*|\"[^\"]*\"))?", "output.format.string" = "%1$s %2$s %3$s %4$s %5$s %6$s %7$s %8$s %9$s"
+							</span>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+		<div id="step4" class="stepDetails hidden">
+			<fieldset>
+				<legend>Choose a File Format</legend>
+				<div class="clearfix">
+					<div class="input">
+						Use <strong>TextFile</strong> for newline-delimited text files.
+						Use <strong>SequenceFile</strong> for Hadoop's binary serialization format.
+						Use <strong>InputFormat</strong> to choose a custom implementation.<br/>
+					</div>
+				</div>
+				
+				<div class="clearfix">
+					<label id="fileFormatRadio">File format</label>
+					<div class="input">
+						${comps.field(table_form["file_format"],
+			              render_default=True, 
+			              klass="bw-file_formats",
+			              notitle=True
+			            )}		
+					</div>
+				</div>
+				<div id="inputFormatDetails" class="hidden">
+					<div class="clearfix">
+						${comps.label(table_form["input_format_class"])}
+						<div class="input">
+							${comps.field(table_form["input_format_class"], attrs=dict(
+								placeholder='com.acme.data.MyInputFormat',
+				              )
+				            )}
+							<span class="help-block">
+							Java Class used to read data
+							</span>
+						</div>
+					</div>
+					<div class="clearfix">
+						${comps.label(table_form["output_format_class"])}
+						<div class="input">
+							${comps.field(table_form["output_format_class"], attrs=dict(
+								placeholder='com.acme.data.MyOutputFormat',
+				              )
+				            )}
+							<span class="help-block">
+							Java Class used to write data
+							</span>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+		<div id="step5" class="stepDetails hidden">
+			<fieldset>
+				<legend>Choose Where Your Table's Data is Stored</legend>
+				
+				<div class="clearfix">
+					<label>Location</label>
+					<div class="input">
+						<ul class="inputs-list">
+							<li>
+								<label>
+			                    	${comps.field(table_form["use_default_location"],
+						                render_default=True
+						              )}
+									<span>Use default location</span>
+								</label>
+								<span class="help-block">
+									Store your table in the default location (controlled by Hive, and typically <em>/user/hive/warehouse/table_name</em>).
+								</span>
+			                </li>
+						</ul>
+					</div>
+				</div>
+				
+				<div id="location" class="hidden">
+					<div class="clearfix">
+						${comps.label(table_form["external_location"])}
+						<div class="input">
+							${comps.field(table_form["external_location"], attrs=dict(
+								placeholder='/user/user_name/data_dir',
+				              )
+				            )}
+							<span class="help-inline"><a id="pathChooser" href="#" data-filechooser-destination="table-external_location">Choose File</a></span>
+							<span class="help-block">
+							Enter the path (on HDFS) to your table's data location
+							</span>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+			<div id="step6" class="stepDetails hidden">
+				<fieldset>
+					<legend>Configure Table Columns</legend>
+					% for form in columns_form.forms:
+		                ${render_column(form)}
+		            %endfor
+					<div class="hidden">
+		              ${unicode(columns_form.management_form) | n}
+		            </div>
+					<div class="clearfix">
+						<div class="input">
+							<button class="btn" value="True" name="columns-add" type="submit">Add a column</button>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Configure Partitions</legend>
+					<div class="clearfix">
+						<div class="input">
+							If your data is naturally partitioned (by, say, date),
+				              partitions are a way to tell Hive that data
+				              for a specific partition value are stored together.
+				              Hive establishes a mapping between directories on disk
+				              (<em>e.g.,</em> <code>/user/hive/warehouse/logs/dt=20100101/</code>)
+				              and the data for that day.  Partitions are virtual
+				              columns; they are not represented in the data themselves,
+				              but are determined by the data location.  Hive implements
+				              query optimizations such that queries that are specific
+				              to a single partition need not read the data in other partitions.
+						</div>
+					</div>
+					% for form in partitions_form.forms:
+	                  ${render_column(form, True)}
+	                % endfor
+					<div class="hidden">
+		              ${unicode(partitions_form.management_form) | n}
+		            </div>
+					<div class="clearfix">
+						<div class="input">
+							<button class="btn" value="True" name="partitions-add" type="submit">Add a partition</button>
+						</div>
+					</div>
+		
+				</fieldset>
+			</div>
+		<div class="actions">
+			<input id="backBtn" type="button" class="btn hidden" value="Back" />
+			<input id="nextBtn" type="button" class="btn primary" value="Next" />
+			<input id="submit" type="submit" class="btn primary hidden" value="Create table" />
+		</div>
+	</form>
+</div>
 
-      <div class="hue-bc-section">
-        <a name="step3"></a>
-        <dt>Step 3: Configure Record Serialization</dt>
-        <dd>
-          <ul class="bw-config-data">
-            <li class="bw-delim-options">
-              <p class="jframe-hidden">If your records are delimited, please configure these fields:</p>
-              Hive only supports single-character delimiters.
-              <dl>
-                ${comps.field(table_form["field_terminator"], render_default=True, help=r'Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.', dd_attrs=dict(data_filters="SelectWithOther"))}
-                ${comps.field(table_form["collection_terminator"], render_default=True, help="Use for array types.", dd_attrs=dict(data_filters="SelectWithOther"))}
-                ${comps.field(table_form["map_key_terminator"], render_default=True, help="Use for map types.", dd_attrs=dict(data_filters="SelectWithOther"))}
-              </dl>
-            </li>
-            <li class="bw-serde-options">
-              <p class="jframe-hidden">If you're using SerDe data, please configure these fields:</p>
-              <dl>
-                ${comps.field(table_form["serde_name"],
-                  help="Enter the Java Classname of your SerDe. <em>e.g.</em>, org.apache.hadoop.hive.contrib.serde2.RegexSerDe",
-                  attrs=dict(
-                    klass='required',
-                    data_filters="OverText",
-                    alt='com.acme.hive.SerDe',
-                  )
-                )}
-                <%!
-                  help=r'Properties to pass to the (de)serialization mechanism. <em>e.g.,</em>, "input.regex" = "([^ ]*) ([^ ]*) ([^ ]*) (-|\\[[^\\]]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*)(?: ([^ \"]*|\"[^\"]*\") ([^ \"]*|\"[^\"]*\"))?", "output.format.string" = "%1$s %2$s %3$s %4$s %5$s %6$s %7$s %8$s %9$s"'
-                %>
-
-                ${comps.field(table_form["serde_properties"],
-                  help=help,
-                  attrs=dict(
-                    data_filters="OverText",
-                    alt=r'"prop" = "value", "prop2" = "value2"'
-                  )
-                )}
-              </dl>
-            </li>
-          </ul>
-          <a href="#step4" class="hue-multipart-next">Step 4: Choose a File Format &raquo;</a>
-        </dd>
-      </div>
-
-      <div class="hue-bc-section">
-        <a name="step4"></a>
-        <dt>Step 4: Choose a File Format</dt>
-        <dd>
-          <ul>
-            <li>Use TextFile for newline-delimited text files.</li>
-            <li>Use SequenceFile for Hadoop's binary serialization format.</li>
-            <li>Use InputFormat to choose a custom implementation.</li>
-          </ul>
-          <dl>
-            ${comps.field(table_form["file_format"],
-              render_default=True, 
-              klass="bw-file_formats",
-              notitle=True
-            )}
-            <div class="jframe-hidden bw-io_formats">
-              ${comps.field(table_form["input_format_class"],
-                help="Java Class to read data",
-                attrs=dict(
-                  data_filters="OverText",
-                  alt='com.acme.data.MyInputFormat'
-                )
-              )}
-              ${comps.field(table_form["output_format_class"],
-                help="Java Class used to write data",
-                attrs=dict(
-                  data_filters="OverText",
-                  alt='com.acme.data.MyOutputFormat'
-                )
-              )}
-            </div>
-          </dl>
-          <a href="#step5" class="hue-multipart-next">Step 5: Choose Where To Save Your Table &raquo;</a>
-        </dd>
-      </div>
-
-      <div class="hue-bc-section">
-        <a name="step5"></a>
-        <dt>Step 5: Choose Where Your Table's Data is Stored</dt>
-        <dd class="bw-file_location">
-          <dl>
-            <div class="bw-default_location">
-              ${comps.field(table_form["use_default_location"],
-                render_default=True, 
-                help="Store your table in the default location (controlled by Hive, and typically <code>/user/hive/warehouse/table_name</code>)."
-              )}
-            </div>
-            <div class="bw-external_loc jframe-hidden">
-              ${comps.field(table_form["external_location"],
-                help="Enter the path (on HDFS) to your table's data location",
-                attrs=dict(
-                  klass='required',
-                  data_filters="OverText",
-                  alt='/user/user_name/data_dir'
-                )
-              )}<a class="hue-choose_file" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 3, 'left': 6 }" data-chooseFor="table-external_location">Choose File</a>
-            </div>
-          </dl>
-          <a href="#step6" class="hue-multipart-next">Final Step: Configure Table Columns &raquo;</a>
-        </dd>
-      </div>
-
-      <div class="hue-bc-section">
-        <a name="step6"></a>
-        <dt>Final Step: Configure Table Columns</dt>
-        <dd>
-          <dl class="bw-columns">
-            <%def name="render_column(form, is_partition_form=False)">
-              <div class="bw-column">
-                <dt class="bw-column_header bw-inactive">
-                  <input name="${form["column_name"].html_name | n}" value="${form["column_name"].data or ''}" class="required bw-column_name" alt="Column Name" data-filters="OverText"/>
-                  <p class="jframe-inline" data-filters="HelpTip" data-help-direction="1">
-                    Column name must be single words that start
-                    with a letter or a digit.
-                  </p>
-                  <div class="bw-remove_column">
-                    ${unicode(form["_deleted"]) | n}
-                  </div>
-                </dt>
-                <dd class="bw-column">
-                  <dl>
-                    <div class="bw-col_type jframe-inline">
-                      ${comps.field(form["column_type"],
-                        render_default=True,
-                        help="Type for this column.  Certain advanced types (namely, structs) are not exposed in this interface.",
-                        help_attrs=dict(
-                          data_help_direction='12'
-                        )
+		<%def name="render_column(form, is_partition_form=False)">
+			<div class="cnt">
+			<div class="clearfix">
+				<label>Column name</label>
+				<div class="input">
+					<input name="${form["column_name"].html_name | n}" value="${form["column_name"].data or ''}" placeholder="Column Name"/>
+					<span class="help-inline">
+					Column name must be single words that start with a letter or a digit.
+					</span>
+				</div>
+			</div>
+			<div class="clearfix">
+				<label>Column type</label>
+				<div class="input columnType">
+					${comps.field(form["column_type"],
+                        render_default=True
                       )}
-                    </div>
-                    % if is_partition_form == False: 
-                      <div class="bw-array_type jframe-inline">
-                        ${comps.field(
-                            form["array_type"],
-                            render_default=True,
-                            help="Type of the array values.",
-                          )}
-                      </div>
-                      <div class="bw-map_data">
-                        <div class="bw-map_key_type jframe-inline">
-                          ${comps.field(form["map_key_type"], render_default=True, help="Type of the map keys.")}
-                        </div>
-                        <div class="bw-map_value_type jframe-inline">
-                          ${comps.field(form["map_value_type"], render_default=True, help="Type of the map values.")}
-                        </div>
-                      </div>
-                    % endif
-                    ${unicode(form["_exists"]) | n}
-                    
-                  </dl>
-                </dd>
-              </div>
+					<span class="help-inline">
+					Type for this column.  Certain advanced types (namely, structs) are not exposed in this interface.
+					</span>
+				</div>
+			</div>
+			 % if is_partition_form == False: 
+			<div class="arraySpec hidden">
+				<div class="clearfix">
+					<label>Array value type</label>
+					<div class="input">
+						${comps.field(form["array_type"], render_default=True)}
+						<span class="help-inline">
+						Type of the array values.
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="mapSpec hidden">
+				<div class="clearfix">
+					<label>Map Key type</label>
+					<div class="input">
+						${comps.field(form["map_key_type"], render_default=True)}
+						<span class="help-inline">
+						Type of the map keys.
+						</span>
+					</div>
+				</div>
+				<div class="clearfix">
+					<label>Map Value type</label>
+					<div class="input">
+						${comps.field(form["map_value_type"], render_default=True)}
+						<span class="help-inline">
+						Type of the map values.
+						</span>
+					</div>
+				</div>
+			</div>
+			% endif
+			<div class="clearfix">
+				<div class="input">
+					${comps.field(form['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
+						type="submit",
+						title="Delete this column",
+						klass="btn small danger"
+					), value=True)}
+					
+				</div>
+			</div>
+            ${unicode(form["_exists"]) | n}
+
+			</div>
+		
             </%def>
-            <div class="bw-column-forms">
-              <p>Configure the columns of your table.</p>
-              % for form in columns_form.forms:
-                ${render_column(form)}
-              %endfor
-            </div>
-            <div class="bw-add_column">
-              ${unicode(columns_form.management_form) | n}
-            </div>
-            <h2>Partitions</h2>
-              ## See http://wiki.apache.org/hadoop/Hive/Tutorial
-              <p>
-              If your data is naturally partitioned (by, say, date),
-              partitions are a way to tell Hive that data
-              for a specific partition value are stored together.
-              Hive establishes a mapping between directories on disk
-              (<em>e.g.,</em> <code>/user/hive/warehouse/logs/dt=20100101/</code>)
-              and the data for that day.  Partitions are virtual
-              columns; they are not represented in the data themselves,
-              but are determined by the data location.  Hive implements
-              query optimizations such that queries that are specific
-              to a single partition need not read the data in other partitions.
-              </p>
-              <div class="bw-partition-forms">
-                % for form in partitions_form.forms:
-                  ${render_column(form, True)}
-                % endfor
-              </div>
-              <div class="bw-add_partition bw-add_column">
-                ${unicode(partitions_form.management_form) | n}
-              </div>
-          </dl>
-          <input type="submit" class="bw-create_table_submit">
-        </dd>
-      </div>
-    </dl>
-  </dd>
+            
+         
 
-</dl>
 
-  <div style="display:none">
-    <div class="beeswax_column_form_template jframe-hidden" style="display: none">
-      ${render_column(columns_form.empty_form())}
-    </div>
-    <div class="beeswax_partition_form_template jframe-hidden" style="display: none">
-      ${render_column(partitions_form.empty_form(), true)}
-    </div>
-  </div>
-</form>
+<div id="chooseFile" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3>Choose a file</h3>
+	</div>
+	<div class="modal-body">  
+		<div id="filechooser">
+		</div>
+	</div>
+	<div class="modal-footer">
+	</div>
+</div>
+
+<style>
+	#filechooser {
+		min-height:100px;
+		overflow-y:scroll;
+	}
+</style>
+
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		
+		$("#pathChooser").click(function(){
+			var _destination = $(this).attr("data-filechooser-destination");
+			$("#filechooser").jHueFileChooser({
+				onFileChoose: function(filePath){
+					$("input[name='"+_destination+"']").val(filePath);
+					$("#chooseFile").modal("hide");
+				}
+			});
+			$("#chooseFile").modal("show");
+		});
+		
+		$("#chooseFile").modal({
+			keyboard: true,
+			backdrop: true
+		})
+		
+		
+		$(".step").click(function(event){
+			event.preventDefault();
+			$(".stepDetails").hide();
+			var _step = $(this).attr("href");
+			$(_step).show();
+			$("#backBtn").hide();
+			if (_step != "#step1"){
+				$("#backBtn").show();
+			}
+			if (_step != "#step6"){
+				$("#nextBtn").show();
+				$("#submit").hide();
+			}
+			else {
+				$("#nextBtn").hide();
+				$("#submit").show();
+			}
+			$(".step").parent().removeClass("active");
+			$(this).parent().addClass("active");
+		});
+		$("#nextBtn").click(function(){
+			$("ul.pills li.active").next().find("a").click();
+		});
+		$("#backBtn").click(function(){
+			$("ul.pills li.active").prev().find("a").click();
+		});
+		var _url = location.href;
+		if (_url.indexOf("#")>-1){
+			$(".step[href='"+_url.substring(_url.indexOf("#"),_url.length)+"']").click();
+		}
+		
+		$("#id_table-field_terminator_1").css("margin-left","4px").attr("placeholder","Write here your field terminator").hide();
+		$("#id_table-field_terminator_0").change(function(){
+			if ($(this).val() == "__other__"){
+				$("#id_table-field_terminator_1").show();
+			}
+			else {
+				$("#id_table-field_terminator_1").hide();
+			}
+		});
+		$("#id_table-collection_terminator_1").css("margin-left","4px").attr("placeholder","Write here your collection terminator").hide();
+		$("#id_table-collection_terminator_0").change(function(){
+			if ($(this).val() == "__other__"){
+				$("#id_table-collection_terminator_1").show();
+			}
+			else {
+				$("#id_table-collection_terminator_1").hide();
+			}
+		});
+		$("#id_table-map_key_terminator_1").css("margin-left","4px").attr("placeholder","Write here your map key terminator").hide();
+		$("#id_table-map_key_terminator_0").change(function(){
+			if ($(this).val() == "__other__"){
+				$("#id_table-map_key_terminator_1").show();
+			}
+			else {
+				$("#id_table-map_key_terminator_1").hide();
+			}
+		});
+		
+		$("input[name='table-row_format']").change(function(){
+			$(".stepDetailsInner").hide();
+			$("#step3"+$(this).val()).show();
+		});
+
+		$("input[name='table-file_format']").change(function(){
+			$("#inputFormatDetails").hide();
+			if ($(this).val() == "InputFormat"){
+				$("#inputFormatDetails").slideDown();
+			}
+		});
+		
+		$("#id_table-use_default_location").change(function(){
+			if (!$(this).is(":checked")){
+				$("#location").slideDown();
+			}
+			else {
+				$("#location").slideUp();
+			}
+		});
+		
+		
+		$("#step6").find("button").click(function(){
+			$("#mainForm").attr("action","#step6");
+		});
+		
+		$(".columnType").find("select").change(function(){
+			$(this).parents(".cnt").find(".arraySpec").hide();
+			$(this).parents(".cnt").find(".mapSpec").hide();
+			if ($(this).val() == "array"){
+				$(this).parents(".cnt").find(".arraySpec").show();
+			}
+			if ($(this).val() == "map"){
+				$(this).parents(".cnt").find(".mapSpec").show();
+			}
+		});
+		
+		$("#step4").find("ul").addClass("inputs-list");
+	});
+</script>
 ${wrappers.foot()}

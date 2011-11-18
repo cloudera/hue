@@ -38,6 +38,7 @@ def is_selected(section, matcher):
 	<title>${title}</title>
 	<link rel="stylesheet" href="/static/ext/css/bootstrap.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 	<link rel="stylesheet" href="/static/css/jhue.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 	
 	<style type="text/css">
       body {
@@ -54,6 +55,7 @@ def is_selected(section, matcher):
 	<script src="/static/ext/js/bootstrap-modal.js" type="text/javascript" charset="utf-8"></script>	
 	<script src="/static/ext/js/bootstrap-twipsy.js" type="text/javascript" charset="utf-8"></script>	
 	<script src="/static/ext/js/bootstrap-popover.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){

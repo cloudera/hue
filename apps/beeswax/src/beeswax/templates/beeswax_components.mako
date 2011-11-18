@@ -179,14 +179,13 @@
   ${pageref(page.num_pages())}
 </%def>
 <%def name="pagination(page)">
-  <div>
-    <p class="bw-showing_msg">Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} items</p>
-    <div class="bw-nav_links">
-      <a title="Beginning of List" ${toppage(page)} class="bw-firstBlock">Beginning of List</a>
-      <a title="Previous Page" ${prevpage(page)} class="bw-prevBlock">Previous Page</a>
-      <p>page ${page.number} of ${page.num_pages()}</p>
-      <a title="Next page" ${nextpage(page)} class="bw-nextBlock">Next Page</a>
-      <a title="End of List" ${bottompage(page)} class="bw-lastBlock">End of List</a>
-    </div>
-  </div>
+	<p>Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} items, page ${page.number} of ${page.num_pages()}</p>
+	<div class="pagination">
+	  <ul>
+	    <li class="prev"><a title="Beginning of List" ${toppage(page)} class="bw-firstBlock">&larr; Beginning of List</a></li>
+	    <li><a title="Previous Page" ${prevpage(page)} class="bw-prevBlock">Previous Page</a></li>
+		<li><a title="Next page" ${nextpage(page)} class="bw-nextBlock">Next Page</a></li>
+	    <li class="next"><a title="End of List" ${bottompage(page)} class="bw-lastBlock">End of List &rarr;</a></li>
+	  </ul>
+	</div>
 </%def>

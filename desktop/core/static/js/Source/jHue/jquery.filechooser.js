@@ -22,9 +22,10 @@
 	Plugin.prototype.setOptions = function(options) {
 		this.options = $.extend({}, defaults, options) ;
 	};
-	
+
 	Plugin.prototype.navigateTo = function (path) {
 		var _parent = this;
+		currentPath = path;
 		$(_parent.element).empty();
 		$.getJSON("/filebrowser/chooser"+path, function(data){
 			var _flist = $("<ul>").addClass("unstyled");
@@ -47,13 +48,16 @@
 				_f.appendTo(_flist);
 			});
 			_flist.appendTo($(_parent.element));
-			var _actions = $("<div>").addClass("clearfix");
+			var _actions = $("<div>").addClass("clearfix").attr('id', 'actionsDiv');
 			var _uploadFileBtn;
 			var _createFolderBtn;
 			if (_parent.options.uploadFile){
-				_uploadFileBtn = $("<button>").addClass("btn").addClass("small").text("Upload File");
+				_uploadFileBtn = $("<div>").attr('id', 'file-uploader');
 				_uploadFileBtn.appendTo(_actions);
+				
+			
 				if ($.fn.upload){
+
 					//_uploadFileBtn.upload();
 				}
 			}
@@ -112,9 +116,25 @@
 				});
 			}
 			_actions.appendTo($(_parent.element));
+			initUploader(path, _parent);
 		});
 		
 	};
+	function initUploader(path, _parent){
+		completeRefreshPath = path;
+		var uploader = new qq.FileUploader({
+            element: document.getElementById('file-uploader'),
+            action: '/filebrowser/upload',
+            params:{
+                dest: path,
+                fileFieldLabel: 'hdfs_file'
+            },
+            onComplete:function(id, fileName, responseJSON){
+				_parent.navigateTo(path);
+            },
+            debug: true
+        });
+	}
 
 	Plugin.prototype.init = function () {
 		if ($.trim(this.options.initialPath)!=""){

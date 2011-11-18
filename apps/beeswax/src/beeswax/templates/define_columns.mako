@@ -16,81 +16,80 @@
 <%namespace name="wrappers" file="header_footer.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-${wrappers.head('Define Columns')}
-<div class="toolbar">
-  <ul class="clearfix" data-filters="Breadcrumb">
-    ## TODO(marcus) These links should be part of the form, and do POST
-    <li><a href="${ url('beeswax.create_table.import_wizard') }">Choose File</a></li>
-    <li><a href="${ url('beeswax.create_table.import_wizard') }">Choose Delimiter</a></li>
-    <li class="tabSelected"><a href="${ url('beeswax.create_table.import_wizard') }">Define Columns</a></li>
-  </ul>
+${wrappers.head("Beeswax: Create table from file", section='tables')}
+
+<div class="sidebar">
+	<div class="well">
+		<h6>Actions</h6>
+		<ul>
+      		<li><a href="${ url('beeswax.create_table.import_wizard')}">Create a new table from file</a></li>
+			<li><a href="${ url('beeswax.create_table.create_table')}">Create a new table manually</a></li>
+		</ul>
+    </div>
 </div>
-<div class="view" id="define-columns">
-  <div class="bw-define-columns">
-    <form action="${action}" method="POST">
-      <div class="jframe-hidden">
-        ${util.render_form(file_form)}
-        ${util.render_form(delim_form)}
-        ${unicode(column_formset.management_form) | n}
-      </div>
-      <div class="hue-bc-section">
-      <dt> Step 3: Define Your Columns </dt>
-      <%
-        n_rows = len(fields_list)
-        if n_rows > 2: n_rows = 2
-      %>
-      <dd>
-          Beeswax has attempted to determine the types of your columns.  Please check them as you name the columns.
-        <dl class="clearfix">
-          <br/>
-          <dt> </dt>
-          <dd>
-            <table class="row_headers jframe-visible" style="display:none">
-              % for i in range(n_rows):
-                <tr><td> Row ${i + 1} </td></tr>
-              % endfor
-              <tr><td>&nbsp;</td></tr>
-              <tr><td class="input_row_header"> Column Name </td></tr>
-              <tr><td class="input_row_header"> Type </td></tr>
-            </table>
-            <div class="table_holder">
-              <table class="data_table">
-                % for i, row in enumerate(fields_list[:n_rows]):
-                  <tr>
-                    <td class="jframe-hidden"> Row ${i + 1} </td>
-                    % for val in row:
-                      <td>${val}</td>
-                    % endfor
-                  </tr>
-                % endfor
-                <tr><td colspan="${n_cols}">&nbsp;</td></tr>
-                <tr>
-                  % for form in column_formset.forms:
-                    <td>
-                      ${comps.field(form["column_name"],
-                        render_default=False,
-                        help="Column name",
-                      )}
-                      ${comps.field(form["column_type"],
-                        render_default=True,
-                        help="Type for this column",
-                      )}
-                      ${unicode(form["_exists"]) | n}
-                    </td>
-                  %endfor
-                </tr>
-              </table>
-            </div>
-          </dd>
-          </dl>
-          <a class="jframe-submit_form jframe-visible hue-multipart-next" data-extra-data="{'submit_create': 'Finish Creating Table'}" style="display:none">
-          Finish Creating Table
-          </a>
-          <input type="submit" name="submit_create" value="Finish Creating Table" class="jframe-hidden"/>
-          <br/><br/><br/>
-        </dd>
-      </div>
-    </form>
-  </div>
+
+
+<div class="content">
+	<h1>Create a new table from file</h1>
+	<ul class="pills">
+	  <li><a href="${ url('beeswax.create_table.import_wizard') }">Step 1: Choose File</a></li>
+	  <li><a href="${ url('beeswax.create_table.import_wizard') }">Step 2: Choose Delimiter</a></li>
+	  <li class="active"><a href="#">Step 3: Define Columns</a></li>
+	</ul>
+	<br/>
+	<form action="${action}" method="POST" class="form-stacked">
+		<div class="hidden">
+			${util.render_form(file_form)}
+	        ${util.render_form(delim_form)}
+	        ${unicode(column_formset.management_form) | n}
+		</div>
+		<%
+	        n_rows = len(fields_list)
+	        if n_rows > 2: n_rows = 2
+	      %>
+		<fieldset>
+			<legend>Define your columns</legend>
+			<div class="clearfix">
+				
+				<div class="input">
+					<table>
+						<tr>
+							<td>&nbsp;</td>
+							% for form in column_formset.forms:
+			                    <td>
+									${comps.label(form["column_name"])}
+									${comps.field(form["column_name"],
+										render_default=False,
+										attrs=dict(
+											placeholder="Column name"
+										)
+									)}
+									<br/><br/>
+									${comps.label(form["column_type"])}
+									${comps.field(form["column_type"],
+										render_default=True
+									)}
+									${unicode(form["_exists"]) | n}
+			                    </td>
+			                  %endfor
+						</tr>
+						% for i, row in enumerate(fields_list[:n_rows]):
+		                  <tr>
+		                    <td><em>Row #${i + 1}</em></td>
+		                    % for val in row:
+		                      <td>${val}</td>
+		                    % endfor
+		                  </tr>
+		                % endfor
+					</table>
+					
+				</div>
+			</div>
+		</fieldset>
+		<div class="actions">
+			<input class="btn primary" type="submit" name="submit_create" value="Create Table" />
+		</div>
+	</form>
 </div>
+
 ${wrappers.foot()}

@@ -185,7 +185,7 @@ ${wrappers.head("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName
 <style>
 	#filechooser {
 		display:none;
-		height:100px;
+		min-height:100px;
 		overflow-y:scroll;
 	}
 </style>

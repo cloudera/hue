@@ -22,7 +22,8 @@ ${wrappers.head("Beeswax: Table List", section='tables')}
 			% if not examples_installed:
         	<li><a href="#" data-controls-modal="installSamples" data-backdrop="true" data-keyboard="true">Install samples</a></li>
       		% endif
-      		<li><a href="${ url('beeswax.create_table.index') }">Create a new table</a></li>
+      		<li><a href="${ url('beeswax.create_table.import_wizard')}">Create a new table from file</a></li>
+			<li><a href="${ url('beeswax.create_table.create_table')}">Create a new table manually</a></li>
 		</ul>
     </div>
 </div>

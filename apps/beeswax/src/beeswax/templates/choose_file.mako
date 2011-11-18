@@ -15,62 +15,123 @@
 ## limitations under the License.
 <%namespace name="wrappers" file="header_footer.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
-${wrappers.head('Choose a File')}
-<div class="toolbar">
-  <ul class="clearfix" data-filters="Breadcrumb">
-    <li class="tabSelected"><a href="${ url('beeswax.create_table.import_wizard') }">Choose File</a></li>
-    <li><a>Choose Delimiter</a></li>
-    <li><a>Define Columns</a></li>
-  </ul>
+${wrappers.head("Beeswax: Create table from file", section='tables')}
+<div class="sidebar">
+	<div class="well">
+		<h6>Actions</h6>
+		<ul>
+      		<li><a href="${ url('beeswax.create_table.import_wizard')}">Create a new table from file</a></li>
+			<li><a href="${ url('beeswax.create_table.create_table')}">Create a new table manually</a></li>
+		</ul>
+    </div>
 </div>
-<div class="view" id="choose-file">
-    <div class="bw-choose-file">
-      <div class="hue-bc-section">
-          <a name="step1"></a>
-            <form action="${action}" method="POST">
-              <dt>Step 1: Name Your Table and Choose A File</dt>
-              <dd>
-              <p>Enter the name of your new table and a file (compressed files are okay) to base this new table definition on.</p>
-              <dl class="clearfix">
-                ${comps.field(file_form["name"], attrs=dict(
-                  klass='required bw-validate-name',
-                  data_filters="OverText",
-                  alt='table_name',
-                ),
-                help="Name of the new table.  Table names must be globally unique.  Table names tend to correspond as well to the directory where the data will be stored.",
-                help_attrs=dict(
-                  data_help_direction='1'
-                )
-              )}
-              ${comps.field(file_form["comment"], attrs=dict(
-                  klass='bw-table-comment',
-                  data_filters="OverText",
-                  alt='Optional'
-                ),
-                help="Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
 
-                ${comps.field(file_form["path"], attrs=dict(
-                    klass='required bw-validate-file',
-                    data_filters="OverText",
-                    alt="/user/user_name/data_dir",
-                  ),
-                  help="The HDFS path to the file that you would like to base this new table definition on.  It can be compressed (gzip) or not.")}
-                <a class="hue-choose_file" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height' : 16, 'top' : 3, 'left' : 6 }" data-chooseFor="path">Choose File</a>
-                <div class="bw-import_data">
-                  ${comps.field(file_form["do_import"],
-                    render_default=True,
-                    help="Check this box if you want to import the data in this file after creating the table definition.  Leave it unchecked if you just want to define an empty table."
-                  )}
-                </div>
-                ## TODO(marcus): Button style?
-                <a class="hue-multipart-next jframe-submit_form jframe-visible" style="display:none" data-extra-data="{'submit_file' : 'Step 2: Choose Your Delimiter'}">
-                  Step 2: Choose Your Delimiter&raquo;
-                </a>
-                  <input type="submit" name="submit_file" value="Step 2: Choose Your Delimiter" class="jframe-hidden jframe-submit_form hue-multipart-next jframe-visible"/>
-              </dl>
-            </form>
-          </dd>
-        </div>
-      </div>
+
+<div class="content">
+	<h1>Create a new table from file</h1>
+	<ul class="pills">
+	  <li class="active"><a href="${ url('beeswax.create_table.import_wizard') }">Step 1: Choose File</a></li>
+	  <li><a href="#">Step 2: Choose Delimiter</a></li>
+	  <li><a href="#">Step 3: Define Columns</a></li>
+	</ul>
+	<br/>
+	<form action="${action}" method="POST">
+		<fieldset>
+			<legend>Name Your Table and Choose A File</legend>
+			<div class="clearfix">
+				${comps.label(file_form["name"])}
+				<div class="input">
+					${comps.field(file_form["name"], attrs=dict(
+						placeholder="table_name",
+						klass=""
+					))}
+					<span class="help-block">
+					Name of the new table.  Table names must be globally unique.  Table names tend to correspond as well to the directory where the data will be stored.
+					</span>
+				</div>
+			</div>
+			<div class="clearfix">
+				${comps.label(file_form["comment"])}
+				<div class="input">
+					${comps.field(file_form["comment"], attrs=dict(
+						placeholder="Optional",
+						klass=""
+					))}
+					<span class="help-block">
+					Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.
+					</span>
+				</div>
+			</div>
+			<div class="clearfix">
+				${comps.label(file_form["path"])}
+				<div class="input">
+					${comps.field(file_form["path"], attrs=dict(
+						placeholder="/user/user_name/data_dir",
+						klass=""
+					))}
+					<span class="help-inline"><a id="pathChooser" href="#" data-filechooser-destination="path">Choose File</a></span>
+					<span class="help-block">
+					The HDFS path to the file that you would like to base this new table definition on.  It can be compressed (gzip) or not.
+					</span>
+				</div>
+			</div>
+			<div class="clearfix">
+				${comps.label(file_form["do_import"])}
+				<div class="input">
+					${comps.field(file_form["do_import"], render_default=True, attrs=dict(
+						klass=""
+					))}
+					<span class="help-block">
+					Check this box if you want to import the data in this file after creating the table definition.  Leave it unchecked if you just want to define an empty table.
+					</span>
+				</div>
+			</div>
+		</fieldset>
+		<div class="actions">
+			<input type="submit" class="btn primary" name="submit_file" value="Choose a delimiter" />
+		</div>
+	</form>
 </div>
+
+<div id="chooseFile" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3>Choose a file</h3>
+	</div>
+	<div class="modal-body">  
+		<div id="filechooser">
+		</div>
+	</div>
+	<div class="modal-footer">
+	</div>
+</div>
+
+<style>
+	#filechooser {
+		min-height:100px;
+		overflow-y:scroll;
+	}
+</style>
+
+
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$("#pathChooser").click(function(){
+			var _destination = $(this).attr("data-filechooser-destination");
+			$("#filechooser").jHueFileChooser({
+				onFileChoose: function(filePath){
+					$("input[name='"+_destination+"']").val(filePath);
+					$("#chooseFile").modal("hide");
+				}
+			});
+			$("#chooseFile").modal("show");
+		});
+		
+		$("#chooseFile").modal({
+			keyboard: true,
+			backdrop: true
+		})
+	});
+</script>
+
 ${wrappers.foot()}
