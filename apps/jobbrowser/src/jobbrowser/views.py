@@ -198,10 +198,15 @@ def single_task_attempt(request, jobid, taskid, attemptid):
     raise KeyError("Cannot find attempt '%s' in task" % (attemptid,))
 
   try:
-    logs = [ section.strip() for section in attempt.get_task_log() ]
+    # Add a diagnostic log
+    diagnostic_log = ", ".join(task.diagnosticMap[attempt.attemptId])
+    logs = [ diagnostic_log ]
+    # Add remaining logs
+    logs += [ section.strip() for section in attempt.get_task_log() ]
   except TaskTrackerNotFoundException:
-    # Three entries for stdout, stderr and syslog
-    logs = [ "Failed to retrieve log. TaskTracker not found." ] * 3
+    # Four entries,
+    # for diagnostic, stdout, stderr and syslog
+    logs = [ "Failed to retrieve log. TaskTracker not found." ] * 4
   return render("attempt.mako", request,
     {
       "attempt":attempt,

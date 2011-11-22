@@ -104,9 +104,10 @@
 
           <li class="jt-logs">
             <%
-              log_stdout = logs[0]
-              log_stderr = logs[1]
-              log_syslog = logs[2]
+              log_diagnostic = logs[0]
+              log_stdout = logs[1]
+              log_stderr = logs[2]
+              log_syslog = logs[3]
             %>
 <%def name="format_log(raw)">
 ## have to remove any indentation here or it breaks inside the pre tags
@@ -114,6 +115,12 @@
 ${ line | h,trim }
 % endfor
 </%def>
+            <h2>task diagnostic log</h2>
+            % if not log_diagnostic:
+<pre>-- empty --</pre>
+            % else:
+<pre>${format_log(log_diagnostic)}</pre>
+            % endif
             <h2>stdout</h2>
             % if not log_stdout:
 <pre>-- empty --</pre>
