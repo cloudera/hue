@@ -2623,6 +2623,7 @@ namespace swig {
 
 
 #include <iostream>
+#include <cstddef>
 
   
 namespace swig {
