@@ -62,7 +62,6 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
               <li><a href="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query.">Delete</a></li>
               <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query.">Usage History</a></li>
             % endif
-            <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query.">Clone</a></li>
           </ul>
         </td>
         <td>
@@ -82,7 +81,7 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
           ${ timesince(design.mtime) } ago
         </td>
         <td>
-          <a class="bw-options">options</a>
+          <a class="btn actions">Actions</a>
         </td>
       </tr>
     % endfor
@@ -99,6 +98,40 @@ ${comps.pagination(page)}
 			"bInfo": false,
 			"bFilter": false
 		});
+		
+		$(".actions").jHueContextMenu({
+			items: [
+				{
+					text: "Clone",
+					onSelect: function(){
+						location.href = "${ url('beeswax.views.clone_design', design_id=design.id) }";
+					}
+				},
+				{
+					divider: true
+				},
+				{
+					text: "Second option",
+					onSelect: function(){
+						alert('Clicked');
+					}
+				},
+				
+				{
+					text: "Third option",
+					onSelect: function(){
+						alert('Clicked');
+					}
+				},
+				{
+					text: "Fourth option",
+					onSelect: function(){
+						alert('Clicked');
+					}
+				}
+				
+			]
+        });
 
 	});
 </script>

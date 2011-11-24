@@ -106,6 +106,17 @@
 	border-radius: 30px;
 }
 
+.menubar-inner a.disabled {
+	cursor: default;
+    opacity: 0.65;
+}
+
+.menubar-inner a.disabled:hover {
+	color:#333;
+}
+
+
+
 .hidden {
 	display:none;
 }
@@ -135,6 +146,12 @@ code {
 	background: url(../images/file.png) no-repeat left center;
 	padding-left:20px;
 }
+
+.contextMenu {
+    display:block;
+    border-radius: 6px 6px 6px 6px;
+}
+
 
 
 /*

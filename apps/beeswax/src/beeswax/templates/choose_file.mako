@@ -91,8 +91,8 @@ ${wrappers.head("Beeswax: Create table from file", section='tables')}
 			<input type="submit" class="btn primary" name="submit_file" value="Choose a delimiter" />
 		</div>
 	</form>
+	
 </div>
-
 <div id="chooseFile" class="modal hide fade">
 	<div class="modal-header">
 		<a href="#" class="close">&times;</a>

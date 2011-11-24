@@ -60,7 +60,6 @@ def is_home(path):
 	<script src="/static/js/Source/jHue/jquery.showusername.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/jquery/plugins/jquery.ocupload-1.1.2.packed.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/bootstrap-tabs.js" type="text/javascript" charset="utf-8"></script>
 
 	<script type="text/javascript" charset="utf-8">
@@ -89,7 +88,9 @@ def is_home(path):
 					<li><a href="/jobsub/">Job Designer</a></li>
 					<li><a href="/jobbrowser/jobs/">Job Browser</a></li>
 					<li><a href="/useradmin/">User Admin</a></li>
+					<li><a href="/shell/">Shell</a></li>
 					<li><a href="/help/">Help</a></li>
+					<li><a href="/about/">About</a></li>
 				</ul>
 				<p class="pull-right">Logged in as <a id="username" href="/accounts/logout">xxx</a></p>
 			</div>

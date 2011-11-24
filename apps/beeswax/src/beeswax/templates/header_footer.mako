@@ -48,9 +48,10 @@ def is_selected(section, matcher):
 	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/js/Source/jHue/jquery.showusername.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/js/Source/jHue/jquery.filechooser.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/js/Source/jHue/jquery.contextmenu.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/jquery/plugins/jquery.ocupload-1.1.2.packed.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/ext/js/bootstrap-dropdown.js" type="text/javascript" charset="utf-8"></script>	
 	<script src="/static/ext/js/bootstrap-tabs.js" type="text/javascript" charset="utf-8"></script>	
 	<script src="/static/ext/js/bootstrap-modal.js" type="text/javascript" charset="utf-8"></script>	
 	<script src="/static/ext/js/bootstrap-twipsy.js" type="text/javascript" charset="utf-8"></script>	
@@ -83,7 +84,9 @@ def is_selected(section, matcher):
 					<li><a href="/jobsub/">Job Designer</a></li>
 					<li><a href="/jobbrowser/jobs/">Job Browser</a></li>
 					<li><a href="/useradmin/">User Admin</a></li>
+					<li><a href="/shell/">Shell</a></li>
 					<li><a href="/help/">Help</a></li>
+					<li><a href="/about/">About</a></li>
 				</ul>
 				<p class="pull-right">Logged in as <a id="username" href="/accounts/logout">xxx</a></p>
 			</div>
@@ -111,52 +114,6 @@ def is_selected(section, matcher):
 <%def name="foot()">
 	</div>
 </body>
-</html>
-</%def>
-
-
-
-
-
-<%def name="headz(title='Beeswax for Hive', toolbar=True, section=False)">
-<html>
-  <head>
-    <title>${title}</title>
-  </head>
-  <body class="hue-shared">
-  <div class="toolbar">
-    <a href="${ url('beeswax.views.index') }"><img src="/beeswax/static/art/beeswax-logo.png" width="55" height="55" alt="Beeswax" class="beeswax_logo"></a>
-    % if toolbar:
-    <ul class="bw-nav" data-filters="ArtButtonBar">
-      <li><a href="${ url('beeswax.views.execute_query') }" 
-        class="bw-nav_icon bw-query_nav ${is_selected(section, 'query')}" data-filters="ArtButton"
-        data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Query Editor</a></li>
-      <li><a href="${ url('beeswax.views.my_queries') }"
-        class="bw-nav_icon bw-my_queries_nav ${is_selected(section, 'my queries')}" data-filters="ArtButton"
-        data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">My Queries</a></li>
-      <li><a href="${ url('beeswax.views.list_designs') }" 
-        class="bw-nav_icon bw-queries_nav ${is_selected(section, 'saved queries')}" data-filters="ArtButton"
-        data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Saved Queries</a></li>
-    ## <li><a href="${ url('beeswax.views.edit_report') }" class="bw-nav_icon bw-new_report_gen_nav ${is_selected(section, 'report generator')}" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Report Generator</a></li>
-      <li><a href="${ url('beeswax.views.list_query_history') }" 
-        class="bw-nav_icon bw-history_nav ${is_selected(section, 'history')}" data-filters="ArtButton"
-        data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">History</a></li>
-      <li><a href="${ url('beeswax.views.show_tables') }" 
-        class="bw-nav_icon bw-tables_nav ${is_selected(section, 'tables')}" data-filters="ArtButton"
-        data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Tables</a></li>
-      <li><a href="${ url('beeswax.views.configuration') }" 
-        class="bw-nav_icon bw-config_nav ${is_selected(section, 'hive configuration')}" data-filters="ArtButton"
-        data-icon-styles="{'width': 16, 'height': 16, 'top': 4, 'left': 5}">Settings</a>
-      </li>
-      <li><a class="jframe-refresh large" data-filters="ArtButton">Refresh</a></li>
-    </ul>
-    % endif
-  </div>
-  <hr class="jframe-hidden"/>
-</%def>
-
-<%def name="footz()">
-  </body>
 </html>
 </%def>
 
