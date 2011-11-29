@@ -147,6 +147,12 @@
                   <include>org.apache.thrift:libthrift</include>
                 </includes>
               </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.apache.thrift</pattern>
+                  <shadedPattern>com.cloudera.hue.org.apache.thrift</shadedPattern>
+                </relocation>
+              </relocations>
             </configuration>
           </execution>
         </executions>
