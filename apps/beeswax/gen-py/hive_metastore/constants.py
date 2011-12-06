@@ -8,6 +8,8 @@ from thrift.Thrift import *
 from ttypes import *
 
 DDL_TIME = "transient_lastDdlTime"
+IS_ARCHIVED = "is_archived"
+ORIGINAL_LOCATION = "original_location"
 META_TABLE_COLUMNS = "columns"
 META_TABLE_COLUMN_TYPES = "columns.types"
 BUCKET_FIELD_NAME = "bucket_field_name"
@@ -20,3 +22,4 @@ META_TABLE_SERDE = "serde"
 META_TABLE_PARTITION_COLUMNS = "partition_columns"
 FILE_INPUT_FORMAT = "file.inputformat"
 FILE_OUTPUT_FORMAT = "file.outputformat"
+META_TABLE_STORAGE = "storage_handler"
