@@ -337,6 +337,10 @@ class BeeswaxSampleProvider(object):
     cls._make_i18n_data_file(data_file % 4, 'latin1')
     cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
 
+    # Create a "myview" view.
+    make_query(cls.client, "CREATE VIEW myview (foo, bar) as SELECT * FROM test",
+               wait=True)
+
     _INITIALIZED = True
 
   @staticmethod

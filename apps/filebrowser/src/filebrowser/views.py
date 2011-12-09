@@ -788,6 +788,8 @@ def location_to_url(request, location, strict=True):
   Python doesn't seem to have a readily-available URI-comparison
   library, so this is quite hacky.
   """
+  if location is None:
+    return None
   split_path = request.fs.urlsplit(location)
   if strict and not split_path[1]:
     # No netloc, not full url
