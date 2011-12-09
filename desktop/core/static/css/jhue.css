@@ -148,8 +148,7 @@ code {
 }
 
 .contextMenu {
-    display:block;
-    border-radius: 6px 6px 6px 6px;
+    display:none;
 }
 
 

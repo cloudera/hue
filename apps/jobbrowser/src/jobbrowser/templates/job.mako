@@ -76,53 +76,56 @@
     % endfor
 </%def>
 
-  ${comps.header("Job: " + job.jobId + " - Job Browser", "Jobs", "Job Details")}
+${comps.header("Job: " + job.jobId + " - Job Browser", "", "Job Details")}
+
+	<div class="sidebar">
+		<div class="well">
+			<h6>Job ID</h6>
+			${job.jobId}
+			
+			<h6>User</h6>
+			${job.user}
+			
+			<h6>Status</h6>
+			% if job.status.lower() == 'running' or job.status.lower() == 'pending':
+				<span class="label warning">${job.status.lower()}</span>
+			% elif job.status.lower() == 'succeeded':
+				<span class="label success">${job.status.lower()}</span>
+			% else:
+				<span class="label">${job.status.lower()}</span>
+			% endif
+			
+			% if job.status.lower() == 'running' or job.status.lower() == 'pending':
+	        <h6>Kill Job</h6>
+			<a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" title="Kill this job">Kill this job</a>
+	        % endif
+			
+			
+			<h6>Output</h6>
+			<%
+	            output_dir = job.conf_keys.get('mapredOutputDir', "")
+	            location_url = location_to_url(request, output_dir)
+	            basename = os.path.basename(output_dir)
+	            dir_name = basename.split('/')[-1]
+	          %>
+	          % if location_url != None:
+	            <a href="${location_url}" title="${output_dir}">${dir_name}</a>
+	          % else:
+	            ${dir_name}
+	          % endif
+		</div>
+	</div>
     
-    <div id="job_browser_job" class="view jframe_padded">
-      <div class="jtv_meta_top clearfix">
-        <dl>
-          <dt>Job ID</dt>
-          <dd>${job.jobId}</dd>
-          <dt>User</dt>
-          <dd>${job.user}</dd>
-        </dl>
-        <dl>
-          <dt>Status</dt>
-          <dd>${job.status.lower()}</dd>
-          <dt>Output</dt>
-          <dd>
-          <%
-            output_dir = job.conf_keys.get('mapredOutputDir', "")
-            location_url = location_to_url(request, output_dir)
-            basename = os.path.basename(output_dir)
-            dir_name = basename.split('/')[-1]
-          %>
-          % if location_url != None:
-            <a href="${location_url}" title="${output_dir}" target="FileBrowser">${dir_name}</a>
-          % else:
-            ${dir_name}
-          % endif
-          <dd>
-        </dl>
-        % if job.status.lower() == 'running' or job.status.lower() == 'pending':
-        <dl>
-          <dt>Kill Job:</dt>
-          <dd>
-          <a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" title="Kill this job">Kill</a>
-          </dd>
-        </dl>
-        % endif
-
-      </div>
-
+    <div class="content">
+		<h1>Job Details</h1>
 		<ul class="tabs">
 			<li class="active"><a href="#tasks">Tasks</a></li>
 			<li><a href="#metadata">Metadata</a></li>
 			<li><a href="#counters">Counters</a></li>
 		</ul>
 
-		<div class="pill-content">
-			<div class="active" id="tasks">
+		<div class="tab-content">
+			<div class="tab-pane active" id="tasks">
 				<dl>
 	                <dt>Maps:</dt>
 	                <dd>${comps.mr_graph_maps(job)}</dd>
@@ -151,7 +154,7 @@
 	            </div>
 	
 			</div>
-			<div id="metadata">
+			<div id="metadata" class="tab-pane">
 				<div class="toolbar">
 					<form>
 						<b>Filter metadata:</b>
@@ -226,10 +229,11 @@
 		            </table>
 
 			</div>
-			<div id="counters">
+			<div id="counters" class="tab-pane">
 				${comps.job_counters(job.counters)}
 			</div>
 		</div>
+	</div>
 
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready(function(){

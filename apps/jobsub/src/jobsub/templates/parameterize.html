@@ -17,28 +17,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% block title %}Submit Job: {{ job_design.name }}{% endblock %}
-{% block content %}
+{% block nav %}
+<li><a href="{% url jobsub.views.list_designs %}" class="selected">Job List</a></li>
+<li><a href="{% url jobsub.views.watch %}">History</a></li>
+{% endblock %}
 
-<h1>Submit Job: {{ job_design.name }} </h1>
-<form class="form-stacked" action="{% url jobsub.views.submit_design job_design.id %}" method="POST"
-      enctype="multipart/form-data">
-    <div class="well container-fluid">
-    <div class="sidebar">
-        <h5>Job Name</h5>
+{% block content %}
+<div class="sidebar">
+	<div class="well">
+		<h6>Job Name</h6>
         <span>{{ job_design.name }}</span>
         {% if job_design.description %}
-        <h5>Description</h5>
+        <h6>Description</h6>
         <span>{{ job_design.description }}</span>
         {% endif %}
-    </div>
-    <div class="content">
-        {{ form.render_parameterization }}
-        <div style="padding-top: 10px;">
+	</div>
+</div>
+<div class="content">
+	<h1>Submit Job: {{ job_design.name }} </h1>
+	<form class="form-stacked" action="{% url jobsub.views.submit_design job_design.id %}" method="POST" enctype="multipart/form-data">
+		{{ form.render_parameterization }}
+        <div class="actions">
             <input type="submit" name="submitter" value="Start Job" class="btn primary"/>
             <a href="/jobsub/" class="btn">Cancel</a>
         </div>
-
-    </div>
-    </div>
-</form>
+	</form>
+</div>
 {% endblock %}

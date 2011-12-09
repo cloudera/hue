@@ -15,21 +15,30 @@
 ## limitations under the License.
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-  ${comps.header("Job Task: " + task.taskId + "- Job Browser", "Tasks", "Task details")}
+  ${comps.header("Job Task: " + task.taskId + "- Job Browser", "", "Task details")}
 
-    <div id="job_browser_job" class="view jframe_padded">
-      <div class="jtv_meta_top clearfix">
-        <dl>
-          <dt>Task ID</dt>
-          <dd>${task.taskId_short}</dd>
-          <dt>Job</dt>
-          <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" class="frame_tip jt_view" title="View this job">${joblnk.jobId_short}</a></td>
-        </dl>
-        <dl>
-          <dt>Status</dt>
-          <dd>${task.state.lower()}</dd>
-        </dl>
-      </div>
+
+	<div class="sidebar">
+		<div class="well">
+			<h6>Task ID</h6>
+			${task.taskId_short}
+			
+			<h6>Job</h6>
+			<a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" class="frame_tip jt_view" title="View this job">${joblnk.jobId_short}</a>
+			
+			<h6>Status</h6>
+			% if task.state.lower() == 'running' or task.state.lower() == 'pending':
+				<span class="label warning">${task.state.lower()}</span>
+			% elif task.state.lower() == 'succeeded':
+				<span class="label success">${task.state.lower()}</span>
+			% else:
+				<span class="label">${task.state.lower()}</span>
+			% endif
+		</div>
+	</div>
+	
+	<div class="content">
+		<h1>Task details</h1>
 
 		<ul class="tabs">
 			<li class="active"><a href="#attempts">Attempts</a></li>
@@ -37,8 +46,8 @@
 			<li><a href="#counters">Counters</a></li>
 		</ul>
 
-		<div class="pill-content">
-			<div class="active" id="attempts">
+		<div class="tab-content">
+			<div class="tab-pane active" id="attempts">
 				<table id="attemptsTable">
 	              <thead>
 	                <tr>
@@ -77,7 +86,7 @@
 	              </tbody>
 	            </table>
 			</div>
-			<div id="metadata">
+			<div id="metadata" class="tab-pane">
 				<table id="metadataTable">
 	              <thead>
 	                <th>Name</th>
@@ -123,7 +132,7 @@
 	              </tbody>
 	            </table>
 			</div>
-			<div id="counters">
+			<div id="counters" class="tab-pane">
 				${comps.task_counters(task.counters)}
 			</div>
 		</div>

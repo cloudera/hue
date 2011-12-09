@@ -50,19 +50,6 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
           % else:
             ${design.name}
           % endif
-          
-          
-          <ul>
-            % if may_edit:
-              % if design.type == models.SavedQuery.REPORT:
-                <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report.">Edit</a></li>
-              % else:
-                <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="Edit this query.">Edit</a></li>
-              % endif
-              <li><a href="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query.">Delete</a></li>
-              <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query.">Usage History</a></li>
-            % endif
-          </ul>
         </td>
         <td>
           % if design.desc:
@@ -81,7 +68,18 @@ ${wrappers.head("Beeswax: Queries", section='saved queries')}
           ${ timesince(design.mtime) } ago
         </td>
         <td>
-          <a class="btn actions">Actions</a>
+	      	% if may_edit:
+			<a class="btn small contextEnabler" data-menuid="${design.id}">Actions</a>
+			<ul class="contextMenu" id="menu${design.id}">
+	             % if design.type == models.SavedQuery.REPORT:
+	               <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report." class="contextItem">Edit</a></li>
+	             % else:
+	               <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="Edit this query." class="contextItem">Edit</a></li>
+	             % endif
+	             <li><a href="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query." class="contextItem">Delete</a></li>
+	             <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
+			</ul>
+	        % endif
         </td>
       </tr>
     % endfor
@@ -98,40 +96,7 @@ ${comps.pagination(page)}
 			"bInfo": false,
 			"bFilter": false
 		});
-		
-		$(".actions").jHueContextMenu({
-			items: [
-				{
-					text: "Clone",
-					onSelect: function(){
-						location.href = "${ url('beeswax.views.clone_design', design_id=design.id) }";
-					}
-				},
-				{
-					divider: true
-				},
-				{
-					text: "Second option",
-					onSelect: function(){
-						alert('Clicked');
-					}
-				},
-				
-				{
-					text: "Third option",
-					onSelect: function(){
-						alert('Clicked');
-					}
-				},
-				{
-					text: "Fourth option",
-					onSelect: function(){
-						alert('Clicked');
-					}
-				}
-				
-			]
-        });
+		$(".contextEnabler").jHueContextMenu();
 
 	});
 </script>

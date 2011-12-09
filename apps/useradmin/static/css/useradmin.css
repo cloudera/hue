@@ -1,3 +1,11 @@
+// css Added here for convenience before merge -- FIXME
+
+.hidden {
+    display: none;
+}
+
+// end of convenience section
+
 .useradmin .jframe-window-toolbar {
 	position: absolute;
 }
@@ -39,13 +47,13 @@
 	margin: 8px;
 	padding-left: 26px;
 }
-.useradmin_userlist a.useradmin_add_user:hover {
+#useradmin_userlist a.useradmin_add_user:hover {
 	text-decoration: none;
 	background: #ddd url('../art/line_icons.png') no-repeat 4px -88px;
 	color: #333;
 	border: 1px solid #333;
 }
-.useradmin_edituser .view {
+#useradmin_edituser .view {
 	background: #eee;
 }
 .useradmin_edituser dt {

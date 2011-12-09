@@ -22,25 +22,8 @@
 	};
 
 	Plugin.prototype.init = function () {
+		$(".contextMenu").hide();
 		var _this = this;
-		$(this.element).mousedown(function(e){
-			e.preventDefault();
-			switch (e.which){
-				case 1: 
-					if (_this.options.on == "click"){
-						$("#jHueContextMenu").toggle().css({
-							left: e.pageX, 
-							top: e.pageY
-						});
-						
-					}
-					break;
-				case 3:
-					if (_this.options.on == "rightClick"){
-					}
-					break;
-			}
-		});
 		var _ctx;
 		if ($("#jHueContextMenu").length == 0){
 			_ctx = $("<ul>");
@@ -53,27 +36,58 @@
 			_ctx.empty();
 		}
 		_ctx.hide();
-		$(this.options.items).each(function(cnt, item){
-			var _item = $("<li>");
-			if (item.divider){
-				_item.addClass("divider");
+		
+		$(this.element).mousedown(function(e){
+			//e.preventDefault();
+			switch (e.which){
+				case 1: 
+					if (_this.options.on == "click"){
+						_ctx.empty();
+						if (_this.options.items.length > 0){
+							$(_this.options.items).each(function(cnt, item){
+								var _item = $("<li>");
+								if (item.divider){
+									_item.addClass("divider");
+								}
+								else {
+									var _link = $("<a>").text(item.text).attr("href","javascript:void(0)");
+									_link.appendTo(_item);
+									if (item.onSelect){
+										_link.click(function(){
+											item.onSelect();
+											_ctx.hide();
+										});
+									}
+								}
+								_item.appendTo(_ctx);
+							});
+						}
+						else {
+							$("#menu"+$(_this.element).attr("data-menuid")).find("li").clone().click(function(){
+								console.log($(this));
+							}).appendTo(_ctx);
+						}
+						
+						_ctx.toggle().css({
+							left: e.pageX, 
+							top: e.pageY
+						});
+						
+					}
+					break;
+				case 3:
+					if (_this.options.on == "rightClick"){
+					}
+					break;
 			}
-			else {
-				var _link = $("<a>").text(item.text).attr("href","javascript:void(0)");
-				_link.appendTo(_item);
-				if (item.onSelect){
-					_link.click(function(){
-						item.onSelect();
-						_ctx.hide();
-					});
-				}
-			}
-			_item.appendTo(_ctx);
 		});
 
-		$("body").click(function(){
-//			console.log(_ctx.is(":visible"));
+		$("body").mousedown(function(e){
+			if (!($(e.target).hasClass("contextEnabler")) && !($(e.target).hasClass("contextItem"))){
+				_ctx.hide();
+			}
 		});
+		
 			
 
 		

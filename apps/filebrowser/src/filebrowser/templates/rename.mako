@@ -15,17 +15,21 @@
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
 <%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head('Rename: ' + src_path.split('/')[-1])}
+${wrappers.head('Rename: ' + src_path.split('/')[-1], show_side_bar=False)}
 
-<h1>Renaming: ${src_path}</h1>
-<form action="/filebrowser/rename?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked">
+
+
   <div class="well">
+      <form action="/filebrowser/rename?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked">
+      <h1>Renaming: ${src_path}</h1>
+
     ${edit.render_field(form["src_path"], hidden=True)}
     ${edit.render_field(form["dest_path"], notitle=True)}
       <div>
         <input class="btn primary" type="submit" value="Submit" />
         <a class="btn" href="${next|u}">Cancel</a>
       </div>
+     </form>
   </div>
-</form>
+
 ${wrappers.foot()}

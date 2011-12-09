@@ -95,7 +95,9 @@
 	</div>
 	
 	<div class="container-fluid">
+		% if section != '':
 		<h1>${section}</h1>
+		% endif
 
 </%def>
 

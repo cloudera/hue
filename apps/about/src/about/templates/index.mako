@@ -28,7 +28,7 @@
 	
 	<style type="text/css">
       body {
-        padding-top: 60px;
+        padding-top: 100px;
       }
     </style>
 	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
@@ -78,16 +78,23 @@
 			</div>
 		</div>
 	</div>
+	<div class="menubar">
+		<div class="menubar-inner">
+			<div class="container-fluid">
+				<ul class="nav">
+					<li><a href="${url("desktop.views.dump_config")}">Configuration</a></li>
+					<li><a href="${url("desktop.views.check_config")}">Check for misconfiguration</a></li>
+					<li><a href="${url("desktop.views.log_view")}">Server Logs</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
 	
 	<div class="container-fluid">
 
 		<img src="/static/art/help/logo.png" />
-		<p>Hue</p>
-		<p>${version}</p>
-                <p>&nbsp;</p>
-                <p><a target="_blank" href="${url("desktop.views.dump_config")}">Configuration</a></p>
-                <p><a target="_blank" href="${url("desktop.views.check_config")}">Check for Misconfiguration</a></p>
-                <p><a target="_blank" href="${url("desktop.views.log_view")}">Server Logs</a></p>
+		<p>Hue ${version}</p>
+
 	</div>
 </body>
 

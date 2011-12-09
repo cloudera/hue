@@ -18,61 +18,163 @@
 <%!
 from desktop.lib.conf import BoundContainer, is_anonymous
 %>
-  
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<html><head><title>Hue Configuration</title></head>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta name="viewport" content="width=device-width user-scalable=no initial-scale=1" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<title>About :: Hue Configuration</title>
+	<link rel="stylesheet" href="/static/ext/css/bootstrap.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<link rel="stylesheet" href="/static/css/jhue.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	
+	<style type="text/css">
+      body {
+        padding-top: 100px;
+      }
+    </style>
+	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/js/Source/jHue/jquery.showusername.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/js/Source/jHue/jquery.filechooser.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/js/Source/jHue/jquery.contextmenu.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/ext/js/bootstrap-dropdown.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="/static/ext/js/bootstrap-tabs.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="/static/ext/js/bootstrap-modal.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="/static/ext/js/bootstrap-twipsy.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="/static/ext/js/bootstrap-popover.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
+
+	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function(){
+			$("#username").showUsername();
+			$("input:text[placeholder]").simplePlaceholder();
+			$(".submitter").keydown(function(e){
+				if (e.keyCode==13){
+					$(this).closest("form").submit();
+				}
+			}).change(function(){
+				$(this).closest("form").submit();
+			});
+		});
+	</script>
+	
+</head>
 <body>
-<h1>Hue Configuration</h1>
-<ul><li>Configuration files located in <code>${conf_dir}</code></li></ul>
-<h2>Installed applications</h2>
-% for app in sorted(apps, key=lambda app: app.name.lower()):
-${app.name}
-% endfor
-</ul>
+	<div class="topbar">
+		<div class="topbar-inner">
+			<div class="container-fluid">
+				<a class="brand" href="#">jHue</a>
+				<ul class="nav">
+					<li><a href="/beeswax">Beeswax</a></li>
+					<li><a href="/filebrowser/">File Browser</a></li>
+					<li><a href="/jobsub/">Job Designer</a></li>
+					<li><a href="/jobbrowser/jobs/">Job Browser</a></li>
+					<li><a href="/useradmin/">User Admin</a></li>
+					<li><a href="/shell/">Shell</a></li>
+					<li><a href="/help/">Help</a></li>
+					<li class="active"><a href="/about/">About</a></li>
+				</ul>
+				<p class="pull-right">Logged in as <a id="username" href="/accounts/logout">xxx</a></p>
+			</div>
+		</div>
+	</div>
+	<div class="menubar">
+		<div class="menubar-inner">
+			<div class="container-fluid">
+				<ul class="nav">
+					<li><a href="${url("desktop.views.dump_config")}" class="selected">Configuration</a></li>
+					<li><a href="${url("desktop.views.check_config")}">Check for misconfiguration</a></li>
+					<li><a href="${url("desktop.views.log_view")}">Server Logs</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	
+	<div class="container-fluid">
 
-<h2>Configuration Sections</h2>
-% for obj in top_level.get().values():
-  <a href="#${obj.config.key}">${obj.config.key}</a>
-% endfor
+		Configuration files located in <code>${conf_dir}</code>
+		<br/><br/>
+		
+		<h2>Installed applications</h2>
+		<ul>
+		% for app in sorted(apps, key=lambda app: app.name.lower()):
+			<li>${app.name}</li>
+		% endfor
+		</ul>
 
-<h2>Configuration Variables</h2>
-<%def name="recurse(config_obj, depth=0)">
-<dl>
-  <dt>
-  % if is_anonymous(config_obj.config.key):
-    <i>(default section)</i>
-  % else:
-    % if depth == 1:
-      <a name=${config_obj.config.key}></a>
-    % endif
-    ${config_obj.config.key}
-  % endif
-  </dt>
-  <dd>
-  % if isinstance(config_obj, BoundContainer):
-    <p class="dump_config_help"><i>${config_obj.config.help or "No help available."}</i></p>
+		<h2>Configuration Sections</h2>
+		
+		<ul class="tabs">
+			% for obj in top_level.get().values():
+				<li><a href="#${obj.config.key}">${obj.config.key}</a></li>
+			% endfor
+		</ul>
 
-    % for v in config_obj.get().values():
-<%
-      # Don't recurse into private variables.
-      if v.config.private and not show_private:
-        continue
-%>
-    ${recurse(v, depth + 1)}
-    % endfor
-  % else:
-    <p>${str(config_obj.get())}</p>
-    <p class="dump_config_help"><i>${config_obj.config.help or "No help available."}</i></p>
-    <p class="dump_config_default">Default: <i>${config_obj.config.default}</i></p>
-  % endif
-  </dd>
-</dl>
-</%def>
+		
+		
 
-${recurse(top_level)}
+		<h2>Configuration Variables</h2>
 
-<hr/>
+		<%def name="recurse(config_obj, depth=0)">
+		% if is_anonymous(config_obj.config.key):
+			moo
+		% else:
+		    % if depth == 1:			  
+		      <hr/>
+		    % endif
+        % endif
+		<table>
+		<tr>
+		  <th>
+		  % if is_anonymous(config_obj.config.key):
+		    <i>(default section)</i>
+		  % else:
+		    % if depth == 1:			  
+		      <a name=${config_obj.config.key}></a>
+		    % endif
+		    ${config_obj.config.key}
+		  % endif
+		  </th>
+		  <td>
+		  % if isinstance(config_obj, BoundContainer):
+		    <p class="dump_config_help"><i>${config_obj.config.help or "No help available."}</i></p>
 
-<a href="/accounts/logout">Logout</a>
+		    % for v in config_obj.get().values():
+		<%
+		      # Don't recurse into private variables.
+		      if v.config.private and not show_private:
+		        continue
+		%>
+		    ${recurse(v, depth + 1)}
+		    % endfor
+		  % else:
+		    <p>${str(config_obj.get())}</p>
+		    <p class="dump_config_help"><i>${config_obj.config.help or "No help available."}</i></p>
+		    <p class="dump_config_default">Default: <i>${config_obj.config.default}</i></p>
+		  % endif
+		  </td>
+		</tr>
+		</table>
+		</%def>
+		
+		${recurse(top_level)}
+
+		<hr/>
+		
+	</div>
+
+	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function(){
+			$(".tabs").tabs();
+		});
+	</script>
 </body>
+
 </html>

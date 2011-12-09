@@ -23,9 +23,14 @@
   dirname_enc = urlencode(dirname)
 %>
 <%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head('${truncate(filename)} :: File Editor', show_upload=False, show_new_directory=False)}
-<div class="toolbar"><a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View Location</a></div>
+${wrappers.head('${truncate(filename)} :: File Editor', show_upload=False, show_new_directory=False, show_side_bar=False)}
+
+
 <h1>${truncate(path, 91)}</h1>
+<div class="well" >
+    <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
+    <div class="toolbar"><a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View Location</a></div>
+
 
 
 % if form.errors:
@@ -37,9 +42,6 @@ ${wrappers.head('${truncate(filename)} :: File Editor', show_upload=False, show_
     % endfor
   </div>
 % endif
-<form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
-<div class="well" >
-
         ${edit.render_field(form["path"], hidden=True, notitle=True)}
         ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
         
@@ -48,8 +50,8 @@ ${wrappers.head('${truncate(filename)} :: File Editor', show_upload=False, show_
         <input class="btn primary" type="submit" name="save" value="save">
         <input class="btn" type="submit" name="save" value="saveAs">
 
-
+    </form>
 </div>
-</form>
+
 ${wrappers.foot()}
 

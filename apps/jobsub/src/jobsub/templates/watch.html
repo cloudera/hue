@@ -46,7 +46,17 @@ limitations under the License.
             <span class="jobsub_actual_date" style="display: none">{{ submission.submission_date|date:"U" }}</span>
             {{ submission.submission_date|timesince }} ago
         </td>
-        <td>{{ submission.last_seen_state_as_string }}</td>
+
+        <td>
+        {%if submission.last_seen_state_as_string == "SUCCESS" %}
+            <span class="label success">{{ submission.last_seen_state_as_string }}</span>
+        {% else %}
+        {%if submission.last_seen_state_as_string == "ERROR" %}
+            <span class="label important">{{ submission.last_seen_state_as_string }}</span>
+        {%else %}
+            <span class="label">{{ submission.last_seen_state_as_string }}</span>
+        {% endif %}{% endif %}
+        </td>
         <td><a href="{{ submission.watch_url }}" class="btn">Watch Progress</a></td>
     </tr>
     {% endfor %}

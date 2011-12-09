@@ -17,34 +17,40 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% block title %}Job Design Editor{% endblock %}
+{% block nav %}
+<li><a href="{% url jobsub.views.list_designs %}" class="selected">Job List</a></li>
+<li><a href="{% url jobsub.views.watch %}">History</a></li>
+{% endblock %}
+
 {% block content %}
-<h1>Job Design Editor: {{form.name}} Job</h1>
-<div class="alert-message block-message info">
-    <b>Tip</b>:
-    Job Designs allow you to rudimentarily parameterize your jobs by using variables.
-    At submission time, you'll be prompted to specify the values of any variables
-    of the form <i>$variable_name</i>.
-    <!--
-                     TODO(philip): Put this in if the file chooser is hooked up.
-
-                     The following variables are treated specially, prompting a "file chooser"
-                     tool.
-
-                     <dl class="jobsub_notes clearfix">
-                     <dt><tt>$input</tt></dt><dd>Input for your job.</dd>
-                     <dt><tt>$output</tt></dt><dd>Output directory (must not already exist) for your job.</dd>
-                     </dl>
-                     -->
-</div>
-
-<div class="container-fluid">
-    <div class="sidebar well">
-        {% include "types.html" %}
+    <div class="sidebar">
+		<div class="well">
+        	{% include "types.html" %}
+		</div>
     </div>
-    <div class="content well">
+    <div class="content">
+		<h1>Job Design Editor: {{form.name}} Job</h1>
         {% if message %}
         <div>{{message}}</div>
         {% endif %}
+		<div class="alert-message block-message info">
+		    <b>Tip</b>:
+		    Job Designs allow you to rudimentarily parameterize your jobs by using variables.
+		    At submission time, you'll be prompted to specify the values of any variables
+		    of the form <i>$variable_name</i>.
+		    <!--
+		                     TODO(philip): Put this in if the file chooser is hooked up.
+
+		                     The following variables are treated specially, prompting a "file chooser"
+		                     tool.
+
+		                     <dl class="jobsub_notes clearfix">
+		                     <dt><tt>$input</tt></dt><dd>Input for your job.</dd>
+		                     <dt><tt>$output</tt></dt><dd>Output directory (must not already exist) for your job.</dd>
+		                     </dl>
+		                     -->
+		</div>
+
         <form method="POST" action="{{ edit_url }}" enctype="multipart/form-data" class="form-stacked">
 
             <input type="hidden" name="type" value="{{ form.type_str }}"/>
@@ -57,15 +63,18 @@ limitations under the License.
 
 
             {{ form.render_edit }}
-            <div style="padding-top: 10px;">
+			
+			<div class="actions">
                 <input type="submit" name="submit" value="Save" class="btn primary"/>
                 <input type="checkbox" name="save_submit"/> Submit upon save.
                 <a href="/jobsub/" class="btn">Cancel</a>
-            </div>
+			</div>
+
+
         </form>
 
 
     </div>
-</div>
+
 
 {% endblock %}

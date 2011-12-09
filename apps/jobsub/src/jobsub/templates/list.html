@@ -22,18 +22,16 @@ limitations under the License.
 <li><a href="{% url jobsub.views.watch %}">History</a></li>
 {% endblock %}
 {% block content %}
-<div>
-    <h1>Job Designer: Job Designs</h1>
-
-    <div class="container-fluid">
-        <div class="sidebar well">
-
+        <div class="sidebar">
+			<div class="well">
             {% include "types.html" %}
+			</div>
         </div>
+
         <div class="content">
+			<h1>Job Designer: Job Designs</h1>
             <form action="{% url jobsub.list %}" method="get">
                 <div class="well">
-
                     <span>Filter By Owner:</span>
                     <input name="owner" alt="Filter By Owner"
                            value="{{ owner }}"/>
@@ -84,10 +82,6 @@ limitations under the License.
                 </tbody>
             </table>
         </div>
-
-    </div>
-
-</div>
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
         $(".datatables").dataTable({

@@ -14,20 +14,21 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head('Move: ' + src_path.split('/')[-1])}
 
-<h1>Move: ${src_path}</h1>
-<form action="/filebrowser/move?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked">
-
-  <div class="well">
-    ${edit.render_field(form["src_path"], hidden=True)}
-    ${edit.render_field(form["dest_path"], notitle=True)}
-    <div>
-        <input class="btn primary" type="submit" value="Submit" />
-        <a class="btn" href="${next|u}">Cancel</a>
+<form action="/filebrowser/move?next=${next|u}" method="POST" enctype="multipart/form-data"
+      class="form-stacked form-padding-fix">
+    <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3>Move: ${src_path}</h3>
     </div>
-  </div>
-
+    <div class="change-owner-modal-body clearfix" >
+        <div style="padding-left: 15px;">
+        ${edit.render_field(form["src_path"], hidden=True)}
+        ${edit.render_field(form["dest_path"], notitle=True)}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input class="btn primary" type="submit" value="Submit"/>
+        <a class="btn" onclick="$('#move-modal').modal('hide');">Cancel</a>
+    </div>
 </form>
-${wrappers.foot()}

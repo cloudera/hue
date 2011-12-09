@@ -37,7 +37,7 @@ def is_home(path):
         return ""
 %>
 
-<%def name="head(title='Beeswax for Hive', section='', path='', current_request_path=False, toolbar=True, cwd_set=True, show_upload=False, show_new_directory=False)">
+<%def name="head(title='Beeswax for Hive', section='', path='', current_request_path=False, toolbar=True, cwd_set=True, show_upload=False, show_new_directory=False, show_side_bar=True)">
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -61,6 +61,9 @@ def is_home(path):
 	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/bootstrap-tabs.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/ext/js/bootstrap-modal.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/ext/js/bootstrap-alerts.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/ext/js/bootstrap-dropdown.js" type="text/javascript" charset="utf-8"></script>
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
@@ -84,6 +87,7 @@ def is_home(path):
 				<a class="brand" href="#">jHue</a>
 				<ul class="nav">
 					<li><a href="/beeswax">Beeswax</a></li>
+
 					<li class="active"><a href="/filebrowser/">File Browser</a></li>
 					<li><a href="/jobsub/">Job Designer</a></li>
 					<li><a href="/jobbrowser/jobs/">Job Browser</a></li>
@@ -96,33 +100,41 @@ def is_home(path):
 			</div>
 		</div>
 	</div>
+    % if breadcrumbs:
+
 	<div class="menubar">
 		<div class="menubar-inner">
-			<div class="container-fluid">
-				<ul class="nav">
-                     % if toolbar:
-                        % if home_directory:
-                          <% my_home_disabled = "" %>
-                        % else:
-                          <% my_home_disabled = "disabled" %>
-                        % endif
-                        <li><a class="${is_home(path)}" href="${url('filebrowser.views.view', path=(home_directory or "/"))}">My Home</a></li>
-                        % if cwd_set:
-                          % if show_upload:
-                            <li><a class="${is_selected(section, 'upload')}" href="${url('filebrowser.views.upload')}?dest=${path|urlencode}&next=${current_request_path|urlencode}">Upload Files</a></li>
-                          % endif
-                          % if show_new_directory:
-                            <li><a class="${is_selected(section, 'new directory')}" href="${url('filebrowser.views.mkdir')}?path=${path|urlencode}&next=${current_request_path|urlencode}">New Directory</a></li>
-                          %endif
-                        % endif
-                     % endif
-				</ul>
-			</div>
+			<ul class="breadcrumb">
+                % for breadcrumb_item in breadcrumbs:
+                <li><a href="/filebrowser/view${breadcrumb_item['url']}">${breadcrumb_item['label']}</a> <span class="divider">/</span></li>
+                % endfor
+            </ul>
+            
+
 		</div>
 	</div>
+    %endif
 
 	<div class="container-fluid">
+        % if show_side_bar:
+         <div class="sidebar">
+            <div class="well">
+                 % if toolbar:
 
+                        <ul>
+                        % if cwd_set:
+                          % if show_upload:
+                            <li><a class="upload-link" href="#">Upload Files</a></li>
+                          % endif
+                          % if show_new_directory:
+                            <li><a class="create-directory-link" href="#">New Directory</a></li>
+                          %endif
+                        % endif
+                            </ul>
+                  % endif
+            </div>
+        </div>
+        % endif
 </%def>
 
 <%def name="foot()">

@@ -19,34 +19,41 @@ limitations under the License.
 {% block title %}Job - {{ submission.name }}{% endblock %}
 {% block head %}
 	{% if not completed %}
-		<meta http-equiv="refresh" content="10" />
+		<meta http-equiv="refresh" content="5" />
 	{% endif %}
 {% endblock %}
+{% block nav %}
+<li><a href="{% url jobsub.views.list_designs %}" class="selected">Job List</a></li>
+<li><a href="{% url jobsub.views.watch %}">History</a></li>
+{% endblock %}
 {% block content %}
-	<div id="jobsub_output" class="view">
-		<h1>Job - {{ submission.name }}</h1>
-		<b class="state{% if completed %} complete {% endif %}" data-single-partial-id="0">
+	<div class="sidebar">
+		<div class="well">
+			<h6>Status</h6>
 			{% if completed %}
-				status: finished
+				<span class="label success">Finished</span>
 			{% else %}
-				status: running
-				<input type="hidden" value="5" class="autorefresh">
-				<span class="jobsub_autorefresh_note">note: this view will auto refresh in <span class="sec_to_autorefresh"></span> seconds</span>
+				<span class="label warning">Running</span>
+				<span class="help-block">note: this view will auto refresh every 5 seconds</span>
 			{% endif %}
-		</b>
-		<div class="jframe_padded" data-filters="SizeTo" data-size-to-height="-74">
-			<h2 class="jobsub_output_links_header">Launched Jobs</h2>
-			<ul class="jobsub_output_links" data-single-partial-id="1">
+			<br/><br/>
+			<h6>Launched Jobs</h6>
+			<ul>
 				{% for j in jobs %}
-					<li><a href="{% url single_job jobid=j %}" target="JobBrowser">{{ j }}</a>
+				<li><a href="{% url single_job jobid=j %}">{{ j }}</a>
 				{% endfor %}
 			</ul>
-
-			<h2 class="jobsub_output_stout_header">Last 10KB of stdout:</h2>
-			<pre class="jobsub_output_stout" data-single-partial-id="2">{{ job_data.stdout_tail }}</pre>
-
-			<h2 class="jobsub_output_sterr_header">Last 10KB of stderr:</h2>
-			<pre class="jobsub_output_sterr" data-single-partial-id="3">{{ job_data.stderr_tail }}</pre>
 		</div>
 	</div>
+	
+	<div class="content">
+		<h1>Job - {{ submission.name }}</h1>		
+
+		<h2>Last 10KB of stdout:</h2>
+		<pre>{{ job_data.stdout_tail }}</pre>
+
+		<h2>Last 10KB of stderr:</h2>
+		<pre>{{ job_data.stderr_tail }}</pre>
+	</div>
+		
 {% endblock %}
