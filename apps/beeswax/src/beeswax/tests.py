@@ -857,6 +857,13 @@ for x in sys.stdin:
     assert_true("<td>nada</td>" in resp.content)
     assert_true("<td>sp ace</td>" in resp.content)
 
+  def test_describe_view(self):
+    resp = self.client.get('/beeswax/table/myview')
+    assert_equal(None, resp.context['top_rows'])
+    assert_true(resp.context['is_view'])
+    assert_true("Beeswax View Metadata" in resp.content)
+    assert_true("Drop View" in resp.content)
+
 
 def test_import_gzip_reader():
   """Test the gzip reader in create table"""

@@ -65,35 +65,51 @@ def show_tables(request):
 
 def describe_table(request, table):
   table_obj = db_utils.meta_client().get_table("default", table)
-  # Show the first few rows
-  hql = "SELECT * FROM `%s`" % (table,)
-  query_msg = make_beeswax_query(request, hql)
-  try:
-    results = db_utils.execute_and_wait(request.user, query_msg, timeout_sec=5.0)
-  except:
-    # Gracefully degrade if we're unable to load the results.
-    logging.exception("Failed to read table '%s'" % table)
-    results = None
+  sample_results = None
+  is_view = table_obj.tableType == 'VIRTUAL_VIEW'
+
+  # Don't show samples if it's a view (HUE-526).
+  if not is_view:
+    # Show the first few rows
+    hql = "SELECT * FROM `%s`" % (table,)
+    query_msg = make_beeswax_query(request, hql)
+    try:
+      sample_results = db_utils.execute_and_wait(request.user, query_msg, timeout_sec=5.0)
+    except:
+      # Gracefully degrade if we're unable to load the results.
+      logging.exception("Failed to read table '%s'" % table)
+      sample_results = None
+
   hdfs_link = location_to_url(request, table_obj.sd.location)
   load_form = beeswax.forms.LoadDataForm(table_obj)
   return render("describe_table.mako", request, dict(
       table=table_obj,
       table_name=table,
-      top_rows=results and list(parse_results(results.data)) or None,
+      top_rows=sample_results and list(parse_results(sample_results.data)) or None,
       hdfs_link=hdfs_link,
-      load_form=load_form
+      load_form=load_form,
+      is_view=is_view
   ))
 
 def drop_table(request, table):
+  table_obj = db_utils.meta_client().get_table("default", table)
+  is_view = table_obj.tableType == 'VIRTUAL_VIEW'
+
   if request.method == 'GET':
     # It may be possible to determine whether the table is
     # external by looking at db_utils.meta_client().get_table("default", table).tableType,
     # but this was introduced in Hive 0.5, and therefore may not be available
     # with older metastores.
-    title = "This may delete the underlying data as well as the metadata.  Drop table %s?" % table
+    if is_view:
+      title = "Do you really want to drop the view '%s'?" % (table,)
+    else:
+      title = "This may delete the underlying data as well as the metadata.  Drop table '%s'?" % table
     return render('confirm.html', request, dict(url=request.path, title=title))
   elif request.method == 'POST':
-    hql = "DROP TABLE `%s`" % (table,)
+    if is_view:
+      hql = "DROP VIEW `%s`" % (table,)
+    else:
+      hql = "DROP TABLE `%s`" % (table,)
     query_msg = make_beeswax_query(request, hql)
     try:
       return execute_directly(request,
@@ -102,7 +118,7 @@ def drop_table(request, table):
     except BeeswaxException, ex:
       # Note that this state is difficult to get to.
       error_message, log = expand_exception(ex)
-      error = "Failed to remove table.  Error: " + error_message
+      error = "Failed to remove %s.  Error: %s" % (table, error_message)
       raise PopupException(error, title="Beeswax Error", detail=log)
 
 
