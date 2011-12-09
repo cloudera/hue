@@ -36,16 +36,18 @@
 
           <div class="clearfix">
             <div class="input">
-              <textarea class="span12" rows="9"
-		        placeholder="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+              	<textarea class="span12" rows="9" placeholder="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+				<div id="validationResults">
+				% if len(form.query["query"].errors):
+					${unicode(form.query["query"].errors) | n}
+				 % endif
+				</div>
             </div>
           </div>
         </fieldset>
-		 % if len(form.query["query"].errors):
-	          <div class="validation-advice ">
-	             ${unicode(form.query["query"].errors) | n}
-	          </div>
-	        % endif
+
+		
+		 
 		<div class="actions">
 			<a id="executeQuery" class="btn primary">Execute</a>
 			% if design and not design.is_auto and design.name:
@@ -355,10 +357,21 @@ ${wrappers.head('Hive Query', section='query')}
 		$("#queryField").change(function(){
 			$(".query").val($(this).val());
 		});
+		
+		$("#queryField").focus(function(){
+			$(this).removeClass("fieldError");
+			$("#validationResults").empty();
+		});
 				
 		function checkAndSubmit(){
 			$(".query").val($("#queryField").val());
-			$("#advancedSettingsForm").submit();
+			if ($.trim($("#queryField").val()) == ""){
+				$("#queryField").addClass("fieldError");
+				$("#validationResults").html('<ul class="errorlist"><li>This field is required.</li></ul>');
+			}
+			else {
+				$("#advancedSettingsForm").submit();
+			}
 		}
 		
 		$("#chooseFile").modal({

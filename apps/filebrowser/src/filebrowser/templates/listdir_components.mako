@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 import datetime
+import hashlib
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time
 from desktop.lib.django_util import reverse_with_get
 %>
@@ -114,23 +115,28 @@ from desktop.lib.django_util import reverse_with_get
           <td><span>${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime']))}</span></td>
           <td>
              % if ".." != file['name']:
+				<%
+				m = hashlib.md5()
+				m.update(path)
+				%>
+				<a class="btn small contextEnabler" data-menuid="${urlencode(m.hexdigest())}">Options</a>
+				<ul class="contextMenu" id="menu${urlencode(m.hexdigest())}">
                 % if "dir" == file['type']:
-                  <a class="btn danger small delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="true" data-keyboard="true">Delete</a></li>
-                  <a class="btn danger small delete" delete-type="rmtree" file-to-delete="${path}" >Delete Recursively</a>
+                  <li><a class="contextItem delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
+                  <li><a class="contextItem delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete Recursively</a></li>
                 % else:
-                  <a class="btn small danger delete" delete-type="remove" file-to-delete="${path}">Delete</a>
-                  <a class="btn small" href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a>
-                  <a class="btn small" href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a>
-                  <a class="btn small" href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a>
+                  <li><a class="contextItem delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
+                  <li><a class="contextItem" href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a></li>
+                  <li><a class="contextItem" href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a></li>
+                  <li><a class="contextItem" href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
 
                 % endif
-                <a class="btn small rename" file-to-rename="${path}">Rename</a>
-                <a class="btn small" onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a>
+                <li><a class="contextItem rename" file-to-rename="${path}">Rename</a></li>
+                <li><a class="contextItem" onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
 
-                <a class="btn small" onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a>
-                <a class="btn small" onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a>
-
-
+                <li><a class="contextItem" onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a></li>
+                <li><a class="contextItem" onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a></li>
+				</ul>
               % endif
           </td>
         </tr>
@@ -148,10 +154,10 @@ from desktop.lib.django_util import reverse_with_get
         <p>Are you sure you want to delete this file?</p>
     </div>
     <div class="modal-footer">
-        <a id="cancel-delete-button" class="btn primary">No</a>
         <form id="delete-form" action="" method="POST" enctype="multipart/form-data" class="form-stacked">
-        <input id="file-to-delete-input" type="hidden" name="path" id="id_path" />
-        <input type="submit" value="Yes" class="btn" />
+			<input type="submit" value="Yes" class="btn primary" />
+			<a id="cancel-delete-button" class="btn">No</a>
+        	<input id="file-to-delete-input" type="hidden" name="path" id="id_path" />
         </form>
     </div>
 
@@ -336,46 +342,46 @@ from desktop.lib.django_util import reverse_with_get
 	});
 
     //delete handlers
-    $(".delete").click(function(eventObject){
+    $(".delete").live("click",function(eventObject){
         $('#file-to-delete-input').attr('value', $(eventObject.target).attr('file-to-delete'));
         $('#delete-form').attr('action', '/filebrowser/' + $(eventObject.target).attr('delete-type') + '?next=' + encodeURI('${current_request_path}') + '&path=' + encodeURI('${path}'));
         $('#delete-modal').modal('show');
-    })
+    });
 
     $('#cancel-delete-button').click(function(){
         $('#delete-modal').modal('hide');
-    })
+    });
 
     //rename handlers
-    $(".rename").click(function(eventObject){
+    $(".rename").live("click",function(eventObject){
         $('#rename_src_path').attr('value', $(eventObject.target).attr('file-to-rename'));
         $('#rename-file-name').text($(eventObject.target).attr('file-to-rename'));
         $('#rename-modal').modal('show');
-    })
+    });
 
     $('#cancel-rename-button').click(function(){
         $('#rename-modal').modal('hide');
-    })
+    });
 
     $('#rename-form').submit(function(){
         if($('#new-name-input').val() == ''){
             $('#rename-name-required-alert').show(250);
             return false;
         }
-    })
+    });
 
     //upload handlers
     $('.upload-link').click(function(){
         $('#upload-modal').modal('show');
-    })
+    });
 
     //create directory handlers
     $('.create-directory-link').click(function(){
         $('#create-directory-modal').modal('show');
-    })
+    });
     $('#cancel-create-directory-button').click(function(){
         $('#create-directory-modal').modal('hide');
-    })
+    });
     $('#create-directory-form').submit(function(){
 
         if($('#new-directory-name-input').val()==''){
@@ -383,7 +389,7 @@ from desktop.lib.django_util import reverse_with_get
             return false;
         }
 
-    })
+    });
 
     //filter handlers
     $('#filter-input').keyup(function(){
@@ -397,14 +403,18 @@ from desktop.lib.django_util import reverse_with_get
           }
         });
 
-    })
+    });
 
     $('#clear-filter-button').click(function(){
         $('#filter-input').val('');
         $.each($('.file-row'), function(index, value) {
             $(value).show(250);
         });
-    })
+    });
+
+	$(".contextEnabler").jHueContextMenu();
+
+
 
 </script>
 

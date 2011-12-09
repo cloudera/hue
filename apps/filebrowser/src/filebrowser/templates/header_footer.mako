@@ -19,6 +19,7 @@
 ## multiple spaces and line breaks cause issues
 <%!
 import datetime
+import hashlib
 from django.template.defaultfilters import urlencode, escape
 %>
 <%!
@@ -58,11 +59,11 @@ def is_home(path):
     </style>
 	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/js/Source/jHue/jquery.showusername.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/js/Source/jHue/jquery.contextmenu.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/ext/js/bootstrap-tabs.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/ext/js/bootstrap-modal.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/static/ext/js/bootstrap-alerts.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/ext/js/bootstrap-dropdown.js" type="text/javascript" charset="utf-8"></script>
 
 	<script type="text/javascript" charset="utf-8">

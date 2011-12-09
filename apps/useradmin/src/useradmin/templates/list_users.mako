@@ -17,7 +17,16 @@
 <% import urllib %>
 
 ${wrappers.head()}
-	<h1>jHue Users</h1>
+	
+	<div class="sidebar">
+		<div class="well">
+			<ul>
+				<li><a href="${ url('useradmin.views.edit_user') }">Add User</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	<div class="content">
       <table class="datatables">
         <thead>
           <tr>
@@ -41,13 +50,28 @@ ${wrappers.head()}
             </td>
             <td>
               <a title="Edit ${user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">Edit</a>
-              <a title="Delete ${user.username}" class="btn small" alt="Are you sure you want to delete ${user.username}?" href="${ url('useradmin.views.delete_user', username=urllib.quote_plus(user.username)) }">Delete</a>
+              <a title="Delete ${user.username}" class="btn small confirmationModal" alt="Are you sure you want to delete ${user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(user.username)) }">Delete</a>
             </td>
           </tr>
         % endfor
         </tbody>
       </table>
-      <a class="btn primary" href="${ url('useradmin.views.edit_user') }">Add User</a>
+</div>
+
+
+<div id="deleteUser" class="modal hide fade">
+	<form id="deleteUserForm" action="" method="POST">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3 id="deleteUserMessage">Confirm action</h3>
+	</div>
+	<div class="modal-footer">
+		<input type="submit" class="btn primary" value="Yes"/>
+		<a href="#" class="btn secondary hideModal">No</a>
+	</div>
+	</form>
+</div>
+      
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
@@ -59,6 +83,22 @@ ${wrappers.head()}
 			});
 			$(".dataTables_wrapper").css("min-height","0");
 			$(".dataTables_filter").hide();
+
+			$("#deleteUser").modal({
+				backdrop: "static",
+				keyboard: true
+			});
+			$(".confirmationModal").click(function(){
+				var _this = $(this);
+				$.getJSON(_this.attr("data-confirmation-url"), function(data){
+					$("#deleteUserForm").attr("action", data.path);
+					$("#deleteUserMessage").text(_this.attr("alt"));
+				});
+				$("#deleteUser").modal("show");
+			});
+			$(".hideModal").click(function(){
+				$("#deleteUser").modal("hide");
+			});
 
 		});
 	</script>

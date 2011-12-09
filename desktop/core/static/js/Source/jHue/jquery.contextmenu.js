@@ -45,7 +45,7 @@
 						_ctx.empty();
 						if (_this.options.items.length > 0){
 							$(_this.options.items).each(function(cnt, item){
-								var _item = $("<li>");
+								var _item = $("<li>").addClass("contextItem");
 								if (item.divider){
 									_item.addClass("divider");
 								}
@@ -64,7 +64,9 @@
 						}
 						else {
 							$("#menu"+$(_this.element).attr("data-menuid")).find("li").clone().click(function(){
-								console.log($(this));
+								window.setTimeout(function(){
+									_ctx.hide();
+								}, 100);
 							}).appendTo(_ctx);
 						}
 						
@@ -87,9 +89,6 @@
 				_ctx.hide();
 			}
 		});
-		
-			
-
 		
 	};
 

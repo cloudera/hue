@@ -151,7 +151,26 @@ code {
     display:none;
 }
 
+.contextItem {
+	cursor:pointer;
+}
 
+.fieldError {
+	border-color: #EE5F5B;
+	color: #B94A48;
+}
+
+ul.errorlist {
+	list-style: none outside none;
+	margin-left: 0;
+}
+
+ul.errorlist li {
+	color: #B94A48;
+	padding:2px;
+	font-weight:bold;
+	font-style:italic;
+}
 
 /*
  *  File:         demo_table.css
