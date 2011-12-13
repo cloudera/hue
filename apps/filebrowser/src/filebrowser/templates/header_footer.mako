@@ -97,7 +97,7 @@ def is_home(path):
 					<li><a href="/help/">Help</a></li>
 					<li><a href="/about/">About</a></li>
 				</ul>
-				<p class="pull-right">Logged in as <a id="username" href="/accounts/logout">xxx</a></p>
+				<p class="pull-right">Logged in as <strong><span id="username">xxx</span></strong> - <a href="/accounts/logout">Sign out</a></p>
 			</div>
 		</div>
 	</div>

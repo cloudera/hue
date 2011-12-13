@@ -55,7 +55,9 @@
 					<li><a href="/jobsub/">Job Designer</a></li>
 					<li><a href="/jobbrowser/jobs/">Job Browser</a></li>
 					<li><a href="/useradmin/">User Admin</a></li>
+					<li><a href="/shell/">Shell</a></li>
 					<li><a href="/help/">Help</a></li>
+					<li><a href="/about/">About</a></li>
 				</ul>
 			</div>
 		</div>
