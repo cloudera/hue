@@ -29,7 +29,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.DFSClient;
+import org.apache.hadoop.hdfs.BlockReader;
+import org.apache.hadoop.hdfs.DFSClient.RemoteBlockReader;
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.net.NetUtils;
@@ -87,11 +88,11 @@ public class DatanodePlugin
         public BlockData run() throws IOException {
 
           BlockData ret = new BlockData();
-          DFSClient.BlockReader reader = null;
+          BlockReader reader = null;
           try {
             Token<BlockTokenIdentifier> token = new Token<BlockTokenIdentifier>();
             token.decodeFromUrlString(block.token);
-            reader = DFSClient.BlockReader.newBlockReader(getSocket(), block.path, block.blockId,
+            reader = RemoteBlockReader.newBlockReader(getSocket(), block.path, block.blockId,
                 token, block.genStamp, offset, length, bufferSize, true, serverContext
                     .getClientName());
             byte[] buf = new byte[length];
