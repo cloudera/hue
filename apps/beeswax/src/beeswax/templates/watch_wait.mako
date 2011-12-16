@@ -19,8 +19,8 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
 
 <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
 
-
-<div class="sidebar">
+<h1>Beeswax: Waiting for query... ${util.render_query_context(query_context)}</h1>
+<div class="sidebar withTitle">
 	<div class="well">
 		% if download_urls:
 		<h6>Downloads</h6>
@@ -51,7 +51,6 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
 
 
 <div class="content">
-	<h1>Waiting for results: ${util.render_query_context(query_context)}</h1>
 	<ul class="tabs">
 		<li class="active"><a href="#log">Log</a></li>
 		<li><a href="#query">Query</a></li>

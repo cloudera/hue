@@ -74,7 +74,8 @@
 
 
 ${wrappers.head('Hive Query', section='query')}
-<div class="sidebar">
+<h1>Hive Query</h1>
+<div class="sidebar withTitle">
 	<div class="well">
 	<form id="advancedSettingsForm" action="${action}" method="POST" class="form-stacked noPadding">
 		<h4>Advanced settings</h4>
@@ -222,7 +223,6 @@ ${wrappers.head('Hive Query', section='query')}
 </div>
 
 <div class="content">
-	<h1>Query Editor</h1>
 	<div class="form-stacked">
 		% if error_message:
 			<div class="alert-message block-message error">

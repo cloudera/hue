@@ -19,7 +19,7 @@ from django.template.defaultfilters import timesince
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="wrappers" file="header_footer.mako" />
 ${wrappers.head("Beeswax: Queries", section='saved queries')}
-<h1>Saved Queries</h1>
+<h1>Beeswax: Queries</h1>
   <table class="datatables">
     <thead>
       <tr>

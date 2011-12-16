@@ -17,8 +17,8 @@
 <%namespace name="util" file="util.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 ${wrappers.head("Beeswax: Query Results", section='query')}
-
-<div class="sidebar">
+<h1>Beeswax: Query Results: ${util.render_query_context(query_context)}</h1>
+<div class="sidebar withTitle">
 	<div class="well">
 		% if download_urls:
 		<h6>Downloads</h6>
@@ -45,7 +45,7 @@ ${wrappers.head("Beeswax: Query Results", section='query')}
 	</div>
 </div>
 <div class="content">
-	<h1>Query results: ${util.render_query_context(query_context)}</h1>
+	
                 <div class="collapsible jframe-hidden bw-save_query_results" style="display:none" data-filters="Accordion"> 
                   <form action="${url('beeswax.views.save_results', query.id) }" method="POST">
                     ## Writing the save_target fields myself so I can match them to their respective text input fields.

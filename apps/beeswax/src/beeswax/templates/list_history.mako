@@ -41,8 +41,8 @@ ${wrappers.head("Beeswax: Query History", section='history')}
     [ Auto generated action ]
   % endif
 </%def>
-
-<div class="sidebar">
+<h1>Beeswax: Query History</h1>
+<div class="sidebar withTitle">
 	<div class="well">
 		<h6>Actions</h6>
 		<ul>
@@ -78,7 +78,6 @@ ${wrappers.head("Beeswax: Query History", section='history')}
 
 
 <div class="content">
-  <h1>History</h1>
   <table class="datatables">
     <thead>
       <tr>

@@ -20,7 +20,7 @@ from django.template.defaultfilters import timesince
 <%namespace name="wrappers" file="header_footer.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
 ${wrappers.head("Beeswax: My Queries", section='my queries')}
-<h1>My Queries</h1>
+<h1>Beeswax: My Queries</h1>
 ##
 ## ----------------- Saved queries -------------------
 ##

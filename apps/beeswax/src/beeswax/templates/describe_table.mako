@@ -44,8 +44,9 @@ ${wrappers.head("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName
     </table>
 
 </%def>
+<h1>Beeswax Table Metadata: ${table.tableName}</h1>
 
-<div class="sidebar">
+<div class="sidebar withTitle">
 	<div class="well">
 		<h6>Actions</h6>
 		<ul>
@@ -60,7 +61,6 @@ ${wrappers.head("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName
 
 <div class="content">
 
-	<h1>Table: ${table.tableName}</h1>
 	% if table.parameters.get("comment", False):
     <h5>${ table.parameters.get("comment") }</h5>
 	% endif
