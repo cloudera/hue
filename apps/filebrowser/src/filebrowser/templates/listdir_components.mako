@@ -16,7 +16,7 @@
 <%!
 import datetime
 import hashlib
-from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time
+from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time, escape
 from desktop.lib.django_util import reverse_with_get
 %>
 
@@ -50,7 +50,13 @@ from desktop.lib.django_util import reverse_with_get
         margin: 0;
     }
   </style>
-  <div  class="well">Filter by name: <input id="filter-input"/><a href="#" id="clear-filter-button" class="btn">Clear</a></div>
+  <div class="well">
+		Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+		<p class="pull-right">
+			<a href="#" class="btn upload-link">Upload files</a>
+			<a href="#" class="btn create-directory-link">New directory</a>
+		</p>
+  </div>
   <table class="datatables">
     <thead>
       <tr>
@@ -143,66 +149,62 @@ from desktop.lib.django_util import reverse_with_get
       % endfor
     </tbody>
   </table>
-<!-- delete modal -->
-<div id="delete-modal" class="modal hide fade">
 
-    <div class="modal-header">
-        <a href="#" class="close">&times;</a>
-        <h3>Please Confirm</h3>
+<!-- delete modal -->
+<div id="deleteModal" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3>Please Confirm</h3>
     </div>
     <div class="modal-body">
         <p>Are you sure you want to delete this file?</p>
     </div>
     <div class="modal-footer">
-        <form id="delete-form" action="" method="POST" enctype="multipart/form-data" class="form-stacked">
+        <form id="deleteForm" action="" method="POST" enctype="multipart/form-data" class="form-stacked">
 			<input type="submit" value="Yes" class="btn primary" />
-			<a id="cancel-delete-button" class="btn">No</a>
-        	<input id="file-to-delete-input" type="hidden" name="path" id="id_path" />
+			<a id="cancelDeleteBtn" class="btn">No</a>
+        	<input id="fileToDeleteInput" type="hidden" name="path" />
         </form>
     </div>
-
 </div>
-<!-- rename modal -->
 
-<div id="rename-modal" class="modal hide fade">
-    <form id="rename-form" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+<!-- rename modal -->
+<div id="renameModal" class="modal hide fade">
+    <form id="renameForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close">&times;</a>
-        <h3>Renaming: <span id="rename-file-name">file name</span></h3>
+        <h3>Renaming: <span id="renameFileName">file name</span></h3>
     </div>
     <div class="modal-body">
         <div class="clearfix">
             <label>New name</label>
             <div class="input">
-                <input id="new-name-input" name="dest_path" value="" type='text'/>
+                <input id="newNameInput" name="dest_path" value="" type="text" class="xlarge"/>
             </div>
         </div>
-
     </div>
     <div class="modal-footer">
-        <div id="rename-name-required-alert" class="alert-message warning hide" style="position: absolute; left: 10;">
-
+        <div id="renameNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
             <p><strong>Sorry, name is required.</strong>
         </div>
 
-        <input id="rename_src_path" type="hidden" name="src_path" type='text'>
+        <input id="renameSrcPath" type="hidden" name="src_path" type="text">
         <input type="submit" value="Submit" class="btn primary" />
-        <a id="cancel-rename-button" class="btn">Cancel</a>
-
+        <a id="cancelRenameBtn" class="btn">Cancel</a>
     </div>
     </form>
 </div>
 
 <!-- upload modal -->
-<div id="upload-modal" class="modal hide fade">
-    <form id="upload-form" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+<div id="uploadModal" class="modal hide fade">
+    <form id="uploadForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close">&times;</a>
-        <h3>Uploading to: <span id="upload-dir-name">${current_dir_path}</span></h3>
+        <h3>Uploading to: <span id="uploadDirName">${current_dir_path}</span></h3>
     </div>
     <div class="modal-body">
         <form action="/filebrowser/upload?next=${current_dir_path}" method="POST" enctype="multipart/form-data" class="form-stacked">
-         <div id="file-uploader">
+			<div id="fileUploader">
 		<noscript>
 			<p>Please enable JavaScript to use file uploader.</p>
 			<!-- or put a simple form for upload here -->
@@ -219,8 +221,8 @@ from desktop.lib.django_util import reverse_with_get
 
 
 <!-- create directory modal -->
-<div id="create-directory-modal" class="modal hide fade">
-    <form id="create-directory-form" action="/filebrowser/mkdir?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+<div id="createDirectoryModal" class="modal hide fade">
+    <form id="createDirectoryForm" action="/filebrowser/mkdir?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close">&times;</a>
         <h3>Create Directory</h3>
@@ -229,47 +231,49 @@ from desktop.lib.django_util import reverse_with_get
         <div class="clearfix">
             <label>Directory Name</label>
             <div class="input">
-                <input id="new-directory-name-input" name="name" value="" type='text'/>
-                <input type="hidden" name="path" type='text' value="${current_dir_path}"/>
+                <input id="newDirectoryNameInput" name="name" value="" type="text" class="xlarge"/>
+                <input type="hidden" name="path" type="text" value="${current_dir_path}"/>
             </div>
         </div>
 
     </div>
     <div class="modal-footer">
-         <div id="directory-name-required-alert" class="alert-message warning hide" style="position: absolute; left: 10;">
-
+         <div id="directoryNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
             <p><strong>Sorry, directory name is required.</strong>
         </div>
         <input class="btn primary" type="submit" value="Submit" />
-        <a id="cancel-create-directory-button" class="btn" href="#">Cancel</a>
+        <a id="cancelCreateDirectoryBtn" class="btn" href="#">Cancel</a>
     </div>
     </form>
 </div>
 
-<!-- create directory modal -->
-<div id="change-owner-modal" class="modal hide fade">
 
+<div id="changeOwnerModal" class="modal hide fade">
 </div>
-<div id="change-permission-modal" class="modal hide fade">
 
+<div id="changePermissionModal" class="modal hide fade">
 </div>
-<div id="move-modal" class="modal hide fade">
 
+<div id="moveModal" class="modal hide fade">
 </div>
 
 <script type="text/javascript" charset="utf-8">
     // ajax modal windows
     function openChownWindow(path, user, group, next){
         $.ajax({
-            url: '/filebrowser/chown',
-            data: {'path':path, 'user':user, 'group' : group, 'next' : next},
+            url: "/filebrowser/chown",
+            data: {"path":path, "user":user, "group" : group, "next" : next},
             beforeSend: function(xhr){
                 xhr.setRequestHeader("X-Requested-With", "Hue");
             },
-            dataType: 'html',
+            dataType: "html",
             success: function(data){
-                $('#change-owner-modal').html(data);
-                $('#change-owner-modal').modal('show');
+                $("#changeOwnerModal").html(data);
+                $("#changeOwnerModal").modal({
+					backdrop: "static",
+					keyboard: true,
+					show: true
+				});
             }
         });
     }
@@ -277,15 +281,19 @@ from desktop.lib.django_util import reverse_with_get
     function openChmodWindow(path, mode, next){
 
         $.ajax({
-            url: '/filebrowser/chmod',
-            data: {'path':path, 'mode':mode, 'next' : next},
+            url: "/filebrowser/chmod",
+            data: {"path":path, "mode":mode, "next" : next},
             beforeSend: function(xhr){
                 xhr.setRequestHeader("X-Requested-With", "Hue");
             },
-            dataType: 'html',
+            dataType: "html",
             success: function(data){
-                $('#change-permission-modal').html(data);
-                $('#change-permission-modal').modal('show');
+                $("#changePermissionModal").html(data);
+                $("#changePermissionModal").modal({
+					backdrop: "static",
+					keyboard: true,
+					show: true
+				});
             }
         });
     }
@@ -293,15 +301,19 @@ from desktop.lib.django_util import reverse_with_get
     function openMoveModal(src_path, mode, next){
 
         $.ajax({
-            url: '/filebrowser/move',
-            data: {'src_path':src_path, 'mode':mode, 'next' : next},
+            url: "/filebrowser/move",
+            data: {"src_path":src_path, "mode":mode, "next" : next},
             beforeSend: function(xhr){
                 xhr.setRequestHeader("X-Requested-With", "Hue");
             },
-            dataType: 'html',
+            dataType: "html",
             success: function(data){
-                $('#move-modal').html(data);
-                $('#move-modal').modal('show');
+                $("#moveModal").html(data);
+                $("#moveModal").modal({
+					backdrop: "static",
+					keyboard: true,
+					show: true
+				});
             }
         });
     }
@@ -309,11 +321,11 @@ from desktop.lib.django_util import reverse_with_get
     var num_of_pending_uploads = 0;
     function createUploader(){
         var uploader = new qq.FileUploader({
-            element: document.getElementById('file-uploader'),
-            action: '/filebrowser/upload',
+            element: document.getElementById("fileUploader"),
+            action: "/filebrowser/upload",
             params:{
-                dest: '${current_dir_path}',
-                fileFieldLabel: 'hdfs_file'
+                dest: "${current_dir_path}",
+                fileFieldLabel: "hdfs_file"
             },
             onComplete:function(id, fileName, responseJSON){
                 num_of_pending_uploads--;
@@ -329,7 +341,7 @@ from desktop.lib.django_util import reverse_with_get
     }
 
     // in your app create uploader as soon as the DOM is ready
-    // don't wait for the window to load
+    // don"t wait for the window to load
     window.onload = createUploader;
 
 	$(document).ready(function(){
@@ -342,61 +354,103 @@ from desktop.lib.django_util import reverse_with_get
 	});
 
     //delete handlers
-    $(".delete").live("click",function(eventObject){
-        $('#file-to-delete-input').attr('value', $(eventObject.target).attr('file-to-delete'));
-        $('#delete-form').attr('action', '/filebrowser/' + $(eventObject.target).attr('delete-type') + '?next=' + encodeURI('${current_request_path}') + '&path=' + encodeURI('${path}'));
-        $('#delete-modal').modal('show');
+    $(".delete").live("click", function(e){
+        $("#fileToDeleteInput").attr("value", $(e.target).attr("file-to-delete"));
+        $("#deleteForm").attr("action", "/filebrowser/" + $(e.target).attr("delete-type") + "?next=" + encodeURI("${current_request_path}") + "&path=" + encodeURI("${path}"));
+        $("#deleteModal").modal({
+			backdrop: "static",
+			keyboard: true,
+			show: true
+		});
     });
 
-    $('#cancel-delete-button').click(function(){
-        $('#delete-modal').modal('hide');
+    $("#cancelDeleteBtn").click(function(){
+        $("#deleteModal").modal("hide");
     });
 
     //rename handlers
     $(".rename").live("click",function(eventObject){
-        $('#rename_src_path').attr('value', $(eventObject.target).attr('file-to-rename'));
-        $('#rename-file-name').text($(eventObject.target).attr('file-to-rename'));
-        $('#rename-modal').modal('show');
+        $("#renameSrcPath").attr("value", $(eventObject.target).attr("file-to-rename"));
+        $("#renameFileName").text($(eventObject.target).attr("file-to-rename"));
+        $("#renameModal").modal({
+			backdrop: "static",
+			keyboard: true,
+			show: true
+		});
     });
 
-    $('#cancel-rename-button').click(function(){
-        $('#rename-modal').modal('hide');
+    $("#cancelRenameBtn").click(function(){
+        $("#renameModal").modal("hide");
     });
 
-    $('#rename-form').submit(function(){
-        if($('#new-name-input').val() == ''){
-            $('#rename-name-required-alert').show(250);
+    $("#renameForm").submit(function(){
+        if($("#newNameInput").val() == ""){
+            $("#renameNameRequiredAlert").show();
+			$("#newNameInput").addClass("fieldError");
             return false;
         }
     });
 
+	$("#newNameInput").focus(function(){
+		$("#renameNameRequiredAlert").hide();
+		$("#newNameInput").removeClass("fieldError");
+	});
+	
+	$("#moveForm").live("submit", function(){
+		console.log("submit");
+		if ($.trim($("#moveForm").find("input[name='dest_path']").val()) == ""){
+			$("#moveNameRequiredAlert").show();
+			$("#moveForm").find("input[name='dest_path']").addClass("fieldError");
+			return false;
+		}
+		return true;
+	});
+	
+	$("#moveForm").find("input[name='dest_path']").live("focus", function(){
+		$("#moveNameRequiredAlert").hide();
+		$("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
+	});
+	
+
     //upload handlers
-    $('.upload-link').click(function(){
-        $('#upload-modal').modal('show');
+    $(".upload-link").click(function(){
+        $("#uploadModal").modal({
+			backdrop: "static",
+			keyboard: true,
+			show: true
+		});
     });
 
     //create directory handlers
-    $('.create-directory-link').click(function(){
-        $('#create-directory-modal').modal('show');
+    $(".create-directory-link").click(function(){
+        $("#createDirectoryModal").modal({
+			backdrop: "static",
+			keyboard: true,
+			show: true
+		});
     });
-    $('#cancel-create-directory-button').click(function(){
-        $('#create-directory-modal').modal('hide');
+    $("#cancelCreateDirectoryBtn").click(function(){
+        $("#createDirectoryModal").modal("hide");
     });
-    $('#create-directory-form').submit(function(){
-
-        if($('#new-directory-name-input').val()==''){
-            $('#directory-name-required-alert').alert().show(250)
-            return false;
-        }
-
+    $("#createDirectoryForm").submit(function(){
+		if ($.trim($("#newDirectoryNameInput").val())==""){
+			$("#directoryNameRequiredAlert").show();
+			$("#newDirectoryNameInput").addClass("fieldError");
+			return false;
+		}
+		return true;
     });
+	$("#newDirectoryNameInput").focus(function(){
+		$("#newDirectoryNameInput").removeClass("fieldError");
+		$("#directoryNameRequiredAlert").hide();
+	});
+	
 
     //filter handlers
-    $('#filter-input').keyup(function(){
-        $.each($('.file-row'), function(index, value) {
+    $("#filterInput").keyup(function(){
+        $.each($(".file-row"), function(index, value) {
 
-          if($(value).attr('file-name').toLowerCase().indexOf($('#filter-input').val().toLowerCase()) == -1 && $('#filter-input').val() != ''){
-             // alert('hide: ' + $(value).attr('file-name'));
+          if($(value).attr("file-name").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
             $(value).hide(250);
           }else{
             $(value).show(250);
@@ -405,9 +459,9 @@ from desktop.lib.django_util import reverse_with_get
 
     });
 
-    $('#clear-filter-button').click(function(){
-        $('#filter-input').val('');
-        $.each($('.file-row'), function(index, value) {
+    $("#clearFilterBtn").click(function(){
+        $("#filterInput").val("");
+        $.each($(".file-row"), function(index, value) {
             $(value).show(250);
         });
     });

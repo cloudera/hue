@@ -22,8 +22,6 @@
     ${wrappers.head('Create User -- Hue Users')}
   % endif
 
-    <h1>jHue Users</h1>
-
 	<form action="${urllib.quote(action)}" method="POST" class="jframe_padded">
 		<fieldset>
 			<legend> 

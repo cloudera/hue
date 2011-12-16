@@ -57,6 +57,6 @@
     </div>
     <div class="modal-footer" style="padding-top: 10px;">
         <input class="btn primary" type="submit" value="Submit"/>
-        <a class="btn" onclick="$('#change-permission-modal').modal('hide');">Cancel</a>
+        <a class="btn" onclick="$('#changePermissionModal').modal('hide');">Cancel</a>
     </div>
 </form>

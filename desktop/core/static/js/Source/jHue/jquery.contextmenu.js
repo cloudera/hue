@@ -70,8 +70,10 @@
 							}).appendTo(_ctx);
 						}
 						
+						var _left = (e.pageX+_ctx.width()>$(document).width())?($(document).width()-_ctx.width()-5):e.pageX;
+						
 						_ctx.toggle().css({
-							left: e.pageX, 
+							left: _left, 
 							top: e.pageY
 						});
 						

@@ -38,7 +38,7 @@ def is_home(path):
         return ""
 %>
 
-<%def name="head(title='Beeswax for Hive', section='', path='', current_request_path=False, toolbar=True, cwd_set=True, show_upload=False, show_new_directory=False, show_side_bar=True)">
+<%def name="head(title='File Browser', section='', path='', current_request_path=False, toolbar=True, cwd_set=True, show_upload=False, show_new_directory=False, show_side_bar=True)">
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -54,7 +54,7 @@ def is_home(path):
 
 	<style type="text/css">
       body {
-        padding-top: 100px;
+        padding-top: 60px;
       }
     </style>
 	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
@@ -101,41 +101,17 @@ def is_home(path):
 			</div>
 		</div>
 	</div>
-    % if breadcrumbs:
-
-	<div class="menubar">
-		<div class="menubar-inner">
-			<ul class="breadcrumb">
-                % for breadcrumb_item in breadcrumbs:
-                <li><a href="/filebrowser/view${breadcrumb_item['url']}">${breadcrumb_item['label']}</a> <span class="divider">/</span></li>
-                % endfor
-            </ul>
-            
-
-		</div>
-	</div>
-    %endif
 
 	<div class="container-fluid">
-        % if show_side_bar:
-         <div class="sidebar">
-            <div class="well">
-                 % if toolbar:
+		<h1>${title}</h1>
+		% if breadcrumbs:
+			<ul class="breadcrumb">
+				% for breadcrumb_item in breadcrumbs:
+				<li><a href="/filebrowser/view${breadcrumb_item['url']}">${breadcrumb_item['label']}</a> <span class="divider">/</span></li>
+				% endfor
+			</ul>
 
-                        <ul>
-                        % if cwd_set:
-                          % if show_upload:
-                            <li><a class="upload-link" href="#">Upload Files</a></li>
-                          % endif
-                          % if show_new_directory:
-                            <li><a class="create-directory-link" href="#">New Directory</a></li>
-                          %endif
-                        % endif
-                            </ul>
-                  % endif
-            </div>
-        </div>
-        % endif
+	    %endif
 </%def>
 
 <%def name="foot()">
@@ -143,23 +119,3 @@ def is_home(path):
 </body>
 </html>
 </%def>
-
-
-
-
-
-<%def name="headz(title='Beeswax for Hive', toolbar=True, section=False)">
-<html>
-  <head>
-    <title>${title}</title>
-  </head>
-  <body class="hue-shared">
-  
-</%def>
-
-<%def name="footz()">
-  </body>
-</html>
-</%def>
-
-

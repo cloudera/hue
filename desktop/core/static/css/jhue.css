@@ -1,7 +1,33 @@
+.topbar-inner, .topbar {
+	background-image: -webkit-linear-gradient(top, #2c7fb3, #01639c);
+	background-image: -moz-linear-gradient(top, #2c7fb3, #01639c);
+	background-color: #01639c;
+	background-repeat: repeat-x;
+}
+
+.topbar div > ul .active > a, .nav .active > a {
+	background-image: -webkit-linear-gradient(top, #266d99, #015382);
+	background-image: -moz-linear-gradient(top, #266d99, #015382);
+	background-color: #015382;
+	font-weight: bold;
+}
+
+.topbar a {
+	color: #CFCFCF;
+}
+
+.btn.primary {
+    background-color: #01639c;
+    background-image: -moz-linear-gradient(center top , #2c7fb3, #01639c);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    color: #FFFFFF;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
 .clear {
 	clear:both;
 }
-
 
 .sectionbar {
 	background-color: #E5E5E5;
@@ -80,10 +106,10 @@
 }
 
 .menubar-inner, .menubar .fill {
-    background-color: #BBBBBB;
-    background-image: -moz-linear-gradient(center top , #CCCCCC, #BBBBBB);
+    background-color: #d0e1f4;
+    background-image: -moz-linear-gradient(center top , #d0e1f4, #d0e1f4);
+	background-image: -webkit-linear-gradient(top, #d0e1f4, #d0e1f4);
     background-repeat: repeat-x;
-/*    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 rgba(0, 0, 0, 0.1) inset;*/
 }
 
 .menubar-inner a {
@@ -91,18 +117,23 @@
 	font-weight:bold;
 }
 
+.menubar-inner a:hover {
+	color:#01639C;
+}
+
+
 .menubar-inner a.selected {
 	color:#FFFFFF;
 	padding:2px;
 	padding-left:10px;
 	padding-right:10px;
 	margin-top:8px;
-	background-color: #333;
-    background-image: -moz-linear-gradient(center top , #333, #444);
+	background-color: #01639C;
+    background-image: -moz-linear-gradient(center top , #01639C, #015382);
     background-repeat: repeat-x;
-	box-shadow: 0 0 3px #212121 inset;
-	-moz-box-shadow: 0 0 3px #212121 inset;
-	-webkit-box-shadow: 0 0 3px #212121 inset;
+	box-shadow: 0 0 3px #015382 inset;
+	-moz-box-shadow: 0 0 3px #015382 inset;
+	-webkit-box-shadow: 0 0 3px #015382 inset;
 	border-radius: 30px;
 }
 
@@ -115,14 +146,12 @@
 	color:#333;
 }
 
-
-
 .hidden {
 	display:none;
 }
 
 .pull-right {
-	color:#999;
+	color:#CFCFCF;
 }
 
 .pull-right a {

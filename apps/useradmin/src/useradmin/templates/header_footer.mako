@@ -80,6 +80,7 @@
 		</div>
 
 		<div class="container-fluid">
+			<h1>${title}</h1>
 </%def>
 
 <%def name="foot()">

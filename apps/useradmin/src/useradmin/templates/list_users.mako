@@ -17,16 +17,12 @@
 <% import urllib %>
 
 ${wrappers.head()}
-	
-	<div class="sidebar">
-		<div class="well">
-			<ul>
-				<li><a href="${ url('useradmin.views.edit_user') }">Add User</a></li>
-			</ul>
-		</div>
+	<div class="well">
+			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+			<p class="pull-right">
+				<a href="${ url('useradmin.views.edit_user') }" class="btn">Add user</a>
+			</p>
 	</div>
-	
-	<div class="content">
       <table class="datatables">
         <thead>
           <tr>
@@ -40,7 +36,7 @@ ${wrappers.head()}
         </head>
         <tbody>
         % for user in users:
-          <tr>
+          <tr class="userRow" data-search="${user.username}${user.first_name}${user.last_name}${user.email}">
             <td>${user.username}</td>
             <td>${user.first_name}</td>
             <td>${user.last_name}</td>
@@ -56,7 +52,7 @@ ${wrappers.head()}
         % endfor
         </tbody>
       </table>
-</div>
+
 
 
 <div id="deleteUser" class="modal hide fade">
@@ -99,6 +95,26 @@ ${wrappers.head()}
 			$(".hideModal").click(function(){
 				$("#deleteUser").modal("hide");
 			});
+			
+			$("#filterInput").keyup(function(){
+		        $.each($(".userRow"), function(index, value) {
+
+		          if($(value).attr("data-search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
+		            $(value).hide(250);
+		          }else{
+		            $(value).show(250);
+		          }
+		        });
+
+		    });
+
+		    $("#clearFilterBtn").click(function(){
+		        $("#filterInput").val("");
+		        $.each($(".file-row"), function(index, value) {
+		            $(value).show(250);
+		        });
+		    });
+		   
 
 		});
 	</script>

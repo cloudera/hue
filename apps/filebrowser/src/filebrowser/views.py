@@ -178,7 +178,7 @@ def save_file(request):
     is_valid = form.is_valid()
     path = form.cleaned_data.get('path')
 
-    if request.POST.get('save') == "saveAs":
+    if request.POST.get('save') == "Save As":
         if not is_valid:
             return edit(request, path, form=form)
         else:

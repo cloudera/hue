@@ -15,8 +15,7 @@
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
 
-<form action="/filebrowser/move?next=${next|u}" method="POST" enctype="multipart/form-data"
-      class="form-stacked form-padding-fix">
+<form id="moveForm" action="/filebrowser/move?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close">&times;</a>
         <h3>Move: ${src_path}</h3>
@@ -24,11 +23,14 @@
     <div class="change-owner-modal-body clearfix" >
         <div style="padding-left: 15px;">
         ${edit.render_field(form["src_path"], hidden=True)}
-        ${edit.render_field(form["dest_path"], notitle=True)}
+        ${edit.render_field(form["dest_path"], notitle=True, klass="xlarge")}
         </div>
     </div>
     <div class="modal-footer">
+		<div id="moveNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
+        	<p><strong>Sorry, name is required.</strong>
+    	</div>
         <input class="btn primary" type="submit" value="Submit"/>
-        <a class="btn" onclick="$('#move-modal').modal('hide');">Cancel</a>
+        <a class="btn" onclick="$('#moveModal').modal('hide');">Cancel</a>
     </div>
 </form>

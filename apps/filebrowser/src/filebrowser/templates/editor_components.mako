@@ -90,7 +90,7 @@
         % elif hidden:
           <input type="hidden" name="${field.html_name | n}" ${make_attr_str(attrs) | n} value="${extract_field_data(field)}"></input>
         % else:
-          <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n}/>
+          <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" class="${cls}" ${make_attr_str(attrs) | n}/>
         % endif
       % endif
       % if help:

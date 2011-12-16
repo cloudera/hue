@@ -51,14 +51,14 @@ ${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_ne
       % endif
 
       % if editable and view['compression'] == "none":
-        <a class="btn" href="${url('filebrowser.views.edit', path=path_enc)}" target="FileEditor">Edit File</a>
+        <a class="btn" href="${url('filebrowser.views.edit', path=path_enc)}">Edit File</a>
       % endif
        <a class="btn" href="${url('filebrowser.views.download', path=path_enc)}">Download</a>
-       <a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}" target="FileBrowser">View File Location</a>
-       <a class="btn">Refresh</a>
+       <a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}">View File Location</a>
+       <a id="refreshBtn" class="btn">Refresh</a>
     </div>
   </div>
-  <div class="fv-navhead">
+  <div>
     % if not view['compression'] or view['compression'] in ("none", "avro"):
       <div class="fv-navStatus">
         <form action="${url('filebrowser.views.view', path=path_enc)}" method="GET">
@@ -159,4 +159,12 @@ ${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_ne
       </div>
     </div>
   </div>
+
+	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function(){
+			$("#refreshBtn").click(function(){
+				window.location.reload();
+			});
+		});
+	</script>
 ${wrappers.foot()}

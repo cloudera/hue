@@ -86,7 +86,7 @@
     </div>
     <div class="modal-footer" style="padding-top: 10px;">
         <input class="btn primary" type="submit" value="Submit" />
-        <a class="btn" onclick="$('#change-owner-modal').modal('hide');">Cancel</a>
+        <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">Cancel</a>
     </div>
 </form>
 
