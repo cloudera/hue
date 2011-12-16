@@ -77,8 +77,8 @@
 </%def>
 
 ${comps.header("Job: " + job.jobId + " - Job Browser", "", "Job Details")}
-
-	<div class="sidebar">
+	<h1>Job: ${job.jobId} - Job Browser</h1>
+	<div class="sidebar withTitle">
 		<div class="well">
 			<h6>Job ID</h6>
 			${job.jobId}
@@ -117,7 +117,6 @@ ${comps.header("Job: " + job.jobId + " - Job Browser", "", "Job Details")}
 	</div>
     
     <div class="content">
-		<h1>Job Details</h1>
 		<ul class="tabs">
 			<li class="active"><a href="#tasks">Tasks</a></li>
 			<li><a href="#metadata">Metadata</a></li>

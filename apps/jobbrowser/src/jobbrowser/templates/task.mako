@@ -16,9 +16,9 @@
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
   ${comps.header("Job Task: " + task.taskId + "- Job Browser", "", "Task details")}
+	<h1>Job Task: ${task.taskId} - Job Browser</h1>
 
-
-	<div class="sidebar">
+	<div class="sidebar withTitle">
 		<div class="well">
 			<h6>Task ID</h6>
 			${task.taskId_short}
@@ -38,7 +38,7 @@
 	</div>
 	
 	<div class="content">
-		<h1>Task details</h1>
+		
 
 		<ul class="tabs">
 			<li class="active"><a href="#attempts">Attempts</a></li>

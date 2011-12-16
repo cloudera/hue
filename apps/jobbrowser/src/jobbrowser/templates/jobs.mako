@@ -28,12 +28,11 @@
 
 
 % if len(jobs) > 0 or filtered:
-${comps.header("Job Browser", "Jobs", trackersLink=True)}
-<div class="toolbar">
+${comps.header("Job Browser", "Job Browser", trackersLink=True)}
+<div class="well">
 	<form action="/jobbrowser/jobs" method="GET">
 		<b>Filter jobs:</b>
-		<ul>
-			<li>
+		
 				<select name="state" class="submitter">
 					<option value="all" ${get_state('all', state_filter)}>All States</option>
 					<option value="running" ${get_state('running', state_filter)}>Running</option>
@@ -41,17 +40,14 @@ ${comps.header("Job Browser", "Jobs", trackersLink=True)}
 					<option value="failed" ${get_state('failed', state_filter)}>Failed</option>
 					<option value="killed" ${get_state('killed', state_filter)}>Killed</option>
 				</select>
-			</li>
-			<li>
+		
 				<input type="text" name="user" title="User Name Filter" value="${user_filter}" placeholder="User Name Filter" class="submitter"/>
-			</li>
-			<li>
+			
 				<input type="text" name="text" title="Text Filter" value="${text_filter}" placeholder="Text Filter" class="submitter"/>
-			</li>
-		</ul>
+			
 	</form>
 </div>
-<div class="clear"></div>
+
 
 % if len(jobs) == 0:
 <p>There were no jobs that match your search criteria.</p>

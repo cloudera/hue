@@ -19,49 +19,48 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-  ${comps.header("Task View: Job: " + jobid, "Tasks")}
+  ${comps.header("Task View: Job: " + jobid, "Task View: Job: " + jobid)}
   <%def name="selected(val, state)">
   %   if val is not None and state is not None and val in state:
         selected="true"
   %   endif
   </%def>
 
-
-	<div class="toolbar">
-		<ul>
-			<form method="get" action="/jobbrowser/jobs/${jobid}/tasks">
-				<b>Filter tasks:</b>
-				<li>
-					<select name="taskstate" class="submitter">
-						<option value="">All states</option>
-						<option value="succeeded" ${selected('succeeded', taskstate)}>succeeded</option>
-						<option value="running" ${selected('running', taskstate)}>running</option>
-						<option value="failed" ${selected('failed', taskstate)}>failed</option>
-						<option value="killed" ${selected('killed', taskstate)}>killed</option>
-						<option value="pending" ${selected('pending', taskstate)}>pending</option>
-					</select>
-				</li>
-				<li>
-					<select name="tasktype" class="submitter">
-						<option value="">All types</option>
-						<option value="map" ${selected('map', tasktype)}>maps</option>
-						<option value="reduce" ${selected('reduce', tasktype)}>reduces</option>
-						<option value="job_cleanup" ${selected('job_cleanup', tasktype)}>cleanups</option>
-						<option value="job_setup" ${selected('job_setup', tasktype)}>setups</option>
-					</select>
-				</li>
-				<li>
-					<input type="text" name="tasktext"  class="submitter" title="Text filter" placeholder="Text Filter"
-					% if tasktext:
-					value="${tasktext}"
-					% endif
-					/>
-				</li>
-			</form>
-		</ul>
+	<div class="well">
+		<div class="">
+		
+				<form method="get" action="/jobbrowser/jobs/${jobid}/tasks">
+					<b>Filter tasks:</b>
+				
+						<select name="taskstate" class="submitter">
+							<option value="">All states</option>
+							<option value="succeeded" ${selected('succeeded', taskstate)}>succeeded</option>
+							<option value="running" ${selected('running', taskstate)}>running</option>
+							<option value="failed" ${selected('failed', taskstate)}>failed</option>
+							<option value="killed" ${selected('killed', taskstate)}>killed</option>
+							<option value="pending" ${selected('pending', taskstate)}>pending</option>
+						</select>
+				
+				
+						<select name="tasktype" class="submitter">
+							<option value="">All types</option>
+							<option value="map" ${selected('map', tasktype)}>maps</option>
+							<option value="reduce" ${selected('reduce', tasktype)}>reduces</option>
+							<option value="job_cleanup" ${selected('job_cleanup', tasktype)}>cleanups</option>
+							<option value="job_setup" ${selected('job_setup', tasktype)}>setups</option>
+						</select>
+				
+				
+						<input type="text" name="tasktext"  class="submitter" title="Text filter" placeholder="Text Filter"
+						% if tasktext:
+						value="${tasktext}"
+						% endif
+						/>
+				
+				</form>
+		
+		</div>
 	</div>
-
-	<div class="clear"></div>
 
 
 	% if len(page.object_list) == 0:
