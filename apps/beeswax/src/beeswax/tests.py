@@ -112,6 +112,16 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     response = self.client.get("/beeswax/table/test/partitions")
     assert_true("is not partitioned." in response.content)
 
+  def test_browse_partitions_with_limit(self):
+    # Limit to 90
+    finish = beeswax.conf.BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("90")
+    try:
+      response = self.client.get("/beeswax/table/test_partitions")
+      assert_true("89" in response.content)
+      assert_false("90" in response.content)
+    finally:
+      finish()
+
   def test_query_with_resource(self):
     script = self.cluster.fs.open("/square.py", "w")
     script.write(
