@@ -43,6 +43,7 @@ from beeswax import common
 from beeswax import data_export
 from beeswax import db_utils
 from beeswax import models
+from beeswax import conf
 
 from jobsub.parameterization import find_variables, substitute_variables
 
@@ -71,7 +72,7 @@ def describe_table(request, table):
   # Don't show samples if it's a view (HUE-526).
   if not is_view:
     # Show the first few rows
-    hql = "SELECT * FROM `%s`" % (table,)
+    hql = "SELECT * FROM `%s` %s" % (table, _get_browse_limit_clause(table_obj))
     query_msg = make_beeswax_query(request, hql)
     try:
       sample_results = db_utils.execute_and_wait(request.user, query_msg, timeout_sec=5.0)
@@ -124,7 +125,8 @@ def drop_table(request, table):
 
 def read_table(request, table):
   """View function for select * from table"""
-  hql = "SELECT * FROM %s" % (table,)
+  table_obj = db_utils.meta_client().get_table("default", table)
+  hql = "SELECT * FROM `%s` %s" % (table, _get_browse_limit_clause(table_obj))
   query_msg = make_beeswax_query(request, hql)
   try:
     return execute_directly(request, query_msg, tablename=table)
@@ -153,6 +155,14 @@ def confirm_query(request, query, on_success_url=None):
     'design': None,
     'on_success_url': on_success_url,
   })
+
+def _get_browse_limit_clause(table_obj):
+  """Get the limit clause when browsing a partitioned table"""
+  if table_obj.partitionKeys:
+    limit = conf.BROWSE_PARTITIONED_TABLE_LIMIT.get()
+    if limit > 0:
+      return "LIMIT %d" % (limit,)
+  return ""
 
 
 _SEMICOLON_WHITESPACE = re.compile(";\s*$")
