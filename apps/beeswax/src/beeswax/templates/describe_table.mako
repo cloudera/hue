@@ -102,12 +102,12 @@ ${wrappers.head("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName
   <div class="right_col">
     <div data-filters="Tabs">
       <ul class="toolbar tabs">
-        % if top_rows is not None:
-          <li><span>Sample</span></li>
-        % endif
         <li><span>Columns</span></li>
         % if len(table.partitionKeys) > 0:
           <li><span>Partition Columns</span></li>
+        % endif
+        % if top_rows is not None:
+          <li><span>Sample</span></li>
         % endif
       </ul>
       <ul class="tab_sections jframe-clear">
