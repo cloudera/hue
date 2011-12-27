@@ -1,0 +1,35 @@
+# Win32 setup.cfg
+# You have to edit this file to reflect your system configuration
+#
+# $Id: setup.cfg.mingw,v 1.1 2005/01/25 18:54:46 stroeder Exp $
+
+# Section for compiling the C extension module
+# for wrapping OpenLDAP 2 libs
+
+# Platform: Win32
+# Compile environment: MinGW
+[_ldap]
+class = OpenLDAP2
+maintainer = Mauro Cicognini
+defines = WIN32
+
+# modify these to fit your local configuration
+library_dirs = C:/msys/1.0/home/mcicogni/openldap-mingw-build-4/openldap-2.2.18/libraries/libldap_r/.libs C:/msys/1.0/home/mcicogni/openldap-mingw-build-4/openldap-2.2.18/libraries/liblber/.libs C:\msys\1.0\home\mcicogni\openldap-mingw-build-4\openssl-0.9.7e
+include_dirs = C:/msys/1.0/home/mcicogni/openldap-mingw-build-4/openldap-2.2.18/include
+
+extra_compile_args = 
+extra_objects = 
+
+libs = ldap_r lber ssl crypto ws2_32 gdi32
+
+[build]
+compiler = mingw32
+
+# Installation options
+[install]
+compile = 1
+optimize = 1
+record = python-ldap_install.log
+
+[bdist_wininst]
+target_version = 2.4

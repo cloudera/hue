@@ -1,0 +1,6 @@
+The sample modules/scripts herein require modules pyasn1 and pyasn1-modules.
+
+http://pyasn1.sourceforge.net/
+
+http://pypi.python.org/pypi/pyasn1
+http://pypi.python.org/pypi/pyasn1-modules

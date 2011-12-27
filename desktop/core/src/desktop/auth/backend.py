@@ -37,6 +37,11 @@ import desktop.conf
 from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
 
+import pam
+from django_auth_ldap.backend import LDAPBackend, ldap_settings
+import ldap
+
+
 LOG = logging.getLogger(__name__)
 
 def load_augmentation_class():
@@ -135,6 +140,8 @@ class DesktopBackendBase(object):
     """
     raise Exception("Abstract class - must implement check_auth")
 
+
+
 class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
   """
   Allows the first user in, but otherwise delegates to Django's
@@ -164,6 +171,8 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
     """ Return true if no one has ever logged in to Desktop yet. """
     return User.objects.count() == 0
 
+
+
 class AllowAllBackend(DesktopBackendBase):
   """
   Authentication backend that allows any user to login as long
@@ -175,3 +184,95 @@ class AllowAllBackend(DesktopBackendBase):
   @classmethod
   def manages_passwords_externally(cls):
     return True
+
+
+
+class PamBackend(DesktopBackendBase):
+  """
+  Authentication backend that uses PAM to authenticate logins. The first user to
+  login will become the superuser.
+  """
+  def check_auth(self, username, password):
+    if pam.authenticate(username, password):
+      is_super = False
+      if User.objects.count() == 0:
+        is_super = True
+
+      try:
+        user = User.objects.get(username=username)
+      except User.DoesNotExist:
+        user = find_or_create_user(username, None)
+        if user is not None and user.is_active:
+          user.is_superuser = is_super
+          user.save()
+
+      user = rewrite_user(user)
+      return user
+
+    return None
+
+  @classmethod
+  def manages_passwords_externally(cls):
+    return True
+
+
+
+class LdapBackend(object):
+  """
+  Authentication backend that uses LDAP to authenticate logins.
+  The first user to login will become the superuser.
+  """
+  def __init__(self):
+    # Delegate to django_auth_ldap.LDAPBackend
+    self._backend = LDAPBackend()
+
+    ldap_settings.AUTH_LDAP_SERVER_URI = desktop.conf.LDAP.LDAP_URL.get()
+    if ldap_settings.AUTH_LDAP_SERVER_URI is None:
+      LOG.warn("Could not find LDAP URL required for authentication.")
+      return None
+
+    nt_domain = desktop.conf.LDAP.NT_DOMAIN.get()
+    if nt_domain is None:
+      pattern = desktop.conf.LDAP.LDAP_USERNAME_PATTERN.get()
+      pattern = pattern.replace('<username>', '%(user)s')
+      ldap_settings.AUTH_LDAP_USER_DN_TEMPLATE = pattern
+    else:
+      # %(user)s is a special string that will get replaced during the authentication process
+      ldap_settings.AUTH_LDAP_USER_DN_TEMPLATE = "%(user)s@" + nt_domain
+
+    # Certificate-related config settings
+    if desktop.conf.LDAP.LDAP_CERT.get():
+      ldap_settings.AUTH_LDAP_START_TLS = True
+      ldap_settings.AUTH_LDAP_GLOBAL_OPTIONS[ldap.OPT_X_TLS_CACERTFILE] = desktop.conf.LDAP.LDAP_CERT.get()
+    else:
+      ldap_settings.AUTH_LDAP_START_TLS = False
+      ldap_settings.AUTH_LDAP_GLOBAL_OPTIONS[ldap.OPT_X_TLS_REQUIRE_CERT] = ldap.OPT_X_TLS_NEVER
+
+  def authenticate(self, username=None, password=None):
+    # Do this check up here, because the auth call creates a django user upon first login per user
+    is_super = False
+    if User.objects.count() == 0:
+      is_super = True
+
+    try:
+      user = self._backend.authenticate(username, password)
+    except ImproperlyConfigured, detail:
+      LOG.warn("LDAP was not properly configured: %s", detail)
+      return None
+
+    if user is not None and user.is_active:
+      user.is_superuser = is_super
+      user = rewrite_user(user)
+      return user
+
+    return None
+
+  def get_user(self, user_id):
+    user = self._backend.get_user(user_id)
+    user = rewrite_user(user)
+    return user
+
+  @classmethod
+  def manages_passwords_externally(cls):
+    return True
+ 

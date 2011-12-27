@@ -1,0 +1,28 @@
+------------------------------
+Installing python-ldap
+------------------------------
+
+Prerequisites:
+
+  Required:
+
+    - Python 2.3 or newer (see http://www.python.org)
+
+    - OpenLDAP 2.4.11+ client libs (see http://www.openldap.org)
+      It is not possible and not supported
+      by the python-ldap project to build with prior versions.
+
+  Optional dependencies of OpenLDAP libs:
+
+    - Cyrus SASL 2.1.x or newer (see http://asg.web.cmu.edu/sasl/sasl-library.html)
+
+    - OpenSSL 0.9.7 or newer (see http://www.openssl.org)
+    
+    - MIT Kerberos or heimdal libs
+
+Quick build instructions:
+    edit setup.cfg (see Build/ for platform-specific examples)
+    python setup.py build
+    python setup.py install
+
+$Id: INSTALL,v 1.10 2011/04/02 22:30:55 stroeder Exp $

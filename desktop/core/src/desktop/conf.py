@@ -258,6 +258,26 @@ AUTH = ConfigSection(
                    help="Class which defines extra accessor methods for User objects."),
 ))
 
+LDAP = ConfigSection(
+  key="ldap",
+  help="Configuration options for LDAP connectivity",
+  members=dict(
+    NT_DOMAIN=Config("nt_domain",
+                     default=None,
+                     help="The NT domain used for LDAP authentication."),
+    LDAP_URL=Config("ldap_url",
+                     default=None,
+                     help="The LDAP URL to connect to."),
+    LDAP_CERT=Config("ldap_cert",
+                     default=None,
+                     help="The LDAP certificate for authentication over TLS."),
+    LDAP_USERNAME_PATTERN=Config("ldap_username_pattern",
+                                 default=None,
+                                 help="A pattern to use for constructing LDAP usernames"),
+))
+
+
+
 LOCAL_FILESYSTEMS = UnspecifiedConfigSection(
   key="local_filesystems",
   help="Paths on the local file system that users should be able to browse",
@@ -347,5 +367,25 @@ def config_validator():
 
   for broken_app in appmanager.BROKEN_APPS:
     res.append(('Working Hadoop', 'App %s requires Hadoop but Hadoop is not present.' % (broken_app,)))
+
+  if LDAP.NT_DOMAIN.get() is not None or \
+      LDAP.LDAP_USERNAME_PATTERN.get() is not None:
+    if LDAP.LDAP_URL.get() is None:
+      res.append((LDAP.LDAP_URL,
+                  "LDAP is only partially configured. An LDAP URL must be provided."))
+
+  if LDAP.LDAP_URL.get() is not None:
+    if LDAP.NT_DOMAIN.get() is None and \
+        LDAP.LDAP_USERNAME_PATTERN.get() is None:
+      res.append(LDAP.LDAP_URL,
+                  "LDAP is only partially configured. An NT Domain or username "
+                  "search pattern must be provided.")
+
+  if LDAP.LDAP_USERNAME_PATTERN.get() is not None and \
+      '<username>' not in LDAP.LDAP_USERNAME_PATTERN.get():
+      res.append(LDAP.LDAP_USERNAME_PATTERN,
+                 "The LDAP username pattern should contain the special"
+                 "<username> replacement string for authentication.")
+
 
   return res
