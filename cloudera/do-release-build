@@ -14,7 +14,7 @@ pushd maven
   mvn -N install
 popd
 
-make prod
+MAVEN_OPTIONS=$DO_MAVEN_DEPLOY make prod
 pushd build/release/prod/
   mv hue-1.2.0 hue-${FULL_VERSION}
   tar -czf hue-${FULL_VERSION}.tar.gz hue-${FULL_VERSION}
