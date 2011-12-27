@@ -1,0 +1,33 @@
+# Section for compiling the C extension module
+# for wrapping OpenLDAP 2 libs
+
+# Platform: Win32
+# Compile environment: Microsoft Visual Studio .NET 2003
+[_ldap]
+class = OpenLDAP2
+defines = WIN32
+
+# Cannot have SSL/TLS support under Win32 for the moment
+# (OpenLDAP 2.x port is incomplete)
+libs = olber32 oldap_r ws2_32 libsasl
+
+# Set these to your correct Openldap and Cyrus-sasl paths
+library_dirs = ../openldap/openldap-2.1.22/Release ../openldap/cyrus-sasl/lib
+include_dirs = ../openldap/openldap-2.1.22/include ../openldap/cyrus-sasl/include
+
+# Needs to compile as /MT ("MS libs to use: multithreaded statically-linked")
+# instead of /MD ("MS libs to use: multithreaded DLL") which is distutils' default
+# because OpenLDAP libs compile that way, too
+# This may change, however
+extra_compile_args = /MT
+extra_link_args = /NODEFAULTLIB:msvcrt.lib
+
+# Pull in SASL DLL as a convenience to end-user (which almost never will have it)
+# Destination path is a rather crude hack, but site-packages would be created anyway
+# Set source path to your Cyrus-sasl lib path
+extra_files = Lib/site-packages:../openldap/cyrus-sasl/lib/libsasl.dll
+
+# Installation options
+[install]
+compile = 1
+record = python-ldap_install.log

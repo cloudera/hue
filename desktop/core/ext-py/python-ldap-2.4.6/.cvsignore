@@ -1,0 +1,7 @@
+build
+dist
+MANIFEST
+*.pyc
+*.pyo
+*.bck
+*~

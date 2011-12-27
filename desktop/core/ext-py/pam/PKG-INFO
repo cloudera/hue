@@ -1,0 +1,19 @@
+Metadata-Version: 1.0
+Name: pam
+Version: 0.1.3
+Summary: PAM interface using ctypes
+Home-page: http://atlee.ca/software/pam
+Author: Chris AtLee
+Author-email: chris@atlee.ca
+License: MIT
+Download-URL: http://atlee.ca/software/pam/dist/0.1.3
+Description: An interface to the Pluggable Authentication Modules (PAM) library on linux, written in pure python (using ctypes)
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Programming Language :: Python
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Systems Administration :: Authentication/Directory
