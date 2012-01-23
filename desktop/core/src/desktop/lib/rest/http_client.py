@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -17,8 +16,11 @@
 
 import cookielib
 import logging
+import posixpath
 import urllib
 import urllib2
+
+__docformat__ = "epytext"
 
 LOG = logging.getLogger(__name__)
 
@@ -31,20 +33,36 @@ class RestException(Exception):
     self._error = error
     self._code = None
     self._message = str(error)
-    if isinstance(error, urllib2.HTTPError):
+    # See if there is a code or a message. (For urllib2.HTTPError.)
+    try:
       self._code = error.getcode()
       self._message = error.read()
+    except AttributeError:
+      pass
 
   def __str__(self):
-    res = self._message
+    res = self._message or ""
     if self._code is not None:
       res += " (error %s)" % (self._code,)
     return res
 
+  def get_parent_ex(self):
+    if isinstance(self._error, Exception):
+      return self._error
+    return None
+
+  @property
+  def code(self):
+    return self._code
+
+  @property
+  def message(self):
+    return self._message
+
 
 class HttpClient(object):
   """
-  Basic HTTP client tailed for rest APIs.
+  Basic HTTP client tailored for rest APIs.
   """
   def __init__(self, base_url, exc_class=None, logger=None):
     """
@@ -56,6 +74,7 @@ class HttpClient(object):
     self._base_url = base_url.rstrip('/')
     self._exc_class = exc_class or RestException
     self._logger = logger or LOG
+    self._headers = { }
 
     # Make a basic auth handler that does nothing. Set credentials later.
     self._passmgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -74,8 +93,19 @@ class HttpClient(object):
     @param username: Login name.
     @param password: Login password.
     @param realm: The authentication realm.
+    @return: The current object
     """
     self._passmgr.add_password(realm, self._base_url, username, password)
+    return self
+
+  def set_headers(self, headers):
+    """
+    Add headers to the request
+    @param headers: A dictionary with the key value pairs for the headers
+    @return: The current object
+    """
+    self._headers = headers
+    return self
 
 
   @property
@@ -86,47 +116,43 @@ class HttpClient(object):
   def logger(self):
     return self._logger
 
-  def execute(self, http_method, path, **params):
+  def execute(self, http_method, path, params=None, data=None):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
     @param path: The path of the resource.
-    @param params: Key-value data.
+    @param params: Key-value parameter data.
+    @param data: The data to attach to the body of the request.
 
-    @rtype: json
-    @return: The JSON result of the API call.
+    @return: The result of urllib2.urlopen()
     """
     # Prepare URL and params
-    param_str = urllib.urlencode(params)
+    url = self._make_url(path, params)
     if http_method in ("GET", "DELETE"):
-      url = "%s/%s?%s" % (self._base_url, path, param_str)
-      data = None
-    elif http_method == "POST":
-      url = "%s/%s" % (self._base_url, path)
-      data = param_str
-    elif http_method == "PUT":
-      url = "%s/%s" % (self._base_url, path)
-      data = param_str
-    else:
-      raise NotImplementedError("Method type %s not supported" % (http_method,))
+      if data is not None:
+        self.logger.warn(
+            "GET method does not pass any data. Path '%s'" % (path,))
+        data = None
 
     # Setup the request
-    request = urllib2.Request(url)
+    request = urllib2.Request(url, data)
+    # Hack/workaround because urllib2 only does GET and POST
     request.get_method = lambda: http_method
-    request.get_data = lambda: data
+    for k, v in self._headers.items():
+      request.add_header(k, v)
 
     # Call it
     self.logger.debug("%s %s" % (http_method, url))
     try:
-      call = self._opener.open(request)
+      return self._opener.open(request)
     except urllib2.HTTPError, ex:
       raise self._exc_class(ex)
 
-    try:
-      resp = call.read()
-      self.logger.debug("%s Got response: %s%s" %
-                        (http_method, resp[:32], len(resp) > 32 and "..." or ""))
-    except Exception, ex:
-      raise Exception("Command '%s %s' failed: %s" %
-                      (http_method, path, ex))
-    return resp
+  def _make_url(self, path, params):
+    res = self._base_url
+    if path:
+      res += posixpath.normpath('/' + path)
+    if params:
+      param_str = urllib.urlencode(params)
+      res += '?' + param_str
+    return res

@@ -131,6 +131,12 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                             type=int),
       NN_HTTP_PORT=Config("http_port", help="Hadoop HTTP port for the name node", default=50070,
                             type=int),
+      WEBHDFS_URL=Config("webhdfs_url",
+                         help="The URL to WebHDFS/HttpFs service. Defaults to " +
+                         "the WebHDFS URL on the NameNode. To use the legacy" +
+                         "Thrift plugin communication mechanism, this must be" +
+                         "set to an empty value.",
+                         type=str, default=None),
       NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
                                    default="hdfs", type=str),
       DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode",

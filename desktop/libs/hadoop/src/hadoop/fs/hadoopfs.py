@@ -25,15 +25,10 @@ import posixpath
 import random
 import stat as statconsts
 import subprocess
-import sys
-import time
 import urlparse
-import tempfile
 import threading
 
 from thrift.transport import TTransport
-from thrift.transport import TSocket
-from thrift.protocol import TBinaryProtocol
 
 from django.utils.encoding import smart_str, force_unicode
 from desktop.lib import thrift_util, i18n
@@ -42,17 +37,9 @@ from hadoop.api.hdfs import Namenode, Datanode
 from hadoop.api.hdfs.constants import QUOTA_DONT_SET, QUOTA_RESET
 from hadoop.api.common.ttypes import RequestContext, IOException
 import hadoop.conf
-from hadoop.fs import normpath
+from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.exceptions import PermissionDeniedException
 
-# SEEK_SET and family is found in posixfile or os, depending on the python version
-if sys.version_info[:2] < (2, 5):
-  import posixfile
-  _tmp_mod = posixfile
-else:
-  _tmp_mod = os
-SEEK_SET, SEEK_CUR, SEEK_END = _tmp_mod.SEEK_SET, _tmp_mod.SEEK_CUR, _tmp_mod.SEEK_END
-del _tmp_mod
 
 LOG = logging.getLogger(__name__)
 
@@ -172,7 +159,41 @@ def _coerce_exceptions(function):
   return wrapper
 
 
-class HadoopFileSystem(object):
+class Hdfs(object):
+  """
+  An abstract HDFS proxy
+  """
+
+  @staticmethod
+  def basename(path):
+    return posixpath.basename(path)
+
+  @staticmethod
+  def dirname(path):
+    return posixpath.dirname(path)
+
+  @staticmethod
+  def split(path):
+    return posixpath.split(path)
+
+  @staticmethod
+  def join(first, *comp_list):
+    return posixpath.join(first, *comp_list)
+
+  @staticmethod
+  def abspath(path):
+    return posixpath.abspath(path)
+
+  @staticmethod
+  def normpath(path):
+    res = posixpath.normpath(path)
+    # Python normpath() doesn't eliminate leading double slashes
+    if res.startswith('//'):
+      return res[1:]
+    return res
+
+
+class HadoopFileSystem(Hdfs):
   """
   Implementation of Filesystem APIs through Thrift to a Hadoop cluster.
   """
@@ -634,22 +655,6 @@ class HadoopFileSystem(object):
       'group': stat.group,
       'atime': stat.atime
       }
-
-  @staticmethod
-  def basename(path):
-    return posixpath.basename(path)
-
-  @staticmethod
-  def dirname(path):
-    return posixpath.dirname(path)
-
-  @staticmethod
-  def split(path):
-    return posixpath.split(path)
-
-  @staticmethod
-  def join(first, *comp_list):
-    return posixpath.join(first, *comp_list)
 
   @staticmethod
   def urlsplit(url):

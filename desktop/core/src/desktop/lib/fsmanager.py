@@ -56,7 +56,7 @@ def get_default_hdfs():
   _init_filesystems()
   for name, fs in _filesystems.iteritems():
     # Return the first HDFS encountered
-    if fs.uri.startswith('hdfs'):
+    if fs.uri.startswith('hdfs') or fs.uri.startswith('http'):
       return name, fs
   return None, None
 

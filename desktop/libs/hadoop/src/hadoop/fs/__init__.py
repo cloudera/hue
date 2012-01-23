@@ -31,15 +31,26 @@ native python interfaces.
 """
 
 import __builtin__
-import grp
-import os
 import errno
+import grp
+import logging
+import os
+import posixpath
 import pwd
+import re
 import shutil
 import stat
-import logging
-import posixpath
-import re
+import sys
+
+# SEEK_SET and family is found in posixfile or os, depending on the python version
+if sys.version_info[:2] < (2, 5):
+  import posixfile
+  _tmp_mod = posixfile
+else:
+  _tmp_mod = os
+SEEK_SET, SEEK_CUR, SEEK_END = _tmp_mod.SEEK_SET, _tmp_mod.SEEK_CUR, _tmp_mod.SEEK_END
+del _tmp_mod
+
 
 # The web (and POSIX) always uses forward slash as a separator
 LEADING_DOUBLE_SEPARATORS = re.compile("^" + posixpath.sep*2)
