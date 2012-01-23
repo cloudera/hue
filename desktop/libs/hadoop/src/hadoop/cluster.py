@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from hadoop.fs import hadoopfs, LocalSubFileSystem
+from hadoop.fs import hadoopfs, webhdfs, LocalSubFileSystem
 from hadoop.job_tracker import LiveJobTracker
 
 from desktop.lib.paths import get_build_dir
@@ -34,9 +34,12 @@ def _make_filesystem(identifier):
     return LocalSubFileSystem(path)
   else:
     cluster_conf = conf.HDFS_CLUSTERS[identifier]
-    return hadoopfs.HadoopFileSystem.from_config(
-      cluster_conf,
-      hadoop_bin_path=conf.HADOOP_BIN.get())
+    if cluster_conf.USE_WEBHDFS.get():
+      return webhdfs.WebHdfs.from_config(cluster_conf)
+    else:
+      return hadoopfs.HadoopFileSystem.from_config(
+        cluster_conf,
+        hadoop_bin_path=conf.HADOOP_BIN.get())
 
 def _make_mrcluster(identifier):
   cluster_conf = conf.MR_CLUSTERS[identifier]

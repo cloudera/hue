@@ -172,7 +172,33 @@ def _coerce_exceptions(function):
   return wrapper
 
 
-class HadoopFileSystem(object):
+class Hdfs(object):
+  """
+  An abstract HDFS proxy
+  """
+
+  @staticmethod
+  def basename(path):
+    return posixpath.basename(path)
+
+  @staticmethod
+  def dirname(path):
+    return posixpath.dirname(path)
+
+  @staticmethod
+  def split(path):
+    return posixpath.split(path)
+
+  @staticmethod
+  def join(first, *comp_list):
+    return posixpath.join(first, *comp_list)
+
+  @staticmethod
+  def abspath(path):
+    return posixpath.abspath(path)
+
+
+class HadoopFileSystem(Hdfs):
   """
   Implementation of Filesystem APIs through Thrift to a Hadoop cluster.
   """
@@ -634,22 +660,6 @@ class HadoopFileSystem(object):
       'group': stat.group,
       'atime': stat.atime
       }
-
-  @staticmethod
-  def basename(path):
-    return posixpath.basename(path)
-
-  @staticmethod
-  def dirname(path):
-    return posixpath.dirname(path)
-
-  @staticmethod
-  def split(path):
-    return posixpath.split(path)
-
-  @staticmethod
-  def join(first, *comp_list):
-    return posixpath.join(first, *comp_list)
 
   @staticmethod
   def urlsplit(url):

@@ -302,7 +302,6 @@ def listdir(request, path, chooser):
 
     home_dir_path = request.user.get_home_directory()
 
-
     breadcrumbs = parse_breadcrumbs(path)
     
     data = {
@@ -323,10 +322,11 @@ def listdir(request, path, chooser):
 
     # Include parent dir, unless at filesystem root.
     if normpath(path) != posixpath.sep:
-        parent_stat = request.fs.stats(posixpath.join(path, ".."))
+        parent_path = request.fs.join(path, "..")
+        parent_stat = request.fs.stats(parent_path)
         # The 'path' field would be absolute, but we want its basename to be
         # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.
-        parent_stat['path'] = posixpath.join(path, "..")
+        parent_stat['path'] = parent_path
         stats.insert(0, parent_stat)
 
     data['files'] = [_massage_stats(request, stat) for stat in stats]

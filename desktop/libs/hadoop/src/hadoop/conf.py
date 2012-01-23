@@ -131,6 +131,8 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                             type=int),
       NN_HTTP_PORT=Config("http_port", help="Hadoop HTTP port for the name node", default=50070,
                             type=int),
+      USE_WEBHDFS=Config("use_webhdfs", help="Use WebHDFS as the communication channel",
+                         default=False, type=bool),
       NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
                                    default="hdfs", type=str),
       DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode",

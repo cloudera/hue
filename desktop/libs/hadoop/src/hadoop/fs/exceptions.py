@@ -15,7 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  import json
+except:
+  import simplejson as json
+
 from desktop.lib.django_util import StructuredException
+from desktop.lib.rest.http_client import RestException
+
 
 class PermissionDeniedException(StructuredException):
   def __init__(self, msg, orig_exc=None):
@@ -23,3 +30,16 @@ class PermissionDeniedException(StructuredException):
     StructuredException.__init__(self,
       "PERMISSION_DENIED",
       msg)
+
+
+class WebHdfsException(RestException):
+  def __init__(self, error):
+    RestException.__init__(self, error)
+
+    try:
+      json_body = json.loads(self._message)['RemoteException']
+      self.server_exc = json_body['exception']
+      self._message = "%s: %s" % (self.server_exc, json_body['message'])
+    except:
+      # Don't mask the original exception
+      self.server_exc = None
