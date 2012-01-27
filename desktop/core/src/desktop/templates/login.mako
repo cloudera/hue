@@ -22,6 +22,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>jHue Login</title>
 	<link rel="stylesheet" href="/static/ext/css/bootstrap.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<link rel="stylesheet" href="/static/css/jhue.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 	
 	<style type="text/css">
       body {

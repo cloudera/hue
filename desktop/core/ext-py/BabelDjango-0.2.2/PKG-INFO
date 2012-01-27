@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: BabelDjango
+Version: 0.2.2
+Summary: Utilities for using Babel in Django
+Home-page: http://babel.edgewall.org/wiki/BabelDjango
+Author: Edgewall Software
+Author-email: python-babel@googlegroups.com
+License: BSD
+Description: UNKNOWN
+Platform: UNKNOWN

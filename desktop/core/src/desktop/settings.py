@@ -68,13 +68,14 @@ MANAGERS = ADMINS
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+#LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'it'
 
 SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = False
+USE_I18N = True
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -111,7 +112,8 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
     'desktop.middleware.AppSpecificMiddleware',
-
+	'django.middleware.locale.LocaleMiddleware',
+	'babeldjango.middleware.LocaleMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
@@ -135,6 +137,9 @@ INSTALLED_APPS = [
 
     # JavaScript depency loading
     'depender',
+
+	# i18n support
+	'babeldjango',
 
     # Desktop injects all the other installed apps into here magically.
     'desktop'

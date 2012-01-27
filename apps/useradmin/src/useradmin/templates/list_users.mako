@@ -15,6 +15,8 @@
 ## limitations under the License.
 <%namespace name="wrappers" file="header_footer.mako" />
 <% import urllib %>
+<% from django.utils.translation import ugettext, ungettext, get_language, activate %>
+<% _ = ugettext %>
 
 ${wrappers.head()}
 	<div class="well">
@@ -27,7 +29,7 @@ ${wrappers.head()}
         <thead>
           <tr>
             <th>Username</th>
-            <th>First Name</th>
+            <th>${_('First Name')}</th>
             <th>Last Name</th>
             <th>E-mail</th>
             <th>Last Login</th>

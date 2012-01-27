@@ -1,5 +1,6 @@
 # OS X nonsense
 .DS_Store
+._*
 
 # Python compiled files
 *.pyc
