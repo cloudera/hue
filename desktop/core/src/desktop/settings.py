@@ -68,8 +68,8 @@ MANAGERS = ADMINS
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-#LANGUAGE_CODE = 'en-us'
-LANGUAGE_CODE = 'it'
+LANGUAGE_CODE = 'en-us'
+#LANGUAGE_CODE = 'it'
 
 SITE_ID = 1
 
@@ -104,6 +104,8 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.SessionOverPostMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'django.middleware.locale.LocaleMiddleware',
+	'babeldjango.middleware.LocaleMiddleware',
     'desktop.middleware.AjaxMiddleware',
     # Must be after Session, Auth, and Ajax.  Before everything else.
     'desktop.middleware.LoginAndPermissionMiddleware',
@@ -112,8 +114,6 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
     'desktop.middleware.AppSpecificMiddleware',
-	'django.middleware.locale.LocaleMiddleware',
-	'babeldjango.middleware.LocaleMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
