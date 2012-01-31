@@ -24,11 +24,16 @@ import logging
 import threading
 
 from desktop.lib.rest import http_client, resource
+from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import encode_fs_path, Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat
 
+
 DEFAULT_USER = 'hue_webui'
+
+# The number of bytes to read if not specified
+DEFAULT_READ_SIZE = 1024*1024 # 1MB
 
 LOG = logging.getLogger(__name__)
 
@@ -45,14 +50,15 @@ class WebHdfs(Hdfs):
     self._security_enabled = security_enabled
     self._temp_dir = temp_dir
 
-    self._client = http_client.HttpClient(url, exc_class=WebHdfsException)
+    self._client = http_client.HttpClient(url,
+                                          exc_class=WebHdfsException,
+                                          logger=LOG)
     self._root = resource.Resource(self._client)
 
     # To store user info
     self._thread_local = threading.local()
-    self._thread_local.params = { }
-
     self.setuser(DEFAULT_USER)
+
     LOG.debug("Initializing Hadoop HttpFs; %s (security: %s, superuser: %s)" %
               (self._url, self._security_enabled, self._superuser))
 
@@ -68,18 +74,6 @@ class WebHdfs(Hdfs):
   def __str__(self):
     return "WebHdfs at %s" % (self._url,)
 
-  def _rest_call(member_fn):
-    """Decorator to reset the api related params."""
-    def reset_params(fs, *args, **kwargs):
-      PRESERVE_KEYS = set(['user.name'])
-      new_dict = { }
-      for key, val in fs._thread_local.params.iteritems():
-        if key in PRESERVE_KEYS:
-          new_dict[key] = val
-      fs._thread_local.params = new_dict
-      return member_fn(fs, *args, **kwargs)
-    return reset_params
-
   @property
   def uri(self):
     return self._url
@@ -92,22 +86,13 @@ class WebHdfs(Hdfs):
   def user(self):
     return self.thread_local
 
-  def _setop(self, op):
-    return self._setparam("op", op)
-
-  def _setparam(self, key, val):
-    self._thread_local.params[key] = val
-    return self._thread_local.params
-
   def _getparams(self):
-    return self._thread_local.params
+    return { "user.name" : self._thread_local.user }
 
   def setuser(self, user):
     self._thread_local.user = user
-    self._setparam("user.name", user)
 
 
-  @_rest_call
   def listdir_stats(self, path, glob=None):
     """
     listdir_stats(path, glob=None) -> [ WebhdfsStat ]
@@ -115,9 +100,10 @@ class WebHdfs(Hdfs):
     Get directory listing with stats.
     """
     path = encode_fs_path(Hdfs.abspath(path))
+    params = self._getparams()
     if glob is not None:
-      self._setparam("filter", glob)
-    params = self._setop("LISTSTATUS")
+      params['filter'] = glob
+    params['op'] = 'LISTSTATUS'
     json = self._root.get(path, **params)
     filestatus_list = json['FileStatuses']['FileStatus']
     return [ WebHdfsStat(st, path) for st in filestatus_list ]
@@ -131,11 +117,11 @@ class WebHdfs(Hdfs):
     dirents = self.listdir_stats(self, path, glob)
     return [ x.path for x in dirents ]
 
-  @_rest_call
   def _stats(self, path):
     """This version of stats returns None if the entry is not found"""
     path = encode_fs_path(Hdfs.abspath(path))
-    params = self._setop('GETFILESTATUS')
+    params = self._getparams()
+    params['op'] = 'GETFILESTATUS'
     try:
       json = self._root.get(path, **params)
       return WebHdfsStat(json['FileStatus'], path)
@@ -167,3 +153,68 @@ class WebHdfs(Hdfs):
     if sb is None:
       return False
     return not sb.isDir
+
+  def read(self, path, offset, length, bufsize=None):
+    """
+    read(path, offset, length[, bufsize]) -> data
+
+    Read data from a file.
+    """
+    path = encode_fs_path(Hdfs.abspath(path))
+    params = self._getparams()
+    params['op'] = 'OPEN'
+    params['offset'] = offset
+    params['length'] = length
+    if bufsize is not None:
+      params['bufsize'] = bufsize
+    return self._root.get_raw(path, **params)
+
+  def open(self, path, mode='r'):
+    """
+    DEPRECATED!
+    open(path, mode='r') -> File object
+
+    This exists for legacy support and backwards compatibility only.
+    Please use read().
+    """
+    return File(self, path, mode)
+
+
+
+class File(object):
+  """
+  DEPRECATED!
+
+  Represent an open file on HDFS. This exists to mirror the old thriftfs
+  interface, for backwards compatibility only.
+  """
+  def __init__(self, fs, path, mode='r'):
+    self._fs = fs
+    self._path = normpath(path)
+    self._pos = 0
+
+    stat = fs.stats(path)
+    if stat.isDir:
+      raise IOError(errno.EISDIR, "Is a directory: '%s'" % (path,))
+
+  def seek(self, offset, whence=0):
+    """Set the file pointer to the given spot. @see file.seek"""
+    if whence == SEEK_SET:
+      self._pos = offset
+    elif whence == SEEK_CUR:
+      self._pos += offset
+    elif whence == SEEK_END:
+      self._pos = self._fs.stats(self._path).length + offset
+    else:
+      raise IOError(errno.EINVAL, "Invalid argument to seek for whence")
+
+  def tell(self):
+    return self._pos
+
+  def read(self, length=DEFAULT_READ_SIZE):
+    data = self._fs.read(self._path, self._pos, length)
+    self._pos += len(data)
+    return data
+
+  def close(self):
+    pass

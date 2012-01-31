@@ -48,7 +48,7 @@ class WebHdfsStat(object):
       self.mode |= stat.S_IFREG
 
   def __str__(self):
-    return "[WebHdfsStat] %6s %8s %8s %12s %s%s" % \
+    return "[WebHdfsStat] %7s %8s %8s %12s %s%s" % \
         (oct(self.mode), self.user, self.group, self.size, self.path,
          self.isDir and '/' or "")
 
