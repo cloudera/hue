@@ -13,10 +13,14 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${wrappers.head("Beeswax: Query Constructor", section='report generator')}
-
+${commonheader("Beeswax: Query Constructor", "beeswax", "100px")}
+${layout.menubar(section='report generator')}
+<div class="container-fluid">
 <h1>Report Generator</h1>
 % if design and not design.is_auto and design.name:
 <b>Working on saved query: ${design.name}</b>
@@ -113,4 +117,5 @@ Error: <b>${error_message}</b>
 ${log}
 </pre>
 % endif
-${wrappers.foot()}
+</div>
+${commonfooter()}

@@ -13,10 +13,12 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+  from desktop.views import commonheader, commonfooter
+%>
 <%namespace name="comps" file="jobbrowser_components.mako" />
-${comps.header("Task Trackers - Job Browser","Task Trackers")}
-
-
+${commonheader("Task Trackers - Job Browser", "jobbrowser")}
+<div class="container-fluid">
 <table class="datatables">
 	<thead>
 		<tr>
@@ -50,6 +52,7 @@ ${comps.header("Task Trackers - Job Browser","Task Trackers")}
 	</tbody>
 </table>
 <div id="trackerDialog"></div>
+</div>
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function(){
 	$(".datatables").dataTable({
@@ -61,4 +64,4 @@ $(document).ready(function(){
 });
 </script>
 
-${comps.footer()}
+${commonfooter()}

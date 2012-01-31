@@ -16,19 +16,10 @@
 <%!
 from desktop.views import commonheader, commonfooter
 %>
-${commonheader("jHue Help", "help", "100px")}
-	<div class="menubar">
-		<div class="menubar-inner">
-			<div class="container-fluid">
-				<ul class="nav">
-					% for app in apps:
-				        <li><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
-				      % endfor
-				</ul>
-			</div>
-		</div>
-	</div>
+${commonheader("Hi there!", "hello")}
+
 	<div class="container-fluid">
-		${content|n}
+		<h1>${greeting}</h1>
 	</div>
+
 ${commonfooter()}

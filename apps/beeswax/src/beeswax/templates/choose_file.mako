@@ -13,9 +13,15 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
-${wrappers.head("Beeswax: Create table from file", section='tables')}
+${commonheader("Beeswax: Create table from file", "beeswax", "100px")}
+${layout.menubar(section='tables')}
+
+<div class="container-fluid">
 <div class="sidebar">
 	<div class="well">
 		<h6>Actions</h6>
@@ -105,7 +111,7 @@ ${wrappers.head("Beeswax: Create table from file", section='tables')}
 	<div class="modal-footer">
 	</div>
 </div>
-
+</div>
 <style>
 	#filechooser {
 		min-height:100px;
@@ -134,4 +140,4 @@ ${wrappers.head("Beeswax: Create table from file", section='tables')}
 	});
 </script>
 
-${wrappers.foot()}
+${commonfooter()}

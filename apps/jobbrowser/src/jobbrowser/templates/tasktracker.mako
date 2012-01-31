@@ -13,9 +13,13 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+  from desktop.views import commonheader, commonfooter
+%>
 <%namespace name="comps" file="jobbrowser_components.mako" />
-${comps.header("Tracker " + tracker.trackerId + " - Job Browser", "Task Trackers", "Tracker details")}
-<div>
+
+${commonheader("Tracker " + tracker.trackerId + " - Job Browser", "jobbrowser")}
+<div class="container-fluid">
 	<h1>Tracker at ${ tracker.host } on port ${ tracker.httpPort }</h1>
 	<div>
 		<dl>
@@ -53,4 +57,4 @@ ${comps.header("Tracker " + tracker.trackerId + " - Job Browser", "Task Trackers
 	</div>
 </div>
 
-${comps.footer()}
+${commonfooter()}

@@ -13,12 +13,16 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from desktop.views import commonheader, commonfooter
+%>
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${wrappers.head('Query Explanation', section='saved queries')}
+${commonheader("Query Explanation", "beeswax", "100px")}
+${layout.menubar(section='saved queries')}
 
-
+<div class="container-fluid">
 	<h1>Query Explanation: ${util.render_query_context(query_context)}</h1>
 
 	<ul class="tabs">
@@ -40,5 +44,5 @@ ${wrappers.head('Query Explanation', section='saved queries')}
 			$(".tabs").tabs();
 		});
 	</script>
-
-${wrappers.foot()}
+</div>
+${commonfooter()}

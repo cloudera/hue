@@ -14,7 +14,6 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
 <%! from desktop.lib.django_util import extract_field_data %>
 
 <%

@@ -15,10 +15,13 @@
 ## limitations under the License.
 <%!
 from django.template.defaultfilters import timesince
+from desktop.views import commonheader, commonfooter
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head("Beeswax: Queries", section='saved queries')}
+<%namespace name="layout" file="layout.mako" />
+${commonheader("Beeswax: Queries", "beeswax", "100px")}
+${layout.menubar(section='saved queries')}
+<div class="container-fluid">
 <h1>Beeswax: Queries</h1>
   <table class="datatables">
     <thead>
@@ -100,7 +103,7 @@ ${comps.pagination(page)}
 	</div>
 	</form>
 </div>
-
+</div>
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		$(".tabs").tabs();
@@ -128,4 +131,4 @@ ${comps.pagination(page)}
 	});
 </script>
 
-${wrappers.foot()}
+${commonfooter()}

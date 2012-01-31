@@ -19,6 +19,7 @@
   from filebrowser.views import location_to_url
   import os
   import re
+  from desktop.views import commonheader, commonfooter
 %>
 
 <%def name="task_table(tasks)">
@@ -75,8 +76,8 @@
         </tr>
     % endfor
 </%def>
-
-${comps.header("Job: " + job.jobId + " - Job Browser", "", "Job Details")}
+${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
+<div class="container-fluid">
 	<h1>Job: ${job.jobId} - Job Browser</h1>
 	<div class="sidebar withTitle">
 		<div class="well">
@@ -233,7 +234,7 @@ ${comps.header("Job: " + job.jobId + " - Job Browser", "", "Job Details")}
 			</div>
 		</div>
 	</div>
-
+</div>
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready(function(){
 				$(".tabs").tabs();
@@ -294,4 +295,4 @@ ${comps.header("Job: " + job.jobId + " - Job Browser", "", "Job Details")}
 		</script>
 
 
-    ${comps.footer()}
+${commonfooter()}

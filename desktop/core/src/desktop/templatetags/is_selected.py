@@ -14,26 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import django
 
-"""
-Helpers to reuse and access native filebrowser views.
-"""
+register = django.template.Library()
 
-from desktop.lib.django_util import render, render_injected
-
-import filebrowser.plugin.toolbar
-
-def render_with_toolbars(template, request, data, **kwargs):
-  """
-  render_with_toolbars(template, request, data, **kwargs) -> HttpResposne
-
-  Return a HttpResponse of the filebrowser template view, plus all the registered toolbars.
-  This also allow callers to reuse templates in the FileBrowser.
-  """
-  resp = render(template, request, data, **kwargs)
-  toolbars = filebrowser.plugin.toolbar.all()
-  context = filebrowser.plugin.toolbar.DisplayContext(template, request, data)
-
-  for tb in toolbars:
-    render_injected(resp, tb.display(context))
-  return resp
+@register.simple_tag
+def is_selected(section, matcher):
+  if section == matcher:
+    return 'class="active"'
+  else:
+    return ''
+is_selected.is_safe = True

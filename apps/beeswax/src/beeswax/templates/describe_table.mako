@@ -13,7 +13,10 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%
   if is_view:
@@ -21,7 +24,8 @@
   else:
     view_or_table_noun = "Table"
 %>
-${wrappers.head("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName), section='tables')}
+${commonheader("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName), "beeswax", "100px")}
+${layout.menubar(section='tables')}
 <%def name="column_table(cols)">
 
     <table class="datatables">
@@ -44,6 +48,8 @@ ${wrappers.head("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName
     </table>
 
 </%def>
+
+<div class="container-fluid">
 <h1>Beeswax Table Metadata: ${table.tableName}</h1>
 
 <div class="sidebar withTitle">
@@ -181,7 +187,7 @@ ${wrappers.head("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName
 	</div>
 	</form>
 </div>
-
+</div>
 <style>
 	#filechooser {
 		display:none;
@@ -219,4 +225,4 @@ ${wrappers.head("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName
 	});
 </script>
 
-${wrappers.foot()}
+${commonfooter()}

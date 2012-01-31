@@ -13,10 +13,15 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-${wrappers.head("Beeswax: Create table from file", section='tables')}
+${commonheader("Beeswax: Create table from file", "beeswax", "100px")}
+${layout.menubar(section='tables')}
+<div class="container-fluid">
 <div class="sidebar">
 	<div class="well">
 		<h6>Actions</h6>
@@ -92,7 +97,7 @@ ${wrappers.head("Beeswax: Create table from file", section='tables')}
 		</div>
 	</div>
 </div>
-
+</div>
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		$("#id_delimiter_1").css("margin-left","4px").attr("placeholder","Please write here your delimiter").hide();
@@ -108,4 +113,4 @@ ${wrappers.head("Beeswax: Create table from file", section='tables')}
 	});
 </script>
 
-${wrappers.foot()}
+${commonfooter()}

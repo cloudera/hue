@@ -13,15 +13,18 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
 <% import urllib %>
-
+<div class="container-fluid">
   % if username:
-    ${wrappers.head('Edit User: ' + username + ' -- Hue Users')}
+	${commonheader('Edit User: ' + username + ' -- Hue Users', "useradmin")}
+	<h1>Edit User: ${username} -- Hue Users</h1>
   % else:
-    ${wrappers.head('Create User -- Hue Users')}
+    ${commonheader('Create User -- Hue Users', "useradmin")}
+    <h1>Create User -- Hue Users</h1>
   % endif
-
 	<form action="${urllib.quote(action)}" method="POST" class="jframe_padded">
 		<fieldset>
 			<legend> 
@@ -51,4 +54,5 @@
 			<input type="submit" value="Save" class="btn primary"/>
 		</div>
 	</form>
-${wrappers.foot()}
+</div>
+${commonfooter()}

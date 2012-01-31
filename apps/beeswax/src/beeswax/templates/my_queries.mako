@@ -15,16 +15,16 @@
 ## limitations under the License.
 <%!
 from django.template.defaultfilters import timesince
+from desktop.views import commonheader, commonfooter
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
+<%namespace name="layout" file="layout.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
-${wrappers.head("Beeswax: My Queries", section='my queries')}
-<h1>Beeswax: My Queries</h1>
-##
-## ----------------- Saved queries -------------------
-##
+${commonheader("Beeswax: My Queries", "beeswax", "100px")}
+${layout.menubar(section='my queries')}
 
+<div class="container-fluid">
+<h1>Beeswax: My Queries</h1>
 
 	<ul class="tabs">
 		<li class="active"><a href="#recentSavedQueries">Recent Saved Queries</a></li>
@@ -163,7 +163,7 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
 	</div>
 	</form>
 </div>
-
+</div>
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
@@ -196,4 +196,4 @@ ${wrappers.head("Beeswax: My Queries", section='my queries')}
 </script>
 
 
-${wrappers.foot()}
+${commonfooter()}

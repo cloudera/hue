@@ -15,10 +15,11 @@
 ## limitations under the License.
 <%!
   from desktop.lib.django_util import extract_field_data
+  from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
 <%def name="query()">
@@ -72,8 +73,9 @@
 </%def>
 
 
-
-${wrappers.head('Hive Query', section='query')}
+${commonheader("Hive Query", "beeswax", "100px")}
+${layout.menubar(section='query')}
+<div class="container-fluid">
 <h1>Hive Query</h1>
 <div class="sidebar withTitle">
 	<div class="well">
@@ -291,7 +293,7 @@ ${wrappers.head('Hive Query', section='query')}
 		overflow-y:scroll;
 	}
 </style>
-
+</div>
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
@@ -382,4 +384,4 @@ ${wrappers.head('Hive Query', section='query')}
 </script>
 
 
-${wrappers.foot()}
+${commonfooter()}

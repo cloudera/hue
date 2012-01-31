@@ -13,12 +13,16 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${wrappers.head("Beeswax: Waiting for query...", section='query')}
+${commonheader("Beeswax: Waiting for query...", "beeswax", "100px")}
+${layout.menubar(section='query')}
 
 <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
-
+<div class="container-fluid">
 <h1>Beeswax: Waiting for query... ${util.render_query_context(query_context)}</h1>
 <div class="sidebar withTitle">
 	<div class="well">
@@ -65,10 +69,11 @@ ${wrappers.head("Beeswax: Waiting for query...", section='query')}
 		</div>
 	</div>
 </div>
-
+</div>
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		$(".tabs").tabs();
 	});
 </script>
-${wrappers.foot()}
+
+${commonfooter()}

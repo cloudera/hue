@@ -17,6 +17,7 @@
   from jobbrowser.views import get_state_link
   from desktop import appmanager
   from django.template.defaultfilters import urlencode
+  from desktop.views import commonheader, commonfooter
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 <%def name="get_state(option, state)">
@@ -28,7 +29,9 @@
 
 
 % if len(jobs) > 0 or filtered:
-${comps.header("Job Browser", "Job Browser", trackersLink=True)}
+${commonheader("Job Browser", "jobbrowser")}
+<div class="container-fluid">
+<h1>Job Browser</h1>
 <div class="well">
 	<form action="/jobbrowser/jobs" method="GET">
 		<b>Filter jobs:</b>
@@ -101,7 +104,9 @@ ${comps.header("Job Browser", "Job Browser", trackersLink=True)}
 
 
 	% else:
-	${comps.header("Job Browser", "Welcome to the Job Browser")}
+	${commonheader("Job Browser", "jobbrowser")}
+	<div class="container-fluid">
+	<h1>Welcome to the Job Browser</h1>
 	<div>
 		<p>There aren't any jobs running. Let's fix that.</p>
 		<a href="/jobsub/list/">Launch the Job Designer</a>
@@ -110,7 +115,7 @@ ${comps.header("Job Browser", "Job Browser", trackersLink=True)}
 		% endif
 	</div>
 	% endif
-
+</div>
 	<script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		$(".datatables").dataTable({
@@ -134,4 +139,4 @@ ${comps.header("Job Browser", "Job Browser", trackersLink=True)}
 	</script>
 
 
-${comps.footer()}
+${commonfooter()}

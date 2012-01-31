@@ -6,6 +6,9 @@
 *.pyc
 *.pyo
 
+# Language compiled files
+*.mo
+
 # vim tmp files
 .*.swp
 .*.swo

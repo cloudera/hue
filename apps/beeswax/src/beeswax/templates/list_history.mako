@@ -13,10 +13,14 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
-${wrappers.head("Beeswax: Query History", section='history')}
+${commonheader("Beeswax: Query History", "beeswax", "100px")}
+${layout.menubar(section='history')}
 <%def name="show_saved_query(design, history)">
   % if design:
     % if request.user == design.owner:
@@ -41,6 +45,7 @@ ${wrappers.head("Beeswax: Query History", section='history')}
     [ Auto generated action ]
   % endif
 </%def>
+<div class="container-fluid">
 <h1>Beeswax: Query History</h1>
 <div class="sidebar withTitle">
 	<div class="well">
@@ -136,6 +141,7 @@ ${wrappers.head("Beeswax: Query History", section='history')}
       data-filter-elements="tbody tr" value=""/>
   </div> -->
 </div>
+</div>
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
@@ -149,4 +155,4 @@ ${wrappers.head("Beeswax: Query History", section='history')}
 
 	});
 </script>
-${wrappers.foot()}
+${commonfooter()}

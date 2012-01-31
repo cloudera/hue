@@ -13,9 +13,13 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+  from desktop.views import commonheader, commonfooter
+%>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-  ${comps.header("Job Task: " + task.taskId + "- Job Browser", "", "Task details")}
+  ${commonheader("Job Task: " + task.taskId + "- Job Browser", "jobbrowser")}
+	<div class="container-fluid">
 	<h1>Job Task: ${task.taskId} - Job Browser</h1>
 
 	<div class="sidebar withTitle">
@@ -136,7 +140,7 @@
 				${comps.task_counters(task.counters)}
 			</div>
 		</div>
-		
+	</div>	
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready(function(){
 				$(".tabs").tabs();
@@ -176,4 +180,4 @@
 		</script>
      
 
-    ${comps.footer()}
+    ${commonfooter()}

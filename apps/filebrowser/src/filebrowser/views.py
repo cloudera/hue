@@ -39,14 +39,13 @@ from gzip import GzipFile
 from avro import datafile, io
 
 from desktop.lib import i18n
-from desktop.lib.django_util import make_absolute, render_json
+from desktop.lib.django_util import make_absolute, render, render_json
 from desktop.lib.django_util import PopupException, format_preserving_redirect
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadForm, MkDirForm, RmDirForm, RmTreeForm,\
     RemoveForm, ChmodForm, ChownForm, EditorForm
 from hadoop.fs import normpath
-from filebrowser.plugin.views import render_with_toolbars
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -165,7 +164,7 @@ def edit(request, path, form=None):
         path=path,
         filename=os.path.basename(path),
         dirname=os.path.dirname(path))
-    return render_with_toolbars("edit.mako", request, data)
+    return render("edit.mako", request, data)
 
 
 def save_file(request):
@@ -183,7 +182,7 @@ def save_file(request):
             return edit(request, path, form=form)
         else:
             data = dict(form=form)
-            return render_with_toolbars("saveas.mako", request, data)
+            return render("saveas.mako", request, data)
 
     if not path:
         raise PopupException("No path specified")
@@ -332,9 +331,9 @@ def listdir(request, path, chooser):
 
     data['files'] = [_massage_stats(request, stat) for stat in stats]
     if chooser:
-        return render_with_toolbars('chooser.mako', request, data)
+        return render('chooser.mako', request, data)
     else:
-        return render_with_toolbars('listdir.mako', request, data)
+        return render('listdir.mako', request, data)
 
 
 def chooser(request, path):
@@ -495,7 +494,7 @@ def display(request, path):
 
     data['breadcrumbs'] = parse_breadcrumbs(path)
 
-    return render_with_toolbars("display.mako", request, data)
+    return render("display.mako", request, data)
 
 
 def read_contents(codec_type, path, fs, offset, length):
@@ -680,7 +679,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 logger.exception("Exception while processing piggyback data")
                 ret["result_error"] = True
 
-            return render_with_toolbars(template, request, ret)
+            return render(template, request, ret)
     else:
         # Initial parameters may be specified with get
         initial_values = {}
@@ -690,7 +689,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 initial_values[p] = val
         form = form_class(initial=initial_values)
         ret['form'] = form
-    return render_with_toolbars(template, request, ret)
+    return render(template, request, ret)
 
 
 def move(request):
@@ -821,7 +820,7 @@ def _upload(request):
                     (tmp_file, dest, ex))
 
             dest_stats = request.fs.stats(dest)
-            return render_with_toolbars('upload_done.mako', request, {
+            return render('upload_done.mako', request, {
                 # status is used by "fancy uploader"
                 'status': 1,
                 'path': dest,
@@ -834,7 +833,7 @@ def _upload(request):
         if dest:
             initial_values["dest"] = dest
         form = UploadForm(initial=initial_values)
-    return render_with_toolbars('upload.mako', request,
+    return render('upload.mako', request,
             {'form': form, 'next': request.REQUEST.get("dest")})
 
 
@@ -847,7 +846,7 @@ def status(request):
         'datanode_report': status.get_datanode_report(),
         'name': request.fs.name
     }
-    return render_with_toolbars("status.mako", request, data)
+    return render("status.mako", request, data)
 
 
 def location_to_url(request, location, strict=True):

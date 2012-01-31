@@ -13,9 +13,14 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from desktop.views import commonheader, commonfooter
+%>
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head("Beeswax: Create table manually", section='tables')}
+<%namespace name="layout" file="layout.mako" />
+${commonheader("Beeswax: Create table manually", "beeswax", "100px")}
+${layout.menubar(section='tables')}
+<div class="container-fluid">
 <div class="sidebar">
 	<div class="well">
 		<h6>Actions</h6>
@@ -423,7 +428,7 @@ ${wrappers.head("Beeswax: Create table manually", section='tables')}
 		overflow-y:scroll;
 	}
 </style>
-
+</div>
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		
@@ -543,4 +548,4 @@ ${wrappers.head("Beeswax: Create table manually", section='tables')}
 		$("#step4").find("ul").addClass("inputs-list");
 	});
 </script>
-${wrappers.foot()}
+${commonfooter()}

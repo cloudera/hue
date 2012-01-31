@@ -1,6 +1,68 @@
-<%namespace name="shared" file="shared_components.mako" />
+## Licensed to Cloudera, Inc. under one
+## or more contributor license agreements.  See the NOTICE file
+## distributed with this work for additional information
+## regarding copyright ownership.  Cloudera, Inc. licenses this file
+## to you under the Apache License, Version 2.0 (the
+## "License"); you may not use this file except in compliance
+## with the License.  You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+<%!
+from desktop.views import commonheader, commonfooter
+%>
 
-${shared.header("Hue Shell", True, shells)}
+% if shells:
+	${commonheader("Hue Shell", "shell", "100px")}
+% else:
+	${commonheader("Hue Shell", "shell")}
+% endif
+
+
+% if shells:
+<div class="menubar">
+	<div class="menubar-inner">
+		<div class="container-fluid">
+			<ul class="nav">
+			% if len(shells) == 1:
+				% if shells[0]["exists"]:
+					<li><a href="${url('shell.views.create')}?keyName=${shells[0]["keyName"]}" class="${shells[0]["keyName"]}">${shells[0]["niceName"]}</a></li>
+				% else: 
+					<li><a href="#" class="disabled">${shells[0]["niceName"]}</a></li>
+				% endif
+			% else:
+				% if shells[0]["exists"]:
+					<li><a href="${url('shell.views.create')}?keyName=${shells[0]["keyName"]}" class="${shells[0]["keyName"]}">${shells[0]["niceName"]}</a></li>
+				% else:
+					<li><a href="#" class="disabled">${shells[0]["niceName"]}</a></li>
+				% endif
+				% for item in shells[1:-1]:
+					% if item["exists"]:
+						<li><a href="${url('shell.views.create')}?keyName=${item["keyName"]}" class="${item["keyName"]}">${item["niceName"]}</a></li>
+					% else:
+						<li><a href="#" class="disabled">${item["niceName"]}</a></li>
+					% endif
+				% endfor
+				% if shells[-1]["exists"]:
+					<li><a href="${url('shell.views.create')}?keyName=${shells[-1]["keyName"]}" class="${shells[-1]["keyName"]}">${shells[-1]["niceName"]}</a></li>
+				% else:
+					<li><a href="#" class="disabled">${shells[-1]["niceName"]}</a></li>
+				% endif
+			% endif
+			</ul>
+		</div>
+	</div>
+</div>
+% endif
+
+
+<div class="container-fluid">
+
   % if shell_id:
 	<style type="text/css" media="screen">
 		body {
@@ -51,6 +113,13 @@ ${shared.header("Hue Shell", True, shells)}
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
+		var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+		for (var i=0;i<hashes.length;i++){
+			if (hashes[i].indexOf("keyName")>-1){
+				$("."+hashes[i].split("=")[1]).addClass("selected");
+			}
+		}
+		
 		var hueInstanceID = function() {
 			var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
 			var lastIndex = chars.length - 1;
@@ -174,5 +243,5 @@ ${shared.header("Hue Shell", True, shells)}
 		
 	});
 </script>
-
-${shared.footer()}
+</div>
+${commonfooter()}

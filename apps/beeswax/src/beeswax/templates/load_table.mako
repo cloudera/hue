@@ -13,9 +13,14 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${wrappers.head("Beeswax: Load Data into " + table)}
+${commonheader("Beeswax: Load Data into " + table, "beeswax", "100px")}
+${layout.menubar()}
+<div class="container-fluid">
   <h1>Load Data into <tt>${table}</tt></h1>
   <div class="prompt_popup">
     <form action="${action}" method="POST">
@@ -39,4 +44,5 @@ ${wrappers.head("Beeswax: Load Data into " + table)}
       <input type="submit">
     </form>
   </div>
-${wrappers.foot()}
+</div>
+${commonfooter()}

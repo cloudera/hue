@@ -28,7 +28,7 @@ from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 import django.views.debug
 
-from desktop.lib.django_util import login_notrequired, render_json, render
+from desktop.lib.django_util import login_notrequired, render_json, render, render_to_string
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
 from desktop.models import UserPreferences
@@ -259,6 +259,21 @@ def who_am_i(request):
   time.sleep(sleep)
   return HttpResponse(request.user.username + "\t" + request.fs.user + "\n")
 
+def commonheader(title, section, padding="60px"):
+  """
+  Returns the rendered common header
+  """
+  return render_to_string("commonheader.html", dict(
+    title=title,
+    section=section,
+    padding=padding
+  ))
+
+def commonfooter():
+  """
+  Returns the rendered common footer
+  """
+  return render_to_string("commonfooter.html")
 
 # If the app's conf.py has a config_validator() method, call it.
 CONFIG_VALIDATOR = 'config_validator'

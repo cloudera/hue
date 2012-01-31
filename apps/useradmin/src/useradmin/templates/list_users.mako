@@ -13,12 +13,16 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
+<%!
+from desktop.views import commonheader, commonfooter
+%>
 <% import urllib %>
 <% from django.utils.translation import ugettext, ungettext, get_language, activate %>
 <% _ = ugettext %>
 
-${wrappers.head()}
+${commonheader("Hue Users", "useradmin")}
+<div class="container-fluid">
+	<h1>Hue Users</h1>
 	<div class="well">
 			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 			<p class="pull-right">
@@ -28,11 +32,11 @@ ${wrappers.head()}
       <table class="datatables">
         <thead>
           <tr>
-            <th>Username</th>
+            <th>${_('Username')}</th>
             <th>${_('First Name')}</th>
-            <th>Last Name</th>
-            <th>E-mail</th>
-            <th>Last Login</th>
+            <th>${_('Last Name')}</th>
+            <th>${_('E-mail')}</th>
+            <th>${_('Last Login')}</th>
 			<th>&nbsp;</th>
           </tr>
         </head>
@@ -69,7 +73,7 @@ ${wrappers.head()}
 	</div>
 	</form>
 </div>
-      
+</div>   
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
@@ -121,4 +125,4 @@ ${wrappers.head()}
 		});
 	</script>
 
-${wrappers.foot()}
+${commonfooter()}

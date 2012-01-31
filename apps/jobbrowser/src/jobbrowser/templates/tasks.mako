@@ -15,17 +15,19 @@
 ## limitations under the License.
 <%
   from jobbrowser.views import get_state_link
+  from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-  ${comps.header("Task View: Job: " + jobid, "Task View: Job: " + jobid)}
+  ${commonheader("Task View: Job: " + jobid + " - Job Browser", "jobbrowser")}
   <%def name="selected(val, state)">
   %   if val is not None and state is not None and val in state:
         selected="true"
   %   endif
   </%def>
-
+	<div class="container-fluid">
+	<h1>Task View: Job:  ${jobid}</h1>
 	<div class="well">
 		<div class="">
 		
@@ -98,7 +100,7 @@
 		</tbody>
 	</table>
 	%endif
-	
+	</div>
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
 			$(".datatables").dataTable({
@@ -110,4 +112,4 @@
 		});
 	</script>
 
-  ${comps.footer()}
+  ${commonfooter()}
