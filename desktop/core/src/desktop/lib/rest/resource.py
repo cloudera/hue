@@ -72,6 +72,17 @@ class Resource(object):
     return self.invoke("GET", relpath, params)
 
 
+  def delete(self, relpath=None, params=None):
+    """
+    Invoke the DELETE method on a resource.
+    @param relpath: Optional. A relative path to this resource's path.
+    @param params: Key-value data.
+
+    @return: A dictionary of the JSON result.
+    """
+    return self.invoke("DELETE", relpath, params)
+
+
   def get_raw(self, relpath=None, params=None):
     """
     Invoke the GET method on a resource.

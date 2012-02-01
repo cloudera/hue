@@ -156,6 +156,33 @@ class WebHdfs(Hdfs):
       return False
     return not sb.isDir
 
+  def _delete(self, path, recursive=False):
+    """
+    _delete(path, recursive=False)
+
+    Delete a file or directory.
+    """
+    path = encode_fs_path(Hdfs.abspath(path))
+    params = self._getparams()
+    params['op'] = 'DELETE'
+    params['recusive'] = recursive and 'true' or 'false'
+    result = self._root.delete(path, params)
+    # This part of the API is nonsense.
+    # The lack of exception should indicate success.
+    return result['boolean']
+
+  def remove(self, path):
+    """Delete a file"""
+    return self._delete(path, recursive=False)
+
+  def rmdir(self, path):
+    """Delete a file"""
+    return self._delete(path, recursive=False)
+
+  def rmtree(self, path):
+    """Delete a tree recursively"""
+    return self._delete(path, recursive=True)
+
   def read(self, path, offset, length, bufsize=None):
     """
     read(path, offset, length[, bufsize]) -> data
