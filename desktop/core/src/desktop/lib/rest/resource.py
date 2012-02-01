@@ -20,6 +20,7 @@ try:
 except ImportError:
   import simplejson as json
 import logging
+import posixpath
 
 LOG = logging.getLogger(__name__)
 
@@ -39,15 +40,15 @@ class Resource(object):
   def _join_uri(self, relpath):
     if relpath is None:
       return self._path
-    return (self._path + '/' + relpath).strip('/')
+    return self._path + posixpath.normpath('/' + relpath)
 
-  def _invoke(self, method, relpath=None, json_decode=True, **params):
+  def invoke(self, method, relpath=None, params=None, data=None, json_decode=True):
     """
     Invoke an API method.
-    @return: JSON dictionary.
+    @return: JSON dictionary (if "json_decode" is True), or raw data.
     """
     path = self._join_uri(relpath)
-    res = self._client.execute(method, path, **params)
+    res = self._client.execute(method, path, params=params, data=data)
     if not json_decode:
       return res
 
@@ -60,7 +61,7 @@ class Resource(object):
       raise ex
 
 
-  def get(self, relpath=None, **params):
+  def get(self, relpath=None, params=None):
     """
     Invoke the GET method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
@@ -68,10 +69,10 @@ class Resource(object):
 
     @return: A dictionary of the JSON result.
     """
-    return self._invoke("GET", relpath, **params)
+    return self.invoke("GET", relpath, params)
 
 
-  def get_raw(self, relpath=None, **params):
+  def get_raw(self, relpath=None, params=None):
     """
     Invoke the GET method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
@@ -79,26 +80,28 @@ class Resource(object):
 
     @return: Raw response body.
     """
-    return self._invoke("GET", relpath, json_decode=False, **params)
+    return self.invoke("GET", relpath, params, json_decode=False)
 
 
-  def post(self, relpath=None, **params):
+  def post(self, relpath=None, params=None, data=None):
     """
     Invoke the POST method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
     @param params: Key-value data.
+    @param data: Optional. Body of the request.
 
     @return: A dictionary of the JSON result.
     """
-    return self._invoke("POST", relpath, **params)
+    return self.invoke("POST", relpath, params, data)
 
 
-  def put(self, relpath=None, **params):
+  def put(self, relpath=None, params=None, data=None):
     """
     Invoke the PUT method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
     @param params: Key-value data.
+    @param data: Optional. Body of the request.
 
     @return: A dictionary of the JSON result.
     """
-    return self._invoke("PUT", relpath, **params)
+    return self.invoke("PUT", relpath, params, data, json_decode=False)

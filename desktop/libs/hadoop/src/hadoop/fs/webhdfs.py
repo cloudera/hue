@@ -50,9 +50,7 @@ class WebHdfs(Hdfs):
     self._security_enabled = security_enabled
     self._temp_dir = temp_dir
 
-    self._client = http_client.HttpClient(url,
-                                          exc_class=WebHdfsException,
-                                          logger=LOG)
+    self._client = self._make_client(url)
     self._root = resource.Resource(self._client)
 
     # To store user info
@@ -73,6 +71,10 @@ class WebHdfs(Hdfs):
 
   def __str__(self):
     return "WebHdfs at %s" % (self._url,)
+
+  def _make_client(self, url):
+    return http_client.HttpClient(
+        url, exc_class=WebHdfsException, logger=LOG)
 
   @property
   def uri(self):
@@ -104,7 +106,7 @@ class WebHdfs(Hdfs):
     if glob is not None:
       params['filter'] = glob
     params['op'] = 'LISTSTATUS'
-    json = self._root.get(path, **params)
+    json = self._root.get(path, params)
     filestatus_list = json['FileStatuses']['FileStatus']
     return [ WebHdfsStat(st, path) for st in filestatus_list ]
 
@@ -123,7 +125,7 @@ class WebHdfs(Hdfs):
     params = self._getparams()
     params['op'] = 'GETFILESTATUS'
     try:
-      json = self._root.get(path, **params)
+      json = self._root.get(path, params)
       return WebHdfsStat(json['FileStatus'], path)
     except WebHdfsException, ex:
       if ex.server_exc == 'FileNotFoundException':
@@ -163,11 +165,11 @@ class WebHdfs(Hdfs):
     path = encode_fs_path(Hdfs.abspath(path))
     params = self._getparams()
     params['op'] = 'OPEN'
-    params['offset'] = offset
-    params['length'] = length
+    params['offset'] = long(offset)
+    params['length'] = long(length)
     if bufsize is not None:
       params['bufsize'] = bufsize
-    return self._root.get_raw(path, **params)
+    return self._root.get_raw(path, params)
 
   def open(self, path, mode='r'):
     """
@@ -179,6 +181,82 @@ class WebHdfs(Hdfs):
     """
     return File(self, path, mode)
 
+
+  def create(self, path, overwrite=False, blocksize=None,
+             replication=None, permission=None, data=None):
+    """
+    create(path, overwrite=False, blocksize=None, replication=None, permission=None)
+
+    Creates a file with the specified parameters.
+    """
+    path = encode_fs_path(Hdfs.abspath(path))
+    params = self._getparams()
+    params['op'] = 'CREATE'
+    params['overwrite'] = overwrite and 'true' or 'false'
+    if blocksize is not None:
+      params['blocksize'] = long(blocksize)
+    if replication is not None:
+      params['replication'] = int(replication)
+    if permission is not None:
+      params['permission'] = oct(permission)
+
+    self._invoke_with_redirect('PUT', path, params, data)
+
+
+  def append(self, path, data):
+    """
+    append(path, data)
+
+    Append data to a given file.
+    """
+    path = encode_fs_path(Hdfs.abspath(path))
+    params = self._getparams()
+    params['op'] = 'APPEND'
+    self._invoke_with_redirect('POST', path, params, data)
+
+
+  def _invoke_with_redirect(self, method, path, params=None, data=None):
+    """
+    Issue a request, and expect a redirect, and then submit the data to
+    the redirected location. This is used for create, write, etc.
+
+    Returns the 
+    """
+    next_url = None
+    try:
+      # Do not pass data in the first leg.
+      self._root.invoke(method, path, params)
+    except WebHdfsException, ex:
+      # This is expected. We get a 307 redirect.
+      # The following call may throw.
+      next_url = self._get_redirect_url(ex)
+
+    if next_url is None:
+      raise WebHdfsException(
+        "Failed to create '%s'. HDFS did not return a redirect" % (path,))
+
+    # Now talk to the real thing. The redirect url already includes the params.
+    client = self._make_client(next_url)
+    return resource.Resource(client).invoke(
+        method, data=data, json_decode=False)
+
+
+  def _get_redirect_url(self, webhdfs_ex):
+    """Retrieve the redirect url from an exception object"""
+    try:
+      # The actual HttpError (307) is wrapped inside
+      http_error = webhdfs_ex.get_parent_ex()
+      if http_error is None:
+        raise webhdfs_ex
+
+      if http_error.code not in (301, 302, 303, 307):
+        LOG.error("Response is not a redirect: %s" % (webhdfs_ex,))
+        raise webhdfs_ex
+      return http_error.headers.getheader('location')
+    except Exception, ex:
+      LOG.error("Failed to read redirect from response: %s (%s)" %
+                (webhdfs_ex, ex))
+      raise webhdfs_ex
 
 
 class File(object):

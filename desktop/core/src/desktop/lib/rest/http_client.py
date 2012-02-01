@@ -17,6 +17,7 @@
 
 import cookielib
 import logging
+import posixpath
 import urllib
 import urllib2
 
@@ -40,6 +41,11 @@ class RestException(Exception):
     if self._code is not None:
       res += " (error %s)" % (self._code,)
     return res
+
+  def get_parent_ex(self):
+    if isinstance(self._error, Exception):
+      return self._error
+    return None
 
 
 class HttpClient(object):
@@ -86,34 +92,29 @@ class HttpClient(object):
   def logger(self):
     return self._logger
 
-  def execute(self, http_method, path, **params):
+  def execute(self, http_method, path, params=None, data=None):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
     @param path: The path of the resource.
-    @param params: Key-value data.
+    @param params: Key-value parameter data.
+    @param data: The data to attach to the body of the request.
 
     @rtype: json
     @return: The JSON result of the API call.
     """
     # Prepare URL and params
-    param_str = urllib.urlencode(params)
+    url = self._make_url(path, params)
     if http_method in ("GET", "DELETE"):
-      url = "%s/%s?%s" % (self._base_url, path, param_str)
-      data = None
-    elif http_method == "POST":
-      url = "%s/%s" % (self._base_url, path)
-      data = param_str
-    elif http_method == "PUT":
-      url = "%s/%s" % (self._base_url, path)
-      data = param_str
-    else:
-      raise NotImplementedError("Method type %s not supported" % (http_method,))
+      if data is not None:
+        self.logger.warn(
+            "GET method does not pass any data. Path '%s'" % (path,))
+        data = None
 
     # Setup the request
-    request = urllib2.Request(url)
+    request = urllib2.Request(url, data)
+    # Hack/workaround because urllib2 only does GET and POST
     request.get_method = lambda: http_method
-    request.get_data = lambda: data
 
     # Call it
     self.logger.debug("%s %s" % (http_method, url))
@@ -130,3 +131,12 @@ class HttpClient(object):
       raise Exception("Command '%s %s' failed: %s" %
                       (http_method, path, ex))
     return resp
+
+  def _make_url(self, path, params):
+    res = self._base_url
+    if path:
+      res += posixpath.normpath('/' + path)
+    if params:
+      param_str = urllib.urlencode(params)
+      res += '?' + param_str
+    return res
