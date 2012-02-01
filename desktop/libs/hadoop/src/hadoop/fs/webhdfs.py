@@ -270,10 +270,16 @@ class File(object):
     self._fs = fs
     self._path = normpath(path)
     self._pos = 0
+    self._mode = mode
 
-    stat = fs.stats(path)
-    if stat.isDir:
-      raise IOError(errno.EISDIR, "Is a directory: '%s'" % (path,))
+    try:
+      self._stat = fs.stats(path)
+      if self._stat.isDir:
+        raise IOError(errno.EISDIR, "Is a directory: '%s'" % (path,))
+    except IOError, ex:
+      if ex.errno == errno.ENOENT and mode == 'r':
+        raise ex
+      self._stat = None
 
   def seek(self, offset, whence=0):
     """Set the file pointer to the given spot. @see file.seek"""
@@ -282,9 +288,14 @@ class File(object):
     elif whence == SEEK_CUR:
       self._pos += offset
     elif whence == SEEK_END:
+      self.stat()
       self._pos = self._fs.stats(self._path).length + offset
     else:
       raise IOError(errno.EINVAL, "Invalid argument to seek for whence")
+
+  def stat(self):
+    self._stat = self._fs.stats(self._path)
+    return self._stat
 
   def tell(self):
     return self._pos
@@ -293,6 +304,20 @@ class File(object):
     data = self._fs.read(self._path, self._pos, length)
     self._pos += len(data)
     return data
+
+  def write(self, data):
+    """Append the data to the end of the file"""
+    self.append(data)
+
+  def append(self, data):
+    if 'w' not in self._mode:
+      raise IOError(errno.EINVAL, "File not open for writing")
+
+    if self._stat is None:
+      # File not there yet.
+      self._fs.create(self._path, data=data)
+    else:
+      self._fs.append(self._path, data=data)
 
   def close(self):
     pass
