@@ -184,6 +184,10 @@ class Hdfs(object):
   def abspath(path):
     return posixpath.abspath(path)
 
+  @staticmethod
+  def normpath(path):
+    return posixpath.normpath(path)
+
 
 class HadoopFileSystem(Hdfs):
   """

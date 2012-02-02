@@ -49,7 +49,7 @@ class Resource(object):
     """
     path = self._join_uri(relpath)
     res = self._client.execute(method, path, params=params, data=data)
-    if not json_decode:
+    if not res or not json_decode:
       return res
 
     try:
@@ -115,4 +115,4 @@ class Resource(object):
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("PUT", relpath, params, data, json_decode=False)
+    return self.invoke("PUT", relpath, params, data)

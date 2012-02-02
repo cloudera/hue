@@ -27,7 +27,7 @@ from desktop.lib.rest import http_client, resource
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import encode_fs_path, Hdfs
 from hadoop.fs.exceptions import WebHdfsException
-from hadoop.fs.webhdfs_types import WebHdfsStat
+from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 
 
 DEFAULT_USER = 'hue_webui'
@@ -97,11 +97,11 @@ class WebHdfs(Hdfs):
 
   def listdir_stats(self, path, glob=None):
     """
-    listdir_stats(path, glob=None) -> [ WebhdfsStat ]
+    listdir_stats(path, glob=None) -> [ WebHdfsStat ]
 
     Get directory listing with stats.
     """
-    path = encode_fs_path(Hdfs.abspath(path))
+    path = encode_fs_path(Hdfs.normpath(path))
     params = self._getparams()
     if glob is not None:
       params['filter'] = glob
@@ -119,9 +119,20 @@ class WebHdfs(Hdfs):
     dirents = self.listdir_stats(self, path, glob)
     return [ x.path for x in dirents ]
 
+  def get_content_summary(self, path):
+    """
+    get_content_summary(path) -> WebHdfsContentSummary
+    """
+    path = encode_fs_path(Hdfs.normpath(path))
+    params = self._getparams()
+    params['op'] = 'GETCONTENTSUMMARY'
+    json = self._root.get(path, params)
+    return WebHdfsContentSummary(json['ContentSummary'])
+
+
   def _stats(self, path):
     """This version of stats returns None if the entry is not found"""
-    path = encode_fs_path(Hdfs.abspath(path))
+    path = encode_fs_path(Hdfs.normpath(path))
     params = self._getparams()
     params['op'] = 'GETFILESTATUS'
     try:
@@ -162,26 +173,80 @@ class WebHdfs(Hdfs):
 
     Delete a file or directory.
     """
-    path = encode_fs_path(Hdfs.abspath(path))
+    path = encode_fs_path(Hdfs.normpath(path))
     params = self._getparams()
     params['op'] = 'DELETE'
-    params['recusive'] = recursive and 'true' or 'false'
+    params['recursive'] = recursive and 'true' or 'false'
     result = self._root.delete(path, params)
     # This part of the API is nonsense.
     # The lack of exception should indicate success.
-    return result['boolean']
+    if not result['boolean']:
+      raise IOError('Delete failed: %s' % (path,))
 
   def remove(self, path):
-    """Delete a file"""
-    return self._delete(path, recursive=False)
+    """Delete a file."""
+    self._delete(path, recursive=False)
 
   def rmdir(self, path):
-    """Delete a file"""
-    return self._delete(path, recursive=False)
+    """Delete a file."""
+    self._delete(path, recursive=False)
 
   def rmtree(self, path):
-    """Delete a tree recursively"""
-    return self._delete(path, recursive=True)
+    """Delete a tree recursively."""
+    self._delete(path, recursive=True)
+
+  def mkdir(self, path, mode=None):
+    """
+    mkdir(path, mode=None)
+
+    Creates a directory and any parent directory if necessary.
+    """
+    path = encode_fs_path(Hdfs.normpath(path))
+    params = self._getparams()
+    params['op'] = 'MKDIRS'
+    if mode is not None:
+      params['permission'] = safe_octal(mode)
+    success = self._root.put(path, params)
+    if not success:
+      raise IOError("Mkdir failed: %s" % (path,))
+
+  def rename(self, old, new):
+    """rename(old, new)"""
+    old = encode_fs_path(Hdfs.normpath(old))
+    new = encode_fs_path(Hdfs.normpath(new))
+    params = self._getparams()
+    params['op'] = 'RENAME'
+    params['destination'] = new
+    result = self._root.put(old, params)
+    if not result['boolean']:
+      raise IOError("Rename failed: %s -> %s" % (old, new))
+
+  def chown(self, path, user=None, group=None):
+    """chown(path, user=None, group=None)"""
+    path = encode_fs_path(Hdfs.normpath(path))
+    params = self._getparams()
+    params['op'] = 'SETOWNER'
+    if user is not None:
+      params['owner'] = user
+    if group is not None:
+      params['group'] = group
+    self._root.put(path, params)
+
+  def chmod(self, path, mode):
+    """chmod(path, mode)"""
+    path = encode_fs_path(Hdfs.normpath(path))
+    params = self._getparams()
+    params['op'] = 'SETPERMISSION'
+    params['permission'] = safe_octal(mode)
+    self._root.put(path, params)
+
+  def get_home_dir(self):
+    """get_home_dir() -> Home directory for the current user"""
+    params = self._getparams()
+    params['op'] = 'GETHOMEDIRECTORY'
+    res = self._root.get(params=params)
+    return res['Path']
+
 
   def read(self, path, offset, length, bufsize=None):
     """
@@ -189,7 +254,7 @@ class WebHdfs(Hdfs):
 
     Read data from a file.
     """
-    path = encode_fs_path(Hdfs.abspath(path))
+    path = encode_fs_path(Hdfs.normpath(path))
     params = self._getparams()
     params['op'] = 'OPEN'
     params['offset'] = long(offset)
@@ -216,7 +281,7 @@ class WebHdfs(Hdfs):
 
     Creates a file with the specified parameters.
     """
-    path = encode_fs_path(Hdfs.abspath(path))
+    path = encode_fs_path(Hdfs.normpath(path))
     params = self._getparams()
     params['op'] = 'CREATE'
     params['overwrite'] = overwrite and 'true' or 'false'
@@ -225,7 +290,7 @@ class WebHdfs(Hdfs):
     if replication is not None:
       params['replication'] = int(replication)
     if permission is not None:
-      params['permission'] = oct(permission)
+      params['permission'] = safe_octal(permission)
 
     self._invoke_with_redirect('PUT', path, params, data)
 
@@ -236,7 +301,7 @@ class WebHdfs(Hdfs):
 
     Append data to a given file.
     """
-    path = encode_fs_path(Hdfs.abspath(path))
+    path = encode_fs_path(Hdfs.normpath(path))
     params = self._getparams()
     params['op'] = 'APPEND'
     self._invoke_with_redirect('POST', path, params, data)
@@ -284,6 +349,15 @@ class WebHdfs(Hdfs):
       LOG.error("Failed to read redirect from response: %s (%s)" %
                 (webhdfs_ex, ex))
       raise webhdfs_ex
+
+  def get_delegation_token(self, renewer):
+    """get_delegation_token(user) -> Delegation token"""
+    params = self._getparams()
+    params['op'] = 'GETDELEGATIONTOKEN'
+    params['renewer'] = renewer
+    res = self._root.get(params=params)
+    return res['Token']['urlString']
+
 
 
 class File(object):
@@ -348,3 +422,15 @@ class File(object):
 
   def close(self):
     pass
+
+
+def safe_octal(octal_value):
+  """
+  safe_octal(octal_value) -> octal value in string
+
+  This correctly handles octal values specified as a string or as a numeric.
+  """
+  try:
+    return oct(octal_value)
+  except TypeError:
+    return str(octal_value)

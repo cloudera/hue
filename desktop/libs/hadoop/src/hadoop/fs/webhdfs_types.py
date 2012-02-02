@@ -63,3 +63,16 @@ class WebHdfsStat(object):
 
   def __setitem__(self, key, value):
     setattr(self, key, value)
+
+
+class WebHdfsContentSummary(object):
+  """
+  Content summary info on a directory
+  """
+  def __init__(self, summary):
+    for k, v in summary.iteritems():
+      setattr(self, k, v)
+
+  def __str__(self):
+    return "[WebHdfsContentSummary] nDirs:%s; nFiles:%s (quota %s); du:%s (quota %s)" % \
+        (self.directoryCount, self.fileCount, self.quota, self.spaceConsumed, self.spaceQuota)
