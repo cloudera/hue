@@ -57,15 +57,15 @@ class WebHdfs(Hdfs):
     self._thread_local = threading.local()
     self.setuser(DEFAULT_USER)
 
-    LOG.debug("Initializing Hadoop HttpFs; %s (security: %s, superuser: %s)" %
+    LOG.debug("Initializing Hadoop WebHdfs: %s (security: %s, superuser: %s)" %
+              
+              
+              S: %s (security: %s, superuser: %s)" %
               (self._url, self._security_enabled, self._superuser))
 
   @classmethod
   def from_config(cls, hdfs_config):
-    host = hdfs_config.NN_HOST.get()
-    port = hdfs_config.NN_HTTP_PORT.get()
-    url = "http://%s:%s/webhdfs/v1" % (host, port)
-    return cls(url=url,
+    return cls(url=_get_service_url(hdfs_config),
                security_enabled=hdfs_config.SECURITY_ENABLED.get(),
                temp_dir=hdfs_config.TEMP_DIR.get())
 
@@ -434,3 +434,12 @@ def safe_octal(octal_value):
     return oct(octal_value)
   except TypeError:
     return str(octal_value)
+
+def _get_service_url(hdfs_config):
+  override = hdfs_config.WEBHDFS_URL.get()
+  if override:
+    return override
+
+  host = hdfs_config.NN_HOST.get()
+  port = hdfs_config.NN_HTTP_PORT.get()
+  return "http://%s:%s/webhdfs/v1" % (host, port)

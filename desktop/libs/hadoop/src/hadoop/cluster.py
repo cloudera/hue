@@ -34,7 +34,8 @@ def _make_filesystem(identifier):
     return LocalSubFileSystem(path)
   else:
     cluster_conf = conf.HDFS_CLUSTERS[identifier]
-    if cluster_conf.USE_WEBHDFS.get():
+    # The only way to disable webhdfs is to specify an empty value
+    if cluster_conf.WEBHDFS_URL.get() != '':
       return webhdfs.WebHdfs.from_config(cluster_conf)
     else:
       return hadoopfs.HadoopFileSystem.from_config(
