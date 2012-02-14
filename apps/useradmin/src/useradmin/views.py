@@ -17,7 +17,7 @@
 """
 User management application.
 """
-import os
+import re
 import pwd
 import grp
 import logging
@@ -27,8 +27,8 @@ import subprocess
 import django
 import django.contrib.auth.forms
 from django import forms
-from django.contrib.auth.models import User
-from desktop.lib.django_util import get_username_re_rule, render, PopupException
+from django.contrib.auth.models import User, Group
+from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule, render, PopupException, format_preserving_redirect
 from django.core import urlresolvers
 
 LOG = logging.getLogger(__name__)
@@ -38,6 +38,9 @@ __groups_lock = threading.Lock()
 
 def list_users(request):
   return render("list_users.mako", request, dict(users=User.objects.all()))
+
+def list_groups(request):
+  return render("list_groups.mako", request, dict(groups=Group.objects.all()))
 
 def delete_user(request, username):
   if not request.user.is_superuser:
@@ -61,6 +64,28 @@ def delete_user(request, username):
     return render("confirm.mako",
       request,
       dict(path=request.path, title="Delete user?"))
+
+def delete_group(request, name):
+  if not request.user.is_superuser:
+    raise PopupException("You must be a superuser to delete groups.")
+  if request.method == 'POST':
+    try:
+      global groups_lock
+      __groups_lock.acquire()
+      try:
+        group = Group.objects.get(name=name)
+        group.delete()
+      finally:
+        __groups_lock.release()
+
+      # Send a flash message saying "deleted"?
+      return list_groups(request)
+    except Group.DoesNotExist:
+      raise PopupException("Group not found.")
+  else:
+    return render("confirm.mako",
+      request,
+      dict(path=request.path, title="Delete group?"))
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   """
@@ -158,6 +183,38 @@ def edit_user(request, username=None):
   return render('edit_user.mako', request,
     dict(form=form, action=request.path, username=username))
 
+def edit_group(request, name=None):
+  """
+  edit_group(request, name = None) -> reply
+
+  @type request:        HttpRequest
+  @param request:       The request object
+  @type name:       string
+  @param name:      Default to None, when creating a new group
+
+  Only superusers may create a group
+  """
+  if not request.user.is_superuser:
+    raise PopupException("You must be a superuser to add or edit a group.")
+
+  if name is not None:
+    instance = Group.objects.get(name=name)
+  else:
+    instance = None
+
+  if request.method == 'POST':
+    form = GroupEditForm(request.POST, instance=instance)
+    if form.is_valid():
+      form.save()
+      request.flash.put('Group information updated')
+      url = urlresolvers.reverse(list_groups)
+      return format_preserving_redirect(request, url)
+
+  else:
+    form = GroupEditForm(instance=instance)
+  return render('edit_group.mako', request,
+    dict(form=form, action=request.path, name=name))
+
 
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
@@ -232,3 +289,65 @@ def sync_unix_users_and_groups(min_uid, max_uid, check_shell):
 
   __users_lock.release()
   __groups_lock.release()
+
+class GroupEditForm(forms.ModelForm):
+  """
+  Form to manipulate a group.  This manages the group name and its membership.
+  """
+  class Meta:
+    model = Group
+    fields = ("name",)
+
+  def clean_name(self):
+    # Note that the superclass doesn't have a clean_name method.
+    data = self.cleaned_data["name"]
+    if not re.match(get_groupname_re_rule(), data):
+      raise forms.ValidationError("Group name may only contain letters, " +
+                                  "numbers, hypens or underscores.")
+    return data
+
+  def __init__(self, *args, **kwargs):
+    super(GroupEditForm, self).__init__(*args, **kwargs)
+
+    if self.instance.id:
+      initial_members = User.objects.filter(groups=self.instance).order_by('username')
+    else:
+      initial_members = []
+
+    self.fields["members"] = _make_model_field(initial_members, User.objects.order_by('username'))
+
+  def _compute_diff(self, field_name):
+    """Used for members, but not permissions."""
+    current = set(self.fields[field_name].initial_objs)
+    updated = set(self.cleaned_data[field_name])
+    delete = current.difference(updated)
+    add = updated.difference(current)
+    return delete, add
+
+  def save(self):
+    super(GroupEditForm, self).save()
+    self._save_members()
+
+  def _save_members(self):
+    delete_membership, add_membership = self._compute_diff("members")
+    for user in delete_membership:
+      user.groups.remove(self.instance)
+      user.save()
+    for user in add_membership:
+      user.groups.add(self.instance)
+      user.save()
+
+def _make_model_field(initial, choices, multi=True):
+  """ Creates multiple choice field with given query object as choices. """
+  if multi:
+    field = forms.models.ModelMultipleChoiceField(choices, required=False)
+    field.initial_objs = initial
+    field.initial = [ obj.pk for obj in initial ]
+  else:
+    field = forms.models.ModelChoiceField(choices, required=False)
+    field.initial_obj = initial
+    if initial:
+      field.initial = initial.pk
+  return field
+
+
