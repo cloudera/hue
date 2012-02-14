@@ -19,23 +19,23 @@ from desktop.views import commonheader, commonfooter
 <% import urllib %>
 
 <%namespace name="layout" file="layout.mako" />
-${layout.menubar(section='users')}
+${layout.menubar(section='groups')}
 
 <div class="container-fluid">
-  % if username:
-	${commonheader('Edit User: ' + username + ' -- Hue Users', "useradmin", "100px")}
-	<h1>Edit User: ${username} -- Hue Users</h1>
+  % if name:
+	${commonheader('Edit Group: ' + name + ' -- Hue Groups', "useradmin", "100px")}
+	<h1>Edit Group: ${name} -- Hue Groups</h1>
   % else:
-    ${commonheader('Create User -- Hue Users', "useradmin", "100px")}
-    <h1>Create User -- Hue Users</h1>
+    ${commonheader('Create Group -- Hue Groups', "useradmin", "100px")}
+    <h1>Create Group -- Hue Groups</h1>
   % endif
 	<form action="${urllib.quote(action)}" method="POST" class="jframe_padded">
 		<fieldset>
-			<legend> 
-			  % if username:
-		        Edit User: ${username}
+			<legend>
+			  % if name:
+		        Edit Group: ${name}
 		      % else:
-		        Create User 
+		        Create Group
 		      % endif
 			</legend>
         <%def name="render_field(field)">
@@ -49,7 +49,7 @@ ${layout.menubar(section='users')}
 				% endif
 			</div>
 		</%def>
-          
+
 		% for field in form:
 			${render_field(field)}
 		% endfor

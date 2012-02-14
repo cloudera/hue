@@ -21,41 +21,33 @@ from desktop.views import commonheader, commonfooter
 <% _ = ugettext %>
 
 <%namespace name="layout" file="layout.mako" />
-${commonheader("Hue Users", "useradmin", "100px")}
-${layout.menubar(section='users')}
+${commonheader("Hue Groups", "useradmin", "100px")}
+${layout.menubar(section='groups')}
 
 <div class="container-fluid">
-	<h1>Hue Users</h1>
+	<h1>Hue Groups</h1>
 	<div class="well">
 			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 			<p class="pull-right">
-				<a href="${ url('useradmin.views.edit_user') }" class="btn">Add user</a>
+				<a href="${ url('useradmin.views.edit_group') }" class="btn">Add group</a>
 			</p>
 	</div>
       <table class="datatables">
         <thead>
           <tr>
-            <th>${_('Username')}</th>
-            <th>${_('First Name')}</th>
-            <th>${_('Last Name')}</th>
-            <th>${_('E-mail')}</th>
-            <th>${_('Last Login')}</th>
+            <th>${_('Group Name')}</th>
+            <th>${_('Members')}</th>
 			<th>&nbsp;</th>
           </tr>
         </head>
         <tbody>
-        % for user in users:
-          <tr class="userRow" data-search="${user.username}${user.first_name}${user.last_name}${user.email}">
-            <td>${user.username}</td>
-            <td>${user.first_name}</td>
-            <td>${user.last_name}</td>
-            <td>${user.email}</td>
+        % for group in groups:
+          <tr class="groupRow" data-search="${group.name}${', '.join([user.username for user in group.user_set.all()])}">
+            <td>${group.name}</td>
+            <td>${', '.join([user.username for user in group.user_set.all()])}</td>
             <td>
-              ${user.last_login.strftime('%c')}
-            </td>
-            <td>
-              <a title="Edit ${user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">Edit</a>
-              <a title="Delete ${user.username}" class="btn small confirmationModal" alt="Are you sure you want to delete ${user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(user.username)) }">Delete</a>
+              <a title="Edit ${group.name}" class="btn small" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }">Edit</a>
+              <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>
             </td>
           </tr>
         % endfor
@@ -64,11 +56,11 @@ ${layout.menubar(section='users')}
 
 
 
-<div id="deleteUser" class="modal hide fade">
-	<form id="deleteUserForm" action="" method="POST">
+<div id="deleteGroup" class="modal hide fade">
+	<form id="deleteGroupForm" action="" method="POST">
 	<div class="modal-header">
 		<a href="#" class="close">&times;</a>
-		<h3 id="deleteUserMessage">Confirm action</h3>
+		<h3 id="deleteGroupMessage">Confirm action</h3>
 	</div>
 	<div class="modal-footer">
 		<input type="submit" class="btn primary" value="Yes"/>
@@ -89,24 +81,24 @@ ${layout.menubar(section='users')}
 			$(".dataTables_wrapper").css("min-height","0");
 			$(".dataTables_filter").hide();
 
-			$("#deleteUser").modal({
+			$("#deleteGroup").modal({
 				backdrop: "static",
 				keyboard: true
 			});
 			$(".confirmationModal").click(function(){
 				var _this = $(this);
 				$.getJSON(_this.attr("data-confirmation-url"), function(data){
-					$("#deleteUserForm").attr("action", data.path);
-					$("#deleteUserMessage").text(_this.attr("alt"));
+					$("#deleteGroupForm").attr("action", data.path);
+					$("#deleteGroupMessage").text(_this.attr("alt"));
 				});
-				$("#deleteUser").modal("show");
+				$("#deleteGroup").modal("show");
 			});
 			$(".hideModal").click(function(){
-				$("#deleteUser").modal("hide");
+				$("#deleteGroup").modal("hide");
 			});
 			
 			$("#filterInput").keyup(function(){
-		        $.each($(".userRow"), function(index, value) {
+		        $.each($(".groupRow"), function(index, value) {
 
 		          if($(value).attr("data-search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
 		            $(value).hide(250);

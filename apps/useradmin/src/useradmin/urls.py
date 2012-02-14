@@ -16,13 +16,19 @@
 # limitations under the License.
 
 from django.conf.urls.defaults import patterns, url
-from desktop.lib.django_util import get_username_re_rule
+from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 
 username_re = get_username_re_rule()
+groupname_re = get_groupname_re_rule()
 
 urlpatterns = patterns('useradmin',
   url(r'^$', 'views.list_users'),
-  url(r'^edit/(?P<username>%s)$' % (username_re,), 'views.edit_user'),
-  url(r'^new$', 'views.edit_user', name="useradmin.new"),
-  url(r'^delete/(?P<username>%s)$' % (username_re,), 'views.delete_user'),
+  url(r'^users$', 'views.list_users'),
+  url(r'^groups$', 'views.list_groups'),
+  url(r'^users/edit/(?P<username>%s)$' % (username_re,), 'views.edit_user'),
+  url(r'^groups/edit/(?P<name>%s)$' % (groupname_re,), 'views.edit_group'),
+  url(r'^users/new$', 'views.edit_user', name="useradmin.new"),
+  url(r'^groups/new$', 'views.edit_group', name="useradmin.new_group"),
+  url(r'^users/delete/(?P<username>%s)$' % (username_re,), 'views.delete_user'),
+  url(r'^groups/delete/(?P<name>%s)$' % (groupname_re,), 'views.delete_group'),
 )
