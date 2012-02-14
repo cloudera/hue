@@ -17,16 +17,24 @@
 """
 User management application.
 """
+import os
+import pwd
+import grp
+import logging
+import threading
+import subprocess
 
 import django
-import threading
+import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User
 from desktop.lib.django_util import get_username_re_rule, render, PopupException
 from django.core import urlresolvers
 
-__users_lock = threading.Lock()
+LOG = logging.getLogger(__name__)
 
+__users_lock = threading.Lock()
+__groups_lock = threading.Lock()
 
 def list_users(request):
   return render("list_users.mako", request, dict(users=User.objects.all()))
@@ -164,3 +172,63 @@ def _check_remove_last_super(user_obj):
   if num_active_su == 1:
     raise PopupException("You cannot remove the last active "
                          "superuser from the configuration.")
+
+def sync_unix_users_and_groups(min_uid, max_uid, check_shell):
+  """
+  Syncs the Hue database with the underlying Unix system, by importing users and
+  groups from 'getent passwd' and 'getent groups'. This should also pull in
+  users who are accessible via NSS.
+  """
+  global __users_lock, __groups_lock
+
+  hadoop_groups = dict((group.gr_name, group) for group in grp.getgrall() \
+      if (group.gr_gid >= min_uid and group.gr_gid < max_uid) or group.gr_name == 'hadoop')
+  user_groups = dict()
+
+  __users_lock.acquire()
+  __groups_lock.acquire()
+  # Import groups
+  for name, group in hadoop_groups.iteritems():
+    try:
+      if len(group.gr_mem) != 0:
+        hue_group = Group.objects.get(name=name)
+    except Group.DoesNotExist:
+      hue_group = Group(name=name)
+      hue_group.save()
+      LOG.info("Created group %s" % (hue_group.name,))
+
+    # Build a map of user to groups that the user is a member of
+    members = group.gr_mem
+    for member in members:
+      if member not in user_groups:
+        user_groups[member] = [ hue_group ]
+      else:
+        user_groups[member].append(hue_group)
+
+  # Now let's import the users
+  hadoop_users = dict((user.pw_name, user) for user in pwd.getpwall() \
+      if (user.pw_uid >= min_uid and user.pw_uid < max_uid) or user.pw_name in grp.getgrnam('hadoop').gr_mem)
+  for username, user in hadoop_users.iteritems():
+    try:
+      if check_shell:
+        pw_shell = user.pw_shell
+        if subprocess.call([pw_shell, "-c", "echo"], stdout=subprocess.PIPE) != 0:
+          continue
+      hue_user = User.objects.get(username=username)
+    except User.DoesNotExist:
+      hue_user = User(username=username, password='!', is_active=True, is_superuser=False)
+      hue_user.set_unusable_password()
+
+    # We have to do a save here, because the user needs to exist before we can
+    # access the associated list of groups
+    hue_user.save()
+    if username not in user_groups:
+      hue_user.groups = []
+    else:
+      # Here's where that user to group map we built comes in handy
+      hue_user.groups = user_groups[username]
+    hue_user.save()
+    LOG.info("Synced user %s from Unix" % (hue_user.username,))
+
+  __users_lock.release()
+  __groups_lock.release()
