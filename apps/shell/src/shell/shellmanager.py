@@ -421,7 +421,7 @@ class ShellManager(object):
 
     shell_types_for_user = []
     for item in self.shell_types:
-      if user.has_desktop_permission('launch_%s' % (item[constants.KEY_NAME],), 'shell'):
+      if user.has_hue_permission('launch_%s' % (item[constants.KEY_NAME],), 'shell'):
         shell_types_for_user.append(item)
     return shell_types_for_user
 
@@ -500,7 +500,7 @@ class ShellManager(object):
     except KeyError:
       return { constants.NO_SUCH_USER : True }
 
-    if not user.has_desktop_permission('launch_%s' % (shell_name,), 'shell'):
+    if not user.has_hue_permission('launch_%s' % (shell_name,), 'shell'):
       return { constants.SHELL_NOT_ALLOWED : True }
 
     if not username in self._meta:

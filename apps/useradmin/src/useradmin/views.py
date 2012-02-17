@@ -31,6 +31,8 @@ from django.contrib.auth.models import User, Group
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule, render, PopupException, format_preserving_redirect
 from django.core import urlresolvers
 
+from useradmin.models import GroupPermission, HuePermission
+
 LOG = logging.getLogger(__name__)
 
 __users_lock = threading.Lock()
@@ -215,7 +217,6 @@ def edit_group(request, name=None):
   return render('edit_group.mako', request,
     dict(form=form, action=request.path, name=name))
 
-
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
   if not user_obj.is_superuser:
@@ -311,13 +312,15 @@ class GroupEditForm(forms.ModelForm):
 
     if self.instance.id:
       initial_members = User.objects.filter(groups=self.instance).order_by('username')
+      initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app','description')
     else:
       initial_members = []
+      initial_perms = []
 
     self.fields["members"] = _make_model_field(initial_members, User.objects.order_by('username'))
+    self.fields["permissions"] = _make_model_field(initial_perms, HuePermission.objects.order_by('app','description'))
 
   def _compute_diff(self, field_name):
-    """Used for members, but not permissions."""
     current = set(self.fields[field_name].initial_objs)
     updated = set(self.cleaned_data[field_name])
     delete = current.difference(updated)
@@ -327,6 +330,7 @@ class GroupEditForm(forms.ModelForm):
   def save(self):
     super(GroupEditForm, self).save()
     self._save_members()
+    self._save_permissions()
 
   def _save_members(self):
     delete_membership, add_membership = self._compute_diff("members")
@@ -336,6 +340,13 @@ class GroupEditForm(forms.ModelForm):
     for user in add_membership:
       user.groups.add(self.instance)
       user.save()
+
+  def _save_permissions(self):
+    delete_permission, add_permission = self._compute_diff("permissions")
+    for perm in delete_permission:
+      GroupPermission.objects.get(group=self.instance, hue_permission=perm).delete()
+    for perm in add_permission:
+      GroupPermission.objects.create(group=self.instance, hue_permission=perm)
 
 def _make_model_field(initial, choices, multi=True):
   """ Creates multiple choice field with given query object as choices. """

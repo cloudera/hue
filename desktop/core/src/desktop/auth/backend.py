@@ -21,10 +21,9 @@ These classes should implement the interface described at:
   http://docs.djangoproject.com/en/1.0/topics/auth/#writing-an-authentication-backend
 
 In addition, the User classes they return must support:
- - get_primary_group() (returns a string)
  - get_groups() (returns a list of strings)
  - get_home_directory() (returns None or a string)
- - has_desktop_permission(action, app) -> boolean
+ - has_hue_permission(action, app) -> boolean
 Because Django's models are sometimes unfriendly, you'll want
 User to remain a django.contrib.auth.models.User object.
 
@@ -36,6 +35,7 @@ import logging
 import desktop.conf
 from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
+from useradmin.models import get_profile
 
 import pam
 from django_auth_ldap.backend import LDAPBackend, ldap_settings
@@ -75,8 +75,7 @@ def rewrite_user(user):
   though this could be generalized.
   """
   augment = get_user_augmentation_class()(user)
-  for attr in ("get_groups", "get_primary_group",
-      "get_home_directory", "has_desktop_permission"):
+  for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
     setattr(user, attr, getattr(augment, attr))
   return user
 
@@ -84,17 +83,17 @@ class DefaultUserAugmentor(object):
   def __init__(self, parent):
     self._parent = parent
 
-  def get_groups(self):
-    return [ self._parent.username ]
+  def _get_profile(self):
+    return get_profile(self._parent)
 
-  def get_primary_group(self):
-    return self._parent.username
+  def get_groups(self):
+    return self._get_profile().get_groups()
 
   def get_home_directory(self):
-    return "/user/%s" % self._parent.username
+    return self._get_profile().home_directory
 
-  def has_desktop_permission(self, action, app):
-    return True
+  def has_hue_permission(self, action, app):
+    return self._get_profile().has_hue_permission(action=action, app=app)
 
 def find_or_create_user(username, password=None):
   try:
@@ -203,6 +202,8 @@ class PamBackend(DesktopBackendBase):
       except User.DoesNotExist:
         user = find_or_create_user(username, None)
         if user is not None and user.is_active:
+          profile = get_profile(user)
+          profile.save()
           user.is_superuser = is_super
           user.save()
 
@@ -261,6 +262,8 @@ class LdapBackend(object):
       return None
 
     if user is not None and user.is_active:
+      profile = get_profile(user)
+      profile.save()
       user.is_superuser = is_super
       user = rewrite_user(user)
       return user

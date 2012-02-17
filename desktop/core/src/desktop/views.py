@@ -121,10 +121,10 @@ def prefs(request, key=None):
 
 
 def bootstrap(request):
-  """Concatenates bootstrap.js files from all installed desktop apps."""
+  """Concatenates bootstrap.js files from all installed Hue apps."""
 
   # Has some None's for apps that don't have bootsraps.
-  all_bootstraps = [ (app, app.get_bootstrap_file()) for app in appmanager.DESKTOP_APPS if request.user.has_desktop_permission(action="access", app=app.name) ]
+  all_bootstraps = [ (app, app.get_bootstrap_file()) for app in appmanager.DESKTOP_APPS if request.user.has_hue_permission(action="access", app=app.name) ]
 
   # Iterator over the streams.
   concatenated = [ "\n/* %s */\n%s" % (app.name, b.read()) for app, b in all_bootstraps if b is not None ]
