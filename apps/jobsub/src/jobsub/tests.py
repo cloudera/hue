@@ -34,6 +34,7 @@ from nose.plugins.attrib import attr
 from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access
 
 from jobsub.views import in_process_jobsubd
 from jobsub.models import JobDesign, Submission
@@ -130,6 +131,8 @@ def test_job_design_cycle():
   # doesn't seem to work, so we use a new client.
   c.logout()
   c = make_logged_in_client("test2", is_superuser=False)
+  grant_access("test2", "test-grp", "jobsub")
+
   response = c.post("/jobsub/new/jar", 
     dict(name="test2", jarfile="myfile", arguments="x y z", submit="Save"))
   assert_true(response.context["saved"])

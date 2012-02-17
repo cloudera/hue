@@ -18,6 +18,7 @@ from desktop.views import commonheader, commonfooter
 %>
 <% import urllib %>
 <% from django.utils.translation import ugettext, ungettext, get_language, activate %>
+<% from useradmin.models import group_permissions %>
 <% _ = ugettext %>
 
 <%namespace name="layout" file="layout.mako" />
@@ -37,6 +38,7 @@ ${layout.menubar(section='groups')}
           <tr>
             <th>${_('Group Name')}</th>
             <th>${_('Members')}</th>
+            <th>${_('Permissions')}</th>
 			<th>&nbsp;</th>
           </tr>
         </head>
@@ -45,6 +47,7 @@ ${layout.menubar(section='groups')}
           <tr class="groupRow" data-search="${group.name}${', '.join([user.username for user in group.user_set.all()])}">
             <td>${group.name}</td>
             <td>${', '.join([user.username for user in group.user_set.all()])}</td>
+            <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
             <td>
               <a title="Edit ${group.name}" class="btn small" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }">Edit</a>
               <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>

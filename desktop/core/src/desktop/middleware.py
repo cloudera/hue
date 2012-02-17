@@ -272,7 +272,7 @@ class LoginAndPermissionMiddleware(object):
       AppSpecificMiddleware.augment_request_with_app(request, view_func)
       if request._desktop_app and \
           request._desktop_app != "desktop" and \
-          not request.user.has_desktop_permission(action="access", app=request._desktop_app):
+          not request.user.has_hue_permission(action="access", app=request._desktop_app):
         access_log(request, 'permission denied', level=access_log_level)
         return PopupException("You do not have permission to access the %s application." % (request._desktop_app.capitalize())).response(request)
       else:

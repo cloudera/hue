@@ -23,11 +23,14 @@ Tests for "user admin"
 
 import urllib
 
-from nose.tools import assert_true, assert_equal
+from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from django.contrib.auth.models import User, Group
 from django.utils.encoding import smart_unicode
+
+from useradmin.models import HuePermission, GroupPermission
+from useradmin.models import get_profile
 
 def reset_all_users():
   """Reset to a clean state by deleting all users"""
@@ -48,6 +51,57 @@ def test_invalid_username():
     assert_true(c.get('/useradmin/users/new'))
     response = c.post('/useradmin/users/new', dict(username=bad_name, password1="test", password2="test"))
     assert_true('not allowed' in response.context["form"].errors['username'][0])
+
+def test_group_permissions():
+  reset_all_users()
+  reset_all_groups()
+
+  # Get ourselves set up with a user and a group
+  c = make_logged_in_client(username="test", is_superuser=True)
+  Group.objects.create(name="test-group")
+  test_user = User.objects.get(username="test")
+  test_user.groups.add(Group.objects.get(name="test-group"))
+  test_user.save()
+
+  # Make sure that a superuser can always access applications
+  response = c.get('/useradmin/users')
+  assert_true('Hue Users' in response.content)
+
+  assert_true(len(GroupPermission.objects.all()) == 0)
+  c.post('/useradmin/groups/edit/test-group',
+         dict(name="test-group",
+         members=[User.objects.get(username="test").pk],
+         permissions=[HuePermission.objects.get(app='useradmin',action='access').pk],
+         save="Save"), follow=True)
+  assert_true(len(GroupPermission.objects.all()) == 1)
+
+  # Now test that we have limited access
+  c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
+  response = c1.get('/useradmin/users')
+  assert_true('You do not have permission to access the Useradmin application.' in response.content)
+
+  # Add the non-admin to a group that should grant permissions to the app
+  test_user = User.objects.get(username="nonadmin")
+  test_user.groups.add(Group.objects.get(name='test-group'))
+  test_user.save()
+
+  # Check that we have access now
+  response = c1.get('/useradmin/users')
+  assert_true(get_profile(test_user).has_hue_permission('access','useradmin'))
+  assert_true('Hue Users' in response.content)
+
+  # And revoke access from the group
+  c.post('/useradmin/groups/edit/test-group',
+         dict(name="test-group",
+         members=[User.objects.get(username="test").pk],
+         permissions=[],
+         save="Save"), follow=True)
+  assert_true(len(GroupPermission.objects.all()) == 0)
+  assert_false(get_profile(test_user).has_hue_permission('access','useradmin'))
+
+  # We should no longer have access to the app
+  response = c1.get('/useradmin/users')
+  assert_true('You do not have permission to access the Useradmin application.' in response.content)
 
 def test_group_admin():
   reset_all_users()
@@ -81,13 +135,23 @@ def test_group_admin():
 
   # Test some permissions
   c2 = make_logged_in_client(username="nonadmin", is_superuser=False)
+
+  # Need to give access to the user for the rest of the test
+  group = Group.objects.create(name="access-group")
+  perm = HuePermission.objects.get(app='useradmin', action='access')
+  GroupPermission.objects.create(group=group, hue_permission=perm)
+  test_user = User.objects.get(username="nonadmin")
+  test_user.groups.add(Group.objects.get(name="access-group"))
+  test_user.save()
+
   response = c2.get('/useradmin/groups/new')
   assert_true("You must be a superuser" in response.content)
   response = c2.get('/useradmin/groups/edit/testgroup')
   assert_true("You must be a superuser" in response.content)
 
+  # Should be one group left, because we created the other group
   response = c.post('/useradmin/groups/delete/testgroup')
-  assert_true(len(Group.objects.all()) == 0)
+  assert_true(len(Group.objects.all()) == 1)
 
 
 def test_user_admin():
@@ -155,8 +219,17 @@ def test_user_admin():
   assert_true(len(response.context["users"]) > 1)
   assert_true("Hue Users" in response.content)
 
+  # Need to give access to the user for the rest of the test
+  group = Group.objects.create(name="test-group")
+  perm = HuePermission.objects.get(app='useradmin', action='access')
+  GroupPermission.objects.create(group=group, hue_permission=perm)
+  test_user = User.objects.get(username=FUNNY_NAME)
+  test_user.groups.add(Group.objects.get(name="test-group"))
+  test_user.save()
+
   # Check permissions by logging in as the new user
   c_reg = make_logged_in_client(username=FUNNY_NAME, password="test")
+
   # Regular user should be able to modify oneself
   response = c_reg.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,),
                         dict(username = FUNNY_NAME,

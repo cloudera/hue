@@ -15,28 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-from desktop.lib.django_util import PopupException
+from django.contrib.auth.models import Group, User
+from useradmin.models import HuePermission, GroupPermission
 
-try:
-  from functools import wraps
-except ImportError:
-  from django.utils.functional import wraps
-
-LOG = logging.getLogger(__name__)
-
-def hue_permission_required(action, app):
-  """
-  Checks that the user has permissions to do
-  action 'action' on app 'app'.
-
-  Note that user must already be logged in.
-  """
-  def decorator(view_func):
-    @wraps(view_func)
-    def decorated(request, *args, **kwargs):
-      if not request.user.has_hue_permission(action, app):
-        raise PopupException("Permission denied (%s/%s)" % (action, app))
-      return view_func(request, *args, **kwargs)
-    return decorated
-  return decorator
+def grant_access(username, groupname, appname):
+    grp = Group.objects.create(name=groupname)
+    perm = HuePermission.objects.get(app=appname,action='access')
+    GroupPermission.objects.create(group=grp, hue_permission=perm)
+    user = User.objects.get(username=username)
+    user.groups.add(grp)
+    user.save()

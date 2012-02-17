@@ -14,4 +14,222 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+The core of this module adds permissions functionality to Hue applications.
+
+A "Hue Permission" (colloquially, appname.action, but stored in the
+HuePermission model) is a way to specify some action whose
+control may be restricted.  Every Hue application, by default,
+has an "access" action.  To specify extra actions, applications
+can specify them in appname.settings.PERMISSION_ACTIONS, as
+pairs of (action_name, description).
+
+Several mechanisms enforce permission.  First of all, the "access" permission
+is controlled by LoginAndPermissionMiddleware.  For eligible views
+within an application, the access permission is checked.  Second,
+views may use @desktop.decorators.hue_permission_required("action", "app")
+to annotate their function, and this decorator will check a permission.
+Thirdly, you may wish to do so manually, by using something akin to:
+
+  app = desktop.lib.apputil.get_current_app() # a string
+  dp = HuePermission.objects.get(app=pp, action=action)
+  request.user.has_hue_permission(dp)
+
+[Design note: it is questionable that a Hue permission is
+a model, instead of just being a string.  Could go either way.]
+
+Permissions may be granted to groups, but not, currently, to users.
+A user's abilities is the union of all permissions the group
+has access to.
+
+Note that Django itself has a notion of users, groups, and permissions.
+We re-use Django's notion of users and groups, but ignore its notion of
+permissions.  The permissions notion in Django is strongly tied to
+what models you may or may not edit, and there are elaborations (especially
+in Django 1.2) to manipulate this row by row.  This does not map nicely
+onto actions which may not relate to database models.
+"""
+import logging
+
+from django.db import models
+from django.contrib.auth import models as auth_models
+from desktop import appmanager
+from desktop.lib.django_util import PopupException
+
+LOG = logging.getLogger(__name__)
+
+class UserProfile(models.Model):
+  """
+  WARNING: Some of the columns in the UserProfile object have been added
+  via south migration scripts. During an upgrade that modifies this model,
+  the columns in the django ORM database will not match the
+  actual object defined here, until the latest migration has been executed.
+  The code that does the actual UserProfile population must reside in the most
+  recent migration that modifies the UserProfile model.
+
+  for user in User.objects.all():
+    try:
+      p = orm.UserProfile.objects.get(user=user)
+    except orm.UserProfile.DoesNotExist:
+      create_profile_for_user(user)
+
+  IF ADDING A MIGRATION THAT MODIFIES THIS MODEL, MAKE SURE TO MOVE THIS CODE
+  OUT OF THE CURRENT MIGRATION, AND INTO THE NEW ONE, OR UPGRADES WILL NOT WORK
+  PROPERLY
+  """
+
+  user = models.ForeignKey(auth_models.User, unique=True)
+  home_directory = models.CharField(editable=True, max_length=1024, null=True)
+
+  def get_groups(self):
+    return self.user.groups.all()
+
+  def _lookup_permission(self, app, action):
+    return HuePermission.objects.get(app=app, action=action)
+
+  def has_hue_permission(self, action=None, app=None, perm=None):
+    if perm is None:
+      try:
+        perm = self._lookup_permission(app, action)
+      except HuePermission.DoesNotExist:
+        LOG.exception("Permission object not available. Was syncdb run after installation?")
+        return self.user.is_superuser
+    if self.user.is_superuser:
+      return True
+
+    for group in self.user.groups.all():
+      if group_has_permission(group, perm):
+        return True
+    return False
+
+  def check_hue_permission(self, perm=None, app=None, action=None):
+    """
+    Raises a PopupException if permission is denied.
+
+    Either perm or both app and action are required.
+    """
+    if perm is None:
+      perm = self._lookup_permission(app, action)
+    if self.has_hue_permission(perm):
+      return
+    else:
+      raise PopupException("You do not have permissions to %s." % perm.description)
+
+def get_profile(user):
+  """
+  Caches the profile, to avoid DB queries at every call.
+  """
+  if hasattr(user, "_cached_userman_profile"):
+    return user._cached_userman_profile
+  else:
+    profile = UserProfile.objects.get(user=user)
+    user._cached_userman_profile = profile
+    return profile
+
+def group_has_permission(group, perm):
+  return GroupPermission.objects.filter(group=group, hue_permission=perm).count() > 0
+
+def group_permissions(group):
+  return HuePermission.objects.filter(grouppermission__group=group).all()
+
+# Create a user profile for the given user
+def create_profile_for_user(user):
+  p = UserProfile()
+  p.user = user
+  p.home_directory = "/user/%s" % p.user.username
+  try:
+    p.save()
+  except:
+    LOG.debug("Failed to automatically create user profile.", exc_info=True)
+
+def create_user_signal_handler(sender, **kwargs):
+  if kwargs['created']:
+    create_profile_for_user(kwargs['instance'])
+
+# Create a user profile every time a user gets created.
+models.signals.post_save.connect(create_user_signal_handler, sender=auth_models.User)
+
+class GroupPermission(models.Model):
+  """
+  Represents the permissions a group has.
+  """
+  group = models.ForeignKey(auth_models.Group)
+  hue_permission = models.ForeignKey("HuePermission")
+
+
+# Permission Management
+class HuePermission(models.Model):
+  """
+  Set of non-object specific permissions that an app supports.
+
+  For now, we only assign permissions to groups, though that may change.
+  """
+  app = models.CharField(max_length=30)
+  action = models.CharField(max_length=100)
+  description = models.CharField(max_length=255)
+
+  groups = models.ManyToManyField(auth_models.Group, through=GroupPermission)
+
+  def __str__(self):
+    return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
+
+  @classmethod
+  def get_app_permission(cls, hue_app, action):
+    return HuePermission.objects.get(app=hue_app, action=action)
+
+def update_app_permissions(**kwargs):
+  """
+  Inserts missing permissions into the database table.
+  This is a 'syncdb' callback.
+
+  We never delete permissions automatically, because apps might come and go.
+
+  Note that signing up to the "syncdb" signal is not necessarily
+  the best thing we can do, since some apps might not
+  have models, but nonetheless, "syncdb" is typically
+  run when apps are installed.
+  """
+  # Map app->action->HuePermission.
+  current = {}
+  try:
+    for dp in HuePermission.objects.all():
+      current.setdefault(dp.app, {})[dp.action] = dp
+  except:
+    return
+
+  updated = 0
+  uptodate = 0
+  added = [ ]
+
+  for app_obj in appmanager.DESKTOP_APPS:
+    app = app_obj.name
+    actions = set([("access", "launch this application")])
+    actions.update(getattr(app_obj.settings, "PERMISSION_ACTIONS", []))
+
+    if app not in current:
+      current[app] = {}
+
+    for action, description in actions:
+      c = current[app].get(action)
+      if c:
+        if c.description != description:
+          c.description = description
+          c.save()
+          updated += 1
+        else:
+          uptodate += 1
+      else:
+        new_dp = HuePermission(app=app, action=action, description=description)
+        new_dp.save()
+        added.append(new_dp)
+
+  available = HuePermission.objects.count()
+
+  LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" %
+           (len(added),
+            updated,
+            uptodate,
+            available - len(added) - updated - uptodate))
+
+models.signals.post_syncdb.connect(update_app_permissions)
 
