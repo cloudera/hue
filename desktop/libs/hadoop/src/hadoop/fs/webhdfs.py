@@ -58,9 +58,6 @@ class WebHdfs(Hdfs):
     self.setuser(DEFAULT_USER)
 
     LOG.debug("Initializing Hadoop WebHdfs: %s (security: %s, superuser: %s)" %
-              
-              
-              S: %s (security: %s, superuser: %s)" %
               (self._url, self._security_enabled, self._superuser))
 
   @classmethod
@@ -261,7 +258,7 @@ class WebHdfs(Hdfs):
     params['length'] = long(length)
     if bufsize is not None:
       params['bufsize'] = bufsize
-    return self._root.get_raw(path, params)
+    return self._root.get(path, params)
 
   def open(self, path, mode='r'):
     """

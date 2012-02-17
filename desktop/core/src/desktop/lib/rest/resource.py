@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -37,28 +36,44 @@ class Resource(object):
     self._client = client
     self._path = relpath.strip('/')
 
+  @property
+  def base_url(self):
+    return self._client.base_url
+
   def _join_uri(self, relpath):
     if relpath is None:
       return self._path
     return self._path + posixpath.normpath('/' + relpath)
 
-  def invoke(self, method, relpath=None, params=None, data=None, json_decode=True):
+  def invoke(self, method, relpath=None, params=None, data=None):
     """
     Invoke an API method.
-    @return: JSON dictionary (if "json_decode" is True), or raw data.
+    @return: Raw body or JSON dictionary (if response content type is JSON).
     """
     path = self._join_uri(relpath)
-    res = self._client.execute(method, path, params=params, data=data)
-    if not res or not json_decode:
-      return res
+    resp = self._client.execute(method, path, params=params, data=data)
 
     try:
-      # Return JSON
-      json_dict = json.loads(res)
-      return json_dict
+      body = resp.read()
     except Exception, ex:
-      self._client.logger.exception('Server response: %s' % (res,))
-      raise ex
+      raise Exception("Command '%s %s' failed: %s" %
+                      (method, path, ex))
+
+    self._client.logger.debug(
+        "%s Got response: %s%s" %
+        (method, body[:32], len(body) > 32 and "..." or ""))
+
+    # Is the response application/json?
+    if resp.info().getmaintype() == "application" and \
+         resp.info().getsubtype() == "json":
+      try:
+        json_dict = json.loads(body)
+        return json_dict
+      except Exception, ex:
+        self._client.logger.exception('JSON decode error: %s' % (body,))
+        raise ex
+    else:
+      return body
 
 
   def get(self, relpath=None, params=None):
@@ -81,17 +96,6 @@ class Resource(object):
     @return: A dictionary of the JSON result.
     """
     return self.invoke("DELETE", relpath, params)
-
-
-  def get_raw(self, relpath=None, params=None):
-    """
-    Invoke the GET method on a resource.
-    @param relpath: Optional. A relative path to this resource's path.
-    @param params: Key-value data.
-
-    @return: Raw response body.
-    """
-    return self.invoke("GET", relpath, params, json_decode=False)
 
 
   def post(self, relpath=None, params=None, data=None):
