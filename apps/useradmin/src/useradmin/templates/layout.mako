@@ -32,6 +32,7 @@ def is_selected(section, matcher):
 				<ul class="nav">
 					<li><a href="/useradmin/users" class="${is_selected(section, 'users')}">Users</a></li>
 					<li><a href="/useradmin/groups" class="${is_selected(section, 'groups')}">Groups</a></li>
+					<li><a href="/useradmin/permissions" class="${is_selected(section, 'permissions')}">Permissions</a></li>
 				</ul>
 			</div>
 		</div>
