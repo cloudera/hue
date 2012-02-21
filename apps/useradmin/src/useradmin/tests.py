@@ -91,10 +91,10 @@ def test_group_permissions():
   assert_true('Hue Users' in response.content)
 
   # And revoke access from the group
-  c.post('/useradmin/groups/edit/test-group',
-         dict(name="test-group",
-         members=[User.objects.get(username="test").pk],
-         permissions=[],
+  c.post('/useradmin/permissions/edit/useradmin/access',
+         dict(app='useradmin',
+         priv='access',
+         groups=[],
          save="Save"), follow=True)
   assert_true(len(GroupPermission.objects.all()) == 0)
   assert_false(get_profile(test_user).has_hue_permission('access','useradmin'))

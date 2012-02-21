@@ -44,6 +44,9 @@ def list_users(request):
 def list_groups(request):
   return render("list_groups.mako", request, dict(groups=Group.objects.all()))
 
+def list_permissions(request):
+  return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
+
 def delete_user(request, username):
   if not request.user.is_superuser:
     raise PopupException("You must be a superuser to delete users.")
@@ -217,6 +220,38 @@ def edit_group(request, name=None):
   return render('edit_group.mako', request,
     dict(form=form, action=request.path, name=name))
 
+def edit_permission(request, app=None, priv=None):
+  """
+  edit_permission(request, app = None, priv = None) -> reply
+
+  @type request:        HttpRequest
+  @param request:       The request object
+  @type app:       string
+  @param app:      Default to None, specifies the app of the privilege
+  @type priv:      string
+  @param priv      Default to None, the action of the privilege
+
+  Only superusers may modify permissions
+  """
+  if not request.user.is_superuser:
+    raise PopupException("You must be a superuser to change permissions.")
+
+  instance = HuePermission.objects.get(app=app, action=priv)
+
+  if request.method == 'POST':
+    form = PermissionsEditForm(request.POST, instance=instance)
+    if form.is_valid():
+      form.save()
+      request.flash.put('Permission information updated')
+      url = urlresolvers.reverse(list_permissions)
+      return format_preserving_redirect(request, url)
+
+  else:
+    form = PermissionsEditForm(instance=instance)
+  return render('edit_permissions.mako', request,
+    dict(form=form, action=request.path, app=app, priv=priv))
+
+
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
   if not user_obj.is_superuser:
@@ -347,6 +382,37 @@ class GroupEditForm(forms.ModelForm):
       GroupPermission.objects.get(group=self.instance, hue_permission=perm).delete()
     for perm in add_permission:
       GroupPermission.objects.create(group=self.instance, hue_permission=perm)
+
+class PermissionsEditForm(forms.ModelForm):
+  """
+  Form to manage the set of groups that have a particular permission.
+  """
+  def __init__(self, *args, **kwargs):
+    super(PermissionsEditForm, self).__init__(*args, **kwargs)
+
+    if self.instance.id:
+      initial_groups = Group.objects.filter(grouppermission__hue_permission=self.instance).order_by('name')
+    else:
+      initial_groups = []
+
+    self.fields["groups"] = _make_model_field(initial_groups, Group.objects.order_by('name'))
+
+  def _compute_diff(self, field_name):
+    current = set(self.fields[field_name].initial_objs)
+    updated = set(self.cleaned_data[field_name])
+    delete = current.difference(updated)
+    add = updated.difference(current)
+    return delete, add
+
+  def save(self):
+    self._save_permissions()
+
+  def _save_permissions(self):
+    delete_group, add_group = self._compute_diff("groups")
+    for group in delete_group:
+      GroupPermission.objects.get(group=group, hue_permission=self.instance).delete()
+    for group in add_group:
+      GroupPermission.objects.create(group=group, hue_permission=self.instance)
 
 def _make_model_field(initial, choices, multi=True):
   """ Creates multiple choice field with given query object as choices. """
