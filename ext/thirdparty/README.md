@@ -50,7 +50,7 @@ Checked-in third party dependencies
 |Y|zope.interface|3.5.2|ZPL(MIT-like)|http://pypi.python.org/pypi/zope.interface|
 |Y|MySQL for Python|1.2.3c1|GPL or the original license based on Python 1.5.2|http://sourceforge.net/projects/mysql-python/|
 |Y|django-auth-ldap|1.0.7|BSD|http://bitbucket.org/psagers/django-auth-ldap/|
-|Y|python-ldap|2.4.6|Python|http://pypi.python.org/pypi/python-ldap/|
+|Y|python-ldap|2.3.13|Python|http://pypi.python.org/pypi/python-ldap/|
 
 ---
 Downloaded third party dependencies during build
