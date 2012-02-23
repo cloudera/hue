@@ -173,7 +173,7 @@ def _check_remove_last_super(user_obj):
     raise PopupException("You cannot remove the last active "
                          "superuser from the configuration.")
 
-def sync_unix_users_and_groups(min_uid, max_uid, check_shell):
+def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   """
   Syncs the Hue database with the underlying Unix system, by importing users and
   groups from 'getent passwd' and 'getent groups'. This should also pull in
@@ -182,7 +182,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, check_shell):
   global __users_lock, __groups_lock
 
   hadoop_groups = dict((group.gr_name, group) for group in grp.getgrall() \
-      if (group.gr_gid >= min_uid and group.gr_gid < max_uid) or group.gr_name == 'hadoop')
+      if (group.gr_gid >= min_gid and group.gr_gid < max_gid) or group.gr_name == 'hadoop')
   user_groups = dict()
 
   __users_lock.acquire()
