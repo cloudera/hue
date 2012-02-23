@@ -166,6 +166,12 @@ MR_CLUSTERS = UnspecifiedConfigSection(
   )
 )
 
+OOZIE_URL = Config(
+  key='oozie_url',
+  help='URL to Oozie server. This is required for job submission.',
+  default='http://localhost:11000/oozie',
+  type=str)
+
 
 def config_validator():
   """
