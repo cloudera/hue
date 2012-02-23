@@ -28,6 +28,8 @@ class Command(BaseCommand):
   option_list = BaseCommand.option_list + (
       make_option("--min-uid", help="Minimum UID to import (Inclusive).", default=500),
       make_option("--max-uid", help="Maximum UID to import (Exclusive).", default=65334),
+      make_option("--min-gid", help="Minimum GID to import (Inclusive).", default=500),
+      make_option("--max-gid", help="Maximum GID to import (Exclusive).", default=65334),
       make_option("--check-shell", help="Whether or not to check that the user's shell is not /bin/false", default=True)
   )
 
@@ -36,6 +38,8 @@ class Command(BaseCommand):
     # is usually a nobody user at the top of the ID space, so let's avoid those
     min_uid = options['min_uid']
     max_uid = options['max_uid']
+    min_gid = options['min_gid']
+    max_gid = options['max_gid']
     check_shell = options['check_shell']
 
-    sync_unix_users_and_groups(min_uid, max_uid, check_shell)
+    sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell)
