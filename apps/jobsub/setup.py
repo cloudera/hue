@@ -25,6 +25,5 @@ setup(
       packages = find_packages('src'),
       package_dir = {'': 'src'},
       install_requires = ['setuptools', 'desktop'],
-      entry_points = { 'desktop.supervisor.specs': [ 'jobsubd = jobsub:SUPERVISOR_SPEC' ],
-                       'desktop.sdk.application': 'jobsub=jobsub' },
+      entry_points = { 'desktop.sdk.application': 'jobsub=jobsub' },
 )
