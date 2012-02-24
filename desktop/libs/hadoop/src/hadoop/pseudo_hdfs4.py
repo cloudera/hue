@@ -32,6 +32,9 @@ TEST_USER_GROUP_MAPPING = {
 # How long we're willing to wait for the cluster to start
 STARTUP_DEADLINE = 60.0
 
+# Whether to cleanup afterwards
+CLEANUP_TMP_DIR = os.environ.get("MINI_CLUSTER_CLEANUP", 'true')
+
 
 class PseudoHdfs4(object):
   """This class runs HDFS (CDH4) locally, in pseudo-distributed mode"""
@@ -100,8 +103,12 @@ class PseudoHdfs4(object):
     self._nn_proc = None
     self._dn_proc = None
 
-    LOG.info('Cleaning up temp directory "%s"' % (self._tmpdir,))
-    shutil.rmtree(self._tmpdir)
+    if CLEANUP_TMP_DIR == 'false':
+      LOG.info('Skipping cleanup of temp directory "%s"' % (self._tmpdir,))
+    else:
+      LOG.info('Cleaning up temp directory "%s". '
+               'Use $MINI_CLUSTER_CLEANUP to avoid.' % (self._tmpdir,))
+      shutil.rmtree(self._tmpdir)
 
     if self.shutdown_hook is not None:
       self.shutdown_hook()
