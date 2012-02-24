@@ -27,11 +27,11 @@ import threading
 from django.utils.encoding import smart_str
 from desktop.lib.rest import http_client, resource
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
-from hadoop.fs.hadoopfs import encode_fs_path, Hdfs
+from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 
-
+DEFAULT_HDFS_SUPERUSER = 'hdfs'
 DEFAULT_USER = 'hue_webui'
 
 # The number of bytes to read if not specified
@@ -44,7 +44,7 @@ class WebHdfs(Hdfs):
   WebHdfs implements the filesystem interface via the WebHDFS rest protocol.
   """
   def __init__(self, url,
-               hdfs_superuser="hdfs",
+               hdfs_superuser=None,
                security_enabled=False,
                temp_dir="/tmp"):
     self._url = url
@@ -81,6 +81,15 @@ class WebHdfs(Hdfs):
 
   @property
   def superuser(self):
+    if self._superuser is None:
+      try:
+        # The owner of '/' is usually the superuser
+        sb = self.stats('/')
+        self._superuser = sb.user
+      except Exception, ex:
+        LOG.exception('Failed to determine superuser of %s: %s' % (self, ex))
+        self._superuser = DEFAULT_HDFS_SUPERUSER
+
     return self._superuser
   
   @property
@@ -100,7 +109,7 @@ class WebHdfs(Hdfs):
 
     Get directory listing with stats.
     """
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     if glob is not None:
       params['filter'] = glob
@@ -122,7 +131,7 @@ class WebHdfs(Hdfs):
     """
     get_content_summary(path) -> WebHdfsContentSummary
     """
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'GETCONTENTSUMMARY'
     json = self._root.get(path, params)
@@ -131,7 +140,7 @@ class WebHdfs(Hdfs):
 
   def _stats(self, path):
     """This version of stats returns None if the entry is not found"""
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'GETFILESTATUS'
     try:
@@ -172,7 +181,7 @@ class WebHdfs(Hdfs):
 
     Delete a file or directory.
     """
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'DELETE'
     params['recursive'] = recursive and 'true' or 'false'
@@ -200,7 +209,7 @@ class WebHdfs(Hdfs):
 
     Creates a directory and any parent directory if necessary.
     """
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'MKDIRS'
     if mode is not None:
@@ -228,8 +237,8 @@ class WebHdfs(Hdfs):
 
   def rename(self, old, new):
     """rename(old, new)"""
-    old = encode_fs_path(Hdfs.normpath(old))
-    new = encode_fs_path(Hdfs.normpath(new))
+    old = Hdfs.normpath(old)
+    new = Hdfs.normpath(new)
     params = self._getparams()
     params['op'] = 'RENAME'
     # Encode `new' because it's in the params
@@ -241,7 +250,7 @@ class WebHdfs(Hdfs):
 
   def chown(self, path, user=None, group=None):
     """chown(path, user=None, group=None)"""
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'SETOWNER'
     if user is not None:
@@ -252,7 +261,7 @@ class WebHdfs(Hdfs):
 
   def chmod(self, path, mode):
     """chmod(path, mode)"""
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'SETPERMISSION'
     params['permission'] = safe_octal(mode)
@@ -272,7 +281,7 @@ class WebHdfs(Hdfs):
 
     Read data from a file.
     """
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'OPEN'
     params['offset'] = long(offset)
@@ -299,7 +308,7 @@ class WebHdfs(Hdfs):
 
     Creates a file with the specified parameters.
     """
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'CREATE'
     params['overwrite'] = overwrite and 'true' or 'false'
@@ -319,7 +328,7 @@ class WebHdfs(Hdfs):
 
     Append data to a given file.
     """
-    path = encode_fs_path(Hdfs.normpath(path))
+    path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'APPEND'
     self._invoke_with_redirect('POST', path, params, data)

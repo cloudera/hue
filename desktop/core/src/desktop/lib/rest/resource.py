@@ -64,8 +64,9 @@ class Resource(object):
         (method, body[:32], len(body) > 32 and "..." or ""))
 
     # Is the response application/json?
-    if resp.info().getmaintype() == "application" and \
-         resp.info().getsubtype() == "json":
+    if len(body) != 0 and \
+          resp.info().getmaintype() == "application" and \
+          resp.info().getsubtype() == "json":
       try:
         json_dict = json.loads(body)
         return json_dict

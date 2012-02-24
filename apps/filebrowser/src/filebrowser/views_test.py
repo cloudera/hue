@@ -18,8 +18,9 @@
 """
 Tests for filebrowser views
 """
+from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
-from hadoop import mini_cluster
+from hadoop import pseudo_hdfs4
 from avro import schema, datafile, io
 from desktop.lib.django_test_util import make_logged_in_client
 from nose.tools import assert_true, assert_false, assert_equal
@@ -29,36 +30,35 @@ LOG = logging.getLogger(__name__)
 
 @attr('requires_hadoop')
 def test_chown():
-  cluster = mini_cluster.shared_cluster(conf=True)
-  try:
-    # Only the Hadoop superuser really has carte blanche here
-    c = make_logged_in_client(cluster.superuser)
-    cluster.fs.setuser(cluster.superuser)
+  cluster = pseudo_hdfs4.shared_cluster()
 
-    PATH = u"/test-chown-en-Español"
-    cluster.fs.mkdir(PATH)
-    c.post("/filebrowser/chown", dict(path=PATH, user="x", group="y"))
-    assert_equal("x", cluster.fs.stats(PATH)["user"])
-    assert_equal("y", cluster.fs.stats(PATH)["group"])
-    c.post("/filebrowser/chown", dict(path=PATH, user="__other__", user_other="z", group="y"))
-    assert_equal("z", cluster.fs.stats(PATH)["user"])
+  # Only the Hadoop superuser really has carte blanche here
+  c = make_logged_in_client(cluster.superuser)
+  cluster.fs.setuser(cluster.superuser)
 
-    # Make sure that the regular user chown form doesn't have useless fields,
-    # and that the superuser's form has all the fields it could dream of.
-    PATH = '/filebrowser/chown-regular-user'
-    cluster.fs.mkdir(PATH)
-    cluster.fs.chown(PATH, 'chown_test', 'chown_test')
-    response = c.get('/filebrowser/chown', dict(path=PATH, user='chown_test', group='chown_test'))
-    assert_true('<option value="__other__"' in response.content)
-    c = make_logged_in_client('chown_test')
-    response = c.get('/filebrowser/chown', dict(path=PATH, user='chown_test', group='chown_test'))
-    assert_false('<option value="__other__"' in response.content)
-  finally:
-    cluster.shutdown()
+  PATH = u"/test-chown-en-Español"
+  cluster.fs.mkdir(PATH)
+  c.post("/filebrowser/chown", dict(path=PATH, user="x", group="y"))
+  assert_equal("x", cluster.fs.stats(PATH)["user"])
+  assert_equal("y", cluster.fs.stats(PATH)["group"])
+  c.post("/filebrowser/chown", dict(path=PATH, user="__other__", user_other="z", group="y"))
+  assert_equal("z", cluster.fs.stats(PATH)["user"])
+
+  # Make sure that the regular user chown form doesn't have useless fields,
+  # and that the superuser's form has all the fields it could dream of.
+  PATH = '/filebrowser/chown-regular-user'
+  cluster.fs.mkdir(PATH)
+  cluster.fs.chown(PATH, 'chown_test', 'chown_test')
+  response = c.get('/filebrowser/chown', dict(path=PATH, user='chown_test', group='chown_test'))
+  assert_true('<option value="__other__"' in response.content)
+  c = make_logged_in_client('chown_test')
+  response = c.get('/filebrowser/chown', dict(path=PATH, user='chown_test', group='chown_test'))
+  assert_false('<option value="__other__"' in response.content)
+
 
 @attr('requires_hadoop')
 def test_listdir():
-  cluster = mini_cluster.shared_cluster(conf=True)
+  cluster = pseudo_hdfs4.shared_cluster()
   try:
     c = make_logged_in_client()
     cluster.fs.setuser(cluster.superuser)
@@ -104,11 +104,10 @@ def test_listdir():
       cluster.fs.rmtree('/user/test')
     except:
       pass      # Don't let cleanup errors mask earlier failures
-    cluster.shutdown()
 
 @attr('requires_hadoop')
 def test_view_avro():
-  cluster = mini_cluster.shared_cluster(conf=True)
+  cluster = pseudo_hdfs4.shared_cluster()
   try:
     c = make_logged_in_client()
     cluster.fs.setuser(cluster.superuser)
@@ -166,11 +165,10 @@ def test_view_avro():
       cluster.fs.rmtree('/test-avro-filebrowser/')
     except:
       pass      # Don't let cleanup errors mask earlier failures
-    cluster.shutdown()
 
 @attr('requires_hadoop')
 def test_view_gz():
-  cluster = mini_cluster.shared_cluster(conf=True)
+  cluster = pseudo_hdfs4.shared_cluster()
   try:
     c = make_logged_in_client()
     cluster.fs.setuser(cluster.superuser)
@@ -212,12 +210,11 @@ def test_view_gz():
       cluster.fs.rmtree('/test-gz-filebrowser/')
     except:
       pass      # Don't let cleanup errors mask earlier failures
-    cluster.shutdown()
 
 
 @attr('requires_hadoop')
 def test_view_i18n():
-  cluster = mini_cluster.shared_cluster(conf=True)
+  cluster = pseudo_hdfs4.shared_cluster()
   try:
     cluster.fs.setuser(cluster.superuser)
     cluster.fs.mkdir('/test-filebrowser/')
@@ -250,7 +247,6 @@ def test_view_i18n():
       cluster.fs.rmtree('/user/test')
     except Exception, ex:
       LOG.error('Failed to cleanup test directory: %s' % (ex,))
-    cluster.shutdown()
 
 
 def view_helper(cluster, encoding, content):
@@ -282,7 +278,7 @@ def view_helper(cluster, encoding, content):
 
 @attr('requires_hadoop')
 def test_edit_i18n():
-  cluster = mini_cluster.shared_cluster(conf=True)
+  cluster = pseudo_hdfs4.shared_cluster()
   try:
     cluster.fs.setuser(cluster.superuser)
     cluster.fs.mkdir('/test-filebrowser/')
@@ -312,7 +308,6 @@ def test_edit_i18n():
       cluster.fs.rmtree('/test-filebrowser/')
     except Exception, ex:
       LOG.error('Failed to remove tree /test-filebrowser: %s' % (ex,))
-    cluster.shutdown()
 
 
 def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
@@ -366,13 +361,13 @@ def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
     try:
       cluster.fs.remove(filename)
     except Exception, ex:
-      LOG.error('Failed to remove %s: %s' % (filename, ex))
+      LOG.error('Failed to remove %s: %s' % (smart_str(filename), ex))
 
 
 @attr('requires_hadoop')
 def test_upload():
   """Test file upload"""
-  cluster = mini_cluster.shared_cluster(conf=True)
+  cluster = pseudo_hdfs4.shared_cluster()
   try:
     USER_NAME = cluster.fs.superuser
     cluster.fs.setuser(USER_NAME)
@@ -397,4 +392,3 @@ def test_upload():
       cluster.fs.remove(DEST)
     except Exception, ex:
       pass
-    cluster.shutdown()

@@ -238,7 +238,7 @@ def _do_overwrite_save(fs, path, data, encoding):
     # Try to match the permissions and ownership of the old file
     cur_stats = fs.stats(path)
     try:
-        fs.chmod(path_dest, cur_stats['mode'])
+        fs.chmod(path_dest, stat_module.S_IMODE(cur_stats['mode']))
     except:
         logging.warn("Could not chmod new file %s to match old file %s" % (
             path_dest, path), exc_info=True)

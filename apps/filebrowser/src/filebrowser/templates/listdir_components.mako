@@ -18,6 +18,7 @@ import datetime
 import hashlib
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time, escape
 from desktop.lib.django_util import reverse_with_get
+from django.utils.encoding import smart_str
 %>
 
 
@@ -123,7 +124,7 @@ from desktop.lib.django_util import reverse_with_get
              % if ".." != file['name']:
 				<%
 				m = hashlib.md5()
-				m.update(path)
+				m.update(smart_str(path))
 				%>
 				<a class="btn small contextEnabler" data-menuid="${urlencode(m.hexdigest())}">Options</a>
 				<ul class="contextMenu" id="menu${urlencode(m.hexdigest())}">
