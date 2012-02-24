@@ -90,8 +90,8 @@ ifeq ($(CREPO),)
   $(error "Error: Need crepo. See <http://github.com/cloudera/crepo>.")
 endif
 
-ifneq ($(shell test -e $(HADOOP_HOME)/hadoop-core-0.20*.jar -o -e $(HADOOP_HOME)/hadoop*0.20*core.jar && echo $$?),0)
-  $(error "Error: No Hadoop 0.20 installation at $(HADOOP_HOME). Please set $$HADOOP_HOME.")
+ifneq ($(shell test -e $(HADOOP_HOME)/bin/hadoop && echo $$?),0)
+  $(error "Error: No Hadoop installation at $(HADOOP_HOME). Please set $$HADOOP_HOME.")
 endif
 # END DEV ONLY >>>>
 
