@@ -21,8 +21,10 @@ Interfaces for Hadoop filesystem access via HttpFs/WebHDFS
 
 import errno
 import logging
+import random
 import threading
 
+from django.utils.encoding import smart_str
 from desktop.lib.rest import http_client, resource
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import encode_fs_path, Hdfs
@@ -147,7 +149,7 @@ class WebHdfs(Hdfs):
     res = self._stats(path)
     if res is not None:
       return res
-    raise IOError(errno.ENOENT, "File %s not found" % (path,))
+    raise IOError(errno.ENOENT, "File %s not found" % (smart_str(path),))
 
   def exists(self, path):
     return self._stats(path) is not None
@@ -178,7 +180,7 @@ class WebHdfs(Hdfs):
     # This part of the API is nonsense.
     # The lack of exception should indicate success.
     if not result['boolean']:
-      raise IOError('Delete failed: %s' % (path,))
+      raise IOError('Delete failed: %s' % (smart_str(path),))
 
   def remove(self, path):
     """Delete a file."""
@@ -205,7 +207,24 @@ class WebHdfs(Hdfs):
       params['permission'] = safe_octal(mode)
     success = self._root.put(path, params)
     if not success:
-      raise IOError("Mkdir failed: %s" % (path,))
+      raise IOError("Mkdir failed: %s" % (smart_str(path),))
+
+  def mktemp(self, subdir='', prefix='tmp'):
+    """
+    mktemp(subdir, prefix) ->  <temp_dir>/subdir/prefix.<rand>
+    Return a unique temporary filename with prefix in the cluster's temp dir.
+    """
+    RANDOM_BITS = 64
+
+    base = self.join(self._temp_dir, subdir)
+    if not self.isdir(base):
+      self.mkdir(base)
+
+    while True:
+      name = "%s.%s" % (prefix, random.getrandbits(RANDOM_BITS))
+      candidate = self.join(base, name)
+      if not self.exists(candidate):
+        return candidate
 
   def rename(self, old, new):
     """rename(old, new)"""
@@ -213,10 +232,12 @@ class WebHdfs(Hdfs):
     new = encode_fs_path(Hdfs.normpath(new))
     params = self._getparams()
     params['op'] = 'RENAME'
-    params['destination'] = new
+    # Encode `new' because it's in the params
+    params['destination'] = smart_str(new)
     result = self._root.put(old, params)
     if not result['boolean']:
-      raise IOError("Rename failed: %s -> %s" % (old, new))
+      raise IOError("Rename failed: %s -> %s" %
+                    (smart_str(old), smart_str(new)))
 
   def chown(self, path, user=None, group=None):
     """chown(path, user=None, group=None)"""
@@ -309,7 +330,7 @@ class WebHdfs(Hdfs):
     Issue a request, and expect a redirect, and then submit the data to
     the redirected location. This is used for create, write, etc.
 
-    Returns the 
+    Returns the response from the redirected request.
     """
     next_url = None
     try:
@@ -326,8 +347,7 @@ class WebHdfs(Hdfs):
 
     # Now talk to the real thing. The redirect url already includes the params.
     client = self._make_client(next_url)
-    return resource.Resource(client).invoke(
-        method, data=data, json_decode=False)
+    return resource.Resource(client).invoke(method, data=data)
 
 
   def _get_redirect_url(self, webhdfs_ex):
@@ -373,7 +393,7 @@ class File(object):
     try:
       self._stat = fs.stats(path)
       if self._stat.isDir:
-        raise IOError(errno.EISDIR, "Is a directory: '%s'" % (path,))
+        raise IOError(errno.EISDIR, "Is a directory: '%s'" % (smart_str(path),))
     except IOError, ex:
       if ex.errno == errno.ENOENT and mode == 'r':
         raise ex
@@ -387,7 +407,7 @@ class File(object):
       self._pos += offset
     elif whence == SEEK_END:
       self.stat()
-      self._pos = self._fs.stats(self._path).length + offset
+      self._pos = self._fs.stats(self._path).size + offset
     else:
       raise IOError(errno.EINVAL, "Invalid argument to seek for whence")
 
@@ -414,8 +434,12 @@ class File(object):
     if self._stat is None:
       # File not there yet.
       self._fs.create(self._path, data=data)
+      self.stat()
     else:
       self._fs.append(self._path, data=data)
+
+  def flush(self):
+    pass
 
   def close(self):
     pass

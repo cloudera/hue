@@ -186,7 +186,11 @@ class Hdfs(object):
 
   @staticmethod
   def normpath(path):
-    return posixpath.normpath(path)
+    res = posixpath.normpath(path)
+    # Python normpath() doesn't eliminate leading double slashes
+    if res.startswith('//'):
+      return res[1:]
+    return res
 
 
 class HadoopFileSystem(Hdfs):
