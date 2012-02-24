@@ -80,6 +80,11 @@
         <version>${hadoop.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-client</artifactId>
+        <version>${hadoop.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.hadoop.hive</groupId>
         <artifactId>hive-metastore</artifactId>
         <version>${hive.version}</version>
