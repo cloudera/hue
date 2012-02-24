@@ -18,8 +18,6 @@
 package org.apache.hadoop.thriftfs;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,20 +29,8 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.protocol.FSConstants.DatanodeReportType;
-import org.apache.hadoop.hdfs.protocol.FSConstants.SafeModeAction;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.thriftfs.api.Datanode;
-import org.apache.hadoop.thriftfs.api.DatanodeInfo;
 import org.apache.hadoop.thriftfs.api.RequestContext;
-import org.apache.hadoop.thriftfs.ThriftFsConfig;
-import org.apache.hadoop.util.StringUtils;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
 
 /**
  * Helper class to create Thrift clients.
@@ -60,8 +46,6 @@ public class Helper {
     conf.set(ThriftFsConfig.DFS_THRIFT_ADDR_KEY, "127.0.0.1:10090");
     conf.set(ThriftFsConfig.DFS_THRIFT_DATANODE_ADDR_KEY, "127.0.0.1:0");
     conf.set("slave.host.name", "127.0.0.1");
-    conf.setStrings("dfs.namenode.plugins", NamenodePlugin.class.getName());
-    conf.setStrings("dfs.datanode.plugins", DatanodePlugin.class.getName());
     conf.setBoolean("dfs.permissions", true);
     conf.setBoolean("dfs.support.append", true);
 
@@ -90,30 +74,6 @@ public class Helper {
     return ctx;
   }
 
-  /** Create a DFS cluster. */
-  public static MiniDFSCluster createCluster(short replication)
-      throws IOException {
-    Configuration conf = Helper.createConf();
-    MiniDFSCluster cluster = new MiniDFSCluster(conf, replication, true, null);
-    cluster.waitActive();
-    return cluster;
-  }
-
-  /**
-   * Creates a Thrift data node client.
-   * 
-   * @param addr address of the data node
-   * @return a Thrift data node client.
-   */
-  public static Datanode.Client createDatanodeClient(DatanodeInfo node)
-      throws Exception {
-    InetSocketAddress addr = new InetSocketAddress(node.host, node.thriftPort);
-    TTransport t = new TSocket(addr.getHostName(), addr.getPort());
-    t.open();
-    TProtocol p = new TBinaryProtocol(t);
-    return new Datanode.Client(p);
-  }
-
   /** Create a file on the default file system. */
   public static void createFile(FileSystem fs, String path, short repl,
       short perms, long blockSize, int length) throws Exception {
@@ -126,34 +86,5 @@ public class Helper {
     out.close();
     fs.setPermission(p, new FsPermission(perms));
     fs.setOwner(p, TEST_USER, TEST_GROUP);
-  }
-
-  public static void main(String[] args) throws Exception {
-    if (args.length != 4) {
-      System.err.println("Usage: " + Helper.class.getSimpleName()
-          + " <file name> <repl> <block size> <length>");
-      System.exit(1);
-    }
-
-    Configuration.addDefaultResource("core-site.xml");
-    Configuration.addDefaultResource("hdfs-site.xml");
-    Configuration conf = new Configuration();
-
-    DistributedFileSystem dfs = new DistributedFileSystem();
-    dfs.initialize(new URI(conf.get("fs.default.name")), conf);
-
-    for (;;) {
-      if (!dfs.setSafeMode(SafeModeAction.SAFEMODE_GET)) {
-        org.apache.hadoop.hdfs.protocol.DatanodeInfo[] nodes =
-          dfs.getClient().namenode.getDatanodeReport(DatanodeReportType.LIVE);
-        if (nodes.length > 0) {
-          break;
-        }
-      }
-      Thread.sleep(100);
-    }
-
-    createFile(dfs, args[0], Short.parseShort(args[1]),
-        (short)0644, Long.parseLong(args[2]), Integer.parseInt(args[3]));
   }
 }

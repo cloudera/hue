@@ -39,6 +39,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.Cluster;
 import org.apache.hadoop.mapreduce.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.Text;
@@ -339,7 +340,7 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             tcs.setReduceTasks(cs.getReduceTasks());
             tcs.setMaxMapTasks(cs.getMaxMapTasks());
             tcs.setMaxReduceTasks(cs.getMaxReduceTasks());
-            tcs.setState(cs.getJobTrackerState() == State.INITIALIZING ? JobTrackerState.INITIALIZING :
+            tcs.setState(cs.getJobTrackerStatus() == Cluster.JobTrackerStatus.INITIALIZING ? JobTrackerState.INITIALIZING :
                 JobTrackerState.RUNNING);
             tcs.setUsedMemory(cs.getUsedMemory());
             tcs.setMaxMemory(cs.getMaxMemory());
@@ -1037,10 +1038,8 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             }
 
             ThriftJobCounterRollups ret = new ThriftJobCounterRollups();
-            Counters mapCounters = new Counters();
-            jip.getMapCounters(mapCounters);
-            Counters reduceCounters = new Counters();
-            jip.getReduceCounters(reduceCounters);
+            Counters mapCounters = jip.getMapCounters();
+            Counters reduceCounters = jip.getReduceCounters();
             ret.mapCounters = new ThriftGroupList(
                 JTThriftUtils.toThrift(mapCounters));
             ret.reduceCounters = new ThriftGroupList(
