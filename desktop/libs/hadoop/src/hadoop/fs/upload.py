@@ -41,7 +41,7 @@ LOG = logging.getLogger(__name__)
 class HDFSerror(Exception):
   pass
 
-class HDFStemporaryUploadedFile(hadoop.fs.hadoopfs.FileUpload):
+class HDFStemporaryUploadedFile(object):
   """
   A temporary HDFS file to store upload data.
   This class does not have any file read methods.
@@ -71,7 +71,7 @@ class HDFStemporaryUploadedFile(hadoop.fs.hadoopfs.FileUpload):
 
     # Make the tmp dir 0777
     self._fs.chmod(self._fs.dirname(self._path), 0777)
-    hadoop.fs.hadoopfs.FileUpload.__init__(self, self._fs, self._path)
+    self._file = self._fs.open(self._path, 'w')
     self._do_cleanup = True
 
   def __del__(self):
@@ -88,7 +88,7 @@ class HDFStemporaryUploadedFile(hadoop.fs.hadoopfs.FileUpload):
       self.size = size
       self.close()
     except Exception, ex:
-      LOG.exception('Error uploading file to %s' % (self.path,))
+      LOG.exception('Error uploading file to %s' % (self._path,))
       raise
 
   def remove(self):
@@ -99,6 +99,15 @@ class HDFStemporaryUploadedFile(hadoop.fs.hadoopfs.FileUpload):
       if ex.errno != errno.ENOENT:
         LOG.exception('Failed to remove temporary upload file "%s". '
                       'Please cleanup manually: %s' % (self._path, ex))
+
+  def write(self, data):
+    self._file.write(data)
+
+  def flush(self):
+    self._file.flush()
+
+  def close(self):
+    self._file.close()
 
 
 class HDFSfileUploadHandler(FileUploadHandler):

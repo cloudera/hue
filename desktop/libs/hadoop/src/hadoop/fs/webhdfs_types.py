@@ -21,7 +21,8 @@ Return types from WebHDFS api calls.
 
 import stat
 
-from hadoop.fs.hadoopfs import Hdfs
+from django.utils.encoding import smart_str
+from hadoop.fs.hadoopfs import Hdfs, decode_fs_path
 
 class WebHdfsStat(object):
   """
@@ -31,7 +32,7 @@ class WebHdfsStat(object):
   """
 
   def __init__(self, file_status, parent_path):
-    self.path = Hdfs.join(parent_path, file_status['pathSuffix'])
+    self.path = Hdfs.join(parent_path, decode_fs_path(file_status['pathSuffix']))
     self.isDir = file_status['type'] == 'DIRECTORY'
     self.atime = file_status['accessTime'] / 1000
     self.mtime = file_status['modificationTime'] / 1000
@@ -47,13 +48,13 @@ class WebHdfsStat(object):
     else:
       self.mode |= stat.S_IFREG
 
-  def __str__(self):
+  def __unicode__(self):
     return "[WebHdfsStat] %7s %8s %8s %12s %s%s" % \
         (oct(self.mode), self.user, self.group, self.size, self.path,
          self.isDir and '/' or "")
 
   def __repr__(self):
-    return "<WebHdfsStat %s>" % (self.path,)
+    return smart_str("<WebHdfsStat %s>" % (self.path,))
 
   def __getitem__(self, key):
     try:
