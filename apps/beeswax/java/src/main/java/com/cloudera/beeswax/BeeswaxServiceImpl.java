@@ -46,10 +46,10 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Schema;
+import org.apache.hadoop.hive.ql.CommandNeedRetryException;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.exec.FetchTask;
 import org.apache.hadoop.hive.ql.exec.TaskFactory;
@@ -182,7 +182,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       }
     }
 
-    synchronized public void compile() throws BeeswaxException {
+    synchronized public void compile()
+    throws BeeswaxException, CommandNeedRetryException {
       try {
         assertState(QueryState.INITIALIZED);
         checkedCompile();
@@ -208,7 +209,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       throw ex;
     }
 
-    private void checkedCompile() throws BeeswaxException {
+    private void checkedCompile()
+    throws BeeswaxException, CommandNeedRetryException {
       // Run through configuration commands
       for (String cmd : query.configuration) {
         // This is pretty whacky; SET and ADD get treated differently
@@ -218,7 +220,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
         String[] tokens = cmd_trimmed.split("\\s+");
         String cmd1 = cmd_trimmed.substring(tokens[0].length()).trim();
         CommandProcessor p = CommandProcessorFactory.get(tokens[0]);
-        int res;
+        int res = -1;
         if (p instanceof Driver) {
           res = p.run(cmd).getResponseCode();
         } else {
@@ -301,7 +303,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
      * Executes query. Updates state. (QueryState variable can be polled.)
      * @throws BeeswaxException
      */
-    public void execute() throws BeeswaxException {
+    public void execute() throws BeeswaxException, CommandNeedRetryException {
       synchronized (this) {
         assertState(QueryState.COMPILED);
         state = QueryState.RUNNING;
@@ -333,7 +335,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       SessionState.start(this.sessionState);
     }
 
-    private void materializeResults(Results r, boolean startOver) throws IOException {
+    private void materializeResults(Results r, boolean startOver)
+    throws IOException, CommandNeedRetryException {
       if (driver.getPlan().getFetchTask() == null) {
         // This query is never going to return anything.
         r.has_more = false;
@@ -420,7 +423,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       return work;
     }
 
-    synchronized public QueryExplanation explain() throws BeeswaxException {
+    synchronized public QueryExplanation explain()
+    throws BeeswaxException, CommandNeedRetryException {
       assertState(QueryState.INITIALIZED);
       // By manipulating the query, this will make errors harder to find.
       query.query = "EXPLAIN " + query.query;
@@ -464,7 +468,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
           r.ready = true;
           try {
             materializeResults(r, fromBeginning);
-          } catch (IOException e) {
+          } catch (Exception e) {
             throw new BeeswaxException(e.toString(), logContext.getName(), handle);
           } finally {
             cleanSessionState();
