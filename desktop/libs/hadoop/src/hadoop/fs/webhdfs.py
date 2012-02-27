@@ -94,7 +94,7 @@ class WebHdfs(Hdfs):
   
   @property
   def user(self):
-    return self.thread_local
+    return self._thread_local.user
 
   def _getparams(self):
     return { "user.name" : self._thread_local.user }
@@ -124,8 +124,8 @@ class WebHdfs(Hdfs):
 
     Get directory entry names without stats.
     """
-    dirents = self.listdir_stats(self, path, glob)
-    return [ x.path for x in dirents ]
+    dirents = self.listdir_stats(path, glob)
+    return [ Hdfs.basename(x.path) for x in dirents ]
 
   def get_content_summary(self, path):
     """
@@ -147,7 +147,7 @@ class WebHdfs(Hdfs):
       json = self._root.get(path, params)
       return WebHdfsStat(json['FileStatus'], path)
     except WebHdfsException, ex:
-      if ex.server_exc == 'FileNotFoundException':
+      if ex.server_exc == 'FileNotFoundException' or ex.code == 404:
         return None
       raise ex
 
@@ -248,6 +248,7 @@ class WebHdfs(Hdfs):
       raise IOError("Rename failed: %s -> %s" %
                     (smart_str(old), smart_str(new)))
 
+
   def chown(self, path, user=None, group=None):
     """chown(path, user=None, group=None)"""
     path = Hdfs.normpath(path)
@@ -333,6 +334,9 @@ class WebHdfs(Hdfs):
     params['op'] = 'APPEND'
     self._invoke_with_redirect('POST', path, params, data)
 
+  @staticmethod
+  def urlsplit(url):
+    return Hdfs.urlsplit(url)
 
   def _invoke_with_redirect(self, method, path, params=None, data=None):
     """
@@ -404,9 +408,11 @@ class File(object):
       if self._stat.isDir:
         raise IOError(errno.EISDIR, "Is a directory: '%s'" % (smart_str(path),))
     except IOError, ex:
-      if ex.errno == errno.ENOENT and mode == 'r':
+      if ex.errno == errno.ENOENT and 'w' in self._mode:
+        self._fs.create(self._path)
+        self.stat()
+      else:
         raise ex
-      self._stat = None
 
   def seek(self, offset, whence=0):
     """Set the file pointer to the given spot. @see file.seek"""
@@ -439,13 +445,7 @@ class File(object):
   def append(self, data):
     if 'w' not in self._mode:
       raise IOError(errno.EINVAL, "File not open for writing")
-
-    if self._stat is None:
-      # File not there yet.
-      self._fs.create(self._path, data=data)
-      self.stat()
-    else:
-      self._fs.append(self._path, data=data)
+    self._fs.append(self._path, data=data)
 
   def flush(self):
     pass
@@ -473,3 +473,48 @@ def _get_service_url(hdfs_config):
   host = hdfs_config.NN_HOST.get()
   port = hdfs_config.NN_HTTP_PORT.get()
   return "http://%s:%s/webhdfs/v1" % (host, port)
+
+
+
+def test_fs_configuration(fs_config):
+  """
+  This is a config validation method. Returns a list of
+    [ (config_variable, error_message) ]
+  """
+  fs = WebHdfs.from_config(fs_config)
+  fs.setuser(fs.superuser)
+
+  # Access root
+  try:
+    statbuf = fs.stats('/')
+  except Exception, ex:
+    LOG.info("%s -- Validation error: %s" % (fs, ex))
+    return [(fs_config.WEBHDFS_URL, 'Failed to access filesystem root')]
+
+  # Write a file
+  tmpname = fs.mktemp(prefix='hue_config_validation')
+  try:
+    fs.create(tmpname)
+  except Exception, ex:
+    LOG.info("%s -- Validation error: %s" % (fs, ex))
+    return [(fs_config.WEBHDFS_URL,
+            'Failed to create temporary file "%s"' % (tmpname,))]
+
+  # Check superuser has super power
+  try:  # Finally: delete tmpname
+    try:
+      fs.chown(tmpname, fs.superuser)
+    except Exception, ex:
+      LOG.info("%s -- Validation error: %s" % (fs, ex))
+      return [(fs_config.WEBHDFS_URL,
+              'Failed to chown file. Please make sure that the filesystem root '
+              'is owned by the cluster superuser ("hdfs" in most cases).')]
+  finally:
+    try:
+      fs.remove(tmpname)
+    except Exception, ex:
+      LOG.error("Failed to remove '%s': %s" % (tmpname, ex))
+      return [(fs_config.WEBHDFS_URL,
+              'Failed to remove temporary file "%s"' % (tmpname,))]
+
+  return [ ]

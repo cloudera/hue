@@ -30,7 +30,7 @@ import django.views.generic.simple
 import django.contrib.auth.views
 
 import desktop.conf
-from desktop.lib import apputil, fsmanager
+from desktop.lib import apputil
 from desktop.lib.django_util import render_json, is_jframe_request, PopupException
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
@@ -119,18 +119,14 @@ class ClusterMiddleware(object):
     """
     has_hadoop = apputil.has_hadoop()
 
-    fs_ref = request.GET.get('fs', request.POST.get('fs', view_kwargs.get('fs')))
+    request.fs_ref = request.REQUEST.get('fs', view_kwargs.get('fs', 'default'))
     if "fs" in view_kwargs:
       del view_kwargs["fs"]
 
-    if fs_ref is None:
-      request.fs_ref, request.fs = fsmanager.get_default_hdfs()
-    else:
-      try:
-        request.fs = fsmanager.get_filesystem(fs_ref)
-        request.fs_ref = fs_ref
-      except KeyError:
-        raise KeyError('Cannot find filesystem called "%s"' % (fs_ref,))
+    try:
+      request.fs = cluster.get_hdfs(request.fs_ref)
+    except KeyError:
+      raise KeyError('Cannot find HDFS called "%s"' % (request.fs_ref,))
 
     if request.user.is_authenticated() and request.fs is not None:
       request.fs.setuser(request.user.username)

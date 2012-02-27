@@ -16,20 +16,28 @@
 # limitations under the License.
 """Settings to configure your Hadoop cluster."""
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
-import glob
-import os
+import fnmatch
 import logging
+import os
 
 HADOOP_HOME = Config(
   key="hadoop_home",
-  default=os.environ.get("HADOOP_HOME", "/usr/lib/hadoop-0.20"),
+  default=os.environ.get("HADOOP_HOME", "/usr/lib/hadoop"),
+  help=("Path to directory holding hadoop libs - HADOOP_HOME in " +
+        "hadoop parlance; defaults to environment variable, when" +
+        "set.")
+)
+
+HADOOP_MR1_HOME = Config(
+  key="hadoop_mr1_home",
+  default=os.environ.get("HADOOP_MR1_HOME", "/usr/lib/hadoop-0.20-mapreduce"),
   help=("Path to directory holding hadoop libs - HADOOP_HOME in " +
         "hadoop parlance; defaults to environment variable, when" +
         "set.")
 )
 
 def hadoop_bin_from_hadoop_home():
-  """Returns $HADOOP_HOME/bin/hadoop-0.20"""
+  """Returns $HADOOP_HOME/bin/hadoop"""
   return os.path.join(HADOOP_HOME.get(), "bin/hadoop")
 
 HADOOP_BIN = Config("hadoop_bin",
@@ -44,21 +52,24 @@ HADOOP_CONF_DIR = Config(
   help="If set, directory to pass to hadoop_bin (from hadoop configuration) as the --config flag.",
 )
 
-def find_jar(desired_glob, root=None):
+def find_file_recursive(desired_glob, root=None):
   if root is None:
     root_f = lambda: HADOOP_HOME.get()
   else:
-    root_f = lambda: root
+    root_f = lambda: not callable(root) and root or root()
+
   def f():
-    pattern = os.path.join(root_f(), desired_glob)
-    possibilities = glob.glob(pattern)
-    if len(possibilities) == 0:
-      logging.error("Trouble finding jars matching %s" % (pattern,))
-      return None
-    else:
-      if len(possibilities) != 1:
-        logging.warning("Found multiple jars matching %s: %s" % (pattern, possibilities))
-      return possibilities[0]
+    for dirpath, dirnames, filenames in os.walk(root_f()):
+      matches = fnmatch.filter(filenames, desired_glob)
+      if matches:
+        if len(matches) != 1:
+          logging.warning("Found multiple jars matching %s: %s" %
+                          (desired_glob, matches))
+        return os.path.join(dirpath, matches[0])
+
+    logging.error("Trouble finding jars matching %s" % (desired_glob,))
+    return None
+
   if root is None:
     root_str = "$HADOOP_HOME"
   else:
@@ -66,56 +77,45 @@ def find_jar(desired_glob, root=None):
   f.__doc__ = "Finds %s/%s" % (root_str, desired_glob)
   return f
 
-def find_examples_jar():
-  """
-  Finds $HADOOP_HOME/hadoop-*examples*.jar
-  """
-  return find_jar("hadoop-*examples*.jar")
-
 HADOOP_EXAMPLES_JAR = Config(
   key="hadoop_examples_jar",
-  dynamic_default=find_examples_jar(),
+  dynamic_default=find_file_recursive("hadoop-*examples*.jar", lambda: HADOOP_MR1_HOME.get()),
   help="Path to the hadoop-examples.jar (used for tests and jobdesigner setup)",
   type=str,
   private=True)
 
 HADOOP_STREAMING_JAR = Config(
   key="hadoop_streaming_jar",
-  dynamic_default=find_jar(os.path.join("contrib", "streaming", "hadoop-*streaming*.jar")),
+  dynamic_default=find_file_recursive("hadoop-*streaming*.jar"),
   help="Path to the hadoop-streaming.jar (used by jobdesigner)",
   type=str,
   private=True)
 
 HADOOP_TEST_JAR = Config("hadoop_test_jar",
   help="[Used by testing code.] Path to hadoop-test.jar",
-  dynamic_default=find_jar("hadoop-*test*.jar"),
+  dynamic_default=find_file_recursive("hadoop-*test*.jar", lambda: HADOOP_MR1_HOME.get()),
   type=str,
   private=True)
 
 HADOOP_PLUGIN_CLASSPATH = Config("hadoop_plugin_classpath",
   help="[Used only in testing code.] Path to the Hadoop plugin jar.",
   type=str,
-  dynamic_default=find_jar("../../java-lib/hue-plugins-*.jar", root=os.path.dirname(__file__)),
-  private=True)
-
-HADOOP_EXTRA_CLASSPATH_STRING = Config('hadoop_extra_classpath_entries',
-  help='[Used only in testing code.] String to add to the end of the HADOOP_CLASSPATH environment variable when calling bin/hadoop.',
-  type=str,
-  dynamic_default=find_jar("../../static-group-mapping/java-lib/static-group-mapping-*.jar", root=os.path.dirname(__file__)),
+  dynamic_default=find_file_recursive("hue-plugins-*.jar",
+                root=os.path.join(os.path.dirname(__file__), '..', '..', 'java-lib')),
   private=True)
 
 SUDO_SHELL_JAR = Config("hadoop_sudo_shell_jar",
   help="Tool that allows a proxy user UGI to be used to upload files.",
   type=str,
-  dynamic_default=find_jar("../../sudo-shell/java-lib/sudo-shell-*.jar",
-                           root=os.path.dirname(__file__)),
+  dynamic_default=find_file_recursive("sudo-shell-*.jar",
+                root=os.path.join(os.path.dirname(__file__), '..', '..', 'sudo-shell', 'java-lib')),
   private=True)
 
 CREDENTIALS_MERGER_JAR = Config("hadoop_credentials_merger_jar",
   help="Tool that is capable of merging multiple files containing delegation tokens into one.",
   type=str,
-  dynamic_default=find_jar("../../credentials-merger/java-lib/credentials-merger-*.jar",
-                           root=os.path.dirname(__file__)),
+  dynamic_default=find_file_recursive("credentials-merger-*.jar",
+                root=os.path.join(os.path.dirname(__file__), '..', '..', 'credentials-merger', 'java-lib')),
   private=True)
 
 HDFS_CLUSTERS = UnspecifiedConfigSection(
@@ -133,8 +133,8 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                             type=int),
       WEBHDFS_URL=Config("webhdfs_url",
                          help="The URL to WebHDFS/HttpFs service. Defaults to " +
-                         "the WebHDFS URL on the NameNode. To use the legacy" +
-                         "Thrift plugin communication mechanism, this must be" +
+                         "the WebHDFS URL on the NameNode. To use the legacy " +
+                         "Thrift plugin communication mechanism, this must be " +
                          "set to an empty value.",
                          type=str, default=None),
       NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
@@ -179,7 +179,7 @@ def config_validator():
 
   Called by core check_config() view.
   """
-  from hadoop.fs import hadoopfs
+  from hadoop.fs import webhdfs
   from hadoop import job_tracker
   res = [ ]
 
@@ -195,7 +195,7 @@ def config_validator():
   # HDFS_CLUSTERS
   for name in HDFS_CLUSTERS.keys():
     cluster = HDFS_CLUSTERS[name]
-    res.extend(hadoopfs.test_fs_configuration(cluster, HADOOP_BIN))
+    res.extend(webhdfs.test_fs_configuration(cluster))
 
   # MR_CLUSTERS
   for name in MR_CLUSTERS.keys():

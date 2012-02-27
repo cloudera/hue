@@ -192,6 +192,27 @@ class Hdfs(object):
       return res[1:]
     return res
 
+  @staticmethod
+  def urlsplit(url):
+    """
+    Take an HDFS path (hdfs://nn:port/foo) or just (/foo) and split it into
+    the standard urlsplit's 5-tuple.
+    """
+    i = url.find('://')
+    if i == -1:
+      # Not found. Treat the entire argument as an HDFS path
+      return ('hdfs', '', normpath(url), '', '')
+    if url[:i] != 'hdfs':
+      # Default to standard for non-hdfs
+      return urlparse.urlsplit(url)
+    url = url[i+3:]
+    i = url.find('/')
+    if i == -1:
+      # Everything is netloc. Assume path is root.
+      return ('hdfs', url, '/', '', '')
+    netloc = url[:i]
+    path = url[i:]
+    return ('hdfs', netloc, normpath(path), '', '')
 
 class HadoopFileSystem(Hdfs):
   """
@@ -662,21 +683,7 @@ class HadoopFileSystem(Hdfs):
     Take an HDFS path (hdfs://nn:port/foo) or just (/foo) and split it into
     the standard urlsplit's 5-tuple.
     """
-    i = url.find('://')
-    if i == -1:
-      # Not found. Treat the entire argument as an HDFS path
-      return ('hdfs', '', normpath(url), '', '')
-    if url[:i] != 'hdfs':
-      # Default to standard for non-hdfs
-      return urlparse.urlsplit(url)
-    url = url[i+3:]
-    i = url.find('/')
-    if i == -1:
-      # Everything is netloc. Assume path is root.
-      return ('hdfs', url, '/', '', '')
-    netloc = url[:i]
-    path = url[i:]
-    return ('hdfs', netloc, normpath(path), '', '')
+    return Hdfs.urlsplit(url)
 
 
 def require_open(func):

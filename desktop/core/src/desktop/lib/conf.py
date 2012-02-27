@@ -615,7 +615,7 @@ def validate_path(confvar, is_dir=None):
   @return [(confvar, error_msg)] or []
   """
   path = confvar.get()
-  if not os.path.exists(path):
+  if path is None or not os.path.exists(path):
     return [(confvar, 'Path does not exist on local filesystem.')]
   if is_dir is not None:
     if is_dir:

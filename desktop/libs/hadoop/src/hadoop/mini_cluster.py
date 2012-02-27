@@ -46,7 +46,6 @@ import urllib2
 from hadoop.fs.hadoopfs import HadoopFileSystem
 from hadoop.job_tracker import LiveJobTracker
 import hadoop.cluster
-import desktop.lib.fsmanager
 
 # Starts mini cluster suspended until a debugger attaches to it.
 DEBUG_HADOOP=False
@@ -56,14 +55,8 @@ USE_STDERR=os.environ.get("MINI_CLUSTER_USE_STDERR", False)
 CLEANUP_TMP_DIR=os.environ.get("MINI_CLUSTER_CLEANUP", True)
 # How long to wait for cluster to start up.  (seconds)
 MAX_CLUSTER_STARTUP_TIME = 120.0
-# Class to use for the cluster's GMSP.
-CLUSTER_GMSP = 'org.apache.hadoop.security.StaticUserGroupMapping'
-# List of classes to be used as plugins for the NN of the cluster.
-CLUSTER_NN_PLUGINS = 'org.apache.hadoop.thriftfs.NamenodePlugin'
 # List of classes to be used as plugins for the JT of the cluster.
 CLUSTER_JT_PLUGINS = 'org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin'
-# List of classes to be used as plugins for the DN(s) of the cluster.
-CLUSTER_DN_PLUGINS = 'org.apache.hadoop.thriftfs.DatanodePlugin'
 # MR Task Scheduler. By default use the FIFO scheduler
 CLUSTER_TASK_SCHEDULER='org.apache.hadoop.mapred.JobQueueTaskScheduler'
 # MR queue names
@@ -139,12 +132,9 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     _write_static_group_mapping(TEST_USER_GROUP_MAPPING,
       tmppath('ugm.properties'))
 
-    core_configs = {'hadoop.security.group.mapping': CLUSTER_GMSP,
-      'hadoop.security.static.group.mapping.file': tmppath('ugm.properties'),
+    core_configs = {
       'hadoop.proxyuser.%s.groups' % (self.superuser,): 'users,supergroup',
       'hadoop.proxyuser.%s.hosts' % (self.superuser,): 'localhost',
-      'dfs.namenode.plugins': CLUSTER_NN_PLUGINS,
-      'dfs.datanode.plugins': CLUSTER_DN_PLUGINS,
       'mapred.jobtracker.plugins': CLUSTER_JT_PLUGINS}
 
     extra_configs.update(STARTUP_CONFIGS)
@@ -162,7 +152,8 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     details_file = file(tmppath("details.json"), "w+")
     try:
-      args = [ hadoop.conf.HADOOP_BIN.get(), "jar",
+      args = [ os.path.join(hadoop.conf.HADOOP_MR1_HOME.get(), 'bin', 'hadoop'),
+        "jar",
         hadoop.conf.HADOOP_TEST_JAR.get(),
         "minicluster",
         "-writeConfig", tmppath("config.xml"), 
@@ -213,9 +204,11 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         hadoop.conf.HADOOP_TEST_JAR.get(),
         # -- END JAVA TRIVIA --
         hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(),
-        hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()])
+        # Due to CDH-4537, we need to add test dependencies to run minicluster
+        os.path.join(os.path.dirname(__file__), 'test_jars', '*'),
+      ])
       env["HADOOP_HEAPSIZE"] = "128"
-      env["HADOOP_HOME"] = hadoop.conf.HADOOP_HOME.get()
+      env["HADOOP_HOME"] = hadoop.conf.HADOOP_MR1_HOME.get()
       env["HADOOP_LOG_DIR"] = self.log_dir
       env["USER"] = self.superuser
       if "JAVA_HOME" in os.environ:
@@ -274,11 +267,10 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     hadoop.conf.HADOOP_CONF_DIR.set_for_testing(self.config_dir)
 
     write_config(self.config, tmppath("conf/core-site.xml"), 
-      ["fs.default.name", "jobclient.completion.poll.interval",
-       "fs.checkpoint.period", "fs.checkpoint.dir",
-       'hadoop.security.group.mapping', 'hadoop.security.static.group.mapping.file',
+      ["fs.defaultFS", "jobclient.completion.poll.interval",
+       "dfs.namenode.checkpoint.period", "dfs.namenode.checkpoint.dir",
        'hadoop.proxyuser.'+self.superuser+'.groups', 'hadoop.proxyuser.'+self.superuser+'.hosts'])
-    write_config(self.config, tmppath("conf/hdfs-site.xml"), ["fs.default.name", "dfs.http.address", "dfs.secondary.http.address"])
+    write_config(self.config, tmppath("conf/hdfs-site.xml"), ["fs.defaultFS", "dfs.namenode.http-address", "dfs.namenode.secondary.http-address"])
     # mapred.job.tracker isn't written out into self.config, so we fill
     # that one out more manually.
     write_config({ 'mapred.job.tracker': 'localhost:%d' % self.jobtracker_port },
@@ -420,7 +412,6 @@ def shared_cluster(conf=False):
   if conf:
     closers.extend([
       hadoop.conf.HDFS_CLUSTERS["default"].NN_HOST.set_for_testing("localhost"),
-      hadoop.conf.HDFS_CLUSTERS["default"].NN_THRIFT_PORT.set_for_testing(cluster.fs.thrift_port),
       hadoop.conf.HDFS_CLUSTERS["default"].NN_HDFS_PORT.set_for_testing(cluster.namenode_port),
       hadoop.conf.MR_CLUSTERS["default"].JT_HOST.set_for_testing("localhost"),
       hadoop.conf.MR_CLUSTERS["default"].JT_THRIFT_PORT.set_for_testing(cluster.jt.thrift_port),
@@ -429,7 +420,6 @@ def shared_cluster(conf=False):
     # This is djanky (that's django for "janky").
     # Caches are tricky w.r.t. to to testing;
     # perhaps there are better patterns?
-    desktop.lib.fsmanager.reset()
     old = hadoop.cluster.clear_caches()
 
   def finish():
