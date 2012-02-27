@@ -35,7 +35,7 @@ import logging
 import desktop.conf
 from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
-from useradmin.models import get_profile
+from useradmin.models import get_profile, UserProfile
 
 import pam
 from django_auth_ldap.backend import LDAPBackend, ldap_settings
@@ -203,6 +203,7 @@ class PamBackend(DesktopBackendBase):
         user = find_or_create_user(username, None)
         if user is not None and user.is_active:
           profile = get_profile(user)
+          profile.creation_method = UserProfile.EXTERNAL
           profile.save()
           user.is_superuser = is_super
           user.save()
@@ -263,6 +264,7 @@ class LdapBackend(object):
 
     if user is not None and user.is_active:
       profile = get_profile(user)
+      profile.creation_method = UserProfile.EXTERNAL
       profile.save()
       user.is_superuser = is_super
       user = rewrite_user(user)
