@@ -13,8 +13,13 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head(toolbar=True)}
+<%!
+from desktop.views import commonheader, commonfooter
+%>
+<%namespace name="comps" file="beeswax_components.mako" />
+<%namespace name="layout" file="layout.mako" />
+${commonheader("Beeswax", "beeswax", "100px")}
+${layout.menubar(section='tables')}
 
 <div class="bw-welcome">
   <h2>Welcome to Beeswax for Hive</h2>
@@ -41,4 +46,4 @@ ${wrappers.head(toolbar=True)}
     </li>
   </ul>
 </div>
-${wrappers.foot()}
+${commonfooter()}
