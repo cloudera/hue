@@ -262,6 +262,9 @@ LDAP = ConfigSection(
   key="ldap",
   help="Configuration options for LDAP connectivity",
   members=dict(
+    BASE_DN=Config("base_dn",
+                   default=None,
+                   help="The base LDAP distinguished name to use for LDAP search."),
     NT_DOMAIN=Config("nt_domain",
                      default=None,
                      help="The NT domain used for LDAP authentication."),
@@ -273,7 +276,46 @@ LDAP = ConfigSection(
                      help="The LDAP certificate for authentication over TLS."),
     LDAP_USERNAME_PATTERN=Config("ldap_username_pattern",
                                  default=None,
-                                 help="A pattern to use for constructing LDAP usernames"),
+                                 help="A pattern to use for constructing LDAP usernames."),
+    BIND_DN=Config("bind_dn",
+                   default=None,
+                   help="The distinguished name to bind as, when importing from LDAP."),
+    BIND_PASSWORD=Config("bind_password",
+                   default=None,
+                   help="The password for the bind user."),
+
+    USERS = ConfigSection(
+      key="users",
+      help="Configuration for LDAP user schema and search",
+      members=dict(
+        USER_FILTER=Config("user_filter",
+                           default="objectclass=*",
+                           help="A base filter for use when searching for users."),
+        USER_NAME_ATTR=Config("user_name_attr",
+                              default="sAMAccountName",
+                              help="The username attribute in the LDAP schema. "
+                                   "Typically, this is 'sAMAccountName' for AD and 'uid' "
+                                   "for other LDAP systems."),
+      )
+    ),
+
+    GROUPS = ConfigSection(
+      key="groups",
+      help="Configuration for LDAP group schema and search",
+      members=dict(
+        GROUP_FILTER=Config("group_filter",
+                           default="objectclass=*",
+                           help="A base filter for use when searching for groups."),
+        GROUP_NAME_ATTR=Config("group_name_attr",
+                              default="cn",
+                              help="The group name attribute in the LDAP schema. "
+                                  "Typically, this is 'cn'."),
+        GROUP_MEMBER_ATTR=Config("group_member_attr",
+                                 default="member",
+                                 help="The LDAP attribute which specifies the "
+                                      "members of a group."),
+      )
+    ),
 ))
 
 
