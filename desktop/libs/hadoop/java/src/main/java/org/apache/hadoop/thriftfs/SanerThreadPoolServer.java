@@ -25,6 +25,7 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
+import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
@@ -131,10 +132,12 @@ public class SanerThreadPoolServer extends TServer {
                            TTransportFactory outputTransportFactory,
                            TProtocolFactory inputProtocolFactory,
                            TProtocolFactory outputProtocolFactory) {
-    super(processorFactory, serverTransport,
-          inputTransportFactory, outputTransportFactory,
-          inputProtocolFactory, outputProtocolFactory);
-    options_ = new Options();
+    super(new TThreadPoolServer.Args(serverTransport)
+              .processorFactory(processorFactory)
+              .inputTransportFactory(inputTransportFactory)
+              .outputTransportFactory(outputTransportFactory)
+              .inputProtocolFactory(inputProtocolFactory)
+              .outputProtocolFactory(outputProtocolFactory));
     executorService_ = Executors.newCachedThreadPool();
   }
 
@@ -158,9 +161,12 @@ public class SanerThreadPoolServer extends TServer {
                            TProtocolFactory inputProtocolFactory,
                            TProtocolFactory outputProtocolFactory,
                            Options options) {
-    super(processorFactory, serverTransport,
-          inputTransportFactory, outputTransportFactory,
-          inputProtocolFactory, outputProtocolFactory);
+    super(new Args(serverTransport)
+              .processorFactory(processorFactory)
+              .inputTransportFactory(inputTransportFactory)
+              .outputTransportFactory(outputTransportFactory)
+              .inputProtocolFactory(inputProtocolFactory)
+              .outputProtocolFactory(outputProtocolFactory));
 
     executorService_ = null;
 
