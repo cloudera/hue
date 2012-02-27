@@ -29,8 +29,11 @@ from desktop.lib.django_test_util import make_logged_in_client
 from django.contrib.auth.models import User, Group
 from django.utils.encoding import smart_unicode
 
-from useradmin.models import HuePermission, GroupPermission
+from useradmin.models import HuePermission, GroupPermission, LdapGroup, UserProfile
 from useradmin.models import get_profile
+
+from views import sync_ldap_users_and_groups
+import ldap_access
 
 def reset_all_users():
   """Reset to a clean state by deleting all users"""
@@ -41,6 +44,43 @@ def reset_all_groups():
   """Reset to a clean state by deleting all users"""
   for grp in Group.objects.all():
     grp.delete()
+
+class LdapTestConnection(object):
+  """
+  Test class which mimics the behaviour of LdapConnection (from ldap_access.py).
+  It also includes functionality to fake modifications to an LDAP server.  It is designed
+  as a singleton, to allow for changes to persist across discrete connections.
+  """
+
+  _instance = None
+  def __init__(self):
+    if LdapTestConnection._instance is None:
+      LdapTestConnection._instance = LdapTestConnection._Singleton()
+
+  def add_user_group_for_test(self, user, group):
+    LdapTestConnection._instance.groups[group]['members'].append(user)
+
+  def remove_user_group_for_test(self, user, group):
+    LdapTestConnection._instance.groups[group]['members'].remove(user)
+
+  def find_user(self, user, find_by_dn=False):
+    """ Returns info for a particular user """
+    return LdapTestConnection._instance.users[user]
+
+  def find_group(self, groupname):
+    """ Return all groups in the system with parents and children """
+    return LdapTestConnection._instance.groups[groupname]
+
+  class _Singleton:
+    def __init__(self):
+      self.users = {'moe': {'username':'moe', 'first':'Moe', 'email':'moe@stooges.com'},
+                    'larry': {'username':'larry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com'},
+                    'curly': {'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com'}}
+
+      self.groups = {'TestUsers': {'name':'TestUsers', 'members':['moe','larry','curly']},
+                     'Test Administrators': {'name':'Test Administrators', 'members':['curly','larry']}}
+
+
 
 def test_invalid_username():
   BAD_NAMES = ('-foo', 'foo:o', 'foo o', ' foo')
@@ -268,3 +308,47 @@ def test_user_admin():
   # You shouldn't be able to create a user without a password
   response = c_su.post('/useradmin/users/new', dict(username="test"))
   assert_true("You must specify a password when creating a new user." in response.content)
+
+def test_userman_ldap_integration():
+  reset_all_users()
+  reset_all_groups()
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+  # Try importing a user
+  sync_ldap_users_and_groups(user='larry')
+  larry = User.objects.get(username='larry')
+  assert_true(larry.first_name == 'Larry')
+  assert_true(larry.last_name == 'Stooge')
+  assert_true(larry.email == 'larry@stooges.com')
+  assert_true(get_profile(larry).creation_method == str(UserProfile.CreationMethod.EXTERNAL))
+
+  # Should be a noop
+  sync_ldap_users_and_groups()
+  assert_true(len(User.objects.all()) == 1)
+  assert_true(len(Group.objects.all()) == 0)
+
+  # Should import a group, but will only sync already-imported members
+  sync_ldap_users_and_groups(group='Test Administrators')
+  assert_true(len(User.objects.all()) == 1)
+  assert_true(len(Group.objects.all()) == 1)
+  test_admins = Group.objects.get(name='Test Administrators')
+  assert_true(len(test_admins.user_set.all()) == 1)
+  assert_true(test_admins.user_set.all()[0].username == larry.username)
+
+  # Import all members of TestUsers
+  sync_ldap_users_and_groups(group='TestUsers', import_members=True)
+  test_users = Group.objects.get(name='TestUsers')
+  assert_true(LdapGroup.objects.filter(group=test_users).exists())
+  assert_true(len(test_users.user_set.all()) == 3)
+
+  ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('moe', 'TestUsers')
+  sync_ldap_users_and_groups(group='TestUsers')
+  assert_true(len(test_users.user_set.all()) == 2)
+  assert_true(len(User.objects.get(username='moe').groups.all()) == 0)
+
+  ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('moe', 'TestUsers')
+  sync_ldap_users_and_groups(group='TestUsers')
+  assert_true(len(test_users.user_set.all()) == 3)
+  assert_true(len(User.objects.get(username='moe').groups.all()) == 1)
