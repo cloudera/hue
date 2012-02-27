@@ -196,10 +196,11 @@ public class Server {
     BeeswaxService.Iface impl = new BeeswaxServiceImpl(dtHost, dtPort, dtHttps,
         qlifetime);
     Processor processor = new BeeswaxService.Processor(impl);
-    TThreadPoolServer.Options options = new TThreadPoolServer.Options();
-    TServer server = new TThreadPoolServer(processor, serverTransport,
-        new TTransportFactory(), new TTransportFactory(),
-        new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
+    TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport)
+        .processor(processor)
+        .protocolFactory(new TBinaryProtocol.Factory())
+        .transportFactory(new TTransportFactory());
+    TServer server = new TThreadPoolServer(args);
     LOG.info("Starting beeswax server on port " + port + ", talking back to Desktop at " +
              dtHost + ":" + dtPort + ", lifetime of queries set to " + qlifetime);
 
@@ -225,14 +226,15 @@ public class Server {
     Iface handler = new HMSHandler("new db based metaserver");
     FacebookService.Processor processor = new ThriftHiveMetastore.Processor(handler);
 
-    TThreadPoolServer.Options options = new TThreadPoolServer.Options();
-    options.minWorkerThreads = 10;
-    TServer server = new TThreadPoolServer((TProcessor)processor, serverTransport,
-        new TTransportFactory(), new TTransportFactory(),
-        new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
+    TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport)
+        .processor(processor)
+        .protocolFactory(new TBinaryProtocol.Factory())
+        .transportFactory(new TTransportFactory());
+    TServer server = new TThreadPoolServer(args);
+
     HMSHandler.LOG.info("Started the new metaserver on port [" + port + "]...");
-    HMSHandler.LOG.info("Options.minWorkerThreads = " + options.minWorkerThreads);
-    HMSHandler.LOG.info("Options.maxWorkerThreads = " + options.maxWorkerThreads);
+    HMSHandler.LOG.info("minWorkerThreads = " + args.minWorkerThreads);
+    HMSHandler.LOG.info("maxWorkerThreads = " + args.maxWorkerThreads);
     server.serve();
   }
 }
