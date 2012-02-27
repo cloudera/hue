@@ -146,12 +146,12 @@
       <dependency>
         <groupId>org.apache.thrift</groupId>
         <artifactId>libthrift</artifactId>
-        <version>0.5.0-cdh</version>
+        <version>0.7.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.thrift</groupId>
         <artifactId>libfb303</artifactId>
-        <version>0.5.0-cdh</version>
+        <version>0.7.0</version>
       </dependency>
 
 
