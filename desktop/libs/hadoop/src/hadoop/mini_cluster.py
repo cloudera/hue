@@ -56,8 +56,6 @@ USE_STDERR=os.environ.get("MINI_CLUSTER_USE_STDERR", False)
 CLEANUP_TMP_DIR=os.environ.get("MINI_CLUSTER_CLEANUP", True)
 # How long to wait for cluster to start up.  (seconds)
 MAX_CLUSTER_STARTUP_TIME = 120.0
-# Class to use for the cluster's GMSP.
-CLUSTER_GMSP = 'org.apache.hadoop.security.StaticUserGroupMapping'
 # List of classes to be used as plugins for the NN of the cluster.
 CLUSTER_NN_PLUGINS = 'org.apache.hadoop.thriftfs.NamenodePlugin'
 # List of classes to be used as plugins for the JT of the cluster.
@@ -139,8 +137,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     _write_static_group_mapping(TEST_USER_GROUP_MAPPING,
       tmppath('ugm.properties'))
 
-    core_configs = {'hadoop.security.group.mapping': CLUSTER_GMSP,
-      'hadoop.security.static.group.mapping.file': tmppath('ugm.properties'),
+    core_configs = {
       'hadoop.proxyuser.%s.groups' % (self.superuser,): 'users,supergroup',
       'hadoop.proxyuser.%s.hosts' % (self.superuser,): 'localhost',
       'dfs.namenode.plugins': CLUSTER_NN_PLUGINS,
@@ -212,8 +209,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         # core classes are loaded by the system classloader.
         hadoop.conf.HADOOP_TEST_JAR.get(),
         # -- END JAVA TRIVIA --
-        hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(),
-        hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()])
+        hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get()])
       env["HADOOP_HEAPSIZE"] = "128"
       env["HADOOP_HOME"] = hadoop.conf.HADOOP_HOME.get()
       env["HADOOP_LOG_DIR"] = self.log_dir

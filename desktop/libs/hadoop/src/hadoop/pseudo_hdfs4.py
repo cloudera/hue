@@ -40,7 +40,7 @@ class PseudoHdfs4(object):
   """This class runs HDFS (CDH4) locally, in pseudo-distributed mode"""
 
   def __init__(self):
-    self._tmpdir = tempfile.mkdtemp()
+    self._tmpdir = tempfile.mkdtemp(prefix='tmp_hue_')
     self._superuser = pwd.getpwuid(os.getuid()).pw_name
     self._fs = None
 
@@ -144,16 +144,17 @@ class PseudoHdfs4(object):
     # More stuff to setup in the environment
     env = dict(
       HADOOP_CONF_DIR = conf_dir,
-      HADOOP_CLASSPATH = ":".join([
-        hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()]),
       HADOOP_HEAPSIZE = "128",
       HADOOP_LOG_DIR = self._log_dir,
       USER = self.superuser,
       LANG = "en_US.UTF-8",
+      PATH = os.environ['PATH'],
     )
 
     if "JAVA_HOME" in os.environ:
       env['JAVA_HOME'] = os.environ['JAVA_HOME']
+
+    LOG.debug("Environment:\n" + "\n".join([ str(x) for x in sorted(env.items()) ]))
 
     # Format HDFS
     self._format(conf_dir, env)
@@ -176,10 +177,20 @@ class PseudoHdfs4(object):
             'namenode', '-format')
     LOG.info('Formatting HDFS: %s' % (args,))
 
-    ignore = file('/dev/null', 'w+')
-    ret = subprocess.call(args, env=env, stdout=ignore, stderr=ignore)
-    if ret != 0:
-      raise RuntimeError('Failed to format namenode')
+    stdout = tempfile.TemporaryFile()
+    stderr = tempfile.TemporaryFile()
+    try:
+      ret = subprocess.call(args, env=env, stdout=stdout, stderr=stderr)
+      if ret != 0:
+        stdout.seek(0)
+        stderr.seek(0)
+        raise RuntimeError('Failed to format namenode\n'
+                           '=== Stdout ===:\n%s\n'
+                           '=== Stderr ===:\n%s' %
+                           (stdout.read(), stderr.read()))
+    finally:
+      stdout.close()
+      stderr.close()
 
 
   def _is_ready(self):
@@ -260,8 +271,6 @@ class PseudoHdfs4(object):
       'fs.default.name': self._fs_default_name,
       'hadoop.security.authorization': 'true',
       'hadoop.security.authentication': 'simple',
-      'hadoop.security.group.mapping': CLUSTER_GMSP,
-      'hadoop.security.static.group.mapping.file': ugm_properties,
       'hadoop.proxyuser.%s.groups' % (self.superuser,): 'users,supergroup',
       'hadoop.proxyuser.%s.hosts' % (self.superuser,): 'localhost',
       'hadoop.tmp.dir': self._tmppath('hadoop_tmp_dir'),
