@@ -55,6 +55,7 @@ from django.db import models
 from django.contrib.auth import models as auth_models
 from desktop import appmanager
 from desktop.lib.django_util import PopupException
+from enum import Enum
 
 LOG = logging.getLogger(__name__)
 
@@ -77,9 +78,12 @@ class UserProfile(models.Model):
   OUT OF THE CURRENT MIGRATION, AND INTO THE NEW ONE, OR UPGRADES WILL NOT WORK
   PROPERLY
   """
+  # Enum for describing the creation method of a user.
+  CreationMethod = Enum('HUE', 'EXTERNAL')
 
   user = models.ForeignKey(auth_models.User, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
+  creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE)
 
   def get_groups(self):
     return self.user.groups.all()
@@ -148,6 +152,13 @@ def create_user_signal_handler(sender, **kwargs):
 
 # Create a user profile every time a user gets created.
 models.signals.post_save.connect(create_user_signal_handler, sender=auth_models.User)
+
+class LdapGroup(models.Model):
+  """
+  Groups that come from LDAP originally will have an LdapGroup 
+  record generated at creation time.
+  """
+  group = models.ForeignKey(auth_models.Group, related_name="group")
 
 class GroupPermission(models.Model):
   """

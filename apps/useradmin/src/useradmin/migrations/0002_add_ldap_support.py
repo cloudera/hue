@@ -1,48 +1,40 @@
 # encoding: utf-8
 import datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
-class Migration(SchemaMigration):
+from django.contrib.auth.models import User
+from useradmin.models import create_profile_for_user
+
+class Migration(DataMigration):
     
     def forwards(self, orm):
         
-        # Adding model 'UserProfile'
-        db.create_table('useradmin_userprofile', (
-            ('home_directory', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True)),
+        # Adding model 'LdapGroup'
+        db.create_table('useradmin_ldapgroup', (
+            ('group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='group', to=orm['auth.Group'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
         ))
-        db.send_create_signal('useradmin', ['UserProfile'])
+        db.send_create_signal('useradmin', ['LdapGroup'])
 
-        # Adding model 'GroupPermission'
-        db.create_table('useradmin_grouppermission', (
-            ('hue_permission', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['useradmin.HuePermission'])),
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.Group'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('useradmin', ['GroupPermission'])
+        # Adding field 'UserProfile.creation_method'
+        db.add_column('useradmin_userprofile', 'creation_method', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
+    
+        for user in User.objects.all():
+          try:
+            orm.UserProfile.objects.get(user=user)
+          except orm.UserProfile.DoesNotExist:
+            create_profile_for_user(user)
 
-        # Adding model 'HuePermission'
-        db.create_table('useradmin_huepermission', (
-            ('action', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('app', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal('useradmin', ['HuePermission'])
     
     def backwards(self, orm):
         
-        # Deleting model 'UserProfile'
-        db.delete_table('useradmin_userprofile')
+        # Deleting model 'LdapGroup'
+        db.delete_table('useradmin_ldapgroup')
 
-        # Deleting model 'GroupPermission'
-        db.delete_table('useradmin_grouppermission')
-
-        # Deleting model 'HuePermission'
-        db.delete_table('useradmin_huepermission')
+        # Deleting field 'UserProfile.creation_method'
+        db.delete_column('useradmin_userprofile', 'creation_method')
     
     
     models = {
@@ -82,6 +74,12 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        'useradmin.grouppermission': {
+            'Meta': {'object_name': 'GroupPermission'},
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.Group']"}),
+            'hue_permission': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['useradmin.HuePermission']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
         'useradmin.huepermission': {
             'Meta': {'object_name': 'HuePermission'},
             'action': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -90,14 +88,14 @@ class Migration(SchemaMigration):
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'through': "orm['useradmin.GroupPermission']", 'symmetrical': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
-        'useradmin.grouppermission': {
-            'Meta': {'object_name': 'GroupPermission'},
-            'hue_permission': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['useradmin.HuePermission']"}),
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.Group']"}),
+        'useradmin.ldapgroup': {
+            'Meta': {'object_name': 'LdapGroup'},
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'group'", 'to': "orm['auth.Group']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'useradmin.userprofile': {
             'Meta': {'object_name': 'UserProfile'},
+            'creation_method': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'home_directory': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
