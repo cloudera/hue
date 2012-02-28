@@ -22,7 +22,15 @@ import os
 
 HADOOP_HOME = Config(
   key="hadoop_home",
-  default=os.environ.get("HADOOP_HOME", "/usr/lib/hadoop-0.20"),
+  default=os.environ.get("HADOOP_HOME", "/usr/lib/hadoop"),
+  help=("Path to directory holding hadoop libs - HADOOP_HOME in " +
+        "hadoop parlance; defaults to environment variable, when" +
+        "set.")
+)
+
+HADOOP_MR1_HOME = Config(
+  key="hadoop_mr1_home",
+  default=os.environ.get("HADOOP_MR1_HOME", "/usr/lib/hadoop-0.20-mapreduce"),
   help=("Path to directory holding hadoop libs - HADOOP_HOME in " +
         "hadoop parlance; defaults to environment variable, when" +
         "set.")
@@ -48,7 +56,7 @@ def find_file_recursive(desired_glob, root=None):
   if root is None:
     root_f = lambda: HADOOP_HOME.get()
   else:
-    root_f = lambda: root
+    root_f = lambda: not callable(root) and root or root()
 
   def f():
     for dirpath, dirnames, filenames in os.walk(root_f()):
@@ -69,29 +77,23 @@ def find_file_recursive(desired_glob, root=None):
   f.__doc__ = "Finds %s/%s" % (root_str, desired_glob)
   return f
 
-def find_examples_jar():
-  """
-  Finds $HADOOP_HOME/hadoop-*examples*.jar
-  """
-  return find_file_recursive("hadoop-*examples*.jar")
-
 HADOOP_EXAMPLES_JAR = Config(
   key="hadoop_examples_jar",
-  dynamic_default=find_examples_jar(),
+  dynamic_default=find_file_recursive("hadoop-*examples*.jar", lambda: HADOOP_MR1_HOME.get()),
   help="Path to the hadoop-examples.jar (used for tests and jobdesigner setup)",
   type=str,
   private=True)
 
 HADOOP_STREAMING_JAR = Config(
   key="hadoop_streaming_jar",
-  dynamic_default=find_file_recursive(os.path.join("contrib", "streaming", "hadoop-*streaming*.jar")),
+  dynamic_default=find_file_recursive("hadoop-*streaming*.jar"),
   help="Path to the hadoop-streaming.jar (used by jobdesigner)",
   type=str,
   private=True)
 
 HADOOP_TEST_JAR = Config("hadoop_test_jar",
   help="[Used by testing code.] Path to hadoop-test.jar",
-  dynamic_default=find_file_recursive("hadoop-*test*.jar"),
+  dynamic_default=find_file_recursive("hadoop-*test*.jar", lambda: HADOOP_MR1_HOME.get()),
   type=str,
   private=True)
 
