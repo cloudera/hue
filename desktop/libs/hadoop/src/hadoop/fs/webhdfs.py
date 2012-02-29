@@ -473,3 +473,48 @@ def _get_service_url(hdfs_config):
   host = hdfs_config.NN_HOST.get()
   port = hdfs_config.NN_HTTP_PORT.get()
   return "http://%s:%s/webhdfs/v1" % (host, port)
+
+
+
+def test_fs_configuration(fs_config):
+  """
+  This is a config validation method. Returns a list of
+    [ (config_variable, error_message) ]
+  """
+  fs = WebHdfs.from_config(fs_config)
+  fs.setuser(fs.superuser)
+
+  # Access root
+  try:
+    statbuf = fs.stats('/')
+  except Exception, ex:
+    LOG.info("%s -- Validation error: %s" % (fs, ex))
+    return [(fs_config.WEBHDFS_URL, 'Failed to access filesystem root')]
+
+  # Write a file
+  tmpname = fs.mktemp(prefix='hue_config_validation')
+  try:
+    fs.create(tmpname)
+  except Exception, ex:
+    LOG.info("%s -- Validation error: %s" % (fs, ex))
+    return [(fs_config.WEBHDFS_URL,
+            'Failed to create temporary file "%s"' % (tmpname,))]
+
+  # Check superuser has super power
+  try:  # Finally: delete tmpname
+    try:
+      fs.chown(tmpname, fs.superuser)
+    except Exception, ex:
+      LOG.info("%s -- Validation error: %s" % (fs, ex))
+      return [(fs_config.WEBHDFS_URL,
+              'Failed to chown file. Please make sure that the filesystem root '
+              'is owned by the cluster superuser ("hdfs" in most cases).')]
+  finally:
+    try:
+      fs.remove(tmpname)
+    except Exception, ex:
+      LOG.error("Failed to remove '%s': %s" % (tmpname, ex))
+      return [(fs_config.WEBHDFS_URL,
+              'Failed to remove temporary file "%s"' % (tmpname,))]
+
+  return [ ]

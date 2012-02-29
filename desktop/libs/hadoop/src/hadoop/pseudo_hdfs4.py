@@ -313,7 +313,6 @@ def shared_cluster():
       hadoop.conf.HDFS_CLUSTERS['default'].NN_HDFS_PORT.set_for_testing(cluster.namenode_port),
     ]
 
-    desktop.lib.fsmanager.reset()
     old = hadoop.cluster.clear_caches()
 
     def restore_config():

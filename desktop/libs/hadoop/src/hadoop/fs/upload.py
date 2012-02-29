@@ -31,8 +31,8 @@ import time
 
 from django.core.files.uploadhandler import \
     FileUploadHandler, StopFutureHandlers, StopUpload
-from desktop.lib import fsmanager
-import hadoop.fs.hadoopfs
+import hadoop.cluster
+import hadoop.fs.webhdfs
 
 UPLOAD_SUBDIR = 'hue-uploads'
 LOG = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ class HDFStemporaryUploadedFile(object):
     try:
       self._fs = request.fs
     except AttributeError:
-      _, self._fs = fsmanager.get_default_hdfs()
+      self._fs = hadoop.cluster.get_hdfs()
 
     # Don't want to handle this upload if we don't have an HDFS
     if not self._fs:
@@ -62,7 +62,7 @@ class HDFStemporaryUploadedFile(object):
     # We want to set the user to be the superuser. But any operation
     # in the fs needs a username, including the retrieval of the superuser.
     # So we first set it to the DEFAULT_USER to break this chicken-&-egg.
-    self._fs.setuser(hadoop.fs.hadoopfs.DEFAULT_USER)
+    self._fs.setuser(hadoop.fs.webhdfs.DEFAULT_USER)
     self._fs.setuser(self._fs.superuser)
 
     self._path = self._fs.mktemp(

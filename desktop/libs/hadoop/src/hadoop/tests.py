@@ -23,8 +23,6 @@ import os
 from nose.tools import assert_true, assert_equal, assert_false
 from nose.plugins.attrib import attr
 
-import desktop.views
-
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop import cluster
 from hadoop import conf
@@ -37,9 +35,9 @@ def test_live_jobtracker():
   Checks that LiveJobTracker never raises
   exceptions for most of its calls.
   """
-  cluster = mini_cluster.shared_cluster()
   try:
-    jt = cluster.jt
+    minicluster = mini_cluster.shared_cluster()
+    jt = minicluster.jt
     # Make sure that none of the following
     # raise.
     assert_true(jt.queues())
@@ -56,7 +54,7 @@ def test_live_jobtracker():
     assert_true(jt.get_current_time())
     # not tested: get_job_xml
   finally:
-    cluster.shutdown()
+    minicluster.shutdown()
 
 
 def test_confparse():
@@ -117,21 +115,22 @@ def test_tricky_confparse():
 def test_config_validator_basic():
   reset = (
     conf.HADOOP_STREAMING_JAR.set_for_testing('/tmp'),
-    conf.HDFS_CLUSTERS['default'].NN_THRIFT_PORT.set_for_testing(1),
+    conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing('http://not.the.re:50070/'),
     conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(70000),
   )
+  old = cluster.clear_caches()
   try:
     cli = make_logged_in_client()
     resp = cli.get('/debug/check_config')
     assert_true('hadoop.hadoop_streaming_jar' in resp.content)
     assert_true('Not a file' in resp.content)
-    assert_true('hadoop.hdfs_clusters.default' in resp.content)
-    assert_true('Failed to contact Namenode plugin' in resp.content)
+    assert_true('hadoop.hdfs_clusters.default.webhdfs_url' in resp.content)
     assert_true('hadoop.mapred_clusters.default.thrift_port' in resp.content)
     assert_true('Port should be' in resp.content)
   finally:
     for old_conf in reset:
       old_conf()
+    cluster.restore_caches(old)
 
 
 @attr('requires_hadoop')
@@ -140,36 +139,32 @@ def test_config_validator_more():
 
   # We don't actually use the mini_cluster. But the cluster sets up the correct
   # configuration that forms the test basis.
-  cluster = mini_cluster.shared_cluster()
-  if not cluster.fs.exists('/tmp'):
-    cluster.fs.setuser(cluster.fs.superuser)
-    cluster.fs.mkdir('/tmp', 0777)
+  minicluster = mini_cluster.shared_cluster()
   cli = make_logged_in_client()
 
   reset = (
-    conf.HADOOP_BIN.set_for_testing(cluster.fs.hadoop_bin_path),
-    conf.HDFS_CLUSTERS['default'].NN_HOST.set_for_testing('localhost'),
-    conf.HDFS_CLUSTERS['default'].NN_HDFS_PORT.set_for_testing(22),
-    conf.HDFS_CLUSTERS["default"].NN_THRIFT_PORT.set_for_testing(cluster.fs.thrift_port),
     conf.MR_CLUSTERS["default"].JT_HOST.set_for_testing("localhost"),
     conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(23),
   )
+  old = cluster.clear_caches()
   try:
     resp = cli.get('/debug/check_config')
 
-    assert_false('Failed to contact Namenode plugin' in resp.content)
-    assert_false('Failed to see HDFS root' in resp.content)
-    assert_true('Failed to upload files' in resp.content)
+    assert_false('Failed to access filesystem root' in resp.content)
+    assert_false('Failed to create' in resp.content)
+    assert_false('Failed to chown' in resp.content)
+    assert_false('Failed to delete' in resp.content)
     assert_true('Failed to contact JobTracker plugin' in resp.content)
   finally:
     for old_conf in reset:
       old_conf()
-    cluster.shutdown()
+    cluster.restore_caches(old)
+    minicluster.shutdown()
 
 
 def test_non_default_cluster():
   NON_DEFAULT_NAME = 'non_default'
-  cluster.clear_caches()
+  old = cluster.clear_caches()
   reset = (
     conf.HDFS_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
     conf.MR_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
@@ -187,3 +182,4 @@ def test_non_default_cluster():
   finally:
     for old_conf in reset:
       old_conf()
+    cluster.restore_caches(old)

@@ -133,8 +133,8 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                             type=int),
       WEBHDFS_URL=Config("webhdfs_url",
                          help="The URL to WebHDFS/HttpFs service. Defaults to " +
-                         "the WebHDFS URL on the NameNode. To use the legacy" +
-                         "Thrift plugin communication mechanism, this must be" +
+                         "the WebHDFS URL on the NameNode. To use the legacy " +
+                         "Thrift plugin communication mechanism, this must be " +
                          "set to an empty value.",
                          type=str, default=None),
       NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
@@ -179,7 +179,7 @@ def config_validator():
 
   Called by core check_config() view.
   """
-  from hadoop.fs import hadoopfs
+  from hadoop.fs import webhdfs
   from hadoop import job_tracker
   res = [ ]
 
@@ -195,7 +195,7 @@ def config_validator():
   # HDFS_CLUSTERS
   for name in HDFS_CLUSTERS.keys():
     cluster = HDFS_CLUSTERS[name]
-    res.extend(hadoopfs.test_fs_configuration(cluster, HADOOP_BIN))
+    res.extend(webhdfs.test_fs_configuration(cluster))
 
   # MR_CLUSTERS
   for name in MR_CLUSTERS.keys():
