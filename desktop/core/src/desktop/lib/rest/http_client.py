@@ -36,7 +36,7 @@ class RestException(Exception):
     self._message = str(error)
     # See if there is a code or a message. (For urllib2.HTTPError.)
     try:
-      self._code = error.getcode()
+      self._code = error.code
       self._message = error.read()
     except AttributeError:
       pass
@@ -85,7 +85,9 @@ class HttpClient(object):
     cookiejar = cookielib.CookieJar()
 
     self._opener = urllib2.build_opener(
-      urllib2.HTTPCookieProcessor(cookiejar), authhandler)
+        HTTPErrorProcessor(),
+        urllib2.HTTPCookieProcessor(cookiejar),
+        authhandler)
 
 
   def set_basic_auth(self, username, password, realm):
@@ -158,6 +160,18 @@ class HttpClient(object):
       res += '?' + param_str
     return iri_to_uri(res)
 
+
+class HTTPErrorProcessor(urllib2.HTTPErrorProcessor):
+  """
+  Python 2.4 only recognize 200 and 206 as success. It's broken. So we install
+  the following processor to catch the bug.
+  """
+  def http_response(self, request, response):
+    if 200 <= response.code < 300:
+      return response
+    return urllib2.HTTPErrorProcessor.http_response(self, request, response)
+
+  https_response = http_response
 
 #
 # Method copied from Django
