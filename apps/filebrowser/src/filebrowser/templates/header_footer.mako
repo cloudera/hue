@@ -19,7 +19,6 @@
 ## multiple spaces and line breaks cause issues
 <%!
 import datetime
-import hashlib
 from django.template.defaultfilters import urlencode, escape
 %>
 <%!
