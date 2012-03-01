@@ -89,10 +89,6 @@ CREPO ?= $(shell which crepo 2> /dev/null)
 ifeq ($(CREPO),)
   $(error "Error: Need crepo. See <http://github.com/cloudera/crepo>.")
 endif
-
-ifneq ($(shell test -e $(HADOOP_HOME)/bin/hadoop && echo $$?),0)
-  $(error "Error: No Hadoop installation at $(HADOOP_HOME). Please set $$HADOOP_HOME.")
-endif
 # END DEV ONLY >>>>
 
 
