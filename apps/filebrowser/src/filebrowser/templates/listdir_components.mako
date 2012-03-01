@@ -15,7 +15,7 @@
 ## limitations under the License.
 <%!
 import datetime
-import hashlib
+import md5
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time, escape
 from desktop.lib.django_util import reverse_with_get
 from django.utils.encoding import smart_str
@@ -123,11 +123,10 @@ from django.utils.encoding import smart_str
           <td>
              % if ".." != file['name']:
 				<%
-				m = hashlib.md5()
-				m.update(smart_str(path))
+				path_digest = urlencode(md5.md5(smart_str(path)).hexdigest())
 				%>
-				<a class="btn small contextEnabler" data-menuid="${urlencode(m.hexdigest())}">Options</a>
-				<ul class="contextMenu" id="menu${urlencode(m.hexdigest())}">
+				<a class="btn small contextEnabler" data-menuid="${path_digest}">Options</a>
+				<ul class="contextMenu" id="menu${path_digest}">
                 % if "dir" == file['type']:
                   <li><a class="contextItem delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
                   <li><a class="contextItem delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete Recursively</a></li>
