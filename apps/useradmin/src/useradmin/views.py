@@ -31,9 +31,7 @@ from django.contrib.auth.models import User, Group
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule, render, PopupException, format_preserving_redirect
 from django.core import urlresolvers
 
-from useradmin.models import GroupPermission, HuePermission, UserProfile, LdapGroup
-from useradmin.models import get_profile
-import ldap_access
+from useradmin.models import GroupPermission, HuePermission
 
 LOG = logging.getLogger(__name__)
 
@@ -327,98 +325,6 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
 
   __users_lock.release()
   __groups_lock.release()
-
-def _import_ldap_user(username, import_by_dn=False):
-  """
-  Import a user from LDAP. If import_by_dn is true, this will import the user by
-  the distinguished name, rather than the configured username attribute.
-  """
-  conn = ldap_access.get_connection()
-  user_info = conn.find_user(username, import_by_dn)
-  if user_info is None:
-    LOG.warn("Could not get LDAP details for user %s" % (username,))
-    return None
-
-  user, created = User.objects.get_or_create(username=user_info['username'])
-  profile = get_profile(user)
-  if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
-    # This is a Hue user, and shouldn't be overwritten
-    LOG.warn('There was a naming conflict while importing user %s' % (username,))
-    return None
-
-  if 'first' in user_info:
-    user.first_name = user_info['first']
-  if 'last' in user_info:
-    user.last_name = user_info['last']
-  if 'email' in user_info:
-    user.email = user_info['email']
-
-  profile.creation_method = UserProfile.CreationMethod.EXTERNAL
-  profile.save()
-  user.save()
-
-  return user
-
-def _import_ldap_group(groupname, import_members=False, import_by_dn=False):
-  """
-  Import a group from LDAP. If import_members is true, this will also import any
-  LDAP users that exist within the group.
-  """
-  conn = ldap_access.get_connection()
-  group_info = conn.find_group(groupname, import_by_dn)
-  if group_info is None:
-    LOG.warn("Could not get LDAP details for group %s" % (groupname,))
-    return None
-
-  group, created = Group.objects.get_or_create(name=group_info['name'])
-  if not created and not LdapGroup.objects.filter(group=group).exists():
-    # This is a Hue group, and shouldn't be overwritten
-    LOG.warn('There was a naming conflict while importing group %s' % (groupname,))
-    return None
-
-  LdapGroup.objects.get_or_create(group=group)
-
-  group.user_set.clear()
-  for member in group_info['members']:
-    if import_members:
-      LOG.debug("Importing user %s" % (member,))
-      user = _import_ldap_user(member, import_by_dn=True)
-    else:
-      user_info = conn.find_user(member, find_by_dn=True)
-      try:
-        user = User.objects.get(username=user_info['username'])
-      except User.DoesNotExist:
-        continue
-
-    if get_profile(user).creation_method == str(UserProfile.CreationMethod.HUE):
-      continue
-    LOG.debug("Adding user %s to group %s" % (member, group.name))
-    group.user_set.add(user)
-
-  group.save()
-  return group
-
-def import_ldap_user(user, import_by_dn):
-  _import_ldap_user(user, import_by_dn)
-
-def import_ldap_group(group, import_members, import_by_dn):
-  _import_ldap_group(group, import_members, import_by_dn)
-
-def sync_ldap_users_and_groups():
-  """
-  Syncs LDAP user information and group memberships. This will not import new
-  users or groups from LDAP. It is also not possible to import both a user and a
-  group at the same time. Each must be a separate operation. If neither a user,
-  nor a group is provided, all users and groups will be synced.
-  """
-  # Sync everything
-  users = User.objects.filter(userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).all()
-  for user in users:
-    _import_ldap_user(user.username)
-
-  groups = Group.objects.filter(group__in=LdapGroup.objects.all())
-  for group in groups:
-    _import_ldap_group(group.name)
 
 class GroupEditForm(forms.ModelForm):
   """
