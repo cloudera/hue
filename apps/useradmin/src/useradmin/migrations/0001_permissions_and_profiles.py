@@ -1,37 +1,76 @@
 # encoding: utf-8
 import datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
+from django.db.utils import DatabaseError
 
-class Migration(SchemaMigration):
+from useradmin.models import UserProfile
+
+class Migration(DataMigration):
     
     def forwards(self, orm):
+        """
+        This migration has been customized to support upgrades from Cloudera
+        Enterprise 3.5, as well as Hue 1.2
+        """
+        try:
+          # These will be removed if upgrading from a previous version of
+          # Cloudera Enterprise
+          db.delete_table('userman_groupadministrator')
+          db.delete_table('userman_grouprelations')
+        except DatabaseError:
+         pass
         
-        # Adding model 'UserProfile'
-        db.create_table('useradmin_userprofile', (
-            ('home_directory', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
-        ))
-        db.send_create_signal('useradmin', ['UserProfile'])
+        try:
+          db.rename_table('userman_userprofile', 'useradmin_userprofile')
+          db.delete_column('useradmin_userprofile', 'primary_group_id')
+          db.create_index('useradmin_userprofile', ['user_id'])
 
-        # Adding model 'GroupPermission'
-        db.create_table('useradmin_grouppermission', (
-            ('hue_permission', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['useradmin.HuePermission'])),
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.Group'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('useradmin', ['GroupPermission'])
+          db.alter_column('useradmin_userprofile', 'creation_method', models.CharField(editable=True, null=False, max_length=64, default=UserProfile.CreationMethod.HUE))
+          for up in UserProfile.objects.all():
+            # From when CreationMethod was not an Enum
+            # LDAP == 1
+            # HUE == 0
+            if up.creation_method == '1':
+              up.creation_method = UserProfile.CreationMethod.EXTERNAL
+            elif up.creation_method == '0':
+              up.creation_method = UserProfile.CreationMethod.HUE
+            up.save()
+        except DatabaseError:
+          # Adding model 'UserProfile'
+          db.create_table('useradmin_userprofile', (
+              ('home_directory', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True)),
+              ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+              ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
+          ))
+          db.send_create_signal('useradmin', ['UserProfile'])
 
-        # Adding model 'HuePermission'
-        db.create_table('useradmin_huepermission', (
-            ('action', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('app', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal('useradmin', ['HuePermission'])
+        try:
+          db.rename_table('userman_grouppermission', 'useradmin_grouppermission')
+          db.rename_column('useradmin_grouppermission', 'desktop_permission_id', 'hue_permission_id')
+          db.create_index('useradmin_grouppermission', ['group_id'])
+          db.create_index('useradmin_grouppermission', ['hue_permission_id'])
+        except DatabaseError:
+          # Adding model 'GroupPermission'
+          db.create_table('useradmin_grouppermission', (
+              ('hue_permission', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['useradmin.HuePermission'])),
+              ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.Group'])),
+              ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+          ))
+          db.send_create_signal('useradmin', ['GroupPermission'])
+
+        try:
+          db.rename_table('userman_desktoppermission', 'useradmin_huepermission')
+        except DatabaseError:
+          # Adding model 'HuePermission'
+          db.create_table('useradmin_huepermission', (
+              ('action', self.gf('django.db.models.fields.CharField')(max_length=100)),
+              ('app', self.gf('django.db.models.fields.CharField')(max_length=30)),
+              ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+              ('description', self.gf('django.db.models.fields.CharField')(max_length=255)),
+          ))
+          db.send_create_signal('useradmin', ['HuePermission'])
     
     def backwards(self, orm):
         
