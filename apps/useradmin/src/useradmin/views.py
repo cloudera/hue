@@ -109,7 +109,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput, required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
-    fields = ["username", "first_name", "last_name", "email", "is_active", "is_superuser"]
+    fields = ["username", "first_name", "last_name", "email"]
 
   def clean_password2(self):
     password1 = self.cleaned_data.get("password1", "")
@@ -133,7 +133,25 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       user.set_password(self.cleaned_data["password1"])
     if commit:
       user.save()
+      # groups must be saved after the user
+      self.save_m2m()
     return user
+
+class SuperUserChangeForm(UserChangeForm):
+  class Meta(UserChangeForm.Meta):
+    fields = ["username", "is_active"] + UserChangeForm.Meta.fields + ["is_superuser", "groups"]
+
+    def __init__(self, *args, **kwargs):
+      """
+      Set the default for group membership in 'users' group.
+      """
+      super(SuperUserChangeForm, self).__init__(*args, **kwargs)
+      # Note that because of the way the template displays this,
+      # this isn't actually used.  But if it were using
+      # the normal django way, it would be.
+      if not self.instance.id:
+        self.initial["groups"] = []
+
 
 def edit_user(request, username=None):
   """
@@ -151,8 +169,13 @@ def edit_user(request, username=None):
   else:
     instance = None
 
+  if request.user.is_superuser:
+    form_class = SuperUserChangeForm
+  else:
+    form_class = UserChangeForm
+
   if request.method == 'POST':
-    form = UserChangeForm(request.POST, instance=instance)
+    form = form_class(request.POST, instance=instance)
     if form.is_valid(): # All validation rules pass
       if instance is None:
         form.save()
@@ -186,7 +209,7 @@ def edit_user(request, username=None):
       request.path = urlresolvers.reverse(list_users)
       return list_users(request)
   else:
-    form = UserChangeForm(instance=instance)
+    form = form_class(instance=instance)
   return render('edit_user.mako', request,
     dict(form=form, action=request.path, username=username))
 
