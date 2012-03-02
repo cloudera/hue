@@ -263,12 +263,19 @@ def test_user_admin():
   group = Group.objects.create(name="test-group")
   perm = HuePermission.objects.get(app='useradmin', action='access')
   GroupPermission.objects.create(group=group, hue_permission=perm)
-  test_user = User.objects.get(username=FUNNY_NAME)
-  test_user.groups.add(Group.objects.get(name="test-group"))
-  test_user.save()
+
+  # Verify that we can modify user groups through the user admin pages
+  response = c.post('/useradmin/users/new', dict(username="group_member", password1="test", password2="test", groups=[group.pk]))
+  User.objects.get(username='group_member')
+  assert_true(User.objects.get(username='group_member').groups.filter(name='test-group').exists())
+  response = c.post('/useradmin/users/edit/group_member', dict(username="group_member", password1="test", password2="test", groups=[]))
+  assert_false(User.objects.get(username='group_member').groups.filter(name='test-group').exists())
 
   # Check permissions by logging in as the new user
   c_reg = make_logged_in_client(username=FUNNY_NAME, password="test")
+  test_user = User.objects.get(username=FUNNY_NAME)
+  test_user.groups.add(Group.objects.get(name="test-group"))
+  test_user.save()
 
   # Regular user should be able to modify oneself
   response = c_reg.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,),
@@ -281,14 +288,6 @@ def test_user_admin():
   response = c_reg.post("/useradmin/users/delete/test")
   assert_true("You must be a superuser" in response.content,
               "Regular user can't edit other people")
-  # Regular user should not be able to self-promote to superuser
-  response = c_reg.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,),
-                        dict(username = FUNNY_NAME,
-                             first_name = "OLÁ",
-                             is_superuser = True,
-                             is_active = True))
-  assert_true("You cannot" in response.content,
-              "Regular users can't self-promote to superuser")
 
   # Revert to regular "test" user, that has superuser powers.
   c_su = make_logged_in_client()
