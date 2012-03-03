@@ -413,7 +413,9 @@ def _import_ldap_group(groupname, import_members=False, import_by_dn=False):
       except User.DoesNotExist:
         continue
 
-    if get_profile(user).creation_method == str(UserProfile.CreationMethod.HUE):
+    if user is None:
+      # There was a naming comflict, or for some other reason, we couldn't get
+      # at the user
       continue
     LOG.debug("Adding user %s to group %s" % (member, group.name))
     group.user_set.add(user)

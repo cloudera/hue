@@ -75,10 +75,12 @@ class LdapTestConnection(object):
     def __init__(self):
       self.users = {'moe': {'username':'moe', 'first':'Moe', 'email':'moe@stooges.com'},
                     'larry': {'username':'larry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com'},
-                    'curly': {'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com'}}
+                    'curly': {'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com'},
+                    'otherguy': {'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'}}
 
       self.groups = {'TestUsers': {'name':'TestUsers', 'members':['moe','larry','curly']},
-                     'Test Administrators': {'name':'Test Administrators', 'members':['curly','larry']}}
+                     'Test Administrators': {'name':'Test Administrators', 'members':['curly','larry']},
+                     'OtherGroup': {'name':'OtherGroup', 'members':[]}}
 
 
 
@@ -308,7 +310,7 @@ def test_user_admin():
   response = c_su.post('/useradmin/users/new', dict(username="test"))
   assert_true("You must specify a password when creating a new user." in response.content)
 
-def test_userman_ldap_integration():
+def test_useradmin_ldap_integration():
   reset_all_users()
   reset_all_groups()
 
@@ -325,29 +327,45 @@ def test_userman_ldap_integration():
 
   # Should be a noop
   sync_ldap_users_and_groups()
-  assert_true(len(User.objects.all()) == 1)
-  assert_true(len(Group.objects.all()) == 0)
+  assert_equal(len(User.objects.all()), 1)
+  assert_equal(len(Group.objects.all()), 0)
 
   # Should import a group, but will only sync already-imported members
   import_ldap_group('Test Administrators', import_members=False, import_by_dn=False)
-  assert_true(len(User.objects.all()) == 1)
-  assert_true(len(Group.objects.all()) == 1)
+  assert_equal(len(User.objects.all()), 1)
+  assert_equal(len(Group.objects.all()), 1)
   test_admins = Group.objects.get(name='Test Administrators')
-  assert_true(len(test_admins.user_set.all()) == 1)
-  assert_true(test_admins.user_set.all()[0].username == larry.username)
+  assert_equal(len(test_admins.user_set.all()), 1)
+  assert_equal(test_admins.user_set.all()[0].username, larry.username)
 
   # Import all members of TestUsers
   import_ldap_group('TestUsers', import_members=True, import_by_dn=False)
   test_users = Group.objects.get(name='TestUsers')
   assert_true(LdapGroup.objects.filter(group=test_users).exists())
-  assert_true(len(test_users.user_set.all()) == 3)
+  assert_equal(len(test_users.user_set.all()), 3)
 
   ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('moe', 'TestUsers')
   import_ldap_group('TestUsers', import_members=False, import_by_dn=False)
-  assert_true(len(test_users.user_set.all()) == 2)
-  assert_true(len(User.objects.get(username='moe').groups.all()) == 0)
+  assert_equal(len(test_users.user_set.all()), 2)
+  assert_equal(len(User.objects.get(username='moe').groups.all()), 0)
 
   ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('moe', 'TestUsers')
   import_ldap_group('TestUsers', import_members=False, import_by_dn=False)
-  assert_true(len(test_users.user_set.all()) == 3)
-  assert_true(len(User.objects.get(username='moe').groups.all()) == 1)
+  assert_equal(len(test_users.user_set.all()), 3)
+  assert_equal(len(User.objects.get(username='moe').groups.all()), 1)
+
+  # Make sure that if a Hue user already exists with a naming collision, we
+  # won't overwrite any of that user's information.
+  hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
+  import_ldap_user('otherguy', import_by_dn=False)
+  hue_user = User.objects.get(username='otherguy')
+  assert_equal(get_profile(hue_user).creation_method, str(UserProfile.CreationMethod.HUE))
+  assert_equal(hue_user.first_name, 'Different')
+
+  # Make sure Hue groups with naming collisions don't get marked as LDAP groups
+  hue_group = Group.objects.create(name='OtherGroup')
+  hue_group.user_set.add(hue_user)
+  hue_group.save()
+  import_ldap_group('OtherGroup', import_members=False, import_by_dn=False)
+  assert_false(LdapGroup.objects.filter(group=hue_group).exists())
+  assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
