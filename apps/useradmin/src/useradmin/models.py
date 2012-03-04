@@ -57,6 +57,8 @@ from desktop import appmanager
 from desktop.lib.django_util import PopupException
 from enum import Enum
 
+import useradmin.conf
+
 LOG = logging.getLogger(__name__)
 
 class UserProfile(models.Model):
@@ -188,6 +190,15 @@ class HuePermission(models.Model):
   def get_app_permission(cls, hue_app, action):
     return HuePermission.objects.get(app=hue_app, action=action)
 
+def get_default_user_group(**kwargs):
+  default_user_group = useradmin.conf.DEFAULT_USER_GROUP.get()
+  if default_user_group is not None:
+    group, created = auth_models.Group.objects.get_or_create(name=default_user_group)
+    if created:
+      group.save()
+
+    return group
+
 def update_app_permissions(**kwargs):
   """
   Inserts missing permissions into the database table.
@@ -243,4 +254,5 @@ def update_app_permissions(**kwargs):
             available - len(added) - updated - uptodate))
 
 models.signals.post_syncdb.connect(update_app_permissions)
+models.signals.post_syncdb.connect(get_default_user_group)
 
