@@ -32,7 +32,7 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule,
 from django.core import urlresolvers
 
 from useradmin.models import GroupPermission, HuePermission, UserProfile, LdapGroup
-from useradmin.models import get_profile
+from useradmin.models import get_profile, get_default_user_group
 import ldap_access
 
 LOG = logging.getLogger(__name__)
@@ -75,12 +75,16 @@ def delete_user(request, username):
 def delete_group(request, name):
   if not request.user.is_superuser:
     raise PopupException("You must be a superuser to delete groups.")
+
   if request.method == 'POST':
     try:
       global groups_lock
       __groups_lock.acquire()
       try:
         group = Group.objects.get(name=name)
+        default_group = get_default_user_group()
+        if default_group is not None and default_group.name == name:
+          raise PopupException("The default user group may not be deleted.")
         group.delete()
       finally:
         __groups_lock.release()
@@ -141,17 +145,18 @@ class SuperUserChangeForm(UserChangeForm):
   class Meta(UserChangeForm.Meta):
     fields = ["username", "is_active"] + UserChangeForm.Meta.fields + ["is_superuser", "groups"]
 
-    def __init__(self, *args, **kwargs):
-      """
-      Set the default for group membership in 'users' group.
-      """
-      super(SuperUserChangeForm, self).__init__(*args, **kwargs)
-      # Note that because of the way the template displays this,
-      # this isn't actually used.  But if it were using
-      # the normal django way, it would be.
-      if not self.instance.id:
-        self.initial["groups"] = []
-
+  def __init__(self, *args, **kwargs):
+    super(SuperUserChangeForm, self).__init__(*args, **kwargs)
+    if self.instance.id:
+      # If the user exists already, we'll use its current group memberships
+      self.initial['groups'] = set(self.instance.groups.all())
+    else:
+      # If his is a new user, suggest the default group
+      default_group = get_default_user_group()
+      if default_group is not None:
+        self.initial['groups'] = set([default_group])
+      else:
+        self.initial['groups'] = []
 
 def edit_user(request, username=None):
   """
@@ -210,6 +215,7 @@ def edit_user(request, username=None):
       return list_users(request)
   else:
     form = form_class(instance=instance)
+
   return render('edit_user.mako', request,
     dict(form=form, action=request.path, username=username))
 
@@ -465,6 +471,7 @@ class GroupEditForm(forms.ModelForm):
     super(GroupEditForm, self).__init__(*args, **kwargs)
 
     if self.instance.id:
+      self.fields['name'].widget.attrs['readonly'] = True
       initial_members = User.objects.filter(groups=self.instance).order_by('username')
       initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app','description')
     else:

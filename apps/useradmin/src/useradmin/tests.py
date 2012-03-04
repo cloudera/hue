@@ -32,6 +32,7 @@ from django.utils.encoding import smart_unicode
 from useradmin.models import HuePermission, GroupPermission, LdapGroup, UserProfile
 from useradmin.models import get_profile
 
+import useradmin.conf
 from views import sync_ldap_users_and_groups, import_ldap_user, import_ldap_group
 import ldap_access
 
@@ -42,6 +43,8 @@ def reset_all_users():
 
 def reset_all_groups():
   """Reset to a clean state by deleting all users"""
+
+  useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None)
   for grp in Group.objects.all():
     grp.delete()
 

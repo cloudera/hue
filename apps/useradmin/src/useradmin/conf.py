@@ -17,3 +17,12 @@
 """
 Configuration options for the "user admin" application
 """
+
+from desktop.lib.conf import Config
+
+DEFAULT_USER_GROUP = Config(
+    key="default_user_group",
+    help="The name of a default group for users at creation time, or at first login "
+         "if the server is configured to authenticate against an external source.",
+    type=str,
+    default=None)
