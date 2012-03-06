@@ -59,4 +59,9 @@ ${layout.menubar(section='groups')}
 		</div>
 	</form>
 </div>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$("#id_members").jHueSelector();
+	});
+</script>
 ${commonfooter()}

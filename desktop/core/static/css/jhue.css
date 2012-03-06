@@ -66,7 +66,7 @@
 }
 
 .sectionbar h3 {
-	float:left;	
+	float:left;
 	padding-left:6px;
 	color:#CCC;
 	font-size:12px;
@@ -319,7 +319,7 @@ table.display {
 	width: 100%;
 
 	/* Note Firefox 3.5 and before have a bug with border-collapse
-	 * ( https://bugzilla.mozilla.org/show%5Fbug.cgi?id=155955 ) 
+	 * ( https://bugzilla.mozilla.org/show%5Fbug.cgi?id=155955 )
 	 * border-spacing: 0; is one possible option. Conditional-css.com is
 	 * useful for this kind of thing
 	 *
@@ -327,7 +327,7 @@ table.display {
 	 * It subtracts one px relative to the other browsers from the first column, and
 	 * adds one to the end...
 	 *
-	 * If you want that effect I'd suggest setting a border-top/left on th/td's and 
+	 * If you want that effect I'd suggest setting a border-top/left on th/td's and
 	 * then filling in the gaps with other borders.
 	 */
 }
@@ -532,7 +532,7 @@ table.display tr.odd.row_selected td {
 /*
  * Sorting classes for columns
  */
-/* For the standard odd/even 
+/* For the standard odd/even
 tr.odd td.sorting_1 {
 	background-color: #E8F1F7;
 }
@@ -742,4 +742,51 @@ div.box {
 	overflow: auto;
 	border: 1px solid #8080FF;
 	background-color: #E5E5FF;
+}
+
+/*
+ * jHueSelector
+ */
+
+.jHueSelector {
+	border:1px solid #CCC;
+	padding:0;
+	margin:0;
+	width:300px;
+}
+.jHueSelectorHeader {
+	background-color:#CCC;
+	padding:4px;
+}
+
+.jHueSelector label {
+	width:10px;
+	float: none;
+	padding-left:4px;
+}
+.jHueSelector label input[type=checkbox] {
+	margin-right:3px;
+}
+
+.jHueSelectorHeader input[type=text] {
+	float:right;
+	width:100px;
+	height:20px;
+}
+
+.jHueSelectorBody {
+	height:150px;
+	overflow:auto;
+}
+.jHueSelector ul, li {
+	margin: 0;
+	padding: 0;
+}
+.jHueSelector ul {
+	padding:4px;
+	list-style: none;
+}
+.jHueSelector li.selectorDivider {
+	background-color:#EEE;
+	padding:4px;
 }
