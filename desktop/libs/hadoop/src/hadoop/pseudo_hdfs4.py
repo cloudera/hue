@@ -1,3 +1,20 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 import atexit
 import logging
@@ -13,8 +30,9 @@ import time
 import desktop
 import hadoop
 from hadoop.mini_cluster import find_unused_port, write_config
+from hadoop.job_tracker import LiveJobTracker
 
-# Shared global HDFS (for CDH4).
+# Shared global HDFS (for CDH4) and MR1 cluster.
 _shared_cluster = None
 
 LOG = logging.getLogger(__name__)
@@ -37,12 +55,13 @@ CLEANUP_TMP_DIR = os.environ.get("MINI_CLUSTER_CLEANUP", 'true')
 
 
 class PseudoHdfs4(object):
-  """This class runs HDFS (CDH4) locally, in pseudo-distributed mode"""
+  """This class runs HDFS (CDH4) and MR1 locally, in pseudo-distributed mode"""
 
   def __init__(self):
     self._tmpdir = tempfile.mkdtemp(prefix='tmp_hue_')
     self._superuser = pwd.getpwuid(os.getuid()).pw_name
     self._fs = None
+    self._jt = None
 
     self._log_dir = None
     self._dfs_http_port = None
@@ -50,13 +69,22 @@ class PseudoHdfs4(object):
     self._namenode_port = None
     self._fs_default_name = None
 
+    self._jt_thrift_port = None
+    self._jt_http_port = None
+    self._jt_port = None
+    self._tt_http_port = None
+
     self._nn_proc = None
     self._dn_proc = None
+    self._jt_proc = None
+    self._tt_proc = None
 
     self.shutdown_hook = None
 
   def __str__(self):
-    return "PseudoHdfs4 (%s) at %s" % (self._fs_default_name, self._tmpdir)
+    return "PseudoHdfs4 (%s) at %s --- MR1 (%s) at http://localhost:%s" % \
+        (self._fs_default_name, self._tmpdir,
+         self.mapred_job_tracker, self._jt_http_port)
 
   @property
   def superuser(self):
@@ -79,7 +107,20 @@ class PseudoHdfs4(object):
     return self._dfs_http_port
 
   @property
+  def jt_thrift_port(self):
+    return self._jt_thrift_port
+
+  @property
+  def mapred_job_tracker(self):
+    return "localhost:%s" % (self._jt_port,)
+
+  @property
+  def mapred_job_tracker_http_address(self):
+    return "localhost:%s" % (self._jt_http_port,)
+
+  @property
   def fs(self):
+    """Returns a Filesystem object configured for this cluster."""
     if self._fs is None:
       if self._dfs_http_address is None:
         LOG.warn("Attempt to access uninitialized filesystem")
@@ -88,20 +129,33 @@ class PseudoHdfs4(object):
         "http://%s/webhdfs/v1" % (self._dfs_http_address,))
     return self._fs
 
+  @property
+  def jt(self):
+    """Returns a LiveJobTracker object configured for this cluster."""
+    if self._jt is None:
+      self._jt = LiveJobTracker("localhost", self.jt_thrift_port)
+    return self._jt
+
   def stop(self):
     """Kills the cluster ungracefully."""
-    while self._nn_proc is not None and self._nn_proc.poll() is None:
-      os.kill(self._nn_proc.pid, signal.SIGKILL)
-      LOG.info('Stopping NameNode pid %s' % (self._nn_proc.pid,))
-      time.sleep(0.5)
+    def _kill_proc(name, proc):
+      try:
+        while proc is not None and proc.poll() is None:
+          os.kill(proc.pid, signal.SIGKILL)
+          LOG.info('Stopping %s pid %s' % (name, proc.pid,))
+          time.sleep(0.5)
+      except Exception, ex:
+        LOG.exception('Failed to stop pid %s. You may want to do it manually: %s' % (proc.pid, ex))
 
-    while self._dn_proc is not None and self._dn_proc.poll() is None:
-      os.kill(self._dn_proc.pid, signal.SIGKILL)
-      LOG.info('Stopping DataNode pid %s' % (self._dn_proc.pid,))
-      time.sleep(0.5)
+    _kill_proc('NameNode', self._nn_proc)
+    _kill_proc('DataNode', self._dn_proc)
+    _kill_proc('JobTracker', self._jt_proc)
+    _kill_proc('TaskTracker', self._tt_proc)
 
     self._nn_proc = None
     self._dn_proc = None
+    self._jt_proc = None
+    self._tt_proc = None
 
     if CLEANUP_TMP_DIR == 'false':
       LOG.info('Skipping cleanup of temp directory "%s"' % (self._tmpdir,))
@@ -123,6 +177,7 @@ class PseudoHdfs4(object):
     return os.path.join(self._log_dir, filename)
 
   def start(self):
+    """Start the NN, DN, JT and TT processes"""
     LOG.info("Using temporary directory: %s" % (self._tmpdir,))
 
     # Fix up superuser group mapping
@@ -143,6 +198,7 @@ class PseudoHdfs4(object):
 
     # More stuff to setup in the environment
     env = dict(
+      HADOOP_HOME = hadoop.conf.HADOOP_HOME.get(),
       HADOOP_CONF_DIR = conf_dir,
       HADOOP_HEAPSIZE = "128",
       HADOOP_LOG_DIR = self._log_dir,
@@ -154,7 +210,7 @@ class PseudoHdfs4(object):
     if "JAVA_HOME" in os.environ:
       env['JAVA_HOME'] = os.environ['JAVA_HOME']
 
-    LOG.debug("Environment:\n" + "\n".join([ str(x) for x in sorted(env.items()) ]))
+    LOG.debug("Hadoop Environment:\n" + "\n".join([ str(x) for x in sorted(env.items()) ]))
 
     # Format HDFS
     self._format(conf_dir, env)
@@ -165,13 +221,62 @@ class PseudoHdfs4(object):
 
     # Make sure they're running
     deadline = time.time() + STARTUP_DEADLINE
-    while not self._is_ready():
+    while not self._is_hdfs_ready(env):
+      if time.time() > deadline:
+        self.stop()
+        raise RuntimeError('%s is taking too long to start' % (self,))
+      time.sleep(5)
+
+    # Start MR1
+    self._start_mr1(env)
+
+  def _start_mr1(self, env):
+    LOG.info("Starting MR1")
+    conf_dir = self._tmppath('conf')
+
+    # We need a different env because it's a different hadoop
+    env = env.copy()
+    env['HADOOP_HOME'] = hadoop.conf.HADOOP_MR1_HOME.get()
+    env["HADOOP_CLASSPATH"] = ':'.join([
+        # -- BEGIN JAVA TRIVIA --
+        # Add the -test- jar to the classpath to work around a subtle issue
+        # involving Java classloaders. In brief, hadoop's RunJar class creates
+        # a child classloader with the test jar on it, but the core classes
+        # are loaded by the system classloader. This is fine except that
+        # some classes in the test jar extend package-protected classes in the
+        # core jar. Even though the classes are in the same package name, they
+        # are thus loaded by different classloaders and therefore an IllegalAccessError
+        # prevents the MiniMRCluster from starting. Adding the test jar to the system
+        # classpath prevents this error since then both the MiniMRCluster and the
+        # core classes are loaded by the system classloader.
+        hadoop.conf.HADOOP_TEST_JAR.get(),
+        # -- END JAVA TRIVIA --
+        hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(),
+        # Due to CDH-4537, we need to add test dependencies to run minicluster
+        os.path.join(os.path.dirname(__file__), 'test_jars', '*'),
+      ])
+
+    LOG.debug("MR1 Environment:\n" + "\n".join([ str(x) for x in sorted(env.items()) ]))
+
+    # Configure
+    self._write_mapred_site()
+
+    # Run JT & TT
+    self._jt_proc = self._start_daemon('jobtracker', conf_dir, env)
+    self._tt_proc = self._start_daemon('tasktracker', conf_dir, env)
+
+    __import__("pdb").set_trace()
+
+    # Make sure they're running
+    deadline = time.time() + STARTUP_DEADLINE
+    while not self._is_mr1_ready(env):
       if time.time() > deadline:
         self.stop()
         raise RuntimeError('%s is taking too long to start' % (self,))
       time.sleep(5)
 
   def _format(self, conf_dir, env):
+    """Format HDFS"""
     args = (hadoop.conf.HADOOP_BIN.get(), 
             '--config', conf_dir,
             'namenode', '-format')
@@ -193,29 +298,29 @@ class PseudoHdfs4(object):
       stderr.close()
 
 
-  def _is_ready(self):
-    def log_exit(exit_code, proc_name):
-      LOG.info('%s exited with %s' % (proc_name, exit_code))
-      LOG.debug('--------------------- STDOUT:\n' +
-                file(self._logpath(proc_name + '.stdout')))
-      LOG.debug('--------------------- STDERR:\n' +
-                file(self._logpath(proc_name + '.stderr')))
+  def _log_exit(self, proc_name, exit_code):
+    """Log the stdout and stderr for a process"""
+    LOG.info('%s exited with %s' % (proc_name, exit_code))
+    LOG.debug('--------------------- STDOUT:\n' +
+              file(self._logpath(proc_name + '.stdout')).read())
+    LOG.debug('--------------------- STDERR:\n' +
+              file(self._logpath(proc_name + '.stderr')).read())
 
+  def _is_hdfs_ready(self, env):
+    """Whether HDFS is servicing requests"""
     if self._nn_proc.poll() is not None:
-      log_exit('namenode', self._nn_proc.poll())
+      self._log_exit('namenode', self._nn_proc.poll())
       return False
     if self._dn_proc.poll() is not None:
-      log_exit('datanode', self._dn_proc.poll())
+      self._log_exit('datanode', self._dn_proc.poll())
       return False
 
     # Run a `dfsadmin -report' against it
     dfsreport = subprocess.Popen(
-      (hadoop.conf.HADOOP_BIN.get(),
-       'dfsadmin',
-       '-Dfs.default.name=%s' % self._fs_default_name,
-       '-report'),
+      (self._get_hadoop_bin(env), 'dfsadmin', '-report'),
       stdout=subprocess.PIPE,
-      stderr=subprocess.PIPE)
+      stderr=subprocess.PIPE,
+      env=env)
 
     ret = dfsreport.wait()
     if ret != 0:
@@ -231,12 +336,38 @@ class PseudoHdfs4(object):
     return False
 
 
+  def _is_mr1_ready(self, env):
+    """Whether MR1 is servicing requests"""
+    if self._jt_proc.poll() is not None:
+      self._log_exit('jobtracker', self._jt_proc.poll())
+      return False
+    if self._tt_proc.poll() is not None:
+      self._log_exit('tasktracker', self._tt_proc.poll())
+      return False
+
+    # Run a `hadoop job -list all'
+    list_all = subprocess.Popen(
+      (self._get_hadoop_bin(env), 'job', '-list', 'all'),
+      stdout=subprocess.PIPE,
+      stderr=subprocess.PIPE,
+      env=env)
+
+    ret = list_all.wait()
+    if ret == 0:
+      return True
+
+    LOG.debug('MR1 not ready yet.\n%s\n%s' %
+              (list_all.stderr.read(), list_all.stderr.read()))
+    return False
+
+
   def _start_daemon(self, proc_name, conf_dir, env):
     """Start a hadoop daemon. Returns the Popen object."""
-    args = (hadoop.conf.HADOOP_BIN.get(), 
+    hadoop_bin = self._get_hadoop_bin(env)
+    args = (hadoop_bin,
             '--config', conf_dir,
             proc_name)
-    LOG.info('Starting pseudo HDFS4 cluster: %s' % (args,))
+    LOG.info('Starting Hadoop cluster daemon: %s' % (args,))
     stdout = file(self._logpath(proc_name + ".stdout"), 'w')
     stderr = file(self._logpath(proc_name + ".stderr"), 'w')
 
@@ -245,6 +376,9 @@ class PseudoHdfs4(object):
       stdout=stdout,
       stderr=stderr,
       env=env)
+
+  def _get_hadoop_bin(self, env):
+    return os.path.join(env['HADOOP_HOME'], 'bin', 'hadoop')
 
   def _write_hdfs_site(self):
     self._dfs_http_port = find_unused_port()
@@ -277,6 +411,21 @@ class PseudoHdfs4(object):
     }
     write_config(core_configs, self._tmppath('conf/core-site.xml'))
 
+  def _write_mapred_site(self):
+    self._jt_thrift_port = find_unused_port()
+    self._jt_http_port = find_unused_port()
+    self._jt_port = find_unused_port()
+    self._tt_http_port = find_unused_port()
+
+    mapred_configs = {
+      'mapred.job.tracker': 'localhost:%s' % (self._jt_port,),
+      'mapred.job.tracker.http.address': 'localhost:%s' % (self._jt_http_port,),
+      'jobtracker.thrift.address': 'localhost:%s' % (self._jt_thrift_port,),
+      'mapred.jobtracker.plugins': 'org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin',
+      'mapred.task.tracker.http.address': 'localhost:%s' % (self._tt_http_port,),
+    }
+    write_config(mapred_configs, self._tmppath('conf/mapred-site.xml'))
+
   def _write_hadoop_metrics_conf(self, conf_dir):
     f = file(os.path.join(conf_dir, "hadoop-metrics.properties"), "w")
     try:
@@ -304,13 +453,18 @@ def shared_cluster():
   if _shared_cluster is None:
     cluster = PseudoHdfs4()
     atexit.register(cluster.stop)
-    cluster.start()
+    try:
+      cluster.start()
+    except Exception, ex:
+      LOG.exception("Failed to fully bring up test cluster: %s" % (ex,))
 
     # Fix config to reflect the cluster setup.
     closers = [
       hadoop.conf.HDFS_CLUSTERS['default'].NN_HOST.set_for_testing('localhost'),
       hadoop.conf.HDFS_CLUSTERS['default'].NN_HTTP_PORT.set_for_testing(cluster.dfs_http_port),
       hadoop.conf.HDFS_CLUSTERS['default'].NN_HDFS_PORT.set_for_testing(cluster.namenode_port),
+      hadoop.conf.MR_CLUSTERS['default'].JT_HOST.set_for_testing('localhost'),
+      hadoop.conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(cluster.jt_thrift_port),
     ]
 
     old = hadoop.cluster.clear_caches()
@@ -322,6 +476,7 @@ def shared_cluster():
 
     cluster.shutdown_hook = restore_config
     _shared_cluster = cluster
+
   return _shared_cluster
 
 
@@ -337,6 +492,8 @@ if __name__ == '__main__':
   LOG.info("%s running" % (cluster,))
   LOG.info("fs.default.name=%s" % (cluster.fs_default_name,))
   LOG.info("dfs.http.address=%s" % (cluster.dfs_http_address,))
+  LOG.info("jobtracker.thrift.port=%s" % (cluster.jt_thrift_port,))
+  LOG.info("mapred.job.tracker=%s" % (cluster.mapred_job_tracker,))
 
   from IPython.Shell import IPShellEmbed
   IPShellEmbed()()
