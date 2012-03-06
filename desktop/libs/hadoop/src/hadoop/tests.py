@@ -27,7 +27,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from hadoop import cluster
 from hadoop import conf
 from hadoop import confparse
-from hadoop import mini_cluster
+from hadoop import pseudo_hdfs4
 
 @attr('requires_hadoop')
 def test_live_jobtracker():
@@ -35,26 +35,24 @@ def test_live_jobtracker():
   Checks that LiveJobTracker never raises
   exceptions for most of its calls.
   """
-  try:
-    minicluster = mini_cluster.shared_cluster()
-    jt = minicluster.jt
-    # Make sure that none of the following
-    # raise.
-    assert_true(jt.queues())
-    assert_true(jt.cluster_status())
-    assert_true(jt.all_task_trackers())
-    assert_true(jt.active_trackers())
-    assert_true(jt.blacklisted_trackers())
-    # not tested: task_tracker
-    assert_true(jt.running_jobs())
-    assert_true(jt.completed_jobs())
-    assert_true(jt.failed_jobs())
-    assert_true(jt.all_jobs())
-    # not tested: get_job_counters
-    assert_true(jt.get_current_time())
-    # not tested: get_job_xml
-  finally:
-    minicluster.shutdown()
+  minicluster = pseudo_hdfs4.shared_cluster()
+
+  jt = minicluster.jt
+  # Make sure that none of the following
+  # raise.
+  assert_true(jt.queues())
+  assert_true(jt.cluster_status())
+  assert_true(jt.all_task_trackers())
+  assert_true(jt.active_trackers())
+  assert_true(jt.blacklisted_trackers())
+  # not tested: task_tracker
+  assert_true(jt.running_jobs())
+  assert_true(jt.completed_jobs())
+  assert_true(jt.failed_jobs())
+  assert_true(jt.all_jobs())
+  # not tested: get_job_counters
+  assert_true(jt.get_current_time())
+  # not tested: get_job_xml
 
 
 def test_confparse():
@@ -139,7 +137,7 @@ def test_config_validator_more():
 
   # We don't actually use the mini_cluster. But the cluster sets up the correct
   # configuration that forms the test basis.
-  minicluster = mini_cluster.shared_cluster()
+  minicluster = pseudo_hdfs4.shared_cluster()
   cli = make_logged_in_client()
 
   reset = (
@@ -159,7 +157,6 @@ def test_config_validator_more():
     for old_conf in reset:
       old_conf()
     cluster.restore_caches(old)
-    minicluster.shutdown()
 
 
 def test_non_default_cluster():
