@@ -49,6 +49,7 @@ MR1_URL=${MR1_URL:-http://archive.cloudera.com/cdh4/cdh/4/mr1-0.23.0-mr1-cdh4b1.
 
 MR1_TGZ=$(basename $MR1_URL)
 MR1_VERSION=${MR1_TGZ/.tar.gz/}
+MR1_VERSION=${MR1_VERSION/mr1/hadoop}
 MR1_CACHE="$HOME/.hue_cache/${MR1_TGZ}"
 
 build_mr1() {

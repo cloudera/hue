@@ -35,8 +35,8 @@ def test_live_jobtracker():
   Checks that LiveJobTracker never raises
   exceptions for most of its calls.
   """
+  minicluster = mini_cluster.shared_cluster()
   try:
-    minicluster = mini_cluster.shared_cluster()
     jt = minicluster.jt
     # Make sure that none of the following
     # raise.
