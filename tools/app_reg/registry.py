@@ -19,11 +19,13 @@
 Registry for the applications
 """
 
-import errno
 import glob
 import logging
 import os
-import simplejson
+try:
+  import json
+except ImportError:
+  import simplejson as json
 
 import common
 
@@ -45,7 +47,7 @@ class AppRegistry(object):
     """Open the registry file. May raise OSError"""
     if os.path.exists(self._reg_path):
       reg_file = file(self._reg_path)
-      app_list = simplejson.load(reg_file)
+      app_list = json.load(reg_file)
       reg_file.close()
 
       for app_json in app_list:
@@ -59,7 +61,7 @@ class AppRegistry(object):
   def _write(self, path):
     """Write out the registry to the given path"""
     outfile = file(path, 'w')
-    simplejson.dump(self._apps.values(), outfile, cls=AppJsonEncoder, indent=2)
+    json.dump(self._apps.values(), outfile, cls=AppJsonEncoder, indent=2)
     outfile.close()
 
 
@@ -220,11 +222,11 @@ class HueApp(object):
     return True
 
 
-class AppJsonEncoder(simplejson.JSONEncoder):
+class AppJsonEncoder(json.JSONEncoder):
   def __init__(self, **kwargs):
-    simplejson.JSONEncoder.__init__(self, **kwargs)
+    json.JSONEncoder.__init__(self, **kwargs)
 
   def default(self, obj):
     if isinstance(obj, HueApp):
       return obj.jsonable()
-    return simplejson.JSONEncoder.default(self, obj)
+    return json.JSONEncoder.default(self, obj)
