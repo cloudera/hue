@@ -24,6 +24,12 @@ from hadoop import pseudo_hdfs4
 from avro import schema, datafile, io
 from desktop.lib.django_test_util import make_logged_in_client
 from nose.tools import assert_true, assert_false, assert_equal
+
+try:
+  import json
+except ImportError:
+  import simplejson as json
+
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -104,6 +110,19 @@ def test_listdir():
       cluster.fs.rmtree('/user/test')
     except:
       pass      # Don't let cleanup errors mask earlier failures
+
+@attr('requires_hadoop')
+def test_chooser():
+  cluster = pseudo_hdfs4.shared_cluster()
+  c = make_logged_in_client()
+
+  # Note that the trailing slash is important. We ask for the root dir.
+  resp = c.get('/filebrowser/chooser/?format=json')
+  # We should get a json response
+  dic = json.loads(resp.content)
+  assert_equal('/', dic['current_dir_path'])
+  assert_equal('/', dic['path'])
+
 
 @attr('requires_hadoop')
 def test_view_avro():

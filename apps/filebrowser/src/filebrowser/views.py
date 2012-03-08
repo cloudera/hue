@@ -339,11 +339,9 @@ def listdir(request, path, chooser):
 def chooser(request, path):
     """
     Returns the html to JFrame that will display a file prompt.
+
+    Dispatches viewing of a path to either index() or fileview(), depending on type.
     """
-    """return view(request, path)"""
-
-    """Dispatches viewing of a path to either index() or fileview(), depending on type."""
-
     # default_to_home is set in bootstrap.js
     home_dir_path = request.user.get_home_directory()
     if request.GET.get('default_to_home') and request.fs.isdir(home_dir_path):
@@ -367,7 +365,7 @@ def _massage_stats(request, stats):
     return {
         'path': normalized,
         'name': posixpath.basename(path),
-        'stats': stats,
+        'stats': stats.to_json_dict(),
         'type': filetype(stats['mode']),
         'rwx': rwx(stats['mode']),
         'url': make_absolute(request, "view", dict(path=urlquote(normalized))),

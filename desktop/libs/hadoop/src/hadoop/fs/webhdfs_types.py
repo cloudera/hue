@@ -65,6 +65,15 @@ class WebHdfsStat(object):
   def __setitem__(self, key, value):
     setattr(self, key, value)
 
+  def to_json_dict(self):
+    """Returns a dictionary for easy serialization"""
+    KEYS = ('path', 'size', 'atime', 'mtime', 'mode', 'user', 'group',
+            'blockSize', 'replication')
+    res = { }
+    for k in KEYS:
+      res[k] = getattr(self, k)
+    return res
+
 
 class WebHdfsContentSummary(object):
   """
