@@ -349,8 +349,10 @@ class PopupException(Exception):
     self.detail = detail
 
   def response(self, request):
-    return render("popup_error.mako", request,
-      dict(title=self.title, message=self.message, detail=self.detail, request=request))
+    data = dict(title=self.title, message=self.message, detail=self.detail)
+    if not request.ajax:
+      data['request'] = request
+    return render("popup_error.mako", request, data)
 
 
 class PopupWithJframe(object):
