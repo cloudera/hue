@@ -265,8 +265,6 @@ class PseudoHdfs4(object):
     self._jt_proc = self._start_daemon('jobtracker', conf_dir, env)
     self._tt_proc = self._start_daemon('tasktracker', conf_dir, env)
 
-    __import__("pdb").set_trace()
-
     # Make sure they're running
     deadline = time.time() + STARTUP_DEADLINE
     while not self._is_mr1_ready(env):
