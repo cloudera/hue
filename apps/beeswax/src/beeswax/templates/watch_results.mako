@@ -51,6 +51,7 @@ ${layout.menubar(section='query')}
 </div>
 <div class="content">
 	
+              %if can_save:
                 <div class="collapsible jframe-hidden bw-save_query_results" style="display:none" data-filters="Accordion"> 
                   <form action="${url('beeswax.views.save_results', query.id) }" method="POST">
                     ## Writing the save_target fields myself so I can match them to their respective text input fields.
@@ -76,6 +77,7 @@ ${layout.menubar(section='query')}
                     <input type="submit" value="Save" name="save" data-filters="ArtButton"> 
                   </form>
                 </div>
+              %endif
 
 				<ul class="tabs">
 					<li class="active"><a href="#results">
