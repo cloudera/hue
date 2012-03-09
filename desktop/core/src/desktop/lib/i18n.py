@@ -25,6 +25,7 @@ import os
 import re
 
 import desktop.conf
+import django.utils.encoding
 
 SITE_ENCODING = None
 REPLACEMENT_CHAR = u'\ufffd'
@@ -52,6 +53,30 @@ def validate_encoding(encoding):
     return True
   except LookupError:
     return False
+
+def smart_unicode(s, strings_only=False, errors='strict'):
+  """
+  Wrapper around Django's version, while supplying our configured encoding.
+  Decode char array to unicode.
+  """
+  return django.utils.encoding.smart_unicode(
+        s, get_site_encoding(), strings_only, errors)
+
+def force_unicode(s, strings_only=False, errors='strict'):
+  """
+  Wrapper around Django's version, while supplying our configured encoding.
+  Decode char array to unicode.
+  """
+  return django.utils.encoding.force_unicode(
+        s, get_site_encoding(), strings_only, errors)
+
+def smart_str(s, strings_only=False, errors='strict'):
+  """
+  Wrapper around Django's version, while supplying our configured encoding.
+  Encode unicode into char array.
+  """
+  return django.utils.encoding.smart_str(
+        s, get_site_encoding(), strings_only, errors)
 
 
 _CACHED_ENV = None

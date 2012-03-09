@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from desktop.lib.view_util import format_time_diff
+from desktop.lib import i18n
 from hadoop import job_tracker
 from hadoop import confparse
 from urlparse import urlparse, urlunparse
@@ -145,9 +146,9 @@ class Job(JobLinkage):
     return self._full_job_conf
 
   def _init_attributes(self):
-    self.queueName = self.job.profile.queueName
-    self.jobName = self.job.profile.name
-    self.user = self.job.profile.user
+    self.queueName = i18n.smart_unicode(self.job.profile.queueName)
+    self.jobName = i18n.smart_unicode(self.job.profile.name)
+    self.user = i18n.smart_unicode(self.job.profile.user)
     self.mapProgress = self.job.status.mapProgress
     self.reduceProgress = self.job.status.reduceProgress
     self.setupProgress = self.job.status.setupProgress
