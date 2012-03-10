@@ -114,7 +114,7 @@ ${layout.menubar(section='groups')}
 
 		    $("#clearFilterBtn").click(function(){
 		        $("#filterInput").val("");
-		        $.each($(".file-row"), function(index, value) {
+		        $.each($(".groupRow"), function(index, value) {
 		            $(value).show(250);
 		        });
 		    });

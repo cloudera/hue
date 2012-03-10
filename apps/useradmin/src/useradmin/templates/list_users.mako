@@ -27,7 +27,7 @@ ${layout.menubar(section='users')}
 <div class="container-fluid">
 	<h1>Hue Users</h1>
 	<div class="well">
-			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+			Filter: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 			<p class="pull-right">
 				<a href="${ url('useradmin.views.edit_user') }" class="btn">Add user</a>
 			</p>
@@ -42,7 +42,7 @@ ${layout.menubar(section='users')}
             <th>${_('Last Login')}</th>
 			<th>&nbsp;</th>
           </tr>
-        </head>
+        </thead>
         <tbody>
         % for user in users:
           <tr class="userRow" data-search="${user.username}${user.first_name}${user.last_name}${user.email}">
@@ -119,7 +119,7 @@ ${layout.menubar(section='users')}
 
 		    $("#clearFilterBtn").click(function(){
 		        $("#filterInput").val("");
-		        $.each($(".file-row"), function(index, value) {
+		        $.each($(".userRow"), function(index, value) {
 		            $(value).show(250);
 		        });
 		    });
