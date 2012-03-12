@@ -31,6 +31,7 @@ import os
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -199,6 +200,7 @@ setup_cluster_fs.__test__ = False # Don't confuse nose.
 
 @attr('requires_hadoop')
 def test_job_submission():
+  raise SkipTest
   JARNAME = posixpath.basename(hadoop.conf.HADOOP_EXAMPLES_JAR.get())
   c = make_logged_in_client()
   cluster = mini_cluster.shared_cluster(conf=True)
@@ -306,6 +308,7 @@ def test_jobsub_setup_and_samples():
   Merely exercises jobsub_setup, and then runs
   all the examples.
   """
+  raise SkipTest
   cluster = mini_cluster.shared_cluster(conf=True)
   jobsubd = in_process_jobsubd(cluster.config_dir)
   try:
