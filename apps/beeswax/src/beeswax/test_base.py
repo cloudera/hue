@@ -31,6 +31,7 @@ import time
 
 import fb303.ttypes
 from nose.tools import assert_true, assert_false
+from nose.plugins.skip import SkipTest
 
 from desktop.lib.django_test_util import make_logged_in_client
 
@@ -269,6 +270,7 @@ class BeeswaxSampleProvider(object):
   """
   @classmethod
   def setup_class(cls):
+    raise SkipTest
     cls.cluster, shutdown = get_shared_beeswax_server()
     cls.client = make_logged_in_client()
     # Weird redirection to avoid binding nonsense.

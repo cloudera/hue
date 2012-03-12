@@ -19,6 +19,7 @@ import time
 import re
 
 from nose.tools import assert_true, assert_false, assert_equal
+from nose.plugins.skip import SkipTest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop import mini_cluster
@@ -67,6 +68,7 @@ class TestJobBrowserWithHadoop(object):
 
   @classmethod
   def setup_class(cls):
+    raise SkipTest
     client = make_logged_in_client('test')
     cluster = mini_cluster.shared_cluster(conf=True)
     jobsubd = in_process_jobsubd(cluster.config_dir)
