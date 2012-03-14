@@ -23,12 +23,14 @@ from hadoop import conf
 import os
 import logging
 
+LOG = logging.getLogger(__name__)
+
 def _make_filesystem(identifier):
   choice = os.getenv("FB_FS")
   if choice == "testing":
     path = os.path.join(get_build_dir(), "fs")
     if not os.path.isdir(path):
-      logging.warning(
+      LOG.warning(
         ("Could not find fs directory: %s. Perhaps you need to run " +
         "manage.py filebrowser_test_setup?") % path)
     return LocalSubFileSystem(path)
@@ -51,6 +53,15 @@ def get_hdfs(identifier="default"):
   global FS_CACHE
   get_all_hdfs()
   return FS_CACHE[identifier]
+
+def get_hdfs_url(identifier="default"):
+  """Returns the host:port for the given HDFS"""
+  try:
+    hdfs = conf.HDFS_CLUSTERS[identifier]
+  except KeyError:
+    LOG.error("Misconfiguration: No HDFS cluster called '%s'" % (identifier,))
+    return None
+  return "%s:%s" % (hdfs.NN_HOST.get(), hdfs.NN_HDFS_PORT.get())
 
 def get_all_hdfs():
   global FS_CACHE
@@ -88,6 +99,21 @@ def all_mrclusters():
   for identifier in conf.MR_CLUSTERS.keys():
     MR_CACHE[identifier] = _make_mrcluster(identifier)
   return MR_CACHE
+
+def get_cluster_for_job_submission():
+  """
+  Check the `submit_to' for each MR/Yarn cluster, and return the
+  host:port of first one that enables submission.
+  """
+  for name in conf.YARN_CLUSTERS.keys():
+    yarn = conf.YARN_CLUSTERS[name]
+    if yarn.SUBMIT_TO.get():
+      return "%s:%s" % (yarn.RM_HOST.get(), yarn.RM_PORT.get())
+  for name in conf.MR_CLUSTERS.keys():
+    mr = conf.MR_CLUSTERS[name]
+    if mr.SUBMIT_TO.get():
+      return "%s:%s" % (mr.JT_HOST.get(), mr.JT_PORT.get())
+  return None
 
 def clear_caches():
   """

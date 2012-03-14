@@ -124,7 +124,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
   each=ConfigSection(
     help="Information about a single HDFS cluster",
     members=dict(
-      NN_HOST=Config("namenode_host", help="IP for name node"),
+      NN_HOST=Config("namenode_host", help="Host/IP for name node"),
       NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=10090,
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
@@ -155,22 +155,42 @@ MR_CLUSTERS = UnspecifiedConfigSection(
   each=ConfigSection(
     help="Information about a single MapReduce cluster",
     members=dict(
-      JT_HOST=Config("jobtracker_host", help="IP for JobTracker"),
+      JT_HOST=Config("jobtracker_host", help="Host/IP for JobTracker"),
+      JT_PORT=Config("jobtracker_port",
+                     default=8021,
+                     help="Service port for the JobTracker",
+                     type=int),
       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
                             type=int),
       JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
                                    default="mapred", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
-                              default=False, type=coerce_bool)
+                              default=False, type=coerce_bool),
+      SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
+                       default=False, type=coerce_bool),
     )
   )
 )
 
-OOZIE_URL = Config(
-  key='oozie_url',
-  help='URL to Oozie server. This is required for job submission.',
-  default='http://localhost:11000/oozie',
-  type=str)
+YARN_CLUSTERS = UnspecifiedConfigSection(
+  "yarn_clusters",
+  help="One entry for each Yarn cluster. Currently only one cluster "
+       "(called 'default') is supported.",
+  each=ConfigSection(
+    help="Information about a single Yarn cluster",
+    members=dict(
+      RM_HOST=Config("resourcemanager_host",
+                     default='localhost',
+                     help="Host/IP for the ResourceManager"),
+      RM_PORT=Config("resourcemanager_port",
+                     default=8032,
+                     type=int,
+                     help="Service port for the ResourceManager"),
+      SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
+                       default=False, type=coerce_bool),
+    )
+  )
+)
 
 
 def config_validator():
@@ -192,14 +212,37 @@ def config_validator():
   res.extend(validate_path(HADOOP_EXAMPLES_JAR, is_dir=False))
   res.extend(validate_path(HADOOP_STREAMING_JAR, is_dir=False))
 
+  submit_to = [ ]
+
   # HDFS_CLUSTERS
+  has_default = False
   for name in HDFS_CLUSTERS.keys():
     cluster = HDFS_CLUSTERS[name]
     res.extend(webhdfs.test_fs_configuration(cluster))
+    if name == 'default':
+      has_default = True
+  if not has_default:
+    res.append("hadoop.hdfs_clusters", "You should have an HDFS called 'default'.")
 
   # MR_CLUSTERS
   for name in MR_CLUSTERS.keys():
     cluster = MR_CLUSTERS[name]
     res.extend(job_tracker.test_jt_configuration(cluster))
+    if cluster.SUBMIT_TO.get():
+      submit_to.append('mapred_clusters.' + name)
+
+  # Only one cluster should have submit_to
+  for name in YARN_CLUSTERS.keys():
+    cluster = YARN_CLUSTERS[name]
+    if cluster.SUBMIT_TO.get():
+      submit_to.append('yarn_clusters.' + name)
+
+  if len(submit_to) > 1:
+    res.append(("hadoop", "Only one cluster may enable 'submit_to'. "
+                "But it is enabled in the following clusters: " + 
+                ', '.join(submit_to)))
+  elif len(submit_to) == 0:
+    res.append(("hadoop", "Please designate one of the MapReduce or "
+                "Yarn clusters with `submit_to=true' in order to run jobs."))
 
   return res
