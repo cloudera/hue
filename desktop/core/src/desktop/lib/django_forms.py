@@ -242,17 +242,20 @@ class MultiForm(object):
     if self._forms.has_key(name):
       del self._forms[name]
 
-  def bind(self, data=None):
+  def bind(self, data=None, instances=None):
     self._is_bound = True
     self._forms = {}
     for key, form_cls in self._form_types.iteritems():
-      self._bind_one(key, form_cls, data)
+      instance = instances is not None and instances.get(key) or None
+      self._bind_one(key, form_cls, data, instance=instance)
 
-  def _bind_one(self, key, form_cls, data=None):
+  def _bind_one(self, key, form_cls, data=None, instance=None):
     prefix = self.add_prefix(key)
     if issubclass(form_cls, MultiForm):
       member = form_cls(prefix=prefix)
       member.bind(data=data)
+    elif instance is not None:
+      member = form_cls(data=data, prefix=prefix, instance=instance)
     else:
       member = form_cls(data=data, prefix=prefix)
     self._forms[key] = member
