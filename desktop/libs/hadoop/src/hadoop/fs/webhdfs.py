@@ -32,7 +32,6 @@ from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 
 DEFAULT_HDFS_SUPERUSER = 'hdfs'
-DEFAULT_USER = 'hue_webui'
 
 # The number of bytes to read if not specified
 DEFAULT_READ_SIZE = 1024*1024 # 1MB
@@ -43,6 +42,8 @@ class WebHdfs(Hdfs):
   """
   WebHdfs implements the filesystem interface via the WebHDFS rest protocol.
   """
+  DEFAULT_USER = 'hue'        # This should be the user running Hue
+
   def __init__(self, url,
                hdfs_superuser=None,
                security_enabled=False,
@@ -57,7 +58,7 @@ class WebHdfs(Hdfs):
 
     # To store user info
     self._thread_local = threading.local()
-    self.setuser(DEFAULT_USER)
+    self._thread_local.user = WebHdfs.DEFAULT_USER
 
     LOG.debug("Initializing Hadoop WebHdfs: %s (security: %s, superuser: %s)" %
               (self._url, self._security_enabled, self._superuser))
@@ -100,7 +101,10 @@ class WebHdfs(Hdfs):
     return { "user.name" : self._thread_local.user }
 
   def setuser(self, user):
+    """Set a new user. Return the current user."""
+    curr = self._thread_local.user
     self._thread_local.user = user
+    return curr
 
 
   def listdir_stats(self, path, glob=None):
