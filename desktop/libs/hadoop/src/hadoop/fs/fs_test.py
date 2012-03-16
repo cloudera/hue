@@ -15,12 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
+import stat
 import tempfile
 import unittest
-import logging
 
-from hadoop import fs
+from hadoop import fs, pseudo_hdfs4
+from nose.plugins.attrib import attr
+from nose.tools import assert_equal
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +93,28 @@ class LocalSubFileSystemTest(unittest.TestCase):
   def test_keyword_args(self):
     # This shouldn't work!
     self.assertRaises(TypeError, self.fs.open, name="/foo", mode="w")
+
+
+@attr('requires_hadoop')
+def test_hdfs_copy():
+  minicluster = pseudo_hdfs4.shared_cluster()
+  minifs = minicluster.fs
+
+  olduser = minifs.setuser(minifs.superuser)
+  minifs.chmod('/', 0777)
+  minifs.setuser(olduser)
+
+  data = "I will not make flatuent noises in class\n" * 2000
+  minifs.create('/copy_test_src', permission=0646, data=data)
+  minifs.create('/copy_test_dst', data="some initial data")
+
+  minifs.copyfile('/copy_test_src', '/copy_test_dst')
+  actual = minifs.read('/copy_test_dst', 0, len(data) + 100)
+  assert_equal(data, actual)
+
+  sb = minifs.stats('/copy_test_dst')
+  assert_equal(0646, stat.S_IMODE(sb.mode))
+
 
 if __name__ == "__main__":
   logging.basicConfig()
