@@ -16,7 +16,7 @@
 ## limitations under the License.
 <%!
   import datetime
-  from django.template.defaultfilters import urlencode, escape, stringformat, date, filesizeformat, time
+  from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
   from filebrowser.views import truncate
 %>
 <%
@@ -132,7 +132,7 @@ ${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_ne
     % endif
       <div>
       % if 'contents' in view:
-             <div><pre><code>${view['contents']|escape}</code></pre></div>
+             <div><pre>${view['contents']|h}</pre></div>
       % else:
         <table>
           % for offset, words, masked in view['xxd']:
