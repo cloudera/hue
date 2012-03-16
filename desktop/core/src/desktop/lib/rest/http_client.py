@@ -119,13 +119,20 @@ class HttpClient(object):
   def logger(self):
     return self._logger
 
-  def execute(self, http_method, path, params=None, data=None):
+  def _get_headers(self, headers):
+    res = self._headers.copy()
+    if headers:
+      res.update(headers)
+    return res
+
+  def execute(self, http_method, path, params=None, data=None, headers=None):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
     @param path: The path of the resource.
     @param params: Key-value parameter data.
     @param data: The data to attach to the body of the request.
+    @param headers: The headers to set for this request.
 
     @return: The result of urllib2.urlopen()
     """
@@ -141,7 +148,9 @@ class HttpClient(object):
     request = urllib2.Request(url, data)
     # Hack/workaround because urllib2 only does GET and POST
     request.get_method = lambda: http_method
-    for k, v in self._headers.items():
+
+    headers = self._get_headers(headers)
+    for k, v in headers.items():
       request.add_header(k, v)
 
     # Call it
@@ -154,7 +163,7 @@ class HttpClient(object):
   def _make_url(self, path, params):
     res = self._base_url
     if path:
-      res += posixpath.normpath('/' + path)
+      res += posixpath.normpath('/' + path.lstrip('/'))
     if params:
       param_str = urllib.urlencode(params)
       res += '?' + param_str
