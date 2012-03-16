@@ -22,6 +22,7 @@ Interfaces for Hadoop filesystem access via HttpFs/WebHDFS
 import errno
 import logging
 import random
+import stat
 import threading
 
 from django.utils.encoding import smart_str
@@ -265,7 +266,11 @@ class WebHdfs(Hdfs):
     self._root.put(path, params)
 
   def chmod(self, path, mode):
-    """chmod(path, mode)"""
+    """
+    chmod(path, mode)
+
+    `mode' should be an octal integer or string.
+    """
     path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'SETPERMISSION'
@@ -293,7 +298,13 @@ class WebHdfs(Hdfs):
     params['length'] = long(length)
     if bufsize is not None:
       params['bufsize'] = bufsize
-    return self._root.get(path, params)
+    try:
+      return self._root.get(path, params)
+    except WebHdfsException, ex:
+      if "out of the range" in ex.message:
+        return ""
+      raise ex
+      
 
   def open(self, path, mode='r'):
     """
@@ -312,6 +323,7 @@ class WebHdfs(Hdfs):
     create(path, overwrite=False, blocksize=None, replication=None, permission=None)
 
     Creates a file with the specified parameters.
+    `permission' should be an octal integer or string.
     """
     path = Hdfs.normpath(path)
     params = self._getparams()
@@ -337,6 +349,38 @@ class WebHdfs(Hdfs):
     params = self._getparams()
     params['op'] = 'APPEND'
     self._invoke_with_redirect('POST', path, params, data)
+
+
+  def copyfile(self, src, dst):
+    sb = self._stats(src)
+    if sb is None:
+      raise IOError(errno.ENOENT, "Copy src '%s' does not exist" % (src,))
+    if sb.isDir:
+      raise IOError(errno.INVAL, "Copy src '%s' is a directory" % (src,))
+    if self.isdir(dst):
+      raise IOError(errno.INVAL, "Copy dst '%s' is a directory" % (dst,))
+
+    CHUNK_SIZE = 65536
+    offset = 0
+    
+    while True:
+      data = self.read(src, offset, CHUNK_SIZE)
+      if offset == 0:
+        self.create(dst,
+                    overwrite=True,
+                    blocksize=sb.blockSize,
+                    replication=sb.replication,
+                    permission=oct(stat.S_IMODE(sb.mode)),
+                    data=data)
+
+      cnt = len(data)
+      if cnt == 0:
+        break
+
+      if offset != 0:
+        self.append(dst, data)
+      offset += cnt
+
 
   @staticmethod
   def urlsplit(url):
