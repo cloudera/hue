@@ -202,17 +202,18 @@ class Hdfs(object):
     if i == -1:
       # Not found. Treat the entire argument as an HDFS path
       return ('hdfs', '', normpath(url), '', '')
-    if url[:i] != 'hdfs':
+    schema = url[:i]
+    if schema not in ('hdfs', 'viewfs'):
       # Default to standard for non-hdfs
       return urlparse.urlsplit(url)
     url = url[i+3:]
     i = url.find('/')
     if i == -1:
       # Everything is netloc. Assume path is root.
-      return ('hdfs', url, '/', '', '')
+      return (schema, url, '/', '', '')
     netloc = url[:i]
     path = url[i:]
-    return ('hdfs', netloc, normpath(path), '', '')
+    return (schema, netloc, normpath(path), '', '')
 
 class HadoopFileSystem(Hdfs):
   """
