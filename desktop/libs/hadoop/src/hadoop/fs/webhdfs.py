@@ -21,6 +21,7 @@ Interfaces for Hadoop filesystem access via HttpFs/WebHDFS
 
 import errno
 import logging
+import posixpath
 import random
 import stat
 import threading
@@ -31,6 +32,8 @@ from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
+
+import hadoop.conf
 
 DEFAULT_HDFS_SUPERUSER = 'hdfs'
 
@@ -46,6 +49,7 @@ class WebHdfs(Hdfs):
   DEFAULT_USER = 'hue'        # This should be the user running Hue
 
   def __init__(self, url,
+               fs_defaultfs,
                hdfs_superuser=None,
                security_enabled=False,
                temp_dir="/tmp"):
@@ -53,6 +57,7 @@ class WebHdfs(Hdfs):
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
     self._temp_dir = temp_dir
+    self._fs_defaultfs = fs_defaultfs
 
     self._client = self._make_client(url)
     self._root = resource.Resource(self._client)
@@ -66,7 +71,9 @@ class WebHdfs(Hdfs):
 
   @classmethod
   def from_config(cls, hdfs_config):
+    fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
     return cls(url=_get_service_url(hdfs_config),
+               fs_defaultfs=fs_defaultfs,
                security_enabled=hdfs_config.SECURITY_ENABLED.get(),
                temp_dir=hdfs_config.TEMP_DIR.get())
 
@@ -80,6 +87,10 @@ class WebHdfs(Hdfs):
   @property
   def uri(self):
     return self._url
+
+  @property
+  def fs_defaultfs(self):
+    return self._fs_defaultfs
 
   @property
   def superuser(self):
@@ -386,6 +397,11 @@ class WebHdfs(Hdfs):
   def urlsplit(url):
     return Hdfs.urlsplit(url)
 
+
+  def get_hdfs_path(self, path):
+    return posixpath.join(self.fs_defaultfs, path.lstrip('/'))
+
+
   def _invoke_with_redirect(self, method, path, params=None, data=None):
     """
     Issue a request, and expect a redirect, and then submit the data to
@@ -513,15 +529,17 @@ def safe_octal(octal_value):
   except TypeError:
     return str(octal_value)
 
+
 def _get_service_url(hdfs_config):
   override = hdfs_config.WEBHDFS_URL.get()
   if override:
     return override
 
-  host = hdfs_config.NN_HOST.get()
-  port = hdfs_config.NN_HTTP_PORT.get()
+  fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
+  netloc = Hdfs.urlsplit(fs_defaultfs)[1]
+  host = netloc.split(':')[0]
+  port = hadoop.conf.DEFAULT_NN_HTTP_PORT
   return "http://%s:%s/webhdfs/v1" % (host, port)
-
 
 
 def test_fs_configuration(fs_config):

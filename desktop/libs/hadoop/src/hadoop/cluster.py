@@ -54,15 +54,6 @@ def get_hdfs(identifier="default"):
   get_all_hdfs()
   return FS_CACHE[identifier]
 
-def get_hdfs_url(identifier="default"):
-  """Returns the host:port for the given HDFS"""
-  try:
-    hdfs = conf.HDFS_CLUSTERS[identifier]
-  except KeyError:
-    LOG.error("Misconfiguration: No HDFS cluster called '%s'" % (identifier,))
-    return None
-  return "%s:%s" % (hdfs.NN_HOST.get(), hdfs.NN_HDFS_PORT.get())
-
 def get_all_hdfs():
   global FS_CACHE
   if FS_CACHE is not None:
