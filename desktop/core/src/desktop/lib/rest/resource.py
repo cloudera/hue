@@ -45,14 +45,17 @@ class Resource(object):
       return self._path
     return self._path + posixpath.normpath('/' + relpath)
 
-  def invoke(self, method, relpath=None, params=None, data=None):
+  def invoke(self, method, relpath=None, params=None, data=None, headers=None):
     """
     Invoke an API method.
     @return: Raw body or JSON dictionary (if response content type is JSON).
     """
     path = self._join_uri(relpath)
-    resp = self._client.execute(method, path, params=params, data=data)
-
+    resp = self._client.execute(method,
+                                path,
+                                params=params,
+                                data=data,
+                                headers=headers)
     try:
       body = resp.read()
     except Exception, ex:
@@ -99,25 +102,35 @@ class Resource(object):
     return self.invoke("DELETE", relpath, params)
 
 
-  def post(self, relpath=None, params=None, data=None):
+  def post(self, relpath=None, params=None, data=None, contenttype=None):
     """
     Invoke the POST method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
     @param params: Key-value data.
     @param data: Optional. Body of the request.
+    @param contenttype: Optional. 
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("POST", relpath, params, data)
+    return self.invoke("POST", relpath, params, data,
+                       self._make_headers(contenttype))
 
 
-  def put(self, relpath=None, params=None, data=None):
+  def put(self, relpath=None, params=None, data=None, contenttype=None):
     """
     Invoke the PUT method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
     @param params: Key-value data.
     @param data: Optional. Body of the request.
+    @param contenttype: Optional. 
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("PUT", relpath, params, data)
+    return self.invoke("PUT", relpath, params, data,
+                       self._make_headers(contenttype))
+
+
+  def _make_headers(self, contenttype=None):
+    if contenttype:
+      return { 'Content-Type': contenttype }
+    return None
