@@ -118,19 +118,27 @@ CREDENTIALS_MERGER_JAR = Config("hadoop_credentials_merger_jar",
                 root=os.path.join(os.path.dirname(__file__), '..', '..', 'credentials-merger', 'java-lib')),
   private=True)
 
+
+DEFAULT_NN_HTTP_PORT = 50070
+
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
   help="One entry for each HDFS cluster",
   each=ConfigSection(
     help="Information about a single HDFS cluster",
     members=dict(
+      # Deprecated
       NN_HOST=Config("namenode_host", help="Host/IP for name node"),
+
       NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=10090,
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
                             type=int),
       NN_HTTP_PORT=Config("http_port", help="Hadoop HTTP port for the name node", default=50070,
                             type=int),
+      # End deprecation
+      FS_DEFAULTFS=Config("fs_defaultfs", help="The equivalent of fs.defaultFS (aka fs.default.name)",
+                          default="hdfs://localhost:8020"),
       WEBHDFS_URL=Config("webhdfs_url",
                          help="The URL to WebHDFS/HttpFs service. Defaults to " +
                          "the WebHDFS URL on the NameNode. To use the legacy " +
