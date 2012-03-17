@@ -286,7 +286,7 @@ class PooledClient(object):
           except Exception, e:
             # Stack tends to be only noisy here.
             logging.info("Thrift saw exception: " + str(e), exc_info=False)
-            msg = "Exception communicating with %s at %s:%d: %s" % (
+            msg = "Exception communicating with %s at %s:%s: %s" % (
               self.conf.service_name, self.conf.host, self.conf.port, str(e))
             e.response_data = dict(code="THRIFT_EXCEPTION", message=msg, data="")
             raise

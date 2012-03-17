@@ -23,21 +23,26 @@ urlpatterns = patterns(
   # The base view is the "list" view, which we alias as /
   url(r'^$', 'views.list_designs'),
 
-  # Manipulations of job designs:
-  url(r'^list/$', 'views.list_designs', name="jobsub.list"),
-  url(r'^delete/(?P<id>\d+)$', 'views.delete_design', name="jobsub.delete"),
-  url(r'^edit/(?P<id>\d+)$', 'views.edit_design', name="jobsub.edit"),
-  url(r'^clone/(?P<id>\d+)$', 'views.clone_design', name="jobsub.clone"),
-  url(r'^new/(?P<type>[a-zA-Z]+)$', 'views.edit_design', name="jobsub.new"),
-  url(r'^submit/(?P<id>\d+)$', 'views.submit_design', name="jobsub.submit"),
+  url(r'^list_designs$', 'views.list_designs'),
+  url(r'^new_design/(?P<action_type>\w+)$', 'views.new_design'),
+  url(r'^delete_design/(?P<wf_id>\d+)$', 'views.delete_design'),
+  url(r'^edit_design/(?P<wf_id>\d+)$', 'views.edit_design'),
+  url(r'^clone_design/(?P<wf_id>\d+)$', 'views.clone_design'),
+  url(r'^submit_design/(?P<wf_id>\d+)$', 'views.submit_design'),
+  url(r'^design_parameters/(?P<wf_id>\d+)$', 'views.get_design_params'),
+
+  url(r'^job/(?P<jobid>[-\w]+)$', 'views.oozie_job'),
+  url(r'^list_history$', 'views.list_history'),
+
+  url(r'^test$', 'views.bc_test'),
 
   # Submitted jobs
-  url(r'^watch/$', 'views.watch'),
-  url(r'^watch/(?P<id>\d+)$', 'views.watch_submission'),
+  #url(r'^watch/$', 'views.watch'),
+  #url(r'^watch/(?P<id>\d+)$', 'views.watch_submission'),
 
   # Status Bar (typically invoked by /status_bar, not /jobsub/status_bar)
-  url(r'^status_bar/$', 'views.status_bar'),
+  #url(r'^status_bar/$', 'views.status_bar'),
 
   # Setup
-  url(r'^setup/$', 'views.setup'),
+  #url(r'^setup/$', 'views.setup'),
 )

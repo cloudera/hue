@@ -14,11 +14,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
-Explicitly list imports here, so they get 
-automatically registered.
+Utilities for django database operations.
 """
-import jobsub.forms.interface
-import jobsub.forms.jar
-import jobsub.forms.streaming
-import jobsub.forms.mixins
+
+import logging
+from django.contrib.contenttypes.models import ContentType
+
+LOG = logging.getLogger(__name__)
+
+def remove_content_type(app_label, model_name):
+  """
+  Delete from the Django ContentType table, as applications delete
+  old unused tables.
+
+  See django.contrib.contenttypes.management.update_contenttypes().
+  If applications don't delete their stale content types, users will
+  be prompted with a question as they run syncdb.
+  """
+  try:
+    ct = ContentType.objects.get(app_label=app_label,
+                                 model=model_name.lower())
+    ct.delete()
+  except ContentType.DoesNotExist:
+    pass

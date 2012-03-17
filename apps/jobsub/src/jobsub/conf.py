@@ -19,18 +19,6 @@
 import os.path
 
 from desktop.lib.conf import Config
-from desktop.lib import paths
-
-JOBSUBD_HOST = Config(
-  key="jobsubd_host",
-  help="Host where jobsubd thrift daemon is running",
-  default="localhost")
-
-JOBSUBD_PORT = Config(
-  key="jobsubd_port",
-  help="Port where jobsubd thrift daemon is running",
-  default=8001,
-  type=int)
 
 REMOTE_DATA_DIR = Config(
   key="remote_data_dir",
@@ -45,23 +33,8 @@ LOCAL_DATA_DIR = Config(
   private=True
 )
 
-SAMPLE_DATA_DIR = Config(
-  key="sample_data_dir",
-  default=paths.get_thirdparty_root("sample_data"),
-  help="Location on local FS where sample data is stored",
-  private=True)
-
-# Location of trace jar
-ASPECTPATH = Config(
-  key="aspect_path",
-  default=os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "trace.jar"),
-  help="Path to the built jobsub trace.jar",
-  private=True)
-
-# Location of aspectj weaver jar
-ASPECTJWEAVER = Config(
-  key="aspectj_weaver",
-  default=paths.get_thirdparty_root(
-    "java", "aspectj-1.6.5", "aspectjweaver.jar"),
-  help="Path to aspectjweaver.jar from aspectj distribution",
-  private=True)
+OOZIE_URL = Config(
+  key='oozie_url',
+  help='URL to Oozie server. This is required for job submission.',
+  default='http://localhost:11000/oozie',
+  type=str)

@@ -20,28 +20,9 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
-from jobsubd.ttypes import SubmissionHandle
-from jobsub.models import TSubmissionPlan
-
 class Migration(SchemaMigration):
     
     def forwards(self, orm):
-        
-        # Adding model 'ServerSubmissionState'
-        try:
-            db.create_table('jobsub_serversubmissionstate', (
-                ('tmp_dir', self.gf('django.db.models.fields.CharField')(max_length=128)),
-                ('submission_state', self.gf('django.db.models.fields.IntegerField')()),
-                ('start_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-                ('pid', self.gf('django.db.models.fields.IntegerField')(null=True)),
-                ('end_time', self.gf('django.db.models.fields.DateTimeField')(null=True)),
-                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ))
-        except:
-            logging.warning("Initial db creation being skipped, likely because table already exists.", exc_info=True)
-            return
-        db.send_create_signal('jobsub', ['ServerSubmissionState'])
-
         # Adding model 'JobDesign'
         db.create_table('jobsub_jobdesign', (
             ('description', self.gf('django.db.models.fields.CharField')(max_length=1024)),
@@ -53,18 +34,6 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.CharField')(max_length=40)),
         ))
         db.send_create_signal('jobsub', ['JobDesign'])
-
-        # Adding model 'Submission'
-        db.create_table('jobsub_submission', (
-            ('submission_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('submission_handle', self.gf('desktop.lib.djangothrift.ThriftField')(thrift_class=SubmissionHandle(id=None))),
-            ('submission_plan', self.gf('desktop.lib.djangothrift.ThriftField')(thrift_class=TSubmissionPlan(save_output=None, steps=None, name=None, groups=None, user=None))),
-            ('last_seen_state', self.gf('django.db.models.fields.IntegerField')(db_index=True)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=40)),
-        ))
-        db.send_create_signal('jobsub', ['Submission'])
 
         # Adding model 'CheckForSetup'
         db.create_table('jobsub_checkforsetup', (
@@ -140,25 +109,6 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '128'})
-        },
-        'jobsub.serversubmissionstate': {
-            'Meta': {'object_name': 'ServerSubmissionState'},
-            'end_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'pid': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'start_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'submission_state': ('django.db.models.fields.IntegerField', [], {}),
-            'tmp_dir': ('django.db.models.fields.CharField', [], {'max_length': '128'})
-        },
-        'jobsub.submission': {
-            'Meta': {'object_name': 'Submission'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_seen_state': ('django.db.models.fields.IntegerField', [], {'db_index': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'submission_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'submission_handle': ('desktop.lib.djangothrift.ThriftField', [], {'thrift_class': 'SubmissionHandle(id=None)'}),
-            'submission_plan': ('desktop.lib.djangothrift.ThriftField', [], {'thrift_class': 'TSubmissionPlan(save_output=None, steps=None, name=None, groups=None, user=None)'})
         }
     }
     
