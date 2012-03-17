@@ -29,20 +29,8 @@ from django.utils.encoding import smart_str
   ${_table(files, path, current_request_path, 'view', cwd_set)}
 </%def>
 <%def name="_table(files, path, current_request_path, view, cwd_set=False)">
-  <%
-  # Sortable takes a while for big lists; skip it in that case.
-  if len(files) < 100:
-    optional_sortable = "sortable"
-  else:
-    optional_sortable = ""
-  # FitText doesn't scale well with many rows, so we disable it for
-  # larger views.
-  if len(files) < 30:
-    optional_fit_text = 'data-filters="FitText"'
-  else:
-    optional_fit_text = ''
-  %>
   <script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
   <link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
   <style type="text/css">
     .form-padding-fix{
@@ -52,13 +40,13 @@ from django.utils.encoding import smart_str
     }
   </style>
   <div class="well">
-		Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+		Filter by name: <input id="filterInput"/>
 		<p class="pull-right">
 			<a href="#" class="btn upload-link">Upload files</a>
 			<a href="#" class="btn create-directory-link">New directory</a>
 		</p>
   </div>
-  <table class="datatables">
+  <table class="condensed-table datatables">
     <thead>
       <tr>
         % if cwd_set:
@@ -94,21 +82,8 @@ from django.utils.encoding import smart_str
         <% path = file['path'] %>
         <tr class="file-row" file-name="${display_name}">
           <td>
-            <div>
-              % if "dir" == file['type']:
-                <h5><a ${optional_fit_text | n} href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a></h5>
-              % else:
-                <h5><a ${optional_fit_text | n} href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a></h5>
-              % endif
-
-            </div>
+            <h5><a href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a></h5>
           </td>
-          <%
-            if "dir" == file['type']:
-              sortValue = 0;
-            else:
-              sortValue = file['stats']['size']
-          %>
           <td>
             % if "dir" == file['type']:
               <span>~</span>
@@ -123,7 +98,7 @@ from django.utils.encoding import smart_str
           <td>
              % if ".." != file['name']:
 				<%
-				path_digest = urlencode(md5.md5(smart_str(path)).hexdigest())
+                  path_digest = urlencode(md5.md5(smart_str(path)).hexdigest())
 				%>
 				<a class="btn small contextEnabler" data-menuid="${path_digest}">Options</a>
 				<ul class="contextMenu" id="menu${path_digest}">
@@ -345,129 +320,114 @@ from django.utils.encoding import smart_str
     window.onload = createUploader;
 
 	$(document).ready(function(){
-		$(".datatables").dataTable({
-			"bPaginate": false,
-		    "bLengthChange": false,
-		    "bFilter": false,
-			"bInfo": false
-		});
-	});
-
-    //delete handlers
-    $(".delete").live("click", function(e){
-        $("#fileToDeleteInput").attr("value", $(e.target).attr("file-to-delete"));
-        $("#deleteForm").attr("action", "/filebrowser/" + $(e.target).attr("delete-type") + "?next=" + encodeURI("${current_request_path}") + "&path=" + encodeURI("${path}"));
-        $("#deleteModal").modal({
-			backdrop: "static",
-			keyboard: true,
-			show: true
-		});
-    });
-
-    $("#cancelDeleteBtn").click(function(){
-        $("#deleteModal").modal("hide");
-    });
-
-    //rename handlers
-    $(".rename").live("click",function(eventObject){
-        $("#renameSrcPath").attr("value", $(eventObject.target).attr("file-to-rename"));
-        $("#renameFileName").text($(eventObject.target).attr("file-to-rename"));
-        $("#renameModal").modal({
-			backdrop: "static",
-			keyboard: true,
-			show: true
-		});
-    });
-
-    $("#cancelRenameBtn").click(function(){
-        $("#renameModal").modal("hide");
-    });
-
-    $("#renameForm").submit(function(){
-        if($("#newNameInput").val() == ""){
-            $("#renameNameRequiredAlert").show();
-			$("#newNameInput").addClass("fieldError");
-            return false;
-        }
-    });
-
-	$("#newNameInput").focus(function(){
-		$("#renameNameRequiredAlert").hide();
-		$("#newNameInput").removeClass("fieldError");
-	});
-	
-	$("#moveForm").live("submit", function(){
-		console.log("submit");
-		if ($.trim($("#moveForm").find("input[name='dest_path']").val()) == ""){
-			$("#moveNameRequiredAlert").show();
-			$("#moveForm").find("input[name='dest_path']").addClass("fieldError");
-			return false;
-		}
-		return true;
-	});
-	
-	$("#moveForm").find("input[name='dest_path']").live("focus", function(){
-		$("#moveNameRequiredAlert").hide();
-		$("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
-	});
-	
-
-    //upload handlers
-    $(".upload-link").click(function(){
-        $("#uploadModal").modal({
-			backdrop: "static",
-			keyboard: true,
-			show: true
-		});
-    });
-
-    //create directory handlers
-    $(".create-directory-link").click(function(){
-        $("#createDirectoryModal").modal({
-			backdrop: "static",
-			keyboard: true,
-			show: true
-		});
-    });
-    $("#cancelCreateDirectoryBtn").click(function(){
-        $("#createDirectoryModal").modal("hide");
-    });
-    $("#createDirectoryForm").submit(function(){
-		if ($.trim($("#newDirectoryNameInput").val())==""){
-			$("#directoryNameRequiredAlert").show();
-			$("#newDirectoryNameInput").addClass("fieldError");
-			return false;
-		}
-		return true;
-    });
-	$("#newDirectoryNameInput").focus(function(){
-		$("#newDirectoryNameInput").removeClass("fieldError");
-		$("#directoryNameRequiredAlert").hide();
-	});
-	
-
-    //filter handlers
-    $("#filterInput").keyup(function(){
-        $.each($(".file-row"), function(index, value) {
-
-          if($(value).attr("file-name").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
-            $(value).hide(250);
-          }else{
-            $(value).show(250);
-          }
+        //filter handlers
+        var oTable = $('.datatables').dataTable( {
+          'sPaginationType': 'bootstrap',
+          "bLengthChange": false,
+          "iDisplayLength": 15,
+          "sDom": "<'row'r>t<'row'<'span8'i><''p>>"
         });
 
-    });
-
-    $("#clearFilterBtn").click(function(){
-        $("#filterInput").val("");
-        $.each($(".file-row"), function(index, value) {
-            $(value).show(250);
+        $("#filterInput").keyup(function() {
+            oTable.fnFilter($(this).val(), 0 /* Column Idx */);
+            $(".contextEnabler").jHueContextMenu();
         });
-    });
 
-	$(".contextEnabler").jHueContextMenu();
+        //delete handlers
+        $(".delete").live("click", function(e){
+            $("#fileToDeleteInput").attr("value", $(e.target).attr("file-to-delete"));
+            $("#deleteForm").attr("action", "/filebrowser/" + $(e.target).attr("delete-type") + "?next=" + encodeURI("${current_request_path}") + "&path=" + encodeURI("${path}"));
+            $("#deleteModal").modal({
+                backdrop: "static",
+                keyboard: true,
+                show: true
+            });
+        });
 
+        $("#cancelDeleteBtn").click(function(){
+            $("#deleteModal").modal("hide");
+        });
+
+        //rename handlers
+        $(".rename").live("click",function(eventObject){
+            $("#renameSrcPath").attr("value", $(eventObject.target).attr("file-to-rename"));
+            $("#renameFileName").text($(eventObject.target).attr("file-to-rename"));
+            $("#renameModal").modal({
+                backdrop: "static",
+                keyboard: true,
+                show: true
+            });
+        });
+
+        $("#cancelRenameBtn").click(function(){
+            $("#renameModal").modal("hide");
+        });
+
+        $("#renameForm").submit(function(){
+            if($("#newNameInput").val() == ""){
+                $("#renameNameRequiredAlert").show();
+                $("#newNameInput").addClass("fieldError");
+                return false;
+            }
+        });
+
+        $("#newNameInput").focus(function(){
+            $("#renameNameRequiredAlert").hide();
+            $("#newNameInput").removeClass("fieldError");
+        });
+        
+        $("#moveForm").live("submit", function(){
+            console.log("submit");
+            if ($.trim($("#moveForm").find("input[name='dest_path']").val()) == ""){
+                $("#moveNameRequiredAlert").show();
+                $("#moveForm").find("input[name='dest_path']").addClass("fieldError");
+                return false;
+            }
+            return true;
+        });
+        
+        $("#moveForm").find("input[name='dest_path']").live("focus", function(){
+            $("#moveNameRequiredAlert").hide();
+            $("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
+        });
+        
+
+        //upload handlers
+        $(".upload-link").click(function(){
+            $("#uploadModal").modal({
+                backdrop: "static",
+                keyboard: true,
+                show: true
+            });
+        });
+
+        //create directory handlers
+        $(".create-directory-link").click(function(){
+            $("#createDirectoryModal").modal({
+                backdrop: "static",
+                keyboard: true,
+                show: true
+            });
+        });
+        $("#cancelCreateDirectoryBtn").click(function(){
+            $("#createDirectoryModal").modal("hide");
+        });
+        $("#createDirectoryForm").submit(function(){
+            if ($.trim($("#newDirectoryNameInput").val())==""){
+                $("#directoryNameRequiredAlert").show();
+                $("#newDirectoryNameInput").addClass("fieldError");
+                return false;
+            }
+            return true;
+        });
+        $("#newDirectoryNameInput").focus(function(){
+            $("#newDirectoryNameInput").removeClass("fieldError");
+            $("#directoryNameRequiredAlert").hide();
+        });
+
+        $(".contextEnabler").jHueContextMenu();
+
+	});
 
 
 </script>
