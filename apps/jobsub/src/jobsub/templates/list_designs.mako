@@ -26,10 +26,12 @@
 ${commonheader("Job Designer", "jobsub", "100px")}
 ${layout.menubar(section='designs')}
 
+<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+
 <div class="container-fluid">
     <h1>Job Designs</h1>
     <div class="well">
-        Filter: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+        Filter: <input id="filterInput"/>
         <p class="pull-right">
             <a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn">Create Mapreduce Design</a>
             <a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn">Create Streaming Design</a>
@@ -37,7 +39,7 @@ ${layout.menubar(section='designs')}
         </p>
     </div>
 
-    <table class="datatables">
+    <table id="designTable" class="datatables">
         <thead>
             <tr>
                 <th>Owner</th>
@@ -50,7 +52,7 @@ ${layout.menubar(section='designs')}
         </thead>
         <tbody>
             %for wf in workflows:
-                <tr class="wfRow" data-search="${wf.owner.username}${wf.name}${wf.root_action.action_type}${wf.description}">
+                <tr>
                     <td>${wf.owner.username}</td>
                     <td>${wf.name}</td>
                     <td>${wf.root_action.action_type}</td>
@@ -85,15 +87,6 @@ ${layout.menubar(section='designs')}
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
-        $(".datatables").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false
-        });
-        $(".dataTables_wrapper").css("min-height","0");
-        $(".dataTables_filter").hide();
-
         $("#deleteWf").modal({
             backdrop: "static",
             keyboard: true
@@ -110,25 +103,15 @@ ${layout.menubar(section='designs')}
             $("#deleteWf").modal("hide");
         });
         
-        $("#filterInput").keyup(function(){
-            $.each($(".wfRow"), function(index, value) {
-
-              if($(value).attr("data-search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
-                $(value).hide(250);
-              }else{
-                $(value).show(250);
-              }
-            });
-
+        var oTable = $('#designTable').dataTable( {
+          "sPaginationType": "bootstrap",
+          "bLengthChange": false,
+          "sDom": "<'row'r>t<'row'<'span8'i><''p>>"
         });
 
-        $("#clearFilterBtn").click(function(){
-            $("#filterInput").val("");
-            $.each($(".wfRow"), function(index, value) {
-                $(value).show(250);
-            });
+        $("#filterInput").keyup(function() {
+            oTable.fnFilter($(this).val());
         });
-		   
     });
 </script>
 ${commonfooter()}

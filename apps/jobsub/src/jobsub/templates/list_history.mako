@@ -27,15 +27,15 @@
 ${commonheader("Job Designer", "jobsub", "100px")}
 ${layout.menubar(section='history')}
 
-<script src="/static/ext/js/datatables-paging.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="container-fluid">
     <h1>Job Submission History</h1>
     <div class="well">
-        Filter: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+        Filter: <input id="filterInput"/>
     </div>
 
-    <table class="datatables ">
+    <table class="datatables" id="jobTable">
         <thead>
             <tr>
                 <th>Oozie Job ID</th>
@@ -49,7 +49,7 @@ ${layout.menubar(section='history')}
         <tbody>
             %for record in history:
                 <% wf = record.workflow %>
-                <tr class="historyRow" data-search="${record.job_id}${record.owner.username}${wf.name}${wf.root_action.action_type}${wf.description}">
+                <tr>
                     <td><a href="${url('jobsub.views.oozie_job', jobid=record.job_id)}">${record.job_id}</a></td>
                     <td>${record.owner.username}</td>
                     <td>${wf.name}</td>
@@ -64,23 +64,14 @@ ${layout.menubar(section='history')}
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
-        $("#filterInput").keyup(function(){
-            $.each($(".historyRow"), function(index, value) {
-
-              if($(value).attr("data-search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
-                $(value).hide(250);
-              }else{
-                $(value).show(250);
-              }
-            });
-
+        var oTable = $('#jobTable').dataTable( {
+          'sPaginationType': 'bootstrap',
+          "bLengthChange": false,
+          "sDom": "<'row'r>t<'row'<'span8'i><''p>>"
         });
 
-        $("#clearFilterBtn").click(function(){
-            $("#filterInput").val("");
-            $.each($(".historyRow"), function(index, value) {
-                $(value).show(250);
-            });
+        $("#filterInput").keyup(function() {
+            oTable.fnFilter($(this).val());
         });
     });
 </script>
