@@ -15,22 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from django.db import models
 from django.core import urlresolvers
 from django.contrib.auth.models import User
 
-from desktop.lib.djangothrift import ThriftField
-from desktop.lib.thrift_util import simpler_string
+LOG = logging.getLogger(__name__)
 
-from jobsub.server_models import *
-
-import jobsubd.ttypes
-from jobsubd.ttypes import SubmissionHandle
-
-class TSubmissionPlan(jobsubd.ttypes.SubmissionPlan):
-  """Wrapped submission class with simpler stringification."""
-  def __str__(self):
-    return simpler_string(self)
 
 class JobDesign(models.Model):
   """
@@ -70,27 +62,129 @@ class JobDesign(models.Model):
       'data': repr(self.data)
     }
 
-class Submission(models.Model):
-  """
-  Holds informations on submissions from the web app to the daemon.
-  The daemon should not update this directly.
-  """
-  owner = models.ForeignKey(User)
-  submission_date = models.DateTimeField(auto_now_add=True)
-  name = models.CharField(max_length=40, editable=False)
-  submission_plan = ThriftField(TSubmissionPlan, editable=False)
-  submission_handle = ThriftField(SubmissionHandle)
-  last_seen_state = models.IntegerField(db_index=True)
-
-  def last_seen_state_as_string(self):
-    return jobsubd.ttypes.State._VALUES_TO_NAMES.get(self.last_seen_state)
-
-  def watch_url(self):
-    return urlresolvers.reverse("jobsub.views.watch_submission", kwargs=dict(id=self.id))
-
 class CheckForSetup(models.Model):
   """
   A model which should have at most one row, indicating
   whether jobsub_setup has run succesfully.
   """
+  # Pre-Hue2 setup
   setup_run = models.BooleanField()
+  # What kind of setup have we done?
+  setup_level = models.IntegerField(default=0)
+
+
+################################## New Models ################################
+
+PATH_MAX = 512
+
+
+class OozieAction(models.Model):
+  """
+  The OozieAction model is an abstract base class. All concrete actions
+  derive from it. And it provides something for the OozieWorkflow to
+  reference. See
+  https://docs.djangoproject.com/en/dev/topics/db/models/#multi-table-inheritance
+  """
+  # This allows the code to easily figure out which subclass to access
+  action_type = models.CharField(max_length=64, blank=False)
+
+
+class OozieWorkflow(models.Model):
+  """
+  Contains information on MapReduce job types
+  """
+  # Generic stuff
+  owner = models.ForeignKey(User)
+  name = models.CharField(max_length=64, blank=False,
+      help_text='Name of the design, which must be unique per user')
+  description = models.CharField(max_length=PATH_MAX, blank=True)
+  last_modified = models.DateTimeField(auto_now=True)
+
+  # Action. Avoid using `root_action' directly, because it only gives you the
+  # intermediate table (i.e. OozieAction). You want to use `get_root_action()'
+  # most of the time.
+  root_action = models.ForeignKey(OozieAction)
+
+  def get_root_action(self):
+    """Return the concrete action object, not just a generic OozieAction"""
+    root = self.root_action
+    if root is None:
+      return None
+    if root.action_type == OozieMapreduceAction.ACTION_TYPE:
+      return root.ooziemapreduceaction
+    elif root.action_type == OozieStreamingAction.ACTION_TYPE:
+      return root.ooziestreamingaction
+    elif root.action_type == OozieJavaAction.ACTION_TYPE:
+      return root.ooziejavaaction
+
+    LOG.error("Oozie action type '%s' is not valid (jobsub_oozieaction.id %s)"
+              % (root.action_type, root.id))
+    return None
+
+
+class OozieMapreduceAction(OozieAction):
+  """
+  Stores MR actions
+  """
+  ACTION_TYPE = "mapreduce"
+
+  # For the distributed cache. JSON arrays.
+  files = models.CharField(max_length=PATH_MAX, default="[]",
+      help_text='List of paths to files to be added to the distributed cache')
+  archives = models.CharField(max_length=PATH_MAX, default="[]",
+      help_text='List of paths to archives to be added to the distributed cache')
+  # For the job configuration. JSON dict. Required (e.g. mapred.mapper.class).
+  job_properties = models.CharField(max_length=32768, default="[]")
+  # Location of the jar in hdfs
+  jar_path = models.CharField(max_length=PATH_MAX,
+      help_text='Path to jar files on HDFS')
+
+
+class OozieStreamingAction(OozieAction):
+  """
+  This is still an MR action from Oozie's perspective. But the data modeling is
+  slightly different.
+
+  Note that we don't inherit from OozieMapreduceAction because we want the data
+  to be in one place.
+  """
+  ACTION_TYPE = "streaming"
+
+  # For the distributed cache. JSON arrays.
+  files = models.CharField(max_length=PATH_MAX, default="[]")
+  archives = models.CharField(max_length=PATH_MAX, default="[]")
+  # For the job configuration. JSON dict. Required (e.g. mapred.input.dir).
+  job_properties = models.CharField(max_length=32768, default="[]")
+  # Scripts/commands (paths in hdfs)
+  mapper = models.CharField(max_length=PATH_MAX, blank=False)
+  reducer = models.CharField(max_length=PATH_MAX, blank=False)
+
+
+class OozieJavaAction(OozieAction):
+  """
+  Definition of Java actions
+  """
+  ACTION_TYPE = "java"
+
+  # For the distributed cache. JSON arrays.
+  files = models.CharField(max_length=PATH_MAX, default="[]",
+      help_text='List of paths to files to be added to the distributed cache')
+  archives = models.CharField(max_length=PATH_MAX, default="[]",
+      help_text='List of paths to archives to be added to the distributed cache')
+  # Location of the jar in hdfs
+  jar_path = models.CharField(max_length=PATH_MAX, blank=False)
+  main_class = models.CharField(max_length=256, blank=False)
+  args = models.CharField(max_length=4096, blank=True)
+  java_opts = models.CharField(max_length=256, blank=True)
+  # For the job configuration. JSON dict.
+  job_properties = models.CharField(max_length=32768, default="[]")
+
+
+class JobHistory(models.Model):
+  """
+  Contains informatin on submitted jobs/workflows.
+  """
+  owner = models.ForeignKey(User)
+  submission_date = models.DateTimeField(auto_now=True)
+  job_id = models.CharField(max_length=128)
+  workflow = models.ForeignKey(OozieWorkflow)

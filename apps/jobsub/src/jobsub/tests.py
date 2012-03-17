@@ -38,8 +38,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 
 from jobsub.views import in_process_jobsubd
-from jobsub.models import JobDesign, Submission
-from jobsub.server_models import ServerSubmissionState
+from jobsub.models import JobDesign
 from jobsub.parameterization import recursive_walk, find_variables, substitute_variables
 import jobbrowser.models
 

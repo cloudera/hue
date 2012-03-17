@@ -23,294 +23,223 @@ To "run" the job design, it must be parameterized, and submitted
 to the cluster.  A parameterized, submitted job design
 is a "job submission".  Submissions can be "watched".
 """
-from django.http import HttpResponse
-from django.contrib.auth.models import User
-from django import forms
-from django.core import urlresolvers
-from django.db.models import Q
 
-from desktop.views import register_status_bar_view
-from desktop.lib import thrift_util
-from desktop.lib.django_util import render, MessageException, format_preserving_redirect
+try:
+  import json
+except ImportError:
+  import simplejson as json
+import logging
+
+
+from django.core import urlresolvers
+from django.shortcuts import redirect
+
+from desktop.lib.django_util import render, PopupException, extract_field_data
 from desktop.log.access import access_warn
 
-from jobsub.management.commands import jobsub_setup
-from jobsub import conf
-from jobsub.forms import interface
-from jobsub.models import JobDesign, Submission
-from jobsubd.ttypes import SubmissionPlan
-from jobsubd import JobSubmissionService
-from jobsubd.ttypes import State
+from jobsub import models, submit
+from jobsub.oozie_lib.oozie_api import get_oozie
+import jobsub.forms
 
-JOBSUB_THRIFT_TIMEOUT_SECS=5
 
-class MetadataForm(forms.Form):
-  name = forms.CharField(required=True, initial="Untitled", help_text="Name of Job Design")
-  description = forms.CharField(required=False, initial="", help_text="Description of Job Design", widget=forms.Textarea)
+LOG = logging.getLogger(__name__)
 
-def edit_design(request, id=None, type=None, force_get=False, clone_design=None):
+
+def oozie_job(request, jobid):
+  """View the details about this job."""
+  workflow = get_oozie().get_job(jobid)
+  _check_permission(request, workflow.user,
+                    "Access denied: view job %s" % (jobid,))
+
+  return render('workflow.mako', request, {
+    'workflow': workflow,
+  })
+
+
+def list_history(request):
   """
-  Edits a job submission.
-
-  This method has high-ish cyclomatic complexity, in large part,
-  because, when handling web forms, validation errors
-  on submit receive very similar treatment to a request
-  for the form itself.
-
-  This method does double-duty for "new" as well.
+  List the job submission history. Normal users can only look at their
+  own submissions.
   """
-  assert id or type
+  history = models.JobHistory.objects
 
-  message=request.GET.get("message")
+  if not request.user.is_superuser:
+    history = history.filter(owner=request.user)
+  history = history.order_by('-submission_date')
 
-  if type:
-    new = True
-    jd = JobDesign()
-    form_type = interface.registry.get(type)
-    edit_url = urlresolvers.reverse("jobsub.new", kwargs=dict(type=type))
-    if form_type is None:
-      raise MessageException("Type %s does not exist." % repr(type))
+  return render('list_history.mako', request, {
+    'history': history,
+  })
+
+
+def new_design(request, action_type):
+  form = jobsub.forms.workflow_form_by_type(action_type)
+
+  if request.method == 'POST':
+    form.bind(request.POST)
+
+    if form.is_valid():
+      action = form.action.save(commit=False)
+      action.action_type = action_type
+      action.save()
+
+      workflow = form.wf.save(commit=False)
+      workflow.root_action = action
+      workflow.owner = request.user
+      workflow.save()
+
+      return redirect(urlresolvers.reverse(list_designs))
   else:
-    new = False
-    jd = JobDesign.objects.get(pk=id)
-    edit_url = jd.edit_url()
-    form_type = interface.registry.get(jd.type)
-    if form_type is None:
-      raise MessageException("Could not find form type for %s." % str(jd))
-    if jd.owner != request.user:
-      access_warn(request, 'Insufficient permission')
-      raise MessageException("Permission Denied.  You are not the owner of this JobDesign.  "
-                             "You may copy the design instead.")
+    form.bind()
 
-  if not force_get and request.method == 'POST':
-    metadata_form = MetadataForm(request.POST)
-    form = form_type()
-    if metadata_form.is_valid() and form.is_valid_edit(request.POST):
-      message = _save_design(request, jd, metadata_form, form)
-      if request.POST.get("save_submit") == "on":
-        return submit_design(request, jd.id, force_get=True)
-      else:
-        return list_designs(request, saved=jd.id)
-  else:
-    if new:
-      metadata_form = MetadataForm()
-      if clone_design:
-        form = form_type(string_repr=clone_design.data)
-        metadata_form.initial["name"] = "Copy of %s" % clone_design.name
-        metadata_form.initial["description"] = clone_design.description
-      else:
-        form = form_type()
-    else:
-      form = form_type(string_repr=jd.data)
-      metadata_form = MetadataForm(dict(name=jd.name, description=jd.description))
+  return _render_design_edit(request, form, action_type, _STD_PROPERTIES_JSON)
 
-  # Present edit form for failed POST requests and edits.
-  newlinks = [ (type, urlresolvers.reverse("jobsub.new", kwargs=dict(type=type))) for type in interface.registry ]
-  request.path = edit_url
-  return render("edit.html", request, {
-      'newlinks': newlinks,
-      'metadata_form': metadata_form,
-      'form': form,
-      'edit_url': edit_url,
-      'message': message
-    })
 
-def _save_design(request, jd, metadata_form, form):
-  """
-  Helper responsible for saving the job design.
-  """
-  jd.name = metadata_form.cleaned_data["name"]
-  jd.description = metadata_form.cleaned_data["description"]
-  jd.data = form.serialize_to_string()
-  jd.owner = request.user
-  jd.type = form.name
-  jd.save()
+def _render_design_edit(request, form, action_type, properties_hint):
+  return render('edit_design.mako', request, {
+    'form': form,
+    'action': request.path,
+    'action_type': action_type,
+    'properties': extract_field_data(form.action['job_properties']),
+    'files': extract_field_data(form.action['files']),
+    'archives': extract_field_data(form.action['archives']),
+    'properties_hint': properties_hint,
+  })
 
-def list_designs(request, saved=None):
-  """
-  Lists extant job designs.
 
-  Filters can be specified for owners.
-
-  Note: the URL is named "list", but since list is a built-in,
-  better to name the method somethign else.
-  """
-  show_install_examples = request.user.is_superuser and not jobsub_setup.Command().has_been_setup()
-  data = JobDesign.objects.order_by('-last_modified')
-  owner = request.GET.get("owner", "")
-  name = request.GET.get('name', "")
+def list_designs(request):
+  '''
+  List all workflow designs. Result sorted by last modification time.
+  Query params:
+    owner       - Substring filter by owner field 
+    name        - Substring filter by workflow name field
+  '''
+  data = models.OozieWorkflow.objects
+  owner = request.GET.get("owner", '')
+  name = request.GET.get('name', '')
   if owner:
     data = data.filter(owner__username__icontains=owner)
   if name:
     data = data.filter(name__icontains=name)
+  data = data.order_by('-last_modified')
 
-  newlinks = [ (type, urlresolvers.reverse("jobsub.new", kwargs=dict(type=type))) for type in interface.registry ]
-
-  return render("list.html", request, {
-    'jobdesigns': list(data),
+  return render("list_designs.mako", request, {
+    'workflows': list(data),
     'currentuser':request.user,
-    'newlinks': newlinks,
     'owner': owner,
     'name': name,
-    'saved': saved,
-    'show_install_examples': show_install_examples,
   })
 
-def clone_design(request, id):
-  """
-  Clone a design.
-  """
+
+def _get_design(wf_id):
+  """Raise PopupException if workflow doesn't exist"""
   try:
-    jd = JobDesign.objects.get(pk=id)
-  except JobDesign.DoesNotExist:
-    raise MessageException("Design not found.")
+    return models.OozieWorkflow.objects.get(pk=wf_id)
+  except models.OozieWorkflow.DoesNotExist:
+    raise PopupException("Job design not found")
 
-  return edit_design(request, type=jd.type, clone_design=jd, force_get=True)
+def _check_permission(request, owner_name, error_msg):
+  """Raise PopupException if user doesn't have permission to modify the workflow"""
+  if request.user.username != owner_name and not request.user.is_superuser:
+    access_warn(request, error_msg)
+    raise PopupException("Permission denied. You are not the owner or a superuser.")
 
-def delete_design(request, id):
-  """
-  Design deletion.
 
-  The url provides the id, but we require a POST
-  for deletion to indicate that it's an "action".
-  """
-  try:
-    jd = JobDesign.objects.get(pk=id)
-  except JobDesign.DoesNotExist:
-    return HttpResponse("Design not found.")
+def delete_design(request, wf_id):
+  if request.method == 'POST':
+    try:
+      wf_obj = _get_design(wf_id)
+      _check_permission(request, wf_obj.owner.username,
+                        "Access denied: delete workflow %s" % (wf_id,))
+      wf_obj.root_action.delete()
+      wf_obj.delete()
 
-  if jd.owner != request.user:
-    access_warn(request, 'Insufficient permission')
-    raise MessageException("Permission Denied.  You are not the owner of this JobDesign.")
+      submit.Submission(wf_obj, request.fs).remove_deployment_dir()
+    except models.OozieWorkflow.DoesNotExist:
+      LOG.error("Trying to delete non-existent workflow (id %s)" % (wf_id,))
+      raise PopupException("Workflow not found")
+
+  return redirect(urlresolvers.reverse(list_designs))
+
+
+def edit_design(request, wf_id):
+  wf_obj = _get_design(wf_id)
+  _check_permission(request, wf_obj.owner.username,
+                    "Access denied: edit workflow %s" % (wf_id,))
 
   if request.method == 'POST':
-    jd.delete()
-    return list_designs(request)
+    form = jobsub.forms.workflow_form_by_instance(wf_obj, request.POST)
+    if form.is_valid():
+      form.action.save()
+      form.wf.save()
+      return redirect(urlresolvers.reverse(list_designs))
   else:
-    return render("confirm.html", request, dict(url=request.path, title="Delete job design?"))
+    form = jobsub.forms.workflow_form_by_instance(wf_obj)
 
-def submit_design(request, id, force_get=False):
-  """
-  Job design submission.
+  return _render_design_edit(request,
+                               form,
+                               wf_obj.root_action.action_type,
+                               _STD_PROPERTIES_JSON)
 
-  force_get is used when other views chain to this view.
-  """
-  job_design = JobDesign.objects.get(pk=id)
-  form_type = interface.registry.get(job_design.type)
-  form = form_type(string_repr=job_design.data)
-  if not force_get and request.method == "POST":
-    if form.is_valid_parameterization(request.POST):
-      return _submit_to_cluster(request, job_design, form)
 
-  return render("parameterize.html", request, dict(form=form, job_design=job_design))
+def submit_design(request, wf_id):
+  """Submit a workflow to Oozie"""
+  wf_obj = _get_design(wf_id)
+  _check_permission(request, wf_obj.owner.username,
+                    "Access denied: submit workflow %s" % (wf_id,))
 
-def _submit_to_cluster(request, job_design, form):
-  plan = SubmissionPlan()
-  plan.name = job_design.name
-  plan.user = request.user.username
-  plan.groups = request.user.get_groups()
-  plan.steps = form.to_job_submission_steps(plan.name)
+  submission = submit.Submission(wf_obj, request.fs)
+  jobid = submission.run()
 
-  submission = Submission(owner=request.user,
-    last_seen_state=State.SUBMITTED,
-    name=job_design.name,
-    submission_plan=plan)
+  # Save the submission record
+  job_record = models.JobHistory(owner=request.user,
+                                 job_id=jobid,
+                                 workflow=wf_obj)
+  job_record.save()
 
-  # Save aggressively in case submit() below triggers an error.
-  submission.save()
-  try:
-    try:
-      submission.submission_handle = get_client().submit(plan)
-    except Exception:
-      submission.last_seen_state=State.ERROR
-      raise
-  finally:
-    submission.save()
+  # Show oozie job info
+  return redirect(urlresolvers.reverse(oozie_job, kwargs={'jobid': jobid}))
 
-  watch_url = submission.watch_url()
-  return format_preserving_redirect(request, watch_url)
 
-def watch(request):
-  offset = request.GET.get("offset", 0)
-  limit = request.GET.get("limit", 20)
-  submissions = Submission.objects.order_by('-submission_date')
-  limited = submissions[offset:limit]
-  more = len(limited) < len(submissions)
-  return render("watch.html", request,
-    dict(submissions=limited, offset=offset, limit=limit, more=more))
+# See http://wiki.apache.org/hadoop/JobConfFile
+_STD_PROPERTIES = [
+  'mapred.input.dir',
+  'mapred.output.dir',
+  'mapred.job.name',
+  'mapred.job.queue.name',
+  'mapred.mapper.class',
+  'mapred.reducer.class',
+  'mapred.combiner.class',
+  'mapred.partitioner.class',
+  'mapred.map.tasks',
+  'mapred.reduce.tasks',
+  'mapred.input.format.class',
+  'mapred.output.format.class',
+  'mapred.input.key.class',
+  'mapred.input.value.class',
+  'mapred.output.key.class',
+  'mapred.output.value.class',
+  'mapred.combine.buffer.size',
+  'mapred.min.split.size',
+  'mapred.map.tasks.speculative.execution',
+  'mapred.reduce.tasks.speculative.execution',
+  'mapred.queue.default.acl-administer-jobs',
+]
 
-def watch_submission(request, id):
-  """
-  Views job data for an already submitted job.
-  """
-  submission = Submission.objects.get(id=int(id))
-  handle = submission.submission_handle
-  job_data = get_client().get_job_data(handle)
-  submission.last_seen_state = job_data.state
-  submission.save()
+_STD_PROPERTIES_JSON = json.dumps(_STD_PROPERTIES)
 
-  completed = (job_data.state not in (State.SUBMITTED, State.RUNNING))
-  template = "watch_submission.html"
-  return render(template, request, dict(
-    id=id,
-    submission=submission,
-    job_data=job_data,
-    completed=completed,
-    jobs=job_data.hadoop_job_ids
-  ))
 
-def setup(request):
-  """Installs jobsub examples."""
-  if request.method == "GET":
-    return render("confirm.html", request, dict(url=request.path, title="Install job design examples?"))
-  else:
-    jobsub_setup.Command().handle_noargs()
-    return format_preserving_redirect(request, "/jobsub")
+def bc_test(request):
+  __import__("ipdb").set_trace()
+  wf = models.OozieWorkflow(owner=request.user, name='Test WF')
+  wf.save()
 
-def status_bar(request):
-  """Returns number of pending jobs tied to this user."""
-  pending_count = Submission.objects.filter(Q(owner=request.user), 
-    Q(last_seen_state=State.SUBMITTED) | Q(last_seen_state=State.RUNNING)).count()
-  # Use force_template to avoid returning JSON.
-  return render("status_bar.mako", request, dict(pending_count=pending_count), 
-    force_template=True)
-    
-# Disabled, because the state is a bit confusing.
-# This is more like a "inbox flag" that there's stuff that
-# the user hasn't looked at, but we haven't found a great
-# way to expose that.
-# register_status_bar_view(status_bar)
+  java_action = models.OozieJavaAction(jar_path="hdfs://somewhere",
+                                       main_class="foo.bar.com",
+                                       args="-D bulllshit",
+                                       job_properties='{ "json": "here" }')
+  java_action.action_type = java_action.ACTION_TYPE
+  java_action.save()
 
-CACHED_CLIENT = None
-def get_client():
-  """
-  Returns a stub to talk to the server.
-  """
-  global CACHED_CLIENT
-  if CACHED_CLIENT is None:
-    CACHED_CLIENT = thrift_util.get_client(JobSubmissionService.Client,
-      conf.JOBSUBD_HOST.get(), conf.JOBSUBD_PORT.get(), service_name="JobSubmission Daemon",
-      timeout_seconds=JOBSUB_THRIFT_TIMEOUT_SECS)
-  return CACHED_CLIENT
-
-def in_process_jobsubd(conf_dir=None):
-  """
-  Instead of talking through Thrift, connects
-  to jobsub daemon in process.
-  """
-  import jobsub.server
-  import hadoop.conf
-  global CACHED_CLIENT
-  prev = CACHED_CLIENT
-  next = jobsub.server.JobSubmissionServiceImpl()
-  finish = hadoop.conf.HADOOP_CONF_DIR.set_for_testing(conf_dir)
-  CACHED_CLIENT = next
-  class Close(object):
-    def __init__(self, client, prev):
-      self.client = client
-      self._prev = prev
-
-    def exit(self):
-      CACHED_CLIENT = self._prev
-      finish()
-  return Close(next, prev)
+  wf.root_action = java_action
+  wf.save()
