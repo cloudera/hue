@@ -30,7 +30,7 @@ ${layout.menubar(section='groups')}
 	<div class="well">
 			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 			<p class="pull-right">
-				<a href="${ url('useradmin.views.edit_group') }" class="btn">Add group</a>
+				<a id="addGroupBtn" href="#" class="btn">Add group</a>
 			</p>
 	</div>
       <table class="datatables">
@@ -49,7 +49,7 @@ ${layout.menubar(section='groups')}
             <td>${', '.join([user.username for user in group.user_set.all()])}</td>
             <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
             <td>
-              <a title="Edit ${group.name}" class="btn small" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }">Edit</a>
+              <a title="Edit ${group.name}" class="btn small editGroupBtn" data-url="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-name="${group.name}">Edit</a>
               <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>
             </td>
           </tr>
@@ -59,7 +59,7 @@ ${layout.menubar(section='groups')}
 
 
 
-<div id="deleteGroup" class="modal hide fade">
+<div id="deleteGroup" class="modal hide fade groupModal">
 	<form id="deleteGroupForm" action="" method="POST">
 	<div class="modal-header">
 		<a href="#" class="close">&times;</a>
@@ -71,7 +71,34 @@ ${layout.menubar(section='groups')}
 	</div>
 	</form>
 </div>
-</div>   
+
+<div id="addGroup" class="modal hide fade groupModal">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3>Add group</h3>
+	</div>
+	<div id="addGroupBody" class="modal-body">
+		<iframe id="addGroupFrame"></iframe>
+	</div>
+	<div class="modal-footer">
+		<button id="addGroupSaveBtn" class="btn primary">Save</button>
+	</div>
+</div>
+
+<div id="editGroup" class="modal hide fade groupModal">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3>Edit group <span class="groupName"></span></h3>
+	</div>
+	<div id="editGroupBody" class="modal-body">
+		<iframe id="editGroupFrame"></iframe>
+	</div>
+	<div class="modal-footer">
+		<button id="editGroupSaveBtn" class="btn primary">Save</button>
+	</div>
+</div>
+
+</div>
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
@@ -79,15 +106,22 @@ ${layout.menubar(section='groups')}
 				"bPaginate": false,
 			    "bLengthChange": false,
 				"bInfo": false,
-				"bFilter": false
+				"bFilter": false,
+				"aoColumns": [
+					{ "sWidth": "20%" },
+					{ "sWidth": "20%" },
+					null,
+					{ "sWidth": "120px" },
+				 ]
 			});
 			$(".dataTables_wrapper").css("min-height","0");
 			$(".dataTables_filter").hide();
 
-			$("#deleteGroup").modal({
+			$(".groupModal").modal({
 				backdrop: "static",
 				keyboard: true
 			});
+
 			$(".confirmationModal").click(function(){
 				var _this = $(this);
 				$.getJSON(_this.attr("data-confirmation-url"), function(data){
@@ -99,11 +133,11 @@ ${layout.menubar(section='groups')}
 			$(".hideModal").click(function(){
 				$("#deleteGroup").modal("hide");
 			});
-			
+
 			$("#filterInput").keyup(function(){
 		        $.each($(".groupRow"), function(index, value) {
 
-		          if($(value).attr("data-search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
+		          if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
 		            $(value).hide(250);
 		          }else{
 		            $(value).show(250);
@@ -118,7 +152,26 @@ ${layout.menubar(section='groups')}
 		            $(value).show(250);
 		        });
 		    });
-		   
+
+			$("#addGroupBtn").click(function(){
+				$("#addGroupFrame").css("height","400px").attr("src","${url('useradmin.views.edit_group')}");
+				$("#addGroup").modal("show");
+			});
+
+			$("#addGroupSaveBtn").click(function(){
+				$("#addGroupFrame").contents().find('form').submit();
+			});
+
+			$(".editGroupBtn").click(function(){
+				$("#editGroup").find(".groupName").text($(this).data("name"));
+				$("#editGroupFrame").css("height","400px").attr("src", $(this).data("url"));
+				$("#editGroup").modal("show");
+			});
+
+			$("#editGroupSaveBtn").click(function(){
+				$("#editGroupFrame").contents().find('form').submit();
+			});
+
 
 		});
 	</script>

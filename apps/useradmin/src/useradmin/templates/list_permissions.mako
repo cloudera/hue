@@ -47,13 +47,27 @@ ${layout.menubar(section='permissions')}
             <td>${perm.description}</td>
             <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
             <td>
-              <a title="Edit groups" class="btn small" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }">Edit</a>
+              <a title="Edit permission" class="btn small editPermissionBtn" data-url="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}">Edit</a>
             </td>
           </tr>
         % endfor
         </tbody>
       </table>
 
+</div>
+
+
+<div id="editPermission" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close">&times;</a>
+		<h3>Edit permissions for <span class="applicationName"></span></h3>
+	</div>
+	<div id="editPermissionBody" class="modal-body">
+		<iframe id="editPermissionFrame"></iframe>
+	</div>
+	<div class="modal-footer">
+		<button id="editPermissionSaveBtn" class="btn primary">Save</button>
+	</div>
 </div>
 
 	<script type="text/javascript" charset="utf-8">
@@ -69,8 +83,7 @@ ${layout.menubar(section='permissions')}
 
 			$("#filterInput").keyup(function(){
 		        $.each($(".permissionRow"), function(index, value) {
-
-		          if($(value).attr("data-search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
+		          if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
 		            $(value).hide(250);
 		          }else{
 		            $(value).show(250);
@@ -81,10 +94,25 @@ ${layout.menubar(section='permissions')}
 
 		    $("#clearFilterBtn").click(function(){
 		        $("#filterInput").val("");
-		        $.each($(".file-row"), function(index, value) {
+		        $.each($(".permissionRow"), function(index, value) {
 		            $(value).show(250);
 		        });
 		    });
+
+			$("#editPermission").modal({
+				backdrop: "static",
+				keyboard: true
+			});
+
+			$(".editPermissionBtn").click(function(){
+				$("#editPermission").find(".applicationName").text($(this).data("name"));
+				$("#editPermissionFrame").css("height","260px").attr("src", $(this).data("url"));
+				$("#editPermission").modal("show");
+			});
+
+			$("#editPermissionSaveBtn").click(function(){
+				$("#editPermissionFrame").contents().find('form').submit();
+			});
 
 
 		});

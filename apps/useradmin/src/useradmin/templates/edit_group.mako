@@ -14,54 +14,32 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader_iframe, commonfooter_iframe
+import urllib
 %>
-<% import urllib %>
-
-<%namespace name="layout" file="layout.mako" />
-${layout.menubar(section='groups')}
-
-<div class="container-fluid">
-  % if name:
-	${commonheader('Edit Group: ' + name + ' -- Hue Groups', "useradmin", "100px")}
-	<h1>Edit Group: ${name} -- Hue Groups</h1>
-  % else:
-    ${commonheader('Create Group -- Hue Groups', "useradmin", "100px")}
-    <h1>Create Group -- Hue Groups</h1>
-  % endif
-	<form action="${urllib.quote(action)}" method="POST" class="jframe_padded">
+${commonheader_iframe()}
+	<form id="editForm" action="${urllib.quote(action)}" method="POST">
 		<fieldset>
-			<legend>
-			  % if name:
-		        Edit Group: ${name}
-		      % else:
-		        Create Group
-		      % endif
-			</legend>
         <%def name="render_field(field)">
 			<div class="clearfix">
 				${field.label_tag() | n}
 				<div class="input">
 					${unicode(field) | n}
+					% if len(field.errors):
+						${unicode(field.errors) | n}
+					% endif
 				</div>
-				% if len(field.errors):
-					${unicode(field.errors) | n}
-				% endif
 			</div>
 		</%def>
-
 		% for field in form:
 			${render_field(field)}
 		% endfor
         </fieldset>
-		<div class="actions">
-			<input type="submit" value="Save" class="btn primary"/>
-		</div>
 	</form>
-</div>
-<script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$("#id_members").jHueSelector();
-	});
-</script>
-${commonfooter()}
+
+	<script type="text/javascript" charset="utf-8">
+		$(document).ready(function(){
+			$("#id_members").jHueSelector();
+		});
+	</script>
+${commonfooter_iframe()}

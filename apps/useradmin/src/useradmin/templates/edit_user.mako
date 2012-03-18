@@ -14,49 +14,26 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
-%>
-<% import urllib %>
+from desktop.views import commonheader_iframe, commonfooter_iframe
+import urllib %>
 
-<%namespace name="layout" file="layout.mako" />
-${layout.menubar(section='users')}
-
-<div class="container-fluid">
-  % if username:
-	${commonheader('Edit User: ' + username + ' -- Hue Users', "useradmin", "100px")}
-	<h1>Edit User: ${username} -- Hue Users</h1>
-  % else:
-    ${commonheader('Create User -- Hue Users', "useradmin", "100px")}
-    <h1>Create User -- Hue Users</h1>
-  % endif
-	<form action="${urllib.quote(action)}" method="POST" class="jframe_padded">
-		<fieldset>
-			<legend> 
-			  % if username:
-		        Edit User: ${username}
-		      % else:
-		        Create User 
-		      % endif
-			</legend>
-        <%def name="render_field(field)">
-			<div class="clearfix">
-				${field.label_tag() | n}
-				<div class="input">
-					${unicode(field) | n}
-				</div>
+${commonheader_iframe()}
+<form id="editForm" action="${urllib.quote(action)}" method="POST">
+	<fieldset>
+    <%def name="render_field(field)">
+		<div class="clearfix">
+			${field.label_tag() | n}
+			<div class="input">
+				${unicode(field) | n}
 				% if len(field.errors):
 					${unicode(field.errors) | n}
 				% endif
 			</div>
-		</%def>
-          
-		% for field in form:
-			${render_field(field)}
-		% endfor
-        </fieldset>
-		<div class="actions">
-			<input type="submit" value="Save" class="btn primary"/>
 		</div>
-	</form>
-</div>
-${commonfooter()}
+	</%def>
+	% for field in form:
+		${render_field(field)}
+	% endfor
+    </fieldset>
+</form>
+${commonfooter_iframe()}
