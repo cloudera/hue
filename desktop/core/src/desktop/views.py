@@ -335,7 +335,7 @@ def check_config(request):
                     error_list=_get_config_errors(cache=False),
                     conf_dir=conf_dir))
 
-def status_bar_config_check(request):
+def check_config_ajax(request):
   """Alert administrators about configuration problems."""
   if not request.user.is_superuser:
     return HttpResponse('')
@@ -349,4 +349,4 @@ def status_bar_config_check(request):
                 dict(error_list=error_list),
                 force_template=True)
 
-register_status_bar_view(status_bar_config_check)
+register_status_bar_view(check_config_ajax)

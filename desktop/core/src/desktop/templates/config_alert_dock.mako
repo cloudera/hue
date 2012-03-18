@@ -15,8 +15,7 @@
 ## limitations under the License.
 
 % if error_list:
-  <a class="dock_misconfig" target="_blank" href="${url('desktop.views.check_config')}"
-      title="Misconfiguration detected" alt="Misconfiguration detected">
+  <a href="${url('desktop.views.check_config')}" title="Misconfiguration detected" alt="Misconfiguration detected">
     <img src="/static/art/error.png"/>
   </a>
 % endif
