@@ -129,6 +129,21 @@ class OozieWorkflow(models.Model):
               % (root.action_type, root.id))
     return None
 
+  def clone(self, new_owner=None):
+    """Return a newly saved instance."""
+    action_copy = self.get_root_action()
+    action_copy.pk = None       # Need a new OozieAction (superclass instance)
+    action_copy.id = None       # Need a new action instance as well
+    action_copy.save()
+
+    copy = self
+    copy.pk = None
+    copy.root_action = action_copy
+    if new_owner is not None:
+      copy.owner = new_owner
+    copy.save()
+    return copy
+
 
 class OozieMapreduceAction(OozieAction):
   """

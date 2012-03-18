@@ -58,12 +58,15 @@ ${layout.menubar(section='designs')}
                     <td>${wf.root_action.action_type}</td>
                     <td>${wf.description}</td>
                     <td nowrap="nowrap">${wf.last_modified.strftime('%c')}</td>
-                    <td nowrap="nowrap">
-                      %if currentuser.is_superuser or currentuser.username == wf.owner.username:
+                    <td nowrap="nowrap" class="pull-right">
+                      %if currentuser.is_superuser:
+                        %if currentuser.username == wf.owner.username:
                         <a title="Edit ${wf.name}" class="btn small" href="${ url('jobsub.views.edit_design', wf_id=wf.id) }">Edit</a>
                         <a title="Submit ${wf.name}" class="btn small" href="${ url('jobsub.views.submit_design', wf_id=wf.id) }">Submit</a>
+                        %endif
                         <a title="Delete ${wf.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${wf.name}?" href="javascript:void(0)" data-confirmation-url="${ url('jobsub.views.delete_design', wf_id=wf.id) }">Delete</a>
                       %endif
+                      <a title="Clone ${wf.name}" class="btn small" href="${ url('jobsub.views.clone_design', wf_id=wf.id) }">Clone</a>
                     </td>
                 </tr>
             %endfor

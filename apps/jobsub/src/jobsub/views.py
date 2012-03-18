@@ -138,11 +138,13 @@ def _get_design(wf_id):
   except models.OozieWorkflow.DoesNotExist:
     raise PopupException("Job design not found")
 
-def _check_permission(request, owner_name, error_msg):
+def _check_permission(request, owner_name, error_msg, allow_root=False):
   """Raise PopupException if user doesn't have permission to modify the workflow"""
-  if request.user.username != owner_name and not request.user.is_superuser:
+  if request.user.username != owner_name:
+    if allow_root and request.user.is_superuser:
+      return
     access_warn(request, error_msg)
-    raise PopupException("Permission denied. You are not the owner or a superuser.")
+    raise PopupException("Permission denied. You are not the owner.")
 
 
 def delete_design(request, wf_id):
@@ -150,7 +152,8 @@ def delete_design(request, wf_id):
     try:
       wf_obj = _get_design(wf_id)
       _check_permission(request, wf_obj.owner.username,
-                        "Access denied: delete workflow %s" % (wf_id,))
+                        "Access denied: delete workflow %s" % (wf_id,),
+                        allow_root=True)
       wf_obj.root_action.delete()
       wf_obj.delete()
 
@@ -180,6 +183,12 @@ def edit_design(request, wf_id):
                                form,
                                wf_obj.root_action.action_type,
                                _STD_PROPERTIES_JSON)
+
+
+def clone_design(request, wf_id):
+  wf_obj = _get_design(wf_id)
+  clone = wf_obj.clone(request.user)
+  return redirect(urlresolvers.reverse(edit_design, kwargs={'wf_id': clone.id}))
 
 
 def submit_design(request, wf_id):

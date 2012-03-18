@@ -27,6 +27,7 @@ urlpatterns = patterns(
   url(r'^new_design/(?P<action_type>\w+)$', 'views.new_design'),
   url(r'^delete_design/(?P<wf_id>\d+)$', 'views.delete_design'),
   url(r'^edit_design/(?P<wf_id>\d+)$', 'views.edit_design'),
+  url(r'^clone_design/(?P<wf_id>\d+)$', 'views.clone_design'),
   url(r'^submit_design/(?P<wf_id>\d+)$', 'views.submit_design'),
 
   url(r'^job/(?P<jobid>[-\w]+)$', 'views.oozie_job'),
