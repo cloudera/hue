@@ -48,8 +48,9 @@ def log_view(request):
   l = logging.getLogger()
   for h in l.handlers:
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
-      return render_to_response("logs.html", dict(log=[l for l in h.buf]))
-  return render_to_response("logs.html", dict(log=["No logs found!"]))
+	  return render('logs.mako', request, dict(log=[l for l in h.buf]))
+
+  return render('logs.mako', request, dict(log=["No logs found!"]))
 
 @access_log_level(logging.WARN)
 def download_log_view(request):
