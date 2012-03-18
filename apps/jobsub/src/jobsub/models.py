@@ -16,6 +16,10 @@
 # limitations under the License.
 
 import logging
+try:
+  import json
+except ImportException:
+  import simplejson
 
 from django.db import models
 from django.core import urlresolvers
@@ -101,7 +105,7 @@ class OozieWorkflow(models.Model):
   owner = models.ForeignKey(User)
   name = models.CharField(max_length=64, blank=False,
       help_text='Name of the design, which must be unique per user')
-  description = models.CharField(max_length=PATH_MAX, blank=True)
+  description = models.CharField(max_length=1024, blank=True)
   last_modified = models.DateTimeField(auto_now=True)
 
   # Action. Avoid using `root_action' directly, because it only gives you the
@@ -192,3 +196,78 @@ class JobHistory(models.Model):
   submission_date = models.DateTimeField(auto_now=True)
   job_id = models.CharField(max_length=128)
   workflow = models.ForeignKey(OozieWorkflow)
+
+
+def hue1_to_hue2_data_migration():
+  """
+  Data migration from the JobDesign table to the new Oozie-based models.
+
+  The migration could be incomplete:
+  - Jar types, for which the main class wasn't specified.
+
+  We add an `(incomplete)' marker to the design name to alert the user.
+  """
+  jd_list = JobDesign.objects.all()
+
+  for jd in jd_list:
+    if jd.type == 'jar':
+      _job_design_migration_for_jar(jd)
+    elif jd.type == 'streaming':
+      _job_design_migration_for_streaming(jd)
+    else:
+      LOG.warn("Unknown JobDesign type '%s' in the old table. Row id: %s" %
+               (jd.type, jd.id))
+
+
+def _job_design_migration_for_jar(jd):
+  """Migrate one jar type design"""
+  data = json.loads(jd.data)
+  action = OozieJavaAction(action_type=OozieJavaAction.ACTION_TYPE,
+                           jar_path=data['jarfile'],
+                           main_class="please.specify.in.the.job.design",
+                           args=data['arguments'])
+  action.save()
+
+  wf = OozieWorkflow(owner=jd.owner,
+                     name=jd.name + ' (incomplete)',
+                     description=jd.description,
+                     root_action=action)
+  wf.save()
+
+
+def _job_design_migration_for_streaming(jd):
+  """Migrate one streaming type design"""
+  data = json.loads(jd.data)
+
+  files = json.dumps(data['cache_files'])
+  archives = json.dumps(data['cache_archives'])
+  properties = data['hadoop_properties']
+
+  def add_property(key, value):
+    if value:
+      properties[key] = value
+
+  add_property('mapred.input.dir', ','.join(data['input']))
+  add_property('mapred.output.dir', data['output'])
+  add_property('mapred.combiner.class', data['combiner_class'])
+  add_property('mapred.mapper.class', data['mapper_class'])
+  add_property('mapred.reducer.class', data['reducer_class'])
+  add_property('mapred.partitioner.class', data['partitioner_class'])
+  add_property('mapred.input.format.class', data['inputformat_class'])
+  add_property('mapred.output.format.class', data['outputformat_class'])
+  add_property('mapred.reduce.tasks', data['num_reduce_tasks'])
+
+
+  action = OozieStreamingAction(action_type=OozieStreamingAction.ACTION_TYPE,
+                                mapper=data['mapper_cmd'],
+                                reducer=data['reducer_cmd'],
+                                files=files,
+                                archives=archives,
+                                job_properties=properties)
+  action.save()
+
+  wf = OozieWorkflow(owner=jd.owner,
+                     name=jd.name,
+                     description=jd.description,
+                     root_action=action)
+  wf.save()

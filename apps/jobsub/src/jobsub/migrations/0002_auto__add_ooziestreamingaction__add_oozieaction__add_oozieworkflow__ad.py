@@ -6,6 +6,7 @@ from django.db import models
 from django.db.utils import DatabaseError
 
 from desktop.lib.django_db_util import remove_content_type
+from jobsub.models import hue1_to_hue2_data_migration
 
 class Migration(SchemaMigration):
     
@@ -31,7 +32,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'OozieWorkflow'
         db.create_table('jobsub_oozieworkflow', (
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=512, blank=True)),
+            ('description', self.gf('django.db.models.fields.CharField')(max_length=1024, blank=True)),
             ('last_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -88,6 +89,9 @@ class Migration(SchemaMigration):
             remove_content_type('jobsub', 'serversubmissionstate')
         except DatabaseError, ex:
             pass    # Table doesn't exist. Ok.
+
+        # Data migration
+        hue1_to_hue2_data_migration()
 
     
     def backwards(self, orm):
@@ -210,7 +214,7 @@ class Migration(SchemaMigration):
         },
         'jobsub.oozieworkflow': {
             'Meta': {'object_name': 'OozieWorkflow'},
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '512', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
