@@ -57,7 +57,7 @@
    <connection>scm:git:git://github.com/cloudera/hue.git</connection>
    <developerConnection>scm:git:git@github.com:cloudera/hue.git</developerConnection>
    <url>https://github.com/cloudera/hue</url>
-  </scm>  
+  </scm>
 
   <build>
     <plugins>
