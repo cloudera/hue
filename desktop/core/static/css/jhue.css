@@ -195,7 +195,7 @@ code {
 
 ul.errorlist {
 	list-style: none outside none;
-	margin-left: 0;
+	margin: 0;
 }
 
 ul.errorlist li {
@@ -771,7 +771,7 @@ div.box {
 .jHueSelectorHeader input[type=text] {
 	float:right;
 	width:100px;
-	height:20px;
+	height:11px;
 }
 
 .jHueSelectorBody {
@@ -789,4 +789,15 @@ div.box {
 .jHueSelector li.selectorDivider {
 	background-color:#EEE;
 	padding:4px;
+}
+
+.modal-body iframe {
+	border:0;
+	width:100%;
+	height:100%;
+	overflow:hidden;
+}
+
+.modal-body iframe.scroll {
+	overflow:auto;
 }

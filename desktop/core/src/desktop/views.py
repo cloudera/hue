@@ -263,7 +263,7 @@ def commonheader(title, section, padding="60px"):
   """
   Returns the rendered common header
   """
-  return render_to_string("commonheader.html", dict(
+  return render_to_string("common_header.html", dict(
     title=title,
     section=section,
     padding=padding
@@ -273,7 +273,19 @@ def commonfooter():
   """
   Returns the rendered common footer
   """
-  return render_to_string("commonfooter.html")
+  return render_to_string("common_footer.html")
+
+def commonheader_iframe():
+  """
+  Returns the rendered common header for iframes
+  """
+  return render_to_string("common_header_iframe.html")
+
+def commonfooter_iframe():
+  """
+  Returns the rendered common footer for iframes
+  """
+  return render_to_string("common_footer_iframe.html")
 
 # If the app's conf.py has a config_validator() method, call it.
 CONFIG_VALIDATOR = 'config_validator'

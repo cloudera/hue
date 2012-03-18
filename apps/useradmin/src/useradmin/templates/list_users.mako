@@ -27,9 +27,9 @@ ${layout.menubar(section='users')}
 <div class="container-fluid">
 	<h1>Hue Users</h1>
 	<div class="well">
-			Filter: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 			<p class="pull-right">
-				<a href="${ url('useradmin.views.edit_user') }" class="btn">Add user</a>
+				<a id="addUserBtn" href="#" class="btn">Add user</a>
 			</p>
 	</div>
       <table class="datatables">
@@ -42,7 +42,7 @@ ${layout.menubar(section='users')}
             <th>${_('Last Login')}</th>
 			<th>&nbsp;</th>
           </tr>
-        </thead>
+        </head>
         <tbody>
         % for user in users:
           <tr class="userRow" data-search="${user.username}${user.first_name}${user.last_name}${user.email}">
@@ -54,7 +54,7 @@ ${layout.menubar(section='users')}
               ${user.last_login.strftime('%c')}
             </td>
             <td>
-              <a title="Edit ${user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">Edit</a>
+              <a title="Edit ${user.username}" class="btn small editUserBtn" data-url="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }" data-name="${user.username}">Edit</a>
               <a title="Delete ${user.username}" class="btn small confirmationModal" alt="Are you sure you want to delete ${user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(user.username)) }">Delete</a>
             </td>
           </tr>
@@ -62,21 +62,47 @@ ${layout.menubar(section='users')}
         </tbody>
       </table>
 
+	<div id="addUser" class="modal hide fade userModal">
+		<div class="modal-header">
+			<a href="#" class="close">&times;</a>
+			<h3>Add user</h3>
+		</div>
+		<div id="addUserBody" class="modal-body">
+			<iframe id="addUserFrame" class="scroll"></iframe>
+		</div>
+		<div class="modal-footer">
+			<button id="addUserSaveBtn" class="btn primary">Save</button>
+		</div>
+	</div>
+
+	<div id="editUser" class="modal hide fade userModal">
+		<div class="modal-header">
+			<a href="#" class="close">&times;</a>
+			<h3>Edit user <span class="username"></span></h3>
+		</div>
+		<div id="editUserBody" class="modal-body">
+			<iframe id="editUserFrame" class="scroll"></iframe>
+		</div>
+		<div class="modal-footer">
+			<button id="editUserSaveBtn" class="btn primary">Save</button>
+		</div>
+	</div>
+
+	<div id="deleteUser" class="modal hide fade userModal">
+		<form id="deleteUserForm" action="" method="POST">
+		<div class="modal-header">
+			<a href="#" class="close">&times;</a>
+			<h3 id="deleteUserMessage">Confirm action</h3>
+		</div>
+		<div class="modal-footer">
+			<input type="submit" class="btn primary" value="Yes"/>
+			<a href="#" class="btn secondary hideModal">No</a>
+		</div>
+		</form>
+	</div>
 
 
-<div id="deleteUser" class="modal hide fade">
-	<form id="deleteUserForm" action="" method="POST">
-	<div class="modal-header">
-		<a href="#" class="close">&times;</a>
-		<h3 id="deleteUserMessage">Confirm action</h3>
-	</div>
-	<div class="modal-footer">
-		<input type="submit" class="btn primary" value="Yes"/>
-		<a href="#" class="btn secondary hideModal">No</a>
-	</div>
-	</form>
 </div>
-</div>   
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
@@ -89,10 +115,11 @@ ${layout.menubar(section='users')}
 			$(".dataTables_wrapper").css("min-height","0");
 			$(".dataTables_filter").hide();
 
-			$("#deleteUser").modal({
+			$(".userModal").modal({
 				backdrop: "static",
 				keyboard: true
 			});
+
 			$(".confirmationModal").click(function(){
 				var _this = $(this);
 				$.getJSON(_this.attr("data-confirmation-url"), function(data){
@@ -104,11 +131,10 @@ ${layout.menubar(section='users')}
 			$(".hideModal").click(function(){
 				$("#deleteUser").modal("hide");
 			});
-			
+
 			$("#filterInput").keyup(function(){
 		        $.each($(".userRow"), function(index, value) {
-
-		          if($(value).attr("data-search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
+		          if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
 		            $(value).hide(250);
 		          }else{
 		            $(value).show(250);
@@ -123,7 +149,26 @@ ${layout.menubar(section='users')}
 		            $(value).show(250);
 		        });
 		    });
-		   
+
+			$("#addUserBtn").click(function(){
+				$("#addUserFrame").css("height","300px").attr("src","${ url('useradmin.views.edit_user') }");
+				$("#addUser").modal("show");
+			});
+
+			$("#addUserSaveBtn").click(function(){
+				$("#addUserFrame").contents().find('form').submit();
+			});
+
+			$(".editUserBtn").click(function(){
+				$("#editUser").find(".username").text($(this).data("name"));
+				$("#editUserFrame").css("height","300px").attr("src", $(this).data("url"));
+				$("#editUser").modal("show");
+			});
+
+			$("#editUserSaveBtn").click(function(){
+				$("#editUserFrame").contents().find('form').submit();
+			});
+
 
 		});
 	</script>

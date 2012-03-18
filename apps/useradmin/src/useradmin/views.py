@@ -32,7 +32,7 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule,
 from django.core import urlresolvers
 
 from useradmin.models import GroupPermission, HuePermission, UserProfile, LdapGroup
-from useradmin.models import get_profile, get_default_user_group
+from useradmin.models import get_profile
 import ldap_access
 
 LOG = logging.getLogger(__name__)
@@ -75,16 +75,12 @@ def delete_user(request, username):
 def delete_group(request, name):
   if not request.user.is_superuser:
     raise PopupException("You must be a superuser to delete groups.")
-
   if request.method == 'POST':
     try:
       global groups_lock
       __groups_lock.acquire()
       try:
         group = Group.objects.get(name=name)
-        default_group = get_default_user_group()
-        if default_group is not None and default_group.name == name:
-          raise PopupException("The default user group may not be deleted.")
         group.delete()
       finally:
         __groups_lock.release()
@@ -113,7 +109,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput, required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
-    fields = ["username", "first_name", "last_name", "email"]
+    fields = ["username", "first_name", "last_name", "email", "is_active", "is_superuser"]
 
   def clean_password2(self):
     password1 = self.cleaned_data.get("password1", "")
@@ -137,26 +133,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       user.set_password(self.cleaned_data["password1"])
     if commit:
       user.save()
-      # groups must be saved after the user
-      self.save_m2m()
     return user
-
-class SuperUserChangeForm(UserChangeForm):
-  class Meta(UserChangeForm.Meta):
-    fields = ["username", "is_active"] + UserChangeForm.Meta.fields + ["is_superuser", "groups"]
-
-  def __init__(self, *args, **kwargs):
-    super(SuperUserChangeForm, self).__init__(*args, **kwargs)
-    if self.instance.id:
-      # If the user exists already, we'll use its current group memberships
-      self.initial['groups'] = set(self.instance.groups.all())
-    else:
-      # If his is a new user, suggest the default group
-      default_group = get_default_user_group()
-      if default_group is not None:
-        self.initial['groups'] = set([default_group])
-      else:
-        self.initial['groups'] = []
 
 def edit_user(request, username=None):
   """
@@ -174,13 +151,8 @@ def edit_user(request, username=None):
   else:
     instance = None
 
-  if request.user.is_superuser:
-    form_class = SuperUserChangeForm
-  else:
-    form_class = UserChangeForm
-
   if request.method == 'POST':
-    form = form_class(request.POST, instance=instance)
+    form = UserChangeForm(request.POST, instance=instance)
     if form.is_valid(): # All validation rules pass
       if instance is None:
         form.save()
@@ -212,10 +184,10 @@ def edit_user(request, username=None):
           __users_lock.release()
 
       request.path = urlresolvers.reverse(list_users)
-      return list_users(request)
+      return render('edit_user_confirmation.mako', request,
+	    dict(form=form, action=request.path, username=username))
   else:
-    form = form_class(instance=instance)
-
+    form = UserChangeForm(instance=instance)
   return render('edit_user.mako', request,
     dict(form=form, action=request.path, username=username))
 
@@ -244,7 +216,8 @@ def edit_group(request, name=None):
       form.save()
       request.flash.put('Group information updated')
       url = urlresolvers.reverse(list_groups)
-      return format_preserving_redirect(request, url)
+      return render('edit_group_confirmation.mako', request,
+	    dict(form=form, action=request.path, name=name))
 
   else:
     form = GroupEditForm(instance=instance)
@@ -275,7 +248,8 @@ def edit_permission(request, app=None, priv=None):
       form.save()
       request.flash.put('Permission information updated')
       url = urlresolvers.reverse(list_permissions)
-      return format_preserving_redirect(request, url)
+      return render('edit_permissions_confirmation.mako', request,
+	    dict(form=form, action=request.path, app=app, priv=priv))
 
   else:
     form = PermissionsEditForm(instance=instance)
@@ -419,9 +393,7 @@ def _import_ldap_group(groupname, import_members=False, import_by_dn=False):
       except User.DoesNotExist:
         continue
 
-    if user is None:
-      # There was a naming comflict, or for some other reason, we couldn't get
-      # at the user
+    if get_profile(user).creation_method == str(UserProfile.CreationMethod.HUE):
       continue
     LOG.debug("Adding user %s to group %s" % (member, group.name))
     group.user_set.add(user)
@@ -471,7 +443,6 @@ class GroupEditForm(forms.ModelForm):
     super(GroupEditForm, self).__init__(*args, **kwargs)
 
     if self.instance.id:
-      self.fields['name'].widget.attrs['readonly'] = True
       initial_members = User.objects.filter(groups=self.instance).order_by('username')
       initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app','description')
     else:

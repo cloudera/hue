@@ -15,32 +15,13 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader_iframe, commonfooter_iframe
-import urllib %>
+import urllib
+%>
 ${commonheader_iframe()}
-	<form id="editForm" action="${urllib.quote(action)}" method="POST">
-		<fieldset>
-	    <%def name="render_field(field)">
-			<div class="clearfix">
-				${field.label_tag() | n}
-				<div class="input">
-					${unicode(field) | n}
 
-				% if len(field.errors):
-					${unicode(field.errors) | n}
-				% endif
-				</div>
-			</div>
-		</%def>
-
-		% for field in form:
-			${render_field(field)}
-		% endfor
-	    </fieldset>
-	</form>
-
-	<script type="text/javascript" charset="utf-8">
-		$(document).ready(function(){
-			$("#id_groups").jHueSelector();
-		});
-	</script>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		window.parent.location.href = "/useradmin/permissions";
+	});
+</script>
 ${commonfooter_iframe()}
