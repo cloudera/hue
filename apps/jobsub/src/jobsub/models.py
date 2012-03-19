@@ -24,6 +24,7 @@ except ImportException:
 from django.db import models
 from django.core import urlresolvers
 from django.contrib.auth.models import User
+from jobsub.parameterization import find_parameters, bind_parameters
 
 LOG = logging.getLogger(__name__)
 
@@ -93,8 +94,25 @@ class OozieAction(models.Model):
   reference. See
   https://docs.djangoproject.com/en/dev/topics/db/models/#multi-table-inheritance
   """
+  PARAM_FIELDS = ( )    # Nothing is parameterized by default
+
   # This allows the code to easily figure out which subclass to access
   action_type = models.CharField(max_length=64, blank=False)
+
+  def find_parameters(self):
+    """Return a list of parameters in the various fields"""
+    return find_parameters(self, self.PARAM_FIELDS)
+
+  def bind_parameters(self, mapping):
+    """
+    Change the values of the model object by replacing the param variables
+    with actual values.
+
+    Mapping is a dictionary of variable to value.
+    """
+    # We're going to alter this object. Disallow saving (for models).
+    self.save = None
+    bind_parameters(self, mapping, self.PARAM_FIELDS)
 
 
 class OozieWorkflow(models.Model):
@@ -144,11 +162,18 @@ class OozieWorkflow(models.Model):
     copy.save()
     return copy
 
+  def find_parameters(self):
+    return self.get_root_action().find_parameters()
+
+  def bind_parameters(self, mapping):
+    return self.get_root_action().bind_parameters(mapping)
+
 
 class OozieMapreduceAction(OozieAction):
   """
   Stores MR actions
   """
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path')
   ACTION_TYPE = "mapreduce"
 
   # For the distributed cache. JSON arrays.
@@ -171,6 +196,7 @@ class OozieStreamingAction(OozieAction):
   Note that we don't inherit from OozieMapreduceAction because we want the data
   to be in one place.
   """
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'mapper', 'reducer')
   ACTION_TYPE = "streaming"
 
   # For the distributed cache. JSON arrays.
@@ -187,6 +213,8 @@ class OozieJavaAction(OozieAction):
   """
   Definition of Java actions
   """
+  PARAM_FIELDS = ('files', 'archives', 'jar_path', 'main_class', 'args',
+                  'java_opts', 'job_properties')
   ACTION_TYPE = "java"
 
   # For the distributed cache. JSON arrays.
@@ -271,7 +299,6 @@ def _job_design_migration_for_streaming(jd):
   add_property('mapred.input.format.class', data['inputformat_class'])
   add_property('mapred.output.format.class', data['outputformat_class'])
   add_property('mapred.reduce.tasks', data['num_reduce_tasks'])
-
 
   action = OozieStreamingAction(action_type=OozieStreamingAction.ACTION_TYPE,
                                 mapper=data['mapper_cmd'],

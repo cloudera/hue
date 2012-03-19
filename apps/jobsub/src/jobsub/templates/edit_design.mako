@@ -56,6 +56,11 @@ ${layout.menubar(section='designs')}
         % endfor
 
         <hr/>
+        <p class="alert-message block-message info span8">
+            You can parameterize the values, using <code>$myVar</code> or
+            <code>${"${"}myVar}</code>. When the design is submitted, you will be
+            prompted for the actual value of <code>myVar</code>.
+        </p>
         % for field in form.action:
           ${render_field(field)}
         % endfor

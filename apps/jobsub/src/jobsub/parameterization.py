@@ -92,3 +92,33 @@ def substitute_variables(input_data, substitutions):
     return new_value
 
   return recursive_walk(f, input_data)
+
+
+def find_parameters(obj, fields=None):
+  """Find parameters in the given fields"""
+  if fields is None:
+    fields = [ k for k in obj.__dict__.keys() if not k.startswith('_') ]
+
+  params = [ ]
+  for field in fields:
+    data = getattr(obj, field)
+    if isinstance(data, basestring):
+      for match in Template.pattern.finditer(data):
+        name = match.group('named') or match.group('braced')
+        if name is not None:
+          params.append(name)
+  return params
+
+
+def bind_parameters(obj, substitutions, fields=None):
+  """Bind the parameters to the given fields, changing their values."""
+  if fields is None:
+    fields = [ k for k in obj.__dict__.keys() if not k.startswith('_') ]
+
+  for field in fields:
+    data = getattr(obj, field)
+    if isinstance(data, basestring):
+      new_data = Template(data).safe_substitute(substitutions)
+      if new_data != data:
+        LOG.debug("Parameterized %s -> %s" % (repr(data), repr(new_data)))
+        setattr(obj, field, new_data)

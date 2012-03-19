@@ -191,11 +191,35 @@ def clone_design(request, wf_id):
   return redirect(urlresolvers.reverse(edit_design, kwargs={'wf_id': clone.id}))
 
 
+def get_design_params(request, wf_id):
+  """
+  Return the parameters found in the design as a json dictionary of
+    { param_key : label }
+  This expects an ajax call.
+  """
+  wf_obj = _get_design(wf_id)
+  _check_permission(request, wf_obj.owner.username,
+                    "Access denied: workflow parameters %s" % (wf_id,))
+  params = wf_obj.find_parameters()
+  params_with_labels = dict((p, p.upper()) for p in params)
+  return render('dont_care_for_ajax', request, { 'params': params_with_labels })
+
+
 def submit_design(request, wf_id):
-  """Submit a workflow to Oozie"""
+  """
+  Submit a workflow to Oozie.
+  The POST data should contain parameter values.
+  """
+  if request.method != 'POST':
+    raise PopupException('Please use a POST request to submit a design.')
+
   wf_obj = _get_design(wf_id)
   _check_permission(request, wf_obj.owner.username,
                     "Access denied: submit workflow %s" % (wf_id,))
+
+  # Expect the parameter mapping in the POST data
+  param_mapping = request.POST
+  wf_obj.bind_parameters(request.POST)
 
   submission = submit.Submission(wf_obj, request.fs)
   jobid = submission.run()
@@ -208,6 +232,13 @@ def submit_design(request, wf_id):
 
   # Show oozie job info
   return redirect(urlresolvers.reverse(oozie_job, kwargs={'jobid': jobid}))
+
+  parameters = wf_obj.find_parameters()
+  return render('parameterize.mako', request, {
+      'workflow_id': wf_id,
+      'params': parameters
+  })
+
 
 
 # See http://wiki.apache.org/hadoop/JobConfFile

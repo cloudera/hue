@@ -61,10 +61,18 @@ ${layout.menubar(section='designs')}
                     <td nowrap="nowrap" class="pull-right">
                       %if currentuser.is_superuser:
                         %if currentuser.username == wf.owner.username:
-                        <a title="Edit ${wf.name}" class="btn small" href="${ url('jobsub.views.edit_design', wf_id=wf.id) }">Edit</a>
-                        <a title="Submit ${wf.name}" class="btn small" href="${ url('jobsub.views.submit_design', wf_id=wf.id) }">Submit</a>
+                          <a title="Edit ${wf.name}" class="btn small"
+                              href="${ url('jobsub.views.edit_design', wf_id=wf.id) }">Edit</a>
+                          <a title="Submit ${wf.name}" class="btn small submitConfirmation"
+                              alt="Submit ${wf.name} to the cluster"
+                              href="javascript:void(0)"
+                              data-param-url="${ url('jobsub.views.get_design_params', wf_id=wf.id) }"
+                              data-submit-url="${ url('jobsub.views.submit_design', wf_id=wf.id) }">Submit</a>
                         %endif
-                        <a title="Delete ${wf.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${wf.name}?" href="javascript:void(0)" data-confirmation-url="${ url('jobsub.views.delete_design', wf_id=wf.id) }">Delete</a>
+                        <a title="Delete ${wf.name}" class="btn small deleteConfirmation"
+                            alt="Are you sure you want to delete ${wf.name}?"
+                            href="javascript:void(0)"
+                            data-confirmation-url="${ url('jobsub.views.delete_design', wf_id=wf.id) }">Delete</a>
                       %endif
                       <a title="Clone ${wf.name}" class="btn small" href="${ url('jobsub.views.clone_design', wf_id=wf.id) }">Clone</a>
                     </td>
@@ -73,6 +81,26 @@ ${layout.menubar(section='designs')}
         </tbody>
     </table>
 
+</div>
+
+
+<div id="submitWf" class="modal hide fade">
+	<form id="submitWfForm" action="" method="POST">
+        <div class="modal-header">
+            <a href="#" class="close">&times;</a>
+            <h3 id="submitWfMessage">Submit this design?</h3>
+        </div>
+        <div class="modal-body">
+            <fieldset>
+                <div id="param-container">
+                </div>
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+            <input id="submitBtn" type="submit" class="btn primary" value="Yes"/>
+            <a href="#" class="btn secondary hideModal">No</a>
+        </div>
+	</form>
 </div>
 
 <div id="deleteWf" class="modal hide fade">
@@ -90,20 +118,55 @@ ${layout.menubar(section='designs')}
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
-        $("#deleteWf").modal({
+        $(".modal").modal({
             backdrop: "static",
             keyboard: true
         });
 
-        $(".confirmationModal").click(function(){
+        $(".deleteConfirmation").click(function(){
             var _this = $(this);
             var _action = _this.attr("data-confirmation-url");
             $("#deleteWfForm").attr("action", _action);
             $("#deleteWfMessage").text(_this.attr("alt"));
             $("#deleteWf").modal("show");
         });
-        $(".hideModal").click(function(){
+        $("#deleteWf .hideModal").click(function(){
             $("#deleteWf").modal("hide");
+        });
+
+        $(".submitConfirmation").click(function(){
+            var _this = $(this);
+            var _action = _this.attr("data-submit-url");
+            $("#submitWfForm").attr("action", _action);
+            $("#submitWfMessage").text(_this.attr("alt"));
+            // We will show the model form, but disable the submit button
+            // until we've finish loading the parameters via ajax.
+            $("#submitBtn").attr("disabled", "disabled");
+            $("#submitWf").modal("show");
+
+            $.get(_this.attr("data-param-url"), function(data) {
+                var params = data["params"]
+                var container = $("#param-container");
+                container.empty();
+                for (key in params) {
+                    if (!params.hasOwnProperty(key)) {
+                        continue;
+                    }
+                    container.append(
+                        $("<div/>").addClass("clearfix")
+                          .append($("<label/>").text(params[key]))
+                          .append(
+                              $("<div/>").addClass("input")
+                                .append($("<input/>").attr("name", key).attr("type", "text"))
+                          )
+                    )
+                }
+                // Good. We can submit now.
+                $("#submitBtn").removeAttr("disabled");
+            }, "json");
+        });
+        $("#submitWf .hideModal").click(function(){
+            $("#submitWf").modal("hide");
         });
         
         var oTable = $('#designTable').dataTable( {
