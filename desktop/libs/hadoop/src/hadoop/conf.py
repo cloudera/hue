@@ -86,7 +86,7 @@ HADOOP_EXAMPLES_JAR = Config(
 
 HADOOP_STREAMING_JAR = Config(
   key="hadoop_streaming_jar",
-  dynamic_default=find_file_recursive("hadoop-*streaming*.jar"),
+  dynamic_default=find_file_recursive("hadoop-*streaming*.jar", lambda: HADOOP_MR1_HOME.get()),
   help="Path to the hadoop-streaming.jar (used by jobdesigner)",
   type=str,
   private=True)
