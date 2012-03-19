@@ -109,7 +109,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput, required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
-    fields = ["username", "first_name", "last_name", "email", "is_active", "is_superuser"]
+    fields = ["username", "first_name", "last_name", "email", "is_active", "is_superuser", "groups"]
 
   def clean_password2(self):
     password1 = self.cleaned_data.get("password1", "")

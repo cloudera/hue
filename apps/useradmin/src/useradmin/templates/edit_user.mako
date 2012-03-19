@@ -36,4 +36,9 @@ ${commonheader_iframe()}
 	% endfor
     </fieldset>
 </form>
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$("#id_groups").jHueSelector();
+	});
+</script>
 ${commonfooter_iframe()}

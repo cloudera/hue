@@ -41,17 +41,19 @@ ${layout.menubar(section='users')}
             <th>${_('First Name')}</th>
             <th>${_('Last Name')}</th>
             <th>${_('E-mail')}</th>
+			<th>${_('Groups')}</th>
             <th>${_('Last Login')}</th>
 			<th>&nbsp;</th>
           </tr>
         </head>
         <tbody>
         % for listed_user in users:
-          <tr class="userRow" data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}">
+          <tr class="userRow" data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
             <td>${listed_user.username}</td>
             <td>${listed_user.first_name}</td>
             <td>${listed_user.last_name}</td>
             <td>${listed_user.email}</td>
+			<td>${', '.join([group.name for group in listed_user.groups.all()])}</td>
             <td>
               ${listed_user.last_login.strftime('%c')}
             </td>
