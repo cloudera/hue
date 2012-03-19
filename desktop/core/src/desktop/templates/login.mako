@@ -23,13 +23,13 @@
 	<title>jHue Login</title>
 	<link rel="stylesheet" href="/static/ext/css/bootstrap.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 	<link rel="stylesheet" href="/static/css/jhue.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-	
+
 	<style type="text/css">
       body {
         padding-top: 100px;
       }
     </style>
-	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
@@ -40,10 +40,10 @@
 			}).change(function(){
 				$(this).closest("form").submit();
 			});
-			
+
 		});
 	</script>
-	
+
 </head>
 <body>
 	<div class="topbar">
@@ -63,8 +63,9 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="container">
+
 		<div class="row">
 			<div class="span6 offset5">
     			<form method="POST" action="${action}" class="form-stacked">
@@ -81,14 +82,31 @@
 						</div>
 					</div>
 					<div class="actions">
-			    		<input type="submit" class="btn primary" value="Sign in" />
+						%if first_login_ever==True:
+							<input type="submit" class="btn primary" value="Sign up" />
+						%else:
+							<input type="submit" class="btn primary" value="Sign in" />
+						%endif
 			    		<input type="hidden" name="next" value="${next}" />
 					</div>
 				</form>
+
+			</div>
+		</div>
+
+		%if first_login_ever==True:
+		<div class="row">
+			<div class="span10 offset3">
+				<div class="alert-message block-message warning">
+					<p>Since this is your first time logging in,
+				    please pick any username and password. Be sure to remember these, as <strong>	hey
+					    will become your superuser account for Hue</strong>.</p>
 				</div>
 			</div>
+		</div>
+		%endif
 	</div>
-	
+
 
 </body>
 </html>

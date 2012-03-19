@@ -100,10 +100,16 @@ def dt_login(request):
   else:
     form = django.contrib.auth.forms.AuthenticationForm()
   request.session.set_test_cookie()
+  backends = get_backends()
+  first_login_ever = False
+  for be in backends:
+    if isinstance(be, AllowFirstUserDjangoBackend) and be.is_first_login_ever():
+      first_login_ever = True
   return render('login.mako', request, {
     'action': urlresolvers.reverse('desktop.auth.views.dt_login'),
     'form': form,
     'next': redirect_to,
+    'first_login_ever': first_login_ever,
   })
 
 
