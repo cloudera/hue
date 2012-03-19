@@ -84,13 +84,6 @@ include $(ROOT)/Makefile.vars.priv
 # Error checking
 ###################################
 
-# <<<< DEV ONLY
-CREPO ?= $(shell which crepo 2> /dev/null)
-ifeq ($(CREPO),)
-  $(error "Error: Need crepo. See <http://github.com/cloudera/crepo>.")
-endif
-# END DEV ONLY >>>>
-
 
 .PHONY: default
 default:
@@ -102,7 +95,6 @@ default:
 	@echo '  distclean   : Remove desktop and thirdparty build products'
 # <<<< DEV ONLY
 	@echo '  docs        : Build documentation'
-	@echo '  crepo       : Update crepo'
 	@echo '  prod        : Generate a tar file for production distribution'
 # END DEV ONLY >>>>
 
@@ -118,24 +110,6 @@ include Makefile.tarball
 .PHONY: docs
 docs:
 	@$(MAKE) -C docs
-
-###################################
-# Crepo
-###################################
-
-# Development use crepo to fetch thirdparty dependencies.
-
-.PHONY: crepo
-crepo: $(THIRDPARTY_JS_DIR)/manifest.json $(THIRDPARTY_JS_DIR)/*.hash
-	@echo "--- Synchronizing external dependencies with crepo"
-	@# Do crepo sync iff not NOCREPO
-	@if [ -n "$(NOCREPO)" ] ; then \
-	  echo ' ---- Skipping crepo sync (NOCREPO is set)' ; \
-	 else \
-	  mkdir -p $(BLD_DIR); \
-	  cd $(THIRDPARTY_JS_DIR) && $(CREPO) sync && \
-	    ($(CREPO) dump-refs > $(ROOT)/VERSION_DATA || true) ; \
-	 fi
 # END DEV ONLY >>>>
 
 ###################################
@@ -165,7 +139,7 @@ $(BLD_DIR_ENV)/stamp:
 .PHONY: desktop
 
 # <<<< DEV ONLY
-desktop: crepo parent-pom
+desktop: parent-pom
 # END DEV ONLY >>>>
 desktop: virtual-env
 	@$(MAKE) -C desktop
