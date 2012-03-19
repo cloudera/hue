@@ -43,7 +43,6 @@ ext/thirdparty/js/jframe/
 
 # Make product
 desktop/core/ext-py/lxml/src/lxml/lxml-version.h
-/VERSION_DATA
 
 # Common "beeswaxd" product
 /metastore_db

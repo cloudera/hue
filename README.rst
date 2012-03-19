@@ -53,8 +53,8 @@ namespace.  See ``apps/hello/src/hello/urls.py`` for an example.
 
 Development Prerequisites
 ===========================
-1. Also, you'll need these library development packages and tools installed on
-   your system:
+You'll need these library development packages and tools installed on
+your system:
 
     Debian:
       * ant
@@ -84,7 +84,7 @@ Development Prerequisites
       * mysql-devel
       * openldap-devel
       * python-devel
-      * python-simplejson (for the crepo tool)
+      * python-simplejson
       * sqlite-devel
 
     MacOS (mac port):
@@ -94,11 +94,6 @@ Development Prerequisites
       * mysql5-devel
       * simplejson (easy_install)
       * sqlite3
-
-2. You need to have crepo installed, and preferably on your path. If it is not
-   on your path, set the environment variable ``CREPO`` to point to ``crepo.py``
-   from that distribution. You can clone crepo from
-   http://github.com/cloudera/crepo.git somewhere else on your system.
 
 
 Getting Started

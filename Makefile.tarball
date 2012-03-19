@@ -28,8 +28,7 @@ PROD_INCLUDES := \
 	tools/app_reg \
 	tools/virtual-bootstrap \
 	tools/relocatable.sh \
-	VERSION \
-	VERSION_DATA
+	VERSION
 
 # Check for things in BDIST_EXCLUDES in various apps
 PROD_EXCLUDES := \
@@ -76,7 +75,7 @@ $(BLD_DIR_PROD_TGZ): $(BLD_DIR_PROD)
 	@echo "--- Generated $(BLD_DIR_PROD_TGZ)"
 
 .PHONY: $(BLD_DIR_PROD)
-$(BLD_DIR_PROD): apps crepo docs
+$(BLD_DIR_PROD): apps docs
 	@echo "--- Preparing general distribution tree at $@"
 	@rm -rf $@
 	@mkdir -p $@
