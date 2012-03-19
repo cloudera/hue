@@ -23,8 +23,13 @@ if [ -z "$HADOOP_HOME" ]; then
   echo "\$HADOOP_HOME must be specified" 1>&2
   exit 1
 fi
-
 echo \$HADOOP_HOME=$HADOOP_HOME
+
+if [ -z "$HADOOP_BIN" ]; then
+  echo "\$HADOOP_BIN must be specified" 1>&2
+  exit 1
+fi
+echo \$HADOOP_BIN=$HADOOP_BIN
 
 if [ -z "$HIVE_CONF_DIR" ]; then
   echo "\$HIVE_CONF_DIR must be specified" 1>&2
@@ -73,5 +78,5 @@ echo \$HADOOP_CONF_DIR=$HADOOP_CONF_DIR
 # Note: I've had trouble running this with just "java -jar" with the classpath
 # determined with a seemingly appropriate find command.
 echo CWD=$(pwd)
-echo Executing $HADOOP_HOME/bin/hadoop jar $BEESWAX_JAR "$@"
-exec $HADOOP_HOME/bin/hadoop jar $BEESWAX_JAR "$@"
+echo Executing $HADOOP_BIN jar $BEESWAX_JAR "$@"
+exec $HADOOP_BIN jar $BEESWAX_JAR "$@"

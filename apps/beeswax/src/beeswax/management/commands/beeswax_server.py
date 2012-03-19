@@ -33,6 +33,7 @@ class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     env = os.environ.copy()
     env['HADOOP_HOME'] = hadoop.conf.HADOOP_HOME.get()
+    env['HADOOP_BIN'] = hadoop.conf.HADOOP_BIN.get()
     if hadoop.conf.HADOOP_CONF_DIR.get():
       env['HADOOP_CONF_DIR'] = hadoop.conf.HADOOP_CONF_DIR.get()
     if beeswax.conf.BEESWAX_HIVE_HOME_DIR.get():
