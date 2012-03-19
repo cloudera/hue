@@ -48,8 +48,8 @@ HADOOP_BIN = Config("hadoop_bin",
 # TODO(philip): This will need more love for dealing with multiple clusters.
 HADOOP_CONF_DIR = Config(
   key="hadoop_conf_dir",
-  default=None,
-  help="If set, directory to pass to hadoop_bin (from hadoop configuration) as the --config flag.",
+  default="/etc/hadoop/conf",
+  help="Directory to pass to hadoop_bin (from Hadoop configuration) as the --config flag.",
 )
 
 def find_file_recursive(desired_glob, root=None):
@@ -119,8 +119,6 @@ CREDENTIALS_MERGER_JAR = Config("hadoop_credentials_merger_jar",
   private=True)
 
 
-DEFAULT_NN_HTTP_PORT = 50070
-
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
   help="One entry for each HDFS cluster",
@@ -134,9 +132,9 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
                             type=int),
+      # End deprecation
       NN_HTTP_PORT=Config("http_port", help="Hadoop HTTP port for the name node", default=50070,
                             type=int),
-      # End deprecation
       FS_DEFAULTFS=Config("fs_defaultfs", help="The equivalent of fs.defaultFS (aka fs.default.name)",
                           default="hdfs://localhost:8020"),
       WEBHDFS_URL=Config("webhdfs_url",

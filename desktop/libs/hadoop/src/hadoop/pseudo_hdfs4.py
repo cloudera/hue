@@ -460,6 +460,7 @@ def shared_cluster():
     # Fix config to reflect the cluster setup.
     closers = [
       hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
+      hadoop.conf.HDFS_CLUSTERS['default'].NN_HTTP_PORT.set_for_testing(cluster.dfs_http_port),
       hadoop.conf.MR_CLUSTERS['default'].JT_HOST.set_for_testing('localhost'),
       hadoop.conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(cluster.jt_thrift_port),
     ]
