@@ -20,37 +20,38 @@ from desktop.views import commonheader, commonfooter
 <%namespace name="layout" file="layout.mako" />
 ${commonheader("Beeswax", "beeswax", "100px")}
 ${layout.menubar(section='tables')}
-
-<div class="sidebar">
-	<div class="well">
-		<h4>Examples</h4>
-		<ul>
-			<li><a href="${ url('beeswax.views.install_examples') }">Install examples</a></li>
-		</ul>
-    	<h4>Tables</h4>
-		<ul>
-			<li><a href="${ url('beeswax.views.show_tables') }">Show tables</a></li>
-		    <li><a href="${ url('beeswax.create_table.create_table') }">Create Table</a></li>
-		</ul>
-		<h4>Queries</h4>
-		<ul>
-			<li><a href="${ url('beeswax.views.list_designs') }">Saved Queries</a></li>
-		    <li><a href="${ url('beeswax.views.execute_query') }">Execute Query</a></li>
-		    <li><a href="${ url('beeswax.views.edit_report') }">Report Generator</a></li>
-			<li><a href="${ url('beeswax.views.list_query_history') }">Query History</a></li>
-		</ul>
-		<h4>Configuration</h4>
-		<ul>
-			<li><a href="${ url('beeswax.views.configuration') }">Hive Configuration</a></li>
-		    <li><a href="${ url('beeswax.views.configuration') }?include_hadoop=1">Extended Configuration</a></li>
-		</ul>
+<div class="container-fluid">
+	<div class="sidebar">
+		<div class="well">
+			<h4>Examples</h4>
+			<ul>
+				<li><a href="${ url('beeswax.views.install_examples') }">Install examples</a></li>
+			</ul>
+	    	<h4>Tables</h4>
+			<ul>
+				<li><a href="${ url('beeswax.views.show_tables') }">Show tables</a></li>
+			    <li><a href="${ url('beeswax.create_table.create_table') }">Create Table</a></li>
+			</ul>
+			<h4>Queries</h4>
+			<ul>
+				<li><a href="${ url('beeswax.views.list_designs') }">Saved Queries</a></li>
+			    <li><a href="${ url('beeswax.views.execute_query') }">Execute Query</a></li>
+			    <li><a href="${ url('beeswax.views.edit_report') }">Report Generator</a></li>
+				<li><a href="${ url('beeswax.views.list_query_history') }">Query History</a></li>
+			</ul>
+			<h4>Configuration</h4>
+			<ul>
+				<li><a href="${ url('beeswax.views.configuration') }">Hive Configuration</a></li>
+			    <li><a href="${ url('beeswax.views.configuration') }?include_hadoop=1">Extended Configuration</a></li>
+			</ul>
+		</div>
 	</div>
-</div>
 
-<div class="content">
-	<h2>Welcome to Beeswax for Hive</h2>
-	<p>To get started with Beeswax you'll first need set up some data.</p>
-	<a href="${ url('beeswax.create_table.create_table') }" class='btn large'>Import Data</a>
-	<a href="${ url('beeswax.views.install_examples') }" class='btn large'>Install Samples</a>
+	<div class="content">
+		<h1>Welcome to Beeswax for Hive</h1>
+		To get started with Beeswax you'll first need set up some data.
+		<a href="${ url('beeswax.create_table.create_table') }" class='btn'>Import Data</a>
+		or <a href="${ url('beeswax.views.install_examples') }" class=''>Install Samples</a>.
+	</div>
 </div>
 ${commonfooter()}
