@@ -48,8 +48,8 @@ HADOOP_BIN = Config("hadoop_bin",
 # TODO(philip): This will need more love for dealing with multiple clusters.
 HADOOP_CONF_DIR = Config(
   key="hadoop_conf_dir",
-  default=None,
-  help="If set, directory to pass to hadoop_bin (from hadoop configuration) as the --config flag.",
+  default="/etc/hadoop/conf",
+  help="Directory to pass to hadoop_bin (from Hadoop configuration) as the --config flag.",
 )
 
 def find_file_recursive(desired_glob, root=None):
