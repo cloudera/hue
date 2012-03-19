@@ -28,14 +28,17 @@ ${layout.menubar(section='groups')}
 <div class="container-fluid">
 	<h1>Hue Groups</h1>
 	<div class="well">
-			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
-			<p class="pull-right">
-				%if user.is_superuser == True:
-				<a id="addGroupBtn" href="#" class="btn">Add group</a>
-				%endif
-			</p>
+		<p class="pull-right">
+			%if user.is_superuser == True:
+			<a id="addGroupBtn" href="#" class="btn">Add group</a>
+			%endif
+		</p>
+		<form class="form-search">
+			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for group name, members, etc...">
+		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+		</form>
 	</div>
-      <table class="datatables">
+      <table class="table table-striped datatables">
         <thead>
           <tr>
             <th>${_('Group Name')}</th>
@@ -68,7 +71,7 @@ ${layout.menubar(section='groups')}
 <div id="deleteGroup" class="modal hide fade groupModal">
 	<form id="deleteGroupForm" action="" method="POST">
 	<div class="modal-header">
-		<a href="#" class="close">&times;</a>
+		<a href="#" class="close" data-dismiss="modal">&times;</a>
 		<h3 id="deleteGroupMessage">Confirm action</h3>
 	</div>
 	<div class="modal-footer">
@@ -80,7 +83,7 @@ ${layout.menubar(section='groups')}
 
 <div id="addGroup" class="modal hide fade groupModal">
 	<div class="modal-header">
-		<a href="#" class="close">&times;</a>
+		<a href="#" class="close" data-dismiss="modal">&times;</a>
 		<h3>Add group</h3>
 	</div>
 	<div id="addGroupBody" class="modal-body">
@@ -93,7 +96,7 @@ ${layout.menubar(section='groups')}
 
 <div id="editGroup" class="modal hide fade groupModal">
 	<div class="modal-header">
-		<a href="#" class="close">&times;</a>
+		<a href="#" class="close" data-dismiss="modal">&times;</a>
 		<h3>Edit group <span class="groupName"></span></h3>
 	</div>
 	<div id="editGroupBody" class="modal-body">
@@ -124,11 +127,6 @@ ${layout.menubar(section='groups')}
 			});
 			$(".dataTables_wrapper").css("min-height","0");
 			$(".dataTables_filter").hide();
-
-			$(".groupModal").modal({
-				backdrop: "static",
-				keyboard: true
-			});
 
 			$(".confirmationModal").click(function(){
 				var _this = $(this);

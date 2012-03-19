@@ -35,14 +35,11 @@ ${layout.menubar(section='dump_config')}
 		% endfor
 		</ul>
 
-
-
-
 		<h2>Configuration Sections and Variables</h2>
 
-		<ul class="tabs">
+		<ul class="nav nav-tabs">
 			% for obj in top_level.get().values():
-				<li><a href="#${obj.config.key}Conf">${obj.config.key}</a></li>
+				<li><a href="#${obj.config.key}Conf" data-toggle="tab">${obj.config.key}</a></li>
 			% endfor
 		</ul>
 
@@ -64,7 +61,7 @@ ${layout.menubar(section='dump_config')}
 		</%def>
 
 		<%def name="recurse(config_obj, depth=0)">
-			<table>
+			<table class="table table-striped">
 			<tr>
 			 % if depth > 1:
 			  <th>
@@ -110,10 +107,5 @@ ${layout.menubar(section='dump_config')}
 
 	</div>
 
-	<script type="text/javascript" charset="utf-8">
-		$(document).ready(function(){
-			$(".tabs").tabs();
-		});
-	</script>
 
 ${commonfooter()}

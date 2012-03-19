@@ -16,32 +16,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 {% load is_selected %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<meta name="viewport" content="width=device-width user-scalable=no initial-scale=1" />
-	<link rel="stylesheet" href="/static/ext/css/bootstrap.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-	<link rel="stylesheet" href="/static/css/jhue.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-	<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<meta charset="utf-8">
+	<title>{{title}}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<meta name="author" content="">
 
-	<script src="/static/ext/js/jquery/jquery-1.7.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/js/Source/jHue/jquery.showusername.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/js/Source/jHue/jquery.filechooser.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/js/Source/jHue/jquery.contextmenu.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/js/Source/jHue/jquery.selector.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/js/Source/jHue/jquery.alert.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/bootstrap-tabs.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/bootstrap-dropdown.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/bootstrap-tabs.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/bootstrap-modal.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/bootstrap-twipsy.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/bootstrap-popover.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
+	<link href="/static/ext/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/static/ext/css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="/static/css/jhue.css" rel="stylesheet">
+	<link href="/static/ext/css/fileuploader.css" rel="stylesheet">
 
+	<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+
+	<script src="/static/ext/js/jquery/jquery-1.7.1.min.js"></script>
+	<script src="/static/js/Source/jHue/jquery.showusername.js"></script>
+	<script src="/static/js/Source/jHue/jquery.filechooser.js"></script>
+	<script src="/static/js/Source/jHue/jquery.contextmenu.js"></script>
+	<script src="/static/js/Source/jHue/jquery.selector.js"></script>
+	<script src="/static/js/Source/jHue/jquery.alert.js"></script>
+	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js"></script>
+	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
+	<script src="/static/ext/js/bootstrap.min.js"></script>
+	<script src="/static/ext/js/fileuploader.js"></script>
 </head>
 <body>

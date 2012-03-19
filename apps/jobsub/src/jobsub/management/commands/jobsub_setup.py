@@ -155,7 +155,7 @@ def copy_file(local_src, remote_fs, remote_dst):
     return
   else:
     LOG.info("%s does not exist. trying to copy" % remote_dst)
-    
+
   if os.path.isfile(local_src):
     src = file(local_src)
     try:

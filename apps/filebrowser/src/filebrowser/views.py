@@ -299,7 +299,7 @@ def listdir(request, path, chooser):
     home_dir_path = request.user.get_home_directory()
 
     breadcrumbs = parse_breadcrumbs(path)
-    
+
     data = {
         'path': path,
         'file_filter': file_filter,
@@ -696,14 +696,14 @@ def rename(request):
             dest_path = os.path.join(src_dir, dest_path)
         request.fs.rename(src_path, dest_path)
 
-    return generic_op(RenameForm, request, smart_rename, ["src_path", "dest_path"], None, template="rename.mako")
+    return generic_op(RenameForm, request, smart_rename, ["src_path", "dest_path"], None)
 
 
 def mkdir(request):
     def smart_mkdir(path, name):
         request.fs.mkdir(os.path.join(path, name))
 
-    return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path", template="mkdir.mako")
+    return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
 
 
 def remove(request):

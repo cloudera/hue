@@ -14,13 +14,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%namespace name="edit" file="editor_components.mako" />
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head('Upload Files', 'upload', show_new_directory=False, show_side_bar=False)}
+
+
 <script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
-<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />        
-
-
-
+<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 
 
       <div class="well">
@@ -56,6 +53,5 @@ ${wrappers.head('Upload Files', 'upload', show_new_directory=False, show_side_ba
         // in your app create uploader as soon as the DOM is ready
         // don't wait for the window to load
         window.onload = createUploader;
-    </script>            
+    </script>
 
-${wrappers.foot()}

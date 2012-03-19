@@ -32,10 +32,14 @@ ${layout.menubar(section='history')}
 <div class="container-fluid">
     <h1>Job Submission History</h1>
     <div class="well">
-        Filter: <input id="filterInput"/>
+        <form class="form-search">
+			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
+		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+		</form>
     </div>
 
-    <table class="datatables" id="jobTable">
+
+    <table class="table table-condensed datatables" id="jobTable">
         <thead>
             <tr>
                 <th>Oozie Job ID</th>
@@ -73,6 +77,11 @@ ${layout.menubar(section='history')}
         $("#filterInput").keyup(function() {
             oTable.fnFilter($(this).val());
         });
+
+		$("#clearFilterBtn").click(function(){
+	        $("#filterInput").val("");
+	        oTable.fnFilter("");
+	    });
     });
 </script>
 

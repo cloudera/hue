@@ -23,7 +23,7 @@ ${commonheader("Beeswax: Queries", "beeswax", "100px")}
 ${layout.menubar(section='saved queries')}
 <div class="container-fluid">
 <h1>Beeswax: Queries</h1>
-  <table class="datatables">
+  <table class="table table-striped table-condensed datatables">
     <thead>
       <tr>
         <th>Name</th>
@@ -89,24 +89,24 @@ ${layout.menubar(section='saved queries')}
     </tbody>
   </table>
 ${comps.pagination(page)}
-
+</div>
 
 <div id="deleteQuery" class="modal hide fade">
 	<form id="deleteQueryForm" action="" method="POST">
 	<div class="modal-header">
-		<a href="#" class="close">&times;</a>
+		<a href="#" class="close" data-dismiss="modal">&times;</a>
 		<h3 id="deleteQueryMessage">Confirm action</h3>
 	</div>
 	<div class="modal-footer">
 		<input type="submit" class="btn primary" value="Yes"/>
-		<a href="#" class="btn secondary hideModal">No</a>
+		<a href="#" class="btn secondary" data-dismiss="modal">No</a>
 	</div>
 	</form>
 </div>
-</div>
+
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-		$(".tabs").tabs();
+
 		$(".datatables").dataTable({
 			"bPaginate": false,
 		    "bLengthChange": false,
@@ -114,19 +114,13 @@ ${comps.pagination(page)}
 			"bFilter": false
 		});
 		$(".contextEnabler").jHueContextMenu();
-		$("#deleteQuery").modal({
-			backdrop: "static",
-			keyboard: true
-		});
+
 		$(".confirmationModal").live("click", function(){
 			$.getJSON($(this).attr("data-confirmation-url"), function(data){
 				$("#deleteQueryForm").attr("action", data.url);
 				$("#deleteQueryMessage").text(data.title);
 			});
 			$("#deleteQuery").modal("show");
-		});
-		$(".hideModal").click(function(){
-			$("#deleteQuery").modal("hide");
 		});
 	});
 </script>

@@ -25,14 +25,13 @@ from desktop.views import commonheader, commonfooter
 
 
 % if shells:
-<div class="menubar">
-	<div class="menubar-inner">
-		<div class="container-fluid">
-			<ul class="nav">
+<div class="subnav subnav-fixed">
+	<div class="container-fluid">
+		<ul class="nav nav-pills">
 			% if len(shells) == 1:
 				% if shells[0]["exists"]:
 					<li><a href="${url('shell.views.create')}?keyName=${shells[0]["keyName"]}" class="${shells[0]["keyName"]}">${shells[0]["niceName"]}</a></li>
-				% else: 
+				% else:
 					<li><a href="#" class="disabled">${shells[0]["niceName"]}</a></li>
 				% endif
 			% else:
@@ -54,10 +53,10 @@ from desktop.views import commonheader, commonfooter
 					<li><a href="#" class="disabled">${shells[-1]["niceName"]}</a></li>
 				% endif
 			% endif
-			</ul>
-		</div>
+		</ul>
 	</div>
 </div>
+
 % endif
 
 
@@ -88,7 +87,7 @@ from desktop.views import commonheader, commonfooter
 			margin-bottom:10px;
 			padding:0;
 			box-shadow:none;
-			
+
 
 		}
 		#shellInput:focus {
@@ -119,7 +118,7 @@ from desktop.views import commonheader, commonfooter
 				$("."+hashes[i].split("=")[1]).addClass("selected");
 			}
 		}
-		
+
 		var hueInstanceID = function() {
 			var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
 			var lastIndex = chars.length - 1;
@@ -131,9 +130,9 @@ from desktop.views import commonheader, commonfooter
 			}
 			return randomString;
 		}();
-		
+
 		if ($("#shell_id").length){
-		
+
 			var shell = {};
 			shell.id = $("#shell_id").text();
 			shell.get = function(offset){
@@ -146,7 +145,7 @@ from desktop.views import commonheader, commonfooter
 						offset1: offset,
 						shellId1: _shell.id
 					},
-					beforeSend: function(xhr){ 
+					beforeSend: function(xhr){
 						xhr.setRequestHeader("X-Request", "JSON");
 						xhr.setRequestHeader("Hue-Instance-ID", hueInstanceID);
 					},
@@ -169,7 +168,7 @@ from desktop.views import commonheader, commonfooter
 											data: {
 												shellId: _shell.id
 											},
-											beforeSend: function(xhr){ 
+											beforeSend: function(xhr){
 												xhr.setRequestHeader("X-Request", "JSON");
 											},
 											success: function(data, status, xhr){
@@ -194,7 +193,7 @@ from desktop.views import commonheader, commonfooter
 						lineToSend: command,
 						shellId: _shell.id
 					},
-					beforeSend: function(xhr){ 
+					beforeSend: function(xhr){
 						xhr.setRequestHeader("X-Request", "JSON");
 					},
 					success: function(data, status, xhr){
@@ -207,7 +206,7 @@ from desktop.views import commonheader, commonfooter
 										data: {
 											shellId: _shell.id
 										},
-										beforeSend: function(xhr){ 
+										beforeSend: function(xhr){
 											xhr.setRequestHeader("X-Request", "JSON");
 										},
 										success: function(data, status, xhr){
@@ -220,12 +219,12 @@ from desktop.views import commonheader, commonfooter
 					}
 				});
 			};
-		
+
 			shell.get(0);
-		
+
 			$("#shellInput").val("");
 			$("#shellInput").focus();
-		
+
 			$("#shellInput").blur(function(){
 				window.setTimeout(function(){
 					$("#shellInput").focus();
@@ -237,10 +236,10 @@ from desktop.views import commonheader, commonfooter
 					$(this).val("");
 				}
 			});
-		
+
 		}
-				
-		
+
+
 	});
 </script>
 </div>

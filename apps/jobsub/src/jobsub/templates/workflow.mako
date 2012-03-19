@@ -44,11 +44,11 @@ ${layout.menubar(section='history')}
 <%def name="configModal(elementId, title, configs)">
   <div id="${elementId}" class="modal hide fade">
       <div class="modal-header">
-          <a href="#" class="close">&times;</a>
+          <a href="#" class="close" data-dismiss="modal">&times;</a>
           <h3>${title}</h3>
       </div>
       <div class="modal-body">
-          <table>
+          <table class="table table-condensed table-striped">
             <thead>
               <tr>
                 <th>Name</th>
@@ -83,17 +83,17 @@ ${layout.menubar(section='history')}
     %endif
 
     ## Tab headers
-    <ul class="tabs" data-tabs="tabs">
-        <li class="active"><a href="#actions">Actions</a></li>
-        <li><a href="#details">Details</a></li>
-        <li><a href="#definition">Definition</a></li>
-        <li><a href="#log">Log</a></li>
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#actions" data-toggle="tab">Actions</a></li>
+        <li><a href="#details" data-toggle="tab">Details</a></li>
+        <li><a href="#definition" data-toggle="tab">Definition</a></li>
+        <li><a href="#log" data-toggle="tab">Log</a></li>
     </ul>
 
     <div id="workflow-tab-content" class="tab-content">
       ## Tab: Actions
       <div class="tab-pane active" id="actions">
-        <table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
+        <table data-filters="HtmlTable" class="table table-striped table-condensed selectable sortable" cellpadding="0" cellspacing="0">
           <thead>
             <tr>
               <th>Name</th>
@@ -143,7 +143,7 @@ ${layout.menubar(section='history')}
 
         ## Tab: Job details
         <div class="tab-pane" id="details">
-          <table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
+          <table data-filters="HtmlTable" class="table table-striped table-condensed selectable sortable" cellpadding="0" cellspacing="0">
             <tbody>
               <tr>
                 ## App name + configuration
@@ -210,7 +210,7 @@ ${configModal("appConfigModal", "Application Configuration", workflow.conf_dict)
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
-        $('.tabs').tabs();
+
     });
 </script>
 ${commonfooter()}

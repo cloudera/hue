@@ -177,7 +177,7 @@ def test_view_avro():
 
     # offsetting should work as well
     response = c.get('/filebrowser/view/test-avro-filebrowser/test-view.avro?offset=1')
-    assert_true(response.context.has_key('view'))
+    assert_equal('avro', response.context['view']['compression'])
 
     f = cluster.fs.open('/test-avro-filebrowser/test-view2.avro', "w")
     f.write("hello")
@@ -409,7 +409,7 @@ def test_upload():
     resp = client.post('/filebrowser/upload',
                        dict(dest=DEST, hdfs_file=file(__file__)))
 
-    assert_true("Upload Complete" in resp.content)
+    assert_true("View uploaded file" in resp.content)
     stats = cluster.fs.stats(DEST)
     assert_equal(stats['user'], USER_NAME)
     assert_equal(stats['group'], USER_NAME)

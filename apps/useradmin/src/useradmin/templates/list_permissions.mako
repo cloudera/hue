@@ -29,9 +29,12 @@ ${layout.menubar(section='permissions')}
 <div class="container-fluid">
 	<h1>Hue Permissions</h1>
 	<div class="well">
-			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+		<form class="form-search">
+			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for application name, description, etc...">
+		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+		</form>
 	</div>
-      <table class="datatables">
+      <table class="table table-striped datatables">
         <thead>
           <tr>
             <th>${_('Application')}</th>
@@ -44,7 +47,7 @@ ${layout.menubar(section='permissions')}
         </head>
         <tbody>
         % for perm in permissions:
-          <tr class="permissionRow" data-search="${perm.app}${perm.description}">
+          <tr class="permissionRow" data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
             <td>${perm.app}</td>
             <td>${perm.description}</td>
             <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
@@ -63,7 +66,7 @@ ${layout.menubar(section='permissions')}
 
 <div id="editPermission" class="modal hide fade">
 	<div class="modal-header">
-		<a href="#" class="close">&times;</a>
+		<a href="#" class="close" data-dismiss="modal">&times;</a>
 		<h3>Edit permissions for <span class="applicationName"></span></h3>
 	</div>
 	<div id="editPermissionBody" class="modal-body">
@@ -99,14 +102,9 @@ ${layout.menubar(section='permissions')}
 		    $("#clearFilterBtn").click(function(){
 		        $("#filterInput").val("");
 		        $.each($(".permissionRow"), function(index, value) {
-		            $(value).show(250);
+		            $(value).show();
 		        });
 		    });
-
-			$("#editPermission").modal({
-				backdrop: "static",
-				keyboard: true
-			});
 
 			$(".editPermissionBtn").click(function(){
 				$("#editPermission").find(".applicationName").text($(this).data("name"));

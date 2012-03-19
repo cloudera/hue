@@ -21,32 +21,33 @@ from desktop.views import commonheader, commonfooter
 ${commonheader("Hive Configuration Variables", "beeswax", "100px")}
 ${layout.menubar(section='hive configuration')}
 <div class="container-fluid">
-<h1>Hive Configuration Variables</h1>
-<div class="toolbar">
-  <div class="bw-input-filter">
-    <!--input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
-      title="Filter by Name"
-      data-filter-elements="tbody tr" value=""/-->
-  </div>
+	<h1>Hive Configuration Variables</h1>
+	<div class="well">
+		<form class="form-search">
+			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for key, value, etc...">
+		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+		</form>
+	</div>
+	<table class="table table-striped table-condensed datatables">
+		<thead>
+			<tr>
+				<th>Key</th>
+				<th>Value</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+    	% for config_value in config_values:
+	    	<tr class="confRow" data-search="${config_value.key or ""}${config_value.value or ""}${config_value.description or ""}">
+	      		<td>${config_value.key or ""}</td><td>${config_value.value or ""}</td><td>${config_value.description or ""}</td>
+	    	</tr>
+	    % endfor
+		</tbody>
+	</table>
 </div>
-<table class="datatables">
-  <thead>
-    <tr>
-      <th>Key</th>
-      <th>Value</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    % for config_value in config_values:
-    <tr>
-      <td>${config_value.key or ""}</td><td>${config_value.value or ""}</td><td>${config_value.description or ""}</td>
-    </tr>
-    % endfor
-  </tbody>
-</table>
-</div>
+
 <script type="text/javascript" charset="utf-8">
+
 	$(document).ready(function(){
 		$(".datatables").dataTable({
 			"bPaginate": false,
@@ -54,6 +55,26 @@ ${layout.menubar(section='hive configuration')}
 		    "bFilter": false,
 			"bInfo": false,
 		});
+		var searchTimeoutId = 0;
+		$("#filterInput").keyup(function(){
+			window.clearTimeout(searchTimeoutId);
+			searchTimeoutId = window.setTimeout(function(){
+				$.each($(".confRow"), function(index, value) {
+		          if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
+		            $(value).hide();
+		          }else{
+		            $(value).show();
+		          }
+		        });
+			}, 500);
+	    });
+		$("#clearFilterBtn").click(function(){
+	        $("#filterInput").val("");
+	        $.each($(".confRow"), function(index, value) {
+	            $(value).show();
+	        });
+	    });
 	});
+
 </script>
 ${commonfooter()}

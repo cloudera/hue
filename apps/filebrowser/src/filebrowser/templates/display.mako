@@ -18,17 +18,17 @@
   import datetime
   from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
   from filebrowser.views import truncate
+  from desktop.views import commonheader, commonfooter
 %>
 <%
   path_enc = urlencode(path)
   dirname_enc = urlencode(view['dirname'])
   base_url = url('filebrowser.views.view', path=path_enc)
 %>
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_new_directory=False, show_side_bar=False)}
+
+${commonheader(truncate(filename)+' :: File Viewer', 'filebrowser')}
+<div class="container-fluid">
   <div class="toolbar">
-
-
     <div>
       % if view['mode'] == "binary":
         <a class="btn" href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">View As Text</a>
@@ -159,7 +159,7 @@ ${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_ne
       </div>
     </div>
   </div>
-
+</div>
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
 			$("#refreshBtn").click(function(){
@@ -167,4 +167,4 @@ ${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_ne
 			});
 		});
 	</script>
-${wrappers.foot()}
+${commonfooter()}

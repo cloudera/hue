@@ -29,106 +29,106 @@ from django.utils.encoding import smart_str
   ${_table(files, path, current_request_path, 'view', cwd_set)}
 </%def>
 <%def name="_table(files, path, current_request_path, view, cwd_set=False)">
-  <script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-  <link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-  <style type="text/css">
-    .form-padding-fix{
-        display: inline;
-        padding: 0;
-        margin: 0;
-    }
-  </style>
-  <div class="well">
-		Filter by name: <input id="filterInput"/>
+	<script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<style type="text/css">
+    	.form-padding-fix{
+	        display: inline;
+	        padding: 0;
+	        margin: 0;
+	    }
+	</style>
+	<div class="well">
 		<p class="pull-right">
 			<a href="#" class="btn upload-link">Upload files</a>
 			<a href="#" class="btn create-directory-link">New directory</a>
 		</p>
-  </div>
-  <table class="condensed-table datatables">
-    <thead>
-      <tr>
-        % if cwd_set:
-          <th>Name</th>
-        % else:
-          <th>Path</th>
-        % endif
-        <th>Size</th>
-        <th>User</th>
-        <th>Group</th>
-        <th>Permissions</th>
-        <th>Date</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      % for file in files:
-        <%
-          cls = ''
-          if (file_filter == 'dir' and file['type'] != 'dir') or (file_filter != 'dir' and file['type'] == 'dir'):
-            if (file_filter != 'any'):
-              cls = ' not-selectable'
+		<form class="form-search">
+			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for file name">
+		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+		</form>
+	</div>
 
-          if cwd_set:
-            display_name = file['name']
-          else:
-            display_name = file['path']
-          endif
-        %>
-  ## Since path is in unicode, Django and Mako handle url encoding and
-  ## iri encoding correctly for us.
+	<table class="table table-condensed table-striped datatables">
+		<thead>
+			<tr>
+			% if cwd_set:
+				<th>Name</th>
+			% else:
+				<th>Path</th>
+			% endif
+				<th>Size</th>
+				<th>User</th>
+				<th>Group</th>
+				<th>Permissions</th>
+				<th>Date</th>
+				<th>&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			% for file in files:
+			<%
+	          cls = ''
+	          if (file_filter == 'dir' and file['type'] != 'dir') or (file_filter != 'dir' and file['type'] == 'dir'):
+	            if (file_filter != 'any'):
+	              cls = ' not-selectable'
 
-        <% path = file['path'] %>
-        <tr class="file-row" file-name="${display_name}">
-          <td>
-            <h5><a href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a></h5>
-          </td>
-          <td>
-            % if "dir" == file['type']:
-              <span>~</span>
-            % else:
-              <span>${file['stats']['size']|filesizeformat}</span>
-            % endif
-          </td>
-          <td>${file['stats']['user']}</td>
-          <td>${file['stats']['group']}</td>
-          <td>${file['rwx']}</td>
-          <td><span>${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime']))}</span></td>
-          <td>
-             % if ".." != file['name']:
-				<%
-                  path_digest = urlencode(md5.md5(smart_str(path)).hexdigest())
-				%>
-				<a class="btn small contextEnabler" data-menuid="${path_digest}">Options</a>
-				<ul class="contextMenu" id="menu${path_digest}">
-                % if "dir" == file['type']:
-                  <li><a class="contextItem delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
-                  <li><a class="contextItem delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete Recursively</a></li>
-                % else:
-                  <li><a class="contextItem delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
-                  <li><a class="contextItem" href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a></li>
-                  <li><a class="contextItem" href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a></li>
-                  <li><a class="contextItem" href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
+	          if cwd_set:
+	            display_name = file['name']
+	          else:
+	            display_name = file['path']
+	          endif
+	        %>
 
-                % endif
-                <li><a class="contextItem rename" file-to-rename="${path}">Rename</a></li>
-                <li><a class="contextItem" onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
-
-                <li><a class="contextItem" onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a></li>
-                <li><a class="contextItem" onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a></li>
-				</ul>
-              % endif
-          </td>
-        </tr>
-      % endfor
-    </tbody>
-  </table>
+			<% path = file['path'] %>
+			<tr class="file-row" data-search="${display_name}">
+				<td>
+					<h5><a href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a></h5>
+				</td>
+				<td>
+					% if "dir" == file['type']:
+					<span>~</span>
+					% else:
+					<span>${file['stats']['size']|filesizeformat}</span>
+					% endif
+				</td>
+				<td>${file['stats']['user']}</td>
+				<td>${file['stats']['group']}</td>
+				<td>${file['rwx']}</td>
+				<td><span>${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime']))}</span></td>
+				<td>
+					% if ".." != file['name']:
+					<%
+					path_digest = urlencode(md5.md5(smart_str(path)).hexdigest())
+					%>
+					<a class="btn small contextEnabler" data-menuid="${path_digest}">Options</a>
+					<ul class="contextMenu" id="menu${path_digest}">
+						% if "dir" == file['type']:
+						<li><a class="contextItem delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
+						<li><a class="contextItem delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete Recursively</a></li>
+						% else:
+						<li><a class="contextItem delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
+						<li><a class="contextItem" href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a></li>
+						<li><a class="contextItem" href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a></li>
+						<li><a class="contextItem" href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
+						% endif
+						<li><a class="contextItem rename" file-to-rename="${path}">Rename</a></li>
+						<li><a class="contextItem" onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
+						<li><a class="contextItem" onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a></li>
+						<li><a class="contextItem" onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a></li>
+					</ul>
+					% endif
+				</td>
+			</tr>
+			% endfor
+		</tbody>
+	</table>
 
 <!-- delete modal -->
 <div id="deleteModal" class="modal hide fade">
 	<div class="modal-header">
-		<a href="#" class="close">&times;</a>
+		<a href="#" class="close" data-dismiss="modal">&times;</a>
 		<h3>Please Confirm</h3>
     </div>
     <div class="modal-body">
@@ -147,7 +147,7 @@ from django.utils.encoding import smart_str
 <div id="renameModal" class="modal hide fade">
     <form id="renameForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
-        <a href="#" class="close">&times;</a>
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Renaming: <span id="renameFileName">file name</span></h3>
     </div>
     <div class="modal-body">
@@ -174,7 +174,7 @@ from django.utils.encoding import smart_str
 <div id="uploadModal" class="modal hide fade">
     <form id="uploadForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
-        <a href="#" class="close">&times;</a>
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Uploading to: <span id="uploadDirName">${current_dir_path}</span></h3>
     </div>
     <div class="modal-body">
@@ -199,7 +199,7 @@ from django.utils.encoding import smart_str
 <div id="createDirectoryModal" class="modal hide fade">
     <form id="createDirectoryForm" action="/filebrowser/mkdir?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
-        <a href="#" class="close">&times;</a>
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Create Directory</h3>
     </div>
     <div class="modal-body">
@@ -332,6 +332,11 @@ from django.utils.encoding import smart_str
             oTable.fnFilter($(this).val(), 0 /* Column Idx */);
             $(".contextEnabler").jHueContextMenu();
         });
+		$("#clearFilterBtn").click(function(){
+	        $("#filterInput").val("");
+	        oTable.fnFilter("", 0);
+	    });
+
 
         //delete handlers
         $(".delete").live("click", function(e){
@@ -375,9 +380,8 @@ from django.utils.encoding import smart_str
             $("#renameNameRequiredAlert").hide();
             $("#newNameInput").removeClass("fieldError");
         });
-        
+
         $("#moveForm").live("submit", function(){
-            console.log("submit");
             if ($.trim($("#moveForm").find("input[name='dest_path']").val()) == ""){
                 $("#moveNameRequiredAlert").show();
                 $("#moveForm").find("input[name='dest_path']").addClass("fieldError");
@@ -385,12 +389,12 @@ from django.utils.encoding import smart_str
             }
             return true;
         });
-        
+
         $("#moveForm").find("input[name='dest_path']").live("focus", function(){
             $("#moveNameRequiredAlert").hide();
             $("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
         });
-        
+
 
         //upload handlers
         $(".upload-link").click(function(){

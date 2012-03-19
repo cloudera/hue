@@ -28,7 +28,7 @@ ${layout.menubar(section='check_config')}
 		% if error_list:
 	      <h2>Potential misconfiguration detected. Please fix and restart HUE.</h2>
 		  <br/>
-			<table>
+			<table class="table table-striped">
 	      % for confvar, error in error_list:
 			<tr>
 				<td width="5%">

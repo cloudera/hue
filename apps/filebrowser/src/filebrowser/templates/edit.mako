@@ -17,14 +17,15 @@
 <%!
   from django.template.defaultfilters import urlencode
   from filebrowser.views import truncate
+  from desktop.views import commonheader, commonfooter
 %>
 <%
   path_enc = urlencode(path)
   dirname_enc = urlencode(dirname)
 %>
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_new_directory=False, show_side_bar=False)}
+${commonheader(truncate(filename)+':: File Viewer', 'filebrowser')}
 
+<div class="container-fluid">
 
 <h1>${truncate(path, 91)}</h1>
 <div class="well" >
@@ -45,7 +46,7 @@ ${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_ne
 % endif
         ${edit.render_field(form["path"], hidden=True, notitle=True)}
         ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
-        
+
         <div style="width: 100%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", notitle=True, attrs=dict(
           style="width:100%; height:400px;")) | n}</div>
         <input class="btn primary" type="submit" name="save" value="Save">
@@ -85,12 +86,12 @@ ${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_ne
 				show: true
 			})
 		});
-		
-		
+
+
 		$("#cancelSaveAsBtn").click(function(){
 			$("#saveAsModal").modal("hide");
 		});
-		
+
 		$("#saveAsForm").submit(function() {
 			if ($.trim($("#saveAsForm").find("input[name='path']").val()) == ""){
 				$("#saveAsForm").find("input[name='path']").addClass("fieldError");
@@ -99,7 +100,7 @@ ${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_ne
 			}
 			return true;
 		});
-		
+
 		$("#saveAsForm").find("input[name='path']").focus(function(){
 			$(this).removeClass("fieldError");
 			$("#saveAsNameRequiredAlert").hide();
@@ -107,5 +108,6 @@ ${wrappers.head(truncate(filename)+' :: File Viewer', show_upload=False, show_ne
 	});
 </script>
 
-${wrappers.foot()}
+${commonfooter()}
+
 

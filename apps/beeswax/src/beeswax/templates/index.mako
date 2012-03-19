@@ -21,37 +21,73 @@ from desktop.views import commonheader, commonfooter
 ${commonheader("Beeswax", "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 <div class="container-fluid">
-	<div class="sidebar">
-		<div class="well">
-			<h4>Examples</h4>
-			<ul>
-				<li><a href="${ url('beeswax.views.install_examples') }">Install examples</a></li>
-			</ul>
-	    	<h4>Tables</h4>
-			<ul>
-				<li><a href="${ url('beeswax.views.show_tables') }">Show tables</a></li>
-			    <li><a href="${ url('beeswax.create_table.create_table') }">Create Table</a></li>
-			</ul>
-			<h4>Queries</h4>
-			<ul>
-				<li><a href="${ url('beeswax.views.list_designs') }">Saved Queries</a></li>
-			    <li><a href="${ url('beeswax.views.execute_query') }">Execute Query</a></li>
-			    <li><a href="${ url('beeswax.views.edit_report') }">Report Generator</a></li>
-				<li><a href="${ url('beeswax.views.list_query_history') }">Query History</a></li>
-			</ul>
-			<h4>Configuration</h4>
-			<ul>
-				<li><a href="${ url('beeswax.views.configuration') }">Hive Configuration</a></li>
-			    <li><a href="${ url('beeswax.views.configuration') }?include_hadoop=1">Extended Configuration</a></li>
-			</ul>
+	<div class="row-fluid">
+		<div class="span3">
+			<div class="well sidebar-nav">
+				<ul class="nav nav-list">
+					<li class="nav-header">Examples</li>
+					<li><a href="#installSamples" data-toggle="modal">Install Samples</a></li>
+					<li class="nav-header">Tables</li>
+					<li><a href="${ url('beeswax.views.show_tables') }">Show Tables</a></li>
+				    <li><a href="${ url('beeswax.create_table.create_table') }">Create Table</a></li>
+					<li class="nav-header">Queries</li>
+					<li><a href="${ url('beeswax.views.list_designs') }">Saved Queries</a></li>
+				    <li><a href="${ url('beeswax.views.execute_query') }">Execute Query</a></li>
+				    <li><a href="${ url('beeswax.views.edit_report') }">Report Generator</a></li>
+					<li><a href="${ url('beeswax.views.list_query_history') }">Query History</a></li>
+					<li class="nav-header">Configuration</li>
+					<li><a href="${ url('beeswax.views.configuration') }">Hive Configuration</a></li>
+				    <li><a href="${ url('beeswax.views.configuration') }?include_hadoop=1">Extended Configuration</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="span9">
+			<h1>Welcome to Beeswax for Hive</h1>
+			To get started with Beeswax you'll first need set up some data.
+			<a href="${ url('beeswax.create_table.create_table') }" class='btn'>Import Data</a>
+			or <a href="#installSamples" data-toggle="modal">Install Samples</a>.
 		</div>
 	</div>
+</div>
 
-	<div class="content">
-		<h1>Welcome to Beeswax for Hive</h1>
-		To get started with Beeswax you'll first need set up some data.
-		<a href="${ url('beeswax.create_table.create_table') }" class='btn'>Import Data</a>
-		or <a href="${ url('beeswax.views.install_examples') }" class=''>Install Samples</a>.
+<div id="installSamples" class="modal hide fade">
+	<div class="modal-header">
+		<a href="#" class="close" data-dismiss="modal">&times;</a>
+		<h3>Install samples</h3>
+	</div>
+	<div class="modal-body">
+	  <div id="installSamplesMessage" class="alert">
+
+	  </div>
+	</div>
+	<div class="modal-footer">
+		<a href="#" id="installSamplesBtn" class="btn primary">Yes</a>
+		<a href="#" class="btn secondary" data-dismiss="modal">No</a>
 	</div>
 </div>
+
+
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$.getJSON("${ url('beeswax.views.install_examples') }",function(data){
+			$("#installSamplesMessage").text(data.title);
+		});
+
+		$("#installSamplesBtn").click(function(){
+			$.post(
+				"${ url('beeswax.views.install_examples') }",
+				{ submit:"Submit" },
+			  	function(creationSucceeded){
+					if (creationSucceeded){
+						window.location.href = "/beeswax/tables";
+					}
+					else {
+						$("#installSamplesMessage").addClass("alert-error").text("There was an error processing your request.");
+					}
+				}
+			);
+
+		});
+	});
+</script>
 ${commonfooter()}
