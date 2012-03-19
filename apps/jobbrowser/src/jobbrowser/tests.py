@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import time
-import re
 
 from nose.tools import assert_true, assert_false, assert_equal
 from nose.plugins.skip import SkipTest
@@ -25,8 +24,6 @@ from desktop.lib.django_test_util import make_logged_in_client
 from hadoop import mini_cluster
 from jobsub.models import JobDesign
 from jobsub.tests import parse_out_id, watch_till_complete
-from jobsub.views import in_process_jobsubd
-from jobsubd.ttypes import SubmissionHandle
 from jobbrowser import models, views
 
 def test_dots_to_camel_case():
