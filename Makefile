@@ -45,11 +45,11 @@
 # ==========
 # Here we summarize the flow of the build logic. Lines represent dependency.
 #
-#   virtual-bootstrap.py
-#             |                       ext/thirdparty/js (crepo sync)
-#   virtual-env (./env)                           |
-#             |                                   |
-#             '--------+----------+---------------'
+#                  virtual-bootstrap.py
+#                            |
+#                  virtual-env (./env)
+#                            |
+#                      +----------+
 #                      |          |
 #                      |          V
 #                      |       desktop  <--- recursive make in /desktop
@@ -217,9 +217,6 @@ clean:
 	@$(MAKE) -C apps clean
 # <<<< DEV ONLY
 	@$(MAKE) -C docs clean
-	@echo "Removing dependencies managed by crepo"
-	@cd $(THIRDPARTY_JS_DIR) && $(CREPO) do-all -x clean -f -x -d
-	@rm -f VERSION_DATA
 # END DEV ONLY >>>>
 
 #
