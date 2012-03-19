@@ -160,7 +160,7 @@ def test_group_admin():
 
   # Create a group
   response = c.get('/useradmin/groups/new')
-  assert_true("Create Group" in response.content)
+  assert_equal('/useradmin/groups/new', response.context['action'])
   c.post('/useradmin/groups/new', dict(name="testgroup"))
 
   # We should have an empty group in the DB now
