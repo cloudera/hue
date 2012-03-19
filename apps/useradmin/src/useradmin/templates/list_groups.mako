@@ -30,7 +30,9 @@ ${layout.menubar(section='groups')}
 	<div class="well">
 			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 			<p class="pull-right">
+				%if user.is_superuser == True:
 				<a id="addGroupBtn" href="#" class="btn">Add group</a>
+				%endif
 			</p>
 	</div>
       <table class="datatables">
@@ -39,19 +41,23 @@ ${layout.menubar(section='groups')}
             <th>${_('Group Name')}</th>
             <th>${_('Members')}</th>
             <th>${_('Permissions')}</th>
+			%if user.is_superuser == True:
 			<th>&nbsp;</th>
+			%endif
           </tr>
         </head>
         <tbody>
         % for group in groups:
-          <tr class="groupRow" data-search="${group.name}${', '.join([user.username for user in group.user_set.all()])}">
+          <tr class="groupRow" data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
             <td>${group.name}</td>
-            <td>${', '.join([user.username for user in group.user_set.all()])}</td>
+            <td>${', '.join([group_user.username for group_user in group.user_set.all()])}</td>
             <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
+			%if user.is_superuser == True:
             <td>
               <a title="Edit ${group.name}" class="btn small editGroupBtn" data-url="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-name="${group.name}">Edit</a>
               <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>
             </td>
+			%endif
           </tr>
         % endfor
         </tbody>
@@ -111,7 +117,9 @@ ${layout.menubar(section='groups')}
 					{ "sWidth": "20%" },
 					{ "sWidth": "20%" },
 					null,
+					%if user.is_superuser == True:
 					{ "sWidth": "120px" },
+					%endif
 				 ]
 			});
 			$(".dataTables_wrapper").css("min-height","0");

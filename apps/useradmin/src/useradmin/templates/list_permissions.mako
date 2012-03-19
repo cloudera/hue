@@ -37,7 +37,9 @@ ${layout.menubar(section='permissions')}
             <th>${_('Application')}</th>
             <th>${_('Permission')}</th>
             <th>${_('Groups')}</th>
+			%if user.is_superuser == True:
 			<th>&nbsp;</th>
+			%endif
           </tr>
         </head>
         <tbody>
@@ -46,9 +48,11 @@ ${layout.menubar(section='permissions')}
             <td>${perm.app}</td>
             <td>${perm.description}</td>
             <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
+			%if user.is_superuser == True:
             <td>
               <a title="Edit permission" class="btn small editPermissionBtn" data-url="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}">Edit</a>
             </td>
+			%endif
           </tr>
         % endfor
         </tbody>

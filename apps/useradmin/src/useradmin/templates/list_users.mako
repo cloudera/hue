@@ -29,7 +29,9 @@ ${layout.menubar(section='users')}
 	<div class="well">
 			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 			<p class="pull-right">
+				%if user.is_superuser == True:
 				<a id="addUserBtn" href="#" class="btn">Add user</a>
+				%endif
 			</p>
 	</div>
       <table class="datatables">
@@ -44,18 +46,26 @@ ${layout.menubar(section='users')}
           </tr>
         </head>
         <tbody>
-        % for user in users:
-          <tr class="userRow" data-search="${user.username}${user.first_name}${user.last_name}${user.email}">
-            <td>${user.username}</td>
-            <td>${user.first_name}</td>
-            <td>${user.last_name}</td>
-            <td>${user.email}</td>
+        % for listed_user in users:
+          <tr class="userRow" data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}">
+            <td>${listed_user.username}</td>
+            <td>${listed_user.first_name}</td>
+            <td>${listed_user.last_name}</td>
+            <td>${listed_user.email}</td>
             <td>
-              ${user.last_login.strftime('%c')}
+              ${listed_user.last_login.strftime('%c')}
             </td>
             <td>
-              <a title="Edit ${user.username}" class="btn small editUserBtn" data-url="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }" data-name="${user.username}">Edit</a>
-              <a title="Delete ${user.username}" class="btn small confirmationModal" alt="Are you sure you want to delete ${user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(user.username)) }">Delete</a>
+			  %if user.is_superuser == True:
+              <a title="Edit ${listed_user.username}" class="btn small editUserBtn" data-url="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-name="${listed_user.username}">Edit</a>
+              <a title="Delete ${listed_user.username}" class="btn small confirmationModal" alt="Are you sure you want to delete ${listed_user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(listed_user.username)) }">Delete</a>
+			  %else:
+				%if user.username == listed_user.username:
+					<a title="Edit ${listed_user.username}" class="btn small editUserBtn" data-url="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-name="${listed_user.username}">Edit</a>
+				%else:
+					&nbsp;
+				%endif
+			  %endif
             </td>
           </tr>
         % endfor
