@@ -27,7 +27,7 @@ ${layout.menubar(section='users')}
 <div class="container-fluid">
 	<h1>Hue Users</h1>
 	<div class="well">
-			Filter by name: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+			Filter: <input id="filterInput"/> <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 			<p class="pull-right">
 				%if user.is_superuser == True:
 				<a id="addUserBtn" href="#" class="btn">Add user</a>
@@ -45,7 +45,7 @@ ${layout.menubar(section='users')}
             <th>${_('Last Login')}</th>
 			<th>&nbsp;</th>
           </tr>
-        </head>
+        </thead>
         <tbody>
         % for listed_user in users:
           <tr class="userRow" data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
