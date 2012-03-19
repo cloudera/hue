@@ -80,7 +80,7 @@ ${layout.menubar(section='users')}
 			<h3>Add user</h3>
 		</div>
 		<div id="addUserBody" class="modal-body">
-			<iframe id="addUserFrame" class="scroll"></iframe>
+			<iframe id="addUserFrame" class="scroll" frameBorder="0"></iframe>
 		</div>
 		<div class="modal-footer">
 			<button id="addUserSaveBtn" class="btn primary">Save</button>
@@ -93,7 +93,7 @@ ${layout.menubar(section='users')}
 			<h3>Edit user <span class="username"></span></h3>
 		</div>
 		<div id="editUserBody" class="modal-body">
-			<iframe id="editUserFrame" class="scroll"></iframe>
+			<iframe id="editUserFrame" class="scroll" frameBorder="0"></iframe>
 		</div>
 		<div class="modal-footer">
 			<button id="editUserSaveBtn" class="btn primary">Save</button>

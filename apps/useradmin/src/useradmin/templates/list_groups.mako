@@ -84,7 +84,7 @@ ${layout.menubar(section='groups')}
 		<h3>Add group</h3>
 	</div>
 	<div id="addGroupBody" class="modal-body">
-		<iframe id="addGroupFrame"></iframe>
+		<iframe id="addGroupFrame" frameBorder="0"></iframe>
 	</div>
 	<div class="modal-footer">
 		<button id="addGroupSaveBtn" class="btn primary">Save</button>
@@ -97,7 +97,7 @@ ${layout.menubar(section='groups')}
 		<h3>Edit group <span class="groupName"></span></h3>
 	</div>
 	<div id="editGroupBody" class="modal-body">
-		<iframe id="editGroupFrame"></iframe>
+		<iframe id="editGroupFrame" frameBorder="0"></iframe>
 	</div>
 	<div class="modal-footer">
 		<button id="editGroupSaveBtn" class="btn primary">Save</button>
