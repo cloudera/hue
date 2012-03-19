@@ -66,7 +66,8 @@ Development Prerequisites
       * libsqlite3-dev
       * libxml2-dev
       * libxslt-dev
-      * maven2
+      * mvn (from ``maven2`` package or tarball)
+      * openldap-dev
       * python-dev
       * python-simplejson
 
@@ -78,9 +79,10 @@ Development Prerequisites
       * gcc-c++
       * libxml2-devel
       * libxslt-devel
-      * maven2
+      * mvn (from ``maven2`` package or tarball)
       * mysql
       * mysql-devel
+      * openldap-devel
       * python-devel
       * python-simplejson (for the crepo tool)
       * sqlite-devel
@@ -117,18 +119,6 @@ To start the helper daemons::
 Now Hue should be running on http://localhost:8000.
 
 
-Setting up Hadoop
-=================
-In order to start up a pseudo-distributed cluster with the plugins enabled,
-run::
-
-    $ ./tools/scripts/configure-hadoop.sh all
-
-After doing so, running ``jps`` should show all the daemons running (NN, JT,
-TT, DN) and you should be able to see the web UI on http://localhost:50030/ and
-http://localhost:50070/.
-
-
 FAQ
 ===
 1: What does "Exception: no app!" mean?
@@ -149,7 +139,7 @@ because there's ambiguity in the view, be sure to prefix the name
 with the application name.  The url name namespace is global.  So
 ``jobsub.list`` is fine, but ``list`` is not.
 
-Hue is using Django 1.1, which supports the notion of URL namespaces:
+Hue is using Django 1.2, which supports the notion of URL namespaces:
 http://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces.
 We have yet to move over our URLs to this construct. Brownie points for the
 developer who takes this on.
@@ -158,30 +148,13 @@ developer who takes this on.
 Using and Installing Thrift
 ===========================
 Right now, we check in the generated thrift code.
-To generate the code, you'll need the thrift binary.
-Compile it like so::
-
-    $ git clone http://github.com/dreiss/thrift.git
-    $ cd thrift
-    $ ./bootstrap.sh
-    $ ./configure --with-py=no --with-java=no --with-perl=no --prefix=$HOME/pub
-
-We exclude python, java, and perl because they don't like
-to install in prefix.  If you look around at configure's --help,
-there are environment variables that determine where those
-runtime bindings are installed.
-::
-
-    $ make && make install
+To generate the code, you'll need the thrift binary version 0.7.0.
+Please download from http://thrift.apache.org/.
 
 When preparing ``.thrift`` files, you can use she-bangs to generate
 the python bindings like so::
 
     #!/usr/bin/env thrift -r --gen py:new_style -o ../../../
-
-.. note::
-    This file is in reStructuredText. You may run
-    ``rst2html README.rst > README.html`` to produce a HTML.
 
 
 Profiling Hue Apps
