@@ -67,7 +67,7 @@ ${layout.menubar(section='permissions')}
 		<h3>Edit permissions for <span class="applicationName"></span></h3>
 	</div>
 	<div id="editPermissionBody" class="modal-body">
-		<iframe id="editPermissionFrame"></iframe>
+		<iframe id="editPermissionFrame" frameBorder="0"></iframe>
 	</div>
 	<div class="modal-footer">
 		<button id="editPermissionSaveBtn" class="btn primary">Save</button>

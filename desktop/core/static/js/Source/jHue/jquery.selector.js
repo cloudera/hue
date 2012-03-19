@@ -89,7 +89,7 @@
 		selectAll.appendTo(header);
 
 		var searchBox = $("<input>").attr("type","text").attr("placeholder", this.options.searchPlaceholder).keyup(function(){
-			var q = $(this).val().trim();
+			var q = $.trim($(this).val());
 			if (q != ""){
 				body.find("li.selectorDivider").hide();
 				body.find("label").each(function(){
