@@ -1,12 +1,32 @@
+#!/usr/bin/env python
 # encoding: utf-8
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import datetime
+import logging
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 from django.db.utils import DatabaseError
 
 from desktop.lib.django_db_util import remove_content_type
-from jobsub.models import hue1_to_hue2_data_migration
+from jobsub.models import JobDesign, OozieJavaAction, OozieStreamingAction, OozieWorkflow
+
+LOG = logging.getLogger(__name__)
 
 class Migration(SchemaMigration):
     
@@ -90,10 +110,9 @@ class Migration(SchemaMigration):
         except DatabaseError, ex:
             pass    # Table doesn't exist. Ok.
 
-        # Data migration
         hue1_to_hue2_data_migration()
 
-    
+
     def backwards(self, orm):
         
         # Deleting model 'OozieStreamingAction'
@@ -224,3 +243,82 @@ class Migration(SchemaMigration):
     }
     
     complete_apps = ['jobsub']
+
+
+#
+# Data migration helper
+#
+
+def hue1_to_hue2_data_migration():
+  """
+  Data migration from the JobDesign table to the new Oozie-based models.
+
+  The migration could be incomplete:
+  - Jar types, for which the main class wasn't specified.
+
+  We add an `(incomplete)' marker to the design name to alert the user.
+  """
+  jd_list = JobDesign.objects.all()
+
+  for jd in jd_list:
+    if jd.type == 'jar':
+      job_design_migration_for_jar(jd)
+    elif jd.type == 'streaming':
+      job_design_migration_for_streaming(jd)
+    else:
+      LOG.warn("Unknown JobDesign type '%s' in the old table. Row id: %s" %
+               (jd.type, jd.id))
+
+
+def job_design_migration_for_jar(jd):
+  """Migrate one jar type design"""
+  data = json.loads(jd.data)
+  action = OozieJavaAction(action_type=OozieJavaAction.ACTION_TYPE,
+                           jar_path=data['jarfile'],
+                           main_class="please.specify.in.the.job.design",
+                           args=data['arguments'])
+  action.save()
+
+  wf = OozieWorkflow(owner=jd.owner,
+                     name=jd.name + ' (incomplete)',
+                     description=jd.description,
+                     root_action=action)
+  wf.save()
+
+
+def job_design_migration_for_streaming(jd):
+  """Migrate one streaming type design"""
+  data = json.loads(jd.data)
+
+  files = json.dumps(data['cache_files'])
+  archives = json.dumps(data['cache_archives'])
+  properties = data['hadoop_properties']
+
+  def add_property(key, value):
+    if value:
+      properties[key] = value
+
+  add_property('mapred.input.dir', ','.join(data['input']))
+  add_property('mapred.output.dir', data['output'])
+  add_property('mapred.combiner.class', data['combiner_class'])
+  add_property('mapred.mapper.class', data['mapper_class'])
+  add_property('mapred.reducer.class', data['reducer_class'])
+  add_property('mapred.partitioner.class', data['partitioner_class'])
+  add_property('mapred.input.format.class', data['inputformat_class'])
+  add_property('mapred.output.format.class', data['outputformat_class'])
+  add_property('mapred.reduce.tasks', data['num_reduce_tasks'])
+
+  action = OozieStreamingAction(action_type=OozieStreamingAction.ACTION_TYPE,
+                                mapper=data['mapper_cmd'],
+                                reducer=data['reducer_cmd'],
+                                files=files,
+                                archives=archives,
+                                job_properties=properties)
+  action.save()
+
+  wf = OozieWorkflow(owner=jd.owner,
+                     name=jd.name,
+                     description=jd.description,
+                     root_action=action)
+  wf.save()
+
