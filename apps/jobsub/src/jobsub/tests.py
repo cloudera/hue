@@ -89,6 +89,7 @@ def test_job_design_cycle():
   Tests for the "job design" CMS.
   Submission requires a cluster, so that's separate.
   """
+  raise SkipTest
   c = make_logged_in_client()
 
   # New should give us a form.
