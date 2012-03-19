@@ -47,23 +47,23 @@
           </div>
         </fieldset>
 
-		
-		 
+
+
 		<div class="actions">
 			<a id="executeQuery" class="btn primary">Execute</a>
 			% if design and not design.is_auto and design.name:
             <a id="saveQuery" class="btn">Save</a>
           	% endif
           	<a id="saveQueryAs" class="btn">Save as...</a>
-          
+
 			<a id="explainQuery" class="btn">Explain</a>
 			&nbsp; or <a href="${ url('beeswax.views.execute_query') }">create a new query</a>
 		</div>
-          
-          
 
-      
- <!--      
+
+
+
+ <!--
 <a href="#settings">see the advanced settings</a>
     <div>
       ${comps.field(form.saveform['name'])}
@@ -86,7 +86,7 @@ ${layout.menubar(section='query')}
 		% if i > 0:
 			<hr/>
 		% endif
-		
+
 		<div class="clearfix">
 			${comps.label(f['key'])}
 			<div class="input">
@@ -96,7 +96,7 @@ ${layout.menubar(section='query')}
 				))}
 			</div>
 		</div>
-		
+
 		<div class="clearfix">
 			${comps.label(f['value'])}
 			<div class="input">
@@ -111,7 +111,7 @@ ${layout.menubar(section='query')}
 				type="submit",
 				title="Delete this setting",
 				klass="btn small danger settingsDelete"
-			), value=True)}	
+			), value=True)}
 		</div>
 		${comps.field(f['_exists'], hidden=True)}
 	    % endfor
@@ -119,7 +119,7 @@ ${layout.menubar(section='query')}
 			<a class="btn small" data-form-prefix="settings">Add</a>
 		</div>
 
-		
+
 		<h6>File Resources</h6>
 		 % for i, f in enumerate(form.file_resources.forms):
               % if i > 0:
@@ -134,7 +134,7 @@ ${layout.menubar(section='query')}
 					))}
 				</div>
 			</div>
-			
+
 			<div class="clearfix">
 				${comps.label(f['path'])}
 				<div class="input">
@@ -152,7 +152,7 @@ ${layout.menubar(section='query')}
 					title="Delete this setting",
 					klass="btn small danger file_resourcesDelete"
 				), value=True)}
-				
+
 				${comps.field(f['_exists'], hidden=True)}
 			</div>
             % endfor
@@ -192,18 +192,18 @@ ${layout.menubar(section='query')}
 					klass="btn small danger"
 				), value=True)}
 			</div>
-         
+
           ${comps.field(f['_exists'], hidden=True)}
         % endfor
 		<div class="clearfix">
 			<a class="btn small" data-form-prefix="functions">Add</a>
 		</div>
-		
+
 		<h6>Parametrization</h6>
 		${comps.field(form.query["is_parameterized"],
             notitle = True,
             tag = "checkbox",
-            button_text = "Enable Parameterization", 
+            button_text = "Enable Parameterization",
             help = "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.",
             help_attrs= dict(
               data_help_direction='11'
@@ -235,7 +235,7 @@ ${layout.menubar(section='query')}
 				% endif
 			</div>
 		% endif
-	
+
         % if on_success_url:
           <input type="hidden" name="on_success_url" value="${on_success_url}"/>
         % endif
@@ -253,7 +253,7 @@ ${layout.menubar(section='query')}
 				</a></li>
 				% endif
 			</ul>
-            
+
 			<div class="tab-content">
 				<div class="active tab-pane" id="queryPane">
 					${query()}
@@ -279,7 +279,7 @@ ${layout.menubar(section='query')}
 		<a href="#" class="close">&times;</a>
 		<h3>Choose a file</h3>
 	</div>
-	<div class="modal-body">  
+	<div class="modal-body">
 		<div id="filechooser">
 		</div>
 	</div>
@@ -303,7 +303,7 @@ ${layout.menubar(section='query')}
 		});
 		// hack!!!
 		$("select").addClass("span3");
-		
+
 		$("a[data-form-prefix]").each(function(){
 			var _prefix = $(this).attr("data-form-prefix");
 			var _nextID = 0;
@@ -318,13 +318,13 @@ ${layout.menubar(section='query')}
 				checkAndSubmit();
 			});
 		});
-		
+
 		$("a[data-form-prefix]").click(function(){
 			var _prefix = $(this).attr("data-form-prefix");
 			$("<input>").attr("type","hidden").attr("name",_prefix+"-add").attr("value","True").appendTo($("#advancedSettingsForm"));
 			checkAndSubmit();
 		});
-		
+
 		$("a[data-filechooser-destination]").click(function(){
 			var _destination = $(this).attr("data-filechooser-destination");
 			$("#filechooser").jHueFileChooser({
@@ -335,47 +335,41 @@ ${layout.menubar(section='query')}
 			});
 			$("#chooseFile").modal("show");
 		});
-		
+
 		$("#executeQuery").click(function(){
 			$("<input>").attr("type","hidden").attr("name","button-submit").attr("value","Execute").appendTo($("#advancedSettingsForm"));
 			checkAndSubmit();
 		});
-		
+
 		$("#saveQuery").click(function(){
 			$("<input>").attr("type","hidden").attr("name","saveform-save").attr("value","Save").appendTo($("#advancedSettingsForm"));
 			checkAndSubmit();
 		});
-		
+
 		$("#saveQueryAs").click(function(){
 			$("<input>").attr("type","hidden").attr("name","saveform-saveas").attr("value","Save As...").appendTo($("#advancedSettingsForm"));
 			checkAndSubmit();
 		});
-		
+
 		$("#explainQuery").click(function(){
 			$("<input>").attr("type","hidden").attr("name","button-explain").attr("value","Explain").appendTo($("#advancedSettingsForm"));
 			checkAndSubmit();
 		});
-		
+
 		$("#queryField").change(function(){
 			$(".query").val($(this).val());
 		});
-		
+
 		$("#queryField").focus(function(){
 			$(this).removeClass("fieldError");
 			$("#validationResults").empty();
 		});
-				
+
 		function checkAndSubmit(){
-			$(".query").val($("#queryField").val());
-			if ($.trim($("#queryField").val()) == ""){
-				$("#queryField").addClass("fieldError");
-				$("#validationResults").html('<ul class="errorlist"><li>This field is required.</li></ul>');
-			}
-			else {
-				$("#advancedSettingsForm").submit();
-			}
+			// TODO: client side validation
+			$("#advancedSettingsForm").submit();
 		}
-		
+
 		$("#chooseFile").modal({
 			keyboard: true,
 			backdrop: true
