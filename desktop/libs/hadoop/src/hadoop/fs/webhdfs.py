@@ -538,7 +538,7 @@ def _get_service_url(hdfs_config):
   fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
   netloc = Hdfs.urlsplit(fs_defaultfs)[1]
   host = netloc.split(':')[0]
-  port = hadoop.conf.DEFAULT_NN_HTTP_PORT
+  port = hdfs_config.NN_HTTP_PORT.get()
   return "http://%s:%s/webhdfs/v1" % (host, port)
 
 

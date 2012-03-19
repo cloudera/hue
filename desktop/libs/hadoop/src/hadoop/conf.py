@@ -119,8 +119,6 @@ CREDENTIALS_MERGER_JAR = Config("hadoop_credentials_merger_jar",
   private=True)
 
 
-DEFAULT_NN_HTTP_PORT = 50070
-
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
   help="One entry for each HDFS cluster",
@@ -134,9 +132,9 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                             type=int),
       NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
                             type=int),
+      # End deprecation
       NN_HTTP_PORT=Config("http_port", help="Hadoop HTTP port for the name node", default=50070,
                             type=int),
-      # End deprecation
       FS_DEFAULTFS=Config("fs_defaultfs", help="The equivalent of fs.defaultFS (aka fs.default.name)",
                           default="hdfs://localhost:8020"),
       WEBHDFS_URL=Config("webhdfs_url",
