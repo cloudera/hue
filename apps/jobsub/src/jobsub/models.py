@@ -18,7 +18,7 @@
 import logging
 try:
   import json
-except ImportException:
+except ImportError:
   import simplejson
 
 from django.db import models
