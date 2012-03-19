@@ -24,18 +24,18 @@ ${commonheader("Beeswax: My Queries", "beeswax", "100px")}
 ${layout.menubar(section='my queries')}
 
 <div class="container-fluid">
-<h1>Beeswax: My Queries</h1>
+	<h1>Beeswax: My Queries</h1>
 
-	<ul class="tabs">
-		<li class="active"><a href="#recentSavedQueries">Recent Saved Queries</a></li>
-		<li><a href="#recentRunQueries">Recent Run Queries</a></li>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#recentSavedQueries" data-toggle="tab">Recent Saved Queries</a></li>
+		<li><a href="#recentRunQueries" data-toggle="tab">Recent Run Queries</a></li>
 	</ul>
-	
+
 
 		<div class="tab-content">
 			<div class="active tab-pane" id="recentSavedQueries">
-	
-				 <table class="datatables">
+
+				 <table class="table table-striped table-condensed datatables">
 			          <thead>
 			            <tr>
 			              <th>Name</th>
@@ -94,9 +94,9 @@ ${layout.menubar(section='my queries')}
 			          <a href="${ url('beeswax.views.list_designs') }?user=${request.user.username|u}" >View all my queries &raquo;</a>
 			        % endif
 			</div>
-			
+
 			<div class="tab-pane" id="recentRunQueries">
-				<table class="datatables">
+				<table class="table table-striped table-condensed datatables">
 		          <thead>
 		            <tr>
 		              <th>Time</th>
@@ -154,12 +154,12 @@ ${layout.menubar(section='my queries')}
 <div id="deleteQuery" class="modal hide fade">
 	<form id="deleteQueryForm" action="" method="POST">
 	<div class="modal-header">
-		<a href="#" class="close">&times;</a>
+		<a href="#" class="close" data-dismiss="modal">&times;</a>
 		<h3 id="deleteQueryMessage">Confirm action</h3>
 	</div>
 	<div class="modal-footer">
 		<input type="submit" class="btn primary" value="Yes"/>
-		<a href="#" class="btn secondary hideModal">No</a>
+		<a href="#" class="btn secondary" data-dismiss="modal">No</a>
 	</div>
 	</form>
 </div>
@@ -167,29 +167,22 @@ ${layout.menubar(section='my queries')}
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-		$(".tabs").tabs();
 		$(".datatables").dataTable({
 			"bPaginate": false,
 		    "bLengthChange": false,
 			"bInfo": false,
 			"bFilter": false
 		});
-		
-		
+
+
 		$(".contextEnabler").jHueContextMenu();
-		$("#deleteQuery").modal({
-			backdrop: "static",
-			keyboard: true
-		});
+
 		$(".confirmationModal").live("click", function(){
 			$.getJSON($(this).attr("data-confirmation-url"), function(data){
 				$("#deleteQueryForm").attr("action", data.url);
 				$("#deleteQueryMessage").text(data.title);
 			});
 			$("#deleteQuery").modal("show");
-		});
-		$(".hideModal").click(function(){
-			$("#deleteQuery").modal("hide");
 		});
 
 	});

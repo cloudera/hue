@@ -125,7 +125,7 @@ def list_designs(request):
   '''
   List all workflow designs. Result sorted by last modification time.
   Query params:
-    owner       - Substring filter by owner field 
+    owner       - Substring filter by owner field
     name        - Substring filter by design name field
   '''
   data = models.OozieDesign.objects

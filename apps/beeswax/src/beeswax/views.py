@@ -26,6 +26,7 @@ from django.core import urlresolvers
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
 from django.utils.encoding import force_unicode
+from django.utils import simplejson
 
 from desktop.lib import django_mako
 from desktop.lib.paginator import Paginator
@@ -1083,12 +1084,13 @@ def install_examples(request):
     try:
       beeswax.management.commands.beeswax_install_examples.Command().handle_noargs()
       if models.MetaInstall.get().installed_example:
-        request.flash.put('Installed Beeswax examples.')
+        creation_succeeded = True
+        return HttpResponse(simplejson.dumps(creation_succeeded), mimetype="application/json")
     except Exception, err:
       LOG.exception(err)
-      raise PopupException("Error installing examples", detail=err)
 
-    return format_preserving_redirect(request, '/beeswax/tables')
+    creation_succeeded = False
+    return HttpResponse(simplejson.dumps(creation_succeeded), mimetype="application/json")
 
 
 def describe_partitions(request, table):

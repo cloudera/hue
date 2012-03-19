@@ -87,6 +87,7 @@ def get_current_users():
 def dt_login(request):
   """Used by the non-jframe login"""
   redirect_to = request.REQUEST.get('next', '/')
+  login_errors = False
   if request.method == 'POST':
     form = django.contrib.auth.forms.AuthenticationForm(data=request.POST)
     if form.is_valid():
@@ -97,6 +98,7 @@ def dt_login(request):
       return HttpResponseRedirect(redirect_to)
     else:
       access_warn(request, 'Failed login for user "%s"' % (request.POST.get('username'),))
+      login_errors = True
   else:
     form = django.contrib.auth.forms.AuthenticationForm()
   request.session.set_test_cookie()
@@ -110,6 +112,7 @@ def dt_login(request):
     'form': form,
     'next': redirect_to,
     'first_login_ever': first_login_ever,
+    'login_errors': login_errors,
   })
 
 

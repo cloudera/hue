@@ -15,26 +15,24 @@
 ## limitations under the License.
 ##
 ##
-## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and 
+## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and
 ## multiple spaces and line breaks cause issues
 <%!
 def is_selected(section, matcher):
   if section == matcher:
-    return "selected"
+    return "active"
   else:
     return ""
 %>
 
 <%def name="menubar(section='')">
-	<div class="menubar">
-		<div class="menubar-inner">
-			<div class="container-fluid">
-				<ul class="nav">
-					<li><a href="/useradmin/users" class="${is_selected(section, 'users')}">Users</a></li>
-					<li><a href="/useradmin/groups" class="${is_selected(section, 'groups')}">Groups</a></li>
-					<li><a href="/useradmin/permissions" class="${is_selected(section, 'permissions')}">Permissions</a></li>
-				</ul>
-			</div>
+	<div class="subnav subnav-fixed">
+		<div class="container-fluid">
+			<ul class="nav nav-pills">
+				<li class="${is_selected(section, 'users')}"><a href="/useradmin/users">Users</a></li>
+				<li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">Groups</a></li>
+				<li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">Permissions</a></li>
+			</ul>
 		</div>
 	</div>
 </%def>

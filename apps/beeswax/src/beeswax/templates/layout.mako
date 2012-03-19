@@ -15,30 +15,28 @@
 ## limitations under the License.
 ##
 ##
-## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and 
+## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and
 ## multiple spaces and line breaks cause issues
 <%!
 def is_selected(section, matcher):
   if section == matcher:
-    return "selected"
+    return "active"
   else:
     return ""
 %>
 
 <%def name="menubar(section='')">
-	<div class="menubar">
-		<div class="menubar-inner">
-			<div class="container-fluid">
-				<ul class="nav">
-					<li><a href="/beeswax/execute" class="${is_selected(section, 'query')}">Query Editor</a></li>
-					<li><a href="/beeswax/my_queries" class="${is_selected(section, 'my queries')}">My Queries</a></li>
-					<li><a href="/beeswax/list_designs" class="${is_selected(section, 'saved queries')}">Saved Queries</a></li>
-					<li><a href="/beeswax/query_history" class="${is_selected(section, 'history')}">History</a></li>
-					<li><a href="/beeswax/tables" class="${is_selected(section, 'tables')}">Tables</a></li>
-					<li><a href="/beeswax/configuration" class="${is_selected(section, 'hive configuration')}">Settings</a></li>
-				</ul>
-			</div>
-		</div>
+<div class="subnav subnav-fixed">
+	<div class="container-fluid">
+		<ul class="nav nav-pills">
+			<li class="${is_selected(section, 'query')}"><a href="/beeswax/execute">Query Editor</a></li>
+			<li class="${is_selected(section, 'my queries')}"><a href="/beeswax/my_queries">My Queries</a></li>
+			<li class="${is_selected(section, 'saved queries')}"><a href="/beeswax/list_designs">Saved Queries</a></li>
+			<li class="${is_selected(section, 'history')}"><a href="/beeswax/query_history">History</a></li>
+			<li class="${is_selected(section, 'tables')}"><a href="/beeswax/tables">Tables</a></li>
+			<li class="${is_selected(section, 'hive configuration')}"><a href="/beeswax/configuration">Settings</a></li>
+		</ul>
 	</div>
+</div>
 </%def>
 

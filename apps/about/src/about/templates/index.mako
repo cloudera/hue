@@ -17,18 +17,17 @@
 from desktop.views import commonheader, commonfooter
 %>
 ${commonheader("About jHue", "about", "100px")}
-	<div class="menubar">
-		<div class="menubar-inner">
-			<div class="container-fluid">
-				<ul class="nav">
-					<li><a href="${url("desktop.views.dump_config")}">Configuration</a></li>
-					<li><a href="${url("desktop.views.check_config")}">Check for misconfiguration</a></li>
-					<li><a href="${url("desktop.views.log_view")}">Server Logs</a></li>
-				</ul>
-			</div>
+
+	<div class="subnav subnav-fixed">
+		<div class="container-fluid">
+		<ul class="nav nav-pills">
+			<li><a href="${url("desktop.views.dump_config")}">Configuration</a></li>
+			<li><a href="${url("desktop.views.check_config")}">Check for misconfiguration</a></li>
+			<li><a href="${url("desktop.views.log_view")}">Server Logs</a></li>
+		</ul>
 		</div>
 	</div>
-	
+
 	<div class="container-fluid">
 
 		<img src="/static/art/help/logo.png" />

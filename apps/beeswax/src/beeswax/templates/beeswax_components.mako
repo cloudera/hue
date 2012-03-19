@@ -21,19 +21,19 @@
 </%def>
 
 <%def name="label(
-  field, 
-  render_default=False, 
+  field,
+  render_default=False,
   data_filters=None,
-  hidden=False, 
-  notitle=False, 
-  tag='input', 
-  klass=None, 
-  attrs=None, 
-  value=None, 
-  help=False, 
-  help_attrs=None, 
-  dd_attrs=None, 
-  dt_attrs=None, 
+  hidden=False,
+  notitle=False,
+  tag='input',
+  klass=None,
+  attrs=None,
+  value=None,
+  help=False,
+  help_attrs=None,
+  dd_attrs=None,
+  dt_attrs=None,
   title_klass=None,
   button_text=False
   )">
@@ -55,14 +55,14 @@
     attrs = {}
   if not render_default:
     attrs.setdefault('type', 'text')
-    
+
   if data_filters:
     attrs.data_filters = data_filters
-  
+
   classes = []
   if klass:
     classes.append(klass)
-  if hidden: 
+  if hidden:
     classes.append("jframe-hidden")
   cls = ' '.join(classes)
 
@@ -78,19 +78,19 @@
 
 
 <%def name="field(
-  field, 
-  render_default=False, 
+  field,
+  render_default=False,
   data_filters=None,
-  hidden=False, 
-  notitle=False, 
-  tag='input', 
-  klass=None, 
-  attrs=None, 
-  value=None, 
-  help=False, 
-  help_attrs=None, 
-  dd_attrs=None, 
-  dt_attrs=None, 
+  hidden=False,
+  notitle=False,
+  tag='input',
+  klass=None,
+  attrs=None,
+  value=None,
+  help=False,
+  help_attrs=None,
+  dd_attrs=None,
+  dt_attrs=None,
   title_klass=None,
   button_text=False
   )">
@@ -112,14 +112,14 @@
     attrs = {}
   if not render_default:
     attrs.setdefault('type', 'text')
-    
+
   if data_filters:
     attrs.data_filters = data_filters
-  
+
   classes = []
   if klass:
     classes.append(klass)
-  if hidden: 
+  if hidden:
     classes.append("jframe-hidden")
   cls = ' '.join(classes)
 
@@ -149,7 +149,7 @@
         % else:
           <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} />
         % endif
-		
+
       % endif
     % if len(field.errors):
          ${unicode(field.errors) | n}
@@ -179,13 +179,13 @@
   ${pageref(page.num_pages())}
 </%def>
 <%def name="pagination(page)">
-	<p>Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} items, page ${page.number} of ${page.num_pages()}</p>
 	<div class="pagination">
-	  <ul>
+	  <ul class="pull-right">
 	    <li class="prev"><a title="Beginning of List" ${toppage(page)} class="bw-firstBlock">&larr; Beginning of List</a></li>
 	    <li><a title="Previous Page" ${prevpage(page)} class="bw-prevBlock">Previous Page</a></li>
 		<li><a title="Next page" ${nextpage(page)} class="bw-nextBlock">Next Page</a></li>
 	    <li class="next"><a title="End of List" ${bottompage(page)} class="bw-lastBlock">End of List &rarr;</a></li>
 	  </ul>
+	<p>Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} items, page ${page.number} of ${page.num_pages()}</p>
 	</div>
 </%def>

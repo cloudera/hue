@@ -37,7 +37,7 @@
 
           <div class="clearfix">
             <div class="input">
-              	<textarea class="span12" rows="9" placeholder="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+              	<textarea class="span9" rows="9" placeholder="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
 				<div id="validationResults">
 				% if len(form.query["query"].errors):
 					${unicode(form.query["query"].errors) | n}
@@ -76,207 +76,216 @@
 ${commonheader("Hive Query", "beeswax", "100px")}
 ${layout.menubar(section='query')}
 <div class="container-fluid">
-<h1>Hive Query</h1>
-<div class="sidebar withTitle">
-	<div class="well">
-	<form id="advancedSettingsForm" action="${action}" method="POST" class="form-stacked noPadding">
-		<h4>Advanced settings</h4>
-		<h6>Hive settings</h6>
-		% for i, f in enumerate(form.settings.forms):
-		% if i > 0:
-			<hr/>
-		% endif
 
-		<div class="clearfix">
-			${comps.label(f['key'])}
-			<div class="input">
-				${comps.field(f['key'], attrs=dict(
-					placeholder="mapred.reduce.tasks",
-					klass="span3 settingsField"
-				))}
-			</div>
-		</div>
+	<h1>Hive Query</h1>
 
-		<div class="clearfix">
-			${comps.label(f['value'])}
-			<div class="input">
-				${comps.field(f['value'], attrs=dict(
-					placeholder="1",
-					klass="span3"
-				))}
-			</div>
-		</div>
-		<div class="clearfix">
-			${comps.field(f['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
-				type="submit",
-				title="Delete this setting",
-				klass="btn small danger settingsDelete"
-			), value=True)}
-		</div>
-		${comps.field(f['_exists'], hidden=True)}
-	    % endfor
-		<div class="clearfix">
-			<a class="btn small" data-form-prefix="settings">Add</a>
-		</div>
-
-
-		<h6>File Resources</h6>
-		 % for i, f in enumerate(form.file_resources.forms):
-              % if i > 0:
-                <hr/>
-              % endif
-
-			<div class="clearfix">
-				${comps.label(f['type'])}
-				<div class="input">
-					${comps.field(f['type'], render_default=True, attrs=dict(
-						klass="span3"
-					))}
-				</div>
-			</div>
-
-			<div class="clearfix">
-				${comps.label(f['path'])}
-				<div class="input">
-					${comps.field(f['path'], attrs=dict(
-						placeholder="/user/foo/udf.jar",
-						klass="span3 file_resourcesField"
-					))}
-				</div>
-			</div>
-			<div class="clearfix">
-				<a href="#" data-filechooser-destination="${f['path'].html_name | n}" class="btn small">Choose a File</a>
-
-				${comps.field(f['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
-					type="submit",
-					title="Delete this setting",
-					klass="btn small danger file_resourcesDelete"
-				), value=True)}
-
-				${comps.field(f['_exists'], hidden=True)}
-			</div>
-            % endfor
-			<div class="clearfix">
-				<a class="btn small" data-form-prefix="file_resources">Add</a>
-			</div>
-
-		<h6>User-defined Functions</h6>
-		% for i, f in enumerate(form.functions.forms):
-          % if i > 0:
-            <hr/>
-          % endif
-
-			<div class="clearfix">
-				${comps.label(f['name'])}
-				<div class="input">
-					${comps.field(f['name'], attrs=dict(
-						placeholder="myFunction",
-						klass="span3 functionsField"
-					))}
-				</div>
-			</div>
-			<div class="clearfix">
-				${comps.label(f['class_name'])}
-				<div class="input">
-					${comps.field(f['class_name'], attrs=dict(
-						placeholder="com.acme.example",
-						klass="span3"
-					))}
-				</div>
-			</div>
-
-    		<div class="clearfix">
-				${comps.field(f['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
-					type="submit",
-					title="Delete this setting",
-					klass="btn small danger"
-				), value=True)}
-			</div>
-
-          ${comps.field(f['_exists'], hidden=True)}
-        % endfor
-		<div class="clearfix">
-			<a class="btn small" data-form-prefix="functions">Add</a>
-		</div>
-
-		<h6>Parametrization</h6>
-		${comps.field(form.query["is_parameterized"],
-            notitle = True,
-            tag = "checkbox",
-            button_text = "Enable Parameterization",
-            help = "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.",
-            help_attrs= dict(
-              data_help_direction='11'
-            )
-        )}
-		<h6>Email Notification</h6>
-		${comps.field(form.query["email_notify"],
-                      notitle = True,
-                      tag = "checkbox",
-                      button_text = "Email me on complete",
-                      help = "If checked, you will receive an email notification when the query completes.",
-                      help_attrs= dict(
-                        data_help_direction='11'
-                      )
-                     )}
-		<input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
-	</form>
-    </div>
-</div>
-
-<div class="content">
-	<div class="form-stacked">
-		% if error_message:
-			<div class="alert-message block-message error">
-				<p><strong>Your Query Has the Following Error(s):</strong></p>
-				<p>${error_message}</p>
-				% if log:
-					<small>click the <b>Error Log</b> tab below for details</small>
-				% endif
-			</div>
-		% endif
-
-        % if on_success_url:
-          <input type="hidden" name="on_success_url" value="${on_success_url}"/>
-        % endif
-
-        % if error_messages or log:
-			<ul class="tabs">
-				<li class="active"><a href="#queryPane">Query</a></li>
-				% if error_message or log:
-              	<li><a href="#errorPane">
-					% if log:
-						Error Log
-					% else:
-						&nbsp;
-	                % endif
-				</a></li>
-				% endif
-			</ul>
-
-			<div class="tab-content">
-				<div class="active tab-pane" id="queryPane">
-					${query()}
-				</div>
-				% if error_message or log:
-					<div class="tab-pane" id="errorPane">
-					% if log:
-						<pre>${log}</pre>
+	<div class="row-fluid">
+		<div class="span3">
+			<div class="well sidebar-nav">
+				<ul class="nav nav-list">
+					<li class="nav-header"></li>
+					<li><a href="#"></a></li>
+				</ul>
+				<form id="advancedSettingsForm" action="${action}" method="POST" class="form-stacked noPadding">
+					<h4>Advanced settings</h4>
+					<h6>Hive settings</h6>
+					% for i, f in enumerate(form.settings.forms):
+					% if i > 0:
+						<hr/>
 					% endif
+
+					<div class="clearfix">
+						${comps.label(f['key'])}
+						<div class="input">
+							${comps.field(f['key'], attrs=dict(
+								placeholder="mapred.reduce.tasks",
+								klass="span3 settingsField"
+							))}
+						</div>
 					</div>
-				% endif
+
+					<div class="clearfix">
+						${comps.label(f['value'])}
+						<div class="input">
+							${comps.field(f['value'], attrs=dict(
+								placeholder="1",
+								klass="span3"
+							))}
+						</div>
+					</div>
+					<div class="clearfix">
+						${comps.field(f['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
+							type="submit",
+							title="Delete this setting",
+							klass="btn small btn-danger settingsDelete"
+						), value=True)}
+					</div>
+					${comps.field(f['_exists'], hidden=True)}
+				    % endfor
+					<div class="clearfix">
+						<a class="btn small" data-form-prefix="settings">Add</a>
+					</div>
+
+
+					<h6>File Resources</h6>
+					 % for i, f in enumerate(form.file_resources.forms):
+			              % if i > 0:
+			                <hr/>
+			              % endif
+
+						<div class="clearfix">
+							${comps.label(f['type'])}
+							<div class="input">
+								${comps.field(f['type'], render_default=True, attrs=dict(
+									klass="span3"
+								))}
+							</div>
+						</div>
+
+						<div class="clearfix">
+							${comps.label(f['path'])}
+							<div class="input">
+								${comps.field(f['path'], attrs=dict(
+									placeholder="/user/foo/udf.jar",
+									klass="span3 file_resourcesField"
+								))}
+							</div>
+						</div>
+						<div class="clearfix">
+							<a href="#" data-filechooser-destination="${f['path'].html_name | n}" class="btn small">Choose a File</a>
+
+							${comps.field(f['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
+								type="submit",
+								title="Delete this setting",
+								klass="btn small danger file_resourcesDelete"
+							), value=True)}
+
+							${comps.field(f['_exists'], hidden=True)}
+						</div>
+			            % endfor
+						<div class="clearfix">
+							<a class="btn small" data-form-prefix="file_resources">Add</a>
+						</div>
+
+					<h6>User-defined Functions</h6>
+					% for i, f in enumerate(form.functions.forms):
+			          % if i > 0:
+			            <hr/>
+			          % endif
+
+						<div class="clearfix">
+							${comps.label(f['name'])}
+							<div class="input">
+								${comps.field(f['name'], attrs=dict(
+									placeholder="myFunction",
+									klass="span3 functionsField"
+								))}
+							</div>
+						</div>
+						<div class="clearfix">
+							${comps.label(f['class_name'])}
+							<div class="input">
+								${comps.field(f['class_name'], attrs=dict(
+									placeholder="com.acme.example",
+									klass="span3"
+								))}
+							</div>
+						</div>
+
+			    		<div class="clearfix">
+							${comps.field(f['_deleted'], tag="button", button_text="Remove", notitle=True, attrs=dict(
+								type="submit",
+								title="Delete this setting",
+								klass="btn small danger"
+							), value=True)}
+						</div>
+
+			          ${comps.field(f['_exists'], hidden=True)}
+			        % endfor
+					<div class="clearfix">
+						<a class="btn small" data-form-prefix="functions">Add</a>
+					</div>
+
+					<h6>Parametrization</h6>
+					${comps.field(form.query["is_parameterized"],
+			            notitle = True,
+			            tag = "checkbox",
+			            button_text = "Enable Parameterization",
+			            help = "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.",
+			            help_attrs= dict(
+			              data_help_direction='11'
+			            )
+			        )}
+					<h6>Email Notification</h6>
+					${comps.field(form.query["email_notify"],
+			                      notitle = True,
+			                      tag = "checkbox",
+			                      button_text = "Email me on complete",
+			                      help = "If checked, you will receive an email notification when the query completes.",
+			                      help_attrs= dict(
+			                        data_help_direction='11'
+			                      )
+			                     )}
+					<input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
+				</form>
 			</div>
-		% else:
-			${query()}
-		% endif
+		</div>
+		<div class="span9">
+			% if error_message:
+				<div class="alert alert-error">
+					<p><strong>Your Query Has the Following Error(s):</strong></p>
+					<p>${error_message}</p>
+					% if log:
+						<small>click the <b>Error Log</b> tab below for details</small>
+					% endif
+				</div>
+			% endif
+
+	        % if on_success_url:
+	          <input type="hidden" name="on_success_url" value="${on_success_url}"/>
+	        % endif
+
+	        % if error_messages or log:
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#queryPane" data-toggle="tab">Query</a></li>
+					% if error_message or log:
+	              	<li><a href="#errorPane">
+						% if log:
+							Error Log
+						% else:
+							&nbsp;
+		                % endif
+					</a></li>
+					% endif
+				</ul>
+
+				<div class="tab-content">
+					<div class="active tab-pane" id="queryPane">
+						${query()}
+					</div>
+					% if error_message or log:
+						<div class="tab-pane" id="errorPane">
+						% if log:
+							<pre>${log}</pre>
+						% endif
+						</div>
+					% endif
+				</div>
+			% else:
+				${query()}
+			% endif
+
+		</div>
 	</div>
 </div>
 
 
 
+
+
 <div id="chooseFile" class="modal hide fade">
 	<div class="modal-header">
-		<a href="#" class="close">&times;</a>
+		<a href="#" class="close" data-dismiss="modal">&times;</a>
 		<h3>Choose a file</h3>
 	</div>
 	<div class="modal-body">
@@ -293,11 +302,10 @@ ${layout.menubar(section='query')}
 		overflow-y:scroll;
 	}
 </style>
-</div>
+
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-		$(".tabs").tabs();
 		$("*[rel=popover]").popover({
 			offset: 10
 		});
@@ -331,7 +339,8 @@ ${layout.menubar(section='query')}
 				onFileChoose: function(filePath){
 					$("input[name='"+_destination+"']").val(filePath);
 					$("#chooseFile").modal("hide");
-				}
+				},
+				createFolder: false
 			});
 			$("#chooseFile").modal("show");
 		});
@@ -370,10 +379,7 @@ ${layout.menubar(section='query')}
 			$("#advancedSettingsForm").submit();
 		}
 
-		$("#chooseFile").modal({
-			keyboard: true,
-			backdrop: true
-		})
+
 	});
 </script>
 

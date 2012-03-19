@@ -20,21 +20,19 @@
 <%!
 def is_selected(section, matcher):
   if section == matcher:
-    return "selected"
+    return "active"
   else:
     return ""
 %>
 
 <%def name="menubar(section='')">
-	<div class="menubar">
-		<div class="menubar-inner">
-			<div class="container-fluid">
-				<ul class="nav">
-					<li><a href="${url("desktop.views.dump_config")}" class="${is_selected(section, 'dump_config')}">Configuration</a></li>
-					<li><a href="${url("desktop.views.check_config")}" class="${is_selected(section, 'check_config')}">Check for misconfiguration</a></li>
-					<li><a href="${url("desktop.views.log_view")}" class="${is_selected(section, 'log_view')}">Server Logs</a></li>
-				</ul>
-			</div>
+	<div class="subnav subnav-fixed">
+		<div class="container-fluid">
+		<ul class="nav nav-pills">
+			<li class="${is_selected(section, 'dump_config')}"><a href="${url("desktop.views.dump_config")}">Configuration</a></li>
+			<li class="${is_selected(section, 'check_config')}"><a href="${url("desktop.views.check_config")}">Check for misconfiguration</a></li>
+			<li class="${is_selected(section, 'log_view')}"><a href="${url("desktop.views.log_view")}">Server Logs</a></li>
+		</ul>
 		</div>
 	</div>
 </%def>

@@ -45,113 +45,112 @@ ${layout.menubar(section='history')}
     [ Auto generated action ]
   % endif
 </%def>
+
 <div class="container-fluid">
-<h1>Beeswax: Query History</h1>
-<div class="sidebar withTitle">
-	<div class="well">
-		<h6>Actions</h6>
-		<ul>
-	    % if filter_params.get('user') == '_all':
-	      <%
-	        my_querydict = filter_params.copy()
-	        my_querydict['user'] = request.user.username
-	      %>
-		<li><a href="?${my_querydict.urlencode()}">Show my queries</a></li>
-	 	% else:
-	      <%
-	        my_querydict = filter_params.copy()
-	        my_querydict['user'] = '_all'
-	      %>
-	      <li><a href="?${my_querydict.urlencode()}">Show everyone's queries</a></li>
-	    % endif
-	
-	 	% if filter_params.get('auto_query', None):
-	      <%
-	        my_querydict = filter_params.copy()
-	        my_querydict['auto_query'] = ''
-	      %>
-	      <li><a href="?${my_querydict.urlencode()}" class="bw-show_group_noauto" data-filters="ArtButton">Show user queries</a></li>
-	    % else:
-	      <%
-	        my_querydict = filter_params.copy()
-	        my_querydict['auto_query'] = 'on'
-	      %>
-	      <li><a href="?${my_querydict.urlencode()}" class="bw-show_group_auto" data-filters="ArtButton">Show auto actions</a></li>
-	    % endif
-    </div>
+	<h1>Beeswax: Query History</h1>
+	<div class="row-fluid">
+		<div class="span3">
+			<div class="well sidebar-nav">
+				<ul class="nav nav-list">
+					<li class="nav-header">Actions</li>
+					% if filter_params.get('user') == '_all':
+				      <%
+				        my_querydict = filter_params.copy()
+				        my_querydict['user'] = request.user.username
+				      %>
+					<li><a href="?${my_querydict.urlencode()}">Show my queries</a></li>
+				 	% else:
+				      <%
+				        my_querydict = filter_params.copy()
+				        my_querydict['user'] = '_all'
+				      %>
+				      <li><a href="?${my_querydict.urlencode()}">Show everyone's queries</a></li>
+				    % endif
+
+				 	% if filter_params.get('auto_query', None):
+				      <%
+				        my_querydict = filter_params.copy()
+				        my_querydict['auto_query'] = ''
+				      %>
+				      <li><a href="?${my_querydict.urlencode()}">Show user queries</a></li>
+				    % else:
+				      <%
+				        my_querydict = filter_params.copy()
+				        my_querydict['auto_query'] = 'on'
+				      %>
+				      <li><a href="?${my_querydict.urlencode()}">Show auto actions</a></li>
+				    % endif
+				</ul>
+			</div>
+		</div>
+		<div class="span9">
+
+		<table class="table table-striped table-condensed datatables">
+		    <thead>
+		      <tr>
+		        <th>Time</th>
+		        <th>Name</th>
+		        <th>Query</th>
+		        <th>User</th>
+		        <th>State</th>
+		        <th>Result</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		    <%!
+		      from beeswax import models, views
+		    %>
+		    % for query in page.object_list:
+		      <%
+		        qcontext = ""
+			try:
+			  design = query.design
+		          qcontext = views.make_query_context('design', design.id)
+			except:
+			  pass
+		      %>
+		      <tr class="histRow" data-search="${show_saved_query(design, query)}">
+		        <td>${query.submission_date.strftime("%x %X")}</td>
+		        <td>${show_saved_query(design, query)}</td>
+		        <td>
+		          <p>
+		            % if len(query.query) > 100:
+		              <code>${collapse_whitespace(query.query[:100])}...</code>
+		            % else:
+		              <code>${collapse_whitespace(query.query)}</code>
+		            % endif
+		          </p>
+		        </td>
+		        <td>${query.owner}</td>
+		        <td>${models.QueryHistory.STATE[query.last_state]}</td>
+		        <td>
+		          % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
+		            <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}">Results</a>
+		          % else:
+		            ~
+		          % endif
+		        </td>
+		      </tr>
+		    % endfor
+		    </tbody>
+		  </table>
+		 ${comps.pagination(page)}
+		</div>
+	</div>
 </div>
 
-
-<div class="content">
-  <table class="datatables">
-    <thead>
-      <tr>
-        <th>Time</th>
-        <th>Name</th>
-        <th>Query</th>
-        <th>User</th>
-        <th>State</th>
-        <th>Result</th>
-      </tr>
-    </thead>
-    <tbody>
-    <%!
-      from beeswax import models, views
-    %>
-    % for query in page.object_list:
-      <%
-        qcontext = ""
-	try:
-	  design = query.design
-          qcontext = views.make_query_context('design', design.id)
-	except:
-	  pass
-      %>
-      <tr data-dblclick-delegate="{'dblclick_loads':'.bw-view_result'}" class="jframe-no_select hue-help_links_small">
-        <td>${query.submission_date.strftime("%x %X")}</td>
-        <td>${show_saved_query(design, query)}</td>
-        <td>
-          <p class="jframe-inline" data-filters="InfoTip">
-            % if len(query.query) > 100:
-              <code>${collapse_whitespace(query.query[:100])}...</code>
-            % else:
-              <code>${collapse_whitespace(query.query)}</code>
-            % endif
-          </p>
-        </td>
-        <td>${query.owner}</td>
-        <td>${models.QueryHistory.STATE[query.last_state]}</td>
-        <td class="bw-query_result">
-          % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
-            <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" class="bw-view_result" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 2}">Results</a>
-          % else:
-            ~
-          % endif
-        </td>
-      </tr>
-    % endfor
-    </tbody>
-  </table>
- ${comps.pagination(page)}
-</div>
-<!-- <div>
-  <div class="bw-input-filter">
-    <input type="text" class="jframe-hidden" data-filters="OverText, ArtInput, FilterInput" data-art-input-type="search"
-      title="Filter by Name"
-      data-filter-elements="tbody tr" value=""/>
-  </div> -->
-</div>
-</div>
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-		$(".tabs").tabs();
+
 		$(".datatables").dataTable({
 			"bPaginate": false,
 		    "bLengthChange": false,
 			"bInfo": false,
 			"bFilter": false
 		});
+
+
 
 	});
 </script>

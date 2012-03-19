@@ -17,15 +17,13 @@
 from desktop.views import commonheader, commonfooter
 %>
 ${commonheader("jHue Help", "help", "100px")}
-	<div class="menubar">
-		<div class="menubar-inner">
-			<div class="container-fluid">
-				<ul class="nav">
-					% for app in apps:
-				        <li><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
-				      % endfor
-				</ul>
-			</div>
+	<div class="subnav subnav-fixed">
+		<div class="container-fluid">
+		<ul class="nav nav-pills">
+			% for app in apps:
+				<li><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
+			% endfor
+		</ul>
 		</div>
 	</div>
 	<div class="container-fluid">

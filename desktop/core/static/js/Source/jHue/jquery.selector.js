@@ -52,7 +52,7 @@
 			$.each(addressBook[key], function(cnt, opt){
 				var li = $("<li>");
 				var lbl = $("<label>").text(opt.text());
-				$("<input>").attr("type","checkbox").addClass("selector").change(function(){
+				var chk = $("<input>").attr("type","checkbox").addClass("selector").change(function(){
 					if ($(this).is(":checked")){
 						$(this).data("opt").attr("selected", "selected");
 					}
@@ -60,6 +60,9 @@
 						$(this).data("opt").removeAttr("selected");
 					}
 				}).data("opt",opt).prependTo(lbl);
+                if (opt.is(":selected")){
+                    chk.attr("checked","checked");
+                }
 				lbl.appendTo(li);
 				li.appendTo(ul);
 			});
@@ -106,7 +109,7 @@
 				body.find("label").show();
 			}
 		});
-		searchBox.appendTo(header);
+		searchBox.prependTo(header);
 
 		$(_this.element).after(selectorContainer);
 	};

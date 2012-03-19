@@ -17,9 +17,7 @@
 import datetime
 from django.template.defaultfilters import urlencode
 %>
-<%namespace name="wrappers" file="header_footer.mako" />
-${wrappers.head('${path} - Upload Complete', 'upload', show_new_directory=False)}
 <% path_enc = urlencode(path) %>
 View uploaded file: <a href="${url('filebrowser.views.view', path=path_enc)}">${path}</a>.<br>
 Go back to where you were: <a href="${next|urlencode}">${next}</a>.
-${wrappers.foot()}
+

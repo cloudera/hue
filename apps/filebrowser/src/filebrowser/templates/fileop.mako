@@ -16,14 +16,16 @@
 <%!
 import datetime
 from django.template.defaultfilters import urlencode, escape, stringformat, date, filesizeformat, time
+from desktop.views import commonheader, commonfooter
 %>
 
-<%namespace name="wrappers" file="header_footer.mako" />
 
-${wrappers.head('File Operation', show_side_bar=False)}
+
+${commonheader('File Operation', 'filebrowser')}
 
 ## Not sure if enctype breaks anything if used for things other than file upload.
 
+<div class="container-fluid">
 <div class="well">
 <form action="" method="POST" enctype="multipart/form-data" class="form-stacked">
 <h1>${form.op}</h1>
@@ -35,4 +37,4 @@ ${form.as_p()|n}
 </form>
 </div>
 
-${wrappers.foot()}
+${commonfooter()}

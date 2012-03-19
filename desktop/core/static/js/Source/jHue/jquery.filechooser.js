@@ -35,13 +35,13 @@
 				_flink.attr("href","#").text(file.name).appendTo(_f);
 				if (file.type == "dir"){
 					_f.addClass("folder");
-					_flink.click(function(){
+					_f.click(function(){
 						_parent.navigateTo(file.path);
 					});
 				}
 				if (file.type == "file"){
 					_f.addClass("file");
-					_flink.click(function(){
+					_f.click(function(){
 						_parent.options.onFileChoose(file.path)
 					});
 				}

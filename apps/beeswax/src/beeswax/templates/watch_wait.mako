@@ -22,58 +22,54 @@ ${commonheader("Beeswax: Waiting for query...", "beeswax", "100px")}
 ${layout.menubar(section='query')}
 
 <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
+
 <div class="container-fluid">
-<h1>Beeswax: Waiting for query... ${util.render_query_context(query_context)}</h1>
-<div class="sidebar withTitle">
-	<div class="well">
-		% if download_urls:
-		<h6>Downloads</h6>
-		<ul>
-			<li><a target="_blank" href="${download_urls["csv"]}" class="bw-download_csv">Download as CSV</a></li>
-			<li><a target="_blank" href="${download_urls["xls"]}" class="bw-download_xls">Download as XLS</a></li>
-			<li><a class="bw-save collapser jframe_ignore" href="${url('beeswax.views.save_results', query.id)}">Save</a></li>
-		</ul>
-		%endif
+	<h1>Beeswax: Waiting for query... ${util.render_query_context(query_context)}</h1>
+	<div class="row-fluid">
+		<div class="span3">
+			<div class="well sidebar-nav">
+				<ul class="nav nav-list">
+					% if download_urls:
+					<li class="nav-header">Downloads</li>
+					<li><a target="_blank" href="${download_urls["csv"]}">Download as CSV</a></li>
+					<li><a target="_blank" href="${download_urls["xls"]}">Download as XLS</a></li>
+					<li><a href="${url('beeswax.views.save_results', query.id)}">Save</a></li>
+					% endif
+					<%
+			          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
+			          mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
+			        %>
+				 	% if n_jobs > 0:
+						<li class="nav-header">${mr_jobs} (${n_jobs})</li>
 
-		<%
-          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
-          mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
-        %>
-        
-	 	% if n_jobs > 0:
-			<h6>${mr_jobs} (${n_jobs})</h6>
-	             
-			% for jobid in hadoop_jobs:
-			<a href="${url("jobbrowser.views.single_job", jobid=jobid)}" class="bw-hadoop_job">${jobid.replace("job_", "")}</a><br/>
-			% endfor
-		% else:
-			<h6>${mr_jobs}</h6>
-			<p class="bw-no_jobs">No Hadoop jobs were launched in running this query.</p>
-		% endif 
+						% for jobid in hadoop_jobs:
+						<li><a href="${url("jobbrowser.views.single_job", jobid=jobid)}">${jobid.replace("job_", "")}</a></li>
+						% endfor
+					% else:
+						<li class="nav-header">${mr_jobs}</li>
+						<li>No Hadoop jobs were launched in running this query.</li>
+					% endif
+				</ul>
+			</div>
+		</div>
+		<div class="span9">
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#log" data-toggle="tab">Log</a></li>
+				<li><a href="#query" data-toggle="tab">Query</a></li>
+			</ul>
+
+		   	<div class="tab-content">
+				<div class="active tab-pane" id="log">
+					<pre>${log}</pre>
+				</div>
+				<div class="tab-pane" id="query">
+					<pre>${query.query}</pre>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
 
-<div class="content">
-	<ul class="tabs">
-		<li class="active"><a href="#log">Log</a></li>
-		<li><a href="#query">Query</a></li>
-	</ul>
-  
-   	<div class="tab-content">
-		<div class="active tab-pane" id="log">
-			<pre>${log}</pre>
-		</div>
-		<div class="tab-pane" id="query">
-			<pre>${query.query}</pre>
-		</div>
-	</div>
-</div>
-</div>
-<script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$(".tabs").tabs();
-	});
-</script>
 
 ${commonfooter()}
