@@ -115,20 +115,21 @@ are not running this version of CDH or later, upgrade your cluster before
 proceeding.
 
 .Dependency on CDH Components
-[options="header",grid="rows",frame="topbot"]
-|=========================================================================
-| Component | Required | Applications          | Notes
-| HDFS      | Yes      | Core, Filebrowser     | HDFS access through WebHdfs or HttpFS
-| MR1       | No       | JobBrowser, JobDesigner*, Beeswax* | Job information access through hue-plugins
-| Yarn      | No       | JobDesigner*, Beeswax*  | Transitive dependency via Hive or Oozie
-| Oozie     | No       | JobDesigner           | Oozie access through REST API
-| Hive      | No       | Beeswax               | Beeswax uses the Hive client libraries
-| Flume     | No       | Shell                 | Optionally provides access to the Flume shell
-| HBase     | No       | Shell                 | Optionally provides access to the HBase shell
-| Pig       | No       | Shell                 | Optionally provides access to the Pig shell
-|=========================================================================
-[*] Transitive dependency
+[grid="rows"]
+`-------------.----------.----------------------------------.------------------------
+  Component   Required   Applications                       Notes
+-------------------------------------------------------------------------------------
+  HDFS        Yes        Core, Filebrowser                  HDFS access through WebHdfs or HttpFS
+  MR1         No         JobBrowser, JobDesigner*, Beeswax* Job information access through hue-plugins
+  Yarn        No         JobDesigner*, Beeswax*             Transitive dependency via Hive or Oozie
+  Oozie       No         JobDesigner                        Oozie access through REST API
+  Hive        No         Beeswax                            Beeswax uses the Hive client libraries
+  Flume       No         Shell                              Optionally provides access to the Flume shell
+  HBase       No         Shell                              Optionally provides access to the HBase shell
+  Pig         No         Shell                              Optionally provides access to the Pig shell
+-------------------------------------------------------------------------------------
 
+[*] Transitive dependency
 
 
 Hadoop Configuration
