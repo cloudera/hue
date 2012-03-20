@@ -93,6 +93,10 @@ class WebHdfs(Hdfs):
     return self._fs_defaultfs
 
   @property
+  def security_enabled(self):
+    return self._security_enabled
+
+  @property
   def superuser(self):
     if self._superuser is None:
       try:
