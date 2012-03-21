@@ -46,6 +46,7 @@ Checked-in third party dependencies
 |Y|threadframe|0.2|Python|http://www.majid.info/mylos/stories/2004/06/10/threadframe.html|
 |Y|Thrift|?|Apache|http://incubator.apache.org/thrift/download/|
 |Y|Twisted|8.2.0|MIT|http://twistedmatrix.com/trac/|
+|Y|urllib2_kerberos|0.1.6|ASL2|http://pypi.python.org/pypi/urllib2_kerberos|
 |Y|Werkzeug|0.5.1|BSD|http://pypi.python.org/packages/source/W/Werkzeug/Werkzeug-0.5.1.zip|
 |Y|zope.interface|3.5.2|ZPL(MIT-like)|http://pypi.python.org/pypi/zope.interface|
 |Y|MySQL for Python|1.2.3c1|GPL or the original license based on Python 1.5.2|http://sourceforge.net/projects/mysql-python/|
