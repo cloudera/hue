@@ -1,0 +1,21 @@
+Metadata-Version: 1.0
+Name: urllib2_kerberos
+Version: 0.1.6
+Summary: Kerberos over HTTP Negotiate/SPNEGO support for urllib2
+Home-page: http://limedav.com/hg/urllib2_kerberos/
+Author: Tim Olsen
+Author-email: tolsen@limespot.com
+License: Apache 2.0
+Description: UNKNOWN
+Keywords: urllib2 kerberos http negotiate spnego
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Natural Language :: English
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Systems Administration :: Authentication/Directory
