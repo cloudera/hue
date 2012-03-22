@@ -33,7 +33,6 @@ from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 
-import hadoop.conf
 
 DEFAULT_HDFS_SUPERUSER = 'hdfs'
 
@@ -59,12 +58,11 @@ class WebHdfs(Hdfs):
     self._temp_dir = temp_dir
     self._fs_defaultfs = fs_defaultfs
 
-    self._client = self._make_client(url)
+    self._client = self._make_client(url, security_enabled)
     self._root = resource.Resource(self._client)
 
     # To store user info
     self._thread_local = threading.local()
-    self._thread_local.user = WebHdfs.DEFAULT_USER
 
     LOG.debug("Initializing Hadoop WebHdfs: %s (security: %s, superuser: %s)" %
               (self._url, self._security_enabled, self._superuser))
@@ -80,9 +78,12 @@ class WebHdfs(Hdfs):
   def __str__(self):
     return "WebHdfs at %s" % (self._url,)
 
-  def _make_client(self, url):
-    return http_client.HttpClient(
+  def _make_client(self, url, security_enabled):
+    client = http_client.HttpClient(
         url, exc_class=WebHdfsException, logger=LOG)
+    if security_enabled:
+      client.set_kerberos_auth()
+    return client
 
   @property
   def uri(self):
@@ -111,14 +112,23 @@ class WebHdfs(Hdfs):
   
   @property
   def user(self):
-    return self._thread_local.user
+    try:
+      return self._thread_local.user
+    except AttributeError:
+      return WebHdfs.DEFAULT_USER
 
   def _getparams(self):
-    return { "user.name" : self._thread_local.user }
+    if self.security_enabled:
+      return {
+        "user.name" : WebHdfs.DEFAULT_USER,
+        "doas" : self.user
+      }
+    else:
+      return { "user.name" : self.user }
 
   def setuser(self, user):
     """Set a new user. Return the current user."""
-    curr = self._thread_local.user
+    curr = self.user
     self._thread_local.user = user
     return curr
 
@@ -427,7 +437,7 @@ class WebHdfs(Hdfs):
         "Failed to create '%s'. HDFS did not return a redirect" % (path,))
 
     # Now talk to the real thing. The redirect url already includes the params.
-    client = self._make_client(next_url)
+    client = self._make_client(next_url, self.security_enabled)
     return resource.Resource(client).invoke(method, data=data)
 
 
