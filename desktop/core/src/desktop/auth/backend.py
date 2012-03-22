@@ -203,7 +203,7 @@ class PamBackend(DesktopBackendBase):
         user = find_or_create_user(username, None)
         if user is not None and user.is_active:
           profile = get_profile(user)
-          profile.creation_method = UserProfile.EXTERNAL
+          profile.creation_method = UserProfile.CreationMethod.EXTERNAL
           profile.save()
           user.is_superuser = is_super
 
@@ -269,7 +269,7 @@ class LdapBackend(object):
 
     if user is not None and user.is_active:
       profile = get_profile(user)
-      profile.creation_method = UserProfile.EXTERNAL
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
       profile.save()
       user.is_superuser = is_super
       user = rewrite_user(user)
