@@ -61,7 +61,7 @@ class AbstractKerberosAuthHandler:
         LOG.debug("req.get_host() returned %s" % host)
 
         tail, sep, head = host.rpartition(':')
-        domain = tail if tail else head
+        domain = tail or head
                 
         result, self.context = k.authGSSClientInit("HTTP@%s" % domain)
 
@@ -116,22 +116,23 @@ class AbstractKerberosAuthHandler:
 
     def retry_http_kerberos_auth(self, req, headers, neg_value):
         try:
-            neg_hdr = self.generate_request_header(req, headers, neg_value)
+            try:
+                neg_hdr = self.generate_request_header(req, headers, neg_value)
 
-            if neg_hdr is None:
-                LOG.debug("neg_hdr was None")
+                if neg_hdr is None:
+                    LOG.debug("neg_hdr was None")
+                    return None
+
+                req.add_unredirected_header(self.authz_header, neg_hdr)
+                resp = self.parent.open(req)
+
+                self.authenticate_server(resp.info())
+
+                return resp
+
+            except k.GSSError, e:
+                LOG.critical("GSSAPI Error: %s/%s" % (e[0][0], e[1][0]))
                 return None
-
-            req.add_unredirected_header(self.authz_header, neg_hdr)
-            resp = self.parent.open(req)
-
-            self.authenticate_server(resp.info())
-
-            return resp
-
-        except k.GSSError, e:
-            LOG.critical("GSSAPI Error: %s/%s" % (e[0][0], e[1][0]))
-            return None
 
         finally:
             self.clean_context()
