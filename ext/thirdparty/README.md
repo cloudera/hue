@@ -23,6 +23,7 @@ Checked-in third party dependencies
 |Y|eventlet|0.9.14|MIT|http://pypi.python.org/pypi/eventlet/|
 |Y|FancyUpload|3.0|MIT|http://github.com/digitarald/digitarald-fancyupload/tarball/3.0|
 |Y|greenlet|0.3.1|MIT|http://pypi.python.org/pypi/greenlet/|
+|Y|kerberos|1.1.1|ASL2|http://pypi.python.org/pypi/kerberos|
 |Y|lockfile|0.8|MIT|http://smontanaro.dyndns.org/python/lockfile-0.8.tar.gz|
 |Y|lxml|2.2.2|BSD|http://codespeak.net/lxml/|
 |Y|Mako|0.3.4|MIT|http://makotemplates.org/|
