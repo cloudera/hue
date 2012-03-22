@@ -63,7 +63,6 @@ class WebHdfs(Hdfs):
 
     # To store user info
     self._thread_local = threading.local()
-    self._thread_local.user = WebHdfs.DEFAULT_USER
 
     LOG.debug("Initializing Hadoop WebHdfs: %s (security: %s, superuser: %s)" %
               (self._url, self._security_enabled, self._superuser))
@@ -113,20 +112,23 @@ class WebHdfs(Hdfs):
   
   @property
   def user(self):
-    return self._thread_local.user
+    try:
+      return self._thread_local.user
+    except AttributeError:
+      return WebHdfs.DEFAULT_USER
 
   def _getparams(self):
     if self.security_enabled:
       return {
         "user.name" : WebHdfs.DEFAULT_USER,
-        "doas" : self._thread_local.user
+        "doas" : self.user
       }
     else:
-      return { "user.name" : self._thread_local.user }
+      return { "user.name" : self.user }
 
   def setuser(self, user):
     """Set a new user. Return the current user."""
-    curr = self._thread_local.user
+    curr = self.user
     self._thread_local.user = user
     return curr
 
@@ -435,7 +437,7 @@ class WebHdfs(Hdfs):
         "Failed to create '%s'. HDFS did not return a redirect" % (path,))
 
     # Now talk to the real thing. The redirect url already includes the params.
-    client = self._make_client(next_url)
+    client = self._make_client(next_url, self.security_enabled)
     return resource.Resource(client).invoke(method, data=data)
 
 
