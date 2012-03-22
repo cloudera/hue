@@ -109,8 +109,8 @@ class LdapConnection(object):
         user_info['first'] = data['givenName'][0]
       if 'sn' in data:
         user_info['last'] = data['sn'][0]
-      if 'email' in data:
-        user_info['email'] = data['email'][0]
+      if 'mail' in data:
+        user_info['email'] = data['mail'][0]
 
       return user_info
 
