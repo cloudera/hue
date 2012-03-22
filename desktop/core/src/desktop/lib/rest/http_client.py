@@ -21,6 +21,8 @@ import types
 import urllib
 import urllib2
 
+from urllib2_kerberos import HTTPKerberosAuthHandler
+
 __docformat__ = "epytext"
 
 LOG = logging.getLogger(__name__)
@@ -77,17 +79,12 @@ class HttpClient(object):
     self._logger = logger or LOG
     self._headers = { }
 
-    # Make a basic auth handler that does nothing. Set credentials later.
-    self._passmgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    authhandler = urllib2.HTTPBasicAuthHandler(self._passmgr)
-
     # Make a cookie processor
     cookiejar = cookielib.CookieJar()
 
     self._opener = urllib2.build_opener(
         HTTPErrorProcessor(),
-        urllib2.HTTPCookieProcessor(cookiejar),
-        authhandler)
+        urllib2.HTTPCookieProcessor(cookiejar))
 
 
   def set_basic_auth(self, username, password, realm):
@@ -98,8 +95,21 @@ class HttpClient(object):
     @param realm: The authentication realm.
     @return: The current object
     """
-    self._passmgr.add_password(realm, self._base_url, username, password)
+    # Make a basic auth handler that does nothing. Set credentials later.
+    passmgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    passmgr.add_password(realm, self._base_url, username, password)
+    authhandler = urllib2.HTTPBasicAuthHandler(passmgr)
+
+    self._opener.add_handler(authhandler)
     return self
+
+
+  def set_kerberos_auth(self):
+    """Set up kerberos auth for the client, based on the current ticket."""
+    authhandler = HTTPKerberosAuthHandler()
+    self._opener.add_handler(authhandler)
+    return self
+
 
   def set_headers(self, headers):
     """

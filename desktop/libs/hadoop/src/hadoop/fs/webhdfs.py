@@ -33,7 +33,6 @@ from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 
-import hadoop.conf
 
 DEFAULT_HDFS_SUPERUSER = 'hdfs'
 
@@ -59,7 +58,7 @@ class WebHdfs(Hdfs):
     self._temp_dir = temp_dir
     self._fs_defaultfs = fs_defaultfs
 
-    self._client = self._make_client(url)
+    self._client = self._make_client(url, security_enabled)
     self._root = resource.Resource(self._client)
 
     # To store user info
@@ -80,9 +79,12 @@ class WebHdfs(Hdfs):
   def __str__(self):
     return "WebHdfs at %s" % (self._url,)
 
-  def _make_client(self, url):
-    return http_client.HttpClient(
+  def _make_client(self, url, security_enabled):
+    client = http_client.HttpClient(
         url, exc_class=WebHdfsException, logger=LOG)
+    if security_enabled:
+      client.set_kerberos_auth()
+    return client
 
   @property
   def uri(self):
@@ -114,7 +116,13 @@ class WebHdfs(Hdfs):
     return self._thread_local.user
 
   def _getparams(self):
-    return { "user.name" : self._thread_local.user }
+    if self.security_enabled:
+      return {
+        "user.name" : WebHdfs.DEFAULT_USER,
+        "doas" : self._thread_local.user
+      }
+    else:
+      return { "user.name" : self._thread_local.user }
 
   def setuser(self, user):
     """Set a new user. Return the current user."""
