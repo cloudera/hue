@@ -509,6 +509,18 @@ oozie_url::
   environment variable for Oozie.
 
 
+UserAdmin Configuration
+~~~~~~~~~~~~~~~~~~~~~~~
+
+In the `[useradmin]` section of the configuration file, you can
+_optionally_ specify the following:
+
+default_user_group::
+  The name of a default group that is suggested when creating a
+  user manually. If the LdapBackend or PamBackend are configured
+  for doing user authentication, new users will automatically be
+  members of the default group.
+
 
 Starting Hue from the Tarball
 -----------------------------
