@@ -33,6 +33,8 @@ from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 
+import hadoop.conf
+
 
 DEFAULT_HDFS_SUPERUSER = 'hdfs'
 
@@ -552,7 +554,7 @@ def _get_service_url(hdfs_config):
   fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
   netloc = Hdfs.urlsplit(fs_defaultfs)[1]
   host = netloc.split(':')[0]
-  port = hdfs_config.NN_HTTP_PORT.get()
+  port = hadoop.conf.DEFAULT_NN_HTTP_PORT
   return "http://%s:%s/webhdfs/v1" % (host, port)
 
 
