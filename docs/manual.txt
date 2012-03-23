@@ -246,6 +246,50 @@ open TCP port 8888 on the Hue Server (or the configured Hue web HTTP port)
 to interact with the system.
 
 
+Hive Configuration
+~~~~~~~~~~~~~~~~~~
+
+Hue's Beeswax application helps you use Hive to query your data.
+It depends on a Hive installation on your system. Please read
+this section to ensure a proper integration.
+
+Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
+(or any path you specify as `hive.metastore.warehouse.dir` in your
+`hive-site.xml`).  Make sure this location exists and is writable by
+the users whom you expect to be creating tables.  `/tmp` (on the local file
+system) must be world-writable, as Hive makes extensive use of it.
+
+[NOTE]
+If you used the embedded Hive MetaStore functionality of Beeswax in Hue from
+versions prior to Hue 1.2, read this section. Hue 1.2 includes changes in the
+Hive MetaStore schema that are part of the Hive 0.7 release. If you want to use
+Beeswax in Hue 1.2, it is imperative that you upgrade the Hive MetaStore schema
+by running the appropriate schema upgrade script located in the
+`apps/beeswax/hive/scripts/metastore/upgrade` directory in the Hue installation.
+Scripts for Derby and MySQL databases are available. If you are using a
+different database for your MetaStore, you will need to provide your own
+upgrade script.
+
+No Existing Hive Installation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Familiarize yourself with the configuration options in
+`hive-site.xml`. See
+https://ccp.cloudera.com/display/CDHDOC/Hive+Installation#HiveInstallation-ConfiguringtheHiveMetastore[Hive
+Installation and Configuration].
+Having a `hive-site.xml` is optional but often useful, particularly on setting
+up a http://wiki.apache.org/hadoop/Hive/AdminManual/MetastoreAdmin[metastore].
+You may store the `hive-site.xml` in `/etc/hue/conf`, or instruct
+Beeswax to locate it using the `hive_conf_dir` configuration variable.  See
+`/etc/hue/conf/hue-beeswax.ini`.
+
+Existing Hive Installation
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In `/etc/hue/conf/hue-beeswax.ini`, modify `hive_conf_dir` to point to the
+directory containing `hive-site.xml`.
+
+
 Configuring Hue
 ---------------
 
@@ -403,6 +447,12 @@ MapReduce (MR1) Cluster
 Hue only support one MapReduce cluster currently. That cluster should be defined
 under the `[[[default]]]` sub-section. Note that JobBrowser only works with MR1.
 
+jobtracker_host::
+  The host running the JobTracker.
+
+jobtracker_port::
+  The port for the JobTracker IPC service.
+
 submit_to::
   If your Oozie is configured with to talk to a 0.20 MapReduce service, then
   set this to `true`. Hue will be submitting jobs to this MapReduce cluster.
@@ -414,10 +464,50 @@ Yarn (MR2) Cluster
 Hue only support one Yarn cluster currently. That cluster should be defined
 under the `[[[default]]]` sub-section.
 
+resourcemanager_host::
+  The host running the ResourceManager.
+
+resourcemanager_port::
+  The port for the ResourceManager IPC service.
+
 submit_to::
   If your Oozie is configured with to talk to a Yarn cluster, then
   set this to `true`. Hue will be submitting jobs to this Yarn cluster.
   But note that JobBrowser will not be able to show MR2 jobs.
+
+
+Beeswax Configuration
+~~~~~~~~~~~~~~~~~~~~~
+
+In the `[beeswax]` section of the configuration file, you can
+_optionally_ specify the following:
+
+beeswax_server_host::
+  The hostname or IP that the Beeswax Server should bind to. By
+  default it binds to `localhost`, and therefore only serves local
+  IPC clients.
+
+hive_home_dir::
+  The base directory of your Hive installation.
+
+hive_conf_dir::
+  The directory containing your `hive-site.xml` Hive
+  configuration file.
+
+beeswax_server_heapsize::
+  The heap size (-Xmx) of the Beeswax Server.
+
+
+JobDesigner Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the `[jobsub]` section of the configuration file, you should
+specify:
+
+oozie_url::
+  The URL of the Oozie service. It is the same as the `OOZIE_URL`
+  environment variable for Oozie.
+
 
 
 Starting Hue from the Tarball
@@ -589,60 +679,6 @@ To configure Hue to store data in MySQL:
 
 Your system is now configured and you can start the Hue server as normal.
 
-== Hue Applications
-
-This section includes documentation specific to built-in Hue applications.
-
-=== Beeswax, the Hive UI
-
-==== Introduction
-
-Beeswax is an application that is a component within Hue that helps you use
-Hive to query your data.
-
-==== Installation
-
-Beeswax is installed as part of Hue.
-
-==== Hive Configuration
-
-Beeswax, the Hive interface in Hue, includes Hive 0.7.  You do
-not need an existing Hive installation.
-
-Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
-(or any path you specify as `hive.metastore.warehouse.dir` in your
-`hive-site.xml`).  Make sure this location exists and is writable by
-the users whom you expect to be creating tables.  `/tmp` (on the local file
-system) must be world-writable, as Hive makes extensive use of it.
-
-[NOTE]
-If you used the embedded Hive MetaStore functionality of Beeswax in Hue from
-versions prior to Hue 1.2, read this section. Hue 1.2 includes changes in the
-Hive MetaStore schema that are part of the Hive 0.7 release. If you want to use
-Beeswax in Hue 1.2, it is imperative that you upgrade the Hive MetaStore schema
-by running the appropriate schema upgrade script located in the
-apps/beeswax/hive/scripts/metastore/upgrade directory in the Hue installation.
-Scripts for Derby and MySQL databases are available. If you are using a
-different database for your MetaStore, you will need to provide your own
-upgrade script.
-
-==== Configuration
-
-===== No Existing Hive Installation
-
-Familiarize yourself with the configuration options in
-`hive-site.xml` (see
-http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration).
-Having a `hive-site.xml` is optional but often useful, particularly on setting
-up a http://wiki.apache.org/hadoop/Hive/AdminManual/MetastoreAdmin[metastore].
-You may store the `hive-site.xml` in `/etc/hue/conf`, or instruct
-Beeswax to locate it using the `hive_conf_dir` configuration variable.  See
-`/etc/hue/conf/hue-beeswax.ini`.
-
-===== Existing Hive Installation
-
-In `/etc/hue/conf/hue-beeswax.ini`, modify `hive_conf_dir` to point to the
-directory containing `hive-site.xml`.
 
 [[usage]]
 == Using Hue
@@ -677,12 +713,7 @@ and paste the ones that look relevant) and send those with your bug reports.
 image:images/logs.png[]
 
 
-
-
-
 ==== Starting Hue
 
 To start Hue, use `build/env/bin/supervisor`.  This will start
 several subprocesses, corresponding to the different Hue components.
-
-
