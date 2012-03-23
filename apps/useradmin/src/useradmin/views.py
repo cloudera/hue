@@ -373,6 +373,10 @@ def _import_ldap_user(username, import_by_dn=False):
     LOG.warn('There was a naming conflict while importing user %s' % (username,))
     return None
 
+  default_group = get_default_user_group()
+  if created and default_group is not None:
+    user.groups.add(default_group)
+
   if 'first' in user_info:
     user.first_name = user_info['first']
   if 'last' in user_info:
