@@ -99,8 +99,8 @@
 			<div class="span10 offset3">
 				<div class="alert-message block-message warning">
 					<p>Since this is your first time logging in,
-				    please pick any username and password. Be sure to remember these, as <strong>	hey
-					    will become your superuser account for Hue</strong>.</p>
+				    please pick any username and password. Be sure to remember these, as
+				    <strong>they will become your superuser credentials for Hue</strong>.</p>
 				</div>
 			</div>
 		</div>
