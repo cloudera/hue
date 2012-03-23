@@ -157,6 +157,12 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
     if self.is_first_login_ever():
       user = find_or_create_user(username, password)
       user = rewrite_user(user)
+
+      default_group = get_default_user_group()
+      if default_group is not None:
+        user.groups.add(default_group)
+        user.save()
+
       return user
 
     return None
