@@ -44,16 +44,29 @@ def renew_from_kt():
   if NEED_KRB181_WORKAROUND is None:
     NEED_KRB181_WORKAROUND = detect_conf_var()
   if NEED_KRB181_WORKAROUND:
+    # HUE-640. Kerberos clock have seconds level granularity. Make sure we
+    # renew the ticket after the initial valid time.
+    time.sleep(1.5)
     perform_krb181_workaround()
 
 def perform_krb181_workaround():
-  LOG.debug("Working around krb 181 issue by renewing ticket")
   cmdv = [CONF.KINIT_PATH.get(),
           "-R",
           "-c", CONF.CCACHE_PATH.get()]
+  LOG.info("Renewing kerberos ticket to work around kerberos 1.8.1: " +
+           " ".join(cmdv))
   ret = subprocess.call(cmdv)
   if ret != 0:
-    LOG.error("Couldn't renew kerberos ticket in order to work around Kerberos 1.8.1 issue")
+    fmt_dict = dict(princ=CONF.HUE_PRINCIPAL.get(),
+                    ccache=CONF.CCACHE_PATH.get())
+    LOG.error("Couldn't renew kerberos ticket in order to work around "
+              "Kerberos 1.8.1 issue. Please check that the ticket for "
+              "'%(princ)s' is still renewable:\n"
+              "  $ kinit -f -c %(ccache)s\n"
+              "If the 'renew until' date is the same as the 'valid starting' "
+              "date, the ticket cannot be renewed. Please check your KDC "
+              "configuration, and the ticket renewal policy (maxrenewlife) "
+              "for the '%(princ)s' and `krbtgt' principals." % fmt_dict)
     sys.exit(ret)
 
 def detect_conf_var():
