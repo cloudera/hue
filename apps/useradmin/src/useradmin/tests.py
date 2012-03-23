@@ -305,8 +305,12 @@ def test_user_admin():
               "Inactivated user gets redirected to login page")
 
   # Delete that regular user
+  funny_profile = UserProfile.objects.get(user=test_user)
   response = c_su.post('/useradmin/users/delete/%s' % (FUNNY_NAME_QUOTED,))
   assert_true("Hue Users" in response.content)
+  assert_false(User.objects.filter(username=FUNNY_NAME).exists())
+  assert_false(UserProfile.objects.filter(id=funny_profile.id).exists())
+
   # You shouldn't be able to create a user without a password
   response = c_su.post('/useradmin/users/new', dict(username="test"))
   assert_true("You must specify a password when creating a new user." in response.content)
