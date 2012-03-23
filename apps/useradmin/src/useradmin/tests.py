@@ -169,8 +169,6 @@ def test_group_admin():
   assert_true(len(Group.objects.get(name="testgroup").user_set.all()) == 0)
 
   # And now, just for kicks, let's try adding a user
-  response = c.get('/useradmin/groups/edit/testgroup')
-  assert_true("Edit Group: testgroup" in response.content)
   response = c.post('/useradmin/groups/edit/testgroup',
                     dict(name="testgroup",
                     members=[User.objects.get(username="test").pk],
