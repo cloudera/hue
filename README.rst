@@ -61,6 +61,7 @@ your system:
       * asciidoc
       * gcc
       * g++
+      * libkrb5-dev
       * libmysqlclient-dev
       * libsasl2-dev
       * libsqlite3-dev
@@ -77,6 +78,7 @@ your system:
       * cyrus-sasl-devel
       * gcc
       * gcc-c++
+      * krb5-devel
       * libxml2-devel
       * libxslt-devel
       * mvn (from ``maven2`` package or tarball)
