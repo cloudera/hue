@@ -59,6 +59,8 @@ def delete_user(request, username):
       try:
         user = User.objects.get(username=username)
         _check_remove_last_super(user)
+        user_profile = UserProfile.objects.get(user=user)
+        user_profile.delete()
         user.delete()
       finally:
         __users_lock.release()
