@@ -28,7 +28,7 @@ import django
 import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User, Group
-from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule, render, PopupException, format_preserving_redirect
+from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule, render, PopupException
 from django.core import urlresolvers
 
 from useradmin.models import GroupPermission, HuePermission, UserProfile, LdapGroup
@@ -241,7 +241,6 @@ def edit_group(request, name=None):
     if form.is_valid():
       form.save()
       request.flash.put('Group information updated')
-      url = urlresolvers.reverse(list_groups)
       return render('edit_group_confirmation.mako', request,
 	    dict(form=form, action=request.path, name=name))
 
@@ -273,7 +272,6 @@ def edit_permission(request, app=None, priv=None):
     if form.is_valid():
       form.save()
       request.flash.put('Permission information updated')
-      url = urlresolvers.reverse(list_permissions)
       return render('edit_permissions_confirmation.mako', request,
 	    dict(form=form, action=request.path, app=app, priv=priv))
 
