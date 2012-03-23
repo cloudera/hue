@@ -38,6 +38,9 @@ def get_connection():
   password = desktop.conf.LDAP.BIND_PASSWORD.get()
   ldap_cert = desktop.conf.LDAP.LDAP_CERT.get()
 
+  if ldap_url is None:
+    raise Exception('No LDAP URL was specified')
+
   return LdapConnection(ldap_url, get_ldap_username(username, nt_domain),
                         password, ldap_cert)
 
