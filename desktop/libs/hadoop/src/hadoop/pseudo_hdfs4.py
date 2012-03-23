@@ -458,9 +458,10 @@ def shared_cluster():
       LOG.exception("Failed to fully bring up test cluster: %s" % (ex,))
 
     # Fix config to reflect the cluster setup.
+    webhdfs_url = "http://localhost:%s/webhdfs/v1" % (cluster.dfs_http_port,)
     closers = [
       hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
-      hadoop.conf.HDFS_CLUSTERS['default'].NN_HTTP_PORT.set_for_testing(cluster.dfs_http_port),
+      hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
       hadoop.conf.MR_CLUSTERS['default'].JT_HOST.set_for_testing('localhost'),
       hadoop.conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(cluster.jt_thrift_port),
     ]
