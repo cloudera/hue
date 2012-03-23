@@ -264,8 +264,18 @@ class LdapBackend(object):
   def authenticate(self, username=None, password=None):
     # Do this check up here, because the auth call creates a django user upon first login per user
     is_super = False
-    if User.objects.count() == 0:
+    if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
+      # If there are no LDAP users already in the system, the first one will
+      # become a superuser
       is_super = True
+    elif User.objects.filter(username=username).exists():
+      # If the user already exists, we shouldn't change its superuser
+      # privileges. However, if there's a naming conflict with a non-external
+      # user, we should do the safe thing and turn off superuser privs.
+      existing_user = User.objects.get(username=username)
+      existing_profile = get_profile(existing_user)
+      if existing_profile.creation_method == str(UserProfile.CreationMethod.EXTERNAL):
+        is_super = User.objects.get(username=username).is_superuser
 
     try:
       user = self._backend.authenticate(username, password)
