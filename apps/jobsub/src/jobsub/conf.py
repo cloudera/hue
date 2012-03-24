@@ -18,7 +18,7 @@
 
 import os.path
 
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, coerce_bool
 
 REMOTE_DATA_DIR = Config(
   key="remote_data_dir",
@@ -38,3 +38,9 @@ OOZIE_URL = Config(
   help='URL to Oozie server. This is required for job submission.',
   default='http://localhost:11000/oozie',
   type=str)
+
+SECURITY_ENABLED = Config(
+  key="security_enabled",
+  help="Whether Oozie requires client to do perform Kerberos authentication",
+  default=False,
+  type=coerce_bool)
