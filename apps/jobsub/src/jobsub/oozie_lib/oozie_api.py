@@ -43,21 +43,24 @@ def get_oozie():
     _api_cache_lock.acquire()
     try:
       if _api_cache is None:
-        _api_cache = OozieApi(jobsub.conf.OOZIE_URL.get())
+        secure = jobsub.conf.SECURITY_ENABLED.get()
+        _api_cache = OozieApi(jobsub.conf.OOZIE_URL.get(), secure)
     finally:
       _api_cache_lock.release()
   return _api_cache
 
 
 class OozieApi(object):
-  def __init__(self, oozie_url):
+  def __init__(self, oozie_url, security_enabled=False):
     self._url = posixpath.join(oozie_url, API_VERSION)
     self._client = HttpClient(self._url, logger=LOG)
+    if security_enabled:
+      self._client.set_kerberos_auth()
     self._root = Resource(self._client)
+    self._security_enabled = security_enabled
 
     # To store user info
     self._thread_local = threading.local()
-    self._thread_local.user = DEFAULT_USER
 
   def __str__(self):
     return "OozieApi at %s" % (self._url,)
@@ -67,8 +70,15 @@ class OozieApi(object):
     return self._url
 
   @property
+  def security_enabled(self):
+    return self._security_enabled
+
+  @property
   def user(self):
-    return self._thread_local.user
+    try:
+      return self._thread_local.user
+    except AttributeError:
+      return DEFAULT_USER
 
   def setuser(self, user):
     """Return the previous user"""
@@ -77,6 +87,8 @@ class OozieApi(object):
     return prev
 
   def _get_params(self):
+    if self.security_enabled:
+      return { 'doAs': self.user }
     return { }
 
 
