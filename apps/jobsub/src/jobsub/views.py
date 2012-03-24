@@ -49,10 +49,23 @@ def oozie_job(request, jobid):
   """View the details about this job."""
   workflow = get_oozie().get_job(jobid)
   _check_permission(request, workflow.user,
-                    "Access denied: view job %s" % (jobid,))
+                    "Access denied: view job %s" % (jobid,),
+                    allow_root=True)
+
+  # Cross reference the submission history (if any)
+  design_link = None
+  try:
+    history_record = models.JobHistory.objects.get(job_id=jobid)
+    design = history_record.workflow
+    if design.owner == request.user:
+      design_link = urlresolvers.reverse(jobsub.views.edit_design,
+                                         kwargs={'wf_id': design.id})
+  except models.JobHistory.DoesNotExist, ex:
+    pass
 
   return render('workflow.mako', request, {
     'workflow': workflow,
+    'design_link': design_link,
   })
 
 
