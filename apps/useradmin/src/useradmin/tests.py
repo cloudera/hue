@@ -135,6 +135,10 @@ def test_group_permissions():
   assert_true(get_profile(test_user).has_hue_permission('access','useradmin'))
   assert_true('Hue Users' in response.content)
 
+  # Make sure we can't modify permissions
+  response = c1.get('/useradmin/permissions/edit/useradmin/access')
+  assert_true('must be a superuser to change permissions' in response.content)
+
   # And revoke access from the group
   c.post('/useradmin/permissions/edit/useradmin/access',
          dict(app='useradmin',
@@ -147,6 +151,25 @@ def test_group_permissions():
   # We should no longer have access to the app
   response = c1.get('/useradmin/users')
   assert_true('You do not have permission to access the Useradmin application.' in response.content)
+
+
+def test_default_group():
+  reset_all_users()
+  reset_all_groups()
+
+  c = make_logged_in_client(username='test', is_superuser=True)
+
+  # Try deleting the default group
+  useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default')
+  response = c.post('/useradmin/groups/delete/test_default')
+  assert_true('default user group may not be deleted' in response.content)
+  assert_true(Group.objects.filter(name='test_default').exists())
+
+  # Change the name of the default group, and try deleting again
+  useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('new_default')
+  response = c.post('/useradmin/groups/delete/test_default')
+  assert_false(Group.objects.filter(name='test_default').exists())
+  assert_true(Group.objects.filter(name='new_default').exists())
 
 def test_group_admin():
   reset_all_users()
@@ -187,11 +210,20 @@ def test_group_admin():
   test_user.groups.add(Group.objects.get(name="access-group"))
   test_user.save()
 
+  # Make sure non-superusers can't do bad things
   response = c2.get('/useradmin/groups/new')
   assert_true("You must be a superuser" in response.content)
   response = c2.get('/useradmin/groups/edit/testgroup')
   assert_true("You must be a superuser" in response.content)
 
+  response = c2.post('/useradmin/groups/new', dict(name="nonsuperuser"))
+  assert_true("You must be a superuser" in response.content)
+  response = c2.post('/useradmin/groups/edit/testgroup',
+                    dict(name="nonsuperuser",
+                    members=[User.objects.get(username="test").pk],
+                    save="Save"), follow=True)
+  assert_true("You must be a superuser" in response.content)
+ 
   # Should be one group left, because we created the other group
   response = c.post('/useradmin/groups/delete/testgroup')
   assert_true(len(Group.objects.all()) == 1)

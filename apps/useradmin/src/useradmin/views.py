@@ -82,8 +82,11 @@ def delete_group(request, name):
       global groups_lock
       __groups_lock.acquire()
       try:
-        group = Group.objects.get(name=name)
+        # Get the default group before getting the group, because we may be
+        # trying to delete the default group, and it may not have been created
+        # yet
         default_group = get_default_user_group()
+        group = Group.objects.get(name=name)
         if default_group is not None and default_group.name == name:
           raise PopupException("The default user group may not be deleted.")
         group.delete()
