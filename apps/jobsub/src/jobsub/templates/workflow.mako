@@ -69,7 +69,11 @@ ${layout.menubar(section='history')}
 </%def>
 
 <div class="container-fluid">
+    %if design_link is not None:
+    <h1><a title="Edit design" href="${design_link}">${workflow.appName}</a> (${workflow.id})</h1>
+    %else:
     <h1>${workflow.appName} (${workflow.id})</h1>
+    %endif
 
     ## Tab headers
     <ul class="tabs" data-tabs="tabs">
@@ -88,6 +92,7 @@ ${layout.menubar(section='history')}
               <th>Name</th>
               <th>Type</th>
               <th>Status</th>
+              <th>External Id</th>
 
               <th>Start Time</th>
               <th>End Time</th>
@@ -113,6 +118,7 @@ ${layout.menubar(section='history')}
                 </td>
                 <td>${action.type}</td>
                 <td>${action.status}</td>
+                <td>${action.externalId}</td>
 
                 <td>${format_time(action.startTime)}</td>
                 <td>${format_time(action.endTime)}</td>
