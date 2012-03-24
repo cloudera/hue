@@ -267,19 +267,3 @@ _STD_PROPERTIES = [
 ]
 
 _STD_PROPERTIES_JSON = json.dumps(_STD_PROPERTIES)
-
-
-def bc_test(request):
-  __import__("ipdb").set_trace()
-  wf = models.OozieWorkflow(owner=request.user, name='Test WF')
-  wf.save()
-
-  java_action = models.OozieJavaAction(jar_path="hdfs://somewhere",
-                                       main_class="foo.bar.com",
-                                       args="-D bulllshit",
-                                       job_properties='{ "json": "here" }')
-  java_action.action_type = java_action.ACTION_TYPE
-  java_action.save()
-
-  wf.root_action = java_action
-  wf.save()

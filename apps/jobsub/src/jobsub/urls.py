@@ -34,15 +34,6 @@ urlpatterns = patterns(
   url(r'^job/(?P<jobid>[-\w]+)$', 'views.oozie_job'),
   url(r'^list_history$', 'views.list_history'),
 
-  url(r'^test$', 'views.bc_test'),
-
-  # Submitted jobs
-  #url(r'^watch/$', 'views.watch'),
-  #url(r'^watch/(?P<id>\d+)$', 'views.watch_submission'),
-
-  # Status Bar (typically invoked by /status_bar, not /jobsub/status_bar)
-  #url(r'^status_bar/$', 'views.status_bar'),
-
   # Setup
   #url(r'^setup/$', 'views.setup'),
 )
