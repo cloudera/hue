@@ -59,7 +59,14 @@ ${layout.menubar(section='history')}
               % for name, value in sorted(configs.items()):
                 <tr>
                   <td>${name}</td>
-                  <td>${value}</td>
+                  <td>
+                    ## Try to detect paths
+                    %if name.endswith('dir') or name.endswith('path'):
+                      ${hdfs_link(value)}
+                    %else:
+                      ${value}
+                    %endif
+                  </td>
                 </tr>
               % endfor
             </tbody>
@@ -163,7 +170,7 @@ ${layout.menubar(section='history')}
               </tr>
               <tr>
                 <td>External Id</td>
-                <td>${workflow.externalId or None}</td>
+                <td>${workflow.externalId or "-"}</td>
               </tr>
               <tr>
                 <td>Start Time</td>
