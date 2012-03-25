@@ -31,6 +31,7 @@ except ImportError:
   import simplejson as json
 
 import logging
+import urlparse
 
 LOG = logging.getLogger(__name__)
 
@@ -66,7 +67,7 @@ def test_chown():
 def test_listdir():
   cluster = pseudo_hdfs4.shared_cluster()
   try:
-    c = make_logged_in_client()
+    c = make_logged_in_client(cluster.superuser)
     cluster.fs.setuser(cluster.superuser)
 
     # These paths contain non-ascii characters. Your editor will need the
@@ -78,22 +79,32 @@ def test_listdir():
     orig_paths = [
       u'greek-Ελληνικά',
       u'chinese-漢語',
-      'listdir',
-      'non-utf-8-(big5)-\xb2\xc4\xa4@\xb6\xa5\xacq',
+      'listdir%20.,<>~`!@#$%^&()_-+="',
     ]
 
     prefix = '/test-filebrowser/'
     for path in orig_paths:
-      cluster.fs.mkdir(prefix + path)
+      c.post('/filebrowser/mkdir', dict(path=prefix, name=path))
+
+    # Read the parent dir
     response = c.get('/filebrowser/view' + prefix)
-    paths = [f['path'] for f in response.context['files']]
-    for path in orig_paths:
-      if isinstance(path, unicode):
-        uni_path = path
-      else:
-        uni_path = unicode(path, 'utf-8', errors='replace')
-      assert_true(prefix + uni_path in paths,
-                  '%s should be in dir listing %s' % (prefix + uni_path, paths))
+    dir_listing = response.context['files']
+    assert_equal(len(orig_paths) + 1, len(dir_listing))
+
+    for dirent in dir_listing:
+      path = dirent['name']
+      if path == '..':
+        continue
+
+      assert_true(path in orig_paths)
+
+      # Drill down into the subdirectory
+      url = urlparse.urlsplit(dirent['url'])[2]
+      resp = c.get(url)
+
+      # We are actually reading a directory
+      assert_equal('..', resp.context['files'][0]['name'],
+                   "'%s' should be a directory" % (path,))
 
     # Delete user's home if there's already something there
     if cluster.fs.isdir("/user/test"):
@@ -102,6 +113,7 @@ def test_listdir():
 
     # test's home directory now exists. Should be returned.
     cluster.fs.mkdir('/user/test')
+    c = make_logged_in_client()
     response = c.get('/filebrowser/view/test-filebrowser/')
     assert_equal(response.context['home_directory'], '/user/test')
   finally:
