@@ -270,6 +270,8 @@ class WebHdfs(Hdfs):
   def rename(self, old, new):
     """rename(old, new)"""
     old = Hdfs.normpath(old)
+    if not new.startswith('/'):
+      new = Hdfs.join(Hdfs.dirname(old), new)
     new = Hdfs.normpath(new)
     params = self._getparams()
     params['op'] = 'RENAME'
