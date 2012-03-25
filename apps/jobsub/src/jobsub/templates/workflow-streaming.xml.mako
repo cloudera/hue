@@ -22,12 +22,12 @@ except ImportError:
 
 %>
 <%
-    streaming = wf.get_root_action()
+    streaming = design.get_root_action()
     properties = json.loads(streaming.job_properties)
     files = json.loads(streaming.files)
     archives = json.loads(streaming.archives)
 %>
-<workflow-app xmlns="uri:oozie:workflow:0.2" name="${wf.name}">
+<workflow-app xmlns="uri:oozie:workflow:0.2" name="${design.name}">
     <start to="root-node"/>
     <action name="root-node">
         <map-reduce>

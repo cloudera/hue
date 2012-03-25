@@ -48,7 +48,7 @@ ${layout.menubar(section='history')}
         </thead>
         <tbody>
             %for record in history:
-                <% wf = record.workflow %>
+                <% wf = record.design %>
                 <tr>
                     <td><a href="${url('jobsub.views.oozie_job', jobid=record.job_id)}">${record.job_id}</a></td>
                     <td>${record.owner.username}</td>

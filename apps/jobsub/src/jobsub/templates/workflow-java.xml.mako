@@ -21,12 +21,12 @@ except ImportError:
     import simplejson as json
 %>
 <%
-    java = wf.get_root_action()
+    java = design.get_root_action()
     properties = json.loads(java.job_properties)
     files = json.loads(java.files)
     archives = json.loads(java.archives)
 %>
-<workflow-app xmlns="uri:oozie:workflow:0.2" name="${wf.name}">
+<workflow-app xmlns="uri:oozie:workflow:0.2" name="${design.name}">
     <start to="root-node"/>
     <action name="root-node">
         <java>

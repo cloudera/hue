@@ -22,12 +22,12 @@ except ImportError:
 
 %>
 <%
-    mapreduce = wf.get_root_action()
+    mapreduce = design.get_root_action()
     properties = json.loads(mapreduce.job_properties)
     files = json.loads(mapreduce.files)
     archives = json.loads(mapreduce.archives)
 %>
-<workflow-app xmlns="uri:oozie:workflow:0.2" name="${wf.name}">
+<workflow-app xmlns="uri:oozie:workflow:0.2" name="${design.name}">
     <start to="root-node"/>
     <action name="root-node">
         <map-reduce>

@@ -27,10 +27,10 @@ LOG = logging.getLogger(__name__)
 # This aligns with what Oozie accepts as a workflow name
 _OOZIE_WORKFLOW_NAME_REGEX = '^([a-zA-Z_]([\-_a-zA-Z0-9])*){1,39}$'
 
-class WorkflowForm(forms.ModelForm):
-  """Used for specifying a workflow"""
+class WorkflowDesignForm(forms.ModelForm):
+  """Used for specifying a design"""
   class Meta:
-    model = models.OozieWorkflow
+    model = models.OozieDesign
     exclude = ('root_action', 'owner')
 
   name = forms.RegexField(
@@ -87,16 +87,16 @@ _ACTION_TYPE_TO_FORM_CLS = {
 }
 
 
-def workflow_form_by_type(action_type):
+def design_form_by_type(action_type):
   cls = _ACTION_TYPE_TO_FORM_CLS[action_type]
-  return MultiForm(wf=WorkflowForm, action=cls)
+  return MultiForm(wf=WorkflowDesignForm, action=cls)
 
-def workflow_form_by_instance(wf_obj, data=None):
-  action_obj = wf_obj.get_root_action()
+def design_form_by_instance(design_obj, data=None):
+  action_obj = design_obj.get_root_action()
   cls = _ACTION_TYPE_TO_FORM_CLS[action_obj.action_type]
 
-  instances = dict(wf=wf_obj, action=action_obj)
+  instances = dict(wf=design_obj, action=action_obj)
 
-  res = MultiForm(wf=WorkflowForm, action=cls)
+  res = MultiForm(wf=WorkflowDesignForm, action=cls)
   res.bind(data=data, instances=instances)
   return res
