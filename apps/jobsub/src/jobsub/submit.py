@@ -16,7 +16,7 @@
 # limitations under the License.
 
 """
-Handle workflow submission.
+Handle design submission.
 """
 
 import errno
@@ -34,16 +34,16 @@ LOG = logging.getLogger(__name__)
 
 class Submission(object):
   """Represents one submission"""
-  def __init__(self, wf_obj, fs):
-    self._wf_obj = wf_obj
-    self._username = wf_obj.owner.username
-    self._action = wf_obj.get_root_action()
+  def __init__(self, design_obj, fs):
+    self._design_obj = design_obj
+    self._username = design_obj.owner.username
+    self._action = design_obj.get_root_action()
     self._fs = fs
     self._job_id = None       # The oozie workflow instance id
 
   def __unicode__(self):
     res = "Submission for job design '%s' (id %s, owner %s)" % \
-        (self._wf_obj.name, self._wf_obj.id, self._username)
+        (self._design_obj.name, self._design_obj.id, self._username)
     if self.job_id:
       res += " -- " + self.job_id
     return res
@@ -101,7 +101,7 @@ class Submission(object):
   def _copy_files(self, wf_dir, wf_xml):
     """
     Copy the files over to the deployment directory. This should run as the
-    workflow owner.
+    design owner.
     """
     xml_path = self._fs.join(wf_dir, 'workflow.xml')
     self._fs.create(xml_path, overwrite=True, permission=0644, data=wf_xml)
@@ -124,9 +124,9 @@ class Submission(object):
 
   def _generate_workflow_xml(self, namenode):
     """Return a string that is the workflow.xml of this workflow"""
-    action_type = self._wf_obj.root_action.action_type
+    action_type = self._design_obj.root_action.action_type
     data = {
-      'wf': self._wf_obj,
+      'design': self._design_obj,
       'nameNode': namenode,
     }
 
@@ -181,7 +181,7 @@ class Submission(object):
     # We could have collision with usernames. But there's no good separator.
     # Hope people don't create crazy usernames.
     return self._fs.join(conf.REMOTE_DATA_DIR.get(),
-                         "_%s_-design-%s" % (self._username, self._wf_obj.id))
+                         "_%s_-design-%s" % (self._username, self._design_obj.id))
 
 
   def remove_deployment_dir(self):
@@ -193,4 +193,4 @@ class Submission(object):
     except Exception, ex:
       LOG.warn("Failed to clean up workflow deployment directory for "
                "%s (owner %s). Caused by: %s",
-               self._wf_obj.name, self._wf_obj.owner.username, ex)
+               self._design_obj.name, self._design_obj.owner.username, ex)

@@ -24,7 +24,7 @@ from django.db import models
 from django.db.utils import DatabaseError
 
 from desktop.lib.django_db_util import remove_content_type
-from jobsub.models import JobDesign, OozieJavaAction, OozieStreamingAction, OozieWorkflow
+from jobsub.models import JobDesign, OozieJavaAction, OozieStreamingAction, OozieDesign
 
 LOG = logging.getLogger(__name__)
 
@@ -50,8 +50,8 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('jobsub', ['OozieAction'])
 
-        # Adding model 'OozieWorkflow'
-        db.create_table('jobsub_oozieworkflow', (
+        # Adding model 'OozieDesign'
+        db.create_table('jobsub_ooziedesign', (
             ('description', self.gf('django.db.models.fields.CharField')(max_length=1024, blank=True)),
             ('last_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
@@ -59,13 +59,13 @@ class Migration(SchemaMigration):
             ('root_action', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['jobsub.OozieAction'])),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=64)),
         ))
-        db.send_create_signal('jobsub', ['OozieWorkflow'])
+        db.send_create_signal('jobsub', ['OozieDesign'])
 
         # Adding model 'JobHistory'
         db.create_table('jobsub_jobhistory', (
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('submission_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('workflow', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['jobsub.OozieWorkflow'])),
+            ('design', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['jobsub.OozieDesign'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('job_id', self.gf('django.db.models.fields.CharField')(max_length=128)),
         ))
@@ -121,8 +121,8 @@ class Migration(SchemaMigration):
         # Deleting model 'OozieAction'
         db.delete_table('jobsub_oozieaction')
 
-        # Deleting model 'OozieWorkflow'
-        db.delete_table('jobsub_oozieworkflow')
+        # Deleting model 'OozieDesign'
+        db.delete_table('jobsub_ooziedesign')
 
         # Deleting model 'JobHistory'
         db.delete_table('jobsub_jobhistory')
@@ -196,7 +196,7 @@ class Migration(SchemaMigration):
             'job_id': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'submission_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'workflow': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['jobsub.OozieWorkflow']"})
+            'design': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['jobsub.OozieDesign']"})
         },
         'jobsub.oozieaction': {
             'Meta': {'object_name': 'OozieAction'},
@@ -231,8 +231,8 @@ class Migration(SchemaMigration):
             'oozieaction_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['jobsub.OozieAction']", 'unique': 'True', 'primary_key': 'True'}),
             'reducer': ('django.db.models.fields.CharField', [], {'max_length': '512'})
         },
-        'jobsub.oozieworkflow': {
-            'Meta': {'object_name': 'OozieWorkflow'},
+        'jobsub.ooziedesign': {
+            'Meta': {'object_name': 'OozieDesign'},
             'description': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
@@ -279,11 +279,11 @@ def job_design_migration_for_jar(jd):
                            args=data['arguments'])
   action.save()
 
-  wf = OozieWorkflow(owner=jd.owner,
-                     name=jd.name + ' (incomplete)',
-                     description=jd.description,
-                     root_action=action)
-  wf.save()
+  design = OozieDesign(owner=jd.owner,
+                       name=jd.name + ' (incomplete)',
+                       description=jd.description,
+                       root_action=action)
+  design.save()
 
 
 def job_design_migration_for_streaming(jd):
@@ -316,9 +316,9 @@ def job_design_migration_for_streaming(jd):
                                 job_properties=properties)
   action.save()
 
-  wf = OozieWorkflow(owner=jd.owner,
-                     name=jd.name,
-                     description=jd.description,
-                     root_action=action)
-  wf.save()
+  design = OozieDesign(owner=jd.owner,
+                       name=jd.name,
+                       description=jd.description,
+                       root_action=action)
+  design.save()
 

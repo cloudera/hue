@@ -90,7 +90,7 @@ PATH_MAX = 512
 class OozieAction(models.Model):
   """
   The OozieAction model is an abstract base class. All concrete actions
-  derive from it. And it provides something for the OozieWorkflow to
+  derive from it. And it provides something for the OozieDesign to
   reference. See
   https://docs.djangoproject.com/en/dev/topics/db/models/#multi-table-inheritance
   """
@@ -115,9 +115,10 @@ class OozieAction(models.Model):
     bind_parameters(self, mapping, self.PARAM_FIELDS)
 
 
-class OozieWorkflow(models.Model):
+class OozieDesign(models.Model):
   """
-  Contains information on MapReduce job types
+  Contains information about all (Oozie) designs. Specific action info are
+  stored in the Oozie*Action models.
   """
   # Generic stuff
   owner = models.ForeignKey(User)
@@ -238,4 +239,4 @@ class JobHistory(models.Model):
   owner = models.ForeignKey(User)
   submission_date = models.DateTimeField(auto_now=True)
   job_id = models.CharField(max_length=128)
-  workflow = models.ForeignKey(OozieWorkflow)
+  design = models.ForeignKey(OozieDesign)

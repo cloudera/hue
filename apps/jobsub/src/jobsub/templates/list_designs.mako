@@ -51,30 +51,30 @@ ${layout.menubar(section='designs')}
             </tr>
         </thead>
         <tbody>
-            %for wf in workflows:
+            %for design in designs:
                 <tr>
-                    <td>${wf.owner.username}</td>
-                    <td>${wf.name}</td>
-                    <td>${wf.root_action.action_type}</td>
-                    <td>${wf.description}</td>
-                    <td nowrap="nowrap">${wf.last_modified.strftime('%c')}</td>
+                    <td>${design.owner.username}</td>
+                    <td>${design.name}</td>
+                    <td>${design.root_action.action_type}</td>
+                    <td>${design.description}</td>
+                    <td nowrap="nowrap">${design.last_modified.strftime('%c')}</td>
                     <td nowrap="nowrap" class="pull-right">
                       %if currentuser.is_superuser:
-                        %if currentuser.username == wf.owner.username:
-                          <a title="Edit ${wf.name}" class="btn small"
-                              href="${ url('jobsub.views.edit_design', wf_id=wf.id) }">Edit</a>
-                          <a title="Submit ${wf.name}" class="btn small submitConfirmation"
-                              alt="Submit ${wf.name} to the cluster"
+                        %if currentuser.username == design.owner.username:
+                          <a title="Edit ${design.name}" class="btn small"
+                              href="${ url('jobsub.views.edit_design', design_id=design.id) }">Edit</a>
+                          <a title="Submit ${design.name}" class="btn small submitConfirmation"
+                              alt="Submit ${design.name} to the cluster"
                               href="javascript:void(0)"
-                              data-param-url="${ url('jobsub.views.get_design_params', wf_id=wf.id) }"
-                              data-submit-url="${ url('jobsub.views.submit_design', wf_id=wf.id) }">Submit</a>
+                              data-param-url="${ url('jobsub.views.get_design_params', design_id=design.id) }"
+                              data-submit-url="${ url('jobsub.views.submit_design', design_id=design.id) }">Submit</a>
                         %endif
-                        <a title="Delete ${wf.name}" class="btn small deleteConfirmation"
-                            alt="Are you sure you want to delete ${wf.name}?"
+                        <a title="Delete ${design.name}" class="btn small deleteConfirmation"
+                            alt="Are you sure you want to delete ${design.name}?"
                             href="javascript:void(0)"
-                            data-confirmation-url="${ url('jobsub.views.delete_design', wf_id=wf.id) }">Delete</a>
+                            data-confirmation-url="${ url('jobsub.views.delete_design', design_id=design.id) }">Delete</a>
                       %endif
-                      <a title="Clone ${wf.name}" class="btn small" href="${ url('jobsub.views.clone_design', wf_id=wf.id) }">Clone</a>
+                      <a title="Clone ${design.name}" class="btn small" href="${ url('jobsub.views.clone_design', design_id=design.id) }">Clone</a>
                     </td>
                 </tr>
             %endfor
@@ -97,8 +97,8 @@ ${layout.menubar(section='designs')}
             </fieldset>
         </div>
         <div class="modal-footer">
-            <input id="submitBtn" type="submit" class="btn primary" value="Yes"/>
-            <a href="#" class="btn secondary hideModal">No</a>
+            <input id="submitBtn" type="submit" class="btn primary" value="Submit"/>
+            <a href="#" class="btn secondary hideModal">Cancel</a>
         </div>
 	</form>
 </div>

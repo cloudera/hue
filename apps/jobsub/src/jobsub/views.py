@@ -56,10 +56,10 @@ def oozie_job(request, jobid):
   design_link = None
   try:
     history_record = models.JobHistory.objects.get(job_id=jobid)
-    design = history_record.workflow
+    design = history_record.design
     if design.owner == request.user:
       design_link = urlresolvers.reverse(jobsub.views.edit_design,
-                                         kwargs={'wf_id': design.id})
+                                         kwargs={'design_id': design.id})
   except models.JobHistory.DoesNotExist, ex:
     pass
 
@@ -86,7 +86,7 @@ def list_history(request):
 
 
 def new_design(request, action_type):
-  form = jobsub.forms.workflow_form_by_type(action_type)
+  form = jobsub.forms.design_form_by_type(action_type)
 
   if request.method == 'POST':
     form.bind(request.POST)
@@ -96,10 +96,10 @@ def new_design(request, action_type):
       action.action_type = action_type
       action.save()
 
-      workflow = form.wf.save(commit=False)
-      workflow.root_action = action
-      workflow.owner = request.user
-      workflow.save()
+      design = form.wf.save(commit=False)
+      design.root_action = action
+      design.owner = request.user
+      design.save()
 
       return redirect(urlresolvers.reverse(list_designs))
   else:
@@ -125,9 +125,9 @@ def list_designs(request):
   List all workflow designs. Result sorted by last modification time.
   Query params:
     owner       - Substring filter by owner field 
-    name        - Substring filter by workflow name field
+    name        - Substring filter by design name field
   '''
-  data = models.OozieWorkflow.objects
+  data = models.OozieDesign.objects
   owner = request.GET.get("owner", '')
   name = request.GET.get('name', '')
   if owner:
@@ -137,22 +137,22 @@ def list_designs(request):
   data = data.order_by('-last_modified')
 
   return render("list_designs.mako", request, {
-    'workflows': list(data),
+    'designs': list(data),
     'currentuser':request.user,
     'owner': owner,
     'name': name,
   })
 
 
-def _get_design(wf_id):
-  """Raise PopupException if workflow doesn't exist"""
+def _get_design(design_id):
+  """Raise PopupException if design doesn't exist"""
   try:
-    return models.OozieWorkflow.objects.get(pk=wf_id)
-  except models.OozieWorkflow.DoesNotExist:
+    return models.OozieDesign.objects.get(pk=design_id)
+  except models.OozieDesign.DoesNotExist:
     raise PopupException("Job design not found")
 
 def _check_permission(request, owner_name, error_msg, allow_root=False):
-  """Raise PopupException if user doesn't have permission to modify the workflow"""
+  """Raise PopupException if user doesn't have permission to modify the design"""
   if request.user.username != owner_name:
     if allow_root and request.user.is_superuser:
       return
@@ -160,65 +160,65 @@ def _check_permission(request, owner_name, error_msg, allow_root=False):
     raise PopupException("Permission denied. You are not the owner.")
 
 
-def delete_design(request, wf_id):
+def delete_design(request, design_id):
   if request.method == 'POST':
     try:
-      wf_obj = _get_design(wf_id)
-      _check_permission(request, wf_obj.owner.username,
-                        "Access denied: delete workflow %s" % (wf_id,),
+      design_obj = _get_design(design_id)
+      _check_permission(request, design_obj.owner.username,
+                        "Access denied: delete design %s" % (design_id,),
                         allow_root=True)
-      wf_obj.root_action.delete()
-      wf_obj.delete()
+      design_obj.root_action.delete()
+      design_obj.delete()
 
-      submit.Submission(wf_obj, request.fs).remove_deployment_dir()
-    except models.OozieWorkflow.DoesNotExist:
-      LOG.error("Trying to delete non-existent workflow (id %s)" % (wf_id,))
+      submit.Submission(design_obj, request.fs).remove_deployment_dir()
+    except models.OozieDesign.DoesNotExist:
+      LOG.error("Trying to delete non-existent design (id %s)" % (design_id,))
       raise PopupException("Workflow not found")
 
   return redirect(urlresolvers.reverse(list_designs))
 
 
-def edit_design(request, wf_id):
-  wf_obj = _get_design(wf_id)
-  _check_permission(request, wf_obj.owner.username,
-                    "Access denied: edit workflow %s" % (wf_id,))
+def edit_design(request, design_id):
+  design_obj = _get_design(design_id)
+  _check_permission(request, design_obj.owner.username,
+                    "Access denied: edit design %s" % (design_id,))
 
   if request.method == 'POST':
-    form = jobsub.forms.workflow_form_by_instance(wf_obj, request.POST)
+    form = jobsub.forms.design_form_by_instance(design_obj, request.POST)
     if form.is_valid():
       form.action.save()
       form.wf.save()
       return redirect(urlresolvers.reverse(list_designs))
   else:
-    form = jobsub.forms.workflow_form_by_instance(wf_obj)
+    form = jobsub.forms.design_form_by_instance(design_obj)
 
   return _render_design_edit(request,
                                form,
-                               wf_obj.root_action.action_type,
+                               design_obj.root_action.action_type,
                                _STD_PROPERTIES_JSON)
 
 
-def clone_design(request, wf_id):
-  wf_obj = _get_design(wf_id)
-  clone = wf_obj.clone(request.user)
-  return redirect(urlresolvers.reverse(edit_design, kwargs={'wf_id': clone.id}))
+def clone_design(request, design_id):
+  design_obj = _get_design(design_id)
+  clone = design_obj.clone(request.user)
+  return redirect(urlresolvers.reverse(edit_design, kwargs={'design_id': clone.id}))
 
 
-def get_design_params(request, wf_id):
+def get_design_params(request, design_id):
   """
   Return the parameters found in the design as a json dictionary of
     { param_key : label }
   This expects an ajax call.
   """
-  wf_obj = _get_design(wf_id)
-  _check_permission(request, wf_obj.owner.username,
-                    "Access denied: workflow parameters %s" % (wf_id,))
-  params = wf_obj.find_parameters()
+  design_obj = _get_design(design_id)
+  _check_permission(request, design_obj.owner.username,
+                    "Access denied: design parameters %s" % (design_id,))
+  params = design_obj.find_parameters()
   params_with_labels = dict((p, p.upper()) for p in params)
   return render('dont_care_for_ajax', request, { 'params': params_with_labels })
 
 
-def submit_design(request, wf_id):
+def submit_design(request, design_id):
   """
   Submit a workflow to Oozie.
   The POST data should contain parameter values.
@@ -226,31 +226,25 @@ def submit_design(request, wf_id):
   if request.method != 'POST':
     raise PopupException('Please use a POST request to submit a design.')
 
-  wf_obj = _get_design(wf_id)
-  _check_permission(request, wf_obj.owner.username,
-                    "Access denied: submit workflow %s" % (wf_id,))
+  design_obj = _get_design(design_id)
+  _check_permission(request, design_obj.owner.username,
+                    "Access denied: submit design %s" % (design_id,))
 
   # Expect the parameter mapping in the POST data
   param_mapping = request.POST
-  wf_obj.bind_parameters(request.POST)
+  design_obj.bind_parameters(request.POST)
 
-  submission = submit.Submission(wf_obj, request.fs)
+  submission = submit.Submission(design_obj, request.fs)
   jobid = submission.run()
 
   # Save the submission record
   job_record = models.JobHistory(owner=request.user,
                                  job_id=jobid,
-                                 workflow=wf_obj)
+                                 design=design_obj)
   job_record.save()
 
   # Show oozie job info
   return redirect(urlresolvers.reverse(oozie_job, kwargs={'jobid': jobid}))
-
-  parameters = wf_obj.find_parameters()
-  return render('parameterize.mako', request, {
-      'workflow_id': wf_id,
-      'params': parameters
-  })
 
 
 
