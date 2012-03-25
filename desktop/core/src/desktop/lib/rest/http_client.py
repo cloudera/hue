@@ -139,7 +139,7 @@ class HttpClient(object):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
-    @param path: The path of the resource.
+    @param path: The path of the resource. Unsafe characters will be quoted.
     @param params: Key-value parameter data.
     @param data: The data to attach to the body of the request.
     @param headers: The headers to set for this request.
@@ -147,6 +147,7 @@ class HttpClient(object):
     @return: The result of urllib2.urlopen()
     """
     # Prepare URL and params
+    path = urllib.quote(smart_str(path))
     url = self._make_url(path, params)
     if http_method in ("GET", "DELETE"):
       if data is not None:

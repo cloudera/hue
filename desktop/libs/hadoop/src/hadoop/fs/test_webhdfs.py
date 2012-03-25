@@ -165,7 +165,7 @@ def test_i18n_namespace():
     listing = cluster.fs.listdir(parent)
     assertion(name in listing, "%s should be in %s" % (name, listing))
 
-  name = u'pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте'
+  name = u'''pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте%20,.<>~`!@#$%^&()_-+='"'''
   prefix = '/tmp/i18n'
   dir_path = '%s/%s' % (prefix, name)
   file_path = '%s/%s' % (dir_path, name)

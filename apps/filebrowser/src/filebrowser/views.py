@@ -62,10 +62,6 @@ MAX_FILEEDITOR_SIZE = 256 * 1024
 
 logger = logging.getLogger(__name__)
 
-def _unquote_path(path):
-    """Normalizes paths."""
-    return urllib.unquote(path)
-
 
 def _file_reader(fh):
     """Generator that reads a file, chunk-by-chunk."""
@@ -83,7 +79,6 @@ def download(request, path):
 
     This is inspired by django.views.static.serve.
     """
-    path = _unquote_path(path)
     if not request.fs.exists(path):
         raise Http404("File not found: %s" % escape(path))
     if not request.fs.isfile(path):
@@ -292,7 +287,6 @@ def listdir(request, path, chooser):
 
     Intended to be called via view().
     """
-    path = _unquote_path(path)
     if not request.fs.isdir(path):
         raise PopupException("Not a directory: %s" % (path,))
 
@@ -379,7 +373,6 @@ def stat(request, path):
     Intended for use via AJAX (and hence doesn't provide
     an HTML view).
     """
-    path = _unquote_path(path)
     if not request.fs.exists(path):
         raise Http404("File not found: %s" % escape(path))
     stats = request.fs.stats(path)
@@ -401,7 +394,6 @@ def display(request, path):
     sequence files, decompress gzipped text files, etc.).
     There exists a python-magic package to interface with libmagic.
     """
-    path = _unquote_path(path)
     if not request.fs.isfile(path):
         raise PopupException("Not a file: '%s'" % (path,))
 
