@@ -262,9 +262,9 @@ def test_user_admin():
                         is_superuser=False, is_active=True))
   assert_true("You cannot remove" in response.content,
               "Shouldn't be able to remove the last superuser")
-  # Shouldn't be able to delete the last superuser
+  # Shouldn't be able to delete oneself
   response = c.post('/useradmin/users/delete/test', {})
-  assert_true("You cannot remove" in response.content,
+  assert_true("You cannot remove yourself" in response.content,
               "Shouldn't be able to delete the last superuser")
 
   # Let's try changing the password

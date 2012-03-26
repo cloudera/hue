@@ -57,8 +57,9 @@ def delete_user(request, username):
       global __users_lock
       __users_lock.acquire()
       try:
+        if username == request.user.username:
+          raise PopupException("You cannot remove yourself.")
         user = User.objects.get(username=username)
-        _check_remove_last_super(user)
         user_profile = UserProfile.objects.get(user=user)
         user_profile.delete()
         user.delete()
