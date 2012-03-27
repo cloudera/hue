@@ -838,7 +838,7 @@ def view_results(request, id, first_row=0):
 
   # Retrieve query results
   try:
-    results = db_utils.db_client().fetch(handle, start_over)
+    results = db_utils.db_client().fetch(handle, start_over, -1)
     assert results.ready, 'Trying to display result that is not yet ready. Query id %s' % (id,)
     # We display the "Download" button only when we know
     # that there are results:

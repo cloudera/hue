@@ -25,6 +25,16 @@ class Iface(object):
     """
     pass
 
+  def executeAndWait(self, query, clientCtx):
+    """
+    run a query synchronously and return a handle (QueryHandle).
+
+    Parameters:
+     - query
+     - clientCtx
+    """
+    pass
+
   def explain(self, query):
     """
     Get the query plan for a query.
@@ -34,14 +44,16 @@ class Iface(object):
     """
     pass
 
-  def fetch(self, query_id, start_over):
+  def fetch(self, query_id, start_over, fetch_size):
     """
     Get the results of a query. This is non-blocking. Caller should check
-    Results.ready to determine if the results are in yet.
+    Results.ready to determine if the results are in yet. The call requests
+    the batch size of fetch.
 
     Parameters:
      - query_id
      - start_over
+     - fetch_size
     """
     pass
 
@@ -95,6 +107,20 @@ class Iface(object):
     """
     pass
 
+  def close(self, handle):
+    """
+    Parameters:
+     - handle
+    """
+    pass
+
+  def clean(self, log_context):
+    """
+    Parameters:
+     - log_context
+    """
+    pass
+
 
 class Client(Iface):
   def __init__(self, iprot, oprot=None):
@@ -137,6 +163,42 @@ class Client(Iface):
       raise result.error
     raise TApplicationException(TApplicationException.MISSING_RESULT, "query failed: unknown result");
 
+  def executeAndWait(self, query, clientCtx):
+    """
+    run a query synchronously and return a handle (QueryHandle).
+
+    Parameters:
+     - query
+     - clientCtx
+    """
+    self.send_executeAndWait(query, clientCtx)
+    return self.recv_executeAndWait()
+
+  def send_executeAndWait(self, query, clientCtx):
+    self._oprot.writeMessageBegin('executeAndWait', TMessageType.CALL, self._seqid)
+    args = executeAndWait_args()
+    args.query = query
+    args.clientCtx = clientCtx
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_executeAndWait(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = executeAndWait_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success != None:
+      return result.success
+    if result.error != None:
+      raise result.error
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "executeAndWait failed: unknown result");
+
   def explain(self, query):
     """
     Get the query plan for a query.
@@ -171,23 +233,26 @@ class Client(Iface):
       raise result.error
     raise TApplicationException(TApplicationException.MISSING_RESULT, "explain failed: unknown result");
 
-  def fetch(self, query_id, start_over):
+  def fetch(self, query_id, start_over, fetch_size):
     """
     Get the results of a query. This is non-blocking. Caller should check
-    Results.ready to determine if the results are in yet.
+    Results.ready to determine if the results are in yet. The call requests
+    the batch size of fetch.
 
     Parameters:
      - query_id
      - start_over
+     - fetch_size
     """
-    self.send_fetch(query_id, start_over)
+    self.send_fetch(query_id, start_over, fetch_size)
     return self.recv_fetch()
 
-  def send_fetch(self, query_id, start_over):
+  def send_fetch(self, query_id, start_over, fetch_size):
     self._oprot.writeMessageBegin('fetch', TMessageType.CALL, self._seqid)
     args = fetch_args()
     args.query_id = query_id
     args.start_over = start_over
+    args.fetch_size = fetch_size
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
@@ -403,12 +468,73 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "get_default_configuration failed: unknown result");
 
+  def close(self, handle):
+    """
+    Parameters:
+     - handle
+    """
+    self.send_close(handle)
+    self.recv_close()
+
+  def send_close(self, handle):
+    self._oprot.writeMessageBegin('close', TMessageType.CALL, self._seqid)
+    args = close_args()
+    args.handle = handle
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_close(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = close_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.error != None:
+      raise result.error
+    if result.error2 != None:
+      raise result.error2
+    return
+
+  def clean(self, log_context):
+    """
+    Parameters:
+     - log_context
+    """
+    self.send_clean(log_context)
+    self.recv_clean()
+
+  def send_clean(self, log_context):
+    self._oprot.writeMessageBegin('clean', TMessageType.CALL, self._seqid)
+    args = clean_args()
+    args.log_context = log_context
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_clean(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = clean_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    return
+
 
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
     self._handler = handler
     self._processMap = {}
     self._processMap["query"] = Processor.process_query
+    self._processMap["executeAndWait"] = Processor.process_executeAndWait
     self._processMap["explain"] = Processor.process_explain
     self._processMap["fetch"] = Processor.process_fetch
     self._processMap["get_state"] = Processor.process_get_state
@@ -417,6 +543,8 @@ class Processor(Iface, TProcessor):
     self._processMap["dump_config"] = Processor.process_dump_config
     self._processMap["get_log"] = Processor.process_get_log
     self._processMap["get_default_configuration"] = Processor.process_get_default_configuration
+    self._processMap["close"] = Processor.process_close
+    self._processMap["clean"] = Processor.process_clean
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
@@ -447,6 +575,20 @@ class Processor(Iface, TProcessor):
     oprot.writeMessageEnd()
     oprot.trans.flush()
 
+  def process_executeAndWait(self, seqid, iprot, oprot):
+    args = executeAndWait_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = executeAndWait_result()
+    try:
+      result.success = self._handler.executeAndWait(args.query, args.clientCtx)
+    except BeeswaxException, error:
+      result.error = error
+    oprot.writeMessageBegin("executeAndWait", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
   def process_explain(self, seqid, iprot, oprot):
     args = explain_args()
     args.read(iprot)
@@ -467,7 +609,7 @@ class Processor(Iface, TProcessor):
     iprot.readMessageEnd()
     result = fetch_result()
     try:
-      result.success = self._handler.fetch(args.query_id, args.start_over)
+      result.success = self._handler.fetch(args.query_id, args.start_over, args.fetch_size)
     except QueryNotFoundException, error:
       result.error = error
     except BeeswaxException, error2:
@@ -548,6 +690,33 @@ class Processor(Iface, TProcessor):
     result = get_default_configuration_result()
     result.success = self._handler.get_default_configuration(args.include_hadoop)
     oprot.writeMessageBegin("get_default_configuration", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_close(self, seqid, iprot, oprot):
+    args = close_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = close_result()
+    try:
+      self._handler.close(args.handle)
+    except QueryNotFoundException, error:
+      result.error = error
+    except BeeswaxException, error2:
+      result.error2 = error2
+    oprot.writeMessageBegin("close", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_clean(self, seqid, iprot, oprot):
+    args = clean_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = clean_result()
+    self._handler.clean(args.log_context)
+    oprot.writeMessageBegin("clean", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -662,6 +831,150 @@ class query_result(object):
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('query_result')
+    if self.success != None:
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
+      oprot.writeFieldEnd()
+    if self.error != None:
+      oprot.writeFieldBegin('error', TType.STRUCT, 1)
+      self.error.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+    def validate(self):
+      return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class executeAndWait_args(object):
+  """
+  Attributes:
+   - query
+   - clientCtx
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'query', (Query, Query.thrift_spec), None, ), # 1
+    (2, TType.STRING, 'clientCtx', None, None, ), # 2
+  )
+
+  def __init__(self, query=None, clientCtx=None,):
+    self.query = query
+    self.clientCtx = clientCtx
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.query = Query()
+          self.query.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.clientCtx = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('executeAndWait_args')
+    if self.query != None:
+      oprot.writeFieldBegin('query', TType.STRUCT, 1)
+      self.query.write(oprot)
+      oprot.writeFieldEnd()
+    if self.clientCtx != None:
+      oprot.writeFieldBegin('clientCtx', TType.STRING, 2)
+      oprot.writeString(self.clientCtx)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+    def validate(self):
+      return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class executeAndWait_result(object):
+  """
+  Attributes:
+   - success
+   - error
+  """
+
+  thrift_spec = (
+    (0, TType.STRUCT, 'success', (QueryHandle, QueryHandle.thrift_spec), None, ), # 0
+    (1, TType.STRUCT, 'error', (BeeswaxException, BeeswaxException.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, success=None, error=None,):
+    self.success = success
+    self.error = error
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRUCT:
+          self.success = QueryHandle()
+          self.success.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.error = BeeswaxException()
+          self.error.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('executeAndWait_result')
     if self.success != None:
       oprot.writeFieldBegin('success', TType.STRUCT, 0)
       self.success.write(oprot)
@@ -824,17 +1137,20 @@ class fetch_args(object):
   Attributes:
    - query_id
    - start_over
+   - fetch_size
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRUCT, 'query_id', (QueryHandle, QueryHandle.thrift_spec), None, ), # 1
     (2, TType.BOOL, 'start_over', None, None, ), # 2
+    (3, TType.I32, 'fetch_size', None, -1, ), # 3
   )
 
-  def __init__(self, query_id=None, start_over=None,):
+  def __init__(self, query_id=None, start_over=None, fetch_size=thrift_spec[3][4],):
     self.query_id = query_id
     self.start_over = start_over
+    self.fetch_size = fetch_size
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -856,6 +1172,11 @@ class fetch_args(object):
           self.start_over = iprot.readBool();
         else:
           iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.I32:
+          self.fetch_size = iprot.readI32();
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -873,6 +1194,10 @@ class fetch_args(object):
     if self.start_over != None:
       oprot.writeFieldBegin('start_over', TType.BOOL, 2)
       oprot.writeBool(self.start_over)
+      oprot.writeFieldEnd()
+    if self.fetch_size != None:
+      oprot.writeFieldBegin('fetch_size', TType.I32, 3)
+      oprot.writeI32(self.fetch_size)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -1694,6 +2019,239 @@ class get_default_configuration_result(object):
         iter27.write(oprot)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+    def validate(self):
+      return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class close_args(object):
+  """
+  Attributes:
+   - handle
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'handle', (QueryHandle, QueryHandle.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, handle=None,):
+    self.handle = handle
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.handle = QueryHandle()
+          self.handle.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('close_args')
+    if self.handle != None:
+      oprot.writeFieldBegin('handle', TType.STRUCT, 1)
+      self.handle.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+    def validate(self):
+      return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class close_result(object):
+  """
+  Attributes:
+   - error
+   - error2
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'error', (QueryNotFoundException, QueryNotFoundException.thrift_spec), None, ), # 1
+    (2, TType.STRUCT, 'error2', (BeeswaxException, BeeswaxException.thrift_spec), None, ), # 2
+  )
+
+  def __init__(self, error=None, error2=None,):
+    self.error = error
+    self.error2 = error2
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.error = QueryNotFoundException()
+          self.error.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRUCT:
+          self.error2 = BeeswaxException()
+          self.error2.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('close_result')
+    if self.error != None:
+      oprot.writeFieldBegin('error', TType.STRUCT, 1)
+      self.error.write(oprot)
+      oprot.writeFieldEnd()
+    if self.error2 != None:
+      oprot.writeFieldBegin('error2', TType.STRUCT, 2)
+      self.error2.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+    def validate(self):
+      return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class clean_args(object):
+  """
+  Attributes:
+   - log_context
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'log_context', None, None, ), # 1
+  )
+
+  def __init__(self, log_context=None,):
+    self.log_context = log_context
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.log_context = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('clean_args')
+    if self.log_context != None:
+      oprot.writeFieldBegin('log_context', TType.STRING, 1)
+      oprot.writeString(self.log_context)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+    def validate(self):
+      return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class clean_result(object):
+
+  thrift_spec = (
+  )
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('clean_result')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
     def validate(self):

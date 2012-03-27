@@ -16,9 +16,12 @@
 package com.cloudera.beeswax;
 
 import java.io.IOException;
+import java.net.Socket;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
@@ -31,11 +34,16 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.ThriftHiveMetastore;
 import org.apache.hadoop.hive.metastore.api.ThriftHiveMetastore.Iface;
 import org.apache.hadoop.hive.ql.Driver;
+import org.apache.hadoop.security.SaslRpcServer;
+import org.apache.hadoop.security.SecurityUtil;
+import org.apache.hadoop.security.SaslRpcServer.AuthMethod;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
+import org.apache.thrift.transport.TSaslServerTransport;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransportException;
@@ -59,6 +67,9 @@ public class Server {
   private static int dtPort = -1;
   private static boolean dtHttps = false;
   private static long qlifetime = BeeswaxServiceImpl.RUNNING_QUERY_LIFETIME;
+  private static boolean useSasl = false;
+  private static String principalConf;
+  private static String keytabFile;
 
   /**
    * Parse command line options.
@@ -68,6 +79,8 @@ public class Server {
    */
   private static void parseArgs(String[] args) throws ParseException {
     Options options = new Options();
+    OptionGroup dtOptions = new OptionGroup();
+    dtOptions.setRequired(true);
 
     Option metastoreOpt = new Option("m", "metastore", true, "port to use for metastore");
     metastoreOpt.setRequired(false);
@@ -83,23 +96,34 @@ public class Server {
     options.addOption(beeswaxOpt);
 
     Option dtHostOpt = new Option("h", "desktop-host", true, "host running desktop");
-    dtHostOpt.setRequired(true);
+    dtHostOpt.setRequired(false);
     options.addOption(dtHostOpt);
 
     Option dtHttpsOpt = new Option("s", "desktop-https", true, "desktop is running https");
     options.addOption(dtHttpsOpt);
 
     Option dtPortOpt = new Option("p", "desktop-port", true, "port used by desktop");
-    dtPortOpt.setRequired(true);
-    options.addOption(dtPortOpt);
+    dtPortOpt.setRequired(false);
+    dtOptions.addOption(dtPortOpt);
 
     Option superUserOpt = new Option("u", "superuser", true,
                                     "Username of Hadoop superuser (default: hadoop)");
     superUserOpt.setRequired(false);
     options.addOption(superUserOpt);
 
+    Option noDesktopOpt = new Option("n", "no-desktop", false, "no desktop used");
+    dtOptions.addOption(noDesktopOpt);
+
+    Option kPrincipalOpt = new Option("c", "principalConf", true, "Pricipal configuration");
+    options.addOption(kPrincipalOpt);
+
+    Option kTabOpt = new Option("k", "keytab", true, "keytab file");
+    options.addOption(kTabOpt);
+
+    options.addOptionGroup(dtOptions); // make "n" and "p" mutually exclusive
     PosixParser parser = new PosixParser();
     CommandLine cmd = parser.parse(options, args);
+
     if (!cmd.getArgList().isEmpty()) {
       throw new ParseException("Unexpected extra arguments: " + cmd.getArgList());
     }
@@ -119,6 +143,11 @@ public class Server {
         dtHttps = true;
       } else if (opt.getOpt() == "l") {
         qlifetime = Long.valueOf(opt.getValue());
+      } else if (opt.getOpt() == "k") {
+        keytabFile = opt.getValue();
+        useSasl = true;
+      } else if (opt.getOpt() == "c") {
+        principalConf = opt.getValue();
       }
     }
   }
@@ -197,12 +226,50 @@ public class Server {
         qlifetime);
     Processor processor = new BeeswaxService.Processor(impl);
     TThreadPoolServer.Options options = new TThreadPoolServer.Options();
-    TServer server = new TThreadPoolServer(processor, serverTransport,
-        new TTransportFactory(), new TTransportFactory(),
-        new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
-    LOG.info("Starting beeswax server on port " + port + ", talking back to Desktop at " +
-             dtHost + ":" + dtPort + ", lifetime of queries set to " + qlifetime);
+    TTransportFactory transFactory;
 
+    if (useSasl) {
+      if (keytabFile == null || keytabFile.isEmpty()) {
+        throw new IllegalArgumentException("No keytab specified");
+      }
+      if (principalConf == null || principalConf.isEmpty()) {
+        throw new IllegalArgumentException("No principal specified");
+      }
+
+      // Login from the keytab
+      String kerberosName;
+      try {
+        kerberosName =
+          SecurityUtil.getServerPrincipal(principalConf, "0.0.0.0");
+        UserGroupInformation.loginUserFromKeytab(
+            kerberosName, keytabFile);
+        kerberosName = UserGroupInformation.getCurrentUser().getUserName();
+      } catch (IOException e) {
+        throw new IllegalArgumentException("couldn't setup authentication subsystem", e);
+      }
+      final String names[] = SaslRpcServer.splitKerberosName(kerberosName);
+      if (names.length != 3) {
+        throw new IllegalArgumentException("Kerberos principal should have 3 parts: " + kerberosName);
+      }
+      transFactory = new TSaslServerTransport.Factory(AuthMethod.KERBEROS.getMechanismName(),
+          names[0], names[1],  // two parts of kerberos principal
+          SaslRpcServer.SASL_PROPS,
+          new SaslRpcServer.SaslGssCallbackHandler());
+    } else {
+      transFactory = new TTransportFactory();
+    }
+
+    TServer server = new TThreadPoolServer(processor, serverTransport,
+        transFactory, transFactory,
+        new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
+
+
+    if (dtPort != -1) {
+      LOG.info("Starting beeswax server on port " + port + ", talking back to Desktop at "
+                + dtHost + ":" + dtPort);
+    } else {
+      LOG.info("Starting beeswax server on port " + port);
+    }
     server.serve();
   }
 

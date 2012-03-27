@@ -99,7 +99,7 @@ def wait_for_results(query_history, timeout_sec=30.0):
   curr = time.time()
   end = curr + timeout_sec
   while curr <= end:
-    results = db_client().fetch(handle, START_OVER)
+    results = db_client().fetch(handle, START_OVER, fetch_size=-1)
     if results.ready:
       return results
     time.sleep(SLEEP_INTERVAL)

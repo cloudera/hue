@@ -45,6 +45,7 @@ from beeswax.views import parse_results, collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history
 from beeswax.test_base import BeeswaxSampleProvider
 from beeswaxd import BeeswaxService
+from beeswaxd import ttypes
 
 LOG = logging.getLogger(__name__)
 CSV_LINK_PAT = re.compile('/beeswax/download/\d+/csv')
@@ -202,6 +203,7 @@ for x in sys.stdin:
     assert_equal(0, len(response.context["hadoop_jobs"]), "Shouldn't have found jobs.")
     self._verify_query_state(beeswax.models.QueryHistory.STATE.available)
 
+
     # Query multi-page request
     QUERY = """
       SELECT * FROM test
@@ -275,6 +277,48 @@ for x in sys.stdin:
     # Test that we can view the error again
     resp = self.client.get('/beeswax/watch/%s' % (id,), follow=True)
     check_error_in_response(resp)
+
+  def test_sync_query_exec(self):
+    # Execute Query Synchronously, set fetch size and fetch results
+    # verify the size of resultset,
+    QUERY = """
+      SELECT foo FROM test;
+    """
+
+    query_msg = BeeswaxService.Query()
+    query_msg.query = """
+      SELECT foo FROM test
+    """
+    query_msg.configuration = []
+    query_msg.hadoop_user = "test"
+    handle = beeswax.db_utils.db_client().executeAndWait(query_msg, "")
+ 
+    results = beeswax.db_utils.db_client().fetch(handle, True, 5)
+    row_list = list(parse_results(results.data))
+    assert_equal(len(row_list), 5)
+
+    beeswax.db_utils.db_client().close(handle)
+    beeswax.db_utils.db_client().clean(handle.log_context)
+
+
+  def test_sync_query_error(self):
+    # Execute incorrect Query , verify the error code and sqlstate
+    QUERY = """
+      SELECT foo FROM test;
+    """
+
+    query_msg = BeeswaxService.Query()
+    query_msg.query = """
+      SELECT foo FROM zzzzz
+    """
+    query_msg.configuration = []
+    query_msg.hadoop_user = "test"
+    try:
+      handle = beeswax.db_utils.db_client().executeAndWait(query_msg, "")
+    except ttypes.BeeswaxException, bex:
+      assert_equal(bex.errorCode, 10)
+      assert_equal(bex.SQLState, "42S02")
+
 
   def test_parameterization(self):
     """
@@ -1012,3 +1056,5 @@ def test_collapse_whitespace():
   assert_equal("", collapse_whitespace("\t\n\n  \n\t \n"))
   assert_equal("x", collapse_whitespace("\t\nx\n  \n\t \n"))
   assert_equal("x y", collapse_whitespace("\t\nx\n  \ny\t \n"))
+
+
