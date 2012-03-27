@@ -309,15 +309,15 @@ for x in sys.stdin:
 
     query_msg = BeeswaxService.Query()
     query_msg.query = """
-      SELECT foo FROM zzzzz
+      SELECT FROM zzzzz
     """
     query_msg.configuration = []
     query_msg.hadoop_user = "test"
     try:
       handle = beeswax.db_utils.db_client().executeAndWait(query_msg, "")
     except ttypes.BeeswaxException, bex:
-      assert_equal(bex.errorCode, 10)
-      assert_equal(bex.SQLState, "42S02")
+      assert_equal(bex.errorCode, 11)
+      assert_equal(bex.SQLState, "42000")
 
 
   def test_parameterization(self):
