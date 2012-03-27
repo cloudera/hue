@@ -498,6 +498,8 @@ class BeeswaxException(Exception):
    - message
    - log_context
    - handle
+   - errorCode
+   - SQLState
   """
 
   thrift_spec = (
@@ -505,12 +507,16 @@ class BeeswaxException(Exception):
     (1, TType.STRING, 'message', None, None, ), # 1
     (2, TType.STRING, 'log_context', None, None, ), # 2
     (3, TType.STRUCT, 'handle', (QueryHandle, QueryHandle.thrift_spec), None, ), # 3
+    (4, TType.I32, 'errorCode', None, 0, ), # 4
+    (5, TType.STRING, 'SQLState', None, "     ", ), # 5
   )
 
-  def __init__(self, message=None, log_context=None, handle=None,):
+  def __init__(self, message=None, log_context=None, handle=None, errorCode=thrift_spec[4][4], SQLState=thrift_spec[5][4],):
     self.message = message
     self.log_context = log_context
     self.handle = handle
+    self.errorCode = errorCode
+    self.SQLState = SQLState
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -537,6 +543,16 @@ class BeeswaxException(Exception):
           self.handle.read(iprot)
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.I32:
+          self.errorCode = iprot.readI32();
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.STRING:
+          self.SQLState = iprot.readString();
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -558,6 +574,14 @@ class BeeswaxException(Exception):
     if self.handle is not None:
       oprot.writeFieldBegin('handle', TType.STRUCT, 3)
       self.handle.write(oprot)
+      oprot.writeFieldEnd()
+    if self.errorCode is not None:
+      oprot.writeFieldBegin('errorCode', TType.I32, 4)
+      oprot.writeI32(self.errorCode)
+      oprot.writeFieldEnd()
+    if self.SQLState is not None:
+      oprot.writeFieldBegin('SQLState', TType.STRING, 5)
+      oprot.writeString(self.SQLState)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

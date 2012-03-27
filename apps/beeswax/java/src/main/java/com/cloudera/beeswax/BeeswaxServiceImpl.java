@@ -60,6 +60,7 @@ import org.apache.hadoop.hive.ql.plan.FetchWork;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.processors.CommandProcessor;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorFactory;
+import org.apache.hadoop.hive.ql.processors.CommandProcessorResponse;
 import org.apache.hadoop.hive.ql.QueryPlan;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.serde.Constants;
@@ -331,11 +332,47 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       }
     }
 
+    /**
+     * Run query. Updates state.
+     * @throws BeeswaxException
+     */
+    public void run() throws BeeswaxException {
+      CommandProcessorResponse response;
+
+      synchronized (this) {
+        assertState(QueryState.INITIALIZED);
+        state = QueryState.RUNNING;
+      }
+      try {
+        response = driver.run(query.query);
+      } catch (Exception e) {
+        throw new BeeswaxException(getErrorStreamAsString(), logContext.getName(), this.handle);
+      }
+      if (response.getResponseCode() != 0) {
+         throwExceptionWithSqlErrors(new BeeswaxException(response.getErrorMessage(),
+             logContext.getName(), this.handle),
+             response.getResponseCode(), response.getSQLState());
+      } else {
+        synchronized (this) {
+          state = QueryState.FINISHED;
+        }
+      }
+    }
+
+    // Add the SQLCODE and SQLState to the BeeswaxException. Thrift doesn't provide
+    // exception constructors with optional members hence it's done here.
+    private void throwExceptionWithSqlErrors(BeeswaxException ex, int errCode,
+            String sqlState) throws BeeswaxException {
+      ex.setSQLState(sqlState);
+      ex.setErrorCode(errCode);
+      throw ex;
+    }
+
     public void bringUp() {
       SessionState.start(this.sessionState);
     }
 
-    private void materializeResults(Results r, boolean startOver)
+    private void materializeResults(Results r, boolean startOver, int fetchSize)
     throws IOException, CommandNeedRetryException {
       if (driver.getPlan().getFetchTask() == null) {
         // This query is never going to return anything.
@@ -359,6 +396,9 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
 
       ArrayList<String> v = new ArrayList<String>();
       r.setData(v);
+      if (fetchSize > 0) {
+        driver.setMaxRows(fetchSize);
+      }
       r.has_more = driver.getResults(v);
       r.start_row = startRow;
       startRow += v.size();
@@ -454,7 +494,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       return new QueryExplanation(sb.toString());
     }
 
-    public Results fetch(boolean fromBeginning) throws BeeswaxException {
+    public Results fetch(boolean fromBeginning, int fetchSize)
+                throws BeeswaxException {
       this.atime = System.currentTimeMillis();
       Results r = new Results();
       // Only one person can access a running query at a time.
@@ -467,7 +508,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
           bringUp();
           r.ready = true;
           try {
-            materializeResults(r, fromBeginning);
+            materializeResults(r, fromBeginning, fetchSize);
           } catch (Exception e) {
             throw new BeeswaxException(e.toString(), logContext.getName(), handle);
           } finally {
@@ -483,6 +524,19 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
         }
       }
       return r;
+    }
+
+    /**
+     * Close the query. Free the resource held by driver
+     */
+    public int close() {
+      int ret = -1;
+      try {
+        ret = driver.close();
+      } catch (Exception e) {
+        LOG.error("Exception while closing query", e);
+      }
+      return ret;
     }
 
     /** Store the first exception we see. */
@@ -547,6 +601,9 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
    * (We don't care whether the notification handling fails or succeeds.)
    */
   void notifyDone(RunningQueryState state) {
+    if (notifyUrl == null) {
+      return;
+    }
     QueryHandle handle = state.getQueryHandle();
     if (handle == null) {
       LOG.error("Finished execution of a query without a handle: " + state.toString());
@@ -596,27 +653,31 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     this.runningQueries = new ConcurrentHashMap<String, RunningQueryState>();
     this.queryLifetime = queryLifetime;
 
-    String protocol;
-    if (dtHttps) {
-      protocol = "https";
-      try {
-        // Disable SSL verification. HUE cert may be signed by untrusted CA.
-        SSLContext sslcontext = SSLContext.getInstance("SSL");
-        sslcontext.init(null,
-                        new DummyX509TrustManager[] { new DummyX509TrustManager() },
-                        new SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sslcontext.getSocketFactory());
-      } catch (NoSuchAlgorithmException ex) {
-        LOG.warn("Failed to disable SSL certificate check " + ex);
-      } catch (KeyManagementException ex) {
-        LOG.warn("Failed to disable SSL certificate check " + ex);
-      }
-      DummyHostnameVerifier dummy = new DummyHostnameVerifier();
-      HttpsURLConnection.setDefaultHostnameVerifier(dummy);
+    if (dtPort == -1) {
+      this.notifyUrl = null;
     } else {
-      protocol = "http";
+      String protocol;
+      if (dtHttps) {
+        try {
+          // Disable SSL verification. HUE cert may be signed by untrusted CA.
+          SSLContext sslcontext = SSLContext.getInstance("SSL");
+          sslcontext.init(null,
+                          new DummyX509TrustManager[] { new DummyX509TrustManager() },
+                          new SecureRandom());
+          HttpsURLConnection.setDefaultSSLSocketFactory(sslcontext.getSocketFactory());
+        } catch (NoSuchAlgorithmException ex) {
+          LOG.warn("Failed to disable SSL certificate check " + ex);
+        } catch (KeyManagementException ex) {
+          LOG.warn("Failed to disable SSL certificate check " + ex);
+        }
+        DummyHostnameVerifier dummy = new DummyHostnameVerifier();
+        HttpsURLConnection.setDefaultHostnameVerifier(dummy);
+        protocol = "https";
+      } else {
+        protocol = "http";
+      }
+      this.notifyUrl = protocol + "://" + dtHost + ":" + dtPort + NOTIFY_URL_BASE;
     }
-    this.notifyUrl = protocol + "://" + dtHost + ":" + dtPort + NOTIFY_URL_BASE;
 
     // A daemon thread that periodically evict stale RunningQueryState objects
     Thread evicter = new Thread(new Runnable() {
@@ -725,6 +786,53 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
   }
 
   /**
+   * Run a query synchronously and return a handle (QueryHandle).
+   */
+  @Override
+  public QueryHandle executeAndWait(final Query query, String clientUuid)
+      throws BeeswaxException {
+    // First, create an id and reset the LogContext
+    String queryUuid = UUID.randomUUID().toString();
+    String contextUuid;
+
+    LOG.info("got context " + clientUuid);
+    if (clientUuid.isEmpty()) {
+      contextUuid = queryUuid;
+    } else {
+      contextUuid = clientUuid;
+    }
+    LOG.info("running query " + query.query + " context " + contextUuid);
+    final QueryHandle handle = new QueryHandle(queryUuid, contextUuid);
+    final LogContext lc = LogContext.registerCurrentThread(handle.log_context);
+    lc.resetLog();
+
+    // Make an administrative record
+    final RunningQueryState state = new RunningQueryState(query, lc);
+    try {
+      return doWithState(state,
+          new PrivilegedExceptionAction<QueryHandle>() {
+            public QueryHandle run() throws Exception {
+              state.setQueryHandle(handle);
+              runningQueries.put(handle.id, state);
+              state.initialize();
+              try {
+                state.run();
+              } catch (BeeswaxException perr) {
+                state.saveException(perr);
+                throw perr;
+              } catch (Throwable t) {
+                state.saveException(t);
+                throw new BeeswaxException(t.toString(), handle.log_context, handle);
+              }
+              return handle;
+            }
+          });
+    } catch (BeeswaxException e) {
+      throw e;
+    }
+  }
+
+  /**
    * Verify that the handle data is not null.
    */
   private void validateHandle(QueryHandle handle) throws QueryNotFoundException {
@@ -781,9 +889,11 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
    *
    * @param handle  The handle from query()
    * @param fromBeginning  If true, rewind to the first row. Otherwise fetch from last position.
+   * @param fetchSize  Number of rows to return with this fetch
    */
   @Override
-  public Results fetch(final QueryHandle handle, final boolean fromBeginning)
+  public Results fetch(final QueryHandle handle, final boolean fromBeginning,
+            final int fetchSize)
       throws QueryNotFoundException, BeeswaxException {
     LogContext.unregisterCurrentThread();
     validateHandle(handle);
@@ -796,7 +906,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
               if (state == null) {
                 throw new QueryNotFoundException();
               }
-              return state.fetch(fromBeginning);
+              return state.fetch(fromBeginning, fetchSize);
             }
           });
     } catch (BeeswaxException e) {
@@ -912,5 +1022,43 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
 
   public void setQueryLifetime(long queryLifetime) {
     this.queryLifetime = queryLifetime;
+  }
+
+  /*
+   * close the query
+   */
+  @Override
+  public void close(QueryHandle handle)
+    throws QueryNotFoundException, BeeswaxException {
+    LogContext.unregisterCurrentThread();
+    validateHandle(handle);
+    LogContext.registerCurrentThread(handle.log_context);
+    final RunningQueryState state = runningQueries.get(handle.id);
+    try {
+      doWithState(state,
+          new PrivilegedExceptionAction<Integer>() {
+            public Integer run() throws Exception {
+              if (state == null) {
+                throw new QueryNotFoundException();
+              }
+              return state.close();
+            }
+          });
+    } catch (BeeswaxException e) {
+      throw e;
+    }
+    runningQueries.remove(handle.id);
+  }
+
+  @Override
+  public void clean(String contextName) {
+    LogContext.unregisterCurrentThread();
+    try {
+      if (LogContext.destroyContext(contextName) == false) {
+        throw new QueryNotFoundException();
+      }
+    } catch (Exception e) {
+      LOG.error("Error freeing query resources", e);
+    }
   }
 }
