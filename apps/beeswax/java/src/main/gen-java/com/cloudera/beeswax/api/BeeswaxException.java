@@ -27,16 +27,22 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
   private static final org.apache.thrift.protocol.TField MESSAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("message", org.apache.thrift.protocol.TType.STRING, (short)1);
   private static final org.apache.thrift.protocol.TField LOG_CONTEXT_FIELD_DESC = new org.apache.thrift.protocol.TField("log_context", org.apache.thrift.protocol.TType.STRING, (short)2);
   private static final org.apache.thrift.protocol.TField HANDLE_FIELD_DESC = new org.apache.thrift.protocol.TField("handle", org.apache.thrift.protocol.TType.STRUCT, (short)3);
+  private static final org.apache.thrift.protocol.TField ERROR_CODE_FIELD_DESC = new org.apache.thrift.protocol.TField("errorCode", org.apache.thrift.protocol.TType.I32, (short)4);
+  private static final org.apache.thrift.protocol.TField SQLSTATE_FIELD_DESC = new org.apache.thrift.protocol.TField("SQLState", org.apache.thrift.protocol.TType.STRING, (short)5);
 
   public String message; // required
   public String log_context; // required
   public QueryHandle handle; // required
+  public int errorCode; // required
+  public String SQLState; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     MESSAGE((short)1, "message"),
     LOG_CONTEXT((short)2, "log_context"),
-    HANDLE((short)3, "handle");
+    HANDLE((short)3, "handle"),
+    ERROR_CODE((short)4, "errorCode"),
+    SQLSTATE((short)5, "SQLState");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -57,6 +63,10 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
           return LOG_CONTEXT;
         case 3: // HANDLE
           return HANDLE;
+        case 4: // ERROR_CODE
+          return ERROR_CODE;
+        case 5: // SQLSTATE
+          return SQLSTATE;
         default:
           return null;
       }
@@ -97,6 +107,8 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
   }
 
   // isset id assignments
+  private static final int __ERRORCODE_ISSET_ID = 0;
+  private BitSet __isset_bit_vector = new BitSet(1);
 
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
@@ -107,11 +119,19 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING        , "LogContextId")));
     tmpMap.put(_Fields.HANDLE, new org.apache.thrift.meta_data.FieldMetaData("handle", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, QueryHandle.class)));
+    tmpMap.put(_Fields.ERROR_CODE, new org.apache.thrift.meta_data.FieldMetaData("errorCode", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+    tmpMap.put(_Fields.SQLSTATE, new org.apache.thrift.meta_data.FieldMetaData("SQLState", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(BeeswaxException.class, metaDataMap);
   }
 
   public BeeswaxException() {
+    this.errorCode = 0;
+
+    this.SQLState = "     ";
+
   }
 
   public BeeswaxException(
@@ -129,6 +149,8 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
    * Performs a deep copy on <i>other</i>.
    */
   public BeeswaxException(BeeswaxException other) {
+    __isset_bit_vector.clear();
+    __isset_bit_vector.or(other.__isset_bit_vector);
     if (other.isSetMessage()) {
       this.message = other.message;
     }
@@ -137,6 +159,10 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
     }
     if (other.isSetHandle()) {
       this.handle = new QueryHandle(other.handle);
+    }
+    this.errorCode = other.errorCode;
+    if (other.isSetSQLState()) {
+      this.SQLState = other.SQLState;
     }
   }
 
@@ -149,6 +175,10 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
     this.message = null;
     this.log_context = null;
     this.handle = null;
+    this.errorCode = 0;
+
+    this.SQLState = "     ";
+
   }
 
   public String getMessage() {
@@ -223,6 +253,53 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
     }
   }
 
+  public int getErrorCode() {
+    return this.errorCode;
+  }
+
+  public BeeswaxException setErrorCode(int errorCode) {
+    this.errorCode = errorCode;
+    setErrorCodeIsSet(true);
+    return this;
+  }
+
+  public void unsetErrorCode() {
+    __isset_bit_vector.clear(__ERRORCODE_ISSET_ID);
+  }
+
+  /** Returns true if field errorCode is set (has been assigned a value) and false otherwise */
+  public boolean isSetErrorCode() {
+    return __isset_bit_vector.get(__ERRORCODE_ISSET_ID);
+  }
+
+  public void setErrorCodeIsSet(boolean value) {
+    __isset_bit_vector.set(__ERRORCODE_ISSET_ID, value);
+  }
+
+  public String getSQLState() {
+    return this.SQLState;
+  }
+
+  public BeeswaxException setSQLState(String SQLState) {
+    this.SQLState = SQLState;
+    return this;
+  }
+
+  public void unsetSQLState() {
+    this.SQLState = null;
+  }
+
+  /** Returns true if field SQLState is set (has been assigned a value) and false otherwise */
+  public boolean isSetSQLState() {
+    return this.SQLState != null;
+  }
+
+  public void setSQLStateIsSet(boolean value) {
+    if (!value) {
+      this.SQLState = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case MESSAGE:
@@ -249,6 +326,22 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
       }
       break;
 
+    case ERROR_CODE:
+      if (value == null) {
+        unsetErrorCode();
+      } else {
+        setErrorCode((Integer)value);
+      }
+      break;
+
+    case SQLSTATE:
+      if (value == null) {
+        unsetSQLState();
+      } else {
+        setSQLState((String)value);
+      }
+      break;
+
     }
   }
 
@@ -262,6 +355,12 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
 
     case HANDLE:
       return getHandle();
+
+    case ERROR_CODE:
+      return Integer.valueOf(getErrorCode());
+
+    case SQLSTATE:
+      return getSQLState();
 
     }
     throw new IllegalStateException();
@@ -280,6 +379,10 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
       return isSetLog_context();
     case HANDLE:
       return isSetHandle();
+    case ERROR_CODE:
+      return isSetErrorCode();
+    case SQLSTATE:
+      return isSetSQLState();
     }
     throw new IllegalStateException();
   }
@@ -324,6 +427,24 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
         return false;
     }
 
+    boolean this_present_errorCode = true && this.isSetErrorCode();
+    boolean that_present_errorCode = true && that.isSetErrorCode();
+    if (this_present_errorCode || that_present_errorCode) {
+      if (!(this_present_errorCode && that_present_errorCode))
+        return false;
+      if (this.errorCode != that.errorCode)
+        return false;
+    }
+
+    boolean this_present_SQLState = true && this.isSetSQLState();
+    boolean that_present_SQLState = true && that.isSetSQLState();
+    if (this_present_SQLState || that_present_SQLState) {
+      if (!(this_present_SQLState && that_present_SQLState))
+        return false;
+      if (!this.SQLState.equals(that.SQLState))
+        return false;
+    }
+
     return true;
   }
 
@@ -345,6 +466,16 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
     builder.append(present_handle);
     if (present_handle)
       builder.append(handle);
+
+    boolean present_errorCode = true && (isSetErrorCode());
+    builder.append(present_errorCode);
+    if (present_errorCode)
+      builder.append(errorCode);
+
+    boolean present_SQLState = true && (isSetSQLState());
+    builder.append(present_SQLState);
+    if (present_SQLState)
+      builder.append(SQLState);
 
     return builder.toHashCode();
   }
@@ -383,6 +514,26 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
     }
     if (isSetHandle()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.handle, typedOther.handle);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetErrorCode()).compareTo(typedOther.isSetErrorCode());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetErrorCode()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.errorCode, typedOther.errorCode);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetSQLState()).compareTo(typedOther.isSetSQLState());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetSQLState()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.SQLState, typedOther.SQLState);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -426,6 +577,21 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
           }
           break;
+        case 4: // ERROR_CODE
+          if (field.type == org.apache.thrift.protocol.TType.I32) {
+            this.errorCode = iprot.readI32();
+            setErrorCodeIsSet(true);
+          } else { 
+            org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
+        case 5: // SQLSTATE
+          if (field.type == org.apache.thrift.protocol.TType.STRING) {
+            this.SQLState = iprot.readString();
+          } else { 
+            org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
+          }
+          break;
         default:
           org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
       }
@@ -455,6 +621,18 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
       oprot.writeFieldBegin(HANDLE_FIELD_DESC);
       this.handle.write(oprot);
       oprot.writeFieldEnd();
+    }
+    if (isSetErrorCode()) {
+      oprot.writeFieldBegin(ERROR_CODE_FIELD_DESC);
+      oprot.writeI32(this.errorCode);
+      oprot.writeFieldEnd();
+    }
+    if (this.SQLState != null) {
+      if (isSetSQLState()) {
+        oprot.writeFieldBegin(SQLSTATE_FIELD_DESC);
+        oprot.writeString(this.SQLState);
+        oprot.writeFieldEnd();
+      }
     }
     oprot.writeFieldStop();
     oprot.writeStructEnd();
@@ -488,6 +666,22 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
       sb.append(this.handle);
     }
     first = false;
+    if (isSetErrorCode()) {
+      if (!first) sb.append(", ");
+      sb.append("errorCode:");
+      sb.append(this.errorCode);
+      first = false;
+    }
+    if (isSetSQLState()) {
+      if (!first) sb.append(", ");
+      sb.append("SQLState:");
+      if (this.SQLState == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.SQLState);
+      }
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -506,6 +700,8 @@ public class BeeswaxException extends Exception implements org.apache.thrift.TBa
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bit_vector = new BitSet(1);
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);

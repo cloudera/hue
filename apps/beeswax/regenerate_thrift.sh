@@ -44,3 +44,5 @@ EOF
 
 # This is based on thirdparty.
 # thrift -r --gen py:new_style -o ../ ../../../../ext/thirdparty/py/thrift/contrib/fb303/if/fb303.thrift
+# C++ compilation for ODBC
+#thrift -I thrift/include  --gen cpp -o ./ thrift/beeswax.thrift

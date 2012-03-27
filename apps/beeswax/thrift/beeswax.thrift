@@ -86,7 +86,9 @@ exception BeeswaxException {
   // Use get_log(log_context) to retrieve any log related to this exception
   2: LogContextId log_context,
   // (Optional) The QueryHandle that caused this exception
-  3: QueryHandle handle
+  3: QueryHandle handle,
+  4: optional i32 errorCode = 0,
+  5: optional string SQLState = "     "
 }
 
 exception QueryNotFoundException {
@@ -106,6 +108,12 @@ service BeeswaxService {
   QueryHandle query(1:Query query) throws(1:BeeswaxException error),
 
   /**
+   * run a query synchronously and return a handle (QueryHandle).
+   */
+  QueryHandle executeAndWait(1:Query query, 2:LogContextId clientCtx) 
+                        throws(1:BeeswaxException error),
+
+  /**
    * Get the query plan for a query.
    */
   QueryExplanation explain(1:Query query)
@@ -113,9 +121,11 @@ service BeeswaxService {
 
   /**
    * Get the results of a query. This is non-blocking. Caller should check
-   * Results.ready to determine if the results are in yet.
+   * Results.ready to determine if the results are in yet. The call requests
+   * the batch size of fetch.
    */
-  Results fetch(1:QueryHandle query_id, 2:bool start_over) throws(1:QueryNotFoundException error, 2:BeeswaxException error2),
+  Results fetch(1:QueryHandle query_id, 2:bool start_over, 3:i32 fetch_size=-1) 
+              throws(1:QueryNotFoundException error, 2:BeeswaxException error2),
 
   /**
    * Get the state of the query
@@ -148,4 +158,15 @@ service BeeswaxService {
    * Returns "default" configuration.
    */
   list<ConfigVariable> get_default_configuration(1:bool include_hadoop)
+
+  /*
+   * closes the query with given handle
+   */
+  void close(1:QueryHandle handle) throws(1:QueryNotFoundException error, 
+                            2:BeeswaxException error2)
+
+  /*
+   * clean the log context for given id 
+   */
+  void clean(1:LogContextId log_context)
 }
