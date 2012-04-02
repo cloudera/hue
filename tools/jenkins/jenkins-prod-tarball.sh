@@ -54,7 +54,6 @@ make apps
 ##############################
 # Smoke tests
 ##############################
-./build/env/bin/hue depender_check
 ./build/env/bin/hue config_help
 
 ##############################
@@ -66,5 +65,4 @@ INSTALL_DIR=$(pwd)/../installdir make install
 # Check install
 ##############################
 cd ../installdir
-./build/env/bin/hue depender_check
 ./build/env/bin/hue config_help

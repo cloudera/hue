@@ -16,6 +16,3 @@
 DJANGO_APPS = [ "useradmin" ]
 NICE_NAME = "User Admin"
 REQUIRES_HADOOP = False
-DEPENDER_PACKAGE_YMLS = [
-    "static/js/package.yml",
-]

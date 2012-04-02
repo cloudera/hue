@@ -30,10 +30,3 @@ Hue.Desktop.register({
 		help: '/help/jobbrowser/'
 	}
 });
-Depender.require({
-	scripts: ["Hue.JobBrowser.Poller"],
-	callback: function(){
-		if (Cookie.read('activateJobsPoller') != "false") Hue.User.withUser(Hue.Dock.startJobsPoll);
-		else Hue.Dock.statusContent.set('html', 'poller paused');
-	}
-});

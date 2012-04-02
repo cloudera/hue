@@ -21,6 +21,3 @@
 DJANGO_APPS = ['jobbrowser']
 NICE_NAME = "Job Browser"
 REQUIRES_HADOOP = True
-DEPENDER_PACKAGE_YMLS = [
-    "static/js/package.yml",
-]

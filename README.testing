@@ -65,7 +65,8 @@ DESKTOP_LOGLEVEL=<level>
   logger is created if one is not defined.
 
 DESKTOP_DEBUG
-  A shorthand for DESKTOP_LOG_LEVEL=DEBUG
+  A shorthand for DESKTOP_LOG_LEVEL=DEBUG. Also turns on output HTML
+  validation.
 
 DESKTOP_PROFILE
   Turn on Python profiling. The profile data is saved in a file. See the
@@ -73,9 +74,6 @@ DESKTOP_PROFILE
 
 DESKTOP_LOG_DIR=<dir>
   Specify the HUE log directory. Defaults to ./log.
-
-DESKTOP_DEPENDER_DEBUG
-  When specified, re-evaluate the js depender every time.
 
 DESKTOP_DB_CONFIG=<db engine:db name:test db name:username:password:host:port>
   Specify alternate DB connection parameters for HUE to use. Useful for
