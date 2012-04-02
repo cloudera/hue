@@ -41,8 +41,7 @@ APPS := about \
 	useradmin
 
 # <<<< DEV ONLY
-APPS += hello \
-	jframegallery
+APPS += hello
 # END DEV ONLY >>>>
 
 ################################################
