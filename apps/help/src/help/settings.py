@@ -16,6 +16,3 @@
 DJANGO_APPS = ['help']
 NICE_NAME = "Help"
 REQUIRES_HADOOP = False
-DEPENDER_PACKAGE_YMLS = [
-  "src/help/static/js/package.yml",
-]

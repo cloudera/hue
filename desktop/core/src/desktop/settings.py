@@ -141,11 +141,8 @@ INSTALLED_APPS = [
     # 'debug_toolbar',
     'south', # database migration tool
 
-    # JavaScript depency loading
-    'depender',
-
-	# i18n support
-	'babeldjango',
+    # i18n support
+    'babeldjango',
 
     # Desktop injects all the other installed apps into here magically.
     'desktop'
@@ -244,45 +241,6 @@ if SECRET_KEY == "":
 
 
 ############################################################
-
-# Depender configuration
-DEPENDER_ROOT = get_desktop_root(".")
-
-def prep_depender_config():
-  yamls = [
-    "../ext/thirdparty/js/core/package.yml",
-    "../ext/thirdparty/js/more/package.yml",
-    "../ext/thirdparty/js/art/package.yml",
-    "../ext/thirdparty/js/touch/package.yml",
-    "../ext/thirdparty/js/color/package.yml",
-    "../ext/thirdparty/js/behavior/package.yml",
-    "../ext/thirdparty/js/more-behaviors/package.yml",
-    "../ext/thirdparty/js/widgets/package.yml",
-    "../ext/thirdparty/js/slick/package.yml",
-    "core/static/js/package.yml",
-    "core/static/js/ccs.package.yml",
-    "../ext/thirdparty/js/depender/package.yml",
-    "../ext/thirdparty/js/fittext/package.yml",
-    "../ext/thirdparty/js/jframe/package.yml",
-  ]
-  scripts_json = [
-    ("clientcide",  "../ext/thirdparty/js/clientcide/Source/scripts.json"),
-    ("protovis" ,  "../desktop/libs/protovis/static/js/Source/scripts.json"),
-  ]
-
-
-  for app in appmanager.DESKTOP_APPS:
-    yamls.extend(app.depender_yamls)
-    scripts_json.extend(app.depender_jsons)
-
-  return ([ os.path.abspath(os.path.join(DEPENDER_ROOT, x)) for x in yamls ],
-    [ (name, os.path.abspath(os.path.join(DEPENDER_ROOT, p))) for name, p in scripts_json ])
-
-DEPENDER_PACKAGE_YMLS, DEPENDER_SCRIPTS_JSON = prep_depender_config()
-DEPENDER_YUI_PATH = None
-DEPENDER_COMPRESSOR = None
-# Set to true to re-load all JS every time. (slowish)
-DEPENDER_DEBUG = os.getenv("DESKTOP_DEPENDER_DEBUG", "0") not in ["0",""]
 
 # Necessary for South to not futz with tests.  Fixed in South 0.7.1
 SKIP_SOUTH_TESTS = True

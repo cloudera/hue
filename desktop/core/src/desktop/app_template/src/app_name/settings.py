@@ -15,7 +15,3 @@
 # limitations under the License.
 DJANGO_APPS = [ "${app_name}" ]
 REQUIRES_HADOOP = False
-
-DEPENDER_PACKAGE_YMLS = [
-    "src/${app_name}/static/js/package.yml",
-]

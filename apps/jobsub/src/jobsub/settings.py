@@ -20,7 +20,3 @@ REQUIRES_HADOOP = True
 MIDDLEWARE_CLASSES=[
   "jobsub.middleware.SubmissionErrorRecastMiddleware"
 ]
-DEPENDER_PACKAGE_YMLS = [
-    "static/js/package.yml",
-]
-

@@ -16,6 +16,3 @@
 DJANGO_APPS = [ "beeswax" ]
 NICE_NAME = "Beeswax (Hive UI)"
 REQUIRES_HADOOP = True
-DEPENDER_PACKAGE_YMLS = [
-    "static/js/package.yml",
-]

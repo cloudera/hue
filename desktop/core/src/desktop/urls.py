@@ -23,7 +23,6 @@ from django.conf.urls.defaults import include, patterns
 from django.contrib import admin
 
 from desktop import appmanager
-import depender.urls
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls.defaults provides them. But we want to override them.
@@ -58,7 +57,6 @@ dynamic_patterns = patterns('',
   (r'^prefs/(?P<key>\w+)?$', 'desktop.views.prefs'),
   (r'^status_bar/?$', 'desktop.views.status_bar'),
   (r'^admin/', include(admin.site.urls)),
-  (r'^depender/', include(depender.urls)),
   (r'^debug/threads$', 'desktop.views.threads'),
   (r'^debug/who_am_i$', 'desktop.views.who_am_i'),
   (r'^debug/check_config$', 'desktop.views.check_config'),

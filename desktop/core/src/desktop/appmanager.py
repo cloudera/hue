@@ -145,16 +145,9 @@ class DesktopModuleInfo(object):
     if s is not None:
       self.django_apps = getattr(s, 'DJANGO_APPS', [])
       self.config_key = getattr(s, 'CONFIG_KEY', None)
-      self.depender_yamls = \
-          [self._resolve_appdir_path(p) for p in getattr(s, 'DEPENDER_PACKAGE_YMLS', [])]
-      self.depender_jsons = \
-          [(depname, self._resolve_appdir_path(p))
-           for depname, p in getattr(s, 'DEPENDER_SCRIPTS_JSON', [])]
     else:
       self.django_apps = []
       self.config_key = None 
-      self.depender_yamls = []
-      self.depender_jsons = []
 
   def _resolve_appdir_path(self, path):
     """ Takes a path relative to the application dir and returns an absolute path. """

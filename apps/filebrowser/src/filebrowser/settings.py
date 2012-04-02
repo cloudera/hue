@@ -15,14 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.paths import get_desktop_root
-
 DJANGO_APPS = ['filebrowser']
 NICE_NAME = "File Browser"
 REQUIRES_HADOOP = False
-DEPENDER_SCRIPTS_JSON = [
-    ("fancyupload", get_desktop_root("libs/fancyupload/static/js/Source/scripts.json")),
-]
-DEPENDER_PACKAGE_YMLS = [
-    "src/filebrowser/static/js/package.yml",
-]
