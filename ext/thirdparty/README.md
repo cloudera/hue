@@ -36,6 +36,7 @@ Checked-in third party dependencies
 |Y|python-daemon|1.5.1|Python|http://pypi.python.org/pypi/python-daemon/|
 |Y|Python-pam|0.1.3|MIT|http://atlee.ca/software/pam/dist/0.1.3|
 |Y|Python-paste|1.7.2|MIT|http://pythonpaste.org|
+|Y|pytidylib|0.2.1|MIT|http://cloud.github.com/downloads/countergram/pytidylib/pytidylib-0.2.1.tar.gz|
 |Y|PyYAML|3.09|MIT|http://pyyaml.org/wiki/PyYAML|
 |Y|Raphael|MIT|http://raphaeljs.com/index.html|
 |Y|Shakespeares Sonnets|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext97/wssnt10.txt|

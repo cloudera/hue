@@ -1,0 +1,10 @@
+For documentation, see docs/html/index.html in this distribution, or
+http://countergram.com/open-source/pytidylib/
+
+Small example of use:
+
+from tidylib import tidy_document
+document, errors = tidy_document('''<p>f&otilde;o <img src="bar.jpg">''',
+    options={'numeric-entities':1})
+print document
+print errors

@@ -1,0 +1,54 @@
+Metadata-Version: 1.0
+Name: pytidylib
+Version: 0.2.1
+Summary: Python wrapper for HTML Tidy (tidylib)
+Home-page: http://countergram.com/open-source/pytidylib/
+Author: Jason Stitt
+Author-email: js@jasonstitt.com
+License: UNKNOWN
+Download-URL: http://cloud.github.com/downloads/countergram/pytidylib/pytidylib-0.2.1.tar.gz
+Description: 0.2.0: Works on Windows! See documentation for available DLL download
+        locations. Documentation rewritten and expanded.
+        
+        `PyTidyLib`_ is a Python package that wraps the `HTML Tidy`_ library. This
+        allows you, from Python code, to "fix" invalid (X)HTML markup. Some of the
+        library's many capabilities include:
+        
+        * Clean up unclosed tags and unescaped characters such as ampersands
+        * Output HTML 4 or XHTML, strict or transitional, and add missing doctypes
+        * Convert named entities to numeric entities, which can then be used in XML
+        documents without an HTML doctype.
+        * Clean up HTML from programs such as Word (to an extent)
+        * Indent the output, including proper (i.e. no) indenting for ``pre`` elements,
+        which some (X)HTML indenting code overlooks.
+        
+        Small example of use
+        ====================
+        
+        The following code cleans up an invalid HTML document and sets an option::
+        
+        from tidylib import tidy_document
+        document, errors = tidy_document('''<p>f&otilde;o <img src="bar.jpg">''',
+        options={'numeric-entities':1})
+        print document
+        print errors
+        
+        Docs
+        ====
+        
+        Documentation is shipped with the source distribution and is available at
+        the `PyTidyLib`_ web page.
+        
+        .. _`HTML Tidy`: http://tidy.sourceforge.net/
+        .. _`PyTidyLib`: http://countergram.com/open-source/pytidylib/
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Other Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Natural Language :: English
+Classifier: Topic :: Utilities
+Classifier: Topic :: Text Processing :: Markup :: HTML
+Classifier: Topic :: Text Processing :: Markup :: XML
