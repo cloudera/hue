@@ -32,6 +32,7 @@ HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unkn
 NICE_NAME = "Hue"
 
 ENV_HUE_PROCESS_NAME = "HUE_PROCESS_NAME"
+ENV_DESKTOP_DEBUG = "DESKTOP_DEBUG"
 
 ############################################################
 # Part 1: Logging and imports.
@@ -117,6 +118,10 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.AppSpecificMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
+
+if os.environ.get(ENV_DESKTOP_DEBUG):
+  MIDDLEWARE_CLASSES.append('desktop.middleware.HtmlValidationMiddleware')
+  logging.debug("Will try to validate generated HTML.")
 
 ROOT_URLCONF = 'desktop.urls'
 
