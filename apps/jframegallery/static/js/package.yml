@@ -1,5 +1,0 @@
-copyright: Apache License v2.0
-version: 0.9
-description: JFrame Test Gallery
-name: jframe-gallery
-sources: [Source/JFrameGallery/Hue.JFrameGallery.js]
