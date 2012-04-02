@@ -87,6 +87,9 @@ for app in appmanager.DESKTOP_APPS:
 def buildpath(d):
   return os.path.join(os.path.dirname(__file__), "..", '..', '..', d)
 static_patterns.append(static_pattern("static", buildpath("core/static")))
+static_patterns.append((r'^(?P<path>favicon.ico)$',
+                        'django.views.static.serve',
+                        { 'document_root': buildpath('core/static/art') }))
 
 urlpatterns = patterns('', *static_patterns) + dynamic_patterns
 
