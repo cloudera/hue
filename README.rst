@@ -65,6 +65,7 @@ your system:
       * libmysqlclient-dev
       * libsasl2-dev
       * libsqlite3-dev
+      * libtidy (for unit tests only)
       * libxml2-dev
       * libxslt-dev
       * mvn (from ``maven2`` package or tarball)
@@ -79,6 +80,7 @@ your system:
       * gcc
       * gcc-c++
       * krb5-devel
+      * libtidy (for unit tests only)
       * libxml2-devel
       * libxslt-devel
       * mvn (from ``maven2`` package or tarball)

@@ -1,0 +1,12 @@
+include README
+include LICENSE
+include MANIFEST.in
+include tidylib/*.py
+include tests/*.py
+include *.py
+include docs/pytidylib.pdf
+include docs/html/*.html
+include docs/html/*.js
+include docs/html/_static/*.*
+include docs/html/_sources/*.*
+include docs/rst/*.*
