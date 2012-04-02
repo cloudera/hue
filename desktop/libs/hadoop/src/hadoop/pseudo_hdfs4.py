@@ -388,6 +388,9 @@ class PseudoHdfs4(object):
       'dfs.http.address': self._dfs_http_address,
       'dfs.namenode.safemode.extension': 1,
       'dfs.namenode.safemode.threshold-pct': 0,
+      'dfs.datanode.address': 'localhost:0',
+      'dfs.datanode.http.address': 'localhost:0',
+      'dfs.datanode.ipc.address': 'localhost:0',
       'dfs.replication': 1,
       'dfs.safemode.min.datanodes': 1,
     }
