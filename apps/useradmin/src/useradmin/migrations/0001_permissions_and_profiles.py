@@ -3,7 +3,6 @@ import datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-from django.db.utils import DatabaseError
 
 from useradmin.models import UserProfile
 
@@ -19,7 +18,7 @@ class Migration(DataMigration):
           # Cloudera Enterprise
           db.delete_table('userman_groupadministrator')
           db.delete_table('userman_grouprelations')
-        except DatabaseError:
+        except Exception:
          pass
         
         try:
@@ -37,7 +36,7 @@ class Migration(DataMigration):
             elif up.creation_method == '0':
               up.creation_method = UserProfile.CreationMethod.HUE
             up.save()
-        except DatabaseError:
+        except Exception:
           # Adding model 'UserProfile'
           db.create_table('useradmin_userprofile', (
               ('home_directory', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True)),
@@ -51,7 +50,7 @@ class Migration(DataMigration):
           db.rename_column('useradmin_grouppermission', 'desktop_permission_id', 'hue_permission_id')
           db.create_index('useradmin_grouppermission', ['group_id'])
           db.create_index('useradmin_grouppermission', ['hue_permission_id'])
-        except DatabaseError:
+        except Exception:
           # Adding model 'GroupPermission'
           db.create_table('useradmin_grouppermission', (
               ('hue_permission', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['useradmin.HuePermission'])),
@@ -62,7 +61,7 @@ class Migration(DataMigration):
 
         try:
           db.rename_table('userman_desktoppermission', 'useradmin_huepermission')
-        except DatabaseError:
+        except Exception:
           # Adding model 'HuePermission'
           db.create_table('useradmin_huepermission', (
               ('action', self.gf('django.db.models.fields.CharField')(max_length=100)),
