@@ -15,28 +15,53 @@
     <field to="auth.group" name="groups" rel="ManyToManyRel"></field>
     <field to="auth.permission" name="user_permissions" rel="ManyToManyRel"></field>
   </object>
-  <object pk="1" model="jobsub.jobdesign">
-    <field to="auth.user" name="owner" rel="ManyToOneRel">1</field>
-    <field type="CharField" name="name">Example: Pi Calculator</field>
-    <field type="CharField" name="description">Hadoop's built-in Pi example.  This job commonly fails because /user/&lt;your-user-name&gt; is not writable.  iterations_per_mapper is how many random samples to take per-mapper.  number_of_mappers is how many mappers to launch.</field>
-    <field type="DateField" name="last_modified">2009-09-21</field>
-    <field type="CharField" name="type">jar</field>
-    <field type="CharField" name="data">{"arguments": "pi $num_of_mappers $iterations_per_mapper", "jarfile": "/user/hue/jobsub/examples/hadoop-examples.jar"}</field>
+  <object pk="1" model="jobsub.oozieaction">
+    <field type="CharField" name="action_type">streaming</field>
   </object>
-  <object pk="2" model="jobsub.jobdesign">
-    <field to="auth.user" name="owner" rel="ManyToOneRel">1</field>
-    <field type="CharField" name="name">Example: Streaming Wordcount</field>
-    <field type="CharField" name="description">Runs wordcount, implemented in python, via streaming.</field>
-    <field type="DateField" name="last_modified">2009-09-21</field>
-    <field type="CharField" name="type">streaming</field>
-    <field type="CharField" name="data">{"mapper_cmd": "python wordcount.py map", "inputformat_class": "org.apache.hadoop.mapred.TextInputFormat", "cache_archives": [], "reducer_class": "", "num_reduce_tasks": 1, "cache_files": ["/user/hue/jobsub/examples/wordcount.py"], "inputreader": "", "combiner_class": "", "outputformat_class": "org.apache.hadoop.mapred.TextOutputFormat", "mapper_class": "", "output": "$output", "input": ["/user/hue/jobsub/sample_data/sonnets.txt", "/user/hue/jobsub/sample_data/midsummer.txt"], "hadoop_properties": {}, "reducer_cmd": "python wordcount.py reduce", "partitioner_class": ""}</field>
+  <object pk="2" model="jobsub.oozieaction">
+    <field type="CharField" name="action_type">mapreduce</field>
   </object>
-  <object pk="3" model="jobsub.jobdesign">
+  <object pk="3" model="jobsub.oozieaction">
+    <field type="CharField" name="action_type">mapreduce</field>
+  </object>
+  <object pk="1" model="jobsub.ooziedesign">
     <field to="auth.user" name="owner" rel="ManyToOneRel">1</field>
-    <field type="CharField" name="name">Example: Sleep Job</field>
-    <field type="CharField" name="description">MapReduce's sleep example</field>
-    <field type="DateTimeField" name="last_modified">2009-09-26 20:32:03</field>
-    <field type="CharField" name="type">jar</field>
-    <field type="CharField" name="data">{"arguments": "sleep -m $num_mappers -r $num_reducers -mt $map_sleep_time_millis -rt $reduce_sleep_time_millis", "jarfile": "/user/hue/jobsub/examples/hadoop-examples.jar"}</field>
+    <field type="CharField" name="name">streaming_wordcount</field>
+    <field type="CharField" name="description">[Sample] Wordcount</field>
+    <field type="DateTimeField" name="last_modified">2012-04-02 01:13:31</field>
+    <field to="jobsub.oozieaction" name="root_action" rel="ManyToOneRel">1</field>
+  </object>
+  <object pk="2" model="jobsub.ooziedesign">
+    <field to="auth.user" name="owner" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="name">grep_example</field>
+    <field type="CharField" name="description">[Sample] Grep for "dream" in some Shakespearen text</field>
+    <field type="DateTimeField" name="last_modified">2012-04-02 02:04:34</field>
+    <field to="jobsub.oozieaction" name="root_action" rel="ManyToOneRel">2</field>
+  </object>
+  <object pk="3" model="jobsub.ooziedesign">
+    <field to="auth.user" name="owner" rel="ManyToOneRel">1</field>
+    <field type="CharField" name="name">sleep_job</field>
+    <field type="CharField" name="description">[Sample] Sleep Job</field>
+    <field type="DateTimeField" name="last_modified">2012-04-02 03:06:02</field>
+    <field to="jobsub.oozieaction" name="root_action" rel="ManyToOneRel">3</field>
+  </object>
+  <object pk="2" model="jobsub.ooziemapreduceaction">
+    <field type="CharField" name="files">[]</field>
+    <field type="CharField" name="archives">[]</field>
+    <field type="CharField" name="job_properties">[{"name":"mapred.mapper.regex","value":"dream"},{"name":"mapred.input.dir","value":"/user/hue/jobsub/sample_data"},{"name":"mapred.output.dir","value":"$output_dir"},{"name":"mapred.mapper.class","value":"org.apache.hadoop.mapred.lib.RegexMapper"},{"name":"mapred.combiner.class","value":"org.apache.hadoop.mapred.lib.LongSumReducer"},{"name":"mapred.reducer.class","value":"org.apache.hadoop.mapred.lib.LongSumReducer"},{"name":"mapred.output.key.class","value":"org.apache.hadoop.io.Text"},{"name":"mapred.output.value.class","value":"org.apache.hadoop.io.LongWritable"}]</field>
+    <field type="CharField" name="jar_path">/user/hue/jobsub/examples/hadoop-examples.jar</field>
+  </object>
+  <object pk="3" model="jobsub.ooziemapreduceaction">
+    <field type="CharField" name="files">[]</field>
+    <field type="CharField" name="archives">[]</field>
+    <field type="CharField" name="job_properties">[{"name":"org.apache.hadoop.io.Text","value":"$num_maps"},{"name":"mapred.reduce.tasks","value":"$num_reduces"},{"name":"mapred.mapper.class","value":"org.apache.hadoop.examples.SleepJob"},{"name":"mapred.reducer.class","value":"org.apache.hadoop.examples.SleepJob"},{"name":"mapred.mapoutput.key.class","value":"org.apache.hadoop.io.IntWritable"},{"name":"mapred.mapoutput.value.class","value":"org.apache.hadoop.io.NullWritable"},{"name":"mapred.output.format.class","value":"org.apache.hadoop.mapred.lib.NullOutputFormat"},{"name":"mapred.input.format.class","value":"org.apache.hadoop.examples.SleepJob$$SleepInputFormat"},{"name":"mapred.partitioner.class","value":"org.apache.hadoop.examples.SleepJob"},{"name":"mapred.speculative.execution","value":"false"},{"name":"sleep.job.map.sleep.time","value":"$map_sleep_time"},{"name":"sleep.job.reduce.sleep.time","value":"$reduce_sleep_time"}]</field>
+    <field type="CharField" name="jar_path">/user/hue/jobsub/examples/hadoop-examples.jar</field>
+  </object>
+  <object pk="1" model="jobsub.ooziestreamingaction">
+    <field type="CharField" name="files">["/user/hue/jobsub/examples/wordcount.py"]</field>
+    <field type="CharField" name="archives">[]</field>
+    <field type="CharField" name="job_properties">[{"name":"mapred.input.dir","value":"/user/hue/jobsub/sample_data"},{"name":"mapred.output.dir","value":"$output_directory"},{"name":"mapred.reduce.tasks","value":"1"}]</field>
+    <field type="CharField" name="mapper">python wordcount.py map</field>
+    <field type="CharField" name="reducer">python wordcount.py reduce</field>
   </object>
 </django-objects>

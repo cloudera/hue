@@ -34,6 +34,11 @@ import jobsub.conf
 
 LOG = logging.getLogger(__name__)
 
+
+# The setup_level value for the CheckForSetup table
+JOBSUB_SETUP_LEVEL = 200        # Stands for Hue 2.0.0
+
+
 class Command(NoArgsCommand):
   """Creates file system for testing."""
   def handle_noargs(self, **options):
@@ -42,8 +47,8 @@ class Command(NoArgsCommand):
       remote_fs.setuser(remote_fs.superuser)
     LOG.info("Using remote fs: %s" % str(remote_fs))
 
-    # Copy over examples/ and script_templates/ directories
-    for dirname in ("examples", "script_templates"):
+    # Copy over examples/
+    for dirname in ("examples",):
       local_dir = os.path.join(jobsub.conf.LOCAL_DATA_DIR.get(), dirname)
       remote_dir = posixpath.join(jobsub.conf.REMOTE_DATA_DIR.get(), dirname)
       copy_dir(local_dir, remote_fs, remote_dir)
@@ -53,25 +58,30 @@ class Command(NoArgsCommand):
       remote_fs,
       posixpath.join(jobsub.conf.REMOTE_DATA_DIR.get(), "sample_data"))
 
-    # Also copy over Hadoop examples and streaming jars
-    local_src = hadoop.conf.HADOOP_EXAMPLES_JAR.get()
-    if local_src is None:
-      raise Exception('Failed to locate the Hadoop example jar')
-    remote_dst = posixpath.join(jobsub.conf.REMOTE_DATA_DIR.get(), "examples", "hadoop-examples.jar")
-    copy_file(local_src, remote_fs, remote_dst)
-
     # Write out the models too
     fixture_path = os.path.join(os.path.dirname(__file__), "..", "..", "fixtures", "example_data.xml")
     examples = django.core.serializers.deserialize("xml", open(fixture_path))
     sample_user = None
-    sample_job_designs = []
+    sample_oozie_designs = []
+    sample_oozie_abstract_actions = {}      # pk -> object
+    sample_oozie_concrete_actions = {}      # oozieaction_ptr_id -> object
+
     for example in examples:
       if isinstance(example.object, User):
         sample_user = example
-      elif isinstance(example.object, jobsub.models.JobDesign):
-        sample_job_designs.append(example)
+      elif isinstance(example.object, jobsub.models.OozieDesign):
+        sample_oozie_designs.append(example)
+      elif type(example.object) in (jobsub.models.OozieMapreduceAction,
+                                    jobsub.models.OozieJavaAction,
+                                    jobsub.models.OozieStreamingAction):
+        key = example.object.oozieaction_ptr_id
+        sample_oozie_concrete_actions[key] = example
+      elif type(example.object) is jobsub.models.OozieAction:
+        key = example.object.pk
+        sample_oozie_abstract_actions[key] = example
       else:
         raise Exception("Unexpected fixture type.")
+
     if sample_user is None:
       raise Exception("Expected sample user fixture.")
     # Create the sample user if it doesn't exist
@@ -81,11 +91,32 @@ class Command(NoArgsCommand):
       sample_user.object.pk = None
       sample_user.object.id = None
       sample_user.save()
-    for j in sample_job_designs:
-      j.object.id = None
-      j.object.pk = None
-      j.object.owner_id = sample_user.object.id
-      j.save()
+
+    # Create the designs
+    for d in sample_oozie_designs:
+      #
+      # OozieDesign          ----many-to-one--->  OozieAction
+      #
+      # OozieMapreduceAction -----one-to-one--->  OozieAction
+      # OozieStreamingAction -----one-to-one--->  OozieAction
+      # OozieJavaAction      -----one-to-one--->  OozieAction
+      #
+      # We find the OozieAction pk and link everything back together
+      #
+      abstract_action_id = d.object.root_action_id
+      abstract_action = sample_oozie_abstract_actions[abstract_action_id]
+      concrete_action = sample_oozie_concrete_actions[str(abstract_action_id)]
+
+      concrete_action.object.action_type = abstract_action.object.action_type
+      concrete_action.object.pk = None
+      concrete_action.object.id = None
+      concrete_action.object.save()
+
+      d.object.id = None
+      d.object.pk = None
+      d.object.owner_id = sample_user.object.id
+      d.object.root_action = concrete_action.object
+      d.object.save()
 
     # Upon success, write to the database
     try:
@@ -93,6 +124,7 @@ class Command(NoArgsCommand):
     except jobsub.models.CheckForSetup.DoesNotExist:
       entry = jobsub.models.CheckForSetup(id=1)
     entry.setup_run = True
+    entry.setup_level = JOBSUB_SETUP_LEVEL
     entry.save()
 
   def has_been_setup(self):
@@ -103,7 +135,8 @@ class Command(NoArgsCommand):
       entry = jobsub.models.CheckForSetup.objects.get(id=1)
     except jobsub.models.CheckForSetup.DoesNotExist:
       return False
-    return entry.setup_run
+    return entry.setup_run and entry.setup_level >= JOBSUB_SETUP_LEVEL
+
 
 def copy_dir(local_dir, remote_fs, remote_dir):
   # Hadoop mkdir is always recursive.
@@ -112,6 +145,9 @@ def copy_dir(local_dir, remote_fs, remote_dir):
     local_src = os.path.join(local_dir, f)
     remote_dst = posixpath.join(remote_dir, f)
     copy_file(local_src, remote_fs, remote_dst)
+
+
+CHUNK_SIZE = 65536
 
 def copy_file(local_src, remote_fs, remote_dst):
   if remote_fs.exists(remote_dst):
@@ -125,7 +161,7 @@ def copy_file(local_src, remote_fs, remote_dst):
     try:
       dst = remote_fs.open(remote_dst, "w")
       try:
-        shutil.copyfileobj(src, dst)
+        shutil.copyfileobj(src, dst, CHUNK_SIZE)
         LOG.info("Copied %s -> %s" % (local_src, remote_dst))
       finally:
         dst.close()

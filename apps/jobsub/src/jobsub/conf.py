@@ -19,6 +19,7 @@
 import os.path
 
 from desktop.lib.conf import Config, coerce_bool
+from desktop.lib import paths
 
 REMOTE_DATA_DIR = Config(
   key="remote_data_dir",
@@ -30,8 +31,13 @@ LOCAL_DATA_DIR = Config(
   key="local_data_dir",
   default=os.path.join(os.path.dirname(__file__), "..", "..", "data"),
   help="Location on local FS where examples and template are stored",
-  private=True
-)
+  private=True)
+
+SAMPLE_DATA_DIR = Config(
+  key="sample_data_dir",
+  default=paths.get_thirdparty_root("sample_data"),
+  help="Location on local FS where sample data is stored",
+  private=True)
 
 OOZIE_URL = Config(
   key='oozie_url',
