@@ -109,9 +109,11 @@ ${commonheader("Job Browser", "jobbrowser")}
 	<h1>Welcome to the Job Browser</h1>
 	<div>
 		<p>There aren't any jobs running. Let's fix that.</p>
-		<a href="/jobsub/list/">Launch the Job Designer</a>
-		% if "beeswax" in appmanager.DESKTOP_APPS:
-		or <a href="/beeswax/">Launch Beeswax</a>
+		% if appmanager.get_desktop_module('jobsub') is not None:
+		<a href="/jobsub/">Launch the Job Designer</a><br/>
+		% endif
+		% if appmanager.get_desktop_module('beeswax') is not None:
+		<a href="/beeswax/">Launch Beeswax</a><br/>
 		% endif
 	</div>
 	% endif
