@@ -21,7 +21,6 @@ import logging
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from django.db.utils import DatabaseError
 
 from desktop.lib.django_db_util import remove_content_type
 from jobsub.models import JobDesign, OozieJavaAction, OozieStreamingAction, OozieDesign
@@ -101,13 +100,13 @@ class Migration(SchemaMigration):
         try:
             db.delete_table('jobsub_submission')
             remove_content_type('jobsub', 'submission')
-        except DatabaseError, ex:
+        except Exception, ex:
             pass    # Table doesn't exist. Ok.
 
         try:
             db.delete_table('jobsub_serversubmissionstate')
             remove_content_type('jobsub', 'serversubmissionstate')
-        except DatabaseError, ex:
+        except Exception, ex:
             pass    # Table doesn't exist. Ok.
 
         hue1_to_hue2_data_migration()

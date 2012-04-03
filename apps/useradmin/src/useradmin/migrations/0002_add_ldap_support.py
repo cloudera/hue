@@ -3,7 +3,6 @@ import datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-from django.db.utils import DatabaseError
 
 from django.contrib.auth.models import User
 from useradmin.models import create_profile_for_user
@@ -19,7 +18,7 @@ class Migration(DataMigration):
         try:
           db.rename_table('userman_ldapgroup', 'useradmin_ldapgroup')
           db.delete_column('useradmin_ldapgroup', 'hidden')
-        except DatabaseError, e:
+        except Exception, e:
           # Adding model 'LdapGroup'
           db.create_table('useradmin_ldapgroup', (
               ('group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='group', to=orm['auth.Group'])),
@@ -30,7 +29,7 @@ class Migration(DataMigration):
         # Adding field 'UserProfile.creation_method'
         try:
           db.add_column('useradmin_userprofile', 'creation_method', self.gf('django.db.models.fields.CharField')(max_length=64, default=str(UserProfile.CreationMethod.HUE)), keep_default=False)
-        except DatabaseError:
+        except Exception:
           # It's possible that we could run into an error here, because this
           # table may have been migrated from Cloudera Enterprise, in which case
           # this column would already exist.
