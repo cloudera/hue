@@ -162,7 +162,7 @@ class PseudoHdfs4(object):
       LOG.info('Skipping cleanup of temp directory "%s"' % (self._tmpdir,))
     else:
       LOG.info('Cleaning up temp directory "%s". '
-               'Use $MINI_CLUSTER_CLEANUP to avoid.' % (self._tmpdir,))
+               'Use "export MINI_CLUSTER_CLEANUP=false" to avoid.' % (self._tmpdir,))
       shutil.rmtree(self._tmpdir)
 
     if self.shutdown_hook is not None:
@@ -389,7 +389,8 @@ class PseudoHdfs4(object):
       'dfs.namenode.safemode.extension': 1,
       'dfs.namenode.safemode.threshold-pct': 0,
       'dfs.datanode.address': 'localhost:0',
-      'dfs.datanode.http.address': 'localhost:0',
+      # Work around webhdfs redirect bug -- bind to all interfaces
+      'dfs.datanode.http.address': '0.0.0.0:0',
       'dfs.datanode.ipc.address': 'localhost:0',
       'dfs.replication': 1,
       'dfs.safemode.min.datanodes': 1,
