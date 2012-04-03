@@ -35,5 +35,5 @@ urlpatterns = patterns(
   url(r'^list_history$', 'views.list_history'),
 
   # Setup
-  #url(r'^setup/$', 'views.setup'),
+  url(r'^setup/$', 'views.setup'),
 )

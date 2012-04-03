@@ -36,6 +36,10 @@ ${layout.menubar(section='designs')}
             <a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn">Create Mapreduce Design</a>
             <a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn">Create Streaming Design</a>
             <a href="${ url('jobsub.views.new_design', action_type='java') }" class="btn">Create Java Design</a>
+            %if show_install_examples:
+              <a class="btn installSamplesLink" href="javascript:void(0)"
+                data-confirmation-url="${url('jobsub.views.setup')}">Install Samples</a>
+            %endif
         </p>
     </div>
 
@@ -116,6 +120,21 @@ ${layout.menubar(section='designs')}
 	</form>
 </div>
 
+
+<div id="installSamples" class="modal hide fade">
+	<form id="installSamplesForm" action="${url('jobsub.views.setup')}" method="POST">
+        <div class="modal-header">
+            <a href="#" class="close">&times;</a>
+            <h3>Install sample job designs?</h3>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn primary" value="Yes"/>
+            <a href="#" class="btn secondary hideModal">No</a>
+        </div>
+	</form>
+</div>
+
+
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
         $(".modal").modal({
@@ -132,6 +151,13 @@ ${layout.menubar(section='designs')}
         });
         $("#deleteWf .hideModal").click(function(){
             $("#deleteWf").modal("hide");
+        });
+
+        $(".installSamplesLink").click(function(){
+            $("#installSamples").modal("show");
+        });
+        $("#installSamples .hideModal").click(function(){
+            $("#installSamples").modal("hide");
         });
 
         $(".submitConfirmation").click(function(){

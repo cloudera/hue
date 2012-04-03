@@ -38,6 +38,7 @@ from desktop.lib.django_util import render, PopupException, extract_field_data
 from desktop.log.access import access_warn
 
 from jobsub import models, submit
+from jobsub.management.commands import jobsub_setup
 from jobsub.oozie_lib.oozie_api import get_oozie
 import jobsub.forms
 
@@ -135,12 +136,15 @@ def list_designs(request):
   if name:
     data = data.filter(name__icontains=name)
   data = data.order_by('-last_modified')
+  show_install_examples = \
+      request.user.is_superuser and not jobsub_setup.Command().has_been_setup()
 
   return render("list_designs.mako", request, {
     'designs': list(data),
     'currentuser':request.user,
     'owner': owner,
     'name': name,
+    'show_install_examples': show_install_examples,
   })
 
 
@@ -245,6 +249,14 @@ def submit_design(request, design_id):
 
   # Show oozie job info
   return redirect(urlresolvers.reverse(oozie_job, kwargs={'jobid': jobid}))
+
+
+def setup(request):
+  """Installs jobsub examples."""
+  if request.method != "POST":
+    raise PopupException('Please use a POST request to install the examples.')
+  jobsub_setup.Command().handle_noargs()
+  return redirect(urlresolvers.reverse(list_designs))
 
 
 
