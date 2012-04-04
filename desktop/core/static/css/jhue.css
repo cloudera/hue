@@ -385,6 +385,10 @@ ul.errorlist li {
     display:none;
 }
 
+.hueWell {
+    padding-bottom:0;
+}
+
 /*********************************************************
  * From: http://datatables.net/blog/Twitter_Bootstrap
  */

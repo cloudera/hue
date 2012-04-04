@@ -27,7 +27,7 @@ ${layout.menubar(section='users')}
 
 <div class="container-fluid">
 	<h1>Hue Users</h1>
-	<div class="well">
+	<div class="well hueWell">
 		<p class="pull-right">
 			%if user.is_superuser == True:
 			<a id="addUserBtn" href="#" class="btn">Add user</a>
@@ -35,7 +35,6 @@ ${layout.menubar(section='users')}
 		</p>
 		<form class="form-search">
 			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, e-mail, etc...">
-		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 		</form>
 	</div>
 	<table class="table table-striped datatables">
@@ -156,13 +155,6 @@ ${layout.menubar(section='users')}
 		          }
 		        });
 
-		    });
-
-		    $("#clearFilterBtn").click(function(){
-		        $("#filterInput").val("");
-		        $.each($(".userRow"), function(index, value) {
-		            $(value).show(250);
-		        });
 		    });
 
 			$("#addUserBtn").click(function(){

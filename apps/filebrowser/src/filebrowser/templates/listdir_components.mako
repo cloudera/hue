@@ -39,14 +39,13 @@ from django.utils.encoding import smart_str
 	        margin: 0;
 	    }
 	</style>
-	<div class="well">
+	<div class="well hueWell">
 		<p class="pull-right">
 			<a href="#" class="btn upload-link">Upload files</a>
 			<a href="#" class="btn create-directory-link">New directory</a>
 		</p>
 		<form class="form-search">
 			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for file name">
-		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 		</form>
 	</div>
 
@@ -341,11 +340,6 @@ from django.utils.encoding import smart_str
             oTable.fnFilter($(this).val(), 0 /* Column Idx */);
             $(".contextEnabler").jHueContextMenu();
         });
-		$("#clearFilterBtn").click(function(){
-	        $("#filterInput").val("");
-	        oTable.fnFilter("", 0);
-	    });
-
 
         //delete handlers
         $(".delete").live("click", function(e){
