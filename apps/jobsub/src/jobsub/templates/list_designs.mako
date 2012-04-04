@@ -30,7 +30,7 @@ ${layout.menubar(section='designs')}
 
 <div class="container-fluid">
     <h1>Job Designs</h1>
-	<div class="well">
+	<div class="well hueWell">
 			<div class="btn-group pull-right">
 				<a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn">Create Mapreduce Design</a>
             	<a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn">Create Streaming Design</a>
@@ -42,7 +42,6 @@ ${layout.menubar(section='designs')}
 
 		<form class="form-search">
 			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
-		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 		</form>
 	</div>
 
@@ -151,13 +150,6 @@ ${layout.menubar(section='designs')}
             $("#deleteWf").modal("hide");
         });
 
-        $(".installSamplesLink").click(function(){
-            $("#installSamples").modal("show");
-        });
-        $("#installSamples .hideModal").click(function(){
-            $("#installSamples").modal("hide");
-        });
-
         $(".submitConfirmation").click(function(){
             var _this = $(this);
             var _action = _this.attr("data-submit-url");
@@ -211,10 +203,6 @@ ${layout.menubar(section='designs')}
         $("#filterInput").keyup(function() {
             oTable.fnFilter($(this).val());
         });
-		$("#clearFilterBtn").click(function(){
-	        $("#filterInput").val("");
-	        oTable.fnFilter("");
-	    });
 
 		$("#installSamplesLink").click(function(){
             $("#installSamples").modal("show");

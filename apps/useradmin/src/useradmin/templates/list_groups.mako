@@ -27,7 +27,7 @@ ${layout.menubar(section='groups')}
 
 <div class="container-fluid">
 	<h1>Hue Groups</h1>
-	<div class="well">
+	<div class="well hueWell">
 		<p class="pull-right">
 			%if user.is_superuser == True:
 			<a id="addGroupBtn" href="#" class="btn">Add group</a>
@@ -35,7 +35,6 @@ ${layout.menubar(section='groups')}
 		</p>
 		<form class="form-search">
 			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for group name, members, etc...">
-		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 		</form>
 	</div>
       <table class="table table-striped datatables">
@@ -150,13 +149,6 @@ ${layout.menubar(section='groups')}
 		          }
 		        });
 
-		    });
-
-		    $("#clearFilterBtn").click(function(){
-		        $("#filterInput").val("");
-		        $.each($(".groupRow"), function(index, value) {
-		            $(value).show(250);
-		        });
 		    });
 
 			$("#addGroupBtn").click(function(){

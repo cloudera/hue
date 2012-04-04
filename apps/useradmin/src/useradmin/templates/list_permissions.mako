@@ -28,10 +28,9 @@ ${layout.menubar(section='permissions')}
 
 <div class="container-fluid">
 	<h1>Hue Permissions</h1>
-	<div class="well">
+	<div class="well hueWell">
 		<form class="form-search">
 			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for application name, description, etc...">
-		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 		</form>
 	</div>
       <table class="table table-striped datatables">
@@ -97,13 +96,6 @@ ${layout.menubar(section='permissions')}
 		          }
 		        });
 
-		    });
-
-		    $("#clearFilterBtn").click(function(){
-		        $("#filterInput").val("");
-		        $.each($(".permissionRow"), function(index, value) {
-		            $(value).show();
-		        });
 		    });
 
 			$(".editPermissionBtn").click(function(){

@@ -31,10 +31,9 @@ ${layout.menubar(section='history')}
 
 <div class="container-fluid">
     <h1>Job Submission History</h1>
-    <div class="well">
+    <div class="well hueWell">
         <form class="form-search">
 			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
-		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
 		</form>
     </div>
 
@@ -87,10 +86,6 @@ ${layout.menubar(section='history')}
             oTable.fnFilter($(this).val());
         });
 
-		$("#clearFilterBtn").click(function(){
-	        $("#filterInput").val("");
-	        oTable.fnFilter("");
-	    });
     });
 </script>
 
