@@ -14,7 +14,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
+
+#######################################################
+##               WARNING!!!                          ##
+##   This file is stale. Hadoop 0.23 and CDH4        ##
+##   do not support minicluster. This is replaced    ##
+##   by webhdfs.py, to set up a running cluster.     ##
+#######################################################
+
+
 # A Python-side driver for MiniHadoopClusterManager
 # 
 # See README.testing for hints on how to use this,
@@ -413,7 +422,7 @@ def shared_cluster(conf=False):
     closers.extend([
       hadoop.conf.HDFS_CLUSTERS["default"].NN_HOST.set_for_testing("localhost"),
       hadoop.conf.HDFS_CLUSTERS["default"].NN_HDFS_PORT.set_for_testing(cluster.namenode_port),
-      hadoop.conf.MR_CLUSTERS["default"].JT_HOST.set_for_testing("localhost"),
+      hadoop.conf.MR_CLUSTERS["default"].HOST.set_for_testing("localhost"),
       hadoop.conf.MR_CLUSTERS["default"].JT_THRIFT_PORT.set_for_testing(cluster.jt.thrift_port),
     ])
     # Clear the caches

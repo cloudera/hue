@@ -21,7 +21,6 @@ Shell class itself, but a lot also happens in ShellManager.
 
 
 import cStringIO
-import desktop.lib.i18n
 import errno
 import eventlet
 import hadoop.conf
@@ -39,7 +38,8 @@ import tty
 from eventlet.green import os
 from eventlet.green import select
 from eventlet.green import time
-from hadoop.cluster import all_mrclusters, get_all_hdfs
+from hadoop.cluster import all_mrclusters, get_all_hdfs, \
+                           get_cluster_conf_for_job_submission
 
 LOG = logging.getLogger(__name__)
 SHELL_OUTPUT_LOGGER = logging.getLogger("shell_output")
@@ -388,6 +388,7 @@ class ShellManager(object):
     self._parse_configs()
     eventlet.spawn_after(1, self._handle_periodic)
 
+
   @classmethod
   def global_instance(cls):
     if not hasattr(cls, "_global_instance"):
@@ -395,9 +396,15 @@ class ShellManager(object):
     return cls._global_instance
 
   def _parse_configs(self):
+    mr_cluster = get_cluster_conf_for_job_submission()
+    if mr_cluster is None:
+      mapred_home = None
+    else:
+      mapred_home = mr_cluster.HADOOP_MAPRED_HOME.get()
+
     shell_types = [] # List of available shell types. For each shell type, we have a nice name (e.g. "Python Shell") and a short name (e.g. "python")
     for item in shell.conf.SHELL_TYPES.keys():
-      env_for_shell = { constants.HADOOP_HOME: hadoop.conf.HADOOP_HOME.get() }
+      env_for_shell = { constants.HADOOP_MAPRED_HOME: mapred_home }
       command = shell.conf.SHELL_TYPES[item].command.get().strip().split()
       nice_name = shell.conf.SHELL_TYPES[item].nice_name.get().strip()
       executable_exists = utils.executable_exists(command)

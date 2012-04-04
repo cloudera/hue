@@ -412,19 +412,6 @@ Hue Configuration for Hadoop
 These configuration variables are under the `[hadoop]` section in
 the `/etc/hue/hue.ini` configuration file.
 
-hadoop_home::
-  This becomes the value of `$HADOOP_HOME` for any Shell processes
-  and the Beeswax Server. If you use MR1, set this to the MR1 home.
-
-hadoop_bin::
-  Use this as the hadoop binary. If you use MR1, set this to
-  `<hadoop_home>/bin/hadoop` instead of the default `/usr/bin/hadoop`.
-
-hadoop_conf_dir::
-  This is the configuration directory for any processes to
-  configure their Hadoop client. If you use MR1, set this to the
-  directory containing your MR1 configuration.
-
 
 HDFS Cluster
 ^^^^^^^^^^^^
@@ -433,12 +420,25 @@ Hue only support one HDFS cluster currently. That cluster should be defined
 under the `[[[default]]]` sub-section.
 
 fs_defaultfs::
-  This is the equivalence of ``fs.defaultFS`` (aka ``fs.default.name``) in
+  This is the equivalence of `fs.defaultFS` (aka `fs.default.name`) in
   Hadoop configuration.
 
 webhdfs_url::
   You can also set this to be the HttpFS url. The default value is the HTTP
   port on the NameNode.
+
+hadoop_hdfs_home::
+  This is the home of your Hadoop HDFS installation. It is the
+  root of the Hadoop untarred directory, or usually
+  `/usr/lib/hadoop`.
+
+hadoop_bin::
+  Use this as the HDFS Hadoop launcher script, which is usually
+  `/usr/bin/hadoop`.
+
+hadoop_conf_dir::
+  This is the configuration directory of the HDFS, typically
+  `/etc/hadoop/conf`.
 
 
 MapReduce (MR1) Cluster
@@ -457,6 +457,22 @@ submit_to::
   If your Oozie is configured with to talk to a 0.20 MapReduce service, then
   set this to `true`. Hue will be submitting jobs to this MapReduce cluster.
 
+hadoop_mapred_home::
+  This is the home of your Hadoop MapReduce installation. It is the
+  root of the Hadoop MR1 untarred directory, or the root of the
+  Hadoop 0.20 untarred directory, or `/usr/lib/hadoop-0.20-mapreduce` for
+  CDH packages. If `submit_to` is true for this cluster, this
+  config value becomes the `$HADOOP_MAPRED_HOME` for
+  BeeswaxServer and child shell processes.
+
+hadoop_bin::
+  Use this as the MR1 Hadoop launcher script, which is usually
+  `/usr/bin/hadoop`.
+
+hadoop_conf_dir::
+  This is the configuration directory of the MR1 service,
+  typically `/etc/hadoop/conf`.
+
 
 Yarn (MR2) Cluster
 ^^^^^^^^^^^^^^^^^^
@@ -474,6 +490,22 @@ submit_to::
   If your Oozie is configured with to talk to a Yarn cluster, then
   set this to `true`. Hue will be submitting jobs to this Yarn cluster.
   But note that JobBrowser will not be able to show MR2 jobs.
+
+hadoop_mapred_home::
+  This is the home of your Hadoop MapReduce installation. It is the
+  root of the Hadoop 0.23 untarred directory, or
+  `/usr/lib/hadoop-mapreduce` for CDH packages. If `submit_to` is
+  true for this cluster, this config value becomes the
+  `$HADOOP_MAPRED_HOME` for BeeswaxServer and child shell
+  processes.
+
+hadoop_bin::
+  Use this as the Yarn/MR2 Hadoop launcher script, which is usually
+  `/usr/bin/hadoop`.
+
+hadoop_conf_dir::
+  This is the configuration directory of the Yarn/MR2 service,
+  typically `/etc/hadoop/conf`.
 
 
 Beeswax Configuration

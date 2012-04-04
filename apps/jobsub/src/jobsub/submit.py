@@ -69,7 +69,7 @@ class Submission(object):
       raise Exception("Job design already submitted (Oozie job id %s)" % (self.job_id,))
 
     fs_defaultfs = self._fs.fs_defaultfs
-    jobtracker = hadoop.cluster.get_cluster_for_job_submission()
+    jobtracker = hadoop.cluster.get_cluster_addr_for_job_submission()
 
     try:
       wf_dir = self._get_and_create_deployment_dir()

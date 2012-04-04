@@ -5,26 +5,18 @@ If you're impatient, these are the key steps.  Please check the full manual
 for more details.
 
 ## Install
-$ HADOOP_HOME=/usr/lib/hadoop-0.20 PREFIX=/usr/local make install
+$ PREFIX=/usr/share make install
 
 ## Install plug-ins
-$ cd /usr/lib/hadoop/lib
-$ ln -s /usr/local/hue/desktop/libs/hadoop/java-lib/hue*jar
+$ cd /usr/lib/hadoop-0.20-mapreduce/lib
+$ ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar
 
 ## Configure Hadoop
 Edit hdfs-site.xml:
 
 <property>
-  <name>dfs.namenode.plugins</name>
-  <value>org.apache.hadoop.thriftfs.NamenodePlugin</value>
-  <description>Comma-separated list of namenode plug-ins to be activated.
-  </description>
-</property>
-<property>
-  <name>dfs.datanode.plugins</name>
-  <value>org.apache.hadoop.thriftfs.DatanodePlugin</value>
-  <description>Comma-separated list of datanode plug-ins to be activated.
-  </description>
+  <name>dfs.webhdfs.enable</name>
+  <value>true</value>
 </property>
 
 Edit mapred-site.xml:
@@ -37,4 +29,4 @@ Edit mapred-site.xml:
 </property>
 
 ## Run!
-$ /usr/local/hue/build/env/bin/supervisor
+$ /usr/share/hue/build/env/bin/supervisor
