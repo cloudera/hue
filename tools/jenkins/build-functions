@@ -35,7 +35,8 @@ build_hadoop() {
   fi
 
   HADOOP_DIR=$HUE_ROOT/ext/hadoop
-  export HADOOP_HOME="$HADOOP_DIR/${CDH_VERSION}"
+  export HADOOP_HDFS_HOME="$HADOOP_DIR/${CDH_VERSION}"
+  export HADOOP_BIN=$HADOOP_HDFS_HOME/bin/hadoop
 
   mkdir -p $HADOOP_DIR
   rm -rf $HADOOP_HOME
@@ -61,6 +62,7 @@ build_mr1() {
 
   MR1_DIR=$HUE_ROOT/ext/mr1
   export HADOOP_MR1_HOME="$MR1_DIR/${MR1_VERSION}"
+  export HADOOP_MR1_BIN="$HADOOP_MR1_HOME/bin/hadoop"
 
   mkdir -p $MR1_DIR
   rm -rf $HADOOP_MR1_HOME

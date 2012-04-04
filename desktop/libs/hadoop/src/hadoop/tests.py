@@ -112,7 +112,6 @@ def test_tricky_confparse():
 
 def test_config_validator_basic():
   reset = (
-    conf.HADOOP_STREAMING_JAR.set_for_testing('/tmp'),
     conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing('http://not.the.re:50070/'),
     conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(70000),
   )
@@ -120,8 +119,6 @@ def test_config_validator_basic():
   try:
     cli = make_logged_in_client()
     resp = cli.get('/debug/check_config')
-    assert_true('hadoop.hadoop_streaming_jar' in resp.content)
-    assert_true('Not a file' in resp.content)
     assert_true('hadoop.hdfs_clusters.default.webhdfs_url' in resp.content)
     assert_true('hadoop.mapred_clusters.default.thrift_port' in resp.content)
     assert_true('Port should be' in resp.content)
@@ -141,7 +138,7 @@ def test_config_validator_more():
   cli = make_logged_in_client()
 
   reset = (
-    conf.MR_CLUSTERS["default"].JT_HOST.set_for_testing("localhost"),
+    conf.MR_CLUSTERS["default"].HOST.set_for_testing("localhost"),
     conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(23),
   )
   old = cluster.clear_caches()

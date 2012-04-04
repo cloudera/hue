@@ -50,7 +50,7 @@ def test_jt_configuration(cluster):
     jt.runtime_info()
   except TTransport.TTransportException:
     msg = 'Failed to contact JobTracker plugin at %s:%s.' % \
-          (cluster.JT_HOST.get(), cluster.JT_THRIFT_PORT.get())
+          (cluster.HOST.get(), cluster.JT_THRIFT_PORT.get())
     return [ (cluster, msg) ]
   return []
 
@@ -84,7 +84,7 @@ class LiveJobTracker(object):
   @classmethod
   def from_conf(cls, conf):
     return cls(
-      conf.JT_HOST.get(),
+      conf.HOST.get(),
       conf.JT_THRIFT_PORT.get(),
       security_enabled=conf.SECURITY_ENABLED.get(),
       kerberos_principal=conf.JT_KERBEROS_PRINCIPAL.get())

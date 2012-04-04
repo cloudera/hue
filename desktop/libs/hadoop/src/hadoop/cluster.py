@@ -91,20 +91,31 @@ def all_mrclusters():
     MR_CACHE[identifier] = _make_mrcluster(identifier)
   return MR_CACHE
 
-def get_cluster_for_job_submission():
+def get_cluster_conf_for_job_submission():
   """
   Check the `submit_to' for each MR/Yarn cluster, and return the
-  host:port of first one that enables submission.
+  config section of first one that enables submission.
   """
   for name in conf.YARN_CLUSTERS.keys():
     yarn = conf.YARN_CLUSTERS[name]
     if yarn.SUBMIT_TO.get():
-      return "%s:%s" % (yarn.RM_HOST.get(), yarn.RM_PORT.get())
+      return yarn
   for name in conf.MR_CLUSTERS.keys():
     mr = conf.MR_CLUSTERS[name]
     if mr.SUBMIT_TO.get():
-      return "%s:%s" % (mr.JT_HOST.get(), mr.JT_PORT.get())
+      return mr
   return None
+
+def get_cluster_addr_for_job_submission():
+  """
+  Check the `submit_to' for each MR/Yarn cluster, and return the
+  host:port of first one that enables submission.
+  """
+  conf = get_cluster_conf_for_job_submission()
+  if conf is None:
+    return None
+  return "%s:%s" % (conf.HOST.get(), conf.PORT.get())
+
 
 def clear_caches():
   """

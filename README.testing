@@ -84,7 +84,7 @@ DESKTOP_DB_CONFIG=<db engine:db name:test db name:username:password:host:port>
 Writing tests that depend on Hadoop
 ===================================
 
-Use mini_cluster.py!  You should tag such tests with "requires_hadoop", as follows:
+Use pseudo_hdfs4.py!  You should tag such tests with "requires_hadoop", as follows:
 
   from nose.plugins.attrib import attr
 

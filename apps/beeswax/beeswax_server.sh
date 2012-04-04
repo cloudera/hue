@@ -19,8 +19,8 @@
 
 set -o errexit
 
-if [ -z "$HADOOP_HOME" ]; then
-  echo "\$HADOOP_HOME must be specified" 1>&2
+if [ -z "$HADOOP_CONF_DIR" ]; then
+  echo "\$HADOOP_CONF_DIR must be specified" 1>&2
   exit 1
 fi
 echo \$HADOOP_HOME=$HADOOP_HOME
@@ -46,7 +46,6 @@ fi
 
 echo \$HIVE_HOME=$HIVE_HOME
 
-
 BEESWAX_ROOT=$(dirname $0)
 BEESWAX_JAR=$BEESWAX_ROOT/java-lib/BeeswaxServer.jar
 HIVE_LIB=$HIVE_HOME/lib
@@ -65,15 +64,13 @@ echo \$HADOOP_OPTS=$HADOOP_OPTS
 # and to force hive-default to correspond to the Hive version we have.
 # Because we are abusing HADOOP_CONF_DIR, we have to emulate its default
 # behavior here as well.
-if [ -z "$HADOOP_CONF_DIR" ]; then
-  HADOOP_CONF_DIR="$HADOOP_HOME/conf"
-fi
 if [ -f $HADOOP_CONF_DIR/hadoop-env.sh ]; then
   . $HADOOP_CONF_DIR/hadoop-env.sh
 fi
 
-export HADOOP_CONF_DIR=$HIVE_CONF_DIR:$BEESWAX_ROOT/../../desktop/conf:$HADOOP_CONF_DIR
+export HADOOP_CONF_DIR=$HIVE_CONF_DIR:$HADOOP_CONF_DIR
 echo \$HADOOP_CONF_DIR=$HADOOP_CONF_DIR
+echo \$HADOOP_MAPRED_HOME=$HADOOP_MAPRED_HOME
 
 # Note: I've had trouble running this with just "java -jar" with the classpath
 # determined with a seemingly appropriate find command.

@@ -171,17 +171,6 @@
 
 [hadoop]
 
-  # If you installed Hadoop in a different location, you need to set
-  # hadoop_home, in which bin/hadoop, the Hadoop wrapper script, is found.
-  #
-  # NOTE: Hue depends on Cloudera's Distribution of Hadoop version 4 (CDH4)
-  # or later.
-  hadoop_home=$HADOOP_HOME
-  hadoop_bin=$HADOOP_HOME/bin/hadoop
-  hadoop_conf_dir=$HADOOP_HOME/conf
-
-  ## hadoop_mr1_home=$HADOOP_MR1_HOME
-
   # Configuration for HDFS NameNode
   # ------------------------------------------------------------------------
   [[hdfs_clusters]]
@@ -194,6 +183,18 @@
       # using the Thrift plugin (used in Hue 1.x), this must be uncommented
       # and explicitly set to the empty value.
       ## webhdfs_url=
+
+      # Settings about this HDFS cluster. If you install HDFS in a
+      # different location, you need to set the following.
+
+      # Defaults to $HADOOP_HDFS_HOME or /usr/lib/hadoop-hdfs
+      ## hadoop_hdfs_home=/usr/lib/hadoop-hdfs
+
+      # Defaults to $HADOOP_BIN or /usr/bin/hadoop
+      ## hadoop_bin=/usr/bin/hadoop
+
+      # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
+      ## hadoop_conf_dir=/etc/hadoop/conf
 
   # Configuration for MapReduce JobTracker
   # ------------------------------------------------------------------------
@@ -209,6 +210,18 @@
       # Whether to submit jobs to this cluster
       ## submit_to=False
 
+      # Settings about this MR1 cluster. If you install MR1 in a
+      # different location, you need to set the following.
+
+      # Defaults to $HADOOP_MR1_HOME or /usr/lib/hadoop-0.20-mapreduce
+      ## hadoop_mapred_home=/usr/lib/hadoop-0.20-mapreduce
+
+      # Defaults to $HADOOP_BIN or /usr/bin/hadoop
+      ## hadoop_bin=/usr/bin/hadoop
+
+      # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
+      ## hadoop_conf_dir=/etc/hadoop/conf
+
   # Configuration for Yarn
   # ------------------------------------------------------------------------
   [[yarn_clusters]]
@@ -220,6 +233,18 @@
       resourcemanager_port=8032
       # Whether to submit jobs to this cluster
       ## submit_to=False
+
+      # Settings about this MR2 cluster. If you install MR2 in a
+      # different location, you need to set the following.
+
+      # Defaults to $HADOOP_MR2_HOME or /usr/lib/hadoop-mapreduce
+      ## hadoop_mapred_home=/usr/lib/hadoop-mapreduce
+
+      # Defaults to $HADOOP_BIN or /usr/bin/hadoop
+      ## hadoop_bin=/usr/bin/hadoop
+
+      # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
+      ## hadoop_conf_dir=/etc/hadoop/conf
 
 
 ###########################################################################

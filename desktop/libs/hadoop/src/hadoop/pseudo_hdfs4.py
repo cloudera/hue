@@ -199,7 +199,8 @@ class PseudoHdfs4(object):
 
     # More stuff to setup in the environment
     env = dict(
-      HADOOP_HOME = hadoop.conf.HADOOP_HOME.get(),
+      HADOOP_HOME = hadoop.conf.HDFS_CLUSTERS['default'].HADOOP_HDFS_HOME.get(),
+      HADOOP_BIN = hadoop.conf.HDFS_CLUSTERS['default'].HADOOP_BIN.get(),
       HADOOP_CONF_DIR = conf_dir,
       HADOOP_HEAPSIZE = "128",
       HADOOP_LOG_DIR = self._log_dir,
@@ -237,21 +238,9 @@ class PseudoHdfs4(object):
 
     # We need a different env because it's a different hadoop
     env = env.copy()
-    env['HADOOP_HOME'] = hadoop.conf.HADOOP_MR1_HOME.get()
+    env['HADOOP_HOME'] = hadoop.conf.MR_CLUSTERS['default'].HADOOP_MAPRED_HOME.get()
+    env['HADOOP_BIN'] = hadoop.conf.MR_CLUSTERS['default'].HADOOP_BIN.get()
     env["HADOOP_CLASSPATH"] = ':'.join([
-        # -- BEGIN JAVA TRIVIA --
-        # Add the -test- jar to the classpath to work around a subtle issue
-        # involving Java classloaders. In brief, hadoop's RunJar class creates
-        # a child classloader with the test jar on it, but the core classes
-        # are loaded by the system classloader. This is fine except that
-        # some classes in the test jar extend package-protected classes in the
-        # core jar. Even though the classes are in the same package name, they
-        # are thus loaded by different classloaders and therefore an IllegalAccessError
-        # prevents the MiniMRCluster from starting. Adding the test jar to the system
-        # classpath prevents this error since then both the MiniMRCluster and the
-        # core classes are loaded by the system classloader.
-        hadoop.conf.HADOOP_TEST_JAR.get(),
-        # -- END JAVA TRIVIA --
         hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(),
         # Due to CDH-4537, we need to add test dependencies to run minicluster
         os.path.join(os.path.dirname(__file__), 'test_jars', '*'),
@@ -276,7 +265,7 @@ class PseudoHdfs4(object):
 
   def _format(self, conf_dir, env):
     """Format HDFS"""
-    args = (hadoop.conf.HADOOP_BIN.get(), 
+    args = (self._get_hadoop_bin(env),
             '--config', conf_dir,
             'namenode', '-format')
     LOG.info('Formatting HDFS: %s' % (args,))
@@ -377,7 +366,10 @@ class PseudoHdfs4(object):
       env=env)
 
   def _get_hadoop_bin(self, env):
-    return os.path.join(env['HADOOP_HOME'], 'bin', 'hadoop')
+    try:
+      return env['HADOOP_BIN']
+    except KeyError:
+      return os.path.join(env['HADOOP_HOME'], 'bin', 'hadoop')
 
   def _write_hdfs_site(self):
     self._dfs_http_port = find_unused_port()
@@ -466,7 +458,7 @@ def shared_cluster():
     closers = [
       hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
       hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
-      hadoop.conf.MR_CLUSTERS['default'].JT_HOST.set_for_testing('localhost'),
+      hadoop.conf.MR_CLUSTERS['default'].HOST.set_for_testing('localhost'),
       hadoop.conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(cluster.jt_thrift_port),
     ]
 

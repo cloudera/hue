@@ -22,26 +22,36 @@ from django.core.management.base import NoArgsCommand
 import beeswax.conf
 import beeswax.hive_site
 import desktop.conf
-import hadoop.conf
-import os
+import hadoop.cluster
+
 import logging
+import os
+import sys
 
 LOG = logging.getLogger(__name__)
 
 class Command(NoArgsCommand):
   """ Starts beeswax daemon.  """
+
   def handle_noargs(self, **options):
+    cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+    if cluster_conf is None:
+      LOG.error("Configuration does not contain any MR/Yarn clusters with "
+                "`submit_to' enabled. Cannot start BeeswaxServer.")
+      sys.exit(1)
+
     env = os.environ.copy()
-    env['HADOOP_HOME'] = hadoop.conf.HADOOP_HOME.get()
-    env['HADOOP_BIN'] = hadoop.conf.HADOOP_BIN.get()
-    if hadoop.conf.HADOOP_CONF_DIR.get():
-      env['HADOOP_CONF_DIR'] = hadoop.conf.HADOOP_CONF_DIR.get()
-    if beeswax.conf.BEESWAX_HIVE_HOME_DIR.get():
-      env['HIVE_HOME'] = beeswax.conf.BEESWAX_HIVE_HOME_DIR.get()
-    if beeswax.conf.BEESWAX_HIVE_CONF_DIR.get():
-      env['HIVE_CONF_DIR'] = beeswax.conf.BEESWAX_HIVE_CONF_DIR.get()
-    if beeswax.conf.BEESWAX_SERVER_HEAPSIZE.get():
-      env['HADOOP_HEAPSIZE'] = beeswax.conf.BEESWAX_SERVER_HEAPSIZE.get()
+    def set_if_present(name, val):
+      if val:
+        env[name] = val
+
+    env['HADOOP_BIN'] = cluster_conf.HADOOP_BIN.get()
+    set_if_present('HADOOP_MAPRED_HOME', cluster_conf.HADOOP_MAPRED_HOME.get())
+    set_if_present('HADOOP_CONF_DIR', cluster_conf.HADOOP_CONF_DIR.get())
+    set_if_present('HADOOP_HEAPSIZE', beeswax.conf.BEESWAX_SERVER_HEAPSIZE.get())
+    set_if_present('HIVE_HOME', beeswax.conf.BEESWAX_HIVE_HOME_DIR.get())
+    set_if_present('HIVE_CONF_DIR', beeswax.conf.BEESWAX_HIVE_CONF_DIR.get())
+
     bin = beeswax.conf.BEESWAX_SERVER_BIN.get()
 
     # Host that desktop is running on
