@@ -15,7 +15,7 @@
 ## limitations under the License.
 <%!
 import datetime
-from django.template.defaultfilters import escape, stringformat, date, time
+from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time, escape
 from desktop.views import commonheader, commonfooter
 %>
 
@@ -25,11 +25,19 @@ ${commonheader('File Browser', 'filebrowser')}
 <div class="container-fluid">
 	<h1>File Browser</h1>
 	% if breadcrumbs:
-		<ul class="breadcrumb">
-			% for breadcrumb_item in breadcrumbs:
-			<li><a href="/filebrowser/view${breadcrumb_item['url']}">${breadcrumb_item['label']}</a> <span class="divider">/</span></li>
-			% endfor
-		</ul>
+		<div class="subnav">
+		    <ul class="nav nav-pills">
+		      <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i> Home</a></li>
+		      <li>
+				<ul class="hueBreadcrumb">
+					% for breadcrumb_item in breadcrumbs:
+					<li><a href="/filebrowser/view${breadcrumb_item['url']}">${breadcrumb_item['label']}</a> <span class="divider">/</span></li>
+					% endfor
+				</ul>
+			  </li>
+		    </ul>
+		</div>
+		<br/>
 	%endif
     <div id="dirlist" class="view">
     ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}

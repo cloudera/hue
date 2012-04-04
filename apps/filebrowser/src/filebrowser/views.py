@@ -274,7 +274,7 @@ def _do_newfile_save(fs, path, data, encoding):
 def parse_breadcrumbs(path):
     breadcrumbs_parts = path.split('/')
     i = 1
-    breadcrumbs = [{'url': '', 'label': 'my home'}]
+    breadcrumbs = [{'url': '', 'label': '.'}]
     while (i < len(breadcrumbs_parts)):
         breadcrumb_url = breadcrumbs[i - 1]['url'] + '/' + breadcrumbs_parts[i]
         if breadcrumb_url != '/':
