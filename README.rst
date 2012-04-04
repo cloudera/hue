@@ -69,7 +69,7 @@ your system:
       * libxml2-dev
       * libxslt-dev
       * mvn (from ``maven2`` package or tarball)
-      * openldap-dev
+      * openldap-dev / libldap2-dev
       * python-dev
       * python-simplejson
 
