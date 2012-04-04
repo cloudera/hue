@@ -223,6 +223,36 @@
 
 
 ###########################################################################
+# Settings to configure Beeswax
+###########################################################################
+
+[beeswax]
+  # Configure the port the internal metastore daemon runs on. Used only if
+  # hive.metastore.local is true.
+  ## beeswax_meta_server_port=8003
+
+  # Configure the port the beeswax thrift server runs on
+  ## beeswax_server_port=8002
+
+  # Hive home directory
+  ## hive_home_dir=/usr/lib/hive
+
+  # Hive configuration directory, where hive-site.xml is located
+  ## hive_conf_dir=/etc/hive/conf
+
+  # Timeout in seconds for thrift calls to beeswax service
+  ## beeswax_server_conn_timeout=120
+
+  # Timeout in seconds for thrift calls to the hive metastore
+  ## metastore_conn_timeout=10
+
+  # Maximum Java heapsize (in megabytes) used by Beeswax Server.
+  # Note that the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh
+  # may override this setting.
+  ## beeswax_server_heapsize=1000
+
+
+###########################################################################
 # Settings to configure Job Designer.
 ###########################################################################
 
@@ -232,6 +262,63 @@
   oozie_url=http://localhost:11000/oozie
 
   ## security_enabled=false
+
+
+###########################################################################
+# Settings to configure the Shell application
+###########################################################################
+
+[shell]
+  # The shell_buffer_amount specifies the number of bytes of output per shell
+  # that the Shell app will keep in memory. If not specified, it defaults to
+  # 524288 (512 MiB).
+  ## shell_buffer_amount=100
+
+  # If you run Hue against a Hadoop cluster with Kerberos security enabled, the
+  # Shell app needs to acquire delegation tokens for the subprocesses to work
+  # correctly. These delegation tokens are stored as temporary files in some
+  # directory. You can configure this directory here. If not specified, it
+  # defaults to /tmp/hue_delegation_tokens.
+  ## shell_delegation_token_dir=/tmp/hue_delegation_tokens
+
+  [[ shelltypes ]]
+
+    # Define and configure a new shell type "flume"
+    # ------------------------------------------------------------------------
+    [[[ flume ]]]
+      nice_name = "Flume Shell"
+      command = "/usr/bin/flume shell"
+      help = "The command-line Flume client interface."
+
+      [[[[ environment ]]]]
+	# You can specify environment variables for the Flume shell
+	# in this section.
+
+    # Define and configure a new shell type "pig"
+    # ------------------------------------------------------------------------
+    [[[ pig ]]]
+      nice_name = "Pig Shell (Grunt)"
+      command = "/usr/bin/pig -l /dev/null"
+      help = "The command-line interpreter for Pig"
+
+      [[[[ environment ]]]]
+	# You can specify environment variables for the Pig shell
+	# in this section. Note that JAVA_HOME must be configured
+	# for the Pig shell to run.
+
+	[[[[[ JAVA_HOME ]]]]]
+	  value = "/usr/lib/jvm/java-6-sun"
+
+    # Define and configure a new shell type "hbase"
+    # ------------------------------------------------------------------------
+    [[[ hbase ]]]
+      nice_name = "HBase Shell"
+      command = "/usr/bin/hbase shell"
+      help = "The command-line HBase client interface."
+
+      [[[[ environment ]]]]
+	# You can configure environment variables for the HBase shell
+	# in this section.
 
 
 ###########################################################################
