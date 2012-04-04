@@ -20,24 +20,13 @@ from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="dir" file="listdir_components.mako" />
+<%namespace name="fb_components" file="fb_components.mako" />
 
 ${commonheader('File Browser', 'filebrowser')}
 <div class="container-fluid">
 	<h1>File Browser</h1>
 	% if breadcrumbs:
-		<div class="subnav">
-		    <ul class="nav nav-pills">
-		      <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i> Home</a></li>
-		      <li>
-				<ul class="hueBreadcrumb">
-					% for breadcrumb_item in breadcrumbs:
-					<li><a href="/filebrowser/view${breadcrumb_item['url']}">${breadcrumb_item['label']}</a> <span class="divider">/</span></li>
-					% endfor
-				</ul>
-			  </li>
-		    </ul>
-		</div>
-		<br/>
+        ${fb_components.breadcrumbs(path, breadcrumbs)}
 	%endif
     <div id="dirlist" class="view">
     ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}

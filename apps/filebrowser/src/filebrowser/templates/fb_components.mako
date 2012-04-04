@@ -14,39 +14,8 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-import datetime
-from django.template.defaultfilters import urlencode, escape
+from django.template.defaultfilters import urlencode
 %>
-<%def name="header(path, current_request_path=False, toolbar=True, cwd_set=True, show_upload=True)">
-  <html>
-    <head>
-      <title>${path}</title>
-    </head>
-    <body>
-
-      % if toolbar:
-      <div class="toolbar">
-
-        <a href="${url('filebrowser.views.view', path='/')}"><img src="/filebrowser/static/art/icon_large.png" class="fb_icon"/></a>
-        % if current_request_path:
-          <div class="fb-actions" data-filters="ArtButtonBar">
-            % if home_directory:
-              <% my_home_disabled = "" %>
-            % else:
-              <% my_home_disabled = "disabled" %>
-            % endif
-            <a class="fb-home ${my_home_disabled}" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.view', path=(home_directory or "/"))}">My Home</a>
-            % if cwd_set:
-              % if show_upload:
-                <a class="fb-upload" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.upload')}?dest=${path|urlencode}&next=${current_request_path|urlencode}">Upload Files</a>
-              % endif
-              <a class="fb-mkdir" data-filters="ArtButton" data-icon-styles="{'width' : 16, 'height': 16}" href="${url('filebrowser.views.mkdir')}?path=${path|urlencode}&next=${current_request_path|urlencode}">New Directory</a>
-            % endif
-          </div>
-        % endif
-      </div>
-      % endif
-</%def>
 
 <%def name="footer()">
       <div class="fb-uploader jframe-hidden">
@@ -59,4 +28,26 @@ from django.template.defaultfilters import urlencode, escape
       </div>
     </body>
   </html>
+</%def>
+
+<%def name="breadcrumbs(path, breadcrumbs)">
+    <div class="subnav">
+        <ul class="nav nav-pills">
+          <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i>Home</a></li>
+          <li>
+            <ul class="hueBreadcrumb">
+                % for breadcrumb_item in breadcrumbs:
+                    <% label = breadcrumb_item['label'] %>
+                    %if label == '/':
+                        <li><a href="/filebrowser/view${breadcrumb_item['url']}"><span
+                            class="divider">${label | h}<span></a></li>
+                    %else:
+                        <li><a href="/filebrowser/view${breadcrumb_item['url']}">${label | h}</a><span class="divider">/</span></li>
+                    %endif
+                % endfor
+            </ul>
+          </li>
+        </ul>
+    </div>
+    <br/>
 </%def>

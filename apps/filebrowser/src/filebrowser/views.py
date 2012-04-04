@@ -45,7 +45,7 @@ from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadForm, MkDirForm, RmDirForm, RmTreeForm,\
     RemoveForm, ChmodForm, ChownForm, EditorForm
-from hadoop.fs import normpath
+from hadoop.fs.hadoopfs import Hdfs
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -161,7 +161,7 @@ def edit(request, path, form=None):
         path=path,
         filename=os.path.basename(path),
         dirname=os.path.dirname(path),
-		breadcrumbs = parse_breadcrumbs(path))
+        breadcrumbs = parse_breadcrumbs(path))
     return render("edit.mako", request, data)
 
 
@@ -273,9 +273,9 @@ def _do_newfile_save(fs, path, data, encoding):
 
 
 def parse_breadcrumbs(path):
-    breadcrumbs_parts = path.split('/')
+    breadcrumbs_parts = Hdfs.normpath(path).split('/')
     i = 1
-    breadcrumbs = [{'url': '', 'label': '.'}]
+    breadcrumbs = [{'url': '', 'label': '/'}]
     while (i < len(breadcrumbs_parts)):
         breadcrumb_url = breadcrumbs[i - 1]['url'] + '/' + breadcrumbs_parts[i]
         if breadcrumb_url != '/':
@@ -318,7 +318,7 @@ def listdir(request, path, chooser):
     stats = request.fs.listdir_stats(path)
 
     # Include parent dir, unless at filesystem root.
-    if normpath(path) != posixpath.sep:
+    if Hdfs.normpath(path) != posixpath.sep:
         parent_path = request.fs.join(path, "..")
         parent_stat = request.fs.stats(parent_path)
         # The 'path' field would be absolute, but we want its basename to be
@@ -358,7 +358,7 @@ def _massage_stats(request, stats):
     into the format that the views would like it in.
     """
     path = stats['path']
-    normalized = normpath(path)
+    normalized = Hdfs.normpath(path)
     return {
         'path': normalized,
         'name': posixpath.basename(path),
