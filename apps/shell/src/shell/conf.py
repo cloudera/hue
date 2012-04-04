@@ -15,8 +15,8 @@
 # limitations under the License.
 """
 Configuration options for the Shell UI.
-This file specifies the structure that hue-shell.ini should follow.
-See conf/hue-shell.ini to configure which shells are available.
+This file specifies the structure that the shell configuration should follow.
+See conf/hue.ini to configure which shells are available.
 """
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
 import shell.utils as utils
