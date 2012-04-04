@@ -109,11 +109,13 @@ def view(request, path):
     if request.GET.get('default_to_home') and request.fs.isdir(home_dir_path):
         return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=home_dir_path)))
 
-    if request.fs.isdir(path):
-        return listdir(request, path, False)
-    elif request.fs.isfile(path):
-        return display(request, path)
-    else:
+    try:
+        stats = request.fs.stats(path)
+        if stats.isDir:
+            return listdir(request, path, False)
+        else:
+            return display(request, path)
+    except IOError:
         raise Http404("File not found: %s" % escape(path))
 
 
