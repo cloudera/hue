@@ -71,9 +71,9 @@ ${layout.menubar(section='saved queries')}
           ${ timesince(design.mtime) } ago
         </td>
         <td>
-	      	% if may_edit:
 			<a class="btn small contextEnabler" data-menuid="${design.id}">Options</a>
 			<ul class="contextMenu" id="menu${design.id}">
+	      	% if may_edit:
 	             % if design.type == models.SavedQuery.REPORT:
 	               <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report." class="contextItem">Edit</a></li>
 	             % else:
@@ -81,8 +81,10 @@ ${layout.menubar(section='saved queries')}
 	             % endif
 	             <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query." class="contextItem confirmationModal">Delete</a></li>
 	             <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
-			</ul>
+
 	        % endif
+				<li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query.">Clone</a></li>
+			</ul>
         </td>
       </tr>
     % endfor
@@ -111,7 +113,15 @@ ${comps.pagination(page)}
 			"bPaginate": false,
 		    "bLengthChange": false,
 			"bInfo": false,
-			"bFilter": false
+			"bFilter": false,
+			"aoColumns": [
+				null,
+				null,
+				null,
+				null,
+				null,
+				{ "bSortable": false }
+			]
 		});
 		$(".contextEnabler").jHueContextMenu();
 

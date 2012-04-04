@@ -17,7 +17,7 @@
 <%!
   import cgi
   import urllib
-
+  from django.template.defaultfilters import date, time
   from desktop.lib.django_util import extract_field_data
   from desktop.views import commonheader, commonfooter
 %>
@@ -64,7 +64,7 @@ ${layout.menubar(section='designs')}
                     <td>${design.name}</td>
                     <td>${design.root_action.action_type}</td>
                     <td>${design.description}</td>
-                    <td nowrap="nowrap">${design.last_modified.strftime('%c')}</td>
+                    <td nowrap="nowrap">${date(design.last_modified)} ${time(design.last_modified).replace("p.m.","PM").replace("a.m.","AM")}</td>
                     <td nowrap="nowrap" class="right">
                       %if currentuser.is_superuser:
                         %if currentuser.username == design.owner.username:
@@ -196,7 +196,16 @@ ${layout.menubar(section='designs')}
         var oTable = $('#designTable').dataTable( {
           "sPaginationType": "bootstrap",
           "bLengthChange": false,
-          "sDom": "<'row'r>t<'row'<'span8'i><''p>>"
+          "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
+		  "aoColumns": [
+				null,
+				null,
+				null,
+				null,
+				{ "sType": "date" },
+				null
+			],
+			"aaSorting": [[ 4, "desc" ]]
         });
 
         $("#filterInput").keyup(function() {

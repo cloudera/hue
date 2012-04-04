@@ -160,7 +160,8 @@ def edit(request, path, form=None):
         form=form,
         path=path,
         filename=os.path.basename(path),
-        dirname=os.path.dirname(path))
+        dirname=os.path.dirname(path),
+		breadcrumbs = parse_breadcrumbs(path))
     return render("edit.mako", request, data)
 
 
