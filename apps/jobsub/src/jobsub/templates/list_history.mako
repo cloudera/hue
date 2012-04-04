@@ -16,7 +16,7 @@
 
 <%!
   import urllib
-
+  from django.template.defaultfilters import date, time
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext, ungettext, get_language, activate
 
@@ -59,7 +59,7 @@ ${layout.menubar(section='history')}
                     <td>${wf.name}</td>
                     <td>${wf.root_action.action_type}</td>
                     <td>${wf.description}</td>
-                    <td>${record.submission_date.strftime('%c')}</td>
+                    <td>${date(design.submission_date)} ${time(design.submission_date).replace("p.m.","PM").replace("a.m.","AM")}</td>
                 </tr>
             %endfor
         </tbody>
@@ -72,6 +72,15 @@ ${layout.menubar(section='history')}
           'sPaginationType': 'bootstrap',
           "bLengthChange": false,
           "sDom": "<'row'r>t<'row'<'span8'i><''p>>"
+		  "aoColumns": [
+				null,
+				null,
+				null,
+				null,
+				null,
+				{ "sType": "date" }
+			],
+			"aaSorting": [[ 5, "desc" ]]
         });
 
         $("#filterInput").keyup(function() {

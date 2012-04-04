@@ -376,6 +376,14 @@ ul.errorlist li {
     color: #333333;
 }
 
+.hueBreadcrumb > li:last-child > a {
+    font-weight:bold;
+    color: #333333;
+}
+
+.hueBreadcrumb > li:last-child > span {
+    display:none;
+}
 
 /*********************************************************
  * From: http://datatables.net/blog/Twitter_Bootstrap

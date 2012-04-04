@@ -26,8 +26,24 @@
 ${commonheader(truncate(filename)+':: File Viewer', 'filebrowser')}
 
 <div class="container-fluid">
+	% if breadcrumbs:
+		<div class="subnav">
+		    <ul class="nav nav-pills">
+		      <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i> Home</a></li>
+		      <li>
+				<ul class="hueBreadcrumb">
+					% for breadcrumb_item in breadcrumbs:
+					<li><a href="/filebrowser/view${breadcrumb_item['url']}">${breadcrumb_item['label']}</a> <span class="divider">/</span></li>
+					% endfor
+				</ul>
+			  </li>
+		    </ul>
+		</div>
+		<br/>
+	%endif
+</div>
 
-<h1>${truncate(path, 91)}</h1>
+<div class="container-fluid">
 <div class="well" >
     <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
     <div class="toolbar">

@@ -96,7 +96,7 @@ from django.utils.encoding import smart_str
 				<td>${file['stats']['user']}</td>
 				<td>${file['stats']['group']}</td>
 				<td>${file['rwx']}</td>
-				<td><span>${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime']))}</span></td>
+				<td>${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime'])).replace("p.m.","PM").replace("a.m.","AM")}</td>
 				<td>
 					% if ".." != file['name']:
 					<%
@@ -322,10 +322,19 @@ from django.utils.encoding import smart_str
 	$(document).ready(function(){
         //filter handlers
         var oTable = $('.datatables').dataTable( {
-          'sPaginationType': 'bootstrap',
+          "sPaginationType": "bootstrap",
           "bLengthChange": false,
           "iDisplayLength": 15,
-          "sDom": "<'row'r>t<'row'<'span8'i><''p>>"
+          "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
+		  "aoColumns": [
+				null,
+				null,
+				null,
+				null,
+				null,
+				{ "sType": "date" },
+				null
+			]
         });
 
         $("#filterInput").keyup(function() {

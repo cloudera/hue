@@ -15,10 +15,11 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.template.defaultfilters import date, time
+import urllib
+from django.utils.translation import ugettext, ungettext, get_language, activate
+_ = ugettext
 %>
-<% import urllib %>
-<% from django.utils.translation import ugettext, ungettext, get_language, activate %>
-<% _ = ugettext %>
 
 <%namespace name="layout" file="layout.mako" />
 ${commonheader("Hue Users", "useradmin", "100px")}
@@ -57,10 +58,8 @@ ${layout.menubar(section='users')}
 	            <td>${listed_user.last_name}</td>
 	            <td>${listed_user.email}</td>
 				<td>${', '.join([group.name for group in listed_user.groups.all()])}</td>
-	            <td>
-	              ${listed_user.last_login.strftime('%c')}
-	            </td>
-	            <td>
+	            <td>${date(listed_user.last_login)} ${time(listed_user.last_login).replace("p.m.","PM").replace("a.m.","AM")}</td>
+	            <td class="right">
 				%if user.is_superuser == True:
 					<a title="Edit ${listed_user.username}" class="btn small editUserBtn" data-url="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-name="${listed_user.username}">Edit</a>
 					<a title="Delete ${listed_user.username}" class="btn small confirmationModal" alt="Are you sure you want to delete ${listed_user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(listed_user.username)) }">Delete</a>
@@ -125,7 +124,16 @@ ${layout.menubar(section='users')}
 				"bPaginate": false,
 			    "bLengthChange": false,
 				"bInfo": false,
-				"bFilter": false
+				"bFilter": false,
+				"aoColumns": [
+						null,
+						null,
+						null,
+						null,
+						null,
+						null,
+						{ "sType": "date" }
+					]
 			});
 			$(".dataTables_wrapper").css("min-height","0");
 			$(".dataTables_filter").hide();
