@@ -120,8 +120,6 @@ class ClusterMiddleware(object):
     Sets request.fs and request.jt on every request to point to the
     configured filesystem.
     """
-    has_hadoop = apputil.has_hadoop()
-
     request.fs_ref = request.REQUEST.get('fs', view_kwargs.get('fs', 'default'))
     if "fs" in view_kwargs:
       del view_kwargs["fs"]
@@ -131,10 +129,10 @@ class ClusterMiddleware(object):
     except KeyError:
       raise KeyError('Cannot find HDFS called "%s"' % (request.fs_ref,))
 
-    if request.user.is_authenticated() and request.fs is not None:
-      request.fs.setuser(request.user.username)
+    if request.user.is_authenticated():
+      if request.fs is not None:
+        request.fs.setuser(request.user.username)
 
-    if request.user.is_authenticated() and has_hadoop:
       request.jt = cluster.get_default_mrcluster()
       if request.jt is not None:
         request.jt.setuser(request.user.username)
