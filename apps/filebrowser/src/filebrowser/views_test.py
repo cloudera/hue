@@ -280,6 +280,28 @@ def test_view_i18n():
       LOG.error('Failed to cleanup test directory: %s' % (ex,))
 
 
+@attr('requires_hadoop')
+def test_view_access():
+  cluster = pseudo_hdfs4.shared_cluster()
+  NO_PERM_DIR = u'/test-no-perm'
+
+  try:
+    c = make_logged_in_client()
+    cluster.fs.setuser(cluster.superuser)
+    cluster.fs.mkdir(NO_PERM_DIR, mode='700')
+
+    response = c.get('/filebrowser/view/test-no-perm')
+    assert_true('Cannot access' in response.context['message'])
+
+    response = c.get('/filebrowser/view/test-does-not-exist')
+    assert_true('Cannot access' in response.context['message'])
+  finally:
+    try:
+      cluster.fs.rmtree(NO_PERM_DIR)
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+
+
 def view_helper(cluster, encoding, content):
   """
   Write the content in the given encoding directly into the filesystem.

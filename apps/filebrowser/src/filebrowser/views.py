@@ -46,6 +46,7 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadForm, MkDirForm, RmDirForm, RmTreeForm,\
     RemoveForm, ChmodForm, ChownForm, EditorForm
 from hadoop.fs.hadoopfs import Hdfs
+from hadoop.fs.exceptions import WebHdfsException
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -115,8 +116,8 @@ def view(request, path):
             return listdir(request, path, False)
         else:
             return display(request, path)
-    except IOError:
-        raise Http404("File not found: %s" % escape(path))
+    except (IOError, WebHdfsException), e:
+        raise PopupException("Cannot access: %s" % escape(path), detail=e)
 
 
 def edit(request, path, form=None):
