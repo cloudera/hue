@@ -28,40 +28,36 @@
   </%def>
 	<div class="container-fluid">
 	<h1>Task View: Job:  ${jobid}</h1>
-	<div class="well">
-		<div class="">
-		
-				<form method="get" action="/jobbrowser/jobs/${jobid}/tasks">
-					<b>Filter tasks:</b>
-				
-						<select name="taskstate" class="submitter">
-							<option value="">All states</option>
-							<option value="succeeded" ${selected('succeeded', taskstate)}>succeeded</option>
-							<option value="running" ${selected('running', taskstate)}>running</option>
-							<option value="failed" ${selected('failed', taskstate)}>failed</option>
-							<option value="killed" ${selected('killed', taskstate)}>killed</option>
-							<option value="pending" ${selected('pending', taskstate)}>pending</option>
-						</select>
-				
-				
-						<select name="tasktype" class="submitter">
-							<option value="">All types</option>
-							<option value="map" ${selected('map', tasktype)}>maps</option>
-							<option value="reduce" ${selected('reduce', tasktype)}>reduces</option>
-							<option value="job_cleanup" ${selected('job_cleanup', tasktype)}>cleanups</option>
-							<option value="job_setup" ${selected('job_setup', tasktype)}>setups</option>
-						</select>
-				
-				
-						<input type="text" name="tasktext"  class="submitter" title="Text filter" placeholder="Text Filter"
-						% if tasktext:
-						value="${tasktext}"
-						% endif
-						/>
-				
-				</form>
-		
-		</div>
+	<div class="well hueWell">
+		<form method="get" action="/jobbrowser/jobs/${jobid}/tasks">
+			<b>Filter tasks:</b>
+
+				<select name="taskstate" class="submitter">
+					<option value="">All states</option>
+					<option value="succeeded" ${selected('succeeded', taskstate)}>succeeded</option>
+					<option value="running" ${selected('running', taskstate)}>running</option>
+					<option value="failed" ${selected('failed', taskstate)}>failed</option>
+					<option value="killed" ${selected('killed', taskstate)}>killed</option>
+					<option value="pending" ${selected('pending', taskstate)}>pending</option>
+				</select>
+
+
+				<select name="tasktype" class="submitter">
+					<option value="">All types</option>
+					<option value="map" ${selected('map', tasktype)}>maps</option>
+					<option value="reduce" ${selected('reduce', tasktype)}>reduces</option>
+					<option value="job_cleanup" ${selected('job_cleanup', tasktype)}>cleanups</option>
+					<option value="job_setup" ${selected('job_setup', tasktype)}>setups</option>
+				</select>
+
+
+				<input type="text" name="tasktext"  class="submitter" title="Text filter" placeholder="Text Filter"
+				% if tasktext:
+				value="${tasktext}"
+				% endif
+				/>
+
+		</form>
 	</div>
 
 
@@ -69,7 +65,7 @@
 	<p>There were no tasks that match your search criteria.</p>
 	% else:
 
-	<table class="datatables">
+	<table class="datatables table table-striped table-condensed">
 		<thead>
 			<tr>
 				<th>Task ID</th>

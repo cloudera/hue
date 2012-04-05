@@ -32,7 +32,7 @@
 ${commonheader("Job Browser", "jobbrowser")}
 <div class="container-fluid">
 <h1>Job Browser</h1>
-<div class="well">
+<div class="well hueWell">
 	<form action="/jobbrowser/jobs" method="GET">
 		<b>Filter jobs:</b>
 
@@ -55,7 +55,7 @@ ${commonheader("Job Browser", "jobbrowser")}
 % if len(jobs) == 0:
 <p>There were no jobs that match your search criteria.</p>
 % else:
-<table class="datatables">
+<table class="datatables table table-striped table-condensed">
 	<thead>
 		<tr>
 			<th>Name / Id</th>

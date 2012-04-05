@@ -20,11 +20,11 @@
 %>
 	% for group in counters.groups:
 		<h3>${format_counter_name(group.displayName)}</h3>
-	    <table class="taskCountersTable">
+	    <table class="taskCountersTable table table-striped table-condensed">
 	      <thead>
 	         <tr>
 	           <th>Counter Name</th>
-	           <th>Value</th>   
+	           <th>Value</th>
 	        </tr>
 	      </thead>
 	      <tbody>
@@ -46,13 +46,13 @@
 
 	% for group in counters.itervalues():
       <h3>${format_counter_name(group['displayName'])}</h3>
-	  <table class="jobCountersTable">
+	  <table class="jobCountersTable table table-striped table-condensed">
       <thead>
          <tr>
            <th>Name</th>
            <th>Maps Total</th>
            <th>Reduces Total</th>
-           <th>Total</th>   
+           <th>Total</th>
         </tr>
       </thead>
       <tbody>
@@ -72,9 +72,9 @@
 			</tbody>
 	     </table>
 	% endfor
-    
 
-   
+
+
 </%def>
 
 <%def name="mr_graph(job)">

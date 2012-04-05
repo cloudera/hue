@@ -23,7 +23,7 @@
 %>
 
 <%def name="task_table(tasks)">
-  <table class="taskTable">
+  <table class="taskTable table table-striped table-condensed">
     <thead>
       <tr>
         <th>Tasks</th>
@@ -67,8 +67,8 @@
                   <a href="${location_to_url(request, val)}" title="${val}" target="${target}">${val}</a>
                   % if i != len(splitArray) - 1:
                     <br>
-                  % endif  
-               % else: 
+                  % endif
+               % else:
                   ${val}
                % endif
             % endfor
@@ -77,173 +77,172 @@
     % endfor
 </%def>
 ${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
+
 <div class="container-fluid">
 	<h1>Job: ${job.jobId} - Job Browser</h1>
-	<div class="sidebar withTitle">
-		<div class="well">
-			<h6>Job ID</h6>
-			${job.jobId}
-			
-			<h6>User</h6>
-			${job.user}
-			
-			<h6>Status</h6>
-			% if job.status.lower() == 'running' or job.status.lower() == 'pending':
-				<span class="label warning">${job.status.lower()}</span>
-			% elif job.status.lower() == 'succeeded':
-				<span class="label success">${job.status.lower()}</span>
-			% else:
-				<span class="label">${job.status.lower()}</span>
-			% endif
-			
-			% if job.status.lower() == 'running' or job.status.lower() == 'pending':
-	        <h6>Kill Job</h6>
-			<a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" title="Kill this job">Kill this job</a>
-	        % endif
-			
-			
-			<h6>Output</h6>
-			<%
-	            output_dir = job.conf_keys.get('mapredOutputDir', "")
-	            location_url = location_to_url(request, output_dir)
-	            basename = os.path.basename(output_dir)
-	            dir_name = basename.split('/')[-1]
-	          %>
-	          % if location_url != None:
-	            <a href="${location_url}" title="${output_dir}">${dir_name}</a>
-	          % else:
-	            ${dir_name}
-	          % endif
+	<div class="row-fluid">
+		<div class="span2">
+			<div class="well sidebar-nav">
+				<h6>Job ID</h6>
+				${job.jobId}
+
+				<h6>User</h6>
+				${job.user}
+
+				<h6>Status</h6>
+				% if job.status.lower() == 'running' or job.status.lower() == 'pending':
+					<span class="label label-warning">${job.status.lower()}</span>
+				% elif job.status.lower() == 'succeeded':
+					<span class="label label-success">${job.status.lower()}</span>
+				% else:
+					<span class="label">${job.status.lower()}</span>
+				% endif
+
+				% if job.status.lower() == 'running' or job.status.lower() == 'pending':
+		        <h6>Kill Job</h6>
+				<a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" title="Kill this job">Kill this job</a>
+		        % endif
+
+
+				<h6>Output</h6>
+				<%
+		            output_dir = job.conf_keys.get('mapredOutputDir', "")
+		            location_url = location_to_url(request, output_dir)
+		            basename = os.path.basename(output_dir)
+		            dir_name = basename.split('/')[-1]
+		          %>
+		          % if location_url != None:
+		            <a href="${location_url}" title="${output_dir}">${dir_name}</a>
+		          % else:
+		            ${dir_name}
+		          % endif
+			</div>
 		</div>
-	</div>
-    
-    <div class="content">
-		<ul class="tabs">
-			<li class="active"><a href="#tasks">Tasks</a></li>
-			<li><a href="#metadata">Metadata</a></li>
-			<li><a href="#counters">Counters</a></li>
-		</ul>
+		<div class="span10">
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#tasks" data-toggle="tab">Tasks</a></li>
+				<li><a href="#metadata" data-toggle="tab">Metadata</a></li>
+				<li><a href="#counters" data-toggle="tab">Counters</a></li>
+			</ul>
 
-		<div class="tab-content">
-			<div class="tab-pane active" id="tasks">
-				<dl>
-	                <dt>Maps:</dt>
-	                <dd>${comps.mr_graph_maps(job)}</dd>
-	                <dt>Reduces:</dt>
-	                <dd>${comps.mr_graph_reduces(job, right_border=True)}</dd>
-	              </dl>
-	            %if failed_tasks:
-	            <div>
-	              <h3>
-	                <a href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">View Failed Tasks &raquo;</a>
-	                Failed Tasks
-	              </h3>
-	              <div class="jt_task_list_container">
-	                ${task_table(failed_tasks)}
-	              </div>
-	            </div>
-	            %endif
-	            <div>
-					<a style="float:right;margin-right:10px" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
-	              <h3>
-	                Recent Tasks
-	              </h3>
-	              <div class="jt_task_list_container">
-	                ${task_table(recent_tasks)}
-	              </div>
-	            </div>
-	
-			</div>
-			<div id="metadata" class="tab-pane">
-				<div class="toolbar">
-					<form>
-						<b>Filter metadata:</b>
-						<ul>
-							<li>
-								<input type="text" id="metadataFilter" title="Text Filter" placeholder="Text Filter"/>
-							</li>
-						</ul>
-					</form>
-		        </div>
-				 <table id="metadataTable">
-		              <thead>
-		                <th>Name</th>
-		                <th>Value</th>
-		              </thead>
-		              <tbody>
-		                <tr>
-		                  <td>ID</td>
-		                  <td>${job.jobId}</td>
-		                </tr>
-		                <tr>
-		                  <td>User</td>
-		                  <td>${job.user}</td>
-		                </tr>
-		                <tr>
-		                  <td>Maps</td>
-		                  <td>${job.finishedMaps} of ${job.desiredMaps}</td>
-		                </tr>
-		                <tr>
-		                  <td>Reduces</td>
-		                  <td>${job.finishedReduces} of ${job.desiredReduces}</td>
-		                </tr>
-		                <tr>
-		                  <td>Started</td>
-		                  <td>${job.startTimeFormatted}</td>
-		                </tr>
-		                <tr>
-		                  <td>Ended</td>
-		                  <td>${job.finishTimeFormatted}</td>
-		                </tr>
-		                <tr>
-		                  <td>Duration</td>
-		                  <td>${job.duration}</td>
-		                </tr>
-		                <tr>
-		                  <td>Status</td>
-		                  <td>${job.status}</td>
-		                </tr>
-		                ${rows_for_conf_vars(job.conf_keys)}
-		             
-		              </tbody>
-		            </table>
-					<h3>Raw configuration:</h3>
-				 <table id="rawConfigurationTable">
-		              <thead>
-		                <th>Name</th>
-		                <th>Value</th>
-		              </thead>
-		              <tbody>
+			<div class="tab-content">
+				<div class="tab-pane active" id="tasks">
+					<dl>
+		                <dt>Maps:</dt>
+		                <dd>${comps.mr_graph_maps(job)}</dd>
+		                <dt>Reduces:</dt>
+		                <dd>${comps.mr_graph_reduces(job, right_border=True)}</dd>
+		              </dl>
+		            %if failed_tasks:
+		            <div>
+		              <h3>
+		                <a href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">View Failed Tasks &raquo;</a>
+		                Failed Tasks
+		              </h3>
+		              <div class="jt_task_list_container">
+		                ${task_table(failed_tasks)}
+		              </div>
+		            </div>
+		            %endif
+		            <div>
+						<a style="float:right;margin-right:10px" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
+		              <h3>
+		                Recent Tasks
+		              </h3>
+		              <div class="jt_task_list_container">
+		                ${task_table(recent_tasks)}
+		              </div>
+		            </div>
 
-		              % for key, value in sorted(job.full_job_conf.items()):
-		                <tr>
-		                  <td width="20%">${key}</td>
-		                  <td>
-							<div class="wordbreak">
-								${value}
-							</div>
-						  </td>
-		                </tr>
-		              % endfor
-		              </tbody>
-		            </table>
+				</div>
+				<div id="metadata" class="tab-pane">
+					<div class="well hueWell">
+						<form class="form-search">
+							Filter: <input id="metadataFilter" class="input-xlarge search-query" placeholder="Text Filter">
+						</form>
+					</div>
+					 <table id="metadataTable" class="table table-striped table-condensed">
+			              <thead>
+			                <th>Name</th>
+			                <th>Value</th>
+			              </thead>
+			              <tbody>
+			                <tr>
+			                  <td>ID</td>
+			                  <td>${job.jobId}</td>
+			                </tr>
+			                <tr>
+			                  <td>User</td>
+			                  <td>${job.user}</td>
+			                </tr>
+			                <tr>
+			                  <td>Maps</td>
+			                  <td>${job.finishedMaps} of ${job.desiredMaps}</td>
+			                </tr>
+			                <tr>
+			                  <td>Reduces</td>
+			                  <td>${job.finishedReduces} of ${job.desiredReduces}</td>
+			                </tr>
+			                <tr>
+			                  <td>Started</td>
+			                  <td>${job.startTimeFormatted}</td>
+			                </tr>
+			                <tr>
+			                  <td>Ended</td>
+			                  <td>${job.finishTimeFormatted}</td>
+			                </tr>
+			                <tr>
+			                  <td>Duration</td>
+			                  <td>${job.duration}</td>
+			                </tr>
+			                <tr>
+			                  <td>Status</td>
+			                  <td>${job.status}</td>
+			                </tr>
+			                ${rows_for_conf_vars(job.conf_keys)}
 
-			</div>
-			<div id="counters" class="tab-pane">
-				${comps.job_counters(job.counters)}
+			              </tbody>
+			            </table>
+					  <h3>Raw configuration:</h3>
+					 <table id="rawConfigurationTable" class="table table-striped table-condensed">
+			              <thead>
+			                <th>Name</th>
+			                <th>Value</th>
+			              </thead>
+			              <tbody>
+
+			              % for key, value in sorted(job.full_job_conf.items()):
+			                <tr>
+			                  <td width="20%">${key}</td>
+			                  <td>
+								<div class="wordbreak">
+									${value}
+								</div>
+							  </td>
+			                </tr>
+			              % endfor
+			              </tbody>
+			            </table>
+
+				</div>
+				<div id="counters" class="tab-pane">
+					${comps.job_counters(job.counters)}
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
+
+
 		<script type="text/javascript" charset="utf-8">
 			$(document).ready(function(){
-				$(".tabs").tabs();
 				$(".taskTable").dataTable({
 					"bPaginate": false,
 				    "bLengthChange": false,
 					"bInfo": false,
 					"bAutoWidth": false,
-					"aoColumns": [ 
+					"aoColumns": [
 						{ "sWidth": "40%" },
 						{ "sWidth": "40%" },
 						{ "sWidth": "20%" }
@@ -254,7 +253,7 @@ ${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
 				    "bLengthChange": false,
 					"bInfo": false,
 					"bAutoWidth": false,
-					"aoColumns": [ 
+					"aoColumns": [
 						{ "sWidth": "30%" },
 						{ "sWidth": "70%" }
 					]
@@ -264,23 +263,23 @@ ${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
 				    "bLengthChange": false,
 					"bInfo": false,
 					"bAutoWidth": false,
-					"aoColumns": [ 
+					"aoColumns": [
 						{ "sWidth": "30%" },
 						{ "sWidth": "70%" }
 					]
 				});
-				
+
 				$("#metadataFilter").keydown(function(){
 					_metadataTable.fnFilter($(this).val());
 					_rawConfigurationTable.fnFilter($(this).val());
 				});
-				
+
 				$(".jobCountersTable").dataTable({
 					"bPaginate": false,
 				    "bLengthChange": false,
 					"bInfo": false,
 					"bAutoWidth": false,
-					"aoColumns": [ 
+					"aoColumns": [
 						{ "sWidth": "40%" },
 						{ "sWidth": "20%" },
 						{ "sWidth": "20%" },
