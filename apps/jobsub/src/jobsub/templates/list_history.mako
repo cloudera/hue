@@ -70,7 +70,7 @@ ${layout.menubar(section='history')}
         var oTable = $('#jobTable').dataTable( {
           'sPaginationType': 'bootstrap',
           "bLengthChange": false,
-          "sDom": "<'row'r>t<'row'<'span8'i><''p>>"
+          "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
 		  "aoColumns": [
 				null,
 				null,
