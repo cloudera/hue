@@ -189,7 +189,7 @@ def test_view_avro():
 
     # we should fail to do a bad thing if they specify compression when it's not set.
     response = c.get('/filebrowser/view/test-avro-filebrowser/test-view2.avro?compression=gzip')
-    assert_false(response.context.has_key('view'))
+    assert_true('Failed to decompress' in response.context['message'])
 
   finally:
     try:
@@ -222,7 +222,7 @@ def test_view_gz():
 
     # offset should do nothing
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view.gz?compression=gzip&offset=1')
-    assert_false(response.context.has_key('view'))
+    assert_true("We don't support" in response.context['message'])
 
     f = cluster.fs.open('/test-gz-filebrowser/test-view2.gz', "w")
     f.write("hello")
@@ -234,7 +234,7 @@ def test_view_gz():
 
     # we should fail to do a bad thing if they specify compression when it's not set.
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view2.gz?compression=gzip')
-    assert_false(response.context.has_key('view'))
+    assert_true("Failed to decompress" in response.context['message'])
 
   finally:
     try:
