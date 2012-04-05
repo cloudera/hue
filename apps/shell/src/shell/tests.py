@@ -128,15 +128,16 @@ def test_rest():
   assert "There is no Unix user account for you." in response.content
 
   response = client.get("/shell/create?keyName=%s" % (shell_types_available[0],), follow=True, **d)
-  assert '<span class="shell_id hidden">' in response.content
+  fragment = '<span id="shell_id" class="hidden">'
+  assert fragment in response.content
 
-  shell_id_start = response.content.index('<span class="shell_id hidden">')+len('<span class="shell_id hidden">')
-  shell_id_end = response.content.index('</span>')
+  shell_id_start = response.content.index(fragment) + len(fragment)
+  shell_id_end = response.content.index('</span>', shell_id_start)
   shell_id = response.content[shell_id_start:shell_id_end]
   assert re.match(r"^\s*\d+\s*$", shell_id)
 
   response = client.post("/shell/kill_shell", follow=True, data={constants.SHELL_ID: shell_id}, **d)
-  assert response.content.strip() == "Shell successfully killed"
+  assert 'Shell successfully marked for cleanup' in response.content
 
 def test_parse_shell_pairs():
   request = TestRequest()

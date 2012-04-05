@@ -109,7 +109,6 @@ from desktop.views import commonheader, commonfooter
 	</div>
   % endif
 
-
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
@@ -159,7 +158,7 @@ from desktop.views import commonheader, commonfooter
 								_out = _out.replace(/>/g, '&gt;');
 								_out = _out.replace(/</g, '&lt;');
 								_out = _out.replace(/\n/g, '<br />');
-								$("#shellContent").html($("#shellContent").html()+_out);
+								$("#shellContent").html($("#shellContent").html()+"<br/>"+_out);
 								if (_out.indexOf("Disconnected!")>-1){
 									window.setTimeout(function(){
 										$.ajax({
@@ -177,7 +176,7 @@ from desktop.views import commonheader, commonfooter
 										});
 									},500);
 								}
-								$("html").animate({ scrollTop: $(document).height() }, "fast");
+								$("body").animate({ scrollTop: $("#shellInput").offset().top }, "fast");
 								_shell.get(data[_shell.id].nextOffset);
 							}
 						}
@@ -231,6 +230,7 @@ from desktop.views import commonheader, commonfooter
 				}, 50);
 			});
 			$("#shellInput").keydown(function(e){
+				$(this).width($(document).width()-100-$(this).position().left);
 				if ((e.keyCode ? e.keyCode : e.which) == 13){
 					shell.send($(this).val());
 					$(this).val("");
