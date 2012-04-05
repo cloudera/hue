@@ -6,12 +6,12 @@
 # ===================================
 #
 # For complete documentation about the contents of this file, run
-# 	$ <hue_root>/build/env/bin/hue config_help
+#       $ <hue_root>/build/env/bin/hue config_help
 #
 # All .ini files under the current directory are treated equally.  Their
 # contents are merged to form the Hue configuration, which can
 # can be viewed on the Hue at
-# 	http://<hue_host>:<port>/dump_config
+#       http://<hue_host>:<port>/dump_config
 
 
 ###########################################################################
@@ -291,8 +291,8 @@
       help = "The command-line Flume client interface."
 
       [[[[ environment ]]]]
-	# You can specify environment variables for the Flume shell
-	# in this section.
+        # You can specify environment variables for the Flume shell
+        # in this section.
 
     # Define and configure a new shell type "pig"
     # ------------------------------------------------------------------------
@@ -302,12 +302,12 @@
       help = "The command-line interpreter for Pig"
 
       [[[[ environment ]]]]
-	# You can specify environment variables for the Pig shell
-	# in this section. Note that JAVA_HOME must be configured
-	# for the Pig shell to run.
+        # You can specify environment variables for the Pig shell
+        # in this section. Note that JAVA_HOME must be configured
+        # for the Pig shell to run.
 
-	[[[[[ JAVA_HOME ]]]]]
-	  value = "/usr/lib/jvm/java-6-sun"
+        [[[[[ JAVA_HOME ]]]]]
+          value = "/usr/lib/jvm/java-6-sun"
 
     # Define and configure a new shell type "hbase"
     # ------------------------------------------------------------------------
@@ -317,8 +317,15 @@
       help = "The command-line HBase client interface."
 
       [[[[ environment ]]]]
-	# You can configure environment variables for the HBase shell
-	# in this section.
+        # You can configure environment variables for the HBase shell
+        # in this section.
+
+    # Define and configure a new shell type "bash" for testing only
+    # ------------------------------------------------------------------------
+    [[[ bash ]]]
+      nice_name = "Bash (Test only!!!)"
+      command = "/bin/bash"
+      help = "A shell that does not depend on Hadoop components"
 
 
 ###########################################################################
