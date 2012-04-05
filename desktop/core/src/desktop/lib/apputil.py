@@ -21,14 +21,6 @@ import sys
 from django.conf import settings
 
 
-def has_hadoop():
-  """has_hadoop() -> bool   (Whether the Hadoop binary is installed)"""
-  # Do lazy import, since desktop.lib shouldn't depend on an sdk library (i.e. hadoop.conf)
-  # in general.
-  import hadoop.conf
-  return os.path.isfile(hadoop.conf.HADOOP_BIN.get())
-
-
 def get_current_app(frame=None):
   """
   Return the name of the app from INSTALLED_APPS that is most recently

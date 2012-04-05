@@ -407,9 +407,6 @@ def config_validator():
     res.extend(validate_path(KERBEROS.KINIT_PATH, is_dir=False))
     res.extend(validate_path(KERBEROS.CCACHE_PATH, is_dir=False))
 
-  for broken_app in appmanager.BROKEN_APPS:
-    res.append(('Working Hadoop', 'App %s requires Hadoop but Hadoop is not present.' % (broken_app,)))
-
   if LDAP.NT_DOMAIN.get() is not None or \
       LDAP.LDAP_USERNAME_PATTERN.get() is not None:
     if LDAP.LDAP_URL.get() is None:

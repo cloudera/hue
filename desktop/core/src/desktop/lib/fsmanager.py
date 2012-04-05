@@ -16,9 +16,6 @@
 # limitations under the License.
 
 from hadoop.cluster import get_all_hdfs
-from desktop import conf
-from hadoop.fs import LocalSubFileSystem
-from desktop.lib.apputil import has_hadoop
 
 _filesystems = None
 
@@ -27,20 +24,8 @@ def _init_filesystems():
   global _filesystems
   if _filesystems is not None:
     return
-  _filesystems = {}
+  _filesystems = get_all_hdfs()
 
-  if has_hadoop():
-    # Load HDFSes
-    _filesystems.update(get_all_hdfs())
-
-  # Load local
-  for identifier in conf.LOCAL_FILESYSTEMS.keys():
-    local_fs = LocalSubFileSystem(
-        conf.LOCAL_FILESYSTEMS[identifier].PATH.get())
-    if identifier in _filesystems: 
-      raise Exception(("Filesystem '%s' configured twice. First is " +
-        "%s, second is local FS %s") % (identifier, _filesystems[identifier], local_fs))
-    _filesystems[identifier] = local_fs
 
 def get_filesystem(name):
   """Return the filesystem with the given name. If the filesystem is not defined,

@@ -50,19 +50,6 @@ def entry():
   parser.parse_args(argv)
   if len(argv) > 1:
     prof_id = subcommand = argv[1]
-
-    # See if this command belongs to a disabled app
-    commands = { }
-    skipped_apps = sum([ app.django_apps for app in appmanager.BROKEN_APPS ], [])
-    for app_name in skipped_apps:
-      try:
-        path = find_management_module(app_name)
-        if subcommand in find_commands(path):
-          LOG.info("NOT starting the command '%s' from the disabled application '%s'. Exit." %
-                   (subcommand, app_name))
-          sys.exit(0)
-      except ImportError:
-        pass # No management module - ignore this app
   else:
     prof_id = str(os.getpid())
 

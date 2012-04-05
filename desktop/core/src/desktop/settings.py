@@ -189,8 +189,6 @@ _app_conf_modules.append(dict(module=desktop.conf, config_key=None))
 conf.initialize(_lib_conf_modules, _config_dir)
 conf.initialize(_app_conf_modules, _config_dir)
 
-appmanager.determine_broken_apps()
-
 # Now that we've loaded the desktop conf, set the django DEBUG mode based on the conf.
 DEBUG = desktop.conf.DJANGO_DEBUG_MODE.get()
 TEMPLATE_DEBUG = DEBUG

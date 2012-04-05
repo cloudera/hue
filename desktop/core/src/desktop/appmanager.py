@@ -23,7 +23,6 @@ import traceback
 import pkg_resources
 
 import desktop
-import desktop.lib.apputil
 from desktop.lib.paths import get_desktop_root
 
 # Directories where apps and libraries are to be found
@@ -37,8 +36,7 @@ LOG = logging.getLogger(__name__)
 # Global variables set after calling load_apps()
 ######################################################################
 
-# List of DesktopModuleInfo that have been loaded and skipped
-BROKEN_APPS = None
+# List of DesktopModuleInfo that have been loaded
 DESKTOP_LIBS = None
 DESKTOP_APPS = None
 DESKTOP_MODULES = [ ]           # Sum of APPS and LIBS
@@ -222,21 +220,6 @@ def load_apps():
   LOG.debug("Loaded Desktop Applications: " + ", ".join(a.name for a in DESKTOP_APPS))
   DESKTOP_MODULES += DESKTOP_APPS
 
-def determine_broken_apps():
-  global DESKTOP_APPS
-  global BROKEN_APPS
-  BROKEN_APPS = []
-
-  hadoop_ok = desktop.lib.apputil.has_hadoop()
-  # If there is no hadoop installation, note which apps were loaded which
-  # require Hadoop.
-  if not hadoop_ok:
-    for dmi in DESKTOP_APPS:
-      app_settings = dmi.settings
-      # <app_module>.settings.REQUIRES_HADOOP is True by default
-      if app_settings is None or getattr(app_settings, 'REQUIRES_HADOOP', True):
-        LOG.warn('App %s requires Hadoop but Hadoop not present.' % (dmi,))
-        BROKEN_APPS.append(dmi)
 
 def get_desktop_module(name):
   """
