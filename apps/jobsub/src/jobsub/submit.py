@@ -81,6 +81,7 @@ class Submission(object):
     wf_xml = self._generate_workflow_xml(fs_defaultfs)
     self._do_as(self._username, self._copy_files, wf_dir, wf_xml)
     LOG.info("Prepared deployment directory at '%s' for %s" % (wf_dir, self))
+    LOG.info("Submitting design id %s to %s as `%s'" % (self._design_obj.id, jobtracker, self._username))
 
     try:
       prev = get_oozie().setuser(self._username)

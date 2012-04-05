@@ -89,7 +89,7 @@ class OozieApi(object):
   def _get_params(self):
     if self.security_enabled:
       return { 'doAs': self.user }
-    return { }
+    return { 'user.name': DEFAULT_USER, 'doAs': self.user }
 
 
   VALID_JOB_FILTERS = ('name', 'user', 'group', 'status')
