@@ -274,7 +274,7 @@ ${layout.menubar(section='query')}
 			% else:
 				${query()}
 			% endif
-
+			<br/>
 		</div>
 	</div>
 </div>
@@ -376,6 +376,7 @@ ${layout.menubar(section='query')}
 
 		function checkAndSubmit(){
 			// TODO: client side validation
+			$(".query").val($("#queryField").val());
 			$("#advancedSettingsForm").submit();
 		}
 
