@@ -17,7 +17,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>jHue Login</title>
+	<title>Hue Login</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="">
 	<meta name="author" content="">
@@ -42,7 +42,7 @@
 	<div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container-fluid">
-				<a class="brand" href="#">jHue</a>
+				<a class="brand" href="#">Hue</a>
 			</div>
 		</div>
 	</div>
