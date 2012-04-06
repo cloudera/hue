@@ -87,7 +87,7 @@ class Submission(object):
       prev = get_oozie().setuser(self._username)
       self._job_id = get_oozie().submit_workflow(
             self._fs.get_hdfs_path(wf_dir),
-            properties={ 'jobTracker': jobtracker })
+            properties=self._get_properties(jobtracker))
       LOG.info("Submitted: %s" % (self,))
 
       # Now we need to run it
@@ -97,7 +97,15 @@ class Submission(object):
       get_oozie().setuser(prev)
 
     return self.job_id
-    
+
+
+  def _get_properties(self, jobtracker_addr):
+    res = { 'jobTracker': jobtracker_addr }
+    if self._design_obj.get_root_action().action_type == \
+          models.OozieStreamingAction.ACTION_TYPE:
+      res['oozie.use.system.libpath'] = 'true'
+    return res
+
 
   def _copy_files(self, wf_dir, wf_xml):
     """
