@@ -66,7 +66,7 @@ $(BLD_DIR_DOC)/sdk/sdk.html: $(shell find sdk -type f)
 	@# This is somewhat heinous, but works fine and avoids the need
 	@# to install markdown on developer systems, or depend on building
 	@# out the virtual env to build sdk docs
-	@PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown \
+	@PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown:$(DESKTOP_DIR)/core/ext-py/elementtree \
 	  $(DESKTOP_DIR)/core/ext-py/markdown/bin/markdown \
 	  sdk/sdk.md -x toc > $@
 	@echo "--- Generated $@"
