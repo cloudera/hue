@@ -39,7 +39,7 @@ build_hadoop() {
   export HADOOP_BIN=$HADOOP_HDFS_HOME/bin/hadoop
 
   mkdir -p $HADOOP_DIR
-  rm -rf $HADOOP_HOME
+  rm -rf $HADOOP_HDFS_HOME
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
 }
