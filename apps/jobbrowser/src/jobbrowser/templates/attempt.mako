@@ -20,39 +20,36 @@
 
 ${commonheader("Task Attempt: " + attempt.attemptId + ":: Job Browser", "jobbrowser")}
 <div class="container-fluid">
-	<h1>Task Attempt: ${attempt.attemptId} :: Job Browser</h1>
-    <div id="job_browser_job" class="view jframe_padded">
-      <div class="jtv_meta_top clearfix">
-        <dl>
-          <dt>Attempt ID</dt>
-          <dd>${attempt.attemptId_short}</dd>
-          <dt>Task</dt>
-          <td><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" class="frame_tip jt_view" title="View this task">${task.taskId_short}</a></td>
-        </dl>
-        <dl>
-          <dt>Job</dt>
-          <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" class="frame_tip jt_view" title="View this job">${joblnk.jobId_short}</a></td>
-        </dl>
-        <dl>
-          <dt>Status</dt>
-          <dd>${attempt.state.lower()}</dd>
-        </dl>
+    <h1>Task Attempt: ${attempt.attemptId} :: Job Browser</h1>
+    <div class="row-fluid">
+      <div class="span2">
+        <div class="well sidebar-nav">
+          <h6>Attempt ID</h6>
+          ${attempt.attemptId_short}
+
+          <h6>Task</h6>
+          <a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}"
+                class="frame_tip jt_view" title="View this task">${task.taskId_short}</a>
+
+          <h6>Job</h6>
+          <a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}"
+                class="frame_tip jt_view" title="View this job">${joblnk.jobId_short}</a>
+
+          <h6>Status</h6>
+          ${attempt.state.lower()}
+        </div>
       </div>
 
-      <div data-filters="Tabs">
-        <ul class="tabs jtv_tabs jframe-right clearfix">
-          <li><span>Metadata</span></li>
-          <li><span>Counters</span></li>
-          <li><span>Logs</span></li>
+      <div class="span10">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#metadata" data-toggle="tab">Metadata</a></li>
+          <li><a href="#counters" data-toggle="tab">Counters</a></li>
+          <li><a href="#logs" data-toggle="tab">Logs</a></li>
         </ul>
 
-        <ul class="tab_sections jframe-clear">
-          <li>
-            <table data-filters="HtmlTable" class="jt_meta_table sortable" cellpadding="0" cellspacing="0">
-              <thead>
-                <th>Name</th>
-                <th>Value</th>
-              </thead>
+        <div class="tab-content">
+          <div class="tab-pane active" id="metadata">
+            <table class="table">
               <tbody>
                 <tr>
                   <td>Attempt id</td>
@@ -100,51 +97,52 @@ ${commonheader("Task Attempt: " + attempt.attemptId + ":: Job Browser", "jobbrow
                 </tr>
               </tbody>
             </table>
+          </div>
 
-          </li>
-          <li>
+          <div class="tab-pane" id="counters">
             ${comps.task_counters(task.counters)}
-          </li>
+          </div>
 
-          <li class="jt-logs">
+          <div class="tab-pane jt-logs" id="logs">
             <%
               log_diagnostic = logs[0]
               log_stdout = logs[1]
               log_stderr = logs[2]
               log_syslog = logs[3]
             %>
-<%def name="format_log(raw)">
-## have to remove any indentation here or it breaks inside the pre tags
-% for line in raw.split('\n'):
-${ line | h,trim }
-% endfor
-</%def>
+  <%def name="format_log(raw)">
+  ## have to remove any indentation here or it breaks inside the pre tags
+  % for line in raw.split('\n'):
+  ${ line | h,trim }
+  % endfor
+  </%def>
             <h2>task diagnostic log</h2>
             % if not log_diagnostic:
-<pre>-- empty --</pre>
+  <pre>-- empty --</pre>
             % else:
-<pre>${format_log(log_diagnostic)}</pre>
+  <pre>${format_log(log_diagnostic)}</pre>
             % endif
             <h2>stdout</h2>
             % if not log_stdout:
-<pre>-- empty --</pre>
+  <pre>-- empty --</pre>
             % else:
-<pre>${format_log(log_stdout)}</pre>
+  <pre>${format_log(log_stdout)}</pre>
             % endif
             <h2>stderr</h2>
             % if not log_stderr:
-<pre>-- empty --</pre>
+  <pre>-- empty --</pre>
             % else:
-<pre>${format_log(log_stderr)}</pre>
+  <pre>${format_log(log_stderr)}</pre>
             % endif
             <h2>syslog</h2>
             % if not log_syslog:
-<pre>-- empty --</pre>
+  <pre>-- empty --</pre>
             % else:
-<pre>${format_log(log_syslog)}</pre>
+  <pre>${format_log(log_syslog)}</pre>
             % endif
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
+    </div>
 </div>
 ${commonfooter()}

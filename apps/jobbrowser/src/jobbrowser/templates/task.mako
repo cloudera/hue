@@ -82,7 +82,7 @@ ${commonheader("Job Task: " + task.taskId + "- Job Browser", "jobbrowser")}
 		                   <td>${attempt.sortFinishTimeFormatted}</td>
 		                   <td>${attempt.mapFinishTimeFormatted}</td>
 		                   <td><a class="frame_tip jtask_view jt_slide_right view_attempt" title="View this attempt"
-		                          href="${ url('jobbrowser.views.single_task_attempt', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }"></a></td>
+		                          href="${ url('jobbrowser.views.single_task_attempt', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">View</a></td>
 		                 </tr>
 		                % endfor
 		              </tbody>
