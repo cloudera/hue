@@ -16,7 +16,7 @@
 <%!
 from desktop.views import commonheader, commonfooter
 %>
-${commonheader("jHue Help", "help", "100px")}
+${commonheader("Hue Help", "help", "100px")}
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">
 		<ul class="nav nav-pills">

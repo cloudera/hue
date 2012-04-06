@@ -16,7 +16,7 @@
 <%!
 from desktop.views import commonheader, commonfooter
 %>
-${commonheader("About jHue", "about", "100px")}
+${commonheader("About Hue", "about", "100px")}
 
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">
