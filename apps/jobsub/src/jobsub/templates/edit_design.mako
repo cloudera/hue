@@ -38,20 +38,25 @@ ${layout.menubar(section='designs')}
 
 <%def name="render_field(field)">
   %if not field.is_hidden:
-    <div class="clearfix">
-      <label>${field.label | n}</label>
-      <div class="input">
-		<input name="${field.html_name | n}" class="input input-xlarge" value="${extract_field_data(field) or ''}" />
+    <% group_class = len(field.errors) and "error" or "" %>
+    <div class="control-group ${group_class}">
+      <label class="control-label">${field.label | n}</label>
+      <div class="controls">
+        <input name="${field.html_name | n}"
+            class="span5 ${field.field.widget.attrs.get('class', '')}"
+            value="${extract_field_data(field) or ''}" />
+        % if len(field.errors):
+          <span class="help-inline">${unicode(field.errors) | n}</span>
+        % endif
       </div>
-      % if len(field.errors):
-        ${unicode(field.errors) | n}
-      % endif
     </div>
   %endif
 </%def>
 
 <div class="container-fluid">
-  <form id="workflowForm" action="${urllib.quote(action)}" method="POST">
+  <h1>Job Design (${_(action_type)} type)</h1>
+
+  <form class="form-horizontal" id="workflowForm" action="${urllib.quote(action)}" method="POST">
     <fieldset>
 
         % for field in form.wf:
@@ -59,20 +64,22 @@ ${layout.menubar(section='designs')}
         % endfor
 
         <hr/>
-        <p class="alert alert-info">
-            You can parameterize the values, using <code>$myVar</code> or
-            <code>${"${"}myVar}</code>. When the design is submitted, you will be
-            prompted for the actual value of <code>myVar</code>.
-        </p>
+        <div class="row control-group">
+          <p class="span6 alert alert-info">
+              You can parameterize the values, using <code>$myVar</code> or
+              <code>${"${"}myVar}</code>. When the design is submitted, you will be
+              prompted for the actual value of <code>myVar</code>.
+          </p>
+        </div>
         % for field in form.action:
           ${render_field(field)}
         % endfor
 
-        <div class="clearfix">
-            <label>Job Properties</label>
-            <div class="input">
+        <div class="control-group">
+            <label class="control-label">Job Properties</label>
+            <div class="controls">
                 ## Data bind for job properties
-                <table class="table table-condensed" data-bind="visible: properties().length > 0">
+                <table class="table-condensed" data-bind="visible: properties().length > 0">
                   <thead>
                     <tr>
                       <th>Property name</th>
@@ -82,68 +89,68 @@ ${layout.menubar(section='designs')}
                   </thead>
                   <tbody data-bind="foreach: properties">
                     <tr>
-                      <td><input class="input input-small required propKey" data-bind="value: name, uniqueName: false" /></td>
-                      <td><input class="input input-small required" data-bind="value: value, uniqueName: false" /></td>
-                      <td><a class="btn" href="#" data-bind="click: $root.removeProp">Delete</a></td>
+                      <td><input class="input-xlarge required propKey" data-bind="value: name, uniqueName: false" /></td>
+                      <td><input class="input-xlarge span5 required" data-bind="value: value, uniqueName: false" /></td>
+                      <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">Delete</a></td>
                     </tr>
                   </tbody>
                 </table>
                 % if len(form.action["job_properties"].errors):
-                  ${unicode(form.action["job_properties"].errors) | n}
+                  <div class="row">
+                    <div class="span6 alert alert-error">
+                      ${unicode(form.action["job_properties"].errors) | n}
+                    </div>
+                  </div>
                 % endif
 
                 <button class="btn" data-bind="click: addProp">Add Property</button>
             </div>
         </div>
 
-        <div class="clearfix">
-            <label>Files</label>
-            <div class="input">
+        <div class="control-group">
+            <label class="control-label">Files</label>
+            <div class="controls">
                 ## Data bind for files (distributed cache)
-                <table class="table table-condensed" data-bind="visible: files().length > 0">
-                  <thead>
-                    <tr>
-                      <th>Files</th>
-                      <th />
-                    </tr>
-                  </thead>
+                <table class="table-condensed" data-bind="visible: files().length > 0">
                   <tbody data-bind="foreach: files">
                     <tr>
-                      <td><input class="input input-xlarge required"
+                      <td><input class="input span6 required"
                                 data-bind="fileChooser: $data, value: name, uniqueName: false" /></td>
                       <td><a class="btn" href="#" data-bind="click: $root.removeFile">Delete</a></td>
                     </tr>
                   </tbody>
                 </table>
                 % if len(form.action["files"].errors):
-                  ${unicode(form.action["files"].errors) | n}
+                  <div class="row">
+                    <div class="span6 alert alert-error">
+                      ${unicode(form.action["files"].errors) | n}
+                    </div>
+                  </div>
                 % endif
 
                 <button class="btn" data-bind="click: addFile">Add File</button>
             </div>
         </div>
 
-        <div class="clearfix">
-            <label>Archives</label>
-            <div class="input">
+        <div class="control-group">
+            <label class="control-label">Archives</label>
+            <div class="controls">
                 ## Data bind for archives (distributed cache)
-                <table class="table table-condensed" data-bind="visible: archives().length > 0">
-                  <thead>
-                    <tr>
-                      <th>Archives</th>
-                      <th />
-                    </tr>
-                  </thead>
+                <table class="table-condensed" data-bind="visible: archives().length > 0">
                   <tbody data-bind="foreach: archives">
                     <tr>
-                      <td><input class="input input-xlarge required"
+                      <td><input class="input span6 required"
                                 data-bind="fileChooser: $data, value: name, uniqueName: false" /></td>
                       <td><a class="btn" href="#" data-bind="click: $root.removeArchive">Delete</a></td>
                     </tr>
                   </tbody>
                 </table>
                 % if len(form.action["archives"].errors):
-                  ${unicode(form.action["archives"].errors) | n}
+                  <div class="row">
+                    <div class="span6 alert alert-error">
+                      ${unicode(form.action["archives"].errors) | n}
+                    </div>
+                  </div>
                 % endif
 
                 <button class="btn" data-bind="click: addArchive">Add Archive</button>
@@ -152,15 +159,15 @@ ${layout.menubar(section='designs')}
     </fieldset>
 
     ## Submit
-    <div class="actions">
-      <button data-bind="click: submit" class="btn primary">Save</button>
+    <div class="form-actions">
+      <button data-bind="click: submit" class="btn btn-large btn-primary">Save</button>
     </div>
   </form>
 
 </div>
 
 <div id="fileChooserModal" class="smallModal">
-	<a href="#" class="close" data-dismiss="modal">&times;</a>
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
 </div>
 
 <div id="fileChooserModalBackdrop" class="modal-backdrop hide"></div>
@@ -178,34 +185,34 @@ ${layout.menubar(section='designs')}
     <div class="modal-footer">
     </div>
 </div>
-</div>
+
 <style>
 
-	.smallModal {
-		display:none;
-	    background-clip: padding-box;
-	    background-color: #FFFFFF;
-	    border: 1px solid rgba(0, 0, 0, 0.3);
-	    border-radius: 6px 6px 6px 6px;
-	    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-	    width:600px;
-		position:fixed;
-		background-color:#FFFFFF;
-		top:10px;
-		left: 50%;
-		margin: 0 0 0 -300px;
-	    z-index: 1050;
-	}
+    .smallModal {
+        display:none;
+        background-clip: padding-box;
+        background-color: #FFFFFF;
+        border: 1px solid rgba(0, 0, 0, 0.3);
+        border-radius: 6px 6px 6px 6px;
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+        width:600px;
+        position:fixed;
+        background-color:#FFFFFF;
+        top:10px;
+        left: 50%;
+        margin: 0 0 0 -300px;
+        z-index: 1050;
+    }
 
     #fileChooserModal {
-		padding:14px;
+        padding:14px;
         height:370px;
     }
 
-	#fileChooserModal ul {
-		height:330px;
-		overflow-y:auto;
-	}
+    #fileChooserModal ul {
+        height:330px;
+        overflow-y:auto;
+    }
 </style>
 
 
@@ -313,12 +320,12 @@ ${layout.menubar(section='designs')}
                             var binding = valueAccessor();
                             binding["name"] = filePath;
                             $("#fileChooserModal").hide();
-							$("#fileChooserModalBackdrop").hide();
+                            $("#fileChooserModalBackdrop").hide();
                             $(element).val(filePath);
                         },
-						createFolder: false
+                        createFolder: false
                     });
-					$("#fileChooserModalBackdrop").show();
+                    $("#fileChooserModalBackdrop").show();
                     $("#fileChooserModal").slideDown();
                 });
 
@@ -334,19 +341,19 @@ ${layout.menubar(section='designs')}
                 onFileChoose: function(filePath) {
                     $(self).val(filePath);
                     $("#fileChooserModal").hide();
-					$("#fileChooserModalBackdrop").hide();
+                    $("#fileChooserModalBackdrop").hide();
                 },
-				createFolder: false
+                createFolder: false
             });
             $("#fileChooserModal").slideDown();
         });
 
         $(".propKey").each(addAutoComplete);
 
-		$("#fileChooserModalBackdrop").click(function(){
-			$("#fileChooserModal").hide();
-			$(this).hide();
-		});
+        $("#fileChooserModalBackdrop").click(function(){
+            $("#fileChooserModal").hide();
+            $(this).hide();
+        });
 
     });
 </script>
