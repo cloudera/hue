@@ -266,7 +266,7 @@ ${layout.menubar(section='query')}
 					% if error_message or log:
 						<div class="tab-pane" id="errorPane">
 						% if log:
-							<pre>${log}</pre>
+							<pre>${log | h}</pre>
 						% endif
 						</div>
 					% endif

@@ -32,10 +32,10 @@ ${layout.menubar(section='saved queries')}
     
 	<div class="tab-content">
 		<div class="active tab-pane" id="explanation">
-			<pre>${explanation}</pre>
+			<pre>${explanation | h}</pre>
 		</div>
 		<div class="tab-pane" id="query">
-			<pre>${query}</pre>
+			<pre>${query | h}</pre>
 		</div>
 	</div>
 	

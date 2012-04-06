@@ -21,12 +21,6 @@ import re
 <%namespace name="layout" file="about_layout.mako" />
 ${commonheader("About", "about", "100px")}
 ${layout.menubar(section='log_view')}
-	<%
-		def remove_html_tags(data):
-		    p = re.compile(r'<.*?>')
-		    return p.sub('', data)
-	%>
-
 	<div class="container-fluid">
 		<h1>Log entries (most recent first)</h1>
 
@@ -35,7 +29,7 @@ ${layout.menubar(section='log_view')}
 		<% log.reverse() %>
 		<pre>
 		% for l in log:
-${remove_html_tags(l)}
+${l | h}
 		% endfor
 		</pre>
 

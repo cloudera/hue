@@ -97,7 +97,7 @@ ${layout.menubar(section='query')}
 					% if error:
 		            <div class="alert alert-error">
 		              <h3>Error!</h3>
-		              <pre>${error_message}</pre>
+		              <pre>${error_message | h}</pre>
 		            </div>
           			% else:
 		            % if expected_first_row != start_row:
@@ -139,11 +139,11 @@ ${layout.menubar(section='query')}
 				</div>
 				<div class="tab-pane" id="query">
 
-						<pre>${query.query}</pre>
+						<pre>${query.query | h}</pre>
 
 				</div>
 				<div class="tab-pane" id="log">
-					<pre>${log}</pre>
+					<pre>${log | h}</pre>
 				</div>
 			</div>
 

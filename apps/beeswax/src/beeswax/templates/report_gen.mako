@@ -114,7 +114,7 @@ Error: <b>${error_message}</b>
 <br/>
 <a name="log"><h3>Server Log</h3></a>
 <pre>
-${log}
+${log | h}
 </pre>
 % endif
 </div>

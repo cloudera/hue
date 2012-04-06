@@ -60,10 +60,10 @@ ${layout.menubar(section='query')}
 
 		   	<div class="tab-content">
 				<div class="active tab-pane" id="log">
-					<pre>${log}</pre>
+					<pre>${log | h}</pre>
 				</div>
 				<div class="tab-pane" id="query">
-					<pre>${query.query}</pre>
+					<pre>${query.query | h}</pre>
 				</div>
 			</div>
 		</div>
