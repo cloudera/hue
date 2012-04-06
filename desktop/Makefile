@@ -54,10 +54,10 @@ default:: hue syncdb
 CONF_INI := $(patsubst $(CONF_DIR)/%.ini.tmpl,$(CONF_DIR)/%.ini,\
               $(wildcard $(CONF_DIR)/*.ini.tmpl))
 
-# Template ini to rewrite
-$(CONF_DIR)/%.ini:: $(CONF_DIR)/%.ini.tmpl
-	@echo "--- Rewriting $@"
-	sed -e 's:$$HADOOP_HOME:$(HADOOP_HOME):' $< > $@
+# Template ini to generate (only if it doesn't exist)
+$(CONF_DIR)/%.ini:: | $(CONF_DIR)/%.ini.tmpl
+	echo "--- Generating $@"
+	sed -e 's:$$HADOOP_HOME:$(HADOOP_HOME):' $| > $@
 
 # Pattern rule for HUE config file
 .PHONY: conf
