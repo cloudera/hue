@@ -117,11 +117,10 @@ ${layout.menubar(section='history')}
                 <td>
                   ## Include a modal for action configuration
                   ${action.name}
-                  <a href="javascript:void(0)"><img src="/static/art/led-icons/cog.png"
-                      alt="Show Configuration"
-                      data-controls-modal="actionConfigModal${i}"
-                      data-backdrop="static" data-keyboard="true"/></a>
-                  ${configModal("actionConfigModal" + str(i), "Action Configuration", action.conf_dict)}
+                  <% modal_id = "actionConfigModal" + str(i) %>
+                  <a href="#${modal_id}" data-toggle="modal"><img src="/static/art/led-icons/cog.png"
+                      alt="Show Configuration"></a>
+                  ${configModal(modal_id, "Action Configuration", action.conf_dict)}
                 </td>
                 <td>${action.type}</td>
                 <td>${action.status}</td>
@@ -150,10 +149,8 @@ ${layout.menubar(section='history')}
                 <td>Application Name</td>
                 <td>
                   ${workflow.appName}
-                  <a href="javascript:void(0)"><img src="/static/art/led-icons/cog.png"
-                      alt="Show Configuration"
-                      data-controls-modal="appConfigModal"
-                      data-backdrop="static" data-keyboard="true"/></a>
+                  <a href="#appConfigModal" data-toggle="modal"><img src="/static/art/led-icons/cog.png"
+                      alt="Show Configuration"/></a>
                 </td>
               </tr>
               <tr>

@@ -51,14 +51,14 @@ ${layout.menubar(section='history')}
         </thead>
         <tbody>
             %for record in history:
-                <% wf = record.design %>
+                <% design = record.design %>
                 <tr>
                     <td><a href="${url('jobsub.views.oozie_job', jobid=record.job_id)}">${record.job_id}</a></td>
                     <td>${record.owner.username}</td>
-                    <td>${wf.name}</td>
-                    <td>${wf.root_action.action_type}</td>
-                    <td>${wf.description}</td>
-                    <td>${date(design.submission_date)} ${time(design.submission_date).replace("p.m.","PM").replace("a.m.","AM")}</td>
+                    <td>${design.name}</td>
+                    <td>${design.root_action.action_type}</td>
+                    <td>${design.description}</td>
+                    <td>${date(record.submission_date)} ${time(record.submission_date).replace("p.m.","PM").replace("a.m.","AM")}</td>
                 </tr>
             %endfor
         </tbody>
