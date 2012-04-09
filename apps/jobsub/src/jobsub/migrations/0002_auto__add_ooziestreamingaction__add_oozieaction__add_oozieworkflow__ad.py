@@ -18,6 +18,11 @@
 
 import datetime
 import logging
+try:
+  import json
+except ImportError:
+  import simplejson as json
+
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
