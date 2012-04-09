@@ -119,6 +119,11 @@ class DesktopModuleInfo(object):
     else:
         self.icon_path = ""
 
+    if hasattr(self.settings, "MENU_INDEX"):
+        self.menu_index = self.settings.MENU_INDEX
+    else:
+        self.menu_index = 999
+
     if self.config_key is not None:
       self.display_name = self.config_key
 

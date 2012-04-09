@@ -22,3 +22,4 @@ DJANGO_APPS = ['jobbrowser']
 NICE_NAME = "Job Browser"
 REQUIRES_HADOOP = True
 ICON = "/jobbrowser/static/art/icon_large.png"
+MENU_INDEX = 30
