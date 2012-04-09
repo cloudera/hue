@@ -165,8 +165,9 @@ class Submission(object):
       return path
     except IOError, ex:
       if ex.errno != errno.ENOENT:
-        LOG.error("Error accessing workflow directory: %s" % (path,))
-        raise ex
+        msg = "Error accessing workflow directory '%s': %s" % (path, ex)
+        LOG.exception(msg)
+        raise IOError(ex.errno, msg)
       self._create_deployment_dir(path)
       return path
 
@@ -175,7 +176,9 @@ class Submission(object):
     # Make the REMOTE_DATA_DIR, and have it owned by hue
     data_repo = conf.REMOTE_DATA_DIR.get()
     if not self._fs.exists(data_repo):
-      self._do_as(self._fs.DEFAULT_USER, self._fs.mkdir, data_repo, 01777)
+      # Parent directories should be 0755. But the data dir should be 01777.
+      self._do_as(self._fs.DEFAULT_USER, self._fs.mkdir, data_repo, 0755)
+      self._do_as(self._fs.DEFAULT_USER, self._fs.chmod, data_repo, 01777)
 
     # The actual deployment dir should be 0711 owned by the user
     self._do_as(self._username, self._fs.mkdir, path, 0711)
