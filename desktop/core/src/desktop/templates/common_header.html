@@ -75,14 +75,9 @@ limitations under the License.
 				<a class="brand" href="#">Hue</a>
 				<div class="nav-collapse">
 					<ul class="nav">
-						<li {% is_selected section "beeswax" %}><a href="/beeswax/">Beeswax</a></li>
-						<li {% is_selected section "filebrowser" %}><a href="/filebrowser/">File Browser</a></li>
-						<li {% is_selected section "jobsub" %}><a href="/jobsub/">Job Designer</a></li>
-						<li {% is_selected section "jobbrowser" %}><a href="/jobbrowser/jobs/">Job Browser</a></li>
-						<li {% is_selected section "useradmin" %}><a href="/useradmin/">User Admin</a></li>
-						<li {% is_selected section "shell" %}><a href="/shell/">Shell</a></li>
-						<li {% is_selected section "help" %}><a href="/help/">Help</a></li>
-						<li {% is_selected section "about" %}><a href="/about/">About</a></li>
+                        {% for app in apps %}
+                        <li {% is_selected section app.display_name %}><a href="/{{app.display_name}}">{{app.nice_name}}</a></li>
+                        {% endfor %}
 						<li class="divider-vertical"></li>
 						<li id="checkConfig"></li>
 					</ul>
