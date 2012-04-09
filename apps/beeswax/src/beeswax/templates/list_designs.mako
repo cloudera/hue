@@ -83,7 +83,7 @@ ${layout.menubar(section='saved queries')}
 	             <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
 
 	        % endif
-				<li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query.">Clone</a></li>
+				<li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query." class="contextItem">Clone</a></li>
 			</ul>
         </td>
       </tr>
