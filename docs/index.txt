@@ -5,15 +5,12 @@ Installation
 ------------
 The link:manual.html[manual] has instructions to install Hue.
 
-SDK
----
-We encourage you to build an application within the Hue
-environment.  See the link:sdk/sdk.html[SDK Documentation] to get started.
 
 Release Notes
 -------------
 Note that prior to version 0.9, Hue was "Cloudera Desktop".
 
+* Apr 10, 2012 --- link:release-notes/release-notes-2.0.0-beta.html[Version 2.0.0-beta]
 * Feb 21, 2011 --- link:release-notes/release-notes-1.2.0.html[Version 1.2.0]
 * Oct 11, 2010 --- link:release-notes/release-notes-1.1.0.html[Version 1.1.0]
 * Aug 20, 2010 --- link:release-notes/release-notes-1.0.1.html[Version 1.0.1]
