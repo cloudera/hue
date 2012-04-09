@@ -114,6 +114,11 @@ class DesktopModuleInfo(object):
     else:
       self.nice_name = self.name
 
+    if hasattr(self.settings, "ICON"):
+        self.icon_path = self.settings.ICON
+    else:
+        self.icon_path = ""
+
     if self.config_key is not None:
       self.display_name = self.config_key
 
