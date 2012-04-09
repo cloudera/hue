@@ -192,6 +192,24 @@ logs:
     Thrift server listening on 0.0.0.0:9290
 
 
+Configure Oozie
+^^^^^^^^^^^^^^^
+
+Hue submits MapReduce jobs to Oozie as the logged in user. You need to
+configure Oozie to accept the `hue` user to be a proxyuser. Specify this in
+your `oozie-site.xml` (even in a non-secure cluster), and restart Oozie:
+
+    <property>
+        <name>oozie.service.ProxyUserService.proxyuser.hue.hosts</name>
+        <value>*</value>
+    </property>
+    <property>
+        <name>oozie.service.ProxyUserService.proxyuser.hue.groups</name>
+        <value>*</value>
+    </property>
+
+
+
 Further Hadoop Configuration and Caveats
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
