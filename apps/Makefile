@@ -40,10 +40,6 @@ APPS := about \
         shell \
 	useradmin
 
-# <<<< DEV ONLY
-APPS += hello
-# END DEV ONLY >>>>
-
 ################################################
 # Install all applications into the Desktop environment
 ################################################
