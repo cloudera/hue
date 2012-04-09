@@ -44,7 +44,7 @@ class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     remote_fs = cluster.get_hdfs()
     if hasattr(remote_fs, "setuser"):
-      remote_fs.setuser(remote_fs.superuser)
+      remote_fs.setuser(remote_fs.DEFAULT_USER)
     LOG.info("Using remote fs: %s" % str(remote_fs))
 
     # Copy over examples/
