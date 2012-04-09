@@ -22,3 +22,5 @@ PERMISSION_ACTIONS = (
   ("launch_flume", "Launch the Flume Shell"),
   ("launch_hbase", "Launch the HBase Shell"),
 )
+
+ICON = "/shell/static/art/shell.png"

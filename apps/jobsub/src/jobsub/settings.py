@@ -20,3 +20,5 @@ REQUIRES_HADOOP = True
 MIDDLEWARE_CLASSES=[
   "jobsub.middleware.SubmissionErrorRecastMiddleware"
 ]
+
+ICON = "/jobsub/static/art/icon.png"
