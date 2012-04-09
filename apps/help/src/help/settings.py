@@ -17,3 +17,4 @@ DJANGO_APPS = ['help']
 NICE_NAME = "Help"
 REQUIRES_HADOOP = False
 ICON = "/help/static/art/help.png"
+MENU_INDEX = 90

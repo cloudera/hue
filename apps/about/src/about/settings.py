@@ -16,3 +16,4 @@
 DJANGO_APPS = [ "about" ]
 NICE_NAME = "About"
 REQUIRES_HADOOP = False
+MENU_INDEX = 80

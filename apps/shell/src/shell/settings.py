@@ -24,3 +24,4 @@ PERMISSION_ACTIONS = (
 )
 
 ICON = "/shell/static/art/shell.png"
+MENU_INDEX = 50

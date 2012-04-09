@@ -264,8 +264,10 @@ def commonheader(title, section, padding="60px"):
   """
   Returns the rendered common header
   """
+  apps_list = sorted(appmanager.DESKTOP_APPS[:], key=lambda app: app.menu_index)
+
   return render_to_string("common_header.html", dict(
-    apps=appmanager.DESKTOP_APPS,
+    apps=apps_list,
     title=title,
     section=section,
     padding=padding

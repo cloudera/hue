@@ -16,3 +16,4 @@
 DJANGO_APPS = [ "useradmin" ]
 NICE_NAME = "User Admin"
 REQUIRES_HADOOP = False
+MENU_INDEX = 60

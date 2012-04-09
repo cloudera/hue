@@ -15,3 +15,4 @@
 # limitations under the License.
 DJANGO_APPS = [ "${app_name}" ]
 REQUIRES_HADOOP = False
+MENU_INDEX = 100

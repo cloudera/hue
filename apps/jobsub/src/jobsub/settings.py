@@ -22,3 +22,4 @@ MIDDLEWARE_CLASSES=[
 ]
 
 ICON = "/jobsub/static/art/icon.png"
+MENU_INDEX = 40
