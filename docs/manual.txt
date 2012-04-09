@@ -1,5 +1,5 @@
-Hue Tarball Installation Guide
-==============================
+Hue Installation Guide
+======================
 
 Introduction
 ------------
@@ -75,10 +75,13 @@ Build
 
 Configure `$PREFIX` with the path where you want to install Hue by running:
 
-  $ PREFIX=/path/to/install/into make install
+  $ PREFIX=/usr/share make install
+  $ cd /usr/share/hue
+  $ sudo chmod 4750 apps/shell/src/shell/build/setuid
 
-You can install Hue anywhere on your system - it does not need root permission
-although additional third-party SDK applications may.
+You can install Hue anywhere on your system, and run Hue as a non-root user.
+The Shell application needs root privileges to launch various sub-processes as
+the logged in users.
 It is a good practice to create a new user for Hue and either install Hue in
 that user's home directory, or in a directory within `/usr/share`.
 
@@ -168,7 +171,7 @@ If you JobTracker runs on a different host, you need to `scp` the Hue plugins
 jar to the JobTracker host.
 
 Then add this to your `mapred-site.xml` and *restart* your JobTracker.
-Depending on your setup, your `hdfs-site.xml` might be in `/etc/hadoop/conf`.
+Depending on your setup, your `mapred-site.xml` might be in `/etc/hadoop/conf`.
 
     <property>
       <name>jobtracker.thrift.address</name>
@@ -554,6 +557,17 @@ default_user_group::
   members of the default group.
 
 
+Configuration Validation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Hue can detect certain invalid configuration. It will show a red alert icon on
+the top navigation bar. image:images/val.png[]
+
+To view the configuration of a running Hue instance, navigate to
+`http://myserver:8888/dump_config`, also accessible through the About
+application.
+
+
 Starting Hue from the Tarball
 -----------------------------
 
@@ -562,7 +576,8 @@ your Hue Server by running:
 
     # build/env/bin/supervisor
 
-Your Hue installation is now running.
+This will start several subprocesses, corresponding to the different Hue
+components. Your Hue installation is now running.
 
 
 Administering Hue
@@ -575,7 +590,8 @@ section for more details about managing and operating a Hue installation.
 Hue Processes
 ~~~~~~~~~~~~~
 
-==== Process Hierarchy
+Process Hierarchy
+^^^^^^^^^^^^^^^^^
 
 A script called `supervisor` manages all Hue processes. The supervisor is a
 watchdog process -- its only purpose is to spawn and monitor other processes.
@@ -590,19 +606,20 @@ other daemons running under the supervisor as well.
 
 You can see the supervised processes running in the output of `ps -f -u hue`:
 
-------------------
-UID        PID  PPID  C STIME TTY          TIME CMD
-hue       8685  8679  0 Aug05 ?        00:01:39 /usr/share/hue/build/env/bin/python /usr/share/hue/build/env/bin/desktop runcpserver
-hue       8695  8679  0 Aug05 ?        00:00:06 /usr/java/jdk1.6.0_14/bin/java -Xmx1000m -Dhadoop.log.dir=/usr/lib/hadoop-0.20/logs -Dhadoop.log.file=hadoop.log ...
-------------------
+  UID        PID  PPID  C STIME TTY          TIME CMD
+  hue       8685  8679  0 Aug05 ?        00:01:39 /usr/share/hue/build/env/bin/python /usr/share/hue/build/env/bin/desktop runcpserver
+  hue       8695  8679  0 Aug05 ?        00:00:06 /usr/java/jdk1.6.0_14/bin/java -Xmx1000m -Dhadoop.log.dir=/usr/lib/hadoop-0.20/logs -Dhadoop.log.file=hadoop.log ...
 
 Note that the supervisor automatically restarts these processes if they fail for
 any reason. If the processes fail repeatedly within a short time, the supervisor
 itself shuts down.
 
-=== Hue Logging
+[[logging]]
+Hue Logging
+~~~~~~~~~~~
 
-The Hue logs are found in `/var/log/hue`. Inside the log directory you can find:
+The Hue logs are found in `/var/log/hue`, or in a `logs` directory under your
+Hue installation root. Inside the log directory you can find:
 
 * An `access.log` file, which contains a log for all requests against the Hue
 web server.
@@ -619,7 +636,8 @@ If users on your cluster have problems running Hue, you can often find error
 messages in these log files. If you are unable to start Hue from the init
 script, the `supervisor.log` log file can often contain clues.
 
-==== Viewing Recent Log Messages through your Web Browser
+Viewing Recent Log Messages Online
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In addition to logging `INFO` level messages to the `logs` directory, the Hue
 web server keeps a small buffer of log messages at all levels in memory. You can
@@ -627,48 +645,47 @@ view these logs by visiting `http://myserver:8888/logs`. The `DEBUG` level
 messages shown can sometimes be helpful in troubleshooting issues.
 
 
-=== The Hue Database
+The Hue Database
+~~~~~~~~~~~~~~~~
 
 Hue requires a SQL database to store small amounts of data, including user
 account information as well as history of job submissions and Hive queries.
 By default, Hue is configured to use the embedded database SQLite for this
 purpose, and should require no configuration or management by the administrator.
-However, MySQL is the recommended database to use; this section contains
+However, MySQL is the recommended database to use. This section contains
 instructions for configuring Hue to access MySQL and other databases.
 
-==== Inspecting the Hue Database
+Inspecting the Hue Database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The default SQLite database used by Hue is located in:
-
- `/usr/share/hue/desktop/desktop.db`.
-
+The default SQLite database used by Hue is located in: `/usr/share/hue/desktop/desktop.db`.
 You can inspect this database from the command line using the `sqlite3`
 program. For example:
 
----------
-# sqlite3 /usr/share/hue/desktop/desktop.db
-SQLite version 3.6.22
-Enter ".help" for instructions
-Enter SQL statements terminated with a ";"
-sqlite> select username from auth_user;
-admin
-test
-sample
-sqlite>
-----------
+  # sqlite3 /usr/share/hue/desktop/desktop.db
+  SQLite version 3.6.22
+  Enter ".help" for instructions
+  Enter SQL statements terminated with a ";"
+  sqlite> select username from auth_user;
+  admin
+  test
+  sample
+  sqlite>
 
 It is strongly recommended that you avoid making any modifications to the
 database directly using SQLite, though this trick can be useful for management
 or troubleshooting.
 
-==== Backing up the Hue Database
+Backing up the Hue Database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you use the default SQLite database, then copy the `desktop.db` file to
 another node for backup. It is recommended that you back it up on a regular
 schedule, and also that you back it up before any upgrade to a new version of
 Hue.
 
-==== Configuring Hue to Access Another Database
+Configuring Hue to Access Another Database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Although SQLite is the default database type, some advanced users may prefer
 to have Hue access an alternate database type. Note that if you elect to
@@ -684,7 +701,8 @@ work with other common databases such as PostgreSQL and Oracle.
 Note that Hue has only been tested with SQLite and MySQL database backends.
 ============================================================
 
-===== Configuring Hue to Store Data in MySQL
+Configuring Hue to Store Data in MySQL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To configure Hue to store data in MySQL:
 
@@ -725,39 +743,34 @@ Your system is now configured and you can start the Hue server as normal.
 
 
 [[usage]]
-== Using Hue
+Using Hue
+---------
 
 After installation, you can use Hue by navigating to `http://myserver:8888/`.
 The following login screen appears:
 
 image:images/login.png[]
 
-Launch applications on the bottom-right.
-image:images/open-apps.png[,width=50%]
-
 The Help application guides users through the various installed applications.
 
-=== Supported Browsers
+Supported Browsers
+~~~~~~~~~~~~~~~~~~
 
-Hue is primarily tested on Firefox 3.5 and Firefox 3.6, on Windows, Mac, and
-Linux. Google Chrome and Safari work as well.
+Hue is primarily tested on Firefox, Google Chrome and Safari on Windows, Mac,
+and Linux.
 
-=== Feedback
+Feedback
+~~~~~~~~
 
 Your feedback is welcome. The best way to send feedback is to join the
 https://groups.google.com/a/cloudera.org/group/hue-user[mailing list], and 
 send e-mail, to mailto:hue-user@cloudera.org[hue-user@cloudera.org].
 
-=== Reporting Bugs
+Reporting Bugs
+~~~~~~~~~~~~~~
 
 If you find that something doesn't work, it'll often be helpful to include logs
-from your server.  These are available at the +/logs+ URL on Hue's web server
-(not part of the graphical Hue UI).  Please download the logs as a zip (or cut
-and paste the ones that look relevant) and send those with your bug reports.
+from your server. (See the <<logging,Hue Logging>> section. Please include the
+logs as a zip (or cut and paste the ones that look relevant) and send those with
+your bug reports.
 image:images/logs.png[]
-
-
-==== Starting Hue
-
-To start Hue, use `build/env/bin/supervisor`.  This will start
-several subprocesses, corresponding to the different Hue components.
