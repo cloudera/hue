@@ -650,13 +650,13 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
 
     if request.method == 'POST':
         form = form_class(request.POST)
-        # TODO(philip): How best to do error handling?  fs will throw
-        # an arbitrary-ish exception (typically file not found or maybe permission
-        # denied), and this needs to be coaxed into an HTTP error.
         ret['form'] = form
         if form.is_valid():
             args = [form.cleaned_data[p] for p in parameter_names]
-            op(*args)
+            try:
+              op(*args)
+            except (IOError, WebHdfsException), e:
+              raise PopupException("Cannot perform operation.", detail=e)
             if next:
                 logging.debug("Next: %s" % next)
                 # Doesn't need to be quoted: quoting is done by HttpResponseRedirect.
