@@ -42,8 +42,8 @@
   </licenses>
 
   <properties>
-    <hadoop.version>0.23.0-mr1-cdh4.0.0b2</hadoop.version>
-    <hive.version>0.8.1-cdh4.0.0b2</hive.version>
+    <hadoop.version>${cdh.mr1.version}</hadoop.version>
+    <hive.version>${cdh.hive.version}</hive.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
   </properties>
