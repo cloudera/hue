@@ -11,7 +11,7 @@ individual users.
 
 This guide describes how to install and configure a Hue tarball. For
 information about installing Hue packages, see
-https://wiki.cloudera.com/display/DOC/Hue+Installation[Installing Hue].
+https://ccp.cloudera.com/display/CDHDOC/Hue+Installation[Installing Hue].
 
 There is also a companion SDK guide that describes how to develop
 new Hue applications:
