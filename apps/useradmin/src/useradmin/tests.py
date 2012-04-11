@@ -28,12 +28,14 @@ from nose.tools import assert_true, assert_equal, assert_false
 from desktop.lib.django_test_util import make_logged_in_client
 from django.contrib.auth.models import User, Group
 from django.utils.encoding import smart_unicode
+from django.core.urlresolvers import reverse
 
 from useradmin.models import HuePermission, GroupPermission, LdapGroup, UserProfile
 from useradmin.models import get_profile
 
 import useradmin.conf
-from views import sync_ldap_users_and_groups, import_ldap_user, import_ldap_group
+from views import sync_ldap_users_and_groups, import_ldap_user, import_ldap_group, \
+                  add_ldap_user, add_ldap_group, sync_ldap_users_groups
 import ldap_access
 
 def reset_all_users():
@@ -68,11 +70,11 @@ class LdapTestConnection(object):
 
   def find_user(self, user, find_by_dn=False):
     """ Returns info for a particular user """
-    return LdapTestConnection._instance.users[user]
+    return LdapTestConnection._instance.users.get(user, None)
 
   def find_group(self, groupname, find_by_dn=False):
     """ Return all groups in the system with parents and children """
-    return LdapTestConnection._instance.groups[groupname]
+    return LdapTestConnection._instance.groups.get(groupname, None)
 
   class _Singleton:
     def __init__(self):
@@ -411,3 +413,62 @@ def test_useradmin_ldap_integration():
   import_ldap_group('OtherGroup', import_members=False, import_by_dn=False)
   assert_false(LdapGroup.objects.filter(group=hue_group).exists())
   assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
+
+def test_add_ldap_user():
+  URL = reverse(add_ldap_user)
+
+  reset_all_users()
+  reset_all_groups()
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+
+  c = make_logged_in_client(username='test', is_superuser=True)
+
+  assert_true(c.get(URL))
+
+  response = c.post(URL, dict(username='moe', password1='test', password2='test'))
+  assert_equal(response.context['action'], '/useradmin/users')
+
+  response = c.post(URL, dict(username='bad_name', password1='test', password2='test'))
+  assert_true('Could not' in response.context['form'].errors['username'][0])
+
+def test_add_ldap_group():
+  URL = reverse(add_ldap_group)
+
+  reset_all_users()
+  reset_all_groups()
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+
+  c = make_logged_in_client(username='test', is_superuser=True)
+
+  assert_true(c.get(URL))
+
+  response = c.post(URL, dict(name='TestUsers', password1='test', password2='test'))
+  assert_equal(response.context['action'], '/useradmin/groups')
+
+  response = c.post(URL, dict(name='bad_name', password1='test', password2='test'))
+  assert_true('Could not' in response.context['form'].errors['name'][0])
+
+  response = c.post(URL, dict(name='toolongnametoolongnametoolongname',
+                              password1='test', password2='test'))
+  assert_true('Too long' in response.context['form'].errors['name'][0])
+
+def test_sync_ldap_users_groups():
+  URL = reverse(sync_ldap_users_groups)
+
+  reset_all_users()
+  reset_all_groups()
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+
+  c = make_logged_in_client(username='test', is_superuser=True)
+
+  assert_true(c.get(URL))
+  assert_true(c.post(URL))
