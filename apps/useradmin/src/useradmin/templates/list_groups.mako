@@ -26,26 +26,27 @@ ${commonheader("Hue Groups", "useradmin", "100px")}
 ${layout.menubar(section='groups')}
 
 <div class="container-fluid">
-	<h1>Hue Groups</h1>
-	<div class="well hueWell">
-		<p class="pull-right">
-			%if user.is_superuser == True:
-			<a id="addGroupBtn" href="#" class="btn">Add group</a>
-			%endif
-		</p>
-		<form class="form-search">
-			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for group name, members, etc...">
-		</form>
-	</div>
+    <h1>Hue Groups</h1>
+    <div class="well hueWell">
+        <div class="pull-right btn-group">
+            %if user.is_superuser == True:
+            <a id="addGroupBtn" href="#" class="btn">Add group</a>
+            <a id="addLdapGroupBtn" href="#" class="btn">Add/Sync LDAP group</a>
+            %endif
+        </div>
+        <form class="form-search">
+            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for group name, members, etc...">
+        </form>
+    </div>
       <table class="table table-striped datatables">
         <thead>
           <tr>
             <th>${_('Group Name')}</th>
             <th>${_('Members')}</th>
             <th>${_('Permissions')}</th>
-			%if user.is_superuser == True:
-			<th>&nbsp;</th>
-			%endif
+            %if user.is_superuser == True:
+            <th>&nbsp;</th>
+            %endif
           </tr>
         </head>
         <tbody>
@@ -54,12 +55,12 @@ ${layout.menubar(section='groups')}
             <td>${group.name}</td>
             <td>${', '.join([group_user.username for group_user in group.user_set.all()])}</td>
             <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
-			%if user.is_superuser == True:
+            %if user.is_superuser == True:
             <td>
               <a title="Edit ${group.name}" class="btn small editGroupBtn" data-url="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-name="${group.name}">Edit</a>
               <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>
             </td>
-			%endif
+            %endif
           </tr>
         % endfor
         </tbody>
@@ -68,110 +69,132 @@ ${layout.menubar(section='groups')}
 
 
 <div id="deleteGroup" class="modal hide fade groupModal">
-	<form id="deleteGroupForm" action="" method="POST">
-	<div class="modal-header">
-		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3 id="deleteGroupMessage">Confirm action</h3>
-	</div>
-	<div class="modal-footer">
-		<input type="submit" class="btn primary" value="Yes"/>
-		<a href="#" class="btn secondary hideModal">No</a>
-	</div>
-	</form>
+    <form id="deleteGroupForm" action="" method="POST">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3 id="deleteGroupMessage">Confirm action</h3>
+    </div>
+    <div class="modal-footer">
+        <input type="submit" class="btn primary" value="Yes"/>
+        <a href="#" class="btn secondary hideModal">No</a>
+    </div>
+    </form>
 </div>
 
 <div id="addGroup" class="modal hide fade groupModal">
-	<div class="modal-header">
-		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>Add group</h3>
-	</div>
-	<div id="addGroupBody" class="modal-body">
-		<iframe id="addGroupFrame" frameBorder="0"></iframe>
-	</div>
-	<div class="modal-footer">
-		<button id="addGroupSaveBtn" class="btn primary">Save</button>
-	</div>
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>Add group</h3>
+    </div>
+    <div id="addGroupBody" class="modal-body">
+        <iframe id="addGroupFrame" frameBorder="0"></iframe>
+    </div>
+    <div class="modal-footer">
+        <button id="addGroupSaveBtn" class="btn primary">Save</button>
+    </div>
+</div>
+
+<div id="addLdapGroup" class="modal hide fade groupModal">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>Add or Sync a LDAP group</h3>
+    </div>
+    <div id="addLdapGroupBody" class="modal-body">
+        <iframe id="addLdapGroupFrame" frameBorder="0"></iframe>
+    </div>
+    <div class="modal-footer">
+        <button id="addLdapGroupSaveBtn" class="btn primary">Save</button>
+    </div>
 </div>
 
 <div id="editGroup" class="modal hide fade groupModal">
-	<div class="modal-header">
-		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>Edit group <span class="groupName"></span></h3>
-	</div>
-	<div id="editGroupBody" class="modal-body">
-		<iframe id="editGroupFrame" frameBorder="0"></iframe>
-	</div>
-	<div class="modal-footer">
-		<button id="editGroupSaveBtn" class="btn primary">Save</button>
-	</div>
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>Edit group <span class="groupName"></span></h3>
+    </div>
+    <div id="editGroupBody" class="modal-body">
+        <iframe id="editGroupFrame" frameBorder="0"></iframe>
+    </div>
+    <div class="modal-footer">
+        <button id="editGroupSaveBtn" class="btn primary">Save</button>
+    </div>
 </div>
 
 </div>
 
-	<script type="text/javascript" charset="utf-8">
-		$(document).ready(function(){
-			$(".datatables").dataTable({
-				"bPaginate": false,
-			    "bLengthChange": false,
-				"bInfo": false,
-				"bFilter": false,
-				"aoColumns": [
-					{ "sWidth": "20%" },
-					{ "sWidth": "20%" },
-					null,
-					%if user.is_superuser == True:
-					{ "sWidth": "120px" },
-					%endif
-				 ]
-			});
-			$(".dataTables_wrapper").css("min-height","0");
-			$(".dataTables_filter").hide();
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            $(".datatables").dataTable({
+                "bPaginate": false,
+                "bLengthChange": false,
+                "bInfo": false,
+                "bFilter": false,
+                "aoColumns": [
+                    { "sWidth": "20%" },
+                    { "sWidth": "20%" },
+                    null,
+                    %if user.is_superuser == True:
+                    { "sWidth": "120px" },
+                    %endif
+                 ]
+            });
+            $(".dataTables_wrapper").css("min-height","0");
+            $(".dataTables_filter").hide();
 
-			$(".confirmationModal").click(function(){
-				var _this = $(this);
-				$.getJSON(_this.attr("data-confirmation-url"), function(data){
-					$("#deleteGroupForm").attr("action", data.path);
-					$("#deleteGroupMessage").text(_this.attr("alt"));
-				});
-				$("#deleteGroup").modal("show");
-			});
-			$(".hideModal").click(function(){
-				$("#deleteGroup").modal("hide");
-			});
+            $(".confirmationModal").click(function(){
+                var _this = $(this);
+                $.getJSON(_this.attr("data-confirmation-url"), function(data){
+                    $("#deleteGroupForm").attr("action", data.path);
+                    $("#deleteGroupMessage").text(_this.attr("alt"));
+                });
+                $("#deleteGroup").modal("show");
+            });
+            $(".hideModal").click(function(){
+                $("#deleteGroup").modal("hide");
+            });
 
-			$("#filterInput").keyup(function(){
-		        $.each($(".groupRow"), function(index, value) {
+            $("#filterInput").keyup(function(){
+                $.each($(".groupRow"), function(index, value) {
 
-		          if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
-		            $(value).hide(250);
-		          }else{
-		            $(value).show(250);
-		          }
-		        });
+                  if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
+                    $(value).hide(250);
+                  }else{
+                    $(value).show(250);
+                  }
+                });
 
-		    });
+            });
 
-			$("#addGroupBtn").click(function(){
-				$("#addGroupFrame").css("height","400px").attr("src","${url('useradmin.views.edit_group')}");
-				$("#addGroup").modal("show");
-			});
+            $("#addGroupBtn").click(function(){
+                $("#addGroupFrame").css("height","400px").attr("src","${url('useradmin.views.edit_group')}");
+                $("#addGroup").modal("show");
+            });
 
-			$("#addGroupSaveBtn").click(function(){
-				$("#addGroupFrame").contents().find('form').submit();
-			});
+            $("#addGroupSaveBtn").click(function(){
+                $("#addGroupFrame").contents().find('form').submit();
+            });
 
-			$(".editGroupBtn").click(function(){
-				$("#editGroup").find(".groupName").text($(this).data("name"));
-				$("#editGroupFrame").css("height","400px").attr("src", $(this).data("url"));
-				$("#editGroup").modal("show");
-			});
+            $("#addLdapGroupBtn").click(function(){
+                $("#addLdapGroupFrame").css("height","200px").attr("src","${url('useradmin.views.add_ldap_group')}");
+                $("#addLdapGroup").modal("show");
+            });
 
-			$("#editGroupSaveBtn").click(function(){
-				$("#editGroupFrame").contents().find('form').submit();
-			});
+            $("#addLdapGroupSaveBtn").click(function(){
+                $("#addLdapGroupFrame").contents().find('form').submit();
+            });
+
+            $(".editGroupBtn").click(function(){
+                $("#editGroup").find(".groupName").text($(this).data("name"));
+                $("#editGroupFrame").css("height","400px").attr("src", $(this).data("url"));
+                $("#editGroup").modal("show");
+            });
+
+            $("#editGroupSaveBtn").click(function(){
+                $("#editGroupFrame").contents().find('form').submit();
+            });
 
 
-		});
-	</script>
+        });
+    </script>
 
 ${commonfooter()}

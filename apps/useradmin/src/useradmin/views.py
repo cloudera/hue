@@ -30,6 +30,7 @@ from django import forms
 from django.contrib.auth.models import User, Group
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule, render, PopupException
 from django.core import urlresolvers
+from django.forms.util import ErrorList
 
 from useradmin.models import GroupPermission, HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
@@ -286,6 +287,141 @@ def edit_permission(request, app=None, priv=None):
   return render('edit_permissions.mako', request,
     dict(form=form, action=request.path, app=app, priv=priv))
 
+class AddLdapUserForm(forms.Form):
+  username = forms.RegexField(
+      label="Username",
+      max_length=64,
+      regex='^%s$' % (get_username_re_rule(),),
+      help_text="Required. 30 characters or fewer. No whitespaces or colons.",
+      error_messages={'invalid': "Whitespaces and ':' not allowed" })
+  dn = forms.BooleanField(label="Distinguished name",
+                          help_text="Whether or not the user should be imported by "
+                                    "distinguished name",
+                          initial=False,
+                          required=False)
+
+  def clean(self):
+    cleaned_data = super(AddLdapUserForm, self).clean()
+    username = cleaned_data.get("username")
+    dn = cleaned_data.get("dn")
+
+    if not dn:
+      if username is not None and len(username) > 30:
+        msg = 'Too long: 30 characters or fewer and not %s' % (len(username),)
+        errors = self._errors.setdefault('username', ErrorList())
+        errors.append(msg)
+        raise forms.ValidationError(msg)
+
+    return cleaned_data
+
+def add_ldap_user(request):
+  """
+  add_ldap_user(request) -> reply
+
+  Handler for importing LDAP users into the Hue database.
+
+  If a user has been previously imported, this will sync their user information.
+  If the LDAP request failed, the error message is generic right now.
+  """
+  if not request.user.is_superuser:
+    raise PopupException("You must be a superuser to add another user.")
+
+  if request.method == 'POST':
+    form = AddLdapUserForm(request.POST)
+    if form.is_valid():
+      username = form.cleaned_data['username']
+      import_by_dn = form.cleaned_data['dn']
+      user = import_ldap_user(username, import_by_dn)
+
+      if user is None:
+        errors = form._errors.setdefault('username', ErrorList())
+        errors.append('Could not get LDAP details for user %s' % (username,))
+      else:
+        request.path = urlresolvers.reverse(list_users)
+        return render('edit_user_confirmation.mako', request, dict(form=form, action=request.path))
+  else:
+    form = AddLdapUserForm()
+  return render('edit_user.mako', request, dict(form=form, action=request.path))
+
+class AddLdapGroupForm(forms.Form):
+  name = forms.RegexField(
+      label="Name",
+      max_length=64,
+      regex='^%s$' % (get_groupname_re_rule(),),
+      help_text="Required. 30 characters or fewer. May only contain letters, "
+                "numbers, hypens or underscores.",
+      error_messages={'invalid': "Whitespaces and ':' not allowed" })
+  dn = forms.BooleanField(label="Distinguished name",
+                          help_text="Whether or not the group should be imported by "
+                                    "distinguished name",
+                          initial=False,
+                          required=False)
+  import_members = forms.BooleanField(label='Import new members',
+                                      help_text='Import unimported or new users from the group',
+                                      initial=False,
+                                      required=False)
+
+  def clean(self):
+    cleaned_data = super(AddLdapGroupForm, self).clean()
+    name = cleaned_data.get("name")
+    dn = cleaned_data.get("dn")
+
+    if not dn:
+      if name is not None and len(name) > 30:
+        msg = 'Too long: 30 characters or fewer and not %s' % (len(name),)
+        errors = self._errors.setdefault('name', ErrorList())
+        errors.append(msg)
+        raise forms.ValidationError(msg)
+
+    return cleaned_data
+
+def add_ldap_group(request):
+  """
+  add_ldap_group(request) -> reply
+
+  Handler for importing LDAP groups into the Hue database.
+
+  If a group has been previously imported, this will sync membership within the
+  group with the LDAP server. If --import-members is specified, it will import
+  all unimported users.
+  """
+  if not request.user.is_superuser:
+    raise PopupException("You must be a superuser to add another group.")
+
+  if request.method == 'POST':
+    form = AddLdapGroupForm(request.POST)
+    if form.is_valid():
+      groupname = form.cleaned_data['name']
+      import_by_dn = form.cleaned_data['dn']
+      import_members = form.cleaned_data['import_members']
+      group = import_ldap_group(groupname, import_members, import_by_dn)
+
+      if group is None:
+        errors = form._errors.setdefault('name', ErrorList())
+        errors.append('Could not get LDAP details for group %s' % (groupname,))
+      else:
+        request.path = urlresolvers.reverse(list_groups)
+        return render('edit_group_confirmation.mako', request, dict(form=form, action=request.path))
+  else:
+    form = AddLdapGroupForm()
+  return render('edit_group.mako', request, dict(form=form, action=request.path))
+
+def sync_ldap_users_groups(request):
+  """
+  Handler for syncing the Hue database with LDAP users and groups.
+
+  This will not import any users or groups that don't already exist in Hue. All
+  user information and group memberships will be updated based on the LDAP
+  server's current state.
+  """
+  if not request.user.is_superuser:
+    raise PopupException("You must be a superuser to sync the LDAP users/groups.")
+
+  if request.method == 'POST':
+    sync_ldap_users_and_groups()
+    return render('edit_user_confirmation.mako', request, {})
+  else:
+    return render('sync_ldap_users_groups.mako', request, dict(action=request.path))
 
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
@@ -438,10 +574,10 @@ def _import_ldap_group(groupname, import_members=False, import_by_dn=False):
   return group
 
 def import_ldap_user(user, import_by_dn):
-  _import_ldap_user(user, import_by_dn)
+  return _import_ldap_user(user, import_by_dn)
 
 def import_ldap_group(group, import_members, import_by_dn):
-  _import_ldap_group(group, import_members, import_by_dn)
+  return _import_ldap_group(group, import_members, import_by_dn)
 
 def sync_ldap_users_and_groups():
   """
