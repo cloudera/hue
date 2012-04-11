@@ -228,6 +228,11 @@ def test_group_admin():
   response = c.post('/useradmin/groups/delete/testgroup')
   assert_true(len(Group.objects.all()) == 1)
 
+  group_count = len(Group.objects.all())
+  response = c.post('/useradmin/groups/new', dict(name="with space"))
+  assert_true("Group name may only contain letters" in response.content)
+  assert_equal(len(Group.objects.all()), group_count)
+
 
 def test_user_admin():
   FUNNY_NAME = '~`!@#$%^&*()_-+={}[]|\;"<>?/,.'
