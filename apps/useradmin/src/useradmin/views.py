@@ -463,6 +463,8 @@ class GroupEditForm(forms.ModelForm):
   """
   Form to manipulate a group.  This manages the group name and its membership.
   """
+  GROUPNAME = re.compile('^%s$' % get_groupname_re_rule())
+
   class Meta:
     model = Group
     fields = ("name",)
@@ -470,7 +472,7 @@ class GroupEditForm(forms.ModelForm):
   def clean_name(self):
     # Note that the superclass doesn't have a clean_name method.
     data = self.cleaned_data["name"]
-    if not re.match(get_groupname_re_rule(), data):
+    if not self.GROUPNAME.match(data):
       raise forms.ValidationError("Group name may only contain letters, " +
                                   "numbers, hypens or underscores.")
     return data
