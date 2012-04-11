@@ -312,12 +312,16 @@ def job_design_migration_for_streaming(jd):
   add_property('mapred.output.format.class', data['outputformat_class'])
   add_property('mapred.reduce.tasks', data['num_reduce_tasks'])
 
+  property_list = [ ]
+  for k, v in properties.iteritems():
+    property_list.append(dict(name=k, value=v))
+
   action = OozieStreamingAction(action_type=OozieStreamingAction.ACTION_TYPE,
                                 mapper=data['mapper_cmd'],
                                 reducer=data['reducer_cmd'],
                                 files=files,
                                 archives=archives,
-                                job_properties=properties)
+                                job_properties=json.dumps(property_list))
   action.save()
 
   design = OozieDesign(owner=jd.owner,
