@@ -4,26 +4,26 @@
 
 <ul>
 	<li>Create directories, upload files, or rename, move, and delete files and directories. You can also change a file's or directory's owner, group, and permissions. See <a href="#FileBrowser-WorkingwithFilesandDirectories">Working with Files and Directories</a>.</li>
-	<li>Search for files, directories, owners, and groups (Cloudera Enterprise version only). See <a href="#FileBrowser-SearchingforFilesandDirectories">Searching for Files and Directories</a>.</li>
+	<li>Search for files, directories, owners, and groups. See <a href="#FileBrowser-SearchingforFilesandDirectories">Searching for Files and Directories</a>.</li>
 	<li>View and edit files as text or binary. You can also download the files you are viewing and editing to your local system. See <a href="#FileBrowser-Viewing%2CEditing%2CandDownloadingFiles">Viewing, Editing, and Downloading Files</a>.</li>
 </ul>
 
 
-<h2><a name="FileBrowser-Contents"></a>Contents</h2>
+
+
+<h3><a name="FileBrowser-Contents"></a>Contents</h3>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1286391724285 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1286391724285 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1286391724285 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1334104553982 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1334104553982 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1334104553982 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1286391724285'>
+/*]]>*/</style><div class='rbtoc1334104553982'>
 <ul>
     <li><a href='#FileBrowser-IntroducingHueFileBrowser'>Introducing Hue File Browser</a></li>
     <li><a href='#FileBrowser-FileBrowserInstallationandConfiguration'> File Browser Installation and Configuration</a></li>
-    <li><a href='#FileBrowser-UsingFileBrowser'>Using File Browser</a></li>
-<ul>
-    <li><a href='#FileBrowser-StartingFileBrowser'> Starting File Browser</a></li>
-    <li><a href='#FileBrowser-WorkingwithFilesandDirectories'> Working with Files and Directories</a></li>
+    <li><a href='#FileBrowser-StartingFileBrowser'>Starting File Browser</a></li>
+    <li><a href='#FileBrowser-WorkingwithFilesandDirectories'>Working with Files and Directories</a></li>
 <ul>
     <li><a href='#FileBrowser-ChangingDirectories'>Changing Directories</a></li>
     <li><a href='#FileBrowser-CreatingDirectories'>Creating Directories</a></li>
@@ -32,42 +32,38 @@ div.rbtoc1286391724285 li {margin-left: 0px;padding-left: 0px;}
     <li><a href='#FileBrowser-Renaming%2CMoving%2CandDeletingFilesandDirectories'>Renaming, Moving, and Deleting Files and Directories</a></li>
     <li><a href='#FileBrowser-ChangingaFile%27sorDirectory%27sOwner%2CGroup%2CorPermissions'>Changing a File's or Directory's Owner, Group, or Permissions</a></li>
 </ul>
-    <li><a href='#FileBrowser-SearchingforFilesandDirectories%28ClouderaEnterpriseversiononly%29'> Searching for Files and Directories (Cloudera Enterprise version only)</a></li>
-    <li><a href='#FileBrowser-Viewing%2CEditing%2CandDownloadingFiles'> Viewing, Editing, and Downloading Files</a></li>
+    <li><a href='#FileBrowser-SearchingforFilesandDirectories'>Searching for Files and Directories</a></li>
+    <li><a href='#FileBrowser-Viewing%2CEditing%2CandDownloadingFiles'>Viewing, Editing, and Downloading Files</a></li>
 <ul>
     <li><a href='#FileBrowser-ViewingandEditingFiles'>Viewing and Editing Files</a></li>
     <li><a href='#FileBrowser-DownloadingFilesusingtheFileViewer'>Downloading Files using the File Viewer</a></li>
 </ul>
-</ul>
 </ul></div>
+<p><br class="atl-forced-newline" /></p>
 
 <h1><a name="FileBrowser-FileBrowserInstallationandConfiguration"></a><a name="FileBrowser-FileBrowserInstallationandConfiguration"></a>File Browser Installation and Configuration</h1>
 
-<p>File Browser is one of the applications that can be installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDHDOC/Hue+Installation">https://ccp.cloudera.com/display/CDHDOC/Hue+Installation</a>.</p>
+<p>File Browser is one of the applications that can be installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDHDOC/Hue+Installation">Hue Installation</a>.</p>
 
-<h1><a name="FileBrowser-UsingFileBrowser"></a>Using File Browser</h1>
+<p><a name="FileBrowser-StartingFileBrowser"></a></p>
+<h1><a name="FileBrowser-StartingFileBrowser"></a>Starting File Browser</h1>
 
-<p>This section describes how to start File Browser and use it to work with files and directories. </p>
-
-<h2><a name="FileBrowser-StartingFileBrowser"></a><a name="FileBrowser-StartingFileBrowser"></a>Starting File Browser</h2>
-
-<p>To start the File Browser application, click this icon <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259473.jpg" height="27" width="27" style="border: 0px solid black"/></span> in the application bar at the bottom of the Hue web page. The <b>File Browser</b> window opens in the Hue web page.
+<p>To start the File Browser application, click the <b>File Browser</b> tab in the navigation bar at the top of the Hue browser page.  
 <br class="atl-forced-newline" />
-<br class="atl-forced-newline" /> <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259472.jpg" height="372" width="714" style="border: 0px solid black"/></span></p>
+<br class="atl-forced-newline" />
+<a name="FileBrowser-WorkingwithFilesandDirectories"></a></p>
+<h1><a name="FileBrowser-WorkingwithFilesandDirectories"></a>Working with Files and Directories</h1>
 
-<h2><a name="FileBrowser-WorkingwithFilesandDirectories"></a><a name="FileBrowser-WorkingwithFilesandDirectories"></a>Working with Files and Directories</h2>
-
-<p>You can use File Browser to view the input and output files of your Map/Reduce jobs. Typically, you can save your output files in <tt>/tmp</tt> or in your home directory if your system administrator set one up for you. You must have the proper permissions to manipulate other user's files.</p>
+<p>You can use File Browser to view the input and output files of your MapReduce jobs. Typically, you can save your output files in <tt>/tmp</tt> or in your home directory if your system administrator set one up for you. You must have the proper permissions to manipulate other user's files.</p>
 
 <h3><a name="FileBrowser-ChangingDirectories"></a>Changing Directories</h3>
 
-<p>To change to the root directory, click this icon <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259467.jpg" height="28" width="24" style="border: 0px solid black"/></span> in the upper left corner of the <b>File Browser</b> window.</p>
 
-<p>To change to a different directory, double-click the directory name or parent directory dots, or this icon <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259466.jpg" height="17" width="19" style="border: 0px solid black"/></span> next to the directory name in the <b>File Browser</b> window.</p>
+<p>To change to a different directory, double-click the directory name or parent directory dots in the <b>File Browser</b> window.</p>
 
-<p>To change to your home directory, click <b>My Home</b> in the <b>File Browser</b> window.</p>
+<p>To change to your home directory, click <b>My Home</b> in the path field at the top of the <b>File Browser</b> window.</p>
 
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />The <b>My Home</b> button is disabled if you do not have a home directory. Ask your system administrator to create a home directory for you.</td></tr></table></div>
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>Note: The <b>My Home</b> button is disabled if you do not have a home directory. Ask your system administrator to create a home directory for you.</td></tr></table></div>
 
 <h3><a name="FileBrowser-CreatingDirectories"></a>Creating Directories</h3>
 
@@ -76,10 +72,8 @@ div.rbtoc1286391724285 li {margin-left: 0px;padding-left: 0px;}
 <ol>
 	<li>In the File Browser window, click <b>New Directory</b>.
 <br class="atl-forced-newline" />
-<br class="atl-forced-newline" /> <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259472.jpg" height="372" width="714" style="border: 0px solid black"/></span>
-<br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>In the <b>Create Directory</b> dialog box, enter a directory name and then click <b>Ok</b>.
+	<li>In the <b>Create Directory</b> dialog box, enter a directory name and then click <b>Submit</b>.
 <br class="atl-forced-newline" /></li>
 </ol>
 
@@ -97,16 +91,15 @@ div.rbtoc1286391724285 li {margin-left: 0px;padding-left: 0px;}
 	<li>Click <b>Upload Files</b>.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Browse to and select the file(s) you want to upload, and then click <b>Open</b>.
+	<li>In the box that opens, click <b>Upload a File</b> to browse to and select the file(s) you want to upload, and then click <b>Open</b>.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" />
 The file(s) are uploaded to the directory you selected.</li>
 </ol>
 
 
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Important</b><br />To upload files, your browser must have Flash enabled. If your installation of HUE is using HTTPS, self-signed certificates often confuse Flash. You can avoid using Flash by clicking the <b>upload without flash</b> link in the <b>Uploading files</b> message box, or by adding <tt>/filebrowser/upload</tt> to the end of the URL for HUE in your browser to display the following page.
-
-<p><span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259464.jpg" height="307" width="503" style="border: 0px solid black"/></span></p></td></tr></table></div>
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Important</b><br />To upload files, your browser must have Flash enabled. If your installation of Hue is using HTTPS, self-signed certificates often confuse Flash. You can avoid using Flash by clicking the <b>upload without flash</b> link in the <b>Uploading files</b> message box, or by adding <tt>/filebrowser/upload</tt> to the end of the URL for Hue in your browser to display the following page.<br/>
+<font color="red"><em>Is this still true?</em></font></td></tr></table></div>
 
 <h3><a name="FileBrowser-DownloadingFilesusingtheFileBrowser"></a>Downloading Files using the File Browser</h3>
 
@@ -116,7 +109,7 @@ The file(s) are uploaded to the directory you selected.</li>
 	<li>In the <b>File Browser</b> window, select the file you want to download.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Right-click and choose <b>Download File</b> from context menu.
+	<li>Choose <b>Download File</b> from From the Options menu.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 	<li>Save or open the file on your local system.</li>
@@ -131,12 +124,10 @@ The file(s) are uploaded to the directory you selected.</li>
 	<li>In the <b>File Browser</b> window, select the file or directory you want to rename.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Right-click and choose <b>Rename</b> from context menu.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /> <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259471.jpg" height="307" width="718" style="border: 0px solid black"/></span>
+	<li>Choose <b>Rename</b> from the Options menu.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Enter the new name and then click <b>Ok</b>.</li>
+	<li>Enter the new name and then click <b>Submit</b>.</li>
 </ol>
 
 
@@ -146,10 +137,10 @@ The file(s) are uploaded to the directory you selected.</li>
 	<li>In the <b>File Browser</b> window, select the file or directory you want to move.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Right-click and choose <b>Move</b> from context menu.
+	<li>Choose <b>Move</b> from the Options menu.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>In the <b>Move</b> dialog box, browse to the directory where you want to move the file or directory, and then click <b>Ok</b>.</li>
+	<li>In the <b>Move</b> dialog box, enter the new path and file or directory name, and then click <b>Submit</b>. <font color="red"><em>is this really how it will work? old text: (browse to the directory where you want to move the file or directory)</em></font></li>
 </ol>
 
 
@@ -162,7 +153,8 @@ The file(s) are uploaded to the directory you selected.</li>
 	<li>In the <b>File Browser</b> window, select the file or directory you want to delete. If you select a directory, all of the files and subdirectories contained within that directory are also deleted.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Right-click and choose <b>Delete</b> from context menu.
+	<li>Choose <b>Delete</b> from the Options menu.<br/>
+You can delete recursively by choosing <b>Delete Recursively</b> from the Options menu.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 	<li>Click <b>Ok</b> to confirm the deletion.</li>
@@ -171,7 +163,7 @@ The file(s) are uploaded to the directory you selected.</li>
 
 <h3><a name="FileBrowser-ChangingaFile%27sorDirectory%27sOwner%2CGroup%2CorPermissions"></a>Changing a File's or Directory's Owner, Group, or Permissions</h3>
 
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />Only the Hadoop superuser can change a file's or directory's owner, group, or permissions. The user who starts Hadoop is the Hadoop superuser. The Hadoop superuser account is not necessarily the same as a Hue superuser account. If you use User Manager to create a Hue user with the same user name and password as the Hadoop superuser, then that Hue user can change a file's or directory's owner, group, or permissions.</td></tr></table></div>
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />Only the Hadoop superuser can change a file's or directory's owner, group, or permissions. The user who starts Hadoop is the Hadoop superuser. The Hadoop superuser account is not necessarily the same as a Hue superuser account. If you create a Hue user (in User Admin) with the same user name and password as the Hadoop superuser, then that Hue user can change a file's or directory's owner, group, or permissions.</td></tr></table></div>
 
 <p><b>To change a file's or directory's owner or group:</b></p>
 
@@ -179,18 +171,16 @@ The file(s) are uploaded to the directory you selected.</li>
 	<li>In the <b>File Browser</b> window, select the file or directory whose owner or group you want to change.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Right-click and choose <b>Change Owner/Group</b> from context menu.
+	<li>Choose <b>Change Owner/Group</b> from the Options menu.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 	<li>In the <b>Change Owner/Group</b> dialog box, choose the new user from the <b>User</b> drop-down menu.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /> <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259474.jpg" height="176" width="510" style="border: 0px solid black"/></span>
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 	<li>Choose the new group from the <b>Group</b> drop-down menu.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Click <b>Ok</b> to make the changes.</li>
+	<li>Click <b>Submit</b> to make the changes.</li>
 </ol>
 
 
@@ -200,69 +190,33 @@ The file(s) are uploaded to the directory you selected.</li>
 	<li>In the <b>File Browser</b> window, select the file or directory whose permissions you want to change.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Right-click and choose <b>Change Permissions</b> from context menu.
+	<li>Choose <b>Change Permissions</b> from the Options menu.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>In the <b>Change Permissions</b> dialog box, select the permissions you want to assign and then click <b>Ok</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /> <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259475.jpg" height="169" width="270" style="border: 0px solid black"/></span>
+	<li>In the <b>Change Permissions</b> dialog box, select the permissions you want to assign and then click <b>Submit</b>.
 <br class="atl-forced-newline" /></li>
 </ol>
 
 
-<h2><a name="FileBrowser-SearchingforFilesandDirectories%28ClouderaEnterpriseversiononly%29"></a><a name="FileBrowser-SearchingforFilesandDirectories"></a>Searching for Files and Directories (Cloudera Enterprise version only)</h2>
+<p><a name="FileBrowser-SearchingforFilesandDirectories"></a></p>
+<h1><a name="FileBrowser-SearchingforFilesandDirectories"></a>Searching for Files and Directories</h1>
 
-<p>If you are using the Cloudera Enterprise version of File Browser, you can use it to perform searches for:</p>
-
-<ul>
-	<li>Files and directories by name</li>
-	<li>Groups by name</li>
-	<li>Files and directories owned by a user</li>
-</ul>
-
+<p>You can search for files or directories by name using the <b>Filter</b> query search box:</p>
 
 <p><b>To search for files and directories by name:</b></p>
 
 <ol>
-	<li>Choose <b>filename</b> from the drop-down menu at the top of the <b>File Browser</b> window.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
 	<li>Enter the name of the file or directory in the query search box.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" />
 File Browser lists the files or directories matching the search criteria.
 <br class="atl-forced-newline" />
-<br class="atl-forced-newline" /> <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259468.jpg" height="120" width="718" style="border: 0px solid black"/></span></li>
-</ol>
-
-
-<p><b>To search for groups by name:</b></p>
-
-<ol>
-	<li>Choose <b>group</b> from the drop-down menu at the top of the <b>File Browser</b> window.
-<br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Enter the name of the group in the query search box.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" />
-File Browser lists the groups matching the search criteria.</li>
 </ol>
 
 
-<p><b>To search for files and directories owned by a user:</b></p>
-
-<ol>
-	<li>Choose <b>owner</b> from the drop-down menu at the top of the <b>File Browser</b> window.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Enter the user's name in the query search box.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" />
-File Browser lists the files and directories owned by the specified user.</li>
-</ol>
-
-
-<h2><a name="FileBrowser-Viewing%2CEditing%2CandDownloadingFiles"></a><a name="FileBrowser-Viewing%2CEditing%2CandDownloadingFiles"></a>Viewing, Editing, and Downloading Files</h2>
+<p><a name="FileBrowser-Viewing%2CEditing%2CandDownloadingFiles"></a></p>
+<h1><a name="FileBrowser-Viewing%2CEditing%2CandDownloadingFiles"></a>Viewing, Editing, and Downloading Files</h1>
 
 <p>You can view and edit files as text or binary. You can also download files from the HDFS.</p>
 
@@ -271,14 +225,12 @@ File Browser lists the files and directories owned by the specified user.</li>
 <p><b>To view and edit files:</b></p>
 
 <ol>
-	<li>In the <b>File Browser</b> window, double-click the file you want to view, or right-click and choose <b>View File</b> from context menu.
+	<li>In the <b>File Browser</b> window, double-click the file you want to view, or choose <b>View File</b> from the Options menu.
 <br class="atl-forced-newline" />
 File Browser displays the first 4,096 bytes of the file in the <b>File Viewer</b> window.
 <br class="atl-forced-newline" />
-<br class="atl-forced-newline" /> <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259469.jpg" height="274" width="584" style="border: 0px solid black"/></span>
-<br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>If the file is larger than 4,096 bytes, click these icons <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259465.jpg" height="19" width="35" style="border: 0px solid black"/></span> in the upper right corner of the <b>File Viewer</b> window to scroll through the file.
+	<li>If the file is larger than 4,096 bytes, you can use the Block navigation buttons (First Block, Previous Block, Next Block, Last Block) to scroll through the file block by block.  The <b>Viewing Bytes:</b> fields show the range of bytes you are currently viewing.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 	<li>To switch the view from text to binary, click <b>View as Binary</b> to view a hexdump. To switch the view from binary to text, click <b>View as Text</b>.
@@ -287,12 +239,10 @@ File Browser displays the first 4,096 bytes of the file in the <b>File Viewer</b
 	<li>To view the file's location in the HDFS, click <b>View File Location</b>. File Browser displays the file's location in the <b>File Browser</b> window.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>If you are viewing a text file, you can edit the contents by clicking <b>Edit File</b>.
+	<li>If you are viewing a text file, you can edit the contents by clicking <b>Edit File</b> in the left navigation panel.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" />
 File Browser displays the contents of the file in the <b>File Editor</b> window.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /> <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259470.jpg" height="308" width="577" style="border: 0px solid black"/></span>
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 	<li>Edit the file and then click <b>Save</b> or <b>Save As</b> to save the file.</li>
@@ -301,15 +251,13 @@ File Browser displays the contents of the file in the <b>File Editor</b> window.
 
 <h3><a name="FileBrowser-DownloadingFilesusingtheFileViewer"></a>Downloading Files using the File Viewer</h3>
 
-<p><b>To download files from using the File Viewer:</b></p>
+<p><b>To download files using the File Viewer:</b></p>
 
 <ol>
 	<li>In the <b>File Browser</b> window, double-click the file you want to download, or right-click and choose <b>View File</b> from context menu.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 	<li>Click <b>Download</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /> <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/6259469.jpg" height="252" width="537" style="border: 0px solid black"/></span>
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 	<li>Save or open the file on your local system.</li>
@@ -318,5 +266,11 @@ File Browser displays the contents of the file in the <b>File Editor</b> window.
 
 <p><br class="atl-forced-newline" /></p>
 
-				    					    <br/>
-                        
+				    
+                    			    </td>
+		    </tr>
+	    </table>
+	    
+    </body>
+</html>
+

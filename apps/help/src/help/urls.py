@@ -18,6 +18,6 @@
 from django.conf.urls.defaults import url, patterns
 
 urlpatterns = patterns('',
-  url(r'^$', 'help.views.view', { "app": "desktop", "path": "/index.md" }),
+  url(r'^$', 'help.views.view', { "app": "desktop", "path": "/index.html" }),
   url(r'^(?P<app>\w*)(?P<path>/.*)$', 'help.views.view', name='help.view'),
 )
