@@ -107,7 +107,7 @@ def view(request, path):
 
     # default_to_home is set in bootstrap.js
     home_dir_path = request.user.get_home_directory()
-    if request.GET.get('default_to_home') and request.fs.isdir(home_dir_path):
+    if 'default_to_home' in request.GET and request.fs.isdir(home_dir_path):
         return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=home_dir_path)))
 
     try:
