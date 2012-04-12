@@ -15,14 +15,12 @@
 // limitations under the License.
 package com.cloudera.beeswax;
 
-import java.io.CharArrayWriter;
+import com.google.common.base.Charsets;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Writer;
 
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,6 +37,11 @@ import org.apache.log4j.PatternLayout;
  * to one context at any time). And their logs are all kept here.
  */
 public class LogContext {
+  private static final String BUFFER_SIZE =
+      System.getProperty("beeswax.log.context.size", "1048576");
+
+  private static final String HIVE_ENCODING = Charsets.UTF_8.name();
+
   /** This Logger's name is added to an exclusion list in LogDivertAppender */
   private static Logger LOG = Logger.getLogger(LogContext.class.getName());
 
@@ -54,7 +57,7 @@ public class LogContext {
   private static boolean lcIsInitialized = false;
 
   /** Where we keep the log */
-  private CharArrayWriter logStore;
+  private LinkedStringBuffer logBuffer;
 
   /** Name of the context */
   private String name;
@@ -66,28 +69,24 @@ public class LogContext {
    * The LogContextOutputStream helps translate a LogContext to an OutputStream.
    */
   private static class LogContextOutputStream extends OutputStream {
-    private Writer logStore;
+    private LinkedStringBuffer backingStore;
 
     /**
      * Create a LogContextOutputStream backed by the given Writer.
      */
-    public LogContextOutputStream(Writer logStore) {
+    public LogContextOutputStream(LinkedStringBuffer logBuffer) {
       super();
-      this.logStore = logStore;
+      backingStore = logBuffer;
     }
 
     @Override
     public void write(byte[] b) throws IOException {
-      synchronized (this.logStore) {
-        this.logStore.write(new String(b));
-      }
+      backingStore.write(new String(b, HIVE_ENCODING));
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-      synchronized (this.logStore) {
-        this.logStore.write(new String(b, off, len));
-      }
+      backingStore.write(new String(b, off, len, HIVE_ENCODING));
     }
 
     @Override
@@ -138,8 +137,9 @@ public class LogContext {
    * Create a LogContext with the given name.
    */
   private LogContext(String name) {
+    int bufferSize = Integer.valueOf(BUFFER_SIZE);
     this.name = name;
-    this.logStore = new CharArrayWriter();
+    this.logBuffer = new LinkedStringBuffer(bufferSize);
     this.createTime = System.currentTimeMillis();
   }
 
@@ -235,34 +235,28 @@ public class LogContext {
    * Store the given log message
    */
   public void writeLog(String logMessage) {
-    synchronized (this.logStore) {
-      this.logStore.write(logMessage, 0, logMessage.length());
-    }
+    logBuffer.write(logMessage);
   }
 
   /**
    * Retrieve the log stored
    */
   public String readLog() {
-    synchronized (this.logStore) {
-      return this.logStore.toString();
-    }
+    return logBuffer.read();
   }
 
   /**
    * Reset the log stored
    */
   public void resetLog() {
-    synchronized (this.logStore) {
-      this.logStore.reset();
-    }
+    logBuffer.clear();
   }
 
   /**
    * Get an OutputStream that writes to this LogContext.
    */
   public OutputStream getOutputStream() {
-    return new LogContextOutputStream(this.logStore);
+    return new LogContextOutputStream(logBuffer);
   }
 
   public String getName() {
