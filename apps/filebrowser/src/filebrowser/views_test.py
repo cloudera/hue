@@ -31,6 +31,7 @@ except ImportError:
   import simplejson as json
 
 import logging
+import re
 import urlparse
 
 LOG = logging.getLogger(__name__)
@@ -116,6 +117,10 @@ def test_listdir():
     c = make_logged_in_client()
     response = c.get('/filebrowser/view/test-filebrowser/')
     assert_equal(response.context['home_directory'], '/user/test')
+
+    response = c.get('/filebrowser/view/test-filebrowser/?default_to_home')
+    assert_true(re.search('/user/test$', response['Location']))
+
   finally:
     try:
       cluster.fs.rmtree('/test-filebrowser')
