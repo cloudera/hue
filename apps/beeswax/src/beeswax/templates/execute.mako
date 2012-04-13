@@ -246,18 +246,22 @@ ${layout.menubar(section='query')}
 	        % endif
 
 	        % if error_messages or log:
-				<ul class="nav nav-tabs">
-					<li class="active"><a href="#queryPane" data-toggle="tab">Query</a></li>
-					% if error_message or log:
-	              	<li><a href="#errorPane">
-						% if log:
-							Error Log
-						% else:
-							&nbsp;
-		                % endif
-					</a></li>
-					% endif
-				</ul>
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#queryPane" data-toggle="tab">Query</a>
+                    </li>
+                    % if error_message or log:
+                      <li>
+                        <a href="#errorPane" data-toggle="tab">
+                        % if log:
+                            Error Log
+                        % else:
+                            &nbsp;
+                        % endif
+                        </a>
+                    </li>
+                    % endif
+                </ul>
 
 				<div class="tab-content">
 					<div class="active tab-pane" id="queryPane">
