@@ -43,9 +43,9 @@ ${layout.menubar(section='tables')}
 		</div>
 		<div class="span9">
 			<h1>Welcome to Beeswax for Hive</h1>
-			To get started with Beeswax you'll first need set up some data.
+			To get started with Beeswax you'll first need set up some data:
 			<a href="${ url('beeswax.create_table.create_table') }" class='btn'>Import Data</a>
-			or <a href="#installSamples" data-toggle="modal">Install Samples</a>.
+			or <a href="#installSamples" data-toggle="modal" class='btn'>Install Samples</a>
 		</div>
 	</div>
 </div>
