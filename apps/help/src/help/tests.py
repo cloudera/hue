@@ -26,11 +26,11 @@ def test_about():
 
   # Test default output
   response = c.get('/help/')
-  assert_true("<h1>Welcome to Hue!</h1>" in response.content)
+  assert_true("Welcome to Hue!" in response.content)
 
   # Test default to index.md
   response = c.get("/help/about/")
-  response2 = c.get("/help/about/index.md")
+  response2 = c.get("/help/about/index.html")
   assert_equal(response.content, response2.content)
 
   # Test index at the bottom
