@@ -109,7 +109,7 @@ ${layout.menubar(section='history')}
 			except:
 			  pass
 		      %>
-		      <tr class="histRow" data-search="${show_saved_query(design, query)}">
+		      <tr class="histRow">
 		        <td>${query.submission_date.strftime("%x %X")}</td>
 		        <td>${show_saved_query(design, query)}</td>
 		        <td>
