@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -19,6 +20,7 @@ from desktop.lib import django_mako
 from nose.tools import assert_true, assert_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from django.conf.urls.defaults import patterns, url
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
 from desktop.lib.paginator import Paginator
@@ -62,6 +64,17 @@ def teardown_test_environment():
 
   django_mako.render_to_string = django_mako.render_to_string_normal
 teardown_test_environment.__test__ = False
+
+def test_log_view():
+  c = make_logged_in_client()
+
+  URL = reverse(views.log_view)
+
+  LOG = logging.getLogger(__name__)
+  LOG.warn('une voix m’a réveillé')
+
+  # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
+  response = c.get(URL)
 
 def test_dump_config():
   c = make_logged_in_client()

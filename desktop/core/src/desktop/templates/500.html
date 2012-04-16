@@ -37,32 +37,35 @@ limitations under the License.
 		$(document).ready(function(){
 		});
 	</script>
-	
+
 </head>
 <body>
-	<div class="topbar">
-		<div class="topbar-inner">
-			<div class="container-fluid">
-				<a class="brand" href="#">Hue</a>
-				<ul class="nav">
-					<li><a href="/beeswax">Beeswax</a></li>
-					<li><a href="/filebrowser/">File Browser</a></li>
-					<li><a href="/jobsub/">Job Designer</a></li>
-					<li><a href="/jobbrowser/jobs/">Job Browser</a></li>
-					<li><a href="/useradmin/">User Admin</a></li>
-					<li><a href="/shell/">Shell</a></li>
-					<li><a href="/help/">Help</a></li>
-					<li><a href="/about/">About</a></li>
-				</ul>
-			</div>
-		</div>
-	</div>
-	
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <a class="brand" href="#">Hue</a>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li><a href="/beeswax/">Beeswax</a></li>
+            <li><a href="/filebrowser/">File Browser</a></li>
+            <li><a href="/jobsub/">Job Designer</a></li>
+            <li><a href="/jobbrowser/jobs/">Job Browser</a></li>
+            <li><a href="/useradmin/">User Admin</a></li>
+            <li><a href="/shell/">Shell</a></li>
+            <li><a href="/help/">Help</a></li>
+            <li><a href="/about/">About</a></li>
+            <li class="divider-vertical"></li>
+            <li id="checkConfig"></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
 	<div class="container-fluid">
 		<h1>Server Error (500)</h1>
-		<p>There's been an error. It's been reported to the site administrators
+		<p>Sorry, there's been an error. It's been reported to the site administrators
 	  via e-mail and should be fixed shortly. Thanks for your patience.</p>
-	  
 	</div>
 </body>
 </html>
