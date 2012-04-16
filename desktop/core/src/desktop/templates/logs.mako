@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 from desktop.lib.conf import BoundConfig
+from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 import re
 %>
@@ -29,7 +30,7 @@ ${layout.menubar(section='log_view')}
 		<% log.reverse() %>
 		<pre>
 		% for l in log:
-${l | h}
+${smart_unicode(l) | h}
 		% endfor
 		</pre>
 
