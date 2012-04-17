@@ -371,10 +371,14 @@ ${layout.menubar(section='query')}
 			checkAndSubmit();
 		});
 
-		$("#saveQuery").click(function(){
-			$("<input>").attr("type","hidden").attr("name","saveform-save").attr("value","Save").appendTo($("#advancedSettingsForm"));
-			checkAndSubmit();
-		});
+        $("#saveQuery").click(function(){
+            $("<input>").attr("type","hidden").attr("name","saveform-name")
+                .attr("value", "${extract_field_data(form.saveform["name"])}").appendTo($("#advancedSettingsForm"));
+            $("<input>").attr("type","hidden").attr("name","saveform-desc")
+                .attr("value", "${extract_field_data(form.saveform["desc"])}").appendTo($("#advancedSettingsForm"));
+            $("<input>").attr("type","hidden").attr("name","saveform-save").attr("value","Save").appendTo($("#advancedSettingsForm"));
+            checkAndSubmit();
+        });
 
 		$("#saveQueryAs").click(function(){
 			$("<input>").attr("type","hidden").attr("name","saveform-saveas").attr("value","Save As...").appendTo($("#advancedSettingsForm"));

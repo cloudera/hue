@@ -476,7 +476,7 @@ def save_design(request, form, type, design, explicit_save):
   # Don't generate an auto-saved design if the user didn't change anything
   if explicit_save:
     design.name = form.saveform.cleaned_data['name']
-    design.desc = form.saveform.cleaned_data.get('desc')
+    design.desc = form.saveform.cleaned_data['desc']
     design.is_auto = False
   elif new_data != old_design.data:
     # Auto save iff the data is different
