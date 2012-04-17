@@ -284,9 +284,6 @@ ${layout.menubar(section='query')}
 </div>
 
 
-
-
-
 <div id="chooseFile" class="modal hide fade">
 	<div class="modal-header">
 		<a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -298,6 +295,26 @@ ${layout.menubar(section='query')}
 	</div>
 	<div class="modal-footer">
 	</div>
+</div>
+
+<div id="saveAs" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>Choose a name</h3>
+    </div>
+    <div class="modal-body">
+        <div class="clearfix">
+            <label>Name</label>
+            ${comps.field(form.saveform['name'])}
+        </div>
+        <div class="clearfix">
+            <label>Description</label>
+            ${comps.field(form.saveform['desc'])}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="saveAsNameBtn" class="btn primary">Save</button>
+    </div>
 </div>
 
 <style>
@@ -361,8 +378,17 @@ ${layout.menubar(section='query')}
 
 		$("#saveQueryAs").click(function(){
 			$("<input>").attr("type","hidden").attr("name","saveform-saveas").attr("value","Save As...").appendTo($("#advancedSettingsForm"));
-			checkAndSubmit();
+			$("#saveAs").modal("show");
 		});
+
+        $("#saveAsNameBtn").click(function(){
+             $("<input>").attr("type","hidden").attr("name","saveform-name")
+                 .attr("value", $("input[name=saveform-name]").val()).appendTo($("#advancedSettingsForm"));
+             $("<input>").attr("type","hidden").attr("name","saveform-desc")
+                 .attr("value", $("input[name=saveform-desc]").val()).appendTo($("#advancedSettingsForm"));
+
+            checkAndSubmit();
+        });
 
 		$("#explainQuery").click(function(){
 			$("<input>").attr("type","hidden").attr("name","button-explain").attr("value","Explain").appendTo($("#advancedSettingsForm"));
