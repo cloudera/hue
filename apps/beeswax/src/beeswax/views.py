@@ -298,7 +298,7 @@ def execute_query(request, design_id=None):
       to_explain = request.POST.has_key('button-explain')
       to_submit = request.POST.has_key('button-submit')
       # Always validate the saveform, which will tell us whether it needs explicit saving
-      if not form.saveform.is_valid():
+      if not form.is_valid():
         break
       to_save = form.saveform.cleaned_data['save']
       to_saveas = form.saveform.cleaned_data['saveas']
@@ -311,7 +311,7 @@ def execute_query(request, design_id=None):
         action = urlresolvers.reverse(execute_query, kwargs=dict(design_id=design.id))
 
       # We're not going to process the form. Simply re-render it.
-      if not to_explain and not to_submit or not form.is_valid():
+      if not to_explain and not to_submit:
         break
 
       query_str = _strip_trailing_semicolon(form.query.cleaned_data["query"])
