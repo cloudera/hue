@@ -1,6 +1,6 @@
 <h1><a name="FileBrowser-IntroducingHueFileBrowser"></a>Introducing Hue File Browser</h1>
 
-<p>The File Browser application enables you to browse and manipulate files and directories in the Hadoop Distributed File System (HDFS) while using Hue. With File Browser, you can:</p>
+<p>The File Browser application lets you browse and manipulate files and directories in the Hadoop Distributed File System (HDFS) while using Hue. With File Browser, you can:</p>
 
 <ul>
 	<li>Create directories, upload files, or rename, move, and delete files and directories. You can also change a file's or directory's owner, group, and permissions. See <a href="#FileBrowser-WorkingwithFilesandDirectories">Working with Files and Directories</a>.</li>
@@ -14,14 +14,14 @@
 <h3><a name="FileBrowser-Contents"></a>Contents</h3>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1334104553982 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1334104553982 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1334104553982 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1334626349012 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1334626349012 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1334626349012 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1334104553982'>
+/*]]>*/</style><div class='rbtoc1334626349012'>
 <ul>
     <li><a href='#FileBrowser-IntroducingHueFileBrowser'>Introducing Hue File Browser</a></li>
-    <li><a href='#FileBrowser-FileBrowserInstallationandConfiguration'> File Browser Installation and Configuration</a></li>
+    <li><a href='#FileBrowser-FileBrowserInstallationandConfiguration'>File Browser Installation and Configuration</a></li>
     <li><a href='#FileBrowser-StartingFileBrowser'>Starting File Browser</a></li>
     <li><a href='#FileBrowser-WorkingwithFilesandDirectories'>Working with Files and Directories</a></li>
 <ul>
@@ -41,9 +41,10 @@ div.rbtoc1334104553982 li {margin-left: 0px;padding-left: 0px;}
 </ul></div>
 <p><br class="atl-forced-newline" /></p>
 
-<h1><a name="FileBrowser-FileBrowserInstallationandConfiguration"></a><a name="FileBrowser-FileBrowserInstallationandConfiguration"></a>File Browser Installation and Configuration</h1>
+<p><a name="FileBrowser-FileBrowserInstallationandConfiguration"></a></p>
+<h1><a name="FileBrowser-FileBrowserInstallationandConfiguration"></a>File Browser Installation and Configuration</h1>
 
-<p>File Browser is one of the applications that can be installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDHDOC/Hue+Installation">Hue Installation</a>.</p>
+<p>File Browser is one of the applications that can be installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDH4B2/Hue+Installation">Hue Installation</a>.</p>
 
 <p><a name="FileBrowser-StartingFileBrowser"></a></p>
 <h1><a name="FileBrowser-StartingFileBrowser"></a>Starting File Browser</h1>
@@ -61,10 +62,11 @@ div.rbtoc1334104553982 li {margin-left: 0px;padding-left: 0px;}
 
 <p>To change to a different directory, double-click the directory name or parent directory dots in the <b>File Browser</b> window.</p>
 
-<p>To change to your home directory, click <b>My Home</b> in the path field at the top of the <b>File Browser</b> window.</p>
+<p>To change to your home directory, click <b>Home</b> in the path field at the top of the <b>File Browser</b> window.
+<br class="atl-forced-newline" /></p>
 
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>Note: The <b>My Home</b> button is disabled if you do not have a home directory. Ask your system administrator to create a home directory for you.</td></tr></table></div>
-
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b> The <b>Home</b> button is disabled if you do not have a home directory. Ask your system administrator to create a home directory for you.</td></tr></table></div>
+<p><br class="atl-forced-newline" /> </p>
 <h3><a name="FileBrowser-CreatingDirectories"></a>Creating Directories</h3>
 
 <p><b>To create a directory:</b></p>
@@ -94,12 +96,10 @@ div.rbtoc1334104553982 li {margin-left: 0px;padding-left: 0px;}
 	<li>In the box that opens, click <b>Upload a File</b> to browse to and select the file(s) you want to upload, and then click <b>Open</b>.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" />
-The file(s) are uploaded to the directory you selected.</li>
+The file(s) are uploaded to the directory you selected.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
 </ol>
 
-
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Important</b><br />To upload files, your browser must have Flash enabled. If your installation of Hue is using HTTPS, self-signed certificates often confuse Flash. You can avoid using Flash by clicking the <b>upload without flash</b> link in the <b>Uploading files</b> message box, or by adding <tt>/filebrowser/upload</tt> to the end of the URL for Hue in your browser to display the following page.<br/>
-<font color="red"><em>Is this still true?</em></font></td></tr></table></div>
 
 <h3><a name="FileBrowser-DownloadingFilesusingtheFileBrowser"></a>Downloading Files using the File Browser</h3>
 
@@ -140,11 +140,11 @@ The file(s) are uploaded to the directory you selected.</li>
 	<li>Choose <b>Move</b> from the Options menu.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>In the <b>Move</b> dialog box, enter the new path and file or directory name, and then click <b>Submit</b>. <font color="red"><em>is this really how it will work? old text: (browse to the directory where you want to move the file or directory)</em></font></li>
+	<li>In the <b>Move</b> dialog box, enter the new path and file or directory name, and then click <b>Submit</b>.</li>
 </ol>
 
 
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Tip</b><br />While browsing in the <b>Move</b> dialog box, you can use the <b>My Home</b> and <b>New Directory</b> buttons.</td></tr></table></div>
+
 <p><br class="atl-forced-newline" /></p>
 
 <p><b>To delete a file or directory:</b></p>
@@ -162,8 +162,10 @@ You can delete recursively by choosing <b>Delete Recursively</b> from the Option
 
 
 <h3><a name="FileBrowser-ChangingaFile%27sorDirectory%27sOwner%2CGroup%2CorPermissions"></a>Changing a File's or Directory's Owner, Group, or Permissions</h3>
+<p><br class="atl-forced-newline" /></p>
 
 <div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />Only the Hadoop superuser can change a file's or directory's owner, group, or permissions. The user who starts Hadoop is the Hadoop superuser. The Hadoop superuser account is not necessarily the same as a Hue superuser account. If you create a Hue user (in User Admin) with the same user name and password as the Hadoop superuser, then that Hue user can change a file's or directory's owner, group, or permissions.</td></tr></table></div>
+<p><br class="atl-forced-newline" /></p>
 
 <p><b>To change a file's or directory's owner or group:</b></p>
 
@@ -273,4 +275,3 @@ File Browser displays the contents of the file in the <b>File Editor</b> window.
 	    
     </body>
 </html>
-

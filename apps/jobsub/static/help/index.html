@@ -1,6 +1,7 @@
 <h1><a name="JobDesigner-IntroducingHueJobDesigner"></a>Introducing Hue Job Designer</h1>
 
-<p>The Job Designer application enables you to create and submit Hadoop Map/Reduce jobs to the Hadoop cluster. You can include variables with your jobs to enable you and other users to enter values for the variables when they run your job. The Job Designer supports streaming and JAR jobs. For more information about Hadoop Map/Reduce, see the <a href="http://archive.cloudera.com/cdh/3/hadoop-0.20.2+320/mapred_tutorial.html">Hadoop MapReduce Tutorial</a>. <font color="red"><em>update tutorial link</em></font></p>
+<p>The Job Designer application enables you to create and submit Hadoop Map/Reduce jobs to the Hadoop cluster. You can include variables with your jobs to enable you and other users to enter values for the variables when they run your job. The Job Designer supports streaming, MapReduce, and Java jobs. </p>
+
 
 <div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b> A job's input files must be uploaded to the cluster before you can submit the job.</td></tr></table></div>
 
@@ -8,11 +9,11 @@
 <h2><a name="JobDesigner-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1334175427865 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1334175427865 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1334175427865 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1334688108126 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1334688108126 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1334688108126 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1334175427865'>
+/*]]>*/</style><div class='rbtoc1334688108126'>
 <ul>
     <li><a href='#JobDesigner-IntroducingHueJobDesigner'>Introducing Hue Job Designer</a></li>
     <li><a href='#JobDesigner-JobDesignerInstallationandConfiguration'>Job Designer Installation and Configuration</a></li>
@@ -33,14 +34,14 @@ div.rbtoc1334175427865 li {margin-left: 0px;padding-left: 0px;}
     <li><a href='#JobDesigner-FilteringtheJobDesigns'>Filtering the Job Designs</a></li>
 </ul>
 </ul>
-    <li><a href='#JobDesigner-DisplayingJobResults'>Displaying Job Results</a></li>
+    <li><a href='#JobDesigner-DisplayingJobResults%28theJobSubmissionHistory%29'>Displaying Job Results (the Job Submission History)</a></li>
 </ul></div>
 <p><br class="atl-forced-newline" /></p>
 
 <p><a name="JobDesigner-JobDesignerInstallationandConfiguration"></a></p>
 <h1><a name="JobDesigner-JobDesignerInstallationandConfiguration"></a>Job Designer Installation and Configuration</h1>
 
-<p>Job Designer is one of the applications that is installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDHDOC/Hue+Installation">Hue Installation</a>.</p>
+<p>Job Designer is one of the applications that is installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDH4B2/Hue+Installation">Hue Installation</a>.</p>
 
 <p><a name="JobDesigner-StartingJobDesigner"></a></p>
 <h1><a name="JobDesigner-StartingJobDesigner"></a>Starting Job Designer</h1>
@@ -53,7 +54,7 @@ div.rbtoc1334175427865 li {margin-left: 0px;padding-left: 0px;}
 
 <p>The Job Designer sample jobs can help you learn how to use Job Designer. </p>
 
-<p>To install the Job Designer samples, click <b>Install Samples</b> in the <b>Job Designs</b> window and then click <b>Ok</b>. The sample jobs are displayed in the <b>Job Designs</b> window. Job Designer removes the <b>Install Samples</b> button after the samples are installed so you can only install the samples once. <font color="red"><em>has this changed?</em></font>
+<p>To install the Job Designer samples, click <b>Install Samples</b> in the <b>Job Designs</b> window and then click <b>Yes</b>. The sample jobs are displayed in the <b>Job Designs</b> window. Job Designer removes the <b>Install Samples</b> button after the samples are installed so you can only install the samples once. 
 <br class="atl-forced-newline" /></p>
 
 <p><a name="JobDesigner-WorkingwithJobDesigns"></a></p>
@@ -64,19 +65,38 @@ div.rbtoc1334175427865 li {margin-left: 0px;padding-left: 0px;}
 <p><a name="JobDesigner-CreatingaMapreducedesign"></a></p>
 <h3><a name="JobDesigner-CreatingaMapReduceJobDesign"></a>Creating a MapReduce Job Design</h3>
 
-<p>A Hadoop JAR consists of MapReduce functions written in Java.<br/>
-<font color="red"><em>how is this different from a Java job?</em></font></p>
+<p>A Hadoop JAR consists of MapReduce functions written in Java.</p>
+
 
 <p><b>To create a MapReduce job design:</b></p>
 
 <ol>
 	<li>In the <b>Job Designs</b> window, click <b>Create MapReduce Design</b>.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
-The <b>Job Design (mapreduce type)</b> window opens where you can specify information about the MapReduce job.
+The <b>Job Design (MapReduce type)</b> window opens where you can specify information about the MapReduce job.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
-	<li>In the <b>Job Design (mapreduce type)</b> window, specify the following information.
-<br class="atl-forced-newline" /> <br class="atl-forced-newline" />
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b> You can use variables of the form <tt>$variable_name</tt> for the <b>Arguments</b> setting described in the following table. When the MapReduce job is run, a dialog box will appear to enable you or users to specify the values of the variables. <font color="red"><em>no longer supported?</em></font></td></tr></table></div>
+	<li>In the <b>Job Design (MapReduce type)</b> window, specify the following information.
+<br class="atl-forced-newline" /></li>
+</ol>
+
+
+
+
+<style type="text/css">
+td {
+border: #dddddd solid 1px;
+height: 36px;
+padding: 5px 10px;
+vertical-align: top;
+}
+th {
+border: #dddddd solid 1px;
+height: 40px;
+padding: 5px 10px;
+vertical-align: center;
+}
+</style>
+
 <p><br class="atl-forced-newline" /></p>
 <div class='table-wrap'>
 <table class='confluenceTable'><tbody>
@@ -99,23 +119,21 @@ The <b>Job Design (mapreduce type)</b> window opens where you can specify inform
 <tr>
 <td class='confluenceTd'> <b>Job Properties</b> </td>
 <td class='confluenceTd'> Click <b>Add Property</b>, to set a property value: <br/>
-&diams;&nbsp;&nbsp; For <b>Property name</b>, enter a configuration variable name. <br/>
-&diams;&nbsp;&nbsp; For <b>Value</b>, enter the value you want to use for the variable.  </td>
+&raquo;&nbsp;&nbsp; For <b>Property name</b>, enter a configuration variable name.  This field provides auto-completion, so you can type the first few characters of a property name and then select the one you want from a list.<br/>
+&raquo;&nbsp;&nbsp; For <b>Value</b>, enter the value you want to use for the variable.  </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <b>Files</b> </td>
-<td class='confluenceTd'> Click <b>Add File</b>, then enter a file name <font color="red"><em>what files?</em></font>  </td>
+<td class='confluenceTd'> Click <b>Add File</b>, then enter a file name or browse for a file to upload.   </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <b>Archives</b> </td>
-<td class='confluenceTd'> Click <b>Add Archive</b>, then enter an archive name <font color="red"><em>what is this?</em></font>   </td>
+<td class='confluenceTd'> Click <b>Add Archive</b>, then enter an archive name or browse for a    </td>
 </tr>
 </tbody></table>
 </div>
 
-<p><br class="atl-forced-newline" /></p></li>
-</ol>
-
+<p><br class="atl-forced-newline" /></p>
 
 <ol>
 	<li>Click <b>Save</b> to save the job settings.
@@ -164,8 +182,8 @@ The <b>Job Design (streaming type)</b> window opens to enable you to specify inf
 <tr>
 <td class='confluenceTd'> <b>Job Properties</b> </td>
 <td class='confluenceTd'> Click <b>Add Property</b>, to set a property value: <br/>
-&ordm;&nbsp;&nbsp; For <b>Property name</b>, enter a configuration variable name. <br/>
-&ordm;&nbsp;&nbsp; For <b>Value</b>, enter the value you want to use for the variable.  </td>
+&raquo;&nbsp;&nbsp; For <b>Property name</b>, enter a configuration variable name. <br/>
+&raquo;&nbsp;&nbsp; For <b>Value</b>, enter the value you want to use for the variable.  </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <b>Files</b> </td>
@@ -354,18 +372,18 @@ The jobs are displayed in the <b>Job Designs</b> window.
 
 
 <p><a name="JobDesigner-DisplayingJobResults"></a></p>
-<h1><a name="JobDesigner-DisplayingJobResults"></a>Displaying Job Results</h1>
+<h1><a name="JobDesigner-DisplayingJobResults%28theJobSubmissionHistory%29"></a>Displaying Job Results (the Job Submission History)</h1>
 
-<p><b>To display job results:</b></p>
+<p><b>To display the Job Submission History</b></p>
 
 <ol>
 	<li>In the <b>Job Designs</b> window, click the <b>History</b> tab.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" />
-The jobs are displayed in the <b>Recently Launched Jobs</b> list.
+The jobs are displayed in the <b>Job Submissions History</b> list by Oozie job ID.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>To display details about a job, double-click it or click <font color="red">??</font> next to the task.
+	<li>To display details about a job, double-click the Oozie Job ID.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
 The results of the job appear.
 <br class="atl-forced-newline" />
@@ -399,4 +417,3 @@ Click here for more information about using Job Browser.</li>
 	    
     </body>
 </html>
-
