@@ -41,6 +41,7 @@ import beeswax.hive_site
 import beeswax.models
 import beeswax.report
 import beeswax.views
+from beeswax import conf
 from beeswax.views import parse_results, collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history
 from beeswax.test_base import BeeswaxSampleProvider
@@ -491,6 +492,49 @@ for x in sys.stdin:
     do_view('sort=name&user=bogus')
     resp = do_view('sort=-type&user=test&type=hql&text=Rubbish')
     assert_true('rubbish' in resp.content)
+
+    # Test personal saved queries permissions
+    _make_query(self.client, "select one", name='client 1 query', submission_type='Save')
+    _make_query(self.client, "select two", name='client 2 query', submission_type='Save')
+
+    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(True)
+    resp = self.client.get('/beeswax/list_designs')
+    assert_true('select one' in resp.content)
+    assert_true('select two' in resp.content)
+
+    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(False)
+    resp = self.client.get('/beeswax/list_designs')
+    assert_true('select one' in resp.content)
+    assert_true('select two' in resp.content)
+
+    # Login as someone else
+    client2 = make_logged_in_client('not_me')
+    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(True)
+    resp = client2.get('/beeswax/list_designs')
+    assert_true('select one' not in resp.content)
+    assert_true('select two' not in resp.content)
+
+    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(False)
+    resp = client2.get('/beeswax/list_designs')
+    assert_true('select one' in resp.content)
+    assert_true('select two' in resp.content)
+    client2.logout()
+
+    # Login as super user
+    client3 = make_logged_in_client('admin', is_superuser=True)
+    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(True)
+    resp = client3.get('/beeswax/list_designs')
+    assert_true('select one' in resp.content)
+    assert_true('select two' in resp.content)
+
+    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(False)
+    resp = client3.get('/beeswax/list_designs')
+    assert_true('select one' in resp.content)
+    assert_true('select two' in resp.content)
+    client3.logout()
+
+    # Cleaning
+    beeswax.models.SavedQuery.objects.all()[:2].delete()
 
 
   def test_my_queries(self):

@@ -501,7 +501,7 @@ def save_design(request, form, type, design, explicit_save):
 
 def list_designs(request):
   """
-  View function for show all saved queries
+  View function for show all saved queries.
 
   We get here from /beeswax/list_designs?filterargs, with the options being:
     page=<n>    - Controls pagination. Defaults to 1.
@@ -512,10 +512,18 @@ def list_designs(request):
                   Accepts the form "-date", which sort in descending order.
                   Default to "-date".
     text=<frag> - Search for fragment "frag" in names and descriptions.
+
+  Depending on Beeswax configuration parameter ``SHOW_ONLY_PERSONAL_SAVED_QUERIES``,
+  only the personal queries of the user will be returned (even if another user is
+  specified in ``filterargs``).
   """
   DEFAULT_PAGE_SIZE = 10
 
-  page, filter_params = _list_designs(request.GET, DEFAULT_PAGE_SIZE)
+  if conf.SHARE_SAVED_QUERIES.get() or request.user.is_superuser:
+    user = None
+  else:
+    user = request.user
+  page, filter_params = _list_designs(request.GET, DEFAULT_PAGE_SIZE, user=user)
   return render('list_designs.mako', request, {
     'page': page,
     'filter_params': filter_params,
@@ -523,12 +531,14 @@ def list_designs(request):
   })
 
 
-def _list_designs(querydict, page_size, prefix=""):
+def _list_designs(querydict, page_size, prefix="", user=None):
   """
-  _list_designs(querydict, page_size, prefix) -> (page, filter_param)
+  _list_designs(querydict, page_size, prefix, user) -> (page, filter_param)
 
   A helper to gather the designs page. It understands all the GET params in
   ``list_designs``, by reading keys from the ``querydict`` with the given ``prefix``.
+  If a ``user`` is specified, only the saved queries of this user will be returned.
+  This has priority over the ``user`` in the ``querydict`` parameter.
   """
   DEFAULT_SORT = ('-', 'date')                  # Descending date
 
@@ -542,7 +552,8 @@ def _list_designs(querydict, page_size, prefix=""):
 
   # Filtering. Only display designs explicitly saved.
   db_queryset = models.SavedQuery.objects.filter(is_auto=False)
-  user = querydict.get(prefix + 'user')
+  if user is None:
+    user = querydict.get(prefix + 'user')
   if user is not None:
     db_queryset = db_queryset.filter(owner__username=user)
 
