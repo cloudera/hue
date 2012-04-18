@@ -41,6 +41,7 @@ import beeswax.hive_site
 import beeswax.models
 import beeswax.report
 import beeswax.views
+from beeswax import conf
 from beeswax.views import parse_results, collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history
 from beeswax.test_base import BeeswaxSampleProvider
@@ -536,6 +537,66 @@ for x in sys.stdin:
     resp = do_view('sort=-type&user=test&type=hql&text=Rubbish')
     assert_true('rubbish' in resp.content)
 
+    # Test personal saved queries permissions
+    client = make_logged_in_client(username='its_me', is_superuser=False)
+    _make_query(self.client, "select one", name='client query 1', submission_type='Save')
+    _make_query(self.client, "select two", name='client query 2', submission_type='Save')
+
+    finish = conf.SHARE_SAVED_QUERIES.set_for_testing(True)
+    try:
+      resp = self.client.get('/beeswax/list_designs')
+      assert_true('client query 1' in resp.content)
+      assert_true('client query 2' in resp.content)
+    finally:
+      finish()
+
+    finish = conf.SHARE_SAVED_QUERIES.set_for_testing(False)
+    try:
+      resp = self.client.get('/beeswax/list_designs')
+      assert_true('client query 1' in resp.content)
+      assert_true('client query 2' in resp.content)
+    finally:
+      finish()
+      client.logout()
+
+    # Login as someone else
+    client2 = make_logged_in_client(username='not_me', is_superuser=False)
+    # Failing for now as the user does not have access to the Beeswax app.
+#    finish = conf.SHARE_SAVED_QUERIES.set_for_testing(True)
+#    try:
+#      resp = client2.get('/beeswax/list_designs')
+#      assert_true('client query 1' in resp.content)
+#      assert_true('client query 2' in resp.content)
+#    finally:
+#      finish()
+
+    finish = conf.SHARE_SAVED_QUERIES.set_for_testing(False)
+    try:
+      resp = client2.get('/beeswax/list_designs')
+      assert_true('client query 1' not in resp.content)
+      assert_true('client query 2' not in resp.content)
+    finally:
+      finish()
+      client2.logout()
+
+    # Login as super user
+    client3 = make_logged_in_client('admin', is_superuser=True)
+    finish = conf.SHARE_SAVED_QUERIES.set_for_testing(True)
+    try:
+      resp = client3.get('/beeswax/list_designs')
+      assert_true('client query 1' in resp.content)
+      assert_true('client query 2' in resp.content)
+    finally:
+      finish()
+
+    finish = conf.SHARE_SAVED_QUERIES.set_for_testing(False)
+    try:
+      resp = client3.get('/beeswax/list_designs')
+      assert_true('client query 1' in resp.content)
+      assert_true('client query 2' in resp.content)
+    finally:
+      finish()
+      client3.logout()
 
   def test_my_queries(self):
     """Test the "My Queries" page"""
@@ -965,7 +1026,7 @@ def test_history_page():
     assert_true(len(resp.context['page'].object_list) >= 0)     # Make the query run
 
   do_view('user=test')
-  do_view('user=_all')
+  do_view('user=:all')
   do_view('design_id=1')
   do_view('auto_query=0')
   do_view('auto_query=1')
@@ -980,7 +1041,7 @@ def test_history_page():
   do_view('sort=type')
   do_view('sort=-type')
   do_view('sort=name&user=bogus&design_id=1&auto_query=1')
-  do_view('sort=-type&user=_all&type=hql&auto_query=0')
+  do_view('sort=-type&user=:all&type=hql&auto_query=0')
 
 
 def test_strip_trailing_semicolon():

@@ -52,6 +52,42 @@ from filebrowser.views import location_to_url
 
 LOG = logging.getLogger(__name__)
 
+
+def authorized_get_design(request, design_id, owner_only=False, must_exist=False):
+  if design_id is None and not must_exist:
+    return None
+  try:
+    design = models.SavedQuery.objects.get(id=design_id)
+  except models.SavedQuery.DoesNotExist:
+    if must_exist:
+      raise PopupException('Design %s does not exist.' % (design_id,))
+    else:
+      return None
+
+  if not conf.SHARE_SAVED_QUERIES.get() and (not request.user.is_superuser or owner_only) \
+      and design.owner != request.user:
+    raise PopupException('Cannot access design %s' % (design_id,))
+  else:
+    return design
+
+def authorized_get_history(request, query_history_id, owner_only=False, must_exist=False):
+  if query_history_id is None and not must_exist:
+    return None
+  try:
+    query_history = models.QueryHistory.objects.get(id=query_history_id)
+  except models.QueryHistory.DoesNotExist:
+    if must_exist:
+      raise PopupException('QueryHistory %s does not exist.' % (query_history_id,))
+    else:
+      return None
+
+  if not conf.SHARE_SAVED_QUERIES.get() and (not request.user.is_superuser or owner_only) \
+      and query_history.owner != request.user:
+    raise PopupException('Cannot access QueryHistory %s' % (query_history_id,))
+  else:
+    return query_history
+
+
 def index(request):
   tables = db_utils.meta_client().get_tables("default", ".*")
   if not tables:
@@ -249,6 +285,8 @@ def execute_directly(request, query_msg, design=None, tablename=None,
 
   Note that this may throw a Beeswax exception.
   """
+  if design is not None:
+    authorized_get_design(request, design.id)
   history_obj = db_utils.execute_directly(request.user, query_msg, design, **kwargs)
   watch_url = urlresolvers.reverse("beeswax.views.watch_query", kwargs=dict(id=history_obj.id))
 
@@ -282,6 +320,8 @@ def execute_query(request, design_id=None):
       If given, it will be displayed when the query is successfully finished.
       Otherwise, it will display the view query results page by default.
   """
+  authorized_get_design(request, design_id)
+
   error_message = None
   form = beeswax.forms.query_form()
   action = request.path
@@ -395,7 +435,8 @@ def _run_parameterized_query(request, design_id, explain):
 
   This is an extra "step" in the flow from execute_query.
   """
-  design = models.SavedQuery.get(design_id, request.user, models.SavedQuery.HQL)
+  design = authorized_get_design(request, design_id, must_exist=True)
+
   # Reconstitute the form
   design_obj = beeswax.design.HQLdesign.loads(design.data)
   query_form = beeswax.forms.query_form()
@@ -441,6 +482,8 @@ def expand_exception(exc):
 
 
 def edit_report(request, design_id=None):
+  authorized_get_design(request, design_id)
+
   return beeswax.report.edit_report(request, design_id)
 
 
@@ -500,7 +543,7 @@ def save_design(request, form, type, design, explicit_save):
 
 def list_designs(request):
   """
-  View function for show all saved queries
+  View function for show all saved queries.
 
   We get here from /beeswax/list_designs?filterargs, with the options being:
     page=<n>    - Controls pagination. Defaults to 1.
@@ -511,10 +554,18 @@ def list_designs(request):
                   Accepts the form "-date", which sort in descending order.
                   Default to "-date".
     text=<frag> - Search for fragment "frag" in names and descriptions.
+
+  Depending on Beeswax configuration parameter ``SHOW_ONLY_PERSONAL_SAVED_QUERIES``,
+  only the personal queries of the user will be returned (even if another user is
+  specified in ``filterargs``).
   """
   DEFAULT_PAGE_SIZE = 10
 
-  page, filter_params = _list_designs(request.GET, DEFAULT_PAGE_SIZE)
+  if conf.SHARE_SAVED_QUERIES.get() or request.user.is_superuser:
+    user = None
+  else:
+    user = request.user
+  page, filter_params = _list_designs(request.GET, DEFAULT_PAGE_SIZE, user=user)
   return render('list_designs.mako', request, {
     'page': page,
     'filter_params': filter_params,
@@ -522,12 +573,14 @@ def list_designs(request):
   })
 
 
-def _list_designs(querydict, page_size, prefix=""):
+def _list_designs(querydict, page_size, prefix="", user=None):
   """
-  _list_designs(querydict, page_size, prefix) -> (page, filter_param)
+  _list_designs(querydict, page_size, prefix, user) -> (page, filter_param)
 
   A helper to gather the designs page. It understands all the GET params in
   ``list_designs``, by reading keys from the ``querydict`` with the given ``prefix``.
+  If a ``user`` is specified, only the saved queries of this user will be returned.
+  This has priority over the ``user`` in the ``querydict`` parameter.
   """
   DEFAULT_SORT = ('-', 'date')                  # Descending date
 
@@ -541,7 +594,8 @@ def _list_designs(querydict, page_size, prefix=""):
 
   # Filtering. Only display designs explicitly saved.
   db_queryset = models.SavedQuery.objects.filter(is_auto=False)
-  user = querydict.get(prefix + 'user')
+  if user is None:
+    user = querydict.get(prefix + 'user')
   if user is not None:
     db_queryset = db_queryset.filter(owner__username=user)
 
@@ -591,9 +645,9 @@ def _list_designs(querydict, page_size, prefix=""):
 
 def delete_design(request, design_id):
   """Delete a saved design"""
-  try:
-    design = models.SavedQuery.get(design_id, request.user)
-  except models.SavedQuery.DoesNotExist:
+  design = authorized_get_design(request, design_id)
+
+  if design is None:
     LOG.error('Cannot delete non-existent design %s' % (design_id,))
     return list_designs(request)
 
@@ -606,9 +660,9 @@ def delete_design(request, design_id):
 
 def clone_design(request, design_id):
   """Clone a design belonging to any user"""
-  try:
-    design = models.SavedQuery.get(design_id)
-  except models.SavedQuery.DoesNotExist:
+  design = authorized_get_design(request, design_id)
+
+  if design is None:
     LOG.error('Cannot clone non-existent design %s' % (design_id,))
     return list_designs(request)
 
@@ -636,7 +690,8 @@ def download(request, id, format):
   id = int(id)
   assert format in common.DL_FORMATS
 
-  query_history = models.QueryHistory.objects.get(id=id)
+  query_history = authorized_get_history(request, id, must_exist=True)
+
   LOG.debug('Download results for query %s: [ %s ]' %
       (query_history.server_id, query_history.query))
   return data_export.download(query_history, format)
@@ -653,8 +708,9 @@ def query_done_cb(request, server_id):
   """
   res = HttpResponse('<html><head></head><body></body></html>')
 
-  history = models.QueryHistory.objects.get(server_id=server_id)
-  if not history:
+  history = authorized_get_history(request, server_id)
+
+  if history is None:
     LOG.error('Processing query completion email: Cannot find query matching id %s' % (server_id,))
     return res
 
@@ -702,6 +758,8 @@ def watch_query(request, id):
   # Coerce types; manage arguments
   id = int(id)
 
+  query_history = authorized_get_history(request, id, must_exist=True)
+
   # GET param: context.
   context_param = request.GET.get('context', '')
 
@@ -711,8 +769,7 @@ def watch_query(request, id):
   if not on_success_url:
     on_success_url = results_url
 
-  # Retrieve models from database to get the server_id
-  query_history = models.QueryHistory.objects.get(id=id)
+  # Get the server_id
   server_id, state = _get_server_id_and_state(query_history)
   query_history.save_state(state)
 
@@ -831,8 +888,8 @@ def view_results(request, id, first_row=0):
   first_row = long(first_row)
   start_over = (first_row == 0)
 
-  # Retrieve models from database
-  query_history = models.QueryHistory.objects.get(id=id)
+  query_history = authorized_get_history(request, id, must_exist=True)
+
   handle = QueryHandle(id=query_history.server_id, log_context=query_history.log_context)
   context = _parse_query_context(request.GET.get('context'))
 
@@ -1105,6 +1162,13 @@ def configuration(request):
                       bool(request.REQUEST.get("include_hadoop", False)))
   return render("configuration.mako", request, dict(config_values=config_values))
 
+def _copy_prefix(prefix, base_dict):
+  """Copy keys starting with ``prefix``"""
+  querydict = QueryDict(None, mutable=True)
+  for key, val in base_dict.iteritems():
+    if key.startswith(prefix):
+      querydict[key] = val
+  return querydict
 
 def my_queries(request):
   """
@@ -1115,17 +1179,9 @@ def my_queries(request):
   """
   DEFAULT_PAGE_SIZE = 40
 
-  def copy_prefix(prefix):
-    """Copy keys starting with ``prefix``"""
-    querydict = QueryDict(None, mutable=True)
-    for key, val in request.GET.iteritems():
-      if key.startswith(prefix):
-        querydict[key] = val
-    return querydict
-
   # Extract the history list.
   prefix = 'h-'
-  querydict_history = copy_prefix(prefix)
+  querydict_history = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
   querydict_history[ prefix + 'user' ] = request.user.username
   hist_page, hist_filter = _list_query_history(request.user,
@@ -1134,7 +1190,7 @@ def my_queries(request):
                                                prefix)
   # Extract the saved query list.
   prefix = 'q-'
-  querydict_query = copy_prefix(prefix)
+  querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
   querydict_query[ prefix + 'user' ] = request.user.username
   query_page, query_filter = _list_designs(querydict_query, DEFAULT_PAGE_SIZE, prefix)
@@ -1155,7 +1211,7 @@ def list_query_history(request):
   We get here from /beeswax/query_history?filterargs, with the options being:
     page=<n>            - Controls pagination. Defaults to 1.
     user=<name>         - Show history items from a user. Default to current user only.
-                          Also accepts '_all' to show all history items.
+                          Also accepts ':all' to show all history items.
     type=<type>         - <type> is "report|hql", for design type. Default to show all.
     design_id=<id>      - Show history for this particular design id.
     sort=<key>          - Sort by the attribute <key>, which is one of:
@@ -1166,11 +1222,18 @@ def list_query_history(request):
   """
   DEFAULT_PAGE_SIZE = 10
 
-  page, filter_params = _list_query_history(request.user, request.GET, DEFAULT_PAGE_SIZE)
+  share_queries = conf.SHARE_SAVED_QUERIES.get() or request.user.is_superuser
+
+  querydict_query = request.GET.copy()
+  if not share_queries:
+    querydict_query['user'] = request.user.username
+
+  page, filter_params = _list_query_history(request.user, querydict_query, DEFAULT_PAGE_SIZE)
   return render('list_history.mako', request, {
     'request': request,
     'page': page,
     'filter_params': filter_params,
+    'share_queries': share_queries,
   })
 
 
@@ -1201,9 +1264,10 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   if not querydict.get(prefix + 'auto_query', False):
     db_queryset = db_queryset.filter(design__isnull=False)
 
-  user = querydict.get(prefix + 'user', user.username)
-  if user != '_all':
-    db_queryset = db_queryset.filter(owner__username=user)
+  username = user.username
+  user_filter = querydict.get(prefix + 'user', user.username)
+  if user_filter != ':all':
+    db_queryset = db_queryset.filter(owner__username=user_filter)
 
   # Design id
   design_id = querydict.get(prefix + 'design_id')

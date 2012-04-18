@@ -54,18 +54,20 @@ ${wrappers.head("Beeswax: Query History", section='history')}
 
   <div class="bw-show_group toolbar">
       Show:
-    % if filter_params.get('user') == '_all':
-      <%
-        my_querydict = filter_params.copy()
-        my_querydict['user'] = request.user.username
-      %>
-      <a href="?${my_querydict.urlencode()}" class="bw-show_group_mine" data-filters="ArtButton">mine</a>
-    % else:
-      <%
-        my_querydict = filter_params.copy()
-        my_querydict['user'] = '_all'
-      %>
-      <a href="?${my_querydict.urlencode()}" class="bw-show_group_all" data-filters="ArtButton">everyone's</a>
+    % if share_queries:
+      % if filter_params.get('user') == '_all':
+        <%
+          my_querydict = filter_params.copy()
+          my_querydict['user'] = request.user.username
+        %>
+        <a href="?${my_querydict.urlencode()}" class="bw-show_group_mine" data-filters="ArtButton">mine</a>
+      % else:
+        <%
+          my_querydict = filter_params.copy()
+          my_querydict['user'] = '_all'
+        %>
+        <a href="?${my_querydict.urlencode()}" class="bw-show_group_all" data-filters="ArtButton">everyone's</a>
+      % endif
     % endif
 
     % if filter_params.get('auto_query', None):
