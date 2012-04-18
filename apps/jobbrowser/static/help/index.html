@@ -1,6 +1,6 @@
 <h1><a name="JobBrowser-IntroducingHueJobBrowser"></a>Introducing Hue Job Browser</h1>
 
-<p>The Hue Job Browser application enables you to examine the Hadoop MapReduce jobs running on your Hadoop cluster. Job Browser presents the job and tasks in layers. The top layer is a list of jobs, and you can double-click a job to view a list of that job's tasks. You can then view a task's attempts and the properties of each attempt, such as state, start and end time, and output size. To troubleshoot failed jobs, you can also view the logs of each attempt. </p>
+<p>The Hue Job Browser application lets you to examine the Hadoop MapReduce jobs running on your Hadoop cluster. Job Browser presents the job and tasks in layers. The top layer is a list of jobs, and you can link to a list of that job's tasks. You can then view a task's attempts and the properties of each attempt, such as state, start and end time, and output size. To troubleshoot failed jobs, you can also view the logs of each attempt. </p>
 
 
 
@@ -8,11 +8,11 @@
 <h2><a name="JobBrowser-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1334689029994 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1334689029994 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1334689029994 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1334716834877 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1334716834877 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1334716834877 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1334689029994'>
+/*]]>*/</style><div class='rbtoc1334716834877'>
 <ul>
     <li><a href='#JobBrowser-IntroducingHueJobBrowser'>Introducing Hue Job Browser</a></li>
     <li><a href='#JobBrowser-JobBrowserInstallationandConfiguration'>Job Browser Installation and Configuration</a></li>
@@ -21,22 +21,22 @@ div.rbtoc1334689029994 li {margin-left: 0px;padding-left: 0px;}
     <li><a href='#JobBrowser-ViewingJobInformationandLogs'>Viewing Job Information and Logs</a></li>
     <li><a href='#JobBrowser-ViewingJobOutput'>Viewing Job Output</a></li>
 </ul></div>
-<p><br class="atl-forced-newline" /></p>
 
 <p><a name="JobBrowser-JobBrowserInstallationandConfiguration"></a></p>
 <h1><a name="JobBrowser-JobBrowserInstallationandConfiguration"></a>Job Browser Installation and Configuration</h1>
 
-<p>Job Browser is one of the applications that is installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDHDOC/Hue+Installation">Hue Installation</a>.</p>
+<p>Job Browser is one of the applications that is installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDHDOC/Hue+Installation">Hue Installation</a>.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></p>
 
 <p><a name="JobBrowser-StartingJobBrowser"></a></p>
 <h1><a name="JobBrowser-StartingJobBrowser"></a>Starting Job Browser</h1>
 
 <p>To start Job Browser, click the <b>Job Browser</b> tab in the navigation bar at the top of the Hue web page. </p>
 
-<p>If there are no jobs running, the <b>Welcome to the Job Browser</b> page opens, with links to the Job Designer and Beeswax. </p>
+<p>If there are no jobs that have been run, the <b>Welcome to the Job Browser</b> page opens, with links to the Job Designer and Beeswax. </p>
 
-<p>If there are jobs running, then the <b>Job Browser List</b> window opens.
-<br class="atl-forced-newline" /></p>
+<p>If there are jobs running, then the Job Browser list appears.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></p>
 
 <p><a name="JobBrowser-FilteringtheJobBrowserList"></a></p>
 <h1><a name="JobBrowser-FilteringtheJobBrowserList"></a>Filtering the Job Browser List</h1>
@@ -50,38 +50,79 @@ div.rbtoc1334689029994 li {margin-left: 0px;padding-left: 0px;}
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
 	<li>To filter by job name, enter the name in the <b>Text Filter</b> query box.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
-	<li>To clear the filters, choose <b>All States</b> from the <b>Filter Jobs</b> menu and delete any text in the <b>User Name Filter</b> and <b>Text Filter</b> query boxes.</li>
+	<li>To clear the filters, choose <b>All States</b> from the <b>Filter Jobs</b> menu and delete any text in the <b>User Name Filter</b> and <b>Text Filter</b> query boxes.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
 </ol>
 
 
 <p><a name="JobBrowser-ViewingJobInformationandLogs"></a></p>
 <h1><a name="JobBrowser-ViewingJobInformationandLogs"></a>Viewing Job Information and Logs</h1>
 
-<p><b>To view job information and logs:</b>  </p>
+<p><b>To view job information for an individual job:</b>  </p>
 
 <ol>
-	<li>In the <b>Job Browser</b> window, double-click the job you want to view.
+	<li>In the <b>Job Browser</b> window, click <b>View</b> at the right of the job you want to view.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
-The recent tasks associated with the job is displayed.
+This shows the <b>Job</b> page for the job, with the recent tasks associated with the job are displayed in the <b>Tasks</b> tab. 
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
-	<li>To view the attempts for a task, double-click the task.
+	<li>Click the <b>Metadata</b> tab to view the metadata for this job.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
+	<li>Click the <b>Counters</b> tab to view the counter metrics for the job.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
+</ol>
+
+
+<p><b>To view details about the tasks associated with the job:</b></p>
+
+<ol>
+	<li>In the <b>Job</b> window, click the <b>View All Tasks</b> link at the right just above the <b>Recent Tasks</b> list.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" />
+This lists all the tasks associated with the job. 
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
+	<li>Click <b>Attempts</b> to the right of a task to view the attempts for that task.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
+</ol>
+
+
+
+<p><b>To view information about an individual task:</b> </p>
+
+<ol>
+	<li>in the <b>Job</b> window, click the <b>View</b> link to the right of the task.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
 The attempts associated with the task are displayed.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
-	<li>To view information about a task attempt, click the <b>Metadata</b> tab.
+	<li>Click the <b>Metadata</b> tab to view metadata for this task.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
-The metadata associated with the attempt is displayed.
+The metadata associated with the task is displayed.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
-	<li>To view the Hadoop counters for a task attempt, click the <b>Counters</b> tab.
+	<li>To view the Hadoop counters for a task, click the <b>Counters</b> tab.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" />
+The counters associated with the task is displayed.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
+	<li>To return to the <b>Job</b> window for this job, click the job number in the status panel at the left of the window.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /> </li>
+</ol>
+
+
+
+<p><b>To view details about a task attempt:</b></p>
+
+<ol>
+	<li>In the <b>Job Task</b> window, click the <b>View</b> link to the right of the task attempt.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" />
+The metadata associated with the attempt is displayed under the <b>Metadata</b> tab.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
+	<li>To view the Hadoop counters for the task attempt, click the <b>Counters</b> tab.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
 The counters associated with the attempt is displayed.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
-	<li>Click the <b>Logs</b> tab.
+	<li>To view the logs associated with the task attempt, click the <b>Logs</b> tab.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
-The logs associated with the task attempt is displayed.
+The logs associated with the task attempt are displayed.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
-	<li>To return to the list of tasks for the current job, click the job number next to <b>Job</b> near the top of the window.
-<br class="atl-forced-newline" /></li>
+	<li>To return to the list of tasks for the current job, click the task number in the status panel at the left of the window.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
 </ol>
 
 
@@ -93,8 +134,9 @@ The logs associated with the task attempt is displayed.
 <ol>
 	<li>In the <b>Job Browser</b> window, double-click the job.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
-	<li>To view the output of the job, click the link next to <b>Output</b> at the top of the screen.
-<br class="atl-forced-newline" /></li>
+	<li>To view the output of the job, click the link under  <b>Output</b> in the status panel at the left of the window.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" />
+This takes you to the job output directory in the <b>File Browser</b>.</li>
 </ol>
 
 
