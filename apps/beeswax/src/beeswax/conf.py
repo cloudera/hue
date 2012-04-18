@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Configuration options for the Hive UI (Beeswax)."""
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, coerce_bool
 import os.path
 
 BEESWAX_SERVER_HOST = Config(
@@ -96,3 +96,9 @@ BROWSE_PARTITIONED_TABLE_LIMIT = Config(
   default=250,
   type=int,
   help='Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.')
+
+SHARE_SAVED_QUERIES = Config(
+  key='share_saved_queries',
+  default=True,
+  type=coerce_bool,
+  help='Share saved queries with all users. If set to false, saved queries are visible only to the owner and administrators.')
