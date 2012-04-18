@@ -3,17 +3,22 @@
 <p>The Job Designer application enables you to create and submit Hadoop Map/Reduce jobs to the Hadoop cluster. You can include variables with your jobs to enable you and other users to enter values for the variables when they run your job. The Job Designer supports streaming, MapReduce, and Java jobs. </p>
 
 
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b> A job's input files must be uploaded to the cluster before you can submit the job.</td></tr></table></div>
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br /><ul>
+	<li>The Job Designer uses Oozie to submit MapReduce jobs.  Therefore, Oozie must be installed and configured before you can use JobDesigner.</li>
+	<li>A job's input files must be uploaded to the cluster before you can submit the job.
+<br class="atl-forced-newline" /></li>
+</ul>
+</td></tr></table></div>
 
 
 <h2><a name="JobDesigner-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1334688108126 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1334688108126 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1334688108126 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1334776075479 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1334776075479 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1334776075479 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1334688108126'>
+/*]]>*/</style><div class='rbtoc1334776075479'>
 <ul>
     <li><a href='#JobDesigner-IntroducingHueJobDesigner'>Introducing Hue Job Designer</a></li>
     <li><a href='#JobDesigner-JobDesignerInstallationandConfiguration'>Job Designer Installation and Configuration</a></li>
@@ -41,7 +46,7 @@ div.rbtoc1334688108126 li {margin-left: 0px;padding-left: 0px;}
 <p><a name="JobDesigner-JobDesignerInstallationandConfiguration"></a></p>
 <h1><a name="JobDesigner-JobDesignerInstallationandConfiguration"></a>Job Designer Installation and Configuration</h1>
 
-<p>Job Designer is one of the applications that is installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDH4B2/Hue+Installation">Hue Installation</a>.</p>
+<p>Job Designer is one of the applications that is installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDH4B2/Hue+Installation">Hue Installation</a>.  For information about installing Oozie, see <a href="https://ccp.cloudera.com/display/CDH4B2/Oozie+Installation">Oozie installation</a>.</p>
 
 <p><a name="JobDesigner-StartingJobDesigner"></a></p>
 <h1><a name="JobDesigner-StartingJobDesigner"></a>Starting Job Designer</h1>
