@@ -120,13 +120,10 @@ class WebHdfs(Hdfs):
       return WebHdfs.DEFAULT_USER
 
   def _getparams(self):
-    if self.security_enabled:
-      return {
-        "user.name" : WebHdfs.DEFAULT_USER,
-        "doas" : self.user
-      }
-    else:
-      return { "user.name" : self.user }
+    return {
+      "user.name" : WebHdfs.DEFAULT_USER,
+      "doas" : self.user
+    }
 
   def setuser(self, user):
     """Set a new user. Return the current user."""
