@@ -166,50 +166,28 @@ ${layout.menubar(section='designs')}
 
 </div>
 
-<div id="fileChooserModal" class="smallModal">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-</div>
 
-<div id="fileChooserModalBackdrop" class="modal-backdrop hide"></div>
-
-## Modal for file chooser
 <div id="chooseFile" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Choose a file</h3>
     </div>
     <div class="modal-body">
-        <div id="fileChooserModalz">
+        <div id="fileChooserModal">
         </div>
     </div>
     <div class="modal-footer">
     </div>
 </div>
 
+
 <style>
-
-    .smallModal {
-        display:none;
-        background-clip: padding-box;
-        background-color: #FFFFFF;
-        border: 1px solid rgba(0, 0, 0, 0.3);
-        border-radius: 6px 6px 6px 6px;
-        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-        width:600px;
-        position:fixed;
-        background-color:#FFFFFF;
-        top:10px;
-        left: 50%;
-        margin: 0 0 0 -300px;
-        z-index: 1050;
-    }
-
     #fileChooserModal {
         padding:14px;
         height:370px;
     }
 
-    #fileChooserModal ul {
+    #fileChooserModal > ul {
         height:330px;
         overflow-y:auto;
     }
@@ -313,22 +291,18 @@ ${layout.menubar(section='designs')}
 
         ko.bindingHandlers.fileChooser = {
             init: function(element, valueAccessor, allBindings, model) {
-
                 $(element).click(function() {
                     $("#fileChooserModal").jHueFileChooser({
                         onFileChoose: function(filePath) {
                             var binding = valueAccessor();
                             binding["name"] = filePath;
-                            $("#fileChooserModal").hide();
-                            $("#fileChooserModalBackdrop").hide();
+                            $("#chooseFile").modal("hide");
                             $(element).val(filePath);
                         },
                         createFolder: false
                     });
-                    $("#fileChooserModalBackdrop").show();
-                    $("#fileChooserModal").slideDown();
+                    $("#chooseFile").modal("show");
                 });
-
             }
         };
 
@@ -340,21 +314,14 @@ ${layout.menubar(section='designs')}
             $("#fileChooserModal").jHueFileChooser({
                 onFileChoose: function(filePath) {
                     $(self).val(filePath);
-                    $("#fileChooserModal").hide();
-                    $("#fileChooserModalBackdrop").hide();
+                    $("#chooseFile").modal("hide");
                 },
                 createFolder: false
             });
-            $("#fileChooserModal").slideDown();
+            $("#chooseFile").modal("show");
         });
 
         $(".propKey").each(addAutoComplete);
-
-        $("#fileChooserModalBackdrop").click(function(){
-            $("#fileChooserModal").hide();
-            $(this).hide();
-        });
-
     });
 </script>
 
