@@ -386,6 +386,8 @@ class PseudoHdfs4(object):
       'dfs.datanode.ipc.address': 'localhost:0',
       'dfs.replication': 1,
       'dfs.safemode.min.datanodes': 1,
+      'hadoop.proxyuser.hue.hosts': '*',
+      'hadoop.proxyuser.hue.groups': '*',
     }
     write_config(hdfs_configs, self._tmppath('conf/hdfs-site.xml'))
 

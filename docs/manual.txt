@@ -150,9 +150,31 @@ Depending on your setup, your `hdfs-site.xml` might be in `/etc/hadoop/conf`.
       <value>true</value>
     </property>
 
+You also need to add this to `core-site.html`.
+
+    <property>
+      <name>hadoop.proxyuser.hue.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.hue.groups</name>
+      <value>*</value>
+    </property>
+
 If you place your Hue Server outside the Hadoop cluster, you can run
 an HttpFS server to provide Hue access to HDFS. The HttpFS service requires
 only one port to be opened to the cluster.
+
+Also add this in `httpfs-site.xml` which might be in `/etc/hadoop-httpfs/conf`.
+
+    <property>
+      <name>httpfs.proxyuser.hue.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>httpfs.proxyuser.hue.groups</name>
+      <value>*</value>
+    </property>
 
 
 Configure MapReduce 0.20 (MR1)
@@ -607,6 +629,10 @@ section for more details about managing and operating a Hue installation.
 
 Hue Processes
 ~~~~~~~~~~~~~
+
+Process User
+^^^^^^^^^^^^
+Filebrowser requires Hue to be running as the 'hue' user.
 
 Process Hierarchy
 ^^^^^^^^^^^^^^^^^
