@@ -88,13 +88,15 @@ ${commonheader("Job Browser", "jobbrowser")}
 			<td>${job.priority.lower()}</td>
 			<td>${job.durationFormatted}</td>
 			<td>${job.startTimeFormatted}</td>
-			<td>
-				% if job.status.lower() == 'running' or job.status.lower() == 'pending':
-				% if request.user.is_superuser or request.user.username == job.user:
-				<a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" title="Kill this job">Kill</a> -
-				% endif
-				% endif
-				<a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="View this job">View</a></td>
+            <td>
+                <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="View this job">View</a>
+                % if job.status.lower() == 'running' or job.status.lower() == 'pending':
+                % if request.user.is_superuser or request.user.username == job.user:
+                - <a href="#" title="Kill this job" onclick="$('#kill-job').submit()">Kill</a>
+                <form id="kill-job" action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" method="POST"></form>
+                % endif
+                % endif
+            </td>
 			</tr>
 			% endfor
 		</tbody>

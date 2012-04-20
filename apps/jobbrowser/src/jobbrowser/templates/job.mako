@@ -20,6 +20,7 @@
   import os
   import re
   from desktop.views import commonheader, commonfooter
+  from django.template.defaultfilters import urlencode
 %>
 
 <%def name="task_table(tasks)">
@@ -100,7 +101,8 @@ ${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
 
 				% if job.status.lower() == 'running' or job.status.lower() == 'pending':
 		        <h6>Kill Job</h6>
-				<a href="${url('jobbrowser.views.kill_job', jobid=job.jobId)}" title="Kill this job">Kill this job</a>
+                <a href="#" title="Kill this job" onclick="$('#kill-job').submit()">Kill this job</a>
+                <form id="kill-job" action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" method="POST"></form>
 		        % endif
 
 
