@@ -56,12 +56,13 @@ tarball, you must have the following installed:
 .Required Dependencies
 [grid="rows"]
 ``~
-Redhat,Debian
+Redhat,Ubuntu
 ~~~~~~~~~~
 gcc,gcc
 libxml2-devel,libxml2-dev
 libxslt-devel,libxslt-dev
 cyrus-sasl-devel,libsasl2-dev
+cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit
 mysql-devel,libmysqlclient-dev
 python-devel,python-dev
 python-setuptools,python-setuptools
