@@ -56,7 +56,7 @@ Development Prerequisites
 You'll need these library development packages and tools installed on
 your system:
 
-    Debian:
+    Ubuntu:
       * ant
       * asciidoc
       * gcc
@@ -64,6 +64,7 @@ your system:
       * libkrb5-dev
       * libmysqlclient-dev
       * libsasl2-dev
+      * libsasl2-modules-gssapi-mit
       * libsqlite3-dev
       * libtidy (for unit tests only)
       * libxml2-dev
@@ -77,6 +78,7 @@ your system:
       * ant
       * asciidoc
       * cyrus-sasl-devel
+      * cyrus-sasl-gssapi
       * gcc
       * gcc-c++
       * krb5-devel
