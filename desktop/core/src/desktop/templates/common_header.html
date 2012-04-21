@@ -61,7 +61,7 @@ limitations under the License.
 	<script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js"></script>
 	<script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
 	<script src="/static/ext/js/bootstrap.min.js"></script>
-    <script src="/static/ext/js/bootstrap-tooltip.js"></script>
+	<script src="/static/ext/js/bootstrap-tooltip.js"></script>
 	<script src="/static/ext/js/fileuploader.js"></script>
 
 	<script type="text/javascript" charset="utf-8">
@@ -78,9 +78,9 @@ limitations under the License.
 			$("#checkConfig").load("/debug/check_config_ajax");
 		});
 
-        function showTooltip(appDisplayName){
-            $('#' + appDisplayName + "Icon").tooltip({title:appDisplayName, placement:'bottom'})
-            $('#' + appDisplayName + "Icon").tooltip('show')
+        function showTooltip(appName, niceName){
+            $('#' + appName + "Icon").tooltip({title:niceName, placement:'bottom'})
+            $('#' + appName + "Icon").tooltip('show')
         }
 
 
@@ -91,12 +91,17 @@ limitations under the License.
 <div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container-fluid">
-				<a class="brand" href="#">Hue</a>
+				<a class="brand" href="/about">Hue</a>
 				<div class="nav-collapse">
 					<ul class="nav">
-                        {% for app in apps %}
-                        <li id="{{app.display_name}}Icon" {% is_selected section app.display_name %}><a href="/{{app.display_name}}">{%if app.icon_path%}<img  width="25" height="25"  onmouseover="showTooltip('{{app.display_name}}')"  src="{{app.icon_path}}"/>{%else%}{{app.nice_name}}{%endif%} </a></li>
-                        {% endfor %}
+						{% for app in apps %}
+							{%if app.icon_path%}
+							<li id="{{app.display_name}}Icon" {% is_selected section app.display_name %}>
+								<a href="/{{app.display_name}}"><img width="25" height="25" 
+									onmouseover="showTooltip('{{app.display_name}}', '{{app.nice_name}}')"
+									src="{{app.icon_path}}"/></a></li>
+							{%endif%}
+						{% endfor %}
 						<li class="divider-vertical"></li>
 						<li id="checkConfig"></li>
 					</ul>

@@ -16,4 +16,5 @@
 DJANGO_APPS = [ "useradmin" ]
 NICE_NAME = "User Admin"
 REQUIRES_HADOOP = False
+ICON = "/useradmin/static/art/useradmin-logo.png"
 MENU_INDEX = 60
