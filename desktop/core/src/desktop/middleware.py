@@ -25,7 +25,6 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core import exceptions, urlresolvers
 import django.db
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render_to_response
 from django.utils.http import urlquote
 from django.utils.encoding import iri_to_uri
 import django.views.static
@@ -34,7 +33,7 @@ import django.contrib.auth.views
 
 import desktop.conf
 from desktop.lib import apputil, i18n
-from desktop.lib.django_util import render_json, is_jframe_request, PopupException
+from desktop.lib.django_util import render, render_json, is_jframe_request, PopupException
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
 from hadoop import cluster
@@ -76,7 +75,8 @@ class ExceptionMiddleware(object):
         response[MIDDLEWARE_HEADER] = 'EXCEPTION'
         return response
       else:
-        return render_to_response("error.html", dict(error=exception.response_data.get("message")))
+        return render("error.mako", request,
+                      dict(error=exception.response_data.get("message")))
 
     # We didn't handle it as a special exception, but if we're ajax we still
     # need to do some kind of nicer handling than the built-in page

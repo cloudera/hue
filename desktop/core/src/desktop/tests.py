@@ -231,7 +231,7 @@ def test_500_handling():
     c.store_exc_info = store_exc_info
 
     response = c.get('/500_internal_error')
-    assert_equal(response.template.name, '500.html')
+    assert_true('500.mako' in response.template)
     assert_true('should be fixed shortly. Thanks for your patience' in response.content)
     assert_true(exc_msg not in response.content)
 
@@ -251,8 +251,8 @@ def test_404_handling():
   view_name = '/the-view-that-is-not-there'
   c = make_logged_in_client()
   response = c.get(view_name)
-  assert_equal(response.template.name, '404.html')
-  assert_true('Page Not Found' in response.content)
+  assert_true('404.mako' in response.template)
+  assert_true('Not Found' in response.content)
   assert_true(view_name in response.content)
 
 class RecordingHandler(logging.Handler):
