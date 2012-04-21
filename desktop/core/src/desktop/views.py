@@ -209,13 +209,13 @@ def index(request):
 def serve_404_error(request, *args, **kwargs):
   """Registered handler for 404. We just return a simple error"""
   access_warn(request, "404 not found")
-  return render_to_response("404.html", dict(uri=request.build_absolute_uri()))
+  return render("404.mako", request, dict(uri=request.build_absolute_uri()))
 
 def serve_500_error(request, *args, **kwargs):
   """Registered handler for 500. We use the debug view to make debugging easier."""
   if desktop.conf.HTTP_500_DEBUG_MODE.get():
     return django.views.debug.technical_500_response(request, *sys.exc_info())
-  return render_to_response("500.html")
+  return render("500.mako", request, {})
 
 _LOG_LEVELS = {
   "critical": logging.CRITICAL,
