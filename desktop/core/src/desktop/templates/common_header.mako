@@ -36,17 +36,6 @@
     body {
       padding-top: ${padding};
     }
-    .tooltip.fade.bottom{
-        border-style: none;
-        background-color: transparent;
-    }
-    .tooltip{
-        margin-left: -10px;
-        margin-top: -10px;
-    }
-    .tooltip-inner{
-        margin-top: -10px;
-    }
   </style>
 
   <script src="/static/ext/js/jquery/jquery-1.7.1.min.js"></script>
