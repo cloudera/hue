@@ -28,6 +28,7 @@ from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 import django.views.debug
 
+from desktop.lib import django_mako
 from desktop.lib.django_util import login_notrequired, render_json, render, render_to_string
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
@@ -266,7 +267,7 @@ def commonheader(title, section, padding="60px"):
   """
   apps_list = sorted(appmanager.DESKTOP_APPS[:], key=lambda app: app.menu_index)
 
-  return render_to_string("common_header.html", dict(
+  return django_mako.render_to_string("common_header.mako", dict(
     apps=apps_list,
     title=title,
     section=section,

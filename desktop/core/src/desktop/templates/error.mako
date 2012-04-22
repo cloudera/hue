@@ -20,11 +20,13 @@ ${commonheader("Error", "")}
 
   <div class="container-fluid">
     <h1>Error!</h1>
-    <pre>{{ error }}</pre>
+    <pre>${error | h }</pre>
 
-    <textarea style="width: 100%;" rows=80 readonly="readonly">
-    {{ traceback }}
-    </textarea>
+    %if traceback:
+      <textarea style="width: 100%;" rows=80 readonly="readonly">
+      ${traceback | h}
+      </textarea>
+    %endif
   </div>
 
 ${commonfooter()}
