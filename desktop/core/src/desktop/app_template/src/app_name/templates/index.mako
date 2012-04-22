@@ -13,17 +13,21 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-${'<'}%namespace name="shared" file="shared_components.mako" />
+${'<'}%!from desktop.views import commonheader, commonfooter %>
 
-${'$'}{shared.header("${" ".join(word.capitalize() for word in app_name.split("_"))}")}
+${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", "100px")}
 
 ${'#'}# use double hashes for a mako template comment
 
-${'#'}# this id in the div below ("index") is stripped by Hue.JFrame
-${'#'}# and passed along as the "view" argument in its onLoad event
+<div class="subnav subnav-fixed">
+	<div class="container-fluid">
+	<ul class="nav nav-pills">
+		<li></li>
+	</ul>
+	</div>
+</div>
 
-${'#'}# the class 'jframe_padded' will give the contents of your window a standard padding
-<div id="index" class="view jframe_padded">
+<div class="container-fluid">
   <h2>${" ".join(word.capitalize() for word in app_name.split("_"))} app is successfully setup!</h2>
   ## Pass through literal $
   <p>It's now ${'$'}{date}.</p>
