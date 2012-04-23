@@ -21,7 +21,7 @@
 # If not specified, it uses the $CDH variable to select an archive location.
 #
 
-CDH_URL=${CDH_URL:-http://nightly.cloudera.com/cdh4/cdh/4/hadoop-0.23.1-cdh4b2-SNAPSHOT.tar.gz}
+CDH_URL=${CDH_URL:-http://nightly.cloudera.com/cdh4/cdh/4/hadoop-0.23.1-cdh4.0.0-SNAPSHOT.tar.gz}
 
 CDH_TGZ=$(basename $CDH_URL)
 CDH_VERSION=${CDH_TGZ/.tar.gz/}
@@ -46,7 +46,7 @@ build_hadoop() {
 
 ##########
 
-MR1_URL=${MR1_URL:-http://nightly.cloudera.com/cdh4/cdh/4/mr1-0.23.1-mr1-cdh4b2-SNAPSHOT.tar.gz}
+MR1_URL=${MR1_URL:-http://nightly.cloudera.com/cdh4/cdh/4/mr1-0.23.1-mr1-cdh4.0.0-SNAPSHOT.tar.gz}
 
 MR1_TGZ=$(basename $MR1_URL)
 MR1_VERSION=${MR1_TGZ/.tar.gz/}
@@ -72,14 +72,14 @@ build_mr1() {
 
 ##########
 
-HIVE_URL=${HIVE_URL:-http://nightly.cloudera.com/cdh4/cdh/4/hive-0.8.1-cdh4b2-SNAPSHOT.tar.gz}
+HIVE_URL=${HIVE_URL:-http://nightly.cloudera.com/cdh4/cdh/4/hive-0.8.1-cdh4.0.0-SNAPSHOT.tar.gz}
 
 HIVE_TGZ=$(basename $HIVE_URL)
 HIVE_VERSION=${HIVE_TGZ/.tar.gz/}
 HIVE_CACHE="$HOME/.hue_cache/${HIVE_TGZ}"
 
 build_hive() {
-  if [ ! -f $HOME/.hue_cache ]; then
+  if [ ! -f $HIVE_CACHE ]; then
     mkdir -p $HOME/.hue_cache
     echo "Downloading $HIVE_URL..."
     wget $HIVE_URL -O $HIVE_CACHE
