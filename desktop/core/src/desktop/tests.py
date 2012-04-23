@@ -29,7 +29,7 @@ import desktop.urls
 import desktop.conf
 import logging
 import time
-from desktop.lib.django_util import TruncatingModel
+from desktop.lib.django_util import TruncatingModel, PopupException
 import desktop.views as views
 
 def setup_test_environment():
@@ -212,17 +212,22 @@ def test_truncating_model():
   assert_true(a.non_string_field == 10**10, 'non-string fields are not truncated')
 
 
-def test_500_handling():
+def test_error_handling():
   restore_django_debug = desktop.conf.DJANGO_DEBUG_MODE.set_for_testing(False)
   restore_500_debug = desktop.conf.HTTP_500_DEBUG_MODE.set_for_testing(False)
 
-  exc_msg = "error_raising_view: Test 500 handling"
+  exc_msg = "error_raising_view: Test earráid handling"
   def error_raising_view(request, *args, **kwargs):
     raise Exception(exc_msg)
 
+  def popup_exception_view(request, *args, **kwargs):
+    raise PopupException(exc_msg, title="earráid", detail=exc_msg)
+
   # Add an error view
-  error_url_pat = patterns('', url('^500_internal_error$', error_raising_view))[0]
-  desktop.urls.urlpatterns.append(error_url_pat)
+  error_url_pat = patterns('',
+                           url('^500_internal_error$', error_raising_view),
+                           url('^popup_exception$', popup_exception_view))
+  desktop.urls.urlpatterns.extend(error_url_pat)
   try:
     def store_exc_info(*args, **kwargs):
       pass
@@ -240,9 +245,15 @@ def test_500_handling():
     response = c.get('/500_internal_error')
     assert_equal(response.template.name, 'Technical 500 template')
     assert_true(exc_msg in response.content)
+
+    # PopupException
+    response = c.get('/popup_exception')
+    assert_true('popup_error.mako' in response.template)
+    assert_true(exc_msg in response.content)
   finally:
     # Restore the world
-    desktop.urls.urlpatterns.remove(error_url_pat)
+    for i in error_url_pat:
+      desktop.urls.urlpatterns.remove(i)
     restore_django_debug()
     restore_500_debug()
 

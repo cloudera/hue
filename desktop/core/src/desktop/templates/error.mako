@@ -15,16 +15,17 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from desktop.lib.i18n import smart_unicode
 %>
 ${commonheader("Error", "")}
 
   <div class="container-fluid">
     <h1>Error!</h1>
-    <pre>${error | h }</pre>
+    <pre>${smart_unicode(error) | h }</pre>
 
     %if traceback:
       <textarea style="width: 100%;" rows=80 readonly="readonly">
-      ${traceback | h}
+      ${smart_unicode(traceback) | h}
       </textarea>
     %endif
   </div>

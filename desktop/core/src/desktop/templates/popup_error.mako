@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from desktop.lib.i18n import smart_unicode
 %>
 
 ${commonheader(title, "", "60px")}
@@ -22,10 +23,10 @@ ${commonheader(title, "", "60px")}
 
 	<div class="container-fluid">
 		<div class="alert">
-			<p><strong>${message}</strong></p>
+			<p><strong>${smart_unicode(message) | h}</strong></p>
 
 			% if detail:
-			<p>${detail or ""}</p>
+			<p>${smart_unicode(detail) or ""}</p>
 			% endif
 
 			<div class="alert-actions">

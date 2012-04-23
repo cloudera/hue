@@ -18,14 +18,13 @@
 # Adapted from http://code.google.com/p/django-mako/source/browse/trunk/djangomako/shortcuts.py
 
 from django.http import HttpResponse
-from desktop.lib import apputil
+from desktop.lib import apputil, i18n
 import os
 import tempfile
 from mako.lookup import TemplateLookup, TemplateCollection
 import django.template
 
-ENCODING_ERRORS  = 'replace'
-OUTPUT_ENCODING = 'utf-8'
+ENCODING_ERRORS = 'replace'
 
 # Things to automatically import into all template namespaces
 IMPORTS=[
@@ -61,7 +60,8 @@ class DesktopLookup(TemplateCollection):
 
     loader = TemplateLookup(directories=[app_template_dir, self.desktop_template_dir],
                             module_directory=os.path.join(self.module_dir, app),
-                            output_encoding=OUTPUT_ENCODING,
+                            output_encoding=i18n.get_site_encoding(),
+                            input_encoding=i18n.get_site_encoding(),
                             encoding_errors=ENCODING_ERRORS,
                             default_filters=['unicode'], 
                             imports=IMPORTS)
@@ -102,7 +102,7 @@ def render_to_string_normal(template_name, django_context):
 
   template = lookup.get_template(template_name)
   result = template.render(**data_dict)
-  return result
+  return i18n.smart_unicode(result)
 
 # This variable is overridden in test code.
 render_to_string = render_to_string_normal
