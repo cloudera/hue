@@ -200,7 +200,10 @@ def render(template, request, data, json=None, template_lib=None, force_template
   if force-template is True, will render the non-AJAX template response even if the
   request is via AJAX. This is to facilitate fetching HTML fragments.
   """
-  if not force_template and not is_jframe_request(request) and (request.ajax or template is None):
+  # request.ajax is defined in the AjaxMiddleware. But we might hit
+  # errors before getting to that point.
+  is_ajax = getattr(request, "ajax", False)
+  if not force_template and not is_jframe_request(request) and (is_ajax or template is None):
     if json is not None:
       return render_json(json, request.GET.get("callback"))
     else:

@@ -64,7 +64,9 @@ class ExceptionMiddleware(object):
   """
   def process_exception(self, request, exception):
     import traceback
-    logging.info("Processing exception: %s: %s" % (exception, traceback.format_exc()))
+    tb = traceback.format_exc()
+    logging.info("Processing exception: %s: %s" % (i18n.smart_unicode(exception),
+                                                   i18n.smart_unicode(tb)))
 
     if hasattr(exception, "response"):
       return exception.response(request)
