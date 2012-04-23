@@ -497,41 +497,59 @@ for x in sys.stdin:
     _make_query(self.client, "select one", name='client 1 query', submission_type='Save')
     _make_query(self.client, "select two", name='client 2 query', submission_type='Save')
 
-    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(True)
-    resp = self.client.get('/beeswax/list_designs')
-    assert_true('select one' in resp.content)
-    assert_true('select two' in resp.content)
+    finish = conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(True)
+    try:
+      resp = self.client.get('/beeswax/list_designs')
+      assert_true('client 1 query' in resp.content)
+      assert_true('client 2 query' in resp.content)
+    finally:
+      finish()
 
-    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(False)
-    resp = self.client.get('/beeswax/list_designs')
-    assert_true('select one' in resp.content)
-    assert_true('select two' in resp.content)
+    finish = conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(False)
+    try:
+      resp = self.client.get('/beeswax/list_designs')
+      assert_true('client 1 query' in resp.content)
+      assert_true('client 2 query' in resp.content)
+    finally:
+      finish()
 
     # Login as someone else
     client2 = make_logged_in_client('not_me')
-    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(True)
-    resp = client2.get('/beeswax/list_designs')
-    assert_true('select one' not in resp.content)
-    assert_true('select two' not in resp.content)
+    finish = conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(True)
+    try:
+      resp = client2.get('/beeswax/list_designs')
+      assert_true('client 1 query' not in resp.content)
+      assert_true('client 2 query' not in resp.content)
+    finally:
+      finish()
 
-    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(False)
-    resp = client2.get('/beeswax/list_designs')
-    assert_true('select one' in resp.content)
-    assert_true('select two' in resp.content)
-    client2.logout()
+    finish = conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(False)
+    try:
+      resp = client2.get('/beeswax/list_designs')
+      assert_true('client 1 query' in resp.content)
+      assert_true('client 2 query' in resp.content)
+    finally:
+      finish()
+      client2.logout()
 
     # Login as super user
     client3 = make_logged_in_client('admin', is_superuser=True)
-    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(True)
-    resp = client3.get('/beeswax/list_designs')
-    assert_true('select one' in resp.content)
-    assert_true('select two' in resp.content)
+    finish = conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(True)
+    try:
+      resp = client3.get('/beeswax/list_designs')
+      assert_true('client 1 query' in resp.content)
+      assert_true('client 2 query' in resp.content)
+    finally:
+      finish()
 
-    conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(False)
-    resp = client3.get('/beeswax/list_designs')
-    assert_true('select one' in resp.content)
-    assert_true('select two' in resp.content)
-    client3.logout()
+    finish = conf.SHOW_ONLY_PERSONAL_SAVED_QUERIES.set_for_testing(False)
+    try:
+      resp = client3.get('/beeswax/list_designs')
+      assert_true('client 1 query' in resp.content)
+      assert_true('client 2 query' in resp.content)
+    finally:
+      finish()
+      client3.logout()
 
     # Cleaning
     beeswax.models.SavedQuery.objects.all()[:2].delete()
@@ -965,7 +983,7 @@ def test_history_page():
     assert_true(len(resp.context['page'].object_list) >= 0)     # Make the query run
 
   do_view('user=test')
-  do_view('user=_all')
+  do_view('user=:all')
   do_view('design_id=1')
   do_view('auto_query=0')
   do_view('auto_query=1')
@@ -980,7 +998,7 @@ def test_history_page():
   do_view('sort=type')
   do_view('sort=-type')
   do_view('sort=name&user=bogus&design_id=1&auto_query=1')
-  do_view('sort=-type&user=_all&type=hql&auto_query=0')
+  do_view('sort=-type&user=:all&type=hql&auto_query=0')
 
 
 def test_strip_trailing_semicolon():
