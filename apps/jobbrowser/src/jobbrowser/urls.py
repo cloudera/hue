@@ -19,7 +19,7 @@ from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('jobbrowser.views',
   # "Default"
-  url(r'^$','jobbrowser'),
+  url(r'^$','jobs'),
   url(r'^trackers$','trackers',name='trackers'),
   url(r'^trackers/(?P<trackerid>.+)$','single_tracker',name='single_tracker'),
   url(r'^jobs/$','jobs',name='jobs'),
