@@ -53,19 +53,21 @@ ${layout.menubar(section='history')}
 			<div class="well sidebar-nav">
 				<ul class="nav nav-list">
 					<li class="nav-header">Actions</li>
-					% if filter_params.get('user') == '_all':
-				      <%
-				        my_querydict = filter_params.copy()
-				        my_querydict['user'] = request.user.username
-				      %>
-					<li><a href="?${my_querydict.urlencode()}">Show my queries</a></li>
-				 	% else:
-				      <%
-				        my_querydict = filter_params.copy()
-				        my_querydict['user'] = '_all'
-				      %>
-				      <li><a href="?${my_querydict.urlencode()}">Show everyone's queries</a></li>
-				    % endif
+                    % if share_queries:
+                        % if filter_params.get('user') == ':all':
+                          <%
+                            my_querydict = filter_params.copy()
+                            my_querydict['user'] = request.user.username
+                          %>
+                        <li><a href="?${my_querydict.urlencode()}">Show my queries</a></li>
+                        % else:
+                          <%
+                            my_querydict = filter_params.copy()
+                            my_querydict['user'] = ':all'
+                          %>
+                          <li><a href="?${my_querydict.urlencode()}">Show everyone's queries</a></li>
+                        % endif
+                    % endif
 
 				 	% if filter_params.get('auto_query', None):
 				      <%
