@@ -26,13 +26,17 @@ from urllib import quote_plus
 from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import render_json, MessageException, render
 from desktop.lib.django_util import copy_query_dict
+from desktop.lib.django_util import PopupException
+
 from django.http import HttpResponseRedirect
+from django.utils.functional import wraps
 
 from desktop.log.access import access_warn, access_log_level
 from desktop.views import register_status_bar_view
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority
 from hadoop.api.jobtracker.ttypes import TaskTrackerNotFoundException
 
+from jobbrowser import conf
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker, Cluster
 
 ##################################
@@ -40,6 +44,23 @@ from jobbrowser.models import Job, JobLinkage, TaskList, Tracker, Cluster
 
 __DEFAULT_OBJ_PER_PAGINATION = 10
 
+
+def check_job_permission(view_func):
+  """
+  Ensure that the user has access to the job.
+  Assumes that the wrapped function takes a 'jobid' param.
+  """
+  def decorate(request, *args, **kwargs):
+    jobid = kwargs['jobid']
+    job = Job.from_id(jt=request.jt, jobid=jobid)
+    if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
+      and job.user != request.user.username:
+      raise PopupException("You don't have the permissions to access"
+                             " job %s" % jobid)
+    return view_func(request, *args, **kwargs)
+  return wraps(view_func)(decorate)
+
+@check_job_permission
 def single_job(request, jobid):
   """
   We get here from /jobs/jobid
@@ -61,6 +82,7 @@ def single_job(request, jobid):
     'recent_tasks': recent_tasks[:5]
   })
 
+@check_job_permission
 def job_counters(request, jobid):
   """
   We get here from /jobs/jobid/counters
@@ -72,7 +94,11 @@ def jobs(request):
   """
   We get here from /jobs?filterargs
   """
-  matching_jobs = sort_if_necessary(request, get_matching_jobs(request))
+  check_permission = not conf.SHARE_JOBS.get() and not request.user.is_superuser
+
+  jobs = get_matching_jobs(request, check_permission)
+
+  matching_jobs = sort_if_necessary(request, jobs)
   state = request.GET.get('state', 'all')
   user = request.GET.get('user', '')
   text = request.GET.get('text', '')
@@ -122,6 +148,7 @@ def kill_job(request, jobid):
 
   raise Exception("Job did not appear as killed within 15 seconds")
 
+@check_job_permission
 def tasks(request, jobid):
   """
   We get here from /jobs/jobid/tasks?filterargs, with the options being:
@@ -174,6 +201,7 @@ def tasks(request, jobid):
   })
 
 
+@check_job_permission
 def single_task(request, jobid, taskid):
   """
   We get here from /jobs/jobid/tasks/taskid
@@ -186,6 +214,7 @@ def single_task(request, jobid, taskid):
     'joblnk': job_link
   })
 
+@check_job_permission
 def single_task_attempt(request, jobid, taskid, attemptid):
   """
   We get here from /jobs/jobid/tasks/taskid/attempts/attemptid
@@ -216,6 +245,7 @@ def single_task_attempt(request, jobid, taskid, attemptid):
       "logs": logs
     })
 
+@check_job_permission
 def task_attempt_counters(request, jobid, taskid, attemptid):
   """
   We get here from /jobs/jobid/tasks/taskid/attempts/attemptid/counters
@@ -264,6 +294,7 @@ def queues(request):
   """
   return render("queues.html", request, { "queuelist" : request.jt.queues()})
 
+@check_job_permission
 def set_job_priority(request, jobid):
   """
   We get here from /jobs/jobid/setpriority?priority=PRIORITY
@@ -424,7 +455,7 @@ def get_single_job(request, jobid):
   return Job.from_id(jt=request.jt, jobid=jobid)
 
 
-def get_matching_jobs(request, **kwargs):
+def get_matching_jobs(request, check_permission=False, **kwargs):
   """
   Returns an array of jobs where the returned
   jobs are matched by the provided filter arguments.
@@ -433,6 +464,8 @@ def get_matching_jobs(request, **kwargs):
   in the request object.
 
   Filter arguments may be jobid, pools, user, tasks, text and state.
+
+  Filter by user ownership if check_permission is set to true.
   """
   jobfunc = {"completed" : request.jt.completed_jobs,
              # Succeeded and completed are synonyms here.
@@ -449,7 +482,8 @@ def get_matching_jobs(request, **kwargs):
   joblist = jobfunc[selection]().jobs
 
   return [Job.from_thriftjob(request.jt, j)
-          for j in _filter_jobs_by_req(joblist, request, **kwargs) ]
+          for j in _filter_jobs_by_req(joblist, request, **kwargs)
+          if not check_permission or request.user.is_superuser or j.profile.user == request.user]
 
 
 def get_job_count_by_state(request, username):
