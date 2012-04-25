@@ -172,8 +172,12 @@ the file names is /tmp/<app_module>.<page_url>.<time_taken>.<timestamp>.prof.
 Hue uses the hotshot profiling library for instrumentation.  The documentation
 for this library is located at: http://docs.python.org/library/hotshot.html.
 
-To make use of the profiling data quickly, you can create a script that does
-the following::
+You can use kcachegrind to view the profiled data graphically::
+
+    $ hotshot2calltree /tmp/xyz.prof > /tmp/xyz.trace
+    $ kcachegrind /tmp/xyz.trace
+
+More generally, you can programmatically inspect a trace::
 
     #!/usr/bin/python
     import hotshot.stats
@@ -188,4 +192,3 @@ time spent in that function, followed by the number of times the function was
 called, and then prints out the top 100 time-wasters.  For information on the
 other stats available, take a look at this website:
 http://docs.python.org/library/profile.html#pstats.Stats
-
