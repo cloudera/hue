@@ -212,7 +212,7 @@ def make_beeswax_query(request, hql, query_form=None):
     for f in query_form.file_resources.forms:
       type = f.cleaned_data["type"]
       # Perhaps we should have fully-qualified URIs here already?
-      path = request.fs.uri + f.cleaned_data["path"]
+      path = request.fs.fs_defaultfs + f.cleaned_data["path"]
       query_msg.configuration.append(
         django_mako.render_to_string("hql_resource.mako", dict(type=type, path=path)))
     for f in query_form.functions.forms:
