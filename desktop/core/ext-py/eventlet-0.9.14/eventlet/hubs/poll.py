@@ -103,6 +103,7 @@ class Hub(BaseHub):
                 if event & EXC_MASK:
                     readers.get(fileno, noop).cb(fileno)
                     writers.get(fileno, noop).cb(fileno)
+                    self.remove_descriptor(fileno)
             except SYSTEM_EXCEPTIONS:
                 raise
             except:
