@@ -35,6 +35,7 @@ from django.core import urlresolvers
 from django.shortcuts import redirect
 
 from desktop.lib.django_util import render, PopupException, extract_field_data
+from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 
 from jobsub import models, submit
@@ -48,10 +49,17 @@ LOG = logging.getLogger(__name__)
 
 def oozie_job(request, jobid):
   """View the details about this job."""
-  workflow = get_oozie().get_job(jobid)
-  _check_permission(request, workflow.user,
-                    "Access denied: view job %s" % (jobid,),
-                    allow_root=True)
+  try:
+    workflow = get_oozie().get_job(jobid)
+    _check_permission(request, workflow.user,
+                      "Access denied: view job %s" % (jobid,),
+                      allow_root=True)
+    # Accessing log and definition will trigger Oozie API calls
+    log = workflow.log
+    definition = workflow.definition
+  except RestException, ex:
+    raise PopupException("Error accessing Oozie job %s" % (jobid,),
+                         detail=ex.message)
 
   # Cross reference the submission history (if any)
   design_link = None
@@ -67,6 +75,8 @@ def oozie_job(request, jobid):
   return render('workflow.mako', request, {
     'workflow': workflow,
     'design_link': design_link,
+    'definition': definition,
+    'log': log,
   })
 
 

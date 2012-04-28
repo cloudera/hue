@@ -168,7 +168,7 @@ class HttpClient(object):
     self.logger.debug("%s %s" % (http_method, url))
     try:
       return self._opener.open(request)
-    except urllib2.HTTPError, ex:
+    except (urllib2.HTTPError, urllib2.URLError), ex:
       raise self._exc_class(ex)
 
   def _make_url(self, path, params):
