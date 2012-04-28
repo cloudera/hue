@@ -192,12 +192,12 @@ ${layout.menubar(section='history')}
 
         ## Tab: Definition
         <div class="tab-pane" id="definition">
-            <pre>${workflow.definition|h}</pre>
+            <pre>${definition|h}</pre>
         </div>
 
         ## Tab: Log
         <div class="tab-pane" id="log">
-            <pre>${workflow.log|h}</pre>
+            <pre>${log|h}</pre>
         </div>
     </ul>
   </div>

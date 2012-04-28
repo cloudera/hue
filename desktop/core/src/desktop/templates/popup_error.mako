@@ -26,7 +26,7 @@ ${commonheader(title, "", "60px")}
 			<p><strong>${smart_unicode(message) | h}</strong></p>
 
 			% if detail:
-			<p>${smart_unicode(detail) or ""}</p>
+			<p>${smart_unicode(detail) or "" | h}</p>
 			% endif
 
 			<div class="alert-actions">
