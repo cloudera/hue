@@ -57,6 +57,7 @@ public class Server {
 
   private static final Logger LOG = Logger.getLogger(Server.class.getName());
   private static final int USHRT_MAX = 65535;
+  private static final int DEFAULT_KRB_REFRESH_INTERVAL = (8*60*60*1000); // 8 hrs;
 
   private static int mport = -1;
   private static int bport = -1;
@@ -67,9 +68,11 @@ public class Server {
   private static int dtPort = -1;
   private static boolean dtHttps = false;
   private static long qlifetime = BeeswaxServiceImpl.RUNNING_QUERY_LIFETIME;
-  private static boolean useSasl = false;
+  private static boolean useKerberos = false;
   private static String principalConf;
   private static String keytabFile;
+  private static Integer refreshInterval = DEFAULT_KRB_REFRESH_INTERVAL;
+  private static String kerberosName;
 
   /**
    * Parse command line options.
@@ -120,6 +123,9 @@ public class Server {
     Option kTabOpt = new Option("k", "keytab", true, "keytab file");
     options.addOption(kTabOpt);
 
+    Option kRefreshOpt = new Option("r", "refresh", true, "kerberos ticket refresh interval in minutes");
+    options.addOption(kRefreshOpt);
+
     options.addOptionGroup(dtOptions); // make "n" and "p" mutually exclusive
     PosixParser parser = new PosixParser();
     CommandLine cmd = parser.parse(options, args);
@@ -145,10 +151,13 @@ public class Server {
         qlifetime = Long.valueOf(opt.getValue());
       } else if (opt.getOpt() == "k") {
         keytabFile = opt.getValue();
-        useSasl = true;
+        useKerberos = true;
       } else if (opt.getOpt() == "c") {
         principalConf = opt.getValue();
+      } else if (opt.getOpt() == "r") {
+        refreshInterval = Integer.valueOf(opt.getValue()) * 1000 * 60; // minutes
       }
+
     }
   }
 
@@ -162,6 +171,9 @@ public class Server {
   public static void main(String[] args)
         throws TTransportException, MetaException, ParseException {
     parseArgs(args);
+    if (useKerberos) {
+      doKerberosAuth();
+    }
     createDirectoriesAsNecessary();
 
     // Start metastore if specified
@@ -228,25 +240,7 @@ public class Server {
     TThreadPoolServer.Options options = new TThreadPoolServer.Options();
     TTransportFactory transFactory;
 
-    if (useSasl) {
-      if (keytabFile == null || keytabFile.isEmpty()) {
-        throw new IllegalArgumentException("No keytab specified");
-      }
-      if (principalConf == null || principalConf.isEmpty()) {
-        throw new IllegalArgumentException("No principal specified");
-      }
-
-      // Login from the keytab
-      String kerberosName;
-      try {
-        kerberosName =
-          SecurityUtil.getServerPrincipal(principalConf, "0.0.0.0");
-        UserGroupInformation.loginUserFromKeytab(
-            kerberosName, keytabFile);
-        kerberosName = UserGroupInformation.getCurrentUser().getUserName();
-      } catch (IOException e) {
-        throw new IllegalArgumentException("couldn't setup authentication subsystem", e);
-      }
+    if (useKerberos) {
       final String names[] = SaslRpcServer.splitKerberosName(kerberosName);
       if (names.length != 3) {
         throw new IllegalArgumentException("Kerberos principal should have 3 parts: " + kerberosName);
@@ -263,7 +257,6 @@ public class Server {
         transFactory, transFactory,
         new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
 
-
     if (dtPort != -1) {
       LOG.info("Starting beeswax server on port " + port + ", talking back to Desktop at "
                 + dtHost + ":" + dtPort);
@@ -271,6 +264,46 @@ public class Server {
       LOG.info("Starting beeswax server on port " + port);
     }
     server.serve();
+  }
+
+  /**
+   * Authenticate using kerberos if configured
+   */
+  private static void doKerberosAuth() throws IllegalArgumentException {
+    if (keytabFile == null || keytabFile.isEmpty()) {
+      throw new IllegalArgumentException("No keytab specified");
+    }
+    if (principalConf == null || principalConf.isEmpty()) {
+      throw new IllegalArgumentException("No principal specified");
+    }
+
+    // Login from the keytab
+    try {
+      kerberosName = SecurityUtil.getServerPrincipal(principalConf, "0.0.0.0");
+      UserGroupInformation.loginUserFromKeytab(kerberosName, keytabFile);
+      // Start a thread to periodically refresh kerberos ticket
+      Thread t = new Thread(new Runnable() {
+        @Override
+        public void run() {
+          while (true) {
+            try {
+              Thread.sleep(refreshInterval);
+            } catch (InterruptedException e) {
+              return;
+            }
+            try {
+              LOG.info("refreshed kerberos ticket " + kerberosName + keytabFile);
+              UserGroupInformation.getLoginUser().reloginFromKeytab();
+            } catch (IOException eIO) {
+              LOG.error("Error refreshing kerberos ticket", eIO);
+            }
+          }
+        }
+      }, "KerberosRefresher");
+      t.start();
+    } catch (IOException e) {
+      throw new IllegalArgumentException("couldn't setup authentication subsystem", e);
+    }
   }
 
   /**
