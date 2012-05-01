@@ -29,6 +29,7 @@ from django.core.management.base import NoArgsCommand
 from django.contrib.auth.models import User
 
 from hadoop import cluster
+from hadoop.fs.hadoopfs import Hdfs
 import hadoop.conf
 import jobsub.conf
 
@@ -47,16 +48,22 @@ class Command(NoArgsCommand):
       remote_fs.setuser(remote_fs.DEFAULT_USER)
     LOG.info("Using remote fs: %s" % str(remote_fs))
 
+    # Create remote home directory if needed
+    remote_data_dir = jobsub.conf.REMOTE_DATA_DIR.get()
+    remote_home_dir = Hdfs.join('/user', remote_fs.user)
+    if remote_data_dir.startswith(remote_home_dir):
+      remote_fs.create_home_dir(remote_home_dir)
+
     # Copy over examples/
     for dirname in ("examples",):
       local_dir = os.path.join(jobsub.conf.LOCAL_DATA_DIR.get(), dirname)
-      remote_dir = posixpath.join(jobsub.conf.REMOTE_DATA_DIR.get(), dirname)
+      remote_dir = posixpath.join(remote_data_dir, dirname)
       copy_dir(local_dir, remote_fs, remote_dir)
 
     # Copy over sample data
     copy_dir(jobsub.conf.SAMPLE_DATA_DIR.get(),
       remote_fs,
-      posixpath.join(jobsub.conf.REMOTE_DATA_DIR.get(), "sample_data"))
+      posixpath.join(remote_data_dir, "sample_data"))
 
     # Write out the models too
     fixture_path = os.path.join(os.path.dirname(__file__), "..", "..", "fixtures", "example_data.xml")

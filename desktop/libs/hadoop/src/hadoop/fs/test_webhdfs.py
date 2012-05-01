@@ -53,6 +53,20 @@ def test_webhdfs():
     fs.remove("/fortest.txt")
 
 @attr('requires_hadoop')
+def test_webhdfs_functions():
+  """
+  Tests advanced file system operations.
+  """
+  cluster = pseudo_hdfs4.shared_cluster()
+  fs = cluster.fs
+  fs.setuser(cluster.superuser)
+
+  # Create home dir
+  fs.create_home_dir("/user/test")
+  assert_true(fs.isdir("/user/test"))
+  fs.remove("/user/test")
+
+@attr('requires_hadoop')
 def test_seek():
   """Test for DESKTOP-293 - ensure seek works in python2.4"""
   cluster = pseudo_hdfs4.shared_cluster()
