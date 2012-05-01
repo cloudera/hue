@@ -38,6 +38,8 @@ from desktop.lib.django_util import render, PopupException, extract_field_data
 from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 
+from hadoop.fs.exceptions import WebHdfsException
+
 from jobsub import models, submit
 from jobsub.management.commands import jobsub_setup
 from jobsub.oozie_lib.oozie_api import get_oozie
@@ -265,7 +267,10 @@ def setup(request):
   """Installs jobsub examples."""
   if request.method != "POST":
     raise PopupException('Please use a POST request to install the examples.')
-  jobsub_setup.Command().handle_noargs()
+  try:
+    jobsub_setup.Command().handle_noargs()
+  except WebHdfsException, e:
+    raise PopupException('The examples could not be installed.', detail=e)
   return redirect(urlresolvers.reverse(list_designs))
 
 

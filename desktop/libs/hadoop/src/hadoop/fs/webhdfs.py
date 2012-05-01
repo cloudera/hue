@@ -416,6 +416,24 @@ class WebHdfs(Hdfs):
   def get_hdfs_path(self, path):
     return posixpath.join(self.fs_defaultfs, path.lstrip('/'))
 
+  def create_home_dir(self, home_path=None):
+    if home_path is None:
+      home_path = self.get_home_dir()
+
+    if not self.exists(home_path):
+      user = self.user
+      try:
+        self.setuser(self.superuser)
+        self.mkdir(home_path)
+        self.chmod(home_path, 0755)
+        self.chown(home_path, user, user)
+      except IOError, e:
+        msg = 'Failed to create home dir ("%s") as superuser %s' %\
+              (home_path, self.superuser)
+        LOG.exception(msg)
+        raise PopupException(msg, detail=e)
+      finally:
+        self.setuser(user)
 
   def _invoke_with_redirect(self, method, path, params=None, data=None):
     """

@@ -128,6 +128,9 @@ ${layout.menubar(section='designs')}
             <a href="#" class="close" data-dismiss="modal">&times;</a>
             <h3>Install sample job designs?</h3>
         </div>
+        <div class="modal-body">
+          It will take a few seconds to install.
+        </div>
         <div class="modal-footer">
             <input type="submit" class="btn primary" value="Yes"/>
             <a href="#" class="btn secondary" data-dismiss="modal">No</a>
