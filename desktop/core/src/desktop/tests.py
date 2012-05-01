@@ -237,7 +237,7 @@ def test_error_handling():
 
     response = c.get('/500_internal_error')
     assert_true('500.mako' in response.template)
-    assert_true('should be fixed shortly. Thanks for your patience' in response.content)
+    assert_true('Thanks for your patience' in response.content)
     assert_true(exc_msg not in response.content)
 
     # Now test the 500 handler with backtrace
