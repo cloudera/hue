@@ -423,15 +423,16 @@ class WebHdfs(Hdfs):
     if not self.exists(home_path):
       user = self.user
       try:
-        self.setuser(self.superuser)
-        self.mkdir(home_path)
-        self.chmod(home_path, 0755)
-        self.chown(home_path, user, user)
-      except IOError, e:
-        msg = 'Failed to create home dir ("%s") as superuser %s' %\
-              (home_path, self.superuser)
-        LOG.exception(msg)
-        raise PopupException(msg, detail=e)
+        try:
+          self.setuser(self.superuser)
+          self.mkdir(home_path)
+          self.chmod(home_path, 0755)
+          self.chown(home_path, user, user)
+        except IOError, e:
+          msg = 'Failed to create home dir ("%s") as superuser %s' %\
+                (home_path, self.superuser)
+          LOG.exception(msg)
+          raise PopupException(msg, detail=e)
       finally:
         self.setuser(user)
 
