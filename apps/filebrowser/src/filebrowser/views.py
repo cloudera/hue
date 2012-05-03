@@ -117,7 +117,10 @@ def view(request, path):
         else:
             return display(request, path)
     except (IOError, WebHdfsException), e:
-        raise PopupException("Cannot access: %s" % escape(path), detail=e)
+        msg = "Cannot access: %s." % escape(path)
+        if request.user.is_superuser and not request.user == request.fs.superuser:
+            msg += ' Note: you are a Hue admin but not a HDFS superuser (which is "%s").' % (request.fs.superuser,)
+        raise PopupException(msg , detail=e)
 
 
 def edit(request, path, form=None):
@@ -654,9 +657,13 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
         if form.is_valid():
             args = [form.cleaned_data[p] for p in parameter_names]
             try:
-              op(*args)
+                op(*args)
             except (IOError, WebHdfsException), e:
-              raise PopupException("Cannot perform operation.", detail=e)
+                msg = "Cannot perform operation."
+                if request.user.is_superuser and not request.user == request.fs.superuser:
+                    msg += ' Note: you are a Hue admin but not a HDFS superuser (which is "%s").' \
+                           % (request.fs.superuser,)
+                raise PopupException(msg, detail=e)
             if next:
                 logging.debug("Next: %s" % next)
                 # Doesn't need to be quoted: quoting is done by HttpResponseRedirect.

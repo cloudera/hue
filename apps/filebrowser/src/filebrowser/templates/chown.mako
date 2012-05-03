@@ -54,6 +54,7 @@
       % endif
     % endif
 </%def>
+
 <form action="/filebrowser/chown?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close">&times;</a>
@@ -80,14 +81,9 @@
             ${ selection("group", [group for group in form.all_groups if group in extra_params['current_user'].get_groups()], extract_field_data(form["group"])) }
             % endif
         </div>
-
-
     </div>
     <div class="modal-footer" style="padding-top: 10px;">
         <input class="btn primary" type="submit" value="Submit" />
         <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">Cancel</a>
     </div>
 </form>
-
-
-<!--<div class="alert-message info modal-footer">Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</div>-->
