@@ -268,6 +268,7 @@ def setup(request):
   if request.method != "POST":
     raise PopupException('Please use a POST request to install the examples.')
   try:
+    # Warning: below will modify fs.user
     jobsub_setup.Command().handle_noargs()
   except WebHdfsException, e:
     raise PopupException('The examples could not be installed.', detail=e)

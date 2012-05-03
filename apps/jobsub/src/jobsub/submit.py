@@ -25,6 +25,7 @@ import logging
 from desktop.lib import django_mako
 from desktop.lib.django_util import PopupException
 import hadoop.cluster
+from hadoop.fs.hadoopfs import Hdfs
 
 from jobsub import conf, models
 from jobsub.oozie_lib.oozie_api import get_oozie
@@ -173,15 +174,32 @@ class Submission(object):
 
 
   def _create_deployment_dir(self, path):
-    # Make the REMOTE_DATA_DIR, and have it owned by hue
-    data_repo = conf.REMOTE_DATA_DIR.get()
-    if not self._fs.exists(data_repo):
-      # Parent directories should be 0755. But the data dir should be 01777.
-      self._do_as(self._fs.DEFAULT_USER, self._fs.mkdir, data_repo, 0755)
-      self._do_as(self._fs.DEFAULT_USER, self._fs.chmod, data_repo, 01777)
+    # Make sure the root data dir exists
+    self.create_data_dir(self._fs)
 
     # The actual deployment dir should be 0711 owned by the user
     self._do_as(self._username, self._fs.mkdir, path, 0711)
+
+
+  @classmethod
+  def create_data_dir(cls, fs):
+    # If needed, create the remote home and data directories
+    remote_data_dir = conf.REMOTE_DATA_DIR.get()
+    user = fs.user
+
+    try:
+      fs.setuser(fs.DEFAULT_USER)
+      if not fs.exists(remote_data_dir):
+        remote_home_dir = Hdfs.join('/user', fs.user)
+        if remote_data_dir.startswith(remote_home_dir):
+          # Home is 755
+          fs.create_home_dir(remote_home_dir)
+        # Shared by all the users
+        fs.mkdir(remote_data_dir, 01777)
+    finally:
+      fs.setuser(user)
+
+    return remote_data_dir
 
 
   def _get_deployment_dir(self):

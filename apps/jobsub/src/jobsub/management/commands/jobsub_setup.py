@@ -32,6 +32,7 @@ from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
 import hadoop.conf
 import jobsub.conf
+from jobsub.submit import Submission
 
 LOG = logging.getLogger(__name__)
 
@@ -48,11 +49,8 @@ class Command(NoArgsCommand):
       remote_fs.setuser(remote_fs.DEFAULT_USER)
     LOG.info("Using remote fs: %s" % str(remote_fs))
 
-    # Create remote home directory if needed
-    remote_data_dir = jobsub.conf.REMOTE_DATA_DIR.get()
-    remote_home_dir = Hdfs.join('/user', remote_fs.user)
-    if remote_data_dir.startswith(remote_home_dir):
-      remote_fs.create_home_dir(remote_home_dir)
+    # Create remote data directory if needed
+    remote_data_dir = Submission.create_data_dir(remote_fs)
 
     # Copy over examples/
     for dirname in ("examples",):
@@ -60,7 +58,7 @@ class Command(NoArgsCommand):
       remote_dir = posixpath.join(remote_data_dir, dirname)
       copy_dir(local_dir, remote_fs, remote_dir)
 
-    # Copy over sample data
+    # Copy over sample_data/
     copy_dir(jobsub.conf.SAMPLE_DATA_DIR.get(),
       remote_fs,
       posixpath.join(remote_data_dir, "sample_data"))

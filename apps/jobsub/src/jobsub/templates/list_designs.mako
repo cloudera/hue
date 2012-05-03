@@ -65,22 +65,22 @@ ${layout.menubar(section='designs')}
                     <td>${design.description}</td>
                     <td nowrap="nowrap">${date(design.last_modified)} ${time(design.last_modified).replace("p.m.","PM").replace("a.m.","AM")}</td>
                     <td nowrap="nowrap" class="right">
-                      %if currentuser.is_superuser:
-                        %if currentuser.username == design.owner.username:
-                          <a title="Edit ${design.name}" class="btn small"
-                              href="${ url('jobsub.views.edit_design', design_id=design.id) }">Edit</a>
-                          <a title="Submit ${design.name}" class="btn small submitConfirmation"
-                              alt="Submit ${design.name} to the cluster"
-                              href="javascript:void(0)"
-                              data-param-url="${ url('jobsub.views.get_design_params', design_id=design.id) }"
-                              data-submit-url="${ url('jobsub.views.submit_design', design_id=design.id) }">Submit</a>
-                        %endif
+                    %if currentuser.username == design.owner.username:
+                        <a title="Submit ${design.name}" class="btn small submitConfirmation"
+                           alt="Submit ${design.name} to the cluster"
+                           href="javascript:void(0)"
+                           data-param-url="${ url('jobsub.views.get_design_params', design_id=design.id) }"
+                           data-submit-url="${ url('jobsub.views.submit_design', design_id=design.id) }">Submit</a>
+                        <a title="Edit ${design.name}" class="btn small"
+                           href="${ url('jobsub.views.edit_design', design_id=design.id) }">Edit</a>
+                    %endif%
+                    %if currentuser.is_superuser or currentuser.username == design.owner.username:
                         <a title="Delete ${design.name}" class="btn small deleteConfirmation"
-                            alt="Are you sure you want to delete ${design.name}?"
-                            href="javascript:void(0)"
-                            data-confirmation-url="${ url('jobsub.views.delete_design', design_id=design.id) }">Delete</a>
-                      %endif
-                      <a title="Clone ${design.name}" class="btn small" href="${ url('jobsub.views.clone_design', design_id=design.id) }">Clone</a>
+                           alt="Are you sure you want to delete ${design.name}?"
+                           href="javascript:void(0)"
+                           data-confirmation-url="${ url('jobsub.views.delete_design', design_id=design.id) }">Delete</a>
+                    %endif
+                        <a title="Clone ${design.name}" class="btn small" href="${ url('jobsub.views.clone_design', design_id=design.id) }">Clone</a>
                     </td>
                 </tr>
             %endfor

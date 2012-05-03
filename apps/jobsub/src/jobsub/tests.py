@@ -37,10 +37,14 @@ from django.contrib.auth.models import User
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 
+from jobsub import conf
+from jobsub.management.commands import jobsub_setup
 from jobsub.models import JobDesign
 from jobsub.parameterization import recursive_walk, find_variables, substitute_variables
 
 from hadoop import mini_cluster
+from hadoop import pseudo_hdfs4
+from hadoop.fs.hadoopfs import Hdfs
 import hadoop
 
 def test_recursive_walk():
@@ -299,7 +303,42 @@ def test_job_submission():
   finally:
     cluster.shutdown()
     jobsubd.exit()
-    
+
+@attr('requires_hadoop')
+def test_jobsub_setup():
+  # User 'test' triggers the setup of the examples.
+  # 'hue' home will be deleted, the examples installed in the new one
+  # and 'test' will try to access them.
+  cluster = pseudo_hdfs4.shared_cluster()
+  cluster.fs.setuser('test')
+
+  username = 'hue'
+  home_dir = '/user/%s/' % username
+  finish = conf.REMOTE_DATA_DIR.set_for_testing('%s/jobsub' % home_dir)
+
+  try:
+    data_dir = conf.REMOTE_DATA_DIR.get()
+    cluster.fs.setuser(cluster.fs.superuser)
+    if cluster.fs.exists(home_dir):
+      cluster.fs.rmtree(home_dir)
+    cluster.fs.setuser('test')
+
+    jobsub_setup.Command().handle()
+
+    cluster.fs.setuser('test')
+    stats = cluster.fs.stats(home_dir)
+    assert_equal(stats['user'], username)
+    assert_equal(oct(stats['mode']), '040755') #04 because is a dir
+
+    stats = cluster.fs.stats(data_dir)
+    assert_equal(stats['user'], username)
+    assert_equal(oct(stats['mode']), '041777')
+
+    stats = cluster.fs.listdir_stats(data_dir)
+    assert_equal(len(stats), 2) # 2 files inside
+  finally:
+    finish()
+
 @attr('requires_hadoop')
 def test_jobsub_setup_and_samples():
   """
