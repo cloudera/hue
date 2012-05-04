@@ -18,21 +18,22 @@
 %>
 
 <%def name="render_field(
-  field, 
-  render_default=False, 
+  field,
+  render_default=False,
   data_filters=None,
-  hidden=False, 
-  notitle=False, 
-  tag='input', 
-  klass=None, 
-  attrs=None, 
-  value=None, 
-  help=False, 
-  help_attrs=None, 
-  dd_attrs=None, 
-  dt_attrs=None, 
+  hidden=False,
+  notitle=False,
+  tag='input',
+  klass=None,
+  attrs=None,
+  value=None,
+  help=False,
+  help_attrs=None,
+  dd_attrs=None,
+  dt_attrs=None,
   title_klass=None,
-  button_text=False
+  button_text=False,
+  nolabel=False
   )">
 <%
   if value is None:
@@ -55,11 +56,11 @@
 
   if data_filters:
     attrs.data_filters = data_filters
-  
+
   classes = []
   if klass:
     classes.append(klass)
-  if hidden: 
+  if hidden:
     classes.append("jframe-hidden")
   cls = ' '.join(classes)
 
@@ -72,11 +73,9 @@
 %>
 
     % if not hidden:
-    <div class="clearfix">
-
-        ${field.label_tag() | n}
-
-    <div class="input">
+		%if nolabel == False:
+			${field.label_tag() | n}
+		%endif
     % endif
       % if render_default:
         ${unicode(field) | n}
@@ -94,15 +93,11 @@
         % endif
       % endif
       % if help:
-        <p class="jframe-inline" data-filters="HelpTip" ${make_attr_str(help_attrs) | n}>${help}</p>
+        <p data-filters="HelpTip" ${make_attr_str(help_attrs) | n}>${help}</p>
       % endif
 
-    % if not hidden:
-    </div>
-    </div>
-    % endif
     % if len(field.errors):
-      <div class="beeswax_error jframe-error">
+      <div class="beeswax_error">
          ${unicode(field.errors) | n}
       </div>
     % endif
