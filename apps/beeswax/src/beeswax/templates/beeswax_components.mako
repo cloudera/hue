@@ -63,14 +63,14 @@
   if klass:
     classes.append(klass)
   if hidden:
-    classes.append("jframe-hidden")
+    classes.append("hidden")
   cls = ' '.join(classes)
 
   title_classes = []
   if title_klass:
     title_classes.append(title_klass)
   if notitle or hidden:
-    title_classes.append("jframe-hidden")
+    title_classes.append("hidden")
   titlecls = ' '.join(title_classes)
 %>
 	${field.label_tag() | n}
@@ -92,7 +92,8 @@
   dd_attrs=None,
   dt_attrs=None,
   title_klass=None,
-  button_text=False
+  button_text=False,
+  placeholder=None
   )">
 <%
   if value is None:
@@ -120,15 +121,18 @@
   if klass:
     classes.append(klass)
   if hidden:
-    classes.append("jframe-hidden")
+    classes.append("hidden")
   cls = ' '.join(classes)
 
   title_classes = []
   if title_klass:
     title_classes.append(title_klass)
   if notitle or hidden:
-    title_classes.append("jframe-hidden")
+    title_classes.append("hidden")
   titlecls = ' '.join(title_classes)
+
+  if placeholder:
+	plc = "placeholder=\"%s\"" % placeholder
 %>
   % if field.is_hidden:
     ${unicode(field) | n}
@@ -147,7 +151,7 @@
 				<input type="checkbox" name="${field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""}/> <span>${button_text or field.name or ''}</span>
 			% endif
         % else:
-          <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} />
+          <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc} />
         % endif
 
       % endif

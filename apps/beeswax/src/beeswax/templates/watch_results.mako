@@ -32,7 +32,9 @@ ${layout.menubar(section='query')}
 					<li class="nav-header">Downloads</li>
 					<li><a target="_blank" href="${download_urls["csv"]}">Download as CSV</a></li>
 					<li><a target="_blank" href="${download_urls["xls"]}">Download as XLS</a></li>
-					<li><a href="${url('beeswax.views.save_results', query.id)}">Save</a></li>
+					% endif
+					%if can_save:
+					<li><a data-toggle="modal" href="#saveAs">Save</a></li>
 					% endif
 					<%
 			          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
@@ -52,34 +54,6 @@ ${layout.menubar(section='query')}
 			</div>
 		</div>
 		<div class="span9">
-			%if can_save:
-                <div class="collapsible jframe-hidden bw-save_query_results" style="display:none" data-filters="Accordion">
-                  <form action="${url('beeswax.views.save_results', query.id) }" method="POST">
-                    ## Writing the save_target fields myself so I can match them to their respective text input fields.
-                    <div>
-                      <input id="id_save_target_0" type="radio" name="save_target" value="to a new table" class="toggle" checked="checked"/>
-                      <label for="id_save_target_0">In a new table</label>
-                    </div>
-                    ${comps.field(save_form['target_table'], notitle=True, klass="target", attrs=dict(
-                      data_filters="OverText",
-                      alt="table_name"
-                    ))}
-                    <div>
-                      <input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory" class="toggle">
-                      <label for="id_save_target_1">In an HDFS directory</label>
-                    </div>
-                    <div class="target">
-                      ${comps.field(save_form['target_dir'], notitle=True, attrs=dict(
-                      data_filters="OverText",
-                      alt="/user/dir"
-                      ))}
-                      <a data-filters="ArtButton" class="hue-choose_file" data-icon-styles="{'width': 16, 'height': 16, 'top': 1, 'left': 4 }" data-chooseFor="target_dir">Choose File</a>
-                    </div>
-                    <input type="submit" value="Save" name="save" data-filters="ArtButton">
-                  </form>
-                </div>
-              %endif
-
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#results" data-toggle="tab">
 		  			%if error:
@@ -151,6 +125,36 @@ ${layout.menubar(section='query')}
 	</div>
 </div>
 
+%if can_save:
+<div id="saveAs" class="modal hide fade">
+	<form id="saveForm" action="${url('beeswax.views.save_results', query.id) }" method="POST" class="form form-inline">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>Save Query Results</h3>
+    </div>
+    <div class="modal-body">
+		<label class="radio">
+			<input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
+			&nbsp;In a new table
+		</label>
+		${comps.field(save_form['target_table'], notitle=True, placeholder="Table Name")}
+		<br/>
+		<label class="radio">
+			<input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
+			&nbsp;In an HDFS directory
+		</label>
+		${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder="Results location")}
+
+    </div>
+    <div class="modal-footer">
+		<div id="fieldRequired" class="hidden" style="position: absolute; left: 10;">
+			<span class="label label-important">Sorry, name is required.</span>
+        </div>
+        <input type="submit" class="btn primary" value="Save" name="save" />
+    </div>
+</div>
+%endif
+
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
@@ -162,6 +166,37 @@ ${layout.menubar(section='query')}
 		});
 		$(".dataTables_wrapper").css("min-height","0");
 		$(".dataTables_filter").hide();
+		$("input[name='save_target']").change(function(){
+			$("#fieldRequired").addClass("hidden");
+			$("input[name='target_dir']").removeClass("fieldError");
+			$("input[name='target_table']").removeClass("fieldError");
+			if ($(this).val().indexOf("HDFS")>-1){
+				$("input[name='target_table']").addClass("hidden");
+				$("input[name='target_dir']").removeClass("hidden");
+			}
+			else {
+				$("input[name='target_table']").removeClass("hidden");
+				$("input[name='target_dir']").addClass("hidden");
+			}
+		});
+
+		$("#saveForm").submit(function(){
+			if ($("input[name='save_target']:checked").val().indexOf("HDFS")>-1){
+				if ($.trim($("input[name='target_dir']").val()) == ""){
+					$("#fieldRequired").removeClass("hidden");
+					$("input[name='target_dir']").addClass("fieldError");
+					return false;
+				}
+			}
+			else {
+				if ($.trim($("input[name='target_table']").val()) == ""){
+					$("#fieldRequired").removeClass("hidden");
+					$("input[name='target_table']").addClass("fieldError");
+					return false;
+				}
+			}
+			return true;
+		});
 
 	});
 </script>
