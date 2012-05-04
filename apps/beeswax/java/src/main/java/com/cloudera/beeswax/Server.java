@@ -17,6 +17,7 @@ package com.cloudera.beeswax;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.security.PrivilegedAction;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.MissingOptionException;
@@ -46,6 +47,7 @@ import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TSaslServerTransport;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
+import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
 
@@ -73,7 +75,26 @@ public class Server {
   private static String keytabFile;
   private static Integer refreshInterval = DEFAULT_KRB_REFRESH_INTERVAL;
   private static String kerberosName;
+  private static UserGroupInformation bwUgi;
 
+  public static class KbrSaslTransportFactory  extends TTransportFactory {
+    UserGroupInformation ugi;
+    TSaslServerTransport.Factory saslFactory;
+
+    public KbrSaslTransportFactory(TSaslServerTransport.Factory saslFactory, UserGroupInformation ugi) {
+      this.saslFactory = saslFactory;
+      this.ugi = ugi;
+    }
+
+    @Override
+    public TTransport getTransport(final TTransport base) {
+      return ugi.doAs(new PrivilegedAction<TTransport>() {
+        public TTransport run() {
+          return saslFactory.getTransport(base);
+        }
+      });
+    }
+  }
   /**
    * Parse command line options.
    *
@@ -245,10 +266,13 @@ public class Server {
       if (names.length != 3) {
         throw new IllegalArgumentException("Kerberos principal should have 3 parts: " + kerberosName);
       }
-      transFactory = new TSaslServerTransport.Factory(AuthMethod.KERBEROS.getMechanismName(),
-          names[0], names[1],  // two parts of kerberos principal
-          SaslRpcServer.SASL_PROPS,
-          new SaslRpcServer.SaslGssCallbackHandler());
+
+      TSaslServerTransport.Factory saslFactory =
+          new TSaslServerTransport.Factory(AuthMethod.KERBEROS.getMechanismName(),
+              names[0] , names[1] , // two parts of kerberos principal
+              SaslRpcServer.SASL_PROPS,
+              new SaslRpcServer.SaslGssCallbackHandler());
+      transFactory = new KbrSaslTransportFactory(saslFactory, bwUgi);
     } else {
       transFactory = new TTransportFactory();
     }
@@ -281,6 +305,7 @@ public class Server {
     try {
       kerberosName = SecurityUtil.getServerPrincipal(principalConf, "0.0.0.0");
       UserGroupInformation.loginUserFromKeytab(kerberosName, keytabFile);
+      bwUgi = UserGroupInformation.getCurrentUser();
       // Start a thread to periodically refresh kerberos ticket
       Thread t = new Thread(new Runnable() {
         @Override
