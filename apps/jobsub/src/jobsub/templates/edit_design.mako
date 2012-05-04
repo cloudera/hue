@@ -64,8 +64,8 @@ ${layout.menubar(section='designs')}
         % endfor
 
         <hr/>
-        <div class="row control-group">
-          <p class="span6 alert alert-info">
+        <div class="control-group">
+          <p class="alert alert-info">
               You can parameterize the values, using <code>$myVar</code> or
               <code>${"${"}myVar}</code>. When the design is submitted, you will be
               prompted for the actual value of <code>myVar</code>.
@@ -79,7 +79,7 @@ ${layout.menubar(section='designs')}
             <label class="control-label">Job Properties</label>
             <div class="controls">
                 ## Data bind for job properties
-                <table class="table-condensed" data-bind="visible: properties().length > 0">
+                <table class="table-condensed designTable" data-bind="visible: properties().length > 0">
                   <thead>
                     <tr>
                       <th>Property name</th>
@@ -89,15 +89,15 @@ ${layout.menubar(section='designs')}
                   </thead>
                   <tbody data-bind="foreach: properties">
                     <tr>
-                      <td><input class="input-xlarge required propKey" data-bind="value: name, uniqueName: false" /></td>
-                      <td><input class="input-xlarge span5 required" data-bind="value: value, uniqueName: false" /></td>
+                      <td><input class="span2 required propKey" data-bind="value: name, uniqueName: false" /></td>
+                      <td><input class="span3 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
                       <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">Delete</a></td>
                     </tr>
                   </tbody>
                 </table>
                 % if len(form.action["job_properties"].errors):
                   <div class="row">
-                    <div class="span6 alert alert-error">
+                    <div class="alert alert-error">
                       ${unicode(form.action["job_properties"].errors) | n}
                     </div>
                   </div>
@@ -111,21 +111,19 @@ ${layout.menubar(section='designs')}
             <label class="control-label">Files</label>
             <div class="controls">
                 ## Data bind for files (distributed cache)
-                <table class="table-condensed" data-bind="visible: files().length > 0">
+                <table class="table-condensed designTable" data-bind="visible: files().length > 0">
                   <tbody data-bind="foreach: files">
                     <tr>
-                      <td><input class="input span6 required"
+                      <td><input class="input span5 required pathChooserKo"
                                 data-bind="fileChooser: $data, value: name, uniqueName: false" /></td>
                       <td><a class="btn" href="#" data-bind="click: $root.removeFile">Delete</a></td>
                     </tr>
                   </tbody>
                 </table>
                 % if len(form.action["files"].errors):
-                  <div class="row">
-                    <div class="span6 alert alert-error">
+                    <div class="alert alert-error">
                       ${unicode(form.action["files"].errors) | n}
                     </div>
-                  </div>
                 % endif
 
                 <button class="btn" data-bind="click: addFile">Add File</button>
@@ -136,21 +134,19 @@ ${layout.menubar(section='designs')}
             <label class="control-label">Archives</label>
             <div class="controls">
                 ## Data bind for archives (distributed cache)
-                <table class="table-condensed" data-bind="visible: archives().length > 0">
+                <table class="table-condensed designTable" data-bind="visible: archives().length > 0">
                   <tbody data-bind="foreach: archives">
                     <tr>
-                      <td><input class="input span6 required"
+                      <td><input class="input span5 required pathChooserKo"
                                 data-bind="fileChooser: $data, value: name, uniqueName: false" /></td>
                       <td><a class="btn" href="#" data-bind="click: $root.removeArchive">Delete</a></td>
                     </tr>
                   </tbody>
                 </table>
                 % if len(form.action["archives"].errors):
-                  <div class="row">
-                    <div class="span6 alert alert-error">
+                    <div class="alert alert-error">
                       ${unicode(form.action["archives"].errors) | n}
                     </div>
-                  </div>
                 % endif
 
                 <button class="btn" data-bind="click: addArchive">Add Archive</button>
@@ -182,6 +178,14 @@ ${layout.menubar(section='designs')}
 
 
 <style>
+	.pathChooser, .pathChooserKo {
+		border-radius: 3px 0 0 3px;
+		border-right:0;
+	}
+	.fileChooserBtn {
+		border-radius: 0 3px 3px 0;
+	}
+
     #fileChooserModal {
         padding:14px;
         height:370px;
@@ -191,6 +195,16 @@ ${layout.menubar(section='designs')}
         height:330px;
         overflow-y:auto;
     }
+
+	.designTable {
+		margin-left:0;
+	}
+	.designTable th, .designTable td {
+	    padding-left: 0;
+	}
+	.designTable th {
+		text-align:left;
+	}
 </style>
 
 
@@ -291,6 +305,8 @@ ${layout.menubar(section='designs')}
 
         ko.bindingHandlers.fileChooser = {
             init: function(element, valueAccessor, allBindings, model) {
+				var self = $(element);
+				self.after(getFileBrowseButton(self));
                 $(element).click(function() {
                     $("#fileChooserModal").jHueFileChooser({
                         onFileChoose: function(filePath) {
@@ -308,18 +324,25 @@ ${layout.menubar(section='designs')}
 
         ko.applyBindings(viewModel);
 
-        $(".pathChooser").click(function(){
-            var _destination = $(this).attr("data-filechooser-destination");
-            var self = this;
-            $("#fileChooserModal").jHueFileChooser({
-                onFileChoose: function(filePath) {
-                    $(self).val(filePath);
-                    $("#chooseFile").modal("hide");
-                },
-                createFolder: false
-            });
-            $("#chooseFile").modal("show");
-        });
+		$(".pathChooser").each(function(){
+			var self = $(this);
+			self.after(getFileBrowseButton(self));
+		});
+
+		function getFileBrowseButton(inputElement) {
+			return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
+				e.preventDefault();
+				$("#fileChooserModal").jHueFileChooser({
+	                onFileChoose: function(filePath) {
+	                    inputElement.val(filePath);
+	                    $("#chooseFile").modal("hide");
+	                },
+	                createFolder: false
+	            });
+	            $("#chooseFile").modal("show");
+			})
+		}
+
 
         $(".propKey").each(addAutoComplete);
     });
