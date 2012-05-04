@@ -16,15 +16,14 @@
 <%namespace name="edit" file="editor_components.mako" />
 
 <form action="/filebrowser/chmod?next=${next|u}" method="POST" enctype="multipart/form-data"
-      class="form-stacked form-padding-fix">
+      class="form-inline form-padding-fix">
     <div class="modal-header">
-        <a href="#" class="close">&times;</a>
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Change Permissions: ${path}</h3>
     </div>
     <div class="change-owner-modal-body clearfix" >
         ${edit.render_field(form["path"], hidden=True)}
-        <table class="zebra-striped"
-               style="background-color: #ffffff;">
+        <table class="table table-striped">
             <thead>
             <tr>
                 <th></th>
@@ -36,21 +35,21 @@
             <tbody>
             <tr>
                 <td>Read</td>
-                <td>${edit.render_field(form["user_read"], tag="checkbox", button_text=" ", notitle=True)}</td>
-                <td>${edit.render_field(form["group_read"], tag="checkbox", button_text=" ", notitle=True)}</td>
-                <td>${edit.render_field(form["other_read"], tag="checkbox", button_text=" ", notitle=True)}</td>
+                <td>${edit.render_field(form["user_read"], tag="checkbox", button_text=" ", nolabel=True)}</td>
+                <td>${edit.render_field(form["group_read"], tag="checkbox", button_text=" ", nolabel=True)}</td>
+                <td>${edit.render_field(form["other_read"], tag="checkbox", button_text=" ", nolabel=True)}</td>
             </tr>
             <tr>
                 <td>Write</td>
-                <td>${edit.render_field(form["user_write"], tag="checkbox", button_text=" ", notitle=True)}</td>
-                <td>${edit.render_field(form["group_write"], tag="checkbox", button_text=" ", notitle=True)}</td>
-                <td>${edit.render_field(form["other_write"], tag="checkbox", button_text=" ", notitle=True)}</td>
+                <td>${edit.render_field(form["user_write"], tag="checkbox", button_text=" ", nolabel=True)}</td>
+                <td>${edit.render_field(form["group_write"], tag="checkbox", button_text=" ", nolabel=True)}</td>
+                <td>${edit.render_field(form["other_write"], tag="checkbox", button_text=" ", nolabel=True)}</td>
             </tr>
             <tr>
                 <td>Execute</td>
-                <td>${edit.render_field(form["user_execute"], tag="checkbox", button_text=" ", notitle=True)}</td>
-                <td>${edit.render_field(form["group_execute"], tag="checkbox", button_text=" ", notitle=True)}</td>
-                <td>${edit.render_field(form["other_execute"], tag="checkbox", button_text=" ", notitle=True)}</td>
+                <td>${edit.render_field(form["user_execute"], tag="checkbox", button_text=" ", nolabel=True)}</td>
+                <td>${edit.render_field(form["group_execute"], tag="checkbox", button_text=" ", nolabel=True)}</td>
+                <td>${edit.render_field(form["other_execute"], tag="checkbox", button_text=" ", nolabel=True)}</td>
             </tr>
             </tbody>
         </table>

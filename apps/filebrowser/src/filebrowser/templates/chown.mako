@@ -54,14 +54,13 @@
       % endif
     % endif
 </%def>
-
 <form action="/filebrowser/chown?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
-        <a href="#" class="close">&times;</a>
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Change Owner / Group: ${path}</h3>
     </div>
-    <div class="change-owner-modal-body clearfix" >
-        <div class="alert-message block-message info">Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</div>
+    <div class="modal-body change-owner-modal-body clearfix" >
+        <div class="alert alert-message block-message info">Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</div>
         <div style="padding-left: 15px; padding-bottom: 10px;">
             ${edit.render_field(form["path"], hidden=True)}
 
@@ -81,9 +80,14 @@
             ${ selection("group", [group for group in form.all_groups if group in extra_params['current_user'].get_groups()], extract_field_data(form["group"])) }
             % endif
         </div>
+
+
     </div>
     <div class="modal-footer" style="padding-top: 10px;">
         <input class="btn primary" type="submit" value="Submit" />
         <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">Cancel</a>
     </div>
 </form>
+
+
+<!--<div class="alert-message info modal-footer">Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</div>-->

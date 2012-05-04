@@ -101,22 +101,27 @@ from django.utils.encoding import smart_str
 					<%
 					path_digest = urlencode(md5.md5(smart_str(path)).hexdigest())
 					%>
-					<a class="btn small contextEnabler" data-menuid="${path_digest}">Options</a>
-					<ul class="contextMenu" id="menu${path_digest}">
-						% if "dir" == file['type']:
-						<li><a class="contextItem delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
-						<li><a class="contextItem delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete Recursively</a></li>
-						% else:
-						<li><a class="contextItem delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
-						<li><a class="contextItem" href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a></li>
-						<li><a class="contextItem" href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a></li>
-						<li><a class="contextItem" href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
-						% endif
-						<li><a class="contextItem rename" file-to-rename="${path}">Rename</a></li>
-						<li><a class="contextItem" onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
-						<li><a class="contextItem" onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a></li>
-						<li><a class="contextItem" onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a></li>
-					</ul>
+					<div class="btn-group">
+				    	<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+							Options
+				    		<span class="caret"></span>
+				    	</a>
+				    	<ul class="dropdown-menu">
+				    		% if "dir" == file['type']:
+							<li><a class="delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
+							<li><a class="delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete Recursively</a></li>
+							% else:
+							<li><a class="delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
+							<li><a href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a></li>
+							<li><a href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a></li>
+							<li><a href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
+							% endif
+							<li><a class="rename" file-to-rename="${path}">Rename</a></li>
+							<li><a  onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
+							<li><a onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a></li>
+							<li><a onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a></li>
+				    	</ul>
+				    </div>
 					% endif
 				</td>
 			</tr>
@@ -144,22 +149,17 @@ from django.utils.encoding import smart_str
 
 <!-- rename modal -->
 <div id="renameModal" class="modal hide fade">
-    <form id="renameForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+    <form id="renameForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Renaming: <span id="renameFileName">file name</span></h3>
     </div>
     <div class="modal-body">
-        <div class="clearfix">
-            <label>New name</label>
-            <div class="input">
-                <input id="newNameInput" name="dest_path" value="" type="text" class="xlarge"/>
-            </div>
-        </div>
+		<label>New name <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
     </div>
     <div class="modal-footer">
-        <div id="renameNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
-            <p><strong>Sorry, name is required.</strong>
+        <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
+			<span class="label label-important">Sorry, name is required.</span>
         </div>
 
         <input id="renameSrcPath" type="hidden" name="src_path" type="text">
@@ -196,20 +196,14 @@ from django.utils.encoding import smart_str
 
 <!-- create directory modal -->
 <div id="createDirectoryModal" class="modal hide fade">
-    <form id="createDirectoryForm" action="/filebrowser/mkdir?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+    <form id="createDirectoryForm" action="/filebrowser/mkdir?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Create Directory</h3>
     </div>
     <div class="modal-body">
-        <div class="clearfix">
-            <label>Directory Name</label>
-            <div class="input">
-                <input id="newDirectoryNameInput" name="name" value="" type="text" class="xlarge"/>
-                <input type="hidden" name="path" type="text" value="${current_dir_path}"/>
-            </div>
-        </div>
-
+		<label>Directory Name <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
+		<input type="hidden" name="path" type="text" value="${current_dir_path}"/>
     </div>
     <div class="modal-footer">
          <div id="directoryNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
@@ -431,8 +425,6 @@ from django.utils.encoding import smart_str
             $("#newDirectoryNameInput").removeClass("fieldError");
             $("#directoryNameRequiredAlert").hide();
         });
-
-        $(".contextEnabler").jHueContextMenu();
 
 	});
 
