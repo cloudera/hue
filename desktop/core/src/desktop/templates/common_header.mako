@@ -27,7 +27,6 @@ from desktop.lib.i18n import smart_unicode
   <meta name="author" content="">
 
   <link href="/static/ext/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/static/ext/css/bootstrap-responsive.min.css" rel="stylesheet">
   <link href="/static/css/jhue.css" rel="stylesheet">
   <link href="/static/ext/css/fileuploader.css" rel="stylesheet">
 
