@@ -30,8 +30,8 @@ ${layout.menubar(section='users')}
     <div class="well hueWell">
         <div class="btn-group pull-right">
             %if user.is_superuser == True:
-            <a id="addUserBtn" href="#" class="btn">Add user</a>
-            <a id="addLdapUserBtn" href="#" class="btn">Add/sync LDAP user</a>
+            <a id="addUserBtn" href="${ url('useradmin.views.edit_user') }" class="btn">Add user</a>
+            <a id="addLdapUserBtn" href="${ url('useradmin.views.add_ldap_user') }" class="btn">Add/sync LDAP user</a>
             <a id="syncLdapBtn" href="#" class="btn">Sync LDAP users/groups</a>
             %endif
         </div>
@@ -62,11 +62,11 @@ ${layout.menubar(section='users')}
                 <td>${date(listed_user.last_login)} ${time(listed_user.last_login).replace("p.m.","PM").replace("a.m.","AM")}</td>
                 <td class="right">
                 %if user.is_superuser == True:
-                    <a title="Edit ${listed_user.username}" class="btn small editUserBtn" data-url="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-name="${listed_user.username}">Edit</a>
+                    <a title="Edit ${listed_user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }">Edit</a>
                     <a title="Delete ${listed_user.username}" class="btn small confirmationModal" alt="Are you sure you want to delete ${listed_user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(listed_user.username)) }">Delete</a>
                 %else:
                     %if user.username == listed_user.username:
-                        <a title="Edit ${listed_user.username}" class="btn small editUserBtn" data-url="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-name="${listed_user.username}">Edit</a>
+                        <a title="Edit ${listed_user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }">Edit</a>
                     %else:
                         &nbsp;
                     %endif
@@ -76,32 +76,6 @@ ${layout.menubar(section='users')}
         % endfor
         </tbody>
     </table>
-
-    <div id="addUser" class="modal hide fade userModal">
-        <div class="modal-header">
-            <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3>Add user</h3>
-        </div>
-        <div id="addUserBody" class="modal-body">
-            <iframe id="addUserFrame" class="scroll" frameBorder="0"></iframe>
-        </div>
-        <div class="modal-footer">
-            <button id="addUserSaveBtn" class="btn primary">Save</button>
-        </div>
-    </div>
-
-    <div id="addLdapUser" class="modal hide fade userModal">
-        <div class="modal-header">
-            <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3>Add or Sync a LDAP user</h3>
-        </div>
-        <div id="addLdapUserBody" class="modal-body">
-            <iframe id="addLdapUserFrame" class="scroll" frameBorder="0"></iframe>
-        </div>
-        <div class="modal-footer">
-            <button id="addLdapUserSaveBtn" class="btn primary">Save</button>
-        </div>
-    </div>
 
     <div id="syncLdap" class="modal hide fade userModal">
         <div class="modal-header">
@@ -113,19 +87,6 @@ ${layout.menubar(section='users')}
         </div>
         <div class="modal-footer">
             <button id="syncLdapSaveBtn" class="btn primary">Sync</button>
-        </div>
-    </div>
-
-    <div id="editUser" class="modal hide fade userModal">
-        <div class="modal-header">
-            <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3>Edit user <span class="username"></span></h3>
-        </div>
-        <div id="editUserBody" class="modal-body">
-            <iframe id="editUserFrame" class="scroll" frameBorder="0"></iframe>
-        </div>
-        <div class="modal-footer">
-            <button id="editUserSaveBtn" class="btn primary">Save</button>
         </div>
     </div>
 
@@ -158,8 +119,8 @@ ${layout.menubar(section='users')}
                         null,
                         null,
                         null,
-                        null,
-                        { "sType": "date" }
+						{ "sType": "date" },
+                        { "bSortable": false }
                     ]
             });
             $(".dataTables_wrapper").css("min-height","0");
@@ -185,24 +146,6 @@ ${layout.menubar(section='users')}
 
             });
 
-            $("#addUserBtn").click(function(){
-                $("#addUserFrame").css("height","300px").attr("src","${ url('useradmin.views.edit_user') }");
-                $("#addUser").modal("show");
-            });
-
-            $("#addUserSaveBtn").click(function(){
-                $("#addUserFrame").contents().find('form').submit();
-            });
-
-            $("#addLdapUserBtn").click(function(){
-                $("#addLdapUserFrame").css("height","150px").attr("src","${ url('useradmin.views.add_ldap_user') }");
-                $("#addLdapUser").modal("show");
-            });
-
-            $("#addLdapUserSaveBtn").click(function(){
-                $("#addLdapUserFrame").contents().find('form').submit();
-            });
-
             $("#syncLdapBtn").click(function(){
                 $("#syncLdapFrame").css("height","150px").attr("src","${ url('useradmin.views.sync_ldap_users_groups') }");
                 $("#syncLdap").modal("show");
@@ -211,17 +154,6 @@ ${layout.menubar(section='users')}
             $("#syncLdapSaveBtn").click(function(){
                 $("#syncLdapFrame").contents().find('form').submit();
             });
-
-            $(".editUserBtn").click(function(){
-                $("#editUser").find(".username").text($(this).data("name"));
-                $("#editUserFrame").css("height","300px").attr("src", $(this).data("url"));
-                $("#editUser").modal("show");
-            });
-
-            $("#editUserSaveBtn").click(function(){
-                $("#editUserFrame").contents().find('form').submit();
-            });
-
 
         });
     </script>

@@ -51,7 +51,7 @@ ${layout.menubar(section='permissions')}
             <td>${perm.description}</td>
             <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
 			%if user.is_superuser == True:
-            <td>
+            <td class="right">
               <a title="Edit permission" class="btn small editPermissionBtn" data-url="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}">Edit</a>
             </td>
 			%endif
@@ -82,7 +82,13 @@ ${layout.menubar(section='permissions')}
 				"bPaginate": false,
 			    "bLengthChange": false,
 				"bInfo": false,
-				"bFilter": false
+				"bFilter": false,
+				"aoColumns": [
+					null,
+					null,
+					null,
+					{ "bSortable": false }
+                 ]
 			});
 			$(".dataTables_wrapper").css("min-height","0");
 			$(".dataTables_filter").hide();

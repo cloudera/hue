@@ -14,27 +14,60 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader_iframe, commonfooter_iframe
+from desktop.views import commonheader, commonfooter
+from desktop.lib.django_util import extract_field_data
 import urllib
 %>
-${commonheader_iframe()}
-	<form id="editForm" action="${urllib.quote(action)}" method="POST">
+
+<%namespace name="layout" file="layout.mako" />
+
+${commonheader("Hue Users", "useradmin", "100px")}
+${layout.menubar(section='groups')}
+
+<%def name="render_field(field)">
+  %if not field.is_hidden:
+    <% group_class = len(field.errors) and "error" or "" %>
+    <div class="control-group ${group_class}">
+      <label class="control-label" for="id_${field.html_name}">${field.label}</label>
+      <div class="controls">
+		${unicode(field) | n}
+        % if len(field.errors):
+          <span class="help-inline">${unicode(field.errors) | n}</span>
+        % endif
+      </div>
+    </div>
+  %endif
+</%def>
+
+
+<div class="container-fluid">
+	% if name:
+		<h1>Hue Groups - Edit group: ${name}</h1>
+	% else:
+		% if ldap:
+			<h1>Hue Groups - Add/sync LDAP group</h1>
+		% else:
+			<h1>Hue Groups - Create group</h1>
+		% endif
+	% endif
+
+	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
 		<fieldset>
-        <%def name="render_field(field)">
-			<div class="clearfix">
-				${field.label_tag() | n}
-				<div class="input">
-					${unicode(field) | n}
-					% if len(field.errors):
-						${unicode(field.errors) | n}
-					% endif
-				</div>
-			</div>
-		</%def>
 		% for field in form:
 			${render_field(field)}
 		% endfor
         </fieldset>
+		<div class="form-actions">
+			% if name:
+				<input type="submit" class="btn btn-large btn-primary" value="Update group"/>
+			% else:
+				% if ldap:
+					<input type="submit" class="btn btn-large btn-primary" value="Add/Sync group"/>
+				% else:
+					<input type="submit" class="btn btn-large btn-primary" value="Add group"/>
+				% endif
+			% endif
+		</div>
 	</form>
 
 	<script type="text/javascript" charset="utf-8">
@@ -42,4 +75,4 @@ ${commonheader_iframe()}
 			$("#id_members").jHueSelector();
 		});
 	</script>
-${commonfooter_iframe()}
+${commonfooter()}

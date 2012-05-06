@@ -1,5 +1,0 @@
-copyright: Apache License v2.0
-version: 0.9
-description: User Admin
-name: useradmin
-sources: [Source/UserAdmin/Hue.UserAdmin.js]

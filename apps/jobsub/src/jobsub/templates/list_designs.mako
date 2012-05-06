@@ -198,7 +198,7 @@ ${layout.menubar(section='designs')}
 				null,
 				null,
 				{ "sType": "date" },
-				null
+				{ "bSortable": false }
 			],
 			"aaSorting": [[ 4, "desc" ]]
         });

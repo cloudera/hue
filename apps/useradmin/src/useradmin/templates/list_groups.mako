@@ -30,8 +30,8 @@ ${layout.menubar(section='groups')}
     <div class="well hueWell">
         <div class="pull-right btn-group">
             %if user.is_superuser == True:
-            <a id="addGroupBtn" href="#" class="btn">Add group</a>
-            <a id="addLdapGroupBtn" href="#" class="btn">Add/Sync LDAP group</a>
+            <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn">Add group</a>
+            <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_group')}" class="btn">Add/Sync LDAP group</a>
             %endif
         </div>
         <form class="form-search">
@@ -56,8 +56,8 @@ ${layout.menubar(section='groups')}
             <td>${', '.join([group_user.username for group_user in group.user_set.all()])}</td>
             <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
             %if user.is_superuser == True:
-            <td>
-              <a title="Edit ${group.name}" class="btn small editGroupBtn" data-url="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-name="${group.name}">Edit</a>
+            <td class="right">
+              <a title="Edit ${group.name}" class="btn small editGroupBtn" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }">Edit</a>
               <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>
             </td>
             %endif
@@ -81,45 +81,6 @@ ${layout.menubar(section='groups')}
     </form>
 </div>
 
-<div id="addGroup" class="modal hide fade groupModal">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Add group</h3>
-    </div>
-    <div id="addGroupBody" class="modal-body">
-        <iframe id="addGroupFrame" frameBorder="0"></iframe>
-    </div>
-    <div class="modal-footer">
-        <button id="addGroupSaveBtn" class="btn primary">Save</button>
-    </div>
-</div>
-
-<div id="addLdapGroup" class="modal hide fade groupModal">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Add or Sync a LDAP group</h3>
-    </div>
-    <div id="addLdapGroupBody" class="modal-body">
-        <iframe id="addLdapGroupFrame" frameBorder="0"></iframe>
-    </div>
-    <div class="modal-footer">
-        <button id="addLdapGroupSaveBtn" class="btn primary">Save</button>
-    </div>
-</div>
-
-<div id="editGroup" class="modal hide fade groupModal">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Edit group <span class="groupName"></span></h3>
-    </div>
-    <div id="editGroupBody" class="modal-body">
-        <iframe id="editGroupFrame" frameBorder="0"></iframe>
-    </div>
-    <div class="modal-footer">
-        <button id="editGroupSaveBtn" class="btn primary">Save</button>
-    </div>
-</div>
-
 </div>
 
     <script type="text/javascript" charset="utf-8">
@@ -134,7 +95,7 @@ ${layout.menubar(section='groups')}
                     { "sWidth": "20%" },
                     null,
                     %if user.is_superuser == True:
-                    { "sWidth": "120px" },
+                    { "sWidth": "120px", "bSortable": false },
                     %endif
                  ]
             });
@@ -164,35 +125,6 @@ ${layout.menubar(section='groups')}
                 });
 
             });
-
-            $("#addGroupBtn").click(function(){
-                $("#addGroupFrame").css("height","400px").attr("src","${url('useradmin.views.edit_group')}");
-                $("#addGroup").modal("show");
-            });
-
-            $("#addGroupSaveBtn").click(function(){
-                $("#addGroupFrame").contents().find('form').submit();
-            });
-
-            $("#addLdapGroupBtn").click(function(){
-                $("#addLdapGroupFrame").css("height","200px").attr("src","${url('useradmin.views.add_ldap_group')}");
-                $("#addLdapGroup").modal("show");
-            });
-
-            $("#addLdapGroupSaveBtn").click(function(){
-                $("#addLdapGroupFrame").contents().find('form').submit();
-            });
-
-            $(".editGroupBtn").click(function(){
-                $("#editGroup").find(".groupName").text($(this).data("name"));
-                $("#editGroupFrame").css("height","400px").attr("src", $(this).data("url"));
-                $("#editGroup").modal("show");
-            });
-
-            $("#editGroupSaveBtn").click(function(){
-                $("#editGroupFrame").contents().find('form').submit();
-            });
-
 
         });
     </script>
