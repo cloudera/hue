@@ -131,6 +131,7 @@
     title_classes.append("hidden")
   titlecls = ' '.join(title_classes)
 
+  plc = ""
   if placeholder:
 	plc = "placeholder=\"%s\"" % placeholder
 %>
