@@ -217,8 +217,7 @@ def edit_user(request, username=None):
           __users_lock.release()
 
       request.path = urlresolvers.reverse(list_users)
-      return render('edit_user_confirmation.mako', request,
-	    dict(form=form, action=request.path, username=username))
+      return render("list_users.mako", request, dict(users=User.objects.all()))
   else:
     form = form_class(instance=instance)
   return render('edit_user.mako', request,
@@ -248,8 +247,7 @@ def edit_group(request, name=None):
     if form.is_valid():
       form.save()
       request.flash.put('Group information updated')
-      return render('edit_group_confirmation.mako', request,
-	    dict(form=form, action=request.path, name=name))
+      return render("list_groups.mako", request, dict(groups=Group.objects.all()))
 
   else:
     form = GroupEditForm(instance=instance)
@@ -338,10 +336,10 @@ def add_ldap_user(request):
         errors.append('Could not get LDAP details for user %s' % (username,))
       else:
         request.path = urlresolvers.reverse(list_users)
-        return render('edit_user_confirmation.mako', request, dict(form=form, action=request.path))
+        return render("list_users.mako", request, dict(users=User.objects.all()))
   else:
     form = AddLdapUserForm()
-  return render('edit_user.mako', request, dict(form=form, action=request.path))
+  return render('edit_user.mako', request, dict(form=form, action=request.path, ldap=True))
 
 class AddLdapGroupForm(forms.Form):
   name = forms.RegexField(
@@ -401,10 +399,10 @@ def add_ldap_group(request):
         errors.append('Could not get LDAP details for group %s' % (groupname,))
       else:
         request.path = urlresolvers.reverse(list_groups)
-        return render('edit_group_confirmation.mako', request, dict(form=form, action=request.path))
+        return render("list_groups.mako", request, dict(groups=Group.objects.all()))
   else:
     form = AddLdapGroupForm()
-  return render('edit_group.mako', request, dict(form=form, action=request.path))
+  return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True))
 
 def sync_ldap_users_groups(request):
   """
@@ -419,7 +417,7 @@ def sync_ldap_users_groups(request):
 
   if request.method == 'POST':
     sync_ldap_users_and_groups()
-    return render('edit_user_confirmation.mako', request, {})
+    return render("list_users.mako", request, dict(users=User.objects.all()))
   else:
     return render('sync_ldap_users_groups.mako', request, dict(action=request.path))
 
