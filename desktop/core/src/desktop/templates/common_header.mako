@@ -27,7 +27,7 @@ from desktop.lib.i18n import smart_unicode
   <meta name="author" content="">
 
   <link href="/static/ext/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/static/css/jhue.css" rel="stylesheet">
+  <link href="/static/css/hue2.css" rel="stylesheet">
   <link href="/static/ext/css/fileuploader.css" rel="stylesheet">
 
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -55,7 +55,11 @@ from desktop.lib.i18n import smart_unicode
 
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-      $(".navbar .nav-username").showUsername();
+      $("#username").jHueUsername({
+		onLoad: function(user){
+			$(".userProfile").attr("href","/useradmin/users/edit/"+user.username);
+		}
+	  });
       $("input:text[placeholder]").simplePlaceholder();
       $(".submitter").keydown(function(e){
         if (e.keyCode==13){
@@ -84,6 +88,18 @@ from desktop.lib.i18n import smart_unicode
     <div class="navbar-inner">
       <div class="container-fluid">
         <a class="brand nav-tooltip" title="About Hue" href="/about">Hue</a>
+		<div class="btn-group pull-right">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-user"></i> <span id="username"></span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="userProfile" href="#">Profile</a></li>
+            <li class="divider"></li>
+            <li><a href="/accounts/logout/">Sign Out</a></li>
+          </ul>
+        </div>
+
         <div class="nav-collapse">
           <ul class="nav">
             %for app in apps:
@@ -97,7 +113,6 @@ from desktop.lib.i18n import smart_unicode
             <li class="divider-vertical"></li>
             <li id="checkConfig"></li>
           </ul>
-          <p class="navbar-text pull-right">Logged in as <strong><span class="nav-username">&nbsp;</span></strong> - <a href="/accounts/logout/">Sign out</a></p>
         </div>
       </div>
     </div>
