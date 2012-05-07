@@ -458,7 +458,8 @@ class WebHdfs(Hdfs):
 
     # Now talk to the real thing. The redirect url already includes the params.
     client = self._make_client(next_url, self.security_enabled)
-    return resource.Resource(client).invoke(method, data=data)
+    headers = {'Content-Type': 'application/octet-stream'}
+    return resource.Resource(client).invoke(method, data=data, headers=headers)
 
 
   def _get_redirect_url(self, webhdfs_ex):
