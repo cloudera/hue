@@ -54,7 +54,7 @@ SUDO_SHELL_DIR := $(realpath .)/sudo-shell
 SUDO_SHELL_SRC := $(SUDO_SHELL_DIR)/src
 SUDO_SHELL_BUILD := $(SUDO_SHELL_DIR)/target
 SUDO_SHELL_LIB := $(SUDO_SHELL_DIR)/java-lib
-SUDO_SHELL := $(SUDO_SHELL_LIB)/sudo-shell-$(DESKTOP_VERSION).jar
+SUDO_SHELL := $(SUDO_SHELL_LIB)/sudo-shell-$(DESKTOP_VERSION)*.jar
 
 CREDENTIALS_MERGER_DIR := $(realpath .)/credentials-merger
 CREDENTIALS_MERGER_SRC := $(CREDENTIALS_MERGER_DIR)/src
