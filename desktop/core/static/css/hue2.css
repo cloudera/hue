@@ -1,3 +1,7 @@
+.navbar .brand {
+    color: #FFFFFF;
+}
+    
 .subnav {
     background-color: #EEEEEE;
     background-image: -moz-linear-gradient(center top , #F5F5F5 0%, #EEEEEE 100%);
@@ -120,18 +124,6 @@
     text-decoration: none;
 }
 
-.navbar .pull-right {
-	color:#e5e5e5;
-}
-
-.navbar .pull-right a {
-	font-weight:bold;
-    color:#e5e5e5;
-}
-
-.navbar .pull-right a:hover {
-    color:#ffffff;
-}
 
 h1 {
     margin-bottom:.7em;
