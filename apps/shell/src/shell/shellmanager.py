@@ -41,6 +41,8 @@ from eventlet.green import time
 from hadoop.cluster import all_mrclusters, get_all_hdfs, \
                            get_cluster_conf_for_job_submission
 
+from desktop.conf import KERBEROS
+
 LOG = logging.getLogger(__name__)
 SHELL_OUTPUT_LOGGER = logging.getLogger("shell_output")
 SHELL_INPUT_LOGGER = logging.getLogger("shell_input")
@@ -132,7 +134,7 @@ class Shell(object):
     Returns the NamedTemporaryFile that contains the combined delegation tokens.
     """
     merged_token_file = tempfile.NamedTemporaryFile(dir=delegation_token_dir)
-    merge_tool_args = [hadoop.conf.HADOOP_BIN.get(), 'jar']
+    merge_tool_args = [hadoop.KERBEROS.HDFS_CLUSTERS['default'].HADOOP_BIN.get(), 'jar']
     merge_tool_args += [hadoop.conf.CREDENTIALS_MERGER_JAR.get(), merged_token_file.name]
     merge_tool_args += [token_file.name for token_file in delegation_token_files]
     LOG.debug("Merging credentials files with command: '%s'" % (' '.join(merge_tool_args)))
@@ -161,9 +163,9 @@ class Shell(object):
         current_user = cluster.user
         try:
           cluster.setuser(username)
-          token = cluster.get_delegation_token()
+          token = cluster.get_delegation_token(KERBEROS.HUE_PRINCIPAL.get())
           token_file = tempfile.NamedTemporaryFile(dir=delegation_token_dir)
-          token_file.write(token.delegationTokenBytes)
+          token_file.write(token)
           token_file.flush()
           delegation_token_files.append(token_file)
         finally:
