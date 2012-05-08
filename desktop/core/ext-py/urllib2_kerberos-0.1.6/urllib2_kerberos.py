@@ -60,9 +60,12 @@ class AbstractKerberosAuthHandler:
         host = req.get_host()
         LOG.debug("req.get_host() returned %s" % host)
 
-        tail, sep, head = host.rpartition(':')
-        domain = tail or head
-                
+        # We need Python 2.4 compatibility
+        #tail, sep, head = host.rpartition(':')
+        #domain = tail or head
+        host_parts = host.rsplit(':', 1)
+        domain = host_parts[0]
+
         result, self.context = k.authGSSClientInit("HTTP@%s" % domain)
 
         if result < 1:
