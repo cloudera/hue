@@ -29,8 +29,9 @@ import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User, Group
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule, render, PopupException
-from django.core import urlresolvers
+from django.core.urlresolvers import reverse
 from django.forms.util import ErrorList
+from django.shortcuts import redirect
 
 from useradmin.models import GroupPermission, HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
@@ -216,12 +217,10 @@ def edit_user(request, username=None):
         finally:
           __users_lock.release()
 
-      request.path = urlresolvers.reverse(list_users)
-      return render("list_users.mako", request, dict(users=User.objects.all()))
+      return redirect(reverse(list_users))
   else:
     form = form_class(instance=instance)
-  return render('edit_user.mako', request,
-    dict(form=form, action=request.path, username=username))
+  return render('edit_user.mako', request, dict(form=form, action=request.path, username=username))
 
 def edit_group(request, name=None):
   """
@@ -247,12 +246,11 @@ def edit_group(request, name=None):
     if form.is_valid():
       form.save()
       request.flash.put('Group information updated')
-      return render("list_groups.mako", request, dict(groups=Group.objects.all()))
+      return list_groups(request)
 
   else:
     form = GroupEditForm(instance=instance)
-  return render('edit_group.mako', request,
-    dict(form=form, action=request.path, name=name))
+  return render('edit_group.mako', request, dict(form=form, action=request.path, name=name))
 
 def edit_permission(request, app=None, priv=None):
   """
@@ -335,8 +333,7 @@ def add_ldap_user(request):
         errors = form._errors.setdefault('username', ErrorList())
         errors.append('Could not get LDAP details for user %s' % (username,))
       else:
-        request.path = urlresolvers.reverse(list_users)
-        return render("list_users.mako", request, dict(users=User.objects.all()))
+        return redirect(reverse(list_users))
   else:
     form = AddLdapUserForm()
   return render('edit_user.mako', request, dict(form=form, action=request.path, ldap=True))
@@ -398,8 +395,7 @@ def add_ldap_group(request):
         errors = form._errors.setdefault('name', ErrorList())
         errors.append('Could not get LDAP details for group %s' % (groupname,))
       else:
-        request.path = urlresolvers.reverse(list_groups)
-        return render("list_groups.mako", request, dict(groups=Group.objects.all()))
+        return redirect(reverse(list_groups))
   else:
     form = AddLdapGroupForm()
   return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True))

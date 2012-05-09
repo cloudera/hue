@@ -429,7 +429,7 @@ def test_add_ldap_user():
   assert_true(c.get(URL))
 
   response = c.post(URL, dict(username='moe', password1='test', password2='test'))
-  assert_equal(response.context['action'], '/useradmin/users')
+  assert_true('/useradmin/users' in response['Location'])
 
   response = c.post(URL, dict(username='bad_name', password1='test', password2='test'))
   assert_true('Could not' in response.context['form'].errors['username'][0])
@@ -449,7 +449,7 @@ def test_add_ldap_group():
   assert_true(c.get(URL))
 
   response = c.post(URL, dict(name='TestUsers', password1='test', password2='test'))
-  assert_equal(response.context['action'], '/useradmin/groups')
+  assert_true('/useradmin/groups' in response['Location'])
 
   response = c.post(URL, dict(name='bad_name', password1='test', password2='test'))
   assert_true('Could not' in response.context['form'].errors['name'][0])
