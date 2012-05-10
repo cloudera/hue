@@ -31,11 +31,10 @@ import time
 
 import fb303.ttypes
 from nose.tools import assert_true, assert_false
-from nose.plugins.skip import SkipTest
 
 from desktop.lib.django_test_util import make_logged_in_client
 
-from hadoop import mini_cluster
+from hadoop import pseudo_hdfs4
 import hadoop.conf
 
 import beeswax.conf
@@ -43,7 +42,8 @@ import beeswax.conf
 
 _INITIALIZED = False
 _SHARED_BEESWAX_SERVER_PROCESS = None
-
+_SHARED_BEESWAX_SERVER = None
+_SHARED_BEESWAX_SERVER_CLOSER = None
 
 BEESWAXD_TEST_PORT = 6969
 LOG = logging.getLogger(__name__)
@@ -66,89 +66,98 @@ def _start_server(cluster):
     '--desktop-port',
     str('42'),           # Make up a port here. Tests don't start an actual server.
   ]
-  env = {
-    'HADOOP_HOME': hadoop.conf.HADOOP_HOME.get(),
-    'HADOOP_CONF_DIR': cluster.config_dir,
+
+  env = cluster.mr1_env.copy()
+
+  env.update({
     'HIVE_CONF_DIR': beeswax.conf.BEESWAX_HIVE_CONF_DIR.get(),
     'HIVE_HOME' : beeswax.conf.BEESWAX_HIVE_HOME_DIR.get(),
-    'HADOOP_EXTRA_CLASSPATH_STRING': hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()
-  }
+  })
   if os.getenv("JAVA_HOME"):
     env["JAVA_HOME"] = os.getenv("JAVA_HOME")
 
-  LOG.info("Executing %s, env %s, cwd %s" % (repr(args), repr(env), cluster.tmpdir))
-  process = subprocess.Popen(args=args, env=env, cwd=cluster.tmpdir, stdin=subprocess.PIPE)
+  LOG.info("Executing %s, env %s, cwd %s" % (repr(args), repr(env), cluster._tmpdir))
+  process = subprocess.Popen(args=args, env=env, cwd=cluster._tmpdir, stdin=subprocess.PIPE)
   return process
 
 
 
 def get_shared_beeswax_server():
-  # Copy hive-default.xml from BEESWAX_HIVE_CONF_DIR before it is set to
-  # /my/bogus/path
-  default_xml = file(beeswax.conf.BEESWAX_HIVE_CONF_DIR.get()+"/hive-default.xml").read()
+  # Make it happens only once
+  global _SHARED_BEESWAX_SERVER
+  global _SHARED_BEESWAX_SERVER_CLOSER
+  if _SHARED_BEESWAX_SERVER is None:
+    # Copy hive-default.xml.template from BEESWAX_HIVE_CONF_DIR before it is set to
+    # /my/bogus/path
+    default_xml = file(beeswax.conf.BEESWAX_HIVE_CONF_DIR.get()+"/hive-default.xml.template").read()
 
-  finish = (
-    beeswax.conf.BEESWAX_SERVER_HOST.set_for_testing("localhost"),
-    beeswax.conf.BEESWAX_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT),
-    beeswax.conf.BEESWAX_META_SERVER_HOST.set_for_testing("localhost"),
-    beeswax.conf.BEESWAX_META_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT + 1),
-    # Use a bogus path to avoid loading the normal hive-site.xml
-    beeswax.conf.BEESWAX_HIVE_CONF_DIR.set_for_testing('/my/bogus/path')
-  )
+    finish = (
+      beeswax.conf.BEESWAX_SERVER_HOST.set_for_testing("localhost"),
+      beeswax.conf.BEESWAX_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT),
+      beeswax.conf.BEESWAX_META_SERVER_HOST.set_for_testing("localhost"),
+      beeswax.conf.BEESWAX_META_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT + 1),
+      # Use a bogus path to avoid loading the normal hive-site.xml
+      beeswax.conf.BEESWAX_HIVE_CONF_DIR.set_for_testing('/my/bogus/path')
+    )
 
-  cluster = mini_cluster.shared_cluster(conf=True)
+    cluster = pseudo_hdfs4.shared_cluster()
 
-  # Copy hive-default.xml into the mini_cluster's conf dir, which happens to be
-  # in the cluster's tmpdir. This tmpdir is determined during the mini_cluster
-  # startup, during which BEESWAX_HIVE_CONF_DIR needs to be set to
-  # /my/bogus/path. Hence the step of writing to memory.
-  # hive-default.xml will get picked up by the beeswax_server during startup
-  file(cluster.tmpdir+"/conf/hive-default.xml", 'w').write(default_xml)
+    # Copy hive-default.xml into the mini_cluster's conf dir, which happens to be
+    # in the cluster's tmpdir. This tmpdir is determined during the mini_cluster
+    # startup, during which BEESWAX_HIVE_CONF_DIR needs to be set to
+    # /my/bogus/path. Hence the step of writing to memory.
+    # hive-default.xml will get picked up by the beeswax_server during startup
+    file(cluster._tmpdir+"/conf/hive-default.xml", 'w').write(default_xml)
 
-  global _SHARED_BEESWAX_SERVER_PROCESS
-  if _SHARED_BEESWAX_SERVER_PROCESS is None:
-    p = _start_server(cluster)
-    _SHARED_BEESWAX_SERVER_PROCESS = p
-    def kill():
-      LOG.info("Killing beeswax server (pid %d)." % p.pid)
-      os.kill(p.pid, 9)
-      p.wait()
-    atexit.register(kill)
-    # Wait for server to come up, by repeatedly trying.
-    start = time.time()
-    started = False
-    sleep = 0.001
-    while not started and time.time() - start < 20.0:
-      try:
-        client = beeswax.db_utils.db_client()
-        meta_client = beeswax.db_utils.meta_client()
+    global _SHARED_BEESWAX_SERVER_PROCESS
+    if _SHARED_BEESWAX_SERVER_PROCESS is None:
+      p = _start_server(cluster)
+      _SHARED_BEESWAX_SERVER_PROCESS = p
+      def kill():
+        LOG.info("Killing beeswax server (pid %d)." % p.pid)
+        os.kill(p.pid, 9)
+        p.wait()
+      atexit.register(kill)
+      # Wait for server to come up, by repeatedly trying.
+      start = time.time()
+      started = False
+      sleep = 0.001
+      while not started and time.time() - start < 20.0:
+        try:
+          client = beeswax.db_utils.db_client()
+          meta_client = beeswax.db_utils.meta_client()
 
-        client.echo("echo")
-        if meta_client.getStatus() == fb303.ttypes.fb_status.ALIVE:
-          started = True
-          break
-        time.sleep(sleep)
-        sleep *= 2
-      except:
-        time.sleep(sleep)
-        sleep *= 2
-        pass
-    if not started:
-      raise Exception("Beeswax server took too long to come up.")
+          client.echo("echo")
+          if meta_client.getStatus() == fb303.ttypes.fb_status.ALIVE:
+            started = True
+            break
+          time.sleep(sleep)
+          sleep *= 2
+        except:
+          time.sleep(sleep)
+          sleep *= 2
+          pass
+      if not started:
+        raise Exception("Beeswax server took too long to come up.")
 
-    # Make sure /tmp is 0777
-    cluster.fs.setuser(cluster.superuser)
-    if not cluster.fs.isdir('/tmp'):
-      cluster.fs.mkdir('/tmp', 0777)
-    else:
-      cluster.fs.chmod('/tmp', 0777)
+      # Make sure /tmp is 0777
+      cluster.fs.setuser(cluster.superuser)
+      if not cluster.fs.isdir('/tmp'):
+        cluster.fs.mkdir('/tmp', 0777)
+      else:
+        cluster.fs.chmod('/tmp', 0777)
 
-  def s():
-    for f in finish:
-      f()
-    cluster.shutdown()
+      cluster.fs.chmod(cluster._tmpdir, 0777)
+      cluster.fs.chmod(cluster._tmpdir + '/hadoop_tmp_dir/mapred', 0777)
 
-  return cluster, s
+    def s():
+      for f in finish:
+        f()
+      cluster.stop()
+
+    _SHARED_BEESWAX_SERVER, _SHARED_BEESWAX_SERVER_CLOSER = cluster, s
+
+  return _SHARED_BEESWAX_SERVER, _SHARED_BEESWAX_SERVER_CLOSER
 
 
 REFRESH_RE = re.compile('<\s*meta\s+http-equiv="refresh"\s+content="\d*;([^"]*)"\s*/>', re.I)
@@ -270,21 +279,11 @@ class BeeswaxSampleProvider(object):
   """
   @classmethod
   def setup_class(cls):
-    raise SkipTest
     cls.cluster, shutdown = get_shared_beeswax_server()
     cls.client = make_logged_in_client()
     # Weird redirection to avoid binding nonsense.
     cls.shutdown = [ shutdown ]
     cls.init_beeswax_db()
-
-  @classmethod
-  def teardown_class(cls):
-    cls.cluster.fs.setuser(cls.cluster.superuser)
-    try:
-      cls.cluster.fs.rmtree('/tmp/beeswax')
-    except IOError, ex:
-      LOG.warn('Failed to cleanup /tmp/beeswax: %s' % (ex,))
-    cls.shutdown[0]()
 
   @classmethod
   def init_beeswax_db(cls):

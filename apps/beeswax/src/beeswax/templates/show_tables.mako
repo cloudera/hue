@@ -95,20 +95,21 @@ ${layout.menubar(section='tables')}
 			$("#installSamplesMessage").text(data.title);
 		});
 
-		$("#installSamplesBtn").click(function(){
-			$.post(
-				"${ url('beeswax.views.install_examples') }",
-				{ submit:"Submit" },
-			  	function(creationSucceeded){
-					if (creationSucceeded){
-						window.location.href = "/beeswax/tables";
-					}
-					else {
-						$("#installSamplesMessage").addClass("alert-error").text("There was an error processing your request.");
-					}
-				}
-			);
-		});
+        $("#installSamplesBtn").click(function(){
+            $.post(
+                "${ url('beeswax.views.install_examples') }",
+                { submit:"Submit" },
+                function(result){
+                    if (result.creationSucceeded){
+                        window.location.href = "/beeswax/tables";
+                    }
+                    else {
+                        var message = "There was an error processing your request: " + result.message;
+                        $("#installSamplesMessage").addClass("alert-error").text(message);
+                    }
+                }
+            );
+        });
 		% endif
 	});
 </script>

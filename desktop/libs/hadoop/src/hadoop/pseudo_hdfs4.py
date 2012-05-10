@@ -63,6 +63,7 @@ class PseudoHdfs4(object):
     self._fs = None
     self._jt = None
 
+    self._mr1_env = None
     self._log_dir = None
     self._dfs_http_port = None
     self._dfs_http_address = None
@@ -89,6 +90,10 @@ class PseudoHdfs4(object):
   @property
   def superuser(self):
     return self._superuser
+
+  @property
+  def mr1_env(self):
+    return self._mr1_env
 
   @property
   def fs_default_name(self):
@@ -163,7 +168,7 @@ class PseudoHdfs4(object):
     else:
       LOG.info('Cleaning up temp directory "%s". '
                'Use "export MINI_CLUSTER_CLEANUP=false" to avoid.' % (self._tmpdir,))
-      shutil.rmtree(self._tmpdir)
+      shutil.rmtree(self._tmpdir, ignore_errors=True)
 
     if self.shutdown_hook is not None:
       self.shutdown_hook()
@@ -232,32 +237,33 @@ class PseudoHdfs4(object):
     # Start MR1
     self._start_mr1(env)
 
+
   def _start_mr1(self, env):
     LOG.info("Starting MR1")
     conf_dir = self._tmppath('conf')
 
     # We need a different env because it's a different hadoop
-    env = env.copy()
-    env['HADOOP_HOME'] = hadoop.conf.MR_CLUSTERS['default'].HADOOP_MAPRED_HOME.get()
-    env['HADOOP_BIN'] = hadoop.conf.MR_CLUSTERS['default'].HADOOP_BIN.get()
-    env["HADOOP_CLASSPATH"] = ':'.join([
+    self._mr1_env = env.copy()
+    self._mr1_env['HADOOP_HOME'] = hadoop.conf.MR_CLUSTERS['default'].HADOOP_MAPRED_HOME.get()
+    self._mr1_env['HADOOP_BIN'] = hadoop.conf.MR_CLUSTERS['default'].HADOOP_BIN.get()
+    self._mr1_env["HADOOP_CLASSPATH"] = ':'.join([
         hadoop.conf.HADOOP_PLUGIN_CLASSPATH.get(),
         # Due to CDH-4537, we need to add test dependencies to run minicluster
         os.path.join(os.path.dirname(__file__), 'test_jars', '*'),
       ])
 
-    LOG.debug("MR1 Environment:\n" + "\n".join([ str(x) for x in sorted(env.items()) ]))
+    LOG.debug("MR1 Environment:\n" + "\n".join([ str(x) for x in sorted(self.mr1_env.items()) ]))
 
     # Configure
     self._write_mapred_site()
 
     # Run JT & TT
-    self._jt_proc = self._start_daemon('jobtracker', conf_dir, env)
-    self._tt_proc = self._start_daemon('tasktracker', conf_dir, env)
+    self._jt_proc = self._start_daemon('jobtracker', conf_dir, self.mr1_env)
+    self._tt_proc = self._start_daemon('tasktracker', conf_dir, self.mr1_env)
 
     # Make sure they're running
     deadline = time.time() + STARTUP_DEADLINE
-    while not self._is_mr1_ready(env):
+    while not self._is_mr1_ready(self.mr1_env):
       if time.time() > deadline:
         self.stop()
         raise RuntimeError('%s is taking too long to start' % (self,))
