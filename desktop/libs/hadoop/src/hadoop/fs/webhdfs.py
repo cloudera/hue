@@ -279,6 +279,17 @@ class WebHdfs(Hdfs):
       raise IOError("Rename failed: %s -> %s" %
                     (smart_str(old), smart_str(new)))
 
+  def rename_star(self, old_dir, new_dir):
+    """Equivalent to `mv old_dir/* new"""
+    if not self.isdir(old_dir):
+      raise IOError(errno.ENOTDIR, "'%s' is not a directory" % (old_dir,))
+    if not self.exists(new_dir):
+      self.mkdir(new_dir)
+    elif not self.isdir(new_dir):
+      raise IOError(errno.ENOTDIR, "'%s' is not a directory" % (new_dir,))
+    ls = self.listdir(old_dir)
+    for dirent in ls:
+      self.rename(Hdfs.join(old_dir, dirent), Hdfs.join(new_dir, dirent))
 
   def chown(self, path, user=None, group=None):
     """chown(path, user=None, group=None)"""

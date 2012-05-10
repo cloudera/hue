@@ -709,7 +709,7 @@ def query_done_cb(request, server_id):
   """
   res = HttpResponse('<html><head></head><body></body></html>')
 
-  history = authorized_get_history(request, server_id)
+  history = models.QueryHistory.objects.get(server_id=server_id)
 
   if history is None:
     LOG.error('Processing query completion email: Cannot find query matching id %s' % (server_id,))
@@ -1002,7 +1002,7 @@ def save_results(request, id):
                       'Saving results from a table to a directory is not supported. '
                       'You may copy from the HDFS location manually.')
           target_dir = form.cleaned_data['target_dir']
-          request.fs.rename(result_meta.table_dir, target_dir)
+          request.fs.rename_star(result_meta.table_dir, target_dir)
           LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, target_dir))
           query_history.save_state(models.QueryHistory.STATE.expired)
           fb_url = location_to_url(request, target_dir, strict=False)
@@ -1082,7 +1082,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     # 2. Move the results into the table's storage
     table_obj = db_utils.meta_client().get_table("default", target_table)
     table_loc = request.fs.urlsplit(table_obj.sd.location)[2]
-    request.fs.rename(result_meta.table_dir, table_loc)
+    request.fs.rename_star(result_meta.table_dir, table_loc)
     LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, table_loc))
     request.flash.put('Saved query results as new table %s' % (target_table,))
     query_history.save_state(models.QueryHistory.STATE.expired)
