@@ -25,6 +25,7 @@ from django import forms
 from django.core import urlresolvers
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
+from django.shortcuts import redirect
 from django.utils.encoding import force_unicode
 from django.utils import simplejson
 
@@ -92,7 +93,8 @@ def authorized_get_history(request, query_history_id, owner_only=False, must_exi
 def index(request):
   tables = db_utils.meta_client().get_tables("default", ".*")
   if not tables:
-    return render("index.mako", request, {})
+    examples_installed = beeswax.models.MetaInstall.get().installed_example
+    return render("index.mako", request, {'examples_installed': examples_installed})
   else:
     return execute_query(request)
 
@@ -654,7 +656,7 @@ def delete_design(request, design_id):
 
   if request.method == 'POST':
     design.delete()
-    return list_designs(request)
+    return redirect(urlresolvers.reverse(list_designs))
   else:
     return render('confirm.html', request, dict(url=request.path, title='Delete design?'))
 
@@ -1138,16 +1140,18 @@ def install_examples(request):
     return render('confirm.html', request,
                   dict(url=request.path, title='Install sample tables and Beeswax examples?'))
   elif request.method == 'POST':
+    result = {}
+    result['creationSucceeded'] = False
+    result['message'] = ''
     try:
       beeswax.management.commands.beeswax_install_examples.Command().handle_noargs()
       if models.MetaInstall.get().installed_example:
-        creation_succeeded = True
-        return HttpResponse(simplejson.dumps(creation_succeeded), mimetype="application/json")
+        result['creationSucceeded'] = True
     except Exception, err:
       LOG.exception(err)
+      result['message'] = str(err)
 
-    creation_succeeded = False
-    return HttpResponse(simplejson.dumps(creation_succeeded), mimetype="application/json")
+    return HttpResponse(simplejson.dumps(result), mimetype="application/json")
 
 
 def describe_partitions(request, table):
