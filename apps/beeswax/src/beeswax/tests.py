@@ -118,8 +118,8 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     finish = beeswax.conf.BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("90")
     try:
       response = self.client.get("/beeswax/table/test_partitions")
-      assert_true("89" in response.content)
-      assert_false("90" in response.content)
+      assert_true("0x%x" % 89 in response.content)
+      assert_false("0x%x" % 90 in response.content)
     finally:
       finish()
 
