@@ -1,5 +1,0 @@
-copyright: Apache License v2.0
-version: 0.9
-description: File Browser
-name: filebrowser
-sources: [Source/FileBrowser/Hue.FileBrowser.js, Source/FileBrowser/Hue.FileViewer.js, Source/FileBrowser/Hue.FileEditor.js]
