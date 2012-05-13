@@ -56,14 +56,15 @@ ${layout.menubar(section='users')}
 		</fieldset>
 		<div class="form-actions">
 			% if username:
-				<input type="submit" class="btn btn-large btn-primary" value="Update user"/>
+				<input type="submit" class="btn btn-primary" value="Update user"/>
 			% else:
 				% if ldap:
-					<input type="submit" class="btn btn-large btn-primary" value="Add/Sync user"/>
+					<input type="submit" class="btn btn-primary" value="Add/Sync user"/>
 				% else:
-					<input type="submit" class="btn btn-large btn-primary" value="Add user"/>
+					<input type="submit" class="btn btn-primary" value="Add user"/>
 				% endif
 			% endif
+			<a href="/useradmin/users" class="btn">Cancel</a>
 		</div>
 	</form>
 </div>
