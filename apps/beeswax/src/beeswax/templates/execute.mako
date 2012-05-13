@@ -23,7 +23,7 @@
 <%namespace name="util" file="util.mako" />
 
 <%def name="query()">
-
+		<h1>Hive Query</h1>
 		<fieldset>
 			% if design and not design.is_auto and design.name:
 		          <legend>${design.name}</legend>
@@ -63,21 +63,12 @@
 
 
 
- <!--
-<a href="#settings">see the advanced settings</a>
-    <div>
-      ${comps.field(form.saveform['name'])}
-      ${comps.field(form.saveform['desc'])}
-    </div>
--->
 </%def>
 
 
 ${commonheader("Hive Query", "beeswax", "100px")}
 ${layout.menubar(section='query')}
 <div class="container-fluid">
-
-	<h1>Hive Query</h1>
 
 	<div class="row-fluid">
 		<div class="span3">
@@ -92,7 +83,7 @@ ${layout.menubar(section='query')}
 									${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
 										type="submit",
 										title="Delete this setting",
-										klass="btn btn-mini btn-danger settingsDelete"
+										klass="btn btn-mini settingsDelete"
 									), value=True)}
 								</div>
 
@@ -100,7 +91,7 @@ ${layout.menubar(section='query')}
 									${comps.label(f['key'])}
 									${comps.field(f['key'], attrs=dict(
 										placeholder="mapred.reduce.tasks",
-										klass="settingsField span2"
+										klass="settingsField span8"
 									))}
 							    </div>
 
@@ -108,7 +99,7 @@ ${layout.menubar(section='query')}
 									${comps.label(f['value'])}
 									${comps.field(f['value'], attrs=dict(
 										placeholder="1",
-										klass="span2"
+										klass="span8"
 									))}
 								</div>
 							</div>
@@ -127,14 +118,14 @@ ${layout.menubar(section='query')}
 									${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
 										type="submit",
 										title="Delete this setting",
-										klass="btn btn-mini btn-danger file_resourcesDelete"
+										klass="btn btn-mini file_resourcesDelete"
 									), value=True)}
 								</div>
 
 								<div class="control-group">
 									${comps.label(f['type'])}
 									${comps.field(f['type'], render_default=True, attrs=dict(
-										klass="span2"
+										klass="span8"
 									))}
 							    </div>
 
@@ -142,7 +133,7 @@ ${layout.menubar(section='query')}
 									${comps.label(f['path'])}
 									${comps.field(f['path'], attrs=dict(
 										placeholder="/user/foo/udf.jar",
-										klass="span2 file_resourcesField",
+										klass="input-small file_resourcesField",
 										data_filters=f['path'].html_name
 									))}
 								</div>
@@ -162,7 +153,7 @@ ${layout.menubar(section='query')}
 										${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
 											type="submit",
 											title="Delete this setting",
-											klass="btn btn-mini btn-danger file_resourcesDelete"
+											klass="btn btn-mini file_resourcesDelete"
 										), value=True)}
 									</div>
 
@@ -170,7 +161,7 @@ ${layout.menubar(section='query')}
 										${comps.label(f['name'])}
 										${comps.field(f['name'], attrs=dict(
 											placeholder="myFunction",
-											klass="span2 functionsField"
+											klass="span8 functionsField"
 										))}
 								    </div>
 
@@ -178,7 +169,7 @@ ${layout.menubar(section='query')}
 										${comps.label(f['class_name'])}
 										${comps.field(f['class_name'], attrs=dict(
 											placeholder="com.acme.example",
-											klass="span2"
+											klass="span8"
 										))}
 									</div>
 								</div>
@@ -344,11 +335,11 @@ ${layout.menubar(section='query')}
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-		$("*[rel=popover]").popover({
-			offset: 10
+		$("*[rel=tooltip]").tooltip({
+			placement: 'right'
 		});
 		// hack!!!
-		$("select").addClass("span2");
+		$("select").addClass("span8");
 
 		$("a[data-form-prefix]").each(function(){
 			var _prefix = $(this).attr("data-form-prefix");
