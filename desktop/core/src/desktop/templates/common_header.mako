@@ -50,7 +50,6 @@ from desktop.lib.i18n import smart_unicode
   <script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
   <script src="/static/ext/js/bootstrap.min.js"></script>
-  <script src="/static/ext/js/bootstrap-tooltip.js"></script>
   <script src="/static/ext/js/fileuploader.js"></script>
 
   <script type="text/javascript" charset="utf-8">
