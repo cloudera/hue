@@ -127,7 +127,7 @@ ${layout.menubar(section='query')}
 
 %if can_save:
 <div id="saveAs" class="modal hide fade">
-	<form id="saveForm" action="${url('beeswax.views.save_results', query.id) }" method="POST" class="form form-inline">
+	<form id="saveForm" action="${url('beeswax.views.save_results', query.id) }" method="POST" class="form form-inline form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Save Query Results</h3>
@@ -143,14 +143,19 @@ ${layout.menubar(section='query')}
 			<input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
 			&nbsp;In an HDFS directory
 		</label>
-		${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder="Results location")}
+		${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder="Results location", klass="pathChooser")}
+		<br/><br/>
+		<div id="fileChooserModal" class="smallModal well hide">
+			<a href="#" class="close" data-dismiss="modal">&times;</a>
+		</div>
 
     </div>
     <div class="modal-footer">
-		<div id="fieldRequired" class="hidden" style="position: absolute; left: 10;">
+		<div id="fieldRequired" class="hide" style="position: absolute; left: 10;">
 			<span class="label label-important">Sorry, name is required.</span>
         </div>
         <input type="submit" class="btn primary" value="Save" name="save" />
+		<button class="btn" data-dismiss="modal">Cancel</button>
     </div>
 </div>
 %endif
@@ -167,35 +172,50 @@ ${layout.menubar(section='query')}
 		$(".dataTables_wrapper").css("min-height","0");
 		$(".dataTables_filter").hide();
 		$("input[name='save_target']").change(function(){
-			$("#fieldRequired").addClass("hidden");
+			$("#fieldRequired").addClass("hide");
 			$("input[name='target_dir']").removeClass("fieldError");
 			$("input[name='target_table']").removeClass("fieldError");
 			if ($(this).val().indexOf("HDFS")>-1){
-				$("input[name='target_table']").addClass("hidden");
-				$("input[name='target_dir']").removeClass("hidden");
+				$("input[name='target_table']").addClass("hide");
+				$("input[name='target_dir']").removeClass("hide");
 			}
 			else {
-				$("input[name='target_table']").removeClass("hidden");
-				$("input[name='target_dir']").addClass("hidden");
+				$("input[name='target_table']").removeClass("hide");
+				$("input[name='target_dir']").addClass("hide");
 			}
 		});
 
 		$("#saveForm").submit(function(){
 			if ($("input[name='save_target']:checked").val().indexOf("HDFS")>-1){
 				if ($.trim($("input[name='target_dir']").val()) == ""){
-					$("#fieldRequired").removeClass("hidden");
+					$("#fieldRequired").removeClass("hide");
 					$("input[name='target_dir']").addClass("fieldError");
 					return false;
 				}
 			}
 			else {
 				if ($.trim($("input[name='target_table']").val()) == ""){
-					$("#fieldRequired").removeClass("hidden");
+					$("#fieldRequired").removeClass("hide");
 					$("input[name='target_table']").addClass("fieldError");
 					return false;
 				}
 			}
 			return true;
+		});
+
+		$(".pathChooser").click(function(){
+			var self = this;
+			$("#fileChooserModal").jHueFileChooser({
+				onFileChoose: function(filePath) {
+					$(self).val(filePath);
+				},
+				onFolderChange: function(folderPath){
+					$(self).val(folderPath);
+				},
+				createFolder: false,
+				uploadFile: false
+			});
+			$("#fileChooserModal").slideDown();
 		});
 
 	});
