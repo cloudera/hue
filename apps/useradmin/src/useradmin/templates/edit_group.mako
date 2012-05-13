@@ -59,14 +59,15 @@ ${layout.menubar(section='groups')}
         </fieldset>
 		<div class="form-actions">
 			% if name:
-				<input type="submit" class="btn btn-large btn-primary" value="Update group"/>
+				<input type="submit" class="btn btn-primary" value="Update group"/>
 			% else:
 				% if ldap:
-					<input type="submit" class="btn btn-large btn-primary" value="Add/Sync group"/>
+					<input type="submit" class="btn btn-primary" value="Add/Sync group"/>
 				% else:
-					<input type="submit" class="btn btn-large btn-primary" value="Add group"/>
+					<input type="submit" class="btn btn-primary" value="Add group"/>
 				% endif
 			% endif
+			<a href="/useradmin/groups" class="btn">Cancel</a>
 		</div>
 	</form>
 
