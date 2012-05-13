@@ -51,10 +51,10 @@
 			<div class="span4 offset4">
     			<form method="POST" action="${action}" class="well">
 					<label>Username
-						<input name="username" class="input-xlarge" type="text" maxlength="30">
+						<input name="username" class="input-large" type="text" maxlength="30">
 					</label>
 					<label>Password
-						<input name="password" class="input-xlarge" type="password" maxlength="30">
+						<input name="password" class="input-large" type="password" maxlength="30">
 					</label>
 
 					%if first_login_ever==True:

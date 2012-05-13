@@ -25,7 +25,7 @@
 <%def name="selection(name, choices, current_value, other_key=None)">
     <% seen = False %>
     % if len(choices) == 0:
-      <select name="${name}" class="jframe-hidden">
+      <select name="${name}" class="hide">
     % else:
       <select name="${name}">
     % endif
@@ -48,13 +48,13 @@
     </select>
     % if is_superuser:
       % if seen or not current_value:
-        <input name="${other_key}" class="jframe-hidden">
+        <input name="${other_key}" class="hide">
       % else:
         <input name="${other_key}" value="${current_value}">
       % endif
     % endif
 </%def>
-<form action="/filebrowser/chown?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+<form id="chownForm" action="/filebrowser/chown?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>Change Owner / Group: ${path}</h3>
@@ -84,10 +84,62 @@
 
     </div>
     <div class="modal-footer" style="padding-top: 10px;">
+		<div id="chownRequired" class="hide" style="position: absolute; left: 10;">
+			<span class="label label-important">Sorry, name is required.</span>
+        </div>
         <input class="btn primary" type="submit" value="Submit" />
         <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">Cancel</a>
     </div>
 </form>
 
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$("select[name='user']").change(function(){
+			if ($(this).val() == "__other__"){
+				$("input[name='user_other']").show();
+			}
+			else {
+				$("input[name='user_other']").hide();
+			}
+		});
+		$("select[name='group']").change(function(){
+			if ($(this).val() == "__other__"){
+				$("input[name='group_other']").show();
+			}
+			else {
+				$("input[name='group_other']").hide();
+			}
+		});
 
-<!--<div class="alert-message info modal-footer">Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</div>-->
+		$("#chownForm").submit(function(){
+			console.log($("select[name='user']").val());
+			console.log($("select[name='group']").val());
+			if ($("select[name='user']").val() == null){
+				$("#chownRequired").find(".label").text("Sorry, user is required.");
+				$("#chownRequired").show();
+				return false;
+			}
+			else if ($("select[name='group']").val() == null){
+				$("#chownRequired").find(".label").text("Sorry, group is required.");
+				$("#chownRequired").show();
+				return false;
+			}
+			else {
+				if ($("select[name='group']").val() == "__other__" && $("input[name='group_other']").val() == ""){
+					$("#chownRequired").find(".label").text("Sorry, you need to specify another group.");
+					$("input[name='group_other']").addClass("fieldError");
+					$("#chownRequired").show();
+					return false;
+				}
+				if ($("select[name='user']").val() == "__other__" && $("input[name='user_other']").val() == ""){
+					$("#chownRequired").find(".label").text("Sorry, you need to specify another user.");
+					$("input[name='user_other']").addClass("fieldError");
+					$("#chownRequired").show();
+					return false;
+				}
+				return true;
+			}
+		});
+	});
+</script>
+
