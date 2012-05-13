@@ -1,5 +1,0 @@
-copyright: Apache License v2.0
-version: 0.9
-description: Help for Desktop
-name: help
-sources: [Source/Help/Help.js]
