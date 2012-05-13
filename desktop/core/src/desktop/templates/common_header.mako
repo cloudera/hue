@@ -77,7 +77,6 @@ from desktop.lib.i18n import smart_unicode
 </head>
 <body>
 
-
 <%def name="is_selected(section, matcher)">
   %if section == matcher:
     class="active"

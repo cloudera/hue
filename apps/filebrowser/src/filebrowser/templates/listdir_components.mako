@@ -156,7 +156,11 @@ from django.utils.encoding import smart_str
         <h3>Renaming: <span id="renameFileName">file name</span></h3>
     </div>
     <div class="modal-body">
-		<label>New name <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
+		<label>New name <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge pathChooser"/></label>
+		<br/>
+		<div id="fileChooserModal" class="smallModal well hide">
+			<a href="#" class="close" data-dismiss="modal">&times;</a>
+		</div>
     </div>
     <div class="modal-footer">
         <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
@@ -426,6 +430,20 @@ from django.utils.encoding import smart_str
             $("#newDirectoryNameInput").removeClass("fieldError");
             $("#directoryNameRequiredAlert").hide();
         });
+		$(".pathChooser").click(function(){
+			var self = this;
+			$("#fileChooserModal").jHueFileChooser({
+				onFileChoose: function(filePath) {
+					$(self).val(filePath);
+				},
+				onFolderChange: function(folderPath){
+					$(self).val(folderPath);
+				},
+				createFolder: false,
+				uploadFile: false
+			});
+			$("#fileChooserModal").slideDown();
+		});
 
 	});
 
