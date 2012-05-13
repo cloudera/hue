@@ -33,11 +33,12 @@ from django.utils.encoding import smart_str
 	<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 	<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 	<style type="text/css">
-    	.form-padding-fix{
-	        display: inline;
-	        padding: 0;
-	        margin: 0;
-	    }
+		.pull-right {
+			margin: 4px;
+		}
+		.sortable {
+			cursor: pointer;
+		}
 	</style>
 	<div class="well hueWell">
 		<p class="pull-right">

@@ -902,3 +902,9 @@ div.box {
 .modal-body iframe.scroll {
 	overflow:auto;
 }
+
+.form-padding-fix{
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
