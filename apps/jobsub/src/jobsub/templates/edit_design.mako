@@ -156,7 +156,8 @@ ${layout.menubar(section='designs')}
 
     ## Submit
     <div class="form-actions">
-      <button data-bind="click: submit" class="btn btn-large btn-primary">Save</button>
+      <button data-bind="click: submit" class="btn btn-primary">Save</button>
+      <a href="/jobsub" class="btn">Cancel</a>
     </div>
   </form>
 
@@ -188,11 +189,11 @@ ${layout.menubar(section='designs')}
 
     #fileChooserModal {
         padding:14px;
-        height:370px;
+        height:270px;
     }
 
     #fileChooserModal > ul {
-        height:330px;
+        height:230px;
         overflow-y:auto;
     }
 
@@ -307,18 +308,6 @@ ${layout.menubar(section='designs')}
             init: function(element, valueAccessor, allBindings, model) {
 				var self = $(element);
 				self.after(getFileBrowseButton(self));
-                $(element).click(function() {
-                    $("#fileChooserModal").jHueFileChooser({
-                        onFileChoose: function(filePath) {
-                            var binding = valueAccessor();
-                            binding["name"] = filePath;
-                            $("#chooseFile").modal("hide");
-                            $(element).val(filePath);
-                        },
-                        createFolder: false
-                    });
-                    $("#chooseFile").modal("show");
-                });
             }
         };
 
