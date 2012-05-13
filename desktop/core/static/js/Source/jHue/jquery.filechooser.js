@@ -32,7 +32,7 @@
 		$.getJSON("/filebrowser/chooser"+path, function(data){
 			var _flist = $("<ul>").addClass("unstyled");
             if (data.title != null && data.title == "Error"){
-                var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message + " -- " + _parent.previousPath);
+                var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message);
                 _errorMsg.appendTo($(_parent.element));
                 var _previousLink = $("<button>").addClass("btn").addClass("bnt-small").text("Back").click(function(){
                     _parent.options.onFolderChange(_parent.previousPath);
@@ -45,7 +45,7 @@
                 $(data.files).each(function(cnt, file){
                     var _f = $("<li>");
                     var _flink = $("<a>");
-                    _flink.attr("href","#").text(file.name).appendTo(_f);
+                    _flink.attr("href","javascript:void(0)").text(file.name).appendTo(_f);
                     if (file.type == "dir"){
                         _f.addClass("folder");
                         _f.click(function(){
