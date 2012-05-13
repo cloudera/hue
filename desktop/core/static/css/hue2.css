@@ -141,6 +141,14 @@ h1 {
     text-align:right!important;
 }
 
+.center {
+    text-align:center!important;
+}
+
+.left {
+    text-align:left!important;
+}
+
 
 /*
 .topbar-inner, .topbar {
