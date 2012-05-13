@@ -7,7 +7,8 @@
 	var pluginName = "jHueSelector",
 	defaults = {
 		selectAllLabel: "Select all",
-		searchPlaceholder: "Search"
+		searchPlaceholder: "Search",
+        width: 300
 	};
 
 	function Plugin(element, options) {
@@ -26,6 +27,9 @@
 		var _this = this;
 		var addressBook = [];
 		var selectorContainer = $("<div>").addClass("jHueSelector");
+        if (this.options.width != 300){
+            selectorContainer.width(this.options.width);
+        }
 		$(_this.element).hide();
 		$(_this.element).find("option").each(function(cnt, opt){
 			var initial = $(opt).text().substr(0,1).toLowerCase();
@@ -109,6 +113,9 @@
 				body.find("label").show();
 			}
 		});
+        if (this.options.width != 300){
+            searchBox.css("margin-left", this.options.width-120+"px");
+        }
 		searchBox.prependTo(header);
 
 		$(_this.element).after(selectorContainer);

@@ -40,7 +40,7 @@ ${commonheader_iframe()}
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
-			$("#id_groups").jHueSelector();
+			$("#id_groups").jHueSelector({width:520});
 		});
 	</script>
 ${commonfooter_iframe()}
