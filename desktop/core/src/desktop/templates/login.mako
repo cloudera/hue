@@ -23,8 +23,7 @@
 	<meta name="author" content="">
 
 	<link href="/static/ext/css/bootstrap.min.css" rel="stylesheet">
-	<link href="/static/ext/css/bootstrap-responsive.min.css" rel="stylesheet">
-	<link href="/static/css/jhue.css" rel="stylesheet">
+	<link href="/static/css/hue2.css" rel="stylesheet">
 
 	<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
