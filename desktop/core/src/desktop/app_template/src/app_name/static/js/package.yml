@@ -1,5 +1,0 @@
-copyright: Apache License v2.0
-version: 0.1
-description: Unknown
-name: ${app_name}
-sources: [Source/${app_name_camel}/${app_name_camel}.js]
