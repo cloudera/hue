@@ -13,30 +13,22 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-${'<%'}!
-#declare imports here, for example:
-#import datetime
+
+${'<%!'}
+def is_selected(section, matcher):
+  if section == matcher:
+    return "active"
+  else:
+    return ""
 ${'%>'}
 
-${'<%'}!
-import datetime
-from django.template.defaultfilters import urlencode, escape
-${'%>'}
-${'<%'}def name="header(title='${app_name}', toolbar=True)">
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <title>${'$'}{title}</title>
-    </head>
-    <body>
-      ${'%'} if toolbar:
-      <div class="toolbar">
-        <a href="${'$'}{url('${app_name}.views.index')}"><img src="/${app_name}/static/art/${app_name}.png" class="${app_name}_icon"/></a>
-      </div>
-      ${'%'} endif
-${'<'}/%def>
-
-${'<%'}def name="footer()">
-    </body>
-  </html>
-${'<'}/%def>
+${'<%'}def name="menubar(section='')">
+  <div class="subnav subnav-fixed">
+    <div class="container-fluid">
+      <ul class="nav nav-pills">
+        <li class="${'$'}{is_selected(section, 'mytab')}"><a href="#">Tab 1</a></li>
+        <li class="${'$'}{is_selected(section, 'mytab2')}"><a href="#">Tab 2</a></li>
+      </ul>
+    </div>
+  </div>
+${'</%'}def>
