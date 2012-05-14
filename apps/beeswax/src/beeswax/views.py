@@ -35,6 +35,8 @@ from desktop.lib.django_util import copy_query_dict, format_preserving_redirect,
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.django_util import render_injected, PopupWithJframe, PopupException
 
+from hadoop.fs.exceptions import WebHdfsException
+
 import beeswax.forms
 import beeswax.design
 import beeswax.report
@@ -1022,6 +1024,8 @@ def save_results(request, id):
           except BeeswaxException, bex:
             LOG.exception(bex)
             error_msg, log = expand_exception(bex)
+      except WebHdfsException, ex:
+        raise PopupException('The table could not be saved.', detail=ex)
       except IOError, ex:
         LOG.exception(ex)
         error_msg = str(ex)

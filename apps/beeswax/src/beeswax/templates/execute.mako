@@ -23,53 +23,46 @@
 <%namespace name="util" file="util.mako" />
 
 <%def name="query()">
-		<h1>Hive Query</h1>
-		<fieldset>
-			% if design and not design.is_auto and design.name:
-		          <legend>${design.name}</legend>
-		          % if design.desc:
-		            <p>${design.desc}</p>
-		          % endif
+	<h1>Hive Query</h1>
+	<fieldset>
+		% if design and not design.is_auto and design.name:
+	          <legend>${design.name}</legend>
+	          % if design.desc:
+	            <p>${design.desc}</p>
+	          % endif
 
-		      % else:
-		        <legend>Query</legend>
-		      % endif
+	      % else:
+	        <legend>Query</legend>
+	      % endif
 
-          <div class="clearfix">
-            <div class="input">
-              	<textarea class="span9" rows="9" placeholder="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
-				<div id="validationResults">
-				% if len(form.query["query"].errors):
-					${unicode(form.query["query"].errors) | n}
-				 % endif
-				</div>
-            </div>
-          </div>
-        </fieldset>
+      <div class="clearfix">
+        <div class="input">
+            <textarea class="span9" rows="9" placeholder="Example: SELECT * FROM tablename" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+			<div id="validationResults">
+			% if len(form.query["query"].errors):
+				${unicode(form.query["query"].errors) | n}
+			 % endif
+			</div>
+        </div>
+      </div>
+    </fieldset>
 
-
-
-		<div class="actions">
-			<a id="executeQuery" class="btn primary">Execute</a>
-			% if design and not design.is_auto and design.name:
-            <a id="saveQuery" class="btn">Save</a>
-          	% endif
-          	<a id="saveQueryAs" class="btn">Save as...</a>
-
-			<a id="explainQuery" class="btn">Explain</a>
-			&nbsp; or <a href="${ url('beeswax.views.execute_query') }">create a new query</a>
-		</div>
-
-
-
-
+	<div class="actions">
+		<a id="executeQuery" class="btn primary">Execute</a>
+		% if design and not design.is_auto and design.name:
+        <a id="saveQuery" class="btn">Save</a>
+        % endif
+        <a id="saveQueryAs" class="btn">Save as...</a>
+        <a id="explainQuery" class="btn">Explain</a>
+		&nbsp; or create a &nbsp;<a class="btn" href="${ url('beeswax.views.execute_query') }">New query</a>
+	</div>
 </%def>
 
 
 ${commonheader("Hive Query", "beeswax", "100px")}
 ${layout.menubar(section='query')}
-<div class="container-fluid">
 
+<div class="container-fluid">
 	<div class="row-fluid">
 		<div class="span3">
 			<div class="well sidebar-nav">

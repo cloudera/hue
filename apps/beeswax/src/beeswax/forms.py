@@ -67,12 +67,11 @@ class SaveForm(forms.Form):
       raise forms.ValidationError('Please enter a name')
     return self.cleaned_data
 
-  def set_data(self, name, desc=None):
+  def set_data(self, name, desc=''):
     """Set the name and desc programmatically"""
     data2 = self.data.copy()
     data2[self.add_prefix('name')] = name
-    if desc:
-      data2[self.add_prefix('desc')] = desc
+    data2[self.add_prefix('desc')] = desc
     self.data = data2
 
 

@@ -118,7 +118,7 @@ from django.utils.encoding import smart_str
 							<li><a href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
 							% endif
 							<li><a class="rename" file-to-rename="${path}">Rename</a></li>
-							<li><a  onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
+							<li><a onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
 							<li><a onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a></li>
 							<li><a onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a></li>
 				    	</ul>
@@ -156,11 +156,7 @@ from django.utils.encoding import smart_str
         <h3>Renaming: <span id="renameFileName">file name</span></h3>
     </div>
     <div class="modal-body">
-		<label>New name <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge pathChooser"/></label>
-		<br/>
-		<div id="fileChooserModal" class="smallModal well hide">
-			<a href="#" class="close" data-dismiss="modal">&times;</a>
-		</div>
+		<label>New name <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
     </div>
     <div class="modal-footer">
         <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
@@ -192,12 +188,9 @@ from django.utils.encoding import smart_str
         </form>
 
     </div>
-    <div class="modal-footer">
-
-    </div>
+    <div class="modal-footer"></div>
     </form>
 </div>
-
 
 <!-- create directory modal -->
 <div id="createDirectoryModal" class="modal hide fade">
@@ -252,7 +245,6 @@ from django.utils.encoding import smart_str
     }
 
     function openChmodWindow(path, mode, next){
-
         $.ajax({
             url: "/filebrowser/chmod",
             data: {"path":path, "mode":mode, "next" : next},
@@ -272,7 +264,6 @@ from django.utils.encoding import smart_str
     }
 
     function openMoveModal(src_path, mode, next){
-
         $.ajax({
             url: "/filebrowser/move",
             data: {"src_path":src_path, "mode":mode, "next" : next},
@@ -415,9 +406,11 @@ from django.utils.encoding import smart_str
                 show: true
             });
         });
+
         $("#cancelCreateDirectoryBtn").click(function(){
             $("#createDirectoryModal").modal("hide");
         });
+
         $("#createDirectoryForm").submit(function(){
             if ($.trim($("#newDirectoryNameInput").val())==""){
                 $("#directoryNameRequiredAlert").show();
@@ -426,28 +419,12 @@ from django.utils.encoding import smart_str
             }
             return true;
         });
+
         $("#newDirectoryNameInput").focus(function(){
             $("#newDirectoryNameInput").removeClass("fieldError");
             $("#directoryNameRequiredAlert").hide();
         });
-		$(".pathChooser").click(function(){
-			var self = this;
-			$("#fileChooserModal").jHueFileChooser({
-				onFileChoose: function(filePath) {
-					$(self).val(filePath);
-				},
-				onFolderChange: function(folderPath){
-					$(self).val(folderPath);
-				},
-				createFolder: false,
-				uploadFile: false
-			});
-			$("#fileChooserModal").slideDown();
-		});
-
 	});
-
-
 </script>
 
 </%def>
