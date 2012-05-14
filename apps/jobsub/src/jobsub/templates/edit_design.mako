@@ -89,8 +89,8 @@ ${layout.menubar(section='designs')}
                   </thead>
                   <tbody data-bind="foreach: properties">
                     <tr>
-                      <td><input class="span2 required propKey" data-bind="value: name, uniqueName: false" /></td>
-                      <td><input class="span3 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
+                      <td><input class="span3 required propKey" data-bind="value: name, uniqueName: false" /></td>
+                      <td><input class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
                       <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">Delete</a></td>
                     </tr>
                   </tbody>

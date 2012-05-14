@@ -38,6 +38,7 @@
         <a class="btn" onclick="$('#moveModal').modal('hide');">Cancel</a>
     </div>
 </form>
+
 <script type="text/javascript" charset="utf-8">
 	$(".pathChooser").click(function(){
 		var self = this;
