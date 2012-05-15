@@ -47,7 +47,6 @@ ${layout.menubar(section='history')}
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-
 		$("input[name='save_target']").change(function(){
 			$("#fieldRequired").addClass("hidden");
 			$("input[name='target_dir']").removeClass("fieldError");
@@ -82,7 +81,6 @@ ${layout.menubar(section='history')}
 			}
 			return true;
 		});
-
 	});
 </script>
 ${commonfooter()}

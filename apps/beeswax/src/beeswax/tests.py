@@ -640,8 +640,7 @@ for x in sys.stdin:
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/2')
     # Results has a link to the FB
-    assert_true('Query results stored in' in resp.content)
-    assert_true('filebrowser' in resp.content)
+    assert_true('/filebrowser/view' in resp.content)
 
     # Not supported. Partition tables
     hql = "SELECT * FROM test_partitions"
