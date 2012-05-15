@@ -421,8 +421,6 @@ ${layout.menubar(section='query')}
 			$(".query").val($("#queryField").val());
 			$("#advancedSettingsForm").submit();
 		}
-
-
 	});
 </script>
 

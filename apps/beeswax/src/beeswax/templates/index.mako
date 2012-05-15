@@ -58,9 +58,7 @@ ${layout.menubar(section='tables')}
         <h3>Install samples</h3>
     </div>
     <div class="modal-body">
-      <div id="installSamplesMessage" class="alert">
-
-      </div>
+      <div id="installSamplesMessage" class="alert"></div>
     </div>
     <div class="modal-footer">
         <a href="#" id="installSamplesBtn" class="btn primary">Yes</a>
