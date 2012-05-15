@@ -23,6 +23,9 @@ import logging
 import thrift
 import time
 
+import desktop.conf
+import hadoop.cluster
+
 from beeswax import conf
 from beeswax import models
 from beeswax import hive_site
@@ -30,7 +33,7 @@ from beeswax.models import QueryHistory
 from beeswaxd import BeeswaxService
 
 from django.utils.encoding import smart_str, force_unicode
-from desktop.lib import thrift_util, i18n
+from desktop.lib import thrift_util
 from hive_metastore import ThriftHiveMetastore
 from beeswaxd.ttypes import BeeswaxException, QueryHandle, QueryNotFoundException
 
@@ -202,10 +205,15 @@ def db_client():
       res = self._client.get_results_metadata(*args, **kwargs)
       return _decode_struct_attr(res, 'table_dir')
 
+  cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+  use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
+
   client = thrift_util.get_client(BeeswaxService.Client,
                                 conf.BEESWAX_SERVER_HOST.get(),
                                 conf.BEESWAX_SERVER_PORT.get(),
                                 service_name="Beeswax (Hive UI) Server",
+                                kerberos_principal="hue",
+                                use_sasl=use_sasl,
                                 timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
   return UnicodeBeeswaxClient(client)
 
