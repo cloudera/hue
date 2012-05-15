@@ -64,8 +64,6 @@ public class Server {
 
   private static int mport = -1;
   private static int bport = -1;
-  /** Superuser on the HDFS cluster.  We impersonate to create Hive's directories. */
-  private static String superUser = "hadoop";
   /** Host and port that desktop runs on */
   private static String dtHost = "";
   private static int dtPort = -1;
@@ -132,15 +130,10 @@ public class Server {
     dtPortOpt.setRequired(false);
     dtOptions.addOption(dtPortOpt);
 
-    Option superUserOpt = new Option("u", "superuser", true,
-                                    "Username of Hadoop superuser (default: hadoop)");
-    superUserOpt.setRequired(false);
-    options.addOption(superUserOpt);
-
     Option noDesktopOpt = new Option("n", "no-desktop", false, "no desktop used");
     dtOptions.addOption(noDesktopOpt);
 
-    Option kPrincipalOpt = new Option("c", "principalConf", true, "Pricipal configuration");
+    Option kPrincipalOpt = new Option("c", "principalConf", true, "Principal configuration");
     options.addOption(kPrincipalOpt);
 
     Option kTabOpt = new Option("k", "keytab", true, "keytab file");
@@ -158,26 +151,24 @@ public class Server {
     }
 
     for (Option opt : cmd.getOptions()) {
-      if (opt.getOpt() == "m") {
+      if (opt.getOpt().equals("m")) {
         mport = parsePort(opt);
-      } else if (opt.getOpt() == "b") {
+      } else if (opt.getOpt().equals("b")) {
         bport = parsePort(opt);
-      } else if (opt.getOpt() == "u") {
-        superUser = opt.getValue();
-      } else if (opt.getOpt() == "h") {
+      } else if (opt.getOpt().equals("h")) {
         dtHost = opt.getValue();
-      } else if (opt.getOpt() == "p") {
+      } else if (opt.getOpt().equals("p")) {
         dtPort = parsePort(opt);
-      } else if (opt.getOpt() == "s") {
+      } else if (opt.getOpt().equals("s")) {
         dtHttps = true;
-      } else if (opt.getOpt() == "l") {
+      } else if (opt.getOpt().equals("l")) {
         qlifetime = Long.valueOf(opt.getValue());
-      } else if (opt.getOpt() == "k") {
+      } else if (opt.getOpt().equals("k")) {
         keytabFile = opt.getValue();
         useKerberos = true;
-      } else if (opt.getOpt() == "c") {
+      } else if (opt.getOpt().equals("c")) {
         principalConf = opt.getValue();
-      } else if (opt.getOpt() == "r") {
+      } else if (opt.getOpt().equals("r")) {
         refreshInterval = Integer.valueOf(opt.getValue()) * 1000 * 60; // minutes
       }
 

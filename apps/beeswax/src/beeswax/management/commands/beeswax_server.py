@@ -72,6 +72,16 @@ class Command(NoArgsCommand):
       str(beeswax.conf.BEESWAX_RUNNING_QUERY_LIFETIME.get()),
     ]
 
+    # Pass in keytab if security is turned on. Beeswax periodically renews
+    # the ticket.
+    if cluster_conf.SECURITY_ENABLED.get():
+      args += [
+        '--keytab',
+        desktop.conf.KERBEROS.HUE_KEYTAB.get(),
+        '--principalConf',
+        desktop.conf.KERBEROS.HUE_PRINCIPAL.get(),
+      ]
+
     # Running on HTTPS?
     if desktop.conf.is_https_enabled():
       args.append('--desktop-https')

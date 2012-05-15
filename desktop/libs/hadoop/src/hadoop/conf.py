@@ -176,6 +176,8 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
                   default=8032,
                   type=int,
                   help="Service port for the ResourceManager"),
+      SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
+                              default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
                        default=False, type=coerce_bool),
 
