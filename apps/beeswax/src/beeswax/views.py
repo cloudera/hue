@@ -33,7 +33,7 @@ from desktop.lib import django_mako
 from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
-from desktop.lib.django_util import render_injected, PopupWithJframe, PopupException
+from desktop.lib.django_util import render_injected, PopupException
 
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -1009,11 +1009,7 @@ def save_results(request, id):
           request.fs.rename_star(result_meta.table_dir, target_dir)
           LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, target_dir))
           query_history.save_state(models.QueryHistory.STATE.expired)
-          fb_url = location_to_url(request, target_dir, strict=False)
-          popup = PopupWithJframe('Query results stored in %s' % (target_dir,),
-                                  launch_app_name='FileBrowser',
-                                  launch_app_url=fb_url)
-          return render_injected(list_query_history(request), popup)
+          return HttpResponse(urlresolvers.reverse('filebrowser.views.view', kwargs={'path': target_dir}))
         elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
           # To new table
           try:

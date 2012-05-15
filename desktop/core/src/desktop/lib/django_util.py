@@ -357,26 +357,6 @@ class PopupException(Exception):
       data['request'] = request
     return render("popup_error.mako", request, data)
 
-
-class PopupWithJframe(object):
-  """A popup container, intended to be rendered with a regular HttpResponse."""
-  def __init__(self, message, launch_app_name=None, launch_app_url=None):
-    """
-    PopupWithJframe(message, launch_app_name=None, launch_app_url=None)
-
-    It can simply display a message. It can also show a link to launch an app.
-    """
-    self.message = message
-    self.app = launch_app_name
-    self.app_url = launch_app_url
-
-  def html(self):
-    return django_mako.render_to_string('popup_with_jframe.mako', {
-      'msg': self.message,
-      'app': self.app,
-      'app_url': self.app_url,
-    })
-
 class TruncatingModel(models.Model):
   """
   Abstract class which truncates Text and Char fields to their configured

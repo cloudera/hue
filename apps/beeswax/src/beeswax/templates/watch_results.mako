@@ -112,9 +112,7 @@ ${layout.menubar(section='query')}
 		          % endif
 				</div>
 				<div class="tab-pane" id="query">
-
 						<pre>${query.query | h}</pre>
-
 				</div>
 				<div class="tab-pane" id="log">
 					<pre>${log | h}</pre>
@@ -128,42 +126,42 @@ ${layout.menubar(section='query')}
 %if can_save:
 <div id="saveAs" class="modal hide fade">
 	<form id="saveForm" action="${url('beeswax.views.save_results', query.id) }" method="POST" class="form form-inline form-padding-fix">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Save Query Results</h3>
-    </div>
-    <div class="modal-body">
-		<label class="radio">
-			<input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
-			&nbsp;In a new table
-		</label>
-		${comps.field(save_form['target_table'], notitle=True, placeholder="Table Name")}
-		<br/>
-		<label class="radio">
-			<input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
-			&nbsp;In an HDFS directory
-		</label>
-		${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder="Results location", klass="pathChooser")}
-		<br/><br/>
-		<div id="fileChooserModal" class="smallModal well hide">
-			<a href="#" class="close" data-dismiss="modal">&times;</a>
-		</div>
-
-    </div>
-    <div class="modal-footer">
-		<div id="fieldRequired" class="hide" style="position: absolute; left: 10;">
-			<span class="label label-important">Sorry, name is required.</span>
-        </div>
-        <input type="submit" class="btn primary" value="Save" name="save" />
-		<button class="btn" data-dismiss="modal">Cancel</button>
-    </div>
+	    <div class="modal-header">
+	        <a href="#" class="close" data-dismiss="modal">&times;</a>
+	        <h3>Save Query Results</h3>
+	    </div>
+	    <div class="modal-body">
+			<label class="radio">
+				<input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
+				&nbsp;In a new table
+			</label>
+			${comps.field(save_form['target_table'], notitle=True, placeholder="Table Name")}
+			<br/>
+			<label class="radio">
+				<input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
+				&nbsp;In an HDFS directory
+			</label>
+			${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder="Results location", klass="pathChooser")}
+			<br/>
+			<br/>
+			<div id="fileChooserModal" class="smallModal well hide">
+				<a href="#" class="close" data-dismiss="modal">&times;</a>
+			</div>
+	    </div>
+	    <div class="modal-footer">
+			<div id="fieldRequired" class="hide" style="position: absolute; left: 10;">
+				<span class="label label-important">Sorry, name is required.</span>
+	        </div>
+	        <input type="submit" class="btn primary" value="Save" name="save" />
+			<button class="btn" data-dismiss="modal">Cancel</button>
+	    </div>
+    </form>
 </div>
 %endif
 
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-
 		$(".resultTable").dataTable({
 			"bPaginate": false,
 		    "bLengthChange": false,
@@ -217,7 +215,6 @@ ${layout.menubar(section='query')}
 			});
 			$("#fileChooserModal").slideDown();
 		});
-
 	});
 </script>
 
