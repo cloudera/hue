@@ -25,7 +25,6 @@ import logging
 import mimetypes
 import posixpath
 import stat as stat_module
-import urllib
 import os
 import simplejson
 

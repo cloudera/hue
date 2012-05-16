@@ -16,15 +16,16 @@
 # limitations under the License.
 #
 # Utilities for Thrift
+import desktop.lib.eventlet_util
 
-import socket
-import logging
 import Queue
-import sasl
+import logging
 import select
-import sys
+import socket
 import threading
 import time
+import sasl
+import sys
 
 from thrift.Thrift import TType
 from thrift.transport.TSocket import TSocket
