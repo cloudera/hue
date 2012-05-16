@@ -102,7 +102,7 @@ from desktop.views import commonheader, commonfooter
 		<span id="shellContent"></span>
 		<input type="text" id="shellInput" class="shell" />
 	</div>
-	<span id="shell_id" class="hidden">${shell_id}</span>
+	<span id="shell_id" class="hide">${shell_id}</span>
   % else:
 	<div>
 		<h3>Please select one of the available shells from the toolbar above.</h3>
@@ -131,7 +131,6 @@ from desktop.views import commonheader, commonfooter
 		}();
 
 		if ($("#shell_id").length){
-
 			var shell = {};
 			shell.id = $("#shell_id").text();
 			shell.get = function(offset){
@@ -154,12 +153,14 @@ from desktop.views import commonheader, commonfooter
 								shell.get(offset);
 							}
 							else {
-								var _out = data[_shell.id].output;
-								_out = _out.replace(/>/g, '&gt;');
-								_out = _out.replace(/</g, '&lt;');
-								_out = _out.replace(/\n/g, '<br />');
-								$("#shellContent").html($("#shellContent").html()+"<br/>"+_out);
-								if (_out.indexOf("Disconnected!")>-1){
+								var output = data[_shell.id].output;
+								output = output.replace(/&/g, '&amp;')
+								               .replace(/</g, '&lt;')
+								               .replace(/>/g, '&gt;')
+								               .replace(/"/g, '&quot;')
+								               .replace(/\n/g, '<br/>');
+								$("#shellContent").append(output);
+								if (output.indexOf("Disconnected!")>-1){
 									window.setTimeout(function(){
 										$.ajax({
 											type: "POST",
@@ -176,7 +177,7 @@ from desktop.views import commonheader, commonfooter
 										});
 									},500);
 								}
-								$("body").animate({ scrollTop: $("#shellInput").offset().top }, "fast");
+								$('html').animate({scrollTop: $(document).height()}, 'slow');
 								_shell.get(data[_shell.id].nextOffset);
 							}
 						}
@@ -222,13 +223,9 @@ from desktop.views import commonheader, commonfooter
 			shell.get(0);
 
 			$("#shellInput").val("");
+
 			$("#shellInput").focus();
 
-			$("#shellInput").blur(function(){
-				window.setTimeout(function(){
-					$("#shellInput").focus();
-				}, 50);
-			});
 			$("#shellInput").keydown(function(e){
 				$(this).width($(document).width()-100-$(this).position().left);
 				if ((e.keyCode ? e.keyCode : e.which) == 13){
@@ -237,10 +234,14 @@ from desktop.views import commonheader, commonfooter
 				}
 			});
 
-		}
-
-
+            $(document).keypress(function(e){
+                if (! $("#shellInput").is(":focus")) {
+                    $("#shellInput").focus();
+                }
+            });
+        }
 	});
 </script>
 </div>
+
 ${commonfooter()}
