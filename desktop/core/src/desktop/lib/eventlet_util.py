@@ -15,11 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import desktop.lib.eventlet_util
+import eventlet
 
-import sys
-import os
-from desktop.supervisor import DjangoCommandSupervisee
+# Magically solves the Thrift/REST connection blocking problem
+# by monkey patching socket (http://eventlet.net/doc/patching.html).
+#
+# A cleaner solution would be to avoid this magic and find a way to have
+# the eventlet.green imports done at the very beginning (i.e. before 'socket').
+eventlet.monkey_patch(socket=True)
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'gen-py'))
-SUPERVISOR_SPEC = DjangoCommandSupervisee("filesearch_server")
+from eventlet.green import Queue
+from eventlet.green import SocketServer
+
+from eventlet.green import os
+from eventlet.green import select
+from eventlet.green import ssl
+from eventlet.green import thread
+from eventlet.green import threading
+from eventlet.green import time
+from eventlet.green import socket
