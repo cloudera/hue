@@ -15,9 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-from eventlet.green import os
+import desktop.lib.eventlet_util
+
+
 import logging
+import os
+
 from django.core.management.base import BaseCommand
 from desktop import conf
 import spawning.spawning_controller
