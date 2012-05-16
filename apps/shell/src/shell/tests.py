@@ -128,7 +128,7 @@ def test_rest():
   assert "There is no Unix user account for you." in response.content
 
   response = client.get("/shell/create?keyName=%s" % (shell_types_available[0],), follow=True, **d)
-  fragment = '<span id="shell_id" class="hidden">'
+  fragment = '<span id="shell_id" class="hide">'
   assert fragment in response.content
 
   shell_id_start = response.content.index(fragment) + len(fragment)
