@@ -790,9 +790,6 @@ def watch_query(request, id):
 
   # Still running
   log = db_utils.db_client().get_log(server_id)
-  download_urls = {}
-  for format in common.DL_FORMATS:
-    download_urls[format] = urlresolvers.reverse(download, kwargs=dict(id=str(id), format=format))
 
   # Keep waiting
   # - Translate context into something more meaningful (type, data)
@@ -800,7 +797,6 @@ def watch_query(request, id):
   return render('watch_wait.mako', request, {
                       'query': query_history,
                       'fwd_params': request.GET.urlencode(),
-                      'download_urls': download_urls,
                       'log': log,
                       'hadoop_jobs': _parse_out_hadoop_jobs(log),
                       'query_context': context,
