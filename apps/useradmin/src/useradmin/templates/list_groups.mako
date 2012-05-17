@@ -57,7 +57,7 @@ ${layout.menubar(section='groups')}
             <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
             %if user.is_superuser == True:
             <td class="right">
-              <a title="Edit ${group.name}" class="btn small editGroupBtn" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }">Edit</a>
+              <a title="Edit ${group.name}" class="btn small editGroupBtn" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-row-selector="true">Edit</a>
               <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>
             </td>
             %endif
@@ -125,6 +125,8 @@ ${layout.menubar(section='groups')}
                 });
 
             });
+
+			$("a[data-row-selector='true']").jHueRowSelector();
 
         });
     </script>

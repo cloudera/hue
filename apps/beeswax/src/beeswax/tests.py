@@ -208,7 +208,6 @@ for x in sys.stdin:
       SELECT * FROM test
     """
     response = _make_query(self.client, QUERY, name='select star', local=False)
-    assert_equal(2, len(response.context["download_urls"]))
     response = wait_for_query_to_finish(self.client, response)
     assert_equal(str(response.context['query_context'][0]), 'design')
     assert_true("<td>99</td>" in response.content)

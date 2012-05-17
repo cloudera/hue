@@ -46,9 +46,9 @@ ${layout.menubar(section='saved queries')}
         <td>
           % if may_edit:
             % if design.type == models.SavedQuery.REPORT:
-              <a href="${ url('beeswax.views.edit_report', design_id=design.id) }">${design.name}</a>
+              <a href="${ url('beeswax.views.edit_report', design_id=design.id) }" data-row-selector="true">${design.name}</a>
             % else:
-              <a href="${ url('beeswax.views.execute_query', design_id=design.id) }">${design.name}</a>
+              <a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
             % endif
           % else:
             ${design.name}
@@ -71,20 +71,28 @@ ${layout.menubar(section='saved queries')}
           ${ timesince(design.mtime) } ago
         </td>
         <td>
-			<a class="btn small contextEnabler" data-menuid="${design.id}">Options</a>
-			<ul class="contextMenu" id="menu${design.id}">
-	      	% if may_edit:
-	             % if design.type == models.SavedQuery.REPORT:
-	               <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report." class="contextItem">Edit</a></li>
-	             % else:
-	               <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="Edit this query." class="contextItem">Edit</a></li>
-	             % endif
-	             <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query." class="contextItem confirmationModal">Delete</a></li>
-	             <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
+			<div class="btn-group">
+				<a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
+					Options
+		    		<span class="caret"></span>
+		    	</a>
+				<ul class="dropdown-menu">
 
-	        % endif
-				<li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query." class="contextItem">Clone</a></li>
-			</ul>
+					% if may_edit:
+			             % if design.type == models.SavedQuery.REPORT:
+			               <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report." class="contextItem">Edit</a></li>
+			             % else:
+			               <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="Edit this query." class="contextItem">Edit</a></li>
+			             % endif
+			             <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query." class="contextItem confirmationModal">Delete</a></li>
+			             <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
+
+			        % endif
+						<li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query." class="contextItem">Clone</a></li>
+		    	</ul>
+		    </div>
+
+
         </td>
       </tr>
     % endfor
@@ -123,7 +131,6 @@ ${comps.pagination(page)}
 				{ "bSortable": false }
 			]
 		});
-		$(".contextEnabler").jHueContextMenu();
 
 		$(".confirmationModal").live("click", function(){
 			$.getJSON($(this).attr("data-confirmation-url"), function(data){
@@ -132,6 +139,8 @@ ${comps.pagination(page)}
 			});
 			$("#deleteQuery").modal("show");
 		});
+
+		$("a[data-row-selector='true']").jHueRowSelector();
 	});
 </script>
 
