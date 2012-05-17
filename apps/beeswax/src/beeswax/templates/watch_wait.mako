@@ -29,12 +29,6 @@ ${layout.menubar(section='query')}
 		<div class="span3">
 			<div class="well sidebar-nav">
 				<ul class="nav nav-list">
-					% if download_urls:
-					<li class="nav-header">Downloads</li>
-					<li><a target="_blank" href="${download_urls["csv"]}">Download as CSV</a></li>
-					<li><a target="_blank" href="${download_urls["xls"]}">Download as XLS</a></li>
-					<li><a href="${url('beeswax.views.save_results', query.id)}">Save</a></li>
-					% endif
 					<%
 			          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
 			          mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
