@@ -73,7 +73,8 @@ ${layout.menubar(section='groups')}
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
-			$("#id_members").jHueSelector();
+			$("#id_members").jHueSelector({width:400});
+			$("#id_permissions").jHueSelector({width:400});
 		});
 	</script>
 ${commonfooter()}
