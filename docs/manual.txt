@@ -14,7 +14,7 @@ https://wiki.cloudera.com/display/DOC/Hue+Installation[Installing Hue].
 
 There is also a companion SDK guide that describes how to develop
 new Hue applications:
-http://archive.cloudera.com/cdh3/hue/sdk/sdk.html[Hue SDK Documentation]
+link:sdk/sdk.html[Hue SDK Documentation]
 
 IMPORTANT: Hue requires the Hadoop contained in Cloudera's Distribution for
 Apache Hadoop (CDH), version 3 Beta 4.
