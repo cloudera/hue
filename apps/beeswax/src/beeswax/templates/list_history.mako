@@ -127,7 +127,7 @@ ${layout.menubar(section='history')}
 		        <td>${models.QueryHistory.STATE[query.last_state]}</td>
 		        <td>
 		          % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
-		            <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}">Results</a>
+		            <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" data-row-selector="true">Results</a>
 		          % else:
 		            ~
 		          % endif
@@ -152,7 +152,7 @@ ${layout.menubar(section='history')}
 			"bFilter": false
 		});
 
-
+		$("a[data-row-selector='true']").jHueRowSelector();
 
 	});
 </script>

@@ -22,7 +22,11 @@ from desktop.views import commonheader, commonfooter
 <%!  from beeswax.views import collapse_whitespace %>
 ${commonheader("Beeswax: My Queries", "beeswax", "100px")}
 ${layout.menubar(section='my queries')}
-
+<style>
+	.tab-content {
+		overflow:visible!important;
+	}
+</style>
 <div class="container-fluid">
 	<h1>Beeswax: My Queries</h1>
 
@@ -53,9 +57,9 @@ ${layout.menubar(section='my queries')}
 			            <tr>
 			              <td>
 			                % if design.type == models.SavedQuery.REPORT:
-			                  <a href="${ url('beeswax.views.edit_report', design_id=design.id) }">${design.name}</a>
+			                  <a href="${ url('beeswax.views.edit_report', design_id=design.id) }" data-row-selector="true">${design.name}</a>
 			                % else:
-			                  <a href="${ url('beeswax.views.execute_query', design_id=design.id) }">${design.name}</a>
+			                  <a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
 			                % endif
 			              </td>
 			              <td>
@@ -74,17 +78,22 @@ ${layout.menubar(section='my queries')}
 			                ${ timesince(design.mtime) } ago
 			              </td>
 			              <td>
-							<a class="btn small contextEnabler" data-menuid="${design.id}">Options</a>
-							<ul class="contextMenu" id="menu${design.id}">
-					             % if design.type == models.SavedQuery.REPORT:
-				                    <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report." class="contextItem">Edit</a></li>
-				                  % else:
-				                    <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="Edit this query." class="contextItem">Edit</a></li>
-				                  % endif
-				                  <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query." class="contextItem confirmationModal">Delete</a></li>
-				                  <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
-				                  <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query." class="contextItem">Clone</a></li>
-							</ul>
+							<div class="btn-group">
+								<a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
+									Options
+						    		<span class="caret"></span>
+						    	</a>
+								<ul class="dropdown-menu">
+									% if design.type == models.SavedQuery.REPORT:
+					                    <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report." class="contextItem">Edit</a></li>
+					                  % else:
+					                    <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="Edit this query." class="contextItem">Edit</a></li>
+					                  % endif
+					                  <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query." class="contextItem confirmationModal">Delete</a></li>
+					                  <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
+					                  <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query." class="contextItem">Clone</a></li>
+						    	</ul>
+						    </div>
 			              </td>
 			            </tr>
 			          % endfor
@@ -122,7 +131,7 @@ ${layout.menubar(section='my queries')}
 		            <tr >
 		              <td>${query.submission_date.strftime("%x %X")}</td>
 		              ## TODO (bc): Only showing HQL (not REPORT)
-		              <td><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" >${design.name}</a></td>
+		              <td><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a></td>
 		              <td>
 		                <p>
 		                  % if len(query.query) > 100:
@@ -171,11 +180,15 @@ ${layout.menubar(section='my queries')}
 			"bPaginate": false,
 		    "bLengthChange": false,
 			"bInfo": false,
-			"bFilter": false
+			"bFilter": false,
+			"aoColumns": [
+				null,
+				null,
+				null,
+				null,
+				{ "bSortable": false }
+			]
 		});
-
-
-		$(".contextEnabler").jHueContextMenu();
 
 		$(".confirmationModal").live("click", function(){
 			$.getJSON($(this).attr("data-confirmation-url"), function(data){
@@ -184,6 +197,8 @@ ${layout.menubar(section='my queries')}
 			});
 			$("#deleteQuery").modal("show");
 		});
+
+		$("a[data-row-selector='true']").jHueRowSelector();
 
 	});
 </script>

@@ -72,7 +72,7 @@ ${layout.menubar(section='designs')}
                            data-param-url="${ url('jobsub.views.get_design_params', design_id=design.id) }"
                            data-submit-url="${ url('jobsub.views.submit_design', design_id=design.id) }">Submit</a>
                         <a title="Edit ${design.name}" class="btn small"
-                           href="${ url('jobsub.views.edit_design', design_id=design.id) }">Edit</a>
+                           href="${ url('jobsub.views.edit_design', design_id=design.id) }" data-row-selector="true">Edit</a>
                     %endif%
                     %if currentuser.is_superuser or currentuser.username == design.owner.username:
                         <a title="Delete ${design.name}" class="btn small deleteConfirmation"
@@ -210,6 +210,8 @@ ${layout.menubar(section='designs')}
 		$("#installSamplesLink").click(function(){
             $("#installSamples").modal("show");
         });
+
+		$("a[data-row-selector='true']").jHueRowSelector();
 
 
     });

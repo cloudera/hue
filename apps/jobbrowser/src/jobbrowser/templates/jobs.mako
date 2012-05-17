@@ -89,7 +89,7 @@ ${commonheader("Job Browser", "jobbrowser")}
 			<td>${job.durationFormatted}</td>
 			<td>${job.startTimeFormatted}</td>
             <td>
-                <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="View this job">View</a>
+                <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="View this job" data-row-selector="true">View</a>
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                 % if request.user.is_superuser or request.user.username == job.user:
                 - <a href="#" title="Kill this job" onclick="$('#kill-job').submit()">Kill</a>
@@ -139,6 +139,7 @@ ${commonheader("Job Browser", "jobbrowser")}
 			{"bSortable":false}
 			]
 		});
+		$("a[data-row-selector='true']").jHueRowSelector();
 	});
 	</script>
 

@@ -62,7 +62,7 @@ ${layout.menubar(section='users')}
                 <td>${date(listed_user.last_login)} ${time(listed_user.last_login).replace("p.m.","PM").replace("a.m.","AM")}</td>
                 <td class="right">
                 %if user.is_superuser == True:
-                    <a title="Edit ${listed_user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }">Edit</a>
+                    <a title="Edit ${listed_user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-row-selector="true">Edit</a>
                     <a title="Delete ${listed_user.username}" class="btn small confirmationModal" alt="Are you sure you want to delete ${listed_user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(listed_user.username)) }">Delete</a>
                 %else:
                     %if user.username == listed_user.username:
@@ -154,6 +154,8 @@ ${layout.menubar(section='users')}
             $("#syncLdapSaveBtn").click(function(){
                 $("#syncLdapFrame").contents().find('form').submit();
             });
+
+			$("a[data-row-selector='true']").jHueRowSelector();
 
         });
     </script>
