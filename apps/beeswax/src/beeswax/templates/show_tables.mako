@@ -47,7 +47,7 @@ ${layout.menubar(section='tables')}
 				% for table in tables:
 					<tr>
 						<td>
-							<a href="${ url("beeswax.views.describe_table", table=table) }">${ table }</a>
+							<a href="${ url("beeswax.views.describe_table", table=table) }" data-row-selector="true">${ table }</a>
 						</td>
 						<td><a href="${ url("beeswax.views.read_table", table=table) }" class="btn">Browse Data</a></td>
 					</tr>
@@ -87,9 +87,12 @@ ${layout.menubar(section='tables')}
 			"bFilter": false,
 			"aoColumns": [
 				null,
-				{ "sWidth": "130px" },
+				{ "sWidth": "130px", "bSortable" : false },
 			 ]
 		});
+
+		$("a[data-row-selector='true']").jHueRowSelector();
+
 		% if not examples_installed:
 		$.getJSON("${ url('beeswax.views.install_examples') }",function(data){
 			$("#installSamplesMessage").text(data.title);

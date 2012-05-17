@@ -90,7 +90,7 @@
 					<td>${t.mostRecentState}</td>
 					<td>${t.execStartTimeFormatted}</td>
 					<td>${t.execFinishTimeFormatted}</td>
-					<td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" class="view_task jt_slide_right">Attempts</a></td>
+					<td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" data-row-selector="true">Attempts</a></td>
 				</tr>
 				%endfor
 		</tbody>
@@ -105,6 +105,7 @@
 			    "bFilter": false,
 				"bInfo": false,
 			});
+			$("a[data-row-selector='true']").jHueRowSelector();
 		});
 	</script>
 

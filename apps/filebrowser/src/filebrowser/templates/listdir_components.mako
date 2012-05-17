@@ -84,7 +84,7 @@ from django.utils.encoding import smart_str
 			<% path = file['path'] %>
 			<tr class="file-row" data-search="${display_name}">
 				<td>
-					<h5><a href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}">${display_name}</a></h5>
+					<h5><a href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}" data-row-selector="true">${display_name}</a></h5>
 				</td>
 				<td>
 					% if "dir" == file['type']:
@@ -328,7 +328,6 @@ from django.utils.encoding import smart_str
 
         $("#filterInput").keyup(function() {
             oTable.fnFilter($(this).val(), 0 /* Column Idx */);
-            $(".contextEnabler").jHueContextMenu();
         });
 
         //delete handlers
@@ -424,7 +423,24 @@ from django.utils.encoding import smart_str
             $("#newDirectoryNameInput").removeClass("fieldError");
             $("#directoryNameRequiredAlert").hide();
         });
-	});
+
+        $(".pathChooser").click(function(){
+            var self = this;
+            $("#fileChooserRename").jHueFileChooser({
+                onFileChoose: function(filePath) {
+                    $(self).val(filePath);
+                },
+                onFolderChange: function(folderPath){
+                    $(self).val(folderPath);
+                },
+                createFolder: false,
+                uploadFile: false
+            });
+            $("#fileChooserRename").slideDown();
+        });
+
+        $("a[data-row-selector='true']").jHueRowSelector();
+    });
 </script>
 
 </%def>
