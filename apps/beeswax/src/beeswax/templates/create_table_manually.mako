@@ -78,7 +78,7 @@ ${layout.menubar(section='tables')}
 					</div>
 				</fieldset>
 			</div>
-			<div id="step2" class="stepDetails hidden">
+			<div id="step2" class="stepDetails hide">
 				<fieldset>
 					<legend>Choose Your Record Format</legend>
 					<div class="clearfix">
@@ -128,7 +128,7 @@ ${layout.menubar(section='tables')}
 					</div>
 				</fieldset>
 			</div>
-			<div id="step3" class="stepDetails hidden">
+			<div id="step3" class="stepDetails hide">
 				<fieldset>
 					<legend>Configure Record Serialization</legend>
 					<div id="step3Delimited" class="stepDetailsInner">
@@ -165,7 +165,7 @@ ${layout.menubar(section='tables')}
 							</div>
 						</div>
 					</div>
-					<div id="step3SerDe" class="hidden stepDetailsInner">
+					<div id="step3SerDe" class="hide stepDetailsInner">
 						<div class="clearfix">
 							${comps.label(table_form["serde_name"])}
 							<div class="input">
@@ -193,7 +193,7 @@ ${layout.menubar(section='tables')}
 					</div>
 				</fieldset>
 			</div>
-			<div id="step4" class="stepDetails hidden">
+			<div id="step4" class="stepDetails hide">
 				<fieldset>
 					<legend>Choose a File Format</legend>
 					<div class="clearfix">
@@ -214,7 +214,7 @@ ${layout.menubar(section='tables')}
 				            )}
 						</div>
 					</div>
-					<div id="inputFormatDetails" class="hidden">
+					<div id="inputFormatDetails" class="hide">
 						<div class="clearfix">
 							${comps.label(table_form["input_format_class"])}
 							<div class="input">
@@ -242,7 +242,7 @@ ${layout.menubar(section='tables')}
 					</div>
 				</fieldset>
 			</div>
-			<div id="step5" class="stepDetails hidden">
+			<div id="step5" class="stepDetails hide">
 				<fieldset>
 					<legend>Choose Where Your Table's Data is Stored</legend>
 
@@ -265,7 +265,7 @@ ${layout.menubar(section='tables')}
 						</div>
 					</div>
 
-					<div id="location" class="hidden">
+					<div id="location" class="hide">
 						<div class="clearfix">
 							${comps.label(table_form["external_location"])}
 							<div class="input">
@@ -282,13 +282,13 @@ ${layout.menubar(section='tables')}
 					</div>
 				</fieldset>
 			</div>
-				<div id="step6" class="stepDetails hidden">
+				<div id="step6" class="stepDetails hide">
 					<fieldset>
 						<legend>Configure Table Columns</legend>
 						% for form in columns_form.forms:
 			                ${render_column(form)}
 			            %endfor
-						<div class="hidden">
+						<div class="hide">
 			              ${unicode(columns_form.management_form) | n}
 			            </div>
 						<div class="clearfix">
@@ -316,7 +316,7 @@ ${layout.menubar(section='tables')}
 						% for form in partitions_form.forms:
 		                  ${render_column(form, True)}
 		                % endfor
-						<div class="hidden">
+						<div class="hide">
 			              ${unicode(partitions_form.management_form) | n}
 			            </div>
 						<div class="clearfix">
@@ -328,9 +328,9 @@ ${layout.menubar(section='tables')}
 					</fieldset>
 				</div>
 			<div class="form-actions">
-				<input id="backBtn" type="button" class="btn hidden" value="Back" />
+				<input id="backBtn" type="button" class="btn hide" value="Back" />
 				<input id="nextBtn" type="button" class="btn primary" value="Next" />
-				<input id="submit" type="submit" class="btn primary hidden" value="Create table" />
+				<input id="submit" type="submit" class="btn primary hide" value="Create table" />
 			</div>
 		</form>
 		</div>
@@ -363,7 +363,7 @@ ${layout.menubar(section='tables')}
 				</div>
 			</div>
 			 % if is_partition_form == False:
-			<div class="arraySpec hidden">
+			<div class="arraySpec hide">
 				<div class="clearfix">
 					<label>Array value type</label>
 					<div class="input">
@@ -374,7 +374,7 @@ ${layout.menubar(section='tables')}
 					</div>
 				</div>
 			</div>
-			<div class="mapSpec hidden">
+			<div class="mapSpec hide">
 				<div class="clearfix">
 					<label>Map Key type</label>
 					<div class="input">
