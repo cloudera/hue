@@ -59,8 +59,6 @@ def _start_server(cluster):
     str(BEESWAXD_TEST_PORT),
     '--metastore',
     str(BEESWAXD_TEST_PORT + 1),
-    '--superuser',
-    pwd.getpwuid(os.getuid())[0],
     '--desktop-host',
     str('127.0.0.1'),
     '--desktop-port',
