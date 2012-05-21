@@ -401,7 +401,7 @@ try:
   _has_tidylib = True
 except Exception, ex:
   # The exception type is not ImportError. It's actually an OSError.
-  logging.exception("Failed to import tidylib. Is libtidy installed?")
+  logging.warn("Failed to import tidylib (for debugging). Is libtidy installed?")
   _has_tidylib = False
 
 
