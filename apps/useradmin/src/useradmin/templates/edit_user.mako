@@ -54,6 +54,7 @@ ${layout.menubar(section='users')}
 				${render_field(field)}
 			% endfor
 		</fieldset>
+		<br/>
 		<div class="form-actions">
 			% if username:
 				<input type="submit" class="btn btn-primary" value="Update user"/>

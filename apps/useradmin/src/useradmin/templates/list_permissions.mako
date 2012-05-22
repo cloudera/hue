@@ -52,7 +52,7 @@ ${layout.menubar(section='permissions')}
             <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
 			%if user.is_superuser == True:
             <td class="right">
-              <a title="Edit permission" class="btn small editPermissionBtn" data-url="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">Edit</a>
+              <a title="Edit permission" class="btn small editPermissionBtn" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">Edit</a>
             </td>
 			%endif
           </tr>
@@ -62,19 +62,6 @@ ${layout.menubar(section='permissions')}
 
 </div>
 
-
-<div id="editPermission" class="modal hide fade">
-	<div class="modal-header">
-		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>Edit permissions for <span class="applicationName"></span></h3>
-	</div>
-	<div id="editPermissionBody" class="modal-body">
-		<iframe id="editPermissionFrame" frameBorder="0"></iframe>
-	</div>
-	<div class="modal-footer">
-		<button id="editPermissionSaveBtn" class="btn primary">Save</button>
-	</div>
-</div>
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
@@ -103,16 +90,6 @@ ${layout.menubar(section='permissions')}
 		        });
 
 		    });
-
-			$(".editPermissionBtn").click(function(){
-				$("#editPermission").find(".applicationName").text($(this).data("name"));
-				$("#editPermissionFrame").css("height","260px").attr("src", $(this).data("url"));
-				$("#editPermission").modal("show");
-			});
-
-			$("#editPermissionSaveBtn").click(function(){
-				$("#editPermissionFrame").contents().find('form').submit();
-			});
 
 			$("a[data-row-selector='true']").jHueRowSelector();
 
