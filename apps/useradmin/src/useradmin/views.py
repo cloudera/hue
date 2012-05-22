@@ -275,8 +275,7 @@ def edit_permission(request, app=None, priv=None):
     if form.is_valid():
       form.save()
       request.flash.put('Permission information updated')
-      return render('edit_permissions_confirmation.mako', request,
-	    dict(form=form, action=request.path, app=app, priv=priv))
+      return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
 
   else:
     form = PermissionsEditForm(instance=instance)

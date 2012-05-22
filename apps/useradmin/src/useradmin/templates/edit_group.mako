@@ -57,6 +57,7 @@ ${layout.menubar(section='groups')}
 			${render_field(field)}
 		% endfor
         </fieldset>
+		<br/>
 		<div class="form-actions">
 			% if name:
 				<input type="submit" class="btn btn-primary" value="Update group"/>

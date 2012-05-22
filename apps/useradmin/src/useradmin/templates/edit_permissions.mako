@@ -14,33 +14,48 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader_iframe, commonfooter_iframe
+from desktop.views import commonheader, commonfooter
 import urllib %>
-${commonheader_iframe()}
-	<form id="editForm" action="${urllib.quote(action)}" method="POST">
+<%namespace name="layout" file="layout.mako" />
+
+${commonheader("Hue Users", "useradmin", "100px")}
+${layout.menubar(section='permissions')}
+
+
+<%def name="render_field(field)">
+  %if not field.is_hidden:
+    <% group_class = len(field.errors) and "error" or "" %>
+    <div class="control-group ${group_class}">
+      <label class="control-label" for="id_${field.html_name}">${field.label}</label>
+      <div class="controls">
+		${unicode(field) | n}
+        % if len(field.errors):
+          <span class="help-inline">${unicode(field.errors) | n}</span>
+        % endif
+      </div>
+    </div>
+  %endif
+</%def>
+
+<div class="container-fluid">
+	<h1>Hue Permissions - Edit app: ${app}</h1>
+	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
 		<fieldset>
-	    <%def name="render_field(field)">
-			<div class="clearfix">
-				${field.label_tag() | n}
-				<div class="input">
-					${unicode(field) | n}
-
-				% if len(field.errors):
-					${unicode(field.errors) | n}
-				% endif
-				</div>
-			</div>
-		</%def>
-
-		% for field in form:
-			${render_field(field)}
-		% endfor
-	    </fieldset>
+			% for field in form:
+				${render_field(field)}
+			% endfor
+		</fieldset>
+		<br/>
+		<div class="form-actions">
+			<input type="submit" class="btn btn-primary" value="Update permission"/>
+			<a href="/useradmin/permissions" class="btn">Cancel</a>
+		</div>
 	</form>
+</div>
 
-	<script type="text/javascript" charset="utf-8">
-		$(document).ready(function(){
-			$("#id_groups").jHueSelector({width:520});
-		});
-	</script>
-${commonfooter_iframe()}
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$("#id_groups").jHueSelector({width:520});
+	});
+</script>
+${commonfooter()}
