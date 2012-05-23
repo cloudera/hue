@@ -128,6 +128,7 @@ class TestWithThriftServer(object):
     cls.server.stop_server_process()
 
   def test_basic_operation(self):
+    # To fix in HUE-729
     raise SkipTest
     assert_equal(10, self.client.ping(5))
 
