@@ -18,43 +18,43 @@ from desktop.views import commonheader, commonfooter
 %>
 
 % if shells:
-	${commonheader("Hue Shell", "shell", "100px")}
+    ${commonheader("Hue Shell", "shell", "100px")}
 % else:
-	${commonheader("Hue Shell", "shell")}
+    ${commonheader("Hue Shell", "shell")}
 % endif
 
 
 % if shells:
 <div class="subnav subnav-fixed">
-	<div class="container-fluid">
-		<ul class="nav nav-pills">
-			% if len(shells) == 1:
-				% if shells[0]["exists"]:
-					<li><a href="${url('shell.views.create')}?keyName=${shells[0]["keyName"]}" class="${shells[0]["keyName"]}">${shells[0]["niceName"]}</a></li>
-				% else:
-					<li><a href="#" class="disabled">${shells[0]["niceName"]}</a></li>
-				% endif
-			% else:
-				% if shells[0]["exists"]:
-					<li><a href="${url('shell.views.create')}?keyName=${shells[0]["keyName"]}" class="${shells[0]["keyName"]}">${shells[0]["niceName"]}</a></li>
-				% else:
-					<li><a href="#" class="disabled">${shells[0]["niceName"]}</a></li>
-				% endif
-				% for item in shells[1:-1]:
-					% if item["exists"]:
-						<li><a href="${url('shell.views.create')}?keyName=${item["keyName"]}" class="${item["keyName"]}">${item["niceName"]}</a></li>
-					% else:
-						<li><a href="#" class="disabled">${item["niceName"]}</a></li>
-					% endif
-				% endfor
-				% if shells[-1]["exists"]:
-					<li><a href="${url('shell.views.create')}?keyName=${shells[-1]["keyName"]}" class="${shells[-1]["keyName"]}">${shells[-1]["niceName"]}</a></li>
-				% else:
-					<li><a href="#" class="disabled">${shells[-1]["niceName"]}</a></li>
-				% endif
-			% endif
-		</ul>
-	</div>
+    <div class="container-fluid">
+        <ul class="nav nav-pills">
+            % if len(shells) == 1:
+                % if shells[0]["exists"]:
+                    <li><a href="${url('shell.views.create')}?keyName=${shells[0]["keyName"]}" class="${shells[0]["keyName"]}">${shells[0]["niceName"]}</a></li>
+                % else:
+                    <li><a href="#" class="disabled">${shells[0]["niceName"]}</a></li>
+                % endif
+            % else:
+                % if shells[0]["exists"]:
+                    <li><a href="${url('shell.views.create')}?keyName=${shells[0]["keyName"]}" class="${shells[0]["keyName"]}">${shells[0]["niceName"]}</a></li>
+                % else:
+                    <li><a href="#" class="disabled">${shells[0]["niceName"]}</a></li>
+                % endif
+                % for item in shells[1:-1]:
+                    % if item["exists"]:
+                        <li><a href="${url('shell.views.create')}?keyName=${item["keyName"]}" class="${item["keyName"]}">${item["niceName"]}</a></li>
+                    % else:
+                        <li><a href="#" class="disabled">${item["niceName"]}</a></li>
+                    % endif
+                % endfor
+                % if shells[-1]["exists"]:
+                    <li><a href="${url('shell.views.create')}?keyName=${shells[-1]["keyName"]}" class="${shells[-1]["keyName"]}">${shells[-1]["niceName"]}</a></li>
+                % else:
+                    <li><a href="#" class="disabled">${shells[-1]["niceName"]}</a></li>
+                % endif
+            % endif
+        </ul>
+    </div>
 </div>
 
 % endif
@@ -63,50 +63,50 @@ from desktop.views import commonheader, commonfooter
 <div class="container-fluid">
 
   % if shell_id:
-	<style type="text/css" media="screen">
-		body {
-			background-color: #333;
-		}
-		.shell {
-			background-color:#333;
-			color:#EEE;
-			font-family: monospace;
-			font-size: 14px;
-		}
-		#shellOutput {
-			/*position:absolute;
-			left:0;
-			top:-20px;*/
-			padding:0;
-			width:100%;
-		}
-		#shellInput {
-			border:0;
-			margin:0;
-			margin-top:10px;
-			margin-bottom:10px;
-			padding:0;
-			box-shadow:none;
+    <style type="text/css" media="screen">
+        body {
+            background-color: #333;
+        }
+        .shell {
+            background-color:#333;
+            color:#EEE;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        #shellOutput {
+            /*position:absolute;
+            left:0;
+            top:-20px;*/
+            padding:0;
+            width:100%;
+        }
+        #shellInput {
+            border:0;
+            margin:0;
+            margin-top:10px;
+            margin-bottom:10px;
+            padding:0;
+            box-shadow:none;
 
 
-		}
-		#shellInput:focus {
-			box-shadow:none;
-			border:0;
-		}
-		#shellContent {
+        }
+        #shellInput:focus {
+            box-shadow:none;
+            border:0;
+        }
+        #shellContent {
 
-		}
-	</style>
-	<div id="shellOutput" class="shell">
-		<span id="shellContent"></span>
-		<input type="text" id="shellInput" class="shell" />
-	</div>
-	<span id="shell_id" class="hide">${shell_id}</span>
+        }
+    </style>
+    <div id="shellOutput" class="shell">
+        <span id="shellContent"></span>
+        <input type="text" id="shellInput" class="shell" />
+    </div>
+    <span id="shell_id" class="hide">${shell_id}</span>
   % else:
-	<div>
-		<h3>Please select one of the available shells from the toolbar above.</h3>
-	</div>
+    <div>
+        <h3>Please select one of the available shells from the toolbar above.</h3>
+    </div>
   % endif
 
 <script type="text/javascript" charset="utf-8">
@@ -129,6 +129,54 @@ from desktop.views import commonheader, commonfooter
 			}
 			return randomString;
 		}();
+
+        var history = (function() {
+            var previousCommands = [];
+            var currentCommandIndex = 0;
+            // Save the initial input ("enter" key not pressed yet before navigating in the history)
+            var temporaryInput = null;
+
+            return {
+                recordCommand: function(command) {
+                    if (command) {
+                        if (previousCommands[previousCommands.length - 1] != command) {
+                            previousCommands.push(command);
+                            currentCommandIndex = previousCommands.length;
+                            temporaryInput = null;
+                        }
+                    }
+                },
+                getPreviousCommand: function(input) {
+                    if (currentCommandIndex == previousCommands.length) {
+                        temporaryInput = input;
+                    }
+
+                    var command = null;
+                    if (currentCommandIndex > 0) {
+                        currentCommandIndex--;
+                        command = previousCommands[currentCommandIndex];
+                    }
+                    return command;
+                },
+                getNextCommand: function() {
+                    var command = null;
+                    if (currentCommandIndex < previousCommands.length - 1) {
+                        currentCommandIndex++;
+                        command = previousCommands[currentCommandIndex];
+                    } else {
+                        command = temporaryInput;
+                        currentCommandIndex = previousCommands.length;
+                    }
+                    return command;
+                }
+            };
+        })();
+
+        function setShellInput(command) {
+            if (command != null) {
+                $("#shellInput").val(command);
+            }
+        };
 
 		if ($("#shell_id").length){
 			var shell = {};
@@ -177,7 +225,7 @@ from desktop.views import commonheader, commonfooter
 										});
 									},500);
 								}
-								$('html').animate({scrollTop: $(document).height()}, 'slow');
+								$('body').animate({scrollTop: $(document).height()}, 'slow');
 								_shell.get(data[_shell.id].nextOffset);
 							}
 						}
@@ -226,13 +274,25 @@ from desktop.views import commonheader, commonfooter
 
 			$("#shellInput").focus();
 
-			$("#shellInput").keydown(function(e){
-				$(this).width($(document).width()-100-$(this).position().left);
-				if ((e.keyCode ? e.keyCode : e.which) == 13){
-					shell.send($(this).val());
-					$(this).val("");
-				}
-			});
+            $("#shellInput").keydown(function(e){
+                $(this).width($(document).width()-100-$(this).position().left);
+
+                var input = null;
+                var key = e.keyCode ? e.keyCode : e.which
+
+                if (key == 13){
+                    shell.send($(this).val());
+                    history.recordCommand($(this).val());
+                    input = ""
+                } else if (key == 38){
+                    input = history.getPreviousCommand($(this).val());
+                    e.preventDefault();
+                } else if (key == 40){
+                    input = history.getNextCommand();
+                }
+
+                setShellInput(input);
+            });
 
             $(document).keypress(function(e){
                 if (! $("#shellInput").is(":focus")) {
