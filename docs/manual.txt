@@ -492,7 +492,9 @@ Hue only support one MapReduce cluster currently. That cluster should be defined
 under the `[[[default]]]` sub-section. Note that JobBrowser only works with MR1.
 
 jobtracker_host::
-  The host running the JobTracker.
+  The host running the JobTracker. In a secured environment, this needs to
+  be the FQDN of the JobTracker host, and match the "host" portion of the
+  `mapred' Kerberos principal full name.
 
 jobtracker_port::
   The port for the JobTracker IPC service.
