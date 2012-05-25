@@ -94,3 +94,38 @@ build_hive() {
   tar -C $HIVE_DIR -xzf $HIVE_CACHE
   export HIVE_CONF_DIR=$HIVE_HOME/conf
 }
+
+##########
+OOZIE_URL=${OOZIE_URL:-http://nightly.cloudera.com/cdh4/cdh/4/oozie-3.2.0-cdh4.2.0-SNAPSHOT.tar.gz}
+
+OOZIE_TGZ=$(basename $OOZIE_URL)
+OOZIE_VERSION=${OOZIE_TGZ/.tar.gz/}
+OOZIE_CACHE="$HOME/.hue_cache/${OOZIE_TGZ}"
+
+build_oozie() {
+  if [ ! -f $OOZIE_CACHE ]; then
+    mkdir -p $HOME/.hue_cache
+    echo "Downloading $OOZIE_URL..."
+    wget $OOZIE_URL -O $OOZIE_CACHE
+  fi
+
+  OOZIE_DIR=$HUE_ROOT/ext/oozie
+  export OOZIE_HOME="$OOZIE_DIR/${OOZIE_VERSION}"
+
+  mkdir -p $OOZIE_DIR
+  rm -rf $OOZIE_HOME
+  echo "Unpacking $OOZIE_CACHE to $OOZIE_DIR"
+  tar -C $OOZIE_DIR -xzf $OOZIE_CACHE
+  export OOZIE_CONF_DIR=$OOZIE_HOME/conf
+
+  rm -rf $OOZIE_DIR/oozie
+  ln -s $OOZIE_DIR/${OOZIE_VERSION} $OOZIE_DIR/oozie # easier to reference later
+
+  mkdir -p $OOZIE_HOME/libext
+  tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*-cdh*-SNAPSHOT.tar.gz
+  cp $OOZIE_HOME/libext/oozie-*-SNAPSHOT/hadooplibs/hadooplib-*-mr1-cdh*-SNAPSHOT/*jar $OOZIE_HOME/libext/
+  tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-examples.tar.gz
+
+  $OOZIE_HOME/bin/oozie-setup.sh
+  $OOZIE_HOME/bin/ooziedb.sh create -sqlfile oozie.sql -run
+}

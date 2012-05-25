@@ -14,16 +14,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 try:
   import json
 except ImportError:
   import simplejson as json
 import logging
 import re
+import time
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -31,7 +32,7 @@ from desktop.lib.test_utils import grant_access
 from jobsub.management.commands import jobsub_setup
 from jobsub.models import OozieDesign
 from liboozie import oozie_api
-from liboozie.conf import REMOTE_DEPLOYMENT_DIR
+from liboozie.oozie_api_test import OozieServerProvider
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   CoordinatorList, WorkflowAction
 
@@ -41,6 +42,9 @@ from oozie.conf import SHARE_JOBS
 
 
 LOG = logging.getLogger(__name__)
+
+
+_INITIALIZED = False
 
 
 class MockOozieApi:
@@ -100,24 +104,56 @@ class MockOozieApi:
     return '<xml></xml>'
 
 
-class MockOozieCoordinatorApi(MockOozieApi):
-  def submit_job(self, properties):
-    return 'ONE-OOZIE-ID-C'
-
-# Monkey patch Lib Oozie with Mock API
-oozie_api.OriginalOozieApi = oozie_api.OozieApi
-oozie_api.OozieApi = MockOozieApi
-
-
-class TestEditor:
+class OozieMockBase:
 
   def setUp(self):
+    # Beware: Monkey patch Oozie/LibOozie with Mock API
+    if not hasattr(oozie_api, 'OriginalOozieApi'):
+      oozie_api.OriginalOozieApi = oozie_api.OozieApi
+    if not hasattr(Workflow.objects, 'original_check_workspace'):
+      Workflow.objects.original_check_workspace = Workflow.objects.check_workspace
+    Workflow.objects.check_workspace = lambda a, b: None
+    oozie_api.OozieApi = MockOozieApi
+    oozie_api._api_cache = None
+
     Workflow.objects.all().delete()
     Coordinator.objects.all().delete()
 
     self.c = make_logged_in_client()
     self.wf = create_workflow()
 
+
+  def tearDown(self):
+    oozie_api.OozieApi = oozie_api.OriginalOozieApi
+    Workflow.objects.check_workspace = Workflow.objects.original_check_workspace
+    oozie_api._api_cache = None
+
+
+class OozieBase(OozieServerProvider):
+  requires_hadoop = True
+
+  def setUp(self):
+    OozieServerProvider.setup_class()
+    self.c = make_logged_in_client()
+    self.cluster = OozieServerProvider.cluster
+    self.install_examples()
+
+
+  def install_examples(self):
+    global _INITIALIZED
+    if _INITIALIZED:
+      return
+
+    self.c.post(reverse('oozie:setup_app'))
+    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
+    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/test', 0777, True)
+    hue = User.objects.create_user('hue', 'hue' + '@localhost', 'hue')
+    Workflow.objects.update(owner=hue)
+
+    _INITIALIZED = True
+
+
+class TestEditor(OozieMockBase):
 
   def test_find_parameters(self):
     jobs = [Job(name="$a"),
@@ -126,11 +162,6 @@ class TestEditor:
 
     result = [find_parameters(job, ['name', 'description']) for job in jobs]
     assert_equal(set(["b", "foo"]), reduce(lambda x, y: x | set(y), result, set()))
-
-
-  def test_create_workflow(self):
-    # Done in the setUp
-    pass
 
 
   def test_find_all_parameters(self):
@@ -205,25 +236,6 @@ class TestEditor:
     # 4
 
 
-  def test_clone_workflow(self):
-    workflow_count = Workflow.objects.count()
-
-    response = self.c.post(reverse('oozie:clone_workflow', args=[self.wf.id]), {}, follow=True)
-
-    assert_equal(workflow_count + 1, Workflow.objects.count(), response)
-
-    wf2 = Workflow.objects.latest('id')
-    assert_not_equal(self.wf.id, wf2.id)
-    assert_equal(self.wf.node_set.count(), wf2.node_set.count())
-
-    node_ids = set(self.wf.node_set.values_list('id', flat=True))
-    for node in wf2.node_set.all():
-      assert_false(node.id in node_ids)
-
-    assert_not_equal(self.wf.deployment_dir, wf2.deployment_dir)
-    assert_not_equal('', wf2.deployment_dir)
-
-
   def test_clone_action(self):
     # Need to be tested in edit:workflow too
     action1 = Node.objects.get(name='action-name-1')
@@ -238,26 +250,23 @@ class TestEditor:
     assert_equal(node_count + 1, self.wf.actions.count())
 
 
-  def test_import_action(self):
-    # Setup jobsub examples
-    if not jobsub_setup.Command().has_been_setup():
-      jobsub_setup.Command().handle()
+  def test_delete_action(self):
+    action1 = Node.objects.get(name='action-name-1')
 
-    # There should be 3 from examples
-    jobsub_design = OozieDesign.objects.all()[0]
-    node_size = len(Node.objects.all())
-    kwargs = dict(workflow=self.wf.id, parent_action_id=self.wf.end.get_parents()[0].id)
-    response = self.c.post(reverse('oozie:import_action', kwargs=kwargs), {'action_id': jobsub_design.id})
-    assert_equal(302, response.status_code)
-    assert_equal(node_size + 1, len(Node.objects.all()))
+    action_count = self.wf.actions.count()
+    assert_true(3, action_count)
 
-    # There should now be an imported action at the end of Node list
-    # Need to test properties to make sure we got it right
-    # Must also make sure that jobsub field values are translated
-    translation_regex = re.compile('(?<!\$)\$(\w+)')
-    node = Node.objects.all()[len(Node.objects.all())-1].get_full_node()
-    for field in node.PARAM_FIELDS:
-      assert_equal(translation_regex.sub(r'${\1}', getattr(jobsub_design.get_root_action(), field)), getattr(node, field))
+    self.c.post(reverse('oozie:delete_action', args=[action1.id]), {}, follow=True)
+    self.wf = Workflow.objects.get(name='wf-name-1')
+    assert_false(self.wf.actions.filter(name='action-name-1').exists())
+
+    assert_true(2, self.wf.actions.count())
+    assert_equal(action_count - 1, self.wf.actions.count())
+
+    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-2').id]), {}, follow=True)
+    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-3').id]), {}, follow=True)
+
+    assert_equal(0, self.wf.actions.count())
 
 
   def test_workflow_has_cycle(self):
@@ -357,7 +366,7 @@ class TestEditor:
         '            <name-node>${nameNode}</name-node>\n'
         '            <prepare>\n'
         '                <delete path="${nameNode}${output}"/>\n'
-        '                <mkdir path="${nameNode}test"/>\n'
+        '                <mkdir path="${nameNode}/test"/>\n'
         '            </prepare>\n'
         '            <configuration>\n'
         '                <property>\n'
@@ -375,7 +384,7 @@ class TestEditor:
         '            <name-node>${nameNode}</name-node>\n'
         '            <prepare>\n'
         '                <delete path="${nameNode}${output}"/>\n'
-        '                <mkdir path="${nameNode}test"/>\n'
+        '                <mkdir path="${nameNode}/test"/>\n'
         '            </prepare>\n'
         '            <configuration>\n'
         '                <property>\n'
@@ -393,7 +402,7 @@ class TestEditor:
         '            <name-node>${nameNode}</name-node>\n'
         '            <prepare>\n'
         '                <delete path="${nameNode}${output}"/>\n'
-        '                <mkdir path="${nameNode}test"/>\n'
+        '                <mkdir path="${nameNode}/test"/>\n'
         '            </prepare>\n'
         '            <configuration>\n'
         '                <property>\n'
@@ -425,13 +434,30 @@ class TestEditor:
     finally:
       finish()
 
-    # Build POST dict from the forms and test this
-    raise SkipTest
+    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-2').id]), {}, follow=True)
+    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-3').id]), {}, follow=True)
+
+    node_ids = [node.id for node in self.wf.node_list]
+
+    post = {u'node_set-TOTAL_FORMS': [u'4'], u'node_set-MAX_NUM_FORMS': [u'0'], u'node_set-INITIAL_FORMS': [u'4'],
+            u'node_set-0-id': [node_ids[0]], u'node_set-0-workflow': [u'16'],
+            u'node_set-1-id': [node_ids[1]], u'node_set-1-workflow': [u'16'],
+            u'node_set-2-id': [node_ids[2]], u'node_set-2-workflow': [u'16'],
+            u'node_set-3-id': [node_ids[3]], u'node_set-3-workflow': [u'16']}
+    post.update(WORKFLOW_DICT)
 
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = self.c.post(reverse('oozie:edit_workflow', args=[self.wf.id]), WORKFLOW_DICT)
+      response = self.c.post(reverse('oozie:edit_workflow', args=[self.wf.id]), post)
       assert_false('jHueNotify.error' in response.content, response.content)
+
+      self.wf = Workflow.objects.get(name='wf-name-1')
+      assert_true(self.wf.actions.filter(name='action-name-1').exists())
+      assert_true(1, self.wf.actions.count())
+
+      for field, value in WORKFLOW_DICT.iteritems():
+        if field not in ('params', 'deployment_dir'):
+          assert_equal(value[0], getattr(self.wf, field))
     finally:
       finish()
 
@@ -443,8 +469,8 @@ class TestEditor:
     data = {u'job_xml': [u'job.xml'], u'files': [u'["my_file"]'], u'name': [u'TestActionSleep'],
             u'jar_path': [u'/user/hue/oozie/examples/lib/hadoop-examples.jar'], u'java_opts': [u'-d64'],
             u'args': [u'${n}'],
-            u'job_properties': [u'[{"name":"mapred.job.queue.name","value":"prod"}]'],
-            u'prepares': [u'[{"value":"${input}","type":"delete"},{"value":"${input}","type":"mkdir"}]'],
+            u'job_properties': [u'[{"name":"mapred.job.queue.name","value":"prod"}{"value":"${input}","type":"delete"},{"value":"${input}","type":"mkdir"}]'],
+            u'prepares': [u'[]'],
             u'params': [u'[]'], u'archives': [u'["my_archive.zip"]'],
             u'main_class': [u'org.apache.hadoop.examples.SleepJob'],
             u'description': [u'An action that sleeps']}
@@ -482,136 +508,6 @@ class TestEditor:
     assert_equal('[<Start: start>, <Fork: fork-7>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, '
                  '<Join: join-8>, <Mapreduce: action-name-3>, <Kill: kill>, <End: end>]',
                  str(self.wf.node_list))
-
-
-
-  def test_workflow_permissions(self):
-    # Monkey patch Lib Oozie with Mock API
-    oozie_api.OozieApi = MockOozieApi
-    oozie_api._api_cache = None
-
-    response = self.c.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-    assert_true('Editor' in response.content, response.content)
-    assert_true('Workflow wf-name-1' in response.content, response.content)
-    assert_false(self.wf.is_shared)
-
-    # Login as someone else
-    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
-    grant_access("not_me", "test", "oozie")
-
-    # List
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:list_workflows'))
-      assert_false('wf-name-1' in response.content, response.content)
-    finally:
-      finish()
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.get(reverse('oozie:list_workflows'))
-      assert_false('wf-name-1' in response.content, response.content)
-    finally:
-      finish()
-
-    # View
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Share it !
-    self.wf.is_shared = True
-    self.wf.save()
-
-    # List
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:list_workflows'))
-      assert_equal(200, response.status_code)
-      assert_true('wf-name-1' in response.content, response.content)
-    finally:
-      finish()
-
-    # View
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-      assert_false('Permission denied' in response.content, response.content)
-      assert_false('Save' in response.content, response.content)
-    finally:
-      finish()
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:edit_workflow', args=[self.wf.id]))
-      assert_true('Not allowed' in response.content, response.content)
-    finally:
-      finish()
-
-    # Submit
-#    finish = SHARE_JOBS.set_for_testing(False)
-#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-#    try:
-#      response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
-#      assert_true('Permission denied' in response.content, response.content)
-#    finally:
-#      finish()
-#      finish_deployement()
-#    finish = SHARE_JOBS.set_for_testing(True)
-#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-#    try:
-#      response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
-#      assert_false('Permission denied' in response.content, response.content)
-#    finally:
-#      finish()
-#      finish_deployement()
-#
-#    # Resubmit
-#    finish = SHARE_JOBS.set_for_testing(False)
-#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-#    try:
-#      job_id = History.objects.get(job=self.wf).oozie_job_id
-#      response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
-#      assert_true('Permission denied' in response.content, response.content)
-#    finally:
-#      finish()
-#      finish_deployement()
-#    finish = SHARE_JOBS.set_for_testing(True)
-#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-#    try:
-#      job_id = History.objects.get(job=self.wf).oozie_job_id
-#      response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
-#      assert_false('Permission denied' in response.content, response.content)
-#    finally:
-#      finish()
-#      finish_deployement()
-
-    # Delete
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.post(reverse('oozie:delete_workflow', args=[self.wf.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    response = self.c.post(reverse('oozie:delete_workflow', args=[self.wf.id]), follow=True)
-    assert_equal(200, response.status_code)
-
 
   def test_workflow_action_permissions(self):
     # Login as someone else
@@ -707,9 +603,6 @@ class TestEditor:
 
 
   def test_coordinator_workflow_access_permissions(self):
-    oozie_api.OozieApi = MockOozieCoordinatorApi
-    oozie_api._api_cache = None
-
     self.wf.is_shared = True
     self.wf.save()
 
@@ -753,135 +646,6 @@ class TestEditor:
       assert_true('value="Save"' in response.content, response.content)
     finally:
       finish()
-
-
-  def test_coordinator_permissions(self):
-    coord = create_coordinator(self.wf)
-
-    response = self.c.get(reverse('oozie:edit_coordinator', args=[coord.id]))
-    assert_true('Editor' in response.content, response.content)
-    assert_true('value="Save"' in response.content, response.content)
-
-    # Login as someone else
-    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
-    grant_access("not_me", "test", "oozie")
-
-    # List
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:list_coordinators'))
-      assert_false('MyCoord' in response.content, response.content)
-    finally:
-      finish()
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.get(reverse('oozie:list_coordinators'))
-      assert_false('MyCoord' in response.content, response.content)
-    finally:
-      finish()
-
-    # View
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
-      assert_false('MyCoord' in response.content, response.content)
-    finally:
-      finish()
-
-    # Share it !
-    coord.is_shared = True
-    coord.save()
-    coord.workflow.is_shared = True
-    coord.workflow.save()
-
-    # List
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:list_coordinators'))
-      assert_equal(200, response.status_code)
-      assert_true('MyCoord' in response.content, response.content)
-    finally:
-      finish()
-
-    # View
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
-      assert_false('Permission denied' in response.content, response.content)
-      assert_false('value="Save"' in response.content, response.content)
-    finally:
-      finish()
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:edit_coordinator', args=[coord.id]))
-      assert_false('MyCoord' in response.content, response.content)
-      assert_true('Not allowed' in response.content, response.content)
-    finally:
-      finish()
-
-    # Submit
-#    finish = SHARE_JOBS.set_for_testing(False)
-#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-#    try:
-#      response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
-#      assert_true('Permission denied' in response.content, response.content)
-#    finally:
-#      finish()
-#      finish_deployement()
-#    finish = SHARE_JOBS.set_for_testing(True)
-#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-#    try:
-#      response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
-#      assert_false('Permission denied' in response.content, response.content)
-#    finally:
-#      finish()
-#      finish_deployement()
-#
-#    # Resubmit
-#    # Monkey patch Lib Oozie with Mock API
-#    finish = SHARE_JOBS.set_for_testing(False)
-#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-#    try:
-#      oozie_job_id = History.objects.get(job=coord).oozie_job_id
-#      response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
-#      assert_true('Permission denied' in response.content, response.content)
-#    finally:
-#      finish()
-#      finish_deployement()
-#    finish = SHARE_JOBS.set_for_testing(True)
-#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-#    try:
-#      oozie_job_id = History.objects.get(job=coord).oozie_job_id
-#      response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
-#      assert_false('Permission denied' in response.content, response.content)
-#    finally:
-#      finish()
-#      finish_deployement()
-
-    # Delete
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.post(reverse('oozie:delete_coordinator', args=[coord.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    response = self.c.post(reverse('oozie:delete_coordinator', args=[coord.id]), follow=True)
-    assert_equal(200, response.status_code)
 
 
   def test_coordinator_gen_xml(self):
@@ -977,123 +741,468 @@ class TestEditor:
                  coord.find_all_parameters())
 
 
-# Utils
-WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''],
-                 u'schema_version': [u'uri:oozie:workflow:0.2'],
-                 u'parameters': [u'[{"name":"market","value":"US"}]'],
-                 u'job_xml': [u'jobconf.xml'],
-                 u'job_properties': [u'[{"name":"sleep-all","value":"${SLEEP}"}]']}
-
-
-# Beware: client not consistent with self.c in TestEditor
-def add_action(workflow, action, name):
-  c = make_logged_in_client()
-
-  response = c.post("/oozie/new_action/%s/%s/%s" % (workflow, 'mapreduce', action), {
-     u'files': [u'[]'], u'name': [name], u'jar_path': [u'/tmp/.file.jar'], u'job_properties': [u'[{"name":"sleep","value":"${SLEEP}"}]'],
-     u'archives': [u'[]'], u'description': [u''], u'prepares': [u'[{"type":"delete","value":"${output}"},{"type":"mkdir","value":"test"}]']}, follow=True)
-  assert_true(Node.objects.filter(name=name).exists(), response)
-  return Node.objects.get(name=name)
-
-
-def create_workflow():
-  c = make_logged_in_client()
-
-  workflow_count = Workflow.objects.count()
-  response = c.get(reverse('oozie:create_workflow'))
-  assert_equal(workflow_count, Workflow.objects.count(), response)
-
-  response = c.post(reverse('oozie:create_workflow'), WORKFLOW_DICT, follow=True)
-  assert_equal(200, response.status_code)
-  assert_equal(workflow_count + 1, Workflow.objects.count(), response)
-
-  wf = Workflow.objects.get()
-  assert_not_equal('', wf.deployment_dir)
-  # TODO test for existence on HDFS
-
-  action1 = add_action(wf.id, wf.start.id, 'action-name-1')
-  action2 = add_action(wf.id, action1.id, 'action-name-2')
-  action3 = add_action(wf.id, action2.id, 'action-name-3')
-
-  return wf
-
-
-def create_coordinator(workflow, c=None):
-  if c is None:
-    c = make_logged_in_client()
-
-  coord_count = Coordinator.objects.count()
-  response = c.get(reverse('oozie:create_coordinator'))
-  assert_equal(coord_count, Coordinator.objects.count(), response)
-
-  response = c.post(reverse('oozie:create_coordinator'), {
-                        u'name': [u'MyCoord'], u'description': [u'Description of my coodinator'],
-                        u'workflow': [workflow.id],
-                        u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
-                        u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
-                        u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
-                        u'timezone': [u'America/Los_Angeles'],
-                        u'parameters': [u'[{"name":"market","value":"US,France"}]'],
-                        u'timeout': [u'100'],
-                        u'concurrency': [u'3'],
-                        u'execution': [u'FIFO'],
-                        u'throttle': [u'10'],
-                        u'schema_version': [u'uri:oozie:coordinator:0.1']
-  })
-  assert_equal(coord_count + 1, Coordinator.objects.count(), response)
-
-  return Coordinator.objects.get()
-
-
-def create_dataset(coord):
-  c = make_logged_in_client()
-
-  response = c.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]), {
-                        u'create-name': [u'MyDataset'], u'create-frequency_number': [u'1'], u'create-frequency_unit': [u'days'],
-                        u'create-uri': [u'/data/${YEAR}${MONTH}${DAY}'],
-                        u'create-start_0': [u'07/01/2012'], u'create-start_1': [u'12:00 AM'],
-                        u'create-timezone': [u'America/Los_Angeles'], u'create-done_flag': [u''],
-                        u'create-description': [u'']})
-  data = json.loads(response.content)
-  assert_equal(0, data['status'], data['data'])
-
-
-def create_coordinator_data(coord):
-  c = make_logged_in_client()
-
-  response = c.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'input']),
-                         {u'input-name': [u'input_dir'], u'input-dataset': [u'1']})
-  data = json.loads(response.content)
-  assert_equal(0, data['status'], data['data'])
-
-
-def move(c, wf, direction, action):
-  try:
-    LOG.info(wf.get_hierarchy())
-    LOG.info('%s %s' % (direction, action))
-    assert_equal(200, c.post(reverse(direction, args=[action.id]), {}, follow=True).status_code)
-  except:
-    raise
-
-
-def move_up(c, wf, action):
-  move(c, wf, 'oozie:move_up_action', action)
-
-
-def move_down(c, wf, action):
-  move(c, wf, 'oozie:move_down_action', action)
-
-
-
-class TestDashboard:
+class TestPermissions(OozieBase):
 
   def setUp(self):
-    Workflow.objects.all().delete()
-    Coordinator.objects.all().delete()
-
     self.c = make_logged_in_client()
     self.wf = create_workflow()
 
+    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-2').id]), {}, follow=True)
+    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-3').id]), {}, follow=True)
+
+    node_ids = [node.id for node in self.wf.node_list]
+
+    self.WF_POST = {u'node_set-TOTAL_FORMS': [u'4'], u'node_set-MAX_NUM_FORMS': [u'0'], u'node_set-INITIAL_FORMS': [u'4'],
+               u'node_set-0-id': [node_ids[0]], u'node_set-0-workflow': [self.wf.id],
+               u'node_set-1-id': [node_ids[1]], u'node_set-1-workflow': [self.wf.id],
+               u'node_set-2-id': [node_ids[2]], u'node_set-2-workflow': [self.wf.id],
+               u'node_set-3-id': [node_ids[3]], u'node_set-3-workflow': [self.wf.id]}
+    self.WF_POST.update(WORKFLOW_DICT)
+
+
+
+  def test_workflow_permissions(self):
+    response = self.c.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
+    assert_true('Editor' in response.content, response.content)
+    assert_true('Workflow wf-name-1' in response.content, response.content)
+    assert_false(self.wf.is_shared)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_workflows'))
+      assert_false('wf-name-1' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:list_workflows'))
+      assert_false('wf-name-1' in response.content, response.content)
+    finally:
+      finish()
+
+    # View
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Share it !
+    post = self.WF_POST.copy()
+    post['is_shared'] = [u'on']
+    self.c.post(reverse('oozie:edit_workflow', args=[self.wf.id]), post, follow=True)
+    self.wf = Workflow.objects.get(name='wf-name-1')
+    assert_true(self.wf.is_shared)
+
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_workflows'))
+      assert_equal(200, response.status_code)
+      assert_true('wf-name-1' in response.content, response.content)
+    finally:
+      finish()
+
+    # View
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
+      assert_false('Permission denied' in response.content, response.content)
+      assert_false('Save' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:edit_workflow', args=[self.wf.id]), post, follow=True)
+      assert_true('Not allowed' in response.content, response.content)
+    finally:
+      finish()
+
+    # Submit
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      try:
+        response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
+        assert_false('Permission denied' in response.content, response.content)
+      except IOError:
+        pass
+    finally:
+      finish()
+
+    # Resubmit
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      history, created = History.objects.get_or_create(job=self.wf, oozie_job_id=MockOozieApi.WORKFLOW_IDS[0],
+                                                       defaults={'submitter': User.objects.get(username='test'), 'properties': '[]'})
+      job_id = history.oozie_job_id
+      response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      try:
+        history, created = History.objects.get_or_create(job=self.wf, oozie_job_id=MockOozieApi.WORKFLOW_IDS[0],
+                                                         defaults={'submitter': User.objects.get(username='test'), 'properties': '[]'})
+        job_id = history.oozie_job_id
+        response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
+        assert_false('Permission denied' in response.content, response.content)
+      except IOError:
+        pass
+    finally:
+      finish()
+
+    # Delete
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:delete_workflow', args=[self.wf.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    response = self.c.post(reverse('oozie:delete_workflow', args=[self.wf.id]), follow=True)
+    assert_equal(200, response.status_code)
+
+
+  def test_workflow_action_permissions(self):
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    action1 = Node.objects.get(name='action-name-1')
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_action', args=[action1.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:edit_action', args=[action1.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Add
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      try:
+        add_action(self.wf.id, self.wf.start.id, 'action-name-1000', client_not_me)
+        raise Exception('Should be denied to add an action to someone else workflow')
+      except AssertionError:
+        pass
+    finally:
+      finish()
+
+    action1.workflow.is_shared = True
+    action1.workflow.save()
+
+    # Delete
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:delete_action', args=[action1.id]))
+      assert_true('Not allowed' in response.content, response.content)
+    finally:
+      finish()
+
+    action1.workflow.is_shared = True
+    action1.workflow.save()
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_action', args=[action1.id]))
+      assert_false('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:edit_action', args=[action1.id]))
+      assert_true('Not allowed' in response.content, response.content)
+    finally:
+      finish()
+
+    # Delete
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:delete_action', args=[action1.id]))
+      assert_true('Not allowed' in response.content, response.content)
+    finally:
+      finish()
+
+
+  def test_coordinator_permissions(self):
+    coord = create_coordinator(self.wf)
+
+    response = self.c.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+    assert_true('Editor' in response.content, response.content)
+    assert_true('value="Save"' in response.content, response.content)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_coordinators'))
+      assert_false('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:list_coordinators'))
+      assert_false('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+
+    # View
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_false('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+
+    # Share it !
+    post = self.WF_POST.copy()
+    post['is_shared'] = [u'on']
+    self.c.post(reverse('oozie:edit_workflow', args=[coord.workflow.id]), post, follow=True)
+    wf = Workflow.objects.get(id=coord.workflow.id)
+    assert_true(wf.is_shared)
+
+    post = COORDINATOR_DICT.copy()
+    post.update({
+                 u'datainput_set-TOTAL_FORMS': [u'0'], u'datainput_set-INITIAL_FORMS': [u'0'], u'dataset_set-INITIAL_FORMS': [u'0'],
+                 u'dataoutput_set-INITIAL_FORMS': [u'0'], u'datainput_set-MAX_NUM_FORMS': [u'0'], u'output-MAX_NUM_FORMS': [u''],
+                 u'output-INITIAL_FORMS': [u'0'], u'dataoutput_set-TOTAL_FORMS': [u'0'], u'input-TOTAL_FORMS': [u'0'],
+                 u'dataset_set-MAX_NUM_FORMS': [u'0'], u'dataoutput_set-MAX_NUM_FORMS': [u'0'], u'input-MAX_NUM_FORMS': [u''],
+                 u'dataset_set-TOTAL_FORMS': [u'0'], u'input-INITIAL_FORMS': [u'0'], u'output-TOTAL_FORMS': [u'0']})
+
+    post['is_shared'] = [u'on']
+    post['workflow'] = coord.workflow.id
+    self.c.post(reverse('oozie:edit_coordinator', args=[coord.id]), post)
+    coord = Coordinator.objects.get(id=coord.id)
+    assert_true(coord.is_shared)
+
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_coordinators'))
+      assert_equal(200, response.status_code)
+      assert_true('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+
+    # View
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_false('Permission denied' in response.content, response.content)
+      assert_false('value="Save"' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_false('MyCoord' in response.content, response.content)
+      assert_true('Not allowed' in response.content, response.content)
+    finally:
+      finish()
+
+    # Submit
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      try:
+        response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
+        assert_false('Permission denied' in response.content, response.content)
+      except IOError:
+        pass
+    finally:
+      finish()
+
+    # Resubmit
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      history, created = History.objects.get_or_create(job=coord, oozie_job_id=MockOozieApi.COORDINATOR_IDS[0],
+                                                       defaults={'submitter': User.objects.get(username='test'), 'properties': '[]'})
+      oozie_job_id = history.oozie_job_id
+      response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      try:
+        history, created = History.objects.get_or_create(job=coord, oozie_job_id=MockOozieApi.COORDINATOR_IDS[0],
+                                                         defaults={'submitter': User.objects.get(username='test'), 'properties': '[]'})
+        oozie_job_id = history.oozie_job_id
+        response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
+        assert_false('Permission denied' in response.content, response.content)
+      except IOError:
+        pass
+    finally:
+      finish()
+
+    # Delete
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:delete_coordinator', args=[coord.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    response = self.c.post(reverse('oozie:delete_coordinator', args=[coord.id]), follow=True)
+    assert_equal(200, response.status_code)
+
+
+class TestEditorWithOozie(OozieBase):
+
+  def setUp(self):
+    self.c = make_logged_in_client()
+    self.wf = create_workflow()
+
+
+  def tearDown(self):
+    self.wf.delete()
+
+
+  def test_create_workflow(self):
+    dir_stat = self.cluster.fs.stats(self.wf.deployment_dir)
+    assert_equal('test', dir_stat.user)
+    assert_equal('hue', dir_stat.group)
+    assert_equal('40711', '%o' % dir_stat.mode)
+
+
+  def test_clone_workflow(self):
+    workflow_count = Workflow.objects.count()
+
+    response = self.c.post(reverse('oozie:clone_workflow', args=[self.wf.id]), {}, follow=True)
+
+    assert_equal(workflow_count + 1, Workflow.objects.count(), response)
+
+    wf2 = Workflow.objects.latest('id')
+    assert_not_equal(self.wf.id, wf2.id)
+    assert_equal(self.wf.node_set.count(), wf2.node_set.count())
+
+    node_ids = set(self.wf.node_set.values_list('id', flat=True))
+    for node in wf2.node_set.all():
+      assert_false(node.id in node_ids)
+
+    assert_not_equal(self.wf.deployment_dir, wf2.deployment_dir)
+    assert_not_equal('', wf2.deployment_dir)
+
+
+  def test_import_action(self):
+    # Setup jobsub examples
+    if not jobsub_setup.Command().has_been_setup():
+      jobsub_setup.Command().handle()
+
+    # There should be 3 from examples
+    jobsub_design = OozieDesign.objects.all()[0]
+    node_size = len(Node.objects.all())
+    kwargs = dict(workflow=self.wf.id, parent_action_id=self.wf.end.get_parents()[0].id)
+    response = self.c.post(reverse('oozie:import_action', kwargs=kwargs), {'action_id': jobsub_design.id})
+    assert_equal(302, response.status_code)
+    assert_equal(node_size + 1, len(Node.objects.all()))
+
+    # There should now be an imported action at the end of Node list
+    # Need to test properties to make sure we got it right
+    # Must also make sure that jobsub field values are translated
+    translation_regex = re.compile('(?<!\$)\$(\w+)')
+    node = Node.objects.all()[len(Node.objects.all())-1].get_full_node()
+    for field in node.PARAM_FIELDS:
+      assert_equal(translation_regex.sub(r'${\1}', getattr(jobsub_design.get_root_action(), field)), getattr(node, field))
+
+
+class TestOozieSubmissions(OozieBase):
+
+  def test_submit_mapreduce_action(self):
+    wf = Workflow.objects.get(name='MapReduce')
+
+    response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]),
+                           data={u'form-MAX_NUM_FORMS': [u''],
+                                u'form-INITIAL_FORMS': [u'1'], u'form-0-name': [u'REDUCER_SLEEP_TIME'],
+                                u'form-0-value': [u'1'], u'form-TOTAL_FORMS': [u'1']},
+                           follow=True)
+    job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
+    assert_equal('SUCCEEDED', job.status)
+
+
+  def test_submit_java_action(self):
+    wf = Workflow.objects.get(name='Sequential Java')
+
+    response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]),
+                           data={u'form-MAX_NUM_FORMS': [u''],
+                                u'form-0-name': [u'records'], u'form-0-value': [u'10'],
+                                u'form-1-name': [u' output_dir '], u'form-1-value': [u'${nameNode}/user/test/out/terasort'],
+                                u'form-INITIAL_FORMS': [u'2'], u'form-TOTAL_FORMS': [u'2']},
+                           follow=True)
+    job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
+    assert_equal('SUCCEEDED', job.status)
+
+
+class TestDashboard(OozieMockBase):
 
   def test_manage_workflow_dashboard(self):
     # Kill button in response
@@ -1191,4 +1300,124 @@ class TestDashboard:
 
     response = client_not_me.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]))
     assert_true('Permission denied' in response.content, response.content)
+
+
+
+# Utils
+WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''],
+                 u'schema_version': [u'uri:oozie:workflow:0.2'],
+                 u'parameters': [u'[{"name":"market","value":"US"}]'],
+                 u'job_xml': [u'jobconf.xml'],
+                 u'job_properties': [u'[{"name":"sleep-all","value":"${SLEEP}"}]']
+}
+COORDINATOR_DICT = {u'name': [u'MyCoord'], u'description': [u'Description of my coodinator'],
+                    u'workflow': [u'1'],
+                    u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
+                    u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
+                    u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
+                    u'timezone': [u'America/Los_Angeles'],
+                    u'parameters': [u'[{"name":"market","value":"US,France"}]'],
+                    u'timeout': [u'100'],
+                    u'concurrency': [u'3'],
+                    u'execution': [u'FIFO'],
+                    u'throttle': [u'10'],
+                    u'schema_version': [u'uri:oozie:coordinator:0.1']
+}
+ACTION_DICT = {
+       u'files': [u'[]'], u'name': ['name'], u'jar_path': ['/user/hue/oozie/examples/lib/hadoop-examples.jar'],
+       u'job_properties': [u'[{"name":"sleep","value":"${SLEEP}"}]'],
+       u'archives': [u'[]'], u'description': [u''],
+       u'prepares': [u'[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]'],
+}
+
+# Beware: client not consistent with self.c in TestEditor
+def add_action(workflow, action, name, c=None):
+  if c is None:
+    c = make_logged_in_client()
+
+  post = ACTION_DICT.copy()
+  post['name'] = name
+  response = c.post("/oozie/new_action/%s/%s/%s" % (workflow, 'mapreduce', action), post, follow=True)
+
+  assert_true(Node.objects.filter(name=name).exists(), response)
+  return Node.objects.get(name=name)
+
+
+def create_workflow():
+  c = make_logged_in_client()
+
+  Workflow.objects.filter(name='wf-name-1').delete()
+  Node.objects.filter(name__in=['action-name-1', 'action-name-2', 'action-name-3']).delete()
+
+  workflow_count = Workflow.objects.count()
+  response = c.get(reverse('oozie:create_workflow'))
+  assert_equal(workflow_count, Workflow.objects.count(), response)
+
+  response = c.post(reverse('oozie:create_workflow'), WORKFLOW_DICT, follow=True)
+  assert_equal(200, response.status_code)
+  assert_equal(workflow_count + 1, Workflow.objects.count(), response)
+
+  wf = Workflow.objects.get(name='wf-name-1')
+  assert_not_equal('', wf.deployment_dir)
+
+  action1 = add_action(wf.id, wf.start.id, 'action-name-1')
+  action2 = add_action(wf.id, action1.id, 'action-name-2')
+  action3 = add_action(wf.id, action2.id, 'action-name-3')
+
+  return wf
+
+
+def create_coordinator(workflow, c=None):
+  if c is None:
+    c = make_logged_in_client()
+
+  coord_count = Coordinator.objects.count()
+  response = c.get(reverse('oozie:create_coordinator'))
+  assert_equal(coord_count, Coordinator.objects.count(), response)
+
+  post = COORDINATOR_DICT.copy()
+  post['workflow'] = workflow.id
+  response = c.post(reverse('oozie:create_coordinator'), post)
+  assert_equal(coord_count + 1, Coordinator.objects.count(), response)
+
+  return Coordinator.objects.get(name='MyCoord')
+
+
+def create_dataset(coord):
+  c = make_logged_in_client()
+
+  response = c.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]), {
+                        u'create-name': [u'MyDataset'], u'create-frequency_number': [u'1'], u'create-frequency_unit': [u'days'],
+                        u'create-uri': [u'/data/${YEAR}${MONTH}${DAY}'],
+                        u'create-start_0': [u'07/01/2012'], u'create-start_1': [u'12:00 AM'],
+                        u'create-timezone': [u'America/Los_Angeles'], u'create-done_flag': [u''],
+                        u'create-description': [u'']})
+  data = json.loads(response.content)
+  assert_equal(0, data['status'], data['data'])
+
+
+def create_coordinator_data(coord):
+  c = make_logged_in_client()
+
+  response = c.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'input']),
+                         {u'input-name': [u'input_dir'], u'input-dataset': [u'1']})
+  data = json.loads(response.content)
+  assert_equal(0, data['status'], data['data'])
+
+
+def move(c, wf, direction, action):
+  try:
+    LOG.info(wf.get_hierarchy())
+    LOG.info('%s %s' % (direction, action))
+    assert_equal(200, c.post(reverse(direction, args=[action.id]), {}, follow=True).status_code)
+  except:
+    raise
+
+
+def move_up(c, wf, action):
+  move(c, wf, 'oozie:move_up_action', action)
+
+
+def move_down(c, wf, action):
+  move(c, wf, 'oozie:move_down_action', action)
 

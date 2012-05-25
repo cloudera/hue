@@ -5,19 +5,19 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'Sqoop.script_path'
         db.alter_column('oozie_sqoop', 'script_path', self.gf('django.db.models.fields.TextField')(blank=True))
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'Sqoop.script_path'
         db.alter_column('oozie_sqoop', 'script_path', self.gf('django.db.models.fields.CharField')(max_length=256, blank=True))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -251,5 +251,5 @@ class Migration(SchemaMigration):
             'start': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'start_workflow'", 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-    
+
     complete_apps = ['oozie']

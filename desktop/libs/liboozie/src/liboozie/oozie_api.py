@@ -225,7 +225,7 @@ class OozieApi(object):
 
   def submit_job(self, properties=None):
     """
-    submit_workflow(properties=None, id=None) -> jobid
+    submit_job(properties=None, id=None) -> jobid
 
     Submit a job to Oozie. May raise PopupException.
     """

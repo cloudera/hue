@@ -41,6 +41,7 @@ fi
 build_hadoop
 build_mr1
 build_hive
+build_oozie
 
 make apps
 

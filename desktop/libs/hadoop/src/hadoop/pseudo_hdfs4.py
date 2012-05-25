@@ -17,6 +17,7 @@
 
 
 import atexit
+import getpass
 import logging
 import pwd
 import os
@@ -94,6 +95,10 @@ class PseudoHdfs4(object):
   @property
   def mr1_env(self):
     return self._mr1_env
+
+  @property
+  def log_dir(self):
+    return self._log_dir
 
   @property
   def fs_default_name(self):
@@ -237,6 +242,16 @@ class PseudoHdfs4(object):
     # Start MR1
     self._start_mr1(env)
 
+    # Make sure /tmp is 1777
+    self.fs.setuser(self.superuser)
+    if not self.fs.isdir('/tmp'):
+      self.fs.mkdir('/tmp', 01777)
+    else:
+      self.fs.chmod('/tmp', 01777)
+
+    self.fs.chmod(self._tmpdir, 01777)
+    self.fs.chmod(self._tmpdir + '/hadoop_tmp_dir/mapred', 01777)
+
 
   def _start_mr1(self, env):
     LOG.info("Starting MR1")
@@ -290,7 +305,6 @@ class PseudoHdfs4(object):
     finally:
       stdout.close()
       stderr.close()
-
 
   def _log_exit(self, proc_name, exit_code):
     """Log the stdout and stderr for a process"""
@@ -392,8 +406,6 @@ class PseudoHdfs4(object):
       'dfs.datanode.ipc.address': 'localhost:0',
       'dfs.replication': 1,
       'dfs.safemode.min.datanodes': 1,
-      'hadoop.proxyuser.hue.hosts': '*',
-      'hadoop.proxyuser.hue.groups': '*',
     }
     write_config(hdfs_configs, self._tmppath('conf/hdfs-site.xml'))
 
@@ -410,6 +422,12 @@ class PseudoHdfs4(object):
       'hadoop.security.authentication': 'simple',
       'hadoop.proxyuser.%s.groups' % (self.superuser,): 'users,supergroup',
       'hadoop.proxyuser.%s.hosts' % (self.superuser,): 'localhost',
+      'hadoop.proxyuser.hue.hosts': '*',
+      'hadoop.proxyuser.hue.groups': '*',
+      'hadoop.proxyuser.oozie.hosts': '*',
+      'hadoop.proxyuser.oozie.groups': '*',
+      'hadoop.proxyuser.%s.hosts' % getpass.getuser(): '*',
+      'hadoop.proxyuser.%s.groups' % getpass.getuser(): '*',
       'hadoop.tmp.dir': self._tmppath('hadoop_tmp_dir'),
     }
     write_config(core_configs, self._tmppath('conf/core-site.xml'))
@@ -467,6 +485,7 @@ def shared_cluster():
       hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
       hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
       hadoop.conf.MR_CLUSTERS['default'].HOST.set_for_testing('localhost'),
+      hadoop.conf.MR_CLUSTERS['default'].PORT.set_for_testing(cluster._jt_port),
       hadoop.conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(cluster.jt_thrift_port),
     ]
 

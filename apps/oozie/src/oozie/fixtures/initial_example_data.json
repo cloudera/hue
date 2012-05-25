@@ -28,7 +28,7 @@
     }
   },
   {
-    "pk": 7,
+    "pk": null,
     "model": "oozie.job",
     "fields": {
       "is_shared": true,
