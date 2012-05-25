@@ -134,7 +134,7 @@ class Shell(object):
     Returns the NamedTemporaryFile that contains the combined delegation tokens.
     """
     merged_token_file = tempfile.NamedTemporaryFile(dir=delegation_token_dir)
-    merge_tool_args = [hadoop.KERBEROS.HDFS_CLUSTERS['default'].HADOOP_BIN.get(), 'jar']
+    merge_tool_args = [hadoop.conf.HDFS_CLUSTERS['default'].HADOOP_BIN.get(), 'jar']
     merge_tool_args += [hadoop.conf.CREDENTIALS_MERGER_JAR.get(), merged_token_file.name]
     merge_tool_args += [token_file.name for token_file in delegation_token_files]
     LOG.debug("Merging credentials files with command: '%s'" % (' '.join(merge_tool_args)))
