@@ -81,6 +81,7 @@ def oozie_job(request, jobid):
     'design_link': design_link,
     'definition': definition,
     'log': log,
+    'jobid': jobid,
   })
 
 
@@ -249,7 +250,6 @@ def submit_design(request, design_id):
                     _("Access denied: submit design %(id)s") % {'id': design_id})
 
   # Expect the parameter mapping in the POST data
-  param_mapping = request.POST
   design_obj.bind_parameters(request.POST)
 
   try:

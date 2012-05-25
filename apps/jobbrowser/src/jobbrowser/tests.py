@@ -23,8 +23,10 @@ from nose.plugins.skip import SkipTest
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop import mini_cluster
 from jobsub.models import JobDesign
-from jobsub.tests import parse_out_id, watch_till_complete
+from liboozie.oozie_api_test import OozieServerProvider
+
 from jobbrowser import models, views
+
 
 def test_dots_to_camel_case():
   assert_equal("fooBar", models.dots_to_camel_case("foo.bar"))

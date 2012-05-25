@@ -124,7 +124,7 @@ class Job(models.Model):
   def is_deployed(self, fs):
     return self.deployment_dir != '' and fs.exists(self.deployment_dir)
 
-  def __unicode__(self):
+  def __str__(self):
     return '%s - %s' % (self.name, self.owner)
 
   def get_full_node(self):

@@ -283,7 +283,7 @@ class Job(object):
   def is_running(self):
     return self.status in Job.RUNNING_STATUSES
 
-  def __unicode__(self):
+  def __str__(self):
     return '%s - %s' % (self.id, self.status)
 
 

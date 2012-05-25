@@ -54,22 +54,18 @@ class OozieServerProvider(object):
 
   @classmethod
   def wait_until_completion(cls, oozie_jobid, timeout=300.0, step=5):
-    sleep = 0
     job = cls.oozie.get_job(oozie_jobid)
-    if step < 0:
-      step = 1
     start = time.time()
 
     while job.is_running() and time.time() - start < timeout:
-      time.sleep(sleep)
-      sleep = sleep + step
+      time.sleep(step)
       LOG.info('Checking status of %s...' % oozie_jobid)
       job = cls.oozie.get_job(oozie_jobid)
-      LOG.info('Status: %s' % job)
+      LOG.info('Status after %d: %s' % (time.time() - start, job))
 
     if job.is_running():
       logs = cls.oozie.get_job_log(oozie_jobid)
-      raise Exception("%s took too long to complete: %s" % (oozie_jobid, logs))
+      raise Exception("%s took more than %s to complete: %s" % (oozie_jobid, timeout, logs))
     else:
       LOG.info('Job duration %s: %d' % (job.id, time.time() - start))
 

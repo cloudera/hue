@@ -14,38 +14,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# Tests for job submission.
-#
-# Notable absences:
-#  Test pig and streaming.
-#  Explicit test of error handling.
-#  Test what happens when file doesn't exist for jar submission, say.
 
 import copy
-import re
-import time
-import posixpath
-import shutil
-import os
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
 from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+from liboozie.oozie_api_test import OozieServerProvider
 
 from jobsub import conf
 from jobsub.management.commands import jobsub_setup
-from jobsub.models import JobDesign
+from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction
 from jobsub.parameterization import recursive_walk, find_variables, substitute_variables
 
-from hadoop import mini_cluster
-from hadoop import pseudo_hdfs4
-from hadoop.fs.hadoopfs import Hdfs
-import hadoop
 
 def test_recursive_walk():
   def f(_):
@@ -65,364 +48,235 @@ def test_recursive_walk():
   Dorig = copy.deepcopy(D)
   recursive_walk(f, D)
   assert_equal(4, f.leafs)
-  assert_equal(Dorig, D, "Object unexpectedly modified.")
+  assert_equal(Dorig, D, 'Object unexpectedly modified.')
 
   # Test application and replacement
   def square(x):
-    return x*x
+    return x * x
 
   assert_equal(dict(a=4, b=9, c=dict(d=16, e=25)), recursive_walk(square, D))
 
 def test_find_variables():
-  A = dict(one="$a", 
-        two=dict(c="foo $b $$"), 
-        three=["${foo}", "xxx ${foo}"])
-  assert_equal(set(["a", "b", "foo"]),
+  A = dict(one='$a',
+        two=dict(c='foo $b $$'),
+        three=['${foo}', 'xxx ${foo}'])
+  assert_equal(set(['a', 'b', 'foo']),
     find_variables(A))
 
 def test_substitute_variables():
-  data = ["$greeting", dict(a="${where} $where")]
-  assert_equal(["hi", dict(a="there there")], 
-    substitute_variables(data, dict(greeting="hi", where="there")))
+  data = ['$greeting', dict(a='${where} $where')]
+  assert_equal(['hi', dict(a='there there')],
+    substitute_variables(data, dict(greeting='hi', where='there')))
 
-  data = [None, "foo", dict(a=None)]
-  assert_equal(data, substitute_variables(data, dict()), "Nothing to substitute")
+  data = [None, 'foo', dict(a=None)]
+  assert_equal(data, substitute_variables(data, dict()), 'Nothing to substitute')
 
 def test_job_design_cycle():
   """
   Tests for the "job design" CMS.
   Submission requires a cluster, so that's separate.
   """
-  raise SkipTest
   c = make_logged_in_client()
 
   # New should give us a form.
-  response = c.get("/jobsub/new/jar")
-  assert_true("form" in response.context[1]) # Two templates are evaluated.
-  assert_equal(1, response.content.count("<form method"))
+  response = c.get('/jobsub/new_design/java')
+  assert_equal(1, response.content.count('action="/jobsub/new_design/java" method="POST"'))
 
   # Streaming also:
-  response = c.get("/jobsub/new/streaming")
-  assert_true("form" in response.context[1])
+  response = c.get('/jobsub/new_design/streaming')
+  assert_equal(1, response.content.count('action="/jobsub/new_design/streaming" method="POST"'))
 
   # Post back to create a new submission
-  response = c.post("/jobsub/new/jar", 
-    dict(name="test1", description="descr", jarfile="myfile", arguments="x y z", submit="Save"))
-  job_id = response.context["saved"]
-  assert_true(job_id)
+  design_count = OozieDesign.objects.count()
+  response = c.post('/jobsub/new_design/java', {
+     u'wf-name': [u'name-1'],
+     u'wf-description': [u'description name-1'],
+     u'action-args': [u'x y z'],
+     u'action-main_class': [u'MyClass'],
+     u'action-jar_path': [u'myfile.jar'],
+     u'action-java_opts': [u''],
+     u'action-archives': [u'[]'],
+     u'action-job_properties': [u'[]'],
+     u'action-files': [u'[]']})
+  assert_equal(design_count + 1, OozieDesign.objects.count())
+  job_id = OozieDesign.objects.get(name='name-1').id
+
+  response = c.post('/jobsub/new_design/mapreduce', {
+     u'wf-name': [u'name-2'],
+     u'wf-description': [u'description name-2'],
+     u'action-args': [u'x y z'],
+     u'action-jar_path': [u'myfile.jar'],
+     u'action-archives': [u'[]'],
+     u'action-job_properties': [u'[]'],
+     u'action-files': [u'[]']})
 
   # Follow it
-  edit_url = "/jobsub/edit/%d" % job_id
+  edit_url = '/jobsub/edit_design/%d' % job_id
   response = c.get(edit_url)
-  # Make sure we've seen our changes
-  assert_true("x y z" in response.content)
+  assert_true('x y z' in response.content, response.content)
+
   # Make an edit
-  response = c.get(edit_url)
-  assert_equal(1, response.content.count("<form method"))
-  response = c.post(edit_url,
-    dict(name="test1", jarfile="myfile", arguments="a b c", submit="Save"))
-  assert_equal(job_id, response.context["saved"])
-  assert_true("a b c" in c.get(edit_url).content)
+  response = c.post(edit_url, {
+     u'wf-name': [u'name-1'],
+     u'wf-description': [u'description name-1'],
+     u'action-args': [u'a b c'],
+     u'action-main_class': [u'MyClass'],
+     u'action-jar_path': [u'myfile.jar'],
+     u'action-java_opts': [u''],
+     u'action-archives': [u'[]'],
+     u'action-job_properties': [u'[]'],
+     u'action-files': [u'[]']})
+  assert_true('a b c' in c.get(edit_url).content)
 
-  # Let's try save-submit
-  response = c.post(edit_url, dict(name="test1", jarfile="myfile", arguments="a b c $fancy_parameter",
-    save_submit="on"))
-  assert_true("fancy_parameter" in response.content)
+  # Try to post
+  response = c.post('/jobsub/new_design/java',
+    dict(name='test2', jarfile='myfile.jar', arguments='x y z', submit='Save'))
+  assert_false('This field is required' in response)
 
-  # Add a second one, as a different user
-  # Logging out and logging back in over Django's test client
-  # doesn't seem to work, so we use a new client.
-  c.logout()
-  c = make_logged_in_client("test2", is_superuser=False)
-  grant_access("test2", "test-grp", "jobsub")
-
-  response = c.post("/jobsub/new/jar", 
-    dict(name="test2", jarfile="myfile", arguments="x y z", submit="Save"))
-  assert_true(response.context["saved"])
-  
   # Now check list
-  response = c.get("/jobsub/")
-  assert_true("test1" in [ job_design.name for job_design in response.context["jobdesigns"] ])
-  assert_true("test2" in [ job_design.name for job_design in response.context["jobdesigns"] ])
+  response = c.get('/jobsub/')
+  for design in OozieDesign.objects.all():
+    assert_true(design.name in response.content, response.content)
 
-  # With an owner filter...
-  response = c.get("/jobsub/", dict(owner="test2"))
-  assert_false("test1" in [ job_design.name for job_design in response.context["jobdesigns"] ])
-  assert_true("test2" in [ job_design.name for job_design in response.context["jobdesigns"] ])
+  # With some filters
+  response = c.get('/jobsub/', dict(name='name-1'))
+  assert_true('name-1' in response.content, response.content)
+  assert_false('name-2' in response.content, response.content)
 
-  # Capture the id for later use
-  id = response.context["jobdesigns"][0].id
+  response = c.get('/jobsub/', dict(owner='doesnotexist'))
+  assert_false('doesnotexist' in response.content)
 
-  response = c.get("/jobsub/", dict(owner="doesnotexist"))
-  assert_equal(0, len(response.context["jobdesigns"]))
+  response = c.get('/jobsub/', dict(owner='test', name='name-1'))
+  assert_true('name-1' in response.content, response.content)
+  assert_false('name-2' in response.content, response.content)
 
-  # With a name filter...
-  # Create a job design without the string "test" in its name
-  response = c.post("/jobsub/new/jar",
-    dict(name="newjob1", jarfile="myfile", arguments="x y z", submit="Save"))
-  assert_true(response.context["saved"])
-
-  response = c.get('/jobsub/', dict(name="test"))
-  assert_true('test1' in [ job_design.name for job_design in response.context['jobdesigns'] ])
-  assert_true('test2' in [ job_design.name for job_design in response.context['jobdesigns'] ])
-  assert_false('newjob1' in [job_design.name for job_design in response.context['jobdesigns'] ])
+  response = c.get('/jobsub/', dict(name="name"))
+  assert_true('name-1' in response.content, response.content)
+  assert_true('name-2' in response.content, response.content)
+  assert_false('doesnotexist' in response.content, response.content)
 
   # Combined filters
-  response = c.get('/jobsub/', dict(owner="est2", name="tes"))
-  assert_false('test1' in [ job_design.name for job_design in response.context['jobdesigns'] ])
-  assert_true('test2' in [ job_design.name for job_design in response.context['jobdesigns'] ])
-  assert_false('newjob1' in [job_design.name for job_design in response.context['jobdesigns'] ])
+  response = c.get('/jobsub/', dict(owner="test", name="name-2"))
+  assert_false('name-1' in response.content, response.content)
+  assert_true('name-2' in response.content, response.content)
+  assert_false('doesnotexist' in response.content, response.content)
 
-  response = c.get('/jobsub/', dict(name='doesnotexist'))
-  assert_equal(0, len(response.context['jobdesigns']))
-
-  # Let's try delete
-  assert_true(JobDesign.objects.get(id=id))
-  response = c.post("/jobsub/delete/%d" % id)
-  assert_raises(JobDesign.DoesNotExist, JobDesign.objects.get, id=id)
+  # Try delete
+  job_id = OozieDesign.objects.get(name='name-1').id
+  response = c.post('/jobsub/delete_design/%d' % job_id)
+  assert_raises(OozieDesign.DoesNotExist, OozieDesign.objects.get, id=job_id)
 
   # Let's make sure we can't delete other people's designs.
-  not_mine = JobDesign.objects.get(owner=User.objects.get(username="test"),name="test1")
-  response = c.post("/jobsub/delete/%d" % not_mine.id)
-  assert_true("Permission Denied." in response.context["error"])
+  c.logout()
+  c = make_logged_in_client('test2', is_superuser=False)
+  grant_access('test2', 'test-grp', 'jobsub')
 
-def setup_cluster_fs(cluster):
-  """
-  Irritatingly, pi doesn't run unless /user/test exists.
-  """
-  cluster.fs.setuser(cluster.superuser)
-  if not cluster.fs.exists("/user/test"):
-    cluster.fs.mkdir("/user/test")
-  cluster.fs.chown("/user/test", "test", "test")
-  if not cluster.fs.exists("/tmp"):
-    cluster.fs.mkdir("/tmp")
-  cluster.fs.chmod("/tmp", int('777', 8))
-  cluster.fs.setuser("test")
-setup_cluster_fs.__test__ = False # Don't confuse nose.
+  not_mine = OozieDesign.objects.get(name='name-2')
+  response = c.post('/jobsub/delete_design/%d' % not_mine.id)
+  assert_true('Permission denied.' in response.content, response.content)
 
-@attr('requires_hadoop')
-def test_job_submission():
-  raise SkipTest
-  JARNAME = posixpath.basename(hadoop.conf.HADOOP_EXAMPLES_JAR.get())
-  c = make_logged_in_client()
-  cluster = mini_cluster.shared_cluster(conf=True)
-  jobsubd = in_process_jobsubd(cluster.config_dir)
 
-  # Remember the number of pending jobs beforehand
-  n_pending = c.get("/jobsub/status_bar/").context["pending_count"]
+class TestJobsubWithHadoop(OozieServerProvider):
 
-  try:
-      # Create a job
-      response = c.post("/jobsub/new/jar", dict(
-        name="wordcount", 
-        jarfile="/user/test/%s" % JARNAME,
-        arguments="wordcount $input $output", submit="Save"))
-      design_id = response.context["saved"]
+  def setUp(self):
+    OozieServerProvider.setup_class()
+    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
+    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/test', 0777, True)
+    self.client = make_logged_in_client()
 
-      # Submission should get a parameterization form
-      response = c.get("/jobsub/submit/%d" % design_id)
-      assert_true("<form " in response.content)
+  def test_jobsub_setup(self):
+    # User 'test' triggers the setup of the examples.
+    # 'hue' home will be deleted, the examples installed in the new one
+    # and 'test' will try to access them.
+    self.cluster.fs.setuser('test')
 
-      # Create home dir
-      setup_cluster_fs(cluster)
+    username = 'hue'
+    home_dir = '/user/%s/' % username
+    finish = conf.REMOTE_DATA_DIR.set_for_testing('%s/jobsub' % home_dir)
 
-      # Prepare sample data
-      f = cluster.fs.open("/user/test/input", "w")
-      f.write("alpha beta gamma\nepsilon zeta theta\nalpha beta\n")
-      f.close()
-      # We also have to upload the jar file
-      src = file(hadoop.conf.HADOOP_EXAMPLES_JAR.get())
-      try:
-        dst = cluster.fs.open("/user/test/%s" % JARNAME, "w")
-        try:
-          shutil.copyfileobj(src, dst)
-        finally:
-	  dst.close()
-      finally:
-        src.close()
+    try:
+      data_dir = conf.REMOTE_DATA_DIR.get()
+      self.cluster.fs.setuser(self.cluster.fs.superuser)
+      if self.cluster.fs.exists(home_dir):
+        self.cluster.fs.rmtree(home_dir)
+      self.cluster.fs.setuser('test')
 
-      # Status_bar should be at original
-      assert_equal(n_pending, c.get("/jobsub/status_bar/").context["pending_count"])
+      if not jobsub_setup.Command().has_been_setup():
+        jobsub_setup.Command().handle()
 
-      # Let's parameterize and submit
-      INPUT, OUTPUT = "/user/test/input", "/user/test/output"
-      response = c.post("/jobsub/submit/%d" % design_id, 
-        dict(input=INPUT, output=OUTPUT))
-      watch_id = parse_out_id(response)
+      self.cluster.fs.setuser('test')
+      stats = self.cluster.fs.stats(home_dir)
+      assert_equal(stats['user'], username)
+      assert_equal(oct(stats['mode']), '040755') #04 because is a dir
 
-      # Status bar at original + 1
-      assert_equal(n_pending + 1, c.get("/jobsub/status_bar/").context["pending_count"])
+      stats = self.cluster.fs.stats(data_dir)
+      assert_equal(stats['user'], username)
+      assert_equal(oct(stats['mode']), '041777')
 
-      # Let's take a look
-      response = watch_till_complete(c, watch_id)
-      assert_equal(1, len(response.context["job_data"].hadoop_job_ids), 
-        "Should have launched and captured exactly one Hadoop job")
-      submission = Submission.objects.get(id=watch_id)
-      assert_equal(["wordcount", INPUT, OUTPUT],
-                   submission.submission_plan.steps[1].bin_hadoop_step.arguments[2:])
+      stats = self.cluster.fs.listdir_stats(data_dir)
+      assert_equal(len(stats), 2)
+    finally:
+      finish()
 
-      hadoop_job_id = response.context["job_data"].hadoop_job_ids[0]
-
-      # Status bar back to original
-      assert_equal(n_pending, c.get("/jobsub/status_bar/").context["pending_count"])
-
-      # Make sure the counts are right:
-      lines = cluster.fs.open("/user/test/output/part-r-00000").read().splitlines()
-      counts = {}
-      for line in lines:
-        word, count = line.split("\t", 2)
-        count = int(count)
-        counts[word] = count
-      assert_equal(dict(alpha=2, beta=2, gamma=1, epsilon=1, zeta=1, theta=1), counts)
-
-      # And check that the output file has correct permissions.
-      assert_equal("test", cluster.fs.stats("/user/test/output/part-r-00000")["user"],
-        "Wrong username for job output.")
-      assert_equal("test", cluster.fs.stats("/user/test/output/part-r-00000")["group"],
-        "Wrong groupname for job output.")
-
-      # Just to be sure it really happened, check the Job struct
-      # There's no way to get just one job (eek!)...
-      job_map = dict([ (x.jobID.asString, x) for x in cluster.jt.completed_jobs().jobs ])
-      this_job = job_map[hadoop_job_id]
-      # Check username and group
-      assert_equal("test", this_job.profile.user)
-
-      # Let's kill the temporary directory, and make sure watch
-      # output still works.  We do file deletion very explicitly,
-      # because tests that might mistakenly delete your home directory
-      # tend to cause unhappiness.
-      server_id = Submission.objects.get(id=watch_id).submission_handle.id
-      tmp_dir = ServerSubmissionState.objects.get(id=server_id).tmp_dir
-      for filename in ("jobs", "stderr", "stdout", os.path.join("work", "tmp.jar")):
-        os.remove(os.path.join(tmp_dir, filename))
-      os.rmdir(os.path.join(tmp_dir, "work"))
-      os.rmdir(tmp_dir)
-      response = c.get("/jobsub/watch/%d" % watch_id)
-      assert_true("No longer available" in response.content)
-  finally:
-    cluster.shutdown()
-    jobsubd.exit()
-
-@attr('requires_hadoop')
-def test_jobsub_setup():
-  # User 'test' triggers the setup of the examples.
-  # 'hue' home will be deleted, the examples installed in the new one
-  # and 'test' will try to access them.
-  cluster = pseudo_hdfs4.shared_cluster()
-  cluster.fs.setuser('test')
-
-  username = 'hue'
-  home_dir = '/user/%s/' % username
-  finish = conf.REMOTE_DATA_DIR.set_for_testing('%s/jobsub' % home_dir)
-
-  try:
-    data_dir = conf.REMOTE_DATA_DIR.get()
-    cluster.fs.setuser(cluster.fs.superuser)
-    if cluster.fs.exists(home_dir):
-      cluster.fs.rmtree(home_dir)
-    cluster.fs.setuser('test')
-
-    jobsub_setup.Command().handle()
-
-    cluster.fs.setuser('test')
-    stats = cluster.fs.stats(home_dir)
-    assert_equal(stats['user'], username)
-    assert_equal(oct(stats['mode']), '040755') #04 because is a dir
-
-    stats = cluster.fs.stats(data_dir)
-    assert_equal(stats['user'], username)
-    assert_equal(oct(stats['mode']), '041777')
-
-    stats = cluster.fs.listdir_stats(data_dir)
-    assert_equal(len(stats), 2) # 2 files inside
-  finally:
-    finish()
-
-@attr('requires_hadoop')
-def test_jobsub_setup_and_samples():
-  """
-  Merely exercises jobsub_setup, and then runs
-  all the examples.
-  """
-  raise SkipTest
-  cluster = mini_cluster.shared_cluster(conf=True)
-  jobsubd = in_process_jobsubd(cluster.config_dir)
-  try:
-    c = make_logged_in_client()
-
-    # Create a job, to make sure that it sticks around
-    response = c.post("/jobsub/new/jar", dict(
-      name="should_stick_around", 
-      jarfile="foo",
-      arguments="foo", submit="Save"))
-    design_id = response.context["saved"]
-
-    import jobsub.management.commands.jobsub_setup as jobsub_setup
+  def test_jobsub_setup_and_run_samples(self):
+    """
+    Merely exercises jobsub_setup, and then runs the sleep example.
+    """
     if not jobsub_setup.Command().has_been_setup():
       jobsub_setup.Command().handle()
 
-    # Make sure we have three job designs now.
-    assert_equal(3, JobDesign.objects.filter(name__startswith="Example: ").count())
-
-    # Make sure "should_stick_around" is still there
-    assert_equal(1, JobDesign.objects.filter(name="should_stick_around").count())
+    assert_equal(3, OozieDesign.objects.count())
+    assert_equal(2, OozieMapreduceAction.objects.count())
+    assert_equal(1, OozieStreamingAction.objects.count())
 
     # Make sure sample user got created.
-    assert_equal(1, User.objects.filter(username="sample").count())
-    assert_equal(1, User.objects.filter(username="test").count())
+    assert_equal(1, User.objects.filter(username='sample').count())
 
-    # And now submit and run the samples
-    # pi Example
-    # Irritatingly, /user/test needs to exist first
-    setup_cluster_fs(cluster)
-    id = JobDesign.objects.get(name__contains="Example: Pi").id
-    response = c.get("/jobsub/submit/%d" % id)
-    assert_true("Iterations per mapper" in response.content)
-    assert_true("Num of mappers" in response.content)
-    response = c.post("/jobsub/submit/%d" % id, dict(
-      iterations_per_mapper=10,
-      num_of_mappers=1))
-    response = watch_till_complete(c, parse_out_id(response))
+    # Clone design
+    assert_equal(0, OozieDesign.objects.filter(owner__username='test').count())
+    jobid = OozieDesign.objects.get(name='sleep_job').id
 
-    assert_true("Estimated value of Pi is" in response.context["job_data"].stdout_tail)
-    assert_true("bin/hadoop returned 0" in response.content)
+    self.client.post('/jobsub/clone_design/%d' % jobid)
+    assert_equal(1, OozieDesign.objects.filter(owner__username='test').count())
+    jobid = OozieDesign.objects.get(owner__username='test').id
 
-    # Wordcount example
-    id = JobDesign.objects.get(name__contains="Example: Streaming Wordcount").id
-    response = c.get("/jobsub/submit/%d" % id)
-    response = c.post("/jobsub/submit/%d" % id, dict(
-      output="/user/test/jobsub-streaming-test"))
-    response = watch_till_complete(c, parse_out_id(response))
+    # And now submit and run the sleep sample
+    response = self.client.post('/jobsub/submit_design/%d' % jobid, {
+        'num_reduces': 1,
+        'num_maps': 1,
+        'map_sleep_time': 1,
+        'reduce_sleep_time': 1}, follow=True)
 
-    assert_true("streaming.StreamJob: Job complete:" in response.context["job_data"].stderr_tail)
-    assert_true(cluster.fs.exists("/user/test/jobsub-streaming-test/part-00000"))
+    assert_true('PREP' in response.content, response.content)
+    assert_true(str(jobid) in response.content)
 
-    # Not running sleep example, since it adds little.
-  finally:
-    jobsubd.exit()
-    cluster.shutdown()
+    oozie_job_id = response.context['jobid']
+    job = OozieServerProvider.wait_until_completion(oozie_job_id, timeout=60, step=1)
+    logs = OozieServerProvider.oozie.get_job_log(oozie_job_id)
 
-def watch_till_complete(client, watch_id, timeout_sec=60):
-  """
-  Watches a certain job until it completes.
-  Returns response when response.context["completed"] is true.
-  """
-  location = "/jobsub/watch/%d" % watch_id
-  response = client.get(location)
-  start = time.time()
-  while not response.context["completed"]:
-    assert_true(time.time() - start < timeout_sec,
-                "Should take less than %s seconds to complete job." % (timeout_sec,))
-    time.sleep(1.0)
-    response = client.get(location)
-  return response
+    assert_equal('SUCCEEDED', job.status, logs)
 
-def parse_out_id(response):
-  """
-  Extracts first integer grouping from response["Location"]
 
-  HttpRedirectResponses tend to have ids stuck in them
-  that are useful for continuing the test.
-  """
-  return int(re.match("^http://testserver/.*(\d+).*", response["Location"]).groups()[0])
+    # Grep
+    n = OozieDesign.objects.filter(owner__username='test').count()
+    jobid = OozieDesign.objects.get(name='grep_example').id
+
+    self.client.post('/jobsub/clone_design/%d' % jobid)
+    assert_equal(n + 1, OozieDesign.objects.filter(owner__username='test').count())
+    jobid = OozieDesign.objects.get(owner__username='test', name__contains='sleep_job').id
+
+    # And now submit and run the sleep sample
+    response = self.client.post('/jobsub/submit_design/%d' % jobid, {
+        'num_reduces': 1,
+        'num_maps': 1,
+        'map_sleep_time': 1,
+        'reduce_sleep_time': 1}, follow=True)
+
+    assert_true('PREP' in response.content or 'DONE' in response.content, response.content)
+    assert_true(str(jobid) in response.content)
+
+    oozie_job_id = response.context['jobid']
+    job = OozieServerProvider.wait_until_completion(oozie_job_id, timeout=60, step=1)
+    logs = OozieServerProvider.oozie.get_job_log(oozie_job_id)
+
+    assert_equal('SUCCEEDED', job.status, logs)
