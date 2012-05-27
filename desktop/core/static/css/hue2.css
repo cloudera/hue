@@ -149,26 +149,6 @@ h1 {
     text-align:left!important;
 }
 
-
-/*
-.topbar-inner, .topbar {
-	background-image: -webkit-linear-gradient(top, #2c7fb3, #01639c);
-	background-image: -moz-linear-gradient(top, #2c7fb3, #01639c);
-	background-color: #01639c;
-	background-repeat: repeat-x;
-}
-
-.topbar div > ul .active > a, .nav .active > a {
-	background-image: -webkit-linear-gradient(top, #266d99, #015382);
-	background-image: -moz-linear-gradient(top, #266d99, #015382);
-	background-color: #015382;
-	font-weight: bold;
-}
-
-.topbar a {
-	color: #CFCFCF;
-}
-*/
 .btn.primary {
     background-color: #01639c;
     background-image: -moz-linear-gradient(center top , #2c7fb3, #01639c);
@@ -882,7 +862,7 @@ div.box {
 .jHueSelector ul, li {
 	margin: 0;
 	padding: 0;
-}
+} 
 .jHueSelector ul {
 	padding:4px;
 	list-style: none;
@@ -907,4 +887,8 @@ div.box {
     display: inline;
     padding: 0;
     margin: 0;
+}
+
+.table tbody tr:hover td, .table tbody tr:hover th {
+    background-color: #E8F7FB;
 }
