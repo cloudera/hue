@@ -94,7 +94,6 @@ def get_shared_beeswax_server():
       beeswax.conf.BEESWAX_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT),
       beeswax.conf.BEESWAX_META_SERVER_HOST.set_for_testing("localhost"),
       beeswax.conf.BEESWAX_META_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT + 1),
-      beeswax.conf.BEESWAX_SERVER_CONN_TIMEOUT.set_for_testing(10),
       # Use a bogus path to avoid loading the normal hive-site.xml
       beeswax.conf.BEESWAX_HIVE_CONF_DIR.set_for_testing('/my/bogus/path')
     )
