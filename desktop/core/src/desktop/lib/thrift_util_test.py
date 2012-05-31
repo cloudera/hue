@@ -39,7 +39,6 @@ from thrift.transport import TSocket
 from thrift.transport.TTransport import TBufferedTransportFactory
 
 from nose.tools import assert_equal
-from nose.plugins.skip import SkipTest
 
 
 class SimpleThriftServer(object):
@@ -85,7 +84,6 @@ class SimpleThriftServer(object):
       logging.info("Waiting for service to come online")
       try:
         ping_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ping_s.settimeout(5)
         ping_s.connect(('localhost', self.port))
         ping_s.close()
         return
@@ -128,7 +126,6 @@ class TestWithThriftServer(object):
     cls.server.stop_server_process()
 
   def test_basic_operation(self):
-    raise SkipTest
     assert_equal(10, self.client.ping(5))
 
   def test_connection_race(self):
