@@ -20,6 +20,7 @@ import desktop.lib.eventlet_util
 
 import logging
 import os
+import sys
 
 from django.core.management.base import BaseCommand
 from desktop import conf
@@ -128,6 +129,7 @@ def runspawningserver():
     'watch': SPAWNING_SERVER_OPTIONS['watch']
   }
 
+  os.environ['HUE_SPAWNING'] = 'yes'
   spawning.spawning_controller.start_controller(sock, factory, factory_args)
 
 
