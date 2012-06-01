@@ -250,9 +250,12 @@ def submit_design(request, design_id):
   param_mapping = request.POST
   design_obj.bind_parameters(request.POST)
 
-  submission = submit.Submission(design_obj, request.fs)
-  jobid = submission.run()
-
+  try:
+    submission = submit.Submission(design_obj, request.fs)
+    jobid = submission.run()
+  except RestException, ex:
+    raise PopupException("Error submitting design %s" % (design_id,),
+                         detail=ex.message)
   # Save the submission record
   job_record = models.JobHistory(owner=request.user,
                                  job_id=jobid,
