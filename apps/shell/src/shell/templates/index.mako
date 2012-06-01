@@ -105,7 +105,13 @@ from desktop.views import commonheader, commonfooter
     <span id="shell_id" class="hide">${shell_id}</span>
   % else:
     <div>
-        <h3>Please select one of the available shells from the toolbar above.</h3>
+        <h3>
+            % if shells:
+                Please select one of the available shells from the toolbar above.
+            % else:
+                You don't have permission to access any shell or there is no configured shell.
+            % endif
+        </h3>
     </div>
   % endif
 
