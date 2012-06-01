@@ -28,6 +28,7 @@ from threading import Thread
 from hadoop import pseudo_hdfs4
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.hadoopfs import Hdfs
+from hadoop.fs.webhdfs import safe_octal
 
 LOG = logging.getLogger(__name__)
 
@@ -237,3 +238,13 @@ def test_threadedness():
   assert_equals("alpha", fs.user)
   fs.setuser("gamma")
   assert_equals("gamma", fs.user)
+
+def test_safe_octal():
+  assert_equals('0777', safe_octal(0777))
+  assert_equals('0777', safe_octal(00777))
+  assert_equals('1777', safe_octal(01777))
+
+  assert_equals('777', safe_octal('777'))
+  assert_equals('0777', safe_octal('0777'))
+  assert_equals('1777', safe_octal('1777'))
+  assert_equals('1777', safe_octal('01777'))
