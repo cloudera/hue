@@ -231,7 +231,11 @@ from desktop.views import commonheader, commonfooter
 										});
 									},500);
 								}
-								$('body').animate({scrollTop: $(document).height()}, 'slow');
+								var toScroll = -$(document).height();
+								if (jQuery.browser.webkit) {
+								  toScroll = -toScroll;
+								}
+								$("body").animate({scrollTop: toScroll}, "fast");
 								_shell.get(data[_shell.id].nextOffset);
 							}
 						}
