@@ -25,6 +25,8 @@
     h3 { text-align: center; color: #1767b6; }
     a { color: #1767b6; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+    .image { width: 900px; margin-left: -100px}
+    .caption { text-align: center; margin-bottom: 20px; margin-top: 10px; font-style: italic;}
     .download { float: right; }
 		pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
@@ -39,14 +41,30 @@
   <div id="container">
 
     <h1><a href="http://github.com/cloudera/hue">hue</a>
-      <span class="small">Hadoop User Experience</span></h1>
+      <a href="http://github.com/cloudera/hue"><span class="small">Hadoop User Experience</span></a></h1>
 
     <div class="description">
-      Hue is a browser-based desktop interface for interacting with Hadoop. It features a HDFS file browser, a job browser, a Hive UI and more.
+      Hue is a browser-based desktop interface for interacting with Hadoop. It features a HDFS file browser, a job designer and browser, a Hive UI, a Shell and more.
     </div>
 
+    <div>
+      <a href="docs-2.0.1/images/hue-ui.png">
+        <img class="image" src="docs-2.0.1/images/hue-ui.png"/>
+      </a>
+      <div class="caption">Hue UI - Beeswax Application</div>
+    </div>
+
+    <h1>Releases</h1>
+
+    <h2>Hue 2.0.1</h2>
+    <p>Hue 2.0.1 is a major upgrade with many fixes and key new features. The frontend has been re-implemented, LDAP (OpenLDAP and Active Directory) and per-application authorization are supported, a Shell application was added.<br/> It works with <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 4</a>.</p>
+    <ul>
+      <li><a href="http://github.com/downloads/cloudera/hue/hue-2.0.1.tgz">Download release tarball</a></li>
+      <li><a href="docs-2.0.1/index.html">Documentation</a></li>
+    </ul>
+
     <h2>Hue 1.2.0</h2>
-    <p>Hue 1.2.0 is a minor release, largely focused on bug fixes and compatibility with <a href="https://docs.cloudera.com/display/DOC/CDH3+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 3 beta 4</a>.</p>
+    <p>Hue 1.2.0 is a minor release, largely focused on bug fixes and compatibility with <a href="https://ccp.cloudera.com/display/CDHDOC/CDH3+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 3 beta 4</a>.</p>
     <ul>
       <li><a href="http://github.com/downloads/cloudera/hue/hue-1.2.0.tgz">Download release tarball</a></li>
       <li><a href="docs-1.2.0/index.html">Documentation</a></li>
@@ -54,7 +72,7 @@
 
    <h2>Hue 1.1.0</h2>
     <p>Hue 1.1.0 supports Kerberos integration with using a secured Hadoop
-    cluster. It works with <a href="https://docs.cloudera.com/display/DOC/CDH3+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 3 beta 3</a>.</p>
+    cluster. It works with <a href="https://ccp.cloudera.com/display/CDHDOC/CDH3+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 3 beta 3</a>.</p>
     <ul>
       <li><a href="http://github.com/downloads/cloudera/hue/hue-1.1.0.tgz">Download release tarball</a></li>
       <li><a href="docs-1.1.0/index.html">Documentation</a></li>
@@ -67,6 +85,8 @@
       <li><a href="http://github.com/downloads/cloudera/hue/hue-1.0.1.tgz">Download release tarball</a></li>
       <li><a href="docs-1.0.1/index.html">Documentation</a></li>
     </ul>
+
+    <h1>Open Source</h1>
 
     <h2>Contact</h2>
     <ul>
