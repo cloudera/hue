@@ -282,7 +282,7 @@ public class SanerThreadPoolServer extends TServer {
         // down. this is necessary for graceful shutdown.
         while (!stopped_ && processor.process(inputProtocol, outputProtocol)) {}
       } catch (TTransportException ttx) {
-        // Assume the client died and continue silently
+        LOGGER.debug("Received transport exception. Assuming client went away.", ttx);
       } catch (TException tx) {
         LOGGER.error("Thrift error occurred during processing of message.", tx);
       } catch (Exception x) {
