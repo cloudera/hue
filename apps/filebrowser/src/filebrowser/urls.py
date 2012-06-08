@@ -17,34 +17,31 @@
 
 from django.conf.urls.defaults import url, patterns
 
-# TODO(philip): The names below should be converted to be "qualified", i.e.,
-# should be made "filebrowser.ajax_view" instead of "ajax_view".
 
-urlpatterns = patterns('',
-
+urlpatterns = patterns('filebrowser.views',
   # Base view
-  url(r'^$', 'django.views.generic.simple.redirect_to', { "url": "/filebrowser/view/" }),
+  url(r'^$', 'index', name='index'),
 
-  url(r'listdir(?P<path>/.*)', 'filebrowser.views.listdir', name='listdir'),
-  url(r'display(?P<path>/.*)', 'filebrowser.views.display', name='display'),
-  url(r'stat(?P<path>/.*)', 'filebrowser.views.stat', name='stat'),
-  url(r'download(?P<path>/.*)', 'filebrowser.views.download', name='download'),
-  url(r'status', 'filebrowser.views.status', name='status'),
+  url(r'listdir(?P<path>/.*)', 'listdir', name='listdir'),
+  url(r'display(?P<path>/.*)', 'display', name='display'),
+  url(r'stat(?P<path>/.*)', 'stat', name='stat'),
+  url(r'download(?P<path>/.*)', 'download', name='download'),
+  url(r'status', 'status', name='status'),
   # Catch-all for viewing a file (display) or a directory (listdir)
-  url(r'view(?P<path>/.*)', 'filebrowser.views.view', name='view'),
-  url(r'chooser(?P<path>/.*)', 'filebrowser.views.chooser', name='view'),
-  url(r'edit(?P<path>/.*)', 'filebrowser.views.edit', name='edit'),
-  url(r'save', 'filebrowser.views.save_file'),
+  url(r'view(?P<path>/.*)', 'view', name='view'),
+  url(r'chooser(?P<path>/.*)', 'chooser', name='view'),
+  url(r'edit(?P<path>/.*)', 'edit', name='edit'),
+  url(r'save', 'save_file'),
 
   # POST operations
-  url(r'upload_flash$', 'filebrowser.views.upload_flash', name='upload_flash'),
-  url(r'upload$', 'filebrowser.views.upload', name='upload'),
-  url(r'rename', 'filebrowser.views.rename', name='rename'),
-  url(r'mkdir', 'filebrowser.views.mkdir', name='mkdir'),
-  url(r'^move', 'filebrowser.views.move', name='move'),
-  url(r'remove', 'filebrowser.views.remove', name='remove'),
-  url(r'rmdir', 'filebrowser.views.rmdir', name='rmdir'),
-  url(r'rmtree', 'filebrowser.views.rmtree', name='rmtree'),
-  url(r'chmod', 'filebrowser.views.chmod', name='chmod'),
-  url(r'chown', 'filebrowser.views.chown', name='chown'),
+  url(r'upload_flash$', 'upload_flash', name='upload_flash'),
+  url(r'upload$', 'upload', name='upload'),
+  url(r'rename', 'rename', name='rename'),
+  url(r'mkdir', 'mkdir', name='mkdir'),
+  url(r'^move', 'move', name='move'),
+  url(r'remove', 'remove', name='remove'),
+  url(r'rmdir', 'rmdir', name='rmdir'),
+  url(r'rmtree', 'rmtree', name='rmtree'),
+  url(r'chmod', 'chmod', name='chmod'),
+  url(r'chown', 'chown', name='chown'),
 )
