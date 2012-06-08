@@ -307,6 +307,28 @@ def test_view_access():
       pass      # Don't let cleanup errors mask earlier failures
 
 
+@attr('requires_hadoop')
+def test_index():
+  HOME_DIR = u'/user/test'
+  NO_HOME_DIR = u'/user/no_home'
+
+  c = make_logged_in_client()
+  c_no_home = make_logged_in_client(username='no_home')
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  if not cluster.fs.exists(HOME_DIR):
+    cluster.fs.create_home_dir(HOME_DIR)
+  assert_false(cluster.fs.exists(NO_HOME_DIR))
+
+  response = c.get('/filebrowser', follow=True)
+  assert_equal(HOME_DIR, response.context['path'])
+  assert_equal(HOME_DIR, response.context['home_directory'])
+
+  response = c_no_home.get('/filebrowser', follow=True)
+  assert_equal('/', response.context['path'])
+  assert_equal(None, response.context['home_directory'])
+
+
 def view_helper(cluster, encoding, content):
   """
   Write the content in the given encoding directly into the filesystem.

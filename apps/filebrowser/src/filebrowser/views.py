@@ -63,6 +63,14 @@ MAX_FILEEDITOR_SIZE = 256 * 1024
 logger = logging.getLogger(__name__)
 
 
+def index(request):
+  # Redirect to home directory by default
+  path = request.user.get_home_directory()
+  if not request.fs.isdir(path):
+    path = '/'
+  return view(request, path)
+
+
 def _file_reader(fh):
     """Generator that reads a file, chunk-by-chunk."""
     while True:
@@ -105,9 +113,10 @@ def view(request, path):
     """Dispatches viewing of a path to either index() or fileview(), depending on type."""
 
     # default_to_home is set in bootstrap.js
-    home_dir_path = request.user.get_home_directory()
-    if 'default_to_home' in request.GET and request.fs.isdir(home_dir_path):
-        return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=home_dir_path)))
+    if 'default_to_home' in request.GET:
+        home_dir_path = request.user.get_home_directory()
+        if request.fs.isdir(home_dir_path):
+            return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=home_dir_path)))
 
     try:
         stats = request.fs.stats(path)
