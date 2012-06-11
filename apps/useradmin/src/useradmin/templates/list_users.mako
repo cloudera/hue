@@ -30,9 +30,9 @@ ${layout.menubar(section='users')}
     <div class="well hueWell">
         <div class="btn-group pull-right">
             %if user.is_superuser == True:
-            <a id="addUserBtn" href="${ url('useradmin.views.edit_user') }" class="btn">Add user</a>
-            <a id="addLdapUserBtn" href="${ url('useradmin.views.add_ldap_user') }" class="btn">Add/sync LDAP user</a>
-            <a id="syncLdapBtn" href="#" class="btn">Sync LDAP users/groups</a>
+            <a href="${ url('useradmin.views.edit_user') }" class="btn">Add user</a>
+            <a href="${ url('useradmin.views.add_ldap_user') }" class="btn">Add/sync LDAP user</a>
+            <a href="#syncLdap" class="btn" data-toggle="modal">Sync LDAP users/groups</a>
             %endif
         </div>
         <form class="form-search">
@@ -77,16 +77,25 @@ ${layout.menubar(section='users')}
         </tbody>
     </table>
 
-    <div id="syncLdap" class="modal hide fade userModal">
+    <div id="syncLdap" class="modal hide fade">
         <div class="modal-header">
-            <a href="#" class="close" data-dismiss="modal">&times;</a>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h3>Sync LDAP users and groups</h3>
         </div>
-        <div id="syncLdapBody" class="modal-body">
-            <iframe id="syncLdapFrame" class="scroll" frameBorder="0"></iframe>
+        <div class="modal-body">
+            <div class="alert alert-info">
+                This will not import any users or groups that don't already exist in Hue.
+                Only users and groups imported from LDAP can be synced.
+                <br/>
+                All user information and group memberships will be updated based on the LDAP
+                server's current state.
+            </div>
         </div>
         <div class="modal-footer">
-            <button id="syncLdapSaveBtn" class="btn primary">Sync</button>
+            <form action="${ url('useradmin.views.sync_ldap_users_groups') }" method="POST">
+                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+                <input type="submit" class="btn primary" value="Sync"/>
+             </form>
         </div>
     </div>
 
@@ -102,8 +111,6 @@ ${layout.menubar(section='users')}
         </div>
         </form>
     </div>
-
-
 </div>
 
     <script type="text/javascript" charset="utf-8">
@@ -143,20 +150,9 @@ ${layout.menubar(section='users')}
                     $(value).show(250);
                   }
                 });
-
-            });
-
-            $("#syncLdapBtn").click(function(){
-                $("#syncLdapFrame").css("height","150px").attr("src","${ url('useradmin.views.sync_ldap_users_groups') }");
-                $("#syncLdap").modal("show");
-            });
-
-            $("#syncLdapSaveBtn").click(function(){
-                $("#syncLdapFrame").contents().find('form').submit();
             });
 
 			$("a[data-row-selector='true']").jHueRowSelector();
-
         });
     </script>
 

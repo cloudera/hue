@@ -412,9 +412,9 @@ def sync_ldap_users_groups(request):
 
   if request.method == 'POST':
     sync_ldap_users_and_groups()
-    return render("list_users.mako", request, dict(users=User.objects.all()))
+    return redirect(reverse(list_users))
   else:
-    return render('sync_ldap_users_groups.mako', request, dict(action=request.path))
+    raise PopupException("POST request required in order to sync the LDAP users/groups.")
 
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
