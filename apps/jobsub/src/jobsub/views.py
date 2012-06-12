@@ -39,10 +39,10 @@ from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 
 from hadoop.fs.exceptions import WebHdfsException
+from liboozie.oozie_api import get_oozie
 
 from jobsub import models, submit
 from jobsub.management.commands import jobsub_setup
-from liboozie.oozie_api import get_oozie
 import jobsub.forms
 
 from django.utils.translation import ugettext as _

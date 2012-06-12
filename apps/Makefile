@@ -36,6 +36,7 @@ APPS := about \
 	help \
 	jobbrowser \
 	jobsub \
+        oozie \
 	proxy \
         shell \
 	useradmin
