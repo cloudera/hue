@@ -21,7 +21,8 @@ import threading
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
-from liboozie.types import WorkflowList, Workflow
+from liboozie.types import WorkflowList, CoordinatorList, Coordinator, Workflow,\
+  CoordinatorAction, WorkflowAction
 from liboozie.utils import config_gen
 from liboozie.conf import SECURITY_ENABLED, OOZIE_URL
 
@@ -94,10 +95,11 @@ class OozieApi(object):
 
   VALID_JOB_FILTERS = ('name', 'user', 'group', 'status')
 
-  def get_jobs(self, offset=None, cnt=None, **kwargs):
+  def get_jobs(self, jobtype, offset=None, cnt=None, **kwargs):
     """
-    get_jobs(offset=None, cnt=None, **kwargs) -> WorkflowList
+    Get a list of Oozie jobs.
 
+    jobtype is 'wf', 'coord'
     Note that offset is 1-based.
     kwargs is used for filtering and may be one of VALID_FILTERS: name, user, group, status
     """
@@ -106,9 +108,10 @@ class OozieApi(object):
       params['offset'] = str(offset)
     if cnt is not None:
       params['len'] = str(cnt)
+    params['jobtype'] = jobtype
 
     filter_list = [ ]
-    for key, val in kwargs:
+    for key, val in kwargs.iteritems():
       if key not in OozieApi.VALID_JOB_FILTERS:
         raise ValueError('"%s" is not a valid filter for selecting jobs' % (key,))
       filter_list.append('%s=%s' % (key, val))
@@ -116,8 +119,19 @@ class OozieApi(object):
 
     # Send the request
     resp = self._root.get('jobs', params)
-    wf_list = WorkflowList(self, resp, filters=kwargs)
+    if jobtype == 'wf':
+      wf_list = WorkflowList(self, resp, filters=kwargs)
+    else:
+      wf_list = CoordinatorList(self, resp, filters=kwargs)
     return wf_list
+
+
+  def get_workflows(self, offset=None, cnt=None, **kwargs):
+    return self.get_jobs('wf')
+
+
+  def get_coordinators(self, offset=None, cnt=None, **kwargs):
+    return self.get_jobs('coord')
 
 
   def get_job(self, jobid):
@@ -128,6 +142,11 @@ class OozieApi(object):
     resp = self._root.get('job/%s' % (jobid,), params)
     wf = Workflow(self, resp)
     return wf
+
+  def get_coordinator(self, jobid):
+    params = self._get_params()
+    resp = self._root.get('job/%s' % (jobid,), params)
+    return Coordinator(self, resp)
 
 
   def get_job_definition(self, jobid):
@@ -149,6 +168,14 @@ class OozieApi(object):
     xml = self._root.get('job/%s' % (jobid,), params)
     return xml
 
+  def get_action(self, action_id):
+    if 'C@' in action_id:
+      Klass = CoordinatorAction
+    else:
+      Klass = WorkflowAction
+    params = self._get_params()
+    resp = self._root.get('job/%s' % (action_id,), params)
+    return Klass(resp)
 
   def job_control(self, jobid, action):
     """
@@ -161,12 +188,12 @@ class OozieApi(object):
       raise ValueError(msg)
     params = self._get_params()
     params['action'] = action
-    self._root.put('job/%s' % (jobid,), params)
+    return self._root.put('job/%s' % (jobid,), params)
 
 
   def submit_workflow(self, application_path, properties=None):
     """
-    submit_workflow(application_path, username, properties=None) -> jobid
+    submit_workflow(application_path, properties=None) -> jobid
 
     Submit a job to Oozie. May raise PopupException.
     """
@@ -174,17 +201,34 @@ class OozieApi(object):
       'oozie.wf.application.path': application_path,
       'user.name': self.user,
     }
+
     if properties is not None:
       defaults.update(properties)
-      properties = defaults
-    else:
-      properties = defaults
+    properties = defaults
+
+    return self.submit_job(properties)
+
+  def submit_job(self, properties=None):
+    """
+    submit_workflow(properties=None) -> jobid
+
+    Submit a job to Oozie. May raise PopupException.
+    """
+    defaults = {
+      'user.name': self.user,
+    }
+
+    if properties is not None:
+      defaults.update(properties)
+
+    properties = defaults
 
     params = self._get_params()
-    resp = self._root.post('jobs', params, data=config_gen(properties),
+    resp = self._root.post('jobs',
+                           params, data=config_gen(properties),
                            contenttype=_XML_CONTENT_TYPE)
-    return resp['id']
 
+    return resp['id']
 
   def get_build_version(self):
     """

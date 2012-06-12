@@ -12,6 +12,7 @@ except:
 import logging
 import re
 import time
+from time import strftime
 
 LOG = logging.getLogger(__name__)
 _NAME_REGEX = re.compile('^[a-zA-Z][\-_a-zA-Z0-0]*$')
@@ -50,3 +51,12 @@ def config_gen(dic):
 
 def is_valid_node_name(name):
   return _NAME_REGEX.match(name) is not None
+
+def format_time(time, format='%d %b %Y %H:%M:%S'):
+  if time is None:
+    return ''
+
+  if type(time) == unicode:
+    return time
+  else:
+    return strftime(format, time)
