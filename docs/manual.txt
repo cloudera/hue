@@ -11,7 +11,7 @@ individual users.
 
 This guide describes how to install and configure a Hue tarball. For
 information about installing Hue packages, see
-https://ccp.cloudera.com/display/CDHDOC/Hue+Installation[Installing Hue].
+https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation[Installing Hue].
 
 There is also a companion SDK guide that describes how to develop
 new Hue applications:
@@ -29,7 +29,7 @@ Hue Installation Instructions
 -----------------------------
 
 The following instructions describe how to install the Hue tarball on a
-multi-node cluster.  You need to also install CDH and update some
+multi-node cluster. You need to also install CDH and update some
 Hadoop configuration files before running Hue.
 
 
@@ -319,7 +319,7 @@ No Existing Hive Installation
 
 Familiarize yourself with the configuration options in
 `hive-site.xml`. See
-https://ccp.cloudera.com/display/CDHDOC/Hive+Installation#HiveInstallation-ConfiguringtheHiveMetastore[Hive
+https://ccp.cloudera.com/display/CDH4DOC/Hive+Installation#HiveInstallation-ConfiguringtheHiveMetastore[Hive
 Installation and Configuration].
 Having a `hive-site.xml` is optional but often useful, particularly on setting
 up a http://wiki.apache.org/hadoop/Hive/AdminManual/MetastoreAdmin[metastore].
