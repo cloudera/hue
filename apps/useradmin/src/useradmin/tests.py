@@ -44,7 +44,7 @@ def reset_all_users():
     user.delete()
 
 def reset_all_groups():
-  """Reset to a clean state by deleting all users"""
+  """Reset to a clean state by deleting all groups"""
 
   useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None)
   for grp in Group.objects.all():
@@ -154,14 +154,16 @@ def test_group_permissions():
   response = c1.get('/useradmin/users')
   assert_true('You do not have permission to access the Useradmin application.' in response.content)
 
-
 def test_default_group():
   reset_all_users()
   reset_all_groups()
 
   c = make_logged_in_client(username='test', is_superuser=True)
 
+  Group.objects.create(name="test_default")
+
   # Try deleting the default group
+  assert_true(Group.objects.filter(name='test_default').exists())
   useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default')
   response = c.post('/useradmin/groups/delete/test_default')
   assert_true('default user group may not be deleted' in response.content)
@@ -234,7 +236,6 @@ def test_group_admin():
   response = c.post('/useradmin/groups/new', dict(name="with space"))
   assert_true("Group name may only contain letters" in response.content)
   assert_equal(len(Group.objects.all()), group_count)
-
 
 def test_user_admin():
   FUNNY_NAME = '~`!@#$%^&*()_-+={}[]|\;"<>?/,.'
