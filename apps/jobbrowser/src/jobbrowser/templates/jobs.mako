@@ -20,35 +20,34 @@
   from desktop.views import commonheader, commonfooter
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
+
 <%def name="get_state(option, state)">
 %   if option == state:
       selected="true"
 %   endif
 </%def>
 
-
-
 % if len(jobs) > 0 or filtered:
 ${commonheader("Job Browser", "jobbrowser")}
 <div class="container-fluid">
 <h1>Job Browser</h1>
 <div class="well hueWell">
-	<form action="/jobbrowser/jobs" method="GET">
-		<b>Filter jobs:</b>
+    <form action="/jobbrowser/jobs" method="GET">
+        <b>Filter jobs:</b>
 
-				<select name="state" class="submitter">
-					<option value="all" ${get_state('all', state_filter)}>All States</option>
-					<option value="running" ${get_state('running', state_filter)}>Running</option>
-					<option value="completed" ${get_state('completed', state_filter)}>Completed</option>
-					<option value="failed" ${get_state('failed', state_filter)}>Failed</option>
-					<option value="killed" ${get_state('killed', state_filter)}>Killed</option>
-				</select>
+                <select name="state" class="submitter">
+                    <option value="all" ${get_state('all', state_filter)}>All States</option>
+                    <option value="running" ${get_state('running', state_filter)}>Running</option>
+                    <option value="completed" ${get_state('completed', state_filter)}>Completed</option>
+                    <option value="failed" ${get_state('failed', state_filter)}>Failed</option>
+                    <option value="killed" ${get_state('killed', state_filter)}>Killed</option>
+                </select>
 
-				<input type="text" name="user" title="User Name Filter" value="${user_filter}" placeholder="User Name Filter" class="submitter"/>
+                <input type="text" name="user" title="User Name Filter" value="${user_filter}" placeholder="User Name Filter" class="submitter"/>
 
-				<input type="text" name="text" title="Text Filter" value="${text_filter}" placeholder="Text Filter" class="submitter"/>
+                <input type="text" name="text" title="Text Filter" value="${text_filter}" placeholder="Text Filter" class="submitter"/>
 
-	</form>
+    </form>
 </div>
 
 
@@ -56,38 +55,38 @@ ${commonheader("Job Browser", "jobbrowser")}
 <p>There were no jobs that match your search criteria.</p>
 % else:
 <table class="datatables table table-striped table-condensed">
-	<thead>
-		<tr>
-			<th>Name / Id</th>
-			<th>Status</th>
-			<th>User</th>
-			<th>Maps/Reduces</th>
-			<th>Queue</th>
-			<th>Priority</th>
-			<th>Duration</th>
-			<th>Date</th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-		% for job in jobs:
-		<tr>
-			<td>${job.jobName}
-				<div class="jobbrowser_jobid_short">${job.jobId_short}</div>
-			</td>
-			<td>
-				<a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}" title="Show only ${job.status.lower()} jobs">${job.status.lower()}</a>
-			</td>
-			<td>
-				<a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'user', job.user.lower())}" title="Show only ${job.user.lower()} jobs">${job.user}</a>
-			</td>
-			<td class="jt_mrs">
-				${comps.mr_graph(job)}
-			</td>
-			<td>${job.queueName}</td>
-			<td>${job.priority.lower()}</td>
-			<td>${job.durationFormatted}</td>
-			<td>${job.startTimeFormatted}</td>
+    <thead>
+        <tr>
+            <th>Name / Id</th>
+            <th>Status</th>
+            <th>User</th>
+            <th>Maps</th>
+            <th>Reduces</th>
+            <th>Queue</th>
+            <th>Priority</th>
+            <th>Duration</th>
+            <th>Date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        % for job in jobs:
+        <tr>
+            <td>${job.jobName}
+                <div class="jobbrowser_jobid_short">${job.jobId_short}</div>
+            </td>
+            <td>
+                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}" title="Show only ${job.status.lower()} jobs">${job.status.lower()}</a>
+            </td>
+            <td>
+                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'user', job.user.lower())}" title="Show only ${job.user.lower()} jobs">${job.user}</a>
+            </td>
+            <td><span alt="${job.maps_percent_complete}">${comps.mr_graph_maps(job)}</span></td>
+            <td><span alt="${job.reduces_percent_complete}">${comps.mr_graph_reduces(job)}</span></td>
+            <td>${job.queueName}</td>
+            <td>${job.priority.lower()}</td>
+            <td><span alt="${job.finishTimeMs-job.startTimeMs}">${job.durationFormatted}</span></td>
+            <td><span alt="${job.startTimeMs}">${job.startTimeFormatted}</span></td>
             <td>
                 <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="View this job" data-row-selector="true">View</a>
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
@@ -97,51 +96,50 @@ ${commonheader("Job Browser", "jobbrowser")}
                 % endif
                 % endif
             </td>
-			</tr>
-			% endfor
-		</tbody>
-	</table>
-	% endif
+            </tr>
+            % endfor
+        </tbody>
+    </table>
+    % endif
 
-
-
-	% else:
-	${commonheader("Job Browser", "jobbrowser")}
-	<div class="container-fluid">
-	<h1>Welcome to the Job Browser</h1>
-	<div>
-		<p>There aren't any jobs running. Let's fix that.</p>
-		% if appmanager.get_desktop_module('jobsub') is not None:
-		<a href="/jobsub/">Launch the Job Designer</a><br/>
-		% endif
-		% if appmanager.get_desktop_module('beeswax') is not None:
-		<a href="/beeswax/">Launch Beeswax</a><br/>
-		% endif
-	</div>
-	% endif
+    % else:
+    ${commonheader("Job Browser", "jobbrowser")}
+    <div class="container-fluid">
+    <h1>Welcome to the Job Browser</h1>
+    <div>
+        <p>There aren't any jobs running. Let's fix that.</p>
+        % if appmanager.get_desktop_module('jobsub') is not None:
+        <a href="/jobsub/">Launch the Job Designer</a><br/>
+        % endif
+        % if appmanager.get_desktop_module('beeswax') is not None:
+        <a href="/beeswax/">Launch Beeswax</a><br/>
+        % endif
+    </div>
+    % endif
 </div>
-	<script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$(".datatables").dataTable({
-			"bPaginate": false,
-			"bLengthChange": false,
-			"bFilter": false,
-			"bInfo": false,
-			"aoColumns": [
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			{"bSortable":false}
-			]
-		});
-		$("a[data-row-selector='true']").jHueRowSelector();
-	});
-	</script>
 
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+        $(".datatables").dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bInfo": false,
+            "aoColumns": [
+                null,
+                null,
+                null,
+                { "sType": "alt-numeric" },
+                { "sType": "alt-numeric" },
+                null,
+                null,
+                { "sType": "alt-numeric" },
+                { "sType": "alt-numeric" },
+                {"bSortable":false}
+            ]
+        });
+        $("a[data-row-selector='true']").jHueRowSelector();
+    });
+</script>
 
 ${commonfooter()}

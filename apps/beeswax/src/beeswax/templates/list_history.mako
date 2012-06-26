@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+import time
 from desktop.views import commonheader, commonfooter
 %>
 <%namespace name="layout" file="layout.mako" />
@@ -112,7 +113,7 @@ ${layout.menubar(section='history')}
 			  pass
 		      %>
 		      <tr class="histRow">
-		        <td>${query.submission_date.strftime("%x %X")}</td>
+                <td><span alt="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</span></td>
 		        <td>${show_saved_query(design, query)}</td>
 		        <td>
 		          <p>
@@ -141,19 +142,24 @@ ${layout.menubar(section='history')}
 	</div>
 </div>
 
-
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
+    $(document).ready(function(){
+        $(".datatables").dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bInfo": false,
+            "bFilter": false,
+            "aoColumns": [
+                { "sType": "alt-numeric" },
+                null,
+                null,
+                null,
+                null,
+                { "bSortable": false }
+            ]
+        });
 
-		$(".datatables").dataTable({
-			"bPaginate": false,
-		    "bLengthChange": false,
-			"bInfo": false,
-			"bFilter": false
-		});
-
-		$("a[data-row-selector='true']").jHueRowSelector();
-
-	});
+        $("a[data-row-selector='true']").jHueRowSelector();
+    });
 </script>
 ${commonfooter()}

@@ -20,93 +20,98 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-  ${commonheader("Task View: Job: " + jobid + " - Job Browser", "jobbrowser")}
-  <%def name="selected(val, state)">
-  %   if val is not None and state is not None and val in state:
+${commonheader("Task View: Job: " + jobid + " - Job Browser", "jobbrowser")}
+
+<%def name="selected(val, state)">
+    %   if val is not None and state is not None and val in state:
         selected="true"
-  %   endif
-  </%def>
-	<div class="container-fluid">
-	<h1>Task View: Job:  ${jobid}</h1>
-	<div class="well hueWell">
-		<form method="get" action="/jobbrowser/jobs/${jobid}/tasks">
-			<b>Filter tasks:</b>
+    %   endif
+</%def>
+<div class="container-fluid">
+    <h1>Task View: Job:  ${jobid}</h1>
+    <div class="well hueWell">
+        <form method="get" action="/jobbrowser/jobs/${jobid}/tasks">
+            <b>Filter tasks:</b>
 
-				<select name="taskstate" class="submitter">
-					<option value="">All states</option>
-					<option value="succeeded" ${selected('succeeded', taskstate)}>succeeded</option>
-					<option value="running" ${selected('running', taskstate)}>running</option>
-					<option value="failed" ${selected('failed', taskstate)}>failed</option>
-					<option value="killed" ${selected('killed', taskstate)}>killed</option>
-					<option value="pending" ${selected('pending', taskstate)}>pending</option>
-				</select>
-
-
-				<select name="tasktype" class="submitter">
-					<option value="">All types</option>
-					<option value="map" ${selected('map', tasktype)}>maps</option>
-					<option value="reduce" ${selected('reduce', tasktype)}>reduces</option>
-					<option value="job_cleanup" ${selected('job_cleanup', tasktype)}>cleanups</option>
-					<option value="job_setup" ${selected('job_setup', tasktype)}>setups</option>
-				</select>
+            <select name="taskstate" class="submitter">
+                <option value="">All states</option>
+                <option value="succeeded" ${selected('succeeded', taskstate)}>succeeded</option>
+                <option value="running" ${selected('running', taskstate)}>running</option>
+                <option value="failed" ${selected('failed', taskstate)}>failed</option>
+                <option value="killed" ${selected('killed', taskstate)}>killed</option>
+                <option value="pending" ${selected('pending', taskstate)}>pending</option>
+            </select>
 
 
-				<input type="text" name="tasktext"  class="submitter" title="Text filter" placeholder="Text Filter"
-				% if tasktext:
-				value="${tasktext}"
-				% endif
-				/>
+            <select name="tasktype" class="submitter">
+                <option value="">All types</option>
+                <option value="map" ${selected('map', tasktype)}>maps</option>
+                <option value="reduce" ${selected('reduce', tasktype)}>reduces</option>
+                <option value="job_cleanup" ${selected('job_cleanup', tasktype)}>cleanups</option>
+                <option value="job_setup" ${selected('job_setup', tasktype)}>setups</option>
+            </select>
 
-		</form>
-	</div>
+
+            <input type="text" name="tasktext"  class="submitter" title="Text filter" placeholder="Text Filter"
+                % if tasktext:
+                   value="${tasktext}"
+                % endif
+                    />
+        </form>
+    </div>
 
 
-	% if len(page.object_list) == 0:
-	<p>There were no tasks that match your search criteria.</p>
-	% else:
+    % if len(page.object_list) == 0:
+         <p>There were no tasks that match your search criteria.</p>
+    % else:
+        <table class="datatables table table-striped table-condensed">
+            <thead>
+            <tr>
+                <th>Task ID</th>
+                <th>Type</th>
+                <th>Progress</th>
+                <th>Status</th>
+                <th>State</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>View Attempts</th>
+            </tr>
+            </thead>
+	        <tbody>
+	            %for t in page.object_list:
+	            <tr>
+	                <td>${t.taskId_short}</td>
+	                <td>${t.taskType}</td>
+	                <td>
+	                   <div class="bar">${"%d" % (t.progress * 100)}%</div>
+	                </td>
+	                <td>
+	                    <a href="${url('jobbrowser.views.tasks', jobid=jobid)}?${get_state_link(request, 'taskstate', t.state.lower())}"
+	                       title="Show only ${t.state.lower()} tasks"
+	                       class="${t.state.lower()}">${t.state.lower()}
+	                    </a>
+	                </td>
+	                <td>${t.mostRecentState}</td>
+	                <td>${t.execStartTimeFormatted}</td>
+	                <td>${t.execFinishTimeFormatted}</td>
+	                <td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" data-row-selector="true">Attempts</a></td>
+	            </tr>
+	            %endfor
+	        </tbody>
+        </table>
+    %endif
+</div>
 
-	<table class="datatables table table-striped table-condensed">
-		<thead>
-			<tr>
-				<th>Task ID</th>
-				<th>Type</th>
-				<th>Progress</th>
-				<th>Status</th>
-				<th>State</th>
-				<th>Start Time</th>
-				<th>End Time</th>
-				<th>View Attempts</th>
-			</tr>
-		</thead>
-		<tbody>
-			%for t in page.object_list:
-			<tr data-dblclick-delegate="{'dblclick_loads':'.view_task'}">
-				<td>${t.taskId_short}</td>
-				<td>${t.taskType}</td>
-				<td>${"%d" % (t.progress * 100)}%</td>
-				<td><a href="${url('jobbrowser.views.tasks', jobid=jobid)}?${get_state_link(request, 'taskstate', t.state.lower())}"
-					title="Show only ${t.state.lower()} tasks"
-					class="${t.state.lower()}">${t.state.lower()}</a></td>
-					<td>${t.mostRecentState}</td>
-					<td>${t.execStartTimeFormatted}</td>
-					<td>${t.execFinishTimeFormatted}</td>
-					<td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" data-row-selector="true">Attempts</a></td>
-				</tr>
-				%endfor
-		</tbody>
-	</table>
-	%endif
-	</div>
-	<script type="text/javascript" charset="utf-8">
-		$(document).ready(function(){
-			$(".datatables").dataTable({
-				"bPaginate": false,
-			    "bLengthChange": false,
-			    "bFilter": false,
-				"bInfo": false,
-			});
-			$("a[data-row-selector='true']").jHueRowSelector();
-		});
-	</script>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+        $(".datatables").dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": false,
+            "bInfo": false,
+        });
+        $("a[data-row-selector='true']").jHueRowSelector();
+    });
+</script>
 
-  ${commonfooter()}
+${commonfooter()}

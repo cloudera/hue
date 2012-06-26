@@ -15,12 +15,13 @@
 ## limitations under the License.
 
 <%!
-  import urllib
-  from django.template.defaultfilters import date, time
-  from desktop.views import commonheader, commonfooter
-  from django.utils.translation import ugettext, ungettext, get_language, activate
+    import urllib
+    import time as py_time
+    from django.template.defaultfilters import date, time
+    from desktop.views import commonheader, commonfooter
+    from django.utils.translation import ugettext, ungettext, get_language, activate
 
-  _ = ugettext
+    _ = ugettext
 %>
 <%namespace name="layout" file="layout.mako" />
 
@@ -33,24 +34,24 @@ ${layout.menubar(section='history')}
     <h1>Job Submission History</h1>
     <div class="well hueWell">
         <form class="form-search">
-			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
-		</form>
+            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
+        </form>
     </div>
 
 
     <table class="table table-condensed datatables" id="jobTable">
         <thead>
-            <tr>
-                <th>Oozie Job ID</th>
-                <th>Owner</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Submission Date</th>
-            </tr>
+        <tr>
+            <th>Oozie Job ID</th>
+            <th>Owner</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Submission Date</th>
+        </tr>
         </thead>
         <tbody>
-            %for record in history:
+                %for record in history:
                 <% design = record.design %>
                 <tr>
                     <td><a href="${url('jobsub.views.oozie_job', jobid=record.job_id)}">${record.job_id}</a></td>
@@ -58,9 +59,9 @@ ${layout.menubar(section='history')}
                     <td>${design.name}</td>
                     <td>${design.root_action.action_type}</td>
                     <td>${design.description}</td>
-                    <td>${date(record.submission_date)} ${time(record.submission_date).replace("p.m.","PM").replace("a.m.","AM")}</td>
+                    <td><span alt="${py_time.mktime(design.last_modified.timetuple())}">${date(record.submission_date)} ${time(record.submission_date).replace("p.m.","PM").replace("a.m.","AM")}</span></td>
                 </tr>
-            %endfor
+                %endfor
         </tbody>
     </table>
 </div>
@@ -68,18 +69,18 @@ ${layout.menubar(section='history')}
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
         var oTable = $('#jobTable').dataTable( {
-          'sPaginationType': 'bootstrap',
-          "bLengthChange": false,
-          "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
-		  "aoColumns": [
-				null,
-				null,
-				null,
-				null,
-				null,
-				{ "sType": "date" }
-			],
-			"aaSorting": [[ 5, "desc" ]]
+            'sPaginationType': 'bootstrap',
+            "bLengthChange": false,
+            "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
+            "aoColumns": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                { "sType": "alt-numeric" }
+            ],
+            "aaSorting": [[ 5, "desc" ]]
         });
 
         $("#filterInput").keyup(function() {

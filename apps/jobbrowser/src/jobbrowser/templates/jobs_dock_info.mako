@@ -14,10 +14,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 % if jobs.get('all') > 0:
-  jobs:
-  % for state in ['running', 'failed', 'completed']:
-    % if jobs.get(state) > 0:
-      <a href="${url('jobbrowser.views.jobs')}?user=${user.username}&state=${state}" target="JobBrowser" class="hue-dock-status-${state}">${jobs.get(state)} ${state}</a>
-    % endif
-  % endfor
+    jobs:
+    % for state in ['running', 'failed', 'completed']:
+        % if jobs.get(state) > 0:
+            <a href="${url('jobbrowser.views.jobs')}?user=${user.username}&state=${state}">${jobs.get(state)} ${state}</a>
+        % endif
+    % endfor
 % endif
