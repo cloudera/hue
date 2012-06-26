@@ -61,14 +61,14 @@
   if klass:
     classes.append(klass)
   if hidden:
-    classes.append("jframe-hidden")
+    classes.append("hide")
   cls = ' '.join(classes)
 
   title_classes = []
   if title_klass:
     title_classes.append(title_klass)
   if notitle or hidden:
-    title_classes.append("jframe-hidden")
+    title_classes.append("hide")
   titlecls = ' '.join(title_classes)
 %>
 

@@ -35,7 +35,7 @@ else:
   ${comps.field(field)}
 % endfor
 </dl>
-<input class="jframe-hidden" type="submit">
+<input type="submit">
 </form>
 </div>
 </div>

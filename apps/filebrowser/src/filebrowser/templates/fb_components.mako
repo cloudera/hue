@@ -18,7 +18,7 @@ from django.template.defaultfilters import urlencode
 %>
 
 <%def name="footer()">
-      <div class="fb-uploader jframe-hidden">
+      <div class="fb-uploader hide">
         <a class="fb-cancel-upload">Close</a>
         <ul class="fb-upload-list"></ul>
 

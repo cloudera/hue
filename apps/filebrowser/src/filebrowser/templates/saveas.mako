@@ -32,7 +32,7 @@
           ${edit.render_field(form["path"], notitle=True)}
           <div>${edit.render_field(form["contents"], hidden=True)}</div>
           <div>${edit.render_field(form["encoding"], hidden=True)}</div>
-          <input type="submit" class="jframe-hidden" name="save" value="save"/>
+          <input type="submit" name="save" value="save"/>
       </form>
     </div>
   </body>
