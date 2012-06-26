@@ -15,5 +15,5 @@
 ## limitations under the License.
 <%! import jobsub %>
 % if pending_count:
-<a href="${url(jobsub.views.watch)}" target="JobSub" class="hue-dock-status-pending">${pending_count} pending</a>
+<a href="${url(jobsub.views.watch)}">${pending_count} pending</a>
 % endif

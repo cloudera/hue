@@ -49,17 +49,18 @@ from desktop.lib.i18n import smart_unicode
   <script src="/static/js/Source/jHue/jquery.rowselector.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
+  <script src="/static/js/Source/jHue/jquery.datatables.sorting.js"></script>
   <script src="/static/ext/js/bootstrap.min.js"></script>
   <script src="/static/ext/js/fileuploader.js"></script>
 
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
       $("#username").jHueUsername({
-		onLoad: function(user){
-			$(".userProfile").attr("href","/useradmin/users/edit/"+user.username);
-			$("#usernameDropdown").show();
-		}
-	  });
+        onLoad: function(user){
+            $(".userProfile").attr("href","/useradmin/users/edit/"+user.username);
+            $("#usernameDropdown").show();
+        }
+      });
       $("input:text[placeholder]").simplePlaceholder();
       $(".submitter").keydown(function(e){
         if (e.keyCode==13){
@@ -87,7 +88,7 @@ from desktop.lib.i18n import smart_unicode
     <div class="navbar-inner">
       <div class="container-fluid">
         <a class="brand nav-tooltip" title="About Hue" href="/about">Hue</a>
-		<div id="usernameDropdown" class="btn-group pull-right hide">
+        <div id="usernameDropdown" class="btn-group pull-right hide">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-user"></i> <span id="username"></span>
             <span class="caret"></span>

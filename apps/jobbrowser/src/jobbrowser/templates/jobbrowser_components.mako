@@ -15,86 +15,75 @@
 ## limitations under the License.
 
 <%def name="task_counters(counters)">
-<%
-  from jobbrowser.views import format_counter_name
-%>
-	% for group in counters.groups:
-		<h3>${format_counter_name(group.displayName)}</h3>
-	    <table class="taskCountersTable table table-striped table-condensed">
-	      <thead>
-	         <tr>
-	           <th>Counter Name</th>
-	           <th>Value</th>
-	        </tr>
-	      </thead>
-	      <tbody>
-	      % for name, counter in sorted(group.counters.iteritems()):
-	       <tr>
-	          <td class="jt_counter_display_name">${format_counter_name(counter.displayName)}</td>
-	          <td class="jt_counter_total">${counter.value}</td>
-	        </tr>
-	      % endfor
-      </tbody>
-     </table>
-      % endfor
+    <%
+        from jobbrowser.views import format_counter_name
+    %>
+    % for group in counters.groups:
+        <h3>${format_counter_name(group.displayName)}</h3>
+        <table class="taskCountersTable table table-striped table-condensed">
+            <thead>
+            <tr>
+                <th>Counter Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+        <tbody>
+            % for name, counter in sorted(group.counters.iteritems()):
+            <tr>
+                <td>${format_counter_name(counter.displayName)}</td>
+                <td>${counter.value}</td>
+            </tr>
+            % endfor
+        </tbody>
+        </table>
+    % endfor
 </%def>
 
 <%def name="job_counters(counters)">
-<%
-  from jobbrowser.views import format_counter_name
-%>
-
-	% for group in counters.itervalues():
-      <h3>${format_counter_name(group['displayName'])}</h3>
-	  <table class="jobCountersTable table table-striped table-condensed">
-      <thead>
-         <tr>
-           <th>Name</th>
-           <th>Maps Total</th>
-           <th>Reduces Total</th>
-           <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-		 % for name, counter in sorted(group['counters'].iteritems()):
-	      <%
-	        map_count = counter.get('map', 0)
-	        reduce_count = counter.get('reduce', 0)
-	        job_count = counter.get('job', 0)
-	      %>
-	       <tr>
-	          <td>${format_counter_name(counter.get('displayName', 'n/a'))}</td>
-	          <td>${map_count}</td>
-	          <td>${reduce_count}</td>
-	          <td>${map_count + reduce_count + job_count}</td>
-	        </tr>
-	      % endfor
-			</tbody>
-	     </table>
-	% endfor
-
-
-
+    <%
+        from jobbrowser.views import format_counter_name
+    %>
+    % for group in counters.itervalues():
+        <h3>${format_counter_name(group['displayName'])}</h3>
+        <table class="jobCountersTable table table-striped table-condensed">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Maps Total</th>
+                <th>Reduces Total</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+        <tbody>
+            % for name, counter in sorted(group['counters'].iteritems()):
+            <%
+                map_count = counter.get('map', 0)
+                reduce_count = counter.get('reduce', 0)
+                job_count = counter.get('job', 0)
+            %>
+            <tr>
+                <td>${format_counter_name(counter.get('displayName', 'n/a'))}</td>
+                <td>${map_count}</td>
+                <td>${reduce_count}</td>
+                <td>${map_count + reduce_count + job_count}</td>
+            </tr>
+            % endfor
+        </tbody>
+        </table>
+    % endfor
 </%def>
 
 <%def name="mr_graph(job)">
-  <div class="jt_mr_display">
-    ${mr_graph_maps(job)}
-    ${mr_graph_reduces(job)}
-  </div>
+    <div>
+        ${mr_graph_maps(job)}
+        ${mr_graph_reduces(job)}
+    </div>
 </%def>
 
 <%def name="mr_graph_maps(job)">
-  <div class="jt_maps">
-    <span class="jt_maps_complete" style="width: ${job.maps_percent_complete}%;">${job.finishedMaps} / ${job.desiredMaps}</span>
-    <span class="jt_white_border"></span>
-  </div>
+    <div class="bar">${job.finishedMaps} / ${job.desiredMaps}</div>
 </%def>
-<%def name="mr_graph_reduces(job, right_border=False)">
-  <div class="jt_reduces">
-    <span class="jt_reduces_complete" style="width: ${job.reduces_percent_complete}%;">${job.finishedReduces} / ${job.desiredReduces}</span>
-    % if right_border:
-      <span class="jt_white_border"></span>
-    % endif
-  </div>
+
+<%def name="mr_graph_reduces(job)">
+    <div class="bar">${job.finishedReduces} / ${job.desiredReduces}</div>
 </%def>
