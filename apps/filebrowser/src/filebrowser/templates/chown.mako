@@ -84,8 +84,8 @@
 
     </div>
     <div class="modal-footer" style="padding-top: 10px;">
-		<div id="chownRequired" class="hide" style="position: absolute; left: 10;">
-			<span class="label label-important">Sorry, name is required.</span>
+        <div id="chownRequired" class="hide" style="position: absolute; left: 10;">
+            <span class="label label-important">Sorry, name is required.</span>
         </div>
         <input class="btn primary" type="submit" value="Submit" />
         <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">Cancel</a>
@@ -93,53 +93,51 @@
 </form>
 
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$("select[name='user']").change(function(){
-			if ($(this).val() == "__other__"){
-				$("input[name='user_other']").show();
-			}
-			else {
-				$("input[name='user_other']").hide();
-			}
-		});
-		$("select[name='group']").change(function(){
-			if ($(this).val() == "__other__"){
-				$("input[name='group_other']").show();
-			}
-			else {
-				$("input[name='group_other']").hide();
-			}
-		});
+    $(document).ready(function(){
+        $("select[name='user']").change(function(){
+            if ($(this).val() == "__other__"){
+                $("input[name='user_other']").show();
+            }
+            else {
+                $("input[name='user_other']").hide();
+            }
+        });
+        $("select[name='group']").change(function(){
+            if ($(this).val() == "__other__"){
+                $("input[name='group_other']").show();
+            }
+            else {
+                $("input[name='group_other']").hide();
+            }
+        });
 
-		$("#chownForm").submit(function(){
-			console.log($("select[name='user']").val());
-			console.log($("select[name='group']").val());
-			if ($("select[name='user']").val() == null){
-				$("#chownRequired").find(".label").text("Sorry, user is required.");
-				$("#chownRequired").show();
-				return false;
-			}
-			else if ($("select[name='group']").val() == null){
-				$("#chownRequired").find(".label").text("Sorry, group is required.");
-				$("#chownRequired").show();
-				return false;
-			}
-			else {
-				if ($("select[name='group']").val() == "__other__" && $("input[name='group_other']").val() == ""){
-					$("#chownRequired").find(".label").text("Sorry, you need to specify another group.");
-					$("input[name='group_other']").addClass("fieldError");
-					$("#chownRequired").show();
-					return false;
-				}
-				if ($("select[name='user']").val() == "__other__" && $("input[name='user_other']").val() == ""){
-					$("#chownRequired").find(".label").text("Sorry, you need to specify another user.");
-					$("input[name='user_other']").addClass("fieldError");
-					$("#chownRequired").show();
-					return false;
-				}
-				return true;
-			}
-		});
-	});
+        $("#chownForm").submit(function(){
+            if ($("select[name='user']").val() == null){
+                $("#chownRequired").find(".label").text("Sorry, user is required.");
+                $("#chownRequired").show();
+                return false;
+            }
+            else if ($("select[name='group']").val() == null){
+                $("#chownRequired").find(".label").text("Sorry, group is required.");
+                $("#chownRequired").show();
+                return false;
+            }
+            else {
+                if ($("select[name='group']").val() == "__other__" && $("input[name='group_other']").val() == ""){
+                    $("#chownRequired").find(".label").text("Sorry, you need to specify another group.");
+                    $("input[name='group_other']").addClass("fieldError");
+                    $("#chownRequired").show();
+                    return false;
+                }
+                if ($("select[name='user']").val() == "__other__" && $("input[name='user_other']").val() == ""){
+                    $("#chownRequired").find(".label").text("Sorry, you need to specify another user.");
+                    $("input[name='user_other']").addClass("fieldError");
+                    $("#chownRequired").show();
+                    return false;
+                }
+                return true;
+            }
+        });
+    });
 </script>
 

@@ -25,33 +25,34 @@
         ${edit.render_field(form["src_path"], hidden=True)}
         ${edit.render_field(form["dest_path"], notitle=True, klass="input-xlarge pathChooser")}
         </div>
-		<br/>
-		<div id="fileChooserModal" class="smallModal well hide">
-			<a href="#" class="close" data-dismiss="modal">&times;</a>
-		</div>
+        <br/>
+        <div id="fileChooserModal" class="smallModal well hide">
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+        </div>
     </div>
     <div class="modal-footer">
-		<div id="moveNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-			<span class="label label-important">Sorry, name is required.</span>
-    	</div>
+        <div id="moveNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
+            <span class="label label-important">Sorry, name is required.</span>
+        </div>
         <input class="btn primary" type="submit" value="Submit"/>
         <a class="btn" onclick="$('#moveModal').modal('hide');">Cancel</a>
     </div>
 </form>
 
 <script type="text/javascript" charset="utf-8">
-	$(".pathChooser").click(function(){
-		var self = this;
-		$("#fileChooserModal").jHueFileChooser({
-			onFileChoose: function(filePath) {
-				$(self).val(filePath);
-			},
-			onFolderChange: function(folderPath){
-				$(self).val(folderPath);
-			},
-			createFolder: false,
-			uploadFile: false
-		});
-		$("#fileChooserModal").slideDown();
-	});
+    $(".pathChooser").click(function(){
+        var self = this;
+        $("#fileChooserModal").jHueFileChooser({
+            initialPath: $(self).val(),
+            onFileChoose: function(filePath) {
+                $(self).val(filePath);
+            },
+            onFolderChange: function(folderPath){
+                $(self).val(folderPath);
+            },
+            createFolder: false,
+            uploadFile: false
+        });
+        $("#fileChooserModal").slideDown();
+    });
 </script>

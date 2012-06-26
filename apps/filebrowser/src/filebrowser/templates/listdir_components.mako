@@ -29,121 +29,121 @@ from django.utils.encoding import smart_str
   ${_table(files, path, current_request_path, 'view', cwd_set)}
 </%def>
 <%def name="_table(files, path, current_request_path, view, cwd_set=False)">
-	<script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-	<link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-	<style type="text/css">
-		.pull-right {
-			margin: 4px;
-		}
-		.sortable {
-			cursor: pointer;
-		}
-	</style>
-	<div class="well hueWell">
-		<p class="pull-right">
-			<a href="#" class="btn upload-link">Upload files</a>
-			<a href="#" class="btn create-directory-link">New directory</a>
-		</p>
-		<form class="form-search">
-			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for file name">
-		</form>
-	</div>
+    <script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+    <style type="text/css">
+        .pull-right {
+            margin: 4px;
+        }
+        .sortable {
+            cursor: pointer;
+        }
+    </style>
+    <div class="well hueWell">
+        <p class="pull-right">
+            <a href="#" class="btn upload-link">Upload files</a>
+            <a href="#" class="btn create-directory-link">New directory</a>
+        </p>
+        <form class="form-search">
+            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for file name">
+        </form>
+    </div>
 
-	<table class="table table-condensed table-striped datatables">
-		<thead>
-			<tr>
-			% if cwd_set:
-				<th>Name</th>
-			% else:
-				<th>Path</th>
-			% endif
-				<th>Size</th>
-				<th>User</th>
-				<th>Group</th>
-				<th>Permissions</th>
-				<th>Date</th>
-				<th>&nbsp;</th>
-			</tr>
-		</thead>
-		<tbody>
-			% for file in files:
-			<%
-	          cls = ''
-	          if (file_filter == 'dir' and file['type'] != 'dir') or (file_filter != 'dir' and file['type'] == 'dir'):
-	            if (file_filter != 'any'):
-	              cls = ' not-selectable'
+    <table class="table table-condensed table-striped datatables">
+        <thead>
+            <tr>
+            % if cwd_set:
+                <th>Name</th>
+            % else:
+                <th>Path</th>
+            % endif
+                <th>Size</th>
+                <th>User</th>
+                <th>Group</th>
+                <th>Permissions</th>
+                <th>Date</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            % for file in files:
+            <%
+              cls = ''
+              if (file_filter == 'dir' and file['type'] != 'dir') or (file_filter != 'dir' and file['type'] == 'dir'):
+                if (file_filter != 'any'):
+                  cls = ' not-selectable'
 
-	          if cwd_set:
-	            display_name = file['name']
-	          else:
-	            display_name = file['path']
-	          endif
-	        %>
+              if cwd_set:
+                display_name = file['name']
+              else:
+                display_name = file['path']
+              endif
+            %>
 
-			<% path = file['path'] %>
-			<tr class="file-row" data-search="${display_name}">
-				<td>
-					<h5><a href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}" data-row-selector="true">${display_name}</a></h5>
-				</td>
-				<td>
-					% if "dir" == file['type']:
-					<span>~</span>
-					% else:
-					<span>${file['stats']['size']|filesizeformat}</span>
-					% endif
-				</td>
-				<td>${file['stats']['user']}</td>
-				<td>${file['stats']['group']}</td>
-				<td>${file['rwx']}</td>
-				<td>${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime'])).replace("p.m.","PM").replace("a.m.","AM")}</td>
-				<td>
-					% if ".." != file['name']:
-					<%
-					path_digest = urlencode(md5.md5(smart_str(path)).hexdigest())
-					%>
-					<div class="btn-group">
-				    	<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-							Options
-				    		<span class="caret"></span>
-				    	</a>
-				    	<ul class="dropdown-menu">
-				    		% if "dir" == file['type']:
-							<li><a class="delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
-							<li><a class="delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete Recursively</a></li>
-							% else:
-							<li><a class="delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
-							<li><a href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a></li>
-							<li><a href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a></li>
-							<li><a href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
-							% endif
-							<li><a class="rename" file-to-rename="${path}">Rename</a></li>
-							<li><a onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
-							<li><a onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a></li>
-							<li><a onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a></li>
-				    	</ul>
-				    </div>
-					% endif
-				</td>
-			</tr>
-			% endfor
-		</tbody>
-	</table>
+            <% path = file['path'] %>
+            <tr class="file-row" data-search="${display_name}">
+                <td>
+                    <h5><a href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}" data-row-selector="true">${display_name}</a></h5>
+                </td>
+                <td>
+                    % if "dir" == file['type']:
+                    <span>~</span>
+                    % else:
+                    <span>${file['stats']['size']|filesizeformat}</span>
+                    % endif
+                </td>
+                <td>${file['stats']['user']}</td>
+                <td>${file['stats']['group']}</td>
+                <td>${file['rwx']}</td>
+                <td>${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime'])).replace("p.m.","PM").replace("a.m.","AM")}</td>
+                <td>
+                    % if ".." != file['name']:
+                    <%
+                    path_digest = urlencode(md5.md5(smart_str(path)).hexdigest())
+                    %>
+                    <div class="btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            Options
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            % if "dir" == file['type']:
+                            <li><a class="delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
+                            <li><a class="delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete Recursively</a></li>
+                            % else:
+                            <li><a class="delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
+                            <li><a href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a></li>
+                            <li><a href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a></li>
+                            <li><a href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
+                            % endif
+                            <li><a class="rename" file-to-rename="${path}">Rename</a></li>
+                            <li><a onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
+                            <li><a onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a></li>
+                            <li><a onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a></li>
+                        </ul>
+                    </div>
+                    % endif
+                </td>
+            </tr>
+            % endfor
+        </tbody>
+    </table>
 
 <!-- delete modal -->
 <div id="deleteModal" class="modal hide fade">
-	<div class="modal-header">
-		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>Please Confirm</h3>
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>Please Confirm</h3>
     </div>
     <div class="modal-body">
         <p>Are you sure you want to delete this file?</p>
     </div>
     <div class="modal-footer">
         <form id="deleteForm" action="" method="POST" enctype="multipart/form-data" class="form-stacked">
-			<input type="submit" value="Yes" class="btn primary" />
-			<a id="cancelDeleteBtn" class="btn">No</a>
-        	<input id="fileToDeleteInput" type="hidden" name="path" />
+            <input type="submit" value="Yes" class="btn primary" />
+            <a id="cancelDeleteBtn" class="btn">No</a>
+            <input id="fileToDeleteInput" type="hidden" name="path" />
         </form>
     </div>
 </div>
@@ -156,11 +156,11 @@ from django.utils.encoding import smart_str
         <h3>Renaming: <span id="renameFileName">file name</span></h3>
     </div>
     <div class="modal-body">
-		<label>New name <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
+        <label>New name <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
     </div>
     <div class="modal-footer">
         <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-			<span class="label label-important">Sorry, name is required.</span>
+            <span class="label label-important">Sorry, name is required.</span>
         </div>
 
         <input id="renameSrcPath" type="hidden" name="src_path" type="text">
@@ -179,14 +179,12 @@ from django.utils.encoding import smart_str
     </div>
     <div class="modal-body">
         <form action="/filebrowser/upload?next=${current_dir_path}" method="POST" enctype="multipart/form-data" class="form-stacked">
-			<div id="fileUploader">
-		<noscript>
-			<p>Please enable JavaScript to use file uploader.</p>
-			<!-- or put a simple form for upload here -->
-		</noscript>
-	</div>
+            <div id="fileUploader">
+            <noscript>
+                <p>Please enable JavaScript to use file uploader.</p>
+            </noscript>
+            </div>
         </form>
-
     </div>
     <div class="modal-footer"></div>
     </form>
@@ -200,8 +198,8 @@ from django.utils.encoding import smart_str
         <h3>Create Directory</h3>
     </div>
     <div class="modal-body">
-		<label>Directory Name <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
-		<input type="hidden" name="path" type="text" value="${current_dir_path}"/>
+        <label>Directory Name <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
+        <input type="hidden" name="path" type="text" value="${current_dir_path}"/>
     </div>
     <div class="modal-footer">
          <div id="directoryNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
@@ -236,10 +234,10 @@ from django.utils.encoding import smart_str
             success: function(data){
                 $("#changeOwnerModal").html(data);
                 $("#changeOwnerModal").modal({
-					backdrop: "static",
-					keyboard: true,
-					show: true
-				});
+                    backdrop: "static",
+                    keyboard: true,
+                    show: true
+                });
             }
         });
     }
@@ -255,10 +253,10 @@ from django.utils.encoding import smart_str
             success: function(data){
                 $("#changePermissionModal").html(data);
                 $("#changePermissionModal").modal({
-					backdrop: "static",
-					keyboard: true,
-					show: true
-				});
+                    backdrop: "static",
+                    keyboard: true,
+                    show: true
+                });
             }
         });
     }
@@ -274,10 +272,10 @@ from django.utils.encoding import smart_str
             success: function(data){
                 $("#moveModal").html(data);
                 $("#moveModal").modal({
-					backdrop: "static",
-					keyboard: true,
-					show: true
-				});
+                    backdrop: "static",
+                    keyboard: true,
+                    show: true
+                });
             }
         });
     }
@@ -308,22 +306,22 @@ from django.utils.encoding import smart_str
     // don"t wait for the window to load
     window.onload = createUploader;
 
-	$(document).ready(function(){
+    $(document).ready(function(){
         //filter handlers
         var oTable = $('.datatables').dataTable( {
           "sPaginationType": "bootstrap",
           "bLengthChange": false,
           "iDisplayLength": 15,
           "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
-		  "aoColumns": [
-				null,
-				null,
-				null,
-				null,
-				null,
-				{ "sType": "date" },
-				null
-			]
+          "aoColumns": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                { "sType": "date" },
+                null
+            ]
         });
 
         $("#filterInput").keyup(function() {
@@ -427,6 +425,7 @@ from django.utils.encoding import smart_str
         $(".pathChooser").click(function(){
             var self = this;
             $("#fileChooserRename").jHueFileChooser({
+                initialPath: $(self).val(),
                 onFileChoose: function(filePath) {
                     $(self).val(filePath);
                 },

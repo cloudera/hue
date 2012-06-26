@@ -424,7 +424,6 @@ ${layout.menubar(section='tables')}
             $("#chooseFile").modal("show");
         });
 
-
         $(".step").click(function(event){
             event.preventDefault();
             $(".stepDetails").hide();

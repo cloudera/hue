@@ -191,42 +191,41 @@ ${layout.menubar(section='tables')}
 </div>
 </div>
 <style>
-	#filechooser {
-		display:none;
-		min-height:100px;
-		overflow-y:scroll;
-		margin-top:10px;
-	}
+    #filechooser {
+        display:none;
+        min-height:100px;
+        overflow-y:scroll;
+        margin-top:10px;
+    }
 </style>
 
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
+    $(document).ready(function(){
+        $("#filechooser").jHueFileChooser({
+            initialPath: $(".loadPath").val(),
+            onFileChoose: function(filePath){
+                $(".loadPath").val(filePath);
+                $("#filechooser").slideUp();
+            },
+            createFolder: false
+        });
+        $(".datatables").dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bInfo": false,
+            "bFilter": false
+        });
 
-		$("#filechooser").jHueFileChooser({
-			onFileChoose: function(filePath){
-				$(".loadPath").val(filePath);
-				$("#filechooser").slideUp();
-			},
-			createFolder: false
-		});
-		$(".datatables").dataTable({
-			"bPaginate": false,
-		    "bLengthChange": false,
-			"bInfo": false,
-			"bFilter": false
-		});
-
-		$.getJSON("${ url("beeswax.views.drop_table", table=table_name) }",function(data){
-			$("#dropTableMessage").text(data.title);
-		});
-		$(".hideModal").click(function(){
-			$(this).closest(".modal").modal("hide");
-		});
-		$(".loadPath").click(function(){
-			$("#filechooser").slideDown();
-		});
-
-	});
+        $.getJSON("${ url("beeswax.views.drop_table", table=table_name) }",function(data){
+            $("#dropTableMessage").text(data.title);
+        });
+        $(".hideModal").click(function(){
+            $(this).closest(".modal").modal("hide");
+        });
+        $(".loadPath").click(function(){
+            $("#filechooser").slideDown();
+        });
+    });
 </script>
 
 ${commonfooter()}

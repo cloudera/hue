@@ -179,33 +179,30 @@ ${layout.menubar(section='designs')}
 
 
 <style>
-	.pathChooser, .pathChooserKo {
-		border-radius: 3px 0 0 3px;
-		border-right:0;
-	}
-	.fileChooserBtn {
-		border-radius: 0 3px 3px 0;
-	}
-
+    .pathChooser, .pathChooserKo {
+        border-radius: 3px 0 0 3px;
+        border-right:0;
+    }
+    .fileChooserBtn {
+        border-radius: 0 3px 3px 0;
+    }
     #fileChooserModal {
         padding:14px;
         height:270px;
     }
-
-    #fileChooserModal > ul {
+    #fileChooserModal > ul.unstyled {
         height:230px;
         overflow-y:auto;
     }
-
-	.designTable {
-		margin-left:0;
-	}
-	.designTable th, .designTable td {
-	    padding-left: 0;
-	}
-	.designTable th {
-		text-align:left;
-	}
+    .designTable {
+        margin-left:0;
+    }
+    .designTable th, .designTable td {
+        padding-left: 0;
+    }
+    .designTable th {
+        text-align:left;
+    }
 </style>
 
 
@@ -306,31 +303,32 @@ ${layout.menubar(section='designs')}
 
         ko.bindingHandlers.fileChooser = {
             init: function(element, valueAccessor, allBindings, model) {
-				var self = $(element);
-				self.after(getFileBrowseButton(self));
+                var self = $(element);
+                self.after(getFileBrowseButton(self));
             }
         };
 
         ko.applyBindings(viewModel);
 
-		$(".pathChooser").each(function(){
-			var self = $(this);
-			self.after(getFileBrowseButton(self));
-		});
+        $(".pathChooser").each(function(){
+            var self = $(this);
+            self.after(getFileBrowseButton(self));
+        });
 
-		function getFileBrowseButton(inputElement) {
-			return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
-				e.preventDefault();
-				$("#fileChooserModal").jHueFileChooser({
-	                onFileChoose: function(filePath) {
-	                    inputElement.val(filePath);
-	                    $("#chooseFile").modal("hide");
-	                },
-	                createFolder: false
-	            });
-	            $("#chooseFile").modal("show");
-			})
-		}
+        function getFileBrowseButton(inputElement) {
+            return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
+                e.preventDefault();
+                $("#fileChooserModal").jHueFileChooser({
+                    initialPath: inputElement.val(),
+                    onFileChoose: function(filePath) {
+                        inputElement.val(filePath);
+                        $("#chooseFile").modal("hide");
+                    },
+                    createFolder: false
+                });
+                $("#chooseFile").modal("show");
+            })
+        }
 
 
         $(".propKey").each(addAutoComplete);
