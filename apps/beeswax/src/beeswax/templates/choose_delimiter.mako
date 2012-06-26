@@ -127,6 +127,12 @@ ${layout.menubar(section='tables')}
             e.preventDefault();
             $("input[name='submit_delim']").click();
         });
+        $("body").keypress(function(e){
+            if(e.which == 13){
+                e.preventDefault();
+                $("input[name='submit_delim']").click();
+            }
+        });
     });
 </script>
 

@@ -176,27 +176,17 @@ ${layout.menubar(section='query')}
                         </li>
                         <li class="nav-header">${_('Parametrization')}</li>
                         <li>
-                            ${comps.field(form.query["is_parameterized"],
-                                notitle = True,
-                                tag = "checkbox",
-                                button_text = _("Enable Parameterization"),
-                                help = _("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."),
-                                help_attrs= dict(
-                                  data_help_direction='11'
-                                )
-                            )}
+                            <label class="checkbox" rel="tooltip" data-original-title="${_("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.")}">
+                                <input type="checkbox" id="id_${form.query["is_parameterized"].html_name | n}" name="${form.query["is_parameterized"].html_name | n}" ${extract_field_data(form.query["is_parameterized"]) and "CHECKED" or ""}/>
+                                ${_("Enable Parameterization")}
+                            </label>
                         </li>
                         <li class="nav-header">${_('Email Notification')}</li>
                         <li>
-                            ${comps.field(form.query["email_notify"],
-                              notitle = True,
-                              tag = "checkbox",
-                              button_text = _("Email me on complete"),
-                              help = _("If checked, you will receive an email notification when the query completes."),
-                              help_attrs= dict(
-                                data_help_direction='11'
-                              )
-                             )}
+                            <label class="checkbox" rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
+                                <input type="checkbox" id="id_${form.query["email_notify"].html_name | n}" name="${form.query["email_notify"].html_name | n}" ${extract_field_data(form.query["email_notify"]) and "CHECKED" or ""}/>
+                                ${_("Email me on complete")}
+                            </label>
                         </li>
                     </ul>
                     <input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
@@ -330,7 +320,7 @@ ${layout.menubar(section='query')}
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
         $("*[rel=tooltip]").tooltip({
-            placement: 'right'
+            placement: 'bottom'
         });
         // hack!!!
         $("select").addClass("span8");

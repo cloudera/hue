@@ -54,6 +54,7 @@ ${layout.menubar(section='tables')}
                 placeholder='table_name',
                 )
                 )}
+                <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
                 <p class="help-block">
                     ${_('Name of the new table.  Table names must be globally unique.  Table names tend to correspond as well to the directory where the data will be stored.')}
                 </p>
@@ -120,6 +121,7 @@ ${layout.menubar(section='tables')}
                 ${comps.bootstrapLabel(table_form["field_terminator"])}
                 <div class="controls">
                     ${comps.field(table_form["field_terminator"], render_default=True)}
+                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
                     <span class="help-block">
                         ${_('Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.')}
                     </span>
@@ -129,6 +131,7 @@ ${layout.menubar(section='tables')}
                 ${comps.bootstrapLabel(table_form["collection_terminator"])}
                 <div class="controls">
                     ${comps.field(table_form["collection_terminator"], render_default=True)}
+                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
                     <span class="help-block">
                         ${_('Use for array types.')}
                     </span>
@@ -138,6 +141,7 @@ ${layout.menubar(section='tables')}
                 ${comps.bootstrapLabel(table_form["map_key_terminator"])}
                 <div class="controls">
                     ${comps.field(table_form["map_key_terminator"], render_default=True)}
+                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
                     <span class="help-block">
                         ${_('Use for map types.')}
                     </span>
@@ -201,6 +205,7 @@ ${layout.menubar(section='tables')}
                     placeholder='com.acme.data.MyInputFormat',
                     )
                     )}
+                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
                     <span class="help-block">
                         ${_('Java Class used to read data')}
                     </span>
@@ -213,6 +218,7 @@ ${layout.menubar(section='tables')}
                     placeholder='com.acme.data.MyOutputFormat',
                     )
                     )}
+                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
                     <span class="help-block">
                         ${_('Java Class used to write data')}
                     </span>
@@ -244,9 +250,11 @@ ${layout.menubar(section='tables')}
         <div id="location" class="control-group hide">
             ${comps.bootstrapLabel(table_form["external_location"])}
             <div class="controls">
-                ${comps.field(table_form["external_location"], attrs=dict(
-                placeholder='/user/user_name/data_dir',
-                )
+                ${comps.field(table_form["external_location"],
+                placeholder="/user/user_name/data_dir",
+                klass="pathChooser",
+                file_chooser=True,
+                show_errors=False
                 )}
                 <span class="help-inline"><a id="pathChooser" href="#" class="btn" data-filechooser-destination="table-external_location">${_('Choose File')}</a></span>
                 <span class="help-block">
@@ -283,7 +291,6 @@ ${layout.menubar(section='tables')}
             ${unicode(partitions_form.management_form) | n}
         </div>
         <button class="btn" value="True" name="partitions-add" type="submit">${_('Add a partition')}</button>
-
     </fieldset>
 </div>
 <div class="form-actions">
@@ -311,8 +318,9 @@ ${layout.menubar(section='tables')}
         <div class="control-group">
             <label class="control-label">${_('Column name')}</label>
             <div class="controls">
-                <input name="${form["column_name"].html_name | n}" value="${form["column_name"].data or ''}" placeholder="${_('Column Name')}"/>
-                <span class="help-inline">
+                <input class="column" name="${form["column_name"].html_name | n}" value="${form["column_name"].data or ''}" placeholder="${_('Column Name')}"/>
+                <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+                <span class="help-block">
                 ${_('Column name must be single words that start with a letter or a digit.')}
                 </span>
             </div>
@@ -323,7 +331,7 @@ ${layout.menubar(section='tables')}
             ${comps.field(form["column_type"],
             render_default=True
             )}
-            <span class="help-inline">
+            <span class="help-block">
             ${_('Type for this column. Certain advanced types (namely, structs) are not exposed in this interface.')}
             </span>
             </div>
@@ -334,7 +342,7 @@ ${layout.menubar(section='tables')}
                         <label class="control-label">${_('Array value type')}</label>
                         <div class="controls">
                         ${comps.field(form["array_type"], render_default=True)}
-                            <span class="help-inline">
+                            <span class="help-block">
                             ${_('Type of the array values.')}
                             </span>
                         </div>
@@ -384,6 +392,13 @@ ${layout.menubar(section='tables')}
 </div>
 
 <style>
+    .pathChooser {
+        border-radius: 3px 0 0 3px;
+        border-right:0;
+    }
+    .fileChooserBtn {
+        border-radius: 0 3px 3px 0;
+    }
     #filechooser {
         min-height:100px;
         overflow-y:scroll;
@@ -396,6 +411,10 @@ ${layout.menubar(section='tables')}
     .remove {
         float:right;
     }
+    .error-inline {
+        color: #B94A48;
+        font-weight: bold;
+    }
 </style>
 </div>
 <script type="text/javascript" charset="utf-8">
@@ -403,7 +422,9 @@ ${layout.menubar(section='tables')}
         if ($(".removeBtn").length == 1){
             $(".removeBtn").first().hide();
         }
-        $("#pathChooser").click(function(){
+
+        $(".fileChooserBtn").click(function(e){
+            e.preventDefault();
             var _destination = $(this).attr("data-filechooser-destination");
             $("#filechooser").jHueFileChooser({
                 initialPath: $("input[name='"+_destination+"']").val(),
@@ -411,36 +432,59 @@ ${layout.menubar(section='tables')}
                     $("input[name='"+_destination+"']").val(filePath);
                     $("#chooseFile").modal("hide");
                 },
-                createFolder:false
+                createFolder: false
             });
             $("#chooseFile").modal("show");
         });
 
         $(".step").click(function(event){
             event.preventDefault();
-            $(".stepDetails").hide();
-            var _step = $(this).attr("href");
-            $(_step).css("visibility", "visible").show();
-            $("#backBtn").hide();
-            if (_step != "#step1"){
-                $("#backBtn").css("visibility", "visible").show();
+            if (validateForm()){
+                $(".stepDetails").hide();
+                var _step = $(this).attr("href");
+                $(_step).css("visibility", "visible").show();
+                $("#backBtn").hide();
+                if (_step != "#step1"){
+                    $("#backBtn").css("visibility", "visible").show();
+                }
+                if (_step != "#step6"){
+                    $("#nextBtn").show();
+                    $("#submit").hide();
+                }
+                else {
+                    $("#nextBtn").hide();
+                    $("#submit").css("visibility", "visible").show();
+                }
+                $(".step").parent().removeClass("active");
+                $(this).parent().addClass("active");
             }
-            if (_step != "#step6"){
-                $("#nextBtn").show();
-                $("#submit").hide();
-            }
-            else {
-                $("#nextBtn").hide();
-                $("#submit").css("visibility", "visible").show();
-            }
-            $(".step").parent().removeClass("active");
-            $(this).parent().addClass("active");
         });
         $("#nextBtn").click(function(){
             $("ul.nav-pills li.active").next().find("a").click();
         });
         $("#backBtn").click(function(){
             $("ul.nav-pills li.active").prev().find("a").click();
+        });
+        $("#submit").click(function(event){
+            // validate step 6
+            var step6Valid = true;
+            var scrollTo = 0;
+            $(".column").each(function(){
+                if (!isValid($.trim($(this).val()))){
+                    showFieldError($(this));
+                    if (scrollTo == 0){
+                        scrollTo = $(this).position().top - $(this).closest(".well").height();
+                    }
+                    step6Valid = false;
+                }
+                else {
+                    hideFieldError($(this));
+                }
+            });
+            if (!step6Valid){
+                event.preventDefault();
+                $(window).scrollTop(scrollTo);
+            }
         });
         var _url = location.href;
         if (_url.indexOf("#")>-1){
@@ -453,7 +497,7 @@ ${layout.menubar(section='tables')}
                 $("#id_table-field_terminator_1").show();
             }
             else {
-                $("#id_table-field_terminator_1").hide();
+                $("#id_table-field_terminator_1").hide().nextAll(".error-inline").addClass("hide");
             }
         });
         $("#id_table-collection_terminator_1").css("margin-left","4px").attr("placeholder","${_('Write here your collection terminator')}").hide();
@@ -462,7 +506,7 @@ ${layout.menubar(section='tables')}
                 $("#id_table-collection_terminator_1").show();
             }
             else {
-                $("#id_table-collection_terminator_1").hide();
+                $("#id_table-collection_terminator_1").hide().nextAll(".error-inline").addClass("hide");
             }
         });
         $("#id_table-map_key_terminator_1").css("margin-left","4px").attr("placeholder","${_('Write here your map key terminator')}").hide();
@@ -471,7 +515,7 @@ ${layout.menubar(section='tables')}
                 $("#id_table-map_key_terminator_1").show();
             }
             else {
-                $("#id_table-map_key_terminator_1").hide();
+                $("#id_table-map_key_terminator_1").hide().nextAll(".error-inline").addClass("hide");
             }
         });
 
@@ -513,6 +557,125 @@ ${layout.menubar(section='tables')}
         });
 
         $("#step4").find("ul").addClass("inputs-list");
+
+        $(".addColumnBtn, .addPartitionBtn, .createTableBtn").click(function(e){
+            if (!validateStep6()){
+                e.preventDefault();
+            }
+        });
+
+        function validateStep6(){
+            // step 6
+            var step6Valid = true;
+            $(".columnField").each(function(){
+                if (!isValid($(this).val())){
+                    showFieldError($(this));
+                    step6Valid = false;
+                }
+                else {
+                    hideFieldError($(this))
+                }
+            });
+            return step6Valid;
+        }
+
+        function validateForm(){
+            // step 1
+            var tableNameFld = $("input[name='table-name']");
+            if (!isValid($.trim(tableNameFld.val()))){
+                showFieldError(tableNameFld);
+                return false;
+            }
+            else {
+                hideFieldError(tableNameFld);
+            }
+
+            // step 3
+            var step3Valid = true;
+            var fieldTerminatorFld = $("#id_table-field_terminator_1");
+            if ($("#id_table-field_terminator_0").val() == "__other__" && !isValid($.trim(fieldTerminatorFld.val()))) {
+                showFieldError(fieldTerminatorFld);
+                step3Valid = false;
+            }
+            else {
+                hideFieldError(fieldTerminatorFld);
+            }
+
+            var collectionTerminatorFld = $("#id_table-collection_terminator_1");
+            if ($("#id_table-collection_terminator_0").val() == "__other__" && !isValid($.trim(collectionTerminatorFld.val()))) {
+                showFieldError(collectionTerminatorFld);
+                step3Valid = false;
+            }
+            else {
+                hideFieldError(collectionTerminatorFld);
+            }
+
+            var mapKeyTerminatorFld = $("#id_table-map_key_terminator_1");
+            if ($("#id_table-map_key_terminator_0").val() == "__other__" && !isValid($.trim(mapKeyTerminatorFld.val()))) {
+                showFieldError(mapKeyTerminatorFld);
+                step3Valid = false;
+            }
+            else {
+                hideFieldError(mapKeyTerminatorFld);
+            }
+            if (!step3Valid){
+                return false;
+            }
+
+            // step 4
+            var step4Valid = true;
+            if ($("input[name='table-file_format']:checked").val() == "InputFormat"){
+                var inputFormatFld = $("input[name='table-input_format_class']");
+                if (!isValid($.trim(inputFormatFld.val()))){
+                    showFieldError(inputFormatFld);
+                    step4Valid = false;
+                }
+                else {
+                    hideFieldError(inputFormatFld);
+                }
+
+                var outputFormatFld = $("input[name='table-output_format_class']");
+                if (!isValid($.trim(outputFormatFld.val()))){
+                    showFieldError(outputFormatFld);
+                    step4Valid = false;
+                }
+                else {
+                    hideFieldError(outputFormatFld);
+                }
+            }
+            if (!step4Valid){
+                return false;
+            }
+
+            // step 5
+            var tableExternalLocationFld = $("input[name='table-external_location']");
+            if (!($("#id_table-use_default_location").is(":checked"))){
+                if (!isValid($.trim(tableExternalLocationFld.val()))){
+                    showFieldError(tableExternalLocationFld);
+                    return false;
+                }
+                else {
+                    hideFieldError(tableExternalLocationFld);
+                }
+            }
+
+            return true;
+        }
+
+        function isValid(str){
+            // validates against empty string and no spaces
+            return (str != "" && str.indexOf(" ")==-1);
+        }
+
+        function showFieldError(field){
+            field.nextAll(".error-inline").removeClass("hide");
+        }
+
+        function hideFieldError(field){
+            if (!(field.nextAll(".error-inline").hasClass("hide"))){
+                field.nextAll(".error-inline").addClass("hide");
+            }
+        }
     });
 </script>
 ${commonfooter()}

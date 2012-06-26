@@ -115,6 +115,12 @@ ${layout.menubar(section='tables')}
             e.preventDefault();
             $("input[name='cancel_create']").click();
         });
+        $("body").keypress(function(e){
+            if(e.which == 13){
+                e.preventDefault();
+                $("input[name='submit_create']").click();
+            }
+        });
     });
 </script>
 ${commonfooter()}
