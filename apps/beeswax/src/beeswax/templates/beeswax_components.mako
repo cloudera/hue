@@ -20,6 +20,10 @@
 
 </%def>
 
+<%def name="bootstrapLabel(field)">
+    <label for="${field.html_name | n}" class="control-label">${field.label | n}</label>
+</%def>
+
 <%def name="label(
   field,
   render_default=False,
@@ -93,7 +97,9 @@
   dt_attrs=None,
   title_klass=None,
   button_text=False,
-  placeholder=None
+  placeholder=None,
+  file_chooser=False,
+  show_errors=True
   )">
 <%
   if value is None:
@@ -106,7 +112,7 @@
     for key, value in attributes.iteritems():
       if key == "klass":
         key = "class"
-      ret_str += "%s='%s'" % (key.replace("_", "-"), unicode(value))
+      ret_str += "%s='%s' " % (key.replace("_", "-"), unicode(value))
     return ret_str
 
   if not attrs:
@@ -135,32 +141,35 @@
   if placeholder:
 	plc = "placeholder=\"%s\"" % placeholder
 %>
-  % if field.is_hidden:
-    ${unicode(field) | n}
-  % else:
-      % if render_default:
+    % if field.is_hidden:
         ${unicode(field) | n}
-      % else:
-        % if tag == 'textarea':
-          <textarea name="${field.html_name | n}" ${make_attr_str(attrs) | n} />${extract_field_data(field) or ''}</textarea>
-        % elif tag == 'button':
-          <button name="${field.html_name | n}" ${make_attr_str(attrs) | n} value="${value}"/>${button_text or field.name or ''}</button>
-        % elif tag == 'checkbox':
-			% if help:
-				<input type="checkbox" name="${field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""}/ /> <span rel="tooltip" data-original-title="${help}" >${button_text or field.name or ''}</span>
-			% else:
-				<input type="checkbox" name="${field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""}/> <span>${button_text or field.name or ''}</span>
-			% endif
+    % else:
+        % if render_default:
+            ${unicode(field) | n}
         % else:
-          <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc} />
+            % if tag == 'textarea':
+                <textarea name="${field.html_name | n}" ${make_attr_str(attrs) | n} />${extract_field_data(field) or ''}</textarea>
+            % elif tag == 'button':
+                <button name="${field.html_name | n}" ${make_attr_str(attrs) | n} value="${value}"/>${button_text or field.name or ''}</button>
+            % elif tag == 'checkbox':
+                % if help:
+                    <input type="checkbox" name="${field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""}/ /> <span rel="tooltip" data-original-title="${help}" >${button_text or field.name or ''}</span>
+                % else:
+                    <input type="checkbox" name="${field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""}/> <span>${button_text or field.name or ''}</span>
+                % endif
+            % else:
+                %if file_chooser:
+                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc} /><a class="btn fileChooserBtn" href="#" data-filechooser-destination="${field.html_name | n}">..</a>
+                %else:
+                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc} />
+                %endif
+            % endif
+
         % endif
-
-      % endif
-    % if len(field.errors):
-         ${unicode(field.errors) | n}
+        % if show_errors and len(field.errors):
+            ${unicode(field.errors) | n}
+        % endif
     % endif
-
-  % endif
 </%def>
 
 
