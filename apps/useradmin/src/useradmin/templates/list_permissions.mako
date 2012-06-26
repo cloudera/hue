@@ -27,74 +27,73 @@ ${commonheader("Hue Permissions", "useradmin", "100px")}
 ${layout.menubar(section='permissions')}
 
 <div class="container-fluid">
-	<h1>Hue Permissions</h1>
-	<div class="well hueWell">
-		<form class="form-search">
-			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for application name, description, etc...">
-		</form>
-	</div>
-      <table class="table table-striped datatables">
+    <h1>Hue Permissions</h1>
+    <div class="well hueWell">
+        <form class="form-search">
+            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for application name, description, etc...">
+        </form>
+    </div>
+    <table class="table table-striped datatables">
         <thead>
-          <tr>
+        <tr>
             <th>${_('Application')}</th>
             <th>${_('Permission')}</th>
             <th>${_('Groups')}</th>
-			%if user.is_superuser == True:
-			<th>&nbsp;</th>
-			%endif
-          </tr>
-        </head>
+            %if user.is_superuser:
+                <th>&nbsp;</th>
+            %endif
+        </tr>
+        </thead>
         <tbody>
-        % for perm in permissions:
-          <tr class="permissionRow" data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
-            <td>${perm.app}</td>
-            <td>${perm.description}</td>
-            <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
-			%if user.is_superuser == True:
-            <td class="right">
-              <a title="Edit permission" class="btn small editPermissionBtn" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">Edit</a>
-            </td>
-			%endif
-          </tr>
-        % endfor
+            % for perm in permissions:
+            <tr class="permissionRow" data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
+                <td>${perm.app}</td>
+                <td>${perm.description}</td>
+                <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
+            %if user.is_superuser:
+                <td class="right">
+                    <a title="Edit permission" class="btn small editPermissionBtn" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">Edit</a>
+                </td>
+            %endif
+            </tr>
+            % endfor
         </tbody>
-      </table>
-
+    </table>
 </div>
 
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+        $(".datatables").dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bInfo": false,
+            "bFilter": false,
+            "aoColumns": [
+                null,
+                null,
+                %if user.is_superuser:
+                    null,
+                    { "bSortable": false }
+                %else:
+                    null
+                %endif
+            ]
+        });
+        $(".dataTables_wrapper").css("min-height","0");
+        $(".dataTables_filter").hide();
 
-	<script type="text/javascript" charset="utf-8">
-		$(document).ready(function(){
-			$(".datatables").dataTable({
-				"bPaginate": false,
-			    "bLengthChange": false,
-				"bInfo": false,
-				"bFilter": false,
-				"aoColumns": [
-					null,
-					null,
-					null,
-					{ "bSortable": false }
-                 ]
-			});
-			$(".dataTables_wrapper").css("min-height","0");
-			$(".dataTables_filter").hide();
+        $("#filterInput").keyup(function(){
+            $.each($(".permissionRow"), function(index, value) {
+                if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
+                    $(value).hide(250);
+                }else{
+                    $(value).show(250);
+                }
+            });
+        });
 
-			$("#filterInput").keyup(function(){
-		        $.each($(".permissionRow"), function(index, value) {
-		          if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
-		            $(value).hide(250);
-		          }else{
-		            $(value).show(250);
-		          }
-		        });
-
-		    });
-
-			$("a[data-row-selector='true']").jHueRowSelector();
-
-
-		});
-	</script>
+        $("a[data-row-selector='true']").jHueRowSelector();
+    });
+</script>
 
 ${commonfooter()}
