@@ -18,25 +18,37 @@ from desktop.views import commonheader, commonfooter
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
+
 ${commonheader("Parameterize Hive Query", "beeswax", "100px")}
+
 ${layout.menubar()}
+
 <div class="container-fluid">
-<div class="prompt_popup">
-Please specify parameters for this query.
-<%
-if explain:
-  action = url('beeswax.views.explain_parameterized_query', design.id)
-else:
-  action = url('beeswax.views.execute_parameterized_query', design.id)
-%>
-<form method="POST" action=${action}>
-<dl>
-% for field in form:
-  ${comps.field(field)}
-% endfor
-</dl>
-<input type="submit">
-</form>
+    <%
+        if explain:
+            action = url('beeswax.views.explain_parameterized_query', design.id)
+            btn = "Explain query"
+        else:
+            action = url('beeswax.views.execute_parameterized_query', design.id)
+            btn = "Execute query"
+    %>
+    <form method="POST" action="${action}" class="form-horizontal">
+        <fieldset>
+            <legend>Please specify parameters for this query:</legend>
+            % for field in form:
+                <div class="control-group">
+                    <label class="control-label">${comps.bootstrapLabel(field)}</label>
+                    <div class="controls">
+                    ${comps.field(field)}
+                    </div>
+                </div>
+            % endfor
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">${btn}</button>
+                <a class="btn" href="javascript:history.go(-1);">Cancel</a>
+            </div>
+        </fieldset>
+    </form>
 </div>
-</div>
+
 ${commonfooter()}
