@@ -47,6 +47,7 @@
                     _parent.navigateTo(data.view.dirname);
                     return;
                 }
+                $.cookie("hueFileBrowserLastPath", path, { expires: 90 });
                 _parent.previousPath = path;
                 var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css("padding", "0");
                 var _home = $("<li>");
@@ -184,6 +185,9 @@
     Plugin.prototype.init = function () {
         if ($.trim(this.options.initialPath) != "") {
             this.navigateTo(this.options.initialPath);
+        }
+        else if ($.cookie("hueFileBrowserLastPath") != null) {
+            this.navigateTo($.cookie("hueFileBrowserLastPath"));
         }
         else {
             this.navigateTo("/?default_to_home");
