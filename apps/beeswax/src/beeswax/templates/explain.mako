@@ -23,26 +23,20 @@ ${commonheader("Query Explanation", "beeswax", "100px")}
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">
-	<h1>Query Explanation: ${util.render_query_context(query_context)}</h1>
+    <h1>Query Explanation: ${util.render_query_context(query_context)}</h1>
 
-	<ul class="tabs">
-		<li class="active"><a href="#explanation">Explanation</a></li>
-      	<li><a href="#query">Query</a></li>
-	</ul>
-    
-	<div class="tab-content">
-		<div class="active tab-pane" id="explanation">
-			<pre>${explanation | h}</pre>
-		</div>
-		<div class="tab-pane" id="query">
-			<pre>${query | h}</pre>
-		</div>
-	</div>
-	
-	<script type="text/javascript" charset="utf-8">
-		$(document).ready(function(){
-			$(".tabs").tabs();
-		});
-	</script>
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#explanation" data-toggle="tab">Explanation</a></li>
+        <li><a href="#query" data-toggle="tab">Query</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="explanation">
+            <pre>${explanation | h}</pre>
+        </div>
+        <div class="tab-pane" id="query">
+            <pre>${query | h}</pre>
+        </div>
+    </div>
 </div>
 ${commonfooter()}

@@ -77,7 +77,7 @@
     title_classes.append("hidden")
   titlecls = ' '.join(title_classes)
 %>
-	${field.label_tag() | n}
+${field.label_tag() | n}
 </%def>
 
 
@@ -139,7 +139,7 @@
 
   plc = ""
   if placeholder:
-	plc = "placeholder=\"%s\"" % placeholder
+    plc = "placeholder=\"%s\"" % placeholder
 %>
     % if field.is_hidden:
         ${unicode(field) | n}
@@ -164,7 +164,6 @@
                     <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc} />
                 %endif
             % endif
-
         % endif
         % if show_errors and len(field.errors):
             ${unicode(field.errors) | n}
@@ -193,13 +192,13 @@
   ${pageref(page.num_pages())}
 </%def>
 <%def name="pagination(page)">
-	<div class="pagination">
-	  <ul class="pull-right">
-	    <li class="prev"><a title="Beginning of List" ${toppage(page)} class="bw-firstBlock">&larr; Beginning of List</a></li>
-	    <li><a title="Previous Page" ${prevpage(page)} class="bw-prevBlock">Previous Page</a></li>
-		<li><a title="Next page" ${nextpage(page)} class="bw-nextBlock">Next Page</a></li>
-	    <li class="next"><a title="End of List" ${bottompage(page)} class="bw-lastBlock">End of List &rarr;</a></li>
-	  </ul>
-	<p>Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} items, page ${page.number} of ${page.num_pages()}</p>
-	</div>
+    <div class="pagination">
+        <ul class="pull-right">
+            <li class="prev"><a title="Beginning of List" ${toppage(page)} class="bw-firstBlock">&larr; Beginning of List</a></li>
+            <li><a title="Previous Page" ${prevpage(page)} class="bw-prevBlock">Previous Page</a></li>
+            <li><a title="Next page" ${nextpage(page)} class="bw-nextBlock">Next Page</a></li>
+            <li class="next"><a title="End of List" ${bottompage(page)} class="bw-lastBlock">End of List &rarr;</a></li>
+        </ul>
+        <p>Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} items, page ${page.number} of ${page.num_pages()}</p>
+    </div>
 </%def>
