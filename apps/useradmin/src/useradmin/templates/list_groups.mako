@@ -38,34 +38,34 @@ ${layout.menubar(section='groups')}
             Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for group name, members, etc...">
         </form>
     </div>
-      <table class="table table-striped datatables">
-        <thead>
-          <tr>
-            <th>${_('Group Name')}</th>
-            <th>${_('Members')}</th>
-            <th>${_('Permissions')}</th>
-            %if user.is_superuser == True:
-            <th>&nbsp;</th>
-            %endif
-          </tr>
-        </head>
-        <tbody>
-        % for group in groups:
-          <tr class="groupRow" data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
-            <td>${group.name}</td>
-            <td>${', '.join([group_user.username for group_user in group.user_set.all()])}</td>
-            <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
-            %if user.is_superuser == True:
-            <td class="right">
-              <a title="Edit ${group.name}" class="btn small editGroupBtn" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-row-selector="true">Edit</a>
-              <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>
-            </td>
-            %endif
-          </tr>
-        % endfor
-        </tbody>
-      </table>
-
+    <table class="table table-striped datatables">
+    <thead>
+      <tr>
+        <th>${_('Group Name')}</th>
+        <th>${_('Members')}</th>
+        <th>${_('Permissions')}</th>
+        %if user.is_superuser == True:
+        <th>&nbsp;</th>
+        %endif
+      </tr>
+    </thead>
+    <tbody>
+    % for group in groups:
+      <tr class="groupRow" data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
+        <td>${group.name}</td>
+        <td>${', '.join([group_user.username for group_user in group.user_set.all()])}</td>
+        <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
+        %if user.is_superuser == True:
+        <td class="right">
+          <a title="Edit ${group.name}" class="btn small editGroupBtn" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-row-selector="true">Edit</a>
+          <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>
+        </td>
+        %endif
+      </tr>
+    % endfor
+    </tbody>
+    </table>
+</div>
 
 
 <div id="deleteGroup" class="modal hide fade groupModal">
@@ -81,7 +81,7 @@ ${layout.menubar(section='groups')}
     </form>
 </div>
 
-</div>
+
 
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
@@ -90,6 +90,7 @@ ${layout.menubar(section='groups')}
                 "bLengthChange": false,
                 "bInfo": false,
                 "bFilter": false,
+                "bAutoWidth": false,
                 "aoColumns": [
                     { "sWidth": "20%" },
                     { "sWidth": "20%" },
@@ -126,8 +127,7 @@ ${layout.menubar(section='groups')}
 
             });
 
-			$("a[data-row-selector='true']").jHueRowSelector();
-
+            $("a[data-row-selector='true']").jHueRowSelector();
         });
     </script>
 
