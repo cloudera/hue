@@ -47,6 +47,7 @@ from desktop.lib.i18n import smart_unicode
   <script src="/static/js/Source/jHue/jquery.selector.js"></script>
   <script src="/static/js/Source/jHue/jquery.alert.js"></script>
   <script src="/static/js/Source/jHue/jquery.rowselector.js"></script>
+  <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
   <script src="/static/js/Source/jHue/jquery.datatables.sorting.js"></script>
