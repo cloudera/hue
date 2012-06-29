@@ -136,7 +136,7 @@ def test_rest():
   assert re.match(r"^\s*\d+\s*$", shell_id)
 
   response = client.post("/shell/kill_shell", follow=True, data={constants.SHELL_ID: shell_id}, **d)
-  assert response.content.strip() == "Shell successfully killed"
+  assert "Shell successfully marked for cleanup" in response.content
 
 def test_parse_shell_pairs():
   request = TestRequest()
