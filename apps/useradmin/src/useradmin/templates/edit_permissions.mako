@@ -15,11 +15,13 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
-import urllib %>
+import urllib
+from django.utils.translation import ugettext as _
+%>
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader("Hue Users", "useradmin", "100px")}
-${layout.menubar(section='permissions')}
+${commonheader(_('Hue Permissions'), "useradmin", "100px")}
+${layout.menubar(section='permissions', _=_)}
 
 
 <%def name="render_field(field)">
@@ -38,7 +40,10 @@ ${layout.menubar(section='permissions')}
 </%def>
 
 <div class="container-fluid">
-	<h1>Hue Permissions - Edit app: ${app}</h1>
+    <%
+        i18n_pageTitle = _('Hue Permissions - Edit app: %(app)s') % {'app': app}
+    %>
+	<h1>${i18n_pageTitle}</h1>
 	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
 		<fieldset>
 			% for field in form:
@@ -47,15 +52,19 @@ ${layout.menubar(section='permissions')}
 		</fieldset>
 		<br/>
 		<div class="form-actions">
-			<input type="submit" class="btn btn-primary" value="Update permission"/>
-			<a href="/useradmin/permissions" class="btn">Cancel</a>
+			<input type="submit" class="btn btn-primary" value="${_('Update permission')}"/>
+			<a href="/useradmin/permissions" class="btn">${_('Cancel')}</a>
 		</div>
 	</form>
 </div>
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-		$("#id_groups").jHueSelector({width:520});
+		$("#id_groups").jHueSelector({
+            width:520,
+            selectAllLabel: "${_('Select all')}",
+            searchPlaceholder: "${_('Search')}"
+        });
 	});
 </script>
 ${commonfooter()}

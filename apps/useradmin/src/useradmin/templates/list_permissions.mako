@@ -15,22 +15,21 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+import urllib
+from django.utils.translation import ugettext as _
+from useradmin.models import group_permissions
+from django.contrib.auth.models import Group
 %>
-<% import urllib %>
-<% from django.utils.translation import ugettext, ungettext, get_language, activate %>
-<% from useradmin.models import group_permissions %>
-<% from django.contrib.auth.models import Group %>
-<% _ = ugettext %>
 
 <%namespace name="layout" file="layout.mako" />
-${commonheader("Hue Permissions", "useradmin", "100px")}
-${layout.menubar(section='permissions')}
+${commonheader(_('Hue Permissions'), "useradmin", "100px")}
+${layout.menubar(section='permissions', _=_)}
 
 <div class="container-fluid">
-    <h1>Hue Permissions</h1>
+    <h1>${_('Hue Permissions')}</h1>
     <div class="well hueWell">
         <form class="form-search">
-            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for application name, description, etc...">
+                ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for application name, description, etc...')}">
         </form>
     </div>
     <table class="table table-striped datatables">
@@ -52,7 +51,7 @@ ${layout.menubar(section='permissions')}
                 <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
             %if user.is_superuser:
                 <td class="right">
-                    <a title="Edit permission" class="btn small editPermissionBtn" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">Edit</a>
+                    <a title="${_('Edit permission')}" class="btn small editPermissionBtn" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">${_('Edit')}</a>
                 </td>
             %endif
             </tr>

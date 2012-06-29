@@ -15,13 +15,14 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 ${commonheader(title, "useradmin")}
 <div class="container-fluid">
-	<h1>Confirm</h1>
+	<h1>${_('Confirm')}</h1>
 	<form action="${path}" method="POST">
 		${title}
-		<input type="submit" value="Yes">
+		<input type="submit" value="${_('Yes')}">
 	</form>
 </div>
 ${commonfooter()}
