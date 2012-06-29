@@ -15,14 +15,16 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 
-${commonheader("Hue Shell", "shell")}
+${commonheader(_('Hue Shell'), "shell")}
 <div class="container-fluid">
 <div>
-	The Shell app requires a Unix user account for every user of Hue on the remote webserver.
-	Please ask your admin to create a user account for you on the remote webserver as
-	described in the Shell documentation.
+    ${_('The Shell app requires a Unix user account for every user of Hue on the remote webserver.')}
+    <br/>
+    ${_('Please ask your admin to create a user account for you on the remote webserver as described in the Shell documentation.')}
+
 </div>
 </div>
 ${commonfooter()}

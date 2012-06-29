@@ -15,12 +15,13 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 
 % if shells:
-    ${commonheader("Hue Shell", "shell", "100px")}
+    ${commonheader(_('Hue Shell'), "shell", "100px")}
 % else:
-    ${commonheader("Hue Shell", "shell")}
+    ${commonheader(_('Hue Shell'), "shell")}
 % endif
 
 
@@ -107,9 +108,9 @@ from desktop.views import commonheader, commonfooter
     <div>
         <h3>
             % if shells:
-                Please select one of the available shells from the toolbar above.
+                ${_('Please select one of the available shells from the toolbar above.')}
             % else:
-                You don't have permission to access any shell or there is no configured shell.
+                ${_('You do not have permission to access any shell or there is no configured shell.')}
             % endif
         </h3>
     </div>

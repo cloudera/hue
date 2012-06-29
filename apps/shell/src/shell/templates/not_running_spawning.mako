@@ -15,12 +15,13 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 
-${commonheader("Hue Shell", "shell")}
+${commonheader(_('Hue Shell'), "shell")}
 <div class="container-fluid">
 <div>
-	<h3>The webserver currently running Hue does not support the Shell app. Please contact your administrator.</h3>
+	<h3>${_('The webserver currently running Hue does not support the Shell app. Please contact your administrator.')}</h3>
 </div>
 </div>
 ${commonfooter()}
