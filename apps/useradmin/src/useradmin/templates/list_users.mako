@@ -17,26 +17,25 @@
 from desktop.views import commonheader, commonfooter
 from django.template.defaultfilters import date, time
 import urllib
-from django.utils.translation import ugettext, ungettext, get_language, activate
-_ = ugettext
+from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="layout.mako" />
-${commonheader("Hue Users", "useradmin", "100px")}
-${layout.menubar(section='users')}
+${commonheader(_('Hue Users'), "useradmin", "100px")}
+${layout.menubar(section='users', _=_)}
 
 <div class="container-fluid">
-    <h1>Hue Users</h1>
+    <h1>${_('Hue Users')}</h1>
     <div class="well hueWell">
         <div class="btn-group pull-right">
             %if user.is_superuser == True:
-            <a href="${ url('useradmin.views.edit_user') }" class="btn">Add user</a>
-            <a href="${ url('useradmin.views.add_ldap_user') }" class="btn">Add/sync LDAP user</a>
-            <a href="#syncLdap" class="btn" data-toggle="modal">Sync LDAP users/groups</a>
+            <a href="${ url('useradmin.views.edit_user') }" class="btn">${_('Add user')}</a>
+            <a href="${ url('useradmin.views.add_ldap_user') }" class="btn">${_('Add/sync LDAP user')}</a>
+            <a href="#syncLdap" class="btn" data-toggle="modal">${_('Sync LDAP users/groups')}</a>
             %endif
         </div>
         <form class="form-search">
-            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, e-mail, etc...">
+            ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for username, name, e-mail, etc...')}">
         </form>
     </div>
     <table class="table table-striped datatables">
@@ -61,12 +60,16 @@ ${layout.menubar(section='users')}
                 <td>${', '.join([group.name for group in listed_user.groups.all()])}</td>
                 <td>${date(listed_user.last_login)} ${time(listed_user.last_login).replace("p.m.","PM").replace("a.m.","AM")}</td>
                 <td class="right">
+                <%
+                    i18n_editUsername = _('Edit %(username)s') % {'username': listed_user.username}
+                    i18n_deleteUsername = _('Delete %(username)s') % {'username': listed_user.username}
+                %>
                 %if user.is_superuser == True:
-                    <a title="Edit ${listed_user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-row-selector="true">Edit</a>
-                    <a title="Delete ${listed_user.username}" class="btn small confirmationModal" alt="Are you sure you want to delete ${listed_user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(listed_user.username)) }">Delete</a>
+                    <a title="${i18n_editUsername}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-row-selector="true">${_('Edit')}</a>
+                    <a title="${i18n_deleteUsername}" class="btn small confirmationModal" alt="Are you sure you want to delete ${listed_user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(listed_user.username)) }">${_('Delete')}</a>
                 %else:
                     %if user.username == listed_user.username:
-                        <a title="Edit ${listed_user.username}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }">Edit</a>
+                        <a title="${i18n_editUsername}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }">Edit</a>
                     %else:
                         &nbsp;
                     %endif
@@ -80,21 +83,19 @@ ${layout.menubar(section='users')}
     <div id="syncLdap" class="modal hide fade">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h3>Sync LDAP users and groups</h3>
+            <h3>${_('Sync LDAP users and groups')}</h3>
         </div>
         <div class="modal-body">
             <div class="alert alert-info">
-                This will not import any users or groups that don't already exist in Hue.
-                Only users and groups imported from LDAP can be synced.
+                ${_("This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced.")}
                 <br/>
-                All user information and group memberships will be updated based on the LDAP
-                server's current state.
+                ${_("All user information and group memberships will be updated based on the LDAP server's current state.")}
             </div>
         </div>
         <div class="modal-footer">
             <form action="${ url('useradmin.views.sync_ldap_users_groups') }" method="POST">
-                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-                <input type="submit" class="btn primary" value="Sync"/>
+                <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+                <input type="submit" class="btn primary" value="${_('Sync')}"/>
              </form>
         </div>
     </div>
@@ -103,11 +104,11 @@ ${layout.menubar(section='users')}
         <form id="deleteUserForm" action="" method="POST">
         <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3 id="deleteUserMessage">Confirm action</h3>
+            <h3 id="deleteUserMessage">${_('Confirm action')}</h3>
         </div>
         <div class="modal-footer">
-            <input type="submit" class="btn primary" value="Yes"/>
-            <a href="#" class="btn secondary" data-dismiss="modal">No</a>
+            <input type="submit" class="btn primary" value="${_('Yes')}"/>
+            <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
         </div>
         </form>
     </div>
@@ -126,7 +127,7 @@ ${layout.menubar(section='users')}
                         null,
                         null,
                         null,
-						{ "sType": "date" },
+                        { "sType": "date" },
                         { "bSortable": false }
                     ]
             });
@@ -152,7 +153,7 @@ ${layout.menubar(section='users')}
                 });
             });
 
-			$("a[data-row-selector='true']").jHueRowSelector();
+            $("a[data-row-selector='true']").jHueRowSelector();
         });
     </script>
 

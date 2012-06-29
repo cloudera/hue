@@ -25,13 +25,13 @@ def is_selected(section, matcher):
     return ""
 %>
 
-<%def name="menubar(section='')">
+<%def name="menubar(section='', _=None)">
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">
 			<ul class="nav nav-pills">
-				<li class="${is_selected(section, 'users')}"><a href="/useradmin/users">Users</a></li>
-				<li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">Groups</a></li>
-				<li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">Permissions</a></li>
+				<li class="${is_selected(section, 'users')}"><a href="/useradmin/users">${_('Users')}</a></li>
+				<li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">${_('Groups')}</a></li>
+				<li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">${_('Permissions')}</a></li>
 			</ul>
 		</div>
 	</div>

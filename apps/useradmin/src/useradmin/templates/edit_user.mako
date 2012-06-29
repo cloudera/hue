@@ -16,11 +16,13 @@
 <%!
 from desktop.views import commonheader, commonfooter
 from desktop.lib.django_util import extract_field_data
-import urllib %>
+import urllib
+from django.utils.translation import ugettext as _
+%>
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader("Hue Users", "useradmin", "100px")}
-${layout.menubar(section='users')}
+${commonheader(_('Hue Users'), "useradmin", "100px")}
+${layout.menubar(section='users', _=_)}
 
 <%def name="render_field(field)">
   %if not field.is_hidden:
@@ -39,12 +41,15 @@ ${layout.menubar(section='users')}
 
 <div class="container-fluid">
 	% if username:
-		<h1>Hue Users - Edit user: ${username}</h1>
+        <%
+            i18n_pageTitle = _('Hue Users - Edit user: %(username)s') % {'username': username}
+        %>
+		<h1>${i18n_pageTitle}</h1>
 	% else:
 		% if ldap:
-			<h1>Hue Users - Add/sync LDAP user</h1>
+			<h1>${_('Hue Users - Add/sync LDAP user')}</h1>
 		% else:
-			<h1>Hue Users - Create user</h1>
+			<h1>${_('Hue Users - Create user')}</h1>
 		% endif
 	% endif
 
@@ -57,21 +62,24 @@ ${layout.menubar(section='users')}
 		<br/>
 		<div class="form-actions">
 			% if username:
-				<input type="submit" class="btn btn-primary" value="Update user"/>
+				<input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
 			% else:
 				% if ldap:
-					<input type="submit" class="btn btn-primary" value="Add/Sync user"/>
+					<input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
 				% else:
-					<input type="submit" class="btn btn-primary" value="Add user"/>
+					<input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
 				% endif
 			% endif
-			<a href="/useradmin/users" class="btn">Cancel</a>
+			<a href="/useradmin/users" class="btn">${_('Cancel')}</a>
 		</div>
 	</form>
 </div>
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
-		$("#id_groups").jHueSelector();
+		$("#id_groups").jHueSelector({
+            selectAllLabel: "${_('Select all')}",
+            searchPlaceholder: "${_('Search')}"
+        });
 	});
 </script>
 ${commonfooter()}

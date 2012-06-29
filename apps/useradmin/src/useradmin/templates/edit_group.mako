@@ -17,12 +17,14 @@
 from desktop.views import commonheader, commonfooter
 from desktop.lib.django_util import extract_field_data
 import urllib
+from django.utils.translation import ugettext as _
 %>
+
 
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader("Hue Users", "useradmin", "100px")}
-${layout.menubar(section='groups')}
+${commonheader(_('Hue Groups'), "useradmin", "100px")}
+${layout.menubar(section='groups', _=_)}
 
 <%def name="render_field(field)">
   %if not field.is_hidden:
@@ -42,12 +44,15 @@ ${layout.menubar(section='groups')}
 
 <div class="container-fluid">
 	% if name:
-		<h1>Hue Groups - Edit group: ${name}</h1>
+        <%
+            i18n_pageTitle = _('Hue Groups - Edit group: %(name)s') % {'name': name}
+        %>
+		<h1>${i18n_pageTitle}</h1>
 	% else:
 		% if ldap:
-			<h1>Hue Groups - Add/sync LDAP group</h1>
+			<h1>${_('Hue Groups - Add/sync LDAP group')}</h1>
 		% else:
-			<h1>Hue Groups - Create group</h1>
+			<h1>${_('Hue Groups - Create group')}</h1>
 		% endif
 	% endif
 
@@ -60,22 +65,30 @@ ${layout.menubar(section='groups')}
 		<br/>
 		<div class="form-actions">
 			% if name:
-				<input type="submit" class="btn btn-primary" value="Update group"/>
+				<input type="submit" class="btn btn-primary" value="${_('Update group')}"/>
 			% else:
 				% if ldap:
-					<input type="submit" class="btn btn-primary" value="Add/Sync group"/>
+					<input type="submit" class="btn btn-primary" value="${_('Add/Sync group')}"/>
 				% else:
-					<input type="submit" class="btn btn-primary" value="Add group"/>
+					<input type="submit" class="btn btn-primary" value="${_('Add group')}"/>
 				% endif
 			% endif
-			<a href="/useradmin/groups" class="btn">Cancel</a>
+			<a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
 		</div>
 	</form>
 
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function(){
-			$("#id_members").jHueSelector({width:400});
-			$("#id_permissions").jHueSelector({width:400});
+			$("#id_members").jHueSelector({
+                width:400,
+                selectAllLabel: "${_('Select all')}",
+                searchPlaceholder: "${_('Search')}"
+            });
+			$("#id_permissions").jHueSelector({
+                width:400,
+                selectAllLabel: "${_('Select all')}",
+                searchPlaceholder: "${_('Search')}"
+            });
 		});
 	</script>
 ${commonfooter()}

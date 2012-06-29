@@ -15,27 +15,26 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+import urllib
+from django.utils.translation import ugettext as _
+from useradmin.models import group_permissions
 %>
-<% import urllib %>
-<% from django.utils.translation import ugettext, ungettext, get_language, activate %>
-<% from useradmin.models import group_permissions %>
-<% _ = ugettext %>
 
 <%namespace name="layout" file="layout.mako" />
-${commonheader("Hue Groups", "useradmin", "100px")}
-${layout.menubar(section='groups')}
+${commonheader(_('Hue Groups'), "useradmin", "100px")}
+${layout.menubar(section='groups', _=_)}
 
 <div class="container-fluid">
-    <h1>Hue Groups</h1>
+    <h1>${_('Hue Groups')}</h1>
     <div class="well hueWell">
         <div class="pull-right btn-group">
             %if user.is_superuser == True:
-            <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn">Add group</a>
-            <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_group')}" class="btn">Add/Sync LDAP group</a>
+            <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn">${_('Add group')}</a>
+            <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_group')}" class="btn">${_('Add/Sync LDAP group')}</a>
             %endif
         </div>
         <form class="form-search">
-            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for group name, members, etc...">
+            ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for group name, members, etc...')}">
         </form>
     </div>
     <table class="table table-striped datatables">
@@ -57,8 +56,12 @@ ${layout.menubar(section='groups')}
         <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
         %if user.is_superuser == True:
         <td class="right">
-          <a title="Edit ${group.name}" class="btn small editGroupBtn" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-row-selector="true">Edit</a>
-          <a title="Delete ${group.name}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">Delete</a>
+          <%
+              i18n_editGroupname = _('Edit %(groupname)s') % {'groupname' : group.name}
+              i18n_deleteGroupname = _('Delete %(groupname)s') % {'groupname' : group.name}
+          %>
+          <a title="${i18n_editGroupname}" class="btn small editGroupBtn" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-row-selector="true">${_('Edit')}</a>
+          <a title="${i18n_deleteGroupname}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">${_('Delete')}</a>
         </td>
         %endif
       </tr>
@@ -72,11 +75,11 @@ ${layout.menubar(section='groups')}
     <form id="deleteGroupForm" action="" method="POST">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 id="deleteGroupMessage">Confirm action</h3>
+        <h3 id="deleteGroupMessage">${_('Confirm action')}</h3>
     </div>
     <div class="modal-footer">
-        <input type="submit" class="btn primary" value="Yes"/>
-        <a href="#" class="btn secondary hideModal">No</a>
+        <input type="submit" class="btn primary" value="${_('Yes')}"/>
+        <a href="#" class="btn secondary hideModal">${_('No')}</a>
     </div>
     </form>
 </div>
