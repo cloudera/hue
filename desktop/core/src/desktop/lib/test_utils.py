@@ -19,9 +19,10 @@ from django.contrib.auth.models import Group, User
 from useradmin.models import HuePermission, GroupPermission
 
 def grant_access(username, groupname, appname):
-    grp = Group.objects.create(name=groupname)
-    perm = HuePermission.objects.get(app=appname,action='access')
-    GroupPermission.objects.create(group=grp, hue_permission=perm)
+    group, created = Group.objects.get_or_create(name=groupname)
+    perm = HuePermission.objects.get(app=appname, action='access')
+    GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
     user = User.objects.get(username=username)
-    user.groups.add(grp)
-    user.save()
+    if not user.groups.filter(name=group.name).exists():
+        user.groups.add(group)
+        user.save()
