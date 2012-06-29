@@ -23,7 +23,7 @@ import re
 import simplejson
 
 import django.test.client
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 import nose.tools
 
@@ -44,7 +44,7 @@ def assert_ok_response(response):
   nose.tools.assert_true(200, response.status_code)
   return response
 
-def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False):
+def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None):
   """
   Create a client with a user already logged in.
 
@@ -60,6 +60,12 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
     user = User.objects.create_user(username, username + '@localhost', password)
     user.is_superuser = is_superuser
     user.save()
+
+  if groupname is not None:
+    group, created = Group.objects.get_or_create(name=groupname)
+    if not user.groups.filter(name=group.name).exists():
+      user.groups.add(group)
+      user.save()
 
   c = Client()
   ret = c.login(username=username, password=password)

@@ -47,6 +47,7 @@ from beeswax.test_base import make_query, wait_for_query_to_finish, verify_histo
 from beeswax.test_base import BeeswaxSampleProvider
 from beeswaxd import BeeswaxService
 from beeswaxd import ttypes
+from desktop.lib.test_utils import grant_access
 
 LOG = logging.getLogger(__name__)
 CSV_LINK_PAT = re.compile('/beeswax/download/\d+/csv')
@@ -537,52 +538,53 @@ for x in sys.stdin:
     assert_true('rubbish' in resp.content)
 
     # Test personal saved queries permissions
-    client = make_logged_in_client(username='its_me', is_superuser=False)
-    _make_query(self.client, "select one", name='client query 1', submission_type='Save')
-    _make_query(self.client, "select two", name='client query 2', submission_type='Save')
+    client_me = make_logged_in_client(username='its_me', is_superuser=False, groupname='test')
+    grant_access("its_me", "test", "beeswax")
+    _make_query(client_me, "select one", name='client query 1', submission_type='Save')
+    _make_query(client_me, "select two", name='client query 2', submission_type='Save')
 
     finish = conf.SHARE_SAVED_QUERIES.set_for_testing(True)
     try:
-      resp = self.client.get('/beeswax/list_designs')
-      assert_true('client query 1' in resp.content)
-      assert_true('client query 2' in resp.content)
+      resp = client_me.get('/beeswax/list_designs')
+      assert_true('client query 1' in resp.content, resp.content)
+      assert_true('client query 2' in resp.content, resp.content)
     finally:
       finish()
 
     finish = conf.SHARE_SAVED_QUERIES.set_for_testing(False)
     try:
-      resp = self.client.get('/beeswax/list_designs')
+      resp = client_me.get('/beeswax/list_designs')
       assert_true('client query 1' in resp.content)
       assert_true('client query 2' in resp.content)
     finally:
       finish()
-      client.logout()
+      client_me.logout()
 
     # Login as someone else
-    client2 = make_logged_in_client(username='not_me', is_superuser=False)
-    # Failing for now as the user does not have access to the Beeswax app.
-#    finish = conf.SHARE_SAVED_QUERIES.set_for_testing(True)
-#    try:
-#      resp = client2.get('/beeswax/list_designs')
-#      assert_true('client query 1' in resp.content)
-#      assert_true('client query 2' in resp.content)
-#    finally:
-#      finish()
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "beeswax")
+    finish = conf.SHARE_SAVED_QUERIES.set_for_testing(True)
+    try:
+      resp = client_not_me.get('/beeswax/list_designs')
+      assert_true('client query 1' in resp.content)
+      assert_true('client query 2' in resp.content)
+    finally:
+      finish()
 
     finish = conf.SHARE_SAVED_QUERIES.set_for_testing(False)
     try:
-      resp = client2.get('/beeswax/list_designs')
+      resp = client_not_me.get('/beeswax/list_designs')
       assert_true('client query 1' not in resp.content)
       assert_true('client query 2' not in resp.content)
     finally:
       finish()
-      client2.logout()
+      client_not_me.logout()
 
     # Login as super user
-    client3 = make_logged_in_client('admin', is_superuser=True)
+    client_admin = make_logged_in_client('admin', is_superuser=True)
     finish = conf.SHARE_SAVED_QUERIES.set_for_testing(True)
     try:
-      resp = client3.get('/beeswax/list_designs')
+      resp = client_admin.get('/beeswax/list_designs')
       assert_true('client query 1' in resp.content)
       assert_true('client query 2' in resp.content)
     finally:
@@ -590,12 +592,12 @@ for x in sys.stdin:
 
     finish = conf.SHARE_SAVED_QUERIES.set_for_testing(False)
     try:
-      resp = client3.get('/beeswax/list_designs')
+      resp = client_admin.get('/beeswax/list_designs')
       assert_true('client query 1' in resp.content)
       assert_true('client query 2' in resp.content)
     finally:
       finish()
-      client3.logout()
+      client_admin.logout()
 
 
   def test_my_queries(self):
@@ -609,11 +611,13 @@ for x in sys.stdin:
     assert_true('Even More Bogus Junk' in resp.content)
 
     # Login as someone else
-    client2 = make_logged_in_client('not_me')
-    resp = client2.get('/beeswax/my_queries')
+    client_not_me = make_logged_in_client('not_me', groupname='test')
+    grant_access("not_me", "test", "beeswax")
+
+    resp = client_not_me.get('/beeswax/my_queries')
     assert_true('my rubbish kuery' not in resp.content)
     assert_true('Even More Bogus Junk' not in resp.content)
-    client2.logout()
+    client_not_me.logout()
 
 
   def test_load_data(self):
