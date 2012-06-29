@@ -15,19 +15,20 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 
-${commonheader("Hue Shell", "shell")}
+${commonheader(_('Hue Shell'), "shell")}
 <div class="container-fluid">
 <div>
-	Failed to create a shell of the given type. The possible reasons for this are:
-	<ol>
-		<li>The system is out of PTYs.</li>
-		<li>The system cannot create more subprocesses.</li>
-		<li>You do not have permission to create shells of this type.</li>
-		<li>There is no shell with that name.</li>
-		<li>There is no Unix user account for you.</li>
-	</ol>
+    ${_('Failed to create a shell of the given type. The possible reasons for this are:')}
+    <ol>
+        <li>${_('The system is out of PTYs.')}</li>
+        <li>${_('The system cannot create more subprocesses.')}</li>
+        <li>${_('You do not have permission to create shells of this type.')}</li>
+        <li>${_('There is no shell with that name.')}</li>
+        <li>${_('There is no Unix user account for you.')}</li>
+    </ol>
 </div>
 </div>
 ${commonfooter()}
