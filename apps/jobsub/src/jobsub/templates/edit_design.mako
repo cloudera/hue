@@ -15,19 +15,16 @@
 ## limitations under the License.
 
 <%!
-  import urllib
-
-  from desktop.views import commonheader, commonfooter
-  from django.utils.translation import ugettext, ungettext, get_language, activate
-  from desktop.lib.django_util import extract_field_data
-
-  _ = ugettext
+import urllib
+from desktop.views import commonheader, commonfooter
+from desktop.lib.django_util import extract_field_data
+from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader("Job Designer", "jobsub", "100px")}
-${layout.menubar(section='designs')}
+${commonheader(_('Job Designer'), "jobsub", "100px")}
+${layout.menubar(section='designs', _=_)}
 
 
 
@@ -54,7 +51,7 @@ ${layout.menubar(section='designs')}
 </%def>
 
 <div class="container-fluid">
-  <h1>Job Design (${_(action_type)} type)</h1>
+  <h1>${_('Job Design (%(type)s type)') % dict(type=action_type)}</h1>
 
   <form class="form-horizontal" id="workflowForm" action="${urllib.quote(action)}" method="POST">
     <fieldset>
@@ -66,9 +63,9 @@ ${layout.menubar(section='designs')}
         <hr/>
         <div class="control-group">
           <p class="alert alert-info">
-              You can parameterize the values, using <code>$myVar</code> or
-              <code>${"${"}myVar}</code>. When the design is submitted, you will be
-              prompted for the actual value of <code>myVar</code>.
+              ${_('You can parametrize the values, using')} <code>$myVar</code> ${_('or')}
+              <code>${"${"}myVar}</code> .
+              ${_('When the design is submitted, you will be prompted for the actual value of ')}<code>myVar</code> .
           </p>
         </div>
         % for field in form.action:
@@ -76,14 +73,14 @@ ${layout.menubar(section='designs')}
         % endfor
 
         <div class="control-group">
-            <label class="control-label">Job Properties</label>
+            <label class="control-label">${_('Job Properties')}</label>
             <div class="controls">
                 ## Data bind for job properties
                 <table class="table-condensed designTable" data-bind="visible: properties().length > 0">
                   <thead>
                     <tr>
-                      <th>Property name</th>
-                      <th>Value</th>
+                      <th>${_('Property name')}</th>
+                      <th>${_('Value')}</th>
                       <th />
                     </tr>
                   </thead>
@@ -91,7 +88,7 @@ ${layout.menubar(section='designs')}
                     <tr>
                       <td><input class="span3 required propKey" data-bind="value: name, uniqueName: false" /></td>
                       <td><input class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
-                      <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">Delete</a></td>
+                      <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">${_('Delete')}</a></td>
                     </tr>
                   </tbody>
                 </table>
@@ -103,12 +100,12 @@ ${layout.menubar(section='designs')}
                   </div>
                 % endif
 
-                <button class="btn" data-bind="click: addProp">Add Property</button>
+                <button class="btn" data-bind="click: addProp">${_('Add Property')}</button>
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label">Files</label>
+            <label class="control-label">${_('Files')}</label>
             <div class="controls">
                 ## Data bind for files (distributed cache)
                 <table class="table-condensed designTable" data-bind="visible: files().length > 0">
@@ -116,7 +113,7 @@ ${layout.menubar(section='designs')}
                     <tr>
                       <td><input class="input span5 required pathChooserKo"
                                 data-bind="fileChooser: $data, value: name, uniqueName: false" /></td>
-                      <td><a class="btn" href="#" data-bind="click: $root.removeFile">Delete</a></td>
+                      <td><a class="btn" href="#" data-bind="click: $root.removeFile">${_('Delete')}</a></td>
                     </tr>
                   </tbody>
                 </table>
@@ -126,12 +123,12 @@ ${layout.menubar(section='designs')}
                     </div>
                 % endif
 
-                <button class="btn" data-bind="click: addFile">Add File</button>
+                <button class="btn" data-bind="click: addFile">${_('Add File')}</button>
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label">Archives</label>
+            <label class="control-label">${_('Archives')}</label>
             <div class="controls">
                 ## Data bind for archives (distributed cache)
                 <table class="table-condensed designTable" data-bind="visible: archives().length > 0">
@@ -139,7 +136,7 @@ ${layout.menubar(section='designs')}
                     <tr>
                       <td><input class="input span5 required pathChooserKo"
                                 data-bind="fileChooser: $data, value: name, uniqueName: false" /></td>
-                      <td><a class="btn" href="#" data-bind="click: $root.removeArchive">Delete</a></td>
+                      <td><a class="btn" href="#" data-bind="click: $root.removeArchive">${_('Delete')}</a></td>
                     </tr>
                   </tbody>
                 </table>
@@ -149,15 +146,15 @@ ${layout.menubar(section='designs')}
                     </div>
                 % endif
 
-                <button class="btn" data-bind="click: addArchive">Add Archive</button>
+                <button class="btn" data-bind="click: addArchive">${_('Add Archive')}</button>
             </div>
         </div>
     </fieldset>
 
     ## Submit
     <div class="form-actions">
-      <button data-bind="click: submit" class="btn btn-primary">Save</button>
-      <a href="/jobsub" class="btn">Cancel</a>
+      <button data-bind="click: submit" class="btn btn-primary">${_('Save')}</button>
+      <a href="/jobsub" class="btn">${_('Cancel')}</a>
     </div>
   </form>
 
@@ -167,7 +164,7 @@ ${layout.menubar(section='designs')}
 <div id="chooseFile" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Choose a file</h3>
+        <h3>${_('Choose a file')}</h3>
     </div>
     <div class="modal-body">
         <div id="fileChooserModal">

@@ -25,12 +25,12 @@ def is_selected(section, matcher):
     return ""
 %>
 
-<%def name="menubar(section='')">
+<%def name="menubar(section='', _=None)">
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">
 			<ul class="nav nav-pills">
-				<li class="${is_selected(section, 'designs')}"><a href="${url('jobsub.views.list_designs')}">Designs</a></li>
-				<li class="${is_selected(section, 'history')}"><a href="${url('jobsub.views.list_history')}">History</a></li>
+				<li class="${is_selected(section, 'designs')}"><a href="${url('jobsub.views.list_designs')}">${_('Designs')}</a></li>
+				<li class="${is_selected(section, 'history')}"><a href="${url('jobsub.views.list_history')}">${_('History')}</a></li>
 			</ul>
 		</div>
 	</div>

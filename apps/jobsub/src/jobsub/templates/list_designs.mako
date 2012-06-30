@@ -15,45 +15,46 @@
 ## limitations under the License.
 
 <%!
-    import cgi
-    import urllib
-    import time as py_time
-    from django.template.defaultfilters import date, time
-    from desktop.lib.django_util import extract_field_data
-    from desktop.views import commonheader, commonfooter
+import cgi
+import urllib
+import time as py_time
+from django.template.defaultfilters import date, time
+from desktop.lib.django_util import extract_field_data
+from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader("Job Designer", "jobsub", "100px")}
-${layout.menubar(section='designs')}
+${commonheader(_('Job Designer'), "jobsub", "100px")}
+${layout.menubar(section='designs', _=_)}
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="container-fluid">
-    <h1>Job Designs</h1>
+    <h1>${_('Job Designs')}</h1>
     <div class="well hueWell">
         <div class="btn-group pull-right">
-            <a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn">Create Mapreduce Design</a>
-            <a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn">Create Streaming Design</a>
-            <a href="${ url('jobsub.views.new_design', action_type='java') }" class="btn">Create Java Design</a>
+            <a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn">${_('Create Mapreduce Design')}</a>
+            <a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn">${_('Create Streaming Design')}</a>
+            <a href="${ url('jobsub.views.new_design', action_type='java') }" class="btn">${_('Create Java Design')}</a>
             %if show_install_examples:
-                    <a id="installSamplesLink" href="javascript:void(0)" data-confirmation-url="${url('jobsub.views.setup')}" class="btn" >Install Samples</a>
+                    <a id="installSamplesLink" href="javascript:void(0)" data-confirmation-url="${url('jobsub.views.setup')}" class="btn" >${_('Install Samples')}</a>
             %endif
         </div>
 
         <form class="form-search">
-            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
+            ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for username, name, etc...')}">
         </form>
     </div>
 
     <table id="designTable" class="table table-condensed datatables">
         <thead>
         <tr>
-            <th>Owner</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Last Modified</th>
+            <th>${_('Owner')}</th>
+            <th>${_('Name')}</th>
+            <th>${_('Type')}</th>
+            <th>${_('Description')}</th>
+            <th>${_('Last Modified')}</th>
             <th nowrap="nowrap">&nbsp;</th>
         </tr>
         </thead>
@@ -67,21 +68,21 @@ ${layout.menubar(section='designs')}
                     <td nowrap="nowrap"><span alt="${py_time.mktime(design.last_modified.timetuple())}">${date(design.last_modified)} ${time(design.last_modified).replace("p.m.","PM").replace("a.m.","AM")}</span></td>
                 <td nowrap="nowrap" class="right">
                 %if currentuser.username == design.owner.username:
-                    <a title="Submit ${design.name}" class="btn small submitConfirmation"
-                       alt="Submit ${design.name} to the cluster"
+                    <a title="${_('Submit %(name)s to the cluster') % dict(name=design.name)}" class="btn small submitConfirmation"
+                       alt="${_('Submit %(name)s to the cluster') % dict(name=design.name)}"
                        href="javascript:void(0)"
                        data-param-url="${ url('jobsub.views.get_design_params', design_id=design.id) }"
-                       data-submit-url="${ url('jobsub.views.submit_design', design_id=design.id) }">Submit</a>
-                    <a title="Edit ${design.name}" class="btn small"
-                       href="${ url('jobsub.views.edit_design', design_id=design.id) }" data-row-selector="true">Edit</a>
-                    %endif%
-                %if currentuser.is_superuser or currentuser.username == design.owner.username:
-                        <a title="Delete ${design.name}" class="btn small deleteConfirmation"
-                           alt="Are you sure you want to delete ${design.name}?"
-                           href="javascript:void(0)"
-                           data-confirmation-url="${ url('jobsub.views.delete_design', design_id=design.id) }">Delete</a>
+                       data-submit-url="${ url('jobsub.views.submit_design', design_id=design.id) }">${_('Submit')}</a>
+                    <a title="${_('Edit %(name)s') % dict(name=design.name)}" class="btn small"
+                       href="${ url('jobsub.views.edit_design', design_id=design.id) }" data-row-selector="true">${_('Edit')}</a>
                 %endif
-                    <a title="Clone ${design.name}" class="btn small" href="${ url('jobsub.views.clone_design', design_id=design.id) }">Clone</a>
+                %if currentuser.is_superuser or currentuser.username == design.owner.username:
+                    <a title="${_('Delete %(name)s') % dict(name=design.name)}" class="btn small deleteConfirmation"
+                       alt="${_('Are you sure you want to delete %(name)s?') % dict(name=design.name)}"
+                       href="javascript:void(0)"
+                       data-confirmation-url="${ url('jobsub.views.delete_design', design_id=design.id) }">${_('Delete')}</a>
+                %endif
+                    <a title="${_('Clone %(name)s') % dict(name=design.name)}" class="btn small" href="${ url('jobsub.views.clone_design', design_id=design.id) }">${_('Clone')}</a>
                 </td>
                 </tr>
                 %endfor
@@ -95,7 +96,7 @@ ${layout.menubar(section='designs')}
     <form id="submitWfForm" action="" method="POST">
         <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3 id="submitWfMessage">Submit this design?</h3>
+            <h3 id="submitWfMessage">${_('Submit this design?')}</h3>
         </div>
         <div class="modal-body">
             <fieldset>
@@ -104,8 +105,8 @@ ${layout.menubar(section='designs')}
             </fieldset>
         </div>
         <div class="modal-footer">
-            <input id="submitBtn" type="submit" class="btn primary" value="Submit"/>
-            <a href="#" class="btn secondary hideModal">Cancel</a>
+            <input id="submitBtn" type="submit" class="btn primary" value="${_('Submit')}"/>
+            <a href="#" class="btn secondary hideModal">${_('Cancel')}</a>
         </div>
     </form>
 </div>
@@ -114,11 +115,11 @@ ${layout.menubar(section='designs')}
     <form id="deleteWfForm" action="" method="POST">
         <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3 id="deleteWfMessage">Delete this design?</h3>
+            <h3 id="deleteWfMessage">${_('Delete this design?')}</h3>
         </div>
         <div class="modal-footer">
-            <input type="submit" class="btn primary" value="Yes"/>
-            <a href="#" class="btn secondary hideModal">No</a>
+            <input type="submit" class="btn primary" value="${_('Yes')}"/>
+            <a href="#" class="btn secondary hideModal">${_('No')}</a>
         </div>
     </form>
 </div>
@@ -127,14 +128,14 @@ ${layout.menubar(section='designs')}
     <form id="installSamplesForm" action="${url('jobsub.views.setup')}" method="POST">
         <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3>Install sample job designs?</h3>
+            <h3>${_('Install sample job designs?')}</h3>
         </div>
         <div class="modal-body">
-            It will take a few seconds to install.
+            ${_('It will take a few seconds to install.')}
         </div>
         <div class="modal-footer">
-            <input type="submit" class="btn primary" value="Yes"/>
-            <a href="#" class="btn secondary" data-dismiss="modal">No</a>
+            <input type="submit" class="btn primary" value="${_('Yes')}"/>
+            <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
         </div>
     </form>
 </div>
@@ -201,7 +202,20 @@ ${layout.menubar(section='designs')}
                 { "sType": "alt-numeric" },
                 { "bSortable": false }
             ],
-            "aaSorting": [[ 4, "desc" ]]
+            "aaSorting": [[ 4, "desc" ]],
+            "oLanguage": {
+                "sEmptyTable":     "${_('No data available in table')}",
+                "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+                "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
+                "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
+                "sZeroRecords":    "${_('No matching records found')}",
+                "oPaginate": {
+                    "sFirst":    "${_('First')}",
+                    "sLast":     "${_('Last')}",
+                    "sNext":     "${_('Next')}",
+                    "sPrevious": "${_('Previous')}"
+                }
+            }
         });
 
         $("#filterInput").keyup(function() {

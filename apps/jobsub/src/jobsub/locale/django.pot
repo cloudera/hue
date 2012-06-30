@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-01-27 15:00+0100\n"
+"POT-Creation-Date: 2012-06-30 02:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,263 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/jobsub/templates/layout.html:74
-msgid "'Shell'"
+#: src/jobsub/templates/edit_design.mako:26
+#: src/jobsub/templates/list_designs.mako:28
+#: src/jobsub/templates/list_history.mako:26
+msgid "Job Designer"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:55
+#, python-format
+msgid "Job Design (%(type)s type)"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:69
+msgid "You can parametrize the values, using"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:69
+msgid "or"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:71
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:79
+msgid "Job Properties"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:85
+msgid "Property name"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:86
+msgid "Value"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:94
+#: src/jobsub/templates/edit_design.mako:119
+#: src/jobsub/templates/edit_design.mako:142
+#: src/jobsub/templates/list_designs.mako:91
+msgid "Delete"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:106
+msgid "Add Property"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:111
+msgid "Files"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:129
+msgid "Add File"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:134
+msgid "Archives"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:152
+msgid "Add Archive"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:159
+msgid "Save"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:160
+#: src/jobsub/templates/list_designs.mako:120
+msgid "Cancel"
+msgstr ""
+
+#: src/jobsub/templates/edit_design.mako:170
+msgid "Choose a file"
+msgstr ""
+
+#: src/jobsub/templates/layout.mako:32
+msgid "Designs"
+msgstr ""
+
+#: src/jobsub/templates/layout.mako:33
+msgid "History"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:34
+msgid "Job Designs"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:37
+msgid "Create Mapreduce Design"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:38
+msgid "Create Streaming Design"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:39
+msgid "Create Java Design"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:41
+msgid "Install Samples"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:46
+#: src/jobsub/templates/list_history.mako:35
+msgid "Filter: "
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:46
+#: src/jobsub/templates/list_history.mako:35
+msgid "Search for username, name, etc..."
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:53
+#: src/jobsub/templates/list_history.mako:44
+msgid "Owner"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:54
+#: src/jobsub/templates/list_history.mako:45
+msgid "Name"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:55
+#: src/jobsub/templates/list_history.mako:46
+msgid "Type"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:56
+#: src/jobsub/templates/list_history.mako:47
+msgid "Description"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:57
+msgid "Last Modified"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:72
+#, python-format
+msgid "Submit %(name)s to the cluster"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:73
+#, python-format
+msgid "Edit %(name)s"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:79
+#: src/jobsub/templates/list_designs.mako:119
+msgid "Submit"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:81
+msgid "Edit"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:85
+#, python-format
+msgid "Delete %(name)s"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:86
+#, python-format
+msgid "Are you sure you want to delete %(name)s?"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:94
+#, python-format
+msgid "Clone %(name)s"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:96
+msgid "Clone"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:110
+msgid "Submit this design?"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:129
+msgid "Delete this design?"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:132
+#: src/jobsub/templates/list_designs.mako:148
+msgid "Yes"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:133
+#: src/jobsub/templates/list_designs.mako:149
+msgid "No"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:142
+msgid "Install sample job designs?"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:145
+msgid "It will take a few seconds to install."
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:218
+#: src/jobsub/templates/list_history.mako:83
+msgid "No data available in table"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:219
+#: src/jobsub/templates/list_history.mako:84
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:220
+#: src/jobsub/templates/list_history.mako:85
+msgid "Showing 0 to 0 of 0 entries"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:221
+#: src/jobsub/templates/list_history.mako:86
+msgid "(filtered from _MAX_ total entries)"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:222
+#: src/jobsub/templates/list_history.mako:87
+msgid "No matching records found"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:224
+#: src/jobsub/templates/list_history.mako:89
+msgid "First"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:225
+#: src/jobsub/templates/list_history.mako:90
+msgid "Last"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:226
+#: src/jobsub/templates/list_history.mako:91
+msgid "Next"
+msgstr ""
+
+#: src/jobsub/templates/list_designs.mako:227
+#: src/jobsub/templates/list_history.mako:92
+msgid "Previous"
+msgstr ""
+
+#: src/jobsub/templates/list_history.mako:32
+msgid "Job Submission History"
+msgstr ""
+
+#: src/jobsub/templates/list_history.mako:43
+msgid "Oozie Job ID"
+msgstr ""
+
+#: src/jobsub/templates/list_history.mako:48
+msgid "Submission Date"
 msgstr ""
 
