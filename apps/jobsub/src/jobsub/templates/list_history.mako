@@ -15,26 +15,24 @@
 ## limitations under the License.
 
 <%!
-    import urllib
-    import time as py_time
-    from django.template.defaultfilters import date, time
-    from desktop.views import commonheader, commonfooter
-    from django.utils.translation import ugettext, ungettext, get_language, activate
-
-    _ = ugettext
+import urllib
+import time as py_time
+from django.template.defaultfilters import date, time
+from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader("Job Designer", "jobsub", "100px")}
-${layout.menubar(section='history')}
+${commonheader(_('Job Designer'), "jobsub", "100px")}
+${layout.menubar(section='history', _=_)}
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="container-fluid">
-    <h1>Job Submission History</h1>
+    <h1>${_('Job Submission History')}</h1>
     <div class="well hueWell">
         <form class="form-search">
-            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
+            ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for username, name, etc...')}">
         </form>
     </div>
 
@@ -42,12 +40,12 @@ ${layout.menubar(section='history')}
     <table class="table table-condensed datatables" id="jobTable">
         <thead>
         <tr>
-            <th>Oozie Job ID</th>
-            <th>Owner</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Submission Date</th>
+            <th>${_('Oozie Job ID')}</th>
+            <th>${_('Owner')}</th>
+            <th>${_('Name')}</th>
+            <th>${_('Type')}</th>
+            <th>${_('Description')}</th>
+            <th>${_('Submission Date')}</th>
         </tr>
         </thead>
         <tbody>
@@ -80,7 +78,20 @@ ${layout.menubar(section='history')}
                 null,
                 { "sType": "alt-numeric" }
             ],
-            "aaSorting": [[ 5, "desc" ]]
+            "aaSorting": [[ 5, "desc" ]],
+            "oLanguage": {
+                "sEmptyTable":     "${_('No data available in table')}",
+                "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+                "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
+                "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
+                "sZeroRecords":    "${_('No matching records found')}",
+                "oPaginate": {
+                    "sFirst":    "${_('First')}",
+                    "sLast":     "${_('Last')}",
+                    "sNext":     "${_('Next')}",
+                    "sPrevious": "${_('Previous')}"
+                }
+            }
         });
 
         $("#filterInput").keyup(function() {
