@@ -15,25 +15,26 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader("Hive Configuration Variables", "beeswax", "100px")}
+${commonheader(_('Hive Configuration Variables'), "beeswax", "100px")}
 ${layout.menubar(section='hive configuration')}
 <div class="container-fluid">
-	<h1>Hive Configuration Variables</h1>
+	<h1>${_('Hive Configuration Variables')}</h1>
 	<div class="well">
 		<form class="form-search">
-			Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for key, value, etc...">
-		    <a href="#" id="clearFilterBtn" class="btn">Clear</a>
+            ${_('Filter:')} <input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc...')}">
+		    <a href="#" id="clearFilterBtn" class="btn">${_('Clear')}</a>
 		</form>
 	</div>
 	<table class="table table-striped table-condensed datatables">
 		<thead>
 			<tr>
-				<th>Key</th>
-				<th>Value</th>
-				<th>Description</th>
+				<th>${_('Key')}</th>
+				<th>${_('Value')}</th>
+				<th>${_('Description')}</th>
 			</tr>
 		</thead>
 		<tbody>

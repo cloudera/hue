@@ -15,29 +15,30 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader("Beeswax: Query Constructor", "beeswax", "100px")}
+${commonheader(_('Beeswax: Query Constructor'), "beeswax", "100px")}
 ${layout.menubar(section='report generator')}
 <div class="container-fluid">
-<h1>Report Generator</h1>
+<h1>${_('Report Generator')}</h1>
 % if design and not design.is_auto and design.name:
-<b>Working on saved query: ${design.name}</b>
+<b>${_('Working on saved query:')} ${design.name}</b>
 % endif
 
 % if error_message:
-Error: <b>${error_message}</b>
+${_('Error:')} <b>${error_message}</b>
 % endif
 % if log:
 ## The log should probably be in another tab
-<p><a href="#log">View logs</a><p/>
+<p><a href="#log">${_('View logs')}</a><p/>
 % endif
 
 <form action="${action}" method="POST">
 
     ## columns management form
-    Add column:
+    ${_('Add column:')}
     ${unicode(mform.columns.management_form) | n}
 
     ## colums formset errors
@@ -59,7 +60,7 @@ Error: <b>${error_message}</b>
     <br/>
 
     ## conditions
-    <h2>Conditions</h2>
+    <h2>${_('Conditions')}</h2>
     <%def name="render_conds_formset(formset)">
       % for form in formset.forms:
 	<table>
@@ -102,8 +103,8 @@ Error: <b>${error_message}</b>
     ${render_union_mform(mform.union, 0)}
 
     <hr/>
-    <input type="submit" name="button-submit" value="Submit"/>
-    <input type="submit" name="button-advanced" value="Advanced ..."/>
+    <input type="submit" name="button-submit" value="${_('Submit')}"/>
+    <input type="submit" name="button-advanced" value="${_('Advanced ...')}"/>
     <br/>
 
     ## design info
@@ -112,7 +113,7 @@ Error: <b>${error_message}</b>
 
 % if log:
 <br/>
-<a name="log"><h3>Server Log</h3></a>
+<a name="log"><h3>${_('Server Log')}</h3></a>
 <pre>
 ${log | h}
 </pre>

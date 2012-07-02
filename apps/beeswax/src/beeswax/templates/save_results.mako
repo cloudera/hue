@@ -15,32 +15,33 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader("Beeswax: Create table from file", "beeswax", "100px")}
+${commonheader(_('Beeswax: Create table from file'), "beeswax", "100px")}
 ${layout.menubar(section='history')}
 <div class="container-fluid">
 % if error_msg:
 <h4>${error_msg}</h4>
 % endif
-<h1>Save Query Results</h1>
+<h1>${_('Save Query Results')}</h1>
 <form id="saveForm" action="${action}" method="POST" class="form form-inline">
 	<label class="radio">
 		<input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
-		&nbsp;In a new table
+		&nbsp;${_('In a new table')}
 	</label>
 	${comps.field(form['target_table'], notitle=True, placeholder="Table Name")}
 	<br/>
 	<label class="radio">
 		<input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
-		&nbsp;In an HDFS directory
+		&nbsp;${_('In an HDFS directory')}
 	</label>
-	${comps.field(form['target_dir'], notitle=True, hidden=True, placeholder="Results location")}
+	${comps.field(form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'))}
   <br/><br/>
-  <input type="submit" name="save" value="Save" class="btn primary"/>
-  <input type="submit" name="cancel" value="Cancel" class="btn"/>
+  <input type="submit" name="save" value="${_('Save')}" class="btn primary"/>
+  <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
 </form>
 </div>
 

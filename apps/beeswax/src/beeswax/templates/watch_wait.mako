@@ -15,23 +15,24 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader("Beeswax: Waiting for query...", "beeswax", "100px")}
+${commonheader(_('Beeswax: Waiting for query...'), "beeswax", "100px")}
 ${layout.menubar(section='query')}
 
 <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
 
 <div class="container-fluid">
-	<h1>Beeswax: Waiting for query... ${util.render_query_context(query_context)}</h1>
+	<h1>${_('Beeswax: Waiting for query...')} ${util.render_query_context(query_context)}</h1>
 	<div class="row-fluid">
 		<div class="span3">
 			<div class="well sidebar-nav">
 				<ul class="nav nav-list">
 					<%
 			          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
-			          mr_jobs = (n_jobs == 1) and "MR Job" or "MR Jobs"
+			          mr_jobs = (n_jobs == 1) and _('MR Job') or _('MR Jobs')
 			        %>
 				 	% if n_jobs > 0:
 						<li class="nav-header">${mr_jobs} (${n_jobs})</li>
@@ -41,15 +42,15 @@ ${layout.menubar(section='query')}
 						% endfor
 					% else:
 						<li class="nav-header">${mr_jobs}</li>
-						<li>No Hadoop jobs were launched in running this query.</li>
+						<li>${_('No Hadoop jobs were launched in running this query.')}</li>
 					% endif
 				</ul>
 			</div>
 		</div>
 		<div class="span9">
 			<ul class="nav nav-tabs">
-				<li class="active"><a href="#log" data-toggle="tab">Log</a></li>
-				<li><a href="#query" data-toggle="tab">Query</a></li>
+				<li class="active"><a href="#log" data-toggle="tab">${_('Log')}</a></li>
+				<li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
 			</ul>
 
 		   	<div class="tab-content">

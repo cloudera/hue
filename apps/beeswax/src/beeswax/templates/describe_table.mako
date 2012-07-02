@@ -15,25 +15,26 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%
   if is_view:
-    view_or_table_noun = "View"
+    view_or_table_noun = _("View")
   else:
-    view_or_table_noun = "Table"
+    view_or_table_noun = _("Table")
 %>
-${commonheader("Beeswax %s Metadata: %s" % (view_or_table_noun, table.tableName), "beeswax", "100px")}
+${commonheader(_("Beeswax %s Metadata: %s") % (view_or_table_noun, table.tableName), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 <%def name="column_table(cols)">
 
     <table class="table table-striped table-condensed datatables">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Comment</th>
+          <th>${_('Name')}</th>
+          <th>${_('Type')}</th>
+          <th>${_('Comment')}</th>
         </tr>
       </thead>
       <tbody>
@@ -50,16 +51,16 @@ ${layout.menubar(section='tables')}
 </%def>
 
 <div class="container-fluid">
-	<h1>Beeswax Table Metadata: ${table.tableName}</h1>
+	<h1>${_('Beeswax Table Metadata:')} ${table.tableName}</h1>
 	<div class="row-fluid">
 		<div class="span3">
 			<div class="well sidebar-nav">
 				<ul class="nav nav-list">
-					<li class="nav-header">Actions</li>
-					<li><a href="#importData" data-toggle="modal">Import Data</a></li>
-					<li><a href="${ url("beeswax.views.read_table", table=table_name) }">Browse Data</a></li>
-			        <li><a href="#dropTable" data-toggle="modal">Drop ${view_or_table_noun}</a></li>
-			        <li><a href="${hdfs_link}" rel="${ table.sd.location }">View File Location</a></li>
+					<li class="nav-header">${_('Actions')}</li>
+					<li><a href="#importData" data-toggle="modal">${_('Import Data')}</a></li>
+					<li><a href="${ url("beeswax.views.read_table", table=table_name) }">${_('Browse Data')}</a></li>
+			        <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
+			        <li><a href="${hdfs_link}" rel="${ table.sd.location }">${_('View File Location')}</a></li>
 				</ul>
 			</div>
 		</div>
@@ -69,12 +70,12 @@ ${layout.menubar(section='tables')}
 			% endif
 
 			<ul class="nav nav-tabs">
-				<li class="active"><a href="#columns" data-toggle="tab">Columns</a></li>
+				<li class="active"><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
 		        % if len(table.partitionKeys) > 0:
-					<li><a href="#partitionColumns" data-toggle="tab">Partition Columns</a></li>
+					<li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
 		        % endif
 				% if top_rows is not None:
-					<li><a href="#sample" data-toggle="tab">Sample</a></li>
+					<li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
 				% endif
 			</ul>
 
@@ -85,7 +86,7 @@ ${layout.menubar(section='tables')}
 		        % if len(table.partitionKeys) > 0:
 		          <div class="tab-pane" id="partitionColumns">
 		            ${column_table(table.partitionKeys)}
-		            <a href="${ url("beeswax.views.describe_partitions", table=table_name) }">Show Partitions</a>
+		            <a href="${ url("beeswax.views.describe_partitions", table=table_name) }">${_('Show Partitions')}</a>
 		          </div>
 		        % endif
 				% if top_rows is not None:
@@ -122,7 +123,7 @@ ${layout.menubar(section='tables')}
 	<form id="dropTableForm" method="POST" action="${ url("beeswax.views.drop_table", table=table_name) }">
 	<div class="modal-header">
 		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>Drop Table</h3>
+		<h3>${_('Drop Table')}</h3>
 	</div>
 	<div class="modal-body">
 	  <div id="dropTableMessage" class="alert">
@@ -130,8 +131,8 @@ ${layout.menubar(section='tables')}
 	  </div>
 	</div>
 	<div class="modal-footer">
-		<input type="submit" class="btn primary" value="Yes"/>
-		<a href="#" class="btn secondary hideModal">No</a>
+		<input type="submit" class="btn primary" value="${_('Yes')}"/>
+		<a href="#" class="btn secondary hideModal">${_('No')}</a>
 	</div>
 	</form>
 </div>
@@ -142,11 +143,11 @@ ${layout.menubar(section='tables')}
 	<form method="POST" action="${ url("beeswax.views.load_table", table=table_name) }" class="form-stacked">
 	<div class="modal-header">
 		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>Import data</h3>
+		<h3>${_('Import data')}</h3>
 	</div>
 	<div class="modal-body">
 	  <div class="alert">
-	        <p>Note that loading data will move data from its location into the table's storage location.</p>
+	        <p>${_("Note that loading data will move data from its location into the table's storage location.")}</p>
 	  </div>
 
 
@@ -175,7 +176,7 @@ ${layout.menubar(section='tables')}
 
 		<div class="clearfix">
 			<div class="input">
-				<input type="checkbox" name="overwrite"/> Overwrite existing data
+				<input type="checkbox" name="overwrite"/> ${_('Overwrite existing data')}
 			</div>
 		</div>
 
@@ -184,8 +185,8 @@ ${layout.menubar(section='tables')}
 	</div>
 	</div>
 	<div class="modal-footer">
-		<input type="submit" class="btn primary" value="Submit"/>
-		<a href="#" class="btn secondary" data-dismiss="modal">Cancel</a>
+		<input type="submit" class="btn primary" value="${_('Submit')}"/>
+		<a href="#" class="btn secondary" data-dismiss="modal">${_('Cancel')}</a>
 	</div>
 	</form>
 </div>

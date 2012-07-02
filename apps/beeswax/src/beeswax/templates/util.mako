@@ -13,6 +13,9 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from django.utils.translation import ugettext as _
+%>
 <%def name="render_error(err)">
   <div>
     ${unicode(err) | n}
@@ -56,16 +59,16 @@
   % if query_context:
     % if query_context[0] == 'table':
       <% tablename = query_context[1] %>
-      <a href="${ url('beeswax.views.describe_table', tablename) }" class="bw-query_link">${tablename}</a>
+      <a href="${ url('beeswax.views.describe_table', tablename) }">${tablename}</a>
     % elif query_context[0] == 'design':
       <% design = query_context[1] %>
       % if design.is_auto:
-		<a href="${ url('beeswax.views.execute_query', design.id)}" class="bw-query_link">Unsaved Query</a>
+		<a href="${ url('beeswax.views.execute_query', design.id)}">${_('Unsaved Query')}</a>
       % else:
-        <a href="${ url('beeswax.views.execute_query', design.id)}" class="bw-query_link">${design.name}</a>
+        <a href="${ url('beeswax.views.execute_query', design.id)}">${design.name}</a>
       % endif
     % else:
-      Query Results
+      ${_('Query Results')}
     % endif
   % endif
 </%def>

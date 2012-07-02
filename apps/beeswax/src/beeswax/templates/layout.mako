@@ -18,6 +18,8 @@
 ## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and
 ## multiple spaces and line breaks cause issues
 <%!
+from django.utils.translation import ugettext as _
+
 def is_selected(section, matcher):
   if section == matcher:
     return "active"
@@ -29,12 +31,12 @@ def is_selected(section, matcher):
 <div class="subnav subnav-fixed">
 	<div class="container-fluid">
 		<ul class="nav nav-pills">
-			<li class="${is_selected(section, 'query')}"><a href="/beeswax/execute">Query Editor</a></li>
-			<li class="${is_selected(section, 'my queries')}"><a href="/beeswax/my_queries">My Queries</a></li>
-			<li class="${is_selected(section, 'saved queries')}"><a href="/beeswax/list_designs">Saved Queries</a></li>
-			<li class="${is_selected(section, 'history')}"><a href="/beeswax/query_history">History</a></li>
-			<li class="${is_selected(section, 'tables')}"><a href="/beeswax/tables">Tables</a></li>
-			<li class="${is_selected(section, 'hive configuration')}"><a href="/beeswax/configuration">Settings</a></li>
+			<li class="${is_selected(section, 'query')}"><a href="/beeswax/execute">${_('Query Editor')}</a></li>
+			<li class="${is_selected(section, 'my queries')}"><a href="/beeswax/my_queries">${_('My Queries')}</a></li>
+			<li class="${is_selected(section, 'saved queries')}"><a href="/beeswax/list_designs">${_('Saved Queries')}</a></li>
+			<li class="${is_selected(section, 'history')}"><a href="/beeswax/query_history">${_('History')}</a></li>
+			<li class="${is_selected(section, 'tables')}"><a href="/beeswax/tables">${_('Tables')}</a></li>
+			<li class="${is_selected(section, 'hive configuration')}"><a href="/beeswax/configuration">${_('Settings')}</a></li>
 		</ul>
 	</div>
 </div>

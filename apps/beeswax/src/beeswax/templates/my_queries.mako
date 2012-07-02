@@ -17,11 +17,12 @@
 import time
 from django.template.defaultfilters import timesince
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
-${commonheader("Beeswax: My Queries", "beeswax", "100px")}
+${commonheader(_('Beeswax: My Queries'), "beeswax", "100px")}
 ${layout.menubar(section='my queries')}
 <style>
     .tab-content {
@@ -29,21 +30,21 @@ ${layout.menubar(section='my queries')}
     }
 </style>
 <div class="container-fluid">
-    <h1>Beeswax: My Queries</h1>
+    <h1>${_('Beeswax: My Queries')}</h1>
 
     <div class="well hueWell">
         <div class="btn-group pull-right">
-            <a class="btn" href="/beeswax/">Create New Query</a>
+            <a class="btn" href="/beeswax/">${_('Create New Query')}</a>
         </div>
 
         <form class="form-search">
-            Filter: <input placeholder="Search for name, description, etc..." class="input-xlarge search-query" id="filterInput">
+            ${_('Filter:')} <input placeholder="${_('Search for name, description, etc...')}" class="input-xlarge search-query" id="filterInput">
         </form>
     </div>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#recentSavedQueries" data-toggle="tab">Recent Saved Queries &nbsp;<span id="recentSavedQueriesFilterCnt" class="badge badge-info hide"></span></a></li>
-        <li><a href="#recentRunQueries" data-toggle="tab">Recent Run Queries  &nbsp;<span id="recentRunQueriesFilterCnt" class="badge badge-info hide"></span></a></li>
+        <li class="active"><a href="#recentSavedQueries" data-toggle="tab">${_('Recent Saved Queries')} &nbsp;<span id="recentSavedQueriesFilterCnt" class="badge badge-info hide"></span></a></li>
+        <li><a href="#recentRunQueries" data-toggle="tab">${_('Recent Run Queries')}  &nbsp;<span id="recentRunQueriesFilterCnt" class="badge badge-info hide"></span></a></li>
     </ul>
 
     <div class="tab-content">
@@ -52,10 +53,10 @@ ${layout.menubar(section='my queries')}
                  <table id="recentSavedQueriesTable" class="table table-striped table-condensed datatables">
                       <thead>
                         <tr>
-                          <th>Name</th>
-                          <th>Desc</th>
-                          <th>Type</th>
-                          <th>Last Modified</th>
+                          <th>${_('Name')}</th>
+                          <th>${_('Desc')}</th>
+                          <th>${_('Type')}</th>
+                          <th>${_('Last Modified')}</th>
                           <th></th>
                         </tr>
                       </thead>
@@ -79,29 +80,29 @@ ${layout.menubar(section='my queries')}
                           </td>
                           <td>
                             % if design.type == models.SavedQuery.REPORT:
-                              Report
+                              ${_('Report')}
                             % else:
-                              Query
+                              ${_('Query')}
                             % endif
                           </td>
                           <td>
-                              <span alt="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ago</span>
+                              <span alt="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</span>
                           </td>
                           <td>
                             <div class="btn-group">
                                 <a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
-                                       Options
+                                    ${_('Options')}
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
                                       % if design.type == models.SavedQuery.REPORT:
-                                        <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report." class="contextItem">Edit</a></li>
+                                        <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="${_('Edit this report.')}" class="contextItem">${_('Edit')}</a></li>
                                       % else:
-                                        <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="Edit this query." class="contextItem">Edit</a></li>
+                                        <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="${_('Edit this query.')}" class="contextItem">${_('Edit')}</a></li>
                                       % endif
-                                         <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query." class="contextItem confirmationModal">Delete</a></li>
-                                      <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
-                                      <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query." class="contextItem">Clone</a></li>
+                                         <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="${_('Delete this query.')}" class="contextItem confirmationModal">${_('Delete')}</a></li>
+                                      <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="${_('View the usage history of this query.')}" class="contextItem">${_('Usage History')}</a></li>
+                                      <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="${_('Copy this query.')}" class="contextItem">${_('Clone')}</a></li>
                                 </ul>
                             </div>
                           </td>
@@ -110,7 +111,7 @@ ${layout.menubar(section='my queries')}
                       </tbody>
                     </table>
                     % if q_page.number != q_page.num_pages():
-                      <a href="${ url('beeswax.views.list_designs') }?user=${request.user.username|u}" >View all my queries &raquo;</a>
+                      <a href="${ url('beeswax.views.list_designs') }?user=${request.user.username|u}" >${_('View all my queries')} &raquo;</a>
                     % endif
             </div>
 
@@ -118,11 +119,11 @@ ${layout.menubar(section='my queries')}
                 <table id="recentRunQueriesTable" class="table table-striped table-condensed datatables">
                   <thead>
                     <tr>
-                      <th>Time</th>
-                      <th>Name</th>
-                      <th>Query</th>
-                      <th>State</th>
-                      <th>Result</th>
+                      <th>${_('Time')}</th>
+                      <th>${_('Name')}</th>
+                      <th>${_('Query')}</th>
+                      <th>${_('State')}</th>
+                      <th>${_('Result')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -154,7 +155,7 @@ ${layout.menubar(section='my queries')}
                       <td>${models.QueryHistory.STATE[query.last_state]}</td>
                       <td>
                         % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
-                          <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}">View</a>
+                          <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}">${_('View')}</a>
                         % else:
                           ~
                         % endif
@@ -164,7 +165,7 @@ ${layout.menubar(section='my queries')}
                   </tbody>
                 </table>
                 % if h_page.number != h_page.num_pages():
-                  <a href="${ url('beeswax.views.list_query_history') }">View my entire query history &raquo;</a>
+                  <a href="${ url('beeswax.views.list_query_history') }">${_('View my entire query history')} &raquo;</a>
                 % endif
             </div>
     </div>
@@ -174,11 +175,11 @@ ${layout.menubar(section='my queries')}
     <form id="deleteQueryForm" action="" method="POST">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 id="deleteQueryMessage">Confirm action</h3>
+        <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
     </div>
     <div class="modal-footer">
-        <input type="submit" class="btn primary" value="Yes"/>
-        <a href="#" class="btn secondary" data-dismiss="modal">No</a>
+        <input type="submit" class="btn primary" value="${_('Yes')}"/>
+        <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
     </div>
     </form>
 </div>
