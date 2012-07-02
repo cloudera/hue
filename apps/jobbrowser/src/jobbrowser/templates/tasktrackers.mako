@@ -15,23 +15,24 @@
 ## limitations under the License.
 <%!
   from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
-${commonheader("Task Trackers - Job Browser", "jobbrowser")}
+${commonheader(_('Task Trackers - Job Browser'), "jobbrowser")}
 <div class="container-fluid">
 <table class="datatables">
 	<thead>
 		<tr>
-			<th>Name</th>
-			<th>Host</th>
-			<th>Port</th>
-			<th>Last Seen</th>
-			<th>Available Space</th>
-			<th>Failure Count</th>
-			<th>Map Count</th>
-			<th>Reduce Count</th>
-			<th>Max Map Tasks</th>
-			<th>Max Reduce Tasks</th>
+			<th>${_('Name')}</th>
+			<th>${_('Host')}</th>
+			<th>${_('Port')}</th>
+			<th>${_('Last Seen')}</th>
+			<th>${_('Available Space')}</th>
+			<th>${_('Failure Count')}</th>
+			<th>${_('Map Count')}</th>
+			<th>${_('Reduce Count')}</th>
+			<th>${_('Max Map Tasks')}</th>
+			<th>${_('Max Reduce Tasks')}</th>
 		</tr>
 	</thead>
 	<tbody>

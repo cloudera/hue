@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-<%def name="task_counters(counters)">
+<%def name="task_counters(counters,_)">
     <%
         from jobbrowser.views import format_counter_name
     %>
@@ -23,8 +23,8 @@
         <table class="taskCountersTable table table-striped table-condensed">
             <thead>
             <tr>
-                <th>Counter Name</th>
-                <th>Value</th>
+                <th>${_('Counter Name')}</th>
+                <th>${_('Value')}</th>
             </tr>
             </thead>
         <tbody>
@@ -39,7 +39,7 @@
     % endfor
 </%def>
 
-<%def name="job_counters(counters)">
+<%def name="job_counters(counters,_)">
     <%
         from jobbrowser.views import format_counter_name
     %>
@@ -48,10 +48,10 @@
         <table class="jobCountersTable table table-striped table-condensed">
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Maps Total</th>
-                <th>Reduces Total</th>
-                <th>Total</th>
+                <th>${_('Name')}</th>
+                <th>${_('Maps Total')}</th>
+                <th>${_('Reduces Total')}</th>
+                <th>${_('Total')}</th>
             </tr>
             </thead>
         <tbody>

@@ -15,22 +15,23 @@
 ## limitations under the License.
 <%!
   from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader("Job Task: " + task.taskId + "- Job Browser", "jobbrowser")}
+${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId), "jobbrowser")}
 
 <div class="container-fluid">
-    <h1>Job Task: ${task.taskId} - Job Browser</h1>
+    <h1>${_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId)}</h1>
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li class="nav-header">Task ID</li>
+                    <li class="nav-header">${_('Task ID')}</li>
                     <li>${task.taskId_short}</li>
-                    <li class="nav-header">Job</li>
-                    <li><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="View this job">${joblnk.jobId_short}</a></li>
-                    <li class="nav-header">Status</li>
+                    <li class="nav-header">${_('Job')}</li>
+                    <li><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></li>
+                    <li class="nav-header">${_('Status')}</li>
                     <li>
                             % if task.state.lower() == 'running' or task.state.lower() == 'pending':
                                 <span class="label label-warning">${task.state.lower()}</span>
@@ -45,9 +46,9 @@ ${commonheader("Job Task: " + task.taskId + "- Job Browser", "jobbrowser")}
         </div>
         <div class="span10">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#attempts" data-toggle="tab">Attempts</a></li>
-                <li><a href="#metadata" data-toggle="tab">Metadata</a></li>
-                <li><a href="#counters" data-toggle="tab">Counters</a></li>
+                <li class="active"><a href="#attempts" data-toggle="tab">${_('Attempts')}</a></li>
+                <li><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
+                <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
             </ul>
 
             <div class="tab-content">
@@ -55,18 +56,18 @@ ${commonheader("Job Task: " + task.taskId + "- Job Browser", "jobbrowser")}
                     <table id="attemptsTable" class="table table-striped table-condensed">
                         <thead>
                         <tr>
-                            <th>Attempt ID</th>
-                            <th>Progress</th>
-                            <th>State</th>
-                            <th>Task Tracker</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Output Size</th>
-                            <th>Phase</th>
-                            <th>Shuffle Finish</th>
-                            <th>Sort Finish</th>
-                            <th>Map Finish</th>
-                            <th>View</th>
+                            <th>${_('Attempt ID')}</th>
+                            <th>${_('Progress')}</th>
+                            <th>${_('State')}</th>
+                            <th>${_('Task Tracker')}</th>
+                            <th>${_('Start Time')}</th>
+                            <th>${_('End Time')}</th>
+                            <th>${_('Output Size')}</th>
+                            <th>${_('Phase')}</th>
+                            <th>${_('Shuffle Finish')}</th>
+                            <th>${_('Sort Finish')}</th>
+                            <th>${_('Map Finish')}</th>
+                            <th>${_('View')}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -83,8 +84,8 @@ ${commonheader("Job Task: " + task.taskId + "- Job Browser", "jobbrowser")}
                                     <td>${attempt.shuffleFinishTimeFormatted}</td>
                                     <td>${attempt.sortFinishTimeFormatted}</td>
                                     <td>${attempt.mapFinishTimeFormatted}</td>
-                                    <td><a title="View this attempt"
-                                           href="${ url('jobbrowser.views.single_task_attempt', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">View</a></td>
+                                    <td><a title="${_('View this attempt')}"
+                                           href="${ url('jobbrowser.views.single_task_attempt', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${_('View')}</a></td>
                                 </tr>
                                 % endfor
                         </tbody>
@@ -93,51 +94,51 @@ ${commonheader("Job Task: " + task.taskId + "- Job Browser", "jobbrowser")}
                 <div id="metadata" class="tab-pane">
                     <table id="metadataTable" class="table table-striped table-condensed">
                         <thead>
-                        <th>Name</th>
-                        <th>Value</th>
+                        <th>${_('Name')}</th>
+                        <th>${_('Value')}</th>
                         </thead>
                         <tbody>
                         <tr>
-                            <td>Task id</td>
+                            <td>${_('Task id')}</td>
                             <td>${task.taskId}</td>
                         </tr>
                         <tr>
-                            <td>Type</td>
+                            <td>${_('Type')}</td>
                             <td>${task.taskType}</td>
                         </tr>
                         <tr>
-                            <td>JobId</td>
-                            <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="View this job">${joblnk.jobId}</a></td>
+                            <td>${_('JobId')}</td>
+                            <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId}</a></td>
                         </tr>
                         <tr>
-                            <td>State</td>
+                            <td>${_('State')}</td>
                             <td>${task.state}</td>
                         </tr>
                         <tr>
-                            <td>Status</td>
+                            <td>${_('Status')}</td>
                             <td>${task.mostRecentState}</td>
                         </tr>
                         <tr>
-                            <td>Start Time</td>
+                            <td>${_('Start Time')}</td>
                             <td>${task.startTimeFormatted}</td>
                         </tr>
                         <tr>
-                            <td>Execution Start Time</td>
+                            <td>${_('Execution Start Time')}</td>
                             <td>${task.execStartTimeFormatted}</td>
                         </tr>
                         <tr>
-                            <td>Execution Finish Time</td>
+                            <td>${_('Execution Finish Time')}</td>
                             <td>${task.execFinishTimeFormatted}</td>
                         </tr>
                         <tr>
-                            <td>Progress</td>
+                            <td>${_('Progress')}</td>
                             <td>${"%d" % (task.progress * 100)}%</td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
                 <div id="counters" class="tab-pane">
-                    ${comps.task_counters(task.counters)}
+                    ${comps.task_counters(task.counters, _)}
                 </div>
             </div>
         </div>
