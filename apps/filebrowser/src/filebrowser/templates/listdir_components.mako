@@ -19,6 +19,7 @@ import md5
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time, escape
 from desktop.lib.django_util import reverse_with_get
 from django.utils.encoding import smart_str
+from django.utils.translation import ugettext as _
 %>
 
 
@@ -42,11 +43,11 @@ from django.utils.encoding import smart_str
     </style>
     <div class="well hueWell">
         <p class="pull-right">
-            <a href="#" class="btn upload-link">Upload files</a>
-            <a href="#" class="btn create-directory-link">New directory</a>
+            <a href="#" class="btn upload-link">${_('Upload files')}</a>
+            <a href="#" class="btn create-directory-link">${_('New directory')}</a>
         </p>
         <form class="form-search">
-            Filter: <input id="filterInput" class="input-xlarge search-query" placeholder="Search for file name">
+            ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for file name')}">
         </form>
     </div>
 
@@ -54,15 +55,15 @@ from django.utils.encoding import smart_str
         <thead>
             <tr>
             % if cwd_set:
-                <th>Name</th>
+                <th>${_('Name')}</th>
             % else:
-                <th>Path</th>
+                <th>${_('Path')}</th>
             % endif
-                <th>Size</th>
-                <th>User</th>
-                <th>Group</th>
-                <th>Permissions</th>
-                <th>Date</th>
+                <th>${_('Size')}</th>
+                <th>${_('User')}</th>
+                <th>${_('Group')}</th>
+                <th>${_('Permissions')}</th>
+                <th>${_('Date')}</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>
@@ -104,23 +105,23 @@ from django.utils.encoding import smart_str
                     %>
                     <div class="btn-group">
                         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                            Options
+                            ${_('Options')}
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
                             % if "dir" == file['type']:
-                            <li><a class="delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
-                            <li><a class="delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete Recursively</a></li>
+                            <li><a class="delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">${_('Delete')}</a></li>
+                            <li><a class="delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">${_('Delete Recursively')}</a></li>
                             % else:
-                            <li><a class="delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">Delete</a></li>
-                            <li><a href="${url('filebrowser.views.view', path=urlencode(path))}">View File</a></li>
-                            <li><a href="${url('filebrowser.views.edit', path=urlencode(path))}">Edit File</a></li>
-                            <li><a href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">Download File</a></li>
+                            <li><a class="delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">${_('Delete')}</a></li>
+                            <li><a href="${url('filebrowser.views.view', path=urlencode(path))}">${_('View File')}</a></li>
+                            <li><a href="${url('filebrowser.views.edit', path=urlencode(path))}">${_('Edit File')}</a></li>
+                            <li><a href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">${_('Download File')}</a></li>
                             % endif
-                            <li><a class="rename" file-to-rename="${path}">Rename</a></li>
-                            <li><a onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">Change Owner / Group</a></li>
-                            <li><a onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">Change Permissions</a></li>
-                            <li><a onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">Move</a></li>
+                            <li><a class="rename" file-to-rename="${path}">${_('Rename')}</a></li>
+                            <li><a onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">${_('Change Owner / Group')}</a></li>
+                            <li><a onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">${_('Change Permissions')}</a></li>
+                            <li><a onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">${_('Move')}</a></li>
                         </ul>
                     </div>
                     % endif
@@ -134,15 +135,15 @@ from django.utils.encoding import smart_str
 <div id="deleteModal" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Please Confirm</h3>
+        <h3>${_('Please Confirm')}</h3>
     </div>
     <div class="modal-body">
-        <p>Are you sure you want to delete this file?</p>
+        <p>${_('Are you sure you want to delete this file?')}</p>
     </div>
     <div class="modal-footer">
         <form id="deleteForm" action="" method="POST" enctype="multipart/form-data" class="form-stacked">
-            <input type="submit" value="Yes" class="btn primary" />
-            <a id="cancelDeleteBtn" class="btn">No</a>
+            <input type="submit" value="${_('Yes')}" class="btn primary" />
+            <a id="cancelDeleteBtn" class="btn">${_('No')}</a>
             <input id="fileToDeleteInput" type="hidden" name="path" />
         </form>
     </div>
@@ -153,19 +154,19 @@ from django.utils.encoding import smart_str
     <form id="renameForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Renaming: <span id="renameFileName">file name</span></h3>
+        <h3>${_('Renaming:')} <span id="renameFileName">file name</span></h3>
     </div>
     <div class="modal-body">
-        <label>New name <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
+        <label>${_('New name')} <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
     </div>
     <div class="modal-footer">
         <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-            <span class="label label-important">Sorry, name is required.</span>
+            <span class="label label-important">${_('Sorry, name is required.')}</span>
         </div>
 
         <input id="renameSrcPath" type="hidden" name="src_path" type="text">
-        <input type="submit" value="Submit" class="btn primary" />
-        <a id="cancelRenameBtn" class="btn">Cancel</a>
+        <input type="submit" value="${_('Submit')}" class="btn primary" />
+        <a id="cancelRenameBtn" class="btn">${_('Cancel')}</a>
     </div>
     </form>
 </div>
@@ -175,13 +176,13 @@ from django.utils.encoding import smart_str
     <form id="uploadForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Uploading to: <span id="uploadDirName">${current_dir_path}</span></h3>
+        <h3>${_('Uploading to:')} <span id="uploadDirName">${current_dir_path}</span></h3>
     </div>
     <div class="modal-body">
         <form action="/filebrowser/upload?next=${current_dir_path}" method="POST" enctype="multipart/form-data" class="form-stacked">
             <div id="fileUploader">
             <noscript>
-                <p>Please enable JavaScript to use file uploader.</p>
+                <p>${_('Please enable JavaScript to use file uploader.')}</p>
             </noscript>
             </div>
         </form>
@@ -195,18 +196,18 @@ from django.utils.encoding import smart_str
     <form id="createDirectoryForm" action="/filebrowser/mkdir?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Create Directory</h3>
+        <h3>${_('Create Directory')}</h3>
     </div>
     <div class="modal-body">
-        <label>Directory Name <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
+        <label>${_('Directory Name')} <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
         <input type="hidden" name="path" type="text" value="${current_dir_path}"/>
     </div>
     <div class="modal-footer">
          <div id="directoryNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
-            <p><strong>Sorry, directory name is required.</strong>
+            <p><strong>${_('Sorry, directory name is required.')}</strong>
         </div>
-        <input class="btn primary" type="submit" value="Submit" />
-        <a id="cancelCreateDirectoryBtn" class="btn" href="#">Cancel</a>
+        <input class="btn primary" type="submit" value="${_('Submit')}" />
+        <a id="cancelCreateDirectoryBtn" class="btn" href="#">${_('Cancel')}</a>
     </div>
     </form>
 </div>
@@ -285,6 +286,18 @@ from django.utils.encoding import smart_str
         var uploader = new qq.FileUploader({
             element: document.getElementById("fileUploader"),
             action: "/filebrowser/upload",
+            template: '<div class="qq-uploader">' +
+                    '<div class="qq-upload-drop-area"><span>${_('Drop files here to upload')}</span></div>' +
+                    '<div class="qq-upload-button">${_('Upload a file')}</div>' +
+                    '<ul class="qq-upload-list"></ul>' +
+                    '</div>',
+            fileTemplate: '<li>' +
+                    '<span class="qq-upload-file"></span>' +
+                    '<span class="qq-upload-spinner"></span>' +
+                    '<span class="qq-upload-size"></span>' +
+                    '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
+                    '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
+                    '</li>',
             params:{
                 dest: "${current_dir_path}",
                 fileFieldLabel: "hdfs_file"

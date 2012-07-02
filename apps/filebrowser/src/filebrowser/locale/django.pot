@@ -1,0 +1,366 @@
+# Translations template for PROJECT.
+# Copyright (C) 2012 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-07-02 23:32+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/filebrowser/templates/chmod.mako:32
+msgid "Change Permissions:"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:40
+#: src/filebrowser/templates/chown.mako:71
+#: src/filebrowser/templates/display.mako:77
+#: src/filebrowser/templates/listdir_components.mako:63
+msgid "User"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:41
+#: src/filebrowser/templates/chown.mako:79
+#: src/filebrowser/templates/display.mako:79
+#: src/filebrowser/templates/listdir_components.mako:64
+msgid "Group"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:42
+msgid "Other"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:48
+msgid "Read"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:55
+msgid "Write"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:62
+msgid "Execute"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:72
+#: src/filebrowser/templates/chown.mako:94
+#: src/filebrowser/templates/listdir_components.mako:168
+#: src/filebrowser/templates/listdir_components.mako:209
+#: src/filebrowser/templates/move.mako:40
+msgid "Submit"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:73
+#: src/filebrowser/templates/chown.mako:95
+#: src/filebrowser/templates/edit.mako:82
+#: src/filebrowser/templates/listdir_components.mako:169
+#: src/filebrowser/templates/listdir_components.mako:210
+#: src/filebrowser/templates/listdir_components.mako:298
+#: src/filebrowser/templates/move.mako:41
+#: src/filebrowser/templates/upload.mako:54
+msgid "Cancel"
+msgstr ""
+
+#: src/filebrowser/templates/chown.mako:64
+msgid "Change Owner / Group:"
+msgstr ""
+
+#: src/filebrowser/templates/chown.mako:67
+#, python-format
+msgid ""
+"Note: Only the Hadoop superuser, on this FS \"%(superuser)s\", may change"
+" the owner of a file."
+msgstr ""
+
+#: src/filebrowser/templates/chown.mako:92
+#: src/filebrowser/templates/edit.mako:77
+#: src/filebrowser/templates/listdir_components.mako:164
+#: src/filebrowser/templates/move.mako:38
+msgid "Sorry, name is required."
+msgstr ""
+
+#: src/filebrowser/templates/chown.mako:120
+msgid "Sorry, user is required."
+msgstr ""
+
+#: src/filebrowser/templates/chown.mako:125
+msgid "Sorry, group is required."
+msgstr ""
+
+#: src/filebrowser/templates/chown.mako:131
+msgid "Sorry, you need to specify another group."
+msgstr ""
+
+#: src/filebrowser/templates/chown.mako:137
+msgid "Sorry, you need to specify another user."
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:31
+#: src/filebrowser/templates/edit.mako:29
+#, python-format
+msgid "%(filename)s - File Viewer"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:46
+msgid "Actions"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:48
+msgid "View As Text"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:51
+msgid "View As Binary"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:55
+msgid "Preview As Gzip"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:59
+msgid "Preview As Avro"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:63
+msgid "Stop preview"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:67
+#: src/filebrowser/templates/listdir_components.mako:118
+msgid "Edit File"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:69
+msgid "Download"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:70
+msgid "View File Location"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:71
+msgid "Refresh"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:72
+msgid "Info"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:75
+msgid "Last Modified"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:81
+#: src/filebrowser/templates/listdir_components.mako:62
+msgid "Size"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:83
+msgid "Mode"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:119
+#: src/filebrowser/templates/display.mako:199
+msgid "First Block"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:120
+#: src/filebrowser/templates/display.mako:200
+msgid "Previous Block"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:121
+#: src/filebrowser/templates/display.mako:201
+msgid "Next Block"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:122
+#: src/filebrowser/templates/display.mako:202
+msgid "Last Block"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:126
+msgid "Viewing Bytes:"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:131
+#, python-format
+msgid "(%(length)s B block size)"
+msgstr ""
+
+#: src/filebrowser/templates/display.mako:142
+msgid "Warning: some binary data has been masked out with '&#xfffd'."
+msgstr ""
+
+#: src/filebrowser/templates/edit.mako:41
+msgid "View Location"
+msgstr ""
+
+#: src/filebrowser/templates/edit.mako:59
+#: src/filebrowser/templates/edit.mako:81
+msgid "Save"
+msgstr ""
+
+#: src/filebrowser/templates/edit.mako:60
+#: src/filebrowser/templates/edit.mako:69
+msgid "Save As"
+msgstr ""
+
+#: src/filebrowser/templates/edit.mako:73
+msgid "Please enter the location where you'd like to save the file."
+msgstr ""
+
+#: src/filebrowser/templates/fb_components.mako:24
+msgid "Home"
+msgstr ""
+
+#: src/filebrowser/templates/fileop.mako:25
+msgid "File Operation"
+msgstr ""
+
+#: src/filebrowser/templates/listdir.mako:26
+#: src/filebrowser/templates/listdir.mako:28
+msgid "File Browser"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:46
+msgid "Upload files"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:47
+msgid "New directory"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:50
+msgid "Filter: "
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:50
+msgid "Search for file name"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:58
+msgid "Name"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:60
+msgid "Path"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:65
+msgid "Permissions"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:66
+msgid "Date"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:108
+msgid "Options"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:113
+#: src/filebrowser/templates/listdir_components.mako:116
+msgid "Delete"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:114
+msgid "Delete Recursively"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:117
+msgid "View File"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:119
+msgid "Download File"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:121
+msgid "Rename"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:122
+msgid "Change Owner / Group"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:123
+msgid "Change Permissions"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:124
+msgid "Move"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:138
+msgid "Please Confirm"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:141
+msgid "Are you sure you want to delete this file?"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:145
+msgid "Yes"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:146
+msgid "No"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:157
+msgid "Renaming:"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:160
+msgid "New name"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:179
+msgid "Uploading to:"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:185
+msgid "Please enable JavaScript to use file uploader."
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:199
+msgid "Create Directory"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:202
+msgid "Directory Name"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:207
+msgid "Sorry, directory name is required."
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:290
+#: src/filebrowser/templates/upload.mako:46
+msgid "Drop files here to upload"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:291
+#: src/filebrowser/templates/upload.mako:47
+msgid "Upload a file"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:299
+#: src/filebrowser/templates/upload.mako:55
+msgid "Failed"
+msgstr ""
+
+#: src/filebrowser/templates/move.mako:24
+msgid "Move:"
+msgstr ""
+

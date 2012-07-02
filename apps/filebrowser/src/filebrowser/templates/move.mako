@@ -13,12 +13,15 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from django.utils.translation import ugettext as _
+%>
 <%namespace name="edit" file="editor_components.mako" />
 
 <form id="moveForm" action="/filebrowser/move?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Move: ${src_path}</h3>
+        <h3>${_('Move:')} ${src_path}</h3>
     </div>
     <div class="modal-body">
         <div style="padding-left: 15px;">
@@ -32,10 +35,10 @@
     </div>
     <div class="modal-footer">
         <div id="moveNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-            <span class="label label-important">Sorry, name is required.</span>
+            <span class="label label-important">${_('Sorry, name is required.')}</span>
         </div>
-        <input class="btn primary" type="submit" value="Submit"/>
-        <a class="btn" onclick="$('#moveModal').modal('hide');">Cancel</a>
+        <input class="btn primary" type="submit" value="${_('Submit')}"/>
+        <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
     </div>
 </form>
 

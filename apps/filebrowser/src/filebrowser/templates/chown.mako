@@ -13,6 +13,10 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from django.utils.translation import ugettext as _
+%>
+
 <%namespace name="edit" file="editor_components.mako" />
 <%! from desktop.lib.django_util import extract_field_data %>
 
@@ -57,14 +61,14 @@
 <form id="chownForm" action="/filebrowser/chown?next=${next|u}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Change Owner / Group: ${path}</h3>
+        <h3>${_('Change Owner / Group:')} ${path}</h3>
     </div>
     <div class="modal-body change-owner-modal-body clearfix" >
-        <div class="alert alert-message block-message info">Note: Only the Hadoop superuser, on this FS "${extra_params['superuser']}", may change the owner of a file.</div>
+        <div class="alert alert-message block-message info">${_('Note: Only the Hadoop superuser, on this FS "%(superuser)s", may change the owner of a file.') % dict(superuser=extra_params['superuser'])}"</div>
         <div style="padding-left: 15px; padding-bottom: 10px;">
             ${edit.render_field(form["path"], hidden=True)}
 
-            <label>User</label>
+            <label>${_('User')}</label>
 
             % if is_superuser:
             ${ selection("user", form.all_users, extract_field_data(form["user"]), "user_other") }
@@ -72,7 +76,7 @@
             ${ selection("user", [extract_field_data(form['user'])], extract_field_data(form["user"])) }
             % endif
 
-            <label>Group</label>
+            <label>${_('Group')}</label>
 
             % if is_superuser:
             ${ selection("group", form.all_groups, extract_field_data(form["group"]), "group_other") }
@@ -85,10 +89,10 @@
     </div>
     <div class="modal-footer" style="padding-top: 10px;">
         <div id="chownRequired" class="hide" style="position: absolute; left: 10;">
-            <span class="label label-important">Sorry, name is required.</span>
+            <span class="label label-important">${_('Sorry, name is required.')}</span>
         </div>
-        <input class="btn primary" type="submit" value="Submit" />
-        <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">Cancel</a>
+        <input class="btn primary" type="submit" value="${_('Submit')}" />
+        <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">${_('Cancel')}</a>
     </div>
 </form>
 
@@ -113,24 +117,24 @@
 
         $("#chownForm").submit(function(){
             if ($("select[name='user']").val() == null){
-                $("#chownRequired").find(".label").text("Sorry, user is required.");
+                $("#chownRequired").find(".label").text("${_('Sorry, user is required.')}");
                 $("#chownRequired").show();
                 return false;
             }
             else if ($("select[name='group']").val() == null){
-                $("#chownRequired").find(".label").text("Sorry, group is required.");
+                $("#chownRequired").find(".label").text("${_('Sorry, group is required.')}");
                 $("#chownRequired").show();
                 return false;
             }
             else {
                 if ($("select[name='group']").val() == "__other__" && $("input[name='group_other']").val() == ""){
-                    $("#chownRequired").find(".label").text("Sorry, you need to specify another group.");
+                    $("#chownRequired").find(".label").text("${_('Sorry, you need to specify another group.')}");
                     $("input[name='group_other']").addClass("fieldError");
                     $("#chownRequired").show();
                     return false;
                 }
                 if ($("select[name='user']").val() == "__other__" && $("input[name='user_other']").val() == ""){
-                    $("#chownRequired").find(".label").text("Sorry, you need to specify another user.");
+                    $("#chownRequired").find(".label").text("${_('Sorry, you need to specify another user.')}");
                     $("input[name='user_other']").addClass("fieldError");
                     $("#chownRequired").show();
                     return false;
