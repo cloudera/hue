@@ -23,17 +23,18 @@ from django.core.management.base import CommandError, BaseCommand
 from mako.template import Template
 
 import logging
+from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-  help = ("Creates a Hue application directory structure.")
+  help = _("Creates a Hue application directory structure.")
   args = "[appname]"
-  label = 'application name'
+  label = _('application name')
 
   def handle(self, *args, **options):
     if len(args) > 2 or len(args) == 0:
-      raise CommandError("Expected arguments: app_name [app_dir]")
+      raise CommandError(_("Expected arguments: app_name [app_dir]"))
     app_name = args[0]
     if len(args) == 2:
       app_dir = args[0]
@@ -41,14 +42,14 @@ class Command(BaseCommand):
       app_dir = os.getcwd()
 
     app_template = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..','app_template'))
-    assert os.path.isdir(app_template), "App template dir missing: " + app_template
+    assert os.path.isdir(app_template), _("App template dir missing: %(template)s") % {'template': app_template}
     app_dir = os.path.join(app_dir, app_name)
 
     if not os.path.exists(app_template):
-      raise CommandError("The template path, %r, does not exist." % app_template)
+      raise CommandError(_("The template path, %(path)r, does not exist.") % {'path': app_template})
 
     if not re.search(r'^\w+$', app_name):
-      raise CommandError("%r is not a valid application name. Please use only numbers, letters and underscores." % app_name)
+      raise CommandError(_("%(name)r is not a valid application name. Please use only numbers, letters and underscores.") % {'name': app_name})
     try:
       os.makedirs(app_dir)
     except OSError, e:

@@ -21,6 +21,7 @@ from django.core.management.base import BaseCommand
 
 from desktop import conf
 from desktop.lib.daemon_utils import drop_privileges_if_necessary
+from django.utils.translation import ugettext as _
 
 
 CPSERVER_HELP = r"""
@@ -43,7 +44,7 @@ CPSERVER_OPTIONS = {
 
 
 class Command(BaseCommand):
-    help = "CherryPy Server for Desktop."
+    help = _("CherryPy Server for Desktop.")
     args = ""
 
     def handle(self, *args, **options):
@@ -104,7 +105,7 @@ def runcpserver(argset=[], **kwargs):
         return
 
     # Start the webserver
-    print 'starting server with options %s' % options
+    print _('starting server with options %(options)s') % {'options': options}
     start_server(options)
 
 

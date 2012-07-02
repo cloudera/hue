@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-09 21:58+0200\n"
+"POT-Creation-Date: 2012-07-23 10:40-0700\n"
 "PO-Revision-Date: 2012-07-09 21:58+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en_US <LL@li.org>\n"
@@ -16,6 +16,344 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: src/desktop/appmanager.py:224
+msgid "load_apps already has been called!"
+msgstr ""
+
+#: src/desktop/conf.py:30
+msgid ""
+"If set to true, CherryPy will be used. Otherwise, Spawning will be used "
+"as the webserver."
+msgstr ""
+
+#: src/desktop/conf.py:36
+msgid "HTTP Host to bind to"
+msgstr ""
+
+#: src/desktop/conf.py:41
+msgid "HTTP Port to bind to"
+msgstr ""
+
+#: src/desktop/conf.py:46
+msgid "Filename of SSL Certificate"
+msgstr ""
+
+#: src/desktop/conf.py:50
+msgid "Filename of SSL RSA Private Key"
+msgstr ""
+
+#: src/desktop/conf.py:54
+msgid ""
+"If set to false, runcpserver will not actually start the web server.  "
+"Used if Apache is being used as a WSGI container."
+msgstr ""
+
+#: src/desktop/conf.py:59
+msgid "Number of threads used by the CherryPy web server."
+msgstr ""
+
+#: src/desktop/conf.py:64
+msgid "Used in hashing algorithms for sessions."
+msgstr ""
+
+#: src/desktop/conf.py:69
+msgid "Number of user access to remember per view per user."
+msgstr ""
+
+#: src/desktop/conf.py:94
+msgid "Configuration options for connecting to an external SMTP server"
+msgstr ""
+
+#: src/desktop/conf.py:98
+msgid "The SMTP server for email notification delivery"
+msgstr ""
+
+#: src/desktop/conf.py:105
+msgid "The SMTP server port"
+msgstr ""
+
+#: src/desktop/conf.py:112
+msgid "The username for the SMTP host"
+msgstr ""
+
+#: src/desktop/conf.py:119
+msgid "The password for the SMTP user"
+msgstr ""
+
+#: src/desktop/conf.py:126
+msgid "Whether to use a TLS (secure) connection when talking to the SMTP server"
+msgstr ""
+
+#: src/desktop/conf.py:133
+msgid "Default email address to use for various automated notification from Hue"
+msgstr ""
+
+#: src/desktop/conf.py:142
+msgid ""
+"Configuration options for specifying the Desktop Database.\n"
+"          For more info, see "
+"http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
+msgstr ""
+
+#: src/desktop/conf.py:147
+msgid "Database engine, eg postgresql, mysql, sqlite3, or oracle"
+msgstr ""
+
+#: src/desktop/conf.py:153
+msgid "Database name, or path to DB if using sqlite3"
+msgstr ""
+
+#: src/desktop/conf.py:159
+msgid "Database username"
+msgstr ""
+
+#: src/desktop/conf.py:165
+msgid "Database password"
+msgstr ""
+
+#: src/desktop/conf.py:171
+msgid "Database host"
+msgstr ""
+
+#: src/desktop/conf.py:177
+msgid "Database port"
+msgstr ""
+
+#: src/desktop/conf.py:186
+msgid ""
+"Configuration options for specifying Hue's kerberos integration for\n"
+"          secured Hadoop clusters."
+msgstr ""
+
+#: src/desktop/conf.py:191
+msgid "Path to a Kerberos keytab file containing Hue's service credentials."
+msgstr ""
+
+#: src/desktop/conf.py:196
+msgid "Kerberos principal name for hue. Typically 'hue/hostname.foo.com'"
+msgstr ""
+
+#: src/desktop/conf.py:201
+msgid "Frequency in seconds with which Hue will renew its keytab"
+msgstr ""
+
+#: src/desktop/conf.py:206
+msgid "Path to keep kerberos credentials cached"
+msgstr ""
+
+#: src/desktop/conf.py:213
+msgid "Path to kerberos 'kinit' command"
+msgstr ""
+
+#: src/desktop/conf.py:223
+msgid "Time zone name"
+msgstr ""
+
+#: src/desktop/conf.py:230
+msgid "Default system-wide unicode encoding"
+msgstr ""
+
+#: src/desktop/conf.py:237
+msgid "Username to run servers as"
+msgstr ""
+
+#: src/desktop/conf.py:242
+msgid "Group to run servers as"
+msgstr ""
+
+#: src/desktop/conf.py:249
+msgid "Configuration options for user authentication into the web application"
+msgstr ""
+
+#: src/desktop/conf.py:253
+msgid ""
+"Authentication backend.  Common settings are "
+"django.contrib.auth.backends.ModelBackend (fully Django backend), "
+"desktop.auth.backend.AllowAllBackend (allows everyone), "
+"desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and "
+"user manager, after the first login), "
+msgstr ""
+
+#: src/desktop/conf.py:259
+msgid "Class which defines extra accessor methods for User objects."
+msgstr ""
+
+#: src/desktop/conf.py:264
+msgid "Configuration options for LDAP connectivity"
+msgstr ""
+
+#: src/desktop/conf.py:268
+msgid "The base LDAP distinguished name to use for LDAP search."
+msgstr ""
+
+#: src/desktop/conf.py:271
+msgid "The NT domain used for LDAP authentication."
+msgstr ""
+
+#: src/desktop/conf.py:274
+msgid "The LDAP URL to connect to."
+msgstr ""
+
+#: src/desktop/conf.py:277
+msgid "The LDAP certificate for authentication over TLS."
+msgstr ""
+
+#: src/desktop/conf.py:280
+msgid "A pattern to use for constructing LDAP usernames."
+msgstr ""
+
+#: src/desktop/conf.py:283
+msgid "The distinguished name to bind as, when importing from LDAP."
+msgstr ""
+
+#: src/desktop/conf.py:286
+msgid "The password for the bind user."
+msgstr ""
+
+#: src/desktop/conf.py:290
+msgid "Configuration for LDAP user schema and search"
+msgstr ""
+
+#: src/desktop/conf.py:294
+msgid "A base filter for use when searching for users."
+msgstr ""
+
+#: src/desktop/conf.py:297
+msgid ""
+"The username attribute in the LDAP schema. Typically, this is "
+"'sAMAccountName' for AD and 'uid' for other LDAP systems."
+msgstr ""
+
+#: src/desktop/conf.py:305
+msgid "Configuration for LDAP group schema and search"
+msgstr ""
+
+#: src/desktop/conf.py:309
+msgid "A base filter for use when searching for groups."
+msgstr ""
+
+#: src/desktop/conf.py:312
+msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
+msgstr ""
+
+#: src/desktop/conf.py:316
+msgid "The LDAP attribute which specifies the members of a group."
+msgstr ""
+
+#: src/desktop/conf.py:326
+msgid "Paths on the local file system that users should be able to browse"
+msgstr ""
+
+#: src/desktop/conf.py:331
+msgid "The path on the local FS"
+msgstr ""
+
+#: src/desktop/conf.py:339
+msgid "Link for 'feedback' tab."
+msgstr ""
+
+#: src/desktop/conf.py:346
+msgid "Whether to send dbug messages from JavaScript to the server logs."
+msgstr ""
+
+#: src/desktop/conf.py:353
+msgid "If true, log all database requests."
+msgstr ""
+
+#: src/desktop/conf.py:359
+msgid "Enable or disable django debug mode."
+msgstr ""
+
+#: src/desktop/conf.py:366
+msgid ""
+"Enable or disable debugging information in the 500 internal server error "
+"response. Note that the debugging information may contain sensitive data."
+" If django_debug_mode is True, this is automatically enabled."
+msgstr ""
+
+#: src/desktop/conf.py:384
+msgid "Secret key should be configured as a random string."
+msgstr ""
+
+#: src/desktop/conf.py:390
+msgid "SSL private key file should be set to enable HTTPS."
+msgstr ""
+
+#: src/desktop/conf.py:396
+msgid "Encoding not supported."
+msgstr ""
+
+#: src/desktop/conf.py:405
+#, python-format
+msgid "Keytab should have 0600 permissions (has %o)"
+msgstr ""
+
+#: src/desktop/conf.py:415
+msgid "LDAP is only partially configured. An LDAP URL must be provided."
+msgstr ""
+
+#: src/desktop/conf.py:421
+msgid ""
+"LDAP is only partially configured. An NT Domain or username search "
+"pattern must be provided."
+msgstr ""
+
+#: src/desktop/conf.py:427
+msgid ""
+"The LDAP username pattern should contain the special<username> "
+"replacement string for authentication."
+msgstr ""
+
+#: src/desktop/decorators.py:40
+#, python-format
+msgid "Permission denied (%(action)s/%(app)s)"
+msgstr ""
+
+#: src/desktop/middleware.py:89
+#, python-format
+msgid "An error occurred: %(error)s"
+msgstr ""
+
+#: src/desktop/middleware.py:134
+#, python-format
+msgid "Cannot find HDFS called \"%(fs_ref)s\""
+msgstr ""
+
+#: src/desktop/middleware.py:215
+#, python-format
+msgid "%(module)s isn't a middleware module"
+msgstr ""
+
+#: src/desktop/middleware.py:220
+#, python-format
+msgid "Error importing middleware %(module)s: \"%(error)s\""
+msgstr ""
+
+#: src/desktop/middleware.py:224
+#, python-format
+msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class"
+msgstr ""
+
+#: src/desktop/middleware.py:236
+#, python-format
+msgid ""
+"AppSpecificMiddleware module \"%(module)s\" has a process_request "
+"function which is impossible."
+msgstr ""
+
+#: src/desktop/middleware.py:278
+#, python-format
+msgid "You do not have permission to access the %(app_name)s application."
+msgstr ""
+
+#: src/desktop/views.py:56 src/desktop/views.py:94
+msgid "No logs found!"
+msgstr ""
+
+#: src/desktop/views.py:171 src/desktop/views.py:194 src/desktop/views.py:338
+msgid "You must be a superuser."
+msgstr ""
 
 #: src/desktop/lib/django_util.py:429
 msgid "year"
@@ -87,6 +425,110 @@ msgstr ""
 msgid "%(separator)s %(number)d %(type)s"
 msgstr ""
 
+#: src/desktop/management/commands/config_dump.py:39
+msgid "Dumping configuration..."
+msgstr ""
+
+#: src/desktop/management/commands/config_dump.py:60
+#: src/desktop/management/commands/config_dump.py:70
+#: src/desktop/templates/dump_config.mako:82
+#: src/desktop/templates/dump_config.mako:94
+msgid "No help available."
+msgstr ""
+
+#: src/desktop/management/commands/config_upgrade.py:38
+msgid "Upgrades the Hue configuration with a mapping file."
+msgstr ""
+
+#: src/desktop/management/commands/config_upgrade.py:41
+msgid "Location of the mapping file."
+msgstr ""
+
+#: src/desktop/management/commands/config_upgrade.py:49
+#, python-format
+msgid "--%(param)s is required."
+msgstr ""
+
+#: src/desktop/management/commands/config_upgrade.py:60
+#, python-format
+msgid "Invalid mapping %(mapping)s in %(file)s"
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:31
+msgid "Creates a Hue application directory structure."
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:33
+msgid "application name"
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:37
+msgid "Expected arguments: app_name [app_dir]"
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:45
+#, python-format
+msgid "App template dir missing: %(template)s"
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:49
+#, python-format
+msgid "The template path, %(path)r, does not exist."
+msgstr ""
+
+#: src/desktop/management/commands/create_desktop_app.py:52
+#, python-format
+msgid ""
+"%(name)r is not a valid application name. Please use only numbers, "
+"letters and underscores."
+msgstr ""
+
+#: src/desktop/management/commands/create_test_fs.py:31
+#, python-format
+msgid "Created fs in: %(dir)s"
+msgstr ""
+
+#: src/desktop/management/commands/runcherrypyserver.py:47
+msgid "CherryPy Server for Desktop."
+msgstr ""
+
+#: src/desktop/management/commands/runcherrypyserver.py:108
+#, python-format
+msgid "starting server with options %(options)s"
+msgstr ""
+
+#: src/desktop/management/commands/runcpserver.py:34
+msgid "Web server for Hue."
+msgstr ""
+
+#: src/desktop/management/commands/runpylint.py:28
+msgid ""
+"\n"
+"  Runs pylint on desktop code.\n"
+"\n"
+"  With no arguments, or with \"all\", this will run pylint on all\n"
+"  installed apps.  Otherwise, specify modules to run, as well\n"
+"  as other parameters to pylint.  Note that you'll want to preface the "
+"section\n"
+"  of pylint arguments with \"--\" so Django's manage.py passes them "
+"along.\n"
+"\n"
+"  Examples:\n"
+"    python core/manage.py runpylint all -- -f parseable\n"
+"    python core/manage.py runpylint filebrowser\n"
+"    python core/manage.py runpylint\n"
+"  "
+msgstr ""
+
+#: src/desktop/management/commands/runpylint.py:61
+#, python-format
+msgid "Cannot find pylint at '%(path)s'. Please install pylint first."
+msgstr ""
+
+#: src/desktop/management/commands/runspawningserver.py:70
+msgid "Spawning Server for Hue."
+msgstr ""
+
 #: src/desktop/templates/404.mako:20
 msgid "Not Found"
 msgstr ""
@@ -147,15 +589,15 @@ msgstr ""
 msgid "All ok. Configuration check passed!"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:91
+#: src/desktop/templates/common_header.mako:92
 msgid "About Hue"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:98
+#: src/desktop/templates/common_header.mako:99
 msgid "Profile"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:100
+#: src/desktop/templates/common_header.mako:101
 msgid "Sign Out"
 msgstr ""
 
@@ -169,11 +611,6 @@ msgstr ""
 
 #: src/desktop/templates/dump_config.mako:39
 msgid "Configuration Sections and Variables"
-msgstr ""
-
-#: src/desktop/templates/dump_config.mako:82
-#: src/desktop/templates/dump_config.mako:94
-msgid "No help available."
 msgstr ""
 
 #: src/desktop/templates/dump_config.mako:95

@@ -25,6 +25,8 @@ import pkg_resources
 import desktop
 from desktop.lib.paths import get_desktop_root
 
+from django.utils.translation import ugettext as _
+
 # Directories where apps and libraries are to be found
 APP_DIRS = [get_desktop_root('core-apps'),
             get_desktop_root('apps'),
@@ -219,7 +221,7 @@ def load_apps():
   global DESKTOP_APPS
 
   if DESKTOP_APPS is not None:
-    raise Exception("load_apps already has been called!")
+    raise Exception(_("load_apps already has been called!"))
   DESKTOP_APPS = []
 
   for sdk_app in pkg_resources.iter_entry_points("desktop.sdk.application"):

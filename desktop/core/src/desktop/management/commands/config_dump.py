@@ -25,6 +25,8 @@ from django.core.management.base import NoArgsCommand
 import desktop.appmanager
 import textwrap
 
+from django.utils.translation import ugettext as _
+
 from desktop.lib.conf import BoundContainer, is_anonymous
 
 class Command(NoArgsCommand):
@@ -34,7 +36,7 @@ class Command(NoArgsCommand):
 
   """Prints documentation for configuration."""
   def handle_noargs(self, **options):
-    print "Dumping configuration..."
+    print _("Dumping configuration...")
     print
     self.recurse(desktop.lib.conf.GLOBAL_CONFIG)
 
@@ -55,7 +57,7 @@ class Command(NoArgsCommand):
 
       self.p("%s:" % key)
       self.indent += 2
-      print textwrap.fill(config_obj.config.help or "No help available.",
+      print textwrap.fill(config_obj.config.help or _("No help available."),
         initial_indent=" "*self.indent, subsequent_indent=" "*self.indent)
       print
       for v in config_obj.get().values():
@@ -65,5 +67,5 @@ class Command(NoArgsCommand):
     else:
       self.p("%s=%s" % (config_obj.config.key, config_obj.get()))
       self.indent += 2
-      self.fill(config_obj.config.help or "No help available.")
+      self.fill(config_obj.config.help or _("No help available."))
       self.indent -= 2

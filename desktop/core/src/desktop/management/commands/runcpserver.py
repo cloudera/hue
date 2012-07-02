@@ -21,6 +21,7 @@ from desktop import conf
 from desktop import supervisor
 import os
 import sys
+from django.utils.translation import ugettext as _
 
 SERVER_HELP = r"""
   Run Hue using either the CherryPy server or the Spawning server, based on
@@ -30,7 +31,7 @@ SERVER_HELP = r"""
 LOG = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-  help = "Web server for Hue."
+  help = _("Web server for Hue.")
 
   def handle(self, *args, **options):
     runserver()

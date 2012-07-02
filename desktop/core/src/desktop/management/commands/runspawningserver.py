@@ -27,6 +27,8 @@ from desktop import conf
 import spawning.spawning_controller
 from desktop.lib.daemon_utils import drop_privileges_if_necessary
 
+from django.utils.translation import ugettext as _
+
 SPAWNING_SERVER_HELP = r"""
   Run Hue using the Spawning WSGI server in asynchronous mode.
 """
@@ -65,7 +67,7 @@ SPAWNING_SERVER_OPTIONS = {
 LOG = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-    help = "Spawning Server for Hue."
+    help = _("Spawning Server for Hue.")
 
     def handle(self, *args, **options):
         from django.conf import settings

@@ -39,6 +39,8 @@ from desktop import appmanager
 from hadoop import cluster
 import simplejson
 
+from django.utils.translation import ugettext as _
+
 MIDDLEWARE_HEADER = "X-Hue-Middleware-Response"
 
 # Views inside Django that don't require login
@@ -84,7 +86,7 @@ class ExceptionMiddleware(object):
     # need to do some kind of nicer handling than the built-in page
     # Note that exception may actually be an Http404 or similar.
     if request.ajax:
-      err = "An error occurred: %s" % (exception,)
+      err = _("An error occurred: %(error)s") % {'error': exception}
       logging.exception("Middleware caught an exception")
       return PopupException(err, detail=None).response(request)
 
@@ -129,7 +131,7 @@ class ClusterMiddleware(object):
     try:
       request.fs = cluster.get_hdfs(request.fs_ref)
     except KeyError:
-      raise KeyError('Cannot find HDFS called "%s"' % (request.fs_ref,))
+      raise KeyError(_('Cannot find HDFS called "%(fs_ref)s"') % {'fs_ref': request.fs_ref})
 
     if request.user.is_authenticated():
       if request.fs is not None:
@@ -210,16 +212,16 @@ class AppSpecificMiddleware(object):
       try:
           dot = middleware_path.rindex('.')
       except ValueError:
-          raise exceptions.ImproperlyConfigured, '%s isn\'t a middleware module' % middleware_path
+          raise exceptions.ImproperlyConfigured, _('%(module)s isn\'t a middleware module') % {'module': middleware_path}
       mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
       try:
           mod = __import__(mw_module, {}, {}, [''])
       except ImportError, e:
-          raise exceptions.ImproperlyConfigured, 'Error importing middleware %s: "%s"' % (mw_module, e)
+          raise exceptions.ImproperlyConfigured, _('Error importing middleware %(module)s: "%(error)s"') % {'module': mw_module, 'error': e}
       try:
           mw_class = getattr(mod, mw_classname)
       except AttributeError:
-          raise exceptions.ImproperlyConfigured, 'Middleware module "%s" does not define a "%s" class' % (mw_module, mw_classname)
+          raise exceptions.ImproperlyConfigured, _('Middleware module "%(module)s" does not define a "%(class)s" class') % {'module': mw_module, 'class':mw_classname}
 
       try:
         mw_instance = mw_class()
@@ -231,8 +233,8 @@ class AppSpecificMiddleware(object):
       # application will handle the request at the point process_request is called
       if hasattr(mw_instance, 'process_request'):
         raise exceptions.ImproperlyConfigured, \
-              ('AppSpecificMiddleware module "%s" has a process_request function' + \
-              ' which is impossible.') % middleware_path
+              _('AppSpecificMiddleware module "%(module)s" has a process_request function' + \
+              ' which is impossible.') % {'module': middleware_path}
       if hasattr(mw_instance, 'process_view'):
         result['view'].append(mw_instance.process_view)
       if hasattr(mw_instance, 'process_response'):
@@ -273,7 +275,7 @@ class LoginAndPermissionMiddleware(object):
           request._desktop_app != "desktop" and \
           not request.user.has_hue_permission(action="access", app=request._desktop_app):
         access_log(request, 'permission denied', level=access_log_level)
-        return PopupException("You do not have permission to access the %s application." % (request._desktop_app.capitalize())).response(request)
+        return PopupException(_("You do not have permission to access the %(app_name)s application.") % {'app_name': request._desktop_app.capitalize()}).response(request)
       else:
         log_page_hit(request, view_func, level=access_log_level)
         return None
