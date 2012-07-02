@@ -15,30 +15,31 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader("Beeswax: Create table from file", "beeswax", "100px")}
+${commonheader(_('Beeswax: Create table from file'), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
-    <h1>Create a new table from file</h1>
+    <h1>${_('Create a new table from file')}</h1>
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li class="nav-header">Actions</li>
-                    <li><a href="${ url('beeswax.create_table.import_wizard')}">Create a new table from file</a></li>
-                    <li><a href="${ url('beeswax.create_table.create_table')}">Create a new table manually</a></li>
+                    <li class="nav-header">${_('Actions')}</li>
+                    <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from file')}</a></li>
+                    <li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
         </div>
         <div class="span9">
             <ul class="nav nav-pills">
-                <li><a id="step1" href="#">Step 1: Choose File</a></li>
-                <li><a id="step2" href="#">Step 2: Choose Delimiter</a></li>
-                <li class="active"><a href="#">Step 3: Define Columns</a></li>
+                <li><a id="step1" href="#">${_('Step 1: Choose File')}</a></li>
+                <li><a id="step2" href="#">${_('Step 2: Choose Delimiter')}</a></li>
+                <li class="active"><a href="#">${_('Step 3: Define Columns')}</a></li>
             </ul>
             <form action="${action}" method="POST" class="form-stacked">
                 <div class="hide">
@@ -51,7 +52,7 @@ ${layout.menubar(section='tables')}
                     if n_rows > 2: n_rows = 2
                 %>
                 <fieldset>
-                    <div class="alert alert-info"><h3>Define your columns</h3></div>
+                    <div class="alert alert-info"><h3>${_('Define your columns')}</h3></div>
                     <div class="control-group">
                         <div class="controls">
                             <div class="scrollable">
@@ -63,7 +64,7 @@ ${layout.menubar(section='tables')}
                                                 ${comps.label(form["column_name"])}
                                                 ${comps.field(form["column_name"],
                                                 render_default=False,
-                                                placeholder="Column name"
+                                                placeholder=_("Column name")
                                                 )}
                                                     <br/><br/>
                                                 ${comps.label(form["column_type"])}
@@ -76,7 +77,7 @@ ${layout.menubar(section='tables')}
                                     </tr>
                                     % for i, row in enumerate(fields_list[:n_rows]):
                                         <tr>
-                                            <td><em>Row #${i + 1}</em></td>
+                                            <td><em>${_('Row')} #${i + 1}</em></td>
                                         % for val in row:
                                                 <td>${val}</td>
                                         % endfor
@@ -88,8 +89,8 @@ ${layout.menubar(section='tables')}
                     </div>
                 </fieldset>
                 <div class="form-actions">
-                    <input class="btn" type="submit" name="cancel_create" value="Previous" />
-                    <input class="btn primary" type="submit" name="submit_create" value="Create Table" />
+                    <input class="btn" type="submit" name="cancel_create" value="${_('Previous')}" />
+                    <input class="btn primary" type="submit" name="submit_create" value="${_('Create Table')}" />
                 </div>
             </form>
         </div>

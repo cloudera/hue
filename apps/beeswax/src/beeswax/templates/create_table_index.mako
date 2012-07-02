@@ -15,19 +15,20 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
-${commonheader("Beeswax: Create Table", "beeswax", "100px")}
+${commonheader(_('Beeswax: Create Table'), "beeswax", "100px")}
 <div class="container-fluid">
   <div class="toolbar">
   </div>
 
 <div id="create_table" class="view">
   <div class="bw-create_table_choice">
-    <h1> How Do You Want to Create Your Table? </h1>
+    <h1>${_('How Do You Want to Create Your Table?')}</h1>
     <ul class="creation_choices">
-       <li class="clearfix"><a href="${ url('beeswax.create_table.import_wizard')}">Create From File</a></li>
-       <li class="clearfix"><a href="${ url('beeswax.create_table.create_table')}">Create Manually</a></li>
+       <li class="clearfix"><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create From File')}</a></li>
+       <li class="clearfix"><a href="${ url('beeswax.create_table.create_table')}">${_('Create Manually')}</a></li>
     </ul>
   </div>
 </div>

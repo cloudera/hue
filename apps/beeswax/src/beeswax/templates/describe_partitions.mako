@@ -17,20 +17,21 @@
   from urllib import quote
   from filebrowser.views import location_to_url 
   from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
-${commonheader("Beeswax Table Partitions: " + table.tableName, "beeswax", "100px")}
+${commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.tableName), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
-<h1>Partitions</h1>
+<h1>${_('Partitions')}</h1>
 
 <table>
 <tr>
   % for field in table.partitionKeys:
   <th>${field.name}</th>
   % endfor
-  <th></th>## Extra column for command links.
+  <th></th>## ${_('Extra column for command links.')}
 </tr>
 % if len(partitions) > 0:
   % for partition in partitions:
@@ -49,7 +50,7 @@ ${layout.menubar(section='tables')}
   </tr>
   % endfor
 % else:
-  <tr><td>Table has no partitions.</td></tr>
+  <tr><td>${_('Table has no partitions.')}</td></tr>
 % endif
 </table>
 </div>

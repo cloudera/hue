@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
   from desktop.lib.django_util import extract_field_data
+  from django.utils.translation import ugettext as _
 %>
 <%def name="fieldName(field)">
 
@@ -194,11 +195,11 @@ ${field.label_tag() | n}
 <%def name="pagination(page)">
     <div class="pagination">
         <ul class="pull-right">
-            <li class="prev"><a title="Beginning of List" ${toppage(page)} class="bw-firstBlock">&larr; Beginning of List</a></li>
-            <li><a title="Previous Page" ${prevpage(page)} class="bw-prevBlock">Previous Page</a></li>
-            <li><a title="Next page" ${nextpage(page)} class="bw-nextBlock">Next Page</a></li>
-            <li class="next"><a title="End of List" ${bottompage(page)} class="bw-lastBlock">End of List &rarr;</a></li>
+            <li class="prev"><a title="Beginning of List" ${toppage(page)} class="bw-firstBlock">&larr; ${_('Beginning of List')}</a></li>
+            <li><a title="Previous Page" ${prevpage(page)} class="bw-prevBlock">${_('Previous Page')}</a></li>
+            <li><a title="Next page" ${nextpage(page)} class="bw-nextBlock">${_('Next Page')}</a></li>
+            <li class="next"><a title="End of List" ${bottompage(page)} class="bw-lastBlock">${_('End of List')} &rarr;</a></li>
         </ul>
-        <p>Showing ${page.start_index()} to ${page.end_index()} of ${page.total_count()} items, page ${page.number} of ${page.num_pages()}</p>
+        <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=page.start_index(),end=page.end_index(),count=page.total_count(),page=page.number,pages=page.num_pages())}</p>
     </div>
 </%def>

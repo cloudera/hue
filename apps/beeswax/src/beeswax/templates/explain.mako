@@ -15,19 +15,20 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader("Query Explanation", "beeswax", "100px")}
+${commonheader(_('Query Explanation'), "beeswax", "100px")}
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">
-    <h1>Query Explanation: ${util.render_query_context(query_context)}</h1>
+    <h1>${_('Query Explanation:')} ${util.render_query_context(query_context)}</h1>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#explanation" data-toggle="tab">Explanation</a></li>
-        <li><a href="#query" data-toggle="tab">Query</a></li>
+        <li class="active"><a href="#explanation" data-toggle="tab">${_('Explanation')}</a></li>
+        <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
     </ul>
 
     <div class="tab-content">

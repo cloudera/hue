@@ -15,11 +15,12 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader("Parameterize Hive Query", "beeswax", "100px")}
+${commonheader(_('Parametrize Hive Query'), "beeswax", "100px")}
 
 ${layout.menubar()}
 
@@ -27,14 +28,14 @@ ${layout.menubar()}
     <%
         if explain:
             action = url('beeswax.views.explain_parameterized_query', design.id)
-            btn = "Explain query"
+            btn = _("Explain query")
         else:
             action = url('beeswax.views.execute_parameterized_query', design.id)
-            btn = "Execute query"
+            btn = _("Execute query")
     %>
     <form method="POST" action="${action}" class="form-horizontal">
         <fieldset>
-            <legend>Please specify parameters for this query:</legend>
+            <legend>${_('Please specify parameters for this query:')}</legend>
             % for field in form:
                 <div class="control-group">
                     <label class="control-label">${comps.bootstrapLabel(field)}</label>
@@ -45,7 +46,7 @@ ${layout.menubar()}
             % endfor
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">${btn}</button>
-                <a class="btn" href="javascript:history.go(-1);">Cancel</a>
+                <a class="btn" href="javascript:history.go(-1);">${_('Cancel')}</a>
             </div>
         </fieldset>
     </form>

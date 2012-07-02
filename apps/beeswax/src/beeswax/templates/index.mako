@@ -15,10 +15,11 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-${commonheader("Beeswax", "beeswax", "100px")}
+${commonheader(_('Beeswax'), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 <div class="container-fluid">
     <div class="row-fluid">
@@ -26,28 +27,28 @@ ${layout.menubar(section='tables')}
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     % if not examples_installed:
-                    <li class="nav-header">Examples</li>
-                    <li><a href="#installSamples" data-toggle="modal">Install Samples</a></li>
+                    <li class="nav-header">${_('Examples')}</li>
+                    <li><a href="#installSamples" data-toggle="modal">${_('Install Samples')}</a></li>
                     % endif
-                    <li class="nav-header">Tables</li>
-                    <li><a href="${ url('beeswax.views.show_tables') }">Show Tables</a></li>
-                    <li><a href="${ url('beeswax.create_table.create_table') }">Create Table</a></li>
-                    <li class="nav-header">Queries</li>
-                    <li><a href="${ url('beeswax.views.list_designs') }">Saved Queries</a></li>
-                    <li><a href="${ url('beeswax.views.execute_query') }">Execute Query</a></li>
-                    <li><a href="${ url('beeswax.views.edit_report') }">Report Generator</a></li>
-                    <li><a href="${ url('beeswax.views.list_query_history') }">Query History</a></li>
-                    <li class="nav-header">Configuration</li>
-                    <li><a href="${ url('beeswax.views.configuration') }">Hive Configuration</a></li>
-                    <li><a href="${ url('beeswax.views.configuration') }?include_hadoop=1">Extended Configuration</a></li>
+                    <li class="nav-header">${_('Tables')}</li>
+                    <li><a href="${ url('beeswax.views.show_tables') }">${_('Show Tables')}</a></li>
+                    <li><a href="${ url('beeswax.create_table.create_table') }">${_('Create Table')}</a></li>
+                    <li class="nav-header">${_('Queries')}</li>
+                    <li><a href="${ url('beeswax.views.list_designs') }">${_('Saved Queries')}</a></li>
+                    <li><a href="${ url('beeswax.views.execute_query') }">${_('Execute Query')}</a></li>
+                    <li><a href="${ url('beeswax.views.edit_report') }">${_('Report Generator')}</a></li>
+                    <li><a href="${ url('beeswax.views.list_query_history') }">${_('Query History')}</a></li>
+                    <li class="nav-header">${_('Configuration')}</li>
+                    <li><a href="${ url('beeswax.views.configuration') }">${_('Hive Configuration')}</a></li>
+                    <li><a href="${ url('beeswax.views.configuration') }?include_hadoop=1">${_('Extended Configuration')}</a></li>
                 </ul>
             </div>
         </div>
         <div class="span9">
-            <h1>Welcome to Beeswax for Hive</h1>
-            To get started with Beeswax you'll first need set up some data:
-            <a href="${ url('beeswax.create_table.create_table') }" class='btn'>Import Data</a>
-            or <a href="#installSamples" data-toggle="modal" class='btn'>Install Samples</a>
+            <h1>${_('Welcome to Beeswax for Hive')}</h1>
+            ${_("To get started with Beeswax you'll first need set up some data:")}
+            <a href="${ url('beeswax.create_table.create_table') }" class='btn'>${_('Import Data')}</a>
+            or <a href="#installSamples" data-toggle="modal" class='btn'>${_('Install Samples')}</a>
         </div>
     </div>
 </div>
@@ -55,14 +56,14 @@ ${layout.menubar(section='tables')}
 <div id="installSamples" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Install samples</h3>
+        <h3>${_('Install samples')}</h3>
     </div>
     <div class="modal-body">
       <div id="installSamplesMessage" class="alert"></div>
     </div>
     <div class="modal-footer">
-        <a href="#" id="installSamplesBtn" class="btn primary">Yes</a>
-        <a href="#" class="btn secondary" data-dismiss="modal">No</a>
+        <a href="#" id="installSamplesBtn" class="btn primary">${_('Yes')}</a>
+        <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
     </div>
 </div>
 
@@ -82,7 +83,7 @@ ${layout.menubar(section='tables')}
                         window.location.href = "/beeswax/tables";
                     }
                     else {
-                        var message = "There was an error processing your request: " + result.message;
+                        var message = "${_('There was an error processing your request:')} " + result.message;
                         $("#installSamplesMessage").addClass("alert-error").text(message);
                     }
                 }

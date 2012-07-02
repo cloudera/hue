@@ -15,23 +15,24 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
-${commonheader("Beeswax: Table List", "beeswax", "100px")}
+${commonheader(_('Beeswax: Table List'), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
-	<h1>Beeswax: Table List</h1>
+	<h1>${_('Beeswax: Table List')}</h1>
 	<div class="row-fluid">
 		<div class="span3">
 			<div class="well sidebar-nav">
 				<ul class="nav nav-list">
-					<li class="nav-header">Actions</li>
+					<li class="nav-header">${_('Actions')}</li>
 					% if not examples_installed:
-		        	<li><a href="#installSamples" data-toggle="modal">Install samples</a></li>
+		        	<li><a href="#installSamples" data-toggle="modal">${_('Install samples')}</a></li>
 		      		% endif
-		      		<li><a href="${ url('beeswax.create_table.import_wizard')}">Create a new table from file</a></li>
-					<li><a href="${ url('beeswax.create_table.create_table')}">Create a new table manually</a></li>
+		      		<li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from file')}</a></li>
+					<li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
 				</ul>
 			</div>
 		</div>
@@ -39,7 +40,7 @@ ${layout.menubar(section='tables')}
 			<table class="table table-condensed table-striped datatables">
 				<thead>
 					<tr>
-						<th>Table Name</th>
+						<th>${_('Table Name')}</th>
 						<th>&nbsp;</th>
 					</tr>
 				</thead>
@@ -49,7 +50,7 @@ ${layout.menubar(section='tables')}
 						<td>
 							<a href="${ url("beeswax.views.describe_table", table=table) }" data-row-selector="true">${ table }</a>
 						</td>
-						<td><a href="${ url("beeswax.views.read_table", table=table) }" class="btn">Browse Data</a></td>
+						<td><a href="${ url("beeswax.views.read_table", table=table) }" class="btn">${_('Browse Data')}</a></td>
 					</tr>
 				% endfor
 				</tbody>
@@ -64,7 +65,7 @@ ${layout.menubar(section='tables')}
 <div id="installSamples" class="modal hide fade">
 	<div class="modal-header">
 		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>Install samples</h3>
+		<h3>${_('Install samples')}</h3>
 	</div>
 	<div class="modal-body">
 	  <div id="installSamplesMessage" class="alert">
@@ -72,8 +73,8 @@ ${layout.menubar(section='tables')}
 	  </div>
 	</div>
 	<div class="modal-footer">
-		<a href="#" id="installSamplesBtn" class="btn primary">Yes</a>
-		<a href="#" class="btn secondary" data-dismiss="modal">No</a>
+		<a href="#" id="installSamplesBtn" class="btn primary">${_('Yes')}</a>
+		<a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
 	</div>
 </div>
 % endif
@@ -107,7 +108,7 @@ ${layout.menubar(section='tables')}
                         window.location.href = "/beeswax/tables";
                     }
                     else {
-                        var message = "There was an error processing your request: " + result.message;
+                        var message = "${_('There was an error processing your request:')} " + result.message;
                         $("#installSamplesMessage").addClass("alert-error").text(message);
                     }
                 }

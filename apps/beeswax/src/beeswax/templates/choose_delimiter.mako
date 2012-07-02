@@ -15,30 +15,31 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader("Beeswax: Create table from file", "beeswax", "100px")}
+${commonheader(_('Beeswax: Create table from file'), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
-    <h1>Create a new table from file</h1>
+    <h1>${_('Create a new table from file')}</h1>
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li class="nav-header">Actions</li>
-                    <li><a href="${ url('beeswax.create_table.import_wizard')}">Create a new table from file</a></li>
-                    <li><a href="${ url('beeswax.create_table.create_table')}">Create a new table manually</a></li>
+                    <li class="nav-header">${_('Actions')}</li>
+                    <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from file')}</a></li>
+                    <li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
         </div>
         <div class="span9">
             <ul class="nav nav-pills">
-                <li><a id="step1" href="#">Step 1: Choose File</a></li>
-                <li class="active"><a href="#">Step 2: Choose Delimiter</a></li>
-                <li><a id="step3" href="#">Step 3: Define Columns</a></li>
+                <li><a id="step1" href="#">${_('Step 1: Choose File')}</a></li>
+                <li class="active"><a href="#">${_('Step 2: Choose Delimiter')}</a></li>
+                <li><a id="step3" href="#">${_('Step 3: Define Columns')}</a></li>
             </ul>
             <form id="delimiterForm" action="${action}" method="POST" class="form-horizontal">
                 <div class="hide">
@@ -46,23 +47,23 @@ ${layout.menubar(section='tables')}
                     ${comps.field(delim_form['file_type'])}
                 </div>
                 <fieldset>
-                    <div class="alert alert-info"><h3>Choose A Delimiter</h3>
+                    <div class="alert alert-info"><h3>${_('Choose A Delimiter')}</h3>
                         % if initial:
-                                Beeswax has determined that this file is delimited by <strong>${delim_readable}</strong>.
+                            ${_('Beeswax has determined that this file is delimited by')} <strong>${delim_readable}</strong>.
                         % endif
                     </div>
                     <div class="control-group">
                         ${comps.bootstrapLabel(delim_form["delimiter"])}
                         <div class="controls">
                             ${comps.field(delim_form["delimiter"], render_default=True)}
-                            <input id="submit_preview" class="btn btn-info" type="submit" value="Preview" name="submit_preview"/>
+                            <input id="submit_preview" class="btn btn-info" type="submit" value="${_('Preview')}" name="submit_preview"/>
                             <span class="help-block">
-                            Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.
+                            ${_('Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.')}
                             </span>
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label">Table preview</label>
+                        <label class="control-label">${_('Table preview')}</label>
                         <div class="controls">
                             <div class="scrollable">
                                 <table class="table table-striped table-condensed">
@@ -89,8 +90,8 @@ ${layout.menubar(section='tables')}
                 </fieldset>
 
                 <div class="form-actions">
-                    <input class="btn" type="submit" value="Previous" name="cancel_delim"/>
-                    <input class="btn primary" type="submit" name="submit_delim" value="Next" />
+                    <input class="btn" type="submit" value="${_('Previous')}" name="cancel_delim"/>
+                    <input class="btn primary" type="submit" name="submit_delim" value="${_('Next')}" />
                 </div>
             </form>
         </div>
@@ -108,7 +109,7 @@ ${layout.menubar(section='tables')}
     $(document).ready(function(){
         $(".scrollable").width($(".form-actions").width());
 
-        $("#id_delimiter_1").css("margin-left","4px").attr("placeholder","Please write here your delimiter").hide();
+        $("#id_delimiter_1").css("margin-left","4px").attr("placeholder","${_('Please write here your delimiter')}").hide();
         $("#id_delimiter_0").change(function(){
             if ($(this).val() == "__other__"){
                 $("#id_delimiter_1").show();

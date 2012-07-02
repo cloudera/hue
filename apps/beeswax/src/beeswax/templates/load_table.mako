@@ -15,18 +15,19 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader("Beeswax: Load Data into " + table, "beeswax", "100px")}
+${commonheader(_('Beeswax: Load Data into %(table)s') % dict(table=table), "beeswax", "100px")}
 ${layout.menubar()}
 <div class="container-fluid">
-  <h1>Load Data into <tt>${table}</tt></h1>
+  <h1>${_('Load Data into %(table)s') % dict(table=table)}</h1>
   <div class="prompt_popup">
     <form action="${action}" method="POST">
       <dl>
         ${util.render_field(form["path"])}
-        <a class="hue-chooseFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 6, 'left': 6 }" data-chooseFor="path">Open File Chooser </a>
+        <a class="hue-chooseFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 6, 'left': 6 }" data-chooseFor="path">${_('Open File Chooser')} </a>
         ## Path (on HDFS) of files to load.
         ${util.render_field(form["overwrite"])}
         ## Any existing data will be erased!
@@ -38,8 +39,7 @@ ${layout.menubar()}
         ## this data corresponds to.
       </dl>
       <p>
-      Note that loading data will move data from its location
-      into the table's storage location.
+          ${_("Note that loading data will move data from its location into the table's storage location.")}
       </p>
       <input type="submit">
     </form>

@@ -17,21 +17,22 @@
     import time
     from django.template.defaultfilters import timesince
     from desktop.views import commonheader, commonfooter
+    from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-${commonheader("Beeswax: Queries", "beeswax", "100px")}
+${commonheader(_('Beeswax: Queries'), "beeswax", "100px")}
 ${layout.menubar(section='saved queries')}
 <div class="container-fluid">
-    <h1>Beeswax: Queries</h1>
+    <h1>${_('Beeswax: Queries')}</h1>
     <table class="table table-striped table-condensed datatables">
         <thead>
         <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Owner</th>
-            <th>Type</th>
-            <th>Last Modified</th>
+            <th>${_('Name')}</th>
+            <th>${_('Description')}</th>
+            <th>${_('Owner')}</th>
+            <th>${_('Type')}</th>
+            <th>${_('Last Modified')}</th>
             <th></th>
         </tr>
         </thead>
@@ -63,13 +64,13 @@ ${layout.menubar(section='saved queries')}
                     <td>${design.owner.username}</td>
                 <td>
                     % if design.type == models.SavedQuery.REPORT:
-                        Report
+                        ${_('Report')}
                     % else:
-                        Query
+                        ${_('Query')}
                     % endif
                 </td>
                     <td>
-                        <span alt="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ago</span>
+                        <span alt="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</span>
                     </td>
                 <td>
                 <div class="btn-group">
@@ -81,15 +82,15 @@ ${layout.menubar(section='saved queries')}
 
                 % if may_edit:
                     % if design.type == models.SavedQuery.REPORT:
-                            <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="Edit this report." class="contextItem">Edit</a></li>
+                            <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="${_('Edit this report.')}" class="contextItem">${_('Edit')}</a></li>
                     % else:
-                            <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="Edit this query." class="contextItem">Edit</a></li>
+                            <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="${_('Edit this query.')}" class="contextItem">${_('Edit')}</a></li>
                     % endif
-                        <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="Delete this query." class="contextItem confirmationModal">Delete</a></li>
-                        <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="View the usage history of this query." class="contextItem">Usage History</a></li>
+                        <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="${_('Delete this query.')}" class="contextItem confirmationModal">${_('Delete')}</a></li>
+                        <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="${_('View the usage history of this query.')}" class="contextItem">${_('Usage History')}</a></li>
 
                 % endif
-                    <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="Copy this query." class="contextItem">Clone</a></li>
+                    <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="${_('Copy this query.')}" class="contextItem">${_('Clone')}</a></li>
                 </ul>
                 </div>
 
@@ -106,11 +107,11 @@ ${layout.menubar(section='saved queries')}
     <form id="deleteQueryForm" action="" method="POST">
         <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3 id="deleteQueryMessage">Confirm action</h3>
+            <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
         </div>
         <div class="modal-footer">
-            <input type="submit" class="btn primary" value="Yes"/>
-            <a href="#" class="btn secondary" data-dismiss="modal">No</a>
+            <input type="submit" class="btn primary" value="${_('Yes')}"/>
+            <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
         </div>
     </form>
 </div>

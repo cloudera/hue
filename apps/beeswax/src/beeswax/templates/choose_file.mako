@@ -15,34 +15,35 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
-${commonheader("Beeswax: Create table from file", "beeswax", "100px")}
+${commonheader(_('Beeswax: Create table from file'), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 
 
 <div class="container-fluid">
-    <h1>Create a new table from file</h1>
+    <h1>${_('Create a new table from file')}</h1>
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li class="nav-header">Actions</li>
-                    <li><a href="${ url('beeswax.create_table.import_wizard')}">Create a new table from file</a></li>
-                    <li><a href="${ url('beeswax.create_table.create_table')}">Create a new table manually</a></li>
+                    <li class="nav-header">${_('Actions')}</li>
+                    <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from file')}</a></li>
+                    <li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
         </div>
         <div class="span9">
             <ul class="nav nav-pills">
-                <li class="active"><a href="${ url('beeswax.create_table.import_wizard') }">Step 1: Choose File</a></li>
-                <li><a id="step2" href="#">Step 2: Choose Delimiter</a></li>
-                <li><a href="#">Step 3: Define Columns</a></li>
+                <li class="active"><a href="${ url('beeswax.create_table.import_wizard') }">${_('Step 1: Choose File')}</a></li>
+                <li><a id="step2" href="#">${_('Step 2: Choose Delimiter')}</a></li>
+                <li><a href="#">${_('Step 3: Define Columns')}</a></li>
             </ul>
             <form action="${action}" method="POST" class="form-horizontal">
                 <fieldset>
-                    <div class="alert alert-info"><h3>Name Your Table and Choose A File</h3></div>
+                    <div class="alert alert-info"><h3>${_('Name Your Table and Choose A File')}</h3></div>
                     <div class="control-group">
                         ${comps.bootstrapLabel(file_form["name"])}
                         <div class="controls">
@@ -52,7 +53,7 @@ ${layout.menubar(section='tables')}
                             )}
                             <span  class="help-inline">${unicode(file_form["name"].errors) | n}</span>
                         <span class="help-block">
-                            Name of the new table.  Table names must be globally unique.  Table names tend to correspond as well to the directory where the data will be stored.
+                            ${_('Name of the new table. Table names must be globally unique. Table names tend to correspond as well to the directory where the data will be stored.')}
                         </span>
                         </div>
                     </div>
@@ -60,13 +61,13 @@ ${layout.menubar(section='tables')}
                         ${comps.bootstrapLabel(file_form["comment"])}
                         <div class="controls">
                             ${comps.field(file_form["comment"],
-                            placeholder="Optional",
+                            placeholder=_("Optional"),
                             klass="",
                             show_errors=False
                             )}
                             <span  class="help-inline">${unicode(file_form["comment"].errors) | n}</span>
                         <span class="help-block">
-                        Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.
+                        ${_("Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
                         </span>
                         </div>
                     </div>
@@ -81,7 +82,7 @@ ${layout.menubar(section='tables')}
                             )}
                             <span  class="help-inline">${unicode(file_form["path"].errors) | n}</span>
                         <span class="help-block">
-                        The HDFS path to the file that you would like to base this new table definition on.  It can be compressed (gzip) or not.
+                        ${_('The HDFS path to the file that you would like to base this new table definition on. It can be compressed (gzip) or not.')}
                         </span>
                         </div>
                     </div>
@@ -90,16 +91,16 @@ ${layout.menubar(section='tables')}
                         <div class="controls">
                             ${comps.field(file_form["do_import"], render_default=True)}
                             <span class="help-block">
-                        Check this box if you want to import the data in this file after creating the table definition.  Leave it unchecked if you just want to define an empty table.
+                        ${_('Check this box if you want to import the data in this file after creating the table definition. Leave it unchecked if you just want to define an empty table.')}
                         <div id="fileWillBeMoved" class="alert">
-                            <strong>Warning!</strong> The selected file is going to be moved during the import.
+                            <strong>${_('Warning!')}</strong> ${_('The selected file is going to be moved during the import.')}
                         </div>
                         </span>
                         </div>
                     </div>
                 </fieldset>
                 <div class="form-actions">
-                    <input type="submit" class="btn primary" name="submit_file" value="Next" />
+                    <input type="submit" class="btn primary" name="submit_file" value="${_('Next')}" />
                 </div>
             </form>
         </div>
@@ -110,7 +111,7 @@ ${layout.menubar(section='tables')}
 <div id="chooseFile" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Choose a file</h3>
+        <h3>${_('Choose a file')}</h3>
     </div>
     <div class="modal-body">
         <div id="filechooser">
