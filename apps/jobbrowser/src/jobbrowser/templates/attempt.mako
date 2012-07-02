@@ -15,24 +15,25 @@
 ## limitations under the License.
 <%!
   from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader("Task Attempt: " + attempt.attemptId + ":: Job Browser", "jobbrowser")}
+${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId), "jobbrowser")}
 <div class="container-fluid">
-    <h1>Task Attempt: ${attempt.attemptId} :: Job Browser</h1>
+    <h1>${_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId)}</h1>
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li class="nav-header">Attempt ID</li>
+                    <li class="nav-header">${_('Attempt ID')}</li>
                     <li>${attempt.attemptId_short}</li>
-                    <li class="nav-header">Task</li>
-                    <li><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" title="View this task">${task.taskId_short}</a>
+                    <li class="nav-header">${_('Task')}</li>
+                    <li><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId_short}</a>
                     </li>
-                    <li class="nav-header">Job</li>
-                    <li><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="View this job">${joblnk.jobId_short}</a></li>
-                    <li class="nav-header">Status</li>
+                    <li class="nav-header">${_('Job')}</li>
+                    <li><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></li>
+                    <li class="nav-header">${_('Status')}</li>
                     <li>
                         <%
                             status = attempt.state.lower()
@@ -51,9 +52,9 @@ ${commonheader("Task Attempt: " + attempt.attemptId + ":: Job Browser", "jobbrow
 
         <div class="span10">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#metadata" data-toggle="tab">Metadata</a></li>
-                <li><a href="#counters" data-toggle="tab">Counters</a></li>
-                <li><a href="#logs" data-toggle="tab">Logs</a></li>
+                <li class="active"><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
+                <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
+                <li><a href="#logs" data-toggle="tab">${_('Logs')}</a></li>
             </ul>
 
             <div class="tab-content">
@@ -61,53 +62,53 @@ ${commonheader("Task Attempt: " + attempt.attemptId + ":: Job Browser", "jobbrow
                     <table id="metadataTable" class="table table-striped table-condensed">
                         <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Value</th>
+                            <th>${_('Name')}</th>
+                            <th>${_('Value')}</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
-                            <td>Attempt id</td>
+                            <td>${_('Attempt id')}</td>
                             <td>${attempt.attemptId}</td>
                         </tr>
                         <tr>
-                            <td>Task id</td>
-                            <td><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" title="View this task">${task.taskId}</a></td>
+                            <td>${_('Task id')}</td>
+                            <td><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId}</a></td>
                         </tr>
                         <tr>
-                            <td>Task Type</td>
+                            <td>${_('Task Type')}</td>
                             <td>${task.taskType}</td>
                         </tr>
                         <tr>
-                            <td>JobId</td>
-                            <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="View this job">${joblnk.jobId}</a></td>
+                            <td>${_('JobId')}</td>
+                            <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId}</a></td>
                         </tr>
                         <tr>
-                            <td>State</td>
+                            <td>${_('State')}</td>
                             <td>${attempt.state}</td>
                         </tr>
                         <tr>
-                            <td>Start Time</td>
+                            <td>${_('Start Time')}</td>
                             <td>${attempt.startTimeFormatted}</td>
                         </tr>
                         <tr>
-                            <td>Finish Time</td>
+                            <td>${_('Finish Time')}</td>
                             <td>${attempt.finishTimeFormatted}</td>
                         </tr>
                         <tr>
-                            <td>Progress</td>
+                            <td>${_('Progress')}</td>
                             <td>${"%d" % (attempt.progress * 100)}%</td>
                         </tr>
                         <tr>
-                            <td>Task Tracker</td>
+                            <td>${_('Task Tracker')}</td>
                             <td><a href="/jobbrowser/trackers/${attempt.taskTrackerId}">${attempt.taskTrackerId}</a></td>
                         </tr>
                         <tr>
-                            <td>Phase</td>
+                            <td>${_('Phase')}</td>
                             <td>${attempt.phase}</td>
                         </tr>
                         <tr>
-                            <td>Output Size</td>
+                            <td>${_('Output Size')}</td>
                             <td>${attempt.outputSize}</td>
                         </tr>
                         </tbody>
@@ -115,7 +116,7 @@ ${commonheader("Task Attempt: " + attempt.attemptId + ":: Job Browser", "jobbrow
                 </div>
 
                 <div class="tab-pane" id="counters">
-                    ${comps.task_counters(task.counters)}
+                    ${comps.task_counters(task.counters, _)}
                 </div>
 
                 <div class="tab-pane jt-logs" id="logs">
@@ -131,25 +132,25 @@ ${commonheader("Task Attempt: " + attempt.attemptId + ":: Job Browser", "jobbrow
                               ${ line | h,trim }
                         % endfor
                     </%def>
-                    <h2>task diagnostic log</h2>
+                    <h2>${_('task diagnostic log')}</h2>
                     % if not log_diagnostic:
                             <pre>-- empty --</pre>
                     % else:
                             <pre>${format_log(log_diagnostic)}</pre>
                     % endif
-                    <h2>stdout</h2>
+                    <h2>${_('stdout')}</h2>
                     % if not log_stdout:
                             <pre>-- empty --</pre>
                     % else:
                             <pre>${format_log(log_stdout)}</pre>
                     % endif
-                    <h2>stderr</h2>
+                    <h2>${_('stderr')}</h2>
                     % if not log_stderr:
                             <pre>-- empty --</pre>
                     % else:
                             <pre>${format_log(log_stderr)}</pre>
                     % endif
-                    <h2>syslog</h2>
+                    <h2>${_('syslog')}</h2>
                     % if not log_syslog:
                             <pre>-- empty --</pre>
                     % else:

@@ -16,11 +16,12 @@
 <%
   from jobbrowser.views import get_state_link
   from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader("Task View: Job: " + jobid + " - Job Browser", "jobbrowser")}
+${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid), "jobbrowser")}
 
 <%def name="selected(val, state)">
     %   if val is not None and state is not None and val in state:
@@ -28,31 +29,31 @@ ${commonheader("Task View: Job: " + jobid + " - Job Browser", "jobbrowser")}
     %   endif
 </%def>
 <div class="container-fluid">
-    <h1>Task View: Job:  ${jobid}</h1>
+    <h1>${_('Task View: Job: %(jobId)s') % dict(jobId=jobid)}</h1>
     <div class="well hueWell">
         <form method="get" action="/jobbrowser/jobs/${jobid}/tasks">
-            <b>Filter tasks:</b>
+            <b>${_('Filter tasks:')}</b>
 
             <select name="taskstate" class="submitter">
-                <option value="">All states</option>
-                <option value="succeeded" ${selected('succeeded', taskstate)}>succeeded</option>
-                <option value="running" ${selected('running', taskstate)}>running</option>
-                <option value="failed" ${selected('failed', taskstate)}>failed</option>
-                <option value="killed" ${selected('killed', taskstate)}>killed</option>
-                <option value="pending" ${selected('pending', taskstate)}>pending</option>
+                <option value="">${_('All states')}</option>
+                <option value="succeeded" ${selected('succeeded', taskstate)}>${_('succeeded')}</option>
+                <option value="running" ${selected('running', taskstate)}>${_('running')}</option>
+                <option value="failed" ${selected('failed', taskstate)}>${_('failed')}</option>
+                <option value="killed" ${selected('killed', taskstate)}>${_('killed')}</option>
+                <option value="pending" ${selected('pending', taskstate)}>${_('pending')}</option>
             </select>
 
 
             <select name="tasktype" class="submitter">
-                <option value="">All types</option>
-                <option value="map" ${selected('map', tasktype)}>maps</option>
-                <option value="reduce" ${selected('reduce', tasktype)}>reduces</option>
-                <option value="job_cleanup" ${selected('job_cleanup', tasktype)}>cleanups</option>
-                <option value="job_setup" ${selected('job_setup', tasktype)}>setups</option>
+                <option value="">${_('All types')}</option>
+                <option value="map" ${selected('map', tasktype)}>${_('maps')}</option>
+                <option value="reduce" ${selected('reduce', tasktype)}>${_('reduces')}</option>
+                <option value="job_cleanup" ${selected('job_cleanup', tasktype)}>${_('cleanups')}</option>
+                <option value="job_setup" ${selected('job_setup', tasktype)}>${_('setups')}</option>
             </select>
 
 
-            <input type="text" name="tasktext"  class="submitter" title="Text filter" placeholder="Text Filter"
+            <input type="text" name="tasktext"  class="submitter" title="${_('Text filter')}" placeholder="${_('Text Filter')}"
                 % if tasktext:
                    value="${tasktext}"
                 % endif
@@ -62,19 +63,19 @@ ${commonheader("Task View: Job: " + jobid + " - Job Browser", "jobbrowser")}
 
 
     % if len(page.object_list) == 0:
-         <p>There were no tasks that match your search criteria.</p>
+         <p>${_('There were no tasks that match your search criteria.')}</p>
     % else:
         <table class="datatables table table-striped table-condensed">
             <thead>
             <tr>
-                <th>Task ID</th>
-                <th>Type</th>
-                <th>Progress</th>
-                <th>Status</th>
-                <th>State</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>View Attempts</th>
+                <th>${_('Task ID')}</th>
+                <th>${_('Type')}</th>
+                <th>${_('Progress')}</th>
+                <th>${_('Status')}</th>
+                <th>${_('State')}</th>
+                <th>${_('Start Time')}</th>
+                <th>${_('End Time')}</th>
+                <th>${_('View Attempts')}</th>
             </tr>
             </thead>
 	        <tbody>
@@ -87,14 +88,14 @@ ${commonheader("Task View: Job: " + jobid + " - Job Browser", "jobbrowser")}
 	                </td>
 	                <td>
 	                    <a href="${url('jobbrowser.views.tasks', jobid=jobid)}?${get_state_link(request, 'taskstate', t.state.lower())}"
-	                       title="Show only ${t.state.lower()} tasks"
+	                       title="${_('Show only %(state)s tasks') % dict(state=t.state.lower())}"
 	                       class="${t.state.lower()}">${t.state.lower()}
 	                    </a>
 	                </td>
 	                <td>${t.mostRecentState}</td>
 	                <td>${t.execStartTimeFormatted}</td>
 	                <td>${t.execFinishTimeFormatted}</td>
-	                <td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" data-row-selector="true">Attempts</a></td>
+	                <td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" data-row-selector="true">${_('Attempts')}</a></td>
 	            </tr>
 	            %endfor
 	        </tbody>
@@ -108,7 +109,7 @@ ${commonheader("Task View: Job: " + jobid + " - Job Browser", "jobbrowser")}
             "bPaginate": false,
             "bLengthChange": false,
             "bFilter": false,
-            "bInfo": false,
+            "bInfo": false
         });
         $("a[data-row-selector='true']").jHueRowSelector();
     });

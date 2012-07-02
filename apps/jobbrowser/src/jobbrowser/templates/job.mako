@@ -21,14 +21,15 @@
   import re
   from desktop.views import commonheader, commonfooter
   from django.template.defaultfilters import urlencode
+  from django.utils.translation import ugettext as _
 %>
 
 <%def name="task_table(tasks)">
     <table class="taskTable table table-striped table-condensed">
         <thead>
         <tr>
-            <th>Tasks</th>
-            <th>Type</th>
+            <th>${_('Tasks')}</th>
+            <th>${_('Type')}</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -38,7 +39,7 @@
                     <td>${task.taskId_short}</td>
                     <td>${task.taskType}</td>
                     <td>
-                        <a title="View this task" href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }">View</a>
+                        <a title="${_('View this task')}" href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }">${_('View')}</a>
                     </td>
                 </tr>
                 % endfor
@@ -77,19 +78,19 @@
         </tr>
     % endfor
 </%def>
-${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
+${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbrowser")}
 
 <div class="container-fluid">
-    <h1>Job: ${job.jobId} - Job Browser</h1>
+    <h1>${_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId)}</h1>
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li class="nav-header">Job ID</li>
+                    <li class="nav-header">${_('Job ID')}</li>
                     <li>${job.jobId}</li>
-                    <li class="nav-header">User</li>
+                    <li class="nav-header">${_('User')}</li>
                     <li>${job.user}</li>
-                    <li class="nav-header">Status</li>
+                    <li class="nav-header">${_('Status')}</li>
                     <li>
                             % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                                 <span class="label label-warning">${job.status.lower()}</span>
@@ -100,11 +101,11 @@ ${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
                             % endif
                     </li>
                     % if job.status.lower() == 'running' or job.status.lower() == 'pending':
-                            <li class="nav-header">Kill Job</li>
-                            <li><a href="#" title="Kill this job" onclick="$('#kill-job').submit()">Kill this job</a>
+                            <li class="nav-header">${_('Kill Job')}</li>
+                            <li><a href="#" title="${_('Kill this job')}" onclick="$('#kill-job').submit()">${_('Kill this job')}</a>
                                 <form id="kill-job" action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" method="POST"></form></li>
                     % endif
-                    <li class="nav-header">Output</li>
+                    <li class="nav-header">${_('Output')}</li>
                     <li>
                         <%
                             output_dir = job.conf_keys.get('mapredOutputDir', "")
@@ -123,20 +124,20 @@ ${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
         </div>
         <div class="span10">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#tasks" data-toggle="tab">Tasks</a></li>
-                <li><a href="#metadata" data-toggle="tab">Metadata</a></li>
-                <li><a href="#counters" data-toggle="tab">Counters</a></li>
+                <li class="active"><a href="#tasks" data-toggle="tab">${_('Tasks')}</a></li>
+                <li><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
+                <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
             </ul>
 
             <div class="tab-content">
                 <div class="tab-pane active" id="tasks">
-                    <strong>Maps:</strong> ${comps.mr_graph_maps(job)}
-                    <strong>Reduces:</strong> ${comps.mr_graph_reduces(job)}
+                    <strong>${_('Maps:')}</strong> ${comps.mr_graph_maps(job)}
+                    <strong>${_('Reduces:')}</strong> ${comps.mr_graph_reduces(job)}
                     %if failed_tasks:
                             <div>
                                 <h3>
-                                    <a href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">View Failed Tasks &raquo;</a>
-                                    Failed Tasks
+                                    <a href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">${_('View Failed Tasks')} &raquo;</a>
+                                    ${_('Failed Tasks')}
                                 </h3>
                                 <div>
                                 ${task_table(failed_tasks)}
@@ -144,9 +145,9 @@ ${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
                             </div>
                     %endif
                     <div>
-                        <a style="float:right;margin-right:10px" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
+                        <a style="float:right;margin-right:10px" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">${_('View All Tasks')} &raquo;</a>
                         <h3>
-                            Recent Tasks
+                            ${_('Recent Tasks')}
                         </h3>
                         <div>
                             ${task_table(recent_tasks)}
@@ -157,56 +158,56 @@ ${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
                 <div id="metadata" class="tab-pane">
                     <div class="well hueWell">
                         <form class="form-search">
-                            Filter: <input id="metadataFilter" class="input-xlarge search-query" placeholder="Text Filter">
+                            ${_('Filter: ')}<input id="metadataFilter" class="input-xlarge search-query" placeholder="${_('Text Filter')}">
                         </form>
                     </div>
                     <table id="metadataTable" class="table table-striped table-condensed">
                         <thead>
-                        <th>Name</th>
-                        <th>Value</th>
+                        <th>${_('Name')}</th>
+                        <th>${_('Value')}</th>
                         </thead>
                         <tbody>
                         <tr>
-                            <td>ID</td>
+                            <td>${_('ID')}</td>
                             <td>${job.jobId}</td>
                         </tr>
                         <tr>
-                            <td>User</td>
+                            <td>${_('User')}</td>
                             <td>${job.user}</td>
                         </tr>
                         <tr>
-                            <td>Maps</td>
+                            <td>${_('Maps')}</td>
                             <td>${job.finishedMaps} of ${job.desiredMaps}</td>
                         </tr>
                         <tr>
-                            <td>Reduces</td>
+                            <td>${_('Reduces')}</td>
                             <td>${job.finishedReduces} of ${job.desiredReduces}</td>
                         </tr>
                         <tr>
-                            <td>Started</td>
+                            <td>${_('Started')}</td>
                             <td>${job.startTimeFormatted}</td>
                         </tr>
                         <tr>
-                            <td>Ended</td>
+                            <td>${_('Ended')}</td>
                             <td>${job.finishTimeFormatted}</td>
                         </tr>
                         <tr>
-                            <td>Duration</td>
+                            <td>${_('Duration')}</td>
                             <td>${job.duration}</td>
                         </tr>
                         <tr>
-                            <td>Status</td>
+                            <td>${_('Status')}</td>
                             <td>${job.status}</td>
                         </tr>
                             ${rows_for_conf_vars(job.conf_keys)}
 
                         </tbody>
                     </table>
-                    <h3>Raw configuration:</h3>
+                    <h3>${_('Raw configuration:')}</h3>
                     <table id="rawConfigurationTable" class="table table-striped table-condensed">
                         <thead>
-                        <th>Name</th>
-                        <th>Value</th>
+                        <th>${_('Name')}</th>
+                        <th>${_('Value')}</th>
                         </thead>
                         <tbody>
 
@@ -225,7 +226,7 @@ ${commonheader("Job: " + job.jobId + " - Job Browser", "jobbrowser")}
 
                 </div>
                 <div id="counters" class="tab-pane">
-                    ${comps.job_counters(job.counters)}
+                    ${comps.job_counters(job.counters, _)}
                 </div>
             </div>
         </div>

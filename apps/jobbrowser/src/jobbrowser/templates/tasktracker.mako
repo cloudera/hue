@@ -15,43 +15,44 @@
 ## limitations under the License.
 <%!
   from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader("Tracker " + tracker.trackerId + " - Job Browser", "jobbrowser")}
+${commonheader(_('Tracker: %(trackerId)s - Job Browser') % dict(trackerId=tracker.trackerId), "jobbrowser")}
 <div class="container-fluid">
-	<h1>Tracker at ${ tracker.host } on port ${ tracker.httpPort }</h1>
+	<h1>${_('Tracker at %(trackerHost)s on port %(trackerPort)s') % dict(trackerHost=tracker.host, trackerPort=tracker.httpPort)}</h1>
 	<div>
 		<dl>
-			<dt>ID</dt>
+			<dt>${_('ID')}</dt>
 			<dd>${ tracker.trackerId }</dd>
-			<dt>Last heard from at</dt>
+			<dt>${_('Last heard from at')}</dt>
 			<dd>${ tracker.lastSeenFormatted }.</dd>
 		</dl>
 	</div>
 	
-	<h2>Memory Metrics</h2>
+	<h2>${_('Memory Metrics')}</h2>
 	<div>
 		<dl>
-			<dt>Total virtual memory:</dt>
+			<dt>${_('Total virtual memory:')}</dt>
 			<dd>${tracker.totalVirtualMemory }</dd>
-			<dt>Total physical memory: </dt>
+			<dt>${_('Total physical memory:')}</dt>
 			<dd>${tracker.totalPhysicalMemory }</dd>
-			<dt>Available space: </dt>
+			<dt>${_('Available space:')}</dt>
 			<dd>${tracker.availableSpace}</dd>
 		</dl>
 	</div>
 
-	<h2>Map and Reduce</h2>
+	<h2>${_('Map and Reduce')}</h2>
 	<div>
 		<dl>
-			<dt>Map count:</dt>
+			<dt>${_('Map count:')}</dt>
 			<dd>${tracker.mapCount}</dd>
-			<dt>Reduce count:</dt>
+			<dt>${_('Reduce count:')}</dt>
 			<dd>${tracker.reduceCount}</dd>
-			<dt>Max map tasks:</dt>
+			<dt>${_('Max map tasks:')}</dt>
 			<dd>${tracker.maxMapTasks}</dd>
-			<dt>Max reduce tasks:</dt>
+			<dt>${_('Max reduce tasks:')}</dt>
 			<dd>${tracker.maxReduceTasks}</dd>
 		</dl>
 	</div>
