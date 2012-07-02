@@ -32,7 +32,7 @@ from hadoop.fs import hadoopfs
 
 import beeswax.common
 import beeswax.forms
-from beeswax.views import describe_table, confirm_query, execute_directly
+from beeswax.views import describe_table, execute_directly
 from beeswax.views import make_beeswax_query
 from beeswax import db_utils
 
@@ -65,9 +65,8 @@ def create_table(request):
       )
       # Mako outputs bytestring in utf8
       proposed_query = proposed_query.decode('utf-8')
-      tablename = form.table.cleaned_data['name']
-      on_success_url = urlresolvers.reverse(describe_table, kwargs={'table': tablename})
-      return confirm_query(request, proposed_query, on_success_url)
+      table_name = form.table.cleaned_data['name']
+      return _submit_create_and_load(request, proposed_query, table_name, None, False)
   else:
     form.bind()
   return render("create_table_manually.mako", request, dict(
@@ -82,9 +81,9 @@ def create_table(request):
 IMPORT_PEEK_SIZE = 8192
 IMPORT_PEEK_NLINES = 10
 DELIMITERS = [ hive_val for hive_val, desc, ascii in beeswax.common.TERMINATORS ]
-DELIMITER_READABLE = {'\\001' : 'ctrl-As',
-                      '\\002' : 'ctrl-Bs',
-                      '\\003' : 'ctrl-Cs',
+DELIMITER_READABLE = {'\\001' : _('ctrl-As'),
+                      '\\002' : _('ctrl-Bs'),
+                      '\\003' : _('ctrl-Cs'),
                       '\\t'   : _('tabs'),
                       ','     : _('commas'),
                       ' '     : _('spaces')}

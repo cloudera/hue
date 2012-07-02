@@ -848,22 +848,22 @@ for x in sys.stdin:
       'columns-0-_exists': 'True',
       'columns-next_form_id': '1',
       'partitions-next_form_id': '0',
-    })
+    }, follow=True)
 
-    assert_equal_mod_whitespace(r"""
+    assert_equal_mod_whitespace("""
         CREATE EXTERNAL TABLE `my_table`
         (
          `my_col` string
         )
         COMMENT "Yo>>>>dude"
         ROW FORMAT DELIMITED
-          FIELDS TERMINATED BY '\001'
-          COLLECTION ITEMS TERMINATED BY '\002'
-          MAP KEYS TERMINATED BY '\003'
+          FIELDS TERMINATED BY '\\001'
+          COLLECTION ITEMS TERMINATED BY '\\002'
+          MAP KEYS TERMINATED BY '\\003'
           STORED AS TextFile LOCATION "/tmp/foo"
-    """, resp.context["form"].query.initial["query"])
+    """, resp.context['query'].query)
 
-    assert_true('/beeswax/table/my_table' in resp.context['on_success_url'])
+    assert_true('on_success_url=%2Fbeeswax%2Ftable%2Fmy_table' in resp.context['fwd_params'])
 
 
   def test_partitioned_create_table(self):
@@ -875,7 +875,7 @@ for x in sys.stdin:
     assert_true("Field terminator" in resp.content)
     # Make a submission
     resp = self.client.post("/beeswax/create/create_table", {
-      'table-name': 'my_table',
+      'table-name': 'my_table2',
       'table-row_format': 'Delimited',
       'table-field_terminator_0': r'\001',
       'table-collection_terminator_0': r'\002',
@@ -890,10 +890,10 @@ for x in sys.stdin:
       'partitions-0-column_type': 'string',
       'partitions-0-_exists': 'True',
       'partitions-next_form_id': '1',
-    })
+    }, follow=True)
 
-    assert_equal_mod_whitespace(r"""
-        CREATE TABLE `my_table`
+    assert_equal_mod_whitespace("""
+        CREATE TABLE `my_table2`
         (
          `my_col` string
         )
@@ -902,11 +902,11 @@ for x in sys.stdin:
           `my_partition` string
         )
         ROW FORMAT DELIMITED
-          FIELDS TERMINATED BY '\001'
-          COLLECTION ITEMS TERMINATED BY '\002'
-          MAP KEYS TERMINATED BY '\003'
+          FIELDS TERMINATED BY '\\001'
+          COLLECTION ITEMS TERMINATED BY '\\002'
+          MAP KEYS TERMINATED BY '\\003'
           STORED AS TextFile
-    """, resp.context["form"].query.initial["query"])
+    """, resp.context['query'].query)
 
 
   def test_create_table_dependencies(self):

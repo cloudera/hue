@@ -53,9 +53,12 @@ class OozieServerProvider(object):
     cls.shutdown = [callback]
 
   @classmethod
-  def wait_until_completion(cls, oozie_jobid, timeout=900.0, step=5):
+
+  def wait_until_completion(cls, oozie_jobid, timeout=1800.0, step=5):
     job = cls.oozie.get_job(oozie_jobid)
     start = time.time()
+
+    LOG.info('[%d] cluster status: %s' % (time.time(), cls.cluster.jt.cluster_status()))
 
     while job.is_running() and time.time() - start < timeout:
       time.sleep(step)
@@ -71,6 +74,7 @@ class OozieServerProvider(object):
     else:
       LOG.info('[%d] Job duration %s: %d' % (time.time(), job.id, time.time() - start))
 
+    LOG.info('[%d] cluster status: %s' % (time.time(), cls.cluster.jt.cluster_status()))
     return job
 
   @classmethod
