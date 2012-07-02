@@ -18,6 +18,7 @@
   from django.template.defaultfilters import urlencode
   from filebrowser.views import truncate
   from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 <%
   path_enc = urlencode(path)
@@ -25,7 +26,7 @@
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 
-${commonheader(truncate(filename)+':: File Viewer', 'filebrowser')}
+${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser')}
 
 <div class="container-fluid">
 	% if breadcrumbs:
@@ -37,7 +38,7 @@ ${commonheader(truncate(filename)+':: File Viewer', 'filebrowser')}
 <div class="well" >
     <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
     <div class="toolbar">
-		<a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}">View Location</a>
+		<a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}">${_('View Location')}</a>
 	</div>
 	<br/>
 
@@ -55,8 +56,8 @@ ${commonheader(truncate(filename)+':: File Viewer', 'filebrowser')}
 
         <div style="width: 100%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", notitle=True, attrs=dict(
           style="width:100%; height:400px;")) | n}</div>
-        <input class="btn primary" type="submit" name="save" value="Save">
-        <a id="saveAsBtn" class="btn">Save As</a>
+        <input class="btn primary" type="submit" name="save" value="${_('Save')}">
+        <a id="saveAsBtn" class="btn">${_('Save As')}</a>
     </form>
 </div>
 
@@ -64,21 +65,21 @@ ${commonheader(truncate(filename)+':: File Viewer', 'filebrowser')}
 <div id="saveAsModal" class="modal hide fade">
     <form id="saveAsForm" action="${url('filebrowser.views.save_file')}" method="POST" class="form-stacked form-padding-fix">
     <div class="modal-header">
-        <a href="#" class="close">&times;</a>
-        <h3>Save As</h3>
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Save As')}</h3>
     </div>
     <div class="modal-body">
 		${edit.render_field(form["path"], notitle=True, klass="xlarge")}
-		<span class="help-block">Please enter the location where you'd like to save the file.</span>
+		<span class="help-block">${_("Please enter the location where you'd like to save the file.")}</span>
     </div>
     <div class="modal-footer">
         <div id="saveAsNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
-            <p><strong>Sorry, name is required.</strong>
+            <p><strong>${_('Sorry, name is required.')}</strong>
         </div>
 		${edit.render_field(form["contents"], hidden=True)}
 		${edit.render_field(form["encoding"], hidden=True)}
-        <input type="submit" value="Save" class="btn primary" />
-        <a id="cancelSaveAsBtn" class="btn">Cancel</a>
+        <input type="submit" value="${_('Save')}" class="btn primary" />
+        <a id="cancelSaveAsBtn" class="btn">${_('Cancel')}</a>
     </div>
     </form>
 </div>

@@ -13,6 +13,10 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from django.utils.translation import ugettext as _
+%>
+
 <%namespace name="edit" file="editor_components.mako" />
 <style>
 .table-margin {
@@ -25,7 +29,7 @@
       class="form-inline form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>Change Permissions: ${path}</h3>
+        <h3>${_('Change Permissions:')} ${path}</h3>
     </div>
     <div class="table-margin">
         ${edit.render_field(form["path"], hidden=True)}
@@ -33,29 +37,29 @@
             <thead>
             <tr>
                 <th>&nbsp;</th>
-                <th class="center">User</th>
-                <th class="center">Group</th>
-                <th class="center">Other</th>
+                <th class="center">${_('User')}</th>
+                <th class="center">${_('Group')}</th>
+                <th class="center">${_('Other')}</th>
 				<th width="120">&nbsp</th>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td><strong>Read</strong></td>
+                <td><strong>${_('Read')}</strong></td>
                 <td class="center">${edit.render_field(form["user_read"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["group_read"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["other_read"], tag="checkbox", button_text=" ", nolabel=True)}</td>
 				<td>&nbsp;</td>
             </tr>
             <tr>
-                <td><strong>Write</strong></td>
+                <td><strong>${_('Write')}</strong></td>
                 <td class="center">${edit.render_field(form["user_write"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["group_write"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["other_write"], tag="checkbox", button_text=" ", nolabel=True)}</td>
 				<td>&nbsp;</td>
             </tr>
             <tr>
-                <td><strong>Execute</strong></td>
+                <td><strong>${_('Execute')}</strong></td>
                 <td class="center">${edit.render_field(form["user_execute"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["group_execute"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["other_execute"], tag="checkbox", button_text=" ", nolabel=True)}</td>
@@ -65,7 +69,7 @@
         </table>
     </div>
     <div class="modal-footer" style="padding-top: 10px;">
-        <input class="btn primary" type="submit" value="Submit"/>
-        <a class="btn" onclick="$('#changePermissionModal').modal('hide');">Cancel</a>
+        <input class="btn primary" type="submit" value="${_('Submit')}"/>
+        <a class="btn" onclick="$('#changePermissionModal').modal('hide');">${_('Cancel')}</a>
     </div>
 </form>

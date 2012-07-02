@@ -17,14 +17,15 @@
 import datetime
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time, escape
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="dir" file="listdir_components.mako" />
 <%namespace name="fb_components" file="fb_components.mako" />
 
-${commonheader('File Browser', 'filebrowser')}
+${commonheader(_('File Browser'), 'filebrowser')}
 <div class="container-fluid">
-	<h1>File Browser</h1>
+	<h1>${_('File Browser')}</h1>
 	% if breadcrumbs:
         ${fb_components.breadcrumbs(path, breadcrumbs)}
 	%endif

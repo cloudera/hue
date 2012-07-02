@@ -17,11 +17,12 @@
 import datetime
 from django.template.defaultfilters import urlencode, escape, stringformat, date, filesizeformat, time
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 
 
 
-${commonheader('File Operation', 'filebrowser')}
+${commonheader(_('File Operation'), 'filebrowser')}
 
 ## Not sure if enctype breaks anything if used for things other than file upload.
 
@@ -31,8 +32,8 @@ ${commonheader('File Operation', 'filebrowser')}
 <h1>${form.op}</h1>
 ${form.as_p()|n}
 <div>
-<input type="submit" value="Submit" class="btn primary" />
-<a href="${urlencode(next)}" class="btn">Cancel</a>
+<input type="submit" value="${('Submit')}" class="btn primary" />
+<a href="${urlencode(next)}" class="btn">${('Cancel')}</a>
 </div>
 </form>
 </div>

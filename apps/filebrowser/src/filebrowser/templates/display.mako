@@ -19,6 +19,7 @@
   from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
   from filebrowser.views import truncate
   from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 <%
   path_enc = urlencode(path)
@@ -27,7 +28,7 @@
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 
-${commonheader(truncate(filename)+' :: File Viewer', 'filebrowser')}
+${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser')}
 
 
 
@@ -42,44 +43,44 @@ ${commonheader(truncate(filename)+' :: File Viewer', 'filebrowser')}
 		<div class="span2">
 			<div class="well sidebar-nav">
 				<ul class="nav nav-list">
-					<li class="nav-header">Actions</li>
+					<li class="nav-header">${_('Actions')}</li>
 					% if view['mode'] == "binary":
-				        <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">View As Text</a></li>
+				        <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">${_('View As Text')}</a></li>
 				      % endif
 					  % if view['mode'] == "text":
-				        <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}">View As Binary</a></li>
+				        <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}">${_('View As Binary')}</a></li>
 				      % endif
 
 				      % if view['compression'] != "gzip" and path.endswith('.gz'):
-				        <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">Preview As Gzip</a></li>
+				        <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">${_('Preview As Gzip')}</a></li>
 				      % endif
 
 				      % if view['compression'] != "avro" and path.endswith('.avro'):
-				        <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro">Preview As Avro</a></li>
+				        <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro">${_('Preview As Avro')}</a></li>
 				      % endif
 
 				      % if view['compression'] and view['compression'] != "none":
-				        <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none">Stop preview</a></li>
+				        <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none">${_('Stop preview')}</a></li>
 				      % endif
 
 				      % if editable and view['compression'] == "none":
-				        <li><a href="${url('filebrowser.views.edit', path=path_enc)}">Edit File</a></li>
+				        <li><a href="${url('filebrowser.views.edit', path=path_enc)}">${_('Edit File')}</a></li>
 				      % endif
-				       <li><a href="${url('filebrowser.views.download', path=path_enc)}">Download</a></li>
-				       <li><a href="${url('filebrowser.views.view', path=dirname_enc)}">View File Location</a></li>
-				       <li><a id="refreshBtn">Refresh</a></li>
-					<li class="nav-header">Info</li>
+				       <li><a href="${url('filebrowser.views.download', path=path_enc)}">${_('Download')}</a></li>
+				       <li><a href="${url('filebrowser.views.view', path=dirname_enc)}">${_('View File Location')}</a></li>
+				       <li><a id="refreshBtn">${_('Refresh')}</a></li>
+					<li class="nav-header">${_('Info')}</li>
 					<li>
 						<dl>
-							<dt>Last Modified</dt>
+							<dt>${_('Last Modified')}</dt>
 				        	<dd>${date(datetime.datetime.fromtimestamp(stats['mtime']))} ${time(datetime.datetime.fromtimestamp(stats['mtime']))}</dd>
-				        	<dt>User</dt>
+				        	<dt>${_('User')}</dt>
 				        	<dd>${stats['user']}</dd>
-				        	<dt>Group</dt>
+				        	<dt>${_('Group')}</dt>
 				        	<dd>${stats['group']}</dd>
-				        	<dt>Size</dt>
+				        	<dt>${_('Size')}</dt>
 				        	<dd>${stats['size']|filesizeformat}</dd>
-				        	<dt>Mode</dt>
+				        	<dt>${_('Mode')}</dt>
 				        	<dd>${stringformat(stats['mode'], "o")}</dd>
 						</dl>
 					</li>
@@ -115,19 +116,19 @@ ${commonheader(truncate(filename)+' :: File Viewer', 'filebrowser')}
 			        %>
 			        ###DEFINE REL
 			        <ul>
-			            <li class="${first_class}"><a ${first_href}>First Block</a></li>
-			            <li class="${prev_class}"><a ${prev_href}>Previous Block</a></li>
-			            <li class="${next_class}"><a ${next_href}>Next Block</a></li>
-			            <li class="${last_class}"><a ${last_href}>Last Block</a></li>
+			            <li class="${first_class}"><a ${first_href}>${_('First Block')}</a></li>
+			            <li class="${prev_class}"><a ${prev_href}>${_('Previous Block')}</a></li>
+			            <li class="${next_class}"><a ${next_href}>${_('Next Block')}</a></li>
+			            <li class="${last_class}"><a ${last_href}>${_('Last Block')}</a></li>
 			        </ul>
 
 					<form action="${url('filebrowser.views.view', path=path_enc)}" method="GET" class="form-inline pull-right">
-						<span>Viewing Bytes:</span>
+						<span>${_('Viewing Bytes:')}</span>
 						<input type="text" name="begin" value="${view['offset'] + 1}" class="input-mini" />
 						-
 						<input type="text" value="${view['end']}" name="end" class="input-mini" /> of
 						<span>${stats['size']}</span>
-						<span>(${view['length']} B block size)</span>
+						<span>${_('(%(length)s B block size)' % dict(length=view['length']))}</span>
 						% if view['mode']:
 							<input type="hidden" name="mode" value="${view['mode']}"/>
 						% endif
@@ -138,7 +139,7 @@ ${commonheader(truncate(filename)+' :: File Viewer', 'filebrowser')}
 			    % endif
 			%if 'contents' in view:
 		      % if view['masked_binary_data']:
-		      <div class="alert-message warning">Warning: some binary data has been masked out with '&#xfffd'.</div>
+		      <div class="alert-message warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
 		      % endif
 		    % endif
 		      <div>
@@ -195,10 +196,10 @@ ${commonheader(truncate(filename)+' :: File Viewer', 'filebrowser')}
 			        %>
 			        ###DEFINE REL
 			        <ul>
-			            <li class="${first_class}"><a ${first_href}>First Block</a></li>
-			            <li class="${prev_class}"><a ${prev_href}>Previous Block</a></li>
-			            <li class="${next_class}"><a ${next_href}>Next Block</a></li>
-			            <li class="${last_class}"><a ${last_href}>Last Block</a></li>
+			            <li class="${first_class}"><a ${first_href}>${_('First Block')}</a></li>
+			            <li class="${prev_class}"><a ${prev_href}>${_('Previous Block')}</a></li>
+			            <li class="${next_class}"><a ${next_href}>${_('Next Block')}</a></li>
+			            <li class="${last_class}"><a ${last_href}>${_('Last Block')}</a></li>
 			        </ul>
 			      </div>
 			    % endif

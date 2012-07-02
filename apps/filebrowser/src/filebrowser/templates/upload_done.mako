@@ -16,8 +16,9 @@
 <%!
 import datetime
 from django.template.defaultfilters import urlencode
+from django.utils.translation import ugettext as _
 %>
 <% path_enc = urlencode(path) %>
-View uploaded file: <a href="${url('filebrowser.views.view', path=path_enc)}">${path}</a>.<br>
-Go back to where you were: <a href="${next|urlencode}">${next}</a>.
+${_('View uploaded file:')} <a href="${url('filebrowser.views.view', path=path_enc)}">${path}</a>.<br>
+${_('Go back to where you were:')} <a href="${next|urlencode}">${next}</a>.
 

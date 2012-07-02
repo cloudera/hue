@@ -15,25 +15,13 @@
 ## limitations under the License.
 <%!
 from django.template.defaultfilters import urlencode
+from django.utils.translation import ugettext as _
 %>
-
-<%def name="footer()">
-      <div class="fb-uploader hide">
-        <a class="fb-cancel-upload">Close</a>
-        <ul class="fb-upload-list"></ul>
-
-        <div class="fb-noflash">If you are experiencing flash errors due to uploading,
-          you can <a target="hue_upload" href="${ url('filebrowser.views.upload') }">upload without flash</a>.
-        </div>
-      </div>
-    </body>
-  </html>
-</%def>
 
 <%def name="breadcrumbs(path, breadcrumbs)">
     <div class="subnav">
         <ul class="nav nav-pills">
-          <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i>Home</a></li>
+          <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i>${_('Home')}</a></li>
           <li>
             <ul class="hueBreadcrumb">
                 % for breadcrumb_item in breadcrumbs:
