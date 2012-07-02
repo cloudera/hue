@@ -16,45 +16,46 @@
 <%!
 from desktop.lib.conf import BoundConfig
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="about_layout.mako" />
-${commonheader("About", "about", "100px")}
+${commonheader(_('About'), "about", "100px")}
 ${layout.menubar(section='check_config')}
 
-	<div class="container-fluid">
+    <div class="container-fluid">
 
-		Configuration files located in <code>${conf_dir}</code>
-		<br/><br/>
-		% if error_list:
-	      <h2>Potential misconfiguration detected. Please fix and restart HUE.</h2>
-		  <br/>
-			<table class="table table-striped">
-	      % for confvar, error in error_list:
-			<tr>
-				<td width="5%">
-					<code>
-		            % if isinstance(confvar, str):
-		              ${confvar | n}
-		            % else:
-		              ${confvar.get_fully_qualifying_key()}
-		            % endif
-		          </code>
-		        </td>
-				<td>
-		          ## Doesn't make sense to print the value of a BoundContainer
-		          % if type(confvar) is BoundConfig:
-		            Current value: <code>${confvar.get()}</code><br/>
-		          % endif
-		          ${error | n}
-	        	</td>
-			</tr>
-	      % endfor
-		</table>
-	    % else:
-	      <h2>All ok. Configuration check passed!</h2>
-	    % endif
+        ${_('Configuration files located in')} <code>${conf_dir}</code>
+        <br/><br/>
+        % if error_list:
+          <h2>${_('Potential misconfiguration detected. Please fix and restart HUE.')}</h2>
+          <br/>
+            <table class="table table-striped">
+          % for confvar, error in error_list:
+            <tr>
+                <td width="5%">
+                    <code>
+                    % if isinstance(confvar, str):
+                      ${confvar | n}
+                    % else:
+                      ${confvar.get_fully_qualifying_key()}
+                    % endif
+                  </code>
+                </td>
+                <td>
+                  ## Doesn't make sense to print the value of a BoundContainer
+                  % if type(confvar) is BoundConfig:
+                    ${_('Current value:')} <code>${confvar.get()}</code><br/>
+                  % endif
+                  ${error | n}
+                </td>
+            </tr>
+          % endfor
+        </table>
+        % else:
+          <h2>${_('All ok. Configuration check passed!')}</h2>
+        % endif
 
-	</div>
+    </div>
 
 
 ${commonfooter()}

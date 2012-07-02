@@ -13,6 +13,9 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from django.utils.translation import ugettext as _
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,17 +53,17 @@
 		<div class="row">
 			<div class="span4 offset4">
     			<form method="POST" action="${action}" class="well">
-					<label>Username
+					<label>${_('Username')}
 						<input name="username" class="input-large" type="text" maxlength="30">
 					</label>
-					<label>Password
+					<label>${_('Password')}
 						<input name="password" class="input-large" type="password" maxlength="30">
 					</label>
 
 					%if first_login_ever==True:
-						<input type="submit" class="btn primary" value="Sign up" />
+						<input type="submit" class="btn primary" value="${_('Sign up')}" />
 					%else:
-						<input type="submit" class="btn primary" value="Sign in" />
+						<input type="submit" class="btn primary" value="${_('Sign in')}" />
 					%endif
 		    		<input type="hidden" name="next" value="${next}" />
 
@@ -68,7 +71,7 @@
 						<br/>
 						<br/>
 						<div class="alert alert-error">
-							<p><strong>Error!</strong> Invalid username or password.</p>
+							<p><strong>${_('Error!')}</strong> ${_('Invalid username or password.')}</p>
 						</div>
 					%endif
 				</form>
@@ -79,9 +82,8 @@
 		<div class="row">
 			<div class="span6 offset3">
 				<div class="alert alert-block">
-					<p>Since this is your first time logging in,
-				    please pick any username and password. Be sure to remember these, as
-				    <strong>they will become your superuser credentials for Hue</strong>.</p>
+					<p>${_('Since this is your first time logging in, please pick any username and password. Be sure to remember these, as')}
+				     <strong>${_('they will become your superuser credentials for Hue')}</strong>.</p>
 				</div>
 			</div>
 		</div>

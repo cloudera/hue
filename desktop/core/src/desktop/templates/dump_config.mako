@@ -18,24 +18,25 @@
 <%!
 from desktop.lib.conf import BoundContainer, is_anonymous
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="about_layout.mako" />
-${commonheader("About", "about", "100px")}
+${commonheader(_('About'), "about", "100px")}
 ${layout.menubar(section='dump_config')}
 
 	<div class="container-fluid">
 
-		Configuration files located in <code>${conf_dir}</code>
+        ${_('Configuration files located in')} <code>${conf_dir}</code>
 		<br/><br/>
 
-		<h2>Installed applications</h2>
+		<h2>${_('Installed applications')}</h2>
 		<ul>
 		% for app in sorted(apps, key=lambda app: app.name.lower()):
 			<li>${app.name}</li>
 		% endfor
 		</ul>
 
-		<h2>Configuration Sections and Variables</h2>
+		<h2>${_('Configuration Sections and Variables')}</h2>
 
 		<ul class="nav nav-tabs">
 			% for obj in top_level.get().values():
@@ -78,7 +79,7 @@ ${layout.menubar(section='dump_config')}
 			  	<td>
 			 % endif
 			  % if isinstance(config_obj, BoundContainer):
-			    <p class="dump_config_help"><i>${config_obj.config.help or "No help available."}</i></p>
+			    <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
 
 			    % for v in config_obj.get().values():
 			<%
@@ -90,8 +91,8 @@ ${layout.menubar(section='dump_config')}
 			    % endfor
 			  % else:
 			    <p>${str(config_obj.get())}</p>
-			    <p class="dump_config_help"><i>${config_obj.config.help or "No help available."}</i></p>
-			    <p class="dump_config_default">Default: <i>${config_obj.config.default}</i></p>
+			    <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
+			    <p class="dump_config_default">${_('Default:')} <i>${config_obj.config.default}</i></p>
 			  % endif
 			  </td>
 			</tr>

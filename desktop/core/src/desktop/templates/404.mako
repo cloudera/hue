@@ -15,12 +15,13 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
-${commonheader("Not Found", "")}
+${commonheader(_('Not Found'), "")}
 
   <div class="container-fluid">
-    <h1>Page not found</h1>
-    <p>We're sorry, but the requested page could not be found:</p>
+    <h1>${_('Page not found')}</h1>
+    <p>${_("We're sorry, but the requested page could not be found:")}</p>
     <br/>
     <code>${uri}</code>
   </div>

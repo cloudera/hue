@@ -17,15 +17,16 @@
 from desktop.lib.conf import BoundConfig
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 import re
 %>
 <%namespace name="layout" file="about_layout.mako" />
-${commonheader("About", "about", "100px")}
+${commonheader(_('About'), "about", "100px")}
 ${layout.menubar(section='log_view')}
 	<div class="container-fluid">
-		<h1>Log entries (most recent first)</h1>
+		<h1>${_('Log entries (most recent first)')}</h1>
 
-		<a href="/download_logs">Download entire log as zip</a>
+		<a href="/download_logs">${_('Download entire log as zip')}</a>
 		<hr/>
 		<% log.reverse() %>
 		<pre>

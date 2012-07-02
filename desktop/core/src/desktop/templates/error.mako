@@ -16,11 +16,12 @@
 <%!
 from desktop.views import commonheader, commonfooter
 from desktop.lib.i18n import smart_unicode
+from django.utils.translation import ugettext as _
 %>
-${commonheader("Error", "")}
+${commonheader(_('Error'), "")}
 
   <div class="container-fluid">
-    <h1>Error!</h1>
+    <h1>${_('Error!')}</h1>
     <pre>${smart_unicode(error) | h }</pre>
 
     %if traceback:
