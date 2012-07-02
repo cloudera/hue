@@ -18,6 +18,8 @@
 ## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and
 ## multiple spaces and line breaks cause issues
 <%!
+from django.utils.translation import ugettext as _
+
 def is_selected(section, matcher):
   if section == matcher:
     return "active"
@@ -29,9 +31,9 @@ def is_selected(section, matcher):
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">
 		<ul class="nav nav-pills">
-			<li class="${is_selected(section, 'dump_config')}"><a href="${url("desktop.views.dump_config")}">Configuration</a></li>
-			<li class="${is_selected(section, 'check_config')}"><a href="${url("desktop.views.check_config")}">Check for misconfiguration</a></li>
-			<li class="${is_selected(section, 'log_view')}"><a href="${url("desktop.views.log_view")}">Server Logs</a></li>
+			<li class="${is_selected(section, 'dump_config')}"><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
+			<li class="${is_selected(section, 'check_config')}"><a href="${url("desktop.views.check_config")}">${_('Check for misconfiguration')}</a></li>
+			<li class="${is_selected(section, 'log_view')}"><a href="${url("desktop.views.log_view")}">${_('Server Logs')}</a></li>
 		</ul>
 		</div>
 	</div>

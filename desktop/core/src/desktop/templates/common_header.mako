@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 from desktop.lib.i18n import smart_unicode
+from django.utils.translation import ugettext as _
 %>
 
 <!DOCTYPE html>
@@ -88,16 +89,16 @@ from desktop.lib.i18n import smart_unicode
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
-        <a class="brand nav-tooltip" title="About Hue" href="/about">Hue</a>
+        <a class="brand nav-tooltip" title="${_('About Hue')}" href="/about">Hue</a>
         <div id="usernameDropdown" class="btn-group pull-right hide">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-user"></i> <span id="username"></span>
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><a class="userProfile" href="#">Profile</a></li>
+            <li><a class="userProfile" href="#">${_('Profile')}</a></li>
             <li class="divider"></li>
-            <li><a href="/accounts/logout/">Sign Out</a></li>
+            <li><a href="/accounts/logout/">${_('Sign Out')}</a></li>
           </ul>
         </div>
 

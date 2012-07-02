@@ -1,0 +1,228 @@
+# English (United States) translations for PROJECT.
+# Copyright (C) 2012 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-07-09 21:58+0200\n"
+"PO-Revision-Date: 2012-07-09 21:58+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: en_US <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/desktop/lib/django_util.py:429
+msgid "year"
+msgid_plural "years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:430
+msgid "month"
+msgid_plural "months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:431
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:432
+msgid "day"
+msgid_plural "days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:433
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:434
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:435
+msgid "second"
+msgid_plural "seconds"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/desktop/lib/django_util.py:456
+msgid "s"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:458
+msgid "seconds"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:464
+#, python-format
+msgid "%(number)d%(type)s"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:466
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:473
+#, python-format
+msgid "%(separator)s %(number)d%(type)s"
+msgstr ""
+
+#: src/desktop/lib/django_util.py:475
+#, python-format
+msgid "%(separator)s %(number)d %(type)s"
+msgstr ""
+
+#: src/desktop/templates/404.mako:20
+msgid "Not Found"
+msgstr ""
+
+#: src/desktop/templates/404.mako:23
+msgid "Page not found"
+msgstr ""
+
+#: src/desktop/templates/404.mako:24
+msgid "We're sorry, but the requested page could not be found:"
+msgstr ""
+
+#: src/desktop/templates/500.mako:20 src/desktop/templates/error.mako:21
+msgid "Error"
+msgstr ""
+
+#: src/desktop/templates/500.mako:23
+msgid "Server Error (500)"
+msgstr ""
+
+#: src/desktop/templates/500.mako:24
+msgid ""
+"Sorry, there's been an error. Please contact your site administrators. "
+"Thanks for your patience."
+msgstr ""
+
+#: src/desktop/templates/about_layout.mako:34
+msgid "Configuration"
+msgstr ""
+
+#: src/desktop/templates/about_layout.mako:35
+msgid "Check for misconfiguration"
+msgstr ""
+
+#: src/desktop/templates/about_layout.mako:36
+msgid "Server Logs"
+msgstr ""
+
+#: src/desktop/templates/check_config.mako:22
+#: src/desktop/templates/dump_config.mako:24 src/desktop/templates/logs.mako:24
+msgid "About"
+msgstr ""
+
+#: src/desktop/templates/check_config.mako:27
+#: src/desktop/templates/dump_config.mako:29
+msgid "Configuration files located in"
+msgstr ""
+
+#: src/desktop/templates/check_config.mako:30
+msgid "Potential misconfiguration detected. Please fix and restart HUE."
+msgstr ""
+
+#: src/desktop/templates/check_config.mako:47
+msgid "Current value:"
+msgstr ""
+
+#: src/desktop/templates/check_config.mako:55
+msgid "All ok. Configuration check passed!"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:91
+msgid "About Hue"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:98
+msgid "Profile"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:100
+msgid "Sign Out"
+msgstr ""
+
+#: src/desktop/templates/config_alert_dock.mako:20
+msgid "Misconfiguration detected"
+msgstr ""
+
+#: src/desktop/templates/dump_config.mako:32
+msgid "Installed applications"
+msgstr ""
+
+#: src/desktop/templates/dump_config.mako:39
+msgid "Configuration Sections and Variables"
+msgstr ""
+
+#: src/desktop/templates/dump_config.mako:82
+#: src/desktop/templates/dump_config.mako:94
+msgid "No help available."
+msgstr ""
+
+#: src/desktop/templates/dump_config.mako:95
+msgid "Default:"
+msgstr ""
+
+#: src/desktop/templates/error.mako:24 src/desktop/templates/login.mako:74
+msgid "Error!"
+msgstr ""
+
+#: src/desktop/templates/login.mako:56
+msgid "Username"
+msgstr ""
+
+#: src/desktop/templates/login.mako:59
+msgid "Password"
+msgstr ""
+
+#: src/desktop/templates/login.mako:64
+msgid "Sign up"
+msgstr ""
+
+#: src/desktop/templates/login.mako:66
+msgid "Sign in"
+msgstr ""
+
+#: src/desktop/templates/login.mako:74
+msgid "Invalid username or password."
+msgstr ""
+
+#: src/desktop/templates/login.mako:85
+msgid ""
+"Since this is your first time logging in, please pick any username and "
+"password. Be sure to remember these, as"
+msgstr ""
+
+#: src/desktop/templates/login.mako:86
+msgid "they will become your superuser credentials for Hue"
+msgstr ""
+
+#: src/desktop/templates/logs.mako:27
+msgid "Log entries (most recent first)"
+msgstr ""
+
+#: src/desktop/templates/logs.mako:29
+msgid "Download entire log as zip"
+msgstr ""
+
+#: src/desktop/templates/popup_error.mako:35
+msgid "Go back"
+msgstr ""
+

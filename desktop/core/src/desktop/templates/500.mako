@@ -15,12 +15,13 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
-${commonheader("Error", "")}
+${commonheader(_('Error'), "")}
 
   <div class="container-fluid">
-    <h1>Server Error (500)</h1>
-    <p>Sorry, there's been an error. Please contact your site administrators. Thanks for your patience.</p>
+    <h1>${_('Server Error (500)')}</h1>
+    <p>${_("Sorry, there's been an error. Please contact your site administrators. Thanks for your patience.")}</p>
   </div>
 
 ${commonfooter()}

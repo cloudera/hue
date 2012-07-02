@@ -13,9 +13,11 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-
+<%!
+from django.utils.translation import ugettext as _
+%>
 % if error_list:
-  <a href="${url('desktop.views.check_config')}" title="Misconfiguration detected" alt="Misconfiguration detected">
+  <a href="${url('desktop.views.check_config')}" title="${_('Misconfiguration detected')}" alt="${_('Misconfiguration detected')}">
     <img src="/static/art/error.png"/>
   </a>
 % endif
