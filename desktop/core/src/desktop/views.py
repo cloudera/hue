@@ -37,6 +37,8 @@ from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
 
+from django.utils.translation import ugettext as _
+
 LOG = logging.getLogger(__name__)
 
 @access_log_level(logging.WARN)
@@ -51,7 +53,7 @@ def log_view(request):
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
       return render('logs.mako', request, dict(log=[l for l in h.buf]))
 
-  return render('logs.mako', request, dict(log=["No logs found!"]))
+  return render('logs.mako', request, dict(log=[_("No logs found!")]))
 
 @access_log_level(logging.WARN)
 def download_log_view(request):
@@ -89,7 +91,7 @@ def download_log_view(request):
         logging.exception("Couldn't construct zip file to write logs to!")
         return log_view(request)
 
-  return render_to_response("logs.html", dict(log=["No logs found!"]))
+  return render_to_response("logs.mako", dict(log=[_("No logs found!")]))
 
 
 @access_log_level(logging.DEBUG)
@@ -166,7 +168,7 @@ def dump_config(request):
   conf_dir = os.path.realpath(get_desktop_root('conf'))
 
   if not request.user.is_superuser:
-    return HttpResponse("You must be a superuser.")
+    return HttpResponse(_("You must be a superuser."))
 
   if request.GET.get("private"):
     show_private = True
@@ -189,7 +191,7 @@ else:
 def threads(request):
   """Dumps out server threads.  Useful for debugging."""
   if not request.user.is_superuser:
-    return HttpResponse("You must be a superuser.")
+    return HttpResponse(_("You must be a superuser."))
 
   out = []
   for thread_id, stack in _threads():
@@ -333,7 +335,7 @@ def _get_config_errors(cache=True):
 def check_config(request):
   """Check config and view for the list of errors"""
   if not request.user.is_superuser:
-    return HttpResponse("You must be a superuser.")
+    return HttpResponse(_("You must be a superuser."))
   conf_dir = os.path.realpath(get_desktop_root('conf'))
   return render('check_config.mako', request, dict(
                     error_list=_get_config_errors(cache=False),

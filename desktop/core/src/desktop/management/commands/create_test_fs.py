@@ -19,6 +19,7 @@ from django.core.management.base import NoArgsCommand
 
 from desktop.lib.paths import get_build_dir
 from hadoop.fs import fs_for_testing
+from django.utils.translation import ugettext as _
 
 class Command(NoArgsCommand):
   """Creates file system for testing."""
@@ -27,4 +28,4 @@ class Command(NoArgsCommand):
     if not os.path.isdir(fs_dir):
       os.makedirs(fs_dir)
     fs_for_testing.create(fs_dir)
-    print "Created fs in: %s" % fs_dir
+    print _("Created fs in: %(dir)s") % {'dir': fs_dir}

@@ -22,9 +22,10 @@ import subprocess
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from desktop.lib import paths
+from django.utils.translation import ugettext as _
 
 class Command(BaseCommand):
-  help = """
+  help = _("""
   Runs pylint on desktop code.
 
   With no arguments, or with "all", this will run pylint on all
@@ -36,7 +37,7 @@ class Command(BaseCommand):
     python core/manage.py runpylint all -- -f parseable
     python core/manage.py runpylint filebrowser
     python core/manage.py runpylint
-  """
+  """)
 
   def handle(self, *args, **options):
     """Check the source code using PyLint."""
@@ -57,7 +58,7 @@ class Command(BaseCommand):
     pylint_args = [pylint_prog, "--rcfile=" + settings.PYLINTRC] + pylint_args
 
     if not os.path.exists(pylint_prog):
-      msg = "Cannot find pylint at '%s'. Please install pylint first." % (pylint_prog,)
+      msg = _("Cannot find pylint at '%(path)s'. Please install pylint first.") % {'path': pylint_prog}
       logging.error(msg)
       raise CommandError(msg)
 

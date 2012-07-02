@@ -29,15 +29,16 @@ import desktop.log
 from optparse import make_option
 from desktop.lib.paths import get_desktop_root
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
 class Command(BaseCommand):
   args = ''
-  help = 'Upgrades the Hue configuration with a mapping file.'
+  help = _('Upgrades the Hue configuration with a mapping file.')
 
   option_list = BaseCommand.option_list + (
-      make_option('--mapping_file', help='Location of the mapping file.'),
+      make_option('--mapping_file', help=_('Location of the mapping file.')),
   )
 
   """Upgrades a configuration."""
@@ -45,7 +46,7 @@ class Command(BaseCommand):
     required = ("mapping_file",)
     for r in required:
       if not options.get(r):
-        raise CommandError("--%s is required." % r)
+        raise CommandError(_("--%(param)s is required.") % {'param': r})
   
     # Pull out all the mappings  
     mapping_file = options["mapping_file"]
@@ -56,7 +57,7 @@ class Command(BaseCommand):
       map_parts = map_parts.rstrip('/')
       map_parts = map_parts.split('/')
       if len(map_parts) != 2:
-        raise CommandError("Invalid mapping %s in %s" % (mapping.strip(), mapping_file,))
+        raise CommandError(_("Invalid mapping %(mapping)s in %(file)s") % {'mapping': mapping.strip(), 'file': mapping_file})
       mappings.append(map_parts)
 
     config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))
