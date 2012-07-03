@@ -1,0 +1,94 @@
+# French translations for PROJECT.
+# Copyright (C) 2012 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-07-03 14:28-0700\n"
+"PO-Revision-Date: 2012-07-03 12:23-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/failed_to_create.mako:21
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/index.mako:22
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/index.mako:24
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/no_such_user.mako:21
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/not_running_spawning.mako:21
+msgid "Hue Shell"
+msgstr "Hue Shell"
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/failed_to_create.mako:24
+msgid ""
+"Failed to create a shell of the given type. The possible reasons for this"
+" are:"
+msgstr "Echec de la creation du terminal demande. Les raisons possibles sont:"
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/failed_to_create.mako:26
+msgid "The system is out of PTYs."
+msgstr "Le systeme n'a plus de PTYs disponible."
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/failed_to_create.mako:27
+msgid "The system cannot create more subprocesses."
+msgstr "Le systeme ne peut plus creer de processus."
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/failed_to_create.mako:28
+msgid "You do not have permission to create shells of this type."
+msgstr "Vous n'avez pas la permission de creer des terminaux de ce type."
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/failed_to_create.mako:29
+msgid "There is no shell with that name."
+msgstr "Il n'y a pas de terminal de ce nom."
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/failed_to_create.mako:30
+msgid "There is no Unix user account for you."
+msgstr "Votre compte Unix n'existe pas."
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/index.mako:111
+msgid "Please select one of the available shells from the toolbar above."
+msgstr ""
+"S'il vous plait veuillez selectionner un des terminaux disponibles \"\n"
+"\"depuis la bar de menus ci dessus."
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/index.mako:113
+msgid ""
+"You do not have permission to access any shell or there is no configured "
+"shell."
+msgstr ""
+"Vous n'avez pas la permission de creer des terminaux ou bien aucun d'eux "
+"n'est configure."
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/no_such_user.mako:24
+msgid ""
+"The Shell app requires a Unix user account for every user of Hue on the "
+"remote webserver."
+msgstr ""
+"L'application Shell necessite un compte Unix pour chaque utilisateur de "
+"Hue sur le server distant."
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/no_such_user.mako:26
+msgid ""
+"Please ask your admin to create a user account for you on the remote "
+"webserver as described in the Shell documentation."
+msgstr ""
+"S'il vous plait veuillez demander a votre administrateur de vous creer un"
+" compte sur le serveur distant comme descrit dans la documentation de "
+"Shell."
+
+#: /home/romain/projects/hue/apps/shell/src/shell/templates/not_running_spawning.mako:24
+#, fuzzy
+msgid ""
+"The webserver currently running Hue does not support the Shell app. "
+"Please contact your administrator."
+msgstr ""
+"Le serveur Web faisant tourner Hue ne supporte pas actuellement "
+"l'application Shell. S'il vous plait, veuillez contacter votre "
+"administrateur."
+
