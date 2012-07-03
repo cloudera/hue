@@ -41,10 +41,7 @@ ${layout.menubar(section='users', _=_)}
 
 <div class="container-fluid">
 	% if username:
-        <%
-            i18n_pageTitle = _('Hue Users - Edit user: %(username)s') % {'username': username}
-        %>
-		<h1>${i18n_pageTitle}</h1>
+		<h1>${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
 	% else:
 		% if ldap:
 			<h1>${_('Hue Users - Add/sync LDAP user')}</h1>
