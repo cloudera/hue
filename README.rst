@@ -192,3 +192,16 @@ time spent in that function, followed by the number of times the function was
 called, and then prints out the top 100 time-wasters.  For information on the
 other stats available, take a look at this website:
 http://docs.python.org/library/profile.html#pstats.Stats
+
+
+Internationalization
+====================
+
+How to update the messages:
+compile-locale rule in Makefile.sdk
+
+How to create a new locale for an app:
+LOCALE_ROOT = $APP_ROOT/src/$APP_NAME/locale
+./build/env/bin/pybabel init -D django -i $LOCALE_ROOT/en_US.pot -d $LOCALE_ROOT -l fr
+
+

@@ -17,10 +17,10 @@ ifeq ($(ROOT),)
   $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
 endif
 
-APP_NAME = hue-shell
+APP_NAME = shell
 include $(ROOT)/Makefile.sdk
 
-compile: setuid
+compile: setuid compile-locale
 
 clean:: remove_setuid
 

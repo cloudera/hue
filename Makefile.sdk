@@ -55,7 +55,8 @@ APP_NAME ?= $(SETUPTOOLS_NAME)
 APP_VERSION ?= $(shell $(ENV_PYTHON) setup.py --version)
 APP_FULL_NAME ?= $(APP_NAME)-$(APP_VERSION)
 RSYNC_OPT ?= --copy-unsafe-links -a
-
+PYBABEL := $(ROOT)/build/env/bin/pybabel
+LOCALE_ROOT := $(APP_ROOT)/src/$(APP_NAME)/locale
 
 BUILD_DIR := $(APP_ROOT)/build
 EGG_INFO_DIR := $(APP_ROOT)/src/$(SETUPTOOLS_NAME).egg-info
@@ -167,6 +168,12 @@ clean:: ext-clean
 
 .PHONY: distclean
 distclean:: clean
+
+.PHONY: compile-locale
+compile-locale:
+	$(PYBABEL) extract $(APP_ROOT) -F babel.cfg -o $(LOCALE_ROOT)/en_US.pot
+	$(PYBABEL) update -D django -i $(LOCALE_ROOT)/en_US.pot -d $(LOCALE_ROOT)
+	$(PYBABEL) compile -D django -d $(LOCALE_ROOT)
 
 
 #####################################
