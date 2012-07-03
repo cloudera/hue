@@ -40,10 +40,7 @@ ${layout.menubar(section='permissions', _=_)}
 </%def>
 
 <div class="container-fluid">
-    <%
-        i18n_pageTitle = _('Hue Permissions - Edit app: %(app)s') % {'app': app}
-    %>
-	<h1>${i18n_pageTitle}</h1>
+	<h1>${_('Hue Permissions - Edit app: %(app)s') % dict(app=app)}</h1>
 	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
 		<fieldset>
 			% for field in form:

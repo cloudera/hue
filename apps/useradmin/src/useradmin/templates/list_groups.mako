@@ -56,12 +56,8 @@ ${layout.menubar(section='groups', _=_)}
         <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
         %if user.is_superuser == True:
         <td class="right">
-          <%
-              i18n_editGroupname = _('Edit %(groupname)s') % {'groupname' : group.name}
-              i18n_deleteGroupname = _('Delete %(groupname)s') % {'groupname' : group.name}
-          %>
-          <a title="${i18n_editGroupname}" class="btn small editGroupBtn" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-row-selector="true">${_('Edit')}</a>
-          <a title="${i18n_deleteGroupname}" class="btn small confirmationModal" alt="Are you sure you want to delete ${group.name}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">${_('Delete')}</a>
+          <a title="${_('Edit %(groupname)s') % dict(groupname=group.name)}" class="btn small editGroupBtn" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-row-selector="true">${_('Edit')}</a>
+          <a title="${_('Delete %(groupname)s') % dict(groupname=group.name)}" class="btn small confirmationModal" alt="${ _('Are you sure you want to delete %(group_name)s?') % dict(group_name=group.name) }" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }">${_('Delete')}</a>
         </td>
         %endif
       </tr>

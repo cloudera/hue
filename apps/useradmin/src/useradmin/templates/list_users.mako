@@ -65,11 +65,11 @@ ${layout.menubar(section='users', _=_)}
                     i18n_deleteUsername = _('Delete %(username)s') % {'username': listed_user.username}
                 %>
                 %if user.is_superuser == True:
-                    <a title="${i18n_editUsername}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-row-selector="true">${_('Edit')}</a>
-                    <a title="${i18n_deleteUsername}" class="btn small confirmationModal" alt="Are you sure you want to delete ${listed_user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(listed_user.username)) }">${_('Delete')}</a>
+                    <a title="${_('Edit %(username)s') % dict(username=listed_user.username)}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-row-selector="true">${_('Edit')}</a>
+                    <a title="${_('Delete %(username)s') % dict(username=listed_user.username)}" class="btn small confirmationModal" alt="Are you sure you want to delete ${listed_user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(listed_user.username)) }">${_('Delete')}</a>
                 %else:
                     %if user.username == listed_user.username:
-                        <a title="${i18n_editUsername}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }">Edit</a>
+                        <a title="${_('Edit %(username)s') % dict(username=listed_user.username)}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }">Edit</a>
                     %else:
                         &nbsp;
                     %endif

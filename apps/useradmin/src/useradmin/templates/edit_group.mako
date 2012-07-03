@@ -44,10 +44,7 @@ ${layout.menubar(section='groups', _=_)}
 
 <div class="container-fluid">
 	% if name:
-        <%
-            i18n_pageTitle = _('Hue Groups - Edit group: %(name)s') % {'name': name}
-        %>
-		<h1>${i18n_pageTitle}</h1>
+		<h1>${_('Hue Groups - Edit group: %(name)s') % dict(name=name)}</h1>
 	% else:
 		% if ldap:
 			<h1>${_('Hue Groups - Add/sync LDAP group')}</h1>

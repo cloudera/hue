@@ -20,7 +20,7 @@ endif
 APP_NAME = shell
 include $(ROOT)/Makefile.sdk
 
-compile: setuid compile-locale
+compile: setuid
 
 clean:: remove_setuid
 
