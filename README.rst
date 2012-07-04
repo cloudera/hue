@@ -58,21 +58,22 @@ your system:
 
     Ubuntu:
       * ant
-      * asciidoc
       * gcc
       * g++
       * libkrb5-dev
       * libmysqlclient-dev
+      * libssl-dev
       * libsasl2-dev
       * libsasl2-modules-gssapi-mit
       * libsqlite3-dev
-      * libtidy (for unit tests only)
+      * libtidy-0.99-0 (for unit tests only)
       * libxml2-dev
       * libxslt-dev
       * mvn (from ``maven2`` package or tarball)
       * openldap-dev / libldap2-dev
       * python-dev
       * python-simplejson
+      * python-setuptools
 
     CentOS:
       * ant
