@@ -22,7 +22,7 @@
 %>
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(${_("Job Designer")}, "jobsub", "100px")}
+${commonheader(_("Job Designer"), "jobsub", "100px")}
 ${layout.menubar(section='history')}
 
 <%def name="format_time(st_time)">
