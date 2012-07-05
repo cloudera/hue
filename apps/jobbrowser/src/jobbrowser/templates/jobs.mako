@@ -35,7 +35,6 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
 <div class="well hueWell">
     <form action="/jobbrowser/jobs" method="GET">
         <b>${_('Filter jobs:')}</b>
-
                 <select name="state" class="submitter">
                     <option value="all" ${get_state('all', state_filter)}>${_('All States')}</option>
                     <option value="running" ${get_state('running', state_filter)}>${_('Running')}</option>
@@ -45,9 +44,7 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
                 </select>
 
                 <input type="text" name="user" title="${_('User Name Filter')}" value="${user_filter}" placeholder="${_('User Name Filter')}" class="submitter"/>
-
                 <input type="text" name="text" title="${_('Text Filter')}" value="${text_filter}" placeholder="${_('Text Filter')}" class="submitter"/>
-
     </form>
 </div>
 
@@ -58,7 +55,8 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
 <table class="datatables table table-striped table-condensed">
     <thead>
         <tr>
-            <th>${_('Name / Id')}</th>
+            <th>${_('Id')}</th>
+            <th>${_('Name')}</th>
             <th>${_('Status')}</th>
             <th>${_('User')}</th>
             <th>${_('Maps')}</th>
@@ -73,23 +71,58 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
     <tbody>
         % for job in jobs:
         <tr>
-            <td>${job.jobName}
+            <td>
                 <div class="jobbrowser_jobid_short">${job.jobId_short}</div>
             </td>
             <td>
-                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.status.lower())}">${job.status.lower()}</a>
+                ${job.jobName}
+            </td>
+            <td>
+                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.status.lower())}">
+                  ${job.status.lower()}
+                </a>
+                % if job.is_retired:
+                  </br>
+                  ${_('retired')}
+                % endif
             </td>
             <td>
                 <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'user', job.user.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.user.lower())}">${job.user}</a>
             </td>
-            <td><span alt="${job.maps_percent_complete}">${comps.mr_graph_maps(job)}</span></td>
-            <td><span alt="${job.reduces_percent_complete}">${comps.mr_graph_reduces(job)}</span></td>
+            <td>
+                <span alt="${job.maps_percent_complete}">
+                    % if job.is_retired:
+                        ${_('N/A')}
+                    % else:
+                    ${comps.mr_graph_maps(job)}
+                    % endif
+                 </span>
+            </td>
+            <td>
+                <span alt="${job.reduces_percent_complete}">
+                    % if job.is_retired:
+                        ${_('N/A')}
+                    % else:
+                        ${comps.mr_graph_reduces(job)}
+                    % endif
+                </span>
+            </td>
             <td>${job.queueName}</td>
             <td>${job.priority.lower()}</td>
-            <td><span alt="${job.finishTimeMs-job.startTimeMs}">${job.durationFormatted}</span></td>
+            <td>
+                <span alt="${job.finishTimeMs-job.startTimeMs}">
+                    % if job.is_retired:
+                        ${_('N/A')}
+                    % else:
+                        ${job.durationFormatted}
+                    % endif
+                </span>
+            </td>
             <td><span alt="${job.startTimeMs}">${job.startTimeFormatted}</span></td>
             <td>
+                % if not job.is_retired:
                 <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="${_('View this job')}" data-row-selector="true">${_('View')}</a>
+                % endif
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                 % if request.user.is_superuser or request.user.username == job.user:
                 - <a href="#" title="${_('Kill this job')}" onclick="$('#kill-job').submit()">${_('Kill')}</a>
@@ -126,7 +159,9 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             "bLengthChange": false,
             "bFilter": false,
             "bInfo": false,
+            "aaSorting": [[ 0, "desc" ]],
             "aoColumns": [
+                null,
                 null,
                 null,
                 null,
