@@ -18,6 +18,8 @@
 ## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and
 ## multiple spaces and line breaks cause issues
 <%!
+from django.utils.translation import ugettext as _
+
 def is_selected(section, matcher):
   if section == matcher:
     return "active"
@@ -25,7 +27,7 @@ def is_selected(section, matcher):
     return ""
 %>
 
-<%def name="menubar(section='', _=None)">
+<%def name="menubar(section='')">
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">
 			<ul class="nav nav-pills">
