@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 
 ${commonheader(_('Job Designer'), "jobsub", "100px")}
-${layout.menubar(section='history', _=_)}
+${layout.menubar(section='history')}
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 

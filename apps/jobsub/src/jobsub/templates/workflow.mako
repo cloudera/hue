@@ -18,10 +18,11 @@
 
   from desktop.views import commonheader, commonfooter
   from hadoop.fs.hadoopfs import Hdfs
+  from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader("Job Designer", "jobsub", "100px")}
+${commonheader(${_("Job Designer")}, "jobsub", "100px")}
 ${layout.menubar(section='history')}
 
 <%def name="format_time(st_time)">
@@ -51,8 +52,8 @@ ${layout.menubar(section='history')}
           <table class="table table-condensed table-striped">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Value</th>
+                <th>${_('Name')}</th>
+                <th>${_('Value')}</th>
               </tr>
             </thead>
             <tbody>
@@ -77,17 +78,17 @@ ${layout.menubar(section='history')}
 
 <div class="container-fluid">
     %if design_link is not None:
-    <h1><a title="Edit design" href="${design_link}">${workflow.appName}</a> (${workflow.id})</h1>
+    <h1><a title="${_('Edit design')}" href="${design_link}">${workflow.appName}</a> (${workflow.id})</h1>
     %else:
     <h1>${workflow.appName} (${workflow.id})</h1>
     %endif
 
     ## Tab headers
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#actions" data-toggle="tab">Actions</a></li>
-        <li><a href="#details" data-toggle="tab">Details</a></li>
-        <li><a href="#definition" data-toggle="tab">Definition</a></li>
-        <li><a href="#log" data-toggle="tab">Log</a></li>
+        <li class="active"><a href="#actions" data-toggle="tab">${_('Actions')}</a></li>
+        <li><a href="#details" data-toggle="tab">${_('Details')}</a></li>
+        <li><a href="#definition" data-toggle="tab">${_('Definition')}</a></li>
+        <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
     </ul>
 
     <div id="workflow-tab-content" class="tab-content">
@@ -96,19 +97,19 @@ ${layout.menubar(section='history')}
         <table data-filters="HtmlTable" class="table table-striped table-condensed selectable sortable" cellpadding="0" cellspacing="0">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>External Id</th>
+              <th>${_('Name')}</th>
+              <th>${_('Type')}</th>
+              <th>${_('Status')}</th>
+              <th>${_('External Id')}</th>
 
-              <th>Start Time</th>
-              <th>End Time</th>
+              <th>${_('Start Time')}</th>
+              <th>${_('End Time')}</th>
 
-              <th>Retries</th>
-              <th>Error Message</th>
-              <th>Transition</th>
+              <th>${_('Retries')}</th>
+              <th>${_('Error Message')}</th>
+              <th>${_('Transition')}</th>
 
-              <th>Data</th>
+              <th>${_('Data')}</th>
             </tr>
           </thead>
           <tbody>
@@ -146,7 +147,7 @@ ${layout.menubar(section='history')}
             <tbody>
               <tr>
                 ## App name + configuration
-                <td>Application Name</td>
+                <td>${_('Application Name')}</td>
                 <td>
                   ${workflow.appName}
                   <a href="#appConfigModal" data-toggle="modal"><img src="/static/art/led-icons/cog.png"
@@ -154,35 +155,35 @@ ${layout.menubar(section='history')}
                 </td>
               </tr>
               <tr>
-                <td>User</td>
+                <td>${_('User')}</td>
                 <td>${workflow.user}</td>
               </tr>
               <tr>
-                <td>Group</td>
+                <td>${_('Group')}</td>
                 <td>${workflow.group}</td>
               </tr>
               <tr>
-                <td>Status</td>
+                <td>${_('Status')}</td>
                 <td>${workflow.status}</td>
               </tr>
               <tr>
-                <td>External Id</td>
+                <td>${_('External Id')}</td>
                 <td>${workflow.externalId or "-"}</td>
               </tr>
               <tr>
-                <td>Start Time</td>
+                <td>${_('Start Time')}</td>
                 <td>${format_time(workflow.startTime)}</td>
               </tr>
               <tr>
-                <td>Created Time</td>
+                <td>${_('Created Time')}</td>
                 <td>${format_time(workflow.createdTime)}</td>
               </tr>
               <tr>
-                <td>End Time</td>
+                <td>${_('End Time')}</td>
                 <td>${format_time(workflow.endTime)}</td>
               </tr>
               <tr>
-                <td>Application Path</td>
+                <td>${_('Application Path')}</td>
                 <td>${hdfs_link(workflow.appPath)}
                 </td>
               </tr>
@@ -205,9 +206,4 @@ ${layout.menubar(section='history')}
 
 ${configModal("appConfigModal", "Application Configuration", workflow.conf_dict)}
 
-<script type="text/javascript" charset="utf-8">
-    $(document).ready(function() {
-
-    });
-</script>
 ${commonfooter()}
