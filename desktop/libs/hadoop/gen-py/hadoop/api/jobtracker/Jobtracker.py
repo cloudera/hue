@@ -75,6 +75,16 @@ class Iface(hadoop.api.common.HadoopServiceBase.Iface):
     """
     pass
 
+  def getRetiredJobs(self, ctx, state):
+    """
+    Get a list of retired jobs
+
+    Parameters:
+     - ctx
+     - state
+    """
+    pass
+
   def getFailedJobs(self, ctx):
     """
     Get a list of failed (due to error, not killed) jobs
@@ -461,6 +471,40 @@ class Client(hadoop.api.common.HadoopServiceBase.Client, Iface):
     if result.success is not None:
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getCompletedJobs failed: unknown result");
+
+  def getRetiredJobs(self, ctx, state):
+    """
+    Get a list of retired jobs
+
+    Parameters:
+     - ctx
+     - state
+    """
+    self.send_getRetiredJobs(ctx, state)
+    return self.recv_getRetiredJobs()
+
+  def send_getRetiredJobs(self, ctx, state):
+    self._oprot.writeMessageBegin('getRetiredJobs', TMessageType.CALL, self._seqid)
+    args = getRetiredJobs_args()
+    args.ctx = ctx
+    args.state = state
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_getRetiredJobs(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = getRetiredJobs_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "getRetiredJobs failed: unknown result");
 
   def getFailedJobs(self, ctx):
     """
@@ -1108,6 +1152,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     self._processMap["getJob"] = Processor.process_getJob
     self._processMap["getRunningJobs"] = Processor.process_getRunningJobs
     self._processMap["getCompletedJobs"] = Processor.process_getCompletedJobs
+    self._processMap["getRetiredJobs"] = Processor.process_getRetiredJobs
     self._processMap["getFailedJobs"] = Processor.process_getFailedJobs
     self._processMap["getKilledJobs"] = Processor.process_getKilledJobs
     self._processMap["getAllJobs"] = Processor.process_getAllJobs
@@ -1210,6 +1255,17 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getCompletedJobs_result()
     result.success = self._handler.getCompletedJobs(args.ctx)
     oprot.writeMessageBegin("getCompletedJobs", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_getRetiredJobs(self, seqid, iprot, oprot):
+    args = getRetiredJobs_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = getRetiredJobs_result()
+    result.success = self._handler.getRetiredJobs(args.ctx, args.state)
+    oprot.writeMessageBegin("getRetiredJobs", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -2250,6 +2306,147 @@ class getCompletedJobs_result(object):
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('getCompletedJobs_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class getRetiredJobs_args(object):
+  """
+  Attributes:
+   - ctx
+   - state
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.I32, 'state', None, None, ), # 1
+    None, # 2
+    None, # 3
+    None, # 4
+    None, # 5
+    None, # 6
+    None, # 7
+    None, # 8
+    None, # 9
+    (10, TType.STRUCT, 'ctx', (hadoop.api.common.ttypes.RequestContext, hadoop.api.common.ttypes.RequestContext.thrift_spec), None, ), # 10
+  )
+
+  def __init__(self, ctx=None, state=None,):
+    self.ctx = ctx
+    self.state = state
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 10:
+        if ftype == TType.STRUCT:
+          self.ctx = hadoop.api.common.ttypes.RequestContext()
+          self.ctx.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.I32:
+          self.state = iprot.readI32();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('getRetiredJobs_args')
+    if self.state is not None:
+      oprot.writeFieldBegin('state', TType.I32, 1)
+      oprot.writeI32(self.state)
+      oprot.writeFieldEnd()
+    if self.ctx is not None:
+      oprot.writeFieldBegin('ctx', TType.STRUCT, 10)
+      self.ctx.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class getRetiredJobs_result(object):
+  """
+  Attributes:
+   - success
+  """
+
+  thrift_spec = (
+    (0, TType.STRUCT, 'success', (ThriftJobList, ThriftJobList.thrift_spec), None, ), # 0
+  )
+
+  def __init__(self, success=None,):
+    self.success = success
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRUCT:
+          self.success = ThriftJobList()
+          self.success.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('getRetiredJobs_result')
     if self.success is not None:
       oprot.writeFieldBegin('success', TType.STRUCT, 0)
       self.success.write(oprot)

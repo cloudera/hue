@@ -169,9 +169,9 @@ struct ThriftTaskStatus {
 
   11: ThriftGroupList counters
 
-	12: i64 shuffleFinishTime,
-	13: i64 sortFinishTime,
-	14: i64 mapFinishTime,
+  12: i64 shuffleFinishTime,
+  13: i64 sortFinishTime,
+  14: i64 mapFinishTime,
 }
 
 /**
@@ -245,11 +245,11 @@ enum JobTrackerState {
 
 /** Enum version of the ints in JobStatus */
 enum ThriftJobState {
-		 RUNNING = 1,
-		 SUCCEEDED = 2,
-		 FAILED = 3,
-		 PREP = 4,
-		 KILLED = 5
+     RUNNING = 1,
+     SUCCEEDED = 2,
+     FAILED = 3,
+     PREP = 4,
+     KILLED = 5
 }
 
 /** Status of a job */
@@ -292,17 +292,17 @@ struct ThriftJobInProgress {
   1: ThriftJobProfile profile
   2: ThriftJobStatus status
   3: ThriftJobID jobID
-  4: i32 desiredMaps
-  5: i32 desiredReduces
-  6: i32 finishedMaps
-  7: i32 finishedReduces
-  8: ThriftJobPriority priority
+  4: i32 desiredMaps                     /* N/A for a Retired job */
+  5: i32 desiredReduces                  /* N/A for a Retired job */
+  6: i32 finishedMaps                    /* N/A for a Retired job */
+  7: i32 finishedReduces                 /* N/A for a Retired job */
+  8: ThriftJobPriority priority          /* N/A for a Retired job, but present in status field */
 
   11: i64 startTime
-  12: i64 finishTime
-  13: i64 launchTime
+  12: i64 finishTime                     /* N/A for a Retired job */
+  13: i64 launchTime                     /* N/A for a Retired job */
 
-  23: ThriftTaskInProgressList tasks
+  23: ThriftTaskInProgressList tasks     /* N/A for a Retired job */
 }
 
 /** Container structure of a list of jobs, in case we ever want to add metadata */
@@ -352,7 +352,7 @@ struct ThriftClusterStatus {
   18: string hostname
   19: string identifier
 
-	20: i32 httpPort
+  20: i32 httpPort
 }
 
 /** Merely an indicator that job wasn't found. */
@@ -373,40 +373,43 @@ exception TaskTrackerNotFoundException {
 
 /** A proxy service onto a Jobtracker, exposing read-only methods for cluster monitoring */
 service Jobtracker extends common.HadoopServiceBase {
-	/** Get the name of the tracker exporting this service */
-	string getJobTrackerName(10: common.RequestContext ctx),
+  /** Get the name of the tracker exporting this service */
+  string getJobTrackerName(10: common.RequestContext ctx),
 
-	/** Get the current cluster status */
-	ThriftClusterStatus getClusterStatus(10: common.RequestContext ctx),
+  /** Get the current cluster status */
+  ThriftClusterStatus getClusterStatus(10: common.RequestContext ctx),
 
-	/** Get a list of job queues managed by this tracker */
-	ThriftJobQueueList getQueues(10: common.RequestContext ctx)
-				 	   throws(1: common.IOException err),
+  /** Get a list of job queues managed by this tracker */
+  ThriftJobQueueList getQueues(10: common.RequestContext ctx)
+      throws(1: common.IOException err),
 
-	/** Get a job by ID */
-        ThriftJobInProgress getJob(10: common.RequestContext ctx, 1: ThriftJobID jobID)
-                                  throws(1: JobNotFoundException err),
+  /** Get a job by ID */
+  ThriftJobInProgress getJob(10: common.RequestContext ctx, 1: ThriftJobID jobID)
+      throws(1: JobNotFoundException err),
 
-	/** Get a list of currently running jobs */
-	ThriftJobList getRunningJobs(10: common.RequestContext ctx),
+  /** Get a list of currently running jobs */
+  ThriftJobList getRunningJobs(10: common.RequestContext ctx),
 
-	/** Get a list of completed jobs */
-	ThriftJobList getCompletedJobs(10: common.RequestContext ctx),
+  /** Get a list of completed jobs */
+  ThriftJobList getCompletedJobs(10: common.RequestContext ctx),
 
-	/** Get a list of failed (due to error, not killed) jobs */
-	ThriftJobList getFailedJobs(10: common.RequestContext ctx),
+  /** Get a list of retired jobs */
+  ThriftJobList getRetiredJobs(10: common.RequestContext ctx, 1: ThriftJobState state),
 
-	/** Get a list of killed jobs */
-	ThriftJobList getKilledJobs(10: common.RequestContext ctx),
+  /** Get a list of failed (due to error, not killed) jobs */
+  ThriftJobList getFailedJobs(10: common.RequestContext ctx),
 
-	/** Get a list of all failed, completed and running jobs (could be expensive!) */
-	ThriftJobList getAllJobs(10: common.RequestContext ctx),
+  /** Get a list of killed jobs */
+  ThriftJobList getKilledJobs(10: common.RequestContext ctx),
 
-        /** Get the count of jobs by status for a given user */
-        ThriftUserJobCounts getUserJobCounts(1: common.RequestContext ctx, 2: string user),
+  /** Get a list of all failed, completed and running jobs (could be expensive!) */
+  ThriftJobList getAllJobs(10: common.RequestContext ctx),
 
-        /** Get a (possibly incomplete) list of tasks */
-        ThriftTaskInProgressList getTaskList(
+  /** Get the count of jobs by status for a given user */
+  ThriftUserJobCounts getUserJobCounts(1: common.RequestContext ctx, 2: string user),
+
+  /** Get a (possibly incomplete) list of tasks */
+  ThriftTaskInProgressList getTaskList(
                                       1: common.RequestContext ctx,
                                       2: ThriftJobID jobID,
                                       3: set<ThriftTaskType> types,
@@ -415,55 +418,55 @@ service Jobtracker extends common.HadoopServiceBase {
                                       6: i32 count,
                                       7: i32 offset) throws(1: JobNotFoundException err),
 
-        /** Get details of a task */
-        ThriftTaskInProgress getTask(1: common.RequestContext ctx,
-                                     2: ThriftTaskID taskID)
-                        throws(1: JobNotFoundException jnf, 2: TaskNotFoundException tnf),
+  /** Get details of a task */
+  ThriftTaskInProgress getTask(1: common.RequestContext ctx,
+                               2: ThriftTaskID taskID)
+      throws(1: JobNotFoundException jnf, 2: TaskNotFoundException tnf),
 
-        /**
-         * Get a list of groups of counters attached to the job with provided id.
-         * This returns the total counters
-         **/
-        ThriftGroupList getJobCounters(10: common.RequestContext ctx,
-                                        1: ThriftJobID jobID)
-                                  throws(1: JobNotFoundException err),
-
-
-        /** Return job counters rolled up by map, reduce, and total */
-        ThriftJobCounterRollups getJobCounterRollups(10: common.RequestContext ctx,
-                                                     1: ThriftJobID jobID)
-                                  throws(1: JobNotFoundException err),
+  /**
+   * Get a list of groups of counters attached to the job with provided id.
+   * This returns the total counters
+   **/
+  ThriftGroupList getJobCounters(10: common.RequestContext ctx,
+                                 1: ThriftJobID jobID)
+      throws(1: JobNotFoundException err),
 
 
-	/** Get all active trackers */
-	ThriftTaskTrackerStatusList getActiveTrackers(10: common.RequestContext ctx),
+   /** Return job counters rolled up by map, reduce, and total */
+   ThriftJobCounterRollups getJobCounterRollups(10: common.RequestContext ctx,
+                                                1: ThriftJobID jobID)
+      throws(1: JobNotFoundException err),
 
-	/** Get all blacklisted trackers */
-	ThriftTaskTrackerStatusList getBlacklistedTrackers(10: common.RequestContext ctx),
 
-	/** Get all trackers */
-	ThriftTaskTrackerStatusList getAllTrackers(10: common.RequestContext ctx),
+  /** Get all active trackers */
+  ThriftTaskTrackerStatusList getActiveTrackers(10: common.RequestContext ctx),
 
-	/** Get a single task tracker by name */
-	ThriftTaskTrackerStatus getTracker(10: common.RequestContext ctx, 1: string name)
-	          throws(1: TaskTrackerNotFoundException tne),
+  /** Get all blacklisted trackers */
+  ThriftTaskTrackerStatusList getBlacklistedTrackers(10: common.RequestContext ctx),
+
+  /** Get all trackers */
+  ThriftTaskTrackerStatusList getAllTrackers(10: common.RequestContext ctx),
+
+  /** Get a single task tracker by name */
+  ThriftTaskTrackerStatus getTracker(10: common.RequestContext ctx, 1: string name)
+      throws(1: TaskTrackerNotFoundException tne),
 
   /** Get the current time in ms according to the JT */
   i64 getCurrentTime(10: common.RequestContext ctx),
 
   /** Get the xml for a job's configuration, serialised from the local filesystem on the JT */
   string getJobConfXML(10: common.RequestContext ctx, 1: ThriftJobID jobID)
-            throws(1: common.IOException err),
+      throws(1: common.IOException err),
 
   /** Kill a job */
   void killJob(10: common.RequestContext ctx, 1: ThriftJobID jobID)
-                             throws(1: common.IOException err, 2: JobNotFoundException jne),
+      throws(1: common.IOException err, 2: JobNotFoundException jne),
 
   /** Kill a task attempt */
   void killTaskAttempt(10: common.RequestContext ctx, 1: ThriftTaskAttemptID attemptID)
-                                   throws(1: common.IOException err,
-                                          2: TaskAttemptNotFoundException tne,
-                                          3: JobNotFoundException jne),
+      throws(1: common.IOException err,
+             2: TaskAttemptNotFoundException tne,
+             3: JobNotFoundException jne),
 
   /** Set a job's priority */
   void setJobPriority(10: common.RequestContext ctx,
@@ -472,7 +475,6 @@ service Jobtracker extends common.HadoopServiceBase {
       throws(1: common.IOException err, 2: JobNotFoundException jne),
 
   /** Get an MR delegation token. */
-  common.ThriftDelegationToken getDelegationToken(10:common.RequestContext ctx, 1:string renewer) throws(1: common.IOException err)
+  common.ThriftDelegationToken getDelegationToken(10:common.RequestContext ctx, 1:string renewer)
+      throws(1: common.IOException err)
 }
-
-

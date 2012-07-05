@@ -28,12 +28,12 @@ Compilation
 The compilation process creates a server org.apache.hadoop.thriftfs.HadooopThriftServer
 that implements the Thrift interface defined in if/hadoopfs.thrift.
 
-Th thrift compiler is used to generate API stubs in python, php, ruby,
+The thrift compiler is used to generate API stubs in python, php, ruby,
 cocoa, etc. The generated code is checked into the directories gen-*.
 The generated java API is checked into lib/hadoopthriftapi.jar.
 
 There is a sample python script hdfs.py in the scripts directory. This python 
 script, when invoked, creates a HadoopThriftServer in the background, and then
-communicates wth HDFS using the API. This script is for demonstration purposes
+communicates with HDFS using the API. This script is for demonstration purposes
 only.
 

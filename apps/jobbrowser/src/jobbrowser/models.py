@@ -106,10 +106,13 @@ class Job(JobLinkage):
     self._conf_keys = None
     self._full_job_conf = None
     self._init_attributes()
+    self.is_retired = hasattr(thriftJob, 'is_retired')
 
   @property
   def counters(self):
-    if self._counters is None:
+    if self.is_retired:
+      self._counters = {}
+    elif self._counters is None:
       rollups = self.jt.get_job_counter_rollups(self.job.jobID)
       # We get back a structure with counter lists for maps, reduces, and total
       # and we need to invert this
@@ -231,20 +234,24 @@ class Job(JobLinkage):
     return [ t for t in self.tasks if is_good_match(t) ]
 
   def _initialize_conf_keys(self):
-    conf_keys = [
-      'mapred.mapper.class',
-      'mapred.reducer.class',
-      'mapred.input.format.class',
-      'mapred.output.format.class',
-      'mapred.input.dir',
-      'mapred.output.dir',
-      ]
-    jobconf = get_jobconf(self.jt, self.jobId)
-    self._full_job_conf = jobconf
-    self._conf_keys = {}
-    for k, v in jobconf.iteritems():
-      if k in conf_keys:
-        self._conf_keys[dots_to_camel_case(k)] = v
+    if self.is_retired:
+      self._conf_keys = {}
+      self._full_job_conf = {}
+    else:
+      conf_keys = [
+        'mapred.mapper.class',
+        'mapred.reducer.class',
+        'mapred.input.format.class',
+        'mapred.output.format.class',
+        'mapred.input.dir',
+        'mapred.output.dir',
+        ]
+      jobconf = get_jobconf(self.jt, self.jobId)
+      self._full_job_conf = jobconf
+      self._conf_keys = {}
+      for k, v in jobconf.iteritems():
+        if k in conf_keys:
+          self._conf_keys[dots_to_camel_case(k)] = v
 
 
 class TaskList(object):
