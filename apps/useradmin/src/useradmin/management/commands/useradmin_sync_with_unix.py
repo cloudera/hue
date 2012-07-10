@@ -20,17 +20,19 @@ from useradmin.views import sync_unix_users_and_groups
 
 from django.core.management.base import BaseCommand
 
+from django.utils.translation import ugettext_lazy as _
+
 class Command(BaseCommand):
   """
   Handler for syncing the Hue database with Unix users and groups
   """
 
   option_list = BaseCommand.option_list + (
-      make_option("--min-uid", help="Minimum UID to import (Inclusive).", default=500),
-      make_option("--max-uid", help="Maximum UID to import (Exclusive).", default=65334),
-      make_option("--min-gid", help="Minimum GID to import (Inclusive).", default=500),
-      make_option("--max-gid", help="Maximum GID to import (Exclusive).", default=65334),
-      make_option("--check-shell", help="Whether or not to check that the user's shell is not /bin/false", default=True)
+      make_option("--min-uid", help=_("Minimum UID to import (Inclusive)."), default=500),
+      make_option("--max-uid", help=_("Maximum UID to import (Exclusive)."), default=65334),
+      make_option("--min-gid", help=_("Minimum GID to import (Inclusive)."), default=500),
+      make_option("--max-gid", help=_("Maximum GID to import (Exclusive)."), default=65334),
+      make_option("--check-shell", help=_("Whether or not to check that the user's shell is not /bin/false"), default=True)
   )
 
   def handle(self, *args, **options):

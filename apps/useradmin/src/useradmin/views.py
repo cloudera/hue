@@ -24,7 +24,6 @@ import logging
 import threading
 import subprocess
 
-import django
 import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User, Group
@@ -36,6 +35,8 @@ from django.shortcuts import redirect
 from useradmin.models import GroupPermission, HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
 import ldap_access
+
+from django.utils.translation import ugettext_lazy as _
 
 LOG = logging.getLogger(__name__)
 
@@ -53,14 +54,14 @@ def list_permissions(request):
 
 def delete_user(request, username):
   if not request.user.is_superuser:
-    raise PopupException("You must be a superuser to delete users.")
+    raise PopupException(_("You must be a superuser to delete users."))
   if request.method == 'POST':
     try:
       global __users_lock
       __users_lock.acquire()
       try:
         if username == request.user.username:
-          raise PopupException("You cannot remove yourself.")
+          raise PopupException(_("You cannot remove yourself."))
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
         user_profile.delete()
@@ -71,15 +72,15 @@ def delete_user(request, username):
       # Send a flash message saying "deleted"?
       return list_users(request)
     except User.DoesNotExist:
-      raise PopupException("User not found.")
+      raise PopupException(_("User not found."))
   else:
     return render("confirm.mako",
       request,
-      dict(path=request.path, title="Delete user?"))
+      dict(path=request.path, title=_("Delete user?")))
 
 def delete_group(request, name):
   if not request.user.is_superuser:
-    raise PopupException("You must be a superuser to delete groups.")
+    raise PopupException(_("You must be a superuser to delete groups."))
   if request.method == 'POST':
     try:
       global groups_lock
@@ -91,7 +92,7 @@ def delete_group(request, name):
         default_group = get_default_user_group()
         group = Group.objects.get(name=name)
         if default_group is not None and default_group.name == name:
-          raise PopupException("The default user group may not be deleted.")
+          raise PopupException(_("The default user group may not be deleted."))
         group.delete()
       finally:
         __groups_lock.release()
@@ -99,11 +100,11 @@ def delete_group(request, name):
       # Send a flash message saying "deleted"?
       return list_groups(request)
     except Group.DoesNotExist:
-      raise PopupException("Group not found.")
+      raise PopupException(_("Group not found."))
   else:
     return render("confirm.mako",
       request,
-      dict(path=request.path, title="Delete group?"))
+      dict(path=request.path, title=_("Delete group?")))
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   """
@@ -111,13 +112,13 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   and UserCreationForm.
   """
   username = forms.RegexField(
-      label="Username",
+      label=_("Username"),
       max_length=30,
       regex='^%s$' % (get_username_re_rule(),),
-      help_text = "Required. 30 characters or fewer. No whitespaces or colons.",
-      error_messages = {'invalid': "Whitespaces and ':' not allowed" })
-  password1 = forms.CharField(label="Password", widget=forms.PasswordInput, required=False)
-  password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput, required=False)
+      help_text = _("Required. 30 characters or fewer. No whitespaces or colons."),
+      error_messages = {'invalid': _("Whitespaces and ':' not allowed") })
+  password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput, required=False)
+  password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput, required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
     fields = ["username", "first_name", "last_name", "email"]
@@ -126,13 +127,13 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
     password1 = self.cleaned_data.get("password1", "")
     password2 = self.cleaned_data["password2"]
     if password1 != password2:
-      raise forms.ValidationError("Passwords do not match.")
+      raise forms.ValidationError(_("Passwords do not match."))
     return password2
 
   def clean_password1(self):
     password = self.cleaned_data.get("password1", "")
     if self.instance.id is None and password == "":
-      raise forms.ValidationError("You must specify a password when creating a new user.")
+      raise forms.ValidationError(_("You must specify a password when creating a new user."))
     return self.cleaned_data.get("password1", "")
 
   def save(self, commit=True):
@@ -174,7 +175,7 @@ def edit_user(request, username=None):
   @param username:      Default to None, when creating a new user
   """
   if request.user.username != username and not request.user.is_superuser:
-    raise PopupException("You must be a superuser to add or edit another user.")
+    raise PopupException(_("You must be a superuser to add or edit another user."))
   if username is not None:
     instance = User.objects.get(username=username)
   else:
@@ -198,7 +199,7 @@ def edit_user(request, username=None):
         # (3) The last active superuser cannot demote/inactivate himself.
         #
         if request.user.username == username and not form.instance.is_active:
-          raise PopupException("You cannot make yourself inactive.")
+          raise PopupException(_("You cannot make yourself inactive."))
 
         global __users_lock
         __users_lock.acquire()
@@ -210,7 +211,7 @@ def edit_user(request, username=None):
               _check_remove_last_super(orig)
           else:
             if form.instance.is_superuser and not request.user.is_superuser:
-              raise PopupException("You cannot make yourself a superuser.")
+              raise PopupException(_("You cannot make yourself a superuser."))
 
           # All ok
           form.save()
@@ -234,7 +235,7 @@ def edit_group(request, name=None):
   Only superusers may create a group
   """
   if not request.user.is_superuser:
-    raise PopupException("You must be a superuser to add or edit a group.")
+    raise PopupException(_("You must be a superuser to add or edit a group."))
 
   if name is not None:
     instance = Group.objects.get(name=name)
@@ -266,7 +267,7 @@ def edit_permission(request, app=None, priv=None):
   Only superusers may modify permissions
   """
   if not request.user.is_superuser:
-    raise PopupException("You must be a superuser to change permissions.")
+    raise PopupException(_("You must be a superuser to change permissions."))
 
   instance = HuePermission.objects.get(app=app, action=priv)
 
@@ -284,14 +285,14 @@ def edit_permission(request, app=None, priv=None):
 
 class AddLdapUserForm(forms.Form):
   username = forms.RegexField(
-      label="Username",
+      label=_("Username"),
       max_length=64,
       regex='^%s$' % (get_username_re_rule(),),
-      help_text="Required. 30 characters or fewer. No whitespaces or colons.",
-      error_messages={'invalid': "Whitespaces and ':' not allowed" })
-  dn = forms.BooleanField(label="Distinguished name",
-                          help_text="Whether or not the user should be imported by "
-                                    "distinguished name",
+      help_text=_("Required. 30 characters or fewer. No whitespaces or colons."),
+      error_messages={'invalid': _("Whitespaces and ':' not allowed")})
+  dn = forms.BooleanField(label=_("Distinguished name"),
+                          help_text=_("Whether or not the user should be imported by "
+                                    "distinguished name"),
                           initial=False,
                           required=False)
 
@@ -302,7 +303,7 @@ class AddLdapUserForm(forms.Form):
 
     if not dn:
       if username is not None and len(username) > 30:
-        msg = 'Too long: 30 characters or fewer and not %s' % (len(username),)
+        msg = _('Too long: 30 characters or fewer and not %(username)s') % dict(username=len(username),)
         errors = self._errors.setdefault('username', ErrorList())
         errors.append(msg)
         raise forms.ValidationError(msg)
@@ -319,7 +320,7 @@ def add_ldap_user(request):
   If the LDAP request failed, the error message is generic right now.
   """
   if not request.user.is_superuser:
-    raise PopupException("You must be a superuser to add another user.")
+    raise PopupException(_("You must be a superuser to add another user."))
 
   if request.method == 'POST':
     form = AddLdapUserForm(request.POST)
@@ -330,7 +331,7 @@ def add_ldap_user(request):
 
       if user is None:
         errors = form._errors.setdefault('username', ErrorList())
-        errors.append('Could not get LDAP details for user %s' % (username,))
+        errors.append(_('Could not get LDAP details for user %(username)s') % dict(username=(username,)))
       else:
         return redirect(reverse(list_users))
   else:
@@ -342,16 +343,16 @@ class AddLdapGroupForm(forms.Form):
       label="Name",
       max_length=64,
       regex='^%s$' % (get_groupname_re_rule(),),
-      help_text="Required. 30 characters or fewer. May only contain letters, "
-                "numbers, hypens or underscores.",
-      error_messages={'invalid': "Whitespaces and ':' not allowed" })
-  dn = forms.BooleanField(label="Distinguished name",
-                          help_text="Whether or not the group should be imported by "
-                                    "distinguished name",
+      help_text=_("Required. 30 characters or fewer. May only contain letters, "
+                "numbers, hypens or underscores."),
+      error_messages={'invalid': _("Whitespaces and ':' not allowed") })
+  dn = forms.BooleanField(label=_("Distinguished name"),
+                          help_text=_("Whether or not the group should be imported by "
+                                    "distinguished name"),
                           initial=False,
                           required=False)
-  import_members = forms.BooleanField(label='Import new members',
-                                      help_text='Import unimported or new users from the group',
+  import_members = forms.BooleanField(label=_('Import new members'),
+                                      help_text=_('Import unimported or new users from the group'),
                                       initial=False,
                                       required=False)
 
@@ -362,7 +363,7 @@ class AddLdapGroupForm(forms.Form):
 
     if not dn:
       if name is not None and len(name) > 30:
-        msg = 'Too long: 30 characters or fewer and not %s' % (len(name),)
+        msg = _('Too long: 30 characters or fewer and not %(name)s') % dict(name=(len(name),))
         errors = self._errors.setdefault('name', ErrorList())
         errors.append(msg)
         raise forms.ValidationError(msg)
@@ -380,7 +381,7 @@ def add_ldap_group(request):
   all unimported users.
   """
   if not request.user.is_superuser:
-    raise PopupException("You must be a superuser to add another group.")
+    raise PopupException(_("You must be a superuser to add another group."))
 
   if request.method == 'POST':
     form = AddLdapGroupForm(request.POST)
@@ -392,7 +393,7 @@ def add_ldap_group(request):
 
       if group is None:
         errors = form._errors.setdefault('name', ErrorList())
-        errors.append('Could not get LDAP details for group %s' % (groupname,))
+        errors.append(_('Could not get LDAP details for group %(groupname)s') % dict(groupname=(groupname,)))
       else:
         return redirect(reverse(list_groups))
   else:
@@ -408,13 +409,13 @@ def sync_ldap_users_groups(request):
   server's current state.
   """
   if not request.user.is_superuser:
-    raise PopupException("You must be a superuser to sync the LDAP users/groups.")
+    raise PopupException(_("You must be a superuser to sync the LDAP users/groups."))
 
   if request.method == 'POST':
     sync_ldap_users_and_groups()
     return redirect(reverse(list_users))
   else:
-    raise PopupException("POST request required in order to sync the LDAP users/groups.")
+    raise PopupException(_("POST request required in order to sync the LDAP users/groups."))
 
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
@@ -425,10 +426,10 @@ def _check_remove_last_super(user_obj):
   all_active_su = User.objects.filter(is_superuser__exact = True,
                                       is_active__exact = True)
   num_active_su = all_active_su.count()
-  assert num_active_su >= 1, "No active superuser configured"
+  assert num_active_su >= 1, _("No active superuser configured")
   if num_active_su == 1:
-    raise PopupException("You cannot remove the last active "
-                         "superuser from the configuration.")
+    raise PopupException(_("You cannot remove the last active "
+                         "superuser from the configuration."))
 
 def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   """
@@ -602,8 +603,8 @@ class GroupEditForm(forms.ModelForm):
     # Note that the superclass doesn't have a clean_name method.
     data = self.cleaned_data["name"]
     if not self.GROUPNAME.match(data):
-      raise forms.ValidationError("Group name may only contain letters, " +
-                                  "numbers, hypens or underscores.")
+      raise forms.ValidationError(_("Group name may only contain letters, " +
+                                  "numbers, hypens or underscores."))
     return data
 
   def __init__(self, *args, **kwargs):

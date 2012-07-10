@@ -59,6 +59,8 @@ from enum import Enum
 
 import useradmin.conf
 
+from django.utils.translation import ugettext_lazy as _
+
 LOG = logging.getLogger(__name__)
 
 class UserProfile(models.Model):
@@ -119,7 +121,7 @@ class UserProfile(models.Model):
     if self.has_hue_permission(perm):
       return
     else:
-      raise PopupException("You do not have permissions to %s." % perm.description)
+      raise PopupException(_("You do not have permissions to %(description)s.") % dict(description=perm.description))
 
 def get_profile(user):
   """

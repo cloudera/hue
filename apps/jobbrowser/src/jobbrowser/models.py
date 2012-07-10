@@ -27,6 +27,8 @@ import lxml.html
 import re
 import urllib2
 
+from django.utils.translation import ugettext as _
+
 import hadoop.api.jobtracker.ttypes as ttypes
 
 from django.utils.translation import ugettext as _
@@ -76,7 +78,7 @@ class Job(JobLinkage):
     """
     thriftjob = jt.get_job(jt.thriftjobid_from_string(jobid))
     if not thriftjob:
-      raise Exception(_("Could not find job with id %(id)s") % dict(id=jobid))
+      raise Exception(_("could not find job with id %(jobid)s") % {'jobid': jobid})
     return Job(jt, thriftjob)
 
   @staticmethod
@@ -399,7 +401,7 @@ class TaskAttempt(object):
         for t in all_trackers.trackers:
           LOGGER.debug("Available tracker: %s" % (t.trackerName,))
       raise ttypes.TaskTrackerNotFoundException(
-                          _("Cannot lookup TaskTracker '%(id)s'") % dict(id=self.taskTrackerId))
+                          _("Cannot lookup TaskTracker %(id)s") % {'id': self.taskTrackerId})
 
   def get_task_log(self):
     """
@@ -423,14 +425,14 @@ class TaskAttempt(object):
     try:
       data = urllib2.urlopen(url)
     except urllib2.URLError:
-      raise urllib2.URLError(_("Cannot retrieve logs from TaskTracker '%(id)s'") % dict(id=self.taskTrackerId))
+      raise urllib2.URLError(_("Cannot retrieve logs from TaskTracker %(id)s") % {'id': self.taskTrackerId})
 
     et = lxml.html.parse(data)
     log_sections = et.findall('body/pre')
     if len(log_sections) != 3:
       LOGGER.warn('Error parsing task attempt log for %s at "%s". Found %d (not 3) log sections' %
                   (self.attemptId, url, len(log_sections)))
-      err = _("Hue encountered an error while retrieving logs from '%(url)s'") % dict(url=url)
+      err = _("Hue encountered an error while retrieving logs from '%s'") % (url,)
       return (err, err, err)
     return [ section.text for section in log_sections ]
 
