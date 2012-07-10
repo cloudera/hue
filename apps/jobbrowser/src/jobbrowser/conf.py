@@ -17,11 +17,11 @@
 """Configuration for the job browser application"""
 
 from desktop.lib.conf import Config, coerce_bool
-
+from django.utils.translation import ugettext_lazy as _
 
 SHARE_JOBS = Config(
   key='share_jobs',
   default=True,
   type=coerce_bool,
-  help='Share submitted jobs information with all users. If set to false, '
-       'submitted jobs are visible only to the owner and administrators.')
+  help=_('Share submitted jobs information with all users. If set to false, '
+       'submitted jobs are visible only to the owner and administrators.'))

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-02 22:40+0200\n"
+"POT-Creation-Date: 2012-07-10 14:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,64 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: src/jobbrowser/conf.py:26
+msgid ""
+"Share submitted jobs information with all users. If set to false, "
+"submitted jobs are visible only to the owner and administrators."
+msgstr ""
+
+#: src/jobbrowser/models.py:79
+#, python-format
+msgid "could not find job with id %(id)s"
+msgstr ""
+
+#: src/jobbrowser/models.py:402
+#, python-format
+msgid "Cannot lookup TaskTracker '%(id)s'"
+msgstr ""
+
+#: src/jobbrowser/models.py:426
+#, python-format
+msgid "Cannot retrieve logs from TaskTracker '%(id)s'"
+msgstr ""
+
+#: src/jobbrowser/models.py:433
+#, python-format
+msgid "Hue encountered an error while retrieving logs from '%(url)s'"
+msgstr ""
+
+#: src/jobbrowser/views.py:60
+#, python-format
+msgid "You don't have the permissions to access job %(id)s"
+msgstr ""
+
+#: src/jobbrowser/views.py:131
+#, python-format
+msgid "kill_job may only be invoked with a POST (got a %(method)s)"
+msgstr ""
+
+#: src/jobbrowser/views.py:134
+msgid "Insufficient permission"
+msgstr ""
+
+#: src/jobbrowser/views.py:135
+#, python-format
+msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
+msgstr ""
+
+#: src/jobbrowser/views.py:151
+msgid "Job did not appear as killed within 15 seconds"
+msgstr ""
+
+#: src/jobbrowser/views.py:229
+#, python-format
+msgid "Cannot find attempt '%(id)s' in task"
+msgstr ""
+
+#: src/jobbrowser/views.py:240
+msgid "Failed to retrieve log. TaskTracker not found."
+msgstr ""
 
 #: src/jobbrowser/templates/attempt.mako:22
 #: src/jobbrowser/templates/attempt.mako:24
@@ -558,5 +616,9 @@ msgstr ""
 
 #: src/jobbrowser/templates/tasktrackers.mako:35
 msgid "Max Reduce Tasks"
+msgstr ""
+
+#: src/jobbrowser/templatetags/unix_ms_to_datetime.py:29
+msgid "No time"
 msgstr ""
 

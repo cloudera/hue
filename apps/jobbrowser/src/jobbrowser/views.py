@@ -39,6 +39,8 @@ from hadoop.api.jobtracker.ttypes import TaskTrackerNotFoundException
 from jobbrowser import conf
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker, Cluster
 
+from django.utils.translation import ugettext as _
+
 ##################################
 ## View end-points
 
@@ -55,8 +57,8 @@ def check_job_permission(view_func):
     job = Job.from_id(jt=request.jt, jobid=jobid)
     if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
       and job.user != request.user.username:
-      raise PopupException("You don't have the permissions to access"
-                             " job %s" % jobid)
+      raise PopupException(_("You don't have the permissions to access"
+                             " job %(id)s") % dict(id=jobid))
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
 
@@ -126,12 +128,12 @@ def kill_job(request, jobid):
   We get here from /jobs/jobid/kill
   """
   if request.method != "POST":
-    raise Exception("kill_job may only be invoked with a POST (got a %s)" % request.method)
+    raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s)") % dict(method=request.method))
   job = Job.from_id(jt=request.jt, jobid=jobid)
   if job.user != request.user.username and not request.user.is_superuser:
-    access_warn(request, 'Insufficient permission')
-    raise MessageException("Permission denied.  User %s cannot delete user %s's job." %
-                           (request.user.username, job.user))
+    access_warn(request, _('Insufficient permission'))
+    raise MessageException(_("Permission denied.  User %(username)s cannot delete user %(user)s's job.") %
+                           dict(username=request.user.username, user=job.user))
 
   job.kill()
   cur_time = time.time()
@@ -146,7 +148,7 @@ def kill_job(request, jobid):
     time.sleep(1)
     job = Job.from_id(jt=request.jt, jobid=jobid)
 
-  raise Exception("Job did not appear as killed within 15 seconds")
+  raise Exception(_("Job did not appear as killed within 15 seconds"))
 
 @check_job_permission
 def tasks(request, jobid):
@@ -224,7 +226,7 @@ def single_task_attempt(request, jobid, taskid, attemptid):
   try:
     attempt = task.get_attempt(attemptid)
   except KeyError:
-    raise KeyError("Cannot find attempt '%s' in task" % (attemptid,))
+    raise KeyError(_("Cannot find attempt '%(id)s' in task") % dict(id=attemptid))
 
   try:
     # Add a diagnostic log
@@ -235,7 +237,7 @@ def single_task_attempt(request, jobid, taskid, attemptid):
   except TaskTrackerNotFoundException:
     # Four entries,
     # for diagnostic, stdout, stderr and syslog
-    logs = [ "Failed to retrieve log. TaskTracker not found." ] * 4
+    logs = [ _("Failed to retrieve log. TaskTracker not found.") ] * 4
   return render("attempt.mako", request,
     {
       "attempt":attempt,
