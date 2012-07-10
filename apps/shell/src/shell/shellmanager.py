@@ -43,6 +43,8 @@ from hadoop.cluster import all_mrclusters, get_all_hdfs, \
 
 from desktop.conf import KERBEROS
 
+from django.utils.translation import ugettext as _
+
 LOG = logging.getLogger(__name__)
 SHELL_OUTPUT_LOGGER = logging.getLogger("shell_output")
 SHELL_INPUT_LOGGER = logging.getLogger("shell_input")
@@ -142,7 +144,7 @@ class Shell(object):
     retcode = merge_process.wait()
     if retcode != 0:
       LOG.error("Failed to merge credentials :'%s'..." % (merge_process.stderr.readline(),))
-      raise MergeToolException("bin/hadoop return non-zero %d while trying to merge credentials" % (retcode,))
+      raise MergeToolException(_("bin/hadoop return non-zero %(retcode)d while trying to merge credentials") % dict(retcode=(retcode,)))
     return merged_token_file
 
   def _get_delegation_tokens(self, username, delegation_token_dir):
