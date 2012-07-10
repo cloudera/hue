@@ -496,24 +496,34 @@ table.display td.center {
  * DataTables sorting
  */
 
+.dataTables_wrapper table {
+    border-collapse: separate;
+    *border-collapse: collapsed;
+}
+
 .sorting_asc {
-    background: url('../art/datatables/sort_asc.png') no-repeat center right;
+    cursor: pointer;
+    background: url('../art/datatables/sort_asc.png') no-repeat center left;
+    border-bottom: 3px solid #EEEEEE!important;
+    padding-left: 20px!important;
 }
 
 .sorting_desc {
-    background: url('../art/datatables/sort_desc.png') no-repeat center right;
+    cursor: pointer;
+    background: url('../art/datatables/sort_desc.png') no-repeat center left;
+    border-bottom: 3px solid #EEEEEE!important;
+    padding-left: 20px!important;
 }
 
 .sorting {
-    background: url('../art/datatables/sort_both.png') no-repeat center right;
+    cursor: pointer;
+    background: url('../art/datatables/sort_both.png') no-repeat center left;
+    border-bottom: 3px solid #FFFFFF!important;
+    padding-left: 20px!important;
 }
 
-.sorting_asc_disabled {
-    background: url('../art/datatables/sort_asc_disabled.png') no-repeat center right;
-}
-
-.sorting_desc_disabled {
-    background: url('../art/datatables/sort_desc_disabled.png') no-repeat center right;
+.sorting:hover {
+    border-bottom: 3px solid #EEEEEE!important;
 }
 
 
