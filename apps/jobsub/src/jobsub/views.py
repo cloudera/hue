@@ -45,6 +45,7 @@ from jobsub.management.commands import jobsub_setup
 from jobsub.oozie_lib.oozie_api import get_oozie
 import jobsub.forms
 
+from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
@@ -54,13 +55,13 @@ def oozie_job(request, jobid):
   try:
     workflow = get_oozie().get_job(jobid)
     _check_permission(request, workflow.user,
-                      "Access denied: view job %s" % (jobid,),
+                      _("Access denied: view job %(id)s") % {'id': jobid},
                       allow_root=True)
     # Accessing log and definition will trigger Oozie API calls
     log = workflow.log
     definition = workflow.definition
   except RestException, ex:
-    raise PopupException("Error accessing Oozie job %s" % (jobid,),
+    raise PopupException(_("Error accessing Oozie job %(id)s") % {'id': jobid},
                          detail=ex.message)
 
   # Cross reference the submission history (if any)
@@ -173,7 +174,7 @@ def _check_permission(request, owner_name, error_msg, allow_root=False):
     if allow_root and request.user.is_superuser:
       return
     access_warn(request, error_msg)
-    raise PopupException("Permission denied. You are not the owner.")
+    raise PopupException(_("Permission denied. You are not the owner."))
 
 
 def delete_design(request, design_id):
@@ -181,7 +182,7 @@ def delete_design(request, design_id):
     try:
       design_obj = _get_design(design_id)
       _check_permission(request, design_obj.owner.username,
-                        "Access denied: delete design %s" % (design_id,),
+                        _("Access denied: delete design %(id)s") % {'id': design_id},
                         allow_root=True)
       design_obj.root_action.delete()
       design_obj.delete()
@@ -189,7 +190,7 @@ def delete_design(request, design_id):
       submit.Submission(design_obj, request.fs).remove_deployment_dir()
     except models.OozieDesign.DoesNotExist:
       LOG.error("Trying to delete non-existent design (id %s)" % (design_id,))
-      raise PopupException("Workflow not found")
+      raise PopupException(_("Workflow not found"))
 
   return redirect(urlresolvers.reverse(list_designs))
 
@@ -197,7 +198,7 @@ def delete_design(request, design_id):
 def edit_design(request, design_id):
   design_obj = _get_design(design_id)
   _check_permission(request, design_obj.owner.username,
-                    "Access denied: edit design %s" % (design_id,))
+                    _("Access denied: edit design %(id)s") % {'id': design_id})
 
   if request.method == 'POST':
     form = jobsub.forms.design_form_by_instance(design_obj, request.POST)
@@ -228,7 +229,7 @@ def get_design_params(request, design_id):
   """
   design_obj = _get_design(design_id)
   _check_permission(request, design_obj.owner.username,
-                    "Access denied: design parameters %s" % (design_id,))
+                    _("Access denied: design parameters %(id)s") % {'id': design_id})
   params = design_obj.find_parameters()
   params_with_labels = dict((p, p.upper()) for p in params)
   return render('dont_care_for_ajax', request, { 'params': params_with_labels })
@@ -240,11 +241,11 @@ def submit_design(request, design_id):
   The POST data should contain parameter values.
   """
   if request.method != 'POST':
-    raise PopupException('Please use a POST request to submit a design.')
+    raise PopupException(_('Please use a POST request to submit a design.'))
 
   design_obj = _get_design(design_id)
   _check_permission(request, design_obj.owner.username,
-                    "Access denied: submit design %s" % (design_id,))
+                    _("Access denied: submit design %(id)s") % {'id': design_id})
 
   # Expect the parameter mapping in the POST data
   param_mapping = request.POST
@@ -254,7 +255,7 @@ def submit_design(request, design_id):
     submission = submit.Submission(design_obj, request.fs)
     jobid = submission.run()
   except RestException, ex:
-    raise PopupException("Error submitting design %s" % (design_id,),
+    raise PopupException(_("Error submitting design %(id)s") % {'id': design_id},
                          detail=ex.message)
   # Save the submission record
   job_record = models.JobHistory(owner=request.user,
@@ -269,12 +270,12 @@ def submit_design(request, design_id):
 def setup(request):
   """Installs jobsub examples."""
   if request.method != "POST":
-    raise PopupException('Please use a POST request to install the examples.')
+    raise PopupException(_('Please use a POST request to install the examples.'))
   try:
     # Warning: below will modify fs.user
     jobsub_setup.Command().handle_noargs()
   except WebHdfsException, e:
-    raise PopupException('The examples could not be installed.', detail=e)
+    raise PopupException(_('The examples could not be installed.'), detail=e)
   return redirect(urlresolvers.reverse(list_designs))
 
 

@@ -34,6 +34,8 @@ import hadoop.conf
 import jobsub.conf
 from jobsub.submit import Submission
 
+from django.utils.translation import ugettext as _
+
 LOG = logging.getLogger(__name__)
 
 
@@ -85,10 +87,10 @@ class Command(NoArgsCommand):
         key = example.object.pk
         sample_oozie_abstract_actions[key] = example
       else:
-        raise Exception("Unexpected fixture type.")
+        raise Exception(_("Unexpected fixture type."))
 
     if sample_user is None:
-      raise Exception("Expected sample user fixture.")
+      raise Exception(_("Expected sample user fixture."))
     # Create the sample user if it doesn't exist
     try:
       sample_user.object = User.objects.get(username=sample_user.object.username)

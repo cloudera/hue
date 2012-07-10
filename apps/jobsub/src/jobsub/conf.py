@@ -20,33 +20,34 @@ import os.path
 
 from desktop.lib.conf import Config, coerce_bool
 from desktop.lib import paths
+from django.utils.translation import ugettext_lazy as _
 
 REMOTE_DATA_DIR = Config(
   key="remote_data_dir",
   default="/user/hue/jobsub",
-  help="Location on HDFS where the jobsub examples and templates are stored.")
+  help=_("Location on HDFS where the jobsub examples and templates are stored."))
 
 # Where examples and templates are stored.
 LOCAL_DATA_DIR = Config(
   key="local_data_dir",
   default=os.path.join(os.path.dirname(__file__), "..", "..", "data"),
-  help="Location on local FS where examples and template are stored",
+  help=_("Location on local FS where examples and template are stored"),
   private=True)
 
 SAMPLE_DATA_DIR = Config(
   key="sample_data_dir",
   default=paths.get_thirdparty_root("sample_data"),
-  help="Location on local FS where sample data is stored",
+  help=_("Location on local FS where sample data is stored"),
   private=True)
 
 OOZIE_URL = Config(
   key='oozie_url',
-  help='URL to Oozie server. This is required for job submission.',
+  help=_('URL to Oozie server. This is required for job submission.'),
   default='http://localhost:11000/oozie',
   type=str)
 
 SECURITY_ENABLED = Config(
   key="security_enabled",
-  help="Whether Oozie requires client to do perform Kerberos authentication",
+  help=_("Whether Oozie requires client to do perform Kerberos authentication"),
   default=False,
   type=coerce_bool)

@@ -30,6 +30,8 @@ from hadoop.fs.hadoopfs import Hdfs
 from jobsub import conf, models
 from jobsub.oozie_lib.oozie_api import get_oozie
 
+from django.utils.translation import ugettext as _
+
 LOG = logging.getLogger(__name__)
 
 
@@ -43,8 +45,8 @@ class Submission(object):
     self._job_id = None       # The oozie workflow instance id
 
   def __unicode__(self):
-    res = "Submission for job design '%s' (id %s, owner %s)" % \
-        (self._design_obj.name, self._design_obj.id, self._username)
+    res = _("Submission for job design '%(name)s' (id %(id)s, owner %(username)s)") % \
+        dict(name=self._design_obj.name, id=self._design_obj.id, username=self._username)
     if self.job_id:
       res += " -- " + self.job_id
     return res
@@ -67,7 +69,7 @@ class Submission(object):
     Returns the oozie job id if all goes well.
     """
     if self.job_id is not None:
-      raise Exception("Job design already submitted (Oozie job id %s)" % (self.job_id,))
+      raise Exception(_("Job design already submitted (Oozie job id %(id)s)") % dict(id=(self.job_id,)))
 
     fs_defaultfs = self._fs.fs_defaultfs
     jobtracker = hadoop.cluster.get_cluster_addr_for_job_submission()
@@ -76,7 +78,7 @@ class Submission(object):
       wf_dir = self._get_and_create_deployment_dir()
     except Exception, ex:
       LOG.exception("Failed to access deployment directory")
-      raise PopupException(message="Failed to access deployment directory",
+      raise PopupException(message=_("Failed to access deployment directory"),
                            detail=str(ex))
 
     wf_xml = self._generate_workflow_xml(fs_defaultfs)
@@ -205,8 +207,8 @@ class Submission(object):
   def _get_deployment_dir(self):
     """Return the workflow deployment directory"""
     if self._fs is None:
-      raise PopupException("Failed to obtain HDFS reference. "
-                           "Please check your configuration.")
+      raise PopupException(_("Failed to obtain HDFS reference. "
+                           "Please check your configuration."))
 
     # We could have collision with usernames. But there's no good separator.
     # Hope people don't create crazy usernames.

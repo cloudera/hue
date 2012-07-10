@@ -26,6 +26,8 @@ from django.core import urlresolvers
 from django.contrib.auth.models import User
 from jobsub.parameterization import find_parameters, bind_parameters
 
+from django.utils.translation import ugettext_lazy as _
+
 LOG = logging.getLogger(__name__)
 
 
@@ -123,7 +125,7 @@ class OozieDesign(models.Model):
   # Generic stuff
   owner = models.ForeignKey(User)
   name = models.CharField(max_length=64, blank=False,
-      help_text='Name of the design, which must be unique per user')
+      help_text=_('Name of the design, which must be unique per user'))
   description = models.CharField(max_length=1024, blank=True)
   last_modified = models.DateTimeField(auto_now=True)
 
@@ -179,14 +181,14 @@ class OozieMapreduceAction(OozieAction):
 
   # For the distributed cache. JSON arrays.
   files = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text='List of paths to files to be added to the distributed cache')
+      help_text=_('List of paths to files to be added to the distributed cache'))
   archives = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text='List of paths to archives to be added to the distributed cache')
+      help_text=_('List of paths to archives to be added to the distributed cache'))
   # For the job configuration. JSON dict. Required (e.g. mapred.mapper.class).
   job_properties = models.CharField(max_length=32768, default="[]")
   # Location of the jar in hdfs
   jar_path = models.CharField(max_length=PATH_MAX,
-      help_text='Path to jar files on HDFS')
+      help_text=_('Path to jar files on HDFS'))
 
 
 class OozieStreamingAction(OozieAction):
@@ -220,9 +222,9 @@ class OozieJavaAction(OozieAction):
 
   # For the distributed cache. JSON arrays.
   files = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text='List of paths to files to be added to the distributed cache')
+      help_text=_('List of paths to files to be added to the distributed cache'))
   archives = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text='List of paths to archives to be added to the distributed cache')
+      help_text=_('List of paths to archives to be added to the distributed cache'))
   # Location of the jar in hdfs
   jar_path = models.CharField(max_length=PATH_MAX, blank=False)
   main_class = models.CharField(max_length=256, blank=False)
