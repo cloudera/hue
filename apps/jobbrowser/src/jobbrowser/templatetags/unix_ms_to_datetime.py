@@ -17,6 +17,7 @@
 
 import datetime
 import django
+from django.utils.translation import ugettext as _
 
 register = django.template.Library()
 
@@ -25,7 +26,7 @@ def unix_ms_to_datetime(unixtime):
   """unixtime is seconds since the epoch"""
   if unixtime:
     return datetime.datetime.fromtimestamp(unixtime/1000)
-  return "No time"
+  return _("No time")
 unix_ms_to_datetime.is_safe = True
 
 
