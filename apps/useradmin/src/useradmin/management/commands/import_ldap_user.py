@@ -20,6 +20,8 @@ from useradmin.views import import_ldap_user
 
 from django.core.management.base import BaseCommand, CommandError
 
+from django.utils.translation import ugettext_lazy as _
+
 class Command(BaseCommand):
   """
   Handler for importing LDAP users into the Hue database.
@@ -28,8 +30,8 @@ class Command(BaseCommand):
   """
 
   option_list = BaseCommand.option_list + (
-      make_option("--dn", help="Whether or not the user should be imported by "
-                               "distinguished name",
+      make_option("--dn", help=_("Whether or not the user should be imported by "
+                               "distinguished name"),
                           action="store_true",
                           default=False),
   )
@@ -38,7 +40,7 @@ class Command(BaseCommand):
 
   def handle(self, user=None, **options):
     if user is None:
-      raise CommandError("A username must be provided")
+      raise CommandError(_("A username must be provided"))
 
     import_by_dn = options['dn']
     import_ldap_user(user, import_by_dn)

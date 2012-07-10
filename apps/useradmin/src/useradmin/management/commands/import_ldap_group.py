@@ -20,6 +20,8 @@ from useradmin.views import import_ldap_group
 
 from django.core.management.base import BaseCommand, CommandError
 
+from django.utils.translation import ugettext_lazy as _
+
 class Command(BaseCommand):
   """
   Handler for importing LDAP groups into the Hue database.
@@ -30,11 +32,11 @@ class Command(BaseCommand):
   """
 
   option_list = BaseCommand.option_list + (
-      make_option("--dn", help="Whether or not the user should be imported by "
-                               "distinguished name",
+      make_option("--dn", help=_("Whether or not the user should be imported by "
+                               "distinguished name"),
                           action="store_true",
                           default=False),
-      make_option("--import-members", help="Import users from the group",
+      make_option("--import-members", help=_("Import users from the group"),
                                       action="store_true",
                                       default=False),
    )
@@ -43,7 +45,7 @@ class Command(BaseCommand):
 
   def handle(self, group=None, **options):
     if group is None:
-      raise CommandError("A group name must be provided")
+      raise CommandError(_("A group name must be provided"))
 
     import_members = options['import_members']
     import_by_dn = options['dn']
