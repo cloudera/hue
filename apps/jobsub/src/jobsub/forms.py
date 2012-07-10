@@ -22,6 +22,8 @@ from django import forms
 from desktop.lib.django_forms import MultiForm
 from jobsub import models
 
+from django.utils.translation import ugettext as _
+
 LOG = logging.getLogger(__name__)
 
 # This aligns with what Oozie accepts as a workflow name
@@ -34,12 +36,12 @@ class WorkflowDesignForm(forms.ModelForm):
     exclude = ('root_action', 'owner')
 
   name = forms.RegexField(
-        label='Name',
+        label=_('Name'),
         max_length=39,
         regex=_OOZIE_WORKFLOW_NAME_REGEX,
         help_text="Name of the design.",
-        error_messages={'invalid': "Allows alphabets, digits, '_', and '-'. " 
-                        "The first character must be an alphabet or '_'."})
+        error_messages={'invalid': _("Allows alphabets, digits, '_', and '-'. "
+                        "The first character must be an alphabet or '_'.")})
 
 
 class JavaActionForm(forms.ModelForm):
