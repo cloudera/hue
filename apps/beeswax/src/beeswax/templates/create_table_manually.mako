@@ -287,8 +287,8 @@ ${layout.menubar(section='tables')}
     </fieldset>
 </div>
 <div class="form-actions">
-    <input id="backBtn" type="button" class="btn hide" value="${_('Back')}" />
-    <input id="nextBtn" type="button" class="btn primary" value="${_('Next')}" />
+    <button type="button" id="backBtn" class="btn hide">${_('Back')}</button>
+    <button type="button" id="nextBtn" class="btn primary">${_('Next')}</button>
     <input id="submit" type="submit" class="btn primary hide" value="${_('Create table')}" />
 </div>
 </form>
