@@ -44,6 +44,8 @@ import logging
 from beeswax import common
 from beeswax import db_utils
 
+from django.utils.translation import ugettext as _
+
 LOG = logging.getLogger(__name__)
 
 #
@@ -93,7 +95,7 @@ class _Selection(object):
 
   def set_aggregation(self, agg):
     if agg not in common.AGGREGATIONS:
-      raise KeyError("%s is not a valid aggregation" % (agg,))
+      raise KeyError(_("%(aggregation)s is not a valid aggregation") % {'aggregation': agg})
     self._agg = agg
 
   @property
@@ -186,7 +188,7 @@ class BooleanCondition(object):
     assert isinstance(lhs_selection, _Selection)
     assert rhs_selection is None or isinstance(rhs_selection, _Selection)
     if relation not in common.RELATION_OPS:
-      raise ValueError("%s is not a valid operator" % (relation,))
+      raise ValueError(_("%(relation)s is not a valid operator") % {'relation': relation})
     self._lhs = lhs_selection
     self._rhs = rhs_selection
     self._relation = relation
