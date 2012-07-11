@@ -37,6 +37,8 @@ from desktop.lib import thrift_util
 from hive_metastore import ThriftHiveMetastore
 from beeswaxd.ttypes import BeeswaxException, QueryHandle, QueryNotFoundException
 
+from django.utils.translation import ugettext_lazy as _
+
 LOG = logging.getLogger(__name__)
 
 def execute_directly(user, query_msg, design=None, notify=False):
@@ -64,8 +66,8 @@ def execute_directly(user, query_msg, design=None, notify=False):
     handle = db_client().query(query_msg)
     if not handle or not handle.id or not handle.log_context:
       # It really shouldn't happen
-      msg = "BeeswaxServer returning invalid handle for query id %d [%s]..." % \
-            (query_history.id, query_msg.query[:40])
+      msg = _("BeeswaxServer returning invalid handle for query id %(id)d [%(query)s]...") % \
+            {'id': query_history.id, 'query': query_msg.query[:40]}
       raise Exception(msg)
   except BeeswaxException, bex:
     # Kind of expected (hql compile/syntax error, etc.)

@@ -28,6 +28,7 @@ from beeswaxd.ttypes import QueryHandle
 
 from desktop.lib.export_csvxls import CSVformatter, XLSformatter, TooBigToDownloadException
 
+from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
@@ -84,11 +85,11 @@ def data_generator(query_model, formatter):
     # Someone is reading the results concurrently. Abort.
     # But unfortunately, this current generator will produce incomplete data.
     if next_row != results.start_row:
-      msg = 'Error: Potentially incomplete results as an error occur during data retrieval.'
+      msg = _('Error: Potentially incomplete results as an error occur during data retrieval.')
       yield formatter.format_row([msg])
-      err = ('Detected another client retrieving results for %s. '
-             'Expect next row being %s and got %s. Aborting' %
-             (query_model.server_id, next_row, results.start_row))
+      err = (_('Detected another client retrieving results for %(server_id)s. '
+             'Expect next row being %(row)s and got %(start_row)s. Aborting') %
+             {'server_id': query_model.server_id, 'row': next_row, 'start_row': results.start_row})
       LOG.error(err)
       raise RuntimeError(err)
 

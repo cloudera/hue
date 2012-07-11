@@ -53,6 +53,7 @@ from jobsub.parameterization import find_variables, substitute_variables
 
 from filebrowser.views import location_to_url
 
+from django.utils.translation import ugettext_lazy as _t
 
 LOG = logging.getLogger(__name__)
 
@@ -64,13 +65,13 @@ def authorized_get_design(request, design_id, owner_only=False, must_exist=False
     design = models.SavedQuery.objects.get(id=design_id)
   except models.SavedQuery.DoesNotExist:
     if must_exist:
-      raise PopupException('Design %s does not exist.' % (design_id,))
+      raise PopupException(_t('Design %(id)s does not exist.') % {'id': design_id})
     else:
       return None
 
   if not conf.SHARE_SAVED_QUERIES.get() and (not request.user.is_superuser or owner_only) \
       and design.owner != request.user:
-    raise PopupException('Cannot access design %s' % (design_id,))
+    raise PopupException(_t('Cannot access design %(id)s') % {'id': design_id})
   else:
     return design
 
@@ -81,13 +82,13 @@ def authorized_get_history(request, query_history_id, owner_only=False, must_exi
     query_history = models.QueryHistory.objects.get(id=query_history_id)
   except models.QueryHistory.DoesNotExist:
     if must_exist:
-      raise PopupException('QueryHistory %s does not exist.' % (query_history_id,))
+      raise PopupException(_t('QueryHistory %(id)s does not exist.') % {'id': query_history_id})
     else:
       return None
 
   if not conf.SHARE_SAVED_QUERIES.get() and (not request.user.is_superuser or owner_only) \
       and query_history.owner != request.user:
-    raise PopupException('Cannot access QueryHistory %s' % (query_history_id,))
+    raise PopupException(_t('Cannot access QueryHistory %(id)s') % {'id': query_history_id})
   else:
     return query_history
 
@@ -143,9 +144,9 @@ def drop_table(request, table):
     # but this was introduced in Hive 0.5, and therefore may not be available
     # with older metastores.
     if is_view:
-      title = "Do you really want to drop the view '%s'?" % (table,)
+      title = _t("Do you really want to drop the view '%(table)s'?") % {'table': table}
     else:
-      title = "This may delete the underlying data as well as the metadata.  Drop table '%s'?" % table
+      title = _t("This may delete the underlying data as well as the metadata.  Drop table '%(table)s'?") % {'table': table}
     return render('confirm.html', request, dict(url=request.path, title=title))
   elif request.method == 'POST':
     if is_view:
@@ -160,8 +161,8 @@ def drop_table(request, table):
     except BeeswaxException, ex:
       # Note that this state is difficult to get to.
       error_message, log = expand_exception(ex)
-      error = "Failed to remove %s.  Error: %s" % (table, error_message)
-      raise PopupException(error, title="Beeswax Error", detail=log)
+      error = _t("Failed to remove %(table)s.  Error: %(error)s") % {'table': table, 'error': error_message}
+      raise PopupException(error, title=_t("Beeswax Error"), detail=log)
 
 
 def read_table(request, table):
@@ -174,8 +175,8 @@ def read_table(request, table):
   except BeeswaxException, e:
     # Note that this state is difficult to get to.
     error_message, log = expand_exception(e)
-    error = "Failed to read table.  Error: " + error_message
-    raise PopupException(error, title="Beeswax Error", detail=log)
+    error = _t("Failed to read table. Error: %(error)s") % {'error': error_message}
+    raise PopupException(error, title=_t("Beeswax Error"), detail=log)
 
 
 def confirm_query(request, query, on_success_url=None):
@@ -228,7 +229,7 @@ def safe_get_design(request, design_type, design_id=None):
     try:
       design = models.SavedQuery.get(design_id, request.user, design_type)
     except models.SavedQuery.DoesNotExist:
-      request.flash.put('Design does not exist')
+      request.flash.put(_t('Design does not exist'))
   if design is None:
     design = models.SavedQuery(owner=request.user, type=design_type)
   return design
@@ -450,7 +451,7 @@ def _run_parameterized_query(request, design_id, explain):
   query_str = _strip_trailing_semicolon(query_form.query.cleaned_data["query"])
   parameterization_form_cls = make_parameterization_form(query_str)
   if not parameterization_form_cls:
-    raise PopupException("Query is not parameterizable.")
+    raise PopupException(_t("Query is not parameterizable."))
   parameterization_form = parameterization_form_cls(request.REQUEST, prefix="parameterization")
   if parameterization_form.is_valid():
     real_query = substitute_variables(query_str, parameterization_form.cleaned_data)
@@ -478,9 +479,9 @@ def expand_exception(exc):
     log = db_utils.db_client().get_log(exc.log_context)
   except:
     # Always show something, even if server has died on the job.
-    log = "Could not retrieve log."
+    log = _t("Could not retrieve log.")
   if not exc.message:
-    error_message = "Unknown exception."
+    error_message = _t("Unknown exception.")
   else:
     error_message = force_unicode(exc.message, strings_only=True, errors='replace')
   return error_message, log
@@ -513,7 +514,7 @@ def save_design(request, form, type, design, explicit_save):
   elif type == models.SavedQuery.REPORT:
     design_cls = beeswax.report.ReportDesign
   else:
-    raise ValueError('Invalid design type %s' % (type,))
+    raise ValueError(_t('Invalid design type %(type)s') % {'type': type})
 
   old_design = design
   design_obj = design_cls(form)
@@ -541,7 +542,7 @@ def save_design(request, form, type, design, explicit_save):
   LOG.info('Saved %sdesign "%s" (id %s) for %s' %
            (explicit_save and '' or 'auto ', design.name, design.id, design.owner))
   if explicit_save:
-    request.flash.put('Saved design "%s"' % (design.name,))
+    request.flash.put(_t('Saved design "%(name)s"') % {'name': design.name})
   # Design may now have a new/different id
   return design
 
@@ -675,7 +676,7 @@ def clone_design(request, design_id):
   copy.name = design.name + ' (copy)'
   copy.owner = request.user
   copy.save()
-  request.flash.put('Copied design: %s' % (design.name,))
+  request.flash.put(_t('Copied design: %(name)s') % {'name': design.name})
   return format_preserving_redirect(
       request, urlresolvers.reverse(execute_query, kwargs={'design_id': copy.id}))
 
@@ -727,14 +728,14 @@ def query_done_cb(request, server_id):
     return res
   design = history.design
   user = history.owner
-  subject = "Beeswax query completed"
+  subject = _t("Beeswax query completed")
   if design:
     subject += ": %s" % (design.name,)
 
   link = "%s/#launch=Beeswax:%s" % \
             (get_desktop_uri_prefix(),
              urlresolvers.reverse(watch_query, kwargs={'id': history.id}))
-  body = "%s. You may see the results here: %s\n\nQuery:\n%s" % (subject, link, history.query)
+  body = _t("%(subject)s. You may see the results here: %(link)s\n\nQuery:\n%(query)s") % {'subject': subject, 'link': link, 'query': history.query}
   try:
     user.email_user(subject, body)
   except Exception, ex:
@@ -780,7 +781,7 @@ def watch_query(request, id):
 
   # Query finished?
   if state == models.QueryHistory.STATE.expired:
-    raise PopupException("The result of this query has expired.")
+    raise PopupException(_t("The result of this query has expired."))
   elif state == models.QueryHistory.STATE.available:
     return format_preserving_redirect(request, on_success_url, request.GET)
   elif state == models.QueryHistory.STATE.failed:
@@ -826,12 +827,12 @@ def _get_server_id_and_state(query_history):
   ok, server_id = query_history.get_server_id()
   if not server_id:
     if ok:
-      raise PopupException("Query is still being submitted to the Beeswax Server")
-    raise PopupException("Failed to retrieve query state from the Beeswax Server")
+      raise PopupException(_t("Query is still being submitted to the Beeswax Server"))
+    raise PopupException(_t("Failed to retrieve query state from the Beeswax Server"))
 
   state = db_utils.get_query_state(query_history)
   if state is None:
-    raise PopupException("Failed to contact Beeswax Server to check query status")
+    raise PopupException(_t("Failed to contact Beeswax Server to check query status"))
   return (server_id, state)
 
 
@@ -897,7 +898,7 @@ def view_results(request, id, first_row=0):
   # Retrieve query results
   try:
     results = db_utils.db_client().fetch(handle, start_over, -1)
-    assert results.ready, 'Trying to display result that is not yet ready. Query id %s' % (id,)
+    assert results.ready, _t('Trying to display result that is not yet ready. Query id %(id)s') % {'id': id}
     # We display the "Download" button only when we know
     # that there are results:
     downloadable = (first_row > 0 or len(results.data) > 0)
@@ -954,7 +955,7 @@ def save_results(request, id):
   id = int(id)
   query_history = models.QueryHistory.objects.get(id=id)
   if query_history.owner != request.user:
-    raise PopupException('This action is only available to the user who submitted the query.')
+    raise PopupException(_t('This action is only available to the user who submitted the query.'))
   _, state = _get_server_id_and_state(query_history)
   query_history.save_state(state)
   error_msg, log = None, None
@@ -964,9 +965,9 @@ def save_results(request, id):
     # Note that we may still hit errors during the actual save
     if state != models.QueryHistory.STATE.available:
       if state in (models.QueryHistory.STATE.failed, models.QueryHistory.STATE.expired):
-        msg = 'This query has %s. Results unavailable.' % (state,)
+        msg = _t('This query has %(state)s. Results unavailable.') % {'state': state}
       else:
-        msg = 'The result of this query is not available yet.'
+        msg = _t('The result of this query is not available yet.')
       raise PopupException(msg)
 
     form = beeswax.forms.SaveResultsForm(request.POST)
@@ -983,24 +984,20 @@ def save_results(request, id):
         result_meta = db_utils.db_client().get_results_metadata(handle)
       except QueryNotFoundException, ex:
         LOG.exception(ex)
-        raise PopupException('Cannot find query.')
+        raise PopupException(_t('Cannot find query.'))
       if result_meta.table_dir:
         result_meta.table_dir = request.fs.urlsplit(result_meta.table_dir)[2]
 
       # 2. Check for partitioned tables
       if result_meta.table_dir is None:
-        raise PopupException(
-                  'Saving results from a partitioned table is not supported. '
-                  'You may copy from the HDFS location manually.')
+        raise PopupException(_t('Saving results from a partitioned table is not supported. You may copy from the HDFS location manually.'))
 
       # 3. Actual saving of results
       try:
         if form.cleaned_data['save_target'] == form.SAVE_TYPE_DIR:
           # To dir
           if result_meta.in_tablename:
-            raise PopupException(
-                      'Saving results from a table to a directory is not supported. '
-                      'You may copy from the HDFS location manually.')
+            raise PopupException(_t('Saving results from a table to a directory is not supported. You may copy from the HDFS location manually.'))
           target_dir = form.cleaned_data['target_dir']
           request.fs.rename_star(result_meta.table_dir, target_dir)
           LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, target_dir))
@@ -1017,7 +1014,7 @@ def save_results(request, id):
             LOG.exception(bex)
             error_msg, log = expand_exception(bex)
       except WebHdfsException, ex:
-        raise PopupException('The table could not be saved.', detail=ex)
+        raise PopupException(_t('The table could not be saved.'), detail=ex)
       except IOError, ex:
         LOG.exception(ex)
         error_msg = str(ex)
@@ -1025,7 +1022,7 @@ def save_results(request, id):
     form = beeswax.forms.SaveResultsForm()
 
   if error_msg:
-    error_msg = 'Failed to save results from query: %s' % (error_msg,)
+    error_msg = _t('Failed to save results from query: %(error)s') % {'error': error_msg}
   return render('save_results.mako', request, dict(
     action=urlresolvers.reverse(save_results, kwargs={'id': str(id)}),
     form=form,
@@ -1082,7 +1079,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     table_loc = request.fs.urlsplit(table_obj.sd.location)[2]
     request.fs.rename_star(result_meta.table_dir, table_loc)
     LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, table_loc))
-    request.flash.put('Saved query results as new table %s' % (target_table,))
+    request.flash.put(_t('Saved query results as new table %(table)s') % {'table': target_table})
     query_history.save_state(models.QueryHistory.STATE.expired)
   except Exception, ex:
     LOG.error('Error moving data into storage of table %s. Will drop table.' % (target_table,))
@@ -1134,7 +1131,7 @@ def install_examples(request):
   """
   if request.method == 'GET':
     return render('confirm.html', request,
-                  dict(url=request.path, title='Install sample tables and Beeswax examples?'))
+                  dict(url=request.path, title=_t('Install sample tables and Beeswax examples?')))
   elif request.method == 'POST':
     result = {}
     result['creationSucceeded'] = False
@@ -1153,7 +1150,7 @@ def install_examples(request):
 def describe_partitions(request, table):
   table_obj = db_utils.meta_client().get_table("default", table)
   if len(table_obj.partitionKeys) == 0:
-    raise PopupException("Table '%s' is not partitioned." % table)
+    raise PopupException(_t("Table '%(table)s' is not partitioned.") % {'table': table})
   partitions = db_utils.meta_client().get_partitions("default", table, max_parts=-1)
   return render("describe_partitions.mako", request,
                 dict(table=table_obj, partitions=partitions, request=request))

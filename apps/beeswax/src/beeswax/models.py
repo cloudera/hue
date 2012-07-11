@@ -27,6 +27,8 @@ from django.contrib.auth.models import User
 from desktop.lib.django_util import PopupException
 from beeswaxd.ttypes import QueryState
 
+from django.utils.translation import ugettext as _
+
 LOG = logging.getLogger(__name__)
 
 QUERY_SUBMISSION_TIMEOUT = datetime.timedelta(0, 60 * 60)               # 1 hr
@@ -119,8 +121,8 @@ class SavedQuery(models.Model):
   Note that this used to be called QueryDesign. Any references to 'design'
   probably mean a SavedQuery.
   """
-  DEFAULT_NEW_DESIGN_NAME = 'My saved query'
-  AUTO_DESIGN_SUFFIX = ' (new)'
+  DEFAULT_NEW_DESIGN_NAME = _('My saved query')
+  AUTO_DESIGN_SUFFIX = _(' (new)')
   TYPES = (HQL, REPORT) = range(2)
 
   type = models.IntegerField(null=False)
@@ -158,17 +160,17 @@ class SavedQuery(models.Model):
     try:
       design = SavedQuery.objects.get(id=id)
     except SavedQuery.DoesNotExist, err:
-      msg = 'Cannot retrieve Beeswax design id %s' % (id,)
+      msg = _('Cannot retrieve Beeswax design id %(id)s') % {'id': id}
       raise err
 
     if owner is not None and design.owner != owner:
-      msg = 'Design id %s does not belong to user %s' % (id, owner)
+      msg = _('Design id %(id)s does not belong to user %(user)s') % {'id': id, 'user': owner}
       LOG.error(msg)
       raise PopupException(msg)
 
     if type is not None and design.type != type:
-      msg = 'Type mismatch for design id %s (owner %s) - Expects %s got %s' % \
-            (id, owner, design.type, type)
+      msg = _('Type mismatch for design id %(id)s (owner %(owner)s) - Expects %(expected_type)s got %(real_type)s') % \
+            {'id': id, 'owner': owner, 'expected_type': design.type, 'real_type': type}
       LOG.error(msg)
       raise PopupException(msg)
 

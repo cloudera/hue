@@ -57,6 +57,8 @@ from beeswax.report import report_gen
 from desktop.lib.django_forms import BaseSimpleFormSet, ManagementForm, MultiForm
 from desktop.lib.django_forms import simple_formset_factory, SubmitButton
 
+from django.utils.translation import ugettext as _t
+
 LOG = logging.getLogger(__name__)
 
 SUB_UNION_PREFIX = 'sub'
@@ -84,7 +86,7 @@ def fixup_union(parent_mform, subform_name, data, is_root=False):
   union_mform = getattr(parent_mform, subform_name)
   mgmt_form = union_mform.mgmt
   if not mgmt_form.is_valid():
-    raise forms.ValidationError('Missing ManagementForm for conditions')
+    raise forms.ValidationError(_t('Missing ManagementForm for conditions'))
   n_children = mgmt_form.form_counts()
 
   # This removes our current subform (union_mform) and any children.
@@ -181,7 +183,7 @@ def _extract_condition(union_mform, table_alias_dict):
   """
   global SUB_UNION_PREFIX
   if not union_mform.is_valid():
-    assert False, 'UnionMultiForm is not valid'
+    assert False, _t('UnionMultiForm is not valid')
     return None
 
   op = union_mform.bool.cleaned_data['bool']
@@ -212,11 +214,11 @@ def _field_source_check(true_source, field_name, field_value, is_from_table):
   """
   if bool(true_source == 'table') ^ bool(is_from_table):
     if field_value:
-      raise forms.ValidationError('%s value not applicable with %s source' %
-                                  (field_name, true_source))
+      raise forms.ValidationError(_t('%(field)s value not applicable with %(source)s source') %
+                                  {'field': field_name, 'source': true_source})
     return False
   elif not field_value:
-    raise forms.ValidationError('%s value missing' % (field_name,))
+    raise forms.ValidationError(_t('%(field)s value missing') % {'field': field_name})
   return True
 
 
@@ -229,51 +231,51 @@ class ReportColumnForm(forms.Form):
   A form representing a column in the report.
   """
   # If not 'display', then source must be 'table'
-  display = forms.BooleanField(label='Display', required=False, initial=True)
+  display = forms.BooleanField(label=_t('Display'), required=False, initial=True)
 
   # Shown iff 'display'. 'source' is not required, but will be set during clean
-  source = forms.ChoiceField(label='Source', required=False, initial='table',
+  source = forms.ChoiceField(label=_t('Source'), required=False, initial='table',
                                 choices=common.to_choices(common.SELECTION_SOURCE))
   # Shown iff 'display'
-  agg = forms.ChoiceField(label='Aggregate', required=False,
+  agg = forms.ChoiceField(label=_t('Aggregate'), required=False,
                                 choices=common.to_choices(common.AGGREGATIONS))
   # Shown iff 'display'
-  distinct = forms.BooleanField(label="Distinct", required=False)
+  distinct = forms.BooleanField(label=_t("Distinct"), required=False)
 
   # Shown iff 'source' is 'constant'
-  constant = forms.CharField(label='Constant value', required=False)
+  constant = forms.CharField(label=_t('Constant value'), required=False)
 
   # Shown iff 'source' is 'table'
-  table_alias = common.HiveIdentifierField(label='Table alias', required=False)
+  table_alias = common.HiveIdentifierField(label=_t('Table alias'), required=False)
   # Shown iff 'source' is 'table'
-  col = forms.CharField(label='From column', required=False)
+  col = forms.CharField(label=_t('From column'), required=False)
   # Shown iff 'display', and 'source' is 'table'
-  col_alias = common.HiveIdentifierField(label='Column alias', required=False)
+  col_alias = common.HiveIdentifierField(label=_t('Column alias'), required=False)
   # Shown iff 'display', and 'source' is 'table'
-  sort = forms.ChoiceField(label='Sort', required=False,
+  sort = forms.ChoiceField(label=_t('Sort'), required=False,
                                 choices=common.to_choices(common.SORT_OPTIONS))
   # Shown iff 'sort'
-  sort_order = forms.IntegerField(label='Sort order', required=False, min_value=1)
+  sort_order = forms.IntegerField(label=_t('Sort order'), required=False, min_value=1)
   # Shown iff 'display', and 'source' is 'table'
-  group_order = forms.IntegerField(label='Group order', required=False, min_value=1)
+  group_order = forms.IntegerField(label=_t('Group order'), required=False, min_value=1)
 
   def __init__(self, *args, **kwargs):
     forms.Form.__init__(self, *args, **kwargs)
     # Shown iff 'source' is 'table'
-    self.fields['table'] = common.HiveTableChoiceField(label='From table', required=False)
+    self.fields['table'] = common.HiveTableChoiceField(label=_t('From table'), required=False)
 
   def _display_check(self):
     """Reconcile 'display' with 'source'"""
     src = self.cleaned_data.get('source')
     if not self.cleaned_data.get('display'):
       if src and src != 'table':
-        raise forms.ValidationError('Source must be "table" when not displaying column')
+        raise forms.ValidationError(_t('Source must be "table" when not displaying column'))
       self.cleaned_data['source'] = 'table'
       if self.cleaned_data.get('col_alias'):
-        raise forms.ValidationError('Column alias not applicable when not displaying column')
+        raise forms.ValidationError(_t('Column alias not applicable when not displaying column'))
     else:
       if not src:
-        raise forms.ValidationError('Source value missing')
+        raise forms.ValidationError(_t('Source value missing'))
 
 
   def clean_display(self):
@@ -308,25 +310,25 @@ class ReportColumnForm(forms.Form):
       return None                       # No point since we can't get source
 
     constant_val = self.cleaned_data.get('constant')
-    _field_source_check(source, 'Constant', constant_val, is_from_table=False)
+    _field_source_check(source, _t('Constant'), constant_val, is_from_table=False)
 
     table_val = self.cleaned_data.get('table')
-    _field_source_check(source, 'From table', table_val, is_from_table=True)
+    _field_source_check(source, _t('From table'), table_val, is_from_table=True)
 
     col_val = self.cleaned_data.get('col')
-    _field_source_check(source, 'From column', col_val, is_from_table=True)
+    _field_source_check(source, _t('From column'), col_val, is_from_table=True)
 
     if self.cleaned_data.get('sort', '') and not self.cleaned_data.get('sort_order', ''):
-      raise forms.ValidationError('Sort order missing')
+      raise forms.ValidationError(_t('Sort order missing'))
 
     if table_val:
       # Column must belong to the table
       self.qtable = report_gen.QTable(table_val, self.cleaned_data.get('table_alias'))
       if col_val == '*':
         if self.cleaned_data.get('col_alias'):
-          raise forms.ValidationError('Alias not applicable for selecting "*"')
+          raise forms.ValidationError(_t('Alias not applicable for selecting "*"'))
       elif col_val not in self.qtable.get_columns():
-        raise forms.ValidationError('Invalid column name "%s"' % (col_val,))
+        raise forms.ValidationError(_t('Invalid column name "%(column)s"') % {'column': col_val})
       # ColumnSelection object
       self.selection = report_gen.ColumnSelection(self.qtable,
                                                   col_val,
@@ -364,7 +366,7 @@ class ReportColumnBaseFormset(BaseSimpleFormSet):
       for qt in qt_list:
         # Error if a table has alias but another doesn't. (Tables with the same name.)
         if bool(curr.alias) ^ bool(qt.alias):
-          raise forms.ValidationError('Ambiguous table "%s" without alias' % (qt.name,))
+          raise forms.ValidationError(_t('Ambiguous table "%(table)s" without alias') % {'table': qt.name})
         if curr.alias == qt.alias:
           # Duplicate. Don't update.
           break
@@ -374,9 +376,9 @@ class ReportColumnBaseFormset(BaseSimpleFormSet):
 
     self.qtable_list = sum([ tbl_list for tbl_list in qt_by_name.values() ], [ ])
     if not self.qtable_list:
-      raise forms.ValidationError('Not selecting from any table column')
+      raise forms.ValidationError(_t('Not selecting from any table column'))
     if n_display == 0:
-      raise forms.ValidationError('Not displaying any selection')
+      raise forms.ValidationError(_t('Not displaying any selection'))
 
 
 ReportColumnFormset = simple_formset_factory(ReportColumnForm,
@@ -388,18 +390,18 @@ ReportColumnFormset = simple_formset_factory(ReportColumnForm,
 ###########
 
 class ReportConditionForm(forms.Form):
-  l_source = forms.ChoiceField(label='Source', initial='table',
+  l_source = forms.ChoiceField(label=_t('Source'), initial='table',
                               choices=common.to_choices(common.SELECTION_SOURCE))
-  l_table = forms.CharField(label='Table name/alias', required=False)
-  l_col = forms.CharField(label='Column name', required=False)
-  l_constant = forms.CharField(label='Constant', required=False)
-  op = forms.ChoiceField(label='Condition',
+  l_table = forms.CharField(label=_t('Table name/alias'), required=False)
+  l_col = forms.CharField(label=_t('Column name'), required=False)
+  l_constant = forms.CharField(label=_t('Constant'), required=False)
+  op = forms.ChoiceField(label=_t('Condition'),
                               choices=common.to_choices(common.RELATION_OPS))
-  r_source = forms.ChoiceField(label='Source', required=False, initial='table',
+  r_source = forms.ChoiceField(label=_t('Source'), required=False, initial='table',
                               choices=common.to_choices(common.SELECTION_SOURCE))
-  r_table = forms.CharField(label='Table name/alias', required=False)
-  r_col = forms.CharField(label='Column name', required=False)
-  r_constant = forms.CharField(label='Constant', required=False)
+  r_table = forms.CharField(label=_t('Table name/alias'), required=False)
+  r_col = forms.CharField(label=_t('Column name'), required=False)
+  r_constant = forms.CharField(label=_t('Constant'), required=False)
 
 
   def clean(self):
@@ -411,30 +413,30 @@ class ReportConditionForm(forms.Form):
     op = self.cleaned_data['op']
     if op in common.RELATION_OPS_UNARY:
       if self.cleaned_data.get('r_source') or self.cleaned_data.get('r_cond'):
-        raise forms.ValidationError('Operator %s does not take the right operand' % (op,))
+        raise forms.ValidationError(_t('Operator %(operator)s does not take the right operand') % {'operator': op})
       check_right = False
     else:
       if not self.cleaned_data.get('l_source') or not self.cleaned_data.get('r_source'):
-        raise forms.ValidationError('Operator %s takes both operands' % (op,))
+        raise forms.ValidationError(_t('Operator %(operator)s takes both operands') % {'operator': op})
 
     # Verify the lhs values match the source
     l_source = self.cleaned_data['l_source']
     l_constant = self.cleaned_data.get('l_constant')
-    _field_source_check(l_source, 'Constant (Left)', l_constant, is_from_table=False)
+    _field_source_check(l_source, _t('Constant (Left)'), l_constant, is_from_table=False)
     l_table = self.cleaned_data.get('l_table')
-    _field_source_check(l_source, 'Table (Left)', l_table, is_from_table=True)
+    _field_source_check(l_source, _t('Table (Left)'), l_table, is_from_table=True)
     l_col = self.cleaned_data.get('l_col')
-    _field_source_check(l_source, 'Column (Left)', l_col, is_from_table=True)
+    _field_source_check(l_source, _t('Column (Left)'), l_col, is_from_table=True)
 
     if check_right:
       # Verify the rhs values match the source
       r_source = self.cleaned_data['r_source']
       r_constant = self.cleaned_data.get('r_constant')
-      _field_source_check(r_source, 'Constant (Right)', r_constant, is_from_table=False)
+      _field_source_check(r_source, _t('Constant (Right)'), r_constant, is_from_table=False)
       r_table = self.cleaned_data.get('r_table')
-      _field_source_check(r_source, 'Table (Right)', r_table, is_from_table=True)
+      _field_source_check(r_source, _t('Table (Right)'), r_table, is_from_table=True)
       r_col = self.cleaned_data.get('r_col')
-      _field_source_check(r_source, 'Column (Right)', r_col, is_from_table=True)
+      _field_source_check(r_source, _t('Column (Right)'), r_col, is_from_table=True)
     return self.cleaned_data
 
 
@@ -465,7 +467,7 @@ class ReportConditionForm(forms.Form):
       try:
         return report_gen.ColumnSelection(table_alias_dict[table], col)
       except KeyError:
-        raise forms.ValidationError('Unknown table "%s" in condition' % (table,))
+        raise forms.ValidationError(_t('Unknown table "%(table)s" in condition') % {'table': table})
 
     constant = self.cleaned_data[prefix + 'constant']
     return report_gen.ConstSelection(constant)
@@ -482,7 +484,7 @@ class ReportConditionBoolForm(forms.Form):
 class UnionManagementForm(ManagementForm):
   def __init__(self, *args, **kwargs):
     ManagementForm.__init__(self, *args, **kwargs)
-    remove = forms.BooleanField(label='Remove', widget=SubmitButton, required=False)
+    remove = forms.BooleanField(label=_t('Remove'), widget=SubmitButton, required=False)
     remove.widget.label = '-'
     self.fields['remove'] = remove
 

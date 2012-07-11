@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-03 01:12+0200\n"
+"POT-Creation-Date: 2012-07-21 11:58+0200\n"
 "PO-Revision-Date: 2012-07-03 01:11+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en_US <LL@li.org>\n"
@@ -16,6 +16,680 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: src/beeswax/conf.py:24
+msgid "Host where beeswax server thrift daemon is running"
+msgstr ""
+
+#: src/beeswax/conf.py:30
+msgid "Configure the port the beeswax thrift server runs on"
+msgstr ""
+
+#: src/beeswax/conf.py:36
+msgid "Host where beeswax internal metastore thrift daemon is running"
+msgstr ""
+
+#: src/beeswax/conf.py:42
+msgid ""
+"Configure the port the internal metastore daemon runs on. Used only if "
+"hive.metastore.local is true."
+msgstr ""
+
+#: src/beeswax/conf.py:49
+msgid "Path to beeswax_server.sh"
+msgstr ""
+
+#: src/beeswax/conf.py:55
+msgid ""
+"Maximum Java heapsize (in megabytes) used by Beeswax Server.  Note that "
+"the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh may "
+"override this setting."
+msgstr ""
+
+#: src/beeswax/conf.py:63
+msgid ""
+"Path to the root of the Hive installation; defaults to environment "
+"variable when not set."
+msgstr ""
+
+#: src/beeswax/conf.py:68
+msgid "Hive configuration directory, where hive-site.xml is located"
+msgstr ""
+
+#: src/beeswax/conf.py:74
+msgid "The local filesystem path containing the beeswax examples"
+msgstr ""
+
+#: src/beeswax/conf.py:80
+msgid "Timeout in seconds for thrift calls to beeswax service"
+msgstr ""
+
+#: src/beeswax/conf.py:86
+msgid ""
+"Timeouts in seconds for thrift calls to the hive metastore. This timeout "
+"should take into account that the metastore could talk to an external DB"
+msgstr ""
+
+#: src/beeswax/conf.py:92
+msgid "Time in seconds for beeswax to persist queries in its cache."
+msgstr ""
+
+#: src/beeswax/conf.py:98
+msgid ""
+"Set a LIMIT clause when browsing a partitioned table. A positive value "
+"will be set as the LIMIT. If 0 or negative, do not set any limit."
+msgstr ""
+
+#: src/beeswax/conf.py:104
+msgid ""
+"Share saved queries with all users. If set to false, saved queries are "
+"visible only to the owner and administrators."
+msgstr ""
+
+#: src/beeswax/create_table.py:291
+msgid "Internal error when constructing the delimiter form"
+msgstr ""
+
+#: src/beeswax/create_table.py:318
+#, python-format
+msgid ""
+"Failed to decode file '%(path)s' into printable characters under "
+"%(encoding)s"
+msgstr ""
+
+#: src/beeswax/create_table.py:380
+#, python-format
+msgid "Failed to open file '%(path)s': %(error)s"
+msgstr ""
+
+#: src/beeswax/create_table.py:431
+msgid "Internal error: Missing needed parameter to load data into table"
+msgstr ""
+
+#: src/beeswax/data_export.py:88
+msgid ""
+"Error: Potentially incomplete results as an error occur during data "
+"retrieval."
+msgstr ""
+
+#: src/beeswax/data_export.py:90
+#, python-format
+msgid ""
+"Detected another client retrieving results for %(server_id)s. Expect next"
+" row being %(row)s and got %(start_row)s. Aborting"
+msgstr ""
+
+#: src/beeswax/db_utils.py:69
+#, python-format
+msgid "BeeswaxServer returning invalid handle for query id %(id)d [%(query)s]..."
+msgstr ""
+
+#: src/beeswax/forms.py:46
+msgid "Change the name to save as a new design"
+msgstr ""
+
+#: src/beeswax/forms.py:47 src/beeswax/forms.py:162 src/beeswax/forms.py:246
+#: src/beeswax/templates/configuration.mako:37
+#: src/beeswax/templates/list_designs.mako:32
+msgid "Description"
+msgstr ""
+
+#: src/beeswax/forms.py:53 src/beeswax/forms.py:54
+#: src/beeswax/templates/execute.mako:54 src/beeswax/templates/execute.mako:289
+#: src/beeswax/templates/save_results.mako:43
+#: src/beeswax/templates/watch_results.mako:38
+#: src/beeswax/templates/watch_results.mako:156
+msgid "Save"
+msgstr ""
+
+#: src/beeswax/forms.py:55 src/beeswax/forms.py:56
+msgid "Save As"
+msgstr ""
+
+#: src/beeswax/forms.py:69
+msgid "Please enter a name"
+msgstr ""
+
+#: src/beeswax/forms.py:83
+msgid "to a new table"
+msgstr ""
+
+#: src/beeswax/forms.py:83
+msgid "to HDFS directory"
+msgstr ""
+
+#: src/beeswax/forms.py:88 src/beeswax/forms.py:161 src/beeswax/forms.py:245
+#: src/beeswax/templates/show_tables.mako:43
+#: src/beeswax/templates/watch_results.mako:139
+msgid "Table Name"
+msgstr ""
+
+#: src/beeswax/forms.py:90
+msgid "Name of the new table"
+msgstr ""
+
+#: src/beeswax/forms.py:92
+msgid "Results Location"
+msgstr ""
+
+#: src/beeswax/forms.py:94
+msgid "Empty directory in HDFS to put the results"
+msgstr ""
+
+#: src/beeswax/forms.py:105
+msgid "Table already exists"
+msgstr ""
+
+#: src/beeswax/forms.py:112 src/beeswax/templates/layout.mako:34
+msgid "Query Editor"
+msgstr ""
+
+#: src/beeswax/forms.py:132
+msgid ""
+"Resources to upload with your Hive job.  Use 'jar' for UDFs.  Use file "
+"and archive for side files and MAP/TRANSFORM using.  Paths are on HDFS."
+msgstr ""
+
+#: src/beeswax/forms.py:138
+msgid "Path to file on HDFS."
+msgstr ""
+
+#: src/beeswax/forms.py:184
+msgid "SerDe Name"
+msgstr ""
+
+#: src/beeswax/forms.py:187
+msgid "Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"
+msgstr ""
+
+#: src/beeswax/forms.py:198
+msgid "InputFormat Class"
+msgstr ""
+
+#: src/beeswax/forms.py:199
+msgid "OutputFormat Class"
+msgstr ""
+
+#: src/beeswax/forms.py:208
+#: src/beeswax/templates/create_table_manually.mako:236
+msgid "Use default location"
+msgstr ""
+
+#: src/beeswax/forms.py:209
+msgid "Path to HDFS directory or file of table data."
+msgstr ""
+
+#: src/beeswax/forms.py:231
+#, python-format
+msgid "Table \"%(name)s\" already exists"
+msgstr ""
+
+#: src/beeswax/forms.py:238
+msgid "Terminator must be exactly one character"
+msgstr ""
+
+#: src/beeswax/forms.py:249
+msgid "Input File"
+msgstr ""
+
+#: src/beeswax/forms.py:251
+msgid "Import data from file"
+msgstr ""
+
+#: src/beeswax/forms.py:252
+msgid "Automatically load this file into the table after creation"
+msgstr ""
+
+#: src/beeswax/forms.py:268
+msgid "Delimiter value is required"
+msgstr ""
+
+#: src/beeswax/forms.py:278
+msgid "Delimiter value must be smaller than 256"
+msgstr ""
+
+#: src/beeswax/forms.py:281
+msgid "Delimiter must be exactly one character"
+msgstr ""
+
+#: src/beeswax/forms.py:309
+msgid "Array Value Type"
+msgstr ""
+
+#: src/beeswax/forms.py:312 src/beeswax/forms.py:315
+msgid "Specify if column_type is map."
+msgstr ""
+
+#: src/beeswax/forms.py:317
+msgid "add a column"
+msgstr ""
+
+#: src/beeswax/forms.py:319
+msgid "add a partition"
+msgstr ""
+
+#: src/beeswax/forms.py:324
+msgid "Path"
+msgstr ""
+
+#: src/beeswax/forms.py:326
+msgid "Overwrite?"
+msgstr ""
+
+#: src/beeswax/forms.py:339
+#, python-format
+msgid "%(column_name)s (partition key with type %(column_type)s)"
+msgstr ""
+
+#: src/beeswax/models.py:124
+msgid "My saved query"
+msgstr ""
+
+#: src/beeswax/models.py:125
+msgid " (new)"
+msgstr ""
+
+#: src/beeswax/models.py:163
+#, python-format
+msgid "Cannot retrieve Beeswax design id %(id)s"
+msgstr ""
+
+#: src/beeswax/models.py:167
+#, python-format
+msgid "Design id %(id)s does not belong to user %(user)s"
+msgstr ""
+
+#: src/beeswax/models.py:172
+#, python-format
+msgid ""
+"Type mismatch for design id %(id)s (owner %(owner)s) - Expects "
+"%(expected_type)s got %(real_type)s"
+msgstr ""
+
+#: src/beeswax/views.py:68
+#, python-format
+msgid "Design %(id)s does not exist."
+msgstr ""
+
+#: src/beeswax/views.py:74
+#, python-format
+msgid "Cannot access design %(id)s"
+msgstr ""
+
+#: src/beeswax/views.py:85
+#, python-format
+msgid "QueryHistory %(id)s does not exist."
+msgstr ""
+
+#: src/beeswax/views.py:91
+#, python-format
+msgid "Cannot access QueryHistory %(id)s"
+msgstr ""
+
+#: src/beeswax/views.py:147
+#, python-format
+msgid "Do you really want to drop the view '%(table)s'?"
+msgstr ""
+
+#: src/beeswax/views.py:149
+#, python-format
+msgid ""
+"This may delete the underlying data as well as the metadata.  Drop table "
+"'%(table)s'?"
+msgstr ""
+
+#: src/beeswax/views.py:164
+#, python-format
+msgid "Failed to remove %(table)s.  Error: %(error)s"
+msgstr ""
+
+#: src/beeswax/views.py:165 src/beeswax/views.py:179
+msgid "Beeswax Error"
+msgstr ""
+
+#: src/beeswax/views.py:178
+#, python-format
+msgid "Failed to read table. Error: %(error)s"
+msgstr ""
+
+#: src/beeswax/views.py:232
+msgid "Design does not exist"
+msgstr ""
+
+#: src/beeswax/views.py:454
+msgid "Query is not parameterizable."
+msgstr ""
+
+#: src/beeswax/views.py:482
+msgid "Could not retrieve log."
+msgstr ""
+
+#: src/beeswax/views.py:484
+msgid "Unknown exception."
+msgstr ""
+
+#: src/beeswax/views.py:517
+#, python-format
+msgid "Invalid design type %(type)s"
+msgstr ""
+
+#: src/beeswax/views.py:545
+#, python-format
+msgid "Saved design \"%(name)s\""
+msgstr ""
+
+#: src/beeswax/views.py:679
+#, python-format
+msgid "Copied design: %(name)s"
+msgstr ""
+
+#: src/beeswax/views.py:731
+msgid "Beeswax query completed"
+msgstr ""
+
+#: src/beeswax/views.py:738
+#, python-format
+msgid ""
+"%(subject)s. You may see the results here: %(link)s\n"
+"\n"
+"Query:\n"
+"%(query)s"
+msgstr ""
+
+#: src/beeswax/views.py:784
+msgid "The result of this query has expired."
+msgstr ""
+
+#: src/beeswax/views.py:830
+msgid "Query is still being submitted to the Beeswax Server"
+msgstr ""
+
+#: src/beeswax/views.py:831
+msgid "Failed to retrieve query state from the Beeswax Server"
+msgstr ""
+
+#: src/beeswax/views.py:835
+msgid "Failed to contact Beeswax Server to check query status"
+msgstr ""
+
+#: src/beeswax/views.py:901
+#, python-format
+msgid "Trying to display result that is not yet ready. Query id %(id)s"
+msgstr ""
+
+#: src/beeswax/views.py:958
+msgid "This action is only available to the user who submitted the query."
+msgstr ""
+
+#: src/beeswax/views.py:968
+#, python-format
+msgid "This query has %(state)s. Results unavailable."
+msgstr ""
+
+#: src/beeswax/views.py:970
+msgid "The result of this query is not available yet."
+msgstr ""
+
+#: src/beeswax/views.py:987
+msgid "Cannot find query."
+msgstr ""
+
+#: src/beeswax/views.py:993
+msgid ""
+"Saving results from a partitioned table is not supported. You may copy "
+"from the HDFS location manually."
+msgstr ""
+
+#: src/beeswax/views.py:1000
+msgid ""
+"Saving results from a table to a directory is not supported. You may copy"
+" from the HDFS location manually."
+msgstr ""
+
+#: src/beeswax/views.py:1017
+msgid "The table could not be saved."
+msgstr ""
+
+#: src/beeswax/views.py:1025
+#, python-format
+msgid "Failed to save results from query: %(error)s"
+msgstr ""
+
+#: src/beeswax/views.py:1082
+#, python-format
+msgid "Saved query results as new table %(table)s"
+msgstr ""
+
+#: src/beeswax/views.py:1134
+msgid "Install sample tables and Beeswax examples?"
+msgstr ""
+
+#: src/beeswax/views.py:1153
+#, python-format
+msgid "Table '%(table)s' is not partitioned."
+msgstr ""
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:80
+msgid "Beeswax examples already installed"
+msgstr ""
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:172
+#, python-format
+msgid "Cannot find table data in \"%(file)s\""
+msgstr ""
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:189
+#, python-format
+msgid "Table \"%(table)s\" already exists"
+msgstr ""
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:197
+#, python-format
+msgid "Error creating table %(table)s: Operation timeout"
+msgstr ""
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:201
+#, python-format
+msgid "Error creating table %(table)s: %(error)s"
+msgstr ""
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:221
+#, python-format
+msgid "Error loading table %(table)s: Operation timeout"
+msgstr ""
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:225
+#, python-format
+msgid "Error loading table %(table)s: %(error)s"
+msgstr ""
+
+#: src/beeswax/management/commands/beeswax_install_examples.py:246
+#, python-format
+msgid "Sample design %(name)s already exists"
+msgstr ""
+
+#: src/beeswax/report/report_gen.py:98
+#, python-format
+msgid "%(aggregation)s is not a valid aggregation"
+msgstr ""
+
+#: src/beeswax/report/report_gen.py:191
+#, python-format
+msgid "%(relation)s is not a valid operator"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:89
+msgid "Missing ManagementForm for conditions"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:186
+msgid "UnionMultiForm is not valid"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:217
+#, python-format
+msgid "%(field)s value not applicable with %(source)s source"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:221
+#, python-format
+msgid "%(field)s value missing"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:234
+msgid "Display"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:237
+#: src/beeswax/report/report_gen_views.py:393
+#: src/beeswax/report/report_gen_views.py:400
+msgid "Source"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:240
+msgid "Aggregate"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:243
+msgid "Distinct"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:246
+msgid "Constant value"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:249
+msgid "Table alias"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:251
+#: src/beeswax/report/report_gen_views.py:319
+msgid "From column"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:253
+msgid "Column alias"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:255
+msgid "Sort"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:258
+msgid "Sort order"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:260
+msgid "Group order"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:265
+#: src/beeswax/report/report_gen_views.py:316
+msgid "From table"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:272
+msgid "Source must be \"table\" when not displaying column"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:275
+msgid "Column alias not applicable when not displaying column"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:278
+msgid "Source value missing"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:313
+#: src/beeswax/report/report_gen_views.py:397
+#: src/beeswax/report/report_gen_views.py:404
+msgid "Constant"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:322
+msgid "Sort order missing"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:329
+msgid "Alias not applicable for selecting \"*\""
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:331
+#, python-format
+msgid "Invalid column name \"%(column)s\""
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:369
+#, python-format
+msgid "Ambiguous table \"%(table)s\" without alias"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:379
+msgid "Not selecting from any table column"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:381
+msgid "Not displaying any selection"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:395
+#: src/beeswax/report/report_gen_views.py:402
+msgid "Table name/alias"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:396
+#: src/beeswax/report/report_gen_views.py:403
+#: src/beeswax/templates/create_table_manually.mako:312
+#: src/beeswax/templates/define_columns.mako:67
+msgid "Column name"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:398
+msgid "Condition"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:416
+#, python-format
+msgid "Operator %(operator)s does not take the right operand"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:420
+#, python-format
+msgid "Operator %(operator)s takes both operands"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:425
+msgid "Constant (Left)"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:427
+msgid "Table (Left)"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:429
+msgid "Column (Left)"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:435
+msgid "Constant (Right)"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:437
+msgid "Table (Right)"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:439
+msgid "Column (Right)"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:470
+#, python-format
+msgid "Unknown table \"%(table)s\" in condition"
+msgstr ""
+
+#: src/beeswax/report/report_gen_views.py:487
+msgid "Remove"
+msgstr ""
 
 #: src/beeswax/templates/beeswax_components.mako:198
 msgid "Beginning of List"
@@ -210,11 +884,6 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: src/beeswax/templates/configuration.mako:37
-#: src/beeswax/templates/list_designs.mako:32
-msgid "Description"
-msgstr ""
-
 #: src/beeswax/templates/create_table_index.mako:21
 msgid "Beeswax: Create Table"
 msgstr ""
@@ -379,10 +1048,6 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:236
-msgid "Use default location"
-msgstr ""
-
 #: src/beeswax/templates/create_table_manually.mako:239
 msgid ""
 "Store your table in the default location (controlled by Hive, and "
@@ -443,11 +1108,6 @@ msgstr ""
 
 #: src/beeswax/templates/create_table_manually.mako:307
 msgid "Delete this column"
-msgstr ""
-
-#: src/beeswax/templates/create_table_manually.mako:312
-#: src/beeswax/templates/define_columns.mako:67
-msgid "Column name"
 msgstr ""
 
 #: src/beeswax/templates/create_table_manually.mako:314
@@ -675,13 +1335,6 @@ msgstr ""
 msgid "Execute"
 msgstr ""
 
-#: src/beeswax/templates/execute.mako:54 src/beeswax/templates/execute.mako:289
-#: src/beeswax/templates/save_results.mako:43
-#: src/beeswax/templates/watch_results.mako:38
-#: src/beeswax/templates/watch_results.mako:156
-msgid "Save"
-msgstr ""
-
 #: src/beeswax/templates/execute.mako:56
 msgid "Save as..."
 msgstr ""
@@ -852,10 +1505,6 @@ msgstr ""
 #: src/beeswax/templates/index.mako:86
 #: src/beeswax/templates/show_tables.mako:111
 msgid "There was an error processing your request:"
-msgstr ""
-
-#: src/beeswax/templates/layout.mako:34
-msgid "Query Editor"
 msgstr ""
 
 #: src/beeswax/templates/layout.mako:35
@@ -1123,11 +1772,6 @@ msgstr ""
 #: src/beeswax/templates/show_tables.mako:21
 #: src/beeswax/templates/show_tables.mako:25
 msgid "Beeswax: Table List"
-msgstr ""
-
-#: src/beeswax/templates/show_tables.mako:43
-#: src/beeswax/templates/watch_results.mako:139
-msgid "Table Name"
 msgstr ""
 
 #: src/beeswax/templates/util.mako:66

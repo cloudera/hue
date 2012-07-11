@@ -48,6 +48,8 @@ from beeswaxd.ttypes import BeeswaxException
 
 import hive_metastore.ttypes
 
+from django.utils.translation import ugettext as _
+
 LOG = logging.getLogger(__name__)
 DEFAULT_INSTALL_USER = 'hue'
 
@@ -75,7 +77,7 @@ class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     """Main entry point to install examples. May raise InstallException"""
     if self._check_installed():
-      msg = 'Beeswax examples already installed'
+      msg = _('Beeswax examples already installed')
       LOG.error(msg)
       raise InstallException(msg)
 
@@ -167,7 +169,7 @@ class SampleTable(object):
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
     self._contents_file = os.path.join(self._data_dir, self.filename)
     if not os.path.isfile(self._contents_file):
-      msg = 'Cannot find table data in "%s"' % (self._contents_file,)
+      msg = _('Cannot find table data in "%(file)s"') % {'file': self._contents_file}
       LOG.error(msg)
       raise ValueError(msg)
 
@@ -184,7 +186,7 @@ class SampleTable(object):
     try:
       # Already exists?
       tables = db_utils.meta_client().get_table("default", self.name)
-      msg = 'Table "%s" already exists' % (self.name,)
+      msg = _('Table "%(table)s" already exists') % {'table': self.name}
       LOG.error(msg)
       raise InstallException(msg)
     except hive_metastore.ttypes.NoSuchObjectException:
@@ -192,11 +194,11 @@ class SampleTable(object):
       try:
         results = db_utils.execute_and_wait(django_user, query_msg)
         if not results:
-          msg = 'Error creating table %s: Operation timeout' % (self.name,)
+          msg = _('Error creating table %(table)s: Operation timeout') % {'table': self.name}
           LOG.error(msg)
           raise InstallException(msg)
       except BeeswaxException, ex:
-        msg = 'Error creating table %s: %s' % (self.name, ex)
+        msg = _('Error creating table %(table)s: %(error)s') % {'table': self.name, 'error': ex}
         LOG.error(msg)
         raise InstallException(msg)
 
@@ -216,11 +218,11 @@ class SampleTable(object):
     try:
       results = db_utils.execute_and_wait(django_user, query_msg)
       if not results:
-        msg = 'Error loading table %s: Operation timeout' % (self.name,)
+        msg = _('Error loading table %(table)s: Operation timeout') % {'table': self.name}
         LOG.error(msg)
         raise InstallException(msg)
     except BeeswaxException, ex:
-      msg = 'Error loading table %s: %s' % (self.name, ex)
+      msg = _('Error loading table %(table)s: %(error)s') % {'table': self.name, 'error': ex}
       LOG.error(msg)
       raise InstallException(msg)
 
@@ -241,7 +243,7 @@ class SampleDesign(object):
     try:
       # Don't overwrite
       model = models.SavedQuery.objects.get(owner=django_user, name=self.name)
-      msg = 'Sample design %s already exists' % (self.name,)
+      msg = _('Sample design %(name)s already exists') % {'name': self.name}
       LOG.error(msg)
       raise InstallException(msg)
     except models.SavedQuery.DoesNotExist:
