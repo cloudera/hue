@@ -23,6 +23,8 @@ from filebrowser.lib import rwx
 from hadoop.fs import normpath
 from django.contrib.auth.models import User, Group
 
+from django.utils.translation import ugettext_lazy as _
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -36,9 +38,9 @@ class PathField(CharField):
     return normpath(CharField.clean(self, value))
 
 class EditorForm(forms.Form):
-  path = PathField(label="File to edit")
-  contents = CharField(widget=Textarea, label="Contents", required=False)
-  encoding = CharField(label='Encoding', required=False)
+  path = PathField(label=_("File to edit"))
+  contents = CharField(widget=Textarea, label=_("Contents"), required=False)
+  encoding = CharField(label=_('Encoding'), required=False)
 
   def clean_encoding(self):
     encoding = self.cleaned_data.get('encoding', '').strip()
@@ -48,40 +50,40 @@ class EditorForm(forms.Form):
 
 class RenameForm(forms.Form):
   op = "rename"
-  src_path = CharField(label="File to rename", help_text="The file to rename.")
-  dest_path = CharField(label="New name", help_text="Rename the file to:")
+  src_path = CharField(label=_("File to rename"), help_text=_("The file to rename."))
+  dest_path = CharField(label=_("New name"), help_text=_("Rename the file to:"))
 
 class UploadForm(forms.Form):
   op = "upload"
   # The "hdfs" prefix in "hdfs_file" triggers the HDFSfileUploadHandler
-  hdfs_file = FileField(forms.Form, label="File to Upload")
-  dest = PathField(label="Destination Path", help_text="Filename or directory to upload to.")
+  hdfs_file = FileField(forms.Form, label=_("File to Upload"))
+  dest = PathField(label=_("Destination Path"), help_text=_("Filename or directory to upload to."))
 
 class RemoveForm(forms.Form):
   op = "remove"
-  path = PathField(label="File to remove")
+  path = PathField(label=_("File to remove"))
 
 class RmDirForm(forms.Form):
   op = "rmdir"
-  path = PathField(label="Directory to remove")
+  path = PathField(label=_("Directory to remove"))
 
 class RmTreeForm(forms.Form):
   op = "rmtree"
-  path = PathField(label="Directory to remove (recursively)")
+  path = PathField(label=_("Directory to remove (recursively)"))
 
 class MkDirForm(forms.Form):
   op = "mkdir"
-  path = PathField(label="Path in which to create the directory")
-  name = PathField(label="Directory Name")
+  path = PathField(label=_("Path in which to create the directory"))
+  name = PathField(label=_("Directory Name"))
 
 class ChownForm(forms.Form):
   op = "chown"
-  path = PathField(label="Path to change user/group ownership")
+  path = PathField(label=_("Path to change user/group ownership"))
   # These could be "ChoiceFields", listing only users and groups
   # that the current user has permissions for.
-  user = CharField(label="User", min_length=1)
+  user = CharField(label=_("User"), min_length=1)
   user_other = CharField(label="OtherUser", min_length=1, required=False)
-  group = CharField(label="Group", min_length=1)
+  group = CharField(label=_("Group"), min_length=1)
   group_other = CharField(label="OtherGroup", min_length=1, required=False)
 
   def __init__(self, *args, **kwargs):
@@ -92,7 +94,7 @@ class ChownForm(forms.Form):
 
 class ChmodForm(forms.Form):
   op = "chmod"
-  path = PathField(label="Path to change permissions")
+  path = PathField(label=_("Path to change permissions"))
 
   # By default, BooleanField only validates when
   # it's checked.  Oy.

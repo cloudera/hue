@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-02 23:32+0200\n"
+"POT-Creation-Date: 2012-07-11 03:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,22 +17,222 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/filebrowser/templates/chmod.mako:32
-msgid "Change Permissions:"
+#: src/filebrowser/forms.py:41
+msgid "File to edit"
 msgstr ""
 
-#: src/filebrowser/templates/chmod.mako:40
+#: src/filebrowser/forms.py:42
+msgid "Contents"
+msgstr ""
+
+#: src/filebrowser/forms.py:43
+msgid "Encoding"
+msgstr ""
+
+#: src/filebrowser/forms.py:53
+msgid "File to rename"
+msgstr ""
+
+#: src/filebrowser/forms.py:53
+msgid "The file to rename."
+msgstr ""
+
+#: src/filebrowser/forms.py:54
+#: src/filebrowser/templates/listdir_components.mako:160
+msgid "New name"
+msgstr ""
+
+#: src/filebrowser/forms.py:54
+msgid "Rename the file to:"
+msgstr ""
+
+#: src/filebrowser/forms.py:59
+msgid "File to Upload"
+msgstr ""
+
+#: src/filebrowser/forms.py:60
+msgid "Destination Path"
+msgstr ""
+
+#: src/filebrowser/forms.py:60
+msgid "Filename or directory to upload to."
+msgstr ""
+
+#: src/filebrowser/forms.py:64
+msgid "File to remove"
+msgstr ""
+
+#: src/filebrowser/forms.py:68
+msgid "Directory to remove"
+msgstr ""
+
+#: src/filebrowser/forms.py:72
+msgid "Directory to remove (recursively)"
+msgstr ""
+
+#: src/filebrowser/forms.py:76
+msgid "Path in which to create the directory"
+msgstr ""
+
+#: src/filebrowser/forms.py:77
+#: src/filebrowser/templates/listdir_components.mako:202
+msgid "Directory Name"
+msgstr ""
+
+#: src/filebrowser/forms.py:81
+msgid "Path to change user/group ownership"
+msgstr ""
+
+#: src/filebrowser/forms.py:84 src/filebrowser/templates/chmod.mako:40
 #: src/filebrowser/templates/chown.mako:71
 #: src/filebrowser/templates/display.mako:77
 #: src/filebrowser/templates/listdir_components.mako:63
 msgid "User"
 msgstr ""
 
-#: src/filebrowser/templates/chmod.mako:41
+#: src/filebrowser/forms.py:86 src/filebrowser/templates/chmod.mako:41
 #: src/filebrowser/templates/chown.mako:79
 #: src/filebrowser/templates/display.mako:79
 #: src/filebrowser/templates/listdir_components.mako:64
 msgid "Group"
+msgstr ""
+
+#: src/filebrowser/forms.py:97
+msgid "Path to change permissions"
+msgstr ""
+
+#: src/filebrowser/views.py:93 src/filebrowser/views.py:366
+#: src/filebrowser/views.py:394
+#, python-format
+msgid "File not found: %(path)s"
+msgstr ""
+
+#: src/filebrowser/views.py:95
+#, python-format
+msgid "'%(path)s' is not a file"
+msgstr ""
+
+#: src/filebrowser/views.py:130
+#, python-format
+msgid "Cannot access: %(path)s."
+msgstr ""
+
+#: src/filebrowser/views.py:132 src/filebrowser/views.py:674
+#, python-format
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
+msgstr ""
+
+#: src/filebrowser/views.py:150
+#, python-format
+msgid "Cannot edit a directory: %(path)s"
+msgstr ""
+
+#: src/filebrowser/views.py:154
+#, python-format
+msgid "File too big to edit: %(path)s"
+msgstr ""
+
+#: src/filebrowser/views.py:164
+#, python-format
+msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
+msgstr ""
+
+#: src/filebrowser/views.py:213
+#, python-format
+msgid "Saved %(path)s."
+msgstr ""
+
+#: src/filebrowser/views.py:308
+#, python-format
+msgid "Not a directory: %(path)s"
+msgstr ""
+
+#: src/filebrowser/views.py:415
+#, python-format
+msgid "Not a file: '%(path)s'"
+msgstr ""
+
+#: src/filebrowser/views.py:437
+msgid "First byte to display must be before last byte to display."
+msgstr ""
+
+#: src/filebrowser/views.py:447
+msgid "Mode must be one of 'binary' or 'text'."
+msgstr ""
+
+#: src/filebrowser/views.py:449
+msgid "Offset may not be less than zero."
+msgstr ""
+
+#: src/filebrowser/views.py:451
+msgid "Length may not be less than zero."
+msgstr ""
+
+#: src/filebrowser/views.py:453
+#, python-format
+msgid "Cannot request chunks greater than %(bytes)d bytes"
+msgstr ""
+
+#: src/filebrowser/views.py:564
+msgid "Failed to read Avro file"
+msgstr ""
+
+#: src/filebrowser/views.py:573
+msgid "We don't support offset and gzip Compression"
+msgstr ""
+
+#: src/filebrowser/views.py:580
+msgid "Failed to decompress file"
+msgstr ""
+
+#: src/filebrowser/views.py:595
+msgid "Failed to read file"
+msgstr ""
+
+#: src/filebrowser/views.py:623 src/filebrowser/views.py:625
+#: src/filebrowser/templates/display.mako:119
+#: src/filebrowser/templates/display.mako:199
+msgid "First Block"
+msgstr ""
+
+#: src/filebrowser/views.py:623 src/filebrowser/views.py:625
+#: src/filebrowser/templates/display.mako:120
+#: src/filebrowser/templates/display.mako:200
+msgid "Previous Block"
+msgstr ""
+
+#: src/filebrowser/views.py:628 src/filebrowser/views.py:631
+#: src/filebrowser/templates/display.mako:121
+#: src/filebrowser/templates/display.mako:201
+msgid "Next Block"
+msgstr ""
+
+#: src/filebrowser/views.py:628 src/filebrowser/views.py:631
+#: src/filebrowser/templates/display.mako:122
+#: src/filebrowser/templates/display.mako:202
+msgid "Last Block"
+msgstr ""
+
+#: src/filebrowser/views.py:672
+msgid "Cannot perform operation."
+msgstr ""
+
+#: src/filebrowser/views.py:818
+#, python-format
+msgid "Failed to chown uploaded file (\"%(file)s\") as superuser %(superuser)s"
+msgstr ""
+
+#: src/filebrowser/views.py:830
+#, python-format
+msgid ""
+"Failed to rename uploaded temporary file (\"%(file)s\") to \"%(name)s\": "
+"%(error)s"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:32
+msgid "Change Permissions:"
 msgstr ""
 
 #: src/filebrowser/templates/chmod.mako:42
@@ -168,26 +368,6 @@ msgstr ""
 msgid "Mode"
 msgstr ""
 
-#: src/filebrowser/templates/display.mako:119
-#: src/filebrowser/templates/display.mako:199
-msgid "First Block"
-msgstr ""
-
-#: src/filebrowser/templates/display.mako:120
-#: src/filebrowser/templates/display.mako:200
-msgid "Previous Block"
-msgstr ""
-
-#: src/filebrowser/templates/display.mako:121
-#: src/filebrowser/templates/display.mako:201
-msgid "Next Block"
-msgstr ""
-
-#: src/filebrowser/templates/display.mako:122
-#: src/filebrowser/templates/display.mako:202
-msgid "Last Block"
-msgstr ""
-
 #: src/filebrowser/templates/display.mako:126
 msgid "Viewing Bytes:"
 msgstr ""
@@ -321,24 +501,17 @@ msgstr ""
 msgid "Renaming:"
 msgstr ""
 
-#: src/filebrowser/templates/listdir_components.mako:160
-msgid "New name"
-msgstr ""
-
 #: src/filebrowser/templates/listdir_components.mako:179
 msgid "Uploading to:"
 msgstr ""
 
 #: src/filebrowser/templates/listdir_components.mako:185
+#: src/filebrowser/templates/upload.mako:31
 msgid "Please enable JavaScript to use file uploader."
 msgstr ""
 
 #: src/filebrowser/templates/listdir_components.mako:199
 msgid "Create Directory"
-msgstr ""
-
-#: src/filebrowser/templates/listdir_components.mako:202
-msgid "Directory Name"
 msgstr ""
 
 #: src/filebrowser/templates/listdir_components.mako:207
@@ -362,5 +535,17 @@ msgstr ""
 
 #: src/filebrowser/templates/move.mako:24
 msgid "Move:"
+msgstr ""
+
+#: src/filebrowser/templates/upload.mako:28
+msgid "Upload Files"
+msgstr ""
+
+#: src/filebrowser/templates/upload_done.mako:22
+msgid "View uploaded file:"
+msgstr ""
+
+#: src/filebrowser/templates/upload_done.mako:23
+msgid "Go back to where you were:"
 msgstr ""
 

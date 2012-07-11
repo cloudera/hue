@@ -47,6 +47,8 @@ from filebrowser.forms import RenameForm, UploadForm, MkDirForm, RmDirForm, RmTr
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 
+from django.utils.translation import ugettext as _
+
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
@@ -88,9 +90,9 @@ def download(request, path):
     This is inspired by django.views.static.serve.
     """
     if not request.fs.exists(path):
-        raise Http404("File not found: %s" % escape(path))
+        raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
     if not request.fs.isfile(path):
-        raise PopupException("'%s' is not a file" % (path,))
+        raise PopupException(_("'%(path)s' is not a file") % {'path': path})
 
     mimetype = mimetypes.guess_type(path)[0] or 'application/octet-stream'
     stats = request.fs.stats(path)
@@ -125,9 +127,9 @@ def view(request, path):
         else:
             return display(request, path)
     except (IOError, WebHdfsException), e:
-        msg = "Cannot access: %s." % escape(path)
+        msg = _("Cannot access: %(path)s.") % {'path': escape(path)}
         if request.user.is_superuser and not request.user == request.fs.superuser:
-            msg += ' Note: you are a Hue admin but not a HDFS superuser (which is "%s").' % (request.fs.superuser,)
+            msg += _(' Note: you are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') % {'superuser': request.fs.superuser}
         raise PopupException(msg , detail=e)
 
 
@@ -145,11 +147,11 @@ def edit(request, path, form=None):
 
     # Can't edit a directory
     if stats and stats['mode'] & stat_module.S_IFDIR:
-        raise PopupException("Cannot edit a directory: %s" % (path,))
+        raise PopupException(_("Cannot edit a directory: %(path)s") % {'path': path})
 
     # Maximum size of edit
     if stats and stats['size'] > MAX_FILEEDITOR_SIZE:
-        raise PopupException("File too big to edit: %s" % (path,))
+        raise PopupException(_("File too big to edit: %(path)s") % {'path': path})
 
     if not form:
         encoding = request.REQUEST.get('encoding') or i18n.get_site_encoding()
@@ -159,7 +161,7 @@ def edit(request, path, form=None):
                 try:
                     current_contents = unicode(f.read(), encoding)
                 except UnicodeDecodeError:
-                    raise PopupException("File is not encoded in %s; cannot be edited: %s" % (encoding, path))
+                    raise PopupException(_("File is not encoded in %(encoding)s; cannot be edited: %(path)s") % {'encoding': encoding, 'path': path})
             finally:
                 f.close()
         else:
@@ -208,7 +210,7 @@ def save_file(request):
                          form.cleaned_data['contents'],
                          form.cleaned_data['encoding'])
 
-    request.flash.put('Saved %s.' % os.path.basename(path))
+    request.flash.put(_('Saved %(path)s.') % {'path': os.path.basename(path)})
     """ Changing path to reflect the request path of the JFrame that will actually be returned."""
     request.path = urlresolvers.reverse("filebrowser.views.edit", kwargs=dict(path=path))
     return edit(request, path, form)
@@ -303,7 +305,7 @@ def listdir(request, path, chooser):
     Intended to be called via view().
     """
     if not request.fs.isdir(path):
-        raise PopupException("Not a directory: %s" % (path,))
+        raise PopupException(_("Not a directory: %(path)s") % {'path': path})
 
     file_filter = request.REQUEST.get('file_filter', 'any')
 
@@ -361,7 +363,7 @@ def chooser(request, path):
     elif request.fs.isfile(path):
         return display(request, path)
     else:
-        raise Http404("File not found: %s" % escape(path))
+        raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
 
 
 def _massage_stats(request, stats):
@@ -389,7 +391,7 @@ def stat(request, path):
     an HTML view).
     """
     if not request.fs.exists(path):
-        raise Http404("File not found: %s" % escape(path))
+        raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
     stats = request.fs.stats(path)
     return render_json(_massage_stats(request, stats))
 
@@ -410,7 +412,7 @@ def display(request, path):
     There exists a python-magic package to interface with libmagic.
     """
     if not request.fs.isfile(path):
-        raise PopupException("Not a file: '%s'" % (path,))
+        raise PopupException(_("Not a file: '%(path)s'") % {'path': path})
 
     stats = request.fs.stats(path)
     encoding = request.GET.get('encoding') or i18n.get_site_encoding()
@@ -432,7 +434,7 @@ def display(request, path):
         offset = begin
         length = end - begin
         if begin >= end:
-            raise PopupException("First byte to display must be before last byte to display.")
+            raise PopupException(_("First byte to display must be before last byte to display."))
     else:
         length = int(request.GET.get("length", DEFAULT_CHUNK_SIZE_BYTES))
         # Display first block by default.
@@ -442,13 +444,13 @@ def display(request, path):
     compression = request.GET.get("compression")
 
     if mode and mode not in ["binary", "text"]:
-        raise PopupException("Mode must be one of 'binary' or 'text'.")
+        raise PopupException(_("Mode must be one of 'binary' or 'text'."))
     if offset < 0:
-        raise PopupException("Offset may not be less than zero.")
+        raise PopupException(_("Offset may not be less than zero."))
     if length < 0:
-        raise PopupException("Length may not be less than zero.")
+        raise PopupException(_("Length may not be less than zero."))
     if length > MAX_CHUNK_SIZE_BYTES:
-        raise PopupException("Cannot request chunks greater than %d bytes" % MAX_CHUNK_SIZE_BYTES)
+        raise PopupException(_("Cannot request chunks greater than %(bytes)d bytes") % {'bytes': MAX_CHUNK_SIZE_BYTES})
 
     # Do not decompress in binary mode.
     if mode == 'binary':
@@ -559,7 +561,7 @@ def _read_avro(fs, path, offset, length):
             contents = "".join(contents_list)
         except:
             logging.warn("Could not read avro file at %s" % path, exc_info=True)
-            raise PopupException("Failed to read Avro file")
+            raise PopupException(_("Failed to read Avro file"))
     finally:
         fhandle.close()
     return contents
@@ -568,14 +570,14 @@ def _read_avro(fs, path, offset, length):
 def _read_gzip(fs, path, offset, length):
     contents = ''
     if offset and offset != 0:
-        raise PopupException("We don't support offset and gzip Compression")
+        raise PopupException(_("We don't support offset and gzip Compression"))
     try:
         fhandle = fs.open(path)
         try:
             contents = GzipFile('', 'r', 0, StringIO(fhandle.read())).read(length)
         except:
             logging.warn("Could not decompress file at %s" % path, exc_info=True)
-            raise PopupException("Failed to decompress file")
+            raise PopupException(_("Failed to decompress file"))
     finally:
         fhandle.close()
     return contents
@@ -590,7 +592,7 @@ def _read_simple(fs, path, offset, length):
             contents = fhandle.read(length)
         except:
             logging.warn("Could not read file at %s" % path, exc_info=True)
-            raise PopupException("Failed to read file")
+            raise PopupException(_("Failed to read file"))
     finally:
         fhandle.close()
     return contents
@@ -618,15 +620,15 @@ def _calculate_navigation(offset, length, size):
     language is too limiting.
     """
     if offset == 0:
-        first, prev = (-1, None, "First Block"), (-1, None, "Previous Block")
+        first, prev = (-1, None, _("First Block")), (-1, None, _("Previous Block"))
     else:
-        first, prev = (0, length, "First Block"), (max(0, offset - length), length, "Previous Block")
+        first, prev = (0, length, _("First Block")), (max(0, offset - length), length, _("Previous Block"))
 
     if offset + length >= size:
-        next, last = (-1, None, "Next Block"), (-1, None, "Last Block")
+        next, last = (-1, None, _("Next Block")), (-1, None, _("Last Block"))
     else:
         # 1-off Reasoning: if length is the same as size, you want to start at 0.
-        next, last = (offset + length, length, "Next Block"), (max(0, size - length), length, "Last Block")
+        next, last = (offset + length, length, _("Next Block")), (max(0, size - length), length, _("Last Block"))
 
     return first, prev, next, last
 
@@ -667,10 +669,10 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
             try:
                 op(*args)
             except (IOError, WebHdfsException), e:
-                msg = "Cannot perform operation."
+                msg = _("Cannot perform operation.")
                 if request.user.is_superuser and not request.user == request.fs.superuser:
-                    msg += ' Note: you are a Hue admin but not a HDFS superuser (which is "%s").' \
-                           % (request.fs.superuser,)
+                    msg += _(' Note: you are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') \
+                           % {'superuser': request.fs.superuser}
                 raise PopupException(msg, detail=e)
             if next:
                 logging.debug("Next: %s" % next)
@@ -813,8 +815,8 @@ def _upload(request):
                     request.fs.chmod(tmp_file, 0644)
                     request.fs.chown(tmp_file, username, username)
                 except IOError, ex:
-                    msg = 'Failed to chown uploaded file ("%s") as superuser %s' %\
-                          (tmp_file, request.fs.superuser)
+                    msg = _('Failed to chown uploaded file ("%(file)s") as superuser %(superuser)s') %\
+                          {'file': tmp_file, 'superuser': request.fs.superuser}
                     logger.exception(msg)
                     raise PopupException(msg, detail=str(ex))
             finally:
@@ -825,8 +827,8 @@ def _upload(request):
                 request.fs.rename(uploaded_file.get_temp_path(), dest)
             except IOError, ex:
                 raise PopupException(
-                    'Failed to rename uploaded temporary file ("%s") to "%s": %s' %
-                    (tmp_file, dest, ex))
+                    _('Failed to rename uploaded temporary file ("%(file)s") to "%(name)s": %(error)s') %
+                    {'file': tmp_file, 'name': dest, 'error': ex})
 
             dest_stats = request.fs.stats(dest)
             return render('upload_done.mako', request, {
