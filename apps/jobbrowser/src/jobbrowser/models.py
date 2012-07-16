@@ -30,8 +30,10 @@ import urllib2
 from django.utils.translation import ugettext as _
 
 import hadoop.api.jobtracker.ttypes as ttypes
+from hadoop.api.jobtracker.ttypes import JobNotFoundException
 
 from django.utils.translation import ugettext as _
+from desktop.lib.django_util import PopupException
 
 LOGGER = logging.getLogger(__name__)
 
@@ -76,9 +78,14 @@ class Job(JobLinkage):
       Returns a Job instance given a job tracker interface and an id. The job tracker interface is typically
       located in request.jt.
     """
-    thriftjob = jt.get_job(jt.thriftjobid_from_string(jobid))
-    if not thriftjob:
-      raise Exception(_("could not find job with id %(jobid)s") % {'jobid': jobid})
+    try:
+      thriftjob = jt.get_job(jt.thriftjobid_from_string(jobid))
+    except JobNotFoundException:
+      try:
+        thriftjob = jt.get_retired_job(jt.thriftjobid_from_string(jobid))
+      except JobNotFoundException, e:
+        raise PopupException(_("Could not find job with id %(jobid)s") % {'jobid': jobid}, detail=e)
+
     return Job(jt, thriftjob)
 
   @staticmethod

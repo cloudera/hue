@@ -811,6 +811,27 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             });
         }
 
+        /** Returns a retired job (does not include task info, miss some fields) */
+        public ThriftJobInProgress getRetiredJob(final RequestContext ctx, final ThriftJobID jobID) throws JobNotFoundException {
+            final JobID jid = JTThriftUtils.fromThrift(jobID);
+
+            final JobStatus jobStatus = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobStatus>() {
+              public JobStatus run() {
+                return jobTracker.getJobStatus(jid);
+              }
+            });
+
+            if (jobStatus == null) {
+              throw new JobNotFoundException();
+            }
+
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobInProgress>() {
+              public ThriftJobInProgress run() {
+                return JTThriftUtils.toThrift(jobTracker.getJobProfile(jid), jobStatus);
+              }
+            });
+        }
+
         /** Returns all retired jobs (does not include task info, miss some fields) */
         public ThriftJobList getRetiredJobs(RequestContext ctx, final ThriftJobState state) {
             return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobList>() {
@@ -828,6 +849,9 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
                     }
                     for (JobInProgress job : jobTracker.completedJobs()) {
                         jobsInProgressId.add(job.getJobID());
+                    }
+                    for (JobStatus job : jobTracker.jobsToComplete()) {
+                      jobsInProgressId.add(job.getJobID());
                     }
                 }
 

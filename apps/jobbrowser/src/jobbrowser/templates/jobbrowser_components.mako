@@ -62,10 +62,17 @@
                 job_count = counter.get('job', 0)
             %>
             <tr>
-                <td>${format_counter_name(counter.get('displayName', 'n/a'))}</td>
-                <td>${map_count}</td>
-                <td>${reduce_count}</td>
-                <td>${map_count + reduce_count + job_count}</td>
+                % if not job.is_retired:
+	                <td>${format_counter_name(counter.get('displayName', 'n/a'))}</td>
+	                <td>${map_count}</td>
+	                <td>${reduce_count}</td>
+	                <td>${map_count + reduce_count + job_count}</td>
+                % else:
+	                <td>N/A</td>
+	                <td>N/A</td>
+	                <td>N/A</td>
+	                <td>N/A</td>
+                % endif
             </tr>
             % endfor
         </tbody>

@@ -99,6 +99,10 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                             % else:
                                 <span class="label">${job.status.lower()}</span>
                             % endif
+
+                            % if job.is_retired:
+                                <span class="label label-warning">${ _('retired') }</span>
+                            % endif
                     </li>
                     % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                             <li class="nav-header">${_('Kill Job')}</li>
@@ -131,8 +135,15 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
 
             <div class="tab-content">
                 <div class="tab-pane active" id="tasks">
-                    <strong>${_('Maps:')}</strong> ${comps.mr_graph_maps(job)}
-                    <strong>${_('Reduces:')}</strong> ${comps.mr_graph_reduces(job)}
+                    % if not job.is_retired:
+	                    <strong>${_('Maps:')}</strong> ${comps.mr_graph_maps(job)}
+	                    <strong>${_('Reduces:')}</strong> ${comps.mr_graph_reduces(job)}
+	                % else:
+	                   ${ _('This jobs is ')} <span class="label label-warning">${ _('retired') }</span> ${ _(' and so has little information available.') }
+                       <br/>
+                       <br/>
+                    % endif
+
                     %if failed_tasks:
                             <div>
                                 <h3>
@@ -163,8 +174,8 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                     </div>
                     <table id="metadataTable" class="table table-striped table-condensed">
                         <thead>
-                        <th>${_('Name')}</th>
-                        <th>${_('Value')}</th>
+	                        <th>${_('Name')}</th>
+	                        <th>${_('Value')}</th>
                         </thead>
                         <tbody>
                         <tr>
@@ -175,6 +186,7 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                             <td>${_('User')}</td>
                             <td>${job.user}</td>
                         </tr>
+                        % if not job.is_retired:
                         <tr>
                             <td>${_('Maps')}</td>
                             <td>${job.finishedMaps} of ${job.desiredMaps}</td>
@@ -183,10 +195,12 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                             <td>${_('Reduces')}</td>
                             <td>${job.finishedReduces} of ${job.desiredReduces}</td>
                         </tr>
+                        % endif
                         <tr>
                             <td>${_('Started')}</td>
                             <td>${job.startTimeFormatted}</td>
                         </tr>
+                        % if not job.is_retired:
                         <tr>
                             <td>${_('Ended')}</td>
                             <td>${job.finishTimeFormatted}</td>
@@ -195,6 +209,7 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                             <td>${_('Duration')}</td>
                             <td>${job.duration}</td>
                         </tr>
+                        % endif
                         <tr>
                             <td>${_('Status')}</td>
                             <td>${job.status}</td>

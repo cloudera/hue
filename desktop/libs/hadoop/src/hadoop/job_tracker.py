@@ -274,9 +274,22 @@ class LiveJobTracker(object):
       self._fixup_job(job)
     return joblist
 
+  def get_retired_job(self, jobid):
+    """
+    Returns a ThriftJobInProgress (does not include task info and most of the job information)
+    """
+    try:
+      job = self.client.getRetiredJob(self.thread_local.request_context, jobid)
+    except JobNotFoundException, e:
+        e.response_data = dict(code="JT_JOB_NOT_FOUND", message="Could not find job %s on JobTracker." % jobid.asString, data=jobid)
+        raise
+    self._fixup_job(job)
+    self._fixup_retired_job(job)
+    return job
+
   def retired_jobs(self, status=None):
     """
-    Returns a ThriftJobStatusList (does not include task info)
+    Returns a ThriftJobStatusList (does not include task info and most of the job information)
     """
     joblist = self.client.getRetiredJobs(self.thread_local.request_context, status)
     for job in joblist.jobs:
