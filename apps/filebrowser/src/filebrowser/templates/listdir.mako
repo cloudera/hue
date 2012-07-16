@@ -25,12 +25,12 @@ from django.utils.translation import ugettext as _
 
 ${commonheader(_('File Browser'), 'filebrowser')}
 <div class="container-fluid">
-	<h1>${_('File Browser')}</h1>
-	% if breadcrumbs:
-        ${fb_components.breadcrumbs(path, breadcrumbs)}
-	%endif
+    <h1>${_('File Browser')}</h1>
+    % if breadcrumbs:
+        ${fb_components.breadcrumbs(path, breadcrumbs, True)}
+    %endif
     <div id="dirlist" class="view">
-    ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
+        ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
     </div>
 </div>
 ${commonfooter()}

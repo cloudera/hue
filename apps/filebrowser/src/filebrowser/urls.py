@@ -29,7 +29,7 @@ urlpatterns = patterns('filebrowser.views',
   url(r'status', 'status', name='status'),
   # Catch-all for viewing a file (display) or a directory (listdir)
   url(r'view(?P<path>/.*)', 'view', name='view'),
-  url(r'chooser(?P<path>/.*)', 'chooser', name='view'),
+  url(r'chooser(?P<path>/.*)', 'chooser', name='choose'),
   url(r'edit(?P<path>/.*)', 'edit', name='edit'),
   url(r'save', 'save_file'),
 

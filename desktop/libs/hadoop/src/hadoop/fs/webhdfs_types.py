@@ -32,7 +32,8 @@ class WebHdfsStat(object):
   """
 
   def __init__(self, file_status, parent_path):
-    self.path = Hdfs.join(parent_path, decode_fs_path(file_status['pathSuffix']))
+    self.name = decode_fs_path(file_status['pathSuffix'])
+    self.path = Hdfs.join(parent_path, self.name)
     self.isDir = file_status['type'] == 'DIRECTORY'
     self.atime = file_status['accessTime'] / 1000
     self.mtime = file_status['modificationTime'] / 1000

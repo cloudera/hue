@@ -23,6 +23,33 @@ from django.utils.translation import ugettext as _
 %>
 
 
+<%def name="pageref(num)">
+    href="?pagenum=${num}&pagesize=${pagesize}"
+</%def>
+<%def name="prevpage(page)">
+  ${pageref(page.previous_page_number())}
+</%def>
+<%def name="nextpage(page)">
+  ${pageref(page.next_page_number())}
+</%def>
+<%def name="toppage(page)">
+  ${pageref(1)}
+</%def>
+<%def name="bottompage(page)">
+  ${pageref(page.num_pages())}
+</%def>
+<%def name="pagination(page)">
+    <div class="pagination">
+        <ul class="pull-right">
+            <li class="prev"><a title="${_('Beginning of List')}" ${toppage(page)}>&larr; ${_('Beginning of List')}</a></li>
+            <li><a title="${_('Previous Page')}" ${prevpage(page)}>${_('Previous Page')}</a></li>
+            <li><a title="${_('Next page')}" ${nextpage(page)}>${_('Next Page')}</a></li>
+            <li class="next"><a title="${_('End of List')}" ${bottompage(page)}>${_('End of List')} &rarr;</a></li>
+        </ul>
+        <p>${_('Show')} <select id="pagesize" class="input-mini"><option>15</option><option selected>30</option><option>45</option><option>60</option><option>100</option><option>200</option></select> ${_('items per page')}. ${_('Showing %(start_index)s to %(end_index)s of %(total_count)s items, page %(page)s of %(num_pages)s.') % dict(start_index=page.start_index(), end_index=page.end_index(), total_count=page.total_count(), page=page.number, num_pages=page.num_pages())}</p>
+    </div>
+</%def>
+
 <%def name="list_table_chooser(files, path, current_request_path)">
   ${_table(files, path, current_request_path, 'chooser')}
 </%def>
@@ -41,29 +68,20 @@ from django.utils.translation import ugettext as _
             cursor: pointer;
         }
     </style>
-    <div class="well hueWell">
-        <p class="pull-right">
-            <a href="#" class="btn upload-link">${_('Upload files')}</a>
-            <a href="#" class="btn create-directory-link">${_('New directory')}</a>
-        </p>
-        <form class="form-search">
-            ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for file name')}">
-        </form>
-    </div>
-
+    %if len(files)>0 :
     <table class="table table-condensed table-striped datatables">
         <thead>
             <tr>
             % if cwd_set:
-                <th>${_('Name')}</th>
+                <th class="sortable sorting" data-sort="name">${_('Name')}</th>
             % else:
-                <th>${_('Path')}</th>
+                <th class="sortable sorting" data-sort="name">${_('Path')}</th>
             % endif
-                <th>${_('Size')}</th>
-                <th>${_('User')}</th>
-                <th>${_('Group')}</th>
+                <th class="sortable sorting" data-sort="size">${_('Size')}</th>
+                <th class="sortable sorting" data-sort="user">${_('User')}</th>
+                <th class="sortable sorting" data-sort="group">${_('Group')}</th>
                 <th>${_('Permissions')}</th>
-                <th>${_('Date')}</th>
+                <th class="sortable sorting" data-sort="mtime">${_('Date')}</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>
@@ -130,6 +148,13 @@ from django.utils.translation import ugettext as _
             % endfor
         </tbody>
     </table>
+
+    ${pagination(page)}
+    %else:
+        <div class="alert">
+            There are no files matching the search criteria.
+        </div>
+    %endif
 
 <!-- delete modal -->
 <div id="deleteModal" class="modal hide fade">
@@ -319,26 +344,58 @@ from django.utils.translation import ugettext as _
     // don"t wait for the window to load
     window.onload = createUploader;
 
+    function getQueryString(){
+        var queryString = {};
+        if (window.location.href.indexOf("?") > -1) {
+            window.location.href.split("?").pop().split("&").forEach(function (prop) {
+                var item = prop.split("=");
+                queryString[item.shift()] = item.shift();
+            });
+        }
+        return queryString;
+    }
+
+    function setQueryString(queryString){
+        var qs = "?"
+        for (var key in queryString) {
+            qs += key + "=" + queryString[key] + "&";
+        }
+        return qs.substring(0, qs.length - 1);
+    }
+
     $(document).ready(function(){
-        //filter handlers
-        var oTable = $('.datatables').dataTable( {
-          "sPaginationType": "bootstrap",
-          "bLengthChange": false,
-          "iDisplayLength": 15,
-          "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
-          "aoColumns": [
-                null,
-                null,
-                null,
-                null,
-                null,
-                { "sType": "date" },
-                null
-            ]
+        var qs = getQueryString();
+
+        if (qs["sortby"] == null){
+            qs["sortby"] = "name";
+        }
+
+        var el = $(".sortable[data-sort=" + qs["sortby"] + "]");
+        el.removeClass("sorting");
+        if (qs["descending"] != null && qs["descending"] == "true") {
+            el.addClass("sorting_desc");
+        }
+        else {
+            el.addClass("sorting_asc");
+        }
+
+
+        $(".sortable").click(function(){
+            qs["sortby"] = $(this).data("sort");
+            if ($(this).hasClass("sorting_asc")) {
+                qs["descending"] = "true";
+            }
+            else {
+                delete qs["descending"];
+            }
+            location.href = setQueryString(qs);
         });
 
-        $("#filterInput").keyup(function() {
-            oTable.fnFilter($(this).val(), 0 /* Column Idx */);
+        $("#pagesize").val("${pagesize}");
+        $("#pagesize").change(function(){
+            qs["pagenum"] = "1";
+            qs["pagesize"] = $("#pagesize").val();
+            location.href = setQueryString(qs);
         });
 
         //delete handlers
@@ -415,6 +472,18 @@ from django.utils.translation import ugettext as _
                 keyboard: true,
                 show: true
             });
+        });
+
+        // handle search
+        $(".search-query").keydown(function(e){
+            if (e.keyCode == 13){
+                $(".filter").click();
+            }
+        });
+        $(".filter").click(function(){
+            qs["filter"] = $(".search-query").val();
+            qs["pagenum"] = "1";
+            location.href = setQueryString(qs);
         });
 
         $("#cancelCreateDirectoryBtn").click(function(){
