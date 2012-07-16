@@ -71,6 +71,14 @@ public class Jobtracker {
     public ThriftJobList getCompletedJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx) throws org.apache.thrift.TException;
 
     /**
+     * Get a retired job
+     * 
+     * @param ctx
+     * @param jobID
+     */
+    public ThriftJobInProgress getRetiredJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID) throws JobNotFoundException, org.apache.thrift.TException;
+
+    /**
      * Get a list of retired jobs
      * 
      * @param ctx
@@ -238,6 +246,8 @@ public class Jobtracker {
     public void getRunningJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.getRunningJobs_call> resultHandler) throws org.apache.thrift.TException;
 
     public void getCompletedJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.getCompletedJobs_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void getRetiredJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.getRetiredJob_call> resultHandler) throws org.apache.thrift.TException;
 
     public void getRetiredJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobState state, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.getRetiredJobs_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -442,6 +452,33 @@ public class Jobtracker {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "getCompletedJobs failed: unknown result");
+    }
+
+    public ThriftJobInProgress getRetiredJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID) throws JobNotFoundException, org.apache.thrift.TException
+    {
+      send_getRetiredJob(ctx, jobID);
+      return recv_getRetiredJob();
+    }
+
+    public void send_getRetiredJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID) throws org.apache.thrift.TException
+    {
+      getRetiredJob_args args = new getRetiredJob_args();
+      args.setCtx(ctx);
+      args.setJobID(jobID);
+      sendBase("getRetiredJob", args);
+    }
+
+    public ThriftJobInProgress recv_getRetiredJob() throws JobNotFoundException, org.apache.thrift.TException
+    {
+      getRetiredJob_result result = new getRetiredJob_result();
+      receiveBase(result, "getRetiredJob");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      if (result.err != null) {
+        throw result.err;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "getRetiredJob failed: unknown result");
     }
 
     public ThriftJobList getRetiredJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobState state) throws org.apache.thrift.TException
@@ -1148,6 +1185,41 @@ public class Jobtracker {
       }
     }
 
+    public void getRetiredJob(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, org.apache.thrift.async.AsyncMethodCallback<getRetiredJob_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      getRetiredJob_call method_call = new getRetiredJob_call(ctx, jobID, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class getRetiredJob_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private org.apache.hadoop.thriftfs.api.RequestContext ctx;
+      private ThriftJobID jobID;
+      public getRetiredJob_call(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobID jobID, org.apache.thrift.async.AsyncMethodCallback<getRetiredJob_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.ctx = ctx;
+        this.jobID = jobID;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("getRetiredJob", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        getRetiredJob_args args = new getRetiredJob_args();
+        args.setCtx(ctx);
+        args.setJobID(jobID);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public ThriftJobInProgress getResult() throws JobNotFoundException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getRetiredJob();
+      }
+    }
+
     public void getRetiredJobs(org.apache.hadoop.thriftfs.api.RequestContext ctx, ThriftJobState state, org.apache.thrift.async.AsyncMethodCallback<getRetiredJobs_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
       getRetiredJobs_call method_call = new getRetiredJobs_call(ctx, state, resultHandler, this, ___protocolFactory, ___transport);
@@ -1829,6 +1901,7 @@ public class Jobtracker {
       processMap.put("getJob", new getJob());
       processMap.put("getRunningJobs", new getRunningJobs());
       processMap.put("getCompletedJobs", new getCompletedJobs());
+      processMap.put("getRetiredJob", new getRetiredJob());
       processMap.put("getRetiredJobs", new getRetiredJobs());
       processMap.put("getFailedJobs", new getFailedJobs());
       processMap.put("getKilledJobs", new getKilledJobs());
@@ -1951,6 +2024,26 @@ public class Jobtracker {
       protected getCompletedJobs_result getResult(I iface, getCompletedJobs_args args) throws org.apache.thrift.TException {
         getCompletedJobs_result result = new getCompletedJobs_result();
         result.success = iface.getCompletedJobs(args.ctx);
+        return result;
+      }
+    }
+
+    private static class getRetiredJob<I extends Iface> extends org.apache.thrift.ProcessFunction<I, getRetiredJob_args> {
+      public getRetiredJob() {
+        super("getRetiredJob");
+      }
+
+      protected getRetiredJob_args getEmptyArgsInstance() {
+        return new getRetiredJob_args();
+      }
+
+      protected getRetiredJob_result getResult(I iface, getRetiredJob_args args) throws org.apache.thrift.TException {
+        getRetiredJob_result result = new getRetiredJob_result();
+        try {
+          result.success = iface.getRetiredJob(args.ctx, args.jobID);
+        } catch (JobNotFoundException err) {
+          result.err = err;
+        }
         return result;
       }
     }
@@ -6121,6 +6214,780 @@ public class Jobtracker {
         sb.append("null");
       } else {
         sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+  }
+
+  public static class getRetiredJob_args implements org.apache.thrift.TBase<getRetiredJob_args, getRetiredJob_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("getRetiredJob_args");
+
+    private static final org.apache.thrift.protocol.TField CTX_FIELD_DESC = new org.apache.thrift.protocol.TField("ctx", org.apache.thrift.protocol.TType.STRUCT, (short)10);
+    private static final org.apache.thrift.protocol.TField JOB_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("jobID", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+
+    public org.apache.hadoop.thriftfs.api.RequestContext ctx; // required
+    public ThriftJobID jobID; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      CTX((short)10, "ctx"),
+      JOB_ID((short)1, "jobID");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 10: // CTX
+            return CTX;
+          case 1: // JOB_ID
+            return JOB_ID;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CTX, new org.apache.thrift.meta_data.FieldMetaData("ctx", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, org.apache.hadoop.thriftfs.api.RequestContext.class)));
+      tmpMap.put(_Fields.JOB_ID, new org.apache.thrift.meta_data.FieldMetaData("jobID", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, ThriftJobID.class)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getRetiredJob_args.class, metaDataMap);
+    }
+
+    public getRetiredJob_args() {
+    }
+
+    public getRetiredJob_args(
+      org.apache.hadoop.thriftfs.api.RequestContext ctx,
+      ThriftJobID jobID)
+    {
+      this();
+      this.ctx = ctx;
+      this.jobID = jobID;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public getRetiredJob_args(getRetiredJob_args other) {
+      if (other.isSetCtx()) {
+        this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext(other.ctx);
+      }
+      if (other.isSetJobID()) {
+        this.jobID = new ThriftJobID(other.jobID);
+      }
+    }
+
+    public getRetiredJob_args deepCopy() {
+      return new getRetiredJob_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.ctx = null;
+      this.jobID = null;
+    }
+
+    public org.apache.hadoop.thriftfs.api.RequestContext getCtx() {
+      return this.ctx;
+    }
+
+    public getRetiredJob_args setCtx(org.apache.hadoop.thriftfs.api.RequestContext ctx) {
+      this.ctx = ctx;
+      return this;
+    }
+
+    public void unsetCtx() {
+      this.ctx = null;
+    }
+
+    /** Returns true if field ctx is set (has been assigned a value) and false otherwise */
+    public boolean isSetCtx() {
+      return this.ctx != null;
+    }
+
+    public void setCtxIsSet(boolean value) {
+      if (!value) {
+        this.ctx = null;
+      }
+    }
+
+    public ThriftJobID getJobID() {
+      return this.jobID;
+    }
+
+    public getRetiredJob_args setJobID(ThriftJobID jobID) {
+      this.jobID = jobID;
+      return this;
+    }
+
+    public void unsetJobID() {
+      this.jobID = null;
+    }
+
+    /** Returns true if field jobID is set (has been assigned a value) and false otherwise */
+    public boolean isSetJobID() {
+      return this.jobID != null;
+    }
+
+    public void setJobIDIsSet(boolean value) {
+      if (!value) {
+        this.jobID = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case CTX:
+        if (value == null) {
+          unsetCtx();
+        } else {
+          setCtx((org.apache.hadoop.thriftfs.api.RequestContext)value);
+        }
+        break;
+
+      case JOB_ID:
+        if (value == null) {
+          unsetJobID();
+        } else {
+          setJobID((ThriftJobID)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case CTX:
+        return getCtx();
+
+      case JOB_ID:
+        return getJobID();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case CTX:
+        return isSetCtx();
+      case JOB_ID:
+        return isSetJobID();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getRetiredJob_args)
+        return this.equals((getRetiredJob_args)that);
+      return false;
+    }
+
+    public boolean equals(getRetiredJob_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_ctx = true && this.isSetCtx();
+      boolean that_present_ctx = true && that.isSetCtx();
+      if (this_present_ctx || that_present_ctx) {
+        if (!(this_present_ctx && that_present_ctx))
+          return false;
+        if (!this.ctx.equals(that.ctx))
+          return false;
+      }
+
+      boolean this_present_jobID = true && this.isSetJobID();
+      boolean that_present_jobID = true && that.isSetJobID();
+      if (this_present_jobID || that_present_jobID) {
+        if (!(this_present_jobID && that_present_jobID))
+          return false;
+        if (!this.jobID.equals(that.jobID))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(getRetiredJob_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getRetiredJob_args typedOther = (getRetiredJob_args)other;
+
+      lastComparison = Boolean.valueOf(isSetCtx()).compareTo(typedOther.isSetCtx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCtx()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.ctx, typedOther.ctx);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetJobID()).compareTo(typedOther.isSetJobID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJobID()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.jobID, typedOther.jobID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      org.apache.thrift.protocol.TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == org.apache.thrift.protocol.TType.STOP) { 
+          break;
+        }
+        switch (field.id) {
+          case 10: // CTX
+            if (field.type == org.apache.thrift.protocol.TType.STRUCT) {
+              this.ctx = new org.apache.hadoop.thriftfs.api.RequestContext();
+              this.ctx.read(iprot);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // JOB_ID
+            if (field.type == org.apache.thrift.protocol.TType.STRUCT) {
+              this.jobID = new ThriftJobID();
+              this.jobID.read(iprot);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
+        }
+        iprot.readFieldEnd();
+      }
+      iprot.readStructEnd();
+
+      // check for required fields of primitive type, which can't be checked in the validate method
+      validate();
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      validate();
+
+      oprot.writeStructBegin(STRUCT_DESC);
+      if (this.jobID != null) {
+        oprot.writeFieldBegin(JOB_ID_FIELD_DESC);
+        this.jobID.write(oprot);
+        oprot.writeFieldEnd();
+      }
+      if (this.ctx != null) {
+        oprot.writeFieldBegin(CTX_FIELD_DESC);
+        this.ctx.write(oprot);
+        oprot.writeFieldEnd();
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getRetiredJob_args(");
+      boolean first = true;
+
+      sb.append("ctx:");
+      if (this.ctx == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.ctx);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("jobID:");
+      if (this.jobID == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.jobID);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+  }
+
+  public static class getRetiredJob_result implements org.apache.thrift.TBase<getRetiredJob_result, getRetiredJob_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("getRetiredJob_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
+    private static final org.apache.thrift.protocol.TField ERR_FIELD_DESC = new org.apache.thrift.protocol.TField("err", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+
+    public ThriftJobInProgress success; // required
+    public JobNotFoundException err; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      ERR((short)1, "err");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERR
+            return ERR;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, ThriftJobInProgress.class)));
+      tmpMap.put(_Fields.ERR, new org.apache.thrift.meta_data.FieldMetaData("err", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getRetiredJob_result.class, metaDataMap);
+    }
+
+    public getRetiredJob_result() {
+    }
+
+    public getRetiredJob_result(
+      ThriftJobInProgress success,
+      JobNotFoundException err)
+    {
+      this();
+      this.success = success;
+      this.err = err;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public getRetiredJob_result(getRetiredJob_result other) {
+      if (other.isSetSuccess()) {
+        this.success = new ThriftJobInProgress(other.success);
+      }
+      if (other.isSetErr()) {
+        this.err = new JobNotFoundException(other.err);
+      }
+    }
+
+    public getRetiredJob_result deepCopy() {
+      return new getRetiredJob_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+      this.err = null;
+    }
+
+    public ThriftJobInProgress getSuccess() {
+      return this.success;
+    }
+
+    public getRetiredJob_result setSuccess(ThriftJobInProgress success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public JobNotFoundException getErr() {
+      return this.err;
+    }
+
+    public getRetiredJob_result setErr(JobNotFoundException err) {
+      this.err = err;
+      return this;
+    }
+
+    public void unsetErr() {
+      this.err = null;
+    }
+
+    /** Returns true if field err is set (has been assigned a value) and false otherwise */
+    public boolean isSetErr() {
+      return this.err != null;
+    }
+
+    public void setErrIsSet(boolean value) {
+      if (!value) {
+        this.err = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((ThriftJobInProgress)value);
+        }
+        break;
+
+      case ERR:
+        if (value == null) {
+          unsetErr();
+        } else {
+          setErr((JobNotFoundException)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      case ERR:
+        return getErr();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      case ERR:
+        return isSetErr();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getRetiredJob_result)
+        return this.equals((getRetiredJob_result)that);
+      return false;
+    }
+
+    public boolean equals(getRetiredJob_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_err = true && this.isSetErr();
+      boolean that_present_err = true && that.isSetErr();
+      if (this_present_err || that_present_err) {
+        if (!(this_present_err && that_present_err))
+          return false;
+        if (!this.err.equals(that.err))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(getRetiredJob_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getRetiredJob_result typedOther = (getRetiredJob_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetErr()).compareTo(typedOther.isSetErr());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetErr()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.err, typedOther.err);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      org.apache.thrift.protocol.TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == org.apache.thrift.protocol.TType.STOP) { 
+          break;
+        }
+        switch (field.id) {
+          case 0: // SUCCESS
+            if (field.type == org.apache.thrift.protocol.TType.STRUCT) {
+              this.success = new ThriftJobInProgress();
+              this.success.read(iprot);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1: // ERR
+            if (field.type == org.apache.thrift.protocol.TType.STRUCT) {
+              this.err = new JobNotFoundException();
+              this.err.read(iprot);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            org.apache.thrift.protocol.TProtocolUtil.skip(iprot, field.type);
+        }
+        iprot.readFieldEnd();
+      }
+      iprot.readStructEnd();
+
+      // check for required fields of primitive type, which can't be checked in the validate method
+      validate();
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      oprot.writeStructBegin(STRUCT_DESC);
+
+      if (this.isSetSuccess()) {
+        oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+        this.success.write(oprot);
+        oprot.writeFieldEnd();
+      } else if (this.isSetErr()) {
+        oprot.writeFieldBegin(ERR_FIELD_DESC);
+        this.err.write(oprot);
+        oprot.writeFieldEnd();
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getRetiredJob_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("err:");
+      if (this.err == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.err);
       }
       first = false;
       sb.append(")");

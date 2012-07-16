@@ -120,9 +120,7 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             </td>
             <td><span alt="${job.startTimeMs}">${job.startTimeFormatted}</span></td>
             <td>
-                % if not job.is_retired:
                 <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="${_('View this job')}" data-row-selector="true">${_('View')}</a>
-                % endif
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                 % if request.user.is_superuser or request.user.username == job.user:
                 - <a href="#" title="${_('Kill this job')}" onclick="$('#kill-job').submit()">${_('Kill')}</a>

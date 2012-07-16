@@ -393,6 +393,10 @@ service Jobtracker extends common.HadoopServiceBase {
   /** Get a list of completed jobs */
   ThriftJobList getCompletedJobs(10: common.RequestContext ctx),
 
+  /** Get a retired job */
+  ThriftJobInProgress getRetiredJob(10: common.RequestContext ctx, 1: ThriftJobID jobID)
+      throws(1: JobNotFoundException err),
+
   /** Get a list of retired jobs */
   ThriftJobList getRetiredJobs(10: common.RequestContext ctx, 1: ThriftJobState state),
 
