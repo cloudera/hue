@@ -18,8 +18,22 @@ from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext as _
 %>
 
-<%def name="breadcrumbs(path, breadcrumbs)">
+<%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
+    <%
+    current_filter = ""
+    if filter_str is not None:
+        current_filter = filter_str
+    %>
     <div class="subnav">
+        % if from_listdir:
+        <p class="pull-right">
+            <a href="#" class="btn upload-link">${_('Upload files')}</a>
+            <a href="#" class="btn create-directory-link">${_('New directory')}</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="text" value="${current_filter}" class="input-medium search-query" placeholder="${_('Search for file name')}">
+            <a href="#" class="btn filter">${_('Search')}</a>
+        </p>
+        % endif
         <ul class="nav nav-pills">
           <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i>${_('Home')}</a></li>
           <li>
