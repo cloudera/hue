@@ -44,254 +44,256 @@ ${layout.menubar(section='tables')}
     <li><a href="#step6" class="step">${_('Step 6: Columns')}</a></li>
 </ul>
 <form action="#" method="POST" id="mainForm" class="form-horizontal">
-<div id="step1" class="stepDetails">
-    <fieldset>
-        <div class="alert alert-info"><h3>${_('Create a table')}</h3>${_("Let's start with a name and description for where we'll store your data.")}</div>
-        <div class="control-group">
-            ${comps.bootstrapLabel(table_form["name"])}
-            <div class="controls">
-                ${comps.field(table_form["name"], attrs=dict(
-                placeholder='table_name',
-                )
-                )}
-                <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
-                <p class="help-block">
-                    ${_('Name of the new table.  Table names must be globally unique.  Table names tend to correspond as well to the directory where the data will be stored.')}
-                </p>
-            </div>
-        </div>
-        <div class="control-group">
-            ${comps.bootstrapLabel(table_form["comment"])}
-            <div class="controls">
-                ${comps.field(table_form["comment"], attrs=dict(
-                placeholder=_('Optional'),
-                )
-                )}
-                <p class="help-block">
-                    ${_("Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
-                </p>
-            </div>
-        </div>
-    </fieldset>
-</div>
-<div id="step2" class="stepDetails hide">
-    <fieldset>
-        <div class="alert alert-info"><h3>${_('Choose Your Record Format')}</h3>
-            ${_("Individual records are broken up into columns either with delimiters (e.g., CSV or TSV) or using a specific serialization / deserialization (SerDe) implementation. (One common specialized SerDe is for parsing out columns with a regular expression.)")}
-        </div>
-        <%
-            selected = table_form["row_format"].data or table_form["row_format"].field.initial
-        %>
-        <div class="control-group">
-            <label class="control-label" id="formatRadio">${_('Record format')}</label>
-            <div class="controls">
-                <label class="radio">
-                    <input type="radio" name="table-row_format" value="Delimited"
-                        % if selected == "Delimited":
-                           checked
-                        % endif
-                            >
-                    ${_('Delimited')}
-                    <span class="help-inline">
-                    ${_('(Data files use delimiters, like commas (CSV) or tabs.)')}
-                    </span>
-                </label>
-                <label class="radio">
-                    <input type="radio" name="table-row_format" value="SerDe"
-                        % if selected == "SerDe":
-                           checked
-                        % endif
-                            >
-                    ${_('SerDe')}
-                    <span class="help-inline">
-                    ${_('(Enter a specialized serialization implementation.)')}
-                    </span>
-                </label>
-            </div>
-        </div>
-    </fieldset>
-</div>
-<div id="step3" class="stepDetails hide">
-    <fieldset>
-        <div id="step3Delimited" class="stepDetailsInner">
-            <div class="alert alert-info"><h3>${_('Configure Record Serialization')}</h3>
-                ${_('Hive only supports single-character delimiters.')}
-            </div>
-            <div class="control-group">
-                ${comps.bootstrapLabel(table_form["field_terminator"])}
-                <div class="controls">
-                    ${comps.field(table_form["field_terminator"], render_default=True)}
-                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
-                    <span class="help-block">
-                        ${_('Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.')}
-                    </span>
-                </div>
-            </div>
-            <div class="control-group">
-                ${comps.bootstrapLabel(table_form["collection_terminator"])}
-                <div class="controls">
-                    ${comps.field(table_form["collection_terminator"], render_default=True)}
-                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
-                    <span class="help-block">
-                        ${_('Use for array types.')}
-                    </span>
-                </div>
-            </div>
-            <div class="control-group">
-                ${comps.bootstrapLabel(table_form["map_key_terminator"])}
-                <div class="controls">
-                    ${comps.field(table_form["map_key_terminator"], render_default=True)}
-                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
-                    <span class="help-block">
-                        ${_('Use for map types.')}
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div id="step3SerDe" class="hide stepDetailsInner">
-            <div class="alert alert-info"><h3>${_('Configure Record Serialization')}</h3>
-            </div>
-            <div class="control-group">
-                ${comps.bootstrapLabel(table_form["serde_name"])}
-                <div class="controls">
-                    ${comps.field(table_form["serde_name"], attrs=dict(
-                    placeholder='com.acme.hive.SerDe',
-                    )
-                    )}
-                    <span class="help-block">
-                        ${_('Enter the Java Classname of your SerDe.')} <em>${_('e.g.')}</em>, org.apache.hadoop.hive.contrib.serde2.RegexSerDe
-                    </span>
-                </div>
-            </div>
-            <div class="control-group">
-                ${comps.bootstrapLabel(table_form["serde_properties"])}
-                <div class="controls">
-                    ${comps.field(table_form["serde_properties"], attrs=dict(
-                    placeholder='"prop" = "value", "prop2" = "value2"',
-                    )
-                    )}
-                    <span class="help-block">
-                        ${_('Properties to pass to the (de)serialization mechanism.')} <em>${_('e.g.')},</em>, "input.regex" = "([^ ]*) ([^ ]*) ([^ ]*) (-|\\[[^\\]]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*)(?: ([^ \"]*|\"[^\"]*\") ([^ \"]*|\"[^\"]*\"))?", "output.format.string" = "%1$s %2$s %3$s %4$s %5$s %6$s %7$s %8$s %9$s"
-                    </span>
-                </div>
-            </div>
-        </div>
-    </fieldset>
-</div>
-<div id="step4" class="stepDetails hide">
-    <fieldset>
-        <div class="alert alert-info"><h3>${_('Choose a File Format')}</h3>
-            ${_('Use')} <strong>TextFile</strong> ${_('for newline-delimited text files.')}
-            ${_('Use')} <strong>SequenceFile</strong> ${_("for Hadoop's binary serialization format.")}
-            ${_('Use')} <strong>InputFormat</strong> ${_('to choose a custom implementation.')}
-            <br/>
-        </div>
-
-        <div class="control-group">
-            <label id="fileFormatRadio" class="control-label">${_('File format')}</label>
-            <div class="controls">
-                ${comps.field(table_form["file_format"],
-                render_default=True,
-                klass="bw-file_formats",
-                notitle=True
-                )}
-            </div>
-        </div>
-        <div id="inputFormatDetails" class="hide">
-            <div class="control-group">
-                ${comps.bootstrapLabel(table_form["input_format_class"])}
-                <div class="controls">
-                    ${comps.field(table_form["input_format_class"], attrs=dict(
-                    placeholder='com.acme.data.MyInputFormat',
-                    )
-                    )}
-                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
-                    <span class="help-block">
-                        ${_('Java Class used to read data')}
-                    </span>
-                </div>
-            </div>
-            <div class="control-group">
-                ${comps.bootstrapLabel(table_form["output_format_class"])}
-                <div class="controls">
-                    ${comps.field(table_form["output_format_class"], attrs=dict(
-                    placeholder='com.acme.data.MyOutputFormat',
-                    )
-                    )}
-                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
-                    <span class="help-block">
-                        ${_('Java Class used to write data')}
-                    </span>
-                </div>
-            </div>
-        </div>
-    </fieldset>
-</div>
-<div id="step5" class="stepDetails hide">
-    <fieldset>
-        <div class="alert alert-info"><h3>${_("Choose Where Your Table's Data is Stored")}</h3>
-        </div>
-
-        <div class="control-group">
-            <label class="control-label">${_('Location')}</label>
-            <div class="controls">
-                <label class="checkbox">
-                    ${comps.field(table_form["use_default_location"],
-                    render_default=True
-                    )}
-                    ${_('Use default location')}
-                </label>
-                <span class="help-block">
-                    ${_('Store your table in the default location (controlled by Hive, and typically')} <em>/user/hive/warehouse/table_name</em>).
-                </span>
-            </div>
-        </div>
-
-        <div id="location" class="control-group hide">
-            ${comps.bootstrapLabel(table_form["external_location"])}
-            <div class="controls">
-                ${comps.field(table_form["external_location"],
-                placeholder="/user/user_name/data_dir",
-                klass="pathChooser",
-                file_chooser=True,
-                show_errors=False
-                )}
-                <span class="help-inline"><a id="pathChooser" href="#" class="btn" data-filechooser-destination="table-external_location">${_('Choose File')}</a></span>
-                <span class="help-block">
-                ${_("Enter the path (on HDFS) to your table's data location")}
-                </span>
-            </div>
-        </div>
-    </fieldset>
-</div>
-<div id="step6" class="stepDetails hide">
-    <fieldset>
-        <div class="alert alert-info"><h3>${_('Configure Table Columns')}</h3>
-        </div>
-        % for form in columns_form.forms:
-            ${render_column(form)}
-        %endfor
-        <div class="hide">
-            ${unicode(columns_form.management_form) | n}
-        </div>
-        <button class="btn" value="True" name="columns-add" type="submit">${_('Add a column')}</button>
-    </fieldset>
-    <br/><br/>
-    <fieldset>
-        <div class="alert alert-info"><h3>${_('Configure Partitions')}</h3>
-            ${_('If your data is naturally partitioned (by, say, date), partitions are a way to tell Hive that data for a specific partition value are stored together.')}
-            ${_('Hive establishes a mapping between directories on disk')}
-            (<em>${_('e.g.')},</em> <code>/user/hive/warehouse/logs/dt=20100101/</code>)
-            ${_('and the data for that day.  Partitions are virtual columns; they are not represented in the data themselves, but are determined by the data location. Hive implements query optimizations such that queries that are specific to a single partition need not read the data in other partitions.')}
-        </div>
-        % for form in partitions_form.forms:
-            ${render_column(form, True)}
-        % endfor
-        <div class="hide">
-            ${unicode(partitions_form.management_form) | n}
-        </div>
-        <button class="btn" value="True" name="partitions-add" type="submit">${_('Add a partition')}</button>
-    </fieldset>
+<div class="steps">
+	<div id="step1" class="stepDetails">
+	    <fieldset>
+	        <div class="alert alert-info"><h3>${_('Create a table')}</h3>${_("Let's start with a name and description for where we'll store your data.")}</div>
+	        <div class="control-group">
+	            ${comps.bootstrapLabel(table_form["name"])}
+	            <div class="controls">
+	                ${comps.field(table_form["name"], attrs=dict(
+	                placeholder='table_name',
+	                )
+	                )}
+	                <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                <p class="help-block">
+	                    ${_('Name of the new table. Table names must be globally unique. Table names tend to correspond as well to the directory where the data will be stored.')}
+	                </p>
+	            </div>
+	        </div>
+	        <div class="control-group">
+	            ${comps.bootstrapLabel(table_form["comment"])}
+	            <div class="controls">
+	                ${comps.field(table_form["comment"], attrs=dict(
+	                placeholder=_('Optional'),
+	                )
+	                )}
+	                <p class="help-block">
+	                    ${_("Use a table comment to describe your table. For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
+	                </p>
+	            </div>
+	        </div>
+	    </fieldset>
+	</div>
+	<div id="step2" class="stepDetails hide">
+	    <fieldset>
+	        <div class="alert alert-info"><h3>${_('Choose Your Record Format')}</h3>
+	            ${_("Individual records are broken up into columns either with delimiters (e.g., CSV or TSV) or using a specific serialization / deserialization (SerDe) implementation. (One common specialized SerDe is for parsing out columns with a regular expression.)")}
+	        </div>
+	        <%
+	            selected = table_form["row_format"].data or table_form["row_format"].field.initial
+	        %>
+	        <div class="control-group">
+	            <label class="control-label" id="formatRadio">${_('Record format')}</label>
+	            <div class="controls">
+	                <label class="radio">
+	                    <input type="radio" name="table-row_format" value="Delimited"
+	                        % if selected == "Delimited":
+	                           checked
+	                        % endif
+	                            >
+	                    ${_('Delimited')}
+	                    <span class="help-inline">
+	                    ${_('(Data files use delimiters, like commas (CSV) or tabs.)')}
+	                    </span>
+	                </label>
+	                <label class="radio">
+	                    <input type="radio" name="table-row_format" value="SerDe"
+	                        % if selected == "SerDe":
+	                           checked
+	                        % endif
+	                            >
+	                    ${_('SerDe')}
+	                    <span class="help-inline">
+	                    ${_('(Enter a specialized serialization implementation.)')}
+	                    </span>
+	                </label>
+	            </div>
+	        </div>
+	    </fieldset>
+	</div>
+	<div id="step3" class="stepDetails hide">
+	    <fieldset>
+	        <div id="step3Delimited" class="stepDetailsInner">
+	            <div class="alert alert-info"><h3>${_('Configure Record Serialization')}</h3>
+	                ${_('Hive only supports single-character delimiters.')}
+	            </div>
+	            <div class="control-group">
+	                ${comps.bootstrapLabel(table_form["field_terminator"])}
+	                <div class="controls">
+	                    ${comps.field(table_form["field_terminator"], render_default=True)}
+	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span class="help-block">
+	                        ${_('Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.')}
+	                    </span>
+	                </div>
+	            </div>
+	            <div class="control-group">
+	                ${comps.bootstrapLabel(table_form["collection_terminator"])}
+	                <div class="controls">
+	                    ${comps.field(table_form["collection_terminator"], render_default=True)}
+	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span class="help-block">
+	                        ${_('Use for array types.')}
+	                    </span>
+	                </div>
+	            </div>
+	            <div class="control-group">
+	                ${comps.bootstrapLabel(table_form["map_key_terminator"])}
+	                <div class="controls">
+	                    ${comps.field(table_form["map_key_terminator"], render_default=True)}
+	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span class="help-block">
+	                        ${_('Use for map types.')}
+	                    </span>
+	                </div>
+	            </div>
+	        </div>
+	        <div id="step3SerDe" class="hide stepDetailsInner">
+	            <div class="alert alert-info"><h3>${_('Configure Record Serialization')}</h3>
+	            </div>
+	            <div class="control-group">
+	                ${comps.bootstrapLabel(table_form["serde_name"])}
+	                <div class="controls">
+	                    ${comps.field(table_form["serde_name"], attrs=dict(
+	                    placeholder='com.acme.hive.SerDe',
+	                    )
+	                    )}
+	                    <span class="help-block">
+	                        ${_('Enter the Java Classname of your SerDe.')} <em>${_('e.g.')}</em>, org.apache.hadoop.hive.contrib.serde2.RegexSerDe
+	                    </span>
+	                </div>
+	            </div>
+	            <div class="control-group">
+	                ${comps.bootstrapLabel(table_form["serde_properties"])}
+	                <div class="controls">
+	                    ${comps.field(table_form["serde_properties"], attrs=dict(
+	                    placeholder='"prop" = "value", "prop2" = "value2"',
+	                    )
+	                    )}
+	                    <span class="help-block">
+	                        ${_('Properties to pass to the (de)serialization mechanism.')} <em>${_('e.g.')},</em>, "input.regex" = "([^ ]*) ([^ ]*) ([^ ]*) (-|\\[[^\\]]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*)(?: ([^ \"]*|\"[^\"]*\") ([^ \"]*|\"[^\"]*\"))?", "output.format.string" = "%1$s %2$s %3$s %4$s %5$s %6$s %7$s %8$s %9$s"
+	                    </span>
+	                </div>
+	            </div>
+	        </div>
+	    </fieldset>
+	</div>
+	<div id="step4" class="stepDetails hide">
+	    <fieldset>
+	        <div class="alert alert-info"><h3>${_('Choose a File Format')}</h3>
+	            ${_('Use')} <strong>TextFile</strong> ${_('for newline-delimited text files.')}
+	            ${_('Use')} <strong>SequenceFile</strong> ${_("for Hadoop's binary serialization format.")}
+	            ${_('Use')} <strong>InputFormat</strong> ${_('to choose a custom implementation.')}
+	            <br/>
+	        </div>
+	
+	        <div class="control-group">
+	            <label id="fileFormatRadio" class="control-label">${_('File format')}</label>
+	            <div class="controls">
+	                ${comps.field(table_form["file_format"],
+	                render_default=True,
+	                klass="bw-file_formats",
+	                notitle=True
+	                )}
+	            </div>
+	        </div>
+	        <div id="inputFormatDetails" class="hide">
+	            <div class="control-group">
+	                ${comps.bootstrapLabel(table_form["input_format_class"])}
+	                <div class="controls">
+	                    ${comps.field(table_form["input_format_class"], attrs=dict(
+	                    placeholder='com.acme.data.MyInputFormat',
+	                    )
+	                    )}
+	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span class="help-block">
+	                        ${_('Java Class used to read data')}
+	                    </span>
+	                </div>
+	            </div>
+	            <div class="control-group">
+	                ${comps.bootstrapLabel(table_form["output_format_class"])}
+	                <div class="controls">
+	                    ${comps.field(table_form["output_format_class"], attrs=dict(
+	                    placeholder='com.acme.data.MyOutputFormat',
+	                    )
+	                    )}
+	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span class="help-block">
+	                        ${_('Java Class used to write data')}
+	                    </span>
+	                </div>
+	            </div>
+	        </div>
+	    </fieldset>
+	</div>
+	<div id="step5" class="stepDetails hide">
+	    <fieldset>
+	        <div class="alert alert-info"><h3>${_("Choose Where Your Table's Data is Stored")}</h3>
+	        </div>
+	
+	        <div class="control-group">
+	            <label class="control-label">${_('Location')}</label>
+	            <div class="controls">
+	                <label class="checkbox">
+	                    ${comps.field(table_form["use_default_location"],
+	                    render_default=True
+	                    )}
+	                    ${_('Use default location')}
+	                </label>
+	                <span class="help-block">
+	                    ${_('Store your table in the default location (controlled by Hive, and typically')} <em>/user/hive/warehouse/table_name</em>).
+	                </span>
+	            </div>
+	        </div>
+	
+	        <div id="location" class="control-group hide">
+	            ${comps.bootstrapLabel(table_form["external_location"])}
+	            <div class="controls">
+	                ${comps.field(table_form["external_location"],
+	                placeholder="/user/user_name/data_dir",
+	                klass="pathChooser",
+	                file_chooser=True,
+	                show_errors=False
+	                )}
+	                <span class="help-inline"><a id="pathChooser" href="#" class="btn" data-filechooser-destination="table-external_location">${_('Choose File')}</a></span>
+	                <span class="help-block">
+	                ${_("Enter the path (on HDFS) to your table's data location")}
+	                </span>
+	            </div>
+	        </div>
+	    </fieldset>
+	</div>
+	<div id="step6" class="stepDetails hide">
+	    <fieldset>
+	        <div class="alert alert-info"><h3>${_('Configure Table Columns')}</h3>
+	        </div>
+	        % for form in columns_form.forms:
+	            ${render_column(form)}
+	        %endfor
+	        <div class="hide">
+	            ${unicode(columns_form.management_form) | n}
+	        </div>
+	        <button class="btn" value="True" name="columns-add" type="submit">${_('Add a column')}</button>
+	    </fieldset>
+	    <br/><br/>
+	    <fieldset>
+	        <div class="alert alert-info"><h3>${_('Configure Partitions')}</h3>
+	            ${_('If your data is naturally partitioned (by, say, date), partitions are a way to tell Hive that data for a specific partition value are stored together.')}
+	            ${_('Hive establishes a mapping between directories on disk')}
+	            (<em>${_('e.g.')},</em> <code>/user/hive/warehouse/logs/dt=20100101/</code>)
+	            ${_('and the data for that day.  Partitions are virtual columns; they are not represented in the data themselves, but are determined by the data location. Hive implements query optimizations such that queries that are specific to a single partition need not read the data in other partitions.')}
+	        </div>
+	        % for form in partitions_form.forms:
+	            ${render_column(form, True)}
+	        % endfor
+	        <div class="hide">
+	            ${unicode(partitions_form.management_form) | n}
+	        </div>
+	        <button class="btn" value="True" name="partitions-add" type="submit">${_('Add a partition')}</button>
+	    </fieldset>
+	</div>
 </div>
 <div class="form-actions">
     <button type="button" id="backBtn" class="btn hide">${_('Back')}</button>
@@ -414,6 +416,13 @@ ${layout.menubar(section='tables')}
     .error-inline {
         color: #B94A48;
         font-weight: bold;
+    }
+    .steps {
+         min-height:350px;
+         margin-top:10px;
+    }
+    div .alert {
+        margin-bottom:30px;
     }
 </style>
 </div>
