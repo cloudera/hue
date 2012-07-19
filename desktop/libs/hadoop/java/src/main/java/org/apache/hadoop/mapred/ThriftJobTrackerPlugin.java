@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,6 +69,7 @@ import org.apache.hadoop.thriftfs.jobtracker.api.ThriftJobCounterRollups;
 import org.apache.hadoop.thriftfs.jobtracker.api.ThriftJobID;
 import org.apache.hadoop.thriftfs.jobtracker.api.ThriftJobInProgress;
 import org.apache.hadoop.thriftfs.jobtracker.api.ThriftJobList;
+import org.apache.hadoop.thriftfs.jobtracker.api.ThriftJobStatusList;
 import org.apache.hadoop.thriftfs.jobtracker.api.ThriftJobPriority;
 import org.apache.hadoop.thriftfs.jobtracker.api.ThriftJobProfile;
 import org.apache.hadoop.thriftfs.jobtracker.api.ThriftJobQueueInfo;
@@ -255,6 +257,25 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
             return ret;
         }
 
+        /**
+         * Gets as much information about a retired Job and converts it to its corresponding
+         * Thrift representation.
+         * @param jobProfile The profile of a job.
+         * @param jobStatus The status of a job.
+         */
+        public static ThriftJobInProgress toThrift(JobProfile jobProfile, JobStatus jobStatus) {
+            ThriftJobInProgress ret = new ThriftJobInProgress();
+
+            ret.setJobID(toThrift(jobProfile.getJobID()));
+            ret.setPriority(toThrift(jobStatus.getJobPriority()));
+            ret.setProfile(toThrift(jobProfile));
+
+            ret.setStatus(toThrift(jobStatus));
+
+            ret.setStartTime(jobStatus.getStartTime());
+
+            return ret;
+        }
 
         /**
          * There are always two setup tasks and two cleanup tasks by default
@@ -783,6 +804,65 @@ public class ThriftJobTrackerPlugin extends JobTrackerPlugin implements Configur
 
                 for (JobInProgress job : jobs) {
                     ret.add(JTThriftUtils.toThrift(job, false, jobTracker));
+                }
+                return new ThriftJobList(ret);
+              }
+            });
+        }
+
+        /** Returns a retired job (does not include task info, miss some fields) */
+        public ThriftJobInProgress getRetiredJob(final RequestContext ctx, final ThriftJobID jobID) throws JobNotFoundException {
+            final JobID jid = JTThriftUtils.fromThrift(jobID);
+
+            final JobStatus jobStatus = assumeUserContextAndExecute(ctx, new PrivilegedAction<JobStatus>() {
+              public JobStatus run() {
+                return jobTracker.getJobStatus(jid);
+              }
+            });
+
+            if (jobStatus == null) {
+              throw new JobNotFoundException();
+            }
+
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobInProgress>() {
+              public ThriftJobInProgress run() {
+                return JTThriftUtils.toThrift(jobTracker.getJobProfile(jid), jobStatus);
+              }
+            });
+        }
+
+        /** Returns all retired jobs (does not include task info, miss some fields) */
+        public ThriftJobList getRetiredJobs(RequestContext ctx, final ThriftJobState state) {
+            return assumeUserContextAndExecute(ctx, new PrivilegedAction<ThriftJobList>() {
+              public ThriftJobList run() {
+                JobStatus[] jobStatuses = null;
+                Set<JobID> jobsInProgressId = new HashSet<JobID>();
+
+                synchronized(jobTracker) {
+                    jobStatuses = jobTracker.getAllJobs();
+                    for (JobInProgress job : jobTracker.getRunningJobs()) {
+                        jobsInProgressId.add(job.getJobID());
+                    }
+                    for (JobInProgress job : jobTracker.failedJobs()) {
+                        jobsInProgressId.add(job.getJobID());
+                    }
+                    for (JobInProgress job : jobTracker.completedJobs()) {
+                        jobsInProgressId.add(job.getJobID());
+                    }
+                    for (JobStatus job : jobTracker.jobsToComplete()) {
+                      jobsInProgressId.add(job.getJobID());
+                    }
+                }
+
+                ArrayList<ThriftJobInProgress> ret = new ArrayList<ThriftJobInProgress>();
+
+                for (JobStatus jobStatus : jobStatuses) {
+                    JobID jobID = jobStatus.getJobID();
+                    if (!jobsInProgressId.contains(jobID) &&
+                        (state == null || state == JTThriftUtils.jobRunStateToThrift(jobStatus.getRunState()))) {
+                        // No need to lock
+                        ret.add(JTThriftUtils.toThrift(jobTracker.getJobProfile(jobID), jobStatus));
+                    }
                 }
                 return new ThriftJobList(ret);
               }

@@ -52,8 +52,8 @@
             </form>
           </ul>
         </div>
-    
-    
+
+
         <table data-filters="HtmlTable" class="selectable sortable" cellpadding="0" cellspacing="0">
           <thead>
             <tr>
@@ -79,20 +79,34 @@
               <td>${job.jobName}
                   <div class="jt_jobid">${job.jobId_short}</div>
               </td>
-              <td><a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}"
+              <td>
+                % if job.is_retired:
+                  retired
+                % else:
+                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}"
                     title="Show only ${job.status.lower()} jobs"
-                    class="frame_tip status_link ${job.status.lower()}">${job.status.lower()}</a></td>
+                    class="frame_tip status_link ${job.status.lower()}">${job.status.lower()}</a>
+                % endif
+              </td>
               <td><a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'user', job.user.lower())}"
                     title="Show only ${job.user.lower()} jobs"
                     class="frame_tip user_link ${job.user.lower()}">${job.user}</a></td>
               <td class="jt_mrs">
-
-                ${comps.mr_graph(job)}
-              
+                % if job.is_retired:
+                  N/A
+                % else:
+                  ${comps.mr_graph(job)}
+                % endif
               </td>
               <td>${job.queueName}</td>
               <td>${job.priority.lower()}</td>
-              <td>${job.durationFormatted}</td>
+              <td>
+                 % if job.is_retired:
+                   N/A
+                 % else:
+                   ${job.durationFormatted}
+                 % endif
+              </td>
               <td>${job.startTimeFormatted}</td>
               <td>
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
@@ -121,3 +135,4 @@
         <a href="/jobbrowser/trackers">view all task trackers &raquo;</a>
       </div>
     ${comps.footer()}
+

@@ -165,6 +165,9 @@ class LiveJobTracker(object):
     for taskstatus in tip.taskStatuses.values():
       self._fixup_taskstatus(taskstatus)
 
+  def _fixup_retired_job(self, job):
+    job.is_retired = True
+
   def setuser(self, user):
     # Hadoop determines the groups the user belongs to on the server side.
     self.thread_local.request_context = RequestContext()
@@ -269,6 +272,29 @@ class LiveJobTracker(object):
     joblist = self.client.getCompletedJobs(self.thread_local.request_context)
     for job in joblist.jobs:
       self._fixup_job(job)
+    return joblist
+
+  def get_retired_job(self, jobid):
+    """
+    Returns a ThriftJobInProgress (does not include task info and most of the job information)
+    """
+    try:
+      job = self.client.getRetiredJob(self.thread_local.request_context, jobid)
+    except JobNotFoundException, e:
+        e.response_data = dict(code="JT_JOB_NOT_FOUND", message="Could not find job %s on JobTracker." % jobid.asString, data=jobid)
+        raise
+    self._fixup_job(job)
+    self._fixup_retired_job(job)
+    return job
+
+  def retired_jobs(self, status=None):
+    """
+    Returns a ThriftJobStatusList (does not include task info and most of the job information)
+    """
+    joblist = self.client.getRetiredJobs(self.thread_local.request_context, status)
+    for job in joblist.jobs:
+      self._fixup_job(job)
+      self._fixup_retired_job(job)
     return joblist
 
   def failed_jobs(self):

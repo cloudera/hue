@@ -33,8 +33,8 @@ from django.utils.functional import wraps
 
 from desktop.log.access import access_warn, access_log_level
 from desktop.views import register_status_bar_view
-from hadoop.api.jobtracker.ttypes import ThriftJobPriority
-from hadoop.api.jobtracker.ttypes import TaskTrackerNotFoundException
+from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
+
 
 from jobbrowser import conf
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker, Cluster
@@ -467,24 +467,23 @@ def get_matching_jobs(request, check_permission=False, **kwargs):
 
   Filter by user ownership if check_permission is set to true.
   """
-  jobfunc = {"completed" : request.jt.completed_jobs,
+  jobfunc = {"completed" : (request.jt.completed_jobs, ThriftJobState.SUCCEEDED),
              # Succeeded and completed are synonyms here.
-             "succeeded" : request.jt.completed_jobs,
-             "running" : request.jt.running_jobs,
-             "failed" : request.jt.failed_jobs,
-             "killed" : request.jt.killed_jobs,
-             "all" : request.jt.all_jobs}
+             "succeeded" : (request.jt.completed_jobs, ThriftJobState.SUCCEEDED),
+             "running" : (request.jt.running_jobs, ThriftJobState.RUNNING),
+             "failed" : (request.jt.failed_jobs, ThriftJobState.FAILED),
+             "killed" : (request.jt.killed_jobs, ThriftJobState.KILLED),
+             "all" : (request.jt.all_jobs, None)}
   if 'state' in kwargs:
     selection = kwargs['state']
   else:
     selection = request.GET.get("state", "all")
 
-  joblist = jobfunc[selection]().jobs
+  joblist = jobfunc[selection][0]().jobs + request.jt.retired_jobs(jobfunc[selection][1]).jobs
 
   return [Job.from_thriftjob(request.jt, j)
           for j in _filter_jobs_by_req(joblist, request, **kwargs)
           if not check_permission or request.user.is_superuser or j.profile.user == request.user]
-
 
 def get_job_count_by_state(request, username):
   """

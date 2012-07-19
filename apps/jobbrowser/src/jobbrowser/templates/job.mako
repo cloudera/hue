@@ -64,8 +64,8 @@
                   <a href="${location_to_url(request, val)}" title="${val}" target="${target}">${val}</a>
                   % if i != len(splitArray) - 1:
                     <br>
-                  % endif  
-               % else: 
+                  % endif
+               % else:
                   ${val}
                % endif
             % endfor
@@ -75,7 +75,7 @@
 </%def>
 
   ${comps.header("Job: " + job.jobId + " :: Job Browser")}
-    
+
     <div id="job_browser_job" class="view jframe_padded">
       <div class="jtv_meta_top clearfix">
         <dl>
@@ -86,21 +86,30 @@
         </dl>
         <dl>
           <dt>Status</dt>
-          <dd>${job.status.lower()}</dd>
+          <dd>
+            ${job.status.lower()}
+            % if job.is_retired:
+              retired
+            % endif
+          </dd>
           <dt>Output</dt>
           <dd>
-          <%
-            output_dir = job.conf_keys.get('mapredOutputDir', "")
-            location_url = location_to_url(request, output_dir)
-            basename = os.path.basename(output_dir)
-            dir_name = basename.split('/')[-1]
-          %>
-          % if location_url != None:
-            <a class="jt-output_dir" href="${location_url}" title="${output_dir}" target="FileBrowser">${dir_name}</a>
-          % else:
-            ${dir_name}
+          % if job.is_retired:
+              N/A
+            % else:
+            <%
+              output_dir = job.conf_keys.get('mapredOutputDir', "")
+              location_url = location_to_url(request, output_dir)
+              basename = os.path.basename(output_dir)
+              dir_name = basename.split('/')[-1]
+            %>
+            % if location_url != None:
+              <a class="jt-output_dir" href="${location_url}" title="${output_dir}" target="FileBrowser">${dir_name}</a>
+            % else:
+              ${dir_name}
+            % endif
           % endif
-          <dd>
+          </dd>
         </dl>
         % if job.status.lower() == 'running' or job.status.lower() == 'pending':
         <dl>
@@ -122,40 +131,55 @@
 
         <ul class="tab_sections jframe-clear">
           <li>
-            <div class="jt_mr_display">
-              <dl class="jtv_graph">
-                <dt>Maps:</dt>
-                <dd>${comps.mr_graph_maps(job)}</dd>
-                <dt>Reduces:</dt>
-                <dd>${comps.mr_graph_reduces(job, right_border=True)}</dd>
-              </dl>
-            </div>
-            <% 
-            task_table_size = '100%'
-            if failed_tasks:
-              task_table_size = '49%' 
-            %>
-            %if failed_tasks:
-            <div class="jt_task_list jt_failed_tasks jframe-inline" style="width: ${task_table_size};">
-              <h3>
-                <a class="jframe-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">view failed tasks &raquo;</a>
-                Failed Tasks
-              </h3>
-              <div class="jt_task_list_container">
-                ${task_table(failed_tasks)}
+            % if not job.is_retired:
+              <div class="jt_mr_display">
+                <dl class="jtv_graph">
+                  <dt>Maps:</dt>
+                  <dd>
+                    % if job.is_retired:
+                      N/A
+                    % else:
+                      ${comps.mr_graph_maps(job)}
+                    % endif
+                 </dd>
+                 <dt>Reduces:</dt>
+                 <dd>
+                   % if job.is_retired:
+                     N/A
+                   % else:
+                     ${comps.mr_graph_reduces(job, right_border=True)}
+                   % endif
+                </dd>
+                </dl>
               </div>
-            </div>
-            %endif
-            <div class="jt_task_list jt_recent_tasks jframe-inline" style="width: ${task_table_size}">
-              <h3>
-                <a class="jframe-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
-                Recent Tasks
-              </h3>
-              <div class="jt_task_list_container">
-                ${task_table(recent_tasks)}
+              <%
+              task_table_size = '100%'
+              if failed_tasks:
+                task_table_size = '49%'
+              %>
+              %if failed_tasks:
+              <div class="jt_task_list jt_failed_tasks jframe-inline" style="width: ${task_table_size};">
+                <h3>
+                  <a class="jframe-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">view failed tasks &raquo;</a>
+                  Failed Tasks
+                </h3>
+                <div class="jt_task_list_container">
+                  ${task_table(failed_tasks)}
+                </div>
               </div>
-            </div>
-            
+              %endif
+              <div class="jt_task_list jt_recent_tasks jframe-inline" style="width: ${task_table_size}">
+                <h3>
+                  <a class="jframe-right" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">View All Tasks &raquo;</a>
+                  Recent Tasks
+                </h3>
+                <div class="jt_task_list_container">
+                  ${task_table(recent_tasks)}
+                </div>
+              </div>
+              % else:
+                <br/> N/A
+            % endif
           </li>
           <li>
             <table data-filters="HtmlTable" class="jt_meta_table sortable" cellpadding="0" cellspacing="0">
@@ -174,11 +198,23 @@
                 </tr>
                 <tr>
                   <td>Maps</td>
-                  <td>${job.finishedMaps} of ${job.desiredMaps}</td>
+                  <td>
+                    % if job.is_retired:
+                      N/A
+                    % else:
+                      ${job.finishedMaps} of ${job.desiredMaps}
+                    % endif
+                </td>
                 </tr>
                 <tr>
                   <td>Reduces</td>
-                  <td>${job.finishedReduces} of ${job.desiredReduces}</td>
+                  <td>
+                    % if job.is_retired:
+                      N/A
+                    % else:
+                      ${job.finishedReduces} of ${job.desiredReduces}
+                    % endif
+                </td>
                 </tr>
                 <tr>
                   <td>Started</td>
@@ -190,7 +226,13 @@
                 </tr>
                 <tr>
                   <td>Duration</td>
-                  <td>${job.duration}</td>
+                  <td>
+                    % if job.is_retired:
+                      N/A
+                    % else:
+                      ${job.duration}
+                    % endif
+                  </td>
                 </tr>
                 <tr>
                   <td>Status</td>
