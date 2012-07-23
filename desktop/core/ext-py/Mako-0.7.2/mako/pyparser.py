@@ -274,7 +274,7 @@ else:
 
             local_ident_stack = self.local_ident_stack
             self.local_ident_stack = local_ident_stack.union([
-                arg_id(arg) for arg in node.argnames
+                arg for arg in node.argnames
             ])
 
             for n in node.getChildNodes():
