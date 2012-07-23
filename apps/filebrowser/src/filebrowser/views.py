@@ -392,12 +392,12 @@ def listdir_paged(request, path):
 
     # Sort next
     sortby = request.GET.get('sortby', None)
+    descending_param = request.GET.get('descending', None)
     if sortby is not None:
         if sortby not in ('name', 'atime', 'mtime', 'user', 'group', 'size'):
             logger.info("Invalid sort attribute '%s' for listdir." %
                         (sortby,))
         else:
-            descending_param = request.GET.get('descending', None)
             all_stats = sorted(all_stats,
                                key=operator.attrgetter(sortby),
                                reverse=coerce_bool(descending_param))
@@ -416,6 +416,8 @@ def listdir_paged(request, path):
         'pagesize': pagesize,
         'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
         'filter_str': filter_str,
+        'sortby': sortby,
+        'descending': descending_param,
         # The following should probably be deprecated
         'cwd_set': True,
         'file_filter': 'any',
