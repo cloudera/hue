@@ -24,7 +24,20 @@ from django.utils.translation import ugettext as _
 
 
 <%def name="pageref(num)">
-    href="?pagenum=${num}&pagesize=${pagesize}"
+    <%
+    sortby_param = ""
+    if sortby:
+        sortby_param = "&sortby="+sortby
+
+    descending_param = ""
+    if descending:
+        descending_param = "&descending=true"
+
+    filter_param = ""
+    if filter_str is not None:
+        filter_param = "&filter="+filter_str
+    %>
+    href="?pagenum=${num}&pagesize=${pagesize}${sortby_param}${descending_param}${filter_param}"
 </%def>
 <%def name="prevpage(page)">
   ${pageref(page.previous_page_number())}
@@ -156,45 +169,56 @@ from django.utils.translation import ugettext as _
         </div>
     %endif
 
-<!-- delete modal -->
-<div id="deleteModal" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Please Confirm')}</h3>
+%if len(files)>0 :
+    <!-- delete modal -->
+    <div id="deleteModal" class="modal hide fade">
+        <div class="modal-header">
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+            <h3>${_('Please Confirm')}</h3>
+        </div>
+        <div class="modal-body">
+            <p>${_('Are you sure you want to delete this file?')}</p>
+        </div>
+        <div class="modal-footer">
+            <form id="deleteForm" action="" method="POST" enctype="multipart/form-data" class="form-stacked">
+                <input type="submit" value="${_('Yes')}" class="btn primary" />
+                <a id="cancelDeleteBtn" class="btn">${_('No')}</a>
+                <input id="fileToDeleteInput" type="hidden" name="path" />
+            </form>
+        </div>
     </div>
-    <div class="modal-body">
-        <p>${_('Are you sure you want to delete this file?')}</p>
-    </div>
-    <div class="modal-footer">
-        <form id="deleteForm" action="" method="POST" enctype="multipart/form-data" class="form-stacked">
-            <input type="submit" value="${_('Yes')}" class="btn primary" />
-            <a id="cancelDeleteBtn" class="btn">${_('No')}</a>
-            <input id="fileToDeleteInput" type="hidden" name="path" />
+
+    <!-- rename modal -->
+    <div id="renameModal" class="modal hide fade">
+        <form id="renameForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+        <div class="modal-header">
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+            <h3>${_('Renaming:')} <span id="renameFileName">file name</span></h3>
+        </div>
+        <div class="modal-body">
+            <label>${_('New name')} <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
+        </div>
+        <div class="modal-footer">
+            <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
+                <span class="label label-important">${_('Sorry, name is required.')}</span>
+            </div>
+
+            <input id="renameSrcPath" type="hidden" name="src_path" type="text">
+            <input type="submit" value="${_('Submit')}" class="btn primary" />
+            <a id="cancelRenameBtn" class="btn">${_('Cancel')}</a>
+        </div>
         </form>
     </div>
-</div>
 
-<!-- rename modal -->
-<div id="renameModal" class="modal hide fade">
-    <form id="renameForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Renaming:')} <span id="renameFileName">file name</span></h3>
+    <div id="changeOwnerModal" class="modal hide fade">
     </div>
-    <div class="modal-body">
-        <label>${_('New name')} <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
-    </div>
-    <div class="modal-footer">
-        <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-            <span class="label label-important">${_('Sorry, name is required.')}</span>
-        </div>
 
-        <input id="renameSrcPath" type="hidden" name="src_path" type="text">
-        <input type="submit" value="${_('Submit')}" class="btn primary" />
-        <a id="cancelRenameBtn" class="btn">${_('Cancel')}</a>
+    <div id="changePermissionModal" class="modal hide fade">
     </div>
-    </form>
-</div>
+
+    <div id="moveModal" class="modal hide fade">
+    </div>
+%endif
 
 <!-- upload modal -->
 <div id="uploadModal" class="modal hide fade">
@@ -237,17 +261,9 @@ from django.utils.translation import ugettext as _
     </form>
 </div>
 
-
-<div id="changeOwnerModal" class="modal hide fade">
-</div>
-
-<div id="changePermissionModal" class="modal hide fade">
-</div>
-
-<div id="moveModal" class="modal hide fade">
-</div>
-
 <script type="text/javascript" charset="utf-8">
+
+    %if len(files)>0 :
     // ajax modal windows
     function openChownWindow(path, user, group, next){
         $.ajax({
@@ -305,6 +321,9 @@ from django.utils.translation import ugettext as _
             }
         });
     }
+    %endif
+
+
     //uploader
     var num_of_pending_uploads = 0;
     function createUploader(){
@@ -366,6 +385,7 @@ from django.utils.translation import ugettext as _
     $(document).ready(function(){
         var qs = getQueryString();
 
+    %if len(files)>0 :
         if (qs["sortby"] == null){
             qs["sortby"] = "name";
         }
@@ -455,6 +475,8 @@ from django.utils.translation import ugettext as _
             $("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
         });
 
+        $("a[data-row-selector='true']").jHueRowSelector();
+    %endif
 
         //upload handlers
         $(".upload-link").click(function(){
@@ -480,6 +502,7 @@ from django.utils.translation import ugettext as _
                 $(".filter").click();
             }
         });
+
         $(".filter").click(function(){
             qs["filter"] = $(".search-query").val();
             qs["pagenum"] = "1";
@@ -519,8 +542,6 @@ from django.utils.translation import ugettext as _
             });
             $("#fileChooserRename").slideDown();
         });
-
-        $("a[data-row-selector='true']").jHueRowSelector();
     });
 </script>
 
