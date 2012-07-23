@@ -35,7 +35,7 @@ from django.utils.translation import ugettext as _
         </p>
         % endif
         <ul class="nav nav-pills">
-          <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i>${_('Home')}</a></li>
+          <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i> ${_('Home')}</a></li>
           <li>
             <ul class="hueBreadcrumb">
                 % for breadcrumb_item in breadcrumbs:
