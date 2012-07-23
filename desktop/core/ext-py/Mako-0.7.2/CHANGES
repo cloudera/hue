@@ -1,3 +1,8 @@
+0.7.2
+- [bug] Fixed regression in 0.7.1 where AST
+  parsing for Py2.4 was broken.
+  [ticket:193]
+
 0.7.1
 - [feature] Control lines with no bodies will
   now succeed, as "pass" is added for these
