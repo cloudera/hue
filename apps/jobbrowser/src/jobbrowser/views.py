@@ -27,6 +27,7 @@ from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import render_json, MessageException, render
 from desktop.lib.django_util import copy_query_dict
 from desktop.lib.django_util import PopupException
+from desktop.lib.conf import coerce_bool
 
 from django.http import HttpResponseRedirect
 from django.utils.functional import wraps
@@ -102,14 +103,16 @@ def jobs(request):
 
   matching_jobs = sort_if_necessary(request, jobs)
   state = request.GET.get('state', 'all')
-  user = request.GET.get('user', '')
+  user = request.GET.get('user', request.user.username)
   text = request.GET.get('text', '')
+  retired = request.GET.get('retired', '')
   return render("jobs.mako", request, {
     'jobs':matching_jobs,
     'request': request,
     'state_filter': state,
     'user_filter': user,
     'text_filter': text,
+    'retired': retired,
     'filtered': not (state == 'all' and user == '' and text == '')
   })
 
@@ -481,7 +484,17 @@ def get_matching_jobs(request, check_permission=False, **kwargs):
   else:
     selection = request.GET.get("state", "all")
 
-  joblist = jobfunc[selection][0]().jobs + request.jt.retired_jobs(jobfunc[selection][1]).jobs
+  if 'retired' in kwargs:
+    retired_arg = kwargs['retired']
+  else:
+    retired_arg = request.GET.get("retired", None)
+
+  retired = coerce_bool(retired_arg)
+
+  joblist = jobfunc[selection][0]().jobs
+
+  if retired == True:
+    joblist += request.jt.retired_jobs(jobfunc[selection][1]).jobs
 
   return [Job.from_thriftjob(request.jt, j)
           for j in _filter_jobs_by_req(joblist, request, **kwargs)

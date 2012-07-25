@@ -32,26 +32,49 @@
 ${commonheader(_('Job Browser'), "jobbrowser")}
 <div class="container-fluid">
 <h1>${_('Job Browser')}</h1>
-<div class="well hueWell">
-    <form action="/jobbrowser/jobs" method="GET">
-        <b>${_('Filter jobs:')}</b>
-                <select name="state" class="submitter">
-                    <option value="all" ${get_state('all', state_filter)}>${_('All States')}</option>
-                    <option value="running" ${get_state('running', state_filter)}>${_('Running')}</option>
-                    <option value="completed" ${get_state('completed', state_filter)}>${_('Completed')}</option>
-                    <option value="failed" ${get_state('failed', state_filter)}>${_('Failed')}</option>
-                    <option value="killed" ${get_state('killed', state_filter)}>${_('Killed')}</option>
-                </select>
+<form class="well form-inline" action="/jobbrowser/jobs" method="GET">
+    <label>
+    ${_('Job status:')}
+    <select name="state" class="submitter">
+        <option value="all" ${get_state('all', state_filter)}>${_('All States')}</option>
+        <option value="running" ${get_state('running', state_filter)}>${_('Running')}</option>
+        <option value="completed" ${get_state('completed', state_filter)}>${_('Completed')}</option>
+        <option value="failed" ${get_state('failed', state_filter)}>${_('Failed')}</option>
+        <option value="killed" ${get_state('killed', state_filter)}>${_('Killed')}</option>
+    </select>
+    </label>
+    &nbsp;
+    <label class="checkbox">
+        <%
+            checked = ""
+            if retired == "on":
+                checked = 'checked="checked"'
+        %>
+        <input name="retired" type="checkbox" class="submitter" ${checked}> Show retired jobs
+    </label>
 
-                <input type="text" name="user" title="${_('User Name Filter')}" value="${user_filter}" placeholder="${_('User Name Filter')}" class="submitter"/>
-                <input type="text" name="text" title="${_('Text Filter')}" value="${text_filter}" placeholder="${_('Text Filter')}" class="submitter"/>
-    </form>
-</div>
+    <label class="pull-right">
+        &nbsp;
+    ${_('Text:')}
+        <input type="text" name="text" title="${_('Text Filter')}" value="${text_filter}" placeholder="${_('Text Filter')}" class="submitter input-medium search-query"/>
+    </label>
+    <label class="pull-right">
+        ${_('User Name:')}
+        <input type="text" name="user" title="${_('User Name Filter')}" value="${user_filter}" placeholder="${_('User Name Filter')}" class="submitter input-medium search-query" />
+    </label>
+
+
+</form>
 
 
 % if len(jobs) == 0:
 <p>${_('There were no jobs that match your search criteria.')}</p>
 % else:
+<style>
+    .job-row {
+        height:45px;
+    }
+</style>
 <table class="datatables table table-striped table-condensed">
     <thead>
         <tr>
@@ -70,29 +93,25 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
     </thead>
     <tbody>
         % for job in jobs:
-        <tr>
+        <tr class="job-row">
             <td>
-                <div class="jobbrowser_jobid_short">${job.jobId_short}</div>
+                <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="${_('View this job')}" data-row-selector="true">${job.jobId_short}</a>
             </td>
             <td>
                 ${job.jobName}
             </td>
             <td>
-                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.status.lower())}">
-                  ${job.status.lower()}
+                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.status.lower())}" class="nounderline">
+                    ${comps.get_status(job)}
                 </a>
-                % if job.is_retired:
-                  </br>
-                  ${_('retired')}
-                % endif
             </td>
-            <td>
+            <td class="center">
                 <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'user', job.user.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.user.lower())}">${job.user}</a>
             </td>
             <td>
                 <span alt="${job.maps_percent_complete}">
                     % if job.is_retired:
-                        ${_('N/A')}
+                        <div class="center">${_('N/A')}</div>
                     % else:
                     ${comps.mr_graph_maps(job)}
                     % endif
@@ -101,15 +120,15 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             <td>
                 <span alt="${job.reduces_percent_complete}">
                     % if job.is_retired:
-                        ${_('N/A')}
+                        <div class="center">${_('N/A')}</div>
                     % else:
                         ${comps.mr_graph_reduces(job)}
                     % endif
                 </span>
             </td>
-            <td>${job.queueName}</td>
-            <td>${job.priority.lower()}</td>
-            <td>
+            <td class="center">${job.queueName}</td>
+            <td class="center">${job.priority.lower()}</td>
+            <td class="center">
                 <span alt="${job.finishTimeMs-job.startTimeMs}">
                     % if job.is_retired:
                         ${_('N/A')}
@@ -120,11 +139,9 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             </td>
             <td><span alt="${job.startTimeMs}">${job.startTimeFormatted}</span></td>
             <td>
-                <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="${_('View this job')}" data-row-selector="true">${_('View')}</a>
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                 % if request.user.is_superuser or request.user.username == job.user:
-                - <a href="#" title="${_('Kill this job')}" onclick="$('#kill-job').submit()">${_('Kill')}</a>
-                <form id="kill-job" action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" method="POST"></form>
+                <a href="#" title="${_('Kill this job')}" kill-action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" data-backdrop="static" data-keyboard="true" class="btn btn-mini kill"><i class="icon-remove"></i> ${_('Kill')}</a>
                 % endif
                 % endif
             </td>
@@ -150,6 +167,22 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
     % endif
 </div>
 
+<div id="killModal" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Please Confirm')}</h3>
+    </div>
+    <div class="modal-body">
+        <p>${_('Are you sure you want to kill this job?')}</p>
+    </div>
+    <div class="modal-footer">
+        <form id="kill-job" action="" method="POST" class="form-stacked">
+            <input type="submit" value="${_('Yes')}" class="btn primary" />
+            <a id="cancelKillBtn" class="btn">${_('No')}</a>
+        </form>
+    </div>
+</div>
+
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
         $(".datatables").dataTable({
@@ -163,8 +196,8 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
                 null,
                 null,
                 null,
-                { "sType": "alt-numeric" },
-                { "sType": "alt-numeric" },
+                { "sType": "alt-numeric", "sWidth": "60px" },
+                { "sType": "alt-numeric", "sWidth": "60px" },
                 null,
                 null,
                 { "sType": "alt-numeric" },
@@ -172,6 +205,20 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
                 {"bSortable":false}
             ]
         });
+
+        $(".kill").live("click", function(e){
+            $("#kill-job").attr("action", $(e.target).attr("kill-action"));
+            $("#killModal").modal({
+                backdrop: "static",
+                keyboard: true,
+                show: true
+            });
+        });
+
+        $("#cancelKillBtn").click(function(){
+            $("#killModal").modal("hide");
+        });
+
         $("a[data-row-selector='true']").jHueRowSelector();
     });
 </script>

@@ -905,3 +905,16 @@ div.box {
 .table tbody tr:hover td, .table tbody tr:hover th {
     background-color: #E8F1FB;
 }
+
+.nounderline:hover {
+    text-decoration: none;
+}
+
+.bar-label {
+    margin-top: -18px;
+    position: relative;
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 12px;
+    text-shadow: -1px 0 1px #333, 0 1px 1px #333, 1px 0 1px #333, 0 -1px 1px #333;
+}

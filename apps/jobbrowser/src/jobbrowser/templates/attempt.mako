@@ -116,7 +116,7 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                 </div>
 
                 <div class="tab-pane" id="counters">
-                    ${comps.task_counters(task.counters, _)}
+                    ${comps.task_counters(task.counters)}
                 </div>
 
                 <div class="tab-pane jt-logs" id="logs">

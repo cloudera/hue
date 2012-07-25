@@ -13,8 +13,11 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+    from django.utils.translation import ugettext as _
+%>
 
-<%def name="task_counters(counters,_)">
+<%def name="task_counters(counters)">
     <%
         from jobbrowser.views import format_counter_name
     %>
@@ -39,7 +42,7 @@
     % endfor
 </%def>
 
-<%def name="job_counters(counters,_)">
+<%def name="job_counters(counters)">
     <%
         from jobbrowser.views import format_counter_name
     %>
@@ -88,9 +91,51 @@
 </%def>
 
 <%def name="mr_graph_maps(job)">
-    <div class="bar">${job.finishedMaps} / ${job.desiredMaps}</div>
+    <div class="progress ${get_bootstrap_class(job, 'progress')}">
+        <div class="bar" style="width: ${job.maps_percent_complete}%;"></div>
+        <div class="bar-label">${job.finishedMaps} / ${job.desiredMaps}</div>
+    </div>
 </%def>
 
 <%def name="mr_graph_reduces(job)">
-    <div class="bar">${job.finishedReduces} / ${job.desiredReduces}</div>
+    <div class="progress ${get_bootstrap_class(job, 'progress')}">
+        <div class="bar" style="width: ${job.reduces_percent_complete}%;"></div>
+        <div class="bar-label">${job.finishedReduces} / ${job.desiredReduces}</div>
+    </div>
+</%def>
+
+<%def name="get_status(job)">
+    <%
+    additional_class = get_bootstrap_class(job, 'label')
+    %>
+    % if job.is_retired:
+        <span class="label ${additional_class}"><i class="icon-briefcase icon-white" title="${ _('Retired') }"></i> ${job.status.lower()}</span>
+    % else:
+        <span class="label ${additional_class}">${job.status.lower()}</span>
+    % endif
+</%def>
+
+
+<%def name="get_bootstrap_class(job, prefix)">
+    <%
+    additional_class = prefix
+    status = job.status.lower()
+    if status in ('succeeded', 'ok'):
+        additional_class += '-success'
+    elif status in ('running', 'prep'):
+        additional_class += '-warning'
+    elif status == 'ready':
+        additional_class += '-success'
+    else:
+        if (prefix == 'label'):
+            additional_class += '-important'
+        else:
+            additional_class += '-danger'
+        endif
+    endif
+    if job.is_retired:
+        additional_class += '-warning'
+    endif
+    return additional_class
+    %>
 </%def>
