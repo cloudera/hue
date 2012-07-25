@@ -51,13 +51,17 @@ from django.utils.translation import ugettext as _
 <%def name="bottompage(page)">
   ${pageref(page.num_pages())}
 </%def>
-<%def name="pagination(page)">
+<%def name="pagination(localpage)">
     <div class="pagination">
         <ul class="pull-right">
-            <li class="prev"><a title="${_('Beginning of List')}" ${toppage(page)}>&larr; ${_('Beginning of List')}</a></li>
-            <li><a title="${_('Previous Page')}" ${prevpage(page)}>${_('Previous Page')}</a></li>
-            <li><a title="${_('Next Page')}" ${nextpage(page)}>${_('Next Page')}</a></li>
-            <li class="next"><a title="${_('End of List')}" ${bottompage(page)}>${_('End of List')} &rarr;</a></li>
+            % if page.number > 1:
+                <li class="prev"><a title="${_('Beginning of List')}" ${toppage(page)}>&larr; ${_('Beginning of List')}</a></li>
+                <li><a title="${_('Previous Page')}" ${prevpage(page)}>${_('Previous Page')}</a></li>
+            % endif
+            % if page.number < page.num_pages():
+                <li><a title="${_('Next page')}" ${nextpage(page)}>${_('Next Page')}</a></li>
+                <li class="next"><a title="${_('End of List')}" ${bottompage(page)}>${_('End of List')} &rarr;</a></li>
+            % endif
         </ul>
         <p>${_('Show')} <select id="pagesize" class="input-mini"><option>15</option><option selected>30</option><option>45</option><option>60</option><option>100</option><option>200</option></select> ${_('items per page')}. ${_('Showing %(start_index)s to %(end_index)s of %(total_count)s items, page %(page)s of %(num_pages)s.') % dict(start_index=page.start_index(), end_index=page.end_index(), total_count=page.total_count(), page=page.number, num_pages=page.num_pages())}</p>
     </div>
@@ -80,47 +84,60 @@ from django.utils.translation import ugettext as _
         .sortable {
             cursor: pointer;
         }
+        .file-row {
+            height:37px;
+        }
+        .parent {
+            display: none;
+        }
     </style>
     %if len(files)>0 :
     <table class="table table-condensed table-striped datatables">
         <thead>
             <tr>
+                <th class="sortable sorting" data-sort="type" width="5%">Type</th>
             % if cwd_set:
                 <th class="sortable sorting" data-sort="name">${_('Name')}</th>
             % else:
                 <th class="sortable sorting" data-sort="name">${_('Path')}</th>
             % endif
-                <th class="sortable sorting" data-sort="size">${_('Size')}</th>
-                <th class="sortable sorting" data-sort="user">${_('User')}</th>
-                <th class="sortable sorting" data-sort="group">${_('Group')}</th>
-                <th>${_('Permissions')}</th>
-                <th class="sortable sorting" data-sort="mtime">${_('Date')}</th>
-                <th>&nbsp;</th>
+                <th class="sortable sorting" data-sort="size" width="10%">${_('Size')}</th>
+                <th class="sortable sorting" data-sort="user" width="10%">${_('User')}</th>
+                <th class="sortable sorting" data-sort="group" width="10%">${_('Group')}</th>
+                <th width="10%">${_('Permissions')}</th>
+                <th class="sortable sorting" data-sort="mtime" width="15%">${_('Date')}</th>
+                <th width="100">&nbsp;</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="files" class="hide">
             % for file in files:
             <%
-              cls = ''
-              if (file_filter == 'dir' and file['type'] != 'dir') or (file_filter != 'dir' and file['type'] == 'dir'):
-                if (file_filter != 'any'):
-                  cls = ' not-selectable'
+              icon = 'icon-file'
+              if file['type'] == 'dir':
+                icon = 'icon-folder-close'
+              endif
 
               if cwd_set:
                 display_name = file['name']
               else:
                 display_name = file['path']
               endif
+
+              row_class = 'file-row'
+              if '..' == display_name:
+                row_class += ' parent'
+              endif
             %>
 
             <% path = file['path'] %>
-            <tr class="file-row" data-search="${display_name}">
+            <tr class="${row_class}" data-search="${display_name}">
+                <td class="left"><i class="${icon}"></i></td>
                 <td>
                     <h5><a href="${url('filebrowser.views.'+view, path=urlencode(path))}?file_filter=${file_filter}" data-row-selector="true">${display_name}</a></h5>
                 </td>
                 <td>
                     % if "dir" == file['type']:
-                    <span>~</span>
+                    <span></span>
                     % else:
                     <span>${file['stats']['size']|filesizeformat}</span>
                     % endif
@@ -129,22 +146,18 @@ from django.utils.translation import ugettext as _
                 <td>${file['stats']['group']}</td>
                 <td>${file['rwx']}</td>
                 <td>${date(datetime.datetime.fromtimestamp(file['stats']['mtime']))} ${time(datetime.datetime.fromtimestamp(file['stats']['mtime'])).replace("p.m.","PM").replace("a.m.","AM")}</td>
-                <td>
+                <td data-row-selector-exclude="true">
                     % if ".." != file['name']:
                     <%
                     path_digest = urlencode(md5.md5(smart_str(path)).hexdigest())
                     %>
-                    <div class="btn-group">
+                    <div class="btn-group" data-row-selector-exclude="true">
                         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                            ${_('Options')}
+                            ${_('Operations')}
                             <span class="caret"></span>
                         </a>
-                        <ul class="dropdown-menu">
-                            % if "dir" == file['type']:
-                            <li><a class="delete" delete-type="rmdir" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">${_('Delete')}</a></li>
-                            <li><a class="delete" delete-type="rmtree" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">${_('Delete Recursively')}</a></li>
-                            % else:
-                            <li><a class="delete" delete-type="remove" file-to-delete="${path}" data-backdrop="static" data-keyboard="true">${_('Delete')}</a></li>
+                        <ul class="dropdown-menu pull-right">
+                            % if "file" == file['type']:
                             <li><a href="${url('filebrowser.views.view', path=urlencode(path))}">${_('View File')}</a></li>
                             <li><a href="${url('filebrowser.views.edit', path=urlencode(path))}">${_('Edit File')}</a></li>
                             <li><a href="${url('filebrowser.views.download', path=urlencode(path))}" target="_blank">${_('Download File')}</a></li>
@@ -153,6 +166,12 @@ from django.utils.translation import ugettext as _
                             <li><a onclick="openChownWindow('${path}','${file['stats']['user']}','${file['stats']['group']}','${current_request_path}')">${_('Change Owner / Group')}</a></li>
                             <li><a onclick="openChmodWindow('${path}','${stringformat(file['stats']['mode'], "o")}','${current_request_path}')">${_('Change Permissions')}</a></li>
                             <li><a onclick="openMoveModal('${path}','${stringformat(file['stats']['mode'], "o")}', '${current_request_path}')">${_('Move')}</a></li>
+                            % if "dir" == file['type']:
+                            <li><a class="delete" delete-type="rmdir" file-to-delete="${path}" data-keyboard="true">${_('Delete')}</a></li>
+                            <li><a class="delete" delete-type="rmtree" file-to-delete="${path}" data-keyboard="true">${_('Delete Recursively')}</a></li>
+                            % else:
+                            <li><a class="delete" delete-type="remove" file-to-delete="${path}" data-keyboard="true">${_('Delete')}</a></li>
+                            % endif
                         </ul>
                     </div>
                     % endif
@@ -204,8 +223,8 @@ from django.utils.translation import ugettext as _
             </div>
 
             <input id="renameSrcPath" type="hidden" name="src_path" type="text">
-            <input type="submit" value="${_('Submit')}" class="btn primary" />
             <a id="cancelRenameBtn" class="btn">${_('Cancel')}</a>
+            <input type="submit" value="${_('Submit')}" class="btn primary" />
         </div>
         </form>
     </div>
@@ -255,8 +274,8 @@ from django.utils.translation import ugettext as _
          <div id="directoryNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
             <p><strong>${_('Sorry, directory name is required.')}</strong>
         </div>
-        <input class="btn primary" type="submit" value="${_('Submit')}" />
         <a id="cancelCreateDirectoryBtn" class="btn" href="#">${_('Cancel')}</a>
+        <input class="btn primary" type="submit" value="${_('Submit')}" />
     </div>
     </form>
 </div>
@@ -276,7 +295,6 @@ from django.utils.translation import ugettext as _
             success: function(data){
                 $("#changeOwnerModal").html(data);
                 $("#changeOwnerModal").modal({
-                    backdrop: "static",
                     keyboard: true,
                     show: true
                 });
@@ -295,7 +313,6 @@ from django.utils.translation import ugettext as _
             success: function(data){
                 $("#changePermissionModal").html(data);
                 $("#changePermissionModal").modal({
-                    backdrop: "static",
                     keyboard: true,
                     show: true
                 });
@@ -314,7 +331,6 @@ from django.utils.translation import ugettext as _
             success: function(data){
                 $("#moveModal").html(data);
                 $("#moveModal").modal({
-                    backdrop: "static",
                     keyboard: true,
                     show: true
                 });
@@ -423,7 +439,6 @@ from django.utils.translation import ugettext as _
             $("#fileToDeleteInput").attr("value", $(e.target).attr("file-to-delete"));
             $("#deleteForm").attr("action", "/filebrowser/" + $(e.target).attr("delete-type") + "?next=" + encodeURI("${current_request_path}") + "&path=" + encodeURI("${path}"));
             $("#deleteModal").modal({
-                backdrop: "static",
                 keyboard: true,
                 show: true
             });
@@ -437,8 +452,8 @@ from django.utils.translation import ugettext as _
         $(".rename").live("click",function(eventObject){
             $("#renameSrcPath").attr("value", $(eventObject.target).attr("file-to-rename"));
             $("#renameFileName").text($(eventObject.target).attr("file-to-rename"));
+            $("#newNameInput").val($(eventObject.target).attr("file-to-rename"));
             $("#renameModal").modal({
-                backdrop: "static",
                 keyboard: true,
                 show: true
             });
@@ -475,13 +490,14 @@ from django.utils.translation import ugettext as _
             $("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
         });
 
+        $(".parent").prependTo("#files").removeClass("parent");
+        $("#files").removeClass("hide");
         $("a[data-row-selector='true']").jHueRowSelector();
     %endif
 
         //upload handlers
         $(".upload-link").click(function(){
             $("#uploadModal").modal({
-                backdrop: "static",
                 keyboard: true,
                 show: true
             });
@@ -490,7 +506,6 @@ from django.utils.translation import ugettext as _
         //create directory handlers
         $(".create-directory-link").click(function(){
             $("#createDirectoryModal").modal({
-                backdrop: "static",
                 keyboard: true,
                 show: true
             });

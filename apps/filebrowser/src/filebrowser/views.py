@@ -356,7 +356,7 @@ def listdir_paged(request, path):
       pagenum           - The page number to show. Defaults to 1.
       pagesize          - How many to show on a page. Defaults to 15.
       sortby=?          - Specify attribute to sort by. Accepts:
-                            (name, atime, mtime, size, user, group)
+                            (type, name, atime, mtime, size, user, group)
                           Defaults to name.
       descending        - Specify a descending sort order.
                           Default to false.
@@ -394,7 +394,7 @@ def listdir_paged(request, path):
     sortby = request.GET.get('sortby', None)
     descending_param = request.GET.get('descending', None)
     if sortby is not None:
-        if sortby not in ('name', 'atime', 'mtime', 'user', 'group', 'size'):
+        if sortby not in ('type', 'name', 'atime', 'mtime', 'user', 'group', 'size'):
             logger.info("Invalid sort attribute '%s' for listdir." %
                         (sortby,))
         else:

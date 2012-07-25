@@ -91,8 +91,8 @@ from django.utils.translation import ugettext as _
         <div id="chownRequired" class="hide" style="position: absolute; left: 10;">
             <span class="label label-important">${_('Sorry, name is required.')}</span>
         </div>
-        <input class="btn primary" type="submit" value="${_('Submit')}" />
         <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">${_('Cancel')}</a>
+        <input class="btn primary" type="submit" value="${_('Submit')}" />
     </div>
 </form>
 
