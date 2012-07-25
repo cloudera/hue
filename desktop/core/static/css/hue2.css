@@ -504,12 +504,14 @@ table.display td.center {
 .sorting_asc {
     cursor: pointer;
     background: url('../art/datatables/sort_asc.png') no-repeat center left;
+    border-top: 3px solid #FFFFFF!important;
     padding-left: 20px!important;
 }
 
 .sorting_desc {
     cursor: pointer;
     background: url('../art/datatables/sort_desc.png') no-repeat center left;
+    border-top: 3px solid #FFFFFF!important;
     padding-left: 20px!important;
 }
 
@@ -520,7 +522,7 @@ table.display td.center {
     padding-left: 20px!important;
 }
 
-.sorting:hover {
+.sorting:hover, .sorting_asc:hover, .sorting_desc:hover {
     border-top: 3px solid #EEEEEE!important;
 }
 
