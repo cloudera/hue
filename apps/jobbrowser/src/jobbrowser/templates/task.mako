@@ -67,13 +67,13 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                             <th>${_('Shuffle Finish')}</th>
                             <th>${_('Sort Finish')}</th>
                             <th>${_('Map Finish')}</th>
-                            <th>${_('View')}</th>
                         </tr>
                         </thead>
                         <tbody>
                                 % for attempt in task.attempts:
                                 <tr>
-                                    <td>${attempt.attemptId_short}</td>
+                                    <td><a title="${_('View this attempt')}"
+                                           href="${ url('jobbrowser.views.single_task_attempt', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${attempt.attemptId_short}</a></td>
                                     <td>${"%d" % (attempt.progress * 100)}%</td>
                                     <td><span class="status_link ${attempt.state}">${attempt.state}</span></td>
                                     <td><a href="/jobbrowser/trackers/${attempt.taskTrackerId}" class="task_tracker_link">${attempt.taskTrackerId}</a></td>
@@ -84,8 +84,6 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                                     <td>${attempt.shuffleFinishTimeFormatted}</td>
                                     <td>${attempt.sortFinishTimeFormatted}</td>
                                     <td>${attempt.mapFinishTimeFormatted}</td>
-                                    <td><a title="${_('View this attempt')}"
-                                           href="${ url('jobbrowser.views.single_task_attempt', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${_('View')}</a></td>
                                 </tr>
                                 % endfor
                         </tbody>
@@ -138,7 +136,7 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                     </table>
                 </div>
                 <div id="counters" class="tab-pane">
-                    ${comps.task_counters(task.counters, _)}
+                    ${comps.task_counters(task.counters)}
                 </div>
             </div>
         </div>

@@ -30,19 +30,15 @@
         <tr>
             <th>${_('Tasks')}</th>
             <th>${_('Type')}</th>
-            <th>&nbsp;</th>
         </tr>
         </thead>
         <tbody>
-                % for task in tasks:
-                <tr>
-                    <td>${task.taskId_short}</td>
-                    <td>${task.taskType}</td>
-                    <td>
-                        <a title="${_('View this task')}" href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }">${_('View')}</a>
-                    </td>
-                </tr>
-                % endfor
+            % for task in tasks:
+            <tr>
+                <td><a title="${_('View this task')}" href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }" data-row-selector="true">${task.taskId_short}</a></td>
+                <td>${task.taskType}</td>
+            </tr>
+            % endfor
         </tbody>
     </table>
 </%def>
@@ -92,25 +88,29 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                     <li>${job.user}</li>
                     <li class="nav-header">${_('Status')}</li>
                     <li>
-                            % if job.status.lower() == 'running' or job.status.lower() == 'pending':
-                                <span class="label label-warning">${job.status.lower()}</span>
-                            % elif job.status.lower() == 'succeeded':
-                                <span class="label label-success">${job.status.lower()}</span>
-                            % else:
-                                <span class="label">${job.status.lower()}</span>
-                            % endif
-
-                            % if job.is_retired:
-                                <span class="label label-warning">${ _('retired') }</span>
-                            % endif
+                        ${comps.get_status(job)}
                     </li>
                     % if job.status.lower() == 'running' or job.status.lower() == 'pending':
-                            <li class="nav-header">${_('Kill Job')}</li>
-                            <li><a href="#" title="${_('Kill this job')}" onclick="$('#kill-job').submit()">${_('Kill this job')}</a>
-                                <form id="kill-job" action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" method="POST"></form></li>
+                        <li class="nav-header">${_('Kill Job')}</li>
+                        <li><a href="#" title="${_('Kill this job')}" onclick="$('#kill-job').submit()">${_('Kill this job')}</a>
+                        <form id="kill-job" action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" method="POST"></form></li>
                     % endif
-                    <li class="nav-header">${_('Output')}</li>
-                    <li>
+                    % if not job.is_retired:
+                        <li class="nav-header">${_('Maps:')}</li>
+                        <li>${comps.mr_graph_maps(job)}</li>
+                        <li class="nav-header">${_('Reduces:')}</li>
+                        <li>${comps.mr_graph_reduces(job)}</li>
+                    % endif
+
+                    <%
+                        output_dir = job.conf_keys.get('mapredOutputDir', "")
+                        location_url = location_to_url(request, output_dir)
+                        basename = os.path.basename(output_dir)
+                        dir_name = basename.split('/')[-1]
+                    %>
+                    % if dir_name != '':
+                        <li class="nav-header">${_('Output')}</li>
+                        <li>
                         <%
                             output_dir = job.conf_keys.get('mapredOutputDir', "")
                             location_url = location_to_url(request, output_dir)
@@ -122,7 +122,8 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                         % else:
                             ${dir_name}
                         % endif
-                    </li>
+                        </li>
+                    % endif
                 </ul>
             </div>
         </div>
@@ -135,11 +136,8 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
 
             <div class="tab-content">
                 <div class="tab-pane active" id="tasks">
-                    % if not job.is_retired:
-	                    <strong>${_('Maps:')}</strong> ${comps.mr_graph_maps(job)}
-	                    <strong>${_('Reduces:')}</strong> ${comps.mr_graph_reduces(job)}
-	                % else:
-	                   ${ _('This jobs is ')} <span class="label label-warning">${ _('retired') }</span> ${ _(' and so has little information available.') }
+                    % if job.is_retired:
+                       ${ _('This jobs is ')} <span class="label label-warning">${ _('retired') }</span> ${ _(' and so has little information available.') }
                        <br/>
                        <br/>
                     % endif
@@ -174,8 +172,8 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                     </div>
                     <table id="metadataTable" class="table table-striped table-condensed">
                         <thead>
-	                        <th>${_('Name')}</th>
-	                        <th>${_('Value')}</th>
+                            <th>${_('Name')}</th>
+                            <th>${_('Value')}</th>
                         </thead>
                         <tbody>
                         <tr>
@@ -241,7 +239,7 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
 
                 </div>
                 <div id="counters" class="tab-pane">
-                    ${comps.job_counters(job.counters, _)}
+                    ${comps.job_counters(job.counters)}
                 </div>
             </div>
         </div>
@@ -258,9 +256,8 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
             "bInfo": false,
             "bAutoWidth": false,
             "aoColumns": [
-                { "sWidth": "40%" },
-                { "sWidth": "40%" },
-                { "sWidth": "20%" }
+                { "sWidth": "50%" },
+                { "sWidth": "50%" }
             ]
         });
         var _metadataTable = $("#metadataTable").dataTable({
@@ -304,7 +301,7 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
 
         $(".dataTables_wrapper").css("min-height","0");
         $(".dataTables_filter").hide();
-
+        $("a[data-row-selector='true']").jHueRowSelector();
     });
 </script>
 
