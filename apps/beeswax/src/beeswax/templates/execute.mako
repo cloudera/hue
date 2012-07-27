@@ -174,7 +174,7 @@ ${layout.menubar(section='query')}
                                 <a class="btn btn-small" data-form-prefix="functions">${_('Add')}</a>
                             </div>
                         </li>
-                        <li class="nav-header">${_('Parametrization')}</li>
+                        <li class="nav-header">${_('Parameterization')}</li>
                         <li>
                             <label class="checkbox" rel="tooltip" data-original-title="${_("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.")}">
                                 <input type="checkbox" id="id_${form.query["is_parameterized"].html_name | n}" name="${form.query["is_parameterized"].html_name | n}" ${extract_field_data(form.query["is_parameterized"]) and "CHECKED" or ""}/>
@@ -185,7 +185,7 @@ ${layout.menubar(section='query')}
                         <li>
                             <label class="checkbox" rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
                                 <input type="checkbox" id="id_${form.query["email_notify"].html_name | n}" name="${form.query["email_notify"].html_name | n}" ${extract_field_data(form.query["email_notify"]) and "CHECKED" or ""}/>
-                                ${_("Email me on complete")}
+                                ${_("Email upon completion")}
                             </label>
                         </li>
                     </ul>

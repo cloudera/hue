@@ -292,7 +292,7 @@ class AddLdapUserForm(forms.Form):
       error_messages={'invalid': _("Whitespaces and ':' not allowed")})
   dn = forms.BooleanField(label=_("Distinguished name"),
                           help_text=_("Whether or not the user should be imported by "
-                                    "distinguished name"),
+                                    "distinguished name."),
                           initial=False,
                           required=False)
 
@@ -344,15 +344,15 @@ class AddLdapGroupForm(forms.Form):
       max_length=64,
       regex='^%s$' % (get_groupname_re_rule(),),
       help_text=_("Required. 30 characters or fewer. May only contain letters, "
-                "numbers, hypens or underscores."),
+                "numbers, hyphens or underscores."),
       error_messages={'invalid': _("Whitespaces and ':' not allowed") })
   dn = forms.BooleanField(label=_("Distinguished name"),
                           help_text=_("Whether or not the group should be imported by "
-                                    "distinguished name"),
+                                    "distinguished name."),
                           initial=False,
                           required=False)
   import_members = forms.BooleanField(label=_('Import new members'),
-                                      help_text=_('Import unimported or new users from the group'),
+                                      help_text=_('Import unimported or new users from the group.'),
                                       initial=False,
                                       required=False)
 
@@ -426,7 +426,7 @@ def _check_remove_last_super(user_obj):
   all_active_su = User.objects.filter(is_superuser__exact = True,
                                       is_active__exact = True)
   num_active_su = all_active_su.count()
-  assert num_active_su >= 1, _("No active superuser configured")
+  assert num_active_su >= 1, _("No active superuser configured.")
   if num_active_su == 1:
     raise PopupException(_("You cannot remove the last active "
                          "superuser from the configuration."))
@@ -604,7 +604,7 @@ class GroupEditForm(forms.ModelForm):
     data = self.cleaned_data["name"]
     if not self.GROUPNAME.match(data):
       raise forms.ValidationError(_("Group name may only contain letters, " +
-                                  "numbers, hypens or underscores."))
+                                  "numbers, hyphens or underscores."))
     return data
 
   def __init__(self, *args, **kwargs):

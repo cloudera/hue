@@ -33,12 +33,12 @@ USE_CHERRYPY_SERVER = Config(
 
 HTTP_HOST = Config(
   key="http_host",
-  help=_("HTTP Host to bind to"),
+  help=_("HTTP Host to bind to."),
   type=str,
   default="0.0.0.0")
 HTTP_PORT = Config(
   key="http_port",
-  help=_("HTTP Port to bind to"),
+  help=_("HTTP Port to bind to."),
   type=int,
   default=8888)
 SSL_CERTIFICATE = Config(
@@ -91,11 +91,11 @@ def default_from_email():
 
 SMTP = ConfigSection(
   key='smtp',
-  help=_('Configuration options for connecting to an external SMTP server'),
+  help=_('Configuration options for connecting to an external SMTP server.'),
   members=dict(
     HOST = Config(
       key="host",
-      help=_("The SMTP server for email notification delivery"),
+      help=_("The SMTP server for email notification delivery."),
       type=str,
       default="localhost"
     ),
@@ -123,14 +123,14 @@ SMTP = ConfigSection(
 
     USE_TLS = Config(
       key="tls",
-      help=_("Whether to use a TLS (secure) connection when talking to the SMTP server"),
+      help=_("Whether to use a TLS (secure) connection when talking to the SMTP server."),
       type=coerce_bool,
       default=False
     ),
 
     DEFAULT_FROM= Config(
       key="default_from_email",
-      help=_("Default email address to use for various automated notification from Hue"),
+      help=_("Default email address to use for various automated notifications from Hue."),
       type=str,
       dynamic_default=default_from_email
     ),
@@ -144,13 +144,13 @@ DATABASE = ConfigSection(
   members=dict(
     ENGINE=Config(
       key='engine',
-      help=_('Database engine, eg postgresql, mysql, sqlite3, or oracle'),
+      help=_('Database engine, such as postgresql, mysql, sqlite3, or Oracle.'),
       type=str,
       default='sqlite3',
     ),
     NAME=Config(
       key='name',
-      help=_('Database name, or path to DB if using sqlite3'),
+      help=_('Database name, or path to DB if using sqlite3.'),
       type=str,
       default=get_desktop_root('desktop.db'),
     ),
@@ -183,7 +183,7 @@ DATABASE = ConfigSection(
 
 KERBEROS = ConfigSection(
   key="kerberos",
-  help=_("""Configuration options for specifying Hue's kerberos integration for
+  help=_("""Configuration options for specifying Hue's Kerberos integration for
           secured Hadoop clusters."""),
   members=dict(
     HUE_KEYTAB=Config(
@@ -193,24 +193,24 @@ KERBEROS = ConfigSection(
       default=None),
     HUE_PRINCIPAL=Config(
       key='hue_principal',
-      help=_("Kerberos principal name for hue. Typically 'hue/hostname.foo.com'"),
+      help=_("Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."),
       type=str,
       default="hue/%s" % socket.getfqdn()),
     KEYTAB_REINIT_FREQUENCY=Config(
       key='reinit_frequency',
-      help=_("Frequency in seconds with which Hue will renew its keytab"),
+      help=_("Frequency in seconds with which Hue will renew its keytab."),
       type=int,
       default=60*60), #1h
     CCACHE_PATH=Config(
       key='ccache_path',
-      help=_("Path to keep kerberos credentials cached"),
+      help=_("Path to keep Kerberos credentials cached"),
       private=True,
       type=str,
       default="/tmp/hue_krb5_ccache",
     ),
     KINIT_PATH=Config(
       key='kinit_path',
-      help=_("Path to kerberos 'kinit' command"),
+      help=_("Path to Kerberos 'kinit' command"),
       type=str,
       default="kinit", # use PATH!
     )
@@ -227,7 +227,7 @@ TIME_ZONE = Config(
 
 DEFAULT_SITE_ENCODING = Config(
   key='default_site_encoding',
-  help=_('Default system-wide unicode encoding'),
+  help=_('Default system-wide unicode encoding.'),
   type=str,
   default='utf-8'
 )
@@ -246,14 +246,14 @@ SERVER_GROUP = Config(
 
 AUTH = ConfigSection(
   key="auth",
-  help=_("Configuration options for user authentication into the web application"),
+  help=_("Configuration options for user authentication into the web application."),
   members=dict(
     BACKEND=Config("backend",
                    default="desktop.auth.backend.AllowFirstUserDjangoBackend",
                    help=_("Authentication backend.  Common settings are "
                         "django.contrib.auth.backends.ModelBackend (fully Django backend), " + 
                         "desktop.auth.backend.AllowAllBackend (allows everyone), " +
-                        "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login), ")),
+                        "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). ")),
     USER_AUGMENTOR=Config("user_augmentor",
                    default="desktop.auth.backend.DefaultUserAugmentor",
                    help=_("Class which defines extra accessor methods for User objects.")),
@@ -287,7 +287,7 @@ LDAP = ConfigSection(
 
     USERS = ConfigSection(
       key="users",
-      help=_("Configuration for LDAP user schema and search"),
+      help=_("Configuration for LDAP user schema and search."),
       members=dict(
         USER_FILTER=Config("user_filter",
                            default="objectclass=*",
@@ -323,12 +323,12 @@ LDAP = ConfigSection(
 
 LOCAL_FILESYSTEMS = UnspecifiedConfigSection(
   key="local_filesystems",
-  help=_("Paths on the local file system that users should be able to browse"),
+  help=_("Paths on the local file system that users should be able to browse."),
   each=ConfigSection(
     members=dict(
       PATH=Config("path",
                   required=True,
-                  help=_("The path on the local FS")))))
+                  help=_("The path on the local FS.")))))
 
 def default_feedback_url():
   """A version-specific URL."""
@@ -343,7 +343,7 @@ FEEDBACK_URL = Config(
 
 SEND_DBUG_MESSAGES = Config(
   key="send_dbug_messages",
-  help=_("Whether to send dbug messages from JavaScript to the server logs."),
+  help=_("Whether to send debug messages from JavaScript to the server logs."),
   type=coerce_bool,
   default=False
 )
@@ -356,7 +356,7 @@ DATABASE_LOGGING = Config(
 
 DJANGO_DEBUG_MODE = Config(
   key="django_debug_mode",
-  help=_("Enable or disable django debug mode."),
+  help=_("Enable or disable Django debug mode."),
   type=coerce_bool,
   default=True
 )
@@ -402,7 +402,7 @@ def config_validator():
     kt_stat = os.stat(KERBEROS.HUE_KEYTAB.get())
     if stat.S_IMODE(kt_stat.st_mode) & 0077:
       res.append((KERBEROS.HUE_KEYTAB,
-                  unicode(_("Keytab should have 0600 permissions (has %o)") %
+                  unicode(_("Keytab should have 0600 permissions (has %o).") %
                   stat.S_IMODE(kt_stat.st_mode))))
 
     res.extend(validate_path(KERBEROS.KINIT_PATH, is_dir=False))

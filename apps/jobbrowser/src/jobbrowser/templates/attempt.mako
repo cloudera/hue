@@ -68,11 +68,11 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                         </thead>
                         <tbody>
                         <tr>
-                            <td>${_('Attempt id')}</td>
+                            <td>${_('Attempt ID')}</td>
                             <td>${attempt.attemptId}</td>
                         </tr>
                         <tr>
-                            <td>${_('Task id')}</td>
+                            <td>${_('Task ID')}</td>
                             <td><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId}</a></td>
                         </tr>
                         <tr>

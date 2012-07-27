@@ -61,7 +61,7 @@ def oozie_job(request, jobid):
     log = workflow.log
     definition = workflow.definition
   except RestException, ex:
-    raise PopupException(_("Error accessing Oozie job %(id)s") % {'id': jobid},
+    raise PopupException(_("Error accessing Oozie job %(id)s.") % {'id': jobid},
                          detail=ex.message)
 
   # Cross reference the submission history (if any)
@@ -190,7 +190,7 @@ def delete_design(request, design_id):
       submit.Submission(design_obj, request.fs).remove_deployment_dir()
     except models.OozieDesign.DoesNotExist:
       LOG.error("Trying to delete non-existent design (id %s)" % (design_id,))
-      raise PopupException(_("Workflow not found"))
+      raise PopupException(_("Workflow not found."))
 
   return redirect(urlresolvers.reverse(list_designs))
 

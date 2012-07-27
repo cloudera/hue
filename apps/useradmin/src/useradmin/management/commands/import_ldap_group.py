@@ -33,10 +33,10 @@ class Command(BaseCommand):
 
   option_list = BaseCommand.option_list + (
       make_option("--dn", help=_("Whether or not the user should be imported by "
-                               "distinguished name"),
+                               "distinguished name."),
                           action="store_true",
                           default=False),
-      make_option("--import-members", help=_("Import users from the group"),
+      make_option("--import-members", help=_("Import users from the group."),
                                       action="store_true",
                                       default=False),
    )
@@ -45,7 +45,7 @@ class Command(BaseCommand):
 
   def handle(self, group=None, **options):
     if group is None:
-      raise CommandError(_("A group name must be provided"))
+      raise CommandError(_("A group name must be provided."))
 
     import_members = options['import_members']
     import_by_dn = options['dn']

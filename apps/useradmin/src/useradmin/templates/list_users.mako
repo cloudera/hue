@@ -30,7 +30,7 @@ ${layout.menubar(section='users', _=_)}
         <div class="btn-group pull-right">
             %if user.is_superuser == True:
             <a href="${ url('useradmin.views.edit_user') }" class="btn">${_('Add user')}</a>
-            <a href="${ url('useradmin.views.add_ldap_user') }" class="btn">${_('Add/sync LDAP user')}</a>
+            <a href="${ url('useradmin.views.add_ldap_user') }" class="btn">${_('Add/Sync LDAP user')}</a>
             <a href="#syncLdap" class="btn" data-toggle="modal">${_('Sync LDAP users/groups')}</a>
             %endif
         </div>

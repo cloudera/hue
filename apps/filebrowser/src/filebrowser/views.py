@@ -640,7 +640,7 @@ def _read_avro(fs, path, offset, length):
             contents = "".join(contents_list)
         except:
             logging.warn("Could not read avro file at %s" % path, exc_info=True)
-            raise PopupException(_("Failed to read Avro file"))
+            raise PopupException(_("Failed to read Avro file."))
     finally:
         fhandle.close()
     return contents
@@ -649,14 +649,14 @@ def _read_avro(fs, path, offset, length):
 def _read_gzip(fs, path, offset, length):
     contents = ''
     if offset and offset != 0:
-        raise PopupException(_("We don't support offset and gzip Compression"))
+        raise PopupException(_("Offsets are not supported with Gzip compression."))
     try:
         fhandle = fs.open(path)
         try:
             contents = GzipFile('', 'r', 0, StringIO(fhandle.read())).read(length)
         except:
             logging.warn("Could not decompress file at %s" % path, exc_info=True)
-            raise PopupException(_("Failed to decompress file"))
+            raise PopupException(_("Failed to decompress file."))
     finally:
         fhandle.close()
     return contents
@@ -671,7 +671,7 @@ def _read_simple(fs, path, offset, length):
             contents = fhandle.read(length)
         except:
             logging.warn("Could not read file at %s" % path, exc_info=True)
-            raise PopupException(_("Failed to read file"))
+            raise PopupException(_("Failed to read file."))
     finally:
         fhandle.close()
     return contents
@@ -894,7 +894,7 @@ def _upload(request):
                     request.fs.chmod(tmp_file, 0644)
                     request.fs.chown(tmp_file, username, username)
                 except IOError, ex:
-                    msg = _('Failed to chown uploaded file ("%(file)s") as superuser %(superuser)s') %\
+                    msg = _('Failed to chown uploaded file ("%(file)s") as superuser %(superuser)s.') %\
                           {'file': tmp_file, 'superuser': request.fs.superuser}
                     logger.exception(msg)
                     raise PopupException(msg, detail=str(ex))

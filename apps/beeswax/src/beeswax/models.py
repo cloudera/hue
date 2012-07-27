@@ -169,7 +169,7 @@ class SavedQuery(models.Model):
       raise PopupException(msg)
 
     if type is not None and design.type != type:
-      msg = _('Type mismatch for design id %(id)s (owner %(owner)s) - Expects %(expected_type)s got %(real_type)s') % \
+      msg = _('Type mismatch for design id %(id)s (owner %(owner)s) - Expected %(expected_type)s got %(real_type)s') % \
             {'id': id, 'owner': owner, 'expected_type': design.type, 'real_type': type}
       LOG.error(msg)
       raise PopupException(msg)

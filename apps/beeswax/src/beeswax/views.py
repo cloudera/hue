@@ -827,12 +827,12 @@ def _get_server_id_and_state(query_history):
   ok, server_id = query_history.get_server_id()
   if not server_id:
     if ok:
-      raise PopupException(_t("Query is still being submitted to the Beeswax Server"))
-    raise PopupException(_t("Failed to retrieve query state from the Beeswax Server"))
+      raise PopupException(_t("Query is still being submitted to the Beeswax Server."))
+    raise PopupException(_t("Failed to retrieve query state from the Beeswax Server."))
 
   state = db_utils.get_query_state(query_history)
   if state is None:
-    raise PopupException(_t("Failed to contact Beeswax Server to check query status"))
+    raise PopupException(_t("Failed to contact Beeswax Server to check query status."))
   return (server_id, state)
 
 

@@ -29,7 +29,7 @@ ${layout.menubar(section='tables')}
     <div class="well sidebar-nav">
         <ul class="nav nav-list">
             <li class="nav-header">${_('Actions')}</li>
-            <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from file')}</a></li>
+            <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from a file')}</a></li>
             <li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
         </ul>
     </div>
@@ -69,7 +69,7 @@ ${layout.menubar(section='tables')}
 	                )
 	                )}
 	                <p class="help-block">
-	                    ${_("Use a table comment to describe your table. For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
+	                    ${_("Use a table comment to describe your table.  For example, you might note the data's provenance and any caveats users need to know.")}
 	                </p>
 	            </div>
 	        </div>
@@ -280,10 +280,10 @@ ${layout.menubar(section='tables')}
 	    <br/><br/>
 	    <fieldset>
 	        <div class="alert alert-info"><h3>${_('Configure Partitions')}</h3>
-	            ${_('If your data is naturally partitioned (by, say, date), partitions are a way to tell Hive that data for a specific partition value are stored together.')}
+	            ${_('If your data is naturally partitioned (by date, for example), partitions are a way to tell Hive that data for a specific partition value are stored together.')}
 	            ${_('Hive establishes a mapping between directories on disk')}
 	            (<em>${_('e.g.')},</em> <code>/user/hive/warehouse/logs/dt=20100101/</code>)
-	            ${_('and the data for that day.  Partitions are virtual columns; they are not represented in the data themselves, but are determined by the data location. Hive implements query optimizations such that queries that are specific to a single partition need not read the data in other partitions.')}
+	            ${_('and the data for that day.  Partitions are virtual columns; they are not represented in the data itself, but are determined by the data location. Hive implements query optimizations such that queries that are specific to a single partition need not read the data in other partitions.')}
 	        </div>
 	        % for form in partitions_form.forms:
 	            ${render_column(form, True)}
@@ -500,7 +500,7 @@ ${layout.menubar(section='tables')}
             $(".step[href='"+_url.substring(_url.indexOf("#"),_url.length)+"']").click();
         }
 
-        $("#id_table-field_terminator_1").css("margin-left","4px").attr("placeholder","${_('Write here your field terminator')}").hide();
+        $("#id_table-field_terminator_1").css("margin-left","4px").attr("placeholder","${_('Type your field terminator here')}").hide();
         $("#id_table-field_terminator_0").change(function(){
             if ($(this).val() == "__other__"){
                 $("#id_table-field_terminator_1").show();
@@ -509,7 +509,7 @@ ${layout.menubar(section='tables')}
                 $("#id_table-field_terminator_1").hide().nextAll(".error-inline").addClass("hide");
             }
         });
-        $("#id_table-collection_terminator_1").css("margin-left","4px").attr("placeholder","${_('Write here your collection terminator')}").hide();
+        $("#id_table-collection_terminator_1").css("margin-left","4px").attr("placeholder","${_('Type your collection terminator here')}").hide();
         $("#id_table-collection_terminator_0").change(function(){
             if ($(this).val() == "__other__"){
                 $("#id_table-collection_terminator_1").show();
@@ -518,7 +518,7 @@ ${layout.menubar(section='tables')}
                 $("#id_table-collection_terminator_1").hide().nextAll(".error-inline").addClass("hide");
             }
         });
-        $("#id_table-map_key_terminator_1").css("margin-left","4px").attr("placeholder","${_('Write here your map key terminator')}").hide();
+        $("#id_table-map_key_terminator_1").css("margin-left","4px").attr("placeholder","${_('Type your map key terminator here')}").hide();
         $("#id_table-map_key_terminator_0").change(function(){
             if ($(this).val() == "__other__"){
                 $("#id_table-map_key_terminator_1").show();

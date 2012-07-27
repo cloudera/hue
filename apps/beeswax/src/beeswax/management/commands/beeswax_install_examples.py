@@ -77,7 +77,7 @@ class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     """Main entry point to install examples. May raise InstallException"""
     if self._check_installed():
-      msg = _('Beeswax examples already installed')
+      msg = _('Beeswax examples already installed.')
       LOG.error(msg)
       raise InstallException(msg)
 
@@ -186,7 +186,7 @@ class SampleTable(object):
     try:
       # Already exists?
       tables = db_utils.meta_client().get_table("default", self.name)
-      msg = _('Table "%(table)s" already exists') % {'table': self.name}
+      msg = _('Table "%(table)s" already exists.') % {'table': self.name}
       LOG.error(msg)
       raise InstallException(msg)
     except hive_metastore.ttypes.NoSuchObjectException:
@@ -194,7 +194,7 @@ class SampleTable(object):
       try:
         results = db_utils.execute_and_wait(django_user, query_msg)
         if not results:
-          msg = _('Error creating table %(table)s: Operation timeout') % {'table': self.name}
+          msg = _('Error creating table %(table)s: Operation timeout.') % {'table': self.name}
           LOG.error(msg)
           raise InstallException(msg)
       except BeeswaxException, ex:
@@ -218,7 +218,7 @@ class SampleTable(object):
     try:
       results = db_utils.execute_and_wait(django_user, query_msg)
       if not results:
-        msg = _('Error loading table %(table)s: Operation timeout') % {'table': self.name}
+        msg = _('Error loading table %(table)s: Operation timeout.') % {'table': self.name}
         LOG.error(msg)
         raise InstallException(msg)
     except BeeswaxException, ex:
@@ -243,7 +243,7 @@ class SampleDesign(object):
     try:
       # Don't overwrite
       model = models.SavedQuery.objects.get(owner=django_user, name=self.name)
-      msg = _('Sample design %(name)s already exists') % {'name': self.name}
+      msg = _('Sample design %(name)s already exists.') % {'name': self.name}
       LOG.error(msg)
       raise InstallException(msg)
     except models.SavedQuery.DoesNotExist:

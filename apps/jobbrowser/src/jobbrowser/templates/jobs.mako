@@ -55,7 +55,7 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
 <table class="datatables table table-striped table-condensed">
     <thead>
         <tr>
-            <th>${_('Id')}</th>
+            <th>${_('ID')}</th>
             <th>${_('Name')}</th>
             <th>${_('Status')}</th>
             <th>${_('User')}</th>

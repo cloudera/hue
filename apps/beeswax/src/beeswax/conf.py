@@ -21,19 +21,19 @@ from django.utils.translation import ugettext_lazy as _
 
 BEESWAX_SERVER_HOST = Config(
   key="beeswax_server_host",
-  help=_("Host where beeswax server thrift daemon is running"),
+  help=_("Host where Beeswax server Thrift daemon is running."),
   private=True,
   default="localhost")
 
 BEESWAX_SERVER_PORT = Config(
   key="beeswax_server_port",
-  help=_("Configure the port the beeswax thrift server runs on"),
+  help=_("Configure the port the Beeswax Thrift server runs on."),
   default=8002,
   type=int)
 
 BEESWAX_META_SERVER_HOST = Config(
   key="beeswax_meta_server_host",
-  help=_("Host where beeswax internal metastore thrift daemon is running"),
+  help=_("Host where Beeswax internal metastore Thrift daemon is running."),
   private=True,
   default="localhost")
 
@@ -65,31 +65,31 @@ BEESWAX_HIVE_HOME_DIR = Config(
 
 BEESWAX_HIVE_CONF_DIR = Config(
   key='hive_conf_dir',
-  help=_('Hive configuration directory, where hive-site.xml is located'),
+  help=_('Hive configuration directory, where hive-site.xml is located.'),
   default=os.environ.get("HIVE_CONF_DIR", '/etc/hive/conf'))
 
 LOCAL_EXAMPLES_DATA_DIR = Config(
   key='local_examples_data_dir',
   default=os.path.join(os.path.dirname(__file__), "..", "..", "data"),
-  help=_('The local filesystem path containing the beeswax examples'))
+  help=_('The local filesystem path containing the Beeswax examples.'))
 
 BEESWAX_SERVER_CONN_TIMEOUT = Config(
   key='beeswax_server_conn_timeout',
   default=120,
   type=int,
-  help=_('Timeout in seconds for thrift calls to beeswax service'))
+  help=_('Timeout in seconds for Thrift calls to Beeswax service.'))
 
 METASTORE_CONN_TIMEOUT= Config(
   key='metastore_conn_timeout',
   default=10,
   type=int,
-  help=_('Timeouts in seconds for thrift calls to the hive metastore. This timeout should take into account that the metastore could talk to an external DB'))
+  help=_('Timeouts in seconds for Thrift calls to the Hive metastore. This timeout should take into account that the metastore could talk to an external database.'))
 
 BEESWAX_RUNNING_QUERY_LIFETIME = Config(
   key='beeswax_running_query_lifetime',
   default=604800000L, # 7*24*60*60*1000 (1 week)
   type=long,
-  help=_('Time in seconds for beeswax to persist queries in its cache.'))
+  help=_('Time in seconds for Beeswax to persist queries in its cache.'))
 
 BROWSE_PARTITIONED_TABLE_LIMIT = Config(
   key='browse_partitioned_table_limit',
