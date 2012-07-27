@@ -43,7 +43,7 @@ class SaveForm(forms.Form):
   name = forms.CharField(required=False,
                         max_length=64,
                         initial=models.SavedQuery.DEFAULT_NEW_DESIGN_NAME,
-                        help_text=_t('Change the name to save as a new design'))
+                        help_text=_t('Change the name to save as a new design.'))
   desc = forms.CharField(required=False, max_length=1024, label=_t("Description"))
   save = forms.BooleanField(widget=SubmitButton, required=False)
   saveas = forms.BooleanField(widget=SubmitButton, required=False)
@@ -130,8 +130,9 @@ class FileResourceForm(forms.Form):
       ("ARCHIVE", "archive"),
       ("FILE", "file"),
     ], help_text=_t("Resources to upload with your Hive job." +
-       "  Use 'jar' for UDFs.  Use file and archive for "
-       "side files and MAP/TRANSFORM using.  Paths are on HDFS.")
+       "  Use 'jar' for UDFs.  Use 'file' and 'archive' for "
+       "files to be copied and made locally available duirng MAP/TRANSFORM. " +
+       "Paths are on HDFS.")
   )
   # TODO(philip): Could upload files here, too.  Or merely link
   # to upload utility?
@@ -235,7 +236,7 @@ def _clean_tablename(name):
 
 def _clean_terminator(val):
   if val is not None and len(val.decode('string_escape')) != 1:
-      raise forms.ValidationError(_t('Terminator must be exactly one character'))
+      raise forms.ValidationError(_t('Terminator must be exactly one character.'))
   return val
 
 
@@ -249,7 +250,7 @@ class CreateByImportFileForm(forms.Form):
   path = filebrowser.forms.PathField(label=_t("Input File"))
   do_import = forms.BooleanField(required=False, initial=True,
                           label=_t("Import data from file"),
-                          help_text=_t("Automatically load this file into the table after creation"))
+                          help_text=_t("Automatically load this file into the table after creation."))
 
   def clean_name(self):
     return _clean_tablename(self.cleaned_data['name'])
@@ -265,7 +266,7 @@ class CreateByImportDelimForm(forms.Form):
     # ChoiceOrOtherField doesn't work with required=True
     delimiter = self.cleaned_data.get('delimiter')
     if not delimiter:
-      raise forms.ValidationError(_t('Delimiter value is required'))
+      raise forms.ValidationError(_t('Delimiter value is required.'))
     _clean_terminator(delimiter)
     return self.cleaned_data
 
@@ -275,10 +276,10 @@ class CreateByImportDelimForm(forms.Form):
         chr(int(delimiter))
         return int(delimiter)
       except ValueError:
-        raise forms.ValidationError(_t('Delimiter value must be smaller than 256'))
+        raise forms.ValidationError(_t('Delimiter value must be smaller than 256.'))
     val = delimiter.decode('string_escape')
     if len(val) != 1:
-      raise forms.ValidationError(_t('Delimiter must be exactly one character'))
+      raise forms.ValidationError(_t('Delimiter must be exactly one character.'))
     return ord(val)
 
 

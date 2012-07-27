@@ -52,7 +52,7 @@ ${layout.menubar(section='check_config')}
           % endfor
         </table>
         % else:
-          <h2>${_('All ok. Configuration check passed!')}</h2>
+          <h2>${_('All OK. Configuration check passed!')}</h2>
         % endif
 
     </div>

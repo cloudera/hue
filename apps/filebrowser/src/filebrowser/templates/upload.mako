@@ -28,7 +28,7 @@ from django.utils.translation import ugettext as _
         <h1>${_('Upload Files')}</h1>
         <div id="file-uploader">
             <noscript>
-                <p>${_('Please enable JavaScript to use file uploader.')}</p>
+                <p>${_('Please enable JavaScript to use the file uploader.')}</p>
                 <!-- or put a simple form for upload here -->
             </noscript>
         </div>

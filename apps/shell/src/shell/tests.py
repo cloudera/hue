@@ -84,7 +84,7 @@ def test_spawning_check():
                "/shell/kill_shell", "/shell/retrieve_output", "/shell/add_to_output"]
   for url in get_urls:
     response = client.get(url, follow=True)
-    assert "The webserver currently running Hue does not support the Shell app." in response.content
+    assert "The webserver currently running Hue does not support the Shell" in response.content
 
   for url in post_urls:
     response = client.post(url, follow=True)
@@ -97,7 +97,7 @@ def test_unix_user_account_check():
 
   d = { 'eventlet.input' : None }
   response = client.get('/shell/', follow=True, **d)
-  assert "The Shell app requires a Unix user account for every user of Hue" in response.content
+  assert "The Shell application requires a Unix user account for every user of Hue" in response.content
 
 def test_rest():
   reset_all_users()

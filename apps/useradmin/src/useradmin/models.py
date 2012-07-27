@@ -227,7 +227,7 @@ def update_app_permissions(**kwargs):
 
   for app_obj in appmanager.DESKTOP_APPS:
     app = app_obj.name
-    actions = set([("access", "launch this application")])
+    actions = set([("access", "Launch this application")])
     actions.update(getattr(app_obj.settings, "PERMISSION_ACTIONS", []))
 
     if app not in current:

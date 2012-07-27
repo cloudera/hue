@@ -47,7 +47,7 @@ ${layout.menubar(section='groups', _=_)}
 		<h1>${_('Hue Groups - Edit group: %(name)s') % dict(name=name)}</h1>
 	% else:
 		% if ldap:
-			<h1>${_('Hue Groups - Add/sync LDAP group')}</h1>
+			<h1>${_('Hue Groups - Add/Sync LDAP group')}</h1>
 		% else:
 			<h1>${_('Hue Groups - Create group')}</h1>
 		% endif

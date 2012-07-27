@@ -44,7 +44,7 @@ ${layout.menubar(section='users', _=_)}
 		<h1>${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
 	% else:
 		% if ldap:
-			<h1>${_('Hue Users - Add/sync LDAP user')}</h1>
+			<h1>${_('Hue Users - Add/Sync LDAP user')}</h1>
 		% else:
 			<h1>${_('Hue Users - Create user')}</h1>
 		% endif

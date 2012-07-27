@@ -64,7 +64,7 @@ from django.utils.translation import ugettext as _
         <h3>${_('Change Owner / Group:')} ${path}</h3>
     </div>
     <div class="modal-body change-owner-modal-body clearfix" >
-        <div class="alert alert-message block-message info">${_('Note: Only the Hadoop superuser, on this FS "%(superuser)s", may change the owner of a file.') % dict(superuser=extra_params['superuser'])}"</div>
+        <div class="alert alert-message block-message info">${_('Note: Only the Hadoop superuser, "%(superuser)s" on this file system, may change the owner of a file.') % dict(superuser=extra_params['superuser'])}"</div>
         <div style="padding-left: 15px; padding-bottom: 10px;">
             ${edit.render_field(form["path"], hidden=True)}
 

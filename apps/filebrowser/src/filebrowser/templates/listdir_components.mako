@@ -56,7 +56,7 @@ from django.utils.translation import ugettext as _
         <ul class="pull-right">
             <li class="prev"><a title="${_('Beginning of List')}" ${toppage(page)}>&larr; ${_('Beginning of List')}</a></li>
             <li><a title="${_('Previous Page')}" ${prevpage(page)}>${_('Previous Page')}</a></li>
-            <li><a title="${_('Next page')}" ${nextpage(page)}>${_('Next Page')}</a></li>
+            <li><a title="${_('Next Page')}" ${nextpage(page)}>${_('Next Page')}</a></li>
             <li class="next"><a title="${_('End of List')}" ${bottompage(page)}>${_('End of List')} &rarr;</a></li>
         </ul>
         <p>${_('Show')} <select id="pagesize" class="input-mini"><option>15</option><option selected>30</option><option>45</option><option>60</option><option>100</option><option>200</option></select> ${_('items per page')}. ${_('Showing %(start_index)s to %(end_index)s of %(total_count)s items, page %(page)s of %(num_pages)s.') % dict(start_index=page.start_index(), end_index=page.end_index(), total_count=page.total_count(), page=page.number, num_pages=page.num_pages())}</p>
@@ -231,7 +231,7 @@ from django.utils.translation import ugettext as _
         <form action="/filebrowser/upload?next=${current_dir_path}" method="POST" enctype="multipart/form-data" class="form-stacked">
             <div id="fileUploader">
             <noscript>
-                <p>${_('Please enable JavaScript to use file uploader.')}</p>
+                <p>${_('Please enable JavaScript to use the file uploader.')}</p>
             </noscript>
             </div>
         </form>

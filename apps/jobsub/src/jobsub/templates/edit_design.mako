@@ -63,7 +63,7 @@ ${layout.menubar(section='designs')}
         <hr/>
         <div class="control-group">
           <p class="alert alert-info">
-              ${_('You can parametrize the values, using')} <code>$myVar</code> ${_('or')}
+              ${_('You can parameterize the values, using')} <code>$myVar</code> ${_('or')}
               <code>${"${"}myVar}</code> .
               ${_('When the design is submitted, you will be prompted for the actual value of ')}<code>myVar</code> .
           </p>

@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
   option_list = BaseCommand.option_list + (
       make_option("--dn", help=_("Whether or not the user should be imported by "
-                               "distinguished name"),
+                               "distinguished name."),
                           action="store_true",
                           default=False),
   )
@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
   def handle(self, user=None, **options):
     if user is None:
-      raise CommandError(_("A username must be provided"))
+      raise CommandError(_("A username must be provided."))
 
     import_by_dn = options['dn']
     import_ldap_user(user, import_by_dn)

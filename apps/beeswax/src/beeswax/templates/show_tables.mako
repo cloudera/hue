@@ -31,7 +31,7 @@ ${layout.menubar(section='tables')}
 					% if not examples_installed:
 		        	<li><a href="#installSamples" data-toggle="modal">${_('Install samples')}</a></li>
 		      		% endif
-		      		<li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from file')}</a></li>
+		      		<li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from a file')}</a></li>
 					<li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
 				</ul>
 			</div>

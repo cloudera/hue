@@ -78,7 +78,7 @@ class Submission(object):
       wf_dir = self._get_and_create_deployment_dir()
     except Exception, ex:
       LOG.exception("Failed to access deployment directory")
-      raise PopupException(message=_("Failed to access deployment directory"),
+      raise PopupException(message=_("Failed to access deployment directory."),
                            detail=str(ex))
 
     wf_xml = self._generate_workflow_xml(fs_defaultfs)

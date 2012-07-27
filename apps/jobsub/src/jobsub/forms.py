@@ -40,8 +40,8 @@ class WorkflowDesignForm(forms.ModelForm):
         max_length=39,
         regex=_OOZIE_WORKFLOW_NAME_REGEX,
         help_text="Name of the design.",
-        error_messages={'invalid': _("Allows alphabets, digits, '_', and '-'. "
-                        "The first character must be an alphabet or '_'.")})
+        error_messages={'invalid': _("Allows letters, digits, '_', and '-'. "
+                        "The first character must be a letter or '_'.")})
 
 
 class JavaActionForm(forms.ModelForm):

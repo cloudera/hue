@@ -24,13 +24,13 @@ ${commonheader(_('Beeswax: Create table from file'), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
-    <h1>${_('Create a new table from file')}</h1>
+    <h1>${_('Create a new table from a file')}</h1>
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
-                    <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from file')}</a></li>
+                    <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from a file')}</a></li>
                     <li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
@@ -47,7 +47,7 @@ ${layout.menubar(section='tables')}
                     ${comps.field(delim_form['file_type'])}
                 </div>
                 <fieldset>
-                    <div class="alert alert-info"><h3>${_('Choose A Delimiter')}</h3>
+                    <div class="alert alert-info"><h3>${_('Choose a Delimiter')}</h3>
                         % if initial:
                             ${_('Beeswax has determined that this file is delimited by')} <strong>${delim_readable}</strong>.
                         % endif
@@ -109,7 +109,7 @@ ${layout.menubar(section='tables')}
     $(document).ready(function(){
         $(".scrollable").width($(".form-actions").width());
 
-        $("#id_delimiter_1").css("margin-left","4px").attr("placeholder","${_('Please write here your delimiter')}").hide();
+        $("#id_delimiter_1").css("margin-left","4px").attr("placeholder","${_('Please type your delimiter here')}").hide();
         $("#id_delimiter_0").change(function(){
             if ($(this).val() == "__other__"){
                 $("#id_delimiter_1").show();

@@ -32,7 +32,7 @@ class Command(BaseCommand):
       make_option("--max-uid", help=_("Maximum UID to import (Exclusive)."), default=65334),
       make_option("--min-gid", help=_("Minimum GID to import (Inclusive)."), default=500),
       make_option("--max-gid", help=_("Maximum GID to import (Exclusive)."), default=65334),
-      make_option("--check-shell", help=_("Whether or not to check that the user's shell is not /bin/false"), default=True)
+      make_option("--check-shell", help=_("Whether or not to check that the user's shell is not /bin/false."), default=True)
   )
 
   def handle(self, *args, **options):

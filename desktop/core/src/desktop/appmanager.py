@@ -221,7 +221,7 @@ def load_apps():
   global DESKTOP_APPS
 
   if DESKTOP_APPS is not None:
-    raise Exception(_("load_apps already has been called!"))
+    raise Exception(_("load_apps has already been called!"))
   DESKTOP_APPS = []
 
   for sdk_app in pkg_resources.iter_entry_points("desktop.sdk.application"):

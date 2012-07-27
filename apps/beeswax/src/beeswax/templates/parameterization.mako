@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Parametrize Hive Query'), "beeswax", "100px")}
+${commonheader(_('Parameterize Hive Query'), "beeswax", "100px")}
 
 ${layout.menubar()}
 

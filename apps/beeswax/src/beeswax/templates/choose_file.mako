@@ -24,13 +24,13 @@ ${layout.menubar(section='tables')}
 
 
 <div class="container-fluid">
-    <h1>${_('Create a new table from file')}</h1>
+    <h1>${_('Create a new table from a file')}</h1>
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
-                    <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from file')}</a></li>
+                    <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from a file')}</a></li>
                     <li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
@@ -67,7 +67,7 @@ ${layout.menubar(section='tables')}
                             )}
                             <span  class="help-inline">${unicode(file_form["comment"].errors) | n}</span>
                         <span class="help-block">
-                        ${_("Use a table comment to describe your table.  For example, you might mention the data's provenance, and any caveats users of this table should expect.")}
+                        ${_("Use a table comment to describe your table.  For example, you might note the data's provenance and any caveats users need to know.")}
                         </span>
                         </div>
                     </div>
@@ -91,7 +91,7 @@ ${layout.menubar(section='tables')}
                         <div class="controls">
                             ${comps.field(file_form["do_import"], render_default=True)}
                             <span class="help-block">
-                        ${_('Check this box if you want to import the data in this file after creating the table definition. Leave it unchecked if you just want to define an empty table.')}
+                        ${_('Check this box if you want to import the data in this file after creating the table definition. Leave it unchecked if you want to define an empty table.')}
                         <div id="fileWillBeMoved" class="alert">
                             <strong>${_('Warning!')}</strong> ${_('The selected file is going to be moved during the import.')}
                         </div>

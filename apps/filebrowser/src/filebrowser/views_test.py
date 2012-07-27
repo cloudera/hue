@@ -301,7 +301,7 @@ def test_view_gz():
 
     # offset should do nothing
     response = c.get('/filebrowser/view/test-gz-filebrowser/test-view.gz?compression=gzip&offset=1')
-    assert_true("We don't support" in response.context['message'])
+    assert_true("Offsets are not supported" in response.context['message'], response.context['message'])
 
     f = cluster.fs.open('/test-gz-filebrowser/test-view2.gz', "w")
     f.write("hello")
