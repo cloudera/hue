@@ -172,7 +172,8 @@ can be found on the [download page](https://github.com/cloudera/hue/downloads).
     ## Run
     $ build/env/bin/hue runserver_plus
     $ build/env/bin/hue beeswax_server
-    $ build/env/bin/hue jobsubd
+    ## Run alternative
+    $ build/env/bin/hue supervisor
     ## Visit http://localhost:8000/ with your web browser.
 
 <div class="note">
@@ -181,7 +182,7 @@ can be found on the [download page](https://github.com/cloudera/hue/downloads).
   which is very handy.
 </div>
 
-Run "create_app" to Set up a New Source Tree
+Run "create_desktop_app" to Set up a New Source Tree
 --------------------------------------------
 
     $ ./build/env/bin/hue create_desktop_app calculator
