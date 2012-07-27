@@ -164,7 +164,11 @@ Download, Unpack, Build Distro
 ------------------------------
 
 The Hue SDK is available from [Github](http://github.com/cloudera/hue). Releases
-can be found on the [download page](https://github.com/cloudera/hue/downloads).
+can be found on the [download page](https://github.com/cloudera/hue/downloads). 
+Releases are missing a few dependencies that could not be included because of 
+licencing issues (e.g. the werkzeug module). So if you prefer to have an
+environment ready from scratch, it is preferable to checkout a particular
+release tag instead.
 
     $ cd hue
     ## Build
@@ -172,7 +176,7 @@ can be found on the [download page](https://github.com/cloudera/hue/downloads).
     ## Run
     $ build/env/bin/hue runserver_plus
     $ build/env/bin/hue beeswax_server
-    ## Run alternative
+    ## Alternative run
     $ build/env/bin/hue supervisor
     ## Visit http://localhost:8000/ with your web browser.
 
