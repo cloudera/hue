@@ -188,7 +188,7 @@ ${layout.menubar(section='designs')}
         height:270px;
     }
     #fileChooserModal > ul.unstyled {
-        height:230px;
+        height:180px;
         overflow-y:auto;
     }
     .designTable {

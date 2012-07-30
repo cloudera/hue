@@ -371,7 +371,7 @@ from django.utils.translation import ugettext as _
             onSubmit:function(id, fileName, responseJSON){
                 num_of_pending_uploads++;
             },
-            debug: true
+            debug: false
         });
     }
 
