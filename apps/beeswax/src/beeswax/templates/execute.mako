@@ -185,7 +185,7 @@ ${layout.menubar(section='query')}
                         <li>
                             <label class="checkbox" rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
                                 <input type="checkbox" id="id_${form.query["email_notify"].html_name | n}" name="${form.query["email_notify"].html_name | n}" ${extract_field_data(form.query["email_notify"]) and "CHECKED" or ""}/>
-                                ${_("Email upon completion")}
+                                ${_("Email me on completion")}
                             </label>
                         </li>
                     </ul>
