@@ -830,6 +830,18 @@ div.box {
     background-color: #E5E5FF;
 }
 
+
+/*
+ * jHueFileChooser
+ */
+
+.jHueFilechooserActions {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed #EEEEEE;
+}
+
+
 /*
  * jHueSelector
  */

@@ -9,7 +9,17 @@
             initialPath:"",
             createFolder:true,
             uploadFile:true,
+            selectFolder:false,
+            labels: {
+                BACK: "Back",
+                SELECT_FOLDER: "Select this folder",
+                CREATE_FOLDER: "Create folder",
+                FOLDER_NAME: "Folder name",
+                CANCEL: "Cancel"
+            },
             onFileChoose:function () {
+            },
+            onFolderChoose:function () {
             },
             onFolderChange:function () {
             }
@@ -36,7 +46,7 @@
             if (data.title != null && data.title == "Error") {
                 var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message);
                 _errorMsg.appendTo($(_parent.element));
-                var _previousLink = $("<button>").addClass("btn").addClass("bnt-small").text("Back").click(function () {
+                var _previousLink = $("<button>").addClass("btn").addClass("bnt-small").text(_parent.options.labels.BACK).click(function () {
                     _parent.options.onFolderChange(_parent.previousPath);
                     _parent.navigateTo(_parent.previousPath);
                 });
@@ -99,26 +109,43 @@
                     _f.appendTo(_flist);
                 });
                 _flist.appendTo($(_parent.element));
-                var _actions = $("<div>").addClass("clearfix").attr('id', 'actionsDiv');
+                var _actions = $("<div>").addClass("jHueFilechooserActions");
+                var _showActions = false;
                 var _uploadFileBtn;
                 var _createFolderBtn;
+                var _selectFolderBtn;
                 if (_parent.options.uploadFile) {
-                    _uploadFileBtn = $("<div>").attr('id', 'file-uploader');
+                    _uploadFileBtn = $("<div>").attr("id", "file-uploader");
                     _uploadFileBtn.appendTo(_actions);
+                    _showActions = true;
                     initUploader(path, _parent, _uploadFileBtn);
+                }
+                if (_parent.options.selectFolder) {
+                    _selectFolderBtn = $("<button>").addClass("btn").addClass("small").text(_parent.options.labels.SELECT_FOLDER);
+                    if (_parent.options.uploadFile){
+                        _selectFolderBtn.css("margin-top", "10px");
+                    }
+                    _selectFolderBtn.appendTo(_actions);
+                    _showActions = true;
+                    _selectFolderBtn.click(function () {
+                        _parent.options.onFolderChoose(path);
+                    });
                 }
                 $("<span> </span>").appendTo(_actions);
                 if (_parent.options.createFolder) {
-                    _createFolderBtn = $("<button>").addClass("btn").addClass("small").text("Create folder");
+                    _createFolderBtn = $("<button>").addClass("btn").addClass("small").text(_parent.options.labels.CREATE_FOLDER);
+                    if (_parent.options.uploadFile){
+                        _createFolderBtn.css("margin-top", "10px");
+                    }
                     _createFolderBtn.appendTo(_actions);
-                    var _createFolderDetails = $("<div>").css("padding-top", "10px");
+                    _showActions = true;
+                    var _createFolderDetails = $("<form>").css("margin-top", "10px").addClass("well form-inline");
                     _createFolderDetails.hide();
-
-                    var _folderName = $("<input>").attr("type", "text").attr("placeholder", "Folder name").appendTo(_createFolderDetails);
+                    var _folderName = $("<input>").attr("type", "text").attr("placeholder", _parent.options.labels.FOLDER_NAME).appendTo(_createFolderDetails);
                     $("<span> </span>").appendTo(_createFolderDetails);
-                    var _folderBtn = $("<input>").attr("type", "button").attr("value", "Create").addClass("btn primary").appendTo(_createFolderDetails);
-                    $("<span> or </span>").appendTo(_createFolderDetails);
-                    var _folderCancel = $("<a>").attr("href", "#").text("cancel").appendTo(_createFolderDetails);
+                    var _folderBtn = $("<input>").attr("type", "button").attr("value", _parent.options.labels.CREATE_FOLDER).addClass("btn primary").appendTo(_createFolderDetails);
+                    $("<span> </span>").appendTo(_createFolderDetails);
+                    var _folderCancel = $("<input>").attr("type", "button").attr("value", _parent.options.labels.CANCEL).addClass("btn").appendTo(_createFolderDetails);
                     _folderCancel.click(function () {
                         if (_uploadFileBtn) {
                             _uploadFileBtn.removeClass("disabled");
@@ -160,14 +187,17 @@
                         _createFolderBtn.addClass("disabled");
                         _createFolderDetails.slideDown();
                     });
+                }
+                if (_showActions){
                     _actions.appendTo($(_parent.element));
                 }
             }
         });
 
     };
+
+    var num_of_pending_uploads = 0;
     function initUploader(path, _parent, el) {
-        completeRefreshPath = path;
         var uploader = new qq.FileUploader({
             element:el[0],
             action:'/filebrowser/upload',
@@ -176,7 +206,13 @@
                 fileFieldLabel:'hdfs_file'
             },
             onComplete:function (id, fileName, responseJSON) {
-                _parent.navigateTo(path);
+                num_of_pending_uploads--;
+                if(num_of_pending_uploads == 0){
+                    _parent.navigateTo(path);
+                }
+            },
+            onSubmit: function(id, fileName){
+                num_of_pending_uploads++;
             },
             debug:false
         });
