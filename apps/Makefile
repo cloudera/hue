@@ -94,3 +94,21 @@ distclean: $(DISTCLEAN_TARGETS)
 ext-clean: $(EXT_CLEAN_TARGETS)
 .recursive-ext-clean/%:
 	@$(MAKE) -C $* ext-clean
+
+
+################################################
+# Internationalization
+################################################
+I18N_APPS := about \
+  beeswax \
+  filebrowser \
+  jobbrowser \
+  jobsub \
+  shell \
+  useradmin
+
+COMPILE_LOCALE_TARGETS := $(I18N_APPS:%=.recursive-compile-locales/%)
+compile-locales: $(COMPILE_LOCALE_TARGETS)
+.recursive-compile-locales/%:
+	@$(MAKE) -C $* compile-locale
+

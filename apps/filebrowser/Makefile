@@ -20,5 +20,5 @@ ifeq ($(ROOT),)
   $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
 endif
 
-APP_NAME = hue-filebrowser
+APP_NAME = filebrowser
 include $(ROOT)/Makefile.sdk
