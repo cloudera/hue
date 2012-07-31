@@ -20,7 +20,7 @@ ifeq ($(ROOT),)
   $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
 endif
 
-APP_NAME = hue-beeswax
+APP_NAME = beeswax
 include $(ROOT)/Makefile.sdk
 
 ###################################

@@ -80,6 +80,7 @@ ROOT := $(realpath .)
 
 include $(ROOT)/Makefile.vars.priv
 
+
 ###################################
 # Error checking
 ###################################
@@ -96,6 +97,7 @@ default:
 # <<<< DEV ONLY
 	@echo '  docs        : Build documentation'
 	@echo '  prod        : Generate a tar file for production distribution'
+	@echo '  locales     : Extract strings and update dictionary of each locale'
 # END DEV ONLY >>>>
 
 .PHONY: all
@@ -204,6 +206,17 @@ install-env:
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
 	@echo --- Setting up Desktop database
 	$(MAKE) -C $(INSTALL_DIR)/desktop syncdb
+
+###################################
+# Internationalization
+###################################
+
+# <<<< DEV ONLY
+.PHONY: locales
+locales:
+	@$(MAKE) -C desktop compile-locale
+	@$(MAKE) -C apps compile-locales
+# END DEV ONLY >>>>
 
 
 ###################################

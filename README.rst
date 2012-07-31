@@ -198,11 +198,17 @@ http://docs.python.org/library/profile.html#pstats.Stats
 Internationalization
 ====================
 
-How to update the messages:
-compile-locale rule in Makefile.sdk
+How to update all the messages::
 
-How to create a new locale for an app:
-LOCALE_ROOT = $APP_ROOT/src/$APP_NAME/locale
-./build/env/bin/pybabel init -D django -i $LOCALE_ROOT/en_US.pot -d $LOCALE_ROOT -l fr
+    $ make locales
 
+How to update the messages of one app::
+
+    $ cd apps/beeswax
+    $ make compile-locale
+
+How to create a new locale for an app::
+
+    $ cd $APP_ROOT/src/$APP_NAME/locale
+    $ $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
 

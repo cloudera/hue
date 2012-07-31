@@ -167,3 +167,14 @@ install-source-parts:
 	@tar cf - $(SOURCE_PARTS) | tar -C $(INSTALL_DIR)/desktop -xf -
 	@# Remove the application configuration files
 	@find $(INSTALL_DIR)/desktop/conf -type l -exec rm {} \;
+
+# <<<< DEV ONLY
+###################################
+# Internationalization
+###################################
+.PHONY: compile-locale
+compile-locale:
+	@$(MAKE) -C core compile-locale
+
+# END DEV ONLY >>>>
+	

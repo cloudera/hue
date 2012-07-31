@@ -1,0 +1,97 @@
+## Licensed to Cloudera, Inc. under one
+## or more contributor license agreements.  See the NOTICE file
+## distributed with this work for additional information
+## regarding copyright ownership.  Cloudera, Inc. licenses this file
+## to you under the Apache License, Version 2.0 (the
+## "License"); you may not use this file except in compliance
+## with the License.  You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-07-30 18:56-0700\n"
+"PO-Revision-Date: 2012-07-30 18:56-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/shell/shellmanager.py:147
+#, python-format
+msgid "bin/hadoop return non-zero %(retcode)d while trying to merge credentials"
+msgstr ""
+
+#: src/shell/templates/failed_to_create.mako:21
+#: src/shell/templates/index.mako:22 src/shell/templates/index.mako:24
+#: src/shell/templates/no_such_user.mako:21
+#: src/shell/templates/not_running_spawning.mako:21
+msgid "Hue Shell"
+msgstr ""
+
+#: src/shell/templates/failed_to_create.mako:24
+msgid ""
+"Failed to create a shell of the given type. The possible reasons for this"
+" are:"
+msgstr ""
+
+#: src/shell/templates/failed_to_create.mako:26
+msgid "The system is out of PTYs."
+msgstr ""
+
+#: src/shell/templates/failed_to_create.mako:27
+msgid "The system cannot create more subprocesses."
+msgstr ""
+
+#: src/shell/templates/failed_to_create.mako:28
+msgid "You do not have permission to create shells of this type."
+msgstr ""
+
+#: src/shell/templates/failed_to_create.mako:29
+msgid "There is no shell with that name."
+msgstr ""
+
+#: src/shell/templates/failed_to_create.mako:30
+msgid "There is no Unix user account for you."
+msgstr ""
+
+#: src/shell/templates/index.mako:111
+msgid "Please select one of the available shells from the toolbar above."
+msgstr ""
+
+#: src/shell/templates/index.mako:113
+msgid ""
+"You do not have permission to access any shell or there is no configured "
+"shell."
+msgstr ""
+
+#: src/shell/templates/no_such_user.mako:24
+msgid ""
+"The Shell application requires a Unix user account for every user of Hue "
+"on the remote webserver."
+msgstr ""
+
+#: src/shell/templates/no_such_user.mako:26
+msgid ""
+"Please ask your administrator to create a user account for you on the "
+"remote webserver as described in the Shell documentation."
+msgstr ""
+
+#: src/shell/templates/not_running_spawning.mako:24
+msgid ""
+"The webserver currently running Hue does not support the Shell "
+"application. Please contact your administrator."
+msgstr ""
+
