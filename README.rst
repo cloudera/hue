@@ -12,6 +12,8 @@ application for interacting with Hive.  On top of that, the web frontend
 is mostly built from declarative widgets that require no JavaScript and are
 easy to learn.
 
+More documentation is available at http://cloudera.github.com/hue/.
+
 
 File Layout
 ===========
@@ -48,7 +50,7 @@ URL Layout
 ``core/src/desktop/urls.py`` contains the current layout for top-level URLs.
 For the URLs within your application, you should make your own ``urls.py``
 which will be automatically rooted at ``/yourappname/`` in the global
-namespace.  See ``apps/hello/src/hello/urls.py`` for an example.
+namespace.  See ``apps/about/src/about/urls.py`` for an example.
 
 
 Development Prerequisites
@@ -107,30 +109,28 @@ Getting Started
 ===============
 To build and get the core server running::
 
-    $ export HADOOP_HOME=<path-to-hadoop-home>
     $ git clone http://github.com/cloudera/hue.git
     $ cd hue
     $ make apps
-    $ build/env/bin/hue runserver_plus
+    $ build/env/bin/hue runserver
 
-To start the helper daemons::
+If using the Beeswax application, start the daemon::
 
     $ build/env/bin/hue beeswax_server
-    $ build/env/bin/hue jobsubd
 
 Now Hue should be running on http://localhost:8000.
 
+The configuration in development mode is ``desktop/conf/pseudo-distributed.ini``.
 
-FAQ
-===
-1: What does "Exception: no app!" mean?
-    Your template has an error in it.  Check for messages from the server that
-    look like::
 
-        INFO:root:Processing exception: Unclosed tag 'if'. Looking for one of: else, endif
+Note: to start all the servers in one command (but lose the automatic reloading after source modification)::
 
-2: What do I do if I get "There was an error launching ..."?
-    Turn on debugging by issuing ``dbug.cookie()`` in a Firebug console.
+   $ build/env/bin/supervisor
+
+To run the tests::
+
+   $ build/env/bin/hue test all
+   $ build/env/bin/hue test specific filebrowser
 
 
 Django Conventions
@@ -153,10 +153,8 @@ Right now, we check in the generated thrift code.
 To generate the code, you'll need the thrift binary version 0.7.0.
 Please download from http://thrift.apache.org/.
 
-When preparing ``.thrift`` files, you can use she-bangs to generate
-the python bindings like so::
-
-    #!/usr/bin/env thrift -r --gen py:new_style -o ../../../
+The modules using ``Thrift`` have some helper scripts like ``regenerate_thrift.sh``
+for regenerating the code from the interfaces.
 
 
 Profiling Hue Apps
@@ -198,11 +196,11 @@ http://docs.python.org/library/profile.html#pstats.Stats
 Internationalization
 ====================
 
-How to update all the messages::
+How to update all the messages and compile them::
 
     $ make locales
 
-How to update the messages of one app::
+How to update and compile the messages of one app::
 
     $ cd apps/beeswax
     $ make compile-locale
@@ -211,4 +209,14 @@ How to create a new locale for an app::
 
     $ cd $APP_ROOT/src/$APP_NAME/locale
     $ $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
+
+
+License
+=======
+
+Apache License, Version 2.0
+http://www.apache.org/licenses/LICENSE-2.0
+
+
+
 
