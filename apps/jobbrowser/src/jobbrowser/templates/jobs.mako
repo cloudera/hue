@@ -88,7 +88,7 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             <th>${_('Priority')}</th>
             <th>${_('Duration')}</th>
             <th>${_('Date')}</th>
-            <th></th>
+            <th data-row-selector-exclude="true"></th>
         </tr>
     </thead>
     <tbody>
@@ -128,7 +128,7 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             </td>
             <td class="center">${job.queueName}</td>
             <td class="center">${job.priority.lower()}</td>
-            <td class="center">
+            <td class="center" data-row-selector-exclude="true">
                 <span alt="${job.finishTimeMs-job.startTimeMs}">
                     % if job.is_retired:
                         ${_('N/A')}
@@ -141,7 +141,9 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             <td>
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                 % if request.user.is_superuser or request.user.username == job.user:
-                <a href="#" title="${_('Kill this job')}" kill-action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" data-backdrop="static" data-keyboard="true" class="btn btn-mini kill"><i class="icon-remove"></i> ${_('Kill')}</a>
+                <a href="#" title="${_('Kill this job')}" kill-action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" data-row-selector-exclude="true" data-keyboard="true" class="btn btn-mini kill">
+                  <i class="icon-remove"></i> ${_('Kill')}
+                </a>
                 % endif
                 % endif
             </td>
@@ -209,7 +211,6 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
         $(".kill").live("click", function(e){
             $("#kill-job").attr("action", $(e.target).attr("kill-action"));
             $("#killModal").modal({
-                backdrop: "static",
                 keyboard: true,
                 show: true
             });
