@@ -48,6 +48,7 @@ from django.utils.translation import ugettext as _
   <script src="/static/js/Source/jHue/jquery.selector.js"></script>
   <script src="/static/js/Source/jHue/jquery.alert.js"></script>
   <script src="/static/js/Source/jHue/jquery.rowselector.js"></script>
+  <script src="/static/js/Source/jHue/jquery.notify.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
@@ -118,6 +119,9 @@ from django.utils.translation import ugettext as _
         </div>
       </div>
     </div>
-  </div>
+</div>
 
-
+<div id="jHueNotify" class="alert">
+    <button class="close">×</button>
+    <span class="message"></span>
+</div>

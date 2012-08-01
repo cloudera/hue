@@ -930,3 +930,19 @@ div.box {
     font-size: 12px;
     text-shadow: -1px 0 1px #333, 0 1px 1px #333, 1px 0 1px #333, 0 -1px 1px #333;
 }
+
+#jHueNotify {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    margin-left: -200px;
+    width: 400px;
+    text-align: center;
+    z-index: 8000;
+    display: none;
+}
+
+#jHueNotify .close {
+    right: -27px;
+    display: none;
+}
