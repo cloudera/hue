@@ -57,3 +57,24 @@ def format_time_diff(start=None, end=None):
     output.append("%dm" % minutes)
   output.append("%ds" % seconds)
   return ":".join(output)
+
+def format_duration_in_millis(duration=0):
+    """
+      formats the difference between two times in millis as Xd:Xh:Xm:Xs
+    """
+    seconds, millis = divmod(duration, 1000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    days, hours = divmod(hours, 24)
+    output = []
+    written = False
+    if days:
+        written = True
+        output.append("%dd" % days)
+    if written or hours:
+        written = True
+        output.append("%dh" % hours)
+    if written or minutes:
+        output.append("%dm" % minutes)
+    output.append("%ds" % seconds)
+    return ":".join(output)

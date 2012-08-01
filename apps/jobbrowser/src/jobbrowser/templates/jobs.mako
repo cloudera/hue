@@ -129,7 +129,7 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             <td class="center">${job.queueName}</td>
             <td class="center">${job.priority.lower()}</td>
             <td class="center" data-row-selector-exclude="true">
-                <span alt="${job.finishTimeMs-job.startTimeMs}">
+                <span alt="${job.durationInMillis}">
                     % if job.is_retired:
                         ${_('N/A')}
                     % else:

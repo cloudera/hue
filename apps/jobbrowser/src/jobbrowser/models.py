@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.view_util import format_time_diff
+from desktop.lib.view_util import format_duration_in_millis
 from desktop.lib import i18n
 from hadoop import job_tracker
 from hadoop import confparse
@@ -202,7 +202,10 @@ class Job(JobLinkage):
     else:
       finishTime = datetime.datetime.fromtimestamp(finishTime/1000)
     self.duration = finishTime - datetime.datetime.fromtimestamp(self.job.startTime/1000)
-    self.durationFormatted = format_time_diff(datetime.datetime.fromtimestamp(self.job.startTime/1000), finishTime)
+
+    diff = int(finishTime.strftime("%s"))*1000 - self.startTimeMs
+    self.durationFormatted = format_duration_in_millis(diff)
+    self.durationInMillis = diff
 
   def kill(self):
     self.jt.kill_job(self.job.jobID)
