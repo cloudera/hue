@@ -68,14 +68,14 @@
   if klass:
     classes.append(klass)
   if hidden:
-    classes.append("hidden")
+    classes.append("hide")
   cls = ' '.join(classes)
 
   title_classes = []
   if title_klass:
     title_classes.append(title_klass)
   if notitle or hidden:
-    title_classes.append("hidden")
+    title_classes.append("hide")
   titlecls = ' '.join(title_classes)
 %>
 ${field.label_tag() | n}
@@ -128,14 +128,14 @@ ${field.label_tag() | n}
   if klass:
     classes.append(klass)
   if hidden:
-    classes.append("hidden")
+    classes.append("hide")
   cls = ' '.join(classes)
 
   title_classes = []
   if title_klass:
     title_classes.append(title_klass)
   if notitle or hidden:
-    title_classes.append("hidden")
+    title_classes.append("hide")
   titlecls = ' '.join(title_classes)
 
   plc = ""
