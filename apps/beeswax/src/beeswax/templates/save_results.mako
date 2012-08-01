@@ -49,16 +49,16 @@ ${layout.menubar(section='history')}
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		$("input[name='save_target']").change(function(){
-			$("#fieldRequired").addClass("hidden");
+			$("#fieldRequired").addClass("hide");
 			$("input[name='target_dir']").removeClass("fieldError");
 			$("input[name='target_table']").removeClass("fieldError");
 			if ($(this).val().indexOf("HDFS")>-1){
-				$("input[name='target_table']").addClass("hidden");
-				$("input[name='target_dir']").removeClass("hidden");
+				$("input[name='target_table']").addClass("hide");
+				$("input[name='target_dir']").removeClass("hide");
 			}
 			else {
-				$("input[name='target_table']").removeClass("hidden");
-				$("input[name='target_dir']").addClass("hidden");
+				$("input[name='target_table']").removeClass("hide");
+				$("input[name='target_dir']").addClass("hide");
 			}
 		});
 
@@ -68,14 +68,14 @@ ${layout.menubar(section='history')}
 			}
 			if ($("input[name='save_target']:checked").val().indexOf("HDFS")>-1){
 				if ($.trim($("input[name='target_dir']").val()) == ""){
-					$("#fieldRequired").removeClass("hidden");
+					$("#fieldRequired").removeClass("hide");
 					$("input[name='target_dir']").addClass("fieldError");
 					return false;
 				}
 			}
 			else {
 				if ($.trim($("input[name='target_table']").val()) == ""){
-					$("#fieldRequired").removeClass("hidden");
+					$("#fieldRequired").removeClass("hide");
 					$("input[name='target_table']").addClass("fieldError");
 					return false;
 				}
