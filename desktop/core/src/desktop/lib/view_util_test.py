@@ -17,7 +17,7 @@
 
 from nose.tools import *
 
-from desktop.lib.view_util import big_filesizeformat, format_time_diff
+from desktop.lib.view_util import big_filesizeformat, format_time_diff, format_duration_in_millis
 
 import datetime
 
@@ -37,3 +37,7 @@ def test_format_time_diff():
   assert_equal("0s", format_time_diff(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(0)))
   assert_equal("1d:12h:24m:32s", format_time_diff(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(131072)))
 
+def test_format_duration_in_millis():
+    assert_equal("1h:0m:0s", format_duration_in_millis(60*60*1000))
+    assert_equal("0s", format_duration_in_millis(0))
+    assert_equal("1d:12h:24m:32s", format_duration_in_millis(24*60*60*1000 + 12*60*60*1000 + 24*60*1000 + 32*1000))
