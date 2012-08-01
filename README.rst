@@ -5,52 +5,44 @@ Welcome to the repository for Hue
     This is the development-oriented readme. If you want to write notes for
     end users, please put them in ``dist/README``.
 
-Hue is both a web UI for Hadoop and a framework to create interactive web
-applications.  It features a FileBrowser for accessing HDFS, JobSub and
+Hue is both a Web UI for Hadoop and a framework to create interactive Web
+applications.
+
+It features a FileBrowser for accessing HDFS, JobSub and
 JobBrowser applications for submitting and viewing MapReduce jobs, a Beeswax
-application for interacting with Hive.  On top of that, the web frontend
-is mostly built from declarative widgets that require no JavaScript and are
-easy to learn.
+application for executing Hive queries. On top of that, a SDK is available
+for creating new apps integrated with Hadoop.
 
 More documentation is available at http://cloudera.github.com/hue/.
 
 
-File Layout
-===========
-The "core" stuff is in ``desktop/core/``, whereas installable apps live in
-``apps/``.  Please place third-party dependencies in the app's ext-py/
-directory.
+Getting Started
+===============
+To build and get the core server running::
 
-The typical directory structure for inside an application includes:
+    $ git clone http://github.com/cloudera/hue.git
+    $ cd hue
+    $ make apps
+    $ build/env/bin/hue runserver
 
-  src/
-    for Python code
+If using the Beeswax application, start the daemon::
 
-  conf/
-    for configuration (``.ini``) files to be installed
+    $ build/env/bin/hue beeswax_server
 
-  static/
-    for static HTML and js resources
+Now Hue should be running on http://localhost:8000.
 
-  templates/
-    for data to be put through a template engine
-
-  docs/
-    for helpful notes
-
-The python code is structured simply as
-``module/package.py``,
-where module may be "filebrowser" or "jobsub".  Because it is unlikely that
-there are going to be huge conflicts, we're going without a deep nested
-hierarchy.
+The configuration in development mode is ``desktop/conf/pseudo-distributed.ini``.
 
 
-URL Layout
-==========
-``core/src/desktop/urls.py`` contains the current layout for top-level URLs.
-For the URLs within your application, you should make your own ``urls.py``
-which will be automatically rooted at ``/yourappname/`` in the global
-namespace.  See ``apps/about/src/about/urls.py`` for an example.
+Note: to start all the servers in one command (but lose the automatic reloading after source modification)::
+
+   $ build/env/bin/supervisor
+
+To run the tests::
+
+   $ build/env/bin/hue test all
+   $ build/env/bin/hue test specific filebrowser
+   $ build/env/bin/hue test specific jobbrowser.tests:test_get_path
 
 
 Development Prerequisites
@@ -105,46 +97,48 @@ your system:
       * sqlite3
 
 
-Getting Started
-===============
-To build and get the core server running::
+File Layout
+===========
+The "core" stuff is in ``desktop/core/``, whereas installable apps live in
+``apps/``.  Please place third-party dependencies in the app's ext-py/
+directory.
 
-    $ git clone http://github.com/cloudera/hue.git
-    $ cd hue
-    $ make apps
-    $ build/env/bin/hue runserver
+The typical directory structure for inside an application includes:
 
-If using the Beeswax application, start the daemon::
+  src/
+    for Python code
+      models.py
+      urls.py
+      views.py
+      forms.py
+      settings.py
+        for Django code
+ 
+  conf/
+    for configuration (``.ini``) files to be installed
 
-    $ build/env/bin/hue beeswax_server
+  static/
+    for static HTML and js resources
 
-Now Hue should be running on http://localhost:8000.
+  templates/
+    for data to be put through a template engine
 
-The configuration in development mode is ``desktop/conf/pseudo-distributed.ini``.
+  docs/
+    for helpful notes
 
-
-Note: to start all the servers in one command (but lose the automatic reloading after source modification)::
-
-   $ build/env/bin/supervisor
-
-To run the tests::
-
-   $ build/env/bin/hue test all
-   $ build/env/bin/hue test specific filebrowser
+For the URLs within your application, you should make your own ``urls.py``
+which will be automatically rooted at ``/yourappname/`` in the global
+namespace.  See ``apps/about/src/about/urls.py`` for an example.
 
 
-Django Conventions
-==================
-If you need to name your urls
-(http://docs.djangoproject.com/en/dev/topics/http/urls/#naming-url-patterns)
-because there's ambiguity in the view, be sure to prefix the name
-with the application name.  The url name namespace is global.  So
-``jobsub.list`` is fine, but ``list`` is not.
+Main Stack
+==========
 
-Hue is using Django 1.2, which supports the notion of URL namespaces:
-http://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces.
-We have yet to move over our URLs to this construct. Brownie points for the
-developer who takes this on.
+   * Python 2.4 - 2.7
+   * Django 1.2 https://docs.djangoproject.com/en/1.2/
+   * Mako 0.7
+   * jQuery 1.7
+   * Bootstrap 2
 
 
 Using and Installing Thrift
@@ -195,7 +189,6 @@ http://docs.python.org/library/profile.html#pstats.Stats
 
 Internationalization
 ====================
-
 How to update all the messages and compile them::
 
     $ make locales
@@ -213,10 +206,7 @@ How to create a new locale for an app::
 
 License
 =======
-
 Apache License, Version 2.0
 http://www.apache.org/licenses/LICENSE-2.0
-
-
 
 
