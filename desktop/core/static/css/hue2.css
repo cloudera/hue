@@ -931,7 +931,7 @@ div.box {
     text-shadow: -1px 0 1px #333, 0 1px 1px #333, 1px 0 1px #333, 0 -1px 1px #333;
 }
 
-#jHueNotify {
+.jHueNotify {
     position: fixed;
     top: 20px;
     left: 50%;
@@ -942,7 +942,7 @@ div.box {
     display: none;
 }
 
-#jHueNotify .close {
+.jHueNotify .close {
     right: -27px;
     display: none;
 }

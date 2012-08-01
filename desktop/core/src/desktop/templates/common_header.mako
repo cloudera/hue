@@ -140,7 +140,8 @@ from django.utils.translation import ugettext as _
     </div>
 </div>
 
-<div id="jHueNotify" class="alert">
+<div id="jHueNotify" class="alert hide">
     <button class="close">&times;</button>
     <span class="message"></span>
 </div>
+

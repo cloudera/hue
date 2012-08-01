@@ -1,45 +1,47 @@
 /*
-* jHue notify plugin
-* 
-*/
+ * jHue notify plugin
+ *
+ */
 ;(function ($, window, document, undefined) {
 
-	var pluginName = "jHueNotify",
-    TYPES = {
-        INFO: "INFO",
-        ERROR: "ERROR",
-        GENERAL: "GENERAL"
-    },
-	defaults = {
-        level: TYPES.GENERAL,
-        message: "",
-        sticky: false,
-        css: null
+    var pluginName = "jHueNotify",
+        TYPES = {
+            INFO: "INFO",
+            ERROR: "ERROR",
+            GENERAL: "GENERAL"
+        },
+        defaults = {
+            level: TYPES.GENERAL,
+            message: "",
+            sticky: false,
+            css: null
+        };
+
+    function Plugin(options) {
+        this.options = $.extend({}, defaults, options) ;
+        this._defaults = defaults;
+        this._name = pluginName;
+        this.show();
+    }
+
+    Plugin.prototype.setOptions = function(options) {
+        this.options = $.extend({}, defaults, options) ;
     };
 
-	function Plugin(options) {
-		this.options = $.extend({}, defaults, options) ;
-		this._defaults = defaults;
-		this._name = pluginName;
-		this.show();
-	}
-	
-	Plugin.prototype.setOptions = function(options) {
-		this.options = $.extend({}, defaults, options) ;
-	};
+    Plugin.prototype.show = function () {
+        var _this = this;
+        var MARGIN = 6;
+        var el = $("#jHueNotify").clone();
+        el.removeAttr("id");
 
-	Plugin.prototype.show = function () {
-		var _this = this;		
-        var el = $("#jHueNotify");
         // stops all the current animations and resets the style
         el.stop(true);
-        el.attr("class", "alert");
+        el.attr("class", "alert jHueNotify");
         el.find(".close").hide();
 
-        el.click(function(){
-            $(this).stop(true);
-            $(this).fadeOut();
-        });
+        if ($(".jHueNotify").last().position() != null) {
+            el.css("top", $(".jHueNotify").last().position().top + $(".jHueNotify").last().outerHeight() + MARGIN);
+        }
 
         if (_this.options.level == TYPES.ERROR){
             el.addClass("alert-error");
@@ -60,17 +62,34 @@
         if (_this.options.sticky){
             el.find(".close").click(function(){
                 el.fadeOut();
+                el.nextAll(".jHueNotify").animate({
+                    top:'-=' + (el.outerHeight() + MARGIN)
+                }, 200);
+                el.remove();
             }).show();
             el.show();
         }
         else {
-            el.show().animate({
-                opacity: 1
-            }, 3000, function(){
+            var t = window.setTimeout(function(){
                 el.fadeOut();
+                el.nextAll(".jHueNotify").animate({
+                    top:'-=' + (el.outerHeight() + MARGIN)
+                }, 200);
+                el.remove();
+
+            }, 3000);
+            el.click(function(){
+                window.clearTimeout(t);
+                $(this).stop(true);
+                $(this).fadeOut();
+                $(this).nextAll(".jHueNotify").animate({
+                    top:'-=' + ($(this).outerHeight() + MARGIN)
+                }, 200);
             });
+            el.show();
         }
-	};
+        el.appendTo($("body"));
+    };
 
     $[pluginName] = function () {
     };
