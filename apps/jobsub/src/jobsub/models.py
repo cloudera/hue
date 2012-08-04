@@ -185,7 +185,7 @@ class OozieMapreduceAction(OozieAction):
   archives = models.CharField(max_length=PATH_MAX, default="[]",
       help_text=_('List of paths to archives to be added to the distributed cache.'))
   # For the job configuration. JSON dict. Required (e.g. mapred.mapper.class).
-  job_properties = models.CharField(max_length=32768, default="[]")
+  job_properties = models.TextField(default="[]")
   # Location of the jar in hdfs
   jar_path = models.CharField(max_length=PATH_MAX,
       help_text=_('Path to jar files on HDFS.'))
@@ -206,7 +206,7 @@ class OozieStreamingAction(OozieAction):
   files = models.CharField(max_length=PATH_MAX, default="[]")
   archives = models.CharField(max_length=PATH_MAX, default="[]")
   # For the job configuration. JSON dict. Required (e.g. mapred.input.dir).
-  job_properties = models.CharField(max_length=32768, default="[]")
+  job_properties = models.TextField(default="[]")
   # Scripts/commands (paths in hdfs)
   mapper = models.CharField(max_length=PATH_MAX, blank=False)
   reducer = models.CharField(max_length=PATH_MAX, blank=False)
@@ -231,7 +231,7 @@ class OozieJavaAction(OozieAction):
   args = models.CharField(max_length=4096, blank=True)
   java_opts = models.CharField(max_length=256, blank=True)
   # For the job configuration. JSON dict.
-  job_properties = models.CharField(max_length=32768, default="[]")
+  job_properties = models.TextField(default="[]")
 
 
 class JobHistory(models.Model):
