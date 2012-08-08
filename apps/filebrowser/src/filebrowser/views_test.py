@@ -23,7 +23,8 @@ from nose.plugins.attrib import attr
 from hadoop import pseudo_hdfs4
 from avro import schema, datafile, io
 from desktop.lib.django_test_util import make_logged_in_client
-from nose.tools import assert_true, assert_false, assert_equal
+from desktop.lib.django_util import PopupException
+from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 
 try:
   import json
@@ -35,6 +36,37 @@ import re
 import urlparse
 
 LOG = logging.getLogger(__name__)
+
+@attr('requires_hadoop')
+def test_mkdir_singledir():
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    c = make_logged_in_client(cluster.superuser)
+    cluster.fs.setuser(cluster.superuser)
+
+    # We test that mkdir fails when a non-relative path is provided and a multi-level path is provided.
+    success_path = 'mkdir_singledir'
+    path_absolute = '/mkdir_singledir'
+    path_fail = 'fail/foo'
+    prefix = '/test-filebrowser/'
+    # Two of the following post requests should throw exceptions.
+    # See https://issues.cloudera.org/browse/HUE-793.
+    c.post('/filebrowser/mkdir', dict(path=prefix, name=path_fail))
+    c.post('/filebrowser/mkdir', dict(path=prefix, name=path_absolute))
+    c.post('/filebrowser/mkdir', dict(path=prefix, name=success_path))
+
+    # Read the parent dir and make sure we created 'success_path' only.
+    response = c.get('/filebrowser/view' + prefix)
+    dir_listing = response.context['files']
+    assert_equal(2, len(dir_listing))
+    assert_equal(dir_listing[1]['name'], success_path)
+
+  finally:
+    try:
+      cluster.fs.rmtree(prefix)     # Clean up
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
 
 @attr('requires_hadoop')
 def test_chown():

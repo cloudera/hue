@@ -799,6 +799,10 @@ def rename(request):
 
 def mkdir(request):
     def smart_mkdir(path, name):
+        # Make sure only one directory is specified at a time.
+        # No absolute directory specification allowed.
+        if posixpath.sep in name:
+            raise PopupException(_("Sorry, could not name folder \"%s\": Slashes are not allowed in filenames." % name))
         request.fs.mkdir(os.path.join(path, name))
 
     return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
