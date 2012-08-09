@@ -17,16 +17,14 @@
 from setuptools import setup, find_packages
 
 setup(
-      name = "hadoop",
+      name = "liboozie",
       version = "2.1.0",
       url = 'http://github.com/cloudera/hue',
-      description = "Hadoop Libraries",
-      # Note that we're cheating by installing gen-py
-      # in hadoop's __init__.py.
+      description = "Oozie Libraries",
       packages = find_packages('src'),
       package_dir = {'': 'src' },
       install_requires = ['setuptools', 'desktop'],
       # Even libraries need to be registered as desktop_apps,
       # if they have configuration, like this one.
-      entry_points = { 'desktop.sdk.lib': 'hadoop=hadoop' },
+      entry_points = { 'desktop.sdk.lib': 'liboozie=liboozie' },
 )

@@ -11,7 +11,7 @@ from desktop.lib.django_util import PopupException
 from desktop.log.access import access_warn
 
 import hadoop.confparse
-from jobsub.oozie_lib.utils import parse_timestamp
+from liboozie.utils import parse_timestamp
 
 from django.utils.translation import ugettext as _
 

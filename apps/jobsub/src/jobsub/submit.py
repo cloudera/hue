@@ -28,7 +28,7 @@ import hadoop.cluster
 from hadoop.fs.hadoopfs import Hdfs
 
 from jobsub import conf, models
-from jobsub.oozie_lib.oozie_api import get_oozie
+from liboozie.oozie_api import get_oozie
 
 from django.utils.translation import ugettext as _
 
