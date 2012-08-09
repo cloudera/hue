@@ -71,8 +71,11 @@ static_patterns = []
 # Root each app at /appname if they have a "urls" module
 for app in appmanager.DESKTOP_APPS:
   if app.urls:
-    dynamic_patterns.extend( patterns('', ('^' + re.escape(app.name) + '/',
-                                           include(app.urls))) )
+    if app.is_url_namespaced:
+      namespace = {'namespace': app.name, 'app_name': app.name}
+    else:
+      namespace = {}
+    dynamic_patterns.extend( patterns('', ('^' + re.escape(app.name) + '/', include(app.urls, **namespace))) )
     app.urls_imported = True
 
   # Root a /appname/static if they have a static dir
