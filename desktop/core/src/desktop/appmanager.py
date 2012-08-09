@@ -126,6 +126,8 @@ class DesktopModuleInfo(object):
     else:
         self.menu_index = 999
 
+    self.is_url_namespaced = hasattr(self.settings, 'IS_URL_NAMESPACED')
+
     if self.config_key is not None:
       self.display_name = self.config_key
 
