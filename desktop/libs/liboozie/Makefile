@@ -1,3 +1,4 @@
+#
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -13,20 +14,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-from setuptools import setup, find_packages
 
-setup(
-      name = "hadoop",
-      version = "2.1.0",
-      url = 'http://github.com/cloudera/hue',
-      description = "Hadoop Libraries",
-      # Note that we're cheating by installing gen-py
-      # in hadoop's __init__.py.
-      packages = find_packages('src'),
-      package_dir = {'': 'src' },
-      install_requires = ['setuptools', 'desktop'],
-      # Even libraries need to be registered as desktop_apps,
-      # if they have configuration, like this one.
-      entry_points = { 'desktop.sdk.lib': 'hadoop=hadoop' },
-)
+ifeq ($(ROOT),)
+  $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
+endif
+
+include $(ROOT)/Makefile.sdk
+
+default::
+	@echo '  env-install    : Install into virtual-env'
+
+#
+# env-install
+#   Install app into the virtual environment.
+#
+.PHONY: env-install
+env-install: compile ext-env-install
+	@echo '--- Installing $(APP_NAME) into virtual-env'
+	@$(ENV_PYTHON) setup.py develop -N -q
+

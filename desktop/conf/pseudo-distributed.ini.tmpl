@@ -151,7 +151,7 @@
     # Whether to use a TLS (secure) connection when talking to the SMTP server
     tls=no
 
-    # Default email address to use for various automated notification from Hue  
+    # Default email address to use for various automated notification from Hue
     ## default_from_email=hue@localhost
 
 
@@ -256,6 +256,18 @@
 
 
 ###########################################################################
+# Settings to configure Oozie
+###########################################################################
+
+[oozie]
+  # The URL where the Oozie service runs on. This is required in order for
+  # users to submit jobs.
+  oozie_url=http://localhost:11000/oozie
+
+  ## security_enabled=false
+
+
+###########################################################################
 # Settings to configure Beeswax
 ###########################################################################
 
@@ -287,18 +299,6 @@
   # Share saved queries with all users. If set to false, saved queries are
   # visible only to the owner and administrators.
   ## share_saved_queries=true
-
-
-###########################################################################
-# Settings to configure Job Designer.
-###########################################################################
-
-[jobsub]
-  # The URL where the Oozie service runs on. This is required in order for
-  # users to submit jobs.
-  oozie_url=http://localhost:11000/oozie
-
-  ## security_enabled=false
 
 
 ###########################################################################

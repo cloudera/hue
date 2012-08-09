@@ -21,9 +21,9 @@ import threading
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
-from jobsub.oozie_lib.types import WorkflowList, Workflow
-from jobsub.oozie_lib.utils import config_gen
-import jobsub.conf
+from liboozie.types import WorkflowList, Workflow
+from liboozie.utils import config_gen
+from liboozie.conf import SECURITY_ENABLED, OOZIE_URL
 
 
 LOG = logging.getLogger(__name__)
@@ -43,8 +43,8 @@ def get_oozie():
     _api_cache_lock.acquire()
     try:
       if _api_cache is None:
-        secure = jobsub.conf.SECURITY_ENABLED.get()
-        _api_cache = OozieApi(jobsub.conf.OOZIE_URL.get(), secure)
+        secure = SECURITY_ENABLED.get()
+        _api_cache = OozieApi(OOZIE_URL.get(), secure)
     finally:
       _api_cache_lock.release()
   return _api_cache

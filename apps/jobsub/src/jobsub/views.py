@@ -42,7 +42,7 @@ from hadoop.fs.exceptions import WebHdfsException
 
 from jobsub import models, submit
 from jobsub.management.commands import jobsub_setup
-from jobsub.oozie_lib.oozie_api import get_oozie
+from liboozie.oozie_api import get_oozie
 import jobsub.forms
 
 from django.utils.translation import ugettext as _

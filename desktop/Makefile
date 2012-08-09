@@ -40,7 +40,8 @@ DESKTOP_ROOT := $(realpath .)
 include $(ROOT)/Makefile.vars.priv
 
 APPS := core \
-	libs/hadoop
+	libs/hadoop \
+	libs/liboozie
 
 .PHONY: default
 default:: hue syncdb
