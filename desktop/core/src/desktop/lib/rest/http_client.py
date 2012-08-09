@@ -36,10 +36,13 @@ class RestException(Exception):
     self._error = error
     self._code = None
     self._message = str(error)
-    # See if there is a code or a message. (For urllib2.HTTPError.)
+    self._headers = None
+
+    # Get more information if urllib2.HTTPError.
     try:
       self._code = error.code
       self._message = error.read()
+      self._headers = error.info()
     except AttributeError:
       pass
 
