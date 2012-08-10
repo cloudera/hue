@@ -16,5 +16,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 
+
+{% if messages %}
+    <script>
+      {% for message in messages %}
+          {% if message.tags == 'error' %}
+              $.jHueNotify.error('{{ message|safe }}');
+          {% else %}
+              $.jHueNotify.info('{{ message|safe }}');
+          {% endif %}
+      {% endfor %}
+    </script>
+{% endif %}
+
 	</body>
 </html>

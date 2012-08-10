@@ -29,6 +29,7 @@ import stat as stat_module
 import os
 import simplejson
 
+from django.contrib import messages
 from django.core import urlresolvers
 from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.views.static import was_modified_since
@@ -212,7 +213,7 @@ def save_file(request):
                          form.cleaned_data['contents'],
                          form.cleaned_data['encoding'])
 
-    request.flash.put(_('Saved %(path)s.') % {'path': os.path.basename(path)})
+    messages.info(request, _('Saved %(path)s.') % {'path': os.path.basename(path)})
     """ Changing path to reflect the request path of the JFrame that will actually be returned."""
     request.path = urlresolvers.reverse("filebrowser.views.edit", kwargs=dict(path=path))
     return edit(request, path, form)

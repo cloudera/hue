@@ -153,4 +153,4 @@ ${layout.menubar(section='users', _=_)}
         });
     </script>
 
-${commonfooter()}
+${commonfooter(messages)}

@@ -22,6 +22,7 @@ import logging
 import re
 
 from django import forms
+from django.contrib import messages
 from django.core import urlresolvers
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
@@ -221,7 +222,7 @@ def safe_get_design(request, design_type, design_id=None):
   """
   Return a new design, if design_id is None,
   Return the design with the given id and type. If the design is not found,
-  flash a message and return a new design.
+  display a notification and return a new design.
   """
   design = None
 
@@ -229,7 +230,7 @@ def safe_get_design(request, design_type, design_id=None):
     try:
       design = models.SavedQuery.get(design_id, request.user, design_type)
     except models.SavedQuery.DoesNotExist:
-      request.flash.put(_t('Design does not exist'))
+      messages.error(request, _t('Design does not exist'))
   if design is None:
     design = models.SavedQuery(owner=request.user, type=design_type)
   return design
@@ -542,7 +543,7 @@ def save_design(request, form, type, design, explicit_save):
   LOG.info('Saved %sdesign "%s" (id %s) for %s' %
            (explicit_save and '' or 'auto ', design.name, design.id, design.owner))
   if explicit_save:
-    request.flash.put(_t('Saved design "%(name)s"') % {'name': design.name})
+    messages.error(request, _t('Saved design "%(name)s"') % {'name': design.name})
   # Design may now have a new/different id
   return design
 
@@ -676,7 +677,7 @@ def clone_design(request, design_id):
   copy.name = design.name + ' (copy)'
   copy.owner = request.user
   copy.save()
-  request.flash.put(_t('Copied design: %(name)s') % {'name': design.name})
+  messages.error(request, _t('Copied design: %(name)s') % {'name': design.name})
   return format_preserving_redirect(
       request, urlresolvers.reverse(execute_query, kwargs={'design_id': copy.id}))
 
@@ -1079,7 +1080,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     table_loc = request.fs.urlsplit(table_obj.sd.location)[2]
     request.fs.rename_star(result_meta.table_dir, table_loc)
     LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, table_loc))
-    request.flash.put(_t('Saved query results as new table %(table)s') % {'table': target_table})
+    messages.error(request, _t('Saved query results as new table %(table)s') % {'table': target_table})
     query_history.save_state(models.QueryHistory.STATE.expired)
   except Exception, ex:
     LOG.error('Error moving data into storage of table %s. Will drop table.' % (target_table,))
