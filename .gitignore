@@ -72,3 +72,6 @@ desktop/logs
 
 # Maven's target directory
 target
+
+# Reviewboard config file
+.reviewboardrc

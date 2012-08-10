@@ -130,7 +130,12 @@ class BoundConfig(object):
   def get(self):
     """Get the data, or its default value."""
     data, present = self._get_data_and_presence()
-    return self.config.get_value(data, present=present, prefix=self.prefix)
+    return self.config.get_value(data, present=present, prefix=self.prefix, coerce_type=True)
+
+  def get_raw(self):
+    """Get raw config value. This maybe a non-string or non-iterable object."""
+    data, present = self._get_data_and_presence()
+    return self.config.get_value(data, present=present, prefix=self.prefix, coerce_type=False)
 
   def set_for_testing(self, data=None, present=True):
     """
@@ -225,7 +230,7 @@ class Config(object):
     """
     return BoundConfig(config=self, bind_to=conf, grab_key=self.key, prefix=prefix)
 
-  def get_value(self, val, present, prefix=None):
+  def get_value(self, val, present, prefix=None, coerce_type=True):
     """
     Return the value for this configuration variable from the
     currently loaded configuration.
@@ -240,7 +245,10 @@ class Config(object):
       raw_val = val
     else:
       raw_val = self.default
-    return self._coerce_type(raw_val, prefix)
+    if coerce_type:
+      return self._coerce_type(raw_val, prefix)
+    else:
+      return raw_val
 
   def validate(self, source):
     """
