@@ -1,35 +1,25 @@
-## Licensed to Cloudera, Inc. under one
-## or more contributor license agreements.  See the NOTICE file
-## distributed with this work for additional information
-## regarding copyright ownership.  Cloudera, Inc. licenses this file
-## to you under the Apache License, Version 2.0 (the
-## "License"); you may not use this file except in compliance
-## with the License.  You may obtain a copy of the License at
-##
-##     http://www.apache.org/licenses/LICENSE-2.0
-##
-## Unless required by applicable law or agreed to in writing, software
-## distributed under the License is distributed on an "AS IS" BASIS,
-## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-## See the License for the specific language governing permissions and
-## limitations under the License.
+# Portuguese (Brazil) translations for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-23 10:40-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2012-08-10 13:53-0700\n"
+"PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language-Team: pt_BR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/desktop/appmanager.py:224
-msgid "load_apps already has been called!"
+#: src/desktop/appmanager.py:226
+msgid "load_apps has already been called!"
 msgstr ""
 
 #: src/desktop/conf.py:30
@@ -39,11 +29,11 @@ msgid ""
 msgstr ""
 
 #: src/desktop/conf.py:36
-msgid "HTTP Host to bind to"
+msgid "HTTP Host to bind to."
 msgstr ""
 
 #: src/desktop/conf.py:41
-msgid "HTTP Port to bind to"
+msgid "HTTP Port to bind to."
 msgstr ""
 
 #: src/desktop/conf.py:46
@@ -73,11 +63,11 @@ msgid "Number of user access to remember per view per user."
 msgstr ""
 
 #: src/desktop/conf.py:94
-msgid "Configuration options for connecting to an external SMTP server"
+msgid "Configuration options for connecting to an external SMTP server."
 msgstr ""
 
 #: src/desktop/conf.py:98
-msgid "The SMTP server for email notification delivery"
+msgid "The SMTP server for email notification delivery."
 msgstr ""
 
 #: src/desktop/conf.py:105
@@ -93,11 +83,11 @@ msgid "The password for the SMTP user"
 msgstr ""
 
 #: src/desktop/conf.py:126
-msgid "Whether to use a TLS (secure) connection when talking to the SMTP server"
+msgid "Whether to use a TLS (secure) connection when talking to the SMTP server."
 msgstr ""
 
 #: src/desktop/conf.py:133
-msgid "Default email address to use for various automated notification from Hue"
+msgid "Default email address to use for various automated notifications from Hue."
 msgstr ""
 
 #: src/desktop/conf.py:142
@@ -108,11 +98,11 @@ msgid ""
 msgstr ""
 
 #: src/desktop/conf.py:147
-msgid "Database engine, eg postgresql, mysql, sqlite3, or oracle"
+msgid "Database engine, such as postgresql, mysql, sqlite3, or Oracle."
 msgstr ""
 
 #: src/desktop/conf.py:153
-msgid "Database name, or path to DB if using sqlite3"
+msgid "Database name, or path to DB if using sqlite3."
 msgstr ""
 
 #: src/desktop/conf.py:159
@@ -133,7 +123,7 @@ msgstr ""
 
 #: src/desktop/conf.py:186
 msgid ""
-"Configuration options for specifying Hue's kerberos integration for\n"
+"Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
 msgstr ""
 
@@ -142,19 +132,19 @@ msgid "Path to a Kerberos keytab file containing Hue's service credentials."
 msgstr ""
 
 #: src/desktop/conf.py:196
-msgid "Kerberos principal name for hue. Typically 'hue/hostname.foo.com'"
+msgid "Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."
 msgstr ""
 
 #: src/desktop/conf.py:201
-msgid "Frequency in seconds with which Hue will renew its keytab"
+msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr ""
 
 #: src/desktop/conf.py:206
-msgid "Path to keep kerberos credentials cached"
+msgid "Path to keep Kerberos credentials cached"
 msgstr ""
 
 #: src/desktop/conf.py:213
-msgid "Path to kerberos 'kinit' command"
+msgid "Path to Kerberos 'kinit' command"
 msgstr ""
 
 #: src/desktop/conf.py:223
@@ -162,7 +152,7 @@ msgid "Time zone name"
 msgstr ""
 
 #: src/desktop/conf.py:230
-msgid "Default system-wide unicode encoding"
+msgid "Default system-wide unicode encoding."
 msgstr ""
 
 #: src/desktop/conf.py:237
@@ -174,7 +164,7 @@ msgid "Group to run servers as"
 msgstr ""
 
 #: src/desktop/conf.py:249
-msgid "Configuration options for user authentication into the web application"
+msgid "Configuration options for user authentication into the web application."
 msgstr ""
 
 #: src/desktop/conf.py:253
@@ -183,7 +173,7 @@ msgid ""
 "django.contrib.auth.backends.ModelBackend (fully Django backend), "
 "desktop.auth.backend.AllowAllBackend (allows everyone), "
 "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and "
-"user manager, after the first login), "
+"user manager, after the first login). "
 msgstr ""
 
 #: src/desktop/conf.py:259
@@ -223,7 +213,7 @@ msgid "The password for the bind user."
 msgstr ""
 
 #: src/desktop/conf.py:290
-msgid "Configuration for LDAP user schema and search"
+msgid "Configuration for LDAP user schema and search."
 msgstr ""
 
 #: src/desktop/conf.py:294
@@ -253,11 +243,11 @@ msgid "The LDAP attribute which specifies the members of a group."
 msgstr ""
 
 #: src/desktop/conf.py:326
-msgid "Paths on the local file system that users should be able to browse"
+msgid "Paths on the local file system that users should be able to browse."
 msgstr ""
 
 #: src/desktop/conf.py:331
-msgid "The path on the local FS"
+msgid "The path on the local FS."
 msgstr ""
 
 #: src/desktop/conf.py:339
@@ -265,7 +255,7 @@ msgid "Link for 'feedback' tab."
 msgstr ""
 
 #: src/desktop/conf.py:346
-msgid "Whether to send dbug messages from JavaScript to the server logs."
+msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr ""
 
 #: src/desktop/conf.py:353
@@ -273,7 +263,7 @@ msgid "If true, log all database requests."
 msgstr ""
 
 #: src/desktop/conf.py:359
-msgid "Enable or disable django debug mode."
+msgid "Enable or disable Django debug mode."
 msgstr ""
 
 #: src/desktop/conf.py:366
@@ -297,7 +287,7 @@ msgstr ""
 
 #: src/desktop/conf.py:405
 #, python-format
-msgid "Keytab should have 0600 permissions (has %o)"
+msgid "Keytab should have 0600 permissions (has %o)."
 msgstr ""
 
 #: src/desktop/conf.py:415
@@ -597,18 +587,18 @@ msgid "Current value:"
 msgstr ""
 
 #: src/desktop/templates/check_config.mako:55
-msgid "All ok. Configuration check passed!"
+msgid "All OK. Configuration check passed!"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:92
+#: src/desktop/templates/common_header.mako:93
 msgid "About Hue"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:99
+#: src/desktop/templates/common_header.mako:100
 msgid "Profile"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:101
+#: src/desktop/templates/common_header.mako:102
 msgid "Sign Out"
 msgstr ""
 
