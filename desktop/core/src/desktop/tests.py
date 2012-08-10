@@ -31,6 +31,7 @@ import logging
 import time
 from desktop.lib.django_util import TruncatingModel, PopupException
 import desktop.views as views
+import proxy.conf
 
 def setup_test_environment():
   """
@@ -90,6 +91,14 @@ def test_dump_config():
 
   # There are more private variables...
   assert_true(len(response1.content) < len(response2.content))
+
+  clear()
+
+  CANARY = "(localhost|127\.0\.0\.1):(50030|50070|50060|50075)"
+  clear = proxy.conf.WHITELIST.set_for_testing(CANARY)
+
+  response1 = c.get('/dump_config')
+  assert_true(CANARY in response1.content)
 
   clear()
 

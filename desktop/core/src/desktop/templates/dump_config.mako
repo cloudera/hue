@@ -90,7 +90,7 @@ ${layout.menubar(section='dump_config')}
 			    ${recurse(v, depth + 1)}
 			    % endfor
 			  % else:
-			    <p>${str(config_obj.get())}</p>
+			    <p>${str(config_obj.get_raw())}</p>
 			    <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
 			    <p class="dump_config_default">${_('Default:')} <i>${config_obj.config.default}</i></p>
 			  % endif
