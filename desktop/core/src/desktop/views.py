@@ -276,11 +276,13 @@ def commonheader(title, section, padding="60px"):
     padding=padding
   ))
 
-def commonfooter():
+def commonfooter(messages=None):
   """
   Returns the rendered common footer
   """
-  return render_to_string("common_footer.html")
+  if messages is None:
+    messages = {}
+  return render_to_string("common_footer.html", {'messages': messages})
 
 def commonheader_iframe():
   """

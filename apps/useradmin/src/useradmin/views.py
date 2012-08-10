@@ -36,7 +36,7 @@ from useradmin.models import GroupPermission, HuePermission, UserProfile, LdapGr
 from useradmin.models import get_profile, get_default_user_group
 import ldap_access
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ def delete_user(request, username):
       finally:
         __users_lock.release()
 
-      # Send a flash message saying "deleted"?
+      request.info(_('The user was deleted !'))
       return redirect(reverse(list_users))
     except User.DoesNotExist:
       raise PopupException(_("User not found."))
@@ -95,7 +95,7 @@ def delete_group(request, name):
       finally:
         __groups_lock.release()
 
-      # Send a flash message saying "deleted"?
+      request.info(_('The group was deleted !'))
       return redirect(reverse(list_groups))
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."))
@@ -211,6 +211,7 @@ def edit_user(request, username=None):
 
           # All ok
           form.save()
+          request.info(_('User information updated'))
         finally:
           __users_lock.release()
 
@@ -242,7 +243,7 @@ def edit_group(request, name=None):
     form = GroupEditForm(request.POST, instance=instance)
     if form.is_valid():
       form.save()
-      request.flash.put('Group information updated')
+      request.info(_('Group information updated'))
       return list_groups(request)
 
   else:
@@ -271,7 +272,7 @@ def edit_permission(request, app=None, priv=None):
     form = PermissionsEditForm(request.POST, instance=instance)
     if form.is_valid():
       form.save()
-      request.flash.put('Permission information updated')
+      request.info(_('Permission information updated'))
       return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
 
   else:

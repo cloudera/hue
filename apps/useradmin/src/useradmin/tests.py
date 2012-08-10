@@ -227,7 +227,7 @@ def test_group_admin():
                     members=[User.objects.get(username="test").pk],
                     save="Save"), follow=True)
   assert_true("You must be a superuser" in response.content)
- 
+
   # Should be one group left, because we created the other group
   response = c.post('/useradmin/groups/delete/testgroup')
   assert_true(len(Group.objects.all()) == 1)
@@ -259,7 +259,10 @@ def test_user_admin():
                          first_name=u"Inglés",
                          last_name=u"Español",
                          is_superuser="True",
-                         is_active="True"))
+                         is_active="True"),
+                    follow=True)
+  assert_true("User information updated" in response.content,
+              "Notification should be displayed in: %s" % response.content)
   # Now make sure that those were materialized
   response = c.get('/useradmin/users/edit/test')
   assert_equal(smart_unicode("Inglés"), response.context["form"].instance.first_name)

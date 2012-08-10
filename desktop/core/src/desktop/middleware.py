@@ -21,6 +21,7 @@ import re
 import tempfile
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core import exceptions, urlresolvers
 import django.db
@@ -29,7 +30,6 @@ from django.utils.http import urlquote
 from django.utils.encoding import iri_to_uri
 import django.views.static
 import django.views.generic.simple
-import django.contrib.auth.views
 
 import desktop.conf
 from desktop.lib import apputil, i18n
@@ -142,6 +142,29 @@ class ClusterMiddleware(object):
         request.jt.setuser(request.user.username)
     else:
       request.jt = None
+
+
+class NotificationMiddleware(object):
+  """
+  Manages setting request.info and request.error
+  """
+  def process_view(self, request, view_func, view_args, view_kwargs):
+
+    def message(title, detail=None):
+      if detail is None:
+        detail = ''
+      else:
+        detail = '<br/>%s' % detail
+      return '%s %s' % (title, detail)
+
+    def info(title, detail=None):
+      messages.info(request, message(title, detail))
+
+    def error(title, detail=None):
+      messages.error(request, message(title, detail))
+
+    request.info = info
+    request.error = error
 
 
 class AppSpecificMiddleware(object):
@@ -330,59 +353,6 @@ class SessionOverPostMiddleware(object):
       request.COOKIES[cookie_key] = request.POST[cookie_key]
       del request.POST[cookie_key]
 
-class FlashMessageMiddleware(object):
-  """
-  Builds request.flash for manipulating flash messages.
-  request.flash is an instance of the FlashMessenger object.
-  """
-  def process_request(self, request):
-    assert not hasattr(request, "flash")
-    request.flash = FlashMessenger(request)
-    return None
-
-  def process_exception(self, request, exception):
-    request.flash.warn_if_non_empty()
-    return None
-
-  def process_response(self, request, response):
-    # This seems to happen if common middleware's "trailing slash" support gets
-    # activated.
-    if not hasattr(request, "flash"):
-      return response
-
-    request.flash.warn_if_non_empty()
-    return response
-
-class FlashMessenger(object):
-  """
-  Manages storing and rendering flash messages.
-  """
-
-  def __init__(self,request):
-    self.request = request
-
-  def put(self, text):
-    """
-    Places flash messages to be rendered. Note that this will not be HTML-escaped.
-    """
-    self.request.session.setdefault("flashMessages", []).append(text)
-    self.request.session.modified = True
-
-  def get(self):
-    """
-    Gets messages to be displayed, only messages that have not been displayed prior.
-    Always returns a list, though that list may be empty.
-    """
-    messages = self.request.session.get('flashMessages')
-    if messages is not None:
-      del self.request.session['flashMessages']
-      return messages
-    else:
-      return []
-
-  def warn_if_non_empty(self):
-    if self.request.session.get('flashMessages') is not None and len(self.request.session['flashMessages']) > 0:
-      logging.warning("Returning request with unmaterialized flash messages: %s" % repr(self.request.session['flashMessages']))
 
 class DatabaseLoggingMiddleware(object):
   """

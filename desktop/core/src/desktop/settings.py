@@ -111,7 +111,8 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.AjaxMiddleware',
     # Must be after Session, Auth, and Ajax.  Before everything else.
     'desktop.middleware.LoginAndPermissionMiddleware',
-    'desktop.middleware.FlashMessageMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'desktop.middleware.NotificationMiddleware',
     'desktop.middleware.JFrameMiddleware',
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
