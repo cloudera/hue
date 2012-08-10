@@ -28,18 +28,20 @@ class RwxTest(unittest.TestCase):
     self.assertEquals("unknown", rwx.filetype(0))
 
   def test_expand_mode(self):
-    self.assertEquals( [True, True, False, True, True, False, False, False, True], rwx.expand_mode(0661))
+    self.assertEquals( [True, True, False, True, True, False, False, False, True, False], rwx.expand_mode(0661))
+    self.assertEquals( [True, True, False, True, True, False, False, False, True, True], rwx.expand_mode(01661))
 
   def test_compress_mode(self):
-    self.assertEquals(0661, rwx.compress_mode( (True, True, False, True, True, False, False, False, True) ))
+    self.assertEquals(0661, rwx.compress_mode( (True, True, False, True, True, False, False, False, True, False) ))
+    self.assertEquals(01661, rwx.compress_mode( (True, True, False, True, True, False, False, False, True, True) ))
 
   def check_inverseness_and_uniqueness(self):
     all = set()
-    for i in range(0, 8*8*8-1):
+    for i in range(0, 2*8*8*8-1):
       t = rwx.expand_mode(i)
       self.assertEquals(i, rwx.compress_mode(t))
       all.add(t)
-    self.assertEquals(8*8*8, len(all))
+    self.assertEquals(2*8*8*8, len(all))
 
 if __name__ == "__main__":
   unittest.main()

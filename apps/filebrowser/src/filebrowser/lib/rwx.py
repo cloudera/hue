@@ -47,7 +47,8 @@ def rwxtype(mode):
 
 BITS = (stat.S_IRUSR, stat.S_IWUSR, stat.S_IXUSR,
     stat.S_IRGRP, stat.S_IWGRP, stat.S_IXGRP,
-    stat.S_IROTH, stat.S_IWOTH, stat.S_IXOTH)
+    stat.S_IROTH, stat.S_IWOTH, stat.S_IXOTH,
+    stat.S_ISVTX)
 
 def expand_mode(mode):
   return map(lambda y: bool(mode & y), BITS)
@@ -67,9 +68,11 @@ def rwx(mode):
   this is similar in spirit to the google-able "pathinfo.py".
   """
   bools = expand_mode(mode)
-  s = list("rwxrwxrwx")
-  for (i, v) in enumerate(bools):
+  s = list("rwxrwxrwxt")
+  for (i, v) in enumerate(bools[:-1]):
     if not v:
       s[i] = "-"
+  # Sticky bit should either be 't' or no char.
+  if not bools[-1]:
+    s = s[:-1]
   return rwxtype(mode) + "".join(s)
-

@@ -25,6 +25,7 @@ from avro import schema, datafile, io
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.django_util import PopupException
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
+from lib.rwx import expand_mode
 
 try:
   import json
@@ -67,6 +68,50 @@ def test_mkdir_singledir():
       cluster.fs.rmtree(prefix)     # Clean up
     except:
       pass      # Don't let cleanup errors mask earlier failures
+
+
+@attr('requires_hadoop')
+def test_chmod_sticky():
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    c = make_logged_in_client(cluster.superuser)
+    cluster.fs.setuser(cluster.superuser)
+
+    PATH = "/chmod_test"
+    cluster.fs.mkdir(PATH)
+
+    # Get current mode and make sure sticky bit is off
+    mode = expand_mode( int(cluster.fs.stats(PATH)["mode"]) )
+    assert_equal(False, mode[-1])
+
+    # Setup post data
+    permissions = ('user_read', 'user_write', 'user_execute',
+        'group_read', 'group_write', 'group_execute',
+        'other_read', 'other_write', 'other_execute',
+        'sticky') # Order matters!
+    permissions_dict = dict(filter(lambda x: x[1], zip(permissions, map(lambda x: 'on' if x else '', mode))))
+    permissions_dict['sticky'] = 'on'
+    kwargs = {'path': PATH}
+    kwargs.update(permissions_dict)
+
+    # Set sticky bit, then check sticky bit is on in hdfs
+    response = c.post("/filebrowser/chmod", kwargs)
+    mode = expand_mode( int(cluster.fs.stats(PATH)["mode"]) )
+    assert_equal(True, mode[-1])
+
+    # Unset sticky bit, then check sticky bit is off in hdfs
+    del kwargs['sticky']
+    response = c.post("/filebrowser/chmod", kwargs)
+    mode = expand_mode( int(cluster.fs.stats(PATH)["mode"]) )
+    assert_equal(False, mode[-1])
+
+  finally:
+    try:
+      cluster.fs.rmtree(PATH)     # Clean up
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+
 
 @attr('requires_hadoop')
 def test_chown():

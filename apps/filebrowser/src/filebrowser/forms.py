@@ -107,10 +107,12 @@ class ChmodForm(forms.Form):
   other_read = BooleanField(required=False)
   other_write = BooleanField(required=False)
   other_execute = BooleanField(required=False)
+  sticky = BooleanField(required=False)
 
   names = ("user_read", "user_write", "user_execute",
       "group_read", "group_write", "group_execute",
-      "other_read", "other_write", "other_execute")
+      "other_read", "other_write", "other_execute",
+      "sticky")
 
   def __init__(self, initial):
     logging.info(dir(self))

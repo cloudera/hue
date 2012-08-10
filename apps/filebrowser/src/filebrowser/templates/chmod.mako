@@ -20,8 +20,8 @@ from django.utils.translation import ugettext as _
 <%namespace name="edit" file="editor_components.mako" />
 <style>
 .table-margin {
-	padding-left:20px;
-	padding-right:20px;
+    padding-left:20px;
+    padding-right:20px;
 }
 </style>
 
@@ -31,7 +31,7 @@ from django.utils.translation import ugettext as _
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Change Permissions:')} ${path}</h3>
     </div>
-    <div class="table-margin">
+    <div class="modal-body table-margin">
         ${edit.render_field(form["path"], hidden=True)}
         <table class="table table-striped">
             <thead>
@@ -40,7 +40,8 @@ from django.utils.translation import ugettext as _
                 <th class="center">${_('User')}</th>
                 <th class="center">${_('Group')}</th>
                 <th class="center">${_('Other')}</th>
-				<th width="120">&nbsp</th>
+                <th class="center">&nbsp;</th>
+                <th width="120">&nbsp</th>
             </tr>
             </thead>
             <tbody>
@@ -49,21 +50,27 @@ from django.utils.translation import ugettext as _
                 <td class="center">${edit.render_field(form["user_read"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["group_read"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["other_read"], tag="checkbox", button_text=" ", nolabel=True)}</td>
-				<td>&nbsp;</td>
+                <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
                 <td><strong>${_('Write')}</strong></td>
                 <td class="center">${edit.render_field(form["user_write"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["group_write"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["other_write"], tag="checkbox", button_text=" ", nolabel=True)}</td>
-				<td>&nbsp;</td>
+                <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
                 <td><strong>${_('Execute')}</strong></td>
                 <td class="center">${edit.render_field(form["user_execute"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["group_execute"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td class="center">${edit.render_field(form["other_execute"], tag="checkbox", button_text=" ", nolabel=True)}</td>
-				<td>&nbsp;</td>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+                <td><strong>${_('Sticky')}</strong></td>
+                <td colspan="3">&nbsp;</td>
+                <td class="center">${edit.render_field(form["sticky"], tag="checkbox", button_text=" ", nolabel=True)}</td>
+                <td>&nbsp;</td>
             </tr>
             </tbody>
         </table>
