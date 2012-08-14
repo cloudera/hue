@@ -96,13 +96,11 @@ def delete_group(request, name):
         __groups_lock.release()
 
       # Send a flash message saying "deleted"?
-      return list_groups(request)
+      return redirect(reverse(list_groups))
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."))
   else:
-    return render("confirm.mako",
-      request,
-      dict(path=request.path, title=_("Delete group?")))
+    return render("delete_group.mako", request, dict(path=request.path, groupname=name))
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   """

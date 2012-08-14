@@ -67,18 +67,7 @@ ${layout.menubar(section='groups', _=_)}
 </div>
 
 
-<div id="deleteGroup" class="modal hide fade groupModal">
-    <form id="deleteGroupForm" action="" method="POST">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 id="deleteGroupMessage">${_('Confirm action')}</h3>
-    </div>
-    <div class="modal-footer">
-        <input type="submit" class="btn primary" value="${_('Yes')}"/>
-        <a href="#" class="btn secondary hideModal">${_('No')}</a>
-    </div>
-    </form>
-</div>
+<div id="deleteGroup" class="modal hide fade groupModal"></div>
 
 
 
@@ -104,14 +93,17 @@ ${layout.menubar(section='groups', _=_)}
 
             $(".confirmationModal").click(function(){
                 var _this = $(this);
-                $.getJSON(_this.attr("data-confirmation-url"), function(data){
-                    $("#deleteGroupForm").attr("action", data.path);
-                    $("#deleteGroupMessage").text(_this.attr("alt"));
+                $.ajax({
+                    url: _this.attr("data-confirmation-url"),
+                    beforeSend: function(xhr){
+                        xhr.setRequestHeader("X-Requested-With", "Hue");
+                    },
+                    dataType: "html",
+                    success: function(data){
+                        $("#deleteGroup").html(data);
+                        $("#deleteGroup").modal("show");
+                    }
                 });
-                $("#deleteGroup").modal("show");
-            });
-            $(".hideModal").click(function(){
-                $("#deleteGroup").modal("hide");
             });
 
             $("#filterInput").keyup(function(){
