@@ -347,7 +347,7 @@ def test_user_admin():
   # Delete that regular user
   funny_profile = UserProfile.objects.get(user=test_user)
   response = c_su.post('/useradmin/users/delete/%s' % (FUNNY_NAME_QUOTED,))
-  assert_true("Hue Users" in response.content)
+  assert_equal(302, response.status_code)
   assert_false(User.objects.filter(username=FUNNY_NAME).exists())
   assert_false(UserProfile.objects.filter(id=funny_profile.id).exists())
 

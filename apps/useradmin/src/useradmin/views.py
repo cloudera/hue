@@ -70,13 +70,11 @@ def delete_user(request, username):
         __users_lock.release()
 
       # Send a flash message saying "deleted"?
-      return list_users(request)
+      return redirect(reverse(list_users))
     except User.DoesNotExist:
       raise PopupException(_("User not found."))
   else:
-    return render("confirm.mako",
-      request,
-      dict(path=request.path, title=_("Delete user?")))
+    return render("delete_user.mako", request, dict(path=request.path, username=username))
 
 def delete_group(request, name):
   if not request.user.is_superuser:
