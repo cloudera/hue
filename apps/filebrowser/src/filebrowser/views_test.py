@@ -90,8 +90,8 @@ def test_chmod_sticky():
         'group_read', 'group_write', 'group_execute',
         'other_read', 'other_write', 'other_execute',
         'sticky') # Order matters!
-    permissions_dict = dict(filter(lambda x: x[1], zip(permissions, map(lambda x: 'on' if x else '', mode))))
-    permissions_dict['sticky'] = 'on'
+    permissions_dict = dict(filter(lambda x: x[1], zip(permissions, mode)))
+    permissions_dict['sticky'] = True
     kwargs = {'path': PATH}
     kwargs.update(permissions_dict)
 
