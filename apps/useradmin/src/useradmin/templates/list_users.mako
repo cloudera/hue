@@ -100,18 +100,8 @@ ${layout.menubar(section='users', _=_)}
         </div>
     </div>
 
-    <div id="deleteUser" class="modal hide fade userModal">
-        <form id="deleteUserForm" action="" method="POST">
-        <div class="modal-header">
-            <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3 id="deleteUserMessage">${_('Confirm action')}</h3>
-        </div>
-        <div class="modal-footer">
-            <input type="submit" class="btn primary" value="${_('Yes')}"/>
-            <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
-        </div>
-        </form>
-    </div>
+    <div id="deleteUser" class="modal hide fade"></div>
+
 </div>
 
     <script type="text/javascript" charset="utf-8">
@@ -136,11 +126,17 @@ ${layout.menubar(section='users', _=_)}
 
             $(".confirmationModal").click(function(){
                 var _this = $(this);
-                $.getJSON(_this.attr("data-confirmation-url"), function(data){
-                    $("#deleteUserForm").attr("action", data.path);
-                    $("#deleteUserMessage").text(_this.attr("alt"));
+                $.ajax({
+                    url: _this.attr("data-confirmation-url"),
+                    beforeSend: function(xhr){
+                        xhr.setRequestHeader("X-Requested-With", "Hue");
+                    },
+                    dataType: "html",
+                    success: function(data){
+                        $("#deleteUser").html(data);
+                        $("#deleteUser").modal("show");
+                    }
                 });
-                $("#deleteUser").modal("show");
             });
 
             $("#filterInput").keyup(function(){
