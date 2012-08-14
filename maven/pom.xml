@@ -22,12 +22,12 @@
   <parent>
     <groupId>com.cloudera.cdh</groupId>
     <artifactId>cdh-root</artifactId>
-    <version>3.0-u5</version>
+    <version>3.0-u6-SNAPSHOT</version>
   </parent>
 
   <groupId>com.cloudera.hue</groupId>
   <artifactId>hue-parent</artifactId>
-  <version>1.2.0-cdh3u5</version>
+  <version>1.2.0-cdh3u6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hue Maven Parent POM</name>
@@ -42,10 +42,10 @@
   </licenses>
 
   <properties>
-    <hadoop.version>0.20.2-cdh3u5</hadoop.version>
+    <hadoop.version>0.20.2-cdh3u6-SNAPSHOT</hadoop.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
-    <hive.version>0.7.1-cdh3u5</hive.version>
+    <hive.version>0.7.1-cdh3u6-SNAPSHOT</hive.version>
   </properties>
 
   <organization>
