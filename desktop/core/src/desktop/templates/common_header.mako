@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
@@ -88,6 +89,11 @@ from django.utils.translation import ugettext as _
 </%def>
 
 <div class="navbar navbar-fixed-top">
+    % if conf.CUSTOM.BANNER_TOP_HTML.get():
+    <div id="banner-top" class="banner">
+        ${conf.CUSTOM.BANNER_TOP_HTML.get()}
+    </div>
+    % endif
     <div class="navbar-inner">
       <div class="container-fluid">
         <a class="brand nav-tooltip" title="${_('About Hue')}" href="/about">Hue</a>

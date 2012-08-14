@@ -244,6 +244,17 @@ SERVER_GROUP = Config(
   default="hue")
 
 
+CUSTOM = ConfigSection(
+  key="custom",
+  help=_("Customizations to the UI."),
+  members=dict(
+    BANNER_TOP_HTML=Config("banner_top_html",
+                   default="",
+                   help=_("Top banner HTML code. This code will be placed in the navigation bar "
+                        "so that it will reside at the top of the page in a fixed position. " +
+                        "One common value is `<img src=\"http://www.example.com/example.gif\" />`")),
+))
+
 AUTH = ConfigSection(
   key="auth",
   help=_("Configuration options for user authentication into the web application."),

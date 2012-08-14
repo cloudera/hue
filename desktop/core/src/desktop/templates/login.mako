@@ -1,12 +1,12 @@
 ## Licensed to Cloudera, Inc. under one
-## or more contributor license agreements.  See the NOTICE file
+## or more contributor license agreements.	See the NOTICE file
 ## distributed with this work for additional information
 ## regarding copyright ownership.  Cloudera, Inc. licenses this file
 ## to you under the Apache License, Version 2.0 (the
 ## "License"); you may not use this file except in compliance
 ## with the License.  You may obtain a copy of the License at
 ##
-##     http://www.apache.org/licenses/LICENSE-2.0
+##	   http://www.apache.org/licenses/LICENSE-2.0
 ##
 ## Unless required by applicable law or agreed to in writing, software
 ## distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from desktop import conf
 from django.utils.translation import ugettext as _
 %>
 <!DOCTYPE html>
@@ -42,6 +43,11 @@ from django.utils.translation import ugettext as _
 
 <body>
 	<div class="navbar navbar-fixed-top">
+		% if conf.CUSTOM.BANNER_TOP_HTML.get():
+		<div id="banner-top" class="banner">
+			${conf.CUSTOM.BANNER_TOP_HTML.get()}
+		</div>
+		% endif
 		<div class="navbar-inner">
 			<div class="container-fluid">
 				<a class="brand" href="#">Hue</a>
@@ -52,7 +58,7 @@ from django.utils.translation import ugettext as _
 	<div class="container">
 		<div class="row">
 			<div class="span4 offset4">
-    			<form method="POST" action="${action}" class="well">
+				<form method="POST" action="${action}" class="well">
 					<label>${_('Username')}
 						<input name="username" class="input-large" type="text" maxlength="30">
 					</label>
@@ -65,7 +71,7 @@ from django.utils.translation import ugettext as _
 					%else:
 						<input type="submit" class="btn primary" value="${_('Sign in')}" />
 					%endif
-		    		<input type="hidden" name="next" value="${next}" />
+					<input type="hidden" name="next" value="${next}" />
 
 					%if login_errors==True:
 						<br/>
@@ -83,7 +89,7 @@ from django.utils.translation import ugettext as _
 			<div class="span6 offset3">
 				<div class="alert alert-block">
 					<p>${_('Since this is your first time logging in, please pick any username and password. Be sure to remember these, as')}
-				     <strong>${_('they will become your superuser credentials for Hue')}</strong>.</p>
+					 <strong>${_('they will become your superuser credentials for Hue')}</strong>.</p>
 				</div>
 			</div>
 		</div>

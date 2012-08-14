@@ -355,3 +355,18 @@ def test_last_access_time():
   # Check that 'last_access_time' is in between the timestamps before and after the last access path
   assert_true(before_access_time < access_time)
   assert_true(access_time < after_access_time)
+
+
+def test_ui_customizations():
+  custom_banner = 'test ui customization'
+  reset = (
+    desktop.conf.CUSTOM.BANNER_TOP_HTML.set_for_testing(custom_banner),
+  )
+
+  try:
+    c = make_logged_in_client()
+    resp = c.get('/debug/check_config')
+    assert_true(custom_banner in resp.content)
+  finally:
+    for old_conf in reset:
+      old_conf()
