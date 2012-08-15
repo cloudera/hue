@@ -170,11 +170,11 @@ ${ layout.menubar(section='dashboard') }
     </div>
 
     <div class="tab-pane" id="log">
-        <pre>${ log | h }</pre>
+        <pre>${ oozie_coordinator.log | h }</pre>
     </div>
 
     <div class="tab-pane" id="definition">
-        <pre>${ definition | h }</pre>
+        <pre>${ oozie_coordinator.definition | h }</pre>
     </div>
     </div>
   </div>
@@ -186,4 +186,4 @@ ${ layout.menubar(section='dashboard') }
   $("a[data-row-selector='true']").jHueRowSelector();
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

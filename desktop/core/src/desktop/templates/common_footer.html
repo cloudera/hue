@@ -21,9 +21,9 @@ limitations under the License.
     <script>
       {% for message in messages %}
           {% if message.tags == 'error' %}
-              $.jHueNotify.error('{{ message|safe }}');
+              $.jHueNotify.error('{{ message|escape|escapejs }}');
           {% else %}
-              $.jHueNotify.info('{{ message|safe }}');
+              $.jHueNotify.info('{{ message|escape|escapejs }}');
           {% endif %}
       {% endfor %}
     </script>

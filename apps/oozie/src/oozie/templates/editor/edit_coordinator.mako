@@ -342,63 +342,59 @@ ${ layout.menubar(section='coordinators') }
         </div>
     </form>
   </div>
-
-
-  <script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
-
-  <script type="text/javascript" charset="utf-8">
-      $(document).ready(function() {
-          $("#datasets-btn").click(function() {
-            $('[href=#datasets]').tab('show');
-          });
-
-          $('#add-dataset-btn').click(function() {
-          $.post("${ url('oozie:create_coordinator_dataset', coordinator=coordinator.id) }",
-                 $("#add-dataset-form").serialize(),
-                 function(response) {
-                  if (response['status'] != 0) {
-                    $('#add-dataset-body').html(response['data']);
-                  } else {
-                    $.jHueNotify.info('${ _('Dataset created') }');
-                    window.location.replace(response['data']);
-                  }
-              }
-           );
-         });
-
-        $('#add-data-input-btn').click(function() {
-            $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='input') }",
-                   $("#add-data-input-form").serialize(),
-                   function(response) {
-                        if (response['status'] != 0) {
-                          $('#add-data-input-body').html(response['data']);
-                        } else {
-                          $.jHueNotify.info('${ _('Input dataset created') }');
-                          window.location.replace(response['data']);
-                        }
-                    }
-             );
-         });
-
-        $('#add-data-output-btn').click(function() {
-            $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='output') }",
-                   $("#add-data-output-form").serialize(),
-                   function(response) {
-                        if (response['status'] != 0) {
-                          $('#add-data-output-body').html(response['data']);
-                        } else {
-                          $.jHueNotify.info('${ _('Output dataset created') }');
-                          window.location.replace(response['data']);
-                        }
-                    }
-             );
-         });
-
-         $("a[data-row-selector='true']").jHueRowSelector();
-    });
-  </script>
-% endif
-
 </div>
 
-${commonfooter()}
+<script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+      $("#datasets-btn").click(function() {
+        $('[href=#datasets]').tab('show');
+      });
+
+      $('#add-dataset-btn').click(function() {
+        $.post("${ url('oozie:create_coordinator_dataset', coordinator=coordinator.id) }",
+          $("#add-dataset-form").serialize(),
+          function(response) {
+            if (response['status'] != 0) {
+              $('#add-dataset-body').html(response['data']);
+            } else {
+              window.location.replace(response['data']);
+            }
+          }
+        );
+     });
+
+    $('#add-data-input-btn').click(function() {
+      $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='input') }",
+        $("#add-data-input-form").serialize(),
+          function(response) {
+            if (response['status'] != 0) {
+              $('#add-data-input-body').html(response['data']);
+            } else {
+              window.location.replace(response['data']);
+            }
+          }
+        );
+     });
+
+    $('#add-data-output-btn').click(function() {
+      $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='output') }",
+        $("#add-data-output-form").serialize(),
+          function(response) {
+            if (response['status'] != 0) {
+              $('#add-data-output-body').html(response['data']);
+            } else {
+              window.location.replace(response['data']);
+            }
+          }
+        );
+     });
+
+     $("a[data-row-selector='true']").jHueRowSelector();
+    });
+</script>
+
+% endif
+
+${commonfooter(messages)}

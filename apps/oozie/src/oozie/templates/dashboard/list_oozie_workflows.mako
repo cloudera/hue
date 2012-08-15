@@ -258,4 +258,4 @@ ${ layout.menubar(section='dashboard') }
   });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

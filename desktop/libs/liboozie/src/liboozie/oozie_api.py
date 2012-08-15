@@ -122,16 +122,17 @@ class OozieApi(object):
     if jobtype == 'wf':
       wf_list = WorkflowList(self, resp, filters=kwargs)
     else:
+      print resp
       wf_list = CoordinatorList(self, resp, filters=kwargs)
     return wf_list
 
 
   def get_workflows(self, offset=None, cnt=None, **kwargs):
-    return self.get_jobs('wf')
+    return self.get_jobs('wf', offset, cnt, **kwargs)
 
 
   def get_coordinators(self, offset=None, cnt=None, **kwargs):
-    return self.get_jobs('coord')
+    return self.get_jobs('coord', offset, cnt, **kwargs)
 
 
   def get_job(self, jobid):

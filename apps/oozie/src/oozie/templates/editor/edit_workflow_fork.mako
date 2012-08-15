@@ -120,4 +120,4 @@ ${ layout.menubar(section='workflows') }
   </form>
 </div>
 
-${commonfooter()}
+${commonfooter(messages)}

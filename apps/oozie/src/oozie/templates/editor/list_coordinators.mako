@@ -283,4 +283,4 @@ ${ layout.menubar(section='coordinators') }
   });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

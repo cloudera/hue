@@ -383,4 +383,4 @@ ${ layout.menubar(section='workflows') }
   });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

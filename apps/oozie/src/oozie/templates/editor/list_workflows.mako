@@ -88,7 +88,7 @@ ${ layout.menubar(section='workflows') }
           <td>${ workflow.description }</td>
 
           <td nowrap="nowrap">${ utils.format_date(workflow.last_modified) }</td>
-          <td><span class="badge badge-info">${ workflow.get_actions.count() }</span></td>
+          <td><span class="badge badge-info">${ workflow.actions.count() }</span></td>
           <td>
             <span class="label label-info">${ workflow.status }</span>
           </td>
@@ -286,4 +286,4 @@ ${ layout.menubar(section='workflows') }
   });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

@@ -89,7 +89,8 @@ class Submission(object):
         'jobTracker': jobtracker_addr,
         'nameNode': self.fs.fs_defaultfs,
         self.job.get_application_path_key(): self.fs.get_hdfs_path(deployment_dir),
-        'hue-id': self.job.id}
+        self.job.HUE_ID: self.job.id
+        }
     properties.update(self.properties)
     self.properties = properties
 
