@@ -89,4 +89,4 @@ ${ layout.menubar(section='history') }
   $("a[data-row-selector='true']").jHueRowSelector();
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

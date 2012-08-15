@@ -81,4 +81,4 @@ ${ layout.menubar(section='history') }
    <a href="${ url('oozie:list_history') }" class="btn">${ _('Back') }</a>
 </div>
 
-${commonfooter()}
+${commonfooter(messages)}

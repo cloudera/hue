@@ -30,8 +30,8 @@ ${ layout.menubar(section='dashboard') }
     ${ layout.dashboard_sub_menubar(section='workflows') }
 
     <h1>
-      % if coord:
-        ${ _('Coordinator') } <a href="${ coord.get_absolute_url() }">${ coord.appName }</a> :
+      % if oozie_coordinator:
+        ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a> :
       % endif
 
       ${ _('Workflow') } ${ oozie_workflow.appName }
@@ -42,8 +42,8 @@ ${ layout.menubar(section='dashboard') }
       ${ _('Workflow') }
     </div>
     <div class="span3">
-      %if workflow is not None:
-        <a title="${ _('Edit workflow') }" href="${ workflow.get_absolute_url() }">${ oozie_workflow.appName }</a>
+      %if hue_workflow is not None:
+        <a title="${ _('Edit workflow') }" href="${ hue_workflow.get_absolute_url() }">${ oozie_workflow.appName }</a>
       % else:
         ${ oozie_workflow.appName }
       %endif
@@ -110,7 +110,7 @@ ${ layout.menubar(section='dashboard') }
   <br/><br/>
 
     <ul class="nav nav-tabs">
-      % if workflow:
+      % if hue_workflow:
         <li class="active"><a href="#graph" data-toggle="tab">${ _('Graph') }</a></li>
         <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
       % else:
@@ -123,24 +123,24 @@ ${ layout.menubar(section='dashboard') }
     </ul>
 
     <div id="workflow-tab-content" class="tab-content" style="min-height:200px">
-     % if workflow:
+     % if hue_workflow:
        <div id="graph" class="tab-pane active">
-         % if workflow is not None:
+         % if hue_workflow is not None:
          <%
            from oozie.forms import NodeForm
            from oozie.models import Workflow, Node
            from django.forms.models import inlineformset_factory
 
            WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeForm, max_num=0, can_order=False, can_delete=False)
-           forms2 = WorkflowFormSet(instance=workflow.get_full_node()).forms
+           forms = WorkflowFormSet(instance=hue_workflow.get_full_node()).forms
          %>
 
-           ${ workflow.get_full_node().gen_status_graph(forms2, oozie_workflow.actions) }
+           ${ hue_workflow.get_full_node().gen_status_graph(forms, oozie_workflow.actions) }
          % endif
        </div>
      % endif
 
-    <div class="tab-pane ${ utils.if_false(workflow, 'active') }" id="actions">
+    <div class="tab-pane ${ utils.if_false(hue_workflow, 'active') }" id="actions">
       % if oozie_workflow.actions:
         <table class="table table-striped table-condensed selectable">
           <thead>
@@ -233,11 +233,11 @@ ${ layout.menubar(section='dashboard') }
       </div>
 
       <div class="tab-pane" id="log">
-          <pre>${ log | h }</pre>
+          <pre>${ oozie_workflow.log | h }</pre>
       </div>
 
       <div class="tab-pane" id="definition">
-          <pre>${ definition | h }</pre>
+          <pre>${ oozie_workflow.definition | h }</pre>
       </div>
   </div>
 
@@ -257,4 +257,4 @@ ${ layout.menubar(section='dashboard') }
   });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

@@ -89,4 +89,4 @@ ${ layout.menubar(section='coordinators') }
 
 </div>
 
-${commonfooter()}
+${commonfooter(messages)}

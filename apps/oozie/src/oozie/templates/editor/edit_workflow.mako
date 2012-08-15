@@ -22,7 +22,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader({ _("Oozie App") }, "oozie", "100px") }
+${ commonheader(_("Oozie App"), "oozie", "100px") }
 ${ layout.menubar(section='workflows') }
 
 
@@ -64,25 +64,25 @@ ${ layout.menubar(section='workflows') }
             <div class="tab-content">
               <div class="tab-pane active" id="add">
                 <p>
-                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='mapreduce', parent_action_id=workflow.end.get_parents()[1].id) }"
+                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='mapreduce', parent_action_id=workflow.end.get_parents()[0].id) }"
                   title="${ _('Click to add to the end') }" class="btn">
                   <i class="icon-plus"></i> ${ _('MapReduce') }
                 </a>
                 <p/>
                 <p>
-                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='streaming', parent_action_id=workflow.end.get_parents()[1].id) }"
+                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='streaming', parent_action_id=workflow.end.get_parents()[0].id) }"
                   title="${ _('Click to add to the end') }" class="btn">
                   <i class="icon-plus"></i> ${ _('Streaming') }
                 </a>
                 <p/>
                 <p>
-                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='java', parent_action_id=workflow.end.get_parents()[1].id) }"
+                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='java', parent_action_id=workflow.end.get_parents()[0].id) }"
                   title="${ _('Click to add to the end') }" class="btn">
                   <i class="icon-plus"></i> ${ _('Java') }
                 </a>
                 <p/>
                 <p>
-                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='pig', parent_action_id=workflow.end.get_parents()[1].id) }"
+                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='pig', parent_action_id=workflow.end.get_parents()[0].id) }"
                   title="${ _('Click to add to the end') }" class="btn">
                   <i class="icon-plus"></i> ${ _('Pig') }
                 </a>
@@ -173,4 +173,4 @@ ${ layout.menubar(section='workflows') }
 
 ${ utils.path_chooser_libs(True) }
 
-${commonfooter()}
+${commonfooter(messages)}

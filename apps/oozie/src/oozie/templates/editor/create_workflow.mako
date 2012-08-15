@@ -23,7 +23,6 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 ${ commonheader(_("Oozie App"), "oozie", "100px") }
-
 ${ layout.menubar(section='workflows') }
 
 
@@ -85,4 +84,4 @@ ${ layout.menubar(section='workflows') }
 
 ${ utils.path_chooser_libs(True) }
 
-${commonfooter()}
+${commonfooter(messages)}

@@ -130,4 +130,4 @@ ${ layout.menubar(section='running') }
   <a class="btn" onclick="history.back()">${ _('Back') }</a>
 </div>
 
-${commonfooter()}
+${commonfooter(messages)}

@@ -50,6 +50,8 @@ def can_access_job(request, job_id):
   """
   Logic for testing if a user can access a certain Workflow / Coordinator.
   """
+  if job_id is None:
+    return
   try:
     job = Job.objects.select_related().get(pk=job_id).get_full_node()
     if not SHARE_JOBS.get() and not request.user.is_superuser \
@@ -201,19 +203,21 @@ def edit_workflow(request, workflow):
   history = History.objects.filter(submitter=request.user, job=workflow)
 
   if request.method == 'POST' and can_modify_job(request, workflow):
+    try:
+      workflow_form = WorkflowForm(request.POST, instance=workflow)
+      actions_formset = WorkflowFormSet(request.POST, request.FILES, instance=workflow)
+
       if 'clone_action' in request.POST: return clone_action(request, action=request.POST['clone_action'])
       if 'delete_action' in request.POST: return delete_action(request, action=request.POST['delete_action'])
       if 'move_up_action' in request.POST: return move_up_action(request, action=request.POST['move_up_action'])
       if 'move_down_action' in request.POST: return move_down_action(request, action=request.POST['move_down_action'])
 
-      workflow_form = WorkflowForm(request.POST, instance=workflow)
-      actions_formset = WorkflowFormSet(request.POST, request.FILES, instance=workflow)
-
       if workflow_form.is_valid() and actions_formset.is_valid():
         workflow_form.save()
         actions_formset.save()
-
         return redirect(reverse('oozie:list_workflows'))
+    except Exception, e:
+      request.error(_('Sorry, this operation is not supported: %(error)s') % {'error': e})
   else:
     workflow_form = WorkflowForm(instance=workflow)
     actions_formset = WorkflowFormSet(instance=workflow)
@@ -272,6 +276,7 @@ def submit_workflow(request, workflow):
                          detail=ex._headers.get('oozie-error-message', ex))
 
   History.objects.create_from_submission(submission)
+  request.info(_('Workflow submitted'))
 
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
@@ -326,7 +331,7 @@ def new_action(request, workflow, node_type, parent_action_id):
 def edit_action(request, action):
   ActionForm = design_form_by_type(action.node_type)
 
-  if request.method == 'POST' and check_job_modification(request, action.workflow):
+  if request.method == 'POST' and can_modify_job(request, action.workflow):
     action_form = ActionForm(request.POST, instance=action)
     if action_form.is_valid():
       action = action_form.save()
@@ -509,6 +514,7 @@ def create_coordinator_dataset(request, coordinator):
       dataset_form.save()
       response['status'] = 0
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id})
+      request.info(_('Dataset created'));
     else:
       dataset_form = DatasetForm(request.POST, instance=dataset)
   else:
@@ -545,6 +551,7 @@ def create_coordinator_data(request, coordinator, data_type):
       data_form.save()
       response['status'] = 0
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id})
+      request.info(_('Coordinator data created'));
     else:
       data_form = DataForm(request.POST, instance=data_instance, coordinator=coordinator)
   else:
@@ -583,6 +590,7 @@ def submit_coordinator(request, coordinator):
                          detail=ex._headers['oozie-error-message'])
 
   History.objects.create_from_submission(submission)
+  request.info(_('Coordinator submitted'))
 
   return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
 

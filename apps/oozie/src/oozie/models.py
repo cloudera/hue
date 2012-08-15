@@ -172,6 +172,8 @@ class Workflow(Job):
 
   objects = WorkflowManager()
 
+  HUE_ID = 'hue-id-w'
+
   def get_type(self):
     return 'workflow'
 
@@ -392,7 +394,7 @@ class Workflow(Job):
     return list(params)
 
   @property
-  def get_actions(self):
+  def actions(self):
     return Action.objects.filter(workflow=self, node_type__in=Action.types)
 
   @property
@@ -465,6 +467,9 @@ class Workflow(Job):
 
 
 class Link(models.Model):
+  # Links to exclude when using get_children_link(), get_parent_links() in the API
+  META_LINKS = ('related', 'default')
+
   parent = models.ForeignKey('Node', related_name='child_node')
   child = models.ForeignKey('Node', related_name='parent_node', verbose_name='')
 
@@ -544,9 +549,9 @@ class Node(models.Model):
   # https://docs.djangoproject.com/en/1.2/topics/db/models/#intermediary-manytomany
   def get_link(self, name=None):
     if name is None:
-      return Link.objects.exclude(name='related').get(parent=self)
+      return Link.objects.exclude(name__in=Link.META_LINKS).get(parent=self)
     else:
-      return Link.objects.exclude(name='related').get(parent=self, name=name)
+      return Link.objects.exclude(name__in=Link.META_LINKS).get(parent=self, name=name)
 
   def get_child_link(self, name=None):
     return self.get_link(name)
@@ -556,9 +561,9 @@ class Node(models.Model):
 
   def get_children(self, name=None):
     if name is not None:
-      return [link.child for link in Link.objects.exclude(name='related').filter(parent=self, name=name)]
+      return [link.child for link in Link.objects.exclude(name__in=Link.META_LINKS).filter(parent=self, name=name)]
     else:
-      return [link.child for link in Link.objects.exclude(name='related').filter(parent=self)]
+      return [link.child for link in Link.objects.exclude(name__in=Link.META_LINKS).filter(parent=self)]
 
   def get_parent(self, name=None):
     if name is not None:
@@ -576,13 +581,13 @@ class Node(models.Model):
       return Link.objects.get(child=self)
 
   def get_parent_links(self):
-    return Link.objects.filter(child=self)
+    return Link.objects.filter(child=self).exclude(name__in=Link.META_LINKS)
 
   def get_children_links(self, name=None):
     if name is None:
-      return Link.objects.exclude(name='related').filter(parent=self)
+      return Link.objects.exclude(name__in=Link.META_LINKS).filter(parent=self)
     else:
-      return Link.objects.exclude(name='related').filter(parent=self, name=name)
+      return Link.objects.exclude(name__in=Link.META_LINKS).filter(parent=self, name=name)
 
   def get_template_name(self):
     return 'editor/gen/workflow-%s.xml.mako' % self.node_type
@@ -782,7 +787,7 @@ class Fork(ControlFlow):
   ACTION_DECISION_TYPE = 'decision'
 
   def has_decisions(self):
-    return self.get_children_links().exclude(name='related').exclude(comment='').exists()
+    return self.get_children_links().exclude(comment='').exists()
 
   def is_visible(self):
     return True
@@ -802,7 +807,7 @@ class Fork(ControlFlow):
     self.save()
 
   def update_description(self):
-    self.description = ', '.join(self.get_children_links().exclude(name='related').values_list('comment', flat=True))
+    self.description = ', '.join(self.get_children_links().values_list('comment', flat=True))
     self.save()
 
   def remove_join(self):
@@ -828,7 +833,7 @@ class Join(ControlFlow):
     return self.get_parent_link('related').parent.get_full_node()
 
   def get_parent_actions(self):
-    return [link.parent for link in self.get_parent_links().exclude(name='related')]
+    return [link.parent for link in self.get_parent_links()]
 
 
 
@@ -849,6 +854,8 @@ class Coordinator(Job):
   start = models.DateTimeField(default=datetime(2012, 07, 01, 0, 0))
   end = models.DateTimeField(default=datetime(2012, 07, 01, 0, 0) + timedelta(days=3))
   workflow = models.ForeignKey(Workflow, null=True)
+
+  HUE_ID = 'hue-id-w'
 
   def get_type(self):
     return 'coordinator'
@@ -976,6 +983,41 @@ class History(models.Model):
       view = 'oozie:list_oozie_coordinator'
 
     return reverse(view, kwargs={'job_id': self.oozie_job_id})
+
+  def get_workflow(self):
+    if self.oozie_job_id.endswith('W'):
+      return self.job
+
+  def get_coordinator(self):
+    if self.oozie_job_id.endswith('C'):
+      return self.job
+
+  @classmethod
+  def get_workflow_from_config(self, conf_dict):
+    try:
+      return Workflow.objects.get(id=conf_dict.get(Workflow.HUE_ID))
+    except Workflow.DoesNotExist:
+      pass
+
+  @classmethod
+  def get_coordinator_from_config(self, conf_dict):
+    try:
+      return Coordinator.objects.get(id=conf_dict.get(Coordinator.HUE_ID))
+    except Coordinator.DoesNotExist:
+      pass
+
+  @classmethod
+  def cross_reference_submission_history(cls, user, oozie_id, coordinator_job_id):
+    # Try do get the history
+    history = None
+    try:
+      history = History.objects.get(oozie_job_id=oozie_id)
+      if history.job.owner != user:
+        history = None
+    except History.DoesNotExist, ex:
+      pass
+
+    return history
 
 
 def find_parameters(instance, fields=None):

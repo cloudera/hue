@@ -126,6 +126,9 @@ class WorkflowAction(Action):
 
 
 class Job(object):
+  """
+  Accessing log and definition will trigger Oozie API calls.
+  """
   def __init__(self, api, json_dict):
     for attr in self._ATTRS:
       setattr(self, attr, json_dict.get(attr))
@@ -158,14 +161,14 @@ class Job(object):
       self.conf_dict = {}
 
   def _get_log(self):
-    """Get the log lazily"""
+    """Get the log lazily, trigger Oozie API call at the first access."""
     if self._log is None:
       self._log = self._api.get_job_log(self.id)
     return self._log
   log = property(_get_log)
 
   def _get_definition(self):
-    """Get the workflow definition lazily"""
+    """Get the definition lazily, trigger Oozie API call at the first access."""
     if self._definition is None:
       self._definition = self._api.get_job_definition(self.id)
     return self._definition

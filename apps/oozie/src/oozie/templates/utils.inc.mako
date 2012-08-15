@@ -62,11 +62,15 @@
 
 
 <%def name="hdfs_link(url)">
-  <% path = Hdfs.urlsplit(url)[2] %>
-  % if path:
-    <a href="/filebrowser/view${path}">${ url }</a>
+  % if url:
+    <% path = Hdfs.urlsplit(url)[2] %>
+    % if path:
+      <a href="/filebrowser/view${path}">${ url }</a>
+    % else:
+      ${ url }
+    % endif
   % else:
-    ${ url }
+      ${ url }
   % endif
 </%def>
 
