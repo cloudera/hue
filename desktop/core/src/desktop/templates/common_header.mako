@@ -38,9 +38,22 @@ from django.utils.translation import ugettext as _
   <![endif]-->
 
   <style type="text/css">
-    body {
-      padding-top: ${padding};
-    }
+    % if conf.CUSTOM.BANNER_TOP_HTML.get():
+      body {
+        padding-top: ${str(int(padding[:-2]) + 40) + 'px'};
+      }
+      .banner {
+        height: 40px;
+        padding: 0px;
+      }
+      .subnav-fixed {
+        top: 80px;
+      }
+    % else:
+      body {
+        padding-top: ${padding};
+      }
+    % endif
   </style>
 
   <script src="/static/ext/js/jquery/jquery-1.7.1.min.js"></script>
