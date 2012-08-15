@@ -133,6 +133,10 @@ h1 {
     margin: 0;
 }
 
+.form-inline input, .form-inline a {
+  vertical-align: baseline;
+}
+
 .pagination p {
     padding-top:6px;
 }

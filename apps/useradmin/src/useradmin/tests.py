@@ -23,6 +23,7 @@ Tests for "user admin"
 
 import urllib
 
+from nose.plugins.attrib import attr
 from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -34,7 +35,8 @@ from useradmin.models import HuePermission, GroupPermission, LdapGroup, UserProf
 from useradmin.models import get_profile
 
 import useradmin.conf
-from views import sync_ldap_users_and_groups, import_ldap_user, import_ldap_group, \
+from hadoop import pseudo_hdfs4
+from views import sync_ldap_users, sync_ldap_groups, import_ldap_user, import_ldap_group, \
                   add_ldap_user, add_ldap_group, sync_ldap_users_groups
 import ldap_access
 
@@ -243,7 +245,8 @@ def test_user_admin():
 
   reset_all_users()
   reset_all_groups()
-  c = make_logged_in_client(username="test", is_superuser=True)
+
+  c = make_logged_in_client('test', is_superuser=True)
 
   # Test basic output.
   response = c.get('/useradmin/')
@@ -374,7 +377,8 @@ def test_useradmin_ldap_integration():
   assert_true(get_profile(larry).creation_method == str(UserProfile.CreationMethod.EXTERNAL))
 
   # Should be a noop
-  sync_ldap_users_and_groups()
+  sync_ldap_users()
+  sync_ldap_groups()
   assert_equal(len(User.objects.all()), 1)
   assert_equal(len(Group.objects.all()), 0)
 
@@ -427,8 +431,7 @@ def test_add_ldap_user():
   # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
   ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
-
-  c = make_logged_in_client(username='test', is_superuser=True)
+  c = make_logged_in_client('test', is_superuser=True)
 
   assert_true(c.get(URL))
 
@@ -471,8 +474,81 @@ def test_sync_ldap_users_groups():
   # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
   ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
-
-  c = make_logged_in_client(username='test', is_superuser=True)
+  c = make_logged_in_client('test', is_superuser=True)
 
   assert_true(c.get(URL))
   assert_true(c.post(URL))
+
+@attr('requires_hadoop')
+def test_ensure_home_directory_add_ldap_user():
+  URL = reverse(add_ldap_user)
+
+  reset_all_users()
+  reset_all_groups()
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+  cluster = pseudo_hdfs4.shared_cluster()
+  c = make_logged_in_client(cluster.superuser, is_superuser=True)
+  cluster.fs.setuser(cluster.superuser)
+
+  assert_true(c.get(URL))
+
+  response = c.post(URL, dict(username='moe', password1='test', password2='test'))
+  assert_true('/useradmin/users' in response['Location'])
+  assert_false(cluster.fs.exists('/user/moe'))
+
+  # Try same thing with home directory creation.
+  response = c.post(URL, dict(username='curly', password1='test', password2='test', ensure_home_directory=True))
+  assert_true('/useradmin/users' in response['Location'])
+  assert_true(cluster.fs.exists('/user/curly'))
+
+  response = c.post(URL, dict(username='bad_name', password1='test', password2='test'))
+  assert_true('Could not' in response.context['form'].errors['username'][0])
+  assert_false(cluster.fs.exists('/user/bad_name'))
+
+  # See if moe, who did not ask for his home directory, has a home directory.
+  assert_false(cluster.fs.exists('/user/moe'))
+
+  # Clean up
+  cluster.fs.rmtree('/user/curly')
+
+@attr('requires_hadoop')
+def test_ensure_home_directory_sync_ldap_users_groups():
+  URL = reverse(sync_ldap_users_groups)
+
+  reset_all_users()
+  reset_all_groups()
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+  cluster = pseudo_hdfs4.shared_cluster()
+  c = make_logged_in_client(cluster.superuser, is_superuser=True)
+  cluster.fs.setuser(cluster.superuser)
+
+  response = c.post(reverse(add_ldap_user), dict(username='curly', password1='test', password2='test'))
+  assert_false(cluster.fs.exists('/user/curly'))
+  assert_true(c.post(URL, dict(ensure_home_directory=True)))
+  assert_true(cluster.fs.exists('/user/curly'))
+
+@attr('requires_hadoop')
+def test_ensure_home_directory():
+  reset_all_users()
+  reset_all_groups()
+
+  # Cluster and client for home directory creation
+  cluster = pseudo_hdfs4.shared_cluster()
+  c = make_logged_in_client(cluster.superuser, is_superuser=True)
+  cluster.fs.setuser(cluster.superuser)
+
+  # Create a user with a home directory
+  response = c.post('/useradmin/users/new', dict(username="test1", password1='test', password2='test', ensure_home_directory=True))
+  assert_true(cluster.fs.exists('/user/test1'))
+
+  # Create a user, then add their home directory
+  response = c.post('/useradmin/users/new', dict(username="test2", password1='test', password2='test'))
+  assert_false(cluster.fs.exists('/user/test2'))
+  response = c.post('/useradmin/users/edit/%s' % "test2", dict(username="test2", password1='test', password2='test', ensure_home_directory=True))
+  assert_true(cluster.fs.exists('/user/test2'))
