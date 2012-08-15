@@ -32,6 +32,7 @@ from django.core.urlresolvers import reverse
 from django.forms.util import ErrorList
 from django.shortcuts import redirect
 
+from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import GroupPermission, HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
 import ldap_access
@@ -44,7 +45,7 @@ __users_lock = threading.Lock()
 __groups_lock = threading.Lock()
 
 def list_users(request):
-  return render("list_users.mako", request, dict(users=User.objects.all()))
+  return render("list_users.mako", request, dict(users=User.objects.all(), request=request))
 
 def list_groups(request):
   return render("list_groups.mako", request, dict(groups=Group.objects.all()))
@@ -115,9 +116,13 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       error_messages = {'invalid': _("Whitespaces and ':' not allowed") })
   password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput, required=False)
   password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput, required=False)
+  ensure_home_directory = forms.BooleanField(label=_("Create Home Directory"),
+                                            help_text=_("Create home directory if one doesn't already exist."),
+                                            initial=True,
+                                            required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
-    fields = ["username", "first_name", "last_name", "email"]
+    fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
 
   def clean_password2(self):
     password1 = self.cleaned_data.get("password1", "")
@@ -186,7 +191,7 @@ def edit_user(request, username=None):
     form = form_class(request.POST, instance=instance)
     if form.is_valid(): # All validation rules pass
       if instance is None:
-        form.save()
+        instance = form.save()
       else:
         #
         # Check for 3 more conditions:
@@ -215,9 +220,15 @@ def edit_user(request, username=None):
         finally:
           __users_lock.release()
 
+      # Ensure home directory is created, if necessary.
+      if form.cleaned_data['ensure_home_directory']:
+        try:
+          ensure_home_directory(request.fs, instance.username)
+        except (IOError, WebHdfsException), e:
+          request.error(_('Cannot make home directory for user %s' % instance.username))
       return redirect(reverse(list_users))
   else:
-    form = form_class(instance=instance)
+    form = form_class(instance=instance, initial={'ensure_home_directory': False})
   return render('edit_user.mako', request, dict(form=form, action=request.path, username=username))
 
 def edit_group(request, name=None):
@@ -292,6 +303,10 @@ class AddLdapUserForm(forms.Form):
                                     "distinguished name."),
                           initial=False,
                           required=False)
+  ensure_home_directory = forms.BooleanField(label=_("Create Home Directory"),
+                                            help_text=_("Create home directory for user if one doesn't already exist."),
+                                            initial=True,
+                                            required=False)
 
   def clean(self):
     cleaned_data = super(AddLdapUserForm, self).clean()
@@ -325,6 +340,11 @@ def add_ldap_user(request):
       username = form.cleaned_data['username']
       import_by_dn = form.cleaned_data['dn']
       user = import_ldap_user(username, import_by_dn)
+      if form.cleaned_data['ensure_home_directory']:
+        try:
+          ensure_home_directory(request.fs, user.username)
+        except (IOError, WebHdfsException), e:
+          request.error(_("Cannot make home directory for user %s" % user.username))
 
       if user is None:
         errors = form._errors.setdefault('username', ErrorList())
@@ -352,6 +372,10 @@ class AddLdapGroupForm(forms.Form):
                                       help_text=_('Import unimported or new users from the group.'),
                                       initial=False,
                                       required=False)
+  ensure_home_directories = forms.BooleanField(label=_('Create home directories'),
+                                                help_text=_('Create home directories for every member imported, if members are being imported.'),
+                                                initial=True,
+                                                required=False)
 
   def clean(self):
     cleaned_data = super(AddLdapGroupForm, self).clean()
@@ -409,10 +433,32 @@ def sync_ldap_users_groups(request):
     raise PopupException(_("You must be a superuser to sync the LDAP users/groups."))
 
   if request.method == 'POST':
-    sync_ldap_users_and_groups()
-    return redirect(reverse(list_users))
-  else:
-    raise PopupException(_("POST request required in order to sync the LDAP users/groups."))
+    form = SyncLdapUsersGroupsForm(request.POST)
+    if form.is_valid():
+      users = sync_ldap_users()
+      groups = sync_ldap_groups()
+
+      # Create home dirs for every user sync'd
+      if form.cleaned_data['ensure_home_directory']:
+        for user in users:
+          try:
+            ensure_home_directory(request.fs, user.username)
+          except (IOError, WebHdfsException), e:
+            raise PopupException(_("The import may not be complete, sync again"), detail=e)
+      return redirect(reverse(list_users))
+
+  form = SyncLdapUsersGroupsForm()
+  return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form))
+
+def ensure_home_directory(fs, username):
+  """
+  Adds a users home directory if it doesn't already exist.
+
+  Throws WebHdfsException.
+  """
+  home_dir = '/user/%s' % username
+  if not fs.exists(home_dir):
+    fs.create_home_dir(home_dir)
 
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
@@ -570,21 +616,29 @@ def import_ldap_user(user, import_by_dn):
 def import_ldap_group(group, import_members, import_by_dn):
   return _import_ldap_group(group, import_members, import_by_dn)
 
-def sync_ldap_users_and_groups():
+def sync_ldap_users():
   """
-  Syncs LDAP user information and group memberships. This will not import new
-  users or groups from LDAP. It is also not possible to import both a user and a
+  Syncs LDAP user information. This will not import new
+  users from LDAP. It is also not possible to import both a user and a
   group at the same time. Each must be a separate operation. If neither a user,
   nor a group is provided, all users and groups will be synced.
   """
-  # Sync everything
   users = User.objects.filter(userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).all()
   for user in users:
     _import_ldap_user(user.username)
+  return users
 
+def sync_ldap_groups():
+  """
+  Syncs LDAP group memberships. This will not import new
+  groups from LDAP. It is also not possible to import both a user and a
+  group at the same time. Each must be a separate operation. If neither a user,
+  nor a group is provided, all users and groups will be synced.
+  """
   groups = Group.objects.filter(group__in=LdapGroup.objects.all())
   for group in groups:
     _import_ldap_group(group.name)
+  return groups
 
 class GroupEditForm(forms.ModelForm):
   """
@@ -690,4 +744,8 @@ def _make_model_field(initial, choices, multi=True):
       field.initial = initial.pk
   return field
 
-
+class SyncLdapUsersGroupsForm(forms.Form):
+  ensure_home_directory = forms.BooleanField(label=_("Create Home Directories"),
+                                            help_text=_("Create home directory for every user, if one doesn't already exist."),
+                                            initial=True,
+                                            required=False)

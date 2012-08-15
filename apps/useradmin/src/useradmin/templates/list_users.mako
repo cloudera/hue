@@ -31,7 +31,7 @@ ${layout.menubar(section='users', _=_)}
             %if user.is_superuser == True:
             <a href="${ url('useradmin.views.edit_user') }" class="btn">${_('Add user')}</a>
             <a href="${ url('useradmin.views.add_ldap_user') }" class="btn">${_('Add/Sync LDAP user')}</a>
-            <a href="#syncLdap" class="btn" data-toggle="modal">${_('Sync LDAP users/groups')}</a>
+            <a href="javascript:void(0)" class="btn confirmationModal" data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }">${_('Sync LDAP users/groups')}</a>
             %endif
         </div>
         <form class="form-search">
@@ -80,25 +80,7 @@ ${layout.menubar(section='users', _=_)}
         </tbody>
     </table>
 
-    <div id="syncLdap" class="modal hide fade">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h3>${_('Sync LDAP users and groups')}</h3>
-        </div>
-        <div class="modal-body">
-            <div class="alert alert-info">
-                ${_("This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced.")}
-                <br/>
-                ${_("All user information and group memberships will be updated based on the LDAP server's current state.")}
-            </div>
-        </div>
-        <div class="modal-footer">
-            <form action="${ url('useradmin.views.sync_ldap_users_groups') }" method="POST">
-                <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-                <input type="submit" class="btn primary" value="${_('Sync')}"/>
-             </form>
-        </div>
-    </div>
+    <div id="syncLdap" class="modal hide fade"></div>
 
     <div id="deleteUser" class="modal hide fade"></div>
 
