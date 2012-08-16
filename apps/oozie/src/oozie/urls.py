@@ -61,7 +61,6 @@ urlpatterns += patterns(
   url(r'^list_oozie_coordinators/$', 'list_oozie_coordinators', name='list_oozie_coordinators'),
   url(r'^list_oozie_workflow/(?P<job_id>[-\w]+)/(?P<coordinator_job_id>[-\w]+)?$', 'list_oozie_workflow', name='list_oozie_workflow'),
   url(r'^list_oozie_coordinator/(?P<job_id>[-\w]+)$', 'list_oozie_coordinator', name='list_oozie_coordinator'),
-  url(r'^list_oozie_coordinator_from_job/(?P<job_id>[-\w]+)$', 'list_oozie_coordinator_from_job', name='list_oozie_coordinator_from_job'),
   url(r'^list_oozie_workflow_action/(?P<action>[-\w@]+)$', 'list_oozie_workflow_action', name='list_oozie_workflow_action'),
   url(r'^manage_oozie_jobs/(?P<job_id>[-\w]+)/(?P<action>(start|suspend|resume|kill|rerun))$', 'manage_oozie_jobs', name='manage_oozie_jobs'),
 )

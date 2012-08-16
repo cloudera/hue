@@ -122,7 +122,6 @@ class OozieApi(object):
     if jobtype == 'wf':
       wf_list = WorkflowList(self, resp, filters=kwargs)
     else:
-      print resp
       wf_list = CoordinatorList(self, resp, filters=kwargs)
     return wf_list
 
