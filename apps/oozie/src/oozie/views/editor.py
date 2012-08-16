@@ -46,6 +46,17 @@ from oozie.conf import SHARE_JOBS
 LOG = logging.getLogger(__name__)
 
 
+"""
+Permissions:
+
+A Workflow/Coordinator can be accessed/submitted by its owner, a superuser or by anyone if its 'is_shared'
+property and SHARE_JOBS are set to True.
+
+A Workflow/Coordinator can be modified only by its owner or a superuser.
+
+Permissions checking happens by adding the decorators.
+"""
+
 def can_access_job(request, job_id):
   """
   Logic for testing if a user can access a certain Workflow / Coordinator.
@@ -54,15 +65,14 @@ def can_access_job(request, job_id):
     return
   try:
     job = Job.objects.select_related().get(pk=job_id).get_full_node()
-    if not SHARE_JOBS.get() and not request.user.is_superuser \
-      and job.owner != request.user.username:
-      # TODO is shared perms
+    if request.user.is_superuser or job.owner == request.user.username or (SHARE_JOBS.get() and job.is_shared):
+      return job
+    else:
       message = _("Permission denied. %(username)s don't have the permissions to access job %(id)s") % \
           {'username': request.user.username, 'id': job.id}
       access_warn(request, message)
       raise PopupException(message)
-    else:
-      return job
+
   except Job.DoesNotExist:
     raise PopupException(_('job %(id)s not found') % {'id': job_id})
 
@@ -77,24 +87,26 @@ def check_job_modification(request, job):
     raise PopupException(_('Not allowed to modified this job'))
 
 
-def check_job_modification_permission(view_func):
+def check_job_modification_permission(authorize_get=False):
   """
   Decorator ensuring that the user has the permissions to modify a workflow or coordinator.
 
   Need to appear below @check_job_access_permission
   """
-  def decorate(request, *args, **kwargs):
-    if 'workflow' in kwargs:
-      job_type = 'workflow'
-    else:
-      job_type = 'coordinator'
+  def inner(view_func):
+    def decorate(request, *args, **kwargs):
+      if 'workflow' in kwargs:
+        job_type = 'workflow'
+      else:
+        job_type = 'coordinator'
 
-    job = kwargs.get(job_type)
-    if job is not None:
-      check_job_modification(request, job)
+      job = kwargs.get(job_type)
+      if job is not None and not (authorize_get and request.method == 'GET'):
+        check_job_modification(request, job)
 
-    return view_func(request, *args, **kwargs)
-  return wraps(view_func)(decorate)
+      return view_func(request, *args, **kwargs)
+    return wraps(view_func)(decorate)
+  return inner
 
 
 def check_job_access_permission(view_func):
@@ -232,7 +244,7 @@ def edit_workflow(request, workflow):
 
 
 @check_job_access_permission
-@check_job_modification_permission
+@check_job_modification_permission()
 def delete_workflow(request, workflow):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
@@ -452,7 +464,7 @@ def create_coordinator(request, workflow=None):
 
 
 @check_job_access_permission
-@check_job_modification_permission
+@check_job_modification_permission(True)
 def edit_coordinator(request, coordinator):
   history = History.objects.filter(submitter=request.user, job=coordinator)
 
@@ -500,7 +512,7 @@ def edit_coordinator(request, coordinator):
 
 
 @check_job_access_permission
-@check_job_modification_permission
+@check_job_modification_permission()
 def create_coordinator_dataset(request, coordinator):
   """Returns {'status' 0/1, data:html or url}"""
 
@@ -531,7 +543,7 @@ def create_coordinator_dataset(request, coordinator):
 
 
 @check_job_access_permission
-@check_job_modification_permission
+@check_job_modification_permission()
 def create_coordinator_data(request, coordinator, data_type):
   """Returns {'status' 0/1, data:html or url}"""
 

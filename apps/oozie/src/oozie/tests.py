@@ -29,7 +29,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from liboozie import oozie_api
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
-  CoordinatorList
+  CoordinatorList, WorkflowAction
 
 from oozie.models import Workflow, Node, Job, Coordinator, Fork
 from oozie.conf import SHARE_JOBS
@@ -241,19 +241,32 @@ class TestEditor:
 
   def test_workflow_permissions(self):
     response = self.c.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-    assert_equal(200, response.status_code)
+    assert_true('Editor' in response.content, response.content)
+    assert_false(self.wf.is_shared)
 
     # Login as someone else
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
     grant_access("not_me", "test", "oozie")
 
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_workflows'))
+      assert_false('wf-name-1' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:list_workflows'))
+      assert_false('wf-name-1' in response.content, response.content)
+    finally:
+      finish()
 
-    # Edit
+    # View
     finish = SHARE_JOBS.set_for_testing(True)
     try:
       response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-      assert_equal(200, response.status_code)
-      assert_true('wf-name-1' in response.content, response.content)
+      assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
     finish = SHARE_JOBS.set_for_testing(False)
@@ -264,9 +277,20 @@ class TestEditor:
     finally:
       finish()
 
-    # Share
+    # Share it !
     self.wf.is_shared = True
     self.wf.save()
+
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_workflows'))
+      assert_equal(200, response.status_code)
+      assert_true('wf-name-1' in response.content, response.content)
+    finally:
+      finish()
+
+    # Edit
     finish = SHARE_JOBS.set_for_testing(True)
     try:
       response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
@@ -275,17 +299,117 @@ class TestEditor:
     finally:
       finish()
 
+    # Submit
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
+      assert_false('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = client_not_me.post(reverse('oozie:delete_workflow', args=[self.wf.id]))
-      assert_equal(200, response.status_code)
       assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
 
     response = self.c.post(reverse('oozie:delete_workflow', args=[self.wf.id]), follow=True)
     assert_equal(200, response.status_code)
+
+
+  def test_coordinator_permissions(self):
+    coord = create_coordinator(self.wf)
+
+    response = self.c.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+    assert_true('Editor' in response.content, response.content)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_coordinator'))
+      assert_false('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:list_coordinator'))
+      assert_false('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+
+    # View
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_false('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+
+    # Share it !
+    coord.is_shared = True
+    coord.save()
+
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_coordinator'))
+      assert_equal(200, response.status_code)
+      assert_true('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_equal(200, response.status_code)
+      assert_true('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+
+    # Submit
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
+      assert_false('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Delete
+    # TODO view!
+#    finish = SHARE_JOBS.set_for_testing(False)
+#    try:
+#      response = client_not_me.post(reverse('oozie:delete_coordinator', args=[coord.id]))
+#      assert_true('Permission denied' in response.content, response.content)
+#    finally:
+#      finish()
+#
+#    response = self.c.post(reverse('oozie:delete_coordinator', args=[coord.id]), follow=True)
+#    assert_equal(200, response.status_code)
 
 
   def test_coordinator_gen_xml(self):
@@ -456,6 +580,39 @@ class TestDashboard:
     assert_equal(0, data['status'])
 
 
+  def test_workflow_permissions(self):
+    response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]))
+    assert_true('WordCount1' in response.content, response.content)
+    assert_false('Permission denied' in response.content, response.content)
+
+    response = self.c.get(reverse('oozie:list_oozie_workflow_action', args=['XXX']))
+    assert_false('Permission denied' in response.content, response.content)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]))
+    assert_true('Permission denied' in response.content, response.content)
+
+    response = client_not_me.get(reverse('oozie:list_oozie_workflow_action', args=['XXX']))
+    assert_true('Permission denied' in response.content, response.content)
+
+
+  def test_coordinator_permissions(self):
+    response = self.c.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]))
+    assert_true('DailyWordCount1' in response.content, response.content)
+    assert_false('Permission denied' in response.content, response.content)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]))
+    assert_true('Permission denied' in response.content, response.content)
+
+
+
 class MockOozieApi:
   JSON_WORKFLOW_LIST = [{u'status': u'RUNNING', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'appName': u'WordCount1', u'lastModTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000012-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'toString': u'Workflow id[0000012-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'id': u'0000012-120725142744176-oozie-oozi-W', u'group': None, u'user': u'romain'},
                         {u'status': u'KILLED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'appName': u'WordCount2', u'lastModTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000011-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'toString': u'Workflow id[0000011-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'id': u'0000011-120725142744176-oozie-oozi-W', u'group': None, u'user': u'romain'},
@@ -469,6 +626,7 @@ class MockOozieApi:
                            {u'startTime': u'Sun, 01 Jul 2012 00:00:00 GMT', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coornidator application id[0000009-120706144403213-oozie-oozi-C] status[DONEWITHERROR]', u'consoleUrl': None, u'mat_throttling': 0, u'status': u'DONEWITHERROR', u'conf': None, u'user': u'romain', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/hue/jobsub/_romain_-design-2', u'timeUnit': u'DAY', u'coordJobId': u'0000009-120706144403213-oozie-oozi-C', u'coordJobName': u'DailyWordCount4', u'nextMaterializedTime': u'Thu, 05 Jul 2012 00:00:00 GMT', u'coordExternalId': None, u'acl': None, u'lastAction': u'Thu, 05 Jul 2012 00:00:00 GMT', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Wed, 04 Jul 2012 18:54:00 GMT'}]
   COORDINATOR_IDS = [coord['coordJobId'] for coord in JSON_COORDINATOR_LIST]
 
+  WORKFLOW_ACTION = {u'status': u'OK', u'retries': 0, u'transition': u'end', u'stats': None, u'startTime': u'Fri, 10 Aug 2012 05:24:21 GMT', u'toString': u'Action name[WordCount] status[OK]', u'cred': u'null', u'errorMessage': None, u'errorCode': None, u'consoleUrl': u'http://localhost:50030/jobdetails.jsp?jobid=job_201208072118_0044', u'externalId': u'job_201208072118_0044', u'externalStatus': u'SUCCEEDED', u'conf': u'<map-reduce xmlns="uri:oozie:workflow:0.2">\r\n  <job-tracker>localhost:8021</job-tracker>\r\n  <name-node>hdfs://localhost:8020</name-node>\r\n  <configuration>\r\n    <property>\r\n      <name>mapred.mapper.regex</name>\r\n      <value>dream</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.input.dir</name>\r\n      <value>/user/romain/words/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.dir</name>\r\n      <value>/user/romain/out/rrwords/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.mapper.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.RegexMapper</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.combiner.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.reducer.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.key.class</name>\r\n      <value>org.apache.hadoop.io.Text</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.value.class</name>\r\n      <value>org.apache.hadoop.io.LongWritable</value>\r\n    </property>\r\n  </configuration>\r\n</map-reduce>', u'type': u'map-reduce', u'trackerUri': u'localhost:8021', u'externalChildIDs': None, u'endTime': u'Fri, 10 Aug 2012 05:24:38 GMT', u'data': None, u'id': u'0000021-120807211836060-oozie-oozi-W@WordCount', u'name': u'WordCount'}
 
   def get_workflows(self, **kwargs):
     return WorkflowList(self, {'offset': 0, 'total': 4, 'workflows': MockOozieApi.JSON_WORKFLOW_LIST})
@@ -481,6 +639,9 @@ class MockOozieApi:
 
   def get_coordinator(self, job_id):
     return OozieCoordinator(self, MockOozieApi.JSON_COORDINATOR_LIST[0])
+
+  def get_action(self, action_id):
+    return WorkflowAction(MockOozieApi.WORKFLOW_ACTION)
 
   def job_control(self, job_id, action):
     return 'Done'
