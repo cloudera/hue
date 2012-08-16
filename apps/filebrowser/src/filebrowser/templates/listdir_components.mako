@@ -39,18 +39,23 @@ from django.utils.translation import ugettext as _
     %>
     href="?pagenum=${num}&pagesize=${pagesize}${sortby_param}${descending_param}${filter_param}"
 </%def>
+
 <%def name="prevpage(page)">
   ${pageref(page.previous_page_number())}
 </%def>
+
 <%def name="nextpage(page)">
   ${pageref(page.next_page_number())}
 </%def>
+
 <%def name="toppage(page)">
   ${pageref(1)}
 </%def>
+
 <%def name="bottompage(page)">
   ${pageref(page.num_pages())}
 </%def>
+
 <%def name="pagination(localpage)">
     <div class="pagination">
         <ul class="pull-right">
@@ -70,13 +75,13 @@ from django.utils.translation import ugettext as _
 <%def name="list_table_chooser(files, path, current_request_path)">
   ${_table(files, path, current_request_path, 'chooser')}
 </%def>
+
 <%def name="list_table_browser(files, path, current_request_path, cwd_set=True)">
   ${_table(files, path, current_request_path, 'view', cwd_set)}
 </%def>
+
 <%def name="_table(files, path, current_request_path, view, cwd_set=False)">
-    <script src="/static/ext/js/fileuploader.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-    <link rel="stylesheet" href="/static/ext/css/fileuploader.css" type="text/css" media="screen" title="no title" charset="utf-8" />
     <style type="text/css">
         .pull-right {
             margin: 4px;
@@ -91,7 +96,9 @@ from django.utils.translation import ugettext as _
             display: none;
         }
     </style>
-    %if len(files)>0 :
+
+    %if len(files) > 0:
+
     <table class="table table-condensed table-striped datatables">
         <thead>
             <tr>
@@ -188,7 +195,7 @@ from django.utils.translation import ugettext as _
         </div>
     %endif
 
-%if len(files)>0 :
+%if len(files) > 0:
     <!-- delete modal -->
     <div id="deleteModal" class="modal hide fade">
         <div class="modal-header">
@@ -229,19 +236,15 @@ from django.utils.translation import ugettext as _
         </form>
     </div>
 
-    <div id="changeOwnerModal" class="modal hide fade">
-    </div>
+    <div id="changeOwnerModal" class="modal hide fade"></div>
 
-    <div id="changePermissionModal" class="modal hide fade">
-    </div>
+    <div id="changePermissionModal" class="modal hide fade"></div>
 
-    <div id="moveModal" class="modal hide fade">
-    </div>
+    <div id="moveModal" class="modal hide fade"></div>
 %endif
 
 <!-- upload modal -->
 <div id="uploadModal" class="modal hide fade">
-    <form id="uploadForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Uploading to:')} <span id="uploadDirName">${current_dir_path}</span></h3>
@@ -256,10 +259,9 @@ from django.utils.translation import ugettext as _
         </form>
     </div>
     <div class="modal-footer"></div>
-    </form>
 </div>
 
-<!-- create directory modal -->
+<!-- new directory modal -->
 <div id="createDirectoryModal" class="modal hide fade">
     <form id="createDirectoryForm" action="/filebrowser/mkdir?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
     <div class="modal-header">
@@ -281,8 +283,7 @@ from django.utils.translation import ugettext as _
 </div>
 
 <script type="text/javascript" charset="utf-8">
-
-    %if len(files)>0 :
+    %if len(files) > 0 :
     // ajax modal windows
     function openChownWindow(path, user, group, next){
         $.ajax({
@@ -401,7 +402,7 @@ from django.utils.translation import ugettext as _
     $(document).ready(function(){
         var qs = getQueryString();
 
-    %if len(files)>0 :
+    %if len(files) > 0:
         if (qs["sortby"] == null){
             qs["sortby"] = "name";
         }

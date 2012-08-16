@@ -13,9 +13,8 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
-import datetime
-from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time, escape
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
@@ -24,6 +23,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="fb_components" file="fb_components.mako" />
 
 ${commonheader(_('File Browser'), 'filebrowser')}
+
 <div class="container-fluid">
     <h1>${_('File Browser')}</h1>
     % if breadcrumbs:
@@ -33,4 +33,5 @@ ${commonheader(_('File Browser'), 'filebrowser')}
         ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
     </div>
 </div>
-${commonfooter()}
+
+${commonfooter(messages)}
