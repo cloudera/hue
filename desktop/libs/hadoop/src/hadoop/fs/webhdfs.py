@@ -111,7 +111,7 @@ class WebHdfs(Hdfs):
         self._superuser = DEFAULT_HDFS_SUPERUSER
 
     return self._superuser
-  
+
   @property
   def user(self):
     try:
@@ -341,7 +341,7 @@ class WebHdfs(Hdfs):
       if "out of the range" in ex.message:
         return ""
       raise ex
-      
+
 
   def open(self, path, mode='r'):
     """
@@ -399,7 +399,7 @@ class WebHdfs(Hdfs):
 
     CHUNK_SIZE = 65536
     offset = 0
-    
+
     while True:
       data = self.read(src, offset, CHUNK_SIZE)
       if offset == 0:
@@ -498,6 +498,19 @@ class WebHdfs(Hdfs):
     res = self._root.get(params=params)
     return res['Token']['urlString']
 
+
+  def do_as_user(self, username, fn, *args, **kwargs):
+    prev_user = self.user
+
+    try:
+      self.setuser(username)
+      fn(*args, **kwargs)
+    finally:
+      self.setuser(prev_user)
+
+
+  def do_as_superuser(self, fn, *args, **kwargs):
+    self.do_as_user(self.superuser, fn, *args, **kwargs)
 
 
 class File(object):

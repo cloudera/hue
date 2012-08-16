@@ -18,25 +18,30 @@
 """
 Tests for filebrowser views
 """
-from django.utils.encoding import smart_str
-from nose.plugins.attrib import attr
-from hadoop import pseudo_hdfs4
-from avro import schema, datafile, io
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.django_util import PopupException
-from nose.tools import assert_true, assert_false, assert_equal, assert_raises
-from lib.rwx import expand_mode
-
 try:
   import json
 except ImportError:
   import simplejson as json
 
 import logging
+import os
 import re
 import urlparse
 
+from django.utils.encoding import smart_str
+from nose.plugins.attrib import attr
+from nose.tools import assert_true, assert_false, assert_equal, assert_raises
+
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access
+from hadoop import pseudo_hdfs4
+
+from avro import schema, datafile, io
+from lib.rwx import expand_mode
+
+
 LOG = logging.getLogger(__name__)
+
 
 @attr('requires_hadoop')
 def test_mkdir_singledir():
@@ -248,7 +253,7 @@ def test_listdir_sort_and_filter():
 
     listing = c.get('/filebrowser/view' + BASE + '?sortby=name&descending=true').context['files']
     assert_equal(sorted(expect, reverse=True), [ f['name'] for f in listing ])
-    
+
     # Check sorting (size)
     listing = c.get('/filebrowser/view' + BASE + '?sortby=size').context['files']
     assert_equal(expect, [ f['name'] for f in listing ])
@@ -599,27 +604,51 @@ def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
 def test_upload():
   """Test file upload"""
   cluster = pseudo_hdfs4.shared_cluster()
+
   try:
-    USER_NAME = cluster.fs.superuser
-    cluster.fs.setuser(USER_NAME)
-    DEST = "/tmp/fb-upload-test"
+    USER_NAME = 'test'
+    USER_NAME_NOT_ME = 'not_me'
+    HDFS_DEST_DIR = "/tmp/fb-upload-test"
+    LOCAL_FILE = __file__
+    HDFS_FILE = HDFS_DEST_DIR + '/' + os.path.basename(__file__)
+
     client = make_logged_in_client(USER_NAME)
+
+    client_not_me = make_logged_in_client(username=USER_NAME_NOT_ME, is_superuser=False, groupname='test')
+    grant_access(USER_NAME_NOT_ME, "test", "filebrowser")
+
+    cluster.fs.do_as_superuser(cluster.fs.mkdir, HDFS_DEST_DIR)
+    cluster.fs.do_as_superuser(cluster.fs.chown, HDFS_DEST_DIR, USER_NAME, USER_NAME)
+    cluster.fs.do_as_superuser(cluster.fs.chmod, HDFS_DEST_DIR, 0700)
 
     # Just upload the current python file
     resp = client.post('/filebrowser/upload',
-                       dict(dest=DEST, hdfs_file=file(__file__)))
+                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+    response = json.loads(resp.content)
 
-    assert_true("View uploaded file" in resp.content)
-    stats = cluster.fs.stats(DEST)
+    assert_equal(0, response['status'], response)
+    stats = cluster.fs.stats(HDFS_FILE)
     assert_equal(stats['user'], USER_NAME)
     assert_equal(stats['group'], USER_NAME)
 
-    f = cluster.fs.open(DEST)
+    f = cluster.fs.open(HDFS_FILE)
     actual = f.read()
-    expected = file(__file__).read()
+    expected = file(LOCAL_FILE).read()
     assert_equal(actual, expected)
+
+    # Upload again and so fails because file already exits
+    resp = client.post('/filebrowser/upload',
+                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(-1, response['status'], response)
+
+    # Upload in tmp and fails because of missing permissions
+    resp = client_not_me.post('/filebrowser/upload',
+                              dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(-1, response['status'], response)
   finally:
     try:
-      cluster.fs.remove(DEST)
+      cluster.fs.remove(HDFS_DEST_DIR)
     except Exception, ex:
       pass

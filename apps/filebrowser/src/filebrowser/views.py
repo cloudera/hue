@@ -27,7 +27,10 @@ import operator
 import posixpath
 import stat as stat_module
 import os
-import simplejson
+try:
+  import json
+except ImportError:
+  import simplejson as json
 
 from django.contrib import messages
 from django.core import urlresolvers
@@ -854,82 +857,87 @@ def upload_flash(request):
         else:
             raise Exception("Unknown error")
     except Exception, e:
-        return HttpResponse(simplejson.dumps(dict(error=unicode(e))),
+        return HttpResponse(json.dumps(dict(error=unicode(e))),
                             content_type="application/json")
 
 
 def upload(request):
     """
-    A wrapper around the actual upload view function to clean up the
-    temporary file afterwards.
+    A wrapper around the actual upload view function to clean up the temporary file afterwards.
+
+    Returns JSON.
+    e.g. {'status' 0/1, data:'message'...}
     """
-    try:
-        return _upload(request)
-    finally:
-        if request.method == 'POST':
+    response = {'status': -1, 'data': ''}
+
+    if request.method == 'POST':
+        try:
             try:
-                upload_file = request.FILES['hdfs_file']
-                upload_file.remove()
-            except KeyError:
-                pass
+                resp = _upload(request)
+                response.update(resp)
+            except Exception, ex:
+                response['data'] = str(ex)
+        finally:
+            hdfs_file = request.FILES.get('hdfs_file')
+            if hdfs_file:
+                hdfs_file.remove()
+    else:
+        response['data'] = _('A POST request is required.')
+
+    if response['status'] == 0:
+        request.info(_('%(destination)s upload succeded') % {'destination': response['path']})
+    else:
+        request.error(_('Upload failed: %(data)s') % {'data': response['data']})
+
+    return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 def _upload(request):
     """
-    Handles file uploads. The uploaded file is stored in HDFS. We just
-    need to rename it to the right path.
+    Handles file uploaded by HDFSfileUploadHandler.
+    The uploaded file is stored in HDFS. We just need to rename it to the destination path.
     """
-    if request.method == 'POST':
-        form = UploadForm(request.POST, request.FILES)
-        if not form.is_valid():
-            logger.error("Error in upload form: %s" % (form.errors,))
-        else:
-            uploaded_file = request.FILES['hdfs_file']
-            dest = form.cleaned_data["dest"]
-            if request.fs.isdir(dest):
-                assert posixpath.sep not in uploaded_file.name
-                dest = request.fs.join(dest, uploaded_file.name)
+    form = UploadForm(request.POST, request.FILES)
 
+    if form.is_valid():
+        uploaded_file = request.FILES['hdfs_file']
+        dest = form.cleaned_data['dest']
+
+        if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
+            raise PopupException(_('Sorry, no "%(sep)s" in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
+
+        dest = request.fs.join(dest, uploaded_file.name)
+        tmp_file = uploaded_file.get_temp_path()
+        username = request.user.username
+
+        try:
             # Temp file is created by superuser. Chown the file.
-            tmp_file = uploaded_file.get_temp_path()
-            username = request.user.username
-            try:
-                try:
-                    request.fs.setuser(request.fs.superuser)
-                    request.fs.chmod(tmp_file, 0644)
-                    request.fs.chown(tmp_file, username, username)
-                except IOError, ex:
-                    msg = _('Failed to chown uploaded file ("%(file)s") as superuser %(superuser)s.') %\
-                          {'file': tmp_file, 'superuser': request.fs.superuser}
-                    logger.exception(msg)
-                    raise PopupException(msg, detail=str(ex))
-            finally:
-                request.fs.setuser(username)
+            request.fs.do_as_superuser(request.fs.chmod, tmp_file, 0644)
+            request.fs.do_as_superuser(request.fs.chown, tmp_file, username, username)
 
             # Move the file to where it belongs
+            request.fs.rename(uploaded_file.get_temp_path(), dest)
+        except IOError, ex:
+            already_exists = False
             try:
-                request.fs.rename(uploaded_file.get_temp_path(), dest)
-            except IOError, ex:
-                raise PopupException(
-                    _('Failed to rename uploaded temporary file ("%(file)s") to "%(name)s": %(error)s') %
-                    {'file': tmp_file, 'name': dest, 'error': ex})
+                already_exists = request.fs.exists(dest)
+            except Exception:
+              pass
+            if already_exists:
+                msg = _('Destination %(name)s already exists.' % {'name': dest})
+            else:
+                msg = _('Copy to "%(name)s failed: %(error)s') % {'name': dest, 'error': ex}
+            raise PopupException(msg)
 
-            dest_stats = request.fs.stats(dest)
-            return render('upload_done.mako', request, {
-                # status is used by "fancy uploader"
-                'status': 1,
-                'path': dest,
-                'result': _massage_stats(request, dest_stats),
-                'next': request.GET.get("next")
-            })
+        return {
+          'status': 0,
+          'path': dest,
+          'result': _massage_stats(request, request.fs.stats(dest)),
+          'next': request.GET.get("next")
+          }
     else:
-        dest = request.GET.get("dest")
-        initial_values = {}
-        if dest:
-            initial_values["dest"] = dest
-        form = UploadForm(initial=initial_values)
-    return render('upload.mako', request,
-            {'form': form, 'next': request.REQUEST.get("dest")})
+        raise PopupException(_("Error in upload form: %s") % (form.errors,))
+
 
 
 def status(request):

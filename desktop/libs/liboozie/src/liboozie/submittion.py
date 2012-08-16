@@ -146,11 +146,12 @@ class Submission(object):
         self.fs.copyfile(file, self.fs.join(lib_path, self.fs.basename(file)))
 
   def _do_as(self, username, fn, *args, **kwargs):
-    curr_user = self.fs.setuser(username)
+    prev_user = self.fs.user
     try:
+      self.fs.setuser(username)
       fn(*args, **kwargs)
     finally:
-      self.fs.setuser(curr_user)
+      self.fs.setuser(prev_user)
 
   def remove_deployment_dir(self):
     """Delete the workflow deployment directory."""
