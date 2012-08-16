@@ -321,6 +321,48 @@ for x in sys.stdin:
       assert_equal(bex.errorCode, 11)
       assert_equal(bex.SQLState, "42000")
 
+  def test_fetch_configuration(self):
+    class MockClient:
+      """Check if sent fetch correctly supports start_over."""
+      def __init__(self, support_start_over):
+        self.support_start_over = support_start_over
+
+      def fetch(self, query_id, start_over, fetch_size):
+        assert_equal(self.support_start_over, start_over)
+        class Result: pass
+        res = Result()
+        res.ready = False
+        return res
+
+    class ConfigVariable:
+      def __init__(self, **entries):
+        self.__dict__.update(entries)
+
+    client = beeswax.db_utils.db_client()
+
+    prev_get_default_configuration = client.get_default_configuration
+    prev_client = client._client
+
+    try:
+      client._client = MockClient(True)
+      client.get_default_configuration = lambda a: []
+      client.fetch(None, True, 5)
+
+      client._client = MockClient(False)
+      client.get_default_configuration = lambda a: []
+      client.fetch(None, False, 5)
+
+      client._client = MockClient(True)
+      client.get_default_configuration = lambda a: [ConfigVariable(key='support_start_over', value='true')]
+      client.fetch(None, True, 5)
+
+      client._client = MockClient(False)
+      client.get_default_configuration = lambda a: [ConfigVariable(key='support_start_over', value='false')]
+      client.fetch(None, True, 5)
+    finally:
+      client.get_default_configuration = prev_get_default_configuration
+      client._client = prev_client
+
 
   def test_parameterization(self):
     """

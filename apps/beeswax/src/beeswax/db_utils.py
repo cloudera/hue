@@ -64,7 +64,7 @@ def execute_directly(user, query_msg, design=None, notify=False):
   # Now submit it
   try:
     handle = db_client().query(query_msg)
-    if not handle or not handle.id or not handle.log_context:
+    if not handle or not handle.id:
       # It really shouldn't happen
       msg = _("BeeswaxServer returning invalid handle for query id %(id)d [%(query)s]...") % \
             {'id': query_history.id, 'query': query_msg.query[:40]}
@@ -178,6 +178,13 @@ def db_client():
       return _decode_struct_attr(res, 'textual')
 
     def fetch(self, *args, **kwargs):
+      no_start_over_support = [ config_variable for config_variable in self.get_default_configuration(False)
+                                if config_variable.key == 'support_start_over' and config_variable.value == 'false' ]
+      if no_start_over_support:
+        copy = list(args)
+        copy[1] = False
+        args = copy
+
       res = self._client.fetch(*args, **kwargs)
       if res.ready:
         res.columns = [ force_unicode(col, errors='replace') for col in res.columns ]
