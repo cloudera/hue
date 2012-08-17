@@ -189,10 +189,11 @@ class TestEditor:
     response = self.c.post(reverse('oozie:clone_workflow', args=[self.wf.id]), {}, follow=True)
 
     assert_equal(workflow_count + 1, Workflow.objects.count(), response)
+
     wf2 = Workflow.objects.latest('id')
+    assert_not_equal(self.wf.id, wf2.id)
     assert_equal(self.wf.node_set.count(), wf2.node_set.count())
 
-    assert_not_equal(self.wf.id, wf2.id)
     node_ids = set(self.wf.node_set.values_list('id', flat=True))
     for node in wf2.node_set.all():
       assert_false(node.id in node_ids)
@@ -374,6 +375,33 @@ class TestEditor:
 
     response = self.c.post(reverse('oozie:delete_workflow', args=[self.wf.id]), follow=True)
     assert_equal(200, response.status_code)
+
+
+  def test_clone_coordinator(self):
+    coord = create_coordinator(self.wf)
+    coordinator_count = Coordinator.objects.count()
+
+    response = self.c.post(reverse('oozie:clone_coordinator', args=[coord.id]), {}, follow=True)
+
+    wf2 = Coordinator.objects.latest('id')
+    assert_not_equal(coord.id, wf2.id)
+    assert_equal(coordinator_count + 1, Coordinator.objects.count(), response)
+
+    assert_equal(coord.dataset_set.count(), wf2.dataset_set.count())
+    assert_equal(coord.datainput_set.count(), wf2.datainput_set.count())
+    assert_equal(coord.dataoutput_set.count(), wf2.dataoutput_set.count())
+
+    ds_ids = set(coord.dataset_set.values_list('id', flat=True))
+    for node in wf2.dataset_set.all():
+      assert_false(node.id in ds_ids)
+
+    data_input_ids = set(coord.datainput_set.values_list('id', flat=True))
+    for node in wf2.datainput_set.all():
+      assert_false(node.id in data_input_ids)
+
+    data_output_ids = set(coord.dataoutput_set.values_list('id', flat=True))
+    for node in wf2.dataoutput_set.all():
+      assert_false(node.id in data_output_ids)
 
 
   def test_coordinator_permissions(self):

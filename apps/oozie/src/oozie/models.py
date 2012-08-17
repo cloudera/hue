@@ -864,6 +864,45 @@ class Coordinator(Job):
     tmpl = "editor/gen/coordinator.xml.mako"
     return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self}))
 
+  def clone(self, new_owner=None):
+    datasets = Dataset.objects.filter(coordinator=self)
+    data_inputs = DataInput.objects.filter(coordinator=self)
+    data_outputs = DataOutput.objects.filter(coordinator=self)
+
+    copy = self
+    copy.pk = None
+    copy.id = None
+    copy.name += '-copy'
+    if new_owner is not None:
+      copy.owner = new_owner
+    copy.save()
+
+    old_dataset_mapping = {}
+
+    for dataset in datasets:
+      prev_id = dataset.id
+      dataset.pk = None
+      dataset.id = None
+      dataset.coordinator = copy
+      dataset.save()
+      old_dataset_mapping[prev_id] = dataset
+
+    for data_input in data_inputs:
+      data_input.pk = None
+      data_input.id = None
+      data_input.coordinator = copy
+      data_input.dataset = old_dataset_mapping[data_input.dataset.id]
+      data_input.save()
+
+    for data_output in data_outputs:
+      data_output.pk = None
+      data_output.id = None
+      data_output.coordinator = copy
+      data_output.dataset = old_dataset_mapping[data_output.dataset.id]
+      data_output.save()
+
+    return copy
+
   @classmethod
   def get_application_path_key(cls):
     return 'oozie.coord.application.path'

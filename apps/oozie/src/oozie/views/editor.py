@@ -468,7 +468,7 @@ def delete_coordinator(request, coordinator):
   coordinator.delete()
   Submission(coordinator, request.fs, {}).remove_deployment_dir()
   request.info(_('Coordinator deleted!'))
-  
+
   return redirect(reverse('oozie:list_workflows'))
 
 
@@ -584,6 +584,18 @@ def create_coordinator_data(request, coordinator, data_type):
                               'coordinator': coordinator,
                               'form': data_form, },
                               force_template=True).content
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@check_job_access_permission
+def clone_coordinator(request, coordinator):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  clone = coordinator.clone(request.user)
+
+  response = {'url': reverse('oozie:edit_coordinator', kwargs={'coordinator': clone.id})}
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
