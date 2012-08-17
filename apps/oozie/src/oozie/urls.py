@@ -43,6 +43,7 @@ urlpatterns = patterns(
   url(r'^create_coordinator/(?P<workflow>[-\w]+)?$', 'create_coordinator', name='create_coordinator'),
   url(r'^edit_coordinator/(?P<coordinator>[-\w]+)$', 'edit_coordinator', name='edit_coordinator'),
   url(r'^delete_coordinator/(?P<coordinator>\d+)$', 'delete_coordinator', name='delete_coordinator'),
+  url(r'^clone_coordinator/(?P<coordinator>\d+)$', 'clone_coordinator', name='clone_coordinator'),
   url(r'^create_coordinator_dataset/(?P<coordinator>[-\w]+)$', 'create_coordinator_dataset', name='create_coordinator_dataset'),
   url(r'^create_coordinator_data/(?P<coordinator>[-\w]+)/(?P<data_type>(input|output))$', 'create_coordinator_data', name='create_coordinator_data'),
   url(r'^submit_coordinator/(?P<coordinator>\d+)$', 'submit_coordinator', name='submit_coordinator'),

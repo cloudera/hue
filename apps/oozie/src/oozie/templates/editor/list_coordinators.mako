@@ -73,7 +73,7 @@ ${ layout.menubar(section='coordinators') }
                   data-param-url="${ url('oozie:workflow_parameters', workflow=coordinator.id) }"
                   data-delete-url="${ url('oozie:delete_coordinator', coordinator=coordinator.id) }"
               % endif
-                  data-clone-url="${ url('oozie:clone_workflow', workflow=coordinator.id) }"
+                  data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }"
                   data-bundle-url="${ url('oozie:create_coordinator') }"
                   data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }"
               >
@@ -243,6 +243,15 @@ ${ layout.menubar(section='coordinators') }
         $("#deleteWfForm").attr("action", _action);
         $("#deleteWfMessage").text(_this.attr("alt"));
         $("#deleteWf").modal("show");
+    });
+
+    $("#clone-btn").click(function(e){
+        var _this = $('input[name=action]:checked');
+        var _url = _this.attr("data-clone-url");
+
+      $.post(_url, function(data) {
+        window.location = data.url;
+      });
     });
 
     $("#deleteWf .hideModal").click(function(){
