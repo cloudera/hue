@@ -30,7 +30,7 @@ class MockFile:
 
 def test_url_error_rest_exception():
   exception = RestException(URLError('My error'))
-  assert_equal(None, exception._headers)
+  assert_equal({}, exception._headers)
 
 
 def test_http_error_rest_exception():
