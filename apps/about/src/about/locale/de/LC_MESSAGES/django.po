@@ -1,25 +1,14 @@
-## Licensed to Cloudera, Inc. under one
-## or more contributor license agreements.  See the NOTICE file
-## distributed with this work for additional information
-## regarding copyright ownership.  Cloudera, Inc. licenses this file
-## to you under the Apache License, Version 2.0 (the
-## "License"); you may not use this file except in compliance
-## with the License.  You may obtain a copy of the License at
-##
-##     http://www.apache.org/licenses/LICENSE-2.0
-##
-## Unless required by applicable law or agreed to in writing, software
-## distributed under the License is distributed on an "AS IS" BASIS,
-## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-## See the License for the specific language governing permissions and
-## limitations under the License.
+# German translations for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-#, fuzzy
+
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2012-07-30 19:07-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -31,17 +20,17 @@ msgstr ""
 
 #: src/about/templates/index.mako:20
 msgid "About Hue"
-msgstr ""
+msgstr "Über Hue"
 
 #: src/about/templates/index.mako:25
 msgid "Configuration"
-msgstr ""
+msgstr "Konfiguration"
 
 #: src/about/templates/index.mako:26
 msgid "Check for misconfiguration"
-msgstr ""
+msgstr "Auf Fehlkonfiguration prüfen"
 
 #: src/about/templates/index.mako:27
 msgid "Server Logs"
-msgstr ""
+msgstr "Server-Protokolle"
 

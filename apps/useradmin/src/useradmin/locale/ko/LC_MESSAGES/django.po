@@ -1,25 +1,14 @@
-## Licensed to Cloudera, Inc. under one
-## or more contributor license agreements.  See the NOTICE file
-## distributed with this work for additional information
-## regarding copyright ownership.  Cloudera, Inc. licenses this file
-## to you under the Apache License, Version 2.0 (the
-## "License"); you may not use this file except in compliance
-## with the License.  You may obtain a copy of the License at
-##
-##     http://www.apache.org/licenses/LICENSE-2.0
-##
-## Unless required by applicable law or agreed to in writing, software
-## distributed under the License is distributed on an "AS IS" BASIS,
-## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-## See the License for the specific language governing permissions and
-## limitations under the License.
+# Korean translations for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-#, fuzzy
+
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 18:43-0700\n"
+"POT-Creation-Date: 2012-07-30 19:07-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -32,455 +21,449 @@ msgstr ""
 #: src/useradmin/models.py:124
 #, python-format
 msgid "You do not have permissions to %(description)s."
-msgstr ""
+msgstr "%(description)s에 대한 권한이 없습니다."
 
 #: src/useradmin/views.py:57
 msgid "You must be a superuser to delete users."
-msgstr ""
+msgstr "사용자를 삭제하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:64
 msgid "You cannot remove yourself."
-msgstr ""
+msgstr "자신을 제거할 수는 없습니다."
 
 #: src/useradmin/views.py:75
 msgid "User not found."
-msgstr ""
+msgstr "사용자를 찾을 수 없습니다."
 
 #: src/useradmin/views.py:79
 msgid "Delete user?"
-msgstr ""
+msgstr "사용자를 삭제하시겠습니까?"
 
 #: src/useradmin/views.py:83
 msgid "You must be a superuser to delete groups."
-msgstr ""
+msgstr "그룹을 삭제하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:95
 msgid "The default user group may not be deleted."
-msgstr ""
+msgstr "기본 사용자 그룹은 삭제할 수 없습니다."
 
 #: src/useradmin/views.py:103
 msgid "Group not found."
-msgstr ""
+msgstr "그룹을 찾을 수 없습니다."
 
 #: src/useradmin/views.py:107
 msgid "Delete group?"
-msgstr ""
+msgstr "그룹을 삭제하시겠습니까?"
 
 #: src/useradmin/views.py:115 src/useradmin/views.py:288
 #: src/useradmin/templates/list_users.mako:44
 msgid "Username"
-msgstr ""
+msgstr "사용자 이름"
 
 #: src/useradmin/views.py:118 src/useradmin/views.py:291
 msgid "Required. 30 characters or fewer. No whitespaces or colons."
-msgstr ""
+msgstr "필수 입력 항목입니다. 30자 이하로 입력하십시오. 공백이나 콜론은 허용되지 않습니다."
 
 #: src/useradmin/views.py:119 src/useradmin/views.py:292
 #: src/useradmin/views.py:348
 msgid "Whitespaces and ':' not allowed"
-msgstr ""
+msgstr "공백과 ':'은 허용되지 않습니다."
 
 #: src/useradmin/views.py:120
 msgid "Password"
-msgstr ""
+msgstr "암호"
 
 #: src/useradmin/views.py:121
 msgid "Password confirmation"
-msgstr ""
+msgstr "암호 확인"
 
 #: src/useradmin/views.py:130
 msgid "Passwords do not match."
-msgstr ""
+msgstr "암호가 일치하지 않습니다."
 
 #: src/useradmin/views.py:136
 msgid "You must specify a password when creating a new user."
-msgstr ""
+msgstr "새 사용자를 생성할 때 암호를 지정해야 합니다."
 
 #: src/useradmin/views.py:178
 msgid "You must be a superuser to add or edit another user."
-msgstr ""
+msgstr "다른 사용자를 추가하거나 편집하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:202
 msgid "You cannot make yourself inactive."
-msgstr ""
+msgstr "자신을 비활성화할 수는 없습니다."
 
 #: src/useradmin/views.py:214
 msgid "You cannot make yourself a superuser."
-msgstr ""
+msgstr "자신을 superuser로 지정할 수는 없습니다."
 
 #: src/useradmin/views.py:238
 msgid "You must be a superuser to add or edit a group."
-msgstr ""
+msgstr "그룹을 추가하거나 편집하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:270
 msgid "You must be a superuser to change permissions."
-msgstr ""
+msgstr "권한을 변경하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:293 src/useradmin/views.py:349
 msgid "Distinguished name"
-msgstr ""
+msgstr "고유 이름"
 
 #: src/useradmin/views.py:294
 #: src/useradmin/management/commands/import_ldap_group.py:35
 #: src/useradmin/management/commands/import_ldap_user.py:33
 msgid "Whether or not the user should be imported by distinguished name."
-msgstr ""
+msgstr "사용자를 고유 이름별로 가져올지 여부입니다."
 
 #: src/useradmin/views.py:306
 #, python-format
 msgid "Too long: 30 characters or fewer and not %(username)s"
-msgstr ""
+msgstr "너무 깁니다. 30자 이하여야 하며, %(username)s은(는) 허용되지 않습니다."
 
 #: src/useradmin/views.py:323
 msgid "You must be a superuser to add another user."
-msgstr ""
+msgstr "다른 사용자를 추가하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:334
 #, python-format
 msgid "Could not get LDAP details for user %(username)s"
-msgstr ""
+msgstr "사용자 %(username)s의 LDAP 정보를 가져오지 못했습니다."
 
 #: src/useradmin/views.py:346
-msgid ""
-"Required. 30 characters or fewer. May only contain letters, numbers, "
-"hyphens or underscores."
-msgstr ""
+msgid "Required. 30 characters or fewer. May only contain letters, numbers, hyphens or underscores."
+msgstr "필수 입력 항목입니다. 30자 이하로 입력하십시오. 문자, 숫자, 하이픈, 밑줄만 포함될 수 있습니다."
 
 #: src/useradmin/views.py:350
 msgid "Whether or not the group should be imported by distinguished name."
-msgstr ""
+msgstr "그룹을 고유 이름별로 가져올지 여부입니다."
 
 #: src/useradmin/views.py:354
 msgid "Import new members"
-msgstr ""
+msgstr "새 구성원 가져오기"
 
 #: src/useradmin/views.py:355
 msgid "Import unimported or new users from the group."
-msgstr ""
+msgstr "그룹에서 새 사용자 또는 가져오지 않은 사용자를 가져옵니다."
 
 #: src/useradmin/views.py:366
 #, python-format
 msgid "Too long: 30 characters or fewer and not %(name)s"
-msgstr ""
+msgstr "너무 깁니다. 30자 이하여야 하며, %(name)s은(는) 허용되지 않습니다."
 
 #: src/useradmin/views.py:384
 msgid "You must be a superuser to add another group."
-msgstr ""
+msgstr "다른 그룹을 추가하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:396
 #, python-format
 msgid "Could not get LDAP details for group %(groupname)s"
-msgstr ""
+msgstr "그룹 %(groupname)s의 LDAP 정보를 가져오지 못했습니다."
 
 #: src/useradmin/views.py:412
 msgid "You must be a superuser to sync the LDAP users/groups."
-msgstr ""
+msgstr "LDAP 사용자/그룹을 동기화하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:418
 msgid "POST request required in order to sync the LDAP users/groups."
-msgstr ""
+msgstr "LDAP 사용자/그룹을 동기화하려면 POST 요청이 필요합니다."
 
 #: src/useradmin/views.py:429
 msgid "No active superuser configured."
-msgstr ""
+msgstr "구성된 활성 superuser가 없습니다."
 
 #: src/useradmin/views.py:431
 msgid "You cannot remove the last active superuser from the configuration."
-msgstr ""
+msgstr "구성에서 마지막 활성 superuser는 제거할 수 없습니다."
 
 #: src/useradmin/views.py:606
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
-msgstr ""
+msgstr "그룹 이름에는 문자, 숫자, 하이픈, 밑줄만 포함될 수 있습니다."
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
-msgstr ""
+msgstr "그룹에서 사용자를 가져옵니다."
 
 #: src/useradmin/management/commands/import_ldap_group.py:48
 msgid "A group name must be provided."
-msgstr ""
+msgstr "그룹 이름은 반드시 입력해야 합니다."
 
 #: src/useradmin/management/commands/import_ldap_user.py:43
 msgid "A username must be provided."
-msgstr ""
+msgstr "사용자 이름은 반드시 입력해야 합니다."
 
 #: src/useradmin/management/commands/useradmin_sync_with_unix.py:31
 msgid "Minimum UID to import (Inclusive)."
-msgstr ""
+msgstr "가져올 최소 UID입니다(포함)."
 
 #: src/useradmin/management/commands/useradmin_sync_with_unix.py:32
 msgid "Maximum UID to import (Exclusive)."
-msgstr ""
+msgstr "가져올 최대 UID입니다(제외)."
 
 #: src/useradmin/management/commands/useradmin_sync_with_unix.py:33
 msgid "Minimum GID to import (Inclusive)."
-msgstr ""
+msgstr "가져올 최소 GID입니다(포함)."
 
 #: src/useradmin/management/commands/useradmin_sync_with_unix.py:34
 msgid "Maximum GID to import (Exclusive)."
-msgstr ""
+msgstr "가져올 최대 GID입니다(제외)."
 
 #: src/useradmin/management/commands/useradmin_sync_with_unix.py:35
 msgid "Whether or not to check that the user's shell is not /bin/false."
-msgstr ""
+msgstr "사용자의 Shell이 /bin/false가 아닌지를 확인하는 검사 수행 여부입니다."
 
 #: src/useradmin/templates/confirm.mako:22
 msgid "Confirm"
-msgstr ""
+msgstr "확인"
 
 #: src/useradmin/templates/confirm.mako:25
 #: src/useradmin/templates/list_groups.mako:77
 #: src/useradmin/templates/list_users.mako:110
 msgid "Yes"
-msgstr ""
+msgstr "예"
 
 #: src/useradmin/templates/edit_group.mako:26
 #: src/useradmin/templates/list_groups.mako:24
 #: src/useradmin/templates/list_groups.mako:28
 msgid "Hue Groups"
-msgstr ""
+msgstr "Hue 그룹"
 
 #: src/useradmin/templates/edit_group.mako:47
 #, python-format
 msgid "Hue Groups - Edit group: %(name)s"
-msgstr ""
+msgstr "Hue 그룹 - 그룹 편집: %(name)s"
 
 #: src/useradmin/templates/edit_group.mako:50
 msgid "Hue Groups - Add/Sync LDAP group"
-msgstr ""
+msgstr "Hue 그룹 - LDAP 그룹 추가/동기화"
 
 #: src/useradmin/templates/edit_group.mako:52
 msgid "Hue Groups - Create group"
-msgstr ""
+msgstr "Hue 그룹 - 그룹 생성"
 
 #: src/useradmin/templates/edit_group.mako:65
 msgid "Update group"
-msgstr ""
+msgstr "그룹 업데이트"
 
 #: src/useradmin/templates/edit_group.mako:68
 msgid "Add/Sync group"
-msgstr ""
+msgstr "그룹 추가/동기화"
 
 #: src/useradmin/templates/edit_group.mako:70
 #: src/useradmin/templates/list_groups.mako:32
 msgid "Add group"
-msgstr ""
+msgstr "그룹 추가"
 
 #: src/useradmin/templates/edit_group.mako:73
 #: src/useradmin/templates/edit_permissions.mako:53
 #: src/useradmin/templates/edit_user.mako:70
 #: src/useradmin/templates/list_users.mako:97
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
 #: src/useradmin/templates/edit_group.mako:81
 #: src/useradmin/templates/edit_group.mako:86
 #: src/useradmin/templates/edit_permissions.mako:62
 #: src/useradmin/templates/edit_user.mako:77
 msgid "Select all"
-msgstr ""
+msgstr "모두 선택"
 
 #: src/useradmin/templates/edit_group.mako:82
 #: src/useradmin/templates/edit_group.mako:87
 #: src/useradmin/templates/edit_permissions.mako:63
 #: src/useradmin/templates/edit_user.mako:78
 msgid "Search"
-msgstr ""
+msgstr "검색"
 
 #: src/useradmin/templates/edit_permissions.mako:23
 #: src/useradmin/templates/list_permissions.mako:25
 #: src/useradmin/templates/list_permissions.mako:29
 msgid "Hue Permissions"
-msgstr ""
+msgstr "Hue 권한"
 
 #: src/useradmin/templates/edit_permissions.mako:43
 #, python-format
 msgid "Hue Permissions - Edit app: %(app)s"
-msgstr ""
+msgstr "Hue 권한 - 앱 편집: %(app)s"
 
 #: src/useradmin/templates/edit_permissions.mako:52
 msgid "Update permission"
-msgstr ""
+msgstr "권한 업데이트"
 
 #: src/useradmin/templates/edit_user.mako:24
 #: src/useradmin/templates/list_users.mako:24
 #: src/useradmin/templates/list_users.mako:28
 msgid "Hue Users"
-msgstr ""
+msgstr "Hue 사용자"
 
 #: src/useradmin/templates/edit_user.mako:44
 #, python-format
 msgid "Hue Users - Edit user: %(username)s"
-msgstr ""
+msgstr "Hue 사용자 - 사용자 편집: %(username)s"
 
 #: src/useradmin/templates/edit_user.mako:47
 msgid "Hue Users - Add/Sync LDAP user"
-msgstr ""
+msgstr "Hue 사용자 - LDAP 사용자 추가/동기화"
 
 #: src/useradmin/templates/edit_user.mako:49
 msgid "Hue Users - Create user"
-msgstr ""
+msgstr "Hue 사용자 - 사용자 생성"
 
 #: src/useradmin/templates/edit_user.mako:62
 msgid "Update user"
-msgstr ""
+msgstr "사용자 업데이트"
 
 #: src/useradmin/templates/edit_user.mako:65
 msgid "Add/Sync user"
-msgstr ""
+msgstr "사용자 추가/동기화"
 
 #: src/useradmin/templates/edit_user.mako:67
 #: src/useradmin/templates/list_users.mako:32
 msgid "Add user"
-msgstr ""
+msgstr "사용자 추가"
 
 #: src/useradmin/templates/layout.mako:32
 msgid "Users"
-msgstr ""
+msgstr "사용자"
 
 #: src/useradmin/templates/layout.mako:33
 #: src/useradmin/templates/list_permissions.mako:40
 #: src/useradmin/templates/list_users.mako:48
 msgid "Groups"
-msgstr ""
+msgstr "그룹"
 
 #: src/useradmin/templates/layout.mako:34
 #: src/useradmin/templates/list_groups.mako:45
 msgid "Permissions"
-msgstr ""
+msgstr "권한"
 
 #: src/useradmin/templates/list_groups.mako:33
 msgid "Add/Sync LDAP group"
-msgstr ""
+msgstr "LDAP 그룹 추가/동기화"
 
 #: src/useradmin/templates/list_groups.mako:37
 #: src/useradmin/templates/list_permissions.mako:32
 #: src/useradmin/templates/list_users.mako:38
 msgid "Filter: "
-msgstr ""
+msgstr "필터: "
 
 #: src/useradmin/templates/list_groups.mako:37
 msgid "Search for group name, members, etc..."
-msgstr ""
+msgstr "그룹 이름, 구성원 등을 검색합니다."
 
 #: src/useradmin/templates/list_groups.mako:43
 msgid "Group Name"
-msgstr ""
+msgstr "그룹 이름"
 
 #: src/useradmin/templates/list_groups.mako:44
 msgid "Members"
-msgstr ""
+msgstr "구성원"
 
 #: src/useradmin/templates/list_groups.mako:59
 #, python-format
 msgid "Edit %(groupname)s"
-msgstr ""
+msgstr "%(groupname)s 편집"
 
 #: src/useradmin/templates/list_groups.mako:59
 #: src/useradmin/templates/list_permissions.mako:54
 #: src/useradmin/templates/list_users.mako:68
 msgid "Edit"
-msgstr ""
+msgstr "편집"
 
 #: src/useradmin/templates/list_groups.mako:60
 #, python-format
 msgid "Delete %(groupname)s"
-msgstr ""
+msgstr "%(groupname)s 삭제"
 
 #: src/useradmin/templates/list_groups.mako:60
 #, python-format
 msgid "Are you sure you want to delete %(group_name)s?"
-msgstr ""
+msgstr "%(group_name)s을(를) 삭제하시겠습니까?"
 
 #: src/useradmin/templates/list_groups.mako:60
 #: src/useradmin/templates/list_users.mako:69
 msgid "Delete"
-msgstr ""
+msgstr "삭제"
 
 #: src/useradmin/templates/list_groups.mako:74
 #: src/useradmin/templates/list_users.mako:107
 msgid "Confirm action"
-msgstr ""
+msgstr "작업 확인"
 
 #: src/useradmin/templates/list_groups.mako:78
 #: src/useradmin/templates/list_users.mako:111
 msgid "No"
-msgstr ""
+msgstr "아니요"
 
 #: src/useradmin/templates/list_permissions.mako:32
 msgid "Search for application name, description, etc..."
-msgstr ""
+msgstr "애플리케이션 이름, 설명 등을 검색합니다."
 
 #: src/useradmin/templates/list_permissions.mako:38
 msgid "Application"
-msgstr ""
+msgstr "애플리케이션"
 
 #: src/useradmin/templates/list_permissions.mako:39
 msgid "Permission"
-msgstr ""
+msgstr "권한"
 
 #: src/useradmin/templates/list_permissions.mako:54
 msgid "Edit permission"
-msgstr ""
+msgstr "권한 편집"
 
 #: src/useradmin/templates/list_users.mako:33
 msgid "Add/Sync LDAP user"
-msgstr ""
+msgstr "LDAP 사용자 추가/동기화"
 
 #: src/useradmin/templates/list_users.mako:34
 msgid "Sync LDAP users/groups"
-msgstr ""
+msgstr "LDAP 사용자/그룹 동기화"
 
 #: src/useradmin/templates/list_users.mako:38
 msgid "Search for username, name, e-mail, etc..."
-msgstr ""
+msgstr "사용자 이름, 이름, 이메일 등을 검색합니다."
 
 #: src/useradmin/templates/list_users.mako:45
 msgid "First Name"
-msgstr ""
+msgstr "이름"
 
 #: src/useradmin/templates/list_users.mako:46
 msgid "Last Name"
-msgstr ""
+msgstr "성"
 
 #: src/useradmin/templates/list_users.mako:47
 msgid "E-mail"
-msgstr ""
+msgstr "이메일"
 
 #: src/useradmin/templates/list_users.mako:49
 msgid "Last Login"
-msgstr ""
+msgstr "마지막 로그인"
 
 #: src/useradmin/templates/list_users.mako:64
 #: src/useradmin/templates/list_users.mako:68
 #: src/useradmin/templates/list_users.mako:72
 #, python-format
 msgid "Edit %(username)s"
-msgstr ""
+msgstr "%(username)s 편집"
 
 #: src/useradmin/templates/list_users.mako:65
 #: src/useradmin/templates/list_users.mako:69
 #, python-format
 msgid "Delete %(username)s"
-msgstr ""
+msgstr "%(username)s 삭제"
 
 #: src/useradmin/templates/list_users.mako:86
 msgid "Sync LDAP users and groups"
-msgstr ""
+msgstr "LDAP 사용자 및 그룹 동기화"
 
 #: src/useradmin/templates/list_users.mako:90
-msgid ""
-"This will not import any users or groups that don't already exist in Hue."
-" Only users and groups imported from LDAP can be synced."
-msgstr ""
+msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgstr "이미 Hue에 없는 사용자 또는 그룹은 가져오지 않습니다. LDAP에서 가져온 사용자와 그룹만 동기화될 수 있습니다."
 
 #: src/useradmin/templates/list_users.mako:92
-msgid ""
-"All user information and group memberships will be updated based on the "
-"LDAP server's current state."
-msgstr ""
+msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgstr "모든 사용자 정보 및 그룹 구성원 자격이 LDAP 서버의 현재 상태에 따라 업데이트됩니다."
 
 #: src/useradmin/templates/list_users.mako:98
 msgid "Sync"
-msgstr ""
+msgstr "동기화"
 
