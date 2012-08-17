@@ -51,7 +51,7 @@ ${ layout.menubar(section='coordinators') }
 
   <br/>
 
-  <table id="workflowTable" class="table datatables">
+  <table id="coordinatorTable" class="table datatables">
     <thead>
       <tr>
         <th></th>
@@ -65,36 +65,36 @@ ${ layout.menubar(section='coordinators') }
       </tr>
     </thead>
     <tbody>
-      %for workflow in workflows:
+      %for coordinator in jobs:
         <tr class="action-row">
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
-              % if currentuser.username == workflow.owner.username:
-                  data-param-url="${ url('oozie:workflow_parameters', workflow=workflow.id) }"
-                  data-delete-url="${ url('oozie:delete_workflow', workflow=workflow.id) }"
+              % if currentuser.username == coordinator.owner.username:
+                  data-param-url="${ url('oozie:workflow_parameters', workflow=coordinator.id) }"
+                  data-delete-url="${ url('oozie:delete_coordinator', coordinator=coordinator.id) }"
               % endif
-                  data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
-                  data-bundle-url="${ url('oozie:create_coordinator', workflow=workflow.id) }"
-                  data-submit-url="${ url('oozie:submit_coordinator', coordinator=workflow.id) }"
+                  data-clone-url="${ url('oozie:clone_workflow', workflow=coordinator.id) }"
+                  data-bundle-url="${ url('oozie:create_coordinator') }"
+                  data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }"
               >
             </input>
-            %if currentuser.username == workflow.owner.username:
-              <a href="${ url('oozie:edit_coordinator', coordinator=workflow.id) }" data-row-selector="true"/>
+            %if currentuser.username == coordinator.owner.username:
+              <a href="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" data-row-selector="true"/>
             %endif%
           </td>
-          <td>${ workflow.name }</td>
-          <td>${ workflow.description }</td>
+          <td>${ coordinator.name }</td>
+          <td>${ coordinator.description }</td>
           <td>
-            % if workflow.workflow is not None:
-              ${ workflow.workflow }
+            % if coordinator.workflow is not None:
+              ${ coordinator.workflow }
             % endif
           </td>
-          <td>${ workflow.text_frequency }</td>
+          <td>${ coordinator.text_frequency }</td>
           <td>
             <span class="label label-info">${ _('production') }</span>
           </td>
-          <td nowrap="nowrap">${ utils.format_date(workflow.last_modified) }</td>
-          <td>${ workflow.owner.username }</td>
+          <td nowrap="nowrap">${ utils.format_date(coordinator.last_modified) }</td>
+          <td>${ coordinator.owner.username }</td>
         </tr>
       %endfor
     </tbody>
@@ -253,7 +253,7 @@ ${ layout.menubar(section='coordinators') }
         $("#submitWf").modal("hide");
     });
 
-    var oTable = $('#workflowTable').dataTable( {
+    var oTable = $('#coordinatorTable').dataTable( {
       "sPaginationType": "bootstrap",
       'iDisplayLength': 50,
       "bLengthChange": false,

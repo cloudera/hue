@@ -74,7 +74,7 @@ def can_access_job(request, job_id):
       raise PopupException(message)
 
   except Job.DoesNotExist:
-    raise PopupException(_('job %(id)s not found') % {'id': job_id})
+    raise PopupException(_('job %(id)s not exist') % {'id': job_id})
 
 
 def can_modify_job(request, job):
@@ -184,7 +184,7 @@ def list_workflows(request, job_type='workflow'):
   data = data.order_by('-last_modified')
 
   return render(template, request, {
-    'workflows': list(data),
+    'jobs': list(data),
     'currentuser': request.user,
     'show_install_examples': show_install_examples,
   })
@@ -249,16 +249,12 @@ def delete_workflow(request, workflow):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
-  try:
-    workflow.coordinator_set.update(workflow=None) # In Django 1.3 could do ON DELETE set NULL
-    workflow.save()
-    workflow.delete()
-    Submission(workflow, request.fs, {}).remove_deployment_dir()
-  except Workflow.DoesNotExist:
-    LOG.error("Trying to delete non-existent workflow (id %s)" % (workflow,))
-    raise PopupException(_('Workflow not found'))
+  workflow.coordinator_set.update(workflow=None) # In Django 1.3 could do ON DELETE set NULL
+  workflow.save()
+  workflow.delete()
+  Submission(workflow, request.fs, {}).remove_deployment_dir()
+  request.info(_('Workflow deleted!'))
 
-  # TODO notification
   return redirect(reverse('oozie:list_workflows'))
 
 
@@ -461,6 +457,19 @@ def create_coordinator(request, workflow=None):
     'coordinator': coordinator,
     'coordinator_form': coordinator_form,
   })
+
+
+@check_job_access_permission
+@check_job_modification_permission()
+def delete_coordinator(request, coordinator):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  coordinator.delete()
+  Submission(coordinator, request.fs, {}).remove_deployment_dir()
+  request.info(_('Coordinator deleted!'))
+  
+  return redirect(reverse('oozie:list_workflows'))
 
 
 @check_job_access_permission
