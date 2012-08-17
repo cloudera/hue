@@ -1,25 +1,14 @@
-## Licensed to Cloudera, Inc. under one
-## or more contributor license agreements.  See the NOTICE file
-## distributed with this work for additional information
-## regarding copyright ownership.  Cloudera, Inc. licenses this file
-## to you under the Apache License, Version 2.0 (the
-## "License"); you may not use this file except in compliance
-## with the License.  You may obtain a copy of the License at
-##
-##     http://www.apache.org/licenses/LICENSE-2.0
-##
-## Unless required by applicable law or agreed to in writing, software
-## distributed under the License is distributed on an "AS IS" BASIS,
-## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-## See the License for the specific language governing permissions and
-## limitations under the License.
+# Korean translations for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-#, fuzzy
+
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 18:54-0700\n"
+"POT-Creation-Date: 2012-07-30 19:07-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -31,474 +20,470 @@ msgstr ""
 
 #: src/jobsub/conf.py:28
 msgid "Location on HDFS where the jobsub examples and templates are stored."
-msgstr ""
+msgstr "Jobsub 예제와 템플릿이 저장되는 HDFS 상의 위치입니다."
 
 #: src/jobsub/conf.py:34
 msgid "Location on local FS where examples and template are stored"
-msgstr ""
+msgstr "예제와 템플릿이 저장되는 로컬 FS 상의 위치입니다."
 
 #: src/jobsub/conf.py:40
 msgid "Location on local FS where sample data is stored"
-msgstr ""
+msgstr "샘플 데이터가 저장되는 로컬 FS 상의 위치입니다."
 
 #: src/jobsub/conf.py:45
 msgid "URL to Oozie server. This is required for job submission."
-msgstr ""
+msgstr "Oozie 서버의 URL입니다. 작업 제출을 위해서는 반드시 입력해야 합니다."
 
 #: src/jobsub/conf.py:51
 msgid "Whether Oozie requires client to do perform Kerberos authentication"
-msgstr ""
+msgstr "Oozie에서 클라이언트의 Kerberos 인증 수행을 요청할지 여부입니다."
 
 #: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
 #: src/jobsub/templates/list_history.mako:45
 #: src/jobsub/templates/workflow.mako:55 src/jobsub/templates/workflow.mako:100
 msgid "Name"
-msgstr ""
+msgstr "이름"
 
 #: src/jobsub/forms.py:43
-msgid ""
-"Allows letters, digits, '_', and '-'. The first character must be a "
-"letter or '_'."
-msgstr ""
+msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgstr "문자, 숫자, '_', '-'이 허용됩니다. 문자 또는 '_'이 맨 앞에 와야 합니다."
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
-msgstr ""
+msgstr "디자인 이름으로, 사용자마다 고유해야 합니다."
 
 #: src/jobsub/models.py:184 src/jobsub/models.py:225
 msgid "List of paths to files to be added to the distributed cache."
-msgstr ""
+msgstr "분산 캐시에 추가할 파일의 경로 목록입니다."
 
 #: src/jobsub/models.py:186 src/jobsub/models.py:227
 msgid "List of paths to archives to be added to the distributed cache."
-msgstr ""
+msgstr "분산 캐시에 추가할 아카이브의 경로 목록입니다."
 
 #: src/jobsub/models.py:191
 msgid "Path to jar files on HDFS."
-msgstr ""
+msgstr "HDFS의 jar 파일 경로입니다."
 
 #: src/jobsub/submit.py:48
 #, python-format
 msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)"
-msgstr ""
+msgstr "작업 디자인 '%(name)s'(ID %(id)s, 소유자 %(username)s) 제출"
 
 #: src/jobsub/submit.py:72
 #, python-format
 msgid "Job design already submitted (Oozie job id %(id)s)"
-msgstr ""
+msgstr "작업 디자인이 이미 제출되었습니다(Oozie 작업 ID %(id)s)."
 
 #: src/jobsub/submit.py:81
 msgid "Failed to access deployment directory."
-msgstr ""
+msgstr "배포 디렉토리에 액세스하지 못했습니다."
 
 #: src/jobsub/submit.py:210
 msgid "Failed to obtain HDFS reference. Please check your configuration."
-msgstr ""
+msgstr "HDFS 참조를 가져오지 못했습니다. 구성을 확인하십시오."
 
 #: src/jobsub/views.py:58
 #, python-format
 msgid "Access denied: view job %(id)s"
-msgstr ""
+msgstr "액세스 거부됨: 보기 작업 %(id)s"
 
 #: src/jobsub/views.py:64
 #, python-format
 msgid "Error accessing Oozie job %(id)s."
-msgstr ""
+msgstr "Oozie 작업 %(id)에 액세스하는 중 오류 발생"
 
 #: src/jobsub/views.py:177
 msgid "Permission denied. You are not the owner."
-msgstr ""
+msgstr "권한이 거부되었습니다. 귀하는 소유자가 아닙니다."
 
 #: src/jobsub/views.py:185
 #, python-format
 msgid "Access denied: delete design %(id)s"
-msgstr ""
+msgstr "액세스 거부됨: 삭제 디자인 %(id)s"
 
 #: src/jobsub/views.py:193
 msgid "Workflow not found."
-msgstr ""
+msgstr "워크플로를 찾을 수 없습니다."
 
 #: src/jobsub/views.py:201
 #, python-format
 msgid "Access denied: edit design %(id)s"
-msgstr ""
+msgstr "액세스 거부됨: 편집 디자인 %(id)s"
 
 #: src/jobsub/views.py:232
 #, python-format
 msgid "Access denied: design parameters %(id)s"
-msgstr ""
+msgstr "액세스 거부됨: 디자인 매개변수 %(id)s"
 
 #: src/jobsub/views.py:244
 msgid "Please use a POST request to submit a design."
-msgstr ""
+msgstr "POST 요청을 사용하여 디자인을 제출하십시오."
 
 #: src/jobsub/views.py:248
 #, python-format
 msgid "Access denied: submit design %(id)s"
-msgstr ""
+msgstr "액세스 거부됨: 제출 디자인 %(id)s"
 
 #: src/jobsub/views.py:258
 #, python-format
 msgid "Error submitting design %(id)s"
-msgstr ""
+msgstr "%(id)s 디자인을 제출하는 중 오류 발생"
 
 #: src/jobsub/views.py:273
 msgid "Please use a POST request to install the examples."
-msgstr ""
+msgstr "POST 요청을 사용하여 예제를 설치하십시오."
 
 #: src/jobsub/views.py:278
 msgid "The examples could not be installed."
-msgstr ""
+msgstr "예제를 설치하지 못했습니다."
 
 #: src/jobsub/management/commands/jobsub_setup.py:90
 msgid "Unexpected fixture type."
-msgstr ""
+msgstr "예기치 않은 픽스처 유형입니다."
 
 #: src/jobsub/management/commands/jobsub_setup.py:93
 msgid "Expected sample user fixture."
-msgstr ""
+msgstr "필요한 샘플 사용자 픽스처입니다."
 
 #: src/jobsub/oozie_lib/types.py:171
 msgid "Insufficient permission"
-msgstr ""
+msgstr "권한 부족"
 
 #: src/jobsub/oozie_lib/types.py:172
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-msgstr ""
+msgstr "권한이 거부되었습니다. 사용자 %(username)s은(는) 사용자 %(user)s의 작업을 수정할 수 없습니다."
 
 #: src/jobsub/templates/edit_design.mako:26
 #: src/jobsub/templates/list_designs.mako:28
 #: src/jobsub/templates/list_history.mako:26
 #: src/jobsub/templates/workflow.mako:25
 msgid "Job Designer"
-msgstr ""
+msgstr "작업 디자이너"
 
 #: src/jobsub/templates/edit_design.mako:54
 #, python-format
 msgid "Job Design (%(type)s type)"
-msgstr ""
+msgstr "작업 디자인(%(type)s 유형)"
 
 #: src/jobsub/templates/edit_design.mako:66
 msgid "You can parameterize the values, using"
-msgstr ""
+msgstr "다음을 사용하여 값을 매개변수화할 수 있습니다."
 
 #: src/jobsub/templates/edit_design.mako:66
 msgid "or"
-msgstr ""
+msgstr "또는"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid ""
-"When the design is submitted, you will be prompted for the actual value "
-"of "
-msgstr ""
+msgid "When the design is submitted, you will be prompted for the actual value of "
+msgstr "디자인을 제출할 때 다음에 대한 실제 값이 나타납니다. "
 
 #: src/jobsub/templates/edit_design.mako:76
 msgid "Job Properties"
-msgstr ""
+msgstr "작업 속성"
 
 #: src/jobsub/templates/edit_design.mako:82
 msgid "Property name"
-msgstr ""
+msgstr "속성 이름"
 
 #: src/jobsub/templates/edit_design.mako:83
 #: src/jobsub/templates/workflow.mako:56
 msgid "Value"
-msgstr ""
+msgstr "값"
 
 #: src/jobsub/templates/edit_design.mako:91
 #: src/jobsub/templates/edit_design.mako:116
 #: src/jobsub/templates/edit_design.mako:139
 #: src/jobsub/templates/list_designs.mako:83
 msgid "Delete"
-msgstr ""
+msgstr "삭제"
 
 #: src/jobsub/templates/edit_design.mako:103
 msgid "Add Property"
-msgstr ""
+msgstr "속성 추가"
 
 #: src/jobsub/templates/edit_design.mako:108
 msgid "Files"
-msgstr ""
+msgstr "파일"
 
 #: src/jobsub/templates/edit_design.mako:126
 msgid "Add File"
-msgstr ""
+msgstr "파일 추가"
 
 #: src/jobsub/templates/edit_design.mako:131
 msgid "Archives"
-msgstr ""
+msgstr "아카이브"
 
 #: src/jobsub/templates/edit_design.mako:149
 msgid "Add Archive"
-msgstr ""
+msgstr "아카이브 추가"
 
 #: src/jobsub/templates/edit_design.mako:156
 msgid "Save"
-msgstr ""
+msgstr "저장"
 
 #: src/jobsub/templates/edit_design.mako:157
 #: src/jobsub/templates/list_designs.mako:109
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
 #: src/jobsub/templates/edit_design.mako:167
 msgid "Choose a file"
-msgstr ""
+msgstr "파일 선택"
 
 #: src/jobsub/templates/layout.mako:34
 msgid "Designs"
-msgstr ""
+msgstr "디자인"
 
 #: src/jobsub/templates/layout.mako:35
 msgid "History"
-msgstr ""
+msgstr "기록"
 
 #: src/jobsub/templates/list_designs.mako:34
 msgid "Job Designs"
-msgstr ""
+msgstr "작업 디자인"
 
 #: src/jobsub/templates/list_designs.mako:37
 msgid "Create Mapreduce Design"
-msgstr ""
+msgstr "Mapreduce 디자인 생성"
 
 #: src/jobsub/templates/list_designs.mako:38
 msgid "Create Streaming Design"
-msgstr ""
+msgstr "스트리밍 디자인 생성"
 
 #: src/jobsub/templates/list_designs.mako:39
 msgid "Create Java Design"
-msgstr ""
+msgstr "Java 디자인 생성"
 
 #: src/jobsub/templates/list_designs.mako:41
 msgid "Install Samples"
-msgstr ""
+msgstr "샘플 설치"
 
 #: src/jobsub/templates/list_designs.mako:46
 #: src/jobsub/templates/list_history.mako:35
 msgid "Filter: "
-msgstr ""
+msgstr "필터: "
 
 #: src/jobsub/templates/list_designs.mako:46
 #: src/jobsub/templates/list_history.mako:35
 msgid "Search for username, name, etc..."
-msgstr ""
+msgstr "사용자 이름, 이름 등을 검색합니다."
 
 #: src/jobsub/templates/list_designs.mako:53
 #: src/jobsub/templates/list_history.mako:44
 msgid "Owner"
-msgstr ""
+msgstr "소유자"
 
 #: src/jobsub/templates/list_designs.mako:55
 #: src/jobsub/templates/list_history.mako:46
 #: src/jobsub/templates/workflow.mako:101
 msgid "Type"
-msgstr ""
+msgstr "유형"
 
 #: src/jobsub/templates/list_designs.mako:56
 #: src/jobsub/templates/list_history.mako:47
 msgid "Description"
-msgstr ""
+msgstr "설명"
 
 #: src/jobsub/templates/list_designs.mako:57
 msgid "Last Modified"
-msgstr ""
+msgstr "최종 수정 날짜"
 
 #: src/jobsub/templates/list_designs.mako:71
 #: src/jobsub/templates/list_designs.mako:72
 #, python-format
 msgid "Submit %(name)s to the cluster"
-msgstr ""
+msgstr "클러스터로 %(name)s 제출"
 
 #: src/jobsub/templates/list_designs.mako:75
 #: src/jobsub/templates/list_designs.mako:108
 msgid "Submit"
-msgstr ""
+msgstr "제출"
 
 #: src/jobsub/templates/list_designs.mako:76
 #, python-format
 msgid "Edit %(name)s"
-msgstr ""
+msgstr "%(name)s 편집"
 
 #: src/jobsub/templates/list_designs.mako:77
 msgid "Edit"
-msgstr ""
+msgstr "편집"
 
 #: src/jobsub/templates/list_designs.mako:80
 #, python-format
 msgid "Delete %(name)s"
-msgstr ""
+msgstr "%(name)s 삭제"
 
 #: src/jobsub/templates/list_designs.mako:81
 #, python-format
 msgid "Are you sure you want to delete %(name)s?"
-msgstr ""
+msgstr "%(name)s을(를) 삭제하시겠습니까?"
 
 #: src/jobsub/templates/list_designs.mako:85
 #, python-format
 msgid "Clone %(name)s"
-msgstr ""
+msgstr "%(name)s 복제"
 
 #: src/jobsub/templates/list_designs.mako:85
 msgid "Clone"
-msgstr ""
+msgstr "복제"
 
 #: src/jobsub/templates/list_designs.mako:99
 msgid "Submit this design?"
-msgstr ""
+msgstr "이 디자인을 제출하시겠습니까?"
 
 #: src/jobsub/templates/list_designs.mako:118
 msgid "Delete this design?"
-msgstr ""
+msgstr "이 디자인을 삭제하시겠습니까?"
 
 #: src/jobsub/templates/list_designs.mako:121
 #: src/jobsub/templates/list_designs.mako:137
 msgid "Yes"
-msgstr ""
+msgstr "예"
 
 #: src/jobsub/templates/list_designs.mako:122
 #: src/jobsub/templates/list_designs.mako:138
 msgid "No"
-msgstr ""
+msgstr "아니요"
 
 #: src/jobsub/templates/list_designs.mako:131
 msgid "Install sample job designs?"
-msgstr ""
+msgstr "샘플 작업 디자인을 설치하시겠습니까?"
 
 #: src/jobsub/templates/list_designs.mako:134
 msgid "It will take a few seconds to install."
-msgstr ""
+msgstr "설치하는 데 몇 초 정도 걸립니다."
 
 #: src/jobsub/templates/list_designs.mako:207
 #: src/jobsub/templates/list_history.mako:83
 msgid "No data available in table"
-msgstr ""
+msgstr "테이블에 데이터가 없습니다."
 
 #: src/jobsub/templates/list_designs.mako:208
 #: src/jobsub/templates/list_history.mako:84
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-msgstr ""
+msgstr "_START_ to _END_ of _TOTAL_ 항목 표시"
 
 #: src/jobsub/templates/list_designs.mako:209
 #: src/jobsub/templates/list_history.mako:85
 msgid "Showing 0 to 0 of 0 entries"
-msgstr ""
+msgstr "0~0개(전체 0개 중) 항목 표시"
 
 #: src/jobsub/templates/list_designs.mako:210
 #: src/jobsub/templates/list_history.mako:86
 msgid "(filtered from _MAX_ total entries)"
-msgstr ""
+msgstr "(총 _MAX_ 항목에서 필터링됨)"
 
 #: src/jobsub/templates/list_designs.mako:211
 #: src/jobsub/templates/list_history.mako:87
 msgid "No matching records found"
-msgstr ""
+msgstr "일치하는 기록이 없습니다."
 
 #: src/jobsub/templates/list_designs.mako:213
 #: src/jobsub/templates/list_history.mako:89
 msgid "First"
-msgstr ""
+msgstr "처음"
 
 #: src/jobsub/templates/list_designs.mako:214
 #: src/jobsub/templates/list_history.mako:90
 msgid "Last"
-msgstr ""
+msgstr "마지막"
 
 #: src/jobsub/templates/list_designs.mako:215
 #: src/jobsub/templates/list_history.mako:91
 msgid "Next"
-msgstr ""
+msgstr "다음"
 
 #: src/jobsub/templates/list_designs.mako:216
 #: src/jobsub/templates/list_history.mako:92
 msgid "Previous"
-msgstr ""
+msgstr "이전"
 
 #: src/jobsub/templates/list_history.mako:32
 msgid "Job Submission History"
-msgstr ""
+msgstr "작업 제출 기록"
 
 #: src/jobsub/templates/list_history.mako:43
 msgid "Oozie Job ID"
-msgstr ""
+msgstr "Oozie 작업 ID"
 
 #: src/jobsub/templates/list_history.mako:48
 msgid "Submission Date"
-msgstr ""
+msgstr "제출 날짜"
 
 #: src/jobsub/templates/workflow.mako:81
 msgid "Edit design"
-msgstr ""
+msgstr "편집 디자인"
 
 #: src/jobsub/templates/workflow.mako:88
 msgid "Actions"
-msgstr ""
+msgstr "작업"
 
 #: src/jobsub/templates/workflow.mako:89
 msgid "Details"
-msgstr ""
+msgstr "세부 정보"
 
 #: src/jobsub/templates/workflow.mako:90
 msgid "Definition"
-msgstr ""
+msgstr "정의"
 
 #: src/jobsub/templates/workflow.mako:91
 msgid "Log"
-msgstr ""
+msgstr "로그"
 
 #: src/jobsub/templates/workflow.mako:102
 #: src/jobsub/templates/workflow.mako:166
 msgid "Status"
-msgstr ""
+msgstr "상태"
 
 #: src/jobsub/templates/workflow.mako:103
 #: src/jobsub/templates/workflow.mako:170
 msgid "External Id"
-msgstr ""
+msgstr "외부 ID"
 
 #: src/jobsub/templates/workflow.mako:105
 #: src/jobsub/templates/workflow.mako:174
 msgid "Start Time"
-msgstr ""
+msgstr "시작 시간"
 
 #: src/jobsub/templates/workflow.mako:106
 #: src/jobsub/templates/workflow.mako:182
 msgid "End Time"
-msgstr ""
+msgstr "종료 시간"
 
 #: src/jobsub/templates/workflow.mako:108
 msgid "Retries"
-msgstr ""
+msgstr "재시도"
 
 #: src/jobsub/templates/workflow.mako:109
 msgid "Error Message"
-msgstr ""
+msgstr "오류 메시지"
 
 #: src/jobsub/templates/workflow.mako:110
 msgid "Transition"
-msgstr ""
+msgstr "전환"
 
 #: src/jobsub/templates/workflow.mako:112
 msgid "Data"
-msgstr ""
+msgstr "데이터"
 
 #: src/jobsub/templates/workflow.mako:150
 msgid "Application Name"
-msgstr ""
+msgstr "애플리케이션 이름"
 
 #: src/jobsub/templates/workflow.mako:158
 msgid "User"
-msgstr ""
+msgstr "사용자"
 
 #: src/jobsub/templates/workflow.mako:162
 msgid "Group"
-msgstr ""
+msgstr "그룹"
 
 #: src/jobsub/templates/workflow.mako:178
 msgid "Created Time"
-msgstr ""
+msgstr "생성된 시간"
 
 #: src/jobsub/templates/workflow.mako:186
 msgid "Application Path"
-msgstr ""
+msgstr "애플리케이션 경로"
 
