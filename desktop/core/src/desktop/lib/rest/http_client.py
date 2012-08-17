@@ -36,7 +36,7 @@ class RestException(Exception):
     self._error = error
     self._code = None
     self._message = str(error)
-    self._headers = None
+    self._headers = {}
 
     # Get more information if urllib2.HTTPError.
     try:

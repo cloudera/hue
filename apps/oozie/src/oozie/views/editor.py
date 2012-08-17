@@ -599,7 +599,7 @@ def submit_coordinator(request, coordinator):
     job_id = submission.run()
   except RestException, ex:
     raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
-                         detail=ex._headers['oozie-error-message'])
+                         detail=ex._headers.get('oozie-error-message', ex))
 
   History.objects.create_from_submission(submission)
   request.info(_('Coordinator submitted'))
