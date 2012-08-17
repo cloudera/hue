@@ -451,16 +451,15 @@ class TestEditor:
       finish()
 
     # Delete
-    # TODO view!
-#    finish = SHARE_JOBS.set_for_testing(False)
-#    try:
-#      response = client_not_me.post(reverse('oozie:delete_coordinator', args=[coord.id]))
-#      assert_true('Permission denied' in response.content, response.content)
-#    finally:
-#      finish()
-#
-#    response = self.c.post(reverse('oozie:delete_coordinator', args=[coord.id]), follow=True)
-#    assert_equal(200, response.status_code)
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:delete_coordinator', args=[coord.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    response = self.c.post(reverse('oozie:delete_coordinator', args=[coord.id]), follow=True)
+    assert_equal(200, response.status_code)
 
 
   def test_coordinator_gen_xml(self):

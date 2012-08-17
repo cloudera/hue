@@ -66,7 +66,7 @@ ${ layout.menubar(section='workflows') }
       </tr>
     </thead>
     <tbody>
-      %for workflow in workflows:
+      %for workflow in jobs:
         <tr class="action-row">
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
