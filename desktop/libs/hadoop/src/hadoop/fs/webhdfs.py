@@ -582,17 +582,11 @@ def safe_octal(octal_value):
   safe_octal(octal_value) -> octal value in string
 
   This correctly handles octal values specified as a string or as a numeric.
-  Only the 4 rightmost digits are returned (e.g. 01777 becomes 1777).
   """
   try:
-    octal = oct(octal_value)
+    return oct(octal_value)
   except TypeError:
-    octal = str(octal_value)
-  if len(octal) > 4:
-    old_octal = octal
-    octal = octal[-4:]
-    LOG.warn('Octal %s was truncated to %s.' % (old_octal, octal))
-  return octal
+    return str(octal_value)
 
 
 def _get_service_url(hdfs_config):
