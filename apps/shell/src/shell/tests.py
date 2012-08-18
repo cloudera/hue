@@ -43,8 +43,6 @@ from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from django.contrib.auth.models import User
-from django.utils.encoding import smart_unicode
-import eventlet
 import eventlet.wsgi
 from eventlet.green import time
 from eventlet.green import os
@@ -52,10 +50,9 @@ from eventlet.green import threading
 import pwd
 import re
 import shell
-import shell.conf as conf
 import shell.constants as constants
 import shell.utils as utils
-import simplejson
+
 
 class TestServer(threading.Thread):
   def run(self):
