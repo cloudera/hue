@@ -39,7 +39,6 @@ import beeswax.db_utils
 import beeswax.forms
 import beeswax.hive_site
 import beeswax.models
-import beeswax.report
 import beeswax.views
 from beeswax import conf
 from beeswax.views import parse_results, collapse_whitespace
@@ -49,8 +48,10 @@ from beeswaxd import BeeswaxService
 from beeswaxd import ttypes
 from desktop.lib.test_utils import grant_access
 
+
 LOG = logging.getLogger(__name__)
 CSV_LINK_PAT = re.compile('/beeswax/download/\d+/csv')
+
 
 def _make_query(client, query, submission_type="Execute",
                 udfs=None, settings=None, resources=[],
@@ -236,8 +237,8 @@ for x in sys.stdin:
     response = wait_for_query_to_finish(self.client, response, max=60.0)
     assert_equal(["2.0", "256.0"], response.context["results"][0])
     log = response.context['log']
-    assert_true('ql.Driver: Total MapReduce jobs' in log, 'Captured log from Driver')
-    assert_true('exec.Task: Starting Job = job_' in log, 'Captured log from MapRedTask')
+    assert_true(search_log_line('ql.Driver', 'Total MapReduce jobs', log), 'Captured log from Driver in %s' % log)
+    assert_true(search_log_line('exec.Task', 'Starting Job = job_', log), 'Captured log from MapRedTask in %s' % log)
     # Test job extraction while we're at it
     assert_equal(1, len(response.context["hadoop_jobs"]), "Should have started 1 job and extracted it.")
 
@@ -293,7 +294,7 @@ for x in sys.stdin:
     query_msg.configuration = []
     query_msg.hadoop_user = "test"
     handle = beeswax.db_utils.db_client().executeAndWait(query_msg, "")
- 
+
     results = beeswax.db_utils.db_client().fetch(handle, True, 5)
     row_list = list(parse_results(results.data))
     assert_equal(len(row_list), 5)
@@ -351,7 +352,8 @@ for x in sys.stdin:
     response = self.client.post("/beeswax/execute_parameterized/%d" % design_id,
       { "parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2) }, follow=True)
     assert_true("execute.mako" in response.template)
-    assert_true("ql.Driver: FAILED: Parse Error" in response.context["log"])
+    log = response.context["log"]
+    assert_true(search_log_line('ql.Driver', 'FAILED: Parse Error', log), log)
 
   def test_explain_query(self):
     c = self.client
@@ -1125,3 +1127,28 @@ def test_collapse_whitespace():
   assert_equal("x y", collapse_whitespace("\t\nx\n  \ny\t \n"))
 
 
+def test_search_log_line():
+  logs = """
+    FAILED: Parse Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
+    2012-08-18 12:23:15,648 ERROR [pool-1-thread-2] ql.Driver (SessionState.java:printError(380)) - FAILED: Parse Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
+    org.apache.hadoop.hive.ql.parse.ParseException: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
+    """
+  assert_true(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
+
+  logs = """
+    FAILED: Parse Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
+    2012-08-18 12:23:15,648 ERROR [pool-1-thread-2] ql.Driver (SessionState.java:printError(380)) - FAILED: Parse XXXX Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
+    org.apache.hadoop.hive.ql.parse.ParseException: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
+    """
+  assert_false(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
+
+  logs = """
+    2012-08-18 12:23:15,648 ERROR [pool-1-thread-2] ql.Driver (SessionState.java:printError(380)) - FAILED: Parse
+    Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
+    """
+  assert_false(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
+
+
+def search_log_line(component, expected_log, all_logs):
+  """Checks if 'expected_log' can be found in one line of 'all_logs' outputed by the logging component 'component'."""
+  return re.compile('.+? %(component)s .+? - %(expected_log)s' % {'component': component, 'expected_log': expected_log}).search(all_logs)
