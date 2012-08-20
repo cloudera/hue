@@ -17,10 +17,14 @@
 
 import errno
 import logging
+import time
 
 from desktop.lib.django_util import PopupException
 from hadoop import cluster
+from hadoop.fs.hadoopfs import Hdfs
 from liboozie.oozie_api import get_oozie
+
+from oozie.conf import REMOTE_DEPLOYMENT_DIR
 
 
 LOG = logging.getLogger(__name__)
@@ -28,9 +32,9 @@ LOG = logging.getLogger(__name__)
 
 class Submission(object):
   """Represents one unique Oozie submission"""
-  def __init__(self, job, fs, properties=None):
+  def __init__(self, user, job, fs, properties=None):
     self.job = job
-    self.username = job.owner.username
+    self.user = user
     self.fs = fs
     self.oozie_id = None
 
@@ -40,7 +44,7 @@ class Submission(object):
       self.properties = {}
 
   def __unicode__(self):
-    res = "Submission for job '%s' (id %s, owner %s)" % (self.job.name, self.job.id, self.username)
+    res = "Submission for job '%s' (id %s, owner %s)" % (self.job.name, self.job.id, self.user)
     if self.oozie_id:
       res += " -- " + self.oozie_id
     return res
@@ -58,7 +62,7 @@ class Submission(object):
     deployment_dir = self.deploy()
 
     try:
-      prev = get_oozie().setuser(self.username )
+      prev = get_oozie().setuser(self.user.username)
       self._update_properties(jobtracker, deployment_dir)
       self.oozie_id = get_oozie().submit_job(self.properties)
       LOG.info("Submitted: %s" % (self,))
@@ -80,7 +84,7 @@ class Submission(object):
                            detail=str(ex))
 
     oozie_xml = self.job.to_xml()
-    self._do_as(self.username , self._copy_files, deployment_dir, oozie_xml)
+    self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml)
 
     return deployment_dir
 
@@ -98,7 +102,7 @@ class Submission(object):
     """
     Return the job deployment directory in HDFS, creating it if necessary.
     """
-    path = self.job.deployment_dir
+    path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
 
     try:
       statbuf = self.fs.stats(path)
@@ -114,7 +118,7 @@ class Submission(object):
         raise IOError(ex.errno, msg)
     # The actual deployment dir should be 0711 owned by the user
     if not self.fs.exists(path):
-      self._do_as(self.username , self.fs.mkdir, path, 0711)
+      self._do_as(self.user.username , self.fs.mkdir, path, 0711)
     return path
 
   def _copy_files(self, deployment_dir, oozie_xml):
@@ -157,9 +161,9 @@ class Submission(object):
     """Delete the workflow deployment directory."""
     try:
       path = self.job.deployment_dir
-      if self._do_as(self.username , self.fs.exists, path):
-        self._do_as(self.username , self.fs.rmtree, path)
+      if self._do_as(self.user.username , self.fs.exists, path):
+        self._do_as(self.user.username , self.fs.rmtree, path)
     except Exception, ex:
       LOG.warn("Failed to clean up workflow deployment directory for "
                "%s (owner %s). Caused by: %s",
-               self.job.name, self.job.owner.username, ex)
+               self.job.name, self.user, ex)

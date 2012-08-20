@@ -31,7 +31,7 @@ from desktop.lib.rest.http_client import RestException
 from liboozie.oozie_api import get_oozie
 
 from oozie.models import History
-from oozie.views.editor import can_access_job
+from oozie.views.editor import can_access_job_or_exception
 
 
 LOG = logging.getLogger(__name__)
@@ -44,17 +44,6 @@ A Workflow/Coordinator can be accessed/submitted/modified only by its owner or a
 
 Permissions checking happens by calling check_access_and_get_oozie_job().
 """
-
-
-def show_oozie_error(view_func):
-  def decorate(request, *args, **kwargs):
-    try:
-      return view_func(request, *args, **kwargs)
-    except RestException, ex:
-      raise PopupException(_('Sorry, an error with Oozie happened.'), detail=ex._headers.get('oozie-error-message', ex))
-  return wraps(view_func)(decorate)
-
-
 def manage_oozie_jobs(request, job_id, action):
   if request.method != 'POST':
     raise PopupException(_('Please use a POST request to manage an Oozie job.'))
@@ -71,6 +60,15 @@ def manage_oozie_jobs(request, job_id, action):
     response['data'] = _("Error performing %s on Oozie job %s: %s") % (action, job_id, ex.message)
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def show_oozie_error(view_func):
+  def decorate(request, *args, **kwargs):
+    try:
+      return view_func(request, *args, **kwargs)
+    except RestException, ex:
+      raise PopupException(_('Sorry, an error with Oozie happened.'), detail=ex._headers.get('oozie-error-message', ex))
+  return wraps(view_func)(decorate)
 
 
 @show_oozie_error
@@ -113,8 +111,8 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None):
   hue_coord = history and history.get_coordinator() or History.get_coordinator_from_config(oozie_workflow.conf_dict)
   hue_workflow = (hue_coord and hue_coord.workflow) or (history and history.get_workflow()) or History.get_workflow_from_config(oozie_workflow.conf_dict)
 
-  if hue_coord: can_access_job(request, hue_coord.workflow.id)
-  if hue_workflow: can_access_job(request, hue_workflow.id)
+  if hue_coord: can_access_job_or_exception(request, hue_coord.workflow.id)
+  if hue_workflow: can_access_job_or_exception(request, hue_workflow.id)
 
   # Add parameters from coordinator to workflow if possible
   parameters = {}

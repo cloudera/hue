@@ -141,7 +141,7 @@ ${ layout.menubar(section='dashboard') }
      % endif
 
     <div class="tab-pane ${ utils.if_false(hue_workflow, 'active') }" id="actions">
-      % if oozie_workflow.actions:
+      % if oozie_workflow.get_working_actions():
         <table class="table table-striped table-condensed selectable">
           <thead>
             <tr>

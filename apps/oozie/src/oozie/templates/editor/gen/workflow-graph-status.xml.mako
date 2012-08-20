@@ -42,7 +42,7 @@
           % if not is_fork:
             ${ form.instance.description }<br/>
             % if form.instance.__unicode__() in actions:
-              ${actions[form.instance.__unicode__()].errorMessage }
+              ${ actions[form.instance.__unicode__()].errorMessage or '' }
             % endif
           % endif
         </div>
