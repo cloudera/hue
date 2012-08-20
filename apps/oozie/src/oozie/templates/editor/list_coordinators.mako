@@ -17,6 +17,8 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+
+  from oozie.views import can_access_job, can_edit_job
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -69,18 +71,20 @@ ${ layout.menubar(section='coordinators') }
         <tr class="action-row">
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
-              % if currentuser.username == coordinator.owner.username:
+              % if can_edit_job(currentuser, coordinator):
                   data-param-url="${ url('oozie:workflow_parameters', workflow=coordinator.id) }"
                   data-delete-url="${ url('oozie:delete_coordinator', coordinator=coordinator.id) }"
               % endif
+              % if can_access_job(currentuser, coordinator):
                   data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }"
                   data-bundle-url="${ url('oozie:create_coordinator') }"
                   data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }"
+              % endif
               >
             </input>
-            %if currentuser.username == coordinator.owner.username:
+            % if can_access_job(currentuser, coordinator):
               <a href="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" data-row-selector="true"/>
-            %endif%
+            % endif
           </td>
           <td>${ coordinator.name }</td>
           <td>${ coordinator.description }</td>
@@ -91,7 +95,7 @@ ${ layout.menubar(section='coordinators') }
           </td>
           <td>${ coordinator.text_frequency }</td>
           <td>
-            <span class="label label-info">${ _('production') }</span>
+            <span class="label label-info">${ coordinator.status }</span>
           </td>
           <td nowrap="nowrap">${ utils.format_date(coordinator.last_modified) }</td>
           <td>${ coordinator.owner.username }</td>
@@ -134,21 +138,6 @@ ${ layout.menubar(section='coordinators') }
   </form>
 </div>
 
-<div id="installSamples" class="modal hide fade">
-  <form id="installSamplesForm" action="${url('oozie:setup')}" method="POST">
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${ _('Install sample coordinators?') }</h3>
-    </div>
-    <div class="modal-body">
-      ${ _('It will take a few seconds to install.') }
-    </div>
-    <div class="modal-footer">
-      <input type="submit" class="btn primary" value="${ _('Yes') }"/>
-      <a href="#" class="btn secondary" data-dismiss="modal">${ _('No') }</a>
-    </div>
-  </form>
-</div>
 
 <style>
   td .btn-large{ cursor: crosshair;  }
@@ -282,10 +271,6 @@ ${ layout.menubar(section='coordinators') }
 
     $("#filterInput").keyup(function() {
         oTable.fnFilter($(this).val());
-    });
-
-    $("#installSamplesLink").click(function(){
-        $("#installSamples").modal("show");
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();

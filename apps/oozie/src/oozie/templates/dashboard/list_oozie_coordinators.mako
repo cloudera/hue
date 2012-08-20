@@ -34,13 +34,8 @@ ${layout.menubar(section='dashboard')}
       ${ _('Filter:') } <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
 
       <span class="pull-right">
-        <span style="padding-right:10px;float:left">
+        <span style="padding-right:10px;float:left;margin-top:3px">
         ${ _('Show only') }
-         <a class="btn btn-submitter btn-info active">
-          <span class="btn-submitter">${ _('Mine') }</span>
-          <span class="btn-submitter hide">${ _('All') }</span>
-         </a>
-        ${ _('from the last') }
         </span>
         <span class="btn-group" style="float:left">
           <a class="btn btn-date btn-info">1</a>
@@ -200,12 +195,6 @@ ${layout.menubar(section='dashboard')}
       $("#filterInput").keyup();
     });
 
-    $("a.btn-submitter").click(function() {
-      $("a.btn-submitter").toggleClass('active');
-      $("span.btn-submitter").toggleClass('hide');
-      $("#filterInput").keyup();
-    });
-
     $.fn.dataTableExt.afnFiltering.push(
       function(oSettings, aData, iDataIndex) {
 
@@ -228,13 +217,7 @@ ${layout.menubar(section='dashboard')}
           dateFilter = Date.parse(aData[0]) >= minAge;
         }
 
-        submitterBtn = $('a.btn-submitter.active');
-        submitterFilter = true;
-        if (submitterBtn.length > 0) {
-          submitterFilter = aData[4] == '${ user }';
-        }
-
-        return statusFilter && dateFilter && submitterFilter;
+        return statusFilter && dateFilter;
       }
     );
 

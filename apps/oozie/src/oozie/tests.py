@@ -32,7 +32,7 @@ from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator 
   CoordinatorList, WorkflowAction
 
 from oozie.models import Workflow, Node, Job, Coordinator, Fork
-from oozie.conf import SHARE_JOBS
+from oozie.conf import SHARE_JOBS, REMOTE_DEPLOYMENT_DIR
 
 LOG = logging.getLogger(__name__)
 
@@ -55,10 +55,10 @@ class MockOozieApi:
 
   def __init__(self, *args, **kwargs):
     pass
-  
+
   def setuser(self, user):
     pass
-  
+
   def submit_job(self, properties):
     return 'ONE-OOZIE-ID'
 
@@ -104,11 +104,11 @@ class TestEditor:
 
   def test_find_paramters(self):
     jobs = [Job(name="$a"),
-            Job(name="foo $b $$"),
+            Job(name="foo ${b} $$"),
             Job(name="${foo}", description="xxx ${foo}")]
 
     result = [job.find_parameters(['name', 'description']) for job in jobs]
-    assert_equal(set(["a", "b", "foo"]), reduce(lambda x, y: x | set(y), result, set()))
+    assert_equal(set(["b", "foo"]), reduce(lambda x, y: x | set(y), result, set()))
 
 
   def test_create_workflow(self):
@@ -353,17 +353,21 @@ class TestEditor:
 
     # Submit
     finish = SHARE_JOBS.set_for_testing(False)
+    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
     try:
       response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
       assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
+      finish_deployement()
     finish = SHARE_JOBS.set_for_testing(True)
+    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
     try:
       response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
       assert_false('Permission denied' in response.content, response.content)
     finally:
       finish()
+      finish_deployement()
 
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)
@@ -466,17 +470,21 @@ class TestEditor:
 
     # Submit
     finish = SHARE_JOBS.set_for_testing(False)
+    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
     try:
       response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
       assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
+      finish_deployement()
     finish = SHARE_JOBS.set_for_testing(True)
+    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
     try:
       response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
       assert_false('Permission denied' in response.content, response.content)
     finally:
       finish()
+      finish_deployement()
 
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)

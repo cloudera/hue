@@ -1,0 +1,183 @@
+[
+  {
+    "pk": 5,
+    "model": "oozie.job",
+    "fields": {
+      "is_shared": true,
+      "name": "SleepWorkflow",
+      "deployment_dir": "/user/hue/oozie/demo/sleep",
+      "schema_version": "",
+      "last_modified": "2012-08-20 13:13:34",
+      "owner": 1,
+      "description": "Run a Sleep MapReduce job"
+    }
+  },
+  {
+    "pk": 6,
+    "model": "oozie.job",
+    "fields": {
+      "is_shared": true,
+      "name": "DailySleep",
+      "deployment_dir": "/user/hue/oozie/demo/sleep",
+      "schema_version": "",
+      "last_modified": "2012-08-20 13:56:53",
+      "owner": 1,
+      "description": "Sleep each day for the date of the day milliseconds"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "oozie.workflow",
+    "fields": {
+      "start": 18,
+      "is_single": false,
+      "end": 17
+    }
+  },
+  {
+    "pk": 23,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "to",
+      "parent": 18,
+      "child": 19
+    }
+  },
+  {
+    "pk": 24,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "related",
+      "parent": 18,
+      "child": 17
+    }
+  },
+  {
+    "pk": 25,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "ok",
+      "parent": 19,
+      "child": 17
+    }
+  },
+  {
+    "pk": 26,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "error",
+      "parent": 19,
+      "child": 16
+    }
+  },
+  {
+    "pk": 16,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "kill",
+      "workflow": 5,
+      "name": "kill",
+      "description": ""
+    }
+  },
+  {
+    "pk": 17,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "end",
+      "workflow": 5,
+      "name": "end",
+      "description": ""
+    }
+  },
+  {
+    "pk": 18,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "start",
+      "workflow": 5,
+      "name": "start",
+      "description": ""
+    }
+  },
+  {
+    "pk": 19,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "mapreduce",
+      "workflow": 5,
+      "name": "Sleep",
+      "description": "Sleep for some time"
+    }
+  },
+  {
+    "pk": 19,
+    "model": "oozie.mapreduce",
+    "fields": {
+      "files": "[]",
+      "job_properties": "[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]",
+      "jar_path": "/user/hue/oozie/demo/lib/hadoop-examples.jar",
+      "archives": "[]",
+      "node_ptr": 19
+    }
+  },
+  {
+    "pk": 18,
+    "model": "oozie.start",
+    "fields": {
+      "node_ptr": 18
+    }
+  },
+  {
+    "pk": 17,
+    "model": "oozie.end",
+    "fields": {}
+  },
+  {
+    "pk": 16,
+    "model": "oozie.kill",
+    "fields": {
+      "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
+    }
+  },
+  {
+    "pk": 6,
+    "model": "oozie.coordinator",
+    "fields": {
+      "end": "2012-08-04 00:00:00",
+      "frequency_number": 1,
+      "workflow": 5,
+      "frequency_unit": "days",
+      "start": "2012-08-01 00:00:00",
+      "timezone": "America/Los_Angeles"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "oozie.dataset",
+    "fields": {
+      "name": "sleep_time",
+      "frequency_number": 1,
+      "coordinator": 6,
+      "frequency_unit": "days",
+      "uri": "${DAY}",
+      "start": "2012-08-01 00:00:00",
+      "timezone": "America/Los_Angeles",
+      "done_flag": "",
+      "description": ""
+    }
+  },
+  {
+    "pk": 1,
+    "model": "oozie.dataoutput",
+    "fields": {
+      "coordinator": 6,
+      "name": "REDUCER_SLEEP_TIME",
+      "dataset": 3
+    }
+  }
+]

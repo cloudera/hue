@@ -23,23 +23,27 @@ from desktop.lib.conf import Config, coerce_bool
 from desktop.lib import paths
 
 
-REMOTE_DATA_DIR = Config(
-  key="remote_data_dir",
-  default="/user/hue/oozie",
-  help=_("Location on HDFS where the oozie examples and templates are stored."))
-
-# Where examples are stored.
-LOCAL_DATA_DIR = Config(
+LOCAL_SAMPLE_DIR = Config(
   key="local_data_dir",
-  default=os.path.join(os.path.dirname(__file__), "..", "..", "data"),
-  help=_("Location on local FS where examples and template are stored"),
+  default=os.path.join(os.path.dirname(__file__), "..", "..", "examples"),
+  help=_("Location on local FS where the examples are stored"),
   private=True)
 
-SAMPLE_DATA_DIR = Config(
+LOCAL_SAMPLE_DATA_DIR = Config(
   key="sample_data_dir",
   default=paths.get_thirdparty_root("sample_data"),
-  help=_("Location on local FS where sample data is stored"),
+  help=_("Location on local FS where the data for the examples is stored"),
   private=True)
+
+REMOTE_SAMPLE_DIR = Config(
+  key="remote_data_dir",
+  default="/user/hue/oozie/examples",
+  help=_("Location on HDFS where the oozie examples and templates are stored."))
+
+REMOTE_DEPLOYMENT_DIR = Config(
+  key="remote_data_dir",
+  default="/user/hue/oozie/deployments",
+  help=_("Location on HDFS where the workflows/coordinator are deployed when submitted."))
 
 SHARE_JOBS = Config(
   key='share_jobs',

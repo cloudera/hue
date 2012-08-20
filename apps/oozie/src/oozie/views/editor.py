@@ -37,6 +37,7 @@ from hadoop.fs.exceptions import WebHdfsException
 from liboozie.submittion import Submission
 
 from oozie.conf import SHARE_JOBS
+from oozie.management.commands import oozie_setup
 from oozie.models import Workflow, Node, Link, History, Coordinator,\
   Dataset, DataInput, DataOutput, Job, _STD_PROPERTIES_JSON
 from oozie.forms import NodeForm, WorkflowForm, CoordinatorForm, DatasetForm,\
@@ -57,57 +58,26 @@ A Workflow/Coordinator can be modified only by its owner or a superuser.
 
 Permissions checking happens by adding the decorators.
 """
+def can_access_job(user, job):
+  return user.is_superuser or job.owner == user or (SHARE_JOBS.get() and job.is_shared)
 
-def can_access_job(request, job_id):
-  """
-  Logic for testing if a user can access a certain Workflow / Coordinator.
-  """
+
+def can_access_job_or_exception(request, job_id):
   if job_id is None:
     return
   try:
     job = Job.objects.select_related().get(pk=job_id).get_full_node()
-    if request.user.is_superuser or job.owner == request.user.username or (SHARE_JOBS.get() and job.is_shared):
+    if can_access_job(request.user, job):
       return job
     else:
       message = _("Permission denied. %(username)s don't have the permissions to access job %(id)s") % \
           {'username': request.user.username, 'id': job.id}
       access_warn(request, message)
+      request.error(message)
       raise PopupException(message)
 
   except Job.DoesNotExist:
     raise PopupException(_('job %(id)s not exist') % {'id': job_id})
-
-
-def can_modify_job(request, job):
-  """Only owners or admins can modify a job."""
-  return request.user.is_superuser or job.owner.id == request.user.id
-
-
-def check_job_modification(request, job):
-  if not can_modify_job(request, job):
-    raise PopupException(_('Not allowed to modified this job'))
-
-
-def check_job_modification_permission(authorize_get=False):
-  """
-  Decorator ensuring that the user has the permissions to modify a workflow or coordinator.
-
-  Need to appear below @check_job_access_permission
-  """
-  def inner(view_func):
-    def decorate(request, *args, **kwargs):
-      if 'workflow' in kwargs:
-        job_type = 'workflow'
-      else:
-        job_type = 'coordinator'
-
-      job = kwargs.get(job_type)
-      if job is not None and not (authorize_get and request.method == 'GET'):
-        check_job_modification(request, job)
-
-      return view_func(request, *args, **kwargs)
-    return wraps(view_func)(decorate)
-  return inner
 
 
 def check_job_access_permission(view_func):
@@ -127,11 +97,43 @@ def check_job_access_permission(view_func):
 
     job = kwargs.get(job_type)
     if job is not None:
-      job = can_access_job(request, job)
+      job = can_access_job_or_exception(request, job)
     kwargs[job_type] = job
 
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
+
+
+def can_edit_job(user, job):
+  """Only owners or admins can modify a job."""
+  return user.is_superuser or job.owner.id == user.id
+
+
+def can_edit_job_or_exception(request, job):
+  if not can_edit_job(request.user, job):
+    raise PopupException('Not allowed to modified this job')
+
+
+def check_job_edition_permission(authorize_get=False):
+  """
+  Decorator ensuring that the user has the permissions to modify a workflow or coordinator.
+
+  Need to appear below @check_job_access_permission
+  """
+  def inner(view_func):
+    def decorate(request, *args, **kwargs):
+      if 'workflow' in kwargs:
+        job_type = 'workflow'
+      else:
+        job_type = 'coordinator'
+
+      job = kwargs.get(job_type)
+      if job is not None and not (authorize_get and request.method == 'GET'):
+        can_edit_job_or_exception(request, job)
+
+      return view_func(request, *args, **kwargs)
+    return wraps(view_func)(decorate)
+  return inner
 
 
 def check_action_access_permission(view_func):
@@ -146,14 +148,14 @@ def check_action_access_permission(view_func):
   def decorate(request, *args, **kwargs):
     action_id = kwargs.get('action')
     action = Node.objects.get(id=action_id).get_full_node()
-    can_access_job(request, action.workflow.id)
+    can_access_job_or_exception(request, action.workflow.id)
     kwargs['action'] = action
 
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
 
 
-def check_action_modification_permission(view_func):
+def check_action_edition_permission(view_func):
   """
   Decorator ensuring that the user has the permissions to modify a workflow action.
 
@@ -161,7 +163,7 @@ def check_action_modification_permission(view_func):
   """
   def decorate(request, *args, **kwargs):
     action = kwargs.get('action')
-    check_job_modification(request, action.workflow)
+    can_edit_job_or_exception(request, action.workflow)
 
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
@@ -215,7 +217,7 @@ def edit_workflow(request, workflow):
   WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeForm, max_num=0, can_order=False, can_delete=False)
   history = History.objects.filter(submitter=request.user, job=workflow)
 
-  if request.method == 'POST' and can_modify_job(request, workflow):
+  if request.method == 'POST' and can_edit_job_or_exception(request, workflow):
     try:
       workflow_form = WorkflowForm(request.POST, instance=workflow)
       actions_formset = WorkflowFormSet(request.POST, request.FILES, instance=workflow)
@@ -245,7 +247,7 @@ def edit_workflow(request, workflow):
 
 
 @check_job_access_permission
-@check_job_modification_permission()
+@check_job_edition_permission()
 def delete_workflow(request, workflow):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
@@ -253,7 +255,7 @@ def delete_workflow(request, workflow):
   workflow.coordinator_set.update(workflow=None) # In Django 1.3 could do ON DELETE set NULL
   workflow.save()
   workflow.delete()
-  Submission(workflow, request.fs, {}).remove_deployment_dir()
+  Submission(request.user, workflow, request.fs, {}).remove_deployment_dir()
   request.info(_('Workflow deleted!'))
 
   return redirect(reverse('oozie:list_workflows'))
@@ -278,7 +280,7 @@ def submit_workflow(request, workflow):
 
   try:
     mapping = dict(request.POST.iteritems())
-    submission = Submission(workflow, request.fs, mapping)
+    submission = Submission(request.user, workflow, request.fs, mapping)
     job_id = submission.run()
   except RestException, ex:
     raise PopupException(_("Error submitting workflow %s") % (workflow,),
@@ -340,7 +342,7 @@ def new_action(request, workflow, node_type, parent_action_id):
 def edit_action(request, action):
   ActionForm = design_form_by_type(action.node_type)
 
-  if request.method == 'POST' and can_modify_job(request, action.workflow):
+  if request.method == 'POST' and can_edit_job_or_exception(request, action.workflow):
     action_form = ActionForm(request.POST, instance=action)
     if action_form.is_valid():
       action = action_form.save()
@@ -362,7 +364,7 @@ def edit_action(request, action):
 
 
 @check_action_access_permission
-@check_action_modification_permission
+@check_action_edition_permission
 def edit_workflow_fork(request, action):
   fork = action
 
@@ -399,7 +401,7 @@ def edit_workflow_fork(request, action):
 
 
 @check_action_access_permission
-@check_action_modification_permission
+@check_action_edition_permission
 def delete_action(request, action):
   if request.method == 'POST':
     action.workflow.delete_action(action)
@@ -419,7 +421,7 @@ def clone_action(request, action):
 
 
 @check_action_access_permission
-@check_action_modification_permission
+@check_action_edition_permission
 def move_up_action(request, action):
   if request.method == 'POST':
     action.workflow.move_action_up(action)
@@ -429,7 +431,7 @@ def move_up_action(request, action):
 
 
 @check_action_access_permission
-@check_action_modification_permission
+@check_action_edition_permission
 def move_down_action(request, action):
   if request.method == 'POST':
     action.workflow.move_action_down(action)
@@ -461,20 +463,20 @@ def create_coordinator(request, workflow=None):
 
 
 @check_job_access_permission
-@check_job_modification_permission()
+@check_job_edition_permission()
 def delete_coordinator(request, coordinator):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
   coordinator.delete()
-  Submission(coordinator, request.fs, {}).remove_deployment_dir()
+  Submission(request.user, coordinator, request.fs, {}).remove_deployment_dir()
   request.info(_('Coordinator deleted!'))
 
-  return redirect(reverse('oozie:list_workflows'))
+  return redirect(reverse('oozie:list_coordinator'))
 
 
 @check_job_access_permission
-@check_job_modification_permission(True)
+@check_job_edition_permission(True)
 def edit_coordinator(request, coordinator):
   history = History.objects.filter(submitter=request.user, job=coordinator)
 
@@ -522,7 +524,7 @@ def edit_coordinator(request, coordinator):
 
 
 @check_job_access_permission
-@check_job_modification_permission()
+@check_job_edition_permission()
 def create_coordinator_dataset(request, coordinator):
   """Returns {'status' 0/1, data:html or url}"""
 
@@ -553,7 +555,7 @@ def create_coordinator_dataset(request, coordinator):
 
 
 @check_job_access_permission
-@check_job_modification_permission()
+@check_job_edition_permission()
 def create_coordinator_data(request, coordinator, data_type):
   """Returns {'status' 0/1, data:html or url}"""
 
@@ -608,7 +610,7 @@ def submit_coordinator(request, coordinator):
 
   try:
     if not coordinator.workflow.is_deployed(request.fs):
-      submission = Submission(coordinator.workflow, request.fs, request.POST)
+      submission = Submission(request.user, coordinator.workflow, request.fs, request.POST)
       wf_dir = submission.deploy()
       coordinator.workflow.deployment_dir = wf_dir
       coordinator.workflow.save()
@@ -617,7 +619,7 @@ def submit_coordinator(request, coordinator):
     properties = {'wf_application_path': coordinator.workflow.deployment_dir}
     properties.update(dict(request.POST.iteritems()))
 
-    submission = Submission(coordinator, request.fs, properties=properties)
+    submission = Submission(request.user, coordinator, request.fs, properties=properties)
     job_id = submission.run()
   except RestException, ex:
     raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
@@ -661,14 +663,11 @@ def list_history_record(request, record_id):
   })
 
 
-def setup(request):
-  """Installs oozie examples."""
+def install_examples(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
   try:
-    # Warning: below will modify fs.user
-    #oozie_setup.Command().handle_noargs()
-    pass
+    oozie_setup.Command().handle_noargs()
   except WebHdfsException, e:
     raise PopupException(_('The examples could not be installed.'), detail=e)
   return redirect(reverse('oozie:list_workflows'))

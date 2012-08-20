@@ -36,7 +36,7 @@ from desktop.lib import django_mako
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 
-from oozie.conf import REMOTE_DATA_DIR
+from oozie.conf import REMOTE_SAMPLE_DIR
 from timezones import TIMEZONES
 
 
@@ -69,7 +69,7 @@ class Job(models.Model):
     super(Job, self).save()
 
     if not self.deployment_dir:
-      default_dir = Hdfs.join(REMOTE_DATA_DIR.get(), '_%s_-oozie-%s' % (self.owner.username, self.id))
+      default_dir = Hdfs.join(REMOTE_SAMPLE_DIR.get(), '_%s_-oozie-%s' % (self.owner.username, self.id))
       self.deployment_dir = default_dir
       super(Job, self).save()
 
@@ -137,14 +137,14 @@ class WorkflowManager(models.Manager):
     workflow.save()
 
     WorkflowManager.create_data_dir(fs)
-    Submission(workflow, fs, {})._create_deployment_dir()
+    Submission(workflow.owner, workflow, fs, {})._create_deployment_dir()
 
     return workflow
 
   @classmethod
   def create_data_dir(cls, fs):
     # If needed, create the remote home and data directories
-    remote_data_dir = REMOTE_DATA_DIR.get()
+    remote_data_dir = REMOTE_SAMPLE_DIR.get()
     user = fs.user
 
     try:
@@ -993,7 +993,7 @@ class DataOutput(models.Model):
 
 class HistoryManager(models.Manager):
   def create_from_submission(self, submission):
-    History.objects.create(submitter=submission.job.owner,
+    History.objects.create(submitter=submission.user,
                            oozie_job_id=submission.oozie_id,
                            job=submission.job,
                            properties=json.dumps(submission.properties))
@@ -1069,7 +1069,7 @@ def find_parameters(instance, fields=None):
     data = getattr(instance, field)
     if isinstance(data, basestring):
       for match in Template.pattern.finditer(data):
-        name = match.group('named') or match.group('braced')
+        name = match.group('braced')
         if name is not None:
           params.append(name)
   return params

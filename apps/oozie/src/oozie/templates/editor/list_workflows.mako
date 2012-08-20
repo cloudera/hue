@@ -17,6 +17,8 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+
+  from oozie.views import can_access_job, can_edit_job
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -32,6 +34,7 @@ ${ layout.menubar(section='workflows') }
   <div class="well hueWell">
     <div class="btn-group pull-right">
       <a href="${ url('oozie:create_workflow') }" class="btn">${ _('Create') }</a>
+      <a href="#installSamples" data-toggle="modal" class="btn">${ _('Install examples') }</a>
     </div>
 
     <div class="row-fluid">
@@ -70,15 +73,17 @@ ${ layout.menubar(section='workflows') }
         <tr class="action-row">
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
-              % if currentuser.username == workflow.owner.username:
+              % if can_access_job(currentuser, workflow):
                   data-param-url="${ url('oozie:workflow_parameters', workflow=workflow.id) }"
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
-                  data-delete-url="${ url('oozie:delete_workflow', workflow=workflow.id) }"
-                  data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
                   data-schedule-url="${ url('oozie:create_coordinator', workflow=workflow.id) }"
               % endif
+              % if can_edit_job(currentuser, workflow):
+                  data-delete-url="${ url('oozie:delete_workflow', workflow=workflow.id) }"
+                  data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
+              % endif
             />
-            % if currentuser.username == workflow.owner.username:
+            % if can_access_job(currentuser, workflow):
               <a href="${ url('oozie:edit_workflow', workflow=workflow.id) }" data-row-selector="true"></a>
             % endif
           </td>
@@ -134,10 +139,10 @@ ${ layout.menubar(section='workflows') }
 </div>
 
 <div id="installSamples" class="modal hide fade">
-  <form id="installSamplesForm" action="${url('oozie:setup')}" method="POST">
+  <form id="installSamplesForm" action="${url('oozie:install_examples')}" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${ _('Install sample job workflows?') }</h3>
+      <h3>${ _('Install samples?') }</h3>
     </div>
     <div class="modal-body">
       ${ _('It will take a few seconds to install.') }
@@ -276,10 +281,6 @@ ${ layout.menubar(section='workflows') }
 
     $("#filterInput").keyup(function() {
       oTable.fnFilter($(this).val());
-    });
-
-    $("#installSamplesLink").click(function(){
-      $("#installSamples").modal("show");
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
