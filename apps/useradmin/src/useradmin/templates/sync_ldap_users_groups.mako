@@ -31,23 +31,22 @@ from django.utils.translation import ugettext as _
   %endif
 </%def>
 
-<div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal">&times;</button>
-  <h3>${_('Sync LDAP users and groups')}</h3>
-</div>
-<div class="modal-body">
-  <div class="alert alert-info">
-    ${_("This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced.")}
-    <br/>
-    ${_("All user information and group memberships will be updated based on the LDAP server's current state.")}
+<form action="${path}" method="POST" class="form form-inline right">
+  <div class="modal-header left">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3>${_('Sync LDAP users and groups')}</h3>
   </div>
-</div>
-<div class="modal-footer">
-  <form action="${path}" method="POST" class="form form-inline">
+  <div class="modal-body">
+    <div class="alert alert-info left">
+      <p>${_("This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced.")}</p>
+      <p>${_("All user information and group memberships will be updated based on the LDAP server's current state.")}</p>
+    </div>
     % for field in form:
       ${render_field(field)}
     % endfor
+  </div>
+  <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
     <input type="submit" class="btn primary" value="${_('Sync')}"/>
-  </form>
-</div>
+  </div>
+</form>
