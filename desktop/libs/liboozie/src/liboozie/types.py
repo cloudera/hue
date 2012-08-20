@@ -16,9 +16,10 @@
 # limitations under the License.
 
 """
-Oozie objects.
+Oozie API classes.
 
-This is mostly just codifying the oozie json.
+This is mostly just codifying the datastructure of the Oozie REST API.
+http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 """
 
 from cStringIO import StringIO
@@ -41,9 +42,63 @@ class Action(object):
       setattr(self, attr, json_dict.get(attr))
     self._fixup()
 
+  def _fixup(self): pass
+
   def is_finished(self):
     return self.status == 'OK'
 
+  @classmethod
+  def create(self, action_class, action_dict):
+    if ControlFlowAction.is_control_flow(action_dict['type']):
+      return ControlFlowAction(action_dict)
+    else:
+      return action_class(action_dict)
+
+
+class ControlFlowAction(Action):
+  _ATTRS = [
+    'errorMessage',
+    'status',
+    'stats',
+    'data',
+    'transition',
+    'externalStatus',
+    'cred',
+    'conf',
+    'type',
+    'endTime',
+    'externalId',
+    'id',
+    'startTime',
+    'externalChildIDs',
+    'name',
+    'errorCode',
+    'trackerUri',
+    'retries',
+    'toString',
+    'consoleUrl'
+  ]
+
+  @classmethod
+  def is_control_flow(self, action_type):
+    return action_type is not None and ':' in action_type
+
+  def _fixup(self):
+    """
+    Fixup:
+      - time fields as struct_time
+      - config dict
+    """
+    super(ControlFlowAction, self)._fixup()
+
+    if self.startTime:
+      self.startTime = parse_timestamp(self.startTime)
+    if self.endTime:
+      self.endTime = parse_timestamp(self.endTime)
+    if self.retries:
+      self.retries = int(self.retries)
+
+    self.conf_dict = {}
 
 class CoordinatorAction(Action):
   _ATTRS = [
@@ -72,6 +127,8 @@ class CoordinatorAction(Action):
       - time fields as struct_time
       - config dict
     """
+    super(CoordinatorAction, self)._fixup()
+
     if self.createdTime:
       self.createdTime = parse_timestamp(self.createdTime)
     if self.nominalTime:
@@ -79,9 +136,11 @@ class CoordinatorAction(Action):
     if self.lastModifiedTime:
       self.lastModifiedTime = parse_timestamp(self.lastModifiedTime)
 
-    xml = StringIO(i18n.smart_str(self.runConf))
-    self.conf_dict = hadoop.confparse.ConfParse(xml)
-
+    if self.runConf:
+      xml = StringIO(i18n.smart_str(self.runConf))
+      self.conf_dict = hadoop.confparse.ConfParse(xml)
+    else:
+      self.conf_dict = {}
 
 class WorkflowAction(Action):
   _ATTRS = [
@@ -103,13 +162,14 @@ class WorkflowAction(Action):
     'type',
   ]
 
-
   def _fixup(self):
     """
     Fixup:
       - time fields as struct_time
       - config dict
     """
+    super(WorkflowAction, self)._fixup()
+
     if self.startTime:
       self.startTime = parse_timestamp(self.startTime)
     if self.endTime:
@@ -153,7 +213,7 @@ class Job(object):
     if self.endTime:
       self.endTime = parse_timestamp(self.endTime)
 
-    self.actions = [ self.ACTION(act_dict) for act_dict in self.actions ]
+    self.actions = [Action.create(self.ACTION, act_dict) for act_dict in self.actions]
     if self.conf is not None:
       xml = StringIO(i18n.smart_str(self.conf))
       self.conf_dict = hadoop.confparse.ConfParse(xml)
@@ -212,6 +272,12 @@ class Job(object):
       access_warn(request, _('Insufficient permission'))
       raise PopupException(_("Permission denied. User %(username)s cannot modify user %(user)s's job.") %
                            dict(username=request.user.username, user=self.user))
+
+  def get_control_flow_actions(self):
+    return [action for action in self.actions if ControlFlowAction.is_control_flow(action.type)]
+
+  def get_working_actions(self):
+    return [action for action in self.actions if not ControlFlowAction.is_control_flow(action.type)]
 
 class Coordinator(Job):
   _ATTRS = [

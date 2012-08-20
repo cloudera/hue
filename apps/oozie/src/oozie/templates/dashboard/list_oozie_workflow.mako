@@ -135,7 +135,7 @@ ${ layout.menubar(section='dashboard') }
            forms = WorkflowFormSet(instance=hue_workflow.get_full_node()).forms
          %>
 
-           ${ hue_workflow.get_full_node().gen_status_graph(forms, oozie_workflow.actions) }
+           ${ hue_workflow.get_full_node().gen_status_graph(forms, oozie_workflow.get_working_actions()) }
          % endif
        </div>
      % endif
@@ -162,7 +162,7 @@ ${ layout.menubar(section='dashboard') }
             </tr>
           </thead>
           <tbody>
-            % for i, action in enumerate(oozie_workflow.actions):
+            % for i, action in enumerate(oozie_workflow.get_working_actions()):
               <tr>
                 <td>
                   <a href="${ url('oozie:list_oozie_workflow_action', action=action.id) }" data-row-selector='true'>${ action.id }</a>

@@ -46,6 +46,15 @@ Permissions checking happens by calling check_access_and_get_oozie_job().
 """
 
 
+def show_oozie_error(view_func):
+  def decorate(request, *args, **kwargs):
+    try:
+      return view_func(request, *args, **kwargs)
+    except RestException, ex:
+      raise PopupException(_('Sorry, an error with Oozie happened.'), detail=ex._headers.get('oozie-error-message', ex))
+  return wraps(view_func)(decorate)
+
+
 def manage_oozie_jobs(request, job_id, action):
   if request.method != 'POST':
     raise PopupException(_('Please use a POST request to manage an Oozie job.'))
@@ -64,6 +73,7 @@ def manage_oozie_jobs(request, job_id, action):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@show_oozie_error
 def list_oozie_workflows(request):
   kwargs = {'cnt': 50,}
   if not request.user.is_superuser:
@@ -77,6 +87,7 @@ def list_oozie_workflows(request):
   })
 
 
+@show_oozie_error
 def list_oozie_coordinators(request):
   kwargs = {'cnt': 50,}
   if not request.user.is_superuser:
@@ -89,6 +100,7 @@ def list_oozie_coordinators(request):
   })
 
 
+@show_oozie_error
 def list_oozie_workflow(request, job_id, coordinator_job_id=None):
   oozie_workflow = check_access_and_get_oozie_job(request, job_id)
 
@@ -124,6 +136,7 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None):
   })
 
 
+@show_oozie_error
 def list_oozie_coordinator(request, job_id):
   oozie_coordinator = check_access_and_get_oozie_job(request, job_id)
 
@@ -140,6 +153,7 @@ def list_oozie_coordinator(request, job_id):
   })
 
 
+@show_oozie_error
 def list_oozie_workflow_action(request, action):
   try:
     action = get_oozie().get_action(action)

@@ -36,12 +36,13 @@ from desktop.log.access import access_warn
 from hadoop.fs.exceptions import WebHdfsException
 from liboozie.submittion import Submission
 
+from oozie.conf import SHARE_JOBS
 from oozie.models import Workflow, Node, Link, History, Coordinator,\
   Dataset, DataInput, DataOutput, Job, _STD_PROPERTIES_JSON
 from oozie.forms import NodeForm, WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataInputSetForm, DataOutputForm, DataOutputSetForm, LinkForm,\
   DefaultLinkForm, design_form_by_type
-from oozie.conf import SHARE_JOBS
+
 
 LOG = logging.getLogger(__name__)
 

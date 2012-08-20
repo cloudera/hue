@@ -95,7 +95,7 @@ ${ layout.menubar(section='dashboard') }
             </tr>
           </thead>
           <tbody>
-            % for i, action in enumerate(reversed(oozie_coordinator.actions)):
+            % for i, action in enumerate(reversed(oozie_coordinator.get_working_actions())):
               <tr>
                 <td>
                   % if action.externalId:
@@ -133,7 +133,7 @@ ${ layout.menubar(section='dashboard') }
             </tr>
           </thead>
           <tbody>
-            % for i, action in enumerate(oozie_coordinator.actions):
+            % for i, action in enumerate(oozie_coordinator.get_working_actions()):
               <tr>
 
                 <td>${ action.actionNumber }</td>
