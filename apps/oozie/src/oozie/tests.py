@@ -639,8 +639,6 @@ class TestEditor:
         '  <action>\n'
         '    <workflow>\n'
         '      <app-path>${wf_application_path}</app-path>\n'
-        '      <configuration>\n'
-        '     </configuration>\n'
         '   </workflow>\n'
         '  </action>\n'
         '</coordinator-app>\n'.split(), coord.to_xml().split())
