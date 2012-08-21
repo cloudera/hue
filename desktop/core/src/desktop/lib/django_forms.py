@@ -30,6 +30,39 @@ import urllib
 
 import desktop.lib.i18n
 
+class SplitDateTimeWidget(forms.MultiWidget):
+  """
+  A Widget that splits datetime input into two <input type="text"> boxes.
+  The date_class and time_class attributes specify class names to be given
+  specifically to the corresponding DateInput and TimeInput widgets.
+  """
+  date_format = forms.DateInput.format
+  time_format = forms.TimeInput.format
+
+  def __init__(self, attrs=None, date_format=None, time_format=None, date_class='date', time_class='time'):
+    date_attrs = dict(attrs)
+    time_attrs = dict(attrs)
+    if 'class' in date_attrs:
+      date_classes = [clss for clss in date_attrs['class'].split() if clss != date_class]
+      date_classes.append(date_class)
+      date_attrs['class'] = ' '.join(date_classes)
+    else:
+      date_attrs['class'] = date_class
+    if 'class' in time_attrs:
+      time_classes = [clss for clss in time_attrs['class'].split() if clss != time_class]
+      time_classes.append(time_class)
+      time_attrs['class'] = ' '.join(time_classes)
+    else:
+      time_attrs['class'] = time_class
+    widgets = (forms.DateInput(attrs=date_attrs, format=date_format),
+               forms.TimeInput(attrs=time_attrs, format=time_format))
+    del attrs['class']
+    super(SplitDateTimeWidget, self).__init__(widgets, attrs)
+
+  def decompress(self, value):
+    if value:
+      return [value.date(), value.time().replace(microsecond=0)]
+    return [None, None]
 
 class MultipleInputWidget(Widget):
   """

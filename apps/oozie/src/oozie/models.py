@@ -941,9 +941,6 @@ class Coordinator(Job):
     return list(params - set(['MINUTE', 'DAY', 'MONTH', 'YEAR']))
 
 
-def utc_date_format(utc_time):
-  return utc_time.strftime("%Y-%m-%d")
-
 def utc_datetime_format(utc_time):
   return utc_time.strftime("%Y-%m-%dT%H:%MZ")
 
@@ -951,7 +948,7 @@ def utc_datetime_format(utc_time):
 class Dataset(models.Model):
   name = models.CharField(max_length=40, validators=[name_validator])
   description = models.CharField(max_length=1024, blank=True, default='')
-  start = models.DateTimeField(default=utc_date_format(datetime.today()))
+  start = models.DateTimeField(default=datetime.today())
   frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS)
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days')
   uri = models.CharField(max_length=1024, default='/data/${YEAR}${MONTH}${DAY}')

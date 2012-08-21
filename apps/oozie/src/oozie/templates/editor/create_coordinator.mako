@@ -25,6 +25,7 @@
 ${ commonheader(_("Oozie App"), "oozie", "100px") }
 ${ layout.menubar(section='coordinators') }
 
+
 <script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
 
 
@@ -88,5 +89,25 @@ ${ layout.menubar(section='coordinators') }
   </form>
 
 </div>
+
+
+<link rel="stylesheet" href="/static/ext/css/jquery-ui-datepicker-1.8.23.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+<link rel="stylesheet" href="/static/ext/css/jquery-timepicker.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+
+<script src="/static/ext/js/jquery/plugins/jquery-ui-datepicker-1.8.23.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery-timepicker.min.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function(){
+    var timeOptions = {
+      show24Hours: false,
+      startTime: '00:00',
+      endTime: '23:59',
+      step: 60
+    };
+    $( "input.date" ).datepicker();
+    $( "input.time" ).timePicker(timeOptions);
+  });
+</script>
 
 ${commonfooter(messages)}
