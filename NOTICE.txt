@@ -6,3 +6,6 @@ Roman V. Kiseliov <roman@kiseliov.ru> (PyExcel).
 
 This product includes software developed by
 Andrew Valums (http://valums.com/ajax-upload/).
+
+This product includes software developed by
+Anders Fajerson (https://github.com/perifer/timePicker)

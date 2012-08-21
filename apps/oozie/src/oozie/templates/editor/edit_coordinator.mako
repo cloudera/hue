@@ -369,55 +369,69 @@ ${ layout.menubar(section='coordinators') }
   </div>
 </div>
 
+<link rel="stylesheet" href="/static/ext/css/jquery-ui-datepicker-1.8.23.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+<link rel="stylesheet" href="/static/ext/css/jquery-timepicker.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+
+<script src="/static/ext/js/jquery/plugins/jquery-ui-datepicker-1.8.23.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery-timepicker.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function() {
-      $("#datasets-btn").click(function() {
-        $('[href=#datasets]').tab('show');
-      });
+    var timeOptions = {
+      show24Hours: false,
+      startTime: '00:00',
+      endTime: '23:59',
+      step: 60
+    };
+    $( "input.date" ).datepicker();
+    $( "input.time" ).timePicker(timeOptions);
 
-      $('#add-dataset-btn').click(function() {
-        $.post("${ url('oozie:create_coordinator_dataset', coordinator=coordinator.id) }",
-          $("#add-dataset-form").serialize(),
-          function(response) {
-            if (response['status'] != 0) {
-              $('#add-dataset-body').html(response['data']);
-            } else {
-              window.location.replace(response['data']);
-            }
-          }
-        );
-     });
-
-    $('#add-data-input-btn').click(function() {
-      $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='input') }",
-        $("#add-data-input-form").serialize(),
-          function(response) {
-            if (response['status'] != 0) {
-              $('#add-data-input-body').html(response['data']);
-            } else {
-              window.location.replace(response['data']);
-            }
-          }
-        );
-     });
-
-    $('#add-data-output-btn').click(function() {
-      $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='output') }",
-        $("#add-data-output-form").serialize(),
-          function(response) {
-            if (response['status'] != 0) {
-              $('#add-data-output-body').html(response['data']);
-            } else {
-              window.location.replace(response['data']);
-            }
-          }
-        );
-     });
-
-     $("a[data-row-selector='true']").jHueRowSelector();
+    $("#datasets-btn").click(function() {
+      $('[href=#datasets]').tab('show');
     });
+
+    $('#add-dataset-btn').click(function() {
+      $.post("${ url('oozie:create_coordinator_dataset', coordinator=coordinator.id) }",
+        $("#add-dataset-form").serialize(),
+        function(response) {
+          if (response['status'] != 0) {
+            $('#add-dataset-body').html(response['data']);
+          } else {
+            window.location.replace(response['data']);
+          }
+        }
+      );
+   });
+
+  $('#add-data-input-btn').click(function() {
+    $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='input') }",
+      $("#add-data-input-form").serialize(),
+        function(response) {
+          if (response['status'] != 0) {
+            $('#add-data-input-body').html(response['data']);
+          } else {
+            window.location.replace(response['data']);
+          }
+        }
+      );
+   });
+
+  $('#add-data-output-btn').click(function() {
+    $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='output') }",
+      $("#add-data-output-form").serialize(),
+        function(response) {
+          if (response['status'] != 0) {
+            $('#add-data-output-body').html(response['data']);
+          } else {
+            window.location.replace(response['data']);
+          }
+        }
+      );
+   });
+
+   $("a[data-row-selector='true']").jHueRowSelector();
+ });
 </script>
 
 % endif

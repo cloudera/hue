@@ -500,7 +500,7 @@ def edit_coordinator(request, coordinator):
   DataOutputFormSet = inlineformset_factory(Coordinator, DataOutput, form=DataOutputSetForm, max_num=0, can_order=False, can_delete=True)
 
   dataset = Dataset(coordinator=coordinator)
-  dataset_form = DatasetForm(instance=dataset)
+  dataset_form = DatasetForm(instance=dataset, prefix='create')
   data_input = DataInput(coordinator=coordinator)
   data_input_form = DataInputForm(instance=data_input, coordinator=coordinator)
   data_output = DataOutput(coordinator=coordinator)
