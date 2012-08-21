@@ -102,7 +102,7 @@ class TestEditor:
     self.wf = create_workflow()
 
 
-  def test_find_paramters(self):
+  def test_find_parameters(self):
     jobs = [Job(name="$a"),
             Job(name="foo ${b} $$"),
             Job(name="${foo}", description="xxx ${foo}")]
@@ -291,6 +291,26 @@ class TestEditor:
         '</workflow-app>'.split(), self.wf.to_xml().split())
 
 
+  def test_edit_workflow(self):
+    response = self.c.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
+    assert_true('Editor' in response.content, response.content)
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = self.c.post(reverse('oozie:edit_workflow', args=[self.wf.id]), {})
+      assert_true('wf-name-1' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = self.c.post(reverse('oozie:edit_workflow', args=[self.wf.id]), WORKFLOW_DICT)
+      assert_true('wf-name-1' in response.content, response.content)
+    finally:
+      finish()
+
+
   def test_workflow_permissions(self):
     response = self.c.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
     assert_true('Editor' in response.content, response.content)
@@ -345,9 +365,8 @@ class TestEditor:
     # Edit
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-      assert_equal(200, response.status_code)
-      assert_true('wf-name-1' in response.content, response.content)
+      response = client_not_me.post(reverse('oozie:edit_workflow', args=[self.wf.id]))
+      assert_true('Not allowed' in response.content, response.content)
     finally:
       finish()
 
@@ -414,6 +433,15 @@ class TestEditor:
     response = self.c.get(reverse('oozie:edit_coordinator', args=[coord.id]))
     assert_true('Editor' in response.content, response.content)
 
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = self.c.post(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_true('MyCoord' in response.content, response.content)
+      assert_false('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
     # Login as someone else
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
     grant_access("not_me", "test", "oozie")
@@ -449,6 +477,8 @@ class TestEditor:
     # Share it !
     coord.is_shared = True
     coord.save()
+    coord.workflow.is_shared = True
+    coord.workflow.save()
 
     # List
     finish = SHARE_JOBS.set_for_testing(True)
@@ -462,9 +492,9 @@ class TestEditor:
     # Edit
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
-      assert_equal(200, response.status_code)
-      assert_true('MyCoord' in response.content, response.content)
+      response = client_not_me.post(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_false('MyCoord' in response.content, response.content)
+      assert_true('Not allowed' in response.content, response.content)
     finally:
       finish()
 
@@ -537,9 +567,15 @@ class TestEditor:
     data = json.loads(response.content)
     assert_equal(0, data['status'], data['data'])
 
+  def test_install_examples(self):
+    self.c.post(reverse('oozie:install_examples'))
 
 
-# Beware: client not consistent with TestEditor.c
+# Utils
+WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u'']}
+
+
+# Beware: client not consistent with self.c in TestEditor
 def add_action(workflow, action, name):
   c = make_logged_in_client()
 
@@ -557,7 +593,7 @@ def create_workflow():
   response = c.get(reverse('oozie:create_workflow'))
   assert_equal(workflow_count, Workflow.objects.count(), response)
 
-  response = c.post(reverse('oozie:create_workflow'), {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u'']}, follow=True)
+  response = c.post(reverse('oozie:create_workflow'), WORKFLOW_DICT, follow=True)
   assert_equal(200, response.status_code)
   assert_equal(workflow_count + 1, Workflow.objects.count(), response)
 

@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from desktop.log.access import access_warn
 
 try:
   import json
@@ -28,6 +27,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render, PopupException
 from desktop.lib.rest.http_client import RestException
+from desktop.log.access import access_warn
 from liboozie.oozie_api import get_oozie
 
 from oozie.models import History
