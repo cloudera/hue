@@ -106,7 +106,7 @@ def check_job_access_permission(view_func):
 
 def can_edit_job(user, job):
   """Only owners or admins can modify a job."""
-  return user.is_superuser or job.owner.id == user.id
+  return user.is_superuser or job.owner == user
 
 
 def can_edit_job_or_exception(request, job):
@@ -218,10 +218,10 @@ def edit_workflow(request, workflow):
   history = History.objects.filter(submitter=request.user, job=workflow)
 
   if request.method == 'POST' and can_edit_job_or_exception(request, workflow):
-    try:
-      workflow_form = WorkflowForm(request.POST, instance=workflow)
-      actions_formset = WorkflowFormSet(request.POST, request.FILES, instance=workflow)
+    workflow_form = WorkflowForm(request.POST, instance=workflow)
+    actions_formset = WorkflowFormSet(request.POST, request.FILES, instance=workflow)
 
+    try:
       if 'clone_action' in request.POST: return clone_action(request, action=request.POST['clone_action'])
       if 'delete_action' in request.POST: return delete_action(request, action=request.POST['delete_action'])
       if 'move_up_action' in request.POST: return move_up_action(request, action=request.POST['move_up_action'])
@@ -668,6 +668,7 @@ def install_examples(request):
     raise PopupException(_('A POST request is required.'))
   try:
     oozie_setup.Command().handle_noargs()
+    request.info(_('Examples installed!'))
   except WebHdfsException, e:
     raise PopupException(_('The examples could not be installed.'), detail=e)
   return redirect(reverse('oozie:list_workflows'))
