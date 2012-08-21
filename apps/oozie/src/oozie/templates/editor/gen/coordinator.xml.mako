@@ -62,20 +62,22 @@
   <action>
     <workflow>
       <app-path>${'${'}wf_application_path}</app-path>
+      % if coord.datainput_set.exists() and coord.dataoutput_set.exists():
       <configuration>
-      % for input in coord.datainput_set.all():
-        <property>
-          <name>${ input.name }</name>
-          <value>${'${'}coord:dataIn('${ input.name }')}</value>
-        </property>
-      % endfor
+        % for input in coord.datainput_set.all():
+          <property>
+            <name>${ input.name }</name>
+            <value>${'${'}coord:dataIn('${ input.name }')}</value>
+          </property>
+        % endfor
         % for output in coord.dataoutput_set.all():
         <property>
           <name>${ output.name }</name>
           <value>${'${'}coord:dataOut('${ output.name }')}</value>
         </property>
         % endfor
-     </configuration>
+      </configuration>
+      % endif
    </workflow>
   </action>
 </coordinator-app>
