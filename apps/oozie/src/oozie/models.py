@@ -36,7 +36,7 @@ from desktop.lib import django_mako
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 
-from oozie.conf import REMOTE_SAMPLE_DIR
+from oozie.conf import REMOTE_SAMPLE_DIR, REMOTE_DEPLOYMENT_DIR
 from timezones import TIMEZONES
 
 
@@ -143,23 +143,24 @@ class WorkflowManager(models.Manager):
 
   @classmethod
   def create_data_dir(cls, fs):
-    # If needed, create the remote home and data directories
-    remote_data_dir = REMOTE_SAMPLE_DIR.get()
+    # If needed, create the remote home, deployment and data directories
+    directories = (REMOTE_DEPLOYMENT_DIR.get(), REMOTE_SAMPLE_DIR.get())
     user = fs.user
 
     try:
       fs.setuser(fs.DEFAULT_USER)
-      if not fs.exists(remote_data_dir):
-        remote_home_dir = Hdfs.join('/user', fs.user)
-        if remote_data_dir.startswith(remote_home_dir):
-          # Home is 755
-          fs.create_home_dir(remote_home_dir)
-        # Shared by all the users
-        fs.mkdir(remote_data_dir, 01777)
+      for directory in directories:
+        if not fs.exists(directory):
+          remote_home_dir = Hdfs.join('/user', fs.user)
+          if directory.startswith(remote_home_dir):
+            # Home is 755
+            fs.create_home_dir(remote_home_dir)
+          # Shared by all the users
+          fs.mkdir(directory, 01777)
     finally:
       fs.setuser(user)
 
-    return remote_data_dir
+    return REMOTE_SAMPLE_DIR.get()
 
 
 class Workflow(Job):
