@@ -172,7 +172,7 @@ def check_action_edition_permission(view_func):
 
 
 def list_workflows(request, job_type='workflow'):
-  show_install_examples = True
+  show_setup_app = True
 
   if job_type == 'coordinators':
     data = Coordinator.objects
@@ -191,7 +191,7 @@ def list_workflows(request, job_type='workflow'):
   return render(template, request, {
     'jobs': list(data),
     'currentuser': request.user,
-    'show_install_examples': show_install_examples,
+    'show_setup_app': show_setup_app,
   })
 
 
@@ -679,13 +679,13 @@ def list_history_record(request, record_id):
   })
 
 
-def install_examples(request):
+def setup_app(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
   try:
     oozie_setup.Command().handle_noargs()
-    request.info(_('Examples installed!'))
+    request.info(_('Workspace and examples installed!'))
   except WebHdfsException, e:
-    raise PopupException(_('The examples could not be installed.'), detail=e)
+    raise PopupException(_('The app setup could complete.'), detail=e)
   return redirect(reverse('oozie:list_workflows'))
 

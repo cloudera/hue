@@ -34,7 +34,9 @@ ${ layout.menubar(section='workflows') }
   <div class="well hueWell">
     <div class="btn-group pull-right">
       <a href="${ url('oozie:create_workflow') }" class="btn">${ _('Create') }</a>
-      <a href="#installSamples" data-toggle="modal" class="btn">${ _('Install examples') }</a>
+      % if currentuser.is_superuser:
+        <a href="#installSamples" data-toggle="modal" class="btn">${ _('Setup App') }</a>
+      % endif
     </div>
 
     <div class="row-fluid">
@@ -139,13 +141,13 @@ ${ layout.menubar(section='workflows') }
 </div>
 
 <div id="installSamples" class="modal hide fade">
-  <form id="installSamplesForm" action="${url('oozie:install_examples')}" method="POST">
+  <form id="installSamplesForm" action="${url('oozie:setup_app')}" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${ _('Install samples?') }</h3>
+      <h3>${ _('Setup the workspaces and examples?') }</h3>
     </div>
     <div class="modal-body">
-      ${ _('It will take a few seconds to install.') }
+      ${ _('Hue is going to re-create the workspaces and re-install the examples...') }
     </div>
     <div class="modal-footer">
       <input type="submit" class="btn primary" value="${ _('Yes') }"/>
