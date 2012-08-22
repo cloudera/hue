@@ -40,7 +40,9 @@ ${ layout.menubar(section='coordinators') }
   <ul class="nav nav-tabs">
     <li class="active"><a href="#editor" data-toggle="tab">${ _('Editor') }</a></li>
     <li><a href="#datasets" data-toggle="tab">${ _('Datasets') }</a></li>
-    <li><a href="#history" data-toggle="tab">${ _('History') }</a></li>
+    % if can_edit_coordinator:
+      <li><a href="#history" data-toggle="tab">${ _('History') }</a></li>
+    % endif
   </ul>
 
 % if coordinator.id:
@@ -99,8 +101,9 @@ ${ layout.menubar(section='coordinators') }
             <br/>
             <p>
               % if coordinator.workflow:
-                ${ _('The inputs and outputs of the workflow need to be mapped to some data on the') }
-                <a href="#" id="datasets-btn" class="btn">${ _('Datasets page') }</a>
+                ${ _('The inputs and outputs of the workflow need to be mapped to some data.') }
+                ${ _('The data is represented by some datasets that can be created on the ') }
+                <a href="#" id="datasets-btn" class="btn">${ _('Datasets') }</a> ${ _('page') }.
               % endif
             </p>
             </br>
@@ -114,7 +117,9 @@ ${ layout.menubar(section='coordinators') }
                       <th>${ _('Name') }</th>
                       <th>${ _('Dataset') }</th>
                       <th>${ _('Path') }</th>
-                      <th>${ _('Delete') }</th>
+                      % if can_edit_coordinator:
+                        <td>${ _('Delete') }</td>
+                      % endif
                     </tr>
                   </thead>
                   <tbody>
@@ -124,7 +129,9 @@ ${ layout.menubar(section='coordinators') }
                          <td>${ form['name'] }</td>
                          <td>${ form['dataset'] }</td>
                          <td>${ form['dataset'].form.instance.dataset.uri }</td>
-                         <td>${ form['DELETE'] }</td>
+                         % if can_edit_coordinator:
+                           <td>${ form['DELETE'] }</td>
+                         % endif
                       </tr>
                     % endfor
                   </tbody>
@@ -135,8 +142,9 @@ ${ layout.menubar(section='coordinators') }
                   ${ _('No inputs') }
                 </div>
               % endif
-
-             <a class="btn" data-toggle="modal" href="#add-data-input-modal">${ _('Add') }</a>
+             % if can_edit_coordinator:
+               <a class="btn" data-toggle="modal" href="#add-data-input-modal">${ _('Add') }</a>
+             % endif
             </div>
 
             <br/>
@@ -151,17 +159,21 @@ ${ layout.menubar(section='coordinators') }
                     <th>${ _('Name') }</th>
                     <th>${ _('Dataset') }</th>
                     <th>${ _('Path') }</th>
-                    <th>${ _('Delete') }</th>
+                    % if can_edit_coordinator:
+                      <td>${ _('Delete') }</td>
+                    % endif
                   </tr>
                 </thead>
                 <tbody>
                   % for form in data_output_formset.forms:
                     <tr>
-                       ${ form['id'] }
-                       <td>${ form['name'] }</td>
-                       <td>${ form['dataset'] }</td>
-                       <td>${ form['dataset'].form.instance.dataset.uri }</td>
-                       <td>${ form['DELETE'] }</td>
+                      ${ form['id'] }
+                      <td>${ form['name'] }</td>
+                      <td>${ form['dataset'] }</td>
+                      <td>${ form['dataset'].form.instance.dataset.uri }</td>
+                      % if can_edit_coordinator:
+                        <td>${ form['DELETE'] }</td>
+                      % endif
                     </tr>
                   % endfor
                 </tbody>
@@ -173,7 +185,9 @@ ${ layout.menubar(section='coordinators') }
                 </div>
               % endif
 
-              <a class="btn" data-toggle="modal" href="#add-data-output-modal">${ _('Add') }</a>
+              % if can_edit_coordinator:
+                <a class="btn" data-toggle="modal" href="#add-data-output-modal">${ _('Add') }</a>
+              % endif
             </div>
           % endif
         </div>
@@ -183,18 +197,20 @@ ${ layout.menubar(section='coordinators') }
     <div class="tab-pane" id="datasets">
       <div class="row-fluid">
           <div class="span1">
-            <table>
-              <thead>
-                <tr>
-                  <th>${ _('Add a new dataset') }</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><br/><a class="btn" data-toggle="modal" href="#add-dataset-modal">${ _('Create') }</a></td>
-                </tr>
-              </tbody>
-            </table>
+            % if can_edit_coordinator:
+              <table>
+                <thead>
+                  <tr>
+                    <th>${ _('Add a new dataset') }</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><br/><a class="btn" data-toggle="modal" href="#add-dataset-modal">${ _('Create') }</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            % endif
           </div>
 
           <div class="span10">
@@ -211,7 +227,9 @@ ${ layout.menubar(section='coordinators') }
                       <th>${ _('Uri') }</th>
                       <th>${ _('Timezone') }</th>
                       <th>${ _('Done flag') }</th>
-                      <th>${ _('Delete') }</th>
+                      % if can_edit_coordinator:
+                        <td>${ _('Delete') }</td>
+                      % endif
                     </tr>
                   </thead>
                   <tbody>
@@ -221,9 +239,11 @@ ${ layout.menubar(section='coordinators') }
                     % endfor
                     <tr>
                       <td>
-                        <a class="btn" data-toggle="modal" href="#add-data-input-modal">${ _('input') }</a>
-                        <a class="btn" data-toggle="modal" href="#add-data-output-modal">${ _('output') }</a>
-                        </td>
+                        % if can_edit_coordinator:
+                          <a class="btn" data-toggle="modal" href="#add-data-input-modal">${ _('input') }</a>
+                          <a class="btn" data-toggle="modal" href="#add-data-output-modal">${ _('output') }</a>
+                        % endif
+                      </td>
                       <td>${ form.instance.name }</td>
                       <td>${ form.instance.description }</td>
                       <td>${ form.instance.text_frequency }</td>
@@ -231,13 +251,15 @@ ${ layout.menubar(section='coordinators') }
                       <td>${ form.instance.uri }</td>
                       <td>${ form.instance.timezone }</td>
                       <td>${ form.instance.done_flag }</td>
-                      <td>${ form['DELETE'] }</td>
+                      % if can_edit_coordinator:
+                        <td>${ form['DELETE'] }</td>
+                      % endif
                     </tr>
 
                      <div class="hide">
                         % for field in form.visible_fields():
-                                ${ field.errors }
-                                ${ field.label }: ${ field }
+                            ${ field.errors }
+                            ${ field.label }: ${ field }
                         % endfor
                         </div>
 
@@ -255,35 +277,38 @@ ${ layout.menubar(section='coordinators') }
        </div>
     </div>
 
-    <div class="tab-pane" id="history">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>${ _('Date') }</th>
-            <th>${ _('Id') }</th>
-          </tr>
-        </thead>
-        <tbody>
-          % if not history:
-            ${ _('N/A') }
-          % endif
-          % for record in history:
-              <tr>
-                <td><a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>${ record.submission_date }</td>
-                <td>${ record.oozie_job_id }</td>
-              </tr>
-          % endfor
-        </tbody>
-      </table>
-    </div>
+    % if can_edit_coordinator:
+      <div class="tab-pane" id="history">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>${ _('Date') }</th>
+              <th>${ _('Id') }</th>
+            </tr>
+          </thead>
+          <tbody>
+            % if not history:
+              ${ _('N/A') }
+            % endif
+            % for record in history:
+                <tr>
+                  <td><a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>${ record.submission_date }</td>
+                  <td>${ record.oozie_job_id }</td>
+                </tr>
+            % endfor
+          </tbody>
+        </table>
+      </div>
+    % endif
 
     <br/>
-
   </div>
 
   <div class="form-actions center">
     <a href="${ url('oozie:list_coordinator') }" class="btn">${ _('Back') }</a>
-    <input class="btn btn-primary" type="submit" value="${ _('Save') }"></input>
+    % if can_edit_coordinator:
+      <input class="btn btn-primary" type="submit" value="${ _('Save') }"></input>
+    % endif
   </div>
 
   </form>

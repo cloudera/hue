@@ -349,8 +349,7 @@ class TestEditor:
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-      assert_equal(200, response.status_code)
-      assert_false('wf-name-1' in response.content, response.content)
+      assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
 
@@ -364,6 +363,21 @@ class TestEditor:
       response = client_not_me.get(reverse('oozie:list_workflows'))
       assert_equal(200, response.status_code)
       assert_true('wf-name-1' in response.content, response.content)
+    finally:
+      finish()
+
+    # View
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
+      assert_false('Permission denied' in response.content, response.content)
+      assert_false('Save' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
+      assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
 
@@ -403,6 +417,65 @@ class TestEditor:
 
     response = self.c.post(reverse('oozie:delete_workflow', args=[self.wf.id]), follow=True)
     assert_equal(200, response.status_code)
+
+
+  def test_workflow_action_permissions(self):
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    action1 = Node.objects.get(name='action-name-1')
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_action', args=[action1.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:edit_action', args=[action1.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Delete
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:delete_action', args=[action1.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    action1.workflow.is_shared = True
+    action1.workflow.save()
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_action', args=[action1.id]))
+      assert_false('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Edit
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:edit_action', args=[action1.id]))
+      assert_true('Not allowed' in response.content, response.content)
+    finally:
+      finish()
+
+    # Delete
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:delete_action', args=[action1.id]))
+      assert_true('Not allowed' in response.content, response.content)
+    finally:
+      finish()
 
 
   def test_clone_coordinator(self):
@@ -491,6 +564,21 @@ class TestEditor:
       response = client_not_me.get(reverse('oozie:list_coordinator'))
       assert_equal(200, response.status_code)
       assert_true('MyCoord' in response.content, response.content)
+    finally:
+      finish()
+
+    # View
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_false('Permission denied' in response.content, response.content)
+      assert_false('Save' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
 

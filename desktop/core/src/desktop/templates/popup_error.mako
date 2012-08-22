@@ -39,4 +39,4 @@ ${commonheader(title, "", "60px")}
 
 	</div>
 
-${commonfooter()}
+${commonfooter(messages)}

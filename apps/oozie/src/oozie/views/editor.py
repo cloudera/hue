@@ -239,12 +239,20 @@ def edit_workflow(request, workflow):
   workflow_form = WorkflowForm(instance=workflow)
   actions_formset = WorkflowFormSet(instance=workflow)
 
+  graph_options = {}
+  user_can_edit_job = can_edit_job(request.user, workflow)
+  if not user_can_edit_job:
+    graph_options = {'template': 'editor/gen/workflow-graph-readonly.xml.mako'}
+
+  graph = workflow.gen_graph(actions_formset.forms, **graph_options)
+
   return render('editor/edit_workflow.mako', request, {
     'workflow_form': workflow_form,
     'workflow': workflow,
     'actions_formset': actions_formset,
-    'graph': workflow.gen_graph(actions_formset.forms),
+    'graph': graph,
     'history': history,
+    'user_can_edit_job': user_can_edit_job,
   })
 
 
@@ -362,6 +370,7 @@ def edit_action(request, action):
     'node_type': action.node_type,
     'properties_hint': _STD_PROPERTIES_JSON,
     'form_url': reverse('oozie:edit_action', kwargs={'action': action.id}),
+    'can_edit_action': can_edit_job(request.user, action.workflow)
   })
 
 
@@ -526,6 +535,7 @@ def edit_coordinator(request, coordinator):
     'data_input_form': data_input_form,
     'data_output_form': data_output_form,
     'history': history,
+    'can_edit_coordinator': can_edit_job(request.user, coordinator.workflow)
   })
 
 
