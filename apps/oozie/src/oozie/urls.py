@@ -51,7 +51,7 @@ urlpatterns = patterns(
   url(r'^workflow_parameters/(?P<workflow>\d+)$', 'get_workflow_parameters', name='workflow_parameters'),
   url(r'^list_history$', 'list_history', name='list_history'),
   url(r'^list_history/(?P<record_id>[-\w]+)$', 'list_history_record', name='list_history_record'),
-  url(r'^install_examples/$', 'install_examples', name='install_examples'),
+  url(r'^setup_app/$', 'setup_app', name='setup_app'),
 )
 
 urlpatterns += patterns(

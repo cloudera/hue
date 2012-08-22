@@ -157,6 +157,7 @@ class WorkflowManager(models.Manager):
             fs.create_home_dir(remote_home_dir)
           # Shared by all the users
           fs.mkdir(directory, 01777)
+          fs.chmod(directory, 01777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
     finally:
       fs.setuser(user)
 

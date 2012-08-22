@@ -660,8 +660,8 @@ class TestEditor:
     data = json.loads(response.content)
     assert_equal(0, data['status'], data['data'])
 
-  def test_install_examples(self):
-    self.c.post(reverse('oozie:install_examples'))
+  def test_setup_app(self):
+    self.c.post(reverse('oozie:setup_app'))
 
 
 # Utils
