@@ -24,9 +24,9 @@ from django.core.management.base import NoArgsCommand
 from django.utils.translation import ugettext as _
 
 from hadoop import cluster
+from hadoop.fs.hadoopfs import Hdfs
 
-from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR
-from oozie.models import Workflow
+from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_DEPLOYMENT_DIR, REMOTE_SAMPLE_DIR
 
 
 LOG = logging.getLogger(__name__)
@@ -34,41 +34,48 @@ LOG = logging.getLogger(__name__)
 
 class Command(NoArgsCommand):
   def handle_noargs(self, **options):
-    remote_fs = cluster.get_hdfs()
-    remote_dir = Workflow.objects.create_data_dir(remote_fs)
+    fs = cluster.get_hdfs()
+    remote_dir = create_data_dir(fs)
 
     # Copy examples binaries
-    for demo in ('lib', 'pig'):
-      local_dir = posixpath.join(LOCAL_SAMPLE_DIR.get(), demo)
-      remote_data_dir = posixpath.join(remote_dir, demo)
+    for name in os.listdir(LOCAL_SAMPLE_DIR.get()):
+      local_dir = posixpath.join(LOCAL_SAMPLE_DIR.get(), name)
+      remote_data_dir = posixpath.join(remote_dir, name)
       LOG.info(_('Copying examples %(local_dir)s to %(remote_data_dir)s\n') % {
                   'local_dir': local_dir, 'remote_data_dir': remote_data_dir})
-      copy_dir(local_dir, remote_fs, remote_data_dir)
+      copy_dir(fs, local_dir, remote_data_dir)
 
     # Copy sample data
     local_dir = LOCAL_SAMPLE_DATA_DIR.get()
     remote_data_dir = posixpath.join(remote_dir, 'data')
     LOG.info(_('Copying data %(local_dir)s to %(remote_data_dir)s\n') % {
                 'local_dir': local_dir, 'remote_data_dir': remote_data_dir})
-    copy_dir(local_dir, remote_fs, remote_data_dir)
+    copy_dir(fs, local_dir, remote_data_dir)
 
     # Load jobs
     management.call_command('loaddata', 'apps/oozie/src/oozie/fixtures/initial_data.json', verbosity=2)
 
 
-def copy_dir(local_dir, remote_fs, remote_dir, mode=755):
-  remote_fs.do_as_user(remote_fs.DEFAULT_USER, remote_fs.mkdir, remote_dir, mode=mode)
+
+# This should probably be refactored and some parts moved to the HDFS lib. Jobsub could be updated to.
+
+def copy_dir(fs, local_dir, remote_dir, mode=0755):
+  fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, remote_dir, mode=mode)
 
   for f in os.listdir(local_dir):
     local_src = os.path.join(local_dir, f)
     remote_dst = posixpath.join(remote_dir, f)
-    copy_file(local_src, remote_fs, remote_dst)
+    print f, local_src, remote_dst
+    if os.path.isdir(remote_dst):
+      copy_dir(fs, local_src, remote_dst, mode)
+    else:
+      copy_file(fs, local_src, remote_dst)
 
 
 CHUNK_SIZE = 1024 * 1024
 
-def copy_file(local_src, remote_fs, remote_dst):
-  if remote_fs.exists(remote_dst):
+def copy_file(fs, local_src, remote_dst):
+  if fs.exists(remote_dst):
     LOG.info(_('%(remote_dst)s already exists.  Skipping.') % {'remote_dst': remote_dst})
     return
   else:
@@ -78,10 +85,10 @@ def copy_file(local_src, remote_fs, remote_dst):
     src = file(local_src)
     try:
       try:
-        remote_fs.do_as_user(remote_fs.DEFAULT_USER, remote_fs.create, remote_dst, permission=01755)
+        fs.do_as_user(fs.DEFAULT_USER, fs.create, remote_dst, permission=01755)
         chunk = src.read(CHUNK_SIZE)
         while chunk:
-          remote_fs.do_as_user(remote_fs.DEFAULT_USER, remote_fs.append, remote_dst, chunk)
+          fs.do_as_user(fs.DEFAULT_USER, fs.append, remote_dst, chunk)
           chunk = src.read(CHUNK_SIZE)
         LOG.info(_('Copied %s -> %s') % (local_src, remote_dst))
       except:
@@ -91,3 +98,25 @@ def copy_file(local_src, remote_fs, remote_dst):
       src.close()
   else:
     LOG.info(_('Skipping %s (not a file)') % local_src)
+
+
+def create_data_dir(fs):
+  # If needed, create the remote home, deployment and data directories
+  directories = (REMOTE_DEPLOYMENT_DIR.get(), REMOTE_SAMPLE_DIR.get())
+  user = fs.user
+
+  try:
+    fs.setuser(fs.DEFAULT_USER)
+    for directory in directories:
+      if not fs.exists(directory):
+        remote_home_dir = Hdfs.join('/user', fs.user)
+        if directory.startswith(remote_home_dir):
+          # Home is 755
+          fs.create_home_dir(remote_home_dir)
+        # Shared by all the users
+        fs.mkdir(directory, 01777)
+        fs.chmod(directory, 01777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
+  finally:
+    fs.setuser(user)
+
+  return REMOTE_SAMPLE_DIR.get()

@@ -198,9 +198,8 @@ class TestEditor:
     for node in wf2.node_set.all():
       assert_false(node.id in node_ids)
 
-    raise SkipTest
-    # To Fix
     assert_not_equal(self.wf.deployment_dir, wf2.deployment_dir)
+    assert_not_equal('', wf2.deployment_dir)
 
 
   def test_clone_action(self):
@@ -484,25 +483,28 @@ class TestEditor:
 
     response = self.c.post(reverse('oozie:clone_coordinator', args=[coord.id]), {}, follow=True)
 
-    wf2 = Coordinator.objects.latest('id')
-    assert_not_equal(coord.id, wf2.id)
+    coord2 = Coordinator.objects.latest('id')
+    assert_not_equal(coord.id, coord2.id)
     assert_equal(coordinator_count + 1, Coordinator.objects.count(), response)
 
-    assert_equal(coord.dataset_set.count(), wf2.dataset_set.count())
-    assert_equal(coord.datainput_set.count(), wf2.datainput_set.count())
-    assert_equal(coord.dataoutput_set.count(), wf2.dataoutput_set.count())
+    assert_equal(coord.dataset_set.count(), coord2.dataset_set.count())
+    assert_equal(coord.datainput_set.count(), coord2.datainput_set.count())
+    assert_equal(coord.dataoutput_set.count(), coord2.dataoutput_set.count())
 
     ds_ids = set(coord.dataset_set.values_list('id', flat=True))
-    for node in wf2.dataset_set.all():
+    for node in coord2.dataset_set.all():
       assert_false(node.id in ds_ids)
 
     data_input_ids = set(coord.datainput_set.values_list('id', flat=True))
-    for node in wf2.datainput_set.all():
+    for node in coord2.datainput_set.all():
       assert_false(node.id in data_input_ids)
 
     data_output_ids = set(coord.dataoutput_set.values_list('id', flat=True))
-    for node in wf2.dataoutput_set.all():
+    for node in coord2.dataoutput_set.all():
       assert_false(node.id in data_output_ids)
+
+    assert_not_equal(coord.deployment_dir, coord2.deployment_dir)
+    assert_not_equal('', coord2.deployment_dir)
 
 
   def test_coordinator_permissions(self):

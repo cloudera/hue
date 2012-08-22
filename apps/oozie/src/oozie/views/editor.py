@@ -276,7 +276,7 @@ def clone_workflow(request, workflow):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
-  clone = workflow.clone(request.user)
+  clone = workflow.clone(request.fs, request.user)
 
   response = {'url': reverse('oozie:edit_workflow', kwargs={'workflow': clone.id})}
 
@@ -343,8 +343,9 @@ def new_action(request, workflow, node_type, parent_action_id):
       'node_type': node_type,
       'properties_hint': _STD_PROPERTIES_JSON,
       'form_url': reverse('oozie:new_action', kwargs={'workflow': workflow.id,
-                                                     'node_type': node_type,
-                                                     'parent_action_id': parent_action_id}),
+                                                      'node_type': node_type,
+                                                      'parent_action_id': parent_action_id}),
+      'can_edit_action': True,
     })
 
 
