@@ -110,7 +110,9 @@ def can_edit_job(user, job):
 
 
 def can_edit_job_or_exception(request, job):
-  if not can_edit_job(request.user, job):
+  if can_edit_job(request.user, job):
+    return True
+  else:
     raise PopupException('Not allowed to modified this job')
 
 
@@ -218,10 +220,10 @@ def edit_workflow(request, workflow):
   history = History.objects.filter(submitter=request.user, job=workflow)
 
   if request.method == 'POST' and can_edit_job_or_exception(request, workflow):
-    workflow_form = WorkflowForm(request.POST, instance=workflow)
-    actions_formset = WorkflowFormSet(request.POST, request.FILES, instance=workflow)
-
     try:
+      workflow_form = WorkflowForm(request.POST, instance=workflow)
+      actions_formset = WorkflowFormSet(request.POST, request.FILES, instance=workflow)
+
       if 'clone_action' in request.POST: return clone_action(request, action=request.POST['clone_action'])
       if 'delete_action' in request.POST: return delete_action(request, action=request.POST['delete_action'])
       if 'move_up_action' in request.POST: return move_up_action(request, action=request.POST['move_up_action'])
@@ -233,9 +235,9 @@ def edit_workflow(request, workflow):
         return redirect(reverse('oozie:list_workflows'))
     except Exception, e:
       request.error(_('Sorry, this operation is not supported: %(error)s') % {'error': e})
-  else:
-    workflow_form = WorkflowForm(instance=workflow)
-    actions_formset = WorkflowFormSet(instance=workflow)
+
+  workflow_form = WorkflowForm(instance=workflow)
+  actions_formset = WorkflowFormSet(instance=workflow)
 
   return render('editor/edit_workflow.mako', request, {
     'workflow_form': workflow_form,
@@ -411,13 +413,17 @@ def delete_action(request, action):
 
 
 @check_action_access_permission
+@check_action_edition_permission
 def clone_action(request, action):
-  # Really weird: action is like a clone object with the old id here
-  action_id = action.id
-  workflow = action.workflow
-  clone = action.clone()
-  workflow.add_action(clone, action_id)
-  return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
+  if request.method == 'POST':
+    # Really weird: action is like a clone object with the old id here
+    action_id = action.id
+    workflow = action.workflow
+    clone = action.clone()
+    workflow.add_action(clone, action_id)
+    return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
+  else:
+    raise PopupException(_('A POST request is required.'))
 
 
 @check_action_access_permission
