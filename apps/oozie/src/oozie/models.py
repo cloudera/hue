@@ -450,12 +450,12 @@ class Workflow(Job):
       child = Link.objects.filter(parent=node).exclude(name__in=['related', 'kill'])[0].child
       return [node] + self.get_hierarchy_rec(child)
 
-  def gen_graph(self, forms, template="editor/gen/workflow-graph-editable.xml.mako"):
+  def gen_graph(self, forms, template='editor/gen/workflow-graph-editable.xml.mako'):
     index = dict([(form.instance.id, form) for form in forms])
     return django_mako.render_to_string(template, {'nodes': self.get_hierarchy(), 'index': index})
 
   def gen_status_graph(self, forms, actions):
-    template="editor/gen/workflow-graph-status.xml.mako"
+    template='editor/gen/workflow-graph-status.xml.mako'
 
     index = dict([(form.instance.id, form) for form in forms])
     actions_index = dict([(action.name, action) for action in actions])
@@ -463,7 +463,7 @@ class Workflow(Job):
     return django_mako.render_to_string(template, {'nodes': self.get_hierarchy(), 'index': index, 'actions': actions_index})
 
   def to_xml(self):
-    tmpl = "editor/gen/workflow.xml.mako"
+    tmpl = 'editor/gen/workflow.xml.mako'
     return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self}))
 
 

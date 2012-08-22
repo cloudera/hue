@@ -185,7 +185,9 @@ ${ layout.menubar(section='workflows') }
 
     <div class="form-actions">
       <a href="${ url('oozie:edit_workflow', workflow=workflow.id) }" class="btn">${ _('Cancel') }</a>
-      <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
+      % if can_edit_action:
+        <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
+      % endif
     </div>
   </form>
 </div>

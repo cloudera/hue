@@ -155,7 +155,9 @@ ${ layout.menubar(section='workflows') }
 
     <div class="form-actions center">
       <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
-      <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
+      % if user_can_edit_job:
+        <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
+      % endif
     </div>
   </form>
 </div>
