@@ -32,11 +32,13 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib import django_mako
+from hadoop.fs.exceptions import WebHdfsException
 
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 
-from oozie.conf import REMOTE_SAMPLE_DIR, REMOTE_DEPLOYMENT_DIR
+from oozie.management.commands import oozie_setup
+from oozie.conf import REMOTE_SAMPLE_DIR
 from timezones import TIMEZONES
 
 
@@ -136,32 +138,11 @@ class WorkflowManager(models.Manager):
     workflow.end = end
     workflow.save()
 
-    WorkflowManager.create_data_dir(fs)
+    # Recheck if deployement dir exists 
+    oozie_setup.create_data_dir(fs)
     Submission(workflow.owner, workflow, fs, {})._create_deployment_dir()
 
     return workflow
-
-  @classmethod
-  def create_data_dir(cls, fs):
-    # If needed, create the remote home, deployment and data directories
-    directories = (REMOTE_DEPLOYMENT_DIR.get(), REMOTE_SAMPLE_DIR.get())
-    user = fs.user
-
-    try:
-      fs.setuser(fs.DEFAULT_USER)
-      for directory in directories:
-        if not fs.exists(directory):
-          remote_home_dir = Hdfs.join('/user', fs.user)
-          if directory.startswith(remote_home_dir):
-            # Home is 755
-            fs.create_home_dir(remote_home_dir)
-          # Shared by all the users
-          fs.mkdir(directory, 01777)
-          fs.chmod(directory, 01777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
-    finally:
-      fs.setuser(user)
-
-    return REMOTE_SAMPLE_DIR.get()
 
 
 class Workflow(Job):
@@ -350,7 +331,8 @@ class Workflow(Job):
 
     node.delete()
 
-  def clone(self, new_owner=None):
+  def clone(self, fs, new_owner=None):
+    source_deployment_dir = self.deployment_dir # Needed
     nodes = self.node_set.all()
     links = Link.objects.filter(parent__workflow=self)
 
@@ -358,6 +340,7 @@ class Workflow(Job):
     copy.pk = None
     copy.id = None
     copy.name += '-copy'
+    copy.deployment_dir = ''
     if new_owner is not None:
       copy.owner = new_owner
     copy.save()
@@ -383,6 +366,11 @@ class Workflow(Job):
     copy.start = old_nodes_mapping[self.start.id]
     copy.end = old_nodes_mapping[self.end.id]
     copy.save()
+    
+    try:
+      fs.copy_remote_dir(source_deployment_dir, copy.deployment_dir, owner=copy.owner)
+    except WebHdfsException, e:
+      LOG.error('The copy of the deployment directory failed: %s', e)
 
     return copy
 
@@ -875,6 +863,7 @@ class Coordinator(Job):
     copy.pk = None
     copy.id = None
     copy.name += '-copy'
+    copy.deployment_dir = ''
     if new_owner is not None:
       copy.owner = new_owner
     copy.save()

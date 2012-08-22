@@ -5,7 +5,7 @@
     "fields": {
       "is_shared": true,
       "name": "SleepWorkflow",
-      "deployment_dir": "/user/hue/oozie/demo/sleep",
+      "deployment_dir": "/user/hue/oozie/examples/sleep",
       "schema_version": "",
       "last_modified": "2012-08-20 13:13:34",
       "owner": 1,
@@ -18,7 +18,7 @@
     "fields": {
       "is_shared": true,
       "name": "DailySleep",
-      "deployment_dir": "/user/hue/oozie/demo/sleep",
+      "deployment_dir": "/user/hue/oozie/examples/sleep",
       "schema_version": "",
       "last_modified": "2012-08-20 13:56:53",
       "owner": 1,

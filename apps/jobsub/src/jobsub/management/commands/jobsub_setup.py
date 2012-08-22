@@ -29,8 +29,6 @@ from django.core.management.base import NoArgsCommand
 from django.contrib.auth.models import User
 
 from hadoop import cluster
-from hadoop.fs.hadoopfs import Hdfs
-import hadoop.conf
 import jobsub.conf
 from jobsub.submit import Submission
 

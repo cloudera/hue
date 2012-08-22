@@ -115,7 +115,6 @@ def test_seek_across_blocks():
   finally:
     fs.remove("/fortest-blocks.txt")
 
-
 @attr('requires_hadoop')
 def test_exceptions():
   """
@@ -133,6 +132,47 @@ def test_exceptions():
 
   assert_raises(WebHdfsException, f.read)
   assert_raises(IOError, fs.open, "/test/doesnotexist.txt")
+
+@attr('requires_hadoop')
+def test_copy_remote_dir():
+  cluster = pseudo_hdfs4.shared_cluster()
+  fs = cluster.fs
+  fs.setuser(cluster.superuser)
+
+  src_dir = '/copy_remote_dir'
+  fs.mkdir(src_dir)
+  f1 = fs.open("/copy_remote_dir/test_one.txt", "w")
+  f1.write("foo")
+  f1.close()
+  f2 = fs.open("/copy_remote_dir/test_two.txt", "w")
+  f2.write("bar")
+  f2.close()
+
+  new_owner = 'testcopy'
+  new_owner_home = '/user/testcopy'
+  new_owner_dir = new_owner_home + '/test-copy'
+  fs.mkdir(new_owner_home)
+  fs.chown(new_owner_home, new_owner, new_owner)
+
+  fs.copy_remote_dir(src_dir, new_owner_dir, dir_mode=0755, owner=new_owner)
+
+  dir_stat = fs.stats(new_owner_dir)
+  assert_equals(new_owner, dir_stat.user)
+  assert_equals(new_owner, dir_stat.group)
+  assert_equals('40755', '%o' % dir_stat.mode)
+
+  src_stat = fs.listdir_stats(src_dir)
+  dest_stat = fs.listdir_stats(new_owner_dir)
+
+  src_names = set([stat.name for stat in src_stat])
+  dest_names = set([stat.name for stat in dest_stat])
+  assert_true(src_names)
+  assert_equals(src_names, dest_names)
+
+  for stat in dest_stat:
+    assert_equals('testcopy', stat.user)
+    assert_equals('testcopy', stat.group)
+    assert_equals('100644', '%o' % stat.mode)
 
 @attr('requires_hadoop')
 def test_two_files_open():

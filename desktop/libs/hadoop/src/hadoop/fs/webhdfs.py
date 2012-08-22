@@ -419,6 +419,23 @@ class WebHdfs(Hdfs):
       offset += cnt
 
 
+  def copy_remote_dir(self, source, destination, dir_mode=0755, owner=None):
+    if owner is None:
+      owner = self.DEFAULT_USER
+    self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
+    self.do_as_user(owner, self.chmod, destination, mode=dir_mode) # To remove after HDFS-3491
+
+    for stat in self.listdir_stats(source):
+      source_file = stat.path
+      destination_file = posixpath.join(destination, stat.name)
+      print source_file, destination_file
+      if stat.isDir:
+        self.copy_remote_dir(source_file, destination_file, dir_mode, owner)
+      else:
+        self.copyfile(source_file, destination_file)
+        self.do_as_superuser(self.chown, destination_file, owner, owner)
+
+
   @staticmethod
   def urlsplit(url):
     return Hdfs.urlsplit(url)
@@ -426,6 +443,7 @@ class WebHdfs(Hdfs):
 
   def get_hdfs_path(self, path):
     return posixpath.join(self.fs_defaultfs, path.lstrip('/'))
+
 
   def create_home_dir(self, home_path=None):
     if home_path is None:
@@ -446,6 +464,7 @@ class WebHdfs(Hdfs):
           raise PopupException(msg, detail=e)
       finally:
         self.setuser(user)
+
 
   def _invoke_with_redirect(self, method, path, params=None, data=None):
     """
