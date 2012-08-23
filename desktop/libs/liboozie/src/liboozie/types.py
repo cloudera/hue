@@ -186,6 +186,9 @@ class WorkflowAction(Action):
 
 
 class Job(object):
+  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'SUSPENDED', 'PREP', # Workflow
+                          'RUNNING', 'PREPSUSPENDED', 'SUSPENDED', 'PREPPAUSED', 'PAUSED' # Coordinator
+                          ])
   """
   Accessing log and definition will trigger Oozie API calls.
   """
@@ -251,9 +254,9 @@ class Job(object):
     available_actions() -> Zero or more of [ 'start', 'suspend', 'resume', 'kill' ]
     """
     if self.status in ('SUCCEEDED', 'KILLED', 'FAILED'):
-      return [ ]
+      return []
 
-    res = [ ]
+    res = []
     if self.status == 'PREP':
       res.append('start')
     if self.status == 'RUNNING':
@@ -278,6 +281,10 @@ class Job(object):
 
   def get_working_actions(self):
     return [action for action in self.actions if not ControlFlowAction.is_control_flow(action.type)]
+
+  def is_running(self):
+    return self.status in Job.RUNNING_STATUSES
+
 
 class Coordinator(Job):
   _ATTRS = [

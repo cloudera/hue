@@ -80,9 +80,9 @@ ${ layout.menubar(section='dashboard') }
             <td>${ job.user }</td>
             <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
             <td>
-               <a type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }">
-                 ${ _('Kill') }
-               </button>
+              <a type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }">
+                ${ _('Kill') }
+              </button>
            </td>
           </tr>
         % endfor
@@ -111,7 +111,7 @@ ${ layout.menubar(section='dashboard') }
               <span class="label
                % if job.status == 'SUCCEEDED':
                  label-success
-               % elif job.status == 'RUNNING':
+               % elif job.is_running():
                   label-warning
                % else:
                  label-important
@@ -228,9 +228,9 @@ ${ layout.menubar(section='dashboard') }
        $.post($(this).attr("data-url"),
           function(response) {
             if (response['status'] != 0) {
-              alert('Problem :' + response['data']);
+              $.jHueNotify.error('${ _('Problem :') }' + response['data']);
             } else {
-              $.jHueNotify.error('Killed !')
+              $.jHueNotify.info('${ _('Killed !') }');
               row.remove();
             }
           }
@@ -240,4 +240,4 @@ ${ layout.menubar(section='dashboard') }
   });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) }

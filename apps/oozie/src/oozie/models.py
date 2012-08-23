@@ -138,7 +138,7 @@ class WorkflowManager(models.Manager):
     workflow.end = end
     workflow.save()
 
-    # Recheck if deployement dir exists 
+    # Recheck if deployement dir exists
     oozie_setup.create_data_dir(fs)
     Submission(workflow.owner, workflow, fs, {})._create_deployment_dir()
 
@@ -366,7 +366,7 @@ class Workflow(Job):
     copy.start = old_nodes_mapping[self.start.id]
     copy.end = old_nodes_mapping[self.end.id]
     copy.save()
-    
+
     try:
       fs.copy_remote_dir(source_deployment_dir, copy.deployment_dir, owner=copy.owner)
     except WebHdfsException, e:
