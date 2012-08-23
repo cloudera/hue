@@ -16,5 +16,5 @@
 DJANGO_APPS = [ "beeswax" ]
 NICE_NAME = "Beeswax (Hive UI)"
 REQUIRES_HADOOP = True
-ICON = "/beeswax/static/art/beeswax-logo.png"
+ICON = "/beeswax/static/art/icon_beeswax_24.png"
 MENU_INDEX = 10

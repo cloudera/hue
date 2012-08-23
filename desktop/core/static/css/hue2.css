@@ -86,7 +86,7 @@
     background-image: -o-linear-gradient(top, #2c7fb3, #01639c);
     background-image: linear-gradient(top, #2c7fb3, #01639c);
     background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#'2c7fb3, endColorstr='#'01639c, GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2c7fb3', endColorstr='#01639c', GradientType=0);
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -123,7 +123,6 @@
     color: #FFFFFF;
     text-decoration: none;
 }
-
 
 h1 {
     margin-bottom:.7em;
@@ -943,10 +942,8 @@ div.box {
     width: 400px;
     text-align: center;
     z-index: 8000;
-    display: none;
 }
 
 .jHueNotify .close {
     right: -27px;
-    display: none;
 }

@@ -127,9 +127,8 @@ from django.utils.translation import ugettext as _
             %for app in apps:
               %if app.icon_path:
               <li id="${app.display_name}Icon" ${is_selected(section, app.display_name)}>
-                <a class="nav-tooltip" title="${app.nice_name}"
-                  href="/${app.display_name}"><img width="25" height="25"
-                  src="${app.icon_path}"/></a></li>
+                <a class="nav-tooltip" title="${app.nice_name}" href="/${app.display_name}"><img src="${app.icon_path}" /></a>
+              </li>
               %endif
             %endfor
             <li class="divider-vertical"></li>
