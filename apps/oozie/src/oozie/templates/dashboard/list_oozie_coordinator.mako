@@ -76,11 +76,17 @@ ${ layout.menubar(section='dashboard') }
           <tr>
             <td>${ _('Manage') }</td>
             <td>
+            <form action="${ url('oozie:resubmit_coordinator', job_id=oozie_coordinator.id) }" method="post">
             % if oozie_coordinator.is_running():
               <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"  data-message="The coordinator was killed!">
                 ${ _('Kill') }
               </button>
+            % else:
+              <button type="submit" class="btn">
+                ${ _('Resubmit') }
+              </button>
             % endif
+            </form>
             </td>
           </tr>
         </tbody>
