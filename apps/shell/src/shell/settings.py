@@ -23,5 +23,5 @@ PERMISSION_ACTIONS = (
   ("launch_hbase", "Launch the HBase Shell"),
 )
 
-ICON = "/shell/static/art/shell.png"
+ICON = "/shell/static/art/icon_shell_24.png"
 MENU_INDEX = 50

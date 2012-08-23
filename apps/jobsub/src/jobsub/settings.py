@@ -21,5 +21,5 @@ MIDDLEWARE_CLASSES=[
   "jobsub.middleware.SubmissionErrorRecastMiddleware"
 ]
 
-ICON = "/jobsub/static/art/icon.png"
+ICON = "/jobsub/static/art/icon_jobsub_24.png"
 MENU_INDEX = 40

@@ -25,7 +25,7 @@ PERMISSION_ACTIONS = (
   ("launch_jobs", "Can submit Oozie jobs"),
 )
 
-ICON = "/oozie/static/art/icon.png"
+ICON = "/oozie/static/art/icon_oozie_24.png"
 MENU_INDEX = 41
 
 IS_URL_NAMESPACED = True
