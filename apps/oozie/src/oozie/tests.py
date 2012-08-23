@@ -120,6 +120,7 @@ class TestEditor:
     # Kill button in response
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]), {}, follow=True)
     assert_true(('%s/kill' % MockOozieApi.WORKFLOW_IDS[0]) in response.content)
+    assert_false(('%s/kill' % MockOozieApi.WORKFLOW_IDS[1]) in response.content)
 
 
   def test_move_up(self):
