@@ -137,11 +137,13 @@
 </%def>
 
 
-<%def name="render_field(field)">
+<%def name="render_field(field, show_label=True)">
   %if not field.is_hidden:
     <% group_class = len(field.errors) and "error" or "" %>
     <div class="control-group ${group_class}">
-      <label class="control-label">${ field.label | n }</label>
+      % if show_label:
+        <label class="control-label">${ field.label | n }</label>
+      % endif
       <div class="controls">
         ${ field }
         % if len(field.errors):

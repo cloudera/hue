@@ -64,6 +64,8 @@ class Job(models.Model):
   schema_version = models.CharField(max_length=128, blank=True, default='')
   deployment_dir = models.CharField(max_length=1024, blank=True, verbose_name=_('HDFS deployment directory'))
   is_shared = models.BooleanField(default=False, db_index=True)
+  parameters = models.TextField(default='[]',
+                                help_text=_t('Configuration parameters (e.g. market=US)'))
 
   unique_together = ('owner', 'name')
 
@@ -97,6 +99,9 @@ class Job(models.Model):
   def get_absolute_url(self):
     return self.get_full_node().get_absolute_url()
 
+  def get_parameters(self):
+    return json.loads(self.parameters)
+
   @property
   def status(self):
     if self.is_shared:
@@ -104,8 +109,12 @@ class Job(models.Model):
     else:
       return 'personal'
 
-  def find_parameters(self, fields=None):
-    return find_parameters(self, fields)
+  def find_all_parameters(self):
+    params = dict([(param, '') for param in self.find_parameters()])
+    for param in self.get_parameters():
+      params[param['name'].strip()] = param['value']
+
+    return  [{'name': name, 'value': value} for name, value in params.iteritems()]
 
 
 class WorkflowManager(models.Manager):
@@ -927,6 +936,8 @@ class Coordinator(Job):
     for dataset in self.dataset_set.all():
       params.update(set(find_parameters(dataset, ['uri'])))
 
+    params.update(set(self.workflow.find_parameters()))
+
     return list(params - set(['MINUTE', 'DAY', 'MONTH', 'YEAR']))
 
 
@@ -1041,7 +1052,7 @@ class History(models.Model):
       history = History.objects.get(oozie_job_id=oozie_id)
       if history.job.owner != user:
         history = None
-    except History.DoesNotExist, ex:
+    except History.DoesNotExist:
       pass
 
     return history

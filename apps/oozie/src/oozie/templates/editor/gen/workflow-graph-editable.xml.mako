@@ -53,7 +53,7 @@
             <div class="span10">
           % endif
 
-            <span class="">${ node.node_type }</span>
+          <span class="">${ node.node_type }</span>
 
           <br/>
           ${ node.description }

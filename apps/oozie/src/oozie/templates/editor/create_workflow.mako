@@ -46,14 +46,14 @@ ${ layout.menubar(section='workflows') }
                    ${ utils.render_field(workflow_form['name']) }
                    ${ utils.render_field(workflow_form['description']) }
 
-					<div class="control-group ">
-					  <label class="control-label">
-					    <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
-					      <i class="icon-share-alt"></i> ${ _('advanced') }</a>
-					  </label>
-					  <div class="controls">					
-					  </div>				
-					</div>
+          <div class="control-group ">
+            <label class="control-label">
+              <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
+                <i class="icon-share-alt"></i> ${ _('advanced') }</a>
+            </label>
+            <div class="controls">
+            </div>
+          </div>
 
                    <div id="advanced-container" class="hide">
                      ${ utils.render_field(workflow_form['deployment_dir']) }
@@ -66,10 +66,10 @@ ${ layout.menubar(section='workflows') }
         </div>
       </div>
 
-	    <div class="form-actions center">
-	      <a class="btn" onclick="history.back()">${ _('Back') }</a>
-	      <input class="btn btn-primary" type="submit" value="${ _('Save') }"></input>
-	    </div>
+      <div class="form-actions center">
+        <a class="btn" onclick="history.back()">${ _('Back') }</a>
+        <input class="btn btn-primary" type="submit" value="${ _('Save') }"></input>
+      </div>
       </form>
     </div>
 </div>

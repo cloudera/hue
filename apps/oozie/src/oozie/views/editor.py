@@ -22,9 +22,10 @@ except ImportError:
 import logging
 
 
-from django.forms.models import inlineformset_factory, modelformset_factory
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.forms.formsets import formset_factory
+from django.forms.models import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.functional import wraps
@@ -42,7 +43,7 @@ from oozie.models import Workflow, Node, Link, History, Coordinator,\
   Dataset, DataInput, DataOutput, Job, _STD_PROPERTIES_JSON
 from oozie.forms import NodeForm, WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataInputSetForm, DataOutputForm, DataOutputSetForm, LinkForm,\
-  DefaultLinkForm, design_form_by_type
+  DefaultLinkForm, design_form_by_type, ParameterForm
 
 
 LOG = logging.getLogger(__name__)
@@ -253,6 +254,7 @@ def edit_workflow(request, workflow):
     'graph': graph,
     'history': history,
     'user_can_edit_job': user_can_edit_job,
+    'parameters': extract_field_data(workflow_form['parameters'])
   })
 
 
@@ -285,58 +287,59 @@ def clone_workflow(request, workflow):
 
 @check_job_access_permission
 def submit_workflow(request, workflow):
-  if request.method != 'POST':
-    raise PopupException(_('A POST request is required.'))
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
-  try:
-    mapping = dict(request.POST.iteritems())
-    job_id = _submit_workflow(request, workflow, mapping)
-  except RestException, ex:
-    raise PopupException(_("Error submitting workflow %s") % (workflow,),
-                         detail=ex._headers.get('oozie-error-message', ex))
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
 
-  request.info(_('Workflow submitted'))
+    if params_form.is_valid():
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
 
-  return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
+      job_id = _submit_workflow(request, workflow, mapping)
+
+      request.info(_('Workflow submitted'))
+      return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % params_form.errors))
+  else:
+    parameters = workflow.find_all_parameters()
+    params_form = ParametersFormSet(initial=parameters)
+
+  popup = render('editor/submit_job_popup.mako', request, {
+                 'params_form': params_form,
+                 'action': reverse('oozie:submit_workflow', kwargs={'workflow': workflow.id})
+                 }, force_template=True).content
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
+
 
 
 def _submit_workflow(request, workflow, mapping):
-  submission = Submission(request.user, workflow, request.fs, mapping)
-  job_id = submission.run()
-  History.objects.create_from_submission(submission)
-  return job_id
-
-
-def resubmit_workflow(request, job_id):
-  if request.method != 'POST':
-    raise PopupException(_('A POST request is required.'))
-
-  history = History.objects.get(oozie_job_id=job_id)
-
-  can_access_job_or_exception(request, history.job.id)
-
   try:
-    workflow = history.get_workflow().get_full_node()
-    properties = history.properties_dict
-    job_id = _submit_workflow(request, workflow, properties)
+    submission = Submission(request.user, workflow, request.fs, mapping)
+    job_id = submission.run()
+    History.objects.create_from_submission(submission)
+    return job_id
   except RestException, ex:
     raise PopupException(_("Error submitting workflow %s") % (workflow,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
   request.info(_('Workflow submitted'))
-
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
-@check_job_access_permission
-def get_workflow_parameters(request, workflow):
-  """
-  Return the parameters found in the workflow as a JSON dictionary of {param_key : label}.
-  This expects an Ajax call.
-  """
-  params = workflow.find_parameters()
 
-  params_with_labels = dict((p, p.upper()) for p in params)
-  return render('dont_care_for_ajax', request, { 'params': params_with_labels })
+def resubmit_workflow(request, oozie_wf_id):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  history = History.objects.get(oozie_job_id=oozie_wf_id)
+  can_access_job_or_exception(request, history.job.id)
+
+  workflow = history.get_workflow().get_full_node()
+  properties = history.properties_dict
+  job_id = _submit_workflow(request, workflow, properties)
+
+  request.info(_('Workflow re-submitted'))
+  return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
 
 @check_job_access_permission
@@ -561,7 +564,8 @@ def edit_coordinator(request, coordinator):
     'data_input_form': data_input_form,
     'data_output_form': data_output_form,
     'history': history,
-    'can_edit_coordinator': can_edit_job(request.user, coordinator.workflow)
+    'can_edit_coordinator': can_edit_job(request.user, coordinator.workflow),
+    'parameters': extract_field_data(coordinator_form['parameters'])
   })
 
 
@@ -647,57 +651,65 @@ def clone_coordinator(request, coordinator):
 
 @check_job_access_permission
 def submit_coordinator(request, coordinator):
-  if request.method != 'POST':
-    raise PopupException(_('A POST request is required.'))
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
-  try:
-    job_id = _submit_coordinator(request, coordinator, request.POST)
-  except RestException, ex:
-    raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
-                         detail=ex._headers.get('oozie-error-message', ex))
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
 
-  request.info(_('Coordinator submitted'))
+    if params_form.is_valid():
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      job_id = _submit_coordinator(request, coordinator, mapping)
 
-  return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+      request.info(_('Coordinator submitted'))
+      return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % params_form.errors))
+  else:
+    parameters = coordinator.find_all_parameters()
+    params_form = ParametersFormSet(initial=parameters)
+
+  popup = render('editor/submit_job_popup.mako', request, {
+                 'params_form': params_form,
+                 'action': reverse('oozie:submit_coordinator',  kwargs={'coordinator': coordinator.id})
+                }, force_template=True).content
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
 
 
 def _submit_coordinator(request, coordinator, mapping):
-  if not coordinator.workflow.is_deployed(request.fs):
-    submission = Submission(request.user, coordinator.workflow, request.fs, mapping)
-    wf_dir = submission.deploy()
-    coordinator.workflow.deployment_dir = wf_dir
-    coordinator.workflow.save()
-
-  coordinator.deployment_dir = coordinator.workflow.deployment_dir
-  properties = {'wf_application_path': coordinator.workflow.deployment_dir}
-  properties.update(dict(request.POST.iteritems()))
-
-  submission = Submission(request.user, coordinator, request.fs, properties=properties)
-  job_id = submission.run()
-
-  History.objects.create_from_submission(submission)
-
-  return job_id
-
-
-def resubmit_coordinator(request, job_id):
-  if request.method != 'POST':
-    raise PopupException(_('A POST request is required.'))
-
-  history = History.objects.get(oozie_job_id=job_id)
-
-  can_access_job_or_exception(request, history.job.id)
-
   try:
-    coordinator = history.get_coordinator().get_full_node()
-    properties = history.properties_dict
-    job_id = _submit_coordinator(request, coordinator, properties)
+    if not coordinator.workflow.is_deployed(request.fs):
+      submission = Submission(request.user, coordinator.workflow, request.fs, mapping)
+      wf_dir = submission.deploy()
+      coordinator.workflow.deployment_dir = wf_dir
+      coordinator.workflow.save()
+
+    coordinator.deployment_dir = coordinator.workflow.deployment_dir
+    properties = {'wf_application_path': request.fs.get_hdfs_path(coordinator.workflow.deployment_dir)}
+    properties.update(mapping)
+
+    submission = Submission(request.user, coordinator, request.fs, properties=properties)
+    job_id = submission.run()
+
+    History.objects.create_from_submission(submission)
+
+    return job_id
   except RestException, ex:
     raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
-  request.info(_('Coordinator submitted'))
 
+def resubmit_coordinator(request, oozie_coord_id):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  history = History.objects.get(oozie_job_id=oozie_coord_id)
+  can_access_job_or_exception(request, history.job.id)
+
+  coordinator = history.get_coordinator().get_full_node()
+  properties = history.properties_dict
+  job_id = _submit_coordinator(request, coordinator, properties)
+
+  request.info(_('Coordinator re-submitted'))
   return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
 
 

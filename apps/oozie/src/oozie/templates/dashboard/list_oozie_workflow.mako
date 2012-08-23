@@ -112,9 +112,10 @@ ${ layout.menubar(section='dashboard') }
       ${ _('Manage') }
     </div>
     <div class="span3">
-      <form action="${ url('oozie:resubmit_workflow', job_id=oozie_workflow.id) }" method="post">
+      <form action="${ url('oozie:resubmit_workflow', oozie_wf_id=oozie_workflow.id) }" method="post">
       % if oozie_workflow.is_running():
-        <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }" data-message="The workflow was killed!">
+        <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }"
+            data-message="The workflow was killed!">
           ${ _('Kill') }
         </button>
       % else:
