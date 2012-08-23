@@ -41,6 +41,13 @@ class WorkflowForm(forms.ModelForm):
     }
 
 
+class ImportJobsubDesignForm(forms.Form):
+  """Used for specifying what oozie actions to import"""
+  def __init__(self, choices=[], *args, **kwargs):
+    super(ImportJobsubDesignForm, self).__init__(*args, **kwargs)
+    self.fields['action_id'] = forms.ChoiceField(choices=choices, widget=forms.RadioSelect(attrs={'class':'radio'}))
+
+
 class NodeForm(forms.ModelForm):
   class Meta:
     ALWAYS_HIDE = ('workflow', 'children', 'node_type')

@@ -33,6 +33,7 @@ urlpatterns = patterns(
   url(r'^resubmit_workflow/(?P<oozie_wf_id>[-\w]+)$', 'resubmit_workflow', name='resubmit_workflow'),
 
   url(r'^new_action/(?P<workflow>\d+)/(?P<node_type>\w+)/(?P<parent_action_id>\d+)$', 'new_action', name='new_action'),
+  url(r'^import_action/(?P<workflow>\d+)/(?P<parent_action_id>\d+)$', 'import_action', name='import_action'),
   url(r'^edit_action/(?P<action>\d+)$', 'edit_action', name='edit_action'),
   url(r'^edit_workflow_fork/(?P<action>\d+)$', 'edit_workflow_fork', name='edit_workflow_fork'),
   url(r'^delete_action/(?P<action>\d+)$', 'delete_action', name='delete_action'),

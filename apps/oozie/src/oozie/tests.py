@@ -20,6 +20,7 @@ try:
 except ImportError:
   import simplejson as json
 import logging
+import re
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
@@ -27,6 +28,8 @@ from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+from jobsub.management.commands import jobsub_setup
+from jobsub.models import OozieDesign
 from liboozie import oozie_api
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   CoordinatorList, WorkflowAction
@@ -230,6 +233,27 @@ class TestEditor:
     assert_true(2, len(action1.get_children()))
     assert_equal(node_count + 1, self.wf.actions.count())
 
+
+  def test_import_action(self):
+    # Setup jobsub examples
+    if not jobsub_setup.Command().has_been_setup():
+      jobsub_setup.Command().handle()
+
+    # There should be 3 from examples
+    jobsub_design = OozieDesign.objects.all()[0]
+    node_size = len(Node.objects.all())
+    kwargs = dict(workflow=self.wf.id, parent_action_id=self.wf.end.get_parents()[0].id)
+    response = self.c.post(reverse('oozie:import_action', kwargs=kwargs), {'action_id': jobsub_design.id})
+    assert_equal(302, response.status_code)
+    assert_equal(node_size + 1, len(Node.objects.all()))
+
+    # There should now be an imported action at the end of Node list
+    # Need to test properties to make sure we got it right
+    # Must also make sure that jobsub field values are translated
+    translation_regex = re.compile('(?<!\$)\$(\w+)')
+    node = Node.objects.all()[len(Node.objects.all())-1].get_full_node()
+    for field in node.PARAM_FIELDS:
+      assert_equal(translation_regex.sub(r'${\1}', getattr(jobsub_design.get_root_action(), field)), getattr(node, field))
 
   def test_decision_node(self):
     action1 = Node.objects.get(name='action-name-1')

@@ -60,6 +60,9 @@ ${ layout.menubar(section='workflows') }
               <li class="active">
                 <a href="#add" data-toggle="tab">${ _('Add') }</a>
               </li>
+              <li>
+                <a href="#import" data-toggle="tab">${ _('Import') }</a>
+              </li>
              </ul>
 
             <div class="tab-content">
@@ -88,7 +91,16 @@ ${ layout.menubar(section='workflows') }
                   <i class="icon-plus"></i> ${ _('Pig') }
                 </a>
                 <p/>
-             </div>
+              </div>
+              <div class="tab-pane" id="import">
+                <p>
+                <a href="javascript:void(0);" title="${ _('Click to add to the end') }" class="btn modalWindow"
+                  data-modal-url="${ url('oozie:import_action', workflow=workflow.id, parent_action_id=workflow.end.get_parents()[0].id) }"
+                  data-modal-id="#modal-window">
+                  <i class="icon-plus"></i> ${ _('Import Jobsub') }
+                </a>
+                <p/>
+              </div>
             </div>
           </div>
 
@@ -162,6 +174,16 @@ ${ layout.menubar(section='workflows') }
 </div>
 
 
+<div id="modal-window" class="modal hide fade"></div>
+
+
+<style type="text/css">
+#modal-window .modal-content {
+  height: 300px;
+  overflow: auto;
+}
+</style>
+
 <script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
@@ -170,8 +192,23 @@ ${ layout.menubar(section='workflows') }
       window.location = $(this).attr('data-edit');
     });
 
-    $("a[data-row-selector='true']").jHueRowSelector();
+  $(".modalWindow").click(function(){
+    var _this = $(this);
+    $.ajax({
+      url: _this.attr("data-modal-url"),
+      beforeSend: function(xhr){
+        xhr.setRequestHeader("X-Requested-With", "Hue");
+      },
+      dataType: "html",
+      success: function(data){
+        var id = _this.attr("data-modal-id");
+        $(id).html(data);
+        $(id).modal("show");
+      }
+    });
   });
+
+  $("a[data-row-selector='true']").jHueRowSelector();
 </script>
 
 ${ utils.path_chooser_libs(True) }
