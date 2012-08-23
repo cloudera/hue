@@ -30,6 +30,7 @@ from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 from liboozie.oozie_api import get_oozie
 
+from oozie.conf import OOZIE_JOBS_COUNT
 from oozie.models import History
 from oozie.views.editor import can_access_job_or_exception
 
@@ -73,7 +74,7 @@ def show_oozie_error(view_func):
 
 @show_oozie_error
 def list_oozie_workflows(request):
-  kwargs = {'cnt': 50,}
+  kwargs = {'cnt': OOZIE_JOBS_COUNT.get(),}
   if not request.user.is_superuser:
     kwargs['user'] = request.user.username
 
@@ -87,7 +88,7 @@ def list_oozie_workflows(request):
 
 @show_oozie_error
 def list_oozie_coordinators(request):
-  kwargs = {'cnt': 50,}
+  kwargs = {'cnt': OOZIE_JOBS_COUNT.get(),}
   if not request.user.is_superuser:
     kwargs['user'] = request.user.username
 
@@ -172,7 +173,7 @@ def split_oozie_jobs(oozie_jobs):
   jobs_completed = []
 
   for job in oozie_jobs:
-    if job.status == 'RUNNING':
+    if job.is_running():
       jobs_running.append(job)
     else:
       jobs_completed.append(job)

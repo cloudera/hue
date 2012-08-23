@@ -51,3 +51,9 @@ SHARE_JOBS = Config(
   type=coerce_bool,
   help=_('Share workflows and coordinators information with all users. If set to false, '
        'they will be visible only to the owner and administrators.'))
+
+OOZIE_JOBS_COUNT = Config(
+  key='oozie_jobs_count',
+  default=100,
+  type=int,
+  help=_('Maximum of Oozie workflows or coodinators to retrieve in one API call.'))

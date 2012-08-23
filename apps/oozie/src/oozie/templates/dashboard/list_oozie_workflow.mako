@@ -76,7 +76,7 @@ ${ layout.menubar(section='dashboard') }
     </div>
     <div class="span3">
       <span class="label ${ utils.get_status(oozie_workflow.status) }">${ oozie_workflow.status }</span>
-      % if oozie_workflow.status == 'RUNNING':
+      % if oozie_workflow.is_running():
         &nbsp;
         <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }">
           ${ _('Kill') }
