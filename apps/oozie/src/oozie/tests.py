@@ -477,6 +477,10 @@ class TestEditor:
       finish()
 
 
+  def test_create_coordinator(self):
+    create_coordinator(self.wf)
+
+
   def test_clone_coordinator(self):
     coord = create_coordinator(self.wf)
     coordinator_count = Coordinator.objects.count()
@@ -707,7 +711,13 @@ def create_coordinator(workflow):
   response = c.get(reverse('oozie:create_coordinator'))
   assert_equal(coord_count, Coordinator.objects.count(), response)
 
-  response = c.post(reverse('oozie:create_coordinator'), {u'end': [u'2012-07-04 00:00:00'], u'name': [u'MyCoord'], u'frequency_number': [u'1'], u'workflow': [workflow.id], u'frequency_unit': [u'days'], u'start': [u'2012-07-01 00:00:00'], u'timezone': [u'America/Los_Angeles'], u'description': [u'']})
+  response = c.post(reverse('oozie:create_coordinator'), {
+                        u'name': [u'MyCoord'], u'description': [u'Description of my coodinator'],
+                        u'workflow': [workflow.id],
+                        u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
+                        u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
+                        u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
+                        u'timezone': [u'America/Los_Angeles']})
   assert_equal(coord_count + 1, Coordinator.objects.count(), response)
 
   return Coordinator.objects.get()
@@ -716,11 +726,12 @@ def create_coordinator(workflow):
 def create_dataset(coord):
   c = make_logged_in_client()
 
-  response = c.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]),
-                         {u'name': [u'MyDataset'], u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
-                          u'uri': [u'/data/${YEAR}${MONTH}${DAY}'], u'start': [u'2012-08-15'],
-                          u'timezone': [u'America/Los_Angeles'], u'done_flag': [u''],
-                          u'description': [u'']})
+  response = c.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]), {
+                        u'name': [u'MyDataset'], u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
+                        u'uri': [u'/data/${YEAR}${MONTH}${DAY}'],
+                        u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
+                        u'timezone': [u'America/Los_Angeles'], u'done_flag': [u''],
+                        u'description': [u'']})
   data = json.loads(response.content)
   assert_equal(0, data['status'], data['data'])
 
