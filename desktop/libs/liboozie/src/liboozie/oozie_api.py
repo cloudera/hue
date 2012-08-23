@@ -188,12 +188,13 @@ class OozieApi(object):
       raise ValueError(msg)
     params = self._get_params()
     params['action'] = action
-    return self._root.put('job/%s' % (jobid,), params)
+
+    return self._root.put('job/%s' % jobid, params)
 
 
-  def submit_workflow(self, application_path, properties=None):
+  def submit_workflow(self, application_path):
     """
-    submit_workflow(application_path, properties=None) -> jobid
+    submit_workflow(application_path) -> jobid
 
     Submit a job to Oozie. May raise PopupException.
     """
@@ -210,7 +211,7 @@ class OozieApi(object):
 
   def submit_job(self, properties=None):
     """
-    submit_workflow(properties=None) -> jobid
+    submit_workflow(properties=None, id=None) -> jobid
 
     Submit a job to Oozie. May raise PopupException.
     """
@@ -224,11 +225,11 @@ class OozieApi(object):
     properties = defaults
 
     params = self._get_params()
-    resp = self._root.post('jobs',
-                           params, data=config_gen(properties),
-                           contenttype=_XML_CONTENT_TYPE)
-
+    resp = self._root.post('jobs', params,
+                  data=config_gen(properties),
+                  contenttype=_XML_CONTENT_TYPE)
     return resp['id']
+
 
   def get_build_version(self):
     """

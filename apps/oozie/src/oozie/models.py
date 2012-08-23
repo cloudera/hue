@@ -1046,7 +1046,6 @@ class History(models.Model):
 
     return history
 
-
 def find_parameters(instance, fields=None):
   """Find parameters in the given fields"""
   if fields is None:

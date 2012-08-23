@@ -30,6 +30,7 @@ urlpatterns = patterns(
   url(r'^delete_workflow/(?P<workflow>\d+)$', 'delete_workflow', name='delete_workflow'),
   url(r'^clone_workflow/(?P<workflow>\d+)$', 'clone_workflow', name='clone_workflow'),
   url(r'^submit_workflow/(?P<workflow>\d+)$', 'submit_workflow', name='submit_workflow'),
+  url(r'^resubmit_workflow/(?P<job_id>[-\w]+)$', 'resubmit_workflow', name='resubmit_workflow'),
 
   url(r'^new_action/(?P<workflow>\d+)/(?P<node_type>\w+)/(?P<parent_action_id>\d+)$', 'new_action', name='new_action'),
   url(r'^edit_action/(?P<action>\d+)$', 'edit_action', name='edit_action'),
@@ -47,6 +48,7 @@ urlpatterns = patterns(
   url(r'^create_coordinator_dataset/(?P<coordinator>[-\w]+)$', 'create_coordinator_dataset', name='create_coordinator_dataset'),
   url(r'^create_coordinator_data/(?P<coordinator>[-\w]+)/(?P<data_type>(input|output))$', 'create_coordinator_data', name='create_coordinator_data'),
   url(r'^submit_coordinator/(?P<coordinator>\d+)$', 'submit_coordinator', name='submit_coordinator'),
+  url(r'^resubmit_coordinator/(?P<job_id>[-\w]+)$', 'resubmit_coordinator', name='resubmit_coordinator'),
 
   url(r'^workflow_parameters/(?P<workflow>\d+)$', 'get_workflow_parameters', name='workflow_parameters'),
   url(r'^list_history$', 'list_history', name='list_history'),

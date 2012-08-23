@@ -290,17 +290,42 @@ def submit_workflow(request, workflow):
 
   try:
     mapping = dict(request.POST.iteritems())
-    submission = Submission(request.user, workflow, request.fs, mapping)
-    job_id = submission.run()
+    job_id = _submit_workflow(request, workflow, mapping)
   except RestException, ex:
     raise PopupException(_("Error submitting workflow %s") % (workflow,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
-  History.objects.create_from_submission(submission)
   request.info(_('Workflow submitted'))
 
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
+
+def _submit_workflow(request, workflow, mapping):
+  submission = Submission(request.user, workflow, request.fs, mapping)
+  job_id = submission.run()
+  History.objects.create_from_submission(submission)
+  return job_id
+
+
+def resubmit_workflow(request, job_id):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  history = History.objects.get(oozie_job_id=job_id)
+
+  can_access_job_or_exception(request, history.job.id)
+
+  try:
+    workflow = history.get_workflow().get_full_node()
+    properties = history.properties_dict
+    job_id = _submit_workflow(request, workflow, properties)
+  except RestException, ex:
+    raise PopupException(_("Error submitting workflow %s") % (workflow,),
+                         detail=ex._headers.get('oozie-error-message', ex))
+
+  request.info(_('Workflow submitted'))
+
+  return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
 @check_job_access_permission
 def get_workflow_parameters(request, workflow):
@@ -626,23 +651,51 @@ def submit_coordinator(request, coordinator):
     raise PopupException(_('A POST request is required.'))
 
   try:
-    if not coordinator.workflow.is_deployed(request.fs):
-      submission = Submission(request.user, coordinator.workflow, request.fs, request.POST)
-      wf_dir = submission.deploy()
-      coordinator.workflow.deployment_dir = wf_dir
-      coordinator.workflow.save()
-
-    coordinator.deployment_dir = coordinator.workflow.deployment_dir
-    properties = {'wf_application_path': coordinator.workflow.deployment_dir}
-    properties.update(dict(request.POST.iteritems()))
-
-    submission = Submission(request.user, coordinator, request.fs, properties=properties)
-    job_id = submission.run()
+    job_id = _submit_coordinator(request, coordinator, request.POST)
   except RestException, ex:
     raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
+  request.info(_('Coordinator submitted'))
+
+  return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+
+
+def _submit_coordinator(request, coordinator, mapping):
+  if not coordinator.workflow.is_deployed(request.fs):
+    submission = Submission(request.user, coordinator.workflow, request.fs, mapping)
+    wf_dir = submission.deploy()
+    coordinator.workflow.deployment_dir = wf_dir
+    coordinator.workflow.save()
+
+  coordinator.deployment_dir = coordinator.workflow.deployment_dir
+  properties = {'wf_application_path': coordinator.workflow.deployment_dir}
+  properties.update(dict(request.POST.iteritems()))
+
+  submission = Submission(request.user, coordinator, request.fs, properties=properties)
+  job_id = submission.run()
+
   History.objects.create_from_submission(submission)
+
+  return job_id
+
+
+def resubmit_coordinator(request, job_id):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  history = History.objects.get(oozie_job_id=job_id)
+
+  can_access_job_or_exception(request, history.job.id)
+
+  try:
+    coordinator = history.get_coordinator().get_full_node()
+    properties = history.properties_dict
+    job_id = _submit_coordinator(request, coordinator, properties)
+  except RestException, ex:
+    raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
+                         detail=ex._headers.get('oozie-error-message', ex))
+
   request.info(_('Coordinator submitted'))
 
   return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
