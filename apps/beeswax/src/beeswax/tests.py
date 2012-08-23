@@ -1177,6 +1177,9 @@ def test_search_log_line():
     """
   assert_true(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
 
+  logs = "12/08/22 20:50:14 ERROR ql.Driver: FAILED: Parse Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant'"
+  assert_true(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
+
   logs = """
     FAILED: Parse Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
     2012-08-18 12:23:15,648 ERROR [pool-1-thread-2] ql.Driver (SessionState.java:printError(380)) - FAILED: Parse XXXX Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
@@ -1193,4 +1196,4 @@ def test_search_log_line():
 
 def search_log_line(component, expected_log, all_logs):
   """Checks if 'expected_log' can be found in one line of 'all_logs' outputed by the logging component 'component'."""
-  return re.compile('.+? %(component)s .+? - %(expected_log)s' % {'component': component, 'expected_log': expected_log}).search(all_logs)
+  return re.compile('.+?%(component)s(.+?)%(expected_log)s' % {'component': component, 'expected_log': expected_log}).search(all_logs)
