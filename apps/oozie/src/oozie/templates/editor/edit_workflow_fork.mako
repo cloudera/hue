@@ -64,7 +64,7 @@ ${ layout.menubar(section='workflows') }
       <div class="control-group">
         <label class="control-label"></label>
         <div class="controls">
-	        <table class="table-condensed">
+          <table class="table-condensed">
             <thead>
               <tr>
                 <th>${ _('Predicate') }</th>
@@ -72,41 +72,41 @@ ${ layout.menubar(section='workflows') }
                 <th>${ _('Action') }</th>
               </tr>
             </thead>
-	          <tbody>
-	            % for form in link_formset.forms:
-	                % for hidden in form.hidden_fields():
-	                  ${ hidden }
-	                % endfor
-	            <tr>
-	              <td>
-	                ${ utils.render_field(form['comment']) }
-	              </td>
-	              <td class="center">
-	                ${ _('go to') }
-	              </td>
-	              <td class="right">
-	                <a href="${ form.instance.child.get_full_node().get_edit_link() }" class="span3">${ form.instance.child }</a>
-	              </td>
-	            </tr>
-	            % endfor
-	              <tr>
-	                <td>
-	           <div class="control-group">
-	              <label class="control-label"></label>
-	              <div class="controls span8">
-	                  <div>${ _('default') }</div>
-	              </div>
-	            </div>
-	                </td>
-	                <td class="center">
-	                ${ _('go to') }
-	                </td>
-	                <td class="right">
-	                  ${ utils.render_field(default_link_form['child']) }
-	                </td>
-	              </tr>
-	          </tbody>
-	        </table>
+            <tbody>
+              % for form in link_formset.forms:
+                  % for hidden in form.hidden_fields():
+                    ${ hidden }
+                  % endfor
+              <tr>
+                <td>
+                  ${ utils.render_field(form['comment']) }
+                </td>
+                <td class="center">
+                  ${ _('go to') }
+                </td>
+                <td class="right">
+                  <a href="${ form.instance.child.get_full_node().get_edit_link() }" class="span3">${ form.instance.child }</a>
+                </td>
+              </tr>
+              % endfor
+                <tr>
+                  <td>
+             <div class="control-group">
+                <label class="control-label"></label>
+                <div class="controls span8">
+                    <div>${ _('default') }</div>
+                </div>
+              </div>
+                  </td>
+                  <td class="center">
+                  ${ _('go to') }
+                  </td>
+                  <td class="right">
+                    ${ utils.render_field(default_link_form['child']) }
+                  </td>
+                </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 

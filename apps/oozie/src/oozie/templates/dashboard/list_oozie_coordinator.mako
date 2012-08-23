@@ -76,9 +76,10 @@ ${ layout.menubar(section='dashboard') }
           <tr>
             <td>${ _('Manage') }</td>
             <td>
-            <form action="${ url('oozie:resubmit_coordinator', job_id=oozie_coordinator.id) }" method="post">
+            <form action="${ url('oozie:resubmit_coordinator', oozie_coord_id=oozie_coordinator.id) }" method="post">
             % if oozie_coordinator.is_running():
-              <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"  data-message="The coordinator was killed!">
+              <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
+                data-message="The coordinator was killed!">
                 ${ _('Kill') }
               </button>
             % else:
@@ -95,10 +96,10 @@ ${ layout.menubar(section='dashboard') }
 
     <ul class="nav nav-tabs">
       <li class="active"><a href="#calendar" data-toggle="tab">${ _('Calendar') }</a></li>
-	  <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
-	  <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
-	  <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
-	  <li><a href="#definition" data-toggle="tab">${ _('Definition') }</a></li>
+    <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
+    <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
+    <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
+    <li><a href="#definition" data-toggle="tab">${ _('Definition') }</a></li>
     </ul>
 
     <div class="tab-content" style="padding-bottom:200px">

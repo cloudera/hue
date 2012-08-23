@@ -76,7 +76,6 @@ ${ layout.menubar(section='workflows') }
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
               % if can_access_job(currentuser, workflow):
-                  data-param-url="${ url('oozie:workflow_parameters', workflow=workflow.id) }"
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
                   data-schedule-url="${ url('oozie:create_coordinator', workflow=workflow.id) }"
               % endif
@@ -108,24 +107,7 @@ ${ layout.menubar(section='workflows') }
 </div>
 
 
-<div id="submitWf" class="modal hide fade">
-  <form id="submitWfForm" action="" method="POST">
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="submitWfMessage">${ _('Submit this workflow?') }</h3>
-    </div>
-    <div class="modal-body">
-      <fieldset>
-        <div id="param-container">
-        </div>
-      </fieldset>
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="btn secondary hideModal">${ _('Cancel') }</a>
-      <input id="submitBtn" type="submit" class="btn primary" value="${ _('Submit') }"/>
-    </div>
-  </form>
-</div>
+<div id="submit-wf-modal" class="modal hide"></div>
 
 <div id="deleteWf" class="modal hide fade">
   <form id="deleteWfForm" action="" method="POST">
@@ -135,7 +117,7 @@ ${ layout.menubar(section='workflows') }
     </div>
     <div class="modal-footer">
       <input type="submit" class="btn primary" value="${ _('Yes') }"/>
-      <a href="#" class="btn secondary hideModal">${ _('No') }</a>
+      <a href="#" class="btn secondary" data-dismiss="modal">${ _('No') }</a>
     </div>
   </form>
 </div>
@@ -168,81 +150,60 @@ ${ layout.menubar(section='workflows') }
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function() {
-      $(".action-row").click(function(e){
-        var select_btn = $(this).find('input');
-        select_btn.prop("checked", true);
+    $(".action-row").click(function(e){
+      var select_btn = $(this).find('input');
+      select_btn.prop("checked", true);
 
-        $(".action-row").css("background-color", "");
-        $(this).css("background-color", "#ECF4F8");
+      $(".action-row").css("background-color", "");
+      $(this).css("background-color", "#ECF4F8");
 
-        $(".action-buttons").attr("disabled", "disabled");
-
-        update_action_buttons_status();
-      });
-
-      function update_action_buttons_status() {
-        var select_btn = $('input[name=action]:checked');
-
-        var action_buttons = [
-          ['#submit-btn', 'data-submit-url'],
-          ['#schedule-btn', 'data-schedule-url'],
-          ['#delete-btn', 'data-delete-url'],
-          ['#clone-btn', 'data-clone-url']]
-
-        $.each(action_buttons, function(index) {
-          if (select_btn.attr(this[1])) {
-            $(this[0]).removeAttr('disabled');
-          } else {
-            $(this[0]).attr("disabled", "disabled");
-          }
-        });
-      }
+      $(".action-buttons").attr("disabled", "disabled");
 
       update_action_buttons_status();
+    });
 
-      $("#delete-btn").click(function(e){
-          var _this = $('input[name=action]:checked');
-          var _action = _this.attr("data-delete-url");
-          $("#deleteWfForm").attr("action", _action);
-          $("#deleteWfMessage").text(_this.attr("alt"));
-          $("#deleteWf").modal("show");
+    function update_action_buttons_status() {
+      var select_btn = $('input[name=action]:checked');
+
+      var action_buttons = [
+        ['#submit-btn', 'data-submit-url'],
+        ['#schedule-btn', 'data-schedule-url'],
+        ['#delete-btn', 'data-delete-url'],
+        ['#clone-btn', 'data-clone-url']]
+
+      $.each(action_buttons, function(index) {
+        if (select_btn.attr(this[1])) {
+          $(this[0]).removeAttr('disabled');
+        } else {
+          $(this[0]).attr("disabled", "disabled");
+        }
       });
+    }
 
-      $("#submit-btn").click(function(e){
-          var _this = $('input[name=action]:checked');
-          var _action = _this.attr("data-submit-url");
-          $("#submitWfForm").attr("action", _action);
-          $("#submitWfMessage").text(_this.attr("alt"));
-          // We will show the model form, but disable the submit button
-          // until we've finish loading the parameters via ajax.
-          $("#submitBtn").attr("disabled", "disabled");
-          $("#submitWf").modal("show");
+    update_action_buttons_status();
 
-          $.get(_this.attr("data-param-url"), function(data) {
-              var params = data["params"]
-              var container = $("#param-container");
-              container.empty();
-              for (key in params) {
-                if (!params.hasOwnProperty(key)) {
-                    continue;
-                }
-                container.append(
-                  $("<div/>").addClass("clearfix")
-                    .append($("<label/>").text(params[key]))
-                    .append(
-                        $("<div/>").addClass("input")
-                          .append($("<input/>").attr("name", key).attr("type", "text"))
-                    )
-                )
-              }
-              // Good. We can submit now.
-              $("#submitBtn").removeAttr("disabled");
-          }, "json");
-      });
+    $("#delete-btn").click(function(e){
+      var _this = $('input[name=action]:checked');
+      var _action = _this.attr("data-delete-url");
+      $("#deleteWfForm").attr("action", _action);
+      $("#deleteWfMessage").text(_this.attr("alt"));
+      $("#deleteWf").modal("show");
+    });
+
+    $('#submit-btn').click(function() {
+      var _this = $('input[name=action]:checked');
+      var _action = _this.attr("data-submit-url");
+
+      $.get(_action,  function(response) {
+          $('#submit-wf-modal').html(response);
+          $('#submit-wf-modal').modal('show');
+        }
+      );
+     });
 
     $("#clone-btn").click(function(e){
-        var _this = $('input[name=action]:checked');
-        var _url = _this.attr("data-clone-url");
+      var _this = $('input[name=action]:checked');
+      var _url = _this.attr("data-clone-url");
 
       $.post(_url, function(data) {
         window.location = data.url;
@@ -250,18 +211,10 @@ ${ layout.menubar(section='workflows') }
     });
 
     $("#schedule-btn").click(function(e){
-        var _this = $('input[name=action]:checked');
-        var _url = _this.attr("data-schedule-url");
+      var _this = $('input[name=action]:checked');
+      var _url = _this.attr("data-schedule-url");
 
-        window.location.replace(_url);
-    });
-
-    $("#submitWf .hideModal").click(function(){
-        $("#submitWf").modal("hide");
-    });
-
-    $("#deleteWf .hideModal").click(function(){
-        $("#deleteWf").modal("hide");
+      window.location.replace(_url);
     });
 
     var oTable = $('#workflowTable').dataTable( {

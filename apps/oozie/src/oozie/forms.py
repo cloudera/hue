@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import logging
 
 from django import forms
@@ -25,6 +24,11 @@ from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator
   Dataset, DataInput, DataOutput, Pig, Link
 
 LOG = logging.getLogger(__name__)
+
+
+class ParameterForm(forms.Form):
+  name = forms.CharField(max_length=40, widget=forms.widgets.HiddenInput())
+  value = forms.CharField(max_length=40, required=False)
 
 
 class WorkflowForm(forms.ModelForm):
@@ -117,15 +121,17 @@ class DefaultLinkForm(forms.ModelForm):
     super(DefaultLinkForm, self).__init__(*args, **kwargs)
     self.fields['child'].widget = forms.Select(choices=((node.id, node) for node in set(workflow.node_set.all())))
 
+
 DATE_FORMAT = '%m/%d/%Y'
 TIME_FORMAT = '%I:%M %p'
 
 class CoordinatorForm(forms.ModelForm):
-  """Used for specifying a design"""
   start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
-                                   widget=SplitDateTimeWidget(attrs={'class': 'short', 'id': 'coordinator_start'}, date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+                                   widget=SplitDateTimeWidget(attrs={'class': 'short', 'id': 'coordinator_start'},
+                                                              date_format=DATE_FORMAT, time_format=TIME_FORMAT))
   end = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
-                                 widget=SplitDateTimeWidget(attrs={'class': 'short', 'id': 'coordinator_end'}, date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+                                 widget=SplitDateTimeWidget(attrs={'class': 'short', 'id': 'coordinator_end'},
+                                                            date_format=DATE_FORMAT, time_format=TIME_FORMAT))
 
   class Meta:
     model = Coordinator
@@ -137,7 +143,8 @@ class CoordinatorForm(forms.ModelForm):
 
 class DatasetForm(forms.ModelForm):
   start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
-                                   widget=SplitDateTimeWidget(attrs={'class': 'short'}, date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+                                   widget=SplitDateTimeWidget(attrs={'class': 'short'},
+                                                              date_format=DATE_FORMAT, time_format=TIME_FORMAT))
 
   class Meta:
     model = Dataset

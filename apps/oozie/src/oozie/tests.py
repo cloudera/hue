@@ -31,7 +31,8 @@ from liboozie import oozie_api
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   CoordinatorList, WorkflowAction
 
-from oozie.models import Workflow, Node, Job, Coordinator, Fork, History
+from oozie.models import Workflow, Node, Job, Coordinator, Fork, History,\
+  find_parameters
 from oozie.conf import SHARE_JOBS, REMOTE_DEPLOYMENT_DIR
 
 LOG = logging.getLogger(__name__)
@@ -117,13 +118,17 @@ class TestEditor:
             Job(name="foo ${b} $$"),
             Job(name="${foo}", description="xxx ${foo}")]
 
-    result = [job.find_parameters(['name', 'description']) for job in jobs]
+    result = [find_parameters(job, ['name', 'description']) for job in jobs]
     assert_equal(set(["b", "foo"]), reduce(lambda x, y: x | set(y), result, set()))
 
 
   def test_create_workflow(self):
     # Done in the setUp
     pass
+
+
+  def test_find_all_parameters(self):
+        assert_equal([{'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}], self.wf.find_all_parameters())
 
 
   def test_move_up(self):
@@ -727,7 +732,7 @@ class TestEditor:
 
 
 # Utils
-WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u'']}
+WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''], u'parameters': [u'[{"name":"market","value":"US"}]']}
 
 
 # Beware: client not consistent with self.c in TestEditor
@@ -735,7 +740,8 @@ def add_action(workflow, action, name):
   c = make_logged_in_client()
 
   response = c.post("/oozie/new_action/%s/%s/%s" % (workflow, 'mapreduce', action), {
-     u'files': [u'[]'], u'name': [name], u'jar_path': [u'/tmp/.file.jar'], u'job_properties': [u'[]'], u'archives': [u'[]'], u'description': [u'']}, follow=True)
+     u'files': [u'[]'], u'name': [name], u'jar_path': [u'/tmp/.file.jar'], u'job_properties': [u'[{"name":"sleep","value":"${SLEEP}"}]'],
+     u'archives': [u'[]'], u'description': [u'']}, follow=True)
   assert_equal(200, response.status_code)
   assert_true(Node.objects.filter(name=name).exists(), response)
   return Node.objects.get(name=name)
@@ -775,7 +781,8 @@ def create_coordinator(workflow):
                         u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
                         u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
                         u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
-                        u'timezone': [u'America/Los_Angeles']})
+                        u'timezone': [u'America/Los_Angeles'],
+                        u'parameters': [u'[{"name":"market","value":"US,France"}]']})
   assert_equal(coord_count + 1, Coordinator.objects.count(), response)
 
   return Coordinator.objects.get()

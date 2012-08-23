@@ -45,9 +45,9 @@ ${layout.menubar(section='dashboard')}
         </span>
         <span style="float:left;padding-left:10px;padding-right:10px;margin-top:3px">${ _('days with status') }</span>
         <span class="btn-group" style="float:left;">
-	      <a class="btn btn-status btn-success">Succeeded</a>
-	      <a class="btn btn-status btn-warning">Running</a>
-	      <a class="btn btn-status btn-danger">Killed</a>
+        <a class="btn btn-status btn-success">Succeeded</a>
+        <a class="btn btn-status btn-warning">Running</a>
+        <a class="btn btn-status btn-danger">Killed</a>
         </span>
    </form>
   </div>

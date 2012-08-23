@@ -347,16 +347,16 @@ ${ layout.menubar(section='workflows') }
         };
       };
 
-	  var viewModel = new ViewModel(
-	            ${ job_properties },
-	            arrayToDictArray(${ files }),
-	            arrayToDictArray(${ archives }),
-	            ${ params });
-	
-	  ko.bindingHandlers.fileChooser = {
-	        init: function(element, valueAccessor, allBindings, model) {
-	        var self = $(element);
-	        self.after(getFileBrowseButton(self));
+    var viewModel = new ViewModel(
+              ${ job_properties },
+              arrayToDictArray(${ files }),
+              arrayToDictArray(${ archives }),
+              ${ params });
+
+    ko.bindingHandlers.fileChooser = {
+          init: function(element, valueAccessor, allBindings, model) {
+          var self = $(element);
+          self.after(getFileBrowseButton(self));
       }
     };
 
@@ -371,13 +371,13 @@ ${ layout.menubar(section='workflows') }
       return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
         e.preventDefault();
         $("#fileChooserModal").jHueFileChooser({
-	        onFileChoose: function(filePath) {
-	            inputElement.val(filePath);
-	            $("#chooseFile").modal("hide");
-	        },
-	        createFolder: false
-	      });
-	    $("#chooseFile").modal("show");
+          onFileChoose: function(filePath) {
+              inputElement.val(filePath);
+              $("#chooseFile").modal("hide");
+          },
+          createFolder: false
+        });
+      $("#chooseFile").modal("show");
       })
     }
 

@@ -195,7 +195,7 @@ def render(template, request, data, json=None, template_lib=None, force_template
   template_lib), as well as as arbitrary data.
 
   It typically renders to an HttpResponse.  If the request is a non-JFrame
-  AJAX reqeust (or if data is None), it renders into JSON.
+  AJAX request (or if data is None), it renders into JSON.
 
   if force-template is True, will render the non-AJAX template response even if the
   request is via AJAX. This is to facilitate fetching HTML fragments.

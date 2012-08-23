@@ -27,6 +27,7 @@
 ${ commonheader(_("Oozie App"), "oozie", "100px") }
 ${ layout.menubar(section='coordinators') }
 
+
 <div class="container-fluid">
   <h1>${ _('Coordinator Editor') }</h1>
 
@@ -38,15 +39,15 @@ ${ layout.menubar(section='coordinators') }
     <div class="row-fluid">
       <div class="span3">
         <form class="form-search">
-            ${ _('Filter:') }
-            <input id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
+          ${ _('Filter:') }
+          <input id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
         </form>
       </div>
       <div class="span3">
         <button class="btn action-buttons" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-	    &nbsp;&nbsp;&nbsp;&nbsp;
-	    <button class="btn action-buttons" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
-	    <button class="btn action-buttons" id="delete-btn" disabled="disabled"><i class="icon-remove"></i> ${ _('Delete') }</button>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <button class="btn action-buttons" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
+      <button class="btn action-buttons" id="delete-btn" disabled="disabled"><i class="icon-remove"></i> ${ _('Delete') }</button>
       </div>
     </div>
   </div>
@@ -72,7 +73,6 @@ ${ layout.menubar(section='coordinators') }
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
               % if can_edit_job(currentuser, coordinator):
-                  data-param-url="${ url('oozie:workflow_parameters', workflow=coordinator.id) }"
                   data-delete-url="${ url('oozie:delete_coordinator', coordinator=coordinator.id) }"
               % endif
               % if can_access_job(currentuser, coordinator):
@@ -106,26 +106,9 @@ ${ layout.menubar(section='coordinators') }
 </div>
 
 
-<div id="submitWf" class="modal hide fade">
-  <form id="submitWfForm" action="" method="POST">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 id="submitWfMessage">${ _('Submit this coordinator?') }</h3>
-    </div>
-    <div class="modal-body">
-      <fieldset>
-        <div id="param-container">
-        </div>
-      </fieldset>
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="btn secondary hideModal">${ _('Cancel') }</a>
-      <input id="submitBtn" type="submit" class="btn primary" value="${ _('Submit') }"/>
-    </div>
-  </form>
-</div>
+<div id="submit-job-modal" class="modal hide"></div>
 
-<div id="deleteWf" class="modal hide fade">
+<div id="delete-job" class="modal hide">
   <form id="deleteWfForm" action="" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -133,14 +116,16 @@ ${ layout.menubar(section='coordinators') }
     </div>
     <div class="modal-footer">
       <input type="submit" class="btn primary" value="${ _('Yes') }"/>
-      <a href="#" class="btn secondary hideModal">${ _('No') }</a>
+      <a href="#" class="btn secondary" data-dismiss="modal">${ _('No') }</a>
     </div>
   </form>
 </div>
 
 
 <style>
-  td .btn-large{ cursor: crosshair;  }
+  td .btn-large {
+  cursor: crosshair;
+  }
 
   .action-column {
     cursor: auto;
@@ -175,80 +160,50 @@ ${ layout.menubar(section='coordinators') }
         ['#clone-btn', 'data-clone-url']]
 
       $.each(action_buttons, function(index) {
-          if (select_btn.attr(this[1])) {
-            $(this[0]).removeAttr('disabled');
-          } else {
-            $(this[0]).attr("disabled", "disabled");
-          }
+        if (select_btn.attr(this[1])) {
+          $(this[0]).removeAttr('disabled');
+        } else {
+          $(this[0]).attr("disabled", "disabled");
+        }
       });
     }
 
     update_action_buttons_status();
 
     $("#delete-btn").click(function(e){
-        var _this = $('input[name=action]:checked');
-        var _action = _this.attr("data-delete-url");
-        $("#deleteWfForm").attr("action", _action);
-        $("#deleteWfMessage").text(_this.attr("alt"));
-        $("#deleteWf").modal("show");
+      var _this = $('input[name=action]:checked');
+      var _action = _this.attr("data-delete-url");
+      $("#deleteWfForm").attr("action", _action);
+      $("#deleteWfMessage").text(_this.attr("alt"));
+      $("#delete-job").modal("show");
     });
 
-    $("#submit-btn").click(function(){
-        var _this = $('input[name=action]:checked');
-        var _action = _this.attr("data-submit-url");
-        $("#submitWfForm").attr("action", _action);
-        $("#submitWfMessage").text(_this.attr("alt"));
-        // We will show the model form, but disable the submit button
-        // until we've finish loading the parameters via ajax.
-        $("#submitBtn").attr("disabled", "disabled");
-        $("#submitWf").modal("show");
+    $('#submit-btn').click(function() {
+      var _this = $('input[name=action]:checked');
+      var _action = _this.attr("data-submit-url");
 
-        $.get(_this.attr("data-param-url"), function(data) {
-            var params = data["params"]
-            var container = $("#param-container");
-            container.empty();
-
-            for (key in params) {
-                if (! params.hasOwnProperty(key)) {
-                    continue;
-                }
-                container.append(
-	              $("<div/>").addClass("clearfix")
-	                .append($("<label/>").text(params[key]))
-	                .append(
-	                    $("<div/>").addClass("input")
-	                      .append($("<input/>").attr("name", key).attr("type", "text"))
-	                )
-                )
-            }
-            // Good. We can submit now.
-            $("#submitBtn").removeAttr("disabled");
-        }, "json");
-    });
+      $.get(_action,  function(response) {
+          $('#submit-job-modal').html(response);
+          $('#submit-job-modal').modal('show');
+        }
+      );
+     });
 
     $(".deleteConfirmation").click(function(){
-        var _this = $(this);
-        var _action = _this.attr("data-confirmation-url");
-        $("#deleteWfForm").attr("action", _action);
-        $("#deleteWfMessage").text(_this.attr("alt"));
-        $("#deleteWf").modal("show");
+      var _this = $(this);
+      var _action = _this.attr("data-url");
+      $("#deleteWfForm").attr("action", _action);
+      $("#deleteWfMessage").text(_this.attr("alt"));
+      $("#delete-job").modal("show");
     });
 
     $("#clone-btn").click(function(e){
-        var _this = $('input[name=action]:checked');
-        var _url = _this.attr("data-clone-url");
+      var _this = $('input[name=action]:checked');
+      var _url = _this.attr("data-clone-url");
 
       $.post(_url, function(data) {
         window.location = data.url;
       });
-    });
-
-    $("#deleteWf .hideModal").click(function(){
-        $("#deleteWf").modal("hide");
-    });
-
-    $("#submitWf .hideModal").click(function(){
-        $("#submitWf").modal("hide");
     });
 
     var oTable = $('#coordinatorTable').dataTable( {

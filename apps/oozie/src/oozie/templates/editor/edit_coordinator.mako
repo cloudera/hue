@@ -21,6 +21,7 @@
 
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
+<%namespace name="properties" file="job_action_properties.mako" />
 
 ${ commonheader(_("Oozie App"), "oozie", "100px") }
 ${ layout.menubar(section='coordinators') }
@@ -45,12 +46,7 @@ ${ layout.menubar(section='coordinators') }
     % endif
   </ul>
 
-% if coordinator.id:
-  <form class="form-horizontal" id="workflowForm" action="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" method="POST">
-  % else:
-  <form class="form-horizontal" id="workflowForm" action="${ url('oozie:edit_coordinator') }" method="POST">
-  % endif
-
+  <form class="form-horizontal" id="jobForm" action="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" method="POST">
     <div class="tab-content">
       <div class="tab-pane active" id="editor">
         <div class="row-fluid">
@@ -63,6 +59,7 @@ ${ layout.menubar(section='coordinators') }
                ${ utils.render_field(coordinator_form['description']) }
                ${ utils.render_field(coordinator_form['workflow']) }
                ${ utils.render_field(coordinator_form['is_shared']) }
+               ${ properties.print_key_value(_('Parameters'), 'parameters', coordinator_form, parameters) }
              </div>
 
             <hr/>
@@ -307,7 +304,7 @@ ${ layout.menubar(section='coordinators') }
   <div class="form-actions center">
     <a href="${ url('oozie:list_coordinator') }" class="btn">${ _('Back') }</a>
     % if can_edit_coordinator:
-      <input class="btn btn-primary" type="submit" value="${ _('Save') }"></input>
+      <input class="btn btn-primary" data-bind="click: submit" type="submit" value="${ _('Save') }"></input>
     % endif
   </div>
 
@@ -384,8 +381,8 @@ ${ layout.menubar(section='coordinators') }
       endTime: '23:59',
       step: 60
     };
-    $( "input.date" ).datepicker();
-    $( "input.time" ).timePicker(timeOptions);
+    $("input.date").datepicker();
+    $("input.time").timePicker(timeOptions);
 
     $("#datasets-btn").click(function() {
       $('[href=#datasets]').tab('show');

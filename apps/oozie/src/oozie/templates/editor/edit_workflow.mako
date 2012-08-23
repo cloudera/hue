@@ -21,6 +21,7 @@
 
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
+<%namespace name="properties" file="job_action_properties.mako" />
 
 ${ commonheader(_("Oozie App"), "oozie", "100px") }
 ${ layout.menubar(section='workflows') }
@@ -47,7 +48,7 @@ ${ layout.menubar(section='workflows') }
     <li><a href="#history" data-toggle="tab">${ _('History') }</a></li>
   </ul>
 
-  <form class="form-horizontal" id="workflowForm" action="${ url('oozie:edit_workflow', workflow=workflow.id) }" method="POST">
+  <form class="form-horizontal" id="jobForm" action="${ url('oozie:edit_workflow', workflow=workflow.id) }" method="POST">
 
     <div class="tab-content">
       <div class="tab-pane active" id="editor">
@@ -117,13 +118,11 @@ ${ layout.menubar(section='workflows') }
             <h2>${ _('Properties') }</h2>
             <br/>
               <fieldset>
-               ${ utils.render_field(workflow_form['name']) }
-               ${ utils.render_field(workflow_form['description']) }
-                <div class="control-group">
-                  <label class="control-label">${ _('Properties') }</label><div class="controls"></div>
-                </div>
+                ${ utils.render_field(workflow_form['name']) }
+                ${ utils.render_field(workflow_form['description']) }
                 ${ utils.render_field(workflow_form['deployment_dir']) }
                 ${ utils.render_field(workflow_form['is_shared']) }
+                ${ properties.print_key_value(_('Parameters'), 'parameters', workflow_form, parameters) }
              </fieldset>
            </div>
         </div>
@@ -166,13 +165,15 @@ ${ layout.menubar(section='workflows') }
 <script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
-  $(".action-link").click(function(){
-    window.location = $(this).attr('data-edit');
-  });
+  $(document).ready(function(){
+    $(".action-link").click(function(){
+      window.location = $(this).attr('data-edit');
+    });
 
-  $("a[data-row-selector='true']").jHueRowSelector();
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
 </script>
 
 ${ utils.path_chooser_libs(True) }
 
-${commonfooter(messages)}
+${ commonfooter(messages) }
