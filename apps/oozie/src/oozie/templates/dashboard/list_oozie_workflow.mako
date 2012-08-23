@@ -262,7 +262,7 @@ ${ layout.menubar(section='dashboard') }
        $.post($(this).attr("data-url"),
           function(response) {
             if (response['status'] != 0) {
-              $.jHueNotify.error('Problem: ' + response['data']);
+              $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
             } else {
               window.location.reload();
             }
