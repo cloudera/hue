@@ -20,6 +20,7 @@ try:
 except ImportError:
   import simplejson as json
 import logging
+import re
 
 
 from django.core.urlresolvers import reverse
@@ -29,21 +30,26 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.functional import wraps
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render, PopupException, extract_field_data
 from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 from hadoop.fs.exceptions import WebHdfsException
+from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction,\
+  OozieJavaAction
 from liboozie.submittion import Submission
 
 from oozie.conf import SHARE_JOBS
+from oozie.import_jobsub import convert_jobsub_design
 from oozie.management.commands import oozie_setup
 from oozie.models import Workflow, Node, Link, History, Coordinator,\
-  Dataset, DataInput, DataOutput, Job, _STD_PROPERTIES_JSON
+  Mapreduce, Java, Streaming, Dataset, DataInput, DataOutput, Job,\
+  _STD_PROPERTIES_JSON
 from oozie.forms import NodeForm, WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataInputSetForm, DataOutputForm, DataOutputSetForm, LinkForm,\
-  DefaultLinkForm, design_form_by_type, ParameterForm
+  DefaultLinkForm, design_form_by_type, ImportJobsubDesignForm, ParameterForm
 
 
 LOG = logging.getLogger(__name__)
@@ -402,6 +408,35 @@ def edit_action(request, action):
     'can_edit_action': can_edit_job(request.user, action.workflow)
   })
 
+
+@check_job_access_permission
+def import_action(request, workflow, parent_action_id):
+  available_actions = OozieDesign.objects.all()
+
+  if request.method == 'POST':
+    form = ImportJobsubDesignForm(data=request.POST, choices=[(action.id, action.name) for action in available_actions])
+    if form.is_valid():
+      try:
+        design = OozieDesign.objects.get(id=form.cleaned_data['action_id'])
+        action = convert_jobsub_design(design)
+        action.workflow = workflow
+        action.save()
+
+        workflow.add_action(action, parent_action_id)
+      except OozieDesign.DoesNotExist:
+        request.error(_('Jobsub design doesn\'t exist.'))
+      except (Mapreduce.DoesNotExist, Streaming.DoesNotExist, Java.DoesNotExist):
+        request.error(_('Could not convert jobsub design'))
+      except:
+        request.error(_('Could not convert jobsub design or add action to workflow'))
+
+    return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': action.workflow.id}))
+
+  return render('editor/import_workflow_action.mako', request, {
+    'workflow': workflow,
+    'available_actions': available_actions,
+    'form_url': reverse('oozie:import_action', kwargs={'workflow': workflow.id, 'parent_action_id': parent_action_id}),
+  })
 
 @check_action_access_permission
 @check_action_edition_permission

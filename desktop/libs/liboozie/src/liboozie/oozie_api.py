@@ -192,9 +192,9 @@ class OozieApi(object):
     return self._root.put('job/%s' % jobid, params)
 
 
-  def submit_workflow(self, application_path):
+  def submit_workflow(self, application_path, properties=None):
     """
-    submit_workflow(application_path) -> jobid
+    submit_workflow(application_path, properties=None) -> jobid
 
     Submit a job to Oozie. May raise PopupException.
     """

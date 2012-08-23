@@ -153,7 +153,6 @@ class WorkflowManager(models.Manager):
 
     return workflow
 
-
 class Workflow(Job):
   """
   http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WorkflowFunctionalSpec.html
