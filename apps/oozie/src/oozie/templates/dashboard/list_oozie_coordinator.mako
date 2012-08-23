@@ -55,7 +55,7 @@ ${ layout.menubar(section='dashboard') }
           </tr>
           <tr>
             <td>${ _('Status') }</td>
-            <td><span class="label ${ utils.get_status(oozie_coordinator.status) }">${ oozie_coordinator.status }</span></td>
+            <td><span class="label ${ utils.get_status(oozie_coordinator.status) }">${ oozie_coordinator.status }</span>&nbsp;</td>
           </tr>
           <tr>
             <td>${ _('Next Materialized Time') }</td>
@@ -73,6 +73,16 @@ ${ layout.menubar(section='dashboard') }
               </tr>
             % endfor
           % endif
+          <tr>
+            <td>${ _('Manage') }</td>
+            <td>
+            % if oozie_coordinator.is_running():
+              <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"  data-message="The coordinator was killed!">
+                ${ _('Kill') }
+              </button>
+            % endif
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -184,6 +194,20 @@ ${ layout.menubar(section='dashboard') }
 
 <script>
   $("a[data-row-selector='true']").jHueRowSelector();
+  $(".manage-oozie-job-btn").click(function() {
+    var _this = this;
+    $.post($(this).attr("data-url"),
+      { 'notification': $(this).attr("data-message") },
+      function(response) {
+        if (response['status'] != 0) {
+          $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
+        } else {
+          window.location.reload();
+        }
+      }
+    );
+    return false;
+  });
 </script>
 
 ${commonfooter(messages)}

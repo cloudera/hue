@@ -56,7 +56,8 @@ def manage_oozie_jobs(request, job_id, action):
   try:
     response['data'] = get_oozie().job_control(job_id, action)
     response['status'] = 0
-    request.info(_('Action %(action)s was performed on job %(job_id)s') % {'action': action, 'job_id': job_id})
+    if 'notification' in request.POST:
+      request.info(_(request.POST.get('notification')))
   except RestException, ex:
     response['data'] = _("Error performing %s on Oozie job %s: %s") % (action, job_id, ex.message)
 

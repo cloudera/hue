@@ -76,12 +76,6 @@ ${ layout.menubar(section='dashboard') }
     </div>
     <div class="span3">
       <span class="label ${ utils.get_status(oozie_workflow.status) }">${ oozie_workflow.status }</span>
-      % if oozie_workflow.is_running():
-        &nbsp;
-        <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }">
-          ${ _('Kill') }
-        </button>
-      % endif
     </div>
   </div>
 
@@ -112,6 +106,19 @@ ${ layout.menubar(section='dashboard') }
       </div>
     % endfor
   % endif
+
+  <div class="row-fluid">
+    <div class="span3">
+      ${ _('Manage') }
+    </div>
+    <div class="span3">
+      % if oozie_workflow.is_running():
+        <button class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }" data-message="The workflow was killed!">
+          ${ _('Kill') }
+        </button>
+      % endif
+    </div>
+  </div>
 
   <br/><br/>
 
@@ -259,16 +266,18 @@ ${ layout.menubar(section='dashboard') }
       window.location = $(this).attr('data-edit');
     });
     $(".manage-oozie-job-btn").click(function() {
-       $.post($(this).attr("data-url"),
-          function(response) {
-            if (response['status'] != 0) {
-              $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
-            } else {
-              window.location.reload();
-            }
+      var _this = this;
+      $.post($(this).attr("data-url"),
+        { 'notification': $(this).attr("data-message") },
+        function(response) {
+          if (response['status'] != 0) {
+            $.jHueNotify.error("${ _('Error: ') }" + response['data']);
+          } else {
+            window.location.reload();
           }
-        );
-        return false;
+        }
+      );
+      return false;
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
