@@ -76,6 +76,12 @@ ${ layout.menubar(section='dashboard') }
     </div>
     <div class="span3">
       <span class="label ${ utils.get_status(oozie_workflow.status) }">${ oozie_workflow.status }</span>
+      % if oozie_workflow.status == 'RUNNING':
+        &nbsp;
+        <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }">
+          ${ _('Kill') }
+        </button>
+      % endif
     </div>
   </div>
 
@@ -251,6 +257,18 @@ ${ layout.menubar(section='dashboard') }
   $(document).ready(function() {
     $(".action-link").click(function(){
       window.location = $(this).attr('data-edit');
+    });
+    $(".manage-oozie-job-btn").click(function() {
+       $.post($(this).attr("data-url"),
+          function(response) {
+            if (response['status'] != 0) {
+              $.jHueNotify.error('Problem: ' + response['data']);
+            } else {
+              window.location.reload();
+            }
+          }
+        );
+        return false;
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();

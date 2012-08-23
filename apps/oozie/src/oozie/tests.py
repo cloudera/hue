@@ -116,6 +116,12 @@ class TestEditor:
     pass
 
 
+  def test_manage_workflow(self):
+    # Kill button in response
+    response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]), {}, follow=True)
+    assert_true(('%s/kill' % MockOozieApi.WORKFLOW_IDS[0]) in response.content)
+
+
   def test_move_up(self):
     action1 = Node.objects.get(name='action-name-1')
     action2 = Node.objects.get(name='action-name-2')
