@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
@@ -20,76 +19,74 @@ msgstr ""
 
 #: src/oozie/conf.py:29
 msgid "Location on HDFS where the oozie examples and templates are stored."
-msgstr ""
+msgstr "Emplacement sur HDFS où des exemples et modèles Oozie sont stockés."
 
 #: src/oozie/conf.py:35
 msgid "Location on local FS where examples and template are stored"
-msgstr ""
+msgstr "Emplacement sur le FS local où des exemples et modèles sont stockés"
 
 #: src/oozie/conf.py:41
 msgid "Location on local FS where sample data is stored"
-msgstr ""
+msgstr "Emplacement sur le FS local où des données échantillons sont stockées"
 
 #: src/oozie/conf.py:48
-msgid ""
-"Share workflows and coordinators information with all users. If set to "
-"false, they will be visible only to the owner and administrators."
-msgstr ""
+msgid "Share workflows and coordinators information with all users. If set to false, they will be visible only to the owner and administrators."
+msgstr "Partagez des flux de travail et des informations sur les coordinateurs avec tous les utilisateurs. Si défini sur False, ils sont uniquement visibles pour le propriétaire et les administrateurs."
 
 #: src/oozie/models.py:48
 msgid "Please enter a valid value: 40 alphanum chars starting by an alpha"
-msgstr ""
+msgstr "Indiquez une valeur valide : 40 caractères alphanumériques commençant par un alpha"
 
 #: src/oozie/models.py:59
 msgid "Name of the design, which must be unique per user"
-msgstr ""
+msgstr "Nom de la conception, devant être unique pour chaque utilisateur"
 
 #: src/oozie/models.py:63
 msgid "HDFS deployment directory"
-msgstr ""
+msgstr "Répertoire de déploiement HDFS"
 
 #: src/oozie/models.py:521
 #, python-format
 msgid "Unknown Node type: %s. Was it set at its creation?"
-msgstr ""
+msgstr "Type de nœud inconnu : %s. A t-il été défini lors de sa création ?"
 
 #: src/oozie/models.py:933
 msgid "Name of an input variable in the workflow"
-msgstr ""
+msgstr "Nom d'une variable d'entrée dans le flux de travail"
 
 #: src/oozie/models.py:934
 msgid "Pick the dataset representing format of the data input"
-msgstr ""
+msgstr "Choisissez l'ensemble de données représentant le format d'entrée des données"
 
 #: src/oozie/models.py:941
 msgid "Name of an output variable in the workflow"
-msgstr ""
+msgstr "Nom d'une variable de sortie dans le flux de travail"
 
 #: src/oozie/models.py:942
 msgid "Pick the dataset representing the format of the data output"
-msgstr ""
+msgstr "Choisissez l'ensemble de données représentant le format de sortie des données"
 
 #: src/oozie/templates/navigation-bar.mako:28
 #: src/oozie/templates/navigation-bar.mako:38
 msgid "Dashboard"
-msgstr ""
+msgstr "Tableau de bord"
 
 #: src/oozie/templates/navigation-bar.mako:29
 #: src/oozie/templates/navigation-bar.mako:41
 msgid "Workflows"
-msgstr ""
+msgstr "Flux de travail"
 
 #: src/oozie/templates/navigation-bar.mako:30
 #: src/oozie/templates/navigation-bar.mako:42
 msgid "Coordinators"
-msgstr ""
+msgstr "Coordinateurs"
 
 #: src/oozie/templates/navigation-bar.mako:31
 #: src/oozie/templates/editor/edit_coordinator.mako:43
 #: src/oozie/templates/editor/edit_workflow.mako:47
 #: src/oozie/templates/editor/list_history_record.mako:30
 msgid "History"
-msgstr ""
+msgstr "Historique"
 
 #: src/oozie/templates/utils.inc.mako:78
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:67
@@ -106,7 +103,7 @@ msgstr ""
 #: src/oozie/templates/editor/list_history_record.mako:36
 #: src/oozie/templates/editor/list_workflows.mako:60
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 #: src/oozie/templates/utils.inc.mako:79
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:41
@@ -114,19 +111,19 @@ msgstr ""
 #: src/oozie/templates/editor/edit_workflow_action.mako:72
 #: src/oozie/templates/editor/edit_workflow_action.mako:109
 msgid "Value"
-msgstr ""
+msgstr "Valeur"
 
 #: src/oozie/templates/utils.inc.mako:168
 msgid "Choose a"
-msgstr ""
+msgstr "Sélectionner un"
 
 #: src/oozie/templates/utils.inc.mako:168
 msgid "folder"
-msgstr ""
+msgstr "dossier"
 
 #: src/oozie/templates/utils.inc.mako:168
 msgid "file"
-msgstr ""
+msgstr "fichier"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:25
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:25
@@ -144,7 +141,7 @@ msgstr ""
 #: src/oozie/templates/editor/list_history_record.mako:25
 #: src/oozie/templates/editor/list_workflows.mako:25
 msgid "Oozie App"
-msgstr ""
+msgstr "App Oozie"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:32
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:39
@@ -155,7 +152,7 @@ msgstr ""
 #: src/oozie/templates/editor/edit_coordinator.mako:30
 #: src/oozie/templates/editor/edit_coordinator.mako:58
 msgid "Coordinator"
-msgstr ""
+msgstr "Coordinateur"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:49
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:69
@@ -166,7 +163,7 @@ msgstr ""
 #: src/oozie/templates/editor/list_history.mako:43
 #: src/oozie/templates/editor/list_history_record.mako:52
 msgid "Submitter"
-msgstr ""
+msgstr "Soumetteur"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:53
 #: src/oozie/templates/editor/create_coordinator.mako:55
@@ -174,7 +171,7 @@ msgstr ""
 #: src/oozie/templates/editor/edit_coordinator.mako:209
 #: src/oozie/templates/editor/list_coordinators.mako:61
 msgid "Frequency"
-msgstr ""
+msgstr "Fréquence"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:57
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:122
@@ -188,59 +185,59 @@ msgstr ""
 #: src/oozie/templates/editor/list_coordinators.mako:62
 #: src/oozie/templates/editor/list_workflows.mako:64
 msgid "Status"
-msgstr ""
+msgstr "Statut"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:61
 msgid "Next Materialized Time"
-msgstr ""
+msgstr "Prochaine période matérialisée"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:66
 #: src/oozie/templates/editor/edit_coordinator.mako:42
 msgid "Datasets"
-msgstr ""
+msgstr "Ensembles de données"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:81
 msgid "Calendar"
-msgstr ""
+msgstr "Calendrier"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:82
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:115
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:117
 #: src/oozie/templates/editor/edit_workflow.mako:56
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:83
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:120
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:58
 msgid "Configuration"
-msgstr ""
+msgstr "Configuration"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:84
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:121
 msgid "Log"
-msgstr ""
+msgstr "Journal"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:85
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:122
 msgid "Definition"
-msgstr ""
+msgstr "Définition"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:93
 msgid "Day"
-msgstr ""
+msgstr "Jour"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:94
 msgid "Comment"
-msgstr ""
+msgstr "Commentaire"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:118
 msgid "Number"
-msgstr ""
+msgstr "Nombre"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:119
 msgid "Nominal Time"
-msgstr ""
+msgstr "Temps nominal"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:121
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:150
@@ -249,26 +246,26 @@ msgstr ""
 #: src/oozie/templates/editor/list_history.mako:44
 #: src/oozie/templates/editor/list_history_record.mako:60
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:124
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:158
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:69
 msgid "Error Message"
-msgstr ""
+msgstr "Message d'erreur"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:125
 msgid "Missing Dependencies"
-msgstr ""
+msgstr "Dépendances manquantes"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:127
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:216
 msgid "Created Time"
-msgstr ""
+msgstr "Heure de création"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:128
 msgid "Last modified Time"
-msgstr ""
+msgstr "Heure de la dernière modification"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:130
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:70
@@ -281,14 +278,14 @@ msgstr ""
 #: src/oozie/templates/editor/edit_workflow.mako:140
 #: src/oozie/templates/editor/list_history_record.mako:44
 msgid "Id"
-msgstr ""
+msgstr "ID"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:131
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:152
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:208
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:87
 msgid "External Id"
-msgstr ""
+msgstr "ID externe"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:132
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:71
@@ -297,7 +294,7 @@ msgstr ""
 #: src/oozie/templates/editor/edit_workflow_action.mako:30
 #: src/oozie/templates/editor/edit_workflow_fork.mako:72
 msgid "Action"
-msgstr ""
+msgstr "Action"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:182
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:244
@@ -308,7 +305,7 @@ msgstr ""
 #: src/oozie/templates/editor/edit_workflow.mako:157
 #: src/oozie/templates/editor/list_history_record.mako:81
 msgid "Back"
-msgstr ""
+msgstr "Précédent"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:34
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:34
@@ -316,68 +313,68 @@ msgstr ""
 #: src/oozie/templates/editor/list_history.mako:34
 #: src/oozie/templates/editor/list_workflows.mako:40
 msgid "Filter:"
-msgstr ""
+msgstr "Filtrer :"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:38
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:38
 msgid "Show only"
-msgstr ""
+msgstr "Afficher uniquement"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:40
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:40
 msgid "Mine"
-msgstr ""
+msgstr "A moi"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:41
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:41
 msgid "All"
-msgstr ""
+msgstr "Tout"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:43
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:43
 msgid "from the last"
-msgstr ""
+msgstr "depuis le dernier"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:51
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:51
 msgid "days with status"
-msgstr ""
+msgstr "jours avec statut"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:61
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:61
 msgid "Running"
-msgstr ""
+msgstr "En cours d'exécution"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:65
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:65
 msgid "Submission"
-msgstr ""
+msgstr "Envoi"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:68
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:84
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:68
 msgid "Progress"
-msgstr ""
+msgstr "Progression"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:89
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:89
 msgid "Kill"
-msgstr ""
+msgstr "Détruire"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:99
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:99
 msgid "Completed"
-msgstr ""
+msgstr "Terminé"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:103
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:103
 msgid "Completion"
-msgstr ""
+msgstr "Fin"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:106
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:106
 msgid "Duration"
-msgstr ""
+msgstr "Durée"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:37
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:42
@@ -389,90 +386,90 @@ msgstr ""
 #: src/oozie/templates/editor/edit_workflow_fork.mako:30
 #: src/oozie/templates/editor/list_coordinators.mako:60
 msgid "Workflow"
-msgstr ""
+msgstr "Flux de travail"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:46
 msgid "Edit workflow"
-msgstr ""
+msgstr "Modifier le flux de travail"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:94
 msgid "Variables"
-msgstr ""
+msgstr "Variables"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:114
 msgid "Graph"
-msgstr ""
+msgstr "Graphique"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:119
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:76
 #: src/oozie/templates/editor/list_history_record.mako:33
 msgid "Details"
-msgstr ""
+msgstr "Détails"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:154
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:212
 msgid "Start Time"
-msgstr ""
+msgstr "Heure de début"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:155
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:220
 msgid "End Time"
-msgstr ""
+msgstr "Heure de fin"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:157
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:115
 msgid "Retries"
-msgstr ""
+msgstr "Tentatives"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:159
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:123
 msgid "Transition"
-msgstr ""
+msgstr "Transition"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:161
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:99
 msgid "Data"
-msgstr ""
+msgstr "Données"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:204
 msgid "Group"
-msgstr ""
+msgstr "Groupe"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:224
 msgid "Application Path"
-msgstr ""
+msgstr "Chemin d'application"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:40
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:81
 msgid "Property"
-msgstr ""
+msgstr "Propriété"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:63
 msgid "Error Code"
-msgstr ""
+msgstr "Code d'erreur"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:95
 msgid "External Status"
-msgstr ""
+msgstr "Statut externe"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:103
 msgid "Start time"
-msgstr ""
+msgstr "Heure de début"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:107
 msgid "End time"
-msgstr ""
+msgstr "Heure de fin"
 
 #: src/oozie/templates/dashboard/list_oozie_workflow_action.mako:119
 msgid "TrackerUri"
-msgstr ""
+msgstr "TrackerUri"
 
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:34
 #: src/oozie/templates/editor/list_coordinators.mako:40
 #: src/oozie/templates/editor/list_history.mako:34
 #: src/oozie/templates/editor/list_workflows.mako:40
 msgid "Search for username, name, etc..."
-msgstr ""
+msgstr "Rechercher un nom d'utilisateur, un nom, etc."
 
 #: src/oozie/templates/editor/create_coordinator.mako:85
 #: src/oozie/templates/editor/create_workflow.mako:72
@@ -481,27 +478,27 @@ msgstr ""
 #: src/oozie/templates/editor/edit_workflow_action.mako:188
 #: src/oozie/templates/editor/edit_workflow_fork.mako:117
 msgid "Save"
-msgstr ""
+msgstr "Enregistrer"
 
 #: src/oozie/templates/editor/create_coordinator_data.mako:31
 msgid "No Dataset?"
-msgstr ""
+msgstr "Pas d'ensemble de données ?"
 
 #: src/oozie/templates/editor/create_coordinator_data.mako:31
 msgid "Add one"
-msgstr ""
+msgstr "En ajouter un"
 
 #: src/oozie/templates/editor/create_coordinator_dataset.mako:39
 msgid "You can parameterize the values using"
-msgstr ""
+msgstr "Vous pouvez paramétrer les valeurs en utilisant"
 
 #: src/oozie/templates/editor/create_coordinator_dataset.mako:39
 msgid "and"
-msgstr ""
+msgstr "et"
 
 #: src/oozie/templates/editor/create_workflow.mako:31
 msgid "Create Workflow"
-msgstr ""
+msgstr "Créer un flux de travail"
 
 #: src/oozie/templates/editor/create_workflow.mako:44
 #: src/oozie/templates/editor/edit_workflow.mako:46
@@ -509,53 +506,51 @@ msgstr ""
 #: src/oozie/templates/editor/edit_workflow.mako:123
 #: src/oozie/templates/editor/list_history_record.mako:77
 msgid "Properties"
-msgstr ""
+msgstr "Propriétés"
 
 #: src/oozie/templates/editor/create_workflow.mako:53
 msgid "advanced"
-msgstr ""
+msgstr "avancées"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:33
 #: src/oozie/templates/editor/edit_coordinator.mako:208
 #: src/oozie/templates/editor/list_coordinators.mako:59
 #: src/oozie/templates/editor/list_workflows.mako:61
 msgid "Description"
-msgstr ""
+msgstr "Description"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:33
 #: src/oozie/templates/editor/edit_coordinator.mako:268
 #: src/oozie/templates/editor/edit_workflow.mako:134
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:41
 #: src/oozie/templates/editor/edit_workflow.mako:45
 msgid "Editor"
-msgstr ""
+msgstr "Editeur"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:101
-msgid ""
-"The inputs and outputs of the workflow need to be mapped to some data on "
-"the"
-msgstr ""
+msgid "The inputs and outputs of the workflow need to be mapped to some data on the"
+msgstr "Les entrées et sorties du flux de travail doivent être mappées à des données sur"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:102
 msgid "Datasets page"
-msgstr ""
+msgstr "Page d'ensembles de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:107
 msgid "Inputs"
-msgstr ""
+msgstr "Entrées"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:114
 #: src/oozie/templates/editor/edit_coordinator.mako:151
 msgid "Dataset"
-msgstr ""
+msgstr "Ensemble de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:115
 #: src/oozie/templates/editor/edit_coordinator.mako:152
 msgid "Path"
-msgstr ""
+msgstr "Chemin"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:116
 #: src/oozie/templates/editor/edit_coordinator.mako:153
@@ -568,401 +563,399 @@ msgstr ""
 #: src/oozie/templates/editor/list_workflows.mako:48
 #: src/oozie/templates/editor/gen/workflow-graph-editable.xml.mako:76
 msgid "Delete"
-msgstr ""
+msgstr "Supprimer"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:134
 msgid "No inputs"
-msgstr ""
+msgstr "Pas d'entrée"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:138
 #: src/oozie/templates/editor/edit_coordinator.mako:175
 #: src/oozie/templates/editor/edit_workflow.mako:60
 msgid "Add"
-msgstr ""
+msgstr "Ajouter"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:144
 msgid "Outputs"
-msgstr ""
+msgstr "Sorties"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:171
 msgid "No outputs"
-msgstr ""
+msgstr "Pas de sortie"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:188
 msgid "Add a new dataset"
-msgstr ""
+msgstr "Ajouter un nouvel ensemble de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:193
 #: src/oozie/templates/editor/list_coordinators.mako:33
 #: src/oozie/templates/editor/list_workflows.mako:34
 msgid "Create"
-msgstr ""
+msgstr "Créer"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:206
 msgid "Pick dataset as input/output"
-msgstr ""
+msgstr "Choisir un ensemble de données comme entrée/sortie"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:210
 msgid "Start"
-msgstr ""
+msgstr "Démarrer"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:211
 msgid "Uri"
-msgstr ""
+msgstr "Uri"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:212
 msgid "Timezone"
-msgstr ""
+msgstr "Fuseau horaire"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:213
 msgid "Done flag"
-msgstr ""
+msgstr "Drapeau Terminé"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:224
 msgid "input"
-msgstr ""
+msgstr "entrée"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:225
 msgid "output"
-msgstr ""
+msgstr "sortie"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:250
 msgid "No datasets"
-msgstr ""
+msgstr "Pas d'ensemble de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:262
 #: src/oozie/templates/editor/edit_workflow.mako:139
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:296
 msgid "Create a dataset"
-msgstr ""
+msgstr "Créer un ensemble de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:304
 #: src/oozie/templates/editor/edit_coordinator.mako:322
 #: src/oozie/templates/editor/edit_coordinator.mako:340
 msgid "Close"
-msgstr ""
+msgstr "Fermer"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:305
 msgid "Add dataset"
-msgstr ""
+msgstr "Ajouter un ensemble de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:314
 msgid "Create a data input"
-msgstr ""
+msgstr "Créer une entrée de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:323
 msgid "Add data input"
-msgstr ""
+msgstr "Ajouter une entrée de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:332
 msgid "Create a data output"
-msgstr ""
+msgstr "Créer une sortie de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:341
 msgid "Add data output"
-msgstr ""
+msgstr "Ajouter une sortie de données"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:362
 msgid "Dataset created"
-msgstr ""
+msgstr "Ensemble de données créé"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:376
 msgid "Input dataset created"
-msgstr ""
+msgstr "Ensemble de données d'entrée créé"
 
 #: src/oozie/templates/editor/edit_coordinator.mako:390
 msgid "Output dataset created"
-msgstr ""
+msgstr "Ensemble de données de sortie créé"
 
 #: src/oozie/templates/editor/edit_workflow.mako:33
 msgid "Description:"
-msgstr ""
+msgstr "Description :"
 
 #: src/oozie/templates/editor/edit_workflow.mako:38
 msgid "Upload"
-msgstr ""
+msgstr "Charger"
 
 #: src/oozie/templates/editor/edit_workflow.mako:39
 msgid "files to deployment directory"
-msgstr ""
+msgstr "fichiers vers le répertoire de déploiement"
 
 #: src/oozie/templates/editor/edit_workflow.mako:68
 #: src/oozie/templates/editor/edit_workflow.mako:74
 #: src/oozie/templates/editor/edit_workflow.mako:80
 #: src/oozie/templates/editor/edit_workflow.mako:86
 msgid "Click to add to the end"
-msgstr ""
+msgstr "Cliquez pour ajouter à la fin"
 
 #: src/oozie/templates/editor/edit_workflow.mako:69
 msgid "MapReduce"
-msgstr ""
+msgstr "MapReduce"
 
 #: src/oozie/templates/editor/edit_workflow.mako:75
 msgid "Streaming"
-msgstr ""
+msgstr "Diffusion"
 
 #: src/oozie/templates/editor/edit_workflow.mako:81
 msgid "Java"
-msgstr ""
+msgstr "Java"
 
 #: src/oozie/templates/editor/edit_workflow.mako:87
 msgid "Pig"
-msgstr ""
+msgstr "Pig"
 
 #: src/oozie/templates/editor/edit_workflow.mako:95
 msgid "Flow"
-msgstr ""
+msgstr "Flux"
 
 #: src/oozie/templates/editor/edit_workflow.mako:104
 msgid "No actions: add some from the right panel"
-msgstr ""
+msgstr "Pas d'action : ajoutez-en une à partir du panneau de droite"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:45
 msgid "Action type"
-msgstr ""
+msgstr "Type d'action"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:53
 msgid "You can parameterize the values using uppercase"
-msgstr ""
+msgstr "Vous pouvez paramétrer les valeurs, en utilisant les majuscules"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:66
 msgid "Params"
-msgstr ""
+msgstr "Paramètres"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:95
 msgid "Add Param"
-msgstr ""
+msgstr "Ajouter un paramètre"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:96
 msgid "Add Argument"
-msgstr ""
+msgstr "Ajouter un argument"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:103
 msgid "Job Properties"
-msgstr ""
+msgstr "Propriétés du travail"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:108
 msgid "Property name"
-msgstr ""
+msgstr "Nom de la propriété"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:129
 msgid "Add Property"
-msgstr ""
+msgstr "Ajouter une propriété"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:136
 msgid "Files"
-msgstr ""
+msgstr "Fichiers"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:154
 msgid "Add File"
-msgstr ""
+msgstr "Ajouter un fichier"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:161
 msgid "Archives"
-msgstr ""
+msgstr "Archives"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:180
 msgid "Add Archive"
-msgstr ""
+msgstr "Ajouter une archive"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:187
 #: src/oozie/templates/editor/edit_workflow_fork.mako:116
 #: src/oozie/templates/editor/list_coordinators.mako:118
 #: src/oozie/templates/editor/list_workflows.mako:117
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 #: src/oozie/templates/editor/edit_workflow_action.mako:197
 msgid "Choose a file"
-msgstr ""
+msgstr "Choisir un fichier"
 
 #: src/oozie/templates/editor/edit_workflow_fork.mako:44
 msgid "You can convert this"
-msgstr ""
+msgstr "Vous pouvez convertir ce"
 
 #: src/oozie/templates/editor/edit_workflow_fork.mako:44
 msgid "Fork"
-msgstr ""
+msgstr "Fork"
 
 #: src/oozie/templates/editor/edit_workflow_fork.mako:44
 msgid "into a"
-msgstr ""
+msgstr "en un"
 
 #: src/oozie/templates/editor/edit_workflow_fork.mako:44
 msgid "Decision"
-msgstr ""
+msgstr "Décision"
 
 #: src/oozie/templates/editor/edit_workflow_fork.mako:44
 msgid "switch by adding some conditions on the branching."
-msgstr ""
+msgstr "commutateur en ajoutant des conditions à la ramification."
 
 #: src/oozie/templates/editor/edit_workflow_fork.mako:53
 msgid "Examples of predicates:"
-msgstr ""
+msgstr "Exemples de prédicats :"
 
 #: src/oozie/templates/editor/edit_workflow_fork.mako:70
 msgid "Predicate"
-msgstr ""
+msgstr "Prédicat"
 
 #: src/oozie/templates/editor/edit_workflow_fork.mako:85
 #: src/oozie/templates/editor/edit_workflow_fork.mako:102
 msgid "go to"
-msgstr ""
+msgstr "aller à"
 
 #: src/oozie/templates/editor/edit_workflow_fork.mako:97
 msgid "default"
-msgstr ""
+msgstr "par défaut"
 
 #: src/oozie/templates/editor/list_coordinators.mako:29
 msgid "Coordinator Editor"
-msgstr ""
+msgstr "Editeur coordinateur"
 
 #: src/oozie/templates/editor/list_coordinators.mako:44
 #: src/oozie/templates/editor/list_coordinators.mako:119
 #: src/oozie/templates/editor/list_workflows.mako:44
 #: src/oozie/templates/editor/list_workflows.mako:118
 msgid "Submit"
-msgstr ""
+msgstr "Envoyer"
 
 #: src/oozie/templates/editor/list_coordinators.mako:46
 #: src/oozie/templates/editor/list_workflows.mako:47
 msgid "Copy"
-msgstr ""
+msgstr "Copier"
 
 #: src/oozie/templates/editor/list_coordinators.mako:63
 msgid "Last Modified"
-msgstr ""
+msgstr "Dernière modification"
 
 #: src/oozie/templates/editor/list_coordinators.mako:64
 #: src/oozie/templates/editor/list_workflows.mako:65
 msgid "Owner"
-msgstr ""
+msgstr "Propriétaire"
 
 #: src/oozie/templates/editor/list_coordinators.mako:94
 msgid "production"
-msgstr ""
+msgstr "production"
 
 #: src/oozie/templates/editor/list_coordinators.mako:109
 msgid "Submit this coordinator?"
-msgstr ""
+msgstr "Envoyer ce coordinateur ?"
 
 #: src/oozie/templates/editor/list_coordinators.mako:128
 msgid "Delete this coordinator?"
-msgstr ""
+msgstr "Supprimer ce coordinateur ?"
 
 #: src/oozie/templates/editor/list_coordinators.mako:131
 #: src/oozie/templates/editor/list_coordinators.mako:147
 #: src/oozie/templates/editor/list_workflows.mako:130
 #: src/oozie/templates/editor/list_workflows.mako:146
 msgid "Yes"
-msgstr ""
+msgstr "Oui"
 
 #: src/oozie/templates/editor/list_coordinators.mako:132
 #: src/oozie/templates/editor/list_coordinators.mako:148
 #: src/oozie/templates/editor/list_workflows.mako:131
 #: src/oozie/templates/editor/list_workflows.mako:147
 msgid "No"
-msgstr ""
+msgstr "Non"
 
 #: src/oozie/templates/editor/list_coordinators.mako:141
 msgid "Install sample coordinators?"
-msgstr ""
+msgstr "Installer des échantillons de coordinateurs ?"
 
 #: src/oozie/templates/editor/list_coordinators.mako:144
 #: src/oozie/templates/editor/list_workflows.mako:143
 msgid "It will take a few seconds to install."
-msgstr ""
+msgstr "L'installation prendra quelques secondes."
 
 #: src/oozie/templates/editor/list_history.mako:31
 msgid "Submission History"
-msgstr ""
+msgstr "Historique d'envoi"
 
 #: src/oozie/templates/editor/list_history.mako:41
 #: src/oozie/templates/editor/list_history_record.mako:68
 msgid "Submission Date"
-msgstr ""
+msgstr "Date d'envoi"
 
 #: src/oozie/templates/editor/list_history.mako:45
 msgid "Submission Id"
-msgstr ""
+msgstr "ID d'envoi"
 
 #: src/oozie/templates/editor/list_workflows.mako:30
 msgid "Workflow Editor"
-msgstr ""
+msgstr "Editeur de flux de travail"
 
 #: src/oozie/templates/editor/list_workflows.mako:45
 msgid "Schedule"
-msgstr ""
+msgstr "Planning"
 
 #: src/oozie/templates/editor/list_workflows.mako:62
 msgid "Last Modification"
-msgstr ""
+msgstr "Dernière modification"
 
 #: src/oozie/templates/editor/list_workflows.mako:63
 msgid "Steps"
-msgstr ""
+msgstr "Etapes"
 
 #: src/oozie/templates/editor/list_workflows.mako:108
 msgid "Submit this workflow?"
-msgstr ""
+msgstr "Envoyer ce flux de travail ?"
 
 #: src/oozie/templates/editor/list_workflows.mako:127
 msgid "Delete this workflow?"
-msgstr ""
+msgstr "Supprimer ce flux de travail ?"
 
 #: src/oozie/templates/editor/list_workflows.mako:140
 msgid "Install sample job workflows?"
-msgstr ""
+msgstr "Installer des échantillons de flux de travaux ?"
 
 #: src/oozie/templates/editor/gen/workflow-graph-editable.xml.mako:41
 #: src/oozie/templates/editor/gen/workflow-graph-editable.xml.mako:51
 msgid "Edit"
-msgstr ""
+msgstr "Modifier"
 
 #: src/oozie/templates/editor/gen/workflow-graph-editable.xml.mako:63
 msgid "Move Up"
-msgstr ""
+msgstr "Déplacer vers le haut"
 
 #: src/oozie/templates/editor/gen/workflow-graph-editable.xml.mako:66
 msgid "Move Down"
-msgstr ""
+msgstr "Déplacer vers le bas"
 
 #: src/oozie/templates/editor/gen/workflow-graph-editable.xml.mako:75
 msgid "Clone"
-msgstr ""
+msgstr "Cloner"
 
 #: src/oozie/views/dashboard.py:39
 msgid "Please use a POST request to manage an Oozie job."
-msgstr ""
+msgstr "Utilisez une requête POST pour gérer un travail Oozie."
 
 #: src/oozie/views/dashboard.py:106 src/oozie/views/dashboard.py:131
 #, python-format
 msgid "Error accessing Oozie job %s"
-msgstr ""
+msgstr "Erreur d'accès au travail Oozie %s"
 
 #: src/oozie/views/dashboard.py:149
 #, python-format
 msgid "Error accessing Oozie job: %s"
-msgstr ""
+msgstr "Erreur d'accès au travail Oozie : %s"
 
 #: src/oozie/views/editor.py:58
 #, python-format
-msgid ""
-"Permission denied. %(username)s don't have the permissions to access job "
-"%(id)s"
-msgstr ""
+msgid "Permission denied. %(username)s don't have the permissions to access job %(id)s"
+msgstr "Autorisation refusée. %(username)s n'ont pas l'autorisation d'accéder au travail %(id)s"
 
 #: src/oozie/views/editor.py:65
 #, python-format
 msgid "job %(id)s not found"
-msgstr ""
+msgstr "travail %(id)s non trouvé"
 
 #: src/oozie/views/editor.py:75
 msgid "Not allowed to modified this job"
-msgstr ""
+msgstr "Vous n'êtes pas autorisé à modifier ce travail"
 
 #: src/oozie/views/editor.py:234 src/oozie/views/editor.py:252
 #: src/oozie/views/editor.py:264 src/oozie/views/editor.py:394
@@ -970,23 +963,23 @@ msgstr ""
 #: src/oozie/views/editor.py:516 src/oozie/views/editor.py:552
 #: src/oozie/views/editor.py:566 src/oozie/views/editor.py:625
 msgid "A POST request is required."
-msgstr ""
+msgstr "Une requête POST est requise."
 
 #: src/oozie/views/editor.py:243
 msgid "Workflow not found"
-msgstr ""
+msgstr "Flux de travail introuvable"
 
 #: src/oozie/views/editor.py:271
 #, python-format
 msgid "Error submitting workflow %s"
-msgstr ""
+msgstr "Erreur lors de l'envoi du flux de travail %s"
 
 #: src/oozie/views/editor.py:582
 #, python-format
 msgid "Error submitting coordinator %s"
-msgstr ""
+msgstr "Erreur lors de l'envoi du coordinateur %s"
 
 #: src/oozie/views/editor.py:631
 msgid "The examples could not be installed."
-msgstr ""
+msgstr "Impossible d'installer les exemples."
 
