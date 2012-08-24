@@ -57,7 +57,7 @@ from django.utils.translation import ugettext as _
     % endif
   </style>
 
-  <script src="/static/ext/js/jquery/jquery-1.7.1.min.js"></script>
+  <script src="/static/ext/js/jquery/jquery-1.8.1.min.js"></script>
   <script src="/static/js/Source/jHue/jquery.showusername.js"></script>
   <script src="/static/js/Source/jHue/jquery.filechooser.js"></script>
   <script src="/static/js/Source/jHue/jquery.selector.js"></script>

@@ -35,13 +35,13 @@ ${ layout.menubar(section='coordinators') }
     </div>
 
     <div class="row-fluid">
-      <div class="span3">
+      <div class="span4">
         <form>
-          ${ _('Filter:') }
-          <input id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
+            ${ _('Filter:') }
+            <input id="filterInput" class="input-xlarge search-query" type="text" placeholder="${ _('Search for username, name, etc...') }">
         </form>
       </div>
-      <div class="span3">
+      <div class="span4">
         <button class="btn action-buttons" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <button class="btn action-buttons" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>

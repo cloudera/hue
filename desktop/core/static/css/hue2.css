@@ -844,6 +844,13 @@ div.box {
     border-top: 1px dashed #EEEEEE;
 }
 
+.pathChooser, .pathChooserKo {
+    border-radius: 3px 0 0 3px!important;
+    border-right:0!important;
+}
+.fileChooserBtn {
+    border-radius: 0 3px 3px 0!important;
+}
 
 /*
  * jHueSelector

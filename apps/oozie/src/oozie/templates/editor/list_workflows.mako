@@ -40,7 +40,7 @@ ${ layout.menubar(section='workflows') }
     <div class="row-fluid">
       <div class="span4">
         <form>
-          ${ _('Filter:') } <input id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
+          ${ _('Filter:') } <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
         </form>
       </div>
       <div class="span4">
@@ -50,7 +50,6 @@ ${ layout.menubar(section='workflows') }
         <button class="btn action-buttons" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
         <button class="btn action-buttons" id="delete-btn" disabled="disabled"><i class="icon-remove"></i> ${ _('Delete') }</button>
       </div>
-      <div class="span4"></div>
     </div>
   </div>
 

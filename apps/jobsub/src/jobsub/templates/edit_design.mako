@@ -39,7 +39,7 @@ ${layout.menubar(section='designs')}
     <div class="control-group ${group_class}">
       <label class="control-label">${field.label | n}</label>
       <div class="controls">
-        <input name="${field.html_name | n}"
+        <input type="text" name="${field.html_name | n}"
             class="span5 ${field.field.widget.attrs.get('class', '')}"
             value="${extract_field_data(field) or ''}" />
         % if len(field.errors):
@@ -86,8 +86,8 @@ ${layout.menubar(section='designs')}
                   </thead>
                   <tbody data-bind="foreach: properties">
                     <tr>
-                      <td><input class="span3 required propKey" data-bind="value: name, uniqueName: false" /></td>
-                      <td><input class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
+                      <td><input type="text" class="span3 required propKey" data-bind="value: name, uniqueName: false" /></td>
+                      <td><input type="text" class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
                       <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">${_('Delete')}</a></td>
                     </tr>
                   </tbody>
@@ -111,7 +111,7 @@ ${layout.menubar(section='designs')}
                 <table class="table-condensed designTable" data-bind="visible: files().length > 0">
                   <tbody data-bind="foreach: files">
                     <tr>
-                      <td><input class="input span5 required pathChooserKo"
+                      <td><input type="text" class="input span5 required pathChooserKo"
                                 data-bind="fileChooser: $data, value: name, uniqueName: false" /></td>
                       <td><a class="btn" href="#" data-bind="click: $root.removeFile">${_('Delete')}</a></td>
                     </tr>
@@ -134,7 +134,7 @@ ${layout.menubar(section='designs')}
                 <table class="table-condensed designTable" data-bind="visible: archives().length > 0">
                   <tbody data-bind="foreach: archives">
                     <tr>
-                      <td><input class="input span5 required pathChooserKo"
+                      <td><input type="text" class="input span5 required pathChooserKo"
                                 data-bind="fileChooser: $data, value: name, uniqueName: false" /></td>
                       <td><a class="btn" href="#" data-bind="click: $root.removeArchive">${_('Delete')}</a></td>
                     </tr>
@@ -176,13 +176,6 @@ ${layout.menubar(section='designs')}
 
 
 <style>
-    .pathChooser, .pathChooserKo {
-        border-radius: 3px 0 0 3px;
-        border-right:0;
-    }
-    .fileChooserBtn {
-        border-radius: 0 3px 3px 0;
-    }
     #fileChooserModal {
         padding:14px;
         height:270px;

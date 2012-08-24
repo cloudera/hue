@@ -399,13 +399,6 @@ ${layout.menubar(section='tables')}
 </div>
 
 <style>
-    .pathChooser {
-        border-radius: 3px 0 0 3px;
-        border-right:0;
-    }
-    .fileChooserBtn {
-        border-radius: 0 3px 3px 0;
-    }
     #filechooser {
         min-height:100px;
         overflow-y:scroll;

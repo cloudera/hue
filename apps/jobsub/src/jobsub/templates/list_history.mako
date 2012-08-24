@@ -32,7 +32,7 @@ ${layout.menubar(section='history')}
     <h1>${_('Job Submission History')}</h1>
     <div class="well hueWell">
         <form class="form-search">
-            ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for username, name, etc...')}">
+            ${_('Filter: ')}<input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for username, name, etc...')}">
         </form>
     </div>
 

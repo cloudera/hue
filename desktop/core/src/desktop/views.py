@@ -286,17 +286,6 @@ def commonfooter(messages=None):
     messages = {}
   return render_to_string("common_footer.html", {'messages': messages})
 
-def commonheader_iframe():
-  """
-  Returns the rendered common header for iframes
-  """
-  return render_to_string("common_header_iframe.html")
-
-def commonfooter_iframe():
-  """
-  Returns the rendered common footer for iframes
-  """
-  return render_to_string("common_footer_iframe.html")
 
 # If the app's conf.py has a config_validator() method, call it.
 CONFIG_VALIDATOR = 'config_validator'

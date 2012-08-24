@@ -262,13 +262,6 @@ ${ layout.menubar(section='workflows') }
   td.pathChooserKo {
     min-width: 404px;
   }
-  .pathChooser, .pathChooserKo {
-    border-radius: 3px 0 0 3px;
-    border-right:0;
-  }
-  .fileChooserBtn {
-    border-radius: 0 3px 3px 0;
-  }
 
   #fileChooserModal {
     padding:14px;

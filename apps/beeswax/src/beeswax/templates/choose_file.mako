@@ -126,17 +126,6 @@ ${layout.menubar(section='tables')}
         margin-top: 10px;
     }
 
-    .pathChooser {
-        border-radius: 3px 0 0 3px;
-        border-right: 0;
-        margin-right: 0;
-    }
-
-    .fileChooserBtn {
-        border-radius: 0 3px 3px 0;
-        margin-left: 0;
-    }
-
     #fileWillBeMoved {
         margin-top: 10px;
     }

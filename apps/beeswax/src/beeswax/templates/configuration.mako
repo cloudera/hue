@@ -32,9 +32,9 @@ ${layout.menubar(section='configuration')}
 		    <button type="submit" class="btn primary">${_('Look')}</button>
 		   </span>
 		   <span class="pull-right">
-              ${_('Filter:')} <input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc...')}">
+              ${_('Filter:')} <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc...')}">
 		      <a href="#" id="clearFilterBtn" class="btn">${_('Clear')}</a>
-		   <span>
+		   </span>
 		</form>
 	</div>
 	<table class="table table-striped table-condensed datatables">

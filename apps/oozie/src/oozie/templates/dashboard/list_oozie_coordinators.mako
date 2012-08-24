@@ -31,7 +31,7 @@ ${layout.menubar(section='dashboard')}
 
   <div class="well hueWell">
     <form>
-      ${ _('Filter:') } <input id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
+      ${ _('Filter:') } <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
 
       <span class="pull-right">
         <span style="padding-right:10px;float:left;margin-top:3px">

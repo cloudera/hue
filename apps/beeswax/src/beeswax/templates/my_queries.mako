@@ -38,7 +38,7 @@ ${layout.menubar(section='my queries')}
         </div>
 
         <form class="form-search">
-            ${_('Filter:')} <input placeholder="${_('Search for name, description, etc...')}" class="input-xlarge search-query" id="filterInput">
+            ${_('Filter:')} <input type="text" placeholder="${_('Search for name, description, etc...')}" class="input-xlarge search-query" id="filterInput">
         </form>
     </div>
 
