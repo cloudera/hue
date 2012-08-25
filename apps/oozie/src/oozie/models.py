@@ -382,6 +382,28 @@ class Workflow(Job):
 
     return copy
 
+
+  def has_cycle(self):
+    """
+    Topological sort for detecting cycles in the directed graph.
+    """
+    queue = set([self.start])
+    removed_edges = set()
+
+    while queue:
+      node = queue.pop()
+      edges = set(node.get_children_links())
+      for edge in edges:
+        removed_edges.add(edge)
+        # Edge has no other incoming edges
+        if not set(edge.child.get_parent_links()) - removed_edges:
+          queue.add(edge.child)
+
+    graph_edges = set([edge for node in self.node_set.all() for edge in node.get_children_links()])
+
+    return len(graph_edges - removed_edges) > 0 # Graph does not have unseen edges
+
+
   def find_parameters(self):
     params = set()
 

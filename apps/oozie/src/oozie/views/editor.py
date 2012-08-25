@@ -239,6 +239,10 @@ def edit_workflow(request, workflow):
       if workflow_form.is_valid() and actions_formset.is_valid():
         workflow_form.save()
         actions_formset.save()
+
+        if workflow.has_cycle():
+          raise PopupException(_('Sorry, this operation is not creating a cycle which would break the workflow.'))
+
         return redirect(reverse('oozie:list_workflows'))
     except Exception, e:
       request.error(_('Sorry, this operation is not supported: %(error)s') % {'error': e})
@@ -442,7 +446,6 @@ def import_action(request, workflow, parent_action_id):
 @check_action_edition_permission
 def edit_workflow_fork(request, action):
   fork = action
-
   LinkFormSet = modelformset_factory(Link, form=LinkForm, max_num=0)
 
   if request.method == 'POST':
@@ -463,7 +466,12 @@ def edit_workflow_fork(request, action):
 
       return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': fork.workflow.id}))
   else:
-    link_formset = LinkFormSet(queryset=fork.get_children_links().exclude(name__in=['related', 'default']))
+    if filter(lambda link: link.child.id != action.workflow.end.id,
+              [link for link in fork.get_child_join().get_children_links()]):
+      raise PopupException(_('Sorry, this Fork has some other actions below its Join and cannot be converted. '
+                             'Please delete the nodes below the Join.'))
+
+    link_formset = LinkFormSet(queryset=fork.get_children_links())
     default_link = Link(parent=fork, name='default', comment='default')
     default_link_form = DefaultLinkForm(action=fork, instance=default_link)
 
