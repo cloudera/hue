@@ -178,6 +178,61 @@ def check_action_edition_permission(view_func):
   return wraps(view_func)(decorate)
 
 
+def can_access_dataset_or_exception(request, dataset_id):
+  if dataset_id is None:
+    return
+  try:
+    dataset = Dataset.objects.get(pk=dataset_id)
+    if can_access_job(request.user, dataset.coordinator):
+      return dataset
+    else:
+      message = _("Permission denied. %(username)s don't have the permissions to access dataset %(id)s") % \
+          {'username': request.user.username, 'id': dataset.id}
+      access_warn(request, message)
+      request.error(message)
+      raise PopupException(message)
+
+  except Dataset.DoesNotExist:
+    raise PopupException(_('dataset %(id)s not exist') % {'id': dataset_id})
+
+
+def check_dataset_edition_permission(authorize_get=False):
+  """
+  Decorator ensuring that the user has the permissions to modify a dataset.
+  A dataset can be edited if the coordinator that owns the dataset can be edited.
+
+  Need to appear below @check_dataset_access_permission
+  """
+  def inner(view_func):
+    def decorate(request, *args, **kwargs):
+      dataset = kwargs.get('dataset')
+      if dataset is not None and not (authorize_get and request.method == 'GET'):
+        can_edit_job_or_exception(request, dataset.coordinator)
+
+      return view_func(request, *args, **kwargs)
+    return wraps(view_func)(decorate)
+  return inner
+
+
+def check_dataset_access_permission(view_func):
+  """
+  Decorator ensuring that the user has access to dataset.
+
+  Arg: 'dataset'.
+  Return: the dataset or raise an exception
+
+  Notice: its gets an id in input and returns the full object in output (not an id).
+  """
+  def decorate(request, *args, **kwargs):
+    dataset = kwargs.get('dataset')
+    if dataset is not None:
+      dataset = can_access_dataset_or_exception(request, dataset)
+    kwargs['dataset'] = dataset
+
+    return view_func(request, *args, **kwargs)
+  return wraps(view_func)(decorate)
+
+
 def list_workflows(request, job_type='workflow'):
   show_setup_app = True
 
@@ -641,6 +696,30 @@ def create_coordinator_dataset(request, coordinator):
                           }, force_template=True).content
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@check_dataset_access_permission
+@check_dataset_edition_permission()
+def edit_coordinator_dataset(request, dataset):
+  """Returns HTML for modal to edit datasets"""
+
+  if request.method == 'POST':
+    dataset_form = DatasetForm(request.POST, instance=dataset)
+
+    if dataset_form.is_valid():
+      dataset_form.save()
+      request.info(_('Dataset modified'));
+      return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': dataset.coordinator.id}))
+    else:
+      dataset_form = DatasetForm(request.POST, instance=dataset)
+  else:
+    dataset_form = DatasetForm(instance=dataset)
+
+  return render('editor/edit_coordinator_dataset.mako', request, {
+    'coordinator': dataset.coordinator,
+    'dataset_form': dataset_form,
+    'path': request.path,
+  }, force_template=True)
 
 
 @check_job_access_permission
