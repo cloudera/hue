@@ -174,6 +174,9 @@ class DataInputForm(forms.ModelForm):
   class Meta:
     model = DataInput
     exclude = ('coordinator')
+    widgets = {
+      'dataset': forms.Select(attrs={'data-bind': 'value: dataset, uniqueName: false'})
+    }
 
   def __init__(self, *args, **kwargs):
     coordinator = kwargs['coordinator']
@@ -181,7 +184,8 @@ class DataInputForm(forms.ModelForm):
     super(DataInputForm, self).__init__(*args, **kwargs)
     self.fields['dataset'].queryset = Dataset.objects.filter(coordinator=coordinator)
     if coordinator.workflow:
-      self.fields['name'].widget = forms.Select(choices=((param, param) for param in set(coordinator.workflow.find_parameters())))
+      attrs = {'data-bind': 'value: name, uniqueName: false'}
+      self.fields['name'].widget = forms.Select(choices=((param, param) for param in set(coordinator.workflow.find_parameters())), attrs=attrs)
 
 
 class DataOutputSetForm(forms.ModelForm):

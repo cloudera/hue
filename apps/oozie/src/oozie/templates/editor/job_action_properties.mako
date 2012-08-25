@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 
 <%def name="print_key_value(label, element, form, initial_parameters)">
-  <div class="control-group">
+  <div class="control-group ko-${element}">
     <label class="control-label">${ label }</label>
     <div class="controls">
       <table class="table-condensed designTable" data-bind="visible: ${ element }().length > 0">
@@ -85,8 +85,7 @@ from django.utils.translation import ugettext as _
         };
       };
 
-      var viewModel = new ViewModel(${ initial_parameters });
-      ko.applyBindings(viewModel);
+      window.viewModel = new ViewModel(${ initial_parameters });
     });
   </script>
 </%def>

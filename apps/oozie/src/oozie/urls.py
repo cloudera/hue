@@ -47,6 +47,7 @@ urlpatterns = patterns(
   url(r'^delete_coordinator/(?P<coordinator>\d+)$', 'delete_coordinator', name='delete_coordinator'),
   url(r'^clone_coordinator/(?P<coordinator>\d+)$', 'clone_coordinator', name='clone_coordinator'),
   url(r'^create_coordinator_dataset/(?P<coordinator>[-\w]+)$', 'create_coordinator_dataset', name='create_coordinator_dataset'),
+  url(r'^edit_coordinator_dataset/(?P<dataset>\d+)$', 'edit_coordinator_dataset', name='edit_coordinator_dataset'),
   url(r'^create_coordinator_data/(?P<coordinator>[-\w]+)/(?P<data_type>(input|output))$', 'create_coordinator_data', name='create_coordinator_data'),
   url(r'^submit_coordinator/(?P<coordinator>\d+)$', 'submit_coordinator', name='submit_coordinator'),
   url(r'^resubmit_coordinator/(?P<oozie_coord_id>[-\w]+)$', 'resubmit_coordinator', name='resubmit_coordinator'),

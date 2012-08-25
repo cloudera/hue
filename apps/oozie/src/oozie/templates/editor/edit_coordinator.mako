@@ -22,6 +22,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 <%namespace name="properties" file="job_action_properties.mako" />
+<%namespace name="coordinator_data" file="create_coordinator_data.mako" />
 
 ${ commonheader(_("Oozie App"), "oozie", "100px") }
 ${ layout.menubar(section='coordinators') }
@@ -139,16 +140,16 @@ ${ layout.menubar(section='coordinators') }
                   ${ _('No inputs') }
                 </div>
               % endif
-             % if can_edit_coordinator:
-               <a class="btn" data-toggle="modal" href="#add-data-input-modal">${ _('Add') }</a>
-             % endif
+
+              % if can_edit_coordinator:
+                ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_input', data_input_form, 'input') }
+              % endif
             </div>
 
             <br/>
 
             <div class="row-fluid">
               <h3>${ _('Outputs') }</h3>
-
               % if data_output_formset.forms:
               <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
                 <thead>
@@ -183,7 +184,7 @@ ${ layout.menubar(section='coordinators') }
               % endif
 
               % if can_edit_coordinator:
-                <a class="btn" data-toggle="modal" href="#add-data-output-modal">${ _('Add') }</a>
+                ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_output', data_output_form, 'output') }
               % endif
             </div>
           % endif
@@ -216,7 +217,6 @@ ${ layout.menubar(section='coordinators') }
                 <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
                   <thead>
                     <tr>
-                      <th>${ _('Pick dataset as input/output') }</th>
                       <th>${ _('Name') }</th>
                       <th>${ _('Description') }</th>
                       <th>${ _('Frequency') }</th>
@@ -237,11 +237,10 @@ ${ layout.menubar(section='coordinators') }
                     <tr>
                       <td>
                         % if can_edit_coordinator:
-                          <a class="btn" data-toggle="modal" href="#add-data-input-modal">${ _('input') }</a>
-                          <a class="btn" data-toggle="modal" href="#add-data-output-modal">${ _('output') }</a>
+                          <a href="javascript:modalRequest('${ url('oozie:edit_coordinator_dataset', dataset=form.instance.id) }', '#edit-dataset-modal');" data-row-selector="true"/>
                         % endif
+                        ${ form.instance.name }
                       </td>
-                      <td>${ form.instance.name }</td>
                       <td>${ form.instance.description }</td>
                       <td>${ form.instance.text_frequency }</td>
                       <td>${ form.instance.start }</td>
@@ -329,40 +328,8 @@ ${ layout.menubar(section='coordinators') }
     </form>
   </div>
 
-  <div class="modal hide" id="add-data-input-modal">
-    <form class="form-horizontal" id="add-data-input-form">
-        <div class="modal-header">
-          <button class="close" data-dismiss="modal">&times;</button>
-          <h3>${ _('Create a data input') }</h3>
-        </div>
+  <div class="modal hide" id="edit-dataset-modal" style="z-index:1500;width:850px">
 
-        <div class="modal-body" id="add-data-input-body">
-            <%include file="create_coordinator_data.mako" args="form=data_input_form"/>
-        </div>
-
-        <div class="modal-footer">
-          <a href="#" class="btn" data-dismiss="modal">${ _('Close') }</a>
-          <a href="#" class="btn btn-primary" id="add-data-input-btn">${ _('Add data input') }</a>
-        </div>
-    </form>
-  </div>
-
-  <div class="modal hide" id="add-data-output-modal">
-    <form class="form-horizontal" id="add-data-output-form">
-        <div class="modal-header">
-          <button class="close" data-dismiss="modal">&times;</button>
-          <h3>${ _('Create a data output') }</h3>
-        </div>
-
-        <div class="modal-body" id="add-data-output-body">
-            <%include file="create_coordinator_data.mako" args="form=data_output_form"/>
-        </div>
-
-        <div class="modal-footer">
-          <a href="#" class="btn" data-dismiss="modal">${ _('Close') }</a>
-          <a href="#" class="btn btn-primary" id="add-data-output-btn">${ _('Add data output') }</a>
-        </div>
-    </form>
   </div>
 </div>
 
@@ -374,13 +341,30 @@ ${ layout.menubar(section='coordinators') }
 <script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
+  var timeOptions = {
+    show24Hours: false,
+    startTime: '00:00',
+    endTime: '23:59',
+    step: 60
+  };
+
+  function modalRequest(url, el) {
+    $.ajax({
+         url: url,
+         beforeSend: function(xhr){
+             xhr.setRequestHeader("X-Requested-With", "Hue");
+         },
+         dataType: "html",
+         success: function(data){
+             $(el).html(data);
+             $(el).modal("show");
+             $("input.date").datepicker();
+             $("input.time").timePicker(timeOptions);
+         }
+     });
+  }
+
   $(document).ready(function() {
-    var timeOptions = {
-      show24Hours: false,
-      startTime: '00:00',
-      endTime: '23:59',
-      step: 60
-    };
     $("input.date").datepicker();
     $("input.time").timePicker(timeOptions);
 
@@ -401,33 +385,9 @@ ${ layout.menubar(section='coordinators') }
       );
    });
 
-  $('#add-data-input-btn').click(function() {
-    $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='input') }",
-      $("#add-data-input-form").serialize(),
-        function(response) {
-          if (response['status'] != 0) {
-            $('#add-data-input-body').html(response['data']);
-          } else {
-            window.location.replace(response['data']);
-          }
-        }
-      );
-   });
-
-  $('#add-data-output-btn').click(function() {
-    $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='output') }",
-      $("#add-data-output-form").serialize(),
-        function(response) {
-          if (response['status'] != 0) {
-            $('#add-data-output-body').html(response['data']);
-          } else {
-            window.location.replace(response['data']);
-          }
-        }
-      );
-   });
-
    $("a[data-row-selector='true']").jHueRowSelector();
+
+   ko.applyBindings(window.viewModel)
  });
 </script>
 
