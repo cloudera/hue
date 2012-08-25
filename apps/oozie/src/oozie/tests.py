@@ -255,6 +255,43 @@ class TestEditor:
     for field in node.PARAM_FIELDS:
       assert_equal(translation_regex.sub(r'${\1}', getattr(jobsub_design.get_root_action(), field)), getattr(node, field))
 
+
+  def test_workflow_has_cycle(self):
+    action1 = Node.objects.get(name='action-name-1')
+    action2 = Node.objects.get(name='action-name-2')
+    action3 = Node.objects.get(name='action-name-3')
+
+    assert_false(self.wf.has_cycle())
+
+    ok = action3.get_link('ok')
+    ok.child = action1
+    ok.save()
+
+    assert_true(self.wf.has_cycle())
+
+
+  def test_workflow_has_cycle_in_fork(self):
+    action1 = Node.objects.get(name='action-name-1')
+    action2 = Node.objects.get(name='action-name-2')
+    action3 = Node.objects.get(name='action-name-3')
+    action4 = add_action(self.wf.id, action3.id, 'action-name-4')
+
+    move_up(self.c, self.wf, action2)
+    move_up(self.c, self.wf, action4)
+
+    # start
+    # 1 2
+    # 3 4
+
+    assert_false(self.wf.has_cycle())
+
+    ok = action4.get_link('ok')
+    ok.child = action2
+    ok.save()
+
+    assert_true(self.wf.has_cycle())
+
+
   def test_decision_node(self):
     action1 = Node.objects.get(name='action-name-1')
     action2 = Node.objects.get(name='action-name-2')
@@ -262,13 +299,17 @@ class TestEditor:
 
     move_down(self.c, self.wf, action1)
     fork = action1.get_parent()
+    assert_false(fork.has_decisions())
 
     # 1 2
     #  3
     response = self.c.get(reverse('oozie:edit_workflow_fork', args=[fork.id]), {}, follow=True)
-    assert_equal(200, response.status_code)
+    assert_true('this Fork has some other actions below' in response.content, response.content)
 
-    assert_false(fork.has_decisions())
+    self.c.post(reverse('oozie:delete_action', args=[action3.id]), {})
+
+    response = self.c.get(reverse('oozie:edit_workflow_fork', args=[fork.id]), {}, follow=True)
+    assert_false('this Fork has some other actions below' in response.content, response.content)
 
     # Missing information for converting to decision
     response = self.c.post(reverse('oozie:edit_workflow_fork', args=[fork.id]), {
@@ -277,7 +318,6 @@ class TestEditor:
         u'form-1-comment': [u''], u'form-1-id': [u'%s' % action2.id],
         u'child': [u'%s' % self.wf.end.id]}, follow=True)
     assert_true('This field is required' in response.content, response.content)
-    assert_equal(200, response.status_code)
     assert_false(fork.has_decisions())
 
     # Convert to decision
@@ -286,10 +326,10 @@ class TestEditor:
         u'form-0-comment': [u'output'], u'form-0-id': [u'%s' % action1.id],
         u'form-1-comment': [u'output'], u'form-1-id': [u'%s' % action2.id],
         u'child': [u'%s' % self.wf.end.id]}, follow=True)
-    assert_equal(200, response.status_code)
 
     raise SkipTest
     # Mystery below, link_formset.save() does not appear to save the links during a test
+    assert_true('Decision' in response.content, response.content)
     assert_equal(Fork.ACTION_DECISION_TYPE, fork.node_type)
     assert_true(fork.has_decisions(), response.content)
 
@@ -302,6 +342,12 @@ class TestEditor:
         '        <map-reduce>\n'
         '           <job-tracker>${jobTracker}</job-tracker>\n'
         '            <name-node>${nameNode}</name-node>\n'
+        '            <configuration>\n'
+        '                <property>\n'
+        '                    <name>sleep</name>\n'
+        '                    <value>${SLEEP}</value>\n'
+        '                </property>\n'
+        '            </configuration>\n'
         '        </map-reduce>\n'
         '        <ok to="action-name-2"/>\n'
         '        <error to="kill"/>\n'
@@ -310,6 +356,12 @@ class TestEditor:
         '        <map-reduce>\n'
         '            <job-tracker>${jobTracker}</job-tracker>\n'
         '            <name-node>${nameNode}</name-node>\n'
+        '            <configuration>\n'
+        '                <property>\n'
+        '                    <name>sleep</name>\n'
+        '                    <value>${SLEEP}</value>\n'
+        '                </property>\n'
+        '            </configuration>\n'
         '        </map-reduce>\n'
         '        <ok to="action-name-3"/>\n'
         '        <error to="kill"/>\n'
@@ -318,6 +370,12 @@ class TestEditor:
         '        <map-reduce>\n'
         '            <job-tracker>${jobTracker}</job-tracker>\n'
         '            <name-node>${nameNode}</name-node>\n'
+        '            <configuration>\n'
+        '                <property>\n'
+        '                    <name>sleep</name>\n'
+        '                    <value>${SLEEP}</value>\n'
+        '                </property>\n'
+        '            </configuration>\n'
         '        </map-reduce>\n'
         '        <ok to="end"/>\n'
         '        <error to="kill"/>\n'
