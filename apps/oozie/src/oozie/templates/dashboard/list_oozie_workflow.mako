@@ -114,10 +114,16 @@ ${ layout.menubar(section='dashboard') }
     <div class="span3">
       <form action="${ url('oozie:resubmit_workflow', oozie_wf_id=oozie_workflow.id) }" method="post">
       % if oozie_workflow.is_running():
-        <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }"
-            data-message="The workflow was killed!">
-          ${ _('Kill') }
-        </button>
+        <a title="${_('Kill %(workflow)s') % dict(workflow=oozie_workflow.id)}"
+          id="kill-workflow"
+          class="btn small confirmationModal"
+          alt="${ _('Are you sure you want to kill workflow %s?') %  oozie_workflow.id }"
+          href="javascript:void(0)"
+          data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }"
+          data-message="${ _('The workflow was killed!') }"
+          data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
+            ${_('Kill')}
+        </a>
       % else:
         <button type="submit" class="btn">
           ${ _('Resubmit') }
@@ -264,6 +270,16 @@ ${ layout.menubar(section='dashboard') }
   <a class="btn" onclick="history.back()">${ _('Back') }</a>
 </div>
 
+<div id="confirmation" class="modal hide">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3 class="message"></h3>
+  </div>
+  <div class="modal-footer">
+    <a class="btn primary" href="javascript:void(0);">${_('Yes')}</a>
+    <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+  </div>
+</div>
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
@@ -272,7 +288,17 @@ ${ layout.menubar(section='dashboard') }
     $(".action-link").click(function(){
       window.location = $(this).attr('data-edit');
     });
-    $(".manage-oozie-job-btn").click(function() {
+
+    $(".confirmationModal").click(function(){
+      var _this = $(this);
+      $("#confirmation .message").text(_this.attr("data-confirmation-message"));
+      $("#confirmation").modal("show");
+      $("#confirmation a.primary").click(function() {
+        _this.trigger('confirmation');
+      });
+    });
+
+    $("#kill-workflow").bind('confirmation', function() {
       var _this = this;
       $.post($(this).attr("data-url"),
         { 'notification': $(this).attr("data-message") },

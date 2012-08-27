@@ -180,22 +180,48 @@ ${ layout.menubar(section='workflows') }
 </div>
 
 
+<div id="confirmation" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3 class="message"></h3>
+  </div>
+  <div class="modal-footer">
+    <a class="btn primary" href="javascript:void(0);">${_('Yes')}</a>
+    <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+  </div>
+</div>
+
+
 <div id="modal-window" class="modal hide fade"></div>
 
 
 <style type="text/css">
-  #modal-window .modal-content {
-    height: 300px;
-    overflow: auto;
-  }
+modal-window .modal-content {
+  height: 300px;
+  overflow: auto;
+}
 </style>
 
 <script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
+  confirmed = false;
   $(document).ready(function(){
     $(".action-link").click(function(){
       window.location = $(this).attr('data-edit');
+    });
+
+    $("*[name=delete_action]").click(function(){
+      if (!confirmed) {
+        var _this = $(this);
+        $("#confirmation .message").text('${ _("Are you sure you would like to delete this action?") }');
+        $("#confirmation").modal("show");
+        $("#confirmation a.primary").click(function() {
+          confirmed = true;
+          _this.trigger('click');
+        });
+      }
+      return confirmed;
     });
 
     $(".modalWindow").click(function(){
