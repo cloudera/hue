@@ -778,6 +778,11 @@ for x in sys.stdin:
     Test installation of examples
     """
     assert_true(not beeswax.models.MetaInstall.get().installed_example)
+
+    # Check popup
+    resp = self.client.get('/beeswax/install_examples')
+    assert_true('Install sample tables' in resp.content)
+
     self.client.post('/beeswax/install_examples')
 
     # New tables exists
