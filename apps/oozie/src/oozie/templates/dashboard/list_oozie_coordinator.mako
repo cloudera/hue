@@ -78,10 +78,16 @@ ${ layout.menubar(section='dashboard') }
             <td>
             <form action="${ url('oozie:resubmit_coordinator', oozie_coord_id=oozie_coordinator.id) }" method="post">
             % if oozie_coordinator.is_running():
-              <button type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
-                data-message="The coordinator was killed!">
-                ${ _('Kill') }
-              </button>
+              <a title="${_('Kill %(coordinator)s') % dict(coordinator=coordinator.id)}"
+                id="kill-coordinator"
+                class="btn small confirmationModal"
+                alt="${ _('Are you sure you want to kill coordinator %s?') % coordinator.id }"
+                href="javascript:void(0)"
+                data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
+                data-message="${ _('The coordinator was killed!') }"
+                data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
+                  ${_('Kill')}
+              </a>
             % else:
               <button type="submit" class="btn">
                 ${ _('Resubmit') }
@@ -197,11 +203,33 @@ ${ layout.menubar(section='dashboard') }
   </div>
 
   <a href="${ url('oozie:list_oozie_coordinators') }" class="btn">${ _('Back') }</a>
+
+</div>
+
+<div id="confirmation" class="modal hide">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3 class="message"></h3>
+  </div>
+  <div class="modal-footer">
+    <a class="btn primary" href="javascript:void(0);">${_('Yes')}</a>
+    <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+  </div>
 </div>
 
 <script>
   $("a[data-row-selector='true']").jHueRowSelector();
-  $(".manage-oozie-job-btn").click(function() {
+
+  $(".confirmationModal").click(function(){
+    var _this = $(this);
+    $("#confirmation .message").text(_this.attr("data-confirmation-message"));
+    $("#confirmation").modal("show");
+    $("#confirmation a.primary").click(function() {
+      _this.trigger('confirmation');
+    });
+  });
+
+  $("#kill-coordinator").bind('confirmation', function() {
     var _this = this;
     $.post($(this).attr("data-url"),
       { 'notification': $(this).attr("data-message") },

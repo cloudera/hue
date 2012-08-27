@@ -80,8 +80,14 @@ ${layout.menubar(section='dashboard')}
             <td>${ job.user }</td>
             <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
             <td>
-              <a type="button" class="btn manage-oozie-job-btn" data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }">
-                ${ _('Kill') }
+              <a title="${_('Kill %(coordinator)s') % dict(coordinator=job.id)}"
+                class="btn small confirmationModal"
+                alt="${ _('Are you sure you want to kill coordinator %s?') % job.id }"
+                href="javascript:void(0)"
+                data-message="${ _('The coordinator was killed!') }"
+                data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"
+                data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }">
+                  ${ _('Kill') }
               </button>
            </td>
           </tr>
@@ -129,6 +135,18 @@ ${layout.menubar(section='dashboard')}
       </tbody>
      </table>
    </div>
+</div>
+
+
+<div id="confirmation" class="modal hide">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3 class="message"></h3>
+  </div>
+  <div class="modal-footer">
+    <a class="btn primary" href="javascript:void(0);">${_('Yes')}</a>
+    <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+  </div>
 </div>
 
 
@@ -223,21 +241,30 @@ ${layout.menubar(section='dashboard')}
 
     $("a[data-row-selector='true']").jHueRowSelector();
 
-    $(".manage-oozie-job-btn").click(function() {
-        // are you sure?
-        var row = $(this).closest("tr");
-        $.post($(this).attr("data-url"),
-           function(response) {
-             if (response['status'] != 0) {
-               $.jHueNotify.error('${ _('Problem :') }' + response['data']);
-             } else {
-               $.jHueNotify.info('${ _('Killed !') }');
-               row.remove();
-             }
-           }
-         );
-         return false;
-     });
+    $(".confirmationModal").click(function(){
+      var _this = $(this);
+      $("#confirmation .message").text(_this.attr("data-confirmation-message"));
+      $("#confirmation").modal("show");
+      $("#confirmation a.primary").click(function() {
+        _this.trigger('confirmation');
+      });
+    });
+
+    $(".confirmationModal").bind('confirmation', function() {
+      var _this = this;
+      $.post($(this).attr("data-url"),
+        { 'notification': $(this).attr("data-message") },
+        function(response) {
+          if (response['status'] != 0) {
+            $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
+          } else {
+            window.location.reload();
+          }
+        }
+      );
+      return false;
+    });
+
   });
 </script>
 
