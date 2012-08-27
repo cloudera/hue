@@ -228,7 +228,7 @@ def edit_user(request, username=None):
           request.error(_('Cannot make home directory for user %s' % instance.username))
       return redirect(reverse(list_users))
   else:
-    form = form_class(instance=instance, initial={'ensure_home_directory': False})
+    form = form_class(instance=instance, initial={'ensure_home_directory': instance is None})
   return render('edit_user.mako', request, dict(form=form, action=request.path, username=username))
 
 def edit_group(request, name=None):
