@@ -121,6 +121,9 @@ ${ layout.menubar(section='workflows') }
             ${ graph }
           </div>
         </div>
+        <div class="form-actions center">
+          <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
+        </div>
       </div>
 
       <div class="tab-pane" id="properties">
@@ -137,6 +140,12 @@ ${ layout.menubar(section='workflows') }
                 ${ properties.print_key_value(_('Parameters'), 'parameters', workflow_form, parameters) }
              </fieldset>
            </div>
+        </div>
+        <div class="form-actions center">
+          <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
+          % if user_can_edit_job:
+            <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
+          % endif
         </div>
       </div>
 
@@ -163,13 +172,6 @@ ${ layout.menubar(section='workflows') }
         % endif
       </div>
     </div>
-
-    <div class="form-actions center">
-      <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
-      % if user_can_edit_job:
-        <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
-      % endif
-    </div>
   </form>
 </div>
 
@@ -192,23 +194,24 @@ ${ layout.menubar(section='workflows') }
       window.location = $(this).attr('data-edit');
     });
 
-  $(".modalWindow").click(function(){
-    var _this = $(this);
-    $.ajax({
-      url: _this.attr("data-modal-url"),
-      beforeSend: function(xhr){
-        xhr.setRequestHeader("X-Requested-With", "Hue");
-      },
-      dataType: "html",
-      success: function(data){
-        var id = _this.attr("data-modal-id");
-        $(id).html(data);
-        $(id).modal("show");
-      }
+    $(".modalWindow").click(function(){
+      var _this = $(this);
+      $.ajax({
+        url: _this.attr("data-modal-url"),
+        beforeSend: function(xhr){
+          xhr.setRequestHeader("X-Requested-With", "Hue");
+        },
+        dataType: "html",
+        success: function(data){
+          var id = _this.attr("data-modal-id");
+          $(id).html(data);
+          $(id).modal("show");
+        }
+      });
     });
-  });
 
-  $("a[data-row-selector='true']").jHueRowSelector();
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
 </script>
 
 ${ utils.path_chooser_libs(True) }
