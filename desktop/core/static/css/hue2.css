@@ -971,3 +971,7 @@ a#advanced-btn:visited {
 a#advanced-btn:hover {
   color: black; text-decoration: none;
 }
+
+.hand {
+    cursor: pointer;
+}

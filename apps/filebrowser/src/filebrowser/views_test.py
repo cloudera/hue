@@ -236,10 +236,10 @@ def test_listdir_sort_and_filter():
     assert_equal(len(expect), len(listing))
 
     listing = c.get('/filebrowser/view' + BASE + '?pagesize=10').context['files']
-    assert_equal(10, len(listing))
+    assert_equal(11, len(listing))
 
     listing = c.get('/filebrowser/view' + BASE + '?pagesize=10&pagenum=1').context['files']
-    assert_equal(10, len(listing))
+    assert_equal(11, len(listing))
 
     listing = c.get('/filebrowser/view' + BASE + '?pagesize=10&pagenum=2').context['files']
     assert_equal(2, len(listing))
@@ -252,7 +252,8 @@ def test_listdir_sort_and_filter():
     assert_equal(sorted(expect), [ f['name'] for f in listing ])
 
     listing = c.get('/filebrowser/view' + BASE + '?sortby=name&descending=true').context['files']
-    assert_equal(sorted(expect, reverse=True), [ f['name'] for f in listing ])
+    assert_equal("..", listing[0]['name'])
+    assert_equal(FUNNY_NAME, listing[1]['name'])
 
     # Check sorting (size)
     listing = c.get('/filebrowser/view' + BASE + '?sortby=size').context['files']
@@ -265,18 +266,18 @@ def test_listdir_sort_and_filter():
 
     # Check filter
     listing = c.get('/filebrowser/view' + BASE + '?filter=1').context['files']
-    assert_equal(['1', '10'], [ f['name'] for f in listing ])
+    assert_equal(['..', '1', '10'], [ f['name'] for f in listing ])
 
     listing = c.get('/filebrowser/view' + BASE + '?filter=' + FUNNY_NAME).context['files']
-    assert_equal([FUNNY_NAME], [ f['name'] for f in listing ])
+    assert_equal(['..', FUNNY_NAME], [ f['name'] for f in listing ])
 
     # Check filter + sorting
     listing = c.get('/filebrowser/view' + BASE + '?filter=1&sortby=name&descending=true').context['files']
-    assert_equal(['10', '1'], [ f['name'] for f in listing ])
+    assert_equal(['..', '10', '1'], [ f['name'] for f in listing ])
 
     # Check filter + sorting + pagination
     listing = c.get('/filebrowser/view' + BASE + '?filter=1&sortby=name&descending=true&pagesize=1&pagenum=2').context['files']
-    assert_equal(['1'], [ f['name'] for f in listing ])
+    assert_equal(['..', '1'], [ f['name'] for f in listing ])
   finally:
     try:
       cluster.fs.rmtree(BASE)
