@@ -253,11 +253,11 @@ ${ layout.menubar(section='coordinators') }
                     </tr>
 
                      <div class="hide">
-                        % for field in form.visible_fields():
-                            ${ field.errors }
-                            ${ field.label }: ${ field }
-                        % endfor
-                        </div>
+                       % for field in form.visible_fields():
+                          ${ field.errors }
+                          ${ field.label }: ${ field }
+                       % endfor
+                     </div>
 
                    % endfor
                   </tbody>
@@ -387,7 +387,7 @@ ${ layout.menubar(section='coordinators') }
 
    $("a[data-row-selector='true']").jHueRowSelector();
 
-   ko.applyBindings(window.viewModel)
+   ko.applyBindings(window.viewModel);
  });
 </script>
 

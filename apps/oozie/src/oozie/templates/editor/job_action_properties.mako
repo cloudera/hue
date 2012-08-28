@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-from django.utils.translation import ugettext as _
+  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="utils" file="../../utils.inc.mako" />

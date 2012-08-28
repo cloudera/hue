@@ -45,6 +45,11 @@
               <td>${ action.description }</td>
             </tr>
           %endfor
+          % if not available_actions:
+            <tr class="action-row">
+              <td>${ _('N/A') }</td><td></td><td></td>
+            </tr>
+          % endif
         </tbody>
       </table>
     </div>

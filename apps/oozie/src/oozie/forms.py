@@ -61,6 +61,7 @@ class JavaForm(forms.ModelForm):
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
       'job_properties': forms.widgets.HiddenInput(),
+      'prepares': forms.widgets.HiddenInput(),
       'files': forms.HiddenInput(),
       'archives': forms.HiddenInput(),
       'jar_path': forms.TextInput(attrs={'class': 'pathChooser span5'}),
@@ -75,6 +76,7 @@ class MapreduceForm(forms.ModelForm):
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
       'job_properties': forms.widgets.HiddenInput(),
+      'prepares': forms.widgets.HiddenInput(),
       'files': forms.HiddenInput(),
       'archives': forms.HiddenInput(),
       'jar_path': forms.TextInput(attrs={'class': 'pathChooser span5'}),
@@ -101,6 +103,7 @@ class PigForm(forms.ModelForm):
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
       'job_properties': forms.widgets.HiddenInput(),
+      'prepares': forms.widgets.HiddenInput(),
       'params': forms.widgets.HiddenInput(),
       'script_path': forms.TextInput(attrs={'class': 'pathChooser span5'}),
       'files': forms.widgets.HiddenInput(),

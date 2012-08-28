@@ -21,6 +21,7 @@
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 
+            ${ common.prepares(node.get_prepares()) }
             ${ common.configuration(node.get_properties()) }
 
             <script>${ node.script_path }</script>

@@ -131,7 +131,8 @@ class TestEditor:
 
 
   def test_find_all_parameters(self):
-        assert_equal([{'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}], self.wf.find_all_parameters())
+        assert_equal([{'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
+                     self.wf.find_all_parameters())
 
 
   def test_move_up(self):
@@ -342,6 +343,9 @@ class TestEditor:
         '        <map-reduce>\n'
         '           <job-tracker>${jobTracker}</job-tracker>\n'
         '            <name-node>${nameNode}</name-node>\n'
+        '            <prepare>\n'
+        '                <delete path="${output}"/>\n'
+        '            </prepare>\n'
         '            <configuration>\n'
         '                <property>\n'
         '                    <name>sleep</name>\n'
@@ -356,6 +360,9 @@ class TestEditor:
         '        <map-reduce>\n'
         '            <job-tracker>${jobTracker}</job-tracker>\n'
         '            <name-node>${nameNode}</name-node>\n'
+        '            <prepare>\n'
+        '                <delete path="${output}"/>\n'
+        '            </prepare>\n'
         '            <configuration>\n'
         '                <property>\n'
         '                    <name>sleep</name>\n'
@@ -370,6 +377,9 @@ class TestEditor:
         '        <map-reduce>\n'
         '            <job-tracker>${jobTracker}</job-tracker>\n'
         '            <name-node>${nameNode}</name-node>\n'
+        '            <prepare>\n'
+        '                <delete path="${output}"/>\n'
+        '            </prepare>\n'
         '            <configuration>\n'
         '                <property>\n'
         '                    <name>sleep</name>\n'
@@ -814,7 +824,8 @@ class TestEditor:
 
 
 # Utils
-WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''], u'parameters': [u'[{"name":"market","value":"US"}]']}
+WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''],
+                 u'parameters': [u'[{"name":"market","value":"US"}]']}
 
 
 # Beware: client not consistent with self.c in TestEditor
@@ -823,8 +834,7 @@ def add_action(workflow, action, name):
 
   response = c.post("/oozie/new_action/%s/%s/%s" % (workflow, 'mapreduce', action), {
      u'files': [u'[]'], u'name': [name], u'jar_path': [u'/tmp/.file.jar'], u'job_properties': [u'[{"name":"sleep","value":"${SLEEP}"}]'],
-     u'archives': [u'[]'], u'description': [u'']}, follow=True)
-  assert_equal(200, response.status_code)
+     u'archives': [u'[]'], u'description': [u''], u'prepares': [u'[{"type":"delete","value":"${output}"}]']}, follow=True)
   assert_true(Node.objects.filter(name=name).exists(), response)
   return Node.objects.get(name=name)
 
