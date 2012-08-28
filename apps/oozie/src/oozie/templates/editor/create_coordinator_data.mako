@@ -18,64 +18,45 @@
 import re
 
 from django.utils.translation import ugettext as _
+from django.utils.safestring import mark_safe
+
 %>
 
 <%namespace name="utils" file="../../utils.inc.mako" />
 
 
-<%def name="print_datasets(label, element, formset, direction)">
-  <table id="${element}" class="table-condensed designTable">
-    <thead>
-      <tr>
-        <th>${ _('Name') }</th>
-        <th>${ _('Dataset') }</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody data-bind="foreach: ${ element }">
-      % if 'forms' in formset.__dict__:
-        % for form in formset.forms:
-          <tr>
-            <td>${ form['name'] }</td>
-            <td>${ form['dataset'] }</td>
-            <td><a class="btn btn-small" href="#" data-bind="click: $root.remove_${ element }">${ _('Delete') }</a></td>
-          </tr>
-        % endfor
+<%def name="print_datasets(label, element, formset, direction, show_headers=True)">
+  <div id="${element}">
+    <table class="table-condensed dataTable">
+      % if show_headers:
+      <thead
+        % if not formset.forms:
+          data-bind="visible: ${element}().length > 0"
+        % endif
+        >
         <tr>
-          <td>${ formset.empty_form['name'] }</td>
-          <td>${ formset.empty_form['dataset'] }</td>
-          <td><a class="btn btn-small" href="#" data-bind="click: $root.remove_${ element }">${ _('Delete') }</a></td>
+          <th>${ _('Name') }</th>
+          <th>${ _('Dataset') }</th>
+          <th></th>
+          <th></th>
         </tr>
-      % else:
+      </thead>
+      % endif
+      <tbody data-bind="foreach: ${ element }">
         <tr>
-          <td>${ formset['name'] }</td>
-          <td>${ formset['dataset'] }</td>
-          <td><a class="btn btn-small" href="#" data-bind="click: $root.remove_${ element }">${ _('Delete') }</a></td>
+          <td width="10%" data-bind="html: name"></td>
+          <td width="10%" data-bind="html: dataset"></td>
+          <td data-bind="html: error_message"></td>
+          <td width="1%"><a class="btn btn-small" href="#" data-bind="click: $root.remove_${ element }">${ _('Delete') }</a></td>
         </tr>
-      % endif
-    </tbody>
-  </table>
-  % if 'forms' in formset.__dict__:
-    % for form in formset.forms:
-      % if form.errors:
-        <div class="row">
-          <div class="alert alert-error">
-            ${ unicode(form.errors) | n }
-          </div>
-        </div>
-      % endif
-    % endfor
-  % else:
-    % if formset.errors:
-      <div class="row">
-        <div class="alert alert-error">
-          ${ unicode(formset.errors) | n }
-        </div>
-      </div>
-    % endif
-  % endif
+      </tbody>
+    </table>
 
   <button type="button" class="btn" data-bind="click: add_${ element }">${ _('Add') }</button>
+
+  ${ formset.management_form }
+
+  </div>
 
   <style>
     .designTable th {
@@ -85,28 +66,44 @@ from django.utils.translation import ugettext as _
 
   <script type="text/javascript">
     $(document).ready(function(){
-      window.viewModel.${element} = ko.observableArray([]);
+      var initial = ${ [{'name': str(form['name']), 'dataset': str(form['dataset']), 'error_message': str(form.errors) } for form in formset.forms] };
+      var nameHTML = '${ str(formset.empty_form["name"]).replace("\r", "").replace("\n", "").replace("\s", "") }';
+      var datasetHTML = '${ str(formset.empty_form["dataset"]).replace("\r", "").replace("\n", "").replace("\s", "") }';
+      var count = initial.length;
+      var root = $('#${element}');
+      var totalFormsEl = root.find('input[type=hidden]').filter(function() {
+        return this.name.indexOf('TOTAL_FORMS') != -1;
+      });
+      totalFormsEl.val(initial.length);
+
+      window.viewModel.${element} = ko.observableArray(initial);
 
       window.viewModel.add_${element} = function() {
-        window.viewModel.${element}.push({name: "", dataset: ""});
+        var newNameHTML = nameHTML.replace(new RegExp("__prefix__", 'g'), count);
+        var newDatasetHTML = datasetHTML.replace(new RegExp("__prefix__", 'g'), count++);
+        window.viewModel.${element}.push({name: newNameHTML, dataset: newDatasetHTML, error_message: ""});
+        totalFormsEl.val(window.viewModel.${element}().length);
       };
 
       window.viewModel.remove_${element} = function(val) {
         window.viewModel.${element}.remove(val);
-      };
 
-      var previousSubmit = window.viewModel.submit;
-      window.viewModel.submit = function(form) {
-        $.post("${ url('oozie:create_coordinator_data', coordinator=coordinator.id, data_type='%s' % direction) }",
-          $("#${element} :input").serialize(), function(response) {
-            if (response['status'] != 0) {
-              $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
-            } else {
-              window.location.replace(response['data']);
-            }
+        var els = root.find(':input').filter(function() {
+          return !!$(this).attr('name') && $(this).attr('name').search(/\-\d+\-/) != -1;
         });
+        var count = 0;
+        for (var i = 0; i < els.length; i++) {
+          var el = $(els[i]);
+          var name = el.attr('name').replace(/\-\d+\-/g, '-' + count + '-');
+          var id = el.attr('id').replace(/\-\d+\-/g, '-' + count + '-');
+          el.attr('name', name);
+          el.attr('id', id);
+          if (i % 2 == 1) {
+            count++;
+          }
+        }
 
-        previousSubmit(form);
+        totalFormsEl.val(window.viewModel.${element}().length);
       };
     });
   </script>
