@@ -666,7 +666,7 @@ class Action(Node):
 #  - Node.get_full_node()
 
 class Mapreduce(Action):
-  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path')
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path', 'prepares')
   node_type = 'mapreduce'
 
   files = models.CharField(max_length=PATH_MAX, default="[]",
@@ -676,6 +676,7 @@ class Mapreduce(Action):
   job_properties = models.TextField(default='[]', # JSON dict
                                     help_text=_t('For the job configuration (e.g. mapred.mapper.class)'))
   jar_path = models.CharField(max_length=PATH_MAX, help_text=_t('Path to jar files on HDFS'))
+  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete of create before starting the job'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -685,6 +686,9 @@ class Mapreduce(Action):
 
   def get_archives(self):
     return json.loads(self.archives)
+
+  def get_prepares(self):
+    return json.loads(self.prepares)
 
 
 class Streaming(Action):
@@ -710,7 +714,7 @@ class Streaming(Action):
 
 class Java(Action):
   PARAM_FIELDS = ('files', 'archives', 'jar_path', 'main_class', 'args',
-                  'java_opts', 'job_properties')
+                  'java_opts', 'job_properties', 'prepares')
   node_type = "java"
 
   files = models.CharField(max_length=PATH_MAX, default="[]",
@@ -723,6 +727,7 @@ class Java(Action):
   java_opts = models.CharField(max_length=256, blank=True)
   job_properties = models.TextField(default='[]', # JSON dict
                                     help_text=_t('For the job configuration (e.g. mapred.mapper.class)'))
+  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete of create before starting the job'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -733,13 +738,16 @@ class Java(Action):
   def get_archives(self):
     return json.loads(self.archives)
 
+  def get_prepares(self):
+    return json.loads(self.prepares)
+
 
 class Pig(Action):
-  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params')
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
   node_type = 'pig'
 
   script_path = models.CharField(max_length=256, blank=False, help_text=_t('Local path'))
-  params = models.TextField(default="[]")
+  params = models.TextField(default="[]", help_text=_t('The Pig parameters of the script'))
 
   files = models.CharField(max_length=PATH_MAX, default="[]",
       help_text=_t('List of paths to files to be added to the distributed cache'))
@@ -747,6 +755,7 @@ class Pig(Action):
       help_text=_t('List of paths to archives to be added to the distributed cache'))
   job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', # JSON dict
                                     help_text=_t('For the job configuration (e.g. mapred.mapper.class)'))
+  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete of create before starting the job'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -759,6 +768,9 @@ class Pig(Action):
 
   def get_params(self):
     return json.loads(self.params)
+
+  def get_prepares(self):
+    return json.loads(self.prepares)
 
 
 Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type)

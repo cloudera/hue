@@ -61,6 +61,43 @@ ${ layout.menubar(section='workflows') }
       % endif
     % endfor
 
+    % if 'prepares' in action_form.fields:
+      <div class="control-group">
+        <label class="control-label">${ _('Prepare') }</label>
+        <div class="controls">
+          <table class="table-condensed designTable" data-bind="visible: prepares().length > 0">
+            <thead>
+              <tr>
+                <th>${ _('Type') }</th>
+                <th>${ _('Value') }</th>
+                <th/>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: prepares">
+              <tr>
+                <td>
+                  <span class="span3 required" data-bind="text: type" />
+                </td>
+                <td>
+                  <input class="input span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+                </td>
+                <td><a class="btn" href="#" data-bind="click: $root.removePrepare">${ _('Delete') }</a></td>
+              </tr>
+            </tbody>
+          </table>
+
+          % if len(action_form['prepares'].errors):
+            <div class="alert alert-error">
+              ${ unicode(action_form['prepares'].errors) | n }
+            </div>
+          % endif
+
+          <button class="btn" data-bind="click: addPrepareDelete">${ _('Add delete') }</button>
+          <button class="btn" data-bind="click: addPrepareMkdir">${ _('Add mkdir') }</button>
+        </div>
+      </div>
+    % endif
+
     % if 'params' in action_form.fields:
       <div class="control-group">
         <label class="control-label">${ _('Params') }</label>
@@ -275,13 +312,14 @@ ${ layout.menubar(section='workflows') }
         });
     };
 
-    var ViewModel = function(properties, files, archives, params) {
+    var ViewModel = function(properties, files, archives, params, prepares) {
         var self = this;
 
         self.properties = ko.observableArray(properties);
         self.files = ko.observableArray(files);
         self.archives = ko.observableArray(archives);
         self.params = ko.observableArray(params);
+        self.prepares = ko.observableArray(prepares);
 
         self.addProp = function() {
             self.properties.push({ name: "", value: "" });
@@ -302,6 +340,18 @@ ${ layout.menubar(section='workflows') }
 
         self.removeParam = function(val) {
             self.params.remove(val);
+        };
+
+        self.addPrepareDelete = function() {
+            self.prepares.push({ value: "", type: "delete" });
+        };
+
+        self.addPrepareMkdir = function() {
+            self.prepares.push({ value: "", type: "mkdir" });
+        };
+
+        self.removePrepare = function(val) {
+            self.prepares.remove(val);
         };
 
         self.addFile = function() {
@@ -325,7 +375,7 @@ ${ layout.menubar(section='workflows') }
             var files_arr = dictArrayToArray(ko.toJS(self.files));
             var archives_arr = dictArrayToArray(ko.toJS(self.archives));
 
-            // Beware dirty
+            // Beware: dirty
             $("<input>").attr("type", "hidden")
                 .attr("name", "job_properties")
                 .attr("value", ko.utils.stringifyJson(self.properties))
@@ -342,6 +392,10 @@ ${ layout.menubar(section='workflows') }
                 .attr("name", "params")
                 .attr("value", ko.utils.stringifyJson(self.params))
                 .appendTo(form);
+            $("<input>").attr("type", "hidden")
+                .attr("name", "prepares")
+                .attr("value", ko.utils.stringifyJson(self.prepares))
+                .appendTo(form);
 
             form.submit();
         };
@@ -351,7 +405,8 @@ ${ layout.menubar(section='workflows') }
               ${ job_properties },
               arrayToDictArray(${ files }),
               arrayToDictArray(${ archives }),
-              ${ params });
+              ${ params },
+              ${ prepares });
 
     ko.bindingHandlers.fileChooser = {
           init: function(element, valueAccessor, allBindings, model) {

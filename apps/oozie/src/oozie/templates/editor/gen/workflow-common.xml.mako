@@ -26,6 +26,17 @@ import posixpath
 <%def name="filelink(path)">${ path + '#' + posixpath.basename(path) }</%def>
 
 
+<%def name="prepares(prepares)">
+        % if prepares:
+            <prepare>
+                % for p in prepares:
+                <${ p['type'] } path="${ p['value'] }"/>
+                % endfor
+            </prepare>
+        % endif
+</%def>
+
+
 <%def name="configuration(properties)">
         % if properties:
             <configuration>

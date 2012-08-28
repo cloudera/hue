@@ -180,10 +180,10 @@ ${ layout.menubar(section='workflows') }
 
 
 <style type="text/css">
-#modal-window .modal-content {
-  height: 300px;
-  overflow: auto;
-}
+  #modal-window .modal-content {
+    height: 300px;
+    overflow: auto;
+  }
 </style>
 
 <script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
@@ -209,6 +209,8 @@ ${ layout.menubar(section='workflows') }
         }
       });
     });
+
+    ko.applyBindings(window.viewModel);
 
     $("a[data-row-selector='true']").jHueRowSelector();
   });
