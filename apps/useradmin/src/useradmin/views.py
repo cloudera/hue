@@ -457,8 +457,7 @@ def ensure_home_directory(fs, username):
   Throws WebHdfsException.
   """
   home_dir = '/user/%s' % username
-  if not fs.exists(home_dir):
-    fs.create_home_dir(home_dir)
+  fs.do_as_user(username, fs.create_home_dir, home_dir)
 
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""

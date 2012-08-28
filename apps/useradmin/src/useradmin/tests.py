@@ -540,15 +540,25 @@ def test_ensure_home_directory():
 
   # Cluster and client for home directory creation
   cluster = pseudo_hdfs4.shared_cluster()
-  c = make_logged_in_client(cluster.superuser, is_superuser=True)
+  c = make_logged_in_client(cluster.superuser, is_superuser=True, groupname='test1')
   cluster.fs.setuser(cluster.superuser)
 
   # Create a user with a home directory
+  assert_false(cluster.fs.exists('/user/test1'))
   response = c.post('/useradmin/users/new', dict(username="test1", password1='test', password2='test', ensure_home_directory=True))
   assert_true(cluster.fs.exists('/user/test1'))
+  dir_stat = cluster.fs.stats('/user/test1')
+  assert_equal('test1', dir_stat.user)
+  assert_equal('test1', dir_stat.group)
+  assert_equal('40755', '%o' % dir_stat.mode)
 
   # Create a user, then add their home directory
+  assert_false(cluster.fs.exists('/user/test2'))
   response = c.post('/useradmin/users/new', dict(username="test2", password1='test', password2='test'))
   assert_false(cluster.fs.exists('/user/test2'))
   response = c.post('/useradmin/users/edit/%s' % "test2", dict(username="test2", password1='test', password2='test', ensure_home_directory=True))
   assert_true(cluster.fs.exists('/user/test2'))
+  dir_stat = cluster.fs.stats('/user/test2')
+  assert_equal('test2', dir_stat.user)
+  assert_equal('test2', dir_stat.group)
+  assert_equal('40755', '%o' % dir_stat.mode)
