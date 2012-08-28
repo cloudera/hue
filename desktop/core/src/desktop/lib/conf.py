@@ -181,7 +181,7 @@ class Config(object):
     @param dynamic_default a lambda to use to calculate the default
     @param required whether this must be set
     @param help     some text to print out for help
-    @param type    a callable that coerces a string into the expected type.
+    @param type     a callable that coerces a string into the expected type.
                     str is the default. Should raise an exception in the case
                     that it cannot be coerced.
     @param private  if True, does not emit help text
