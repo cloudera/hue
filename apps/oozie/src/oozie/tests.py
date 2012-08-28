@@ -824,7 +824,7 @@ class TestEditor:
     create_dataset(coord)
 
     response = self.c.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'input']),
-                           {u'name': [u'input_dir'], u'dataset': [u'1']})
+                           {u'input-name': [u'input_dir'], u'input-dataset': [u'1']})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data['data'])
 

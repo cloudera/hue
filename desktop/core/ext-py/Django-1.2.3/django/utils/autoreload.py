@@ -51,7 +51,7 @@ _win = (sys.platform == "win32")
 def code_changed():
     global _mtimes, _win
     for filename in filter(lambda v: v, map(lambda m: getattr(m, "__file__", None), sys.modules.values())):
-        if filename.endswith(".pyc") or filename.endswith(".pyo") or filename.endswith(".mako"):
+        if filename.endswith(".pyc") or filename.endswith(".pyo"):
             filename = filename[:-1]
         if not os.path.exists(filename):
             continue # File might be in an egg, so it can't be reloaded.
