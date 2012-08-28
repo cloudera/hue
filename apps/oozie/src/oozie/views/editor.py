@@ -29,7 +29,7 @@ from django.forms.formsets import formset_factory
 from django.forms.models import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.utils.functional import wraps
+from django.utils.functional import curry, wraps
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
@@ -630,29 +630,37 @@ def edit_coordinator(request, coordinator):
 
   dataset = Dataset(coordinator=coordinator)
   dataset_form = DatasetForm(instance=dataset, prefix='create')
-  data_input = DataInput(coordinator=coordinator)
-  data_input_form = DataInputForm(instance=data_input, coordinator=coordinator)
-  data_output = DataOutput(coordinator=coordinator)
-  data_output_form = DataOutputForm(instance=data_output, coordinator=coordinator)
+
+  NewDataInputFormSet = inlineformset_factory(Coordinator, DataInput, form=DataInputForm, extra=0, can_order=False, can_delete=False)
+  NewDataInputFormSet.form = staticmethod(curry(DataInputForm, coordinator=coordinator))
+  NewDataOutputFormSet = inlineformset_factory(Coordinator, DataOutput, form=DataOutputForm, extra=0, can_order=False, can_delete=False)
+  NewDataOutputFormSet.form = staticmethod(curry(DataOutputForm, coordinator=coordinator))
 
   if request.method == 'POST':
     coordinator_form = CoordinatorForm(request.POST, instance=coordinator)
     dataset_formset = DatasetFormSet(request.POST, request.FILES, instance=coordinator)
     data_input_formset = DataInputFormSet(request.POST, request.FILES, instance=coordinator)
     data_output_formset = DataOutputFormSet(request.POST, request.FILES, instance=coordinator)
+    new_data_input_formset = NewDataInputFormSet(request.POST, request.FILES, instance=coordinator, prefix='input')
+    new_data_output_formset = NewDataOutputFormSet(request.POST, request.FILES, instance=coordinator, prefix='output')
 
-    if coordinator_form.is_valid() and dataset_formset.is_valid() and data_input_formset.is_valid() and data_output_formset.is_valid():
+    if coordinator_form.is_valid() and dataset_formset.is_valid() and data_input_formset.is_valid() and data_output_formset.is_valid() and new_data_input_formset.is_valid() and new_data_output_formset.is_valid():
       coordinator = coordinator_form.save()
       dataset_formset.save()
       data_input_formset.save()
       data_output_formset.save()
+      new_data_input_formset.save()
+      new_data_output_formset.save()
 
-      return redirect(reverse('oozie:list_coordinator'))
+      request.info(_("Coordinator saved!"))
+      return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}))
   else:
     coordinator_form = CoordinatorForm(instance=coordinator)
     dataset_formset = DatasetFormSet(instance=coordinator)
     data_input_formset = DataInputFormSet(instance=coordinator)
     data_output_formset = DataOutputFormSet(instance=coordinator)
+    new_data_input_formset = NewDataInputFormSet(queryset=DataInput.objects.none(), instance=coordinator, prefix='input')
+    new_data_output_formset = NewDataOutputFormSet(queryset=DataOutput.objects.none(), instance=coordinator, prefix='output')
 
   return render('editor/edit_coordinator.mako', request, {
     'coordinator': coordinator,
@@ -661,8 +669,8 @@ def edit_coordinator(request, coordinator):
     'data_input_formset': data_input_formset,
     'data_output_formset': data_output_formset,
     'dataset_form': dataset_form,
-    'data_input_form': data_input_form,
-    'data_output_form': data_output_form,
+    'new_data_input_formset': new_data_input_formset,
+    'new_data_output_formset': new_data_output_formset,
     'history': history,
     'can_edit_coordinator': can_edit_job(request.user, coordinator.workflow),
     'parameters': extract_field_data(coordinator_form['parameters'])
@@ -739,7 +747,7 @@ def create_coordinator_data(request, coordinator, data_type):
   response = {'status': -1, 'data': 'None'}
 
   if request.method == 'POST':
-    data_form = DataForm(request.POST, instance=data_instance, coordinator=coordinator)
+    data_form = DataForm(request.POST, instance=data_instance, coordinator=coordinator, prefix=data_type)
 
     if data_form.is_valid():
       data_form.save()
@@ -748,15 +756,9 @@ def create_coordinator_data(request, coordinator, data_type):
       request.info(_('Coordinator data created'));
     else:
       data_form = DataForm(request.POST, instance=data_instance, coordinator=coordinator)
+      response['data'] = data_form.errors
   else:
-    ## Bad
     response['data'] = _('A POST request is required.')
-
-  if response['status'] != 0:
-    response['data'] = render('editor/create_coordinator_data.mako', request, {
-                              'coordinator': coordinator,
-                              'form': data_form, },
-                              force_template=True).content
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 

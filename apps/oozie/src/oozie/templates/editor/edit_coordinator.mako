@@ -112,11 +112,11 @@ ${ layout.menubar(section='coordinators') }
                 <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
                   <thead>
                     <tr>
-                      <th>${ _('Name') }</th>
-                      <th>${ _('Dataset') }</th>
+                      <th width="10%">${ _('Name') }</th>
+                      <th width="10%">${ _('Dataset') }</th>
                       <th>${ _('Path') }</th>
                       % if can_edit_coordinator:
-                        <td>${ _('Delete') }</td>
+                        <th width="1%">${ _('Delete') }</th>
                       % endif
                     </tr>
                   </thead>
@@ -142,10 +142,12 @@ ${ layout.menubar(section='coordinators') }
               % endif
 
               % if can_edit_coordinator:
-                ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_input', data_input_form, 'input') }
+                ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_input', new_data_input_formset, 'input', not len(data_input_formset.forms)) }
               % endif
             </div>
 
+            <br/>
+            <br/>
             <br/>
 
             <div class="row-fluid">
@@ -154,11 +156,11 @@ ${ layout.menubar(section='coordinators') }
               <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
                 <thead>
                   <tr>
-                    <th>${ _('Name') }</th>
-                    <th>${ _('Dataset') }</th>
+                    <th width="10%">${ _('Name') }</th>
+                    <th width="10%">${ _('Dataset') }</th>
                     <th>${ _('Path') }</th>
                     % if can_edit_coordinator:
-                      <td>${ _('Delete') }</td>
+                      <th width="1%">${ _('Delete') }</th>
                     % endif
                   </tr>
                 </thead>
@@ -184,7 +186,7 @@ ${ layout.menubar(section='coordinators') }
               % endif
 
               % if can_edit_coordinator:
-                ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_output', data_output_form, 'output') }
+                ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_output', new_data_output_formset, 'output', not len(data_output_formset.forms)) }
               % endif
             </div>
           % endif
@@ -383,11 +385,11 @@ ${ layout.menubar(section='coordinators') }
           }
         }
       );
-   });
+    });
 
-   $("a[data-row-selector='true']").jHueRowSelector();
+    $("a[data-row-selector='true']").jHueRowSelector();
 
-   ko.applyBindings(window.viewModel);
+    ko.applyBindings(window.viewModel);
  });
 </script>
 
