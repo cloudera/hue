@@ -668,13 +668,13 @@ class TestEditor:
     # List
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = client_not_me.get(reverse('oozie:list_coordinator'))
+      response = client_not_me.get(reverse('oozie:list_coordinators'))
       assert_false('MyCoord' in response.content, response.content)
     finally:
       finish()
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = client_not_me.get(reverse('oozie:list_coordinator'))
+      response = client_not_me.get(reverse('oozie:list_coordinators'))
       assert_false('MyCoord' in response.content, response.content)
     finally:
       finish()
@@ -702,7 +702,7 @@ class TestEditor:
     # List
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = client_not_me.get(reverse('oozie:list_coordinator'))
+      response = client_not_me.get(reverse('oozie:list_coordinators'))
       assert_equal(200, response.status_code)
       assert_true('MyCoord' in response.content, response.content)
     finally:

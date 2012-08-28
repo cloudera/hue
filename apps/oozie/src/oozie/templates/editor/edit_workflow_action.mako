@@ -34,199 +34,209 @@ ${ layout.menubar(section='workflows') }
   </h1>
 
   <br/>
-  <form class="form-horizontal" id="actionForm" action="${ form_url }" method="POST">
-    <fieldset>
-    % for field in action_form:
-      % if field.html_name in ('name', 'description'):
-        ${ utils.render_field(field) }
-      % endif
-    % endfor
 
-    ${ utils.render_constant(_('Action type'), node_type) }
-
-    <hr/>
-
-    <div class="control-group">
-      <label class="control-label"></label>
-      <div class="controls">
-      <p class="alert alert-info span5">
-        ${ _('You can parameterize the values using uppercase') } <code>${"${"}VAR}</code>.
-      </p>
-      </div>
-    </div>
-
-    % for field in action_form:
-      % if field.html_name not in ('name', 'description', 'node_type'):
-        ${ utils.render_field(field) }
-      % endif
-    % endfor
-
-    % if 'prepares' in action_form.fields:
-      <div class="control-group">
-        <label class="control-label">${ _('Prepare') }</label>
-        <div class="controls">
-          <table class="table-condensed designTable" data-bind="visible: prepares().length > 0">
-            <thead>
-              <tr>
-                <th>${ _('Type') }</th>
-                <th>${ _('Value') }</th>
-                <th/>
-              </tr>
-            </thead>
-            <tbody data-bind="foreach: prepares">
-              <tr>
-                <td>
-                  <span class="span3 required" data-bind="text: type" />
-                </td>
-                <td>
-                  <input class="input span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
-                </td>
-                <td><a class="btn" href="#" data-bind="click: $root.removePrepare">${ _('Delete') }</a></td>
-              </tr>
-            </tbody>
-          </table>
-
-          % if len(action_form['prepares'].errors):
-            <div class="alert alert-error">
-              ${ unicode(action_form['prepares'].errors) | n }
-            </div>
-          % endif
-
-          <button class="btn" data-bind="click: addPrepareDelete">${ _('Add delete') }</button>
-          <button class="btn" data-bind="click: addPrepareMkdir">${ _('Add mkdir') }</button>
-        </div>
-      </div>
-    % endif
-
-    % if 'params' in action_form.fields:
-      <div class="control-group">
-        <label class="control-label">${ _('Params') }</label>
-        <div class="controls">
-          <table class="table-condensed designTable" data-bind="visible: params().length > 0">
-            <thead>
-              <tr>
-                <th>${ _('Type') }</th>
-                <th>${ _('Value') }</th>
-                <th/>
-              </tr>
-            </thead>
-            <tbody data-bind="foreach: params">
-              <tr>
-                <td>
-                  <span class="span3 required" data-bind="text: type" />
-                </td>
-                <td>
-                  <input class="input span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
-                </td>
-                <td><a class="btn" href="#" data-bind="click: $root.removeParam">${ _('Delete') }</a></td>
-              </tr>
-            </tbody>
-          </table>
-
-          % if len(action_form['params'].errors):
-            <div class="alert alert-error">
-              ${ unicode(action_form['params'].errors) | n }
-            </div>
-          % endif
-
-          <button class="btn" data-bind="click: addParam">${ _('Add Param') }</button>
-          <button class="btn" data-bind="click: addArgument">${ _('Add Argument') }</button>
-        </div>
-      </div>
-    % endif
-
-    % if 'job_properties' in action_form.fields:
-    <div class="control-group">
-      <label class="control-label">${ _('Job Properties') }</label>
-      <div class="controls">
-        <table class="table-condensed designTable" data-bind="visible: properties().length > 0">
-          <thead>
-            <tr>
-              <th>${ _('Property name') }</th>
-              <th>${ _('Value') }</th>
-              <th/>
-            </tr>
-          </thead>
-          <tbody data-bind="foreach: properties">
-            <tr>
-              <td><input class="span4 required propKey" data-bind="value: name, uniqueName: false" /></td>
-              <td><input class="span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
-              <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">${ _('Delete') }</a></td>
-            </tr>
-          </tbody>
-        </table>
-        % if len(action_form['job_properties'].errors):
-          <div class="row">
-            <div class="alert alert-error">
-              ${ unicode(action_form['job_properties'].errors) | n }
-            </div>
-          </div>
+  <div class="row">
+    <div class="span12">
+    <form class="form-horizontal" id="actionForm" action="${ form_url }" method="POST">
+      <fieldset>
+      % for field in action_form:
+        % if field.html_name in ('name', 'description'):
+          ${ utils.render_field(field) }
         % endif
+      % endfor
 
-        <button class="btn" data-bind="click: addProp">${ _('Add Property') }</button>
-      </div>
-    </div>
-    % endif
+      ${ utils.render_constant(_('Action type'), node_type) }
 
-    % if 'files' in action_form.fields:
-    <div class="control-group">
-        <label class="control-label">${ _('Files') }</label>
+      <hr/>
+
+      <div class="control-group">
+        <label class="control-label"></label>
         <div class="controls">
-            <table class="table-condensed designTable" data-bind="visible: files().length > 0">
-              <tbody data-bind="foreach: files">
+        <p class="alert alert-info span5">
+          ${ _('You can parameterize the values using uppercase') } <code>${"${"}VAR}</code>.
+        </p>
+        </div>
+      </div>
+
+      % for field in action_form:
+        % if field.html_name not in ('name', 'description', 'node_type'):
+          ${ utils.render_field(field) }
+        % endif
+      % endfor
+
+      % if 'prepares' in action_form.fields:
+        <div class="control-group" rel="popover"
+            data-original-title="${ action_form['prepares'].label }" data-content="${ action_form['prepares'].help_text }">
+          <label class="control-label">${ _('Prepare') }</label>
+          <div class="controls">
+            <table class="table-condensed designTable" data-bind="visible: prepares().length > 0">
+              <thead>
                 <tr>
-                  <td><input class="input span5 required pathChooserKo"
-                          data-bind="fileChooser: $data, value: name, uniqueName: false" />
+                  <th>${ _('Type') }</th>
+                  <th>${ _('Value') }</th>
+                  <th/>
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: prepares">
+                <tr>
+                  <td>
+                    <span class="span3 required" data-bind="text: type" />
                   </td>
-                  <td><a class="btn" href="#" data-bind="click: $root.removeFile">${ _('Delete') }</a></td>
+                  <td>
+                    <input class="input span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+                  </td>
+                  <td><a class="btn" href="#" data-bind="click: $root.removePrepare">${ _('Delete') }</a></td>
                 </tr>
               </tbody>
             </table>
-            % if len(action_form['files'].errors):
+
+            % if len(action_form['prepares'].errors):
               <div class="alert alert-error">
-                ${ unicode(action_form['files'].errors) | n }
+                ${ unicode(action_form['prepares'].errors) | n }
               </div>
             % endif
 
-            <button class="btn" data-bind="click: addFile">${ _('Add File') }</button>
-        </div>
-    </div>
-    % endif
-
-    % if 'archives' in action_form.fields:
-    <div class="control-group">
-      <label class="control-label">${ _('Archives') }</label>
-      <div class="controls">
-        <table class="table-condensed designTable" data-bind="visible: archives().length > 0">
-          <tbody data-bind="foreach: archives">
-            <tr>
-              <td>
-                <input class="input span5 required pathChooserKo"
-                    data-bind="fileChooser: $data, value: name, uniqueName: false" />
-              </td>
-              <td><a class="btn" href="#" data-bind="click: $root.removeArchive">${ _('Delete') }</a></td>
-            </tr>
-          </tbody>
-        </table>
-        % if len(action_form['archives'].errors):
-          <div class="alert alert-error">
-            ${ unicode(action_form['archives'].errors) | n }
+            <button class="btn" data-bind="click: addPrepareDelete">${ _('Add delete') }</button>
+            <button class="btn" data-bind="click: addPrepareMkdir">${ _('Add mkdir') }</button>
           </div>
-        % endif
-
-        <button class="btn" data-bind="click: addArchive">${ _('Add Archive') }</button>
-       </div>
-    </div>
-    % endif
-    </fieldset>
-
-    <div class="form-actions">
-      <a href="${ url('oozie:edit_workflow', workflow=workflow.id) }" class="btn">${ _('Cancel') }</a>
-      % if can_edit_action:
-        <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
+        </div>
       % endif
-    </div>
-  </form>
+
+      % if 'params' in action_form.fields:
+        <div class="control-group" rel="popover"
+            data-original-title="${ action_form['params'].label }" data-content="${ action_form['params'].help_text }">
+          <label class="control-label">${ _('Params') }</label>
+          <div class="controls">
+            <table class="table-condensed designTable" data-bind="visible: params().length > 0">
+              <thead>
+                <tr>
+                  <th>${ _('Type') }</th>
+                  <th>${ _('Value') }</th>
+                  <th/>
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: params">
+                <tr>
+                  <td>
+                    <span class="span3 required" data-bind="text: type" />
+                  </td>
+                  <td>
+                    <input class="input span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+                  </td>
+                  <td><a class="btn" href="#" data-bind="click: $root.removeParam">${ _('Delete') }</a></td>
+                </tr>
+              </tbody>
+            </table>
+
+            % if len(action_form['params'].errors):
+              <div class="alert alert-error">
+                ${ unicode(action_form['params'].errors) | n }
+              </div>
+            % endif
+
+            <button class="btn" data-bind="click: addParam">${ _('Add Param') }</button>
+            <button class="btn" data-bind="click: addArgument">${ _('Add Argument') }</button>
+          </div>
+        </div>
+      % endif
+
+      % if 'job_properties' in action_form.fields:
+      <div class="control-group" rel="popover"
+          data-original-title="${ action_form['job_properties'].label }" data-content="${ action_form['job_properties'].help_text }">
+        <label class="control-label">${ _('Job Properties') }</label>
+        <div class="controls">
+          <table class="table-condensed designTable" data-bind="visible: properties().length > 0">
+            <thead>
+              <tr>
+                <th>${ _('Property name') }</th>
+                <th>${ _('Value') }</th>
+                <th/>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: properties">
+              <tr>
+                <td><input class="span4 required propKey" data-bind="value: name, uniqueName: false" /></td>
+                <td><input class="span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
+                <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">${ _('Delete') }</a></td>
+              </tr>
+            </tbody>
+          </table>
+          % if len(action_form['job_properties'].errors):
+            <div class="row">
+              <div class="alert alert-error">
+                ${ unicode(action_form['job_properties'].errors) | n }
+              </div>
+            </div>
+          % endif
+
+          <button class="btn" data-bind="click: addProp">${ _('Add Property') }</button>
+        </div>
+      </div>
+      % endif
+
+      % if 'files' in action_form.fields:
+      <div class="control-group" rel="popover"
+        data-original-title="${ action_form['files'].label }" data-content="${ action_form['files'].help_text }">
+          <label class="control-label">${ _('Files') }</label>
+          <div class="controls">
+              <table class="table-condensed designTable" data-bind="visible: files().length > 0">
+                <tbody data-bind="foreach: files">
+                  <tr>
+                    <td><input class="input span5 required pathChooserKo"
+                            data-bind="fileChooser: $data, value: name, uniqueName: false" />
+                    </td>
+                    <td><a class="btn" href="#" data-bind="click: $root.removeFile">${ _('Delete') }</a></td>
+                  </tr>
+                </tbody>
+              </table>
+              % if len(action_form['files'].errors):
+                <div class="alert alert-error">
+                  ${ unicode(action_form['files'].errors) | n }
+                </div>
+              % endif
+
+              <button class="btn" data-bind="click: addFile">${ _('Add File') }</button>
+          </div>
+      </div>
+      % endif
+
+      % if 'archives' in action_form.fields:
+      <div class="control-group" rel="popover"
+          data-original-title="${ action_form['archives'].label }" data-content="${ action_form['archives'].help_text }">
+        <label class="control-label">${ _('Archives') }</label>
+        <div class="controls">
+          <table class="table-condensed designTable" data-bind="visible: archives().length > 0">
+            <tbody data-bind="foreach: archives">
+              <tr>
+                <td>
+                  <input class="input span5 required pathChooserKo"
+                      data-bind="fileChooser: $data, value: name, uniqueName: false" />
+                </td>
+                <td><a class="btn" href="#" data-bind="click: $root.removeArchive">${ _('Delete') }</a></td>
+              </tr>
+            </tbody>
+          </table>
+          % if len(action_form['archives'].errors):
+            <div class="alert alert-error">
+              ${ unicode(action_form['archives'].errors) | n }
+            </div>
+          % endif
+
+          <button class="btn" data-bind="click: addArchive">${ _('Add Archive') }</button>
+         </div>
+      </div>
+      % endif
+      </fieldset>
+
+      <div class="form-actions">
+        <a href="${ url('oozie:edit_workflow', workflow=workflow.id) }" class="btn">${ _('Cancel') }</a>
+        % if can_edit_action:
+          <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
+        % endif
+      </div>
+    </form>
+  </div>
+  <div class="span1"></div>
 </div>
 
 
@@ -437,6 +447,10 @@ ${ layout.menubar(section='workflows') }
     }
 
     $(".propKey").each(addAutoComplete);
+
+    $("*[rel=popover]").popover({
+      placement: 'right'
+    });
   });
 </script>
 

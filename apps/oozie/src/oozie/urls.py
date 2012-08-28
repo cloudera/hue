@@ -30,6 +30,7 @@ urlpatterns = patterns(
   url(r'^delete_workflow/(?P<workflow>\d+)$', 'delete_workflow', name='delete_workflow'),
   url(r'^clone_workflow/(?P<workflow>\d+)$', 'clone_workflow', name='clone_workflow'),
   url(r'^submit_workflow/(?P<workflow>\d+)$', 'submit_workflow', name='submit_workflow'),
+  url(r'^schedule_workflow/(?P<workflow>\d+)$', 'schedule_workflow', name='schedule_workflow'),
   url(r'^resubmit_workflow/(?P<oozie_wf_id>[-\w]+)$', 'resubmit_workflow', name='resubmit_workflow'),
 
   url(r'^new_action/(?P<workflow>\d+)/(?P<node_type>\w+)/(?P<parent_action_id>\d+)$', 'new_action', name='new_action'),
@@ -41,7 +42,7 @@ urlpatterns = patterns(
   url(r'^move_up_action/(?P<action>\d+)$', 'move_up_action', name='move_up_action'),
   url(r'^move_down_action/(?P<action>\d+)$', 'move_down_action', name='move_down_action'),
 
-  url(r'^list_coordinator/$', 'list_workflows', name='list_coordinator', kwargs={'job_type': 'coordinators'}),
+  url(r'^list_coordinators/(?P<workflow_id>[-\w]+)?$', 'list_coordinators', name='list_coordinators'),
   url(r'^create_coordinator/(?P<workflow>[-\w]+)?$', 'create_coordinator', name='create_coordinator'),
   url(r'^edit_coordinator/(?P<coordinator>[-\w]+)$', 'edit_coordinator', name='edit_coordinator'),
   url(r'^delete_coordinator/(?P<coordinator>\d+)$', 'delete_coordinator', name='delete_coordinator'),

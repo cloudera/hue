@@ -128,8 +128,8 @@ ${ layout.menubar(section='workflows') }
 
       <div class="tab-pane" id="properties">
         <div class="row-fluid">
-          <div class="span2"></div>
-          <div class="span10">
+          <div class="span1"></div>
+          <div class="span8">
             <h2>${ _('Properties') }</h2>
             <br/>
               <fieldset>
@@ -147,6 +147,7 @@ ${ layout.menubar(section='workflows') }
             <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
           % endif
         </div>
+        <div class="span3"></div>
       </div>
 
       <div class="tab-pane" id="history">
@@ -163,7 +164,10 @@ ${ layout.menubar(section='workflows') }
           <tbody>
             % for record in history:
               <tr>
-                <td><a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>${ record.submission_date }</td>
+                <td>
+                  <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
+                  ${ utils.format_date(record.submission_date) }
+                </td>
                 <td>${ record.oozie_job_id }</td>
               </tr>
             % endfor
@@ -213,6 +217,10 @@ ${ layout.menubar(section='workflows') }
     ko.applyBindings(window.viewModel);
 
     $("a[data-row-selector='true']").jHueRowSelector();
+
+    $("*[rel=popover]").popover({
+      placement: 'right'
+    });
   });
 </script>
 

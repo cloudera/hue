@@ -17,8 +17,6 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
-
-  from oozie.views import can_access_job, can_edit_job
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -75,16 +73,16 @@ ${ layout.menubar(section='workflows') }
         <tr class="action-row">
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
-              % if can_access_job(currentuser, workflow):
+              % if workflow.is_accessible(currentuser):
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
-                  data-schedule-url="${ url('oozie:create_coordinator', workflow=workflow.id) }"
+                  data-schedule-url="${ url('oozie:schedule_workflow', workflow=workflow.id) }"
               % endif
-              % if can_edit_job(currentuser, workflow):
+              % if workflow.is_editable(currentuser):
                   data-delete-url="${ url('oozie:delete_workflow', workflow=workflow.id) }"
                   data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
               % endif
             />
-            % if can_access_job(currentuser, workflow):
+            % if workflow.is_accessible(currentuser):
               <a href="${ url('oozie:edit_workflow', workflow=workflow.id) }" data-row-selector="true"></a>
             % endif
           </td>

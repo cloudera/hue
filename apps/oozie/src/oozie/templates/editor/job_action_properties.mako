@@ -22,7 +22,8 @@
 
 
 <%def name="print_key_value(label, element, form, initial_parameters)">
-  <div class="control-group ko-${element}">
+  <div class="control-group ko-${element}" rel="popover"
+      data-original-title="${ label }" data-content="${ _('Set some variables of the job (e.g. market=US)') }">
     <label class="control-label">${ label }</label>
     <div class="controls">
       <table class="table-condensed designTable" data-bind="visible: ${ element }().length > 0">
@@ -41,7 +42,7 @@
           </tr>
         </tbody>
       </table>
-      % if len(form[element].errors):
+      % if form[element].errors:
         <div class="row">
           <div class="alert alert-error">
             ${ unicode(form[element].errors) | n }

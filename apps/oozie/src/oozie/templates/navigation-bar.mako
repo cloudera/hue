@@ -27,7 +27,7 @@
       <ul class="nav nav-pills">
         <li class="${utils.is_selected(section, 'dashboard')}"><a href="${url('oozie:list_oozie_workflows')}">${ _('Dashboard') }</a></li>
         <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
-        <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinator')}">${ _('Coordinators') }</a></li>
+        <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>
         <li class="${utils.is_selected(section, 'history')}"><a href="${url('oozie:list_history')}">${ _('History') }</a></li>
       </ul>
     </div>

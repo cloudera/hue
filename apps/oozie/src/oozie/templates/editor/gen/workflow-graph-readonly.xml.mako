@@ -37,7 +37,7 @@ from django.utils.translation import ugettext as _
         ${ hidden }
       % endfor
       <div class="row-fluid">
-          % if node.can_edit():
+          % if node.is_editable():
           <div class="span10 action-link" data-edit="${ node.get_edit_link() }" title="${ _('View') }">
         % else:
           <div class="span10">
@@ -47,7 +47,7 @@ from django.utils.translation import ugettext as _
           <div class="span2"></div>
       </div>
       <div class="row-fluid">
-        % if node.can_edit():
+        % if node.is_editable():
           <div class="span10 action-link" data-edit="${ node.get_edit_link() }" title="${ _('View') }">
         % else:
           <div class="span10">

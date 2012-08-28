@@ -38,6 +38,7 @@ class WorkflowForm(forms.ModelForm):
     widgets = {
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'deployment_dir': forms.TextInput(attrs={'class': 'pathChooser', 'style': "width:535px"}),
+      'parameters': forms.widgets.HiddenInput(),
     }
 
 
@@ -147,7 +148,8 @@ class CoordinatorForm(forms.ModelForm):
     model = Coordinator
     exclude = ('owner', 'schema_version', 'deployment_dir')
     widgets = {
-      'description': forms.TextInput(attrs={'class': 'span5'})
+      'description': forms.TextInput(attrs={'class': 'span5'}),
+      'parameters': forms.widgets.HiddenInput(),
     }
 
 
