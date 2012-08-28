@@ -263,15 +263,40 @@
 
 
 ###########################################################################
-# Settings to configure Oozie
+# Settings to configure liboozie
+###########################################################################
+
+[liboozie]
+  # The URL where the Oozie service runs on. This is required in order for
+  # users to submit jobs.
+  ## oozie_url=http://localhost:11000/oozie
+
+  ## security_enabled=false
+
+
+###########################################################################
+# Settings to configure the Oozie app
 ###########################################################################
 
 [oozie]
-  # The URL where the Oozie service runs on. This is required in order for
-  # users to submit jobs.
-  oozie_url=http://localhost:11000/oozie
+  # Location on local FS where the examples are stored.
+  ## local_data_dir=..../examples
 
-  ## security_enabled=false
+  # Location on local FS where the data for the examples is stored.
+  ## sample_data_dir=...thirdparty/sample_data
+
+  # Location on HDFS where the oozie examples and templates are stored.
+  ## remote_data_dir=/user/hue/oozie/examples
+
+  # Location on HDFS where the workflows/coordinator are deployed when submitted.
+  ## remote_data_dir=/user/hue/oozie/deployments",
+
+  # Share workflows and coordinators information with all users. If set to false,
+  # they will be visible only to the owner and administrators.
+  ## share_jobs=True
+
+  # Maximum of Oozie workflows or coodinators to retrieve in one API call.
+  ## oozie_jobs_count=100
 
 
 ###########################################################################
@@ -309,7 +334,22 @@
 
 
 ###########################################################################
-# Settings to configure Job Browser.
+# Settings to configure Job Designer
+###########################################################################
+
+[jobsub]
+  # Location on HDFS where the jobsub examples and templates are stored.
+  ## remote_data_dir=/user/hue/jobsub
+
+  # Location on local FS where examples and template are stored.
+  ## local_data_dir=..../data
+
+  # Location on local FS where sample data is stored
+  ## sample_data_dir=...thirdparty/sample_data
+
+
+###########################################################################
+# Settings to configure Job Browser
 ###########################################################################
 
 [jobbrowser]

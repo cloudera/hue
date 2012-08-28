@@ -103,6 +103,7 @@ class MockOozieCoordinatorApi(MockOozieApi):
     return 'ONE-OOZIE-ID-C'
 
 # Monkey patch Lib Oozie with Mock API
+oozie_api.OriginalOozieApi = oozie_api.OozieApi
 oozie_api.OozieApi = MockOozieApi
 
 
