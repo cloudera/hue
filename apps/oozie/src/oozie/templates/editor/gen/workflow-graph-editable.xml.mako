@@ -37,7 +37,7 @@
           ${ hidden }
         % endfor
         <div class="row-fluid">
-            % if node.can_edit():
+            % if node.is_editable():
             <div class="span10 action-link" data-edit="${ node.get_edit_link() }" title="${ _('Edit') }">
           % else:
             <div class="span10">
@@ -47,7 +47,7 @@
             <div class="span2"></div>
         </div>
         <div class="row-fluid">
-          % if node.can_edit():
+          % if node.is_editable():
             <div class="span10 action-link" data-edit="${ node.get_edit_link() }" title="${ _('Edit') }">
           % else:
             <div class="span10">

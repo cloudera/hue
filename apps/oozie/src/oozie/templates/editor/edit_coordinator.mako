@@ -213,7 +213,7 @@ ${ layout.menubar(section='coordinators') }
             % endif
           </div>
 
-          <div class="span10">
+          <div class="span9">
             % if coordinator.id:
               <div>
                 <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
@@ -286,11 +286,16 @@ ${ layout.menubar(section='coordinators') }
           </thead>
           <tbody>
             % if not history:
-              ${ _('N/A') }
+              <tr>
+                <td>${ _('N/A') }</td><td></td>
+              </tr>
             % endif
             % for record in history:
                 <tr>
-                  <td><a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>${ record.submission_date }</td>
+                  <td>
+                    <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
+                    ${ utils.format_date(record.submission_date) }
+                  </td>
                   <td>${ record.oozie_job_id }</td>
                 </tr>
             % endfor
@@ -303,7 +308,7 @@ ${ layout.menubar(section='coordinators') }
   </div>
 
   <div class="form-actions center">
-    <a href="${ url('oozie:list_coordinator') }" class="btn">${ _('Back') }</a>
+    <a href="${ url('oozie:list_coordinators') }" class="btn">${ _('Back') }</a>
     % if can_edit_coordinator:
       <input class="btn btn-primary" data-bind="click: submit" type="submit" value="${ _('Save') }"></input>
     % endif
@@ -390,9 +395,13 @@ ${ layout.menubar(section='coordinators') }
     $("a[data-row-selector='true']").jHueRowSelector();
 
     ko.applyBindings(window.viewModel);
+
+    $("*[rel=popover]").popover({
+      placement: 'right'
+    });
  });
 </script>
 
 % endif
 
-${commonfooter(messages)}
+${ commonfooter(messages) }

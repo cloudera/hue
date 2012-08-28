@@ -17,8 +17,6 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
-
-  from oozie.views import can_access_job, can_edit_job
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -72,17 +70,17 @@ ${ layout.menubar(section='coordinators') }
         <tr class="action-row">
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
-              % if can_edit_job(currentuser, coordinator):
+              % if coordinator.is_editable(currentuser):
                   data-delete-url="${ url('oozie:delete_coordinator', coordinator=coordinator.id) }"
               % endif
-              % if can_access_job(currentuser, coordinator):
+              % if coordinator.is_accessible(currentuser):
                   data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }"
                   data-bundle-url="${ url('oozie:create_coordinator') }"
                   data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }"
               % endif
               >
             </input>
-            % if can_access_job(currentuser, coordinator):
+            % if coordinator.is_accessible(currentuser):
               <a href="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" data-row-selector="true"/>
             % endif
           </td>

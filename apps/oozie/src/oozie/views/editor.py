@@ -20,7 +20,6 @@ try:
 except ImportError:
   import simplejson as json
 import logging
-import re
 
 
 from django.core.urlresolvers import reverse
@@ -35,17 +34,15 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render, PopupException, extract_field_data
 from desktop.lib.rest.http_client import RestException
-from desktop.log.access import access_warn
 from hadoop.fs.exceptions import WebHdfsException
-from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction,\
-  OozieJavaAction
+from jobsub.models import OozieDesign
 from liboozie.submittion import Submission
 
 from oozie.conf import SHARE_JOBS
 from oozie.import_jobsub import convert_jobsub_design
 from oozie.management.commands import oozie_setup
-from oozie.models import Workflow, Node, Link, History, Coordinator,\
-  Mapreduce, Java, Streaming, Dataset, DataInput, DataOutput, Job,\
+from oozie.models import Job, Workflow, Node, Link, History, Coordinator,\
+  Mapreduce, Java, Streaming, Dataset, DataInput, DataOutput,\
   _STD_PROPERTIES_JSON
 from oozie.forms import NodeForm, WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataInputSetForm, DataOutputForm, DataOutputSetForm, LinkForm,\
@@ -54,37 +51,6 @@ from oozie.forms import NodeForm, WorkflowForm, CoordinatorForm, DatasetForm,\
 
 LOG = logging.getLogger(__name__)
 
-
-"""
-Permissions:
-
-A Workflow/Coordinator can be accessed/submitted by its owner, a superuser or by anyone if its 'is_shared'
-property and SHARE_JOBS are set to True.
-
-A Workflow/Coordinator can be modified only by its owner or a superuser.
-
-Permissions checking happens by adding the decorators.
-"""
-def can_access_job(user, job):
-  return user.is_superuser or job.owner == user or (SHARE_JOBS.get() and job.is_shared)
-
-
-def can_access_job_or_exception(request, job_id):
-  if job_id is None:
-    return
-  try:
-    job = Job.objects.select_related().get(pk=job_id).get_full_node()
-    if can_access_job(request.user, job):
-      return job
-    else:
-      message = _("Permission denied. %(username)s don't have the permissions to access job %(id)s") % \
-          {'username': request.user.username, 'id': job.id}
-      access_warn(request, message)
-      request.error(message)
-      raise PopupException(message)
-
-  except Job.DoesNotExist:
-    raise PopupException(_('job %(id)s not exist') % {'id': job_id})
 
 
 def check_job_access_permission(view_func):
@@ -104,23 +70,11 @@ def check_job_access_permission(view_func):
 
     job = kwargs.get(job_type)
     if job is not None:
-      job = can_access_job_or_exception(request, job)
+      job = Job.objects.is_accessible_or_exception(request, job)
     kwargs[job_type] = job
 
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
-
-
-def can_edit_job(user, job):
-  """Only owners or admins can modify a job."""
-  return user.is_superuser or job.owner == user
-
-
-def can_edit_job_or_exception(request, job):
-  if can_edit_job(request.user, job):
-    return True
-  else:
-    raise PopupException('Not allowed to modified this job')
 
 
 def check_job_edition_permission(authorize_get=False):
@@ -138,7 +92,7 @@ def check_job_edition_permission(authorize_get=False):
 
       job = kwargs.get(job_type)
       if job is not None and not (authorize_get and request.method == 'GET'):
-        can_edit_job_or_exception(request, job)
+        Job.objects.can_edit_or_exception(request, job)
 
       return view_func(request, *args, **kwargs)
     return wraps(view_func)(decorate)
@@ -157,7 +111,7 @@ def check_action_access_permission(view_func):
   def decorate(request, *args, **kwargs):
     action_id = kwargs.get('action')
     action = Node.objects.get(id=action_id).get_full_node()
-    can_access_job_or_exception(request, action.workflow.id)
+    Job.objects.is_accessible_or_exception(request, action.workflow.id)
     kwargs['action'] = action
 
     return view_func(request, *args, **kwargs)
@@ -172,46 +126,10 @@ def check_action_edition_permission(view_func):
   """
   def decorate(request, *args, **kwargs):
     action = kwargs.get('action')
-    can_edit_job_or_exception(request, action.workflow)
+    Job.objects.can_edit_or_exception(request, action.workflow)
 
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
-
-
-def can_access_dataset_or_exception(request, dataset_id):
-  if dataset_id is None:
-    return
-  try:
-    dataset = Dataset.objects.get(pk=dataset_id)
-    if can_access_job(request.user, dataset.coordinator):
-      return dataset
-    else:
-      message = _("Permission denied. %(username)s don't have the permissions to access dataset %(id)s") % \
-          {'username': request.user.username, 'id': dataset.id}
-      access_warn(request, message)
-      request.error(message)
-      raise PopupException(message)
-
-  except Dataset.DoesNotExist:
-    raise PopupException(_('dataset %(id)s not exist') % {'id': dataset_id})
-
-
-def check_dataset_edition_permission(authorize_get=False):
-  """
-  Decorator ensuring that the user has the permissions to modify a dataset.
-  A dataset can be edited if the coordinator that owns the dataset can be edited.
-
-  Need to appear below @check_dataset_access_permission
-  """
-  def inner(view_func):
-    def decorate(request, *args, **kwargs):
-      dataset = kwargs.get('dataset')
-      if dataset is not None and not (authorize_get and request.method == 'GET'):
-        can_edit_job_or_exception(request, dataset.coordinator)
-
-      return view_func(request, *args, **kwargs)
-    return wraps(view_func)(decorate)
-  return inner
 
 
 def check_dataset_access_permission(view_func):
@@ -226,22 +144,34 @@ def check_dataset_access_permission(view_func):
   def decorate(request, *args, **kwargs):
     dataset = kwargs.get('dataset')
     if dataset is not None:
-      dataset = can_access_dataset_or_exception(request, dataset)
+      dataset = Dataset.objects.is_accessible_or_exception(request, dataset)
     kwargs['dataset'] = dataset
 
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
 
 
-def list_workflows(request, job_type='workflow'):
-  show_setup_app = True
+def check_dataset_edition_permission(authorize_get=False):
+  """
+  Decorator ensuring that the user has the permissions to modify a dataset.
+  A dataset can be edited if the coordinator that owns the dataset can be edited.
 
-  if job_type == 'coordinators':
-    data = Coordinator.objects
-    template = "editor/list_coordinators.mako"
-  else:
-    data = Workflow.objects
-    template = "editor/list_workflows.mako"
+  Need to appear below @check_dataset_access_permission
+  """
+  def inner(view_func):
+    def decorate(request, *args, **kwargs):
+      dataset = kwargs.get('dataset')
+      if dataset is not None and not (authorize_get and request.method == 'GET'):
+        Job.objects.can_edit_or_exception(request, dataset.coordinator)
+
+      return view_func(request, *args, **kwargs)
+    return wraps(view_func)(decorate)
+  return inner
+
+
+def list_workflows(request):
+  show_setup_app = True
+  data = Workflow.objects
 
   if not SHARE_JOBS.get() and not request.user.is_superuser:
     data = data.filter(owner=request.user)
@@ -250,7 +180,28 @@ def list_workflows(request, job_type='workflow'):
 
   data = data.order_by('-last_modified')
 
-  return render(template, request, {
+  return render('editor/list_workflows.mako', request, {
+    'jobs': list(data),
+    'currentuser': request.user,
+    'show_setup_app': show_setup_app,
+  })
+
+
+def list_coordinators(request, workflow_id=None):
+  show_setup_app = True
+
+  data = Coordinator.objects
+  if workflow_id is not None:
+    data = data.filter(workflow__id=workflow_id)
+
+  if not SHARE_JOBS.get() and not request.user.is_superuser:
+    data = data.filter(owner=request.user)
+  else:
+    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
+
+  data = data.order_by('-last_modified')
+
+  return render('editor/list_coordinators.mako', request, {
     'jobs': list(data),
     'currentuser': request.user,
     'show_setup_app': show_setup_app,
@@ -279,9 +230,9 @@ def create_workflow(request):
 @check_job_access_permission
 def edit_workflow(request, workflow):
   WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeForm, max_num=0, can_order=False, can_delete=False)
-  history = History.objects.filter(submitter=request.user, job=workflow)
+  history = History.objects.filter(submitter=request.user, job=workflow).order_by('-submission_date')
 
-  if request.method == 'POST' and can_edit_job_or_exception(request, workflow):
+  if request.method == 'POST' and Job.objects.can_edit_or_exception(request, workflow):
     try:
       workflow_form = WorkflowForm(request.POST, instance=workflow)
       actions_formset = WorkflowFormSet(request.POST, request.FILES, instance=workflow)
@@ -306,7 +257,7 @@ def edit_workflow(request, workflow):
   actions_formset = WorkflowFormSet(instance=workflow)
 
   graph_options = {}
-  user_can_edit_job = can_edit_job(request.user, workflow)
+  user_can_edit_job = workflow.is_editable(request.user)
   if not user_can_edit_job:
     graph_options = {'template': 'editor/gen/workflow-graph-readonly.xml.mako'}
 
@@ -397,7 +348,7 @@ def resubmit_workflow(request, oozie_wf_id):
     raise PopupException(_('A POST request is required.'))
 
   history = History.objects.get(oozie_job_id=oozie_wf_id)
-  can_access_job_or_exception(request, history.job.id)
+  Job.objects.is_accessible_or_exception(request, history.job.id)
 
   workflow = history.get_workflow().get_full_node()
   properties = history.properties_dict
@@ -405,6 +356,15 @@ def resubmit_workflow(request, oozie_wf_id):
 
   request.info(_('Workflow re-submitted'))
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
+
+
+@check_job_access_permission
+def schedule_workflow(request, workflow):
+  if Coordinator.objects.filter(workflow=workflow).exists():
+    request.info(_('You already have some coordinators for this workflow. Please submit one or create a new one.'))
+    return list_coordinators(request, workflow_id=workflow.id)
+  else:
+    return create_coordinator(request, workflow=workflow.id)
 
 
 @check_job_access_permission
@@ -447,7 +407,7 @@ def new_action(request, workflow, node_type, parent_action_id):
 def edit_action(request, action):
   ActionForm = design_form_by_type(action.node_type)
 
-  if request.method == 'POST' and can_edit_job_or_exception(request, action.workflow):
+  if request.method == 'POST' and Job.objects.can_edit_or_exception(request, action.workflow):
     action_form = ActionForm(request.POST, instance=action)
     if action_form.is_valid():
       action = action_form.save()
@@ -466,7 +426,7 @@ def edit_action(request, action):
     'node_type': action.node_type,
     'properties_hint': _STD_PROPERTIES_JSON,
     'form_url': reverse('oozie:edit_action', kwargs={'action': action.id}),
-    'can_edit_action': can_edit_job(request.user, action.workflow)
+    'can_edit_action': action.workflow.is_editable(request.user)
   })
 
 
@@ -616,13 +576,13 @@ def delete_coordinator(request, coordinator):
   Submission(request.user, coordinator, request.fs, {}).remove_deployment_dir()
   request.info(_('Coordinator deleted!'))
 
-  return redirect(reverse('oozie:list_coordinator'))
+  return redirect(reverse('oozie:list_coordinators'))
 
 
 @check_job_access_permission
 @check_job_edition_permission(True)
 def edit_coordinator(request, coordinator):
-  history = History.objects.filter(submitter=request.user, job=coordinator)
+  history = History.objects.filter(submitter=request.user, job=coordinator).order_by('-submission_date')
 
   DatasetFormSet = inlineformset_factory(Coordinator, Dataset, form=DatasetForm, max_num=0, can_order=False, can_delete=True)
   DataInputFormSet = inlineformset_factory(Coordinator, DataInput, form=DataInputSetForm, max_num=0, can_order=False, can_delete=True)
@@ -672,7 +632,7 @@ def edit_coordinator(request, coordinator):
     'new_data_input_formset': new_data_input_formset,
     'new_data_output_formset': new_data_output_formset,
     'history': history,
-    'can_edit_coordinator': can_edit_job(request.user, coordinator.workflow),
+    'can_edit_coordinator': coordinator.workflow.is_editable(request.user),
     'parameters': extract_field_data(coordinator_form['parameters'])
   })
 
@@ -829,7 +789,7 @@ def resubmit_coordinator(request, oozie_coord_id):
     raise PopupException(_('A POST request is required.'))
 
   history = History.objects.get(oozie_job_id=oozie_coord_id)
-  can_access_job_or_exception(request, history.job.id)
+  Job.objects.is_accessible_or_exception(request, history.job.id)
 
   coordinator = history.get_coordinator().get_full_node()
   properties = history.properties_dict

@@ -138,15 +138,16 @@
 
 
 <%def name="render_field(field, show_label=True)">
-  %if not field.is_hidden:
-    <% group_class = len(field.errors) and "error" or "" %>
-    <div class="control-group ${group_class}">
+  % if not field.is_hidden:
+    <% group_class = field.errors and "error" or "" %>
+    <div class="control-group ${group_class}"
+      rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
       % if show_label:
         <label class="control-label">${ field.label | n }</label>
       % endif
       <div class="controls">
         ${ field }
-        % if len(field.errors):
+        % if field.errors:
           <span class="help-inline">${ unicode(field.errors) | n }</span>
         % endif
       </div>

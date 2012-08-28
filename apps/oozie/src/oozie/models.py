@@ -31,14 +31,16 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+from desktop.log.access import access_warn
 from desktop.lib import django_mako
+from desktop.lib.django_util import PopupException
 from hadoop.fs.exceptions import WebHdfsException
 
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 
 from oozie.management.commands import oozie_setup
-from oozie.conf import REMOTE_SAMPLE_DIR
+from oozie.conf import REMOTE_SAMPLE_DIR, SHARE_JOBS
 from timezones import TIMEZONES
 
 
@@ -50,23 +52,62 @@ name_validator = RegexValidator(regex='[a-zA-Z_][\-_a-zA-Z0-9]{1,39}',
                                 message=_('Please enter a valid value: 40 alphanum chars starting by an alpha'))
 
 
+"""
+Permissions:
+
+A Workflow/Coordinator can be accessed/submitted by its owner, a superuser or by anyone if its 'is_shared'
+property and SHARE_JOBS are set to True.
+
+A Workflow/Coordinator can be modified only by its owner or a superuser.
+
+Permissions checking happens by adding the decorators.
+"""
+class JobManager(models.Manager):
+  def is_accessible_or_exception(self, request, job_id):
+    if job_id is None:
+      return
+    try:
+      job = Job.objects.select_related().get(pk=job_id).get_full_node()
+      if job.is_accessible(request.user):
+        return job
+      else:
+        message = _("Permission denied. %(username)s don't have the permissions to access job %(id)s") % \
+            {'username': request.user.username, 'id': job.id}
+        access_warn(request, message)
+        request.error(message)
+        raise PopupException(message)
+
+    except Job.DoesNotExist:
+      raise PopupException(_('job %(id)s not exist') % {'id': job_id})
+
+  def can_edit_or_exception(self, request, job):
+    if job.is_editable(request.user):
+      return True
+    else:
+      raise PopupException(_('Not allowed to modified this job'))
+
+
 class Job(models.Model):
   """
   Base class for Workflows and Coordinators.
 
   http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/index.html
   """
-  owner = models.ForeignKey(User, db_index=True)
+  owner = models.ForeignKey(User, db_index=True, help_text=_('Person who can modify the job.'))
   name = models.CharField(max_length=40, blank=False, validators=[name_validator],
-      help_text=_('Name of the design, which must be unique per user'))
-  description = models.CharField(max_length=1024, blank=True)
+      help_text=_('Name of the job, which must be unique per user.'))
+  description = models.CharField(max_length=1024, blank=True, help_text=_('What is the purpose of the job.'))
   last_modified = models.DateTimeField(auto_now=True, db_index=True)
   schema_version = models.CharField(max_length=128, blank=True, default='')
-  deployment_dir = models.CharField(max_length=1024, blank=True, verbose_name=_('HDFS deployment directory'))
-  is_shared = models.BooleanField(default=False, db_index=True)
+  deployment_dir = models.CharField(max_length=1024, blank=True, verbose_name=_('HDFS deployment directory.'),
+                                    help_text=_('The path on the HDFS where all the workflows and '
+                                                'dependencies must be uploaded.'))
+  is_shared = models.BooleanField(default=False, db_index=True,
+                                  help_text=_('Check if you want to have some other users to have access to this job.'))
   parameters = models.TextField(default='[]',
-                                help_text=_t('Configuration parameters (e.g. market=US)'))
+                                help_text=_t('Set some variables of the job (e.g. market=US)'))
 
+  objects = JobManager()
   unique_together = ('owner', 'name')
 
   def save(self):
@@ -116,6 +157,13 @@ class Job(models.Model):
 
     return  [{'name': name, 'value': value} for name, value in params.iteritems()]
 
+  def is_accessible(self, user):
+    return user.is_superuser or self.owner == user or (SHARE_JOBS.get() and self.is_shared)
+
+  def is_editable(self, user):
+    """Only owners or admins can modify a job."""
+    return user.is_superuser or self.owner == user
+
 
 class WorkflowManager(models.Manager):
   def new_workflow(self, owner):
@@ -160,7 +208,7 @@ class Workflow(Job):
   is_single = models.BooleanField(default=False)
   start = models.ForeignKey('Start', related_name='start_workflow', blank=True, null=True)
   end  = models.ForeignKey('End', related_name='end_workflow',  blank=True, null=True)
-
+  # jobxml
   objects = WorkflowManager()
 
   HUE_ID = 'hue-id-w'
@@ -513,9 +561,10 @@ class Node(models.Model):
   """
   PARAM_FIELDS = ()
 
-  name = models.CharField(max_length=40, validators=[name_validator])
-  description = models.CharField(max_length=1024, blank=True, default='')
-  node_type = models.CharField(max_length=64, blank=False)
+  name = models.CharField(max_length=40, validators=[name_validator],
+                          help_text=_('Name of the action, it must be unique by workflow.'))
+  description = models.CharField(max_length=1024, blank=True, default='', help_text=_('What is the purpose of this action.'))
+  node_type = models.CharField(max_length=64, blank=False, help_text=_('The type of action (e.g. MapReduce, Pig...)'))
   workflow = models.ForeignKey(Workflow)
   children = models.ManyToManyField('self', related_name='parents', symmetrical=False, through=Link)
 
@@ -623,7 +672,7 @@ class Node(models.Model):
     copy.save()
     return copy
 
-  def can_edit(self):
+  def is_editable(self):
     return False
 
   def can_move(self):
@@ -654,13 +703,13 @@ class Action(Node):
     # Cloning does not work anymore if not abstract
     abstract = True
 
-  def can_edit(self):
+  def is_editable(self):
     return True
 
   def get_edit_link(self):
     return reverse('oozie:edit_action', kwargs={'action': self.id})
 
-
+# The fields with '[]' as default value are JSON dictionaries
 # When adding a new action, also update
 #  - Action.types below
 #  - Node.get_full_node()
@@ -670,13 +719,19 @@ class Mapreduce(Action):
   node_type = 'mapreduce'
 
   files = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text=_t('List of paths to files to be added to the distributed cache'))
+      help_text=_t('List of names or paths of files to be added to the distributed cache. '
+                   'To force a symlink for a file on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'mycat.sh#cat\'.'))
   archives = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text=_t('List of paths to archives to be added to the distributed cache'))
-  job_properties = models.TextField(default='[]', # JSON dict
-                                    help_text=_t('For the job configuration (e.g. mapred.mapper.class)'))
-  jar_path = models.CharField(max_length=PATH_MAX, help_text=_t('Path to jar files on HDFS'))
-  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete of create before starting the job'))
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
+                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+  job_properties = models.TextField(default='[]',
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
+  jar_path = models.CharField(max_length=PATH_MAX,
+                              help_text=_t('Local or absolute path to the %(program)s jar file on HDFS') % {'program': 'MapReduce'})
+  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete or create before starting the application. '
+                                                         'This should be used exclusively for directory cleanup'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -695,12 +750,20 @@ class Streaming(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'mapper', 'reducer')
   node_type = "streaming"
 
-  files = models.CharField(max_length=PATH_MAX, default="[]")
-  archives = models.CharField(max_length=PATH_MAX, default="[]")
-  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', # JSON dict
-                                    help_text=_t('For the job configuration (e.g. mapred.mapper.class)'))
-  mapper = models.CharField(max_length=PATH_MAX, blank=False)
-  reducer = models.CharField(max_length=PATH_MAX, blank=False)
+  files = models.CharField(max_length=PATH_MAX, default="[]",
+      help_text=_t('List of names or paths of files to be added to the distributed cache. '
+                   'To force a symlink for a file on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'mycat.sh#cat\'.'))
+  archives = models.CharField(max_length=PATH_MAX, default="[]",
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
+                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]',
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+  mapper = models.CharField(max_length=PATH_MAX, blank=False,
+                            help_text=_t('The mapper element is used to specify the executable/script to be used as mapper.'))
+  reducer = models.CharField(max_length=PATH_MAX, blank=False,
+                             help_text=_t('The reducer element is used to specify the executable/script to be used as reducer.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -718,16 +781,28 @@ class Java(Action):
   node_type = "java"
 
   files = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text=_t('List of paths to files to be added to the distributed cache'))
+      help_text=_t('List of names or paths of files to be added to the distributed cache. '
+                   'To force a symlink for a file on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'mycat.sh#cat\'.'))
   archives = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text=_t('List of paths to archives to be added to the distributed cache'))
-  jar_path = models.CharField(max_length=PATH_MAX, blank=False)
-  main_class = models.CharField(max_length=256, blank=False)
-  args = models.CharField(max_length=4096, blank=True)
-  java_opts = models.CharField(max_length=256, blank=True)
-  job_properties = models.TextField(default='[]', # JSON dict
-                                    help_text=_t('For the job configuration (e.g. mapred.mapper.class)'))
-  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete of create before starting the job'))
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
+                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+  jar_path = models.CharField(max_length=PATH_MAX, blank=False,
+                              help_text=_t('Local or absolute path to the %(program)s jar file on HDFS') % {'program': 'Java'})
+  main_class = models.CharField(max_length=256, blank=False,
+                                help_text=_t('Full name of the Java class. e.g. org.apache.hadoop.examples.Grep'))
+  args = models.CharField(max_length=4096, blank=True,
+                          help_text=_t('Arguments of the main method. The value of each arg element is considered a single argument '
+                                       'and they are passed to the main method in the same order.'))
+  java_opts = models.CharField(max_length=256, blank=True,
+                               help_text=_t('Command line parameters which are to be used to start the JVM that will execute '
+                                            'the Java application. Using this element is equivalent to use the mapred.child.java.opts '
+                                            'configuration property'))
+  job_properties = models.TextField(default='[]',
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete or create before starting the application. '
+                                                         'This should be used exclusively for directory cleanup'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -746,16 +821,21 @@ class Pig(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
   node_type = 'pig'
 
-  script_path = models.CharField(max_length=256, blank=False, help_text=_t('Local path'))
-  params = models.TextField(default="[]", help_text=_t('The Pig parameters of the script'))
+  script_path = models.CharField(max_length=256, blank=False, help_text=_t('Local path to the Pig script. e.g. my_script.pig'))
+  params = models.TextField(default="[]", help_text=_t('The Pig parameters of the script. e.g. "-param", "INPUT=${inputDir}"'))
 
   files = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text=_t('List of paths to files to be added to the distributed cache'))
+      help_text=_t('List of names or paths of files to be added to the distributed cache. '
+                   'To force a symlink for a file on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'mycat.sh#cat\'.'))
   archives = models.CharField(max_length=PATH_MAX, default="[]",
-      help_text=_t('List of paths to archives to be added to the distributed cache'))
-  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', # JSON dict
-                                    help_text=_t('For the job configuration (e.g. mapred.mapper.class)'))
-  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete of create before starting the job'))
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
+                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]',
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete or create before starting the application. '
+                                                         'This should be used exclusively for directory cleanup'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -827,7 +907,7 @@ class Fork(ControlFlow):
   def get_child_join(self):
     return Link.objects.get(parent=self, name='related').child.get_full_node()
 
-  def can_edit(self):
+  def is_editable(self):
     return True
 
   def get_edit_link(self):
@@ -880,12 +960,19 @@ class Coordinator(Job):
   """
   http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/CoordinatorFunctionalSpec.html
   """
-  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS)
-  frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days')
-  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles')
-  start = models.DateTimeField(default=datetime(2012, 07, 01, 0, 0))
-  end = models.DateTimeField(default=datetime(2012, 07, 01, 0, 0) + timedelta(days=3))
-  workflow = models.ForeignKey(Workflow, null=True)
+  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS,
+                                              help_text=_t('It represents the number of units of the rate at which '
+                                                           'data is periodically created.'))
+  frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days',
+                                    help_text=_t('It represents the unit of the rate at which data is periodically created.'))
+  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles',
+                              help_text=_t('The timezone of the Coordinator.'))
+  start = models.DateTimeField(default=datetime.today(),
+                               help_text=_t('When we need to start the first workflow.'))
+  end = models.DateTimeField(default=datetime.today() + timedelta(days=3),
+                             help_text=_t('When we need to start the last workflow.'))
+  workflow = models.ForeignKey(Workflow, null=True,
+                               help_text=_t('The corresponding workflow we want to schedule repeatedly.'))
 
   HUE_ID = 'hue-id-w'
 
@@ -978,17 +1065,52 @@ def utc_datetime_format(utc_time):
   return utc_time.strftime("%Y-%m-%dT%H:%MZ")
 
 
-class Dataset(models.Model):
-  name = models.CharField(max_length=40, validators=[name_validator])
-  description = models.CharField(max_length=1024, blank=True, default='')
-  start = models.DateTimeField(default=datetime.today())
-  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS)
-  frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days')
-  uri = models.CharField(max_length=1024, default='/data/${YEAR}${MONTH}${DAY}')
-  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles')
-  done_flag = models.CharField(max_length=64, blank=True, default='')
-  coordinator = models.ForeignKey(Coordinator)
+class DatasetManager(models.Manager):
+  def is_accessible_or_exception(self, request, dataset_id):
+    if dataset_id is None:
+      return
+    try:
+      dataset = Dataset.objects.get(pk=dataset_id)
+      if dataset.coordinator.is_accessible(request.user):
+        return dataset
+      else:
+        message = _("Permission denied. %(username)s don't have the permissions to access dataset %(id)s") % \
+            {'username': request.user.username, 'id': dataset.id}
+        access_warn(request, message)
+        request.error(message)
+        raise PopupException(message)
 
+    except Dataset.DoesNotExist:
+      raise PopupException(_('dataset %(id)s not exist') % {'id': dataset_id})
+
+
+class Dataset(models.Model):
+  name = models.CharField(max_length=40, validators=[name_validator],
+                          help_text=_t('The name of the dataset.)'))
+  description = models.CharField(max_length=1024, blank=True, default='',
+                                 help_text=_t('More details about the dataset.'))
+  start = models.DateTimeField(default=datetime.today(),
+                               help_text=_t(' The UTC datetime of the initial instance of the dataset. The initial-instance also provides '
+                                            'the baseline datetime to compute instances of the dataset using multiples of the frequency.'))
+  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS,
+                                              help_text=_t('It represents the number of units of the rate at which '
+                                                           'data is periodically created.'))
+  frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days',
+                                    help_text=_t('It represents the unit of the rate at which data is periodically created.'))
+  uri = models.CharField(max_length=1024, default='/data/${YEAR}${MONTH}${DAY}',
+                         help_text=_t('The URI template that identifies the dataset and can be resolved into concrete URIs to identify a particular '
+                                      'dataset instance. The URI consist of constants (e.g. ${YEAR}/${MONTH}) and '
+                                      'configuration properties (e.g. Ex: ${YEAR}/${MONTH})'))
+  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles',
+                              help_text=_t('The timezone of the dataset.'))
+  done_flag = models.CharField(max_length=64, blank=True, default='',
+                               help_text=_t(' The done file for the data set. If done-flag is not specified, then Oozie '
+                                            'configures Hadoop to create a _SUCCESS file in the output directory. If the done '
+                                            'flag is set to empty, then Coordinator looks for the existence of the directory itself.'))
+  coordinator = models.ForeignKey(Coordinator,
+                                  help_text=_t('The coordinator associated with this data.'))
+
+  objects = DatasetManager()
   unique_together = ('coordinator', 'name')
 
   def __unicode__(self):
@@ -1008,16 +1130,20 @@ class Dataset(models.Model):
 
 
 class DataInput(models.Model):
-  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_('Name of an input variable in the workflow'))
-  dataset = models.OneToOneField(Dataset, verbose_name=_('Pick the dataset representing format of the data input'))
+  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_('Name of an input variable in the workflow'),
+                          help_text=_t('The name of the variable of the workflow to automatically filled up.'))
+  dataset = models.OneToOneField(Dataset, verbose_name=_('Pick the dataset representing format of the data input'),
+                                 help_text=_t('The pattern of the input data we want to process.'))
   coordinator = models.ForeignKey(Coordinator)
 
   unique_together = ('coordinator', 'name')
 
 
 class DataOutput(models.Model):
-  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_('Name of an output variable in the workflow'))
-  dataset = models.OneToOneField(Dataset, verbose_name=_('Pick the dataset representing the format of the data output'))
+  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_('Name of an output variable in the workflow'),
+                          help_text=_t('The name of the variable of the workflow to automatically filled up.'))
+  dataset = models.OneToOneField(Dataset, verbose_name=_('Pick the dataset representing the format of the data output'),
+                                 help_text=_t('The pattern of the output data we want to generate.'))
   coordinator = models.ForeignKey(Coordinator)
 
   unique_together = ('coordinator', 'name')
