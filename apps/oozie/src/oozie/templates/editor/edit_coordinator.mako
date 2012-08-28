@@ -132,7 +132,7 @@ ${ layout.menubar(section='coordinators') }
               <h3>${ _('Inputs') }</h3>
 
               % if data_input_formset.forms:
-                <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+                <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_input_missing">
                   <thead>
                     <tr>
                       <th width="10%">${ _('Name') }</th>
@@ -151,18 +151,21 @@ ${ layout.menubar(section='coordinators') }
                          <td>${ form['dataset'] }</td>
                          <td>${ form['dataset'].form.instance.dataset.uri }</td>
                          % if can_edit_coordinator:
-                           <td>${ form['DELETE'] }</td>
+                           <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] }</a></td>
                          % endif
                       </tr>
                     % endfor
                   </tbody>
                 </table>
-              % else:
-                <br/>
-                <div class="alert alert-error">
-                  ${ _('No inputs') }
-                </div>
               % endif
+              <br/>
+              <div id="dataset_input_missing" data-missing-bind="true" class="alert alert-error
+                % if data_input_formset.forms:
+                  hide
+                % endif
+              ">
+                ${ _('No inputs') }
+              </div>
 
               % if can_edit_coordinator:
                 ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_input', new_data_input_formset, 'input', not len(data_input_formset.forms)) }
@@ -176,7 +179,7 @@ ${ layout.menubar(section='coordinators') }
             <div class="row-fluid">
               <h3>${ _('Outputs') }</h3>
               % if data_output_formset.forms:
-              <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+              <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_output_missing">
                 <thead>
                   <tr>
                     <th width="10%">${ _('Name') }</th>
@@ -195,18 +198,21 @@ ${ layout.menubar(section='coordinators') }
                       <td>${ form['dataset'] }</td>
                       <td>${ form['dataset'].form.instance.dataset.uri }</td>
                       % if can_edit_coordinator:
-                        <td>${ form['DELETE'] }</td>
+                        <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] }</a></td>
                       % endif
                     </tr>
                   % endfor
                 </tbody>
               </table>
-              % else:
-                <br/>
-                <div class="alert alert-error">
-                  ${ _('No outputs') }
-                </div>
               % endif
+              <br/>
+              <div id="dataset_output_missing" data-missing-bind="true" class="alert alert-error
+                % if data_output_formset.forms:
+                  hide
+                % endif
+              ">
+                ${ _('No outputs') }
+              </div>
 
               % if can_edit_coordinator:
                 ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_output', new_data_output_formset, 'output', not len(data_output_formset.forms)) }
@@ -221,7 +227,7 @@ ${ layout.menubar(section='coordinators') }
       <div class="row-fluid">
           <div class="span1">
             % if can_edit_coordinator:
-              <table>
+              <table cellpadding="5">
                 <thead>
                   <tr>
                     <th>${ _('Add a new dataset') }</th>
@@ -229,7 +235,10 @@ ${ layout.menubar(section='coordinators') }
                 </thead>
                 <tbody>
                   <tr>
-                    <td><br/><a class="btn" data-toggle="modal" href="#add-dataset-modal">${ _('Create') }</a></td>
+                    <td class="alert-error"><b>Warning</b>: Save your coordinator before creating a new dataset!</td>
+                  </tr>
+                  <tr>
+                    <td><a class="btn" data-toggle="modal" href="#add-dataset-modal">${ _('Create') }</a></td>
                   </tr>
                 </tbody>
               </table>
@@ -239,7 +248,7 @@ ${ layout.menubar(section='coordinators') }
           <div class="span9">
             % if coordinator.id:
               <div>
-                <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+                <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_missing">
                   <thead>
                     <tr>
                       <th>${ _('Name') }</th>
@@ -274,7 +283,9 @@ ${ layout.menubar(section='coordinators') }
                       <td>${ form.instance.timezone }</td>
                       <td>${ form.instance.done_flag }</td>
                       % if can_edit_coordinator:
-                        <td>${ form['DELETE'] }</td>
+                        <td data-row-selector-exclude="true">
+                          <a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] }</a>
+                        </td>
                       % endif
                     </tr>
 
@@ -289,11 +300,13 @@ ${ layout.menubar(section='coordinators') }
                   </tbody>
                 </table>
               </div>
-              % if not dataset_formset.forms:
-                <div class="alert alert-error">
-                  ${ _('No datasets') }
-                </div>
-              % endif
+              <div id="dataset_missing" data-missing-bind="true" class="alert alert-error
+                % if dataset_formset.forms:
+                  hide
+                % endif
+              ">
+                ${ _('No datasets') }
+              </div>
             % endif
           </div>
        </div>
@@ -364,6 +377,12 @@ ${ layout.menubar(section='coordinators') }
   </div>
 </div>
 
+<style type="text/css">
+  .delete-row input {
+    display: none;
+  }
+</style>
+
 <link rel="stylesheet" href="/static/ext/css/jquery-ui-datepicker-1.8.23.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 <link rel="stylesheet" href="/static/ext/css/jquery-timepicker.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 
@@ -395,6 +414,50 @@ ${ layout.menubar(section='coordinators') }
      });
   }
 
+
+  /**
+   * Initial state is used to define when to display the "initial state" of a table.
+   * IE: if there are no formset forms to display, show an "empty" message.
+   *
+   * First, we build a registry of all functions that need to pass in order for us to display the initial state.
+   * Things that 'remove' or 'add' elements will need to trigger 'reinit' and 'initOff' events on their respective 'initial state' elements.
+   * 'Initial state' elements should have 'data-missing-bind="true"' so that custom events can be binded to them.
+   *
+   * args:
+   *  test_func - function that, if true, will indicate that the initial state should be shown.
+   *  hook - If we do show the initial state, run this function before showing it.
+   */
+  var initialStateRegistry = {};
+
+  $("*[data-missing-bind='true']").on('register', function(e, test_func, hook) {
+    var id = $(this).attr('id');
+    if (!initialStateRegistry[id]) {
+      initialStateRegistry[id] = [];
+    }
+    initialStateRegistry[id].push({ test: test_func, hook: hook });
+  });
+
+  $("*[data-missing-bind='true']").on('reinit', function(e) {
+    var show = true;
+    var id = $(this).attr('id');
+    for (var i in initialStateRegistry[id]) {
+      show = show && initialStateRegistry[id][i].test();
+    }
+    if (show) {
+      for (var i in initialStateRegistry[id]) {
+        if (!!initialStateRegistry[id][i].hook) {
+          initialStateRegistry[id][i].hook();
+        }
+      }
+      $(this).show();
+    }
+  });
+
+  $("*[data-missing-bind='true']").on('initOff', function(e) {
+    $(this).hide();
+  });
+
+
   $(document).ready(function() {
     $("input.date").datepicker();
     $("input.time").timePicker(timeOptions);
@@ -414,6 +477,27 @@ ${ layout.menubar(section='coordinators') }
           }
         }
       );
+    });
+
+    $('.delete-row').click(function() {
+      var el = $(this);
+      var row = el.closest('tr');
+      var table = el.closest('table');
+      el.find(':input').attr('checked', 'checked');
+      row.hide();
+      $(table.attr('data-missing')).trigger('reinit', table);
+    });
+
+    $('.delete-row').closest('table').each(function() {
+      var table = $(this);
+      var id = table.attr('data-missing');
+      if (!!id) {
+        $( id ).trigger('register', [ function() {
+          return table.find('tbody tr').length == table.find('tbody tr:hidden').length;
+        }, function() {
+          table.hide();
+        } ] );
+      }
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();

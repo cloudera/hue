@@ -27,7 +27,7 @@ from django.utils.safestring import mark_safe
 
 <%def name="print_datasets(label, element, formset, direction, show_headers=True)">
   <div id="${element}">
-    <table class="table-condensed dataTable">
+    <table class="table-condensed dataTable" data-missing="#${element}_missing">
       % if show_headers:
       <thead
         % if not formset.forms:
@@ -59,7 +59,7 @@ from django.utils.safestring import mark_safe
   </div>
 
   <style>
-    .designTable th {
+    .dataTable th {
       text-align:left;
     }
   </style>
@@ -71,6 +71,7 @@ from django.utils.safestring import mark_safe
       var datasetHTML = '${ str(formset.empty_form["dataset"]).replace("\r", "").replace("\n", "").replace("\s", "") }';
       var count = initial.length;
       var root = $('#${element}');
+      var table = root.find('table');
       var totalFormsEl = root.find('input[type=hidden]').filter(function() {
         return this.name.indexOf('TOTAL_FORMS') != -1;
       });
@@ -78,16 +79,25 @@ from django.utils.safestring import mark_safe
 
       window.viewModel.${element} = ko.observableArray(initial);
 
+      $(table.attr('data-missing')).trigger('register', function() {
+        return window.viewModel.${element}().length == 0;
+      });
+
       window.viewModel.add_${element} = function() {
         var newNameHTML = nameHTML.replace(new RegExp("__prefix__", 'g'), count);
         var newDatasetHTML = datasetHTML.replace(new RegExp("__prefix__", 'g'), count++);
         window.viewModel.${element}.push({name: newNameHTML, dataset: newDatasetHTML, error_message: ""});
+
         totalFormsEl.val(window.viewModel.${element}().length);
+
+        $(table.attr('data-missing')).trigger('initOff', table);
       };
 
       window.viewModel.remove_${element} = function(val) {
         window.viewModel.${element}.remove(val);
 
+        // The following logic is to manage formsets dynamically
+        // Replace __prefix__ with '0', '1', '2' and update management table of formset
         var els = root.find(':input').filter(function() {
           return !!$(this).attr('name') && $(this).attr('name').search(/\-\d+\-/) != -1;
         });
@@ -104,6 +114,8 @@ from django.utils.safestring import mark_safe
         }
 
         totalFormsEl.val(window.viewModel.${element}().length);
+
+        $(table.attr('data-missing')).trigger('reinit', table);
       };
     });
   </script>
