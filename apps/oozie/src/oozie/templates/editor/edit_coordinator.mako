@@ -21,7 +21,7 @@
 
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
-<%namespace name="properties" file="job_action_properties.mako" />
+<%namespace name="properties" file="coordinator_properties.mako" />
 <%namespace name="coordinator_data" file="create_coordinator_data.mako" />
 
 ${ commonheader(_("Oozie App"), "oozie", "100px") }
@@ -71,17 +71,18 @@ ${ layout.menubar(section='coordinators') }
                </div>
 
                <div id="advanced-container" class="hide">
-                 ${ properties.print_key_value(_('Parameters'), 'parameters', coordinator_form, parameters) }
+                 ${ properties.print_key_value(coordinator_form['parameters'], 'parameters', parameters) }
+                 ${ utils.render_field(coordinator_form['timeout']) }
                  <div class="row-fluid">
                    <div class="span6">
-                   ${ utils.render_field(coordinator_form['timeout_number']) }
+                     ${ utils.render_field(coordinator_form['concurrency']) }
+                   </div>
+                   <div class="span6">
+                     ${ utils.render_field(coordinator_form['throttle']) }
+                   </div>
                  </div>
-                 <div class="span6">
-                   ${ utils.render_field(coordinator_form['timeout_unit']) }
-                 </div>
-                 ${ utils.render_field(coordinator_form['concurrency']) }
                  ${ utils.render_field(coordinator_form['execution']) }
-                 ${ utils.render_field(coordinator_form['throttle']) }
+                 ${ utils.render_field(coordinator_form['schema_version']) }
               </div>
              </div>
 
@@ -261,7 +262,8 @@ ${ layout.menubar(section='coordinators') }
                     <tr>
                       <td>
                         % if can_edit_coordinator:
-                          <a href="javascript:modalRequest('${ url('oozie:edit_coordinator_dataset', dataset=form.instance.id) }', '#edit-dataset-modal');" data-row-selector="true"/>
+                          <a href="javascript:modalRequest('${ url('oozie:edit_coordinator_dataset', dataset=form.instance.id) }', '#edit-dataset-modal');"
+                             data-row-selector="true"/>
                         % endif
                         ${ form.instance.name }
                       </td>

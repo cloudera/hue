@@ -29,7 +29,6 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.functional import curry, wraps
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render, PopupException, extract_field_data
@@ -218,6 +217,8 @@ def create_workflow(request):
       wf = workflow_form.save()
       Workflow.objects.initialize(wf, request.fs)
       return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
+    else:
+      request.error(_('Errors on the form: %s') % workflow_form.errors)
   else:
     workflow_form = WorkflowForm(instance=workflow)
 
@@ -249,7 +250,8 @@ def edit_workflow(request, workflow):
         if workflow.has_cycle():
           raise PopupException(_('Sorry, this operation is not creating a cycle which would break the workflow.'))
 
-        return redirect(reverse('oozie:list_workflows'))
+        request.info(_("Workflow saved!"))
+        return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
     except Exception, e:
       request.error(_('Sorry, this operation is not supported: %(error)s') % {'error': e})
 
@@ -270,7 +272,8 @@ def edit_workflow(request, workflow):
     'graph': graph,
     'history': history,
     'user_can_edit_job': user_can_edit_job,
-    'parameters': extract_field_data(workflow_form['parameters'])
+    'parameters': extract_field_data(workflow_form['parameters']),
+    'job_properties': extract_field_data(workflow_form['job_properties'])
   })
 
 
@@ -547,9 +550,9 @@ def move_down_action(request, action):
 @check_job_access_permission
 def create_coordinator(request, workflow=None):
   if workflow is not None:
-    coordinator = Coordinator(owner=request.user, workflow=workflow)
+    coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.1", workflow=workflow)
   else:
-    coordinator = Coordinator(owner=request.user)
+    coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.1")
 
   if request.method == 'POST':
     coordinator_form = CoordinatorForm(request.POST, instance=coordinator)
@@ -557,6 +560,8 @@ def create_coordinator(request, workflow=None):
     if coordinator_form.is_valid():
       coordinator = coordinator_form.save()
       return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}))
+    else:
+      request.error(_('Errors on the form: %s') % coordinator_form.errors)
   else:
     coordinator_form = CoordinatorForm(instance=coordinator)
 

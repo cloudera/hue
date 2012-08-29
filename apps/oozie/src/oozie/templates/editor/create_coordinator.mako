@@ -51,6 +51,10 @@ ${ layout.menubar(section='coordinators') }
              ${ utils.render_field(coordinator_form['description']) }
              ${ utils.render_field(coordinator_form['workflow']) }
              ${ coordinator_form['parameters'] }
+             <div class="hide">
+               ${ utils.render_field(coordinator_form['timeout']) }
+               ${ utils.render_field(coordinator_form['schema_version']) }
+             </div>
            </div>
 
           <hr/>

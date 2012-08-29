@@ -14,8 +14,18 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+<%namespace name="common" file="workflow-common.xml.mako" />
 
-<workflow-app name="${ workflow.name }" xmlns="uri:oozie:workflow:0.2">
+
+<workflow-app name="${ workflow.name }" xmlns="${ workflow.schema_version }">
+  % if workflow.job_xml or workflow.get_properties():
+  <global>
+    % if workflow.job_xml:
+      <job-xml>${ workflow.job_xml }</job-xml>
+      ${ common.configuration(workflow.get_properties()) }
+    % endif
+  </global>
+  % endif
   % for node in workflow.node_list:
       ${ node.to_xml() }
   % endfor
