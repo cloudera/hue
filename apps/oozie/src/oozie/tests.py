@@ -791,13 +791,12 @@ class TestEditor:
         '  frequency="${coord:days(1)}"\n'
         '  start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"\n'
         '  xmlns="uri:oozie:coordinator:0.1">\n'
-        '  <!--\n'
         '  <controls>\n'
-        '    <timeout>[TIME_PERIOD]</timeout>\n'
-        '    <concurrency>[CONCURRENCY]</concurrency>\n'
-        '    <execution>[EXECUTION_STRATEGY]</execution>\n'
+        '    <timeout>${coord:hours(2)}</timeout>\n'
+        '    <concurrency>3</concurrency>\n'
+        '    <execution>FIFO</execution>\n'
+        '    <throttle>10</throttle>\n'
         '  </controls>\n'
-        '  -->\n'
         '  <action>\n'
         '    <workflow>\n'
         '      <app-path>${wf_application_path}</app-path>\n'
@@ -875,7 +874,12 @@ def create_coordinator(workflow):
                         u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
                         u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
                         u'timezone': [u'America/Los_Angeles'],
-                        u'parameters': [u'[{"name":"market","value":"US,France"}]']})
+                        u'parameters': [u'[{"name":"market","value":"US,France"}]'],
+                        u'timeout_number': [u'2'], u'timeout_unit': [u'hours'],
+                        u'concurrency': [u'3'],
+                        u'execution': [u'FIFO'],
+                        u'throttle': [u'10']
+  })
   assert_equal(coord_count + 1, Coordinator.objects.count(), response)
 
   return Coordinator.objects.get()

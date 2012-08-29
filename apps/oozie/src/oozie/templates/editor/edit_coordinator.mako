@@ -60,7 +60,29 @@ ${ layout.menubar(section='coordinators') }
                ${ utils.render_field(coordinator_form['description']) }
                ${ utils.render_field(coordinator_form['workflow']) }
                ${ utils.render_field(coordinator_form['is_shared']) }
-               ${ properties.print_key_value(_('Parameters'), 'parameters', coordinator_form, parameters) }
+
+               <div class="control-group ">
+                 <label class="control-label">
+                   <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
+                     <i class="icon-share-alt"></i> ${ _('advanced') }
+                   </a>
+                 </label>
+                 <div class="controls"></div>
+               </div>
+
+               <div id="advanced-container" class="hide">
+                 ${ properties.print_key_value(_('Parameters'), 'parameters', coordinator_form, parameters) }
+                 <div class="row-fluid">
+                   <div class="span6">
+                   ${ utils.render_field(coordinator_form['timeout_number']) }
+                 </div>
+                 <div class="span6">
+                   ${ utils.render_field(coordinator_form['timeout_unit']) }
+                 </div>
+                 ${ utils.render_field(coordinator_form['concurrency']) }
+                 ${ utils.render_field(coordinator_form['execution']) }
+                 ${ utils.render_field(coordinator_form['throttle']) }
+              </div>
              </div>
 
             <hr/>

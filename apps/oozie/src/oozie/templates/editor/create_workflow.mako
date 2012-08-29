@@ -36,33 +36,31 @@ ${ layout.menubar(section='workflows') }
     <div style="min-height:300px">
       <form class="form-horizontal" id="workflowForm" action="${ url('oozie:create_workflow') }" method="POST">
 
-       <div class="row-fluid">
-          <div class="span2">
+      <div class="row-fluid">
+        <div class="span2">
+        </div>
+        <div class="span8">
+          <h2>${ _('Properties') }</h2>
+          <br/>
+          <fieldset>
+          ${ utils.render_field(workflow_form['name']) }
+          ${ utils.render_field(workflow_form['description']) }
+
+          <div class="control-group ">
+            <label class="control-label">
+              <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
+                <i class="icon-share-alt"></i> ${ _('advanced') }
+              </a>
+            </label>
+            <div class="controls"></div>
           </div>
-          <div class="span8">
-              <h2>${ _('Properties') }</h2>
-              <br/>
-                <fieldset>
-                   ${ utils.render_field(workflow_form['name']) }
-                   ${ utils.render_field(workflow_form['description']) }
 
-              <div class="control-group ">
-                <label class="control-label">
-                  <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
-                    <i class="icon-share-alt"></i> ${ _('advanced') }</a>
-                </label>
-                <div class="controls">
-                </div>
-              </div>
-
-                   <div id="advanced-container" class="hide">
-                     ${ utils.render_field(workflow_form['deployment_dir']) }
-                   </a>
-               </fieldset>
+            <div id="advanced-container" class="hide">
+              ${ utils.render_field(workflow_form['deployment_dir']) }
            </div>
+         </fieldset>
 
-          <div class="span2">
-          </div>
+        <div class="span2"></div>
         </div>
       </div>
 
@@ -84,4 +82,4 @@ ${ layout.menubar(section='workflows') }
 
 ${ utils.path_chooser_libs(True) }
 
-${commonfooter(messages)}
+${ commonfooter(messages) }
