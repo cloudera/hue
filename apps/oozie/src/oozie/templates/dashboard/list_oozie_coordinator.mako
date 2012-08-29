@@ -78,10 +78,10 @@ ${ layout.menubar(section='dashboard') }
             <td>
             <form action="${ url('oozie:resubmit_coordinator', oozie_coord_id=oozie_coordinator.id) }" method="post">
             % if oozie_coordinator.is_running():
-              <a title="${_('Kill %(coordinator)s') % dict(coordinator=coordinator.id)}"
+              <a title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
                 id="kill-coordinator"
                 class="btn small confirmationModal"
-                alt="${ _('Are you sure you want to kill coordinator %s?') % coordinator.id }"
+                alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
                 href="javascript:void(0)"
                 data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
                 data-message="${ _('The coordinator was killed!') }"
