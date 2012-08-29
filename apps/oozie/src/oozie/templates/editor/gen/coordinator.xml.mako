@@ -18,10 +18,10 @@
 <coordinator-app name="${ coord.name }"
   frequency="${ coord.frequency }"
   start="${ coord.start_utc }" end="${ coord.end_utc }" timezone="${ coord.timezone }"
-  xmlns="uri:oozie:coordinator:0.1">
-  % if (coord.timeout_number and coord.timeout_unit) or coord.concurrency or coord.execution or coord.throttle:
+  xmlns="${ coord.schema_version }">
+  % if coord.timeout or coord.concurrency or coord.execution or coord.throttle:
   <controls>
-    % if coord.timeout_number and coord.timeout_unit:
+    % if coord.timeout:
     <timeout>${ coord.timeout }</timeout>
     % endif
     % if coord.concurrency:

@@ -135,16 +135,33 @@ ${ layout.menubar(section='workflows') }
               <fieldset>
                 ${ utils.render_field(workflow_form['name']) }
                 ${ utils.render_field(workflow_form['description']) }
-                ${ utils.render_field(workflow_form['deployment_dir']) }
                 ${ utils.render_field(workflow_form['is_shared']) }
-                ${ properties.print_key_value(_('Parameters'), 'parameters', workflow_form, parameters) }
+
+                <div class="control-group ">
+                  <label class="control-label">
+                    <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
+                      <i class="icon-share-alt"></i> ${ _('advanced') }</a>
+                  </label>
+                  <div class="controls"></div>
+                </div>
+
+               <div id="advanced-container" class="hide">
+                 ${ utils.render_field(workflow_form['deployment_dir']) }
+                 ${ properties.print_key_value(workflow_form['parameters'], 'parameters', parameters) }
+                 ${ workflow_form['parameters'] }
+                 ${ properties.print_key_value(workflow_form['job_properties'], 'job_properties', job_properties) }
+                 ${ workflow_form['job_properties'] }
+                 ${ utils.render_field(workflow_form['schema_version']) }
+                 ${ utils.render_field(workflow_form['job_xml']) }
+               </div>
+
              </fieldset>
            </div>
         </div>
         <div class="form-actions center">
           <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
           % if user_can_edit_job:
-            <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
+            <button class="btn btn-primary">${ _('Save') }</button>
           % endif
         </div>
         <div class="span3"></div>
@@ -239,8 +256,19 @@ modal-window .modal-content {
         }
       });
     });
-
+    /*
+    var viewModel = function(){};
+    window.viewModel = new viewModel();
     ko.applyBindings(window.viewModel);
+
+     */
+     ko.applyBindings(window.viewModelparameters, $("#parameters")[0]);
+     ko.applyBindings(window.viewModeljob_properties, $("#job_properties")[0]);
+
+    $('#jobForm').submit(function() {
+    window.viewModelparameters.pre_submit();
+    window.viewModeljob_properties.pre_submit();
+  })
 
     $("a[data-row-selector='true']").jHueRowSelector();
 

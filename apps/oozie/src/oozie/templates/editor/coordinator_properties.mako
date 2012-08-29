@@ -22,7 +22,7 @@
 
 
 <%def name="print_key_value(field, element, initial_value)">
-  <div id="${ element }" class="control-group ko-${element}" rel="popover"
+  <div class="control-group ko-${element}" rel="popover"
       data-original-title="${ field.label }" data-content="${ field.help_text }">
     <label class="control-label">${ field.label }</label>
     <div class="controls">
@@ -66,20 +66,27 @@
         var self = this;
         self.${ element } = ko.observableArray(${ element });
 
-        self.add_${ element } = function() {
+        self.add_parameters = function() {
           self.${ element }.push({name: "", value: ""});
         };
 
-        self.remove_${ element } = function(val) {
+        self.remove_parameters = function(val) {
           self.${ element }.remove(val);
         };
 
-        self.pre_submit = function(form) {
-          $("#id_${ element }").attr("value", ko.utils.stringifyJson(self.${ element }));
+        self.submit = function(form) {
+          var form = $("#jobForm");
+
+          $("<input>").attr("type", "hidden")
+              .attr("name", "${ element }")
+              .attr("value", ko.utils.stringifyJson(self.${ element }))
+              .appendTo(form);
+
+          form.submit();
         };
       };
 
-      window.viewModel${ element } = new ViewModel(${ initial_value });
+      window.viewModel = new ViewModel(${ initial_value });
     });
   </script>
 </%def>

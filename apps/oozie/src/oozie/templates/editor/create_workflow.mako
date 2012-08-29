@@ -57,7 +57,14 @@ ${ layout.menubar(section='workflows') }
 
             <div id="advanced-container" class="hide">
               ${ utils.render_field(workflow_form['deployment_dir']) }
+              ${ utils.render_field(workflow_form['schema_version']) }
+              ${ utils.render_field(workflow_form['job_xml']) }
            </div>
+           
+           <div class="hide">
+             ${ workflow_form['job_properties'] }
+             ${ workflow_form['parameters'] }
+         </div>           
          </fieldset>
 
         <div class="span2"></div>
@@ -71,14 +78,6 @@ ${ layout.menubar(section='workflows') }
       </form>
     </div>
 </div>
-
-<style>
-  #advanced-btn { center:right};
-  a#advanced-btn:link {color: black; text-decoration: none; }
-  a#advanced-btn:active {color: black; text-decoration: none; }
-  a#advanced-btn:visited {color: black; text-decoration: none; }
-  a#advanced-btn:hover {color: black; text-decoration: none; }
-</style>
 
 ${ utils.path_chooser_libs(True) }
 

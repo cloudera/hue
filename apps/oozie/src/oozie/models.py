@@ -98,14 +98,15 @@ class Job(models.Model):
       help_text=_('Name of the job, which must be unique per user.'))
   description = models.CharField(max_length=1024, blank=True, help_text=_('What is the purpose of the job.'))
   last_modified = models.DateTimeField(auto_now=True, db_index=True)
-  schema_version = models.CharField(max_length=128, blank=True, default='')
+  schema_version = models.CharField(max_length=128,
+                                    help_text=_t('The version of the XML schema used to talk to Oozie.'))
   deployment_dir = models.CharField(max_length=1024, blank=True, verbose_name=_('HDFS deployment directory.'),
                                     help_text=_('The path on the HDFS where all the workflows and '
                                                 'dependencies must be uploaded.'))
   is_shared = models.BooleanField(default=False, db_index=True,
                                   help_text=_('Check if you want to have some other users to have access to this job.'))
   parameters = models.TextField(default='[]',
-                                help_text=_t('Set some variables of the job (e.g. market=US)'))
+                                help_text=_t('Set some parameters used at the submission time (e.g. market=US).'))
 
   objects = JobManager()
   unique_together = ('owner', 'name')
@@ -167,7 +168,7 @@ class Job(models.Model):
 
 class WorkflowManager(models.Manager):
   def new_workflow(self, owner):
-    workflow = Workflow(owner=owner)
+    workflow = Workflow(owner=owner, schema_version='uri:oozie:workflow:0.4')
 
     kill = Kill(name='kill', workflow=workflow, node_type=Kill.node_type)
     end = End(name='end', workflow=workflow, node_type=End.node_type)
@@ -208,13 +209,23 @@ class Workflow(Job):
   is_single = models.BooleanField(default=False)
   start = models.ForeignKey('Start', related_name='start_workflow', blank=True, null=True)
   end  = models.ForeignKey('End', related_name='end_workflow',  blank=True, null=True)
-  # jobxml
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True,
+                             help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                                          'Properties specified in the configuration element override properties specified in the '
+                                          'files specified by any job-xml elements.'))
+  job_properties = models.TextField(default='[]',
+                                    help_text=_t('Job configuration properties used by all the actions of the workflow '
+                                                 '(e.g. mapred.job.queue.name=production)'))
+
   objects = WorkflowManager()
 
   HUE_ID = 'hue-id-w'
 
   def get_type(self):
     return 'workflow'
+
+  def get_properties(self):
+    return json.loads(self.job_properties)
 
   def add_action(self, action, parent_action_id):
     parent = Node.objects.get(id=parent_action_id).get_full_node()
@@ -713,6 +724,7 @@ class Action(Node):
 # When adding a new action, also update
 #  - Action.types below
 #  - Node.get_full_node()
+#  - forms.py _node_type_TO_FORM_CLS
 
 class Mapreduce(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path', 'prepares')
@@ -732,6 +744,10 @@ class Mapreduce(Action):
                               help_text=_t('Local or absolute path to the %(program)s jar file on HDFS') % {'program': 'MapReduce'})
   prepares = models.TextField(default="[]", help_text=_t('List of paths to delete or create before starting the application. '
                                                          'This should be used exclusively for directory cleanup'))
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True,
+                             help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                                          'Properties specified in the configuration element override properties specified in the '
+                                          'files specified by any job-xml elements.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -803,6 +819,10 @@ class Java(Action):
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", help_text=_t('List of paths to delete or create before starting the application. '
                                                          'This should be used exclusively for directory cleanup'))
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True,
+                             help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                                          'Properties specified in the configuration element override properties specified in the '
+                                          'files specified by any job-xml elements.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -836,6 +856,10 @@ class Pig(Action):
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", help_text=_t('List of paths to delete or create before starting the application. '
                                                          'This should be used exclusively for directory cleanup'))
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True,
+                             help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                                          'Properties specified in the configuration element override properties specified in the '
+                                          'files specified by any job-xml elements.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -973,13 +997,10 @@ class Coordinator(Job):
                              help_text=_t('When we need to start the last workflow.'))
   workflow = models.ForeignKey(Workflow, null=True,
                                help_text=_t('The corresponding workflow we want to schedule repeatedly.'))
-  timeout_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS,
-                                            help_text=_t('Timeout for its coordinator actions, this is, how long the coordinator action will be in '
-                                                         'WAITING or READY status before giving up on its execution.'))
-  timeout_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days',
-                                    help_text=_t('It represents the unit of time of the timeous.'))
-
-
+  timeout = models.SmallIntegerField(null=True, blank=True,
+                                     help_text=_t('Timeout for its coordinator actions, in minutes. This is how long '
+                                                  'the coordinator action will be in '
+                                                  'WAITING or READY status before giving up on its execution.'))
   concurrency = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS,
                                  help_text=_t('Concurrency for its coordinator actions, this is, how many coordinator actions are '
                                               'allowed to run concurrently ( RUNNING status) before the coordinator engine '
@@ -1070,14 +1091,6 @@ class Coordinator(Job):
   @property
   def text_frequency(self):
     return '%(number)d %(unit)s' % {'unit': self.frequency_unit, 'number': self.frequency_number}
-
-  @property
-  def timeout(self):
-    return '${coord:%(unit)s(%(number)d)}' % {'unit': self.timeout_unit, 'number': self.timeout_number}
-
-  @property
-  def text_timeout(self):
-    return '%(number)d %(unit)s' % {'unit': self.timeout_unit, 'number': self.timeout_number}
 
   def find_parameters(self):
     params = set()

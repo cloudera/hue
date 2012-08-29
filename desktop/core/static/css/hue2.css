@@ -947,3 +947,27 @@ div.box {
 .jHueNotify .close {
     right: -27px;
 }
+
+/*
+ * Advanced options
+ */
+
+#advanced-btn {
+  center:right
+}
+
+a#advanced-btn:link {
+  color: black; text-decoration: none;
+}
+
+a#advanced-btn:active {
+  color: black; text-decoration: none;
+}
+
+a#advanced-btn:visited {
+  color: black; text-decoration: none;
+}
+
+a#advanced-btn:hover {
+  color: black; text-decoration: none;
+}

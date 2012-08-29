@@ -339,6 +339,15 @@ class TestEditor:
   def test_workflow_gen_xml(self):
     assert_equal(
         '<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.2">\n'
+        '    <global>\n'
+        '        <job-xml>jobconf.xml</job-xml>\n'
+        '        <configuration>\n'
+        '            <property>\n'
+        '                <name>sleep-all</name>\n'
+        '                <value>${SLEEP}</value>\n'
+        '            </property>\n'
+        '         </configuration>\n'
+        '    </global>\n'
         '    <start to="action-name-1"/>\n'
         '    <action name="action-name-1">\n'
         '        <map-reduce>\n'
@@ -792,7 +801,7 @@ class TestEditor:
         '  start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"\n'
         '  xmlns="uri:oozie:coordinator:0.1">\n'
         '  <controls>\n'
-        '    <timeout>${coord:hours(2)}</timeout>\n'
+        '    <timeout>100</timeout>\n'
         '    <concurrency>3</concurrency>\n'
         '    <execution>FIFO</execution>\n'
         '    <throttle>10</throttle>\n'
@@ -825,7 +834,10 @@ class TestEditor:
 
 # Utils
 WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''],
-                 u'parameters': [u'[{"name":"market","value":"US"}]']}
+                 u'schema_version': [u'uri:oozie:workflow:0.2'],
+                 u'parameters': [u'[{"name":"market","value":"US"}]'],
+                 u'job_xml': [u'jobconf.xml'],
+                 u'job_properties': [u'[{"name":"sleep-all","value":"${SLEEP}"}]']}
 
 
 # Beware: client not consistent with self.c in TestEditor
@@ -875,10 +887,11 @@ def create_coordinator(workflow):
                         u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
                         u'timezone': [u'America/Los_Angeles'],
                         u'parameters': [u'[{"name":"market","value":"US,France"}]'],
-                        u'timeout_number': [u'2'], u'timeout_unit': [u'hours'],
+                        u'timeout': [u'100'],
                         u'concurrency': [u'3'],
                         u'execution': [u'FIFO'],
-                        u'throttle': [u'10']
+                        u'throttle': [u'10'],
+                        u'schema_version': [u'uri:oozie:coordinator:0.1']
   })
   assert_equal(coord_count + 1, Coordinator.objects.count(), response)
 
