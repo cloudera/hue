@@ -19,13 +19,22 @@
   frequency="${ coord.frequency }"
   start="${ coord.start_utc }" end="${ coord.end_utc }" timezone="${ coord.timezone }"
   xmlns="uri:oozie:coordinator:0.1">
-  <!--
+  % if (coord.timeout_number and coord.timeout_unit) or coord.concurrency or coord.execution or coord.throttle:
   <controls>
-    <timeout>[TIME_PERIOD]</timeout>
-    <concurrency>[CONCURRENCY]</concurrency>
-    <execution>[EXECUTION_STRATEGY]</execution>
+    % if coord.timeout_number and coord.timeout_unit:
+    <timeout>${ coord.timeout }</timeout>
+    % endif
+    % if coord.concurrency:
+    <concurrency>${ coord.concurrency }</concurrency>
+    % endif
+    % if coord.execution:
+    <execution>${ coord.execution }</execution>
+    % endif
+    % if coord.throttle:
+    <throttle>${ coord.throttle }</throttle>
+    % endif
   </controls>
-  -->
+  % endif
 
   % if coord.dataset_set.exists():
   <datasets>

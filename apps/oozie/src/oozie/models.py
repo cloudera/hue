@@ -973,7 +973,28 @@ class Coordinator(Job):
                              help_text=_t('When we need to start the last workflow.'))
   workflow = models.ForeignKey(Workflow, null=True,
                                help_text=_t('The corresponding workflow we want to schedule repeatedly.'))
+  timeout_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS,
+                                            help_text=_t('Timeout for its coordinator actions, this is, how long the coordinator action will be in '
+                                                         'WAITING or READY status before giving up on its execution.'))
+  timeout_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days',
+                                    help_text=_t('It represents the unit of time of the timeous.'))
 
+
+  concurrency = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS,
+                                 help_text=_t('Concurrency for its coordinator actions, this is, how many coordinator actions are '
+                                              'allowed to run concurrently ( RUNNING status) before the coordinator engine '
+                                              'starts throttling them.'))
+  execution = models.CharField(max_length=10, null=True, blank=True,
+                               choices=(('FIFO', 'FIFO (oldest first) default'),
+                                        ('LIFO', 'LIFO (newest first)'),
+                                        ('LAST_ONLY', 'LAST_ONLY (discards all older materializations)')),
+                                 help_text=_t('Execution strategy of its coordinator actions when there is backlog of coordinator '
+                                              'actions in the coordinator engine. The different execution strategies are \'oldest first\', '
+                                              '\'newest first\' and \'last one only\'. A backlog normally happens because of delayed '
+                                              'input data, concurrency control or because manual re-runs of coordinator jobs.'))
+  throttle = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS,
+                                 help_text=_t('The materialization or creation throttle value for its coordinator actions, this is, '
+                                              'how many maximum coordinator actions are allowed to be in WAITING state concurrently.'))
   HUE_ID = 'hue-id-w'
 
   def get_type(self):
@@ -1049,6 +1070,14 @@ class Coordinator(Job):
   @property
   def text_frequency(self):
     return '%(number)d %(unit)s' % {'unit': self.frequency_unit, 'number': self.frequency_number}
+
+  @property
+  def timeout(self):
+    return '${coord:%(unit)s(%(number)d)}' % {'unit': self.timeout_unit, 'number': self.timeout_number}
+
+  @property
+  def text_timeout(self):
+    return '%(number)d %(unit)s' % {'unit': self.timeout_unit, 'number': self.timeout_number}
 
   def find_parameters(self):
     params = set()
