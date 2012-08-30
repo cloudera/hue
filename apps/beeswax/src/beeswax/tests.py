@@ -103,11 +103,12 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     response = self.client.get("/beeswax/configuration")
     response_verbose = self.client.get("/beeswax/configuration?include_hadoop=true")
 
-    assert_true("Scratch space for Hive jobs" in response.content)
     assert_true("hive.exec.scratchdir" in response.content)
+    assert_true("hive.exec.scratchdir" in response_verbose.content)
 
+    assert_false("tasktracker.http.threads" in response.content)
     assert_true("tasktracker.http.threads" in response_verbose.content)
-    assert_true("tasktracker.http.threads" not in response.content)
+    assert_true("A base for other temporary directories" in response_verbose.content)
 
   def test_describe_partitions(self):
     response = self.client.get("/beeswax/table/test_partitions/partitions")
@@ -265,7 +266,7 @@ for x in sys.stdin:
   def test_query_with_simple_errors(self):
     """Test handling syntax error"""
     def check_error_in_response(response):
-      assert_true("Parse Error" in response.context["error_message"])
+      assert_true("ParseException" in response.context["error_message"])
       log = response.context['log']
       assert_true(len(log.split('\n')) > 10, 'Captured stack trace')
       assert_true('org.apache.hadoop.hive.ql.parse.ParseException: line' in log,
@@ -318,7 +319,7 @@ for x in sys.stdin:
     try:
       handle = beeswax.db_utils.db_client().executeAndWait(query_msg, "")
     except ttypes.BeeswaxException, bex:
-      assert_equal(bex.errorCode, 11)
+      assert_equal(bex.errorCode, 40000)
       assert_equal(bex.SQLState, "42000")
 
   def test_fetch_configuration(self):
@@ -395,12 +396,12 @@ for x in sys.stdin:
       { "parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2) }, follow=True)
     assert_true("execute.mako" in response.template)
     log = response.context["log"]
-    assert_true(search_log_line('ql.Driver', 'FAILED: Parse Error', log), log)
+    assert_true(search_log_line('ql.Driver', 'FAILED: ParseException', log), log)
 
   def test_explain_query(self):
     c = self.client
     response = _make_query(c, "SELECT KITTENS ARE TASTY", submission_type="Explain")
-    assert_true("Parse Error" in response.context["error_message"])
+    assert_true("ParseException" in response.context["error_message"])
     CREATE_TABLE = "CREATE TABLE test_explain (foo INT, bar STRING);"
     response = _make_query(c, CREATE_TABLE)
     wait_for_query_to_finish(c, response)

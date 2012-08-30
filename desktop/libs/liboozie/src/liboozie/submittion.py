@@ -19,6 +19,8 @@ import errno
 import logging
 import time
 
+from django.utils.translation import ugettext as _
+
 from desktop.lib.django_util import PopupException
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
@@ -43,7 +45,7 @@ class Submission(object):
     else:
       self.properties = {}
 
-  def __unicode__(self):
+  def __str__(self):
     res = "Submission for job '%s' (id %s, owner %s)" % (self.job.name, self.job.id, self.user)
     if self.oozie_id:
       res += " -- " + self.oozie_id
@@ -55,7 +57,7 @@ class Submission(object):
     Returns the oozie job id if all goes well.
     """
     if self.oozie_id is not None:
-      raise Exception("Submission already submitted (Oozie job id %s)" % (self.oozie_id,))
+      raise Exception(_("Submission already submitted (Oozie job id %s)") % (self.oozie_id,))
 
     jobtracker = cluster.get_cluster_addr_for_job_submission()
 
@@ -79,9 +81,9 @@ class Submission(object):
     try:
       deployment_dir = self._create_deployment_dir()
     except Exception, ex:
-      LOG.exception("Failed to access deployment directory")
-      raise PopupException(message="Failed to access deployment directory",
-                           detail=str(ex))
+      msg = _("Failed to access deployment directory")
+      LOG.exception(msg)
+      raise PopupException(message=msg, detail=str(ex))
 
     oozie_xml = self.job.to_xml()
     self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml)
@@ -107,13 +109,13 @@ class Submission(object):
     try:
       statbuf = self.fs.stats(path)
       if not statbuf.isDir:
-        msg = "Workflow deployment path is not a directory: %s" % (path,)
+        msg = _("Workflow deployment path is not a directory: %s") % (path,)
         LOG.error(msg)
         raise Exception(msg)
       return path
     except IOError, ex:
       if ex.errno != errno.ENOENT:
-        msg = "Error accessing workflow directory '%s': %s" % (path, ex)
+        msg = _("Error accessing workflow directory '%s': %s") % (path, ex)
         LOG.exception(msg)
         raise IOError(ex.errno, msg)
     # The actual deployment dir should be 0711 owned by the user
