@@ -1171,7 +1171,10 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
      * Returns id to use with upload, cancel
      **/
     add: function(file){
-        if (!(file instanceof File)){
+        // HUE-815: [fb] Upload button does not work in Firefox 3.6
+        // see https://github.com/valums/ajax-upload/issues/91
+        //if (!(file instanceof File)){
+        if (!(file instanceof File || file.__proto__.constructor.name == 'File' || file instanceof Object) ){
             throw new Error('Passed obj in not a File (in qq.UploadHandlerXhr)');
         }
 
