@@ -479,6 +479,7 @@ class Workflow(Job):
 
   @property
   def node_list(self):
+    """Return a flatten node list ordered by the hierarchy of the nodes in the workflow"""
     def flatten(nodes):
       flat = []
       if type(nodes) == list:
@@ -939,7 +940,7 @@ class Fork(ControlFlow):
     return Link.objects.get(parent=self, name='related').child.get_full_node()
 
   def is_editable(self):
-    return True
+    return False
 
   def get_edit_link(self):
     return reverse('oozie:edit_workflow_fork', kwargs={'action': self.id})
