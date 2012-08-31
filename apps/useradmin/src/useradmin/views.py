@@ -668,8 +668,8 @@ class GroupEditForm(forms.ModelForm):
       initial_members = []
       initial_perms = []
 
-    self.fields["members"] = _make_model_field(initial_members, User.objects.order_by('username'))
-    self.fields["permissions"] = _make_model_field(initial_perms, HuePermission.objects.order_by('app','description'))
+    self.fields["members"] = _make_model_field(_("members"), initial_members, User.objects.order_by('username'))
+    self.fields["permissions"] = _make_model_field(_("permissions"), initial_perms, HuePermission.objects.order_by('app','description'))
 
   def _compute_diff(self, field_name):
     current = set(self.fields[field_name].initial_objs)
@@ -711,7 +711,7 @@ class PermissionsEditForm(forms.ModelForm):
     else:
       initial_groups = []
 
-    self.fields["groups"] = _make_model_field(initial_groups, Group.objects.order_by('name'))
+    self.fields["groups"] = _make_model_field(_("groups"), initial_groups, Group.objects.order_by('name'))
 
   def _compute_diff(self, field_name):
     current = set(self.fields[field_name].initial_objs)
@@ -730,12 +730,13 @@ class PermissionsEditForm(forms.ModelForm):
     for group in add_group:
       GroupPermission.objects.create(group=group, hue_permission=self.instance)
 
-def _make_model_field(initial, choices, multi=True):
+def _make_model_field(label, initial, choices, multi=True):
   """ Creates multiple choice field with given query object as choices. """
   if multi:
     field = forms.models.ModelMultipleChoiceField(choices, required=False)
     field.initial_objs = initial
     field.initial = [ obj.pk for obj in initial ]
+    field.label = label
   else:
     field = forms.models.ModelChoiceField(choices, required=False)
     field.initial_obj = initial

@@ -36,7 +36,6 @@ ${layout.menubar(section='tables')}
                     <li class="nav-header">${_('Queries')}</li>
                     <li><a href="${ url('beeswax.views.list_designs') }">${_('Saved Queries')}</a></li>
                     <li><a href="${ url('beeswax.views.execute_query') }">${_('Execute Query')}</a></li>
-                    <li><a href="${ url('beeswax.views.edit_report') }">${_('Report Generator')}</a></li>
                     <li><a href="${ url('beeswax.views.list_query_history') }">${_('Query History')}</a></li>
                     <li class="nav-header">${_('Configuration')}</li>
                     <li><a href="${ url('beeswax.views.configuration') }">${_('Hive Configuration')}</a></li>
@@ -48,7 +47,7 @@ ${layout.menubar(section='tables')}
             <h1>${_('Welcome to Beeswax for Hive')}</h1>
             ${_("To get started with Beeswax you'll first need set up some data:")}
             <a href="${ url('beeswax.create_table.create_table') }" class='btn'>${_('Import Data')}</a>
-            or <a href="#installSamples" data-toggle="modal" class='btn'>${_('Install Samples')}</a>
+            ${_("or")} <a href="#installSamples" data-toggle="modal" class='btn'>${_('Install Samples')}</a>
         </div>
     </div>
 </div>
