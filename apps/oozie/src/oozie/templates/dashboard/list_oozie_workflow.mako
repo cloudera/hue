@@ -43,7 +43,7 @@ ${ layout.menubar(section='dashboard') }
     </div>
     <div class="span3">
       %if hue_workflow is not None:
-        <a title="${ _('Edit workflow') }" href="${ hue_workflow.get_absolute_url() }">${ oozie_workflow.appName }</a>
+        <a title="${ _('Edit workflow') }" href="${ hue_workflow.get_absolute_url() }">${ hue_workflow }</a>
       % else:
         ${ oozie_workflow.appName }
       %endif

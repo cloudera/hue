@@ -24,6 +24,7 @@ except ImportError:
 import re
 from datetime import datetime,  timedelta
 from string import Template
+from itertools import chain
 
 from django.db import models
 from django.core.urlresolvers import reverse
@@ -478,16 +479,16 @@ class Workflow(Job):
 
   @property
   def node_list(self):
-    nodes = []
-
-    for row in self.get_hierarchy():
-      if type(row) == list:
-        for node in row:
-          nodes.append(node)
+    def flatten(nodes):
+      flat = []
+      if type(nodes) == list:
+        for node in nodes:
+          flat.extend(flatten(node))
       else:
-        nodes.append(row)
+        flat.append(nodes)
+      return flat
 
-    return nodes
+    return list(chain.from_iterable([flatten(row) for row in self.get_hierarchy()]))
 
   @classmethod
   def get_application_path_key(cls):
@@ -1016,7 +1017,7 @@ class Coordinator(Job):
   throttle = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS,
                                  help_text=_t('The materialization or creation throttle value for its coordinator actions, this is, '
                                               'how many maximum coordinator actions are allowed to be in WAITING state concurrently.'))
-  HUE_ID = 'hue-id-w'
+  HUE_ID = 'hue-id-c'
 
   def get_type(self):
     return 'coordinator'

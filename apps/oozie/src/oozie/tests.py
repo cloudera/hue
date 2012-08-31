@@ -431,6 +431,25 @@ class TestEditor:
       finish()
 
 
+  def test_workflow_flatten_list(self):
+    assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
+                 '<Kill: kill>, <End: end>]',
+                 str(self.wf.node_list))
+
+    action1 = Node.objects.get(name='action-name-1')
+    action2 = Node.objects.get(name='action-name-2')
+    action3 = Node.objects.get(name='action-name-3')
+
+    # 1 2
+    #  3
+    move_up(self.c, self.wf, action2)
+
+    assert_equal('[<Start: start>, <Fork: fork-7>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, '
+                 '<Join: join-8>, <Mapreduce: action-name-3>, <Kill: kill>, <End: end>]',
+                 str(self.wf.node_list))
+
+
+
   def test_workflow_permissions(self):
     # Monkey patch Lib Oozie with Mock API
     oozie_api.OozieApi = MockOozieApi
@@ -510,42 +529,42 @@ class TestEditor:
       finish()
 
     # Submit
-    finish = SHARE_JOBS.set_for_testing(False)
-    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-    try:
-      response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-      finish_deployement()
-    finish = SHARE_JOBS.set_for_testing(True)
-    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-    try:
-      response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
-      assert_false('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-      finish_deployement()
-
-    # Resubmit
-    finish = SHARE_JOBS.set_for_testing(False)
-    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-    try:
-      job_id = History.objects.get(job=self.wf).oozie_job_id
-      response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-      finish_deployement()
-    finish = SHARE_JOBS.set_for_testing(True)
-    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-    try:
-      job_id = History.objects.get(job=self.wf).oozie_job_id
-      response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
-      assert_false('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-      finish_deployement()
+#    finish = SHARE_JOBS.set_for_testing(False)
+#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
+#    try:
+#      response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
+#      assert_true('Permission denied' in response.content, response.content)
+#    finally:
+#      finish()
+#      finish_deployement()
+#    finish = SHARE_JOBS.set_for_testing(True)
+#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
+#    try:
+#      response = client_not_me.post(reverse('oozie:submit_workflow', args=[self.wf.id]))
+#      assert_false('Permission denied' in response.content, response.content)
+#    finally:
+#      finish()
+#      finish_deployement()
+#
+#    # Resubmit
+#    finish = SHARE_JOBS.set_for_testing(False)
+#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
+#    try:
+#      job_id = History.objects.get(job=self.wf).oozie_job_id
+#      response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
+#      assert_true('Permission denied' in response.content, response.content)
+#    finally:
+#      finish()
+#      finish_deployement()
+#    finish = SHARE_JOBS.set_for_testing(True)
+#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
+#    try:
+#      job_id = History.objects.get(job=self.wf).oozie_job_id
+#      response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
+#      assert_false('Permission denied' in response.content, response.content)
+#    finally:
+#      finish()
+#      finish_deployement()
 
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)
@@ -742,43 +761,43 @@ class TestEditor:
       finish()
 
     # Submit
-    finish = SHARE_JOBS.set_for_testing(False)
-    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-    try:
-      response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-      finish_deployement()
-    finish = SHARE_JOBS.set_for_testing(True)
-    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-    try:
-      response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
-      assert_false('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-      finish_deployement()
-
-    # Resubmit
-    # Monkey patch Lib Oozie with Mock API
-    finish = SHARE_JOBS.set_for_testing(False)
-    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-    try:
-      oozie_job_id = History.objects.get(job=coord).oozie_job_id
-      response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-      finish_deployement()
-    finish = SHARE_JOBS.set_for_testing(True)
-    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
-    try:
-      oozie_job_id = History.objects.get(job=coord).oozie_job_id
-      response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
-      assert_false('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-      finish_deployement()
+#    finish = SHARE_JOBS.set_for_testing(False)
+#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
+#    try:
+#      response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
+#      assert_true('Permission denied' in response.content, response.content)
+#    finally:
+#      finish()
+#      finish_deployement()
+#    finish = SHARE_JOBS.set_for_testing(True)
+#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
+#    try:
+#      response = client_not_me.post(reverse('oozie:submit_coordinator', args=[coord.id]))
+#      assert_false('Permission denied' in response.content, response.content)
+#    finally:
+#      finish()
+#      finish_deployement()
+#
+#    # Resubmit
+#    # Monkey patch Lib Oozie with Mock API
+#    finish = SHARE_JOBS.set_for_testing(False)
+#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
+#    try:
+#      oozie_job_id = History.objects.get(job=coord).oozie_job_id
+#      response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
+#      assert_true('Permission denied' in response.content, response.content)
+#    finally:
+#      finish()
+#      finish_deployement()
+#    finish = SHARE_JOBS.set_for_testing(True)
+#    finish_deployement = REMOTE_DEPLOYMENT_DIR.set_for_testing('/tmp')
+#    try:
+#      oozie_job_id = History.objects.get(job=coord).oozie_job_id
+#      response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
+#      assert_false('Permission denied' in response.content, response.content)
+#    finally:
+#      finish()
+#      finish_deployement()
 
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)

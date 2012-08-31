@@ -134,9 +134,9 @@ class Submission(object):
 
     # Copy the files over
     files = []
-    if hasattr(self.job, 'nodes'):
-      for node in self.job.nodes:
-        if hasattr(node, 'lib_path'):
+    if hasattr(self.job, 'node_list'):
+      for node in self.job.node_list:
+        if hasattr(node, 'jar_path'):
           files.append(node.jar_path)
 
     if files:

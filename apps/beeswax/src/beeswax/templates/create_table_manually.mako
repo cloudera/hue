@@ -321,7 +321,7 @@ ${layout.menubar(section='tables')}
             <label class="control-label">${_('Column name')}</label>
             <div class="controls">
                 <input class="column" name="${form["column_name"].html_name | n}" value="${form["column_name"].data or ''}" placeholder="${_('Column Name')}"/>
-                <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+                <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
                 <span class="help-block">
                 ${_('Column name must be single words that start with a letter or a digit.')}
                 </span>
