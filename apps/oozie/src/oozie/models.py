@@ -487,8 +487,14 @@ class Workflow(Job):
       else:
         flat.append(nodes)
       return flat
+    
+    def from_iterable(iterables):
+      # Python 2.6 chain.from_iterable(['ABC', 'DEF']) --> A B C D E F
+      for it in iterables:
+        for element in it:
+          yield element
 
-    return list(chain.from_iterable([flatten(row) for row in self.get_hierarchy()]))
+    return list(chain(from_iterable([flatten(row) for row in self.get_hierarchy()])))
 
   @classmethod
   def get_application_path_key(cls):
