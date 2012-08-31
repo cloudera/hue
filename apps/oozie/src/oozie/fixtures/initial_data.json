@@ -1,183 +1,826 @@
 [
-  {
-    "pk": 5,
-    "model": "oozie.job",
-    "fields": {
-      "is_shared": true,
-      "name": "SleepWorkflow",
-      "schema_version": "uri:oozie:workflow:0.4",
-      "deployment_dir": "/user/hue/oozie/examples/sleep",
-      "last_modified": "2012-08-20 13:13:34",
-      "owner": 1,
-      "description": "Run a Sleep MapReduce job"
+    {
+        "fields": {
+            "deployment_dir": "/user/hue/oozie/examples/sleep",
+            "description": "Run a Sleep MapReduce job",
+            "is_shared": true,
+            "last_modified": "2012-08-31 16:07:32",
+            "name": "Sleep",
+            "owner": 1,
+            "parameters": "[]",
+            "schema_version": "uri:oozie:workflow:0.4"
+        },
+        "model": "oozie.job",
+        "pk": 5
+    },
+    {
+        "fields": {
+            "deployment_dir": "/user/hue/oozie/examples/sleep",
+            "description": "Sleep each day for the date of the day milliseconds",
+            "is_shared": true,
+            "last_modified": "2012-08-20 13:56:53",
+            "name": "DailySleep",
+            "owner": 1,
+            "parameters": "[]",
+            "schema_version": "uri:oozie:coordinator:0.2"
+        },
+        "model": "oozie.job",
+        "pk": 6
+    },
+    {
+        "fields": {
+            "deployment_dir": "/user/hue/oozie/examples/terasort",
+            "description": "Generate data and sort",
+            "is_shared": true,
+            "last_modified": "2012-08-31 16:07:21",
+            "name": "TeraSort",
+            "owner": 1,
+            "parameters": "[]",
+            "schema_version": "uri:oozie:workflow:0.4"
+        },
+        "model": "oozie.job",
+        "pk": 7
+    },
+    {
+        "fields": {
+            "deployment_dir": "/user/hue/oozie/examples/sleepfork",
+            "description": "Multiple forks with sleep actions",
+            "is_shared": true,
+            "last_modified": "2012-08-31 16:06:48",
+            "name": "SleepForks",
+            "owner": 1,
+            "parameters": "[]",
+            "schema_version": "uri:oozie:workflow:0.4"
+        },
+        "model": "oozie.job",
+        "pk": 8
+    },
+    {
+        "fields": {
+            "end": 17,
+            "is_single": false,
+            "job_properties": "[]",
+            "job_xml": "",
+            "start": 18
+        },
+        "model": "oozie.workflow",
+        "pk": 5
+    },
+    {
+        "fields": {
+            "end": 21,
+            "is_single": false,
+            "job_properties": "[]",
+            "job_xml": "",
+            "start": 22
+        },
+        "model": "oozie.workflow",
+        "pk": 7
+    },
+    {
+        "fields": {
+            "end": 26,
+            "is_single": false,
+            "job_properties": "[]",
+            "job_xml": "",
+            "start": 27
+        },
+        "model": "oozie.workflow",
+        "pk": 8
+    },
+    {
+        "fields": {
+            "child": 19,
+            "comment": "",
+            "name": "to",
+            "parent": 18
+        },
+        "model": "oozie.link",
+        "pk": 23
+    },
+    {
+        "fields": {
+            "child": 17,
+            "comment": "",
+            "name": "related",
+            "parent": 18
+        },
+        "model": "oozie.link",
+        "pk": 24
+    },
+    {
+        "fields": {
+            "child": 17,
+            "comment": "",
+            "name": "ok",
+            "parent": 19
+        },
+        "model": "oozie.link",
+        "pk": 25
+    },
+    {
+        "fields": {
+            "child": 16,
+            "comment": "",
+            "name": "error",
+            "parent": 19
+        },
+        "model": "oozie.link",
+        "pk": 26
+    },
+    {
+        "fields": {
+            "child": 23,
+            "comment": "",
+            "name": "to",
+            "parent": 22
+        },
+        "model": "oozie.link",
+        "pk": 27
+    },
+    {
+        "fields": {
+            "child": 21,
+            "comment": "",
+            "name": "related",
+            "parent": 22
+        },
+        "model": "oozie.link",
+        "pk": 28
+    },
+    {
+        "fields": {
+            "child": 24,
+            "comment": "",
+            "name": "ok",
+            "parent": 23
+        },
+        "model": "oozie.link",
+        "pk": 29
+    },
+    {
+        "fields": {
+            "child": 20,
+            "comment": "",
+            "name": "error",
+            "parent": 23
+        },
+        "model": "oozie.link",
+        "pk": 30
+    },
+    {
+        "fields": {
+            "child": 21,
+            "comment": "",
+            "name": "ok",
+            "parent": 24
+        },
+        "model": "oozie.link",
+        "pk": 31
+    },
+    {
+        "fields": {
+            "child": 20,
+            "comment": "",
+            "name": "error",
+            "parent": 24
+        },
+        "model": "oozie.link",
+        "pk": 32
+    },
+    {
+        "fields": {
+            "child": 34,
+            "comment": "",
+            "name": "to",
+            "parent": 27
+        },
+        "model": "oozie.link",
+        "pk": 33
+    },
+    {
+        "fields": {
+            "child": 26,
+            "comment": "",
+            "name": "related",
+            "parent": 27
+        },
+        "model": "oozie.link",
+        "pk": 34
+    },
+    {
+        "fields": {
+            "child": 40,
+            "comment": "",
+            "name": "ok",
+            "parent": 28
+        },
+        "model": "oozie.link",
+        "pk": 35
+    },
+    {
+        "fields": {
+            "child": 25,
+            "comment": "",
+            "name": "error",
+            "parent": 28
+        },
+        "model": "oozie.link",
+        "pk": 36
+    },
+    {
+        "fields": {
+            "child": 38,
+            "comment": "",
+            "name": "ok",
+            "parent": 29
+        },
+        "model": "oozie.link",
+        "pk": 37
+    },
+    {
+        "fields": {
+            "child": 25,
+            "comment": "",
+            "name": "error",
+            "parent": 29
+        },
+        "model": "oozie.link",
+        "pk": 38
+    },
+    {
+        "fields": {
+            "child": 28,
+            "comment": "",
+            "name": "start",
+            "parent": 34
+        },
+        "model": "oozie.link",
+        "pk": 50
+    },
+    {
+        "fields": {
+            "child": 29,
+            "comment": "",
+            "name": "start",
+            "parent": 34
+        },
+        "model": "oozie.link",
+        "pk": 51
+    },
+    {
+        "fields": {
+            "child": 26,
+            "comment": "",
+            "name": "to",
+            "parent": 35
+        },
+        "model": "oozie.link",
+        "pk": 52
+    },
+    {
+        "fields": {
+            "child": 35,
+            "comment": "",
+            "name": "related",
+            "parent": 34
+        },
+        "model": "oozie.link",
+        "pk": 53
+    },
+    {
+        "fields": {
+            "child": 39,
+            "comment": "",
+            "name": "ok",
+            "parent": 36
+        },
+        "model": "oozie.link",
+        "pk": 54
+    },
+    {
+        "fields": {
+            "child": 25,
+            "comment": "",
+            "name": "error",
+            "parent": 36
+        },
+        "model": "oozie.link",
+        "pk": 55
+    },
+    {
+        "fields": {
+            "child": 39,
+            "comment": "",
+            "name": "ok",
+            "parent": 37
+        },
+        "model": "oozie.link",
+        "pk": 56
+    },
+    {
+        "fields": {
+            "child": 25,
+            "comment": "",
+            "name": "error",
+            "parent": 37
+        },
+        "model": "oozie.link",
+        "pk": 57
+    },
+    {
+        "fields": {
+            "child": 37,
+            "comment": "",
+            "name": "start",
+            "parent": 38
+        },
+        "model": "oozie.link",
+        "pk": 58
+    },
+    {
+        "fields": {
+            "child": 36,
+            "comment": "",
+            "name": "start",
+            "parent": 38
+        },
+        "model": "oozie.link",
+        "pk": 59
+    },
+    {
+        "fields": {
+            "child": 35,
+            "comment": "",
+            "name": "to",
+            "parent": 39
+        },
+        "model": "oozie.link",
+        "pk": 60
+    },
+    {
+        "fields": {
+            "child": 39,
+            "comment": "",
+            "name": "related",
+            "parent": 38
+        },
+        "model": "oozie.link",
+        "pk": 61
+    },
+    {
+        "fields": {
+            "child": 35,
+            "comment": "",
+            "name": "ok",
+            "parent": 40
+        },
+        "model": "oozie.link",
+        "pk": 62
+    },
+    {
+        "fields": {
+            "child": 25,
+            "comment": "",
+            "name": "error",
+            "parent": 40
+        },
+        "model": "oozie.link",
+        "pk": 63
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "kill",
+            "node_type": "kill",
+            "workflow": 5
+        },
+        "model": "oozie.node",
+        "pk": 16
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "end",
+            "node_type": "end",
+            "workflow": 5
+        },
+        "model": "oozie.node",
+        "pk": 17
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "start",
+            "node_type": "start",
+            "workflow": 5
+        },
+        "model": "oozie.node",
+        "pk": 18
+    },
+    {
+        "fields": {
+            "description": "Sleep for some time",
+            "name": "Sleep",
+            "node_type": "mapreduce",
+            "workflow": 5
+        },
+        "model": "oozie.node",
+        "pk": 19
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "kill",
+            "node_type": "kill",
+            "workflow": 7
+        },
+        "model": "oozie.node",
+        "pk": 20
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "end",
+            "node_type": "end",
+            "workflow": 7
+        },
+        "model": "oozie.node",
+        "pk": 21
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "start",
+            "node_type": "start",
+            "workflow": 7
+        },
+        "model": "oozie.node",
+        "pk": 22
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "TeraGenWorkflow",
+            "node_type": "java",
+            "workflow": 7
+        },
+        "model": "oozie.node",
+        "pk": 23
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "TeraSort",
+            "node_type": "java",
+            "workflow": 7
+        },
+        "model": "oozie.node",
+        "pk": 24
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "kill",
+            "node_type": "kill",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 25
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "end",
+            "node_type": "end",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 26
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "start",
+            "node_type": "start",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 27
+    },
+    {
+        "fields": {
+            "description": "Sleep for some time",
+            "name": "Sleep-1",
+            "node_type": "mapreduce",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 28
+    },
+    {
+        "fields": {
+            "description": "Sleep for some time",
+            "name": "Sleep-5",
+            "node_type": "mapreduce",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 29
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "",
+            "node_type": "fork",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 34
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "",
+            "node_type": "join",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 35
+    },
+    {
+        "fields": {
+            "description": "Sleep for some time",
+            "name": "Sleep-4",
+            "node_type": "mapreduce",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 36
+    },
+    {
+        "fields": {
+            "description": "Sleep for some time",
+            "name": "Sleep-3",
+            "node_type": "mapreduce",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 37
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "",
+            "node_type": "fork",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 38
+    },
+    {
+        "fields": {
+            "description": "",
+            "name": "",
+            "node_type": "join",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 39
+    },
+    {
+        "fields": {
+            "description": "Sleep for some time",
+            "name": "Sleep-10",
+            "node_type": "mapreduce",
+            "workflow": 8
+        },
+        "model": "oozie.node",
+        "pk": 40
+    },
+    {
+        "fields": {
+            "archives": "[]",
+            "files": "[]",
+            "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar",
+            "job_properties": "[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]",
+            "job_xml": "",
+            "node_ptr": 19,
+            "prepares": "[]"
+        },
+        "model": "oozie.mapreduce",
+        "pk": 19
+    },
+    {
+        "fields": {
+            "archives": "[]",
+            "files": "[]",
+            "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar",
+            "job_properties": "[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"1\"}]",
+            "job_xml": "",
+            "node_ptr": 28,
+            "prepares": "[]"
+        },
+        "model": "oozie.mapreduce",
+        "pk": 28
+    },
+    {
+        "fields": {
+            "archives": "[]",
+            "files": "[]",
+            "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar",
+            "job_properties": "[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"5\"}]",
+            "job_xml": "",
+            "node_ptr": 29,
+            "prepares": "[]"
+        },
+        "model": "oozie.mapreduce",
+        "pk": 29
+    },
+    {
+        "fields": {
+            "archives": "[]",
+            "files": "[]",
+            "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar",
+            "job_properties": "[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"4\"}]",
+            "job_xml": "",
+            "node_ptr": 36,
+            "prepares": "[]"
+        },
+        "model": "oozie.mapreduce",
+        "pk": 36
+    },
+    {
+        "fields": {
+            "archives": "[]",
+            "files": "[]",
+            "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar",
+            "job_properties": "[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"3\"}]",
+            "job_xml": "",
+            "node_ptr": 37,
+            "prepares": "[]"
+        },
+        "model": "oozie.mapreduce",
+        "pk": 37
+    },
+    {
+        "fields": {
+            "archives": "[]",
+            "files": "[]",
+            "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar",
+            "job_properties": "[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"10\"}]",
+            "job_xml": "",
+            "node_ptr": 40,
+            "prepares": "[]"
+        },
+        "model": "oozie.mapreduce",
+        "pk": 40
+    },
+    {
+        "fields": {
+            "archives": "[]",
+            "args": "${records} ${output_dir}/teragen",
+            "files": "[]",
+            "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar",
+            "java_opts": "",
+            "job_properties": "[]",
+            "job_xml": "",
+            "main_class": "org.apache.hadoop.examples.terasort.TeraGen",
+            "prepares": "[]"
+        },
+        "model": "oozie.java",
+        "pk": 23
+    },
+    {
+        "fields": {
+            "archives": "[]",
+            "args": "${output_dir}/teragen ${output_dir}/terasort",
+            "files": "[]",
+            "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar",
+            "java_opts": "",
+            "job_properties": "[]",
+            "job_xml": "",
+            "main_class": "org.apache.hadoop.examples.terasort.TeraSort",
+            "prepares": "[]"
+        },
+        "model": "oozie.java",
+        "pk": 24
+    },
+    {
+        "fields": {
+            "node_ptr": 18
+        },
+        "model": "oozie.start",
+        "pk": 18
+    },
+    {
+        "fields": {
+            "node_ptr": 22
+        },
+        "model": "oozie.start",
+        "pk": 22
+    },
+    {
+        "fields": {
+            "node_ptr": 27
+        },
+        "model": "oozie.start",
+        "pk": 27
+    },
+    {
+        "fields": {},
+        "model": "oozie.end",
+        "pk": 17
+    },
+    {
+        "fields": {},
+        "model": "oozie.end",
+        "pk": 21
+    },
+    {
+        "fields": {},
+        "model": "oozie.end",
+        "pk": 26
+    },
+    {
+        "fields": {
+            "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
+        },
+        "model": "oozie.kill",
+        "pk": 16
+    },
+    {
+        "fields": {
+            "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
+        },
+        "model": "oozie.kill",
+        "pk": 20
+    },
+    {
+        "fields": {
+            "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
+        },
+        "model": "oozie.kill",
+        "pk": 25
+    },
+    {
+        "fields": {},
+        "model": "oozie.fork",
+        "pk": 34
+    },
+    {
+        "fields": {},
+        "model": "oozie.fork",
+        "pk": 38
+    },
+    {
+        "fields": {},
+        "model": "oozie.join",
+        "pk": 35
+    },
+    {
+        "fields": {},
+        "model": "oozie.join",
+        "pk": 39
+    },
+    {
+        "fields": {
+            "concurrency": null,
+            "end": "2012-08-04 00:00:00",
+            "execution": null,
+            "frequency_number": 1,
+            "frequency_unit": "days",
+            "start": "2012-08-01 00:00:00",
+            "throttle": null,
+            "timeout": null,
+            "timezone": "America/Los_Angeles",
+            "workflow": 5
+        },
+        "model": "oozie.coordinator",
+        "pk": 6
+    },
+    {
+        "fields": {
+            "coordinator": 6,
+            "description": "",
+            "done_flag": "",
+            "frequency_number": 1,
+            "frequency_unit": "days",
+            "name": "sleep_time",
+            "start": "2012-08-01 00:00:00",
+            "timezone": "America/Los_Angeles",
+            "uri": "${DAY}"
+        },
+        "model": "oozie.dataset",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "coordinator": 6,
+            "dataset": 3,
+            "name": "REDUCER_SLEEP_TIME"
+        },
+        "model": "oozie.dataoutput",
+        "pk": 1
     }
-  },
-  {
-    "pk": 6,
-    "model": "oozie.job",
-    "fields": {
-      "is_shared": true,
-      "name": "DailySleep",
-      "schema_version": "uri:oozie:coordinator:0.2",
-      "deployment_dir": "/user/hue/oozie/examples/sleep",
-      "last_modified": "2012-08-20 13:56:53",
-      "owner": 1,
-      "description": "Sleep each day for the date of the day milliseconds"
-    }
-  },
-  {
-    "pk": 5,
-    "model": "oozie.workflow",
-    "fields": {
-      "start": 18,
-      "is_single": false,
-      "end": 17
-    }
-  },
-  {
-    "pk": 23,
-    "model": "oozie.link",
-    "fields": {
-      "comment": "",
-      "name": "to",
-      "parent": 18,
-      "child": 19
-    }
-  },
-  {
-    "pk": 24,
-    "model": "oozie.link",
-    "fields": {
-      "comment": "",
-      "name": "related",
-      "parent": 18,
-      "child": 17
-    }
-  },
-  {
-    "pk": 25,
-    "model": "oozie.link",
-    "fields": {
-      "comment": "",
-      "name": "ok",
-      "parent": 19,
-      "child": 17
-    }
-  },
-  {
-    "pk": 26,
-    "model": "oozie.link",
-    "fields": {
-      "comment": "",
-      "name": "error",
-      "parent": 19,
-      "child": 16
-    }
-  },
-  {
-    "pk": 16,
-    "model": "oozie.node",
-    "fields": {
-      "node_type": "kill",
-      "workflow": 5,
-      "name": "kill",
-      "description": ""
-    }
-  },
-  {
-    "pk": 17,
-    "model": "oozie.node",
-    "fields": {
-      "node_type": "end",
-      "workflow": 5,
-      "name": "end",
-      "description": ""
-    }
-  },
-  {
-    "pk": 18,
-    "model": "oozie.node",
-    "fields": {
-      "node_type": "start",
-      "workflow": 5,
-      "name": "start",
-      "description": ""
-    }
-  },
-  {
-    "pk": 19,
-    "model": "oozie.node",
-    "fields": {
-      "node_type": "mapreduce",
-      "workflow": 5,
-      "name": "Sleep",
-      "description": "Sleep for some time"
-    }
-  },
-  {
-    "pk": 19,
-    "model": "oozie.mapreduce",
-    "fields": {
-      "files": "[]",
-      "job_properties": "[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]",
-      "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar",
-      "archives": "[]",
-      "node_ptr": 19
-    }
-  },
-  {
-    "pk": 18,
-    "model": "oozie.start",
-    "fields": {
-      "node_ptr": 18
-    }
-  },
-  {
-    "pk": 17,
-    "model": "oozie.end",
-    "fields": {}
-  },
-  {
-    "pk": 16,
-    "model": "oozie.kill",
-    "fields": {
-      "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
-    }
-  },
-  {
-    "pk": 6,
-    "model": "oozie.coordinator",
-    "fields": {
-      "end": "2012-08-04 00:00:00",
-      "frequency_number": 1,
-      "workflow": 5,
-      "frequency_unit": "days",
-      "start": "2012-08-01 00:00:00",
-      "timezone": "America/Los_Angeles"
-    }
-  },
-  {
-    "pk": 3,
-    "model": "oozie.dataset",
-    "fields": {
-      "name": "sleep_time",
-      "frequency_number": 1,
-      "coordinator": 6,
-      "frequency_unit": "days",
-      "uri": "${DAY}",
-      "start": "2012-08-01 00:00:00",
-      "timezone": "America/Los_Angeles",
-      "done_flag": "",
-      "description": ""
-    }
-  },
-  {
-    "pk": 1,
-    "model": "oozie.dataoutput",
-    "fields": {
-      "coordinator": 6,
-      "name": "REDUCER_SLEEP_TIME",
-      "dataset": 3
-    }
-  }
 ]
