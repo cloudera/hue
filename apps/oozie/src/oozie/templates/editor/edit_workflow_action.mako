@@ -156,7 +156,7 @@ ${ layout.menubar(section='workflows') }
             <tbody data-bind="foreach: properties">
               <tr>
                 <td><input class="span4 required propKey" data-bind="value: name, uniqueName: false" /></td>
-                <td><input class="span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
+                <td class="pathChooserKo"><input class="span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
                 <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">${ _('Delete') }</a></td>
               </tr>
             </tbody>
@@ -257,6 +257,9 @@ ${ layout.menubar(section='workflows') }
 <script src="/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js" type="text/javascript" charset="utf-8"></script>
 
 <style>
+  td.pathChooserKo {
+    min-width: 404px;
+  }
   .pathChooser, .pathChooserKo {
     border-radius: 3px 0 0 3px;
     border-right:0;
