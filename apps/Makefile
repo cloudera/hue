@@ -31,15 +31,15 @@ default: env-install
 .PHONY: clean default distclean install
 
 APPS := about \
-	beeswax \
-	filebrowser \
-	help \
-	jobbrowser \
-	jobsub \
-        oozie \
-	proxy \
-        shell \
-	useradmin
+  beeswax \
+  filebrowser \
+  help \
+  jobbrowser \
+  jobsub \
+  oozie \
+  proxy \
+  shell \
+  useradmin
 
 ################################################
 # Install all applications into the Desktop environment
@@ -106,7 +106,8 @@ I18N_APPS := about \
   jobbrowser \
   jobsub \
   shell \
-  useradmin
+  useradmin \
+  oozie
 
 COMPILE_LOCALE_TARGETS := $(I18N_APPS:%=.recursive-compile-locales/%)
 compile-locales: $(COMPILE_LOCALE_TARGETS)

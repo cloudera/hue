@@ -768,14 +768,10 @@ def submit_coordinator(request, coordinator):
 
 def _submit_coordinator(request, coordinator, mapping):
   try:
-    if not coordinator.workflow.is_deployed(request.fs):
-      submission = Submission(request.user, coordinator.workflow, request.fs, mapping)
-      wf_dir = submission.deploy()
-      coordinator.workflow.deployment_dir = wf_dir
-      coordinator.workflow.save()
+    submission = Submission(request.user, coordinator.workflow, request.fs, mapping)
+    wf_dir = submission.deploy()
 
-    coordinator.deployment_dir = coordinator.workflow.deployment_dir
-    properties = {'wf_application_path': request.fs.get_hdfs_path(coordinator.workflow.deployment_dir)}
+    properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
     properties.update(mapping)
 
     submission = Submission(request.user, coordinator, request.fs, properties=properties)
