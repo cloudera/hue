@@ -97,7 +97,7 @@ ${ layout.menubar(section='workflows') }
                 <a href="javascript:void(0);" title="${ _('Click to add to the end') }" class="btn modalWindow"
                   data-modal-url="${ url('oozie:import_action', workflow=workflow.id, parent_action_id=workflow.end.get_parents()[0].id) }"
                   data-modal-id="#modal-window">
-                  <i class="icon-plus"></i> ${ _('Import Jobsub') }
+                  <i class="icon-plus"></i> ${ _('Job Design') }
                 </a>
                 <p/>
               </div>

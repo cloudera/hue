@@ -741,7 +741,7 @@ class TestEditor:
     try:
       response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
       assert_false('Permission denied' in response.content, response.content)
-      assert_false('Save' in response.content, response.content)
+      assert_false('value="Save"' in response.content, response.content)
     finally:
       finish()
     finish = SHARE_JOBS.set_for_testing(False)

@@ -2,7 +2,7 @@
     {
         "fields": {
             "deployment_dir": "/user/hue/oozie/examples/sleep",
-            "description": "Run a Sleep MapReduce job",
+            "description": "MapReduce job that sleeps",
             "is_shared": true,
             "last_modified": "2012-08-31 16:07:32",
             "name": "Sleep",
@@ -16,7 +16,7 @@
     {
         "fields": {
             "deployment_dir": "/user/hue/oozie/examples/sleep",
-            "description": "Sleep each day for the date of the day milliseconds",
+            "description": "Daily sleep increasing every day",
             "is_shared": true,
             "last_modified": "2012-08-20 13:56:53",
             "name": "DailySleep",
@@ -30,7 +30,7 @@
     {
         "fields": {
             "deployment_dir": "/user/hue/oozie/examples/terasort",
-            "description": "Generate data and sort",
+            "description": "Generate data then sort it",
             "is_shared": true,
             "last_modified": "2012-08-31 16:07:21",
             "name": "TeraSort",
@@ -460,7 +460,7 @@
     },
     {
         "fields": {
-            "description": "",
+            "description": "Generate N number of records",
             "name": "TeraGenWorkflow",
             "node_type": "java",
             "workflow": 7
@@ -470,7 +470,7 @@
     },
     {
         "fields": {
-            "description": "",
+            "description": "Sort the records",
             "name": "TeraSort",
             "node_type": "java",
             "workflow": 7
@@ -510,7 +510,7 @@
     },
     {
         "fields": {
-            "description": "Sleep for some time",
+            "description": "Sleep for 1 second",
             "name": "Sleep-1",
             "node_type": "mapreduce",
             "workflow": 8
@@ -520,7 +520,7 @@
     },
     {
         "fields": {
-            "description": "Sleep for some time",
+            "description": "Sleep for 5 seconds",
             "name": "Sleep-5",
             "node_type": "mapreduce",
             "workflow": 8
@@ -550,7 +550,7 @@
     },
     {
         "fields": {
-            "description": "Sleep for some time",
+            "description": "Sleep for 4 seconds",
             "name": "Sleep-4",
             "node_type": "mapreduce",
             "workflow": 8
@@ -560,7 +560,7 @@
     },
     {
         "fields": {
-            "description": "Sleep for some time",
+            "description": "Sleep for 3 seconds",
             "name": "Sleep-3",
             "node_type": "mapreduce",
             "workflow": 8
@@ -590,7 +590,7 @@
     },
     {
         "fields": {
-            "description": "Sleep for some time",
+            "description": "Sleep for 10 seconds",
             "name": "Sleep-10",
             "node_type": "mapreduce",
             "workflow": 8

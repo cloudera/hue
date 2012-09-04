@@ -73,19 +73,21 @@ ${layout.menubar(section='groups', _=_)}
 			<a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
 		</div>
 	</form>
+</div>
 
-	<script type="text/javascript" charset="utf-8">
-		$(document).ready(function(){
-			$("#id_members").jHueSelector({
-                width:400,
-                selectAllLabel: "${_('Select all')}",
-                searchPlaceholder: "${_('Search')}"
-            });
-			$("#id_permissions").jHueSelector({
-                width:400,
-                selectAllLabel: "${_('Select all')}",
-                searchPlaceholder: "${_('Search')}"
-            });
-		});
-	</script>
-${commonfooter()}
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+		$("#id_members").jHueSelector({
+            width:400,
+            selectAllLabel: "${_('Select all')}",
+            searchPlaceholder: "${_('Search')}"
+        });
+		$("#id_permissions").jHueSelector({
+            width:400,
+            selectAllLabel: "${_('Select all')}",
+            searchPlaceholder: "${_('Search')}"
+        });
+	});
+</script>
+
+${commonfooter(messages)}

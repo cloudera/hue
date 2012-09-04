@@ -25,4 +25,4 @@ ${commonheader(title, "useradmin")}
 		<input type="submit" value="${_('Yes')}">
 	</form>
 </div>
-${commonfooter()}
+${commonfooter(messages)}

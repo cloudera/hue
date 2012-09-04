@@ -122,4 +122,4 @@ ${layout.menubar(section='groups', _=_)}
         });
     </script>
 
-${commonfooter()}
+${commonfooter(messages)}
