@@ -64,4 +64,4 @@ ${layout.menubar(section='permissions', _=_)}
         });
 	});
 </script>
-${commonfooter()}
+${commonfooter(messages)}

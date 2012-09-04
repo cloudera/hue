@@ -58,7 +58,6 @@ ${ layout.menubar(section='coordinators') }
              <div class="fieldWrapper">
                ${ utils.render_field(coordinator_form['name']) }
                ${ utils.render_field(coordinator_form['description']) }
-               ${ utils.render_field(coordinator_form['workflow']) }
                ${ utils.render_field(coordinator_form['is_shared']) }
 
                <div class="control-group ">
@@ -71,6 +70,7 @@ ${ layout.menubar(section='coordinators') }
                </div>
 
                <div id="advanced-container" class="hide">
+                 ${ utils.render_field(coordinator_form['workflow']) }
                  ${ properties.print_key_value(coordinator_form['parameters'], 'parameters', parameters) }
                  ${ utils.render_field(coordinator_form['timeout']) }
                  <div class="row-fluid">
@@ -235,9 +235,6 @@ ${ layout.menubar(section='coordinators') }
                 </thead>
                 <tbody>
                   <tr>
-                    <td class="alert-error"><b>Warning</b>: Save your coordinator before creating a new dataset!</td>
-                  </tr>
-                  <tr>
                     <td><a class="btn" data-toggle="modal" href="#add-dataset-modal">${ _('Create') }</a></td>
                   </tr>
                 </tbody>
@@ -359,6 +356,8 @@ ${ layout.menubar(section='coordinators') }
       <div class="modal-header">
         <button class="close" data-dismiss="modal">&times;</button>
         <h3>${ _('Create a dataset') }</h3>
+        <hr/>
+        <div class="alert alert-warning"><b>${ _('Warning') }</b>: ${ _('Save your modifications before creating a new dataset!') }</div>
       </div>
 
       <div class="modal-body" id="add-dataset-body">

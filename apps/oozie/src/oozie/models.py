@@ -148,9 +148,9 @@ class Job(models.Model):
   @property
   def status(self):
     if self.is_shared:
-      return 'shared'
+      return _('shared')
     else:
-      return 'personal'
+      return _('personal')
 
   def find_all_parameters(self):
     params = dict([(param, '') for param in self.find_parameters()])

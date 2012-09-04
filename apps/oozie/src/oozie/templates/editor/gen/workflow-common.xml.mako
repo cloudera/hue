@@ -13,10 +13,6 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-##
-##
-## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and
-## multiple spaces and line breaks cause issues
 
 <%!
 import posixpath
