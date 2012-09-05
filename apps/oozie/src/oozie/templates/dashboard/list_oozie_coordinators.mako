@@ -76,7 +76,7 @@ ${layout.menubar(section='dashboard')}
               </span>
             </td>
             <td>${ job.appName }</td>
-            <td>${ job.get_progress() }%</td>
+            <td data-sort-value="${ job.get_progress() }">${ job.get_progress() }%</td>
             <td>${ job.user }</td>
             <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
             <td>
@@ -127,7 +127,7 @@ ${layout.menubar(section='dashboard')}
               </span>
             </td>
             <td>${ job.appName }</td>
-            <td>-</td>
+            <td data-sort-value="${ utils.job_duration(job) }">${ utils.format_job_duration(job) }</td>
             <td>${job.user}</td>
             <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
           </tr>
@@ -160,15 +160,15 @@ ${layout.menubar(section='dashboard')}
       "bLengthChange": false,
       "sDom": "<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns": [
-           { "sType": "date" },
-            null,
-            null,
-            null,
-            null,
-            null,
-            { "bSortable": false }
-        ],
-        "aaSorting": [[ 0, "desc" ]]
+        { "sType": "date" },
+        null,
+        null,
+        { "sSortDataType": "dom-sort-value", "sType": "alt-numeric" },
+        null,
+        null,
+        { "bSortable": false }
+      ],
+      "aaSorting": [[ 0, "desc" ]]
     });
 
     var completedTable = $('#completed-table').dataTable( {
@@ -177,14 +177,14 @@ ${layout.menubar(section='dashboard')}
       "bLengthChange": false,
       "sDom": "<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns": [
-            { "sType": "date" },
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
-        "aaSorting": [[ 0, "desc" ]]
+        { "sType": "date" },
+        null,
+        null,
+        { "sSortDataType": "dom-sort-value", "sType": "alt-numeric" },
+        null,
+        null
+      ],
+      "aaSorting": [[ 0, "desc" ]]
     });
 
     $('#filterInput').keydown(function(e) {

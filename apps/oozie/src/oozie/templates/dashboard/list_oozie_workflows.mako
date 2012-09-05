@@ -22,6 +22,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
+
 ${ commonheader(_("Oozie App"), "oozie", "100px") }
 ${ layout.menubar(section='dashboard') }
 
@@ -76,7 +77,7 @@ ${ layout.menubar(section='dashboard') }
               </span>
             </td>
             <td>${ job.appName }</td>
-            <td>${ job.get_progress() }%</td>
+            <td data-sort-value="${ job.get_progress() }">${ job.get_progress() }%</td>
             <td>${ job.user }</td>
             <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
             <td>
@@ -127,7 +128,7 @@ ${ layout.menubar(section='dashboard') }
               </span>
             </td>
             <td>${ job.appName }</td>
-            <td>-</td>
+            <td data-sort-value="${ utils.job_duration(job) }">${ utils.format_job_duration(job) }</td>
             <td>${ job.user }</td>
             <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
           </tr>
@@ -163,7 +164,7 @@ ${ layout.menubar(section='dashboard') }
            { "sType": "date" },
             null,
             null,
-            null,
+            { "sSortDataType": "dom-sort-value", "sType": "alt-numeric" },
             null,
             null,
             { "bSortable": false }
@@ -180,7 +181,7 @@ ${ layout.menubar(section='dashboard') }
             { "sType": "date" },
             null,
             null,
-            null,
+            { "sSortDataType": "dom-sort-value", "sType": "alt-numeric" },
             null,
             null
         ],
