@@ -45,7 +45,7 @@
 
 <%def name="job_duration(job)">
   <%
-    return time.mktime(job.endTime) - time.mktime(job.startTime)
+    return ( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000
   %>
 </%def>
 
