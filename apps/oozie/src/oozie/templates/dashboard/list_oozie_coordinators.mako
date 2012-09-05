@@ -163,7 +163,7 @@ ${layout.menubar(section='dashboard')}
         { "sType": "date" },
         null,
         null,
-        { "sSortDataType": "dom-sort-value", "sType": "alt-numeric" },
+        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
         null,
         null,
         { "bSortable": false }
@@ -180,7 +180,7 @@ ${layout.menubar(section='dashboard')}
         { "sType": "date" },
         null,
         null,
-        { "sSortDataType": "dom-sort-value", "sType": "alt-numeric" },
+        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
         null,
         null
       ],

@@ -108,36 +108,30 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             <td class="center">
                 <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'user', job.user.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.user.lower())}">${job.user}</a>
             </td>
-            <td>
-                <span alt="${job.maps_percent_complete}">
-                    % if job.is_retired:
-                        <div class="center">${_('N/A')}</div>
-                    % else:
-                    ${comps.mr_graph_maps(job)}
-                    % endif
-                 </span>
+            <td data-sort-value="${job.maps_percent_complete}">
+                % if job.is_retired:
+                    <div class="center">${_('N/A')}</div>
+                % else:
+                ${comps.mr_graph_maps(job)}
+                % endif
             </td>
-            <td>
-                <span alt="${job.reduces_percent_complete}">
-                    % if job.is_retired:
-                        <div class="center">${_('N/A')}</div>
-                    % else:
-                        ${comps.mr_graph_reduces(job)}
-                    % endif
-                </span>
+            <td data-sort-value="${job.reduces_percent_complete}">
+                % if job.is_retired:
+                    <div class="center">${_('N/A')}</div>
+                % else:
+                    ${comps.mr_graph_reduces(job)}
+                % endif
             </td>
             <td class="center">${job.queueName}</td>
             <td class="center">${job.priority.lower()}</td>
-            <td class="center" data-row-selector-exclude="true">
-                <span alt="${job.durationInMillis}">
-                    % if job.is_retired:
-                        ${_('N/A')}
-                    % else:
-                        ${job.durationFormatted}
-                    % endif
-                </span>
+            <td class="center" data-sort-value="${job.durationInMillis}" data-row-selector-exclude="true">
+                % if job.is_retired:
+                    ${_('N/A')}
+                % else:
+                    ${job.durationFormatted}
+                % endif
             </td>
-            <td><span alt="${job.startTimeMs}">${job.startTimeFormatted}</span></td>
+            <td data-sort-value="${job.startTimeMs}">${job.startTimeFormatted}</td>
             <td>
                 % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                 % if request.user.is_superuser or request.user.username == job.user:
@@ -198,12 +192,12 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
                 null,
                 null,
                 null,
-                { "sType": "alt-numeric", "sWidth": "60px" },
-                { "sType": "alt-numeric", "sWidth": "60px" },
+                { "sSortDataType": "dom-sort-value", "sType": "numeric", "sWidth": "60px" },
+                { "sSortDataType": "dom-sort-value", "sType": "numeric", "sWidth": "60px" },
                 null,
                 null,
-                { "sType": "alt-numeric" },
-                { "sType": "alt-numeric" },
+                { "sSortDataType": "dom-sort-value", "sType": "numeric" },
+                { "sSortDataType": "dom-sort-value", "sType": "numeric" },
                 {"bSortable":false}
             ]
         });
