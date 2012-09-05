@@ -60,7 +60,7 @@
   <object pk="1" model="jobsub.ooziestreamingaction">
     <field type="CharField" name="files">["/user/hue/jobsub/examples/wordcount.py"]</field>
     <field type="CharField" name="archives">[]</field>
-    <field type="CharField" name="job_properties">[{"name":"mapred.input.dir","value":"/user/hue/jobsub/sample_data"},{"name":"mapred.output.dir","value":"$output_directory"},{"name":"mapred.reduce.tasks","value":"1"}]</field>
+    <field type="CharField" name="job_properties">[{"name":"mapred.input.dir","value":"/user/hue/jobsub/sample_data"},{"name":"mapred.output.dir","value":"$output_directory"},{"name":"mapred.reduce.tasks","value":"1"},{"name":"oozie.use.system.libpath","value":"true"}]</field>
     <field type="CharField" name="mapper">python wordcount.py map</field>
     <field type="CharField" name="reducer">python wordcount.py reduce</field>
   </object>
