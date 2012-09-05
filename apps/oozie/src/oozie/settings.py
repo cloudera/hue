@@ -16,16 +16,8 @@
 
 DJANGO_APPS=['oozie']
 NICE_NAME = "Oozie Editor/Dashboard"
-REQUIRES_HADOOP = True
-
-# Unused
-PERMISSION_ACTIONS = (
-  ("launch_editor", "Launch the Oozie Editor"),
-  ("launch_dashboard", "Launch the Oozie Dashboard"),
-  ("launch_jobs", "Can submit Oozie jobs"),
-)
-
 ICON = "/oozie/static/art/icon_oozie_24.png"
 MENU_INDEX = 41
 
+REQUIRES_HADOOP = True
 IS_URL_NAMESPACED = True
