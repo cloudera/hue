@@ -27,6 +27,7 @@
   from django.template.defaultfilters import date, time as dtime
   from django.utils.translation import ugettext as _
 
+  from desktop.lib.view_util import format_duration_in_millis
   from hadoop.fs.hadoopfs import Hdfs
   from liboozie.utils import format_time
 %>
@@ -38,6 +39,20 @@
       return "active"
     else:
       return ""
+  %>
+</%def>
+
+
+<%def name="job_duration(job)">
+  <%
+    return time.mktime(job.endTime) - time.mktime(job.startTime)
+  %>
+</%def>
+
+
+<%def name="format_job_duration(job)">
+  <%
+    return format_duration_in_millis(job_duration(job))
   %>
 </%def>
 
