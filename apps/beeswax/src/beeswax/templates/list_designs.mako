@@ -69,9 +69,7 @@ ${layout.menubar(section='saved queries')}
                         ${_('Query')}
                     % endif
                 </td>
-                    <td>
-                        <span alt="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</span>
-                    </td>
+                <td data-sort-value="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</td>
                 <td>
                 <div class="btn-group">
                     <a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
@@ -129,7 +127,7 @@ ${layout.menubar(section='saved queries')}
                 null,
                 null,
                 null,
-                { "sType": "alt-numeric" },
+                { "sSortDataType": "dom-sort-value", "sType": "numeric" },
                 { "bSortable": false }
             ]
         });

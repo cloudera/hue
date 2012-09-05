@@ -114,7 +114,7 @@ ${layout.menubar(section='history')}
 			  pass
 		      %>
 		      <tr class="histRow">
-                <td><span alt="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</span></td>
+                <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>
 		        <td>${show_saved_query(design, query)}</td>
 		        <td>
 		          <p>
@@ -151,7 +151,7 @@ ${layout.menubar(section='history')}
             "bInfo": false,
             "bFilter": false,
             "aoColumns": [
-                { "sType": "alt-numeric" },
+                { "sSortDataType": "dom-sort-value", "sType": "numeric" },
                 null,
                 null,
                 null,

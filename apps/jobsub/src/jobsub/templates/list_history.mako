@@ -57,7 +57,7 @@ ${layout.menubar(section='history')}
                     <td>${design.name}</td>
                     <td>${design.root_action.action_type}</td>
                     <td>${design.description}</td>
-                    <td><span alt="${py_time.mktime(design.last_modified.timetuple())}">${date(record.submission_date)} ${time(record.submission_date).replace("p.m.","PM").replace("a.m.","AM")}</span></td>
+                    <td data-sort-value="${py_time.mktime(record.submission_date.timetuple())}">${date(record.submission_date)} ${time(record.submission_date).replace("p.m.","PM").replace("a.m.","AM")}</td>
                 </tr>
                 %endfor
         </tbody>
@@ -76,7 +76,7 @@ ${layout.menubar(section='history')}
                 null,
                 null,
                 null,
-                { "sType": "alt-numeric" }
+                { "sSortDataType": "dom-sort-value", "sType": "numeric" }
             ],
             "aaSorting": [[ 5, "desc" ]],
             "oLanguage": {

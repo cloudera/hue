@@ -17,22 +17,7 @@
 $.fn.dataTableExt.afnSortData['dom-sort-value'] = function (oSettings, iColumn) {
   var aData = [];
   $( 'td:eq('+iColumn+')', oSettings.oApi._fnGetTrNodes(oSettings) ).each( function () {
-    aData.push( parseFloat($(this).attr('data-sort-value')) );
+    aData.push( $(this).attr('data-sort-value') );
   } );
   return aData;
 };
-
-jQuery.extend(jQuery.fn.dataTableExt.oSort, {
-  "alt-numeric-pre": function (a) {
-    var x = a.match(/title="*(-?[0-9\.]+)/)[1];
-    return parseFloat(x);
-  },
-
-  "alt-numeric-asc":function (a, b) {
-    return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-  },
-
-  "alt-numeric-desc":function (a, b) {
-    return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-  }
-});

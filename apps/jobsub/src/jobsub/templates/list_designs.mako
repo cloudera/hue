@@ -65,7 +65,7 @@ ${layout.menubar(section='designs')}
                     <td>${design.name}</td>
                     <td>${design.root_action.action_type}</td>
                     <td>${design.description}</td>
-                    <td nowrap="nowrap"><span alt="${py_time.mktime(design.last_modified.timetuple())}">${date(design.last_modified)} ${time(design.last_modified).replace("p.m.","PM").replace("a.m.","AM")}</span></td>
+                    <td nowrap="nowrap" data-sort-value="${py_time.mktime(design.last_modified.timetuple())}">${date(design.last_modified)} ${time(design.last_modified).replace("p.m.","PM").replace("a.m.","AM")}</td>
                 <td nowrap="nowrap" class="right">
                 %if currentuser.username == design.owner.username:
                     <a title="${_('Submit %(name)s to the cluster') % dict(name=design.name)}" class="btn small submitConfirmation"
@@ -199,7 +199,7 @@ ${layout.menubar(section='designs')}
                 null,
                 null,
                 null,
-                { "sType": "alt-numeric" },
+                { "sSortDataType": "dom-sort-value", "sType": "numeric" },
                 { "bSortable": false }
             ],
             "aaSorting": [[ 4, "desc" ]],
