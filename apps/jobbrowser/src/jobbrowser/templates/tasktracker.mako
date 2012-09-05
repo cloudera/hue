@@ -58,4 +58,4 @@ ${commonheader(_('Tracker: %(trackerId)s - Job Browser') % dict(trackerId=tracke
 	</div>
 </div>
 
-${commonfooter()}
+${commonfooter(messages)}

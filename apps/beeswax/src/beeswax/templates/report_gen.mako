@@ -119,4 +119,4 @@ ${log | h}
 </pre>
 % endif
 </div>
-${commonfooter()}
+${commonfooter(messages)}

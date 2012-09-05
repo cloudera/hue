@@ -24,4 +24,4 @@ ${commonheader(_('Hue Shell'), "shell")}
 	<h3>${_('The webserver currently running Hue does not support the Shell application. Please contact your administrator.')}</h3>
 </div>
 </div>
-${commonfooter()}
+${commonfooter(messages)}

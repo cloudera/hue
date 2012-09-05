@@ -687,4 +687,4 @@ ${layout.menubar(section='tables')}
         }
     });
 </script>
-${commonfooter()}
+${commonfooter(messages)}

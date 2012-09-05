@@ -31,4 +31,4 @@ ${commonheader(_('Hue Shell'), "shell")}
     </ol>
 </div>
 </div>
-${commonfooter()}
+${commonfooter(messages)}

@@ -315,4 +315,4 @@ from django.utils.translation import ugettext as _
 </script>
 </div>
 
-${commonfooter()}
+${commonfooter(messages)}

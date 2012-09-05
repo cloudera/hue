@@ -84,4 +84,4 @@ ${layout.menubar(section='history')}
 		});
 	});
 </script>
-${commonfooter()}
+${commonfooter(messages)}

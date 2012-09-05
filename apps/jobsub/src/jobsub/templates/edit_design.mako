@@ -333,4 +333,4 @@ ${layout.menubar(section='designs')}
 </script>
 
 
-${commonfooter()}
+${commonfooter(messages)}

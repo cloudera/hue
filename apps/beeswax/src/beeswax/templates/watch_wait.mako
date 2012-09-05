@@ -67,4 +67,4 @@ ${layout.menubar(section='query')}
 
 
 
-${commonfooter()}
+${commonfooter(messages)}

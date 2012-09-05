@@ -36,4 +36,4 @@ ${commonheader(_('About Hue'), "about", "100px")}
 
 	</div>
 
-${commonfooter()}
+${commonfooter(messages)}

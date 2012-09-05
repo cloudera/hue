@@ -206,4 +206,4 @@ ${layout.menubar(section='history')}
 
 ${configModal("appConfigModal", "Application Configuration", workflow.conf_dict)}
 
-${commonfooter()}
+${commonfooter(messages)}

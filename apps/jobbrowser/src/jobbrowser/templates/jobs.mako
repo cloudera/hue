@@ -218,4 +218,4 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
     });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

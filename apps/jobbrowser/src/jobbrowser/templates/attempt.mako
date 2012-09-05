@@ -189,4 +189,4 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
         });
     });
 </script>
-${commonfooter()}
+${commonfooter(messages)}

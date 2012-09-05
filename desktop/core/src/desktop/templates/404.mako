@@ -26,4 +26,4 @@ ${commonheader(_('Not Found'), "")}
     <code>${uri}</code>
   </div>
 
-${commonfooter()}
+${commonfooter(messages)}

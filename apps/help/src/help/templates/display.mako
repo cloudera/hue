@@ -29,4 +29,4 @@ ${commonheader("Hue Help", "help", "100px")}
 	<div class="container-fluid">
 		${content|n}
 	</div>
-${commonfooter()}
+${commonfooter(messages)}

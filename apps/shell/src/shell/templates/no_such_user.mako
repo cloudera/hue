@@ -27,4 +27,4 @@ ${commonheader(_('Hue Shell'), "shell")}
 
 </div>
 </div>
-${commonfooter()}
+${commonfooter(messages)}

@@ -109,4 +109,4 @@ ${layout.menubar(section='dump_config')}
 	</div>
 
 
-${commonfooter()}
+${commonfooter(messages)}

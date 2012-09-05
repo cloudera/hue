@@ -115,4 +115,4 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid),
     });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

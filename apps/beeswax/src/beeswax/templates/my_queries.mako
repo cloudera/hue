@@ -253,4 +253,4 @@ ${layout.menubar(section='my queries')}
     });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

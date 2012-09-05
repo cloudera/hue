@@ -65,4 +65,4 @@ $(document).ready(function(){
 });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

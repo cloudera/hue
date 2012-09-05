@@ -144,4 +144,4 @@ ${layout.menubar(section='saved queries')}
     });
 </script>
 
-${commonfooter()}
+${commonfooter(messages)}

@@ -38,4 +38,4 @@ ${form.as_p()|n}
 </form>
 </div>
 
-${commonfooter()}
+${commonfooter(messages)}

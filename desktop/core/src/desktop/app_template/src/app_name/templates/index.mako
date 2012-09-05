@@ -27,4 +27,4 @@ ${'#'}# Main body
   ## Pass through literal $
   <p>It's now ${'$'}{date}.</p>
 </div>
-${'$'}{commonfooter()}
+${'$'}{commonfooter(messages)}

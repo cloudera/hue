@@ -31,5 +31,5 @@ ${commonheader(_('Error'), "")}
     %endif
   </div>
 
-${commonfooter()}
+${commonfooter(messages)}
 
