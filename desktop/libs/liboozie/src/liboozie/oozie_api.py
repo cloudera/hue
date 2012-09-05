@@ -146,6 +146,7 @@ class OozieApi(object):
     return self.get_jobs('coord', offset, cnt, **kwargs)
 
 
+  # TODO: make get_job accept any jobid
   def get_job(self, jobid):
     """
     get_job(jobid) -> Workflow
@@ -154,6 +155,7 @@ class OozieApi(object):
     resp = self._root.get('job/%s' % (jobid,), params)
     wf = Workflow(self, resp)
     return wf
+
 
   def get_coordinator(self, jobid):
     params = self._get_params()

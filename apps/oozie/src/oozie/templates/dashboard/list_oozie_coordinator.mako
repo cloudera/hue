@@ -31,73 +31,89 @@ ${ layout.menubar(section='dashboard') }
 
   <h1>${ _('Coordinator') } ${ oozie_coordinator.appName }</h1>
 
-  <div>
     <div class="tab-pane" id="details">
-      <table class="table table-condensed" cellpadding="0" cellspacing="0">
-        <tbody>
-          <tr>
-            <td>${ _('Coordinator') }</td>
-            <td>
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span3">${ _('Coordinator') }</div>
+          <div class="span6">
               % if coordinator is not None:
                 <a href="${ coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a>
               % else:
                 ${ oozie_coordinator.appName }
               % endif
-            </td>
-          </tr>
-          <tr>
-            <td>${ _('Submitter') }</td>
-            <td>${ oozie_coordinator.user }</td>
-          </tr>
-          <tr>
-            <td>${ _('Frequency') }</td>
-            <td>${ oozie_coordinator.frequency } ${ oozie_coordinator.timeUnit }</td>
-          </tr>
-          <tr>
-            <td>${ _('Status') }</td>
-            <td><span class="label ${ utils.get_status(oozie_coordinator.status) }">${ oozie_coordinator.status }</span>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>${ _('Next Materialized Time') }</td>
-            <td>${ utils.format_time(oozie_coordinator.nextMaterializedTime) }</td>
-          </tr>
-          % if coordinator:
-          <tr>
-            <td>${ _('Datasets') }</td>
-            <td></td>
-          </tr>
+          </div>
+        </div>
+
+        <div class="row-fluid">
+          <div class="span3">${ _('Submitter') }</div>
+          <div class="span6">${ oozie_coordinator.user }</div>
+        </div>
+
+        <div class="row-fluid">
+          <div class="span3">${ _('Status') }</div>
+          <div class="span6"><span class="label ${ utils.get_status(oozie_coordinator.status) }">${ oozie_coordinator.status }</span>&nbsp;</div>
+        </div>
+
+        <div class="row-fluid">
+          <div class="span3">
+            ${ _('Progress') }
+          </div>
+          <div class="span3">
+            ${ oozie_coordinator.get_progress() }%
+          </div>
+        </div>
+
+        <div class="row-fluid">
+          <div class="span3">${ _('Frequency') }</div>
+          <div class="span3">${ oozie_coordinator.frequency } ${ oozie_coordinator.timeUnit }</div>
+          <div class="span3">${ _('Next Materialized Time') }</div>
+          <div class="span3">${ utils.format_time(oozie_coordinator.nextMaterializedTime) }</div>
+        </div>
+
+
+        <div class="row-fluid">
+          <div class="span3">${ _('Start time') }</div><div class="span3">${ utils.format_time(oozie_coordinator.startTime) }</div>
+          <div class="span3">${ _('End time') }</div><div class="span3">${ utils.format_time(oozie_coordinator.endTime) }</div>
+        </div>
+
+        % if coordinator:
+          <div class="row-fluid">
+            <div class="row-fluid">
+              <div class="span3">${ _('Datasets') }</div>
+            </div>
             % for dataset in coordinator.dataset_set.all():
-              <tr>
-                <td></td>
-                <td>${ dataset.name } : ${ dataset.uri }</td>
-              </tr>
+              <div class="row-fluid">
+                <div class="span3"></div>
+                <div class="span6">${ dataset.name } : ${ dataset.uri }</div>
+              </div>
             % endfor
+          </div>
           % endif
-          <tr>
-            <td>${ _('Manage') }</td>
-            <td>
-            <form action="${ url('oozie:resubmit_coordinator', oozie_coord_id=oozie_coordinator.id) }" method="post">
-            % if oozie_coordinator.is_running():
-              <a title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
-                id="kill-coordinator"
-                class="btn small confirmationModal"
-                alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
-                href="javascript:void(0)"
-                data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
-                data-message="${ _('The coordinator was killed!') }"
-                data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
-                  ${_('Kill')}
-              </a>
-            % else:
-              <button type="submit" class="btn">
-                ${ _('Resubmit') }
-              </button>
-            % endif
-            </form>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+
+          <div class="row-fluid">
+            <div class="span3">${ _('Manage') }</div>
+            <div class="span6">
+              <form action="${ url('oozie:resubmit_coordinator', oozie_coord_id=oozie_coordinator.id) }" method="post">
+              % if oozie_coordinator.is_running():
+                <a title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
+                  id="kill-coordinator"
+                  class="btn small confirmationModal"
+                  alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
+                  href="javascript:void(0)"
+                  data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
+                  data-message="${ _('The coordinator was killed!') }"
+                  data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
+                    ${_('Kill')}
+                </a>
+              % else:
+                <button type="submit" class="btn">
+                  ${ _('Resubmit') }
+                </button>
+              % endif
+              </form>
+            </div>
+          </div>
+      </div>
     </div>
 
     <ul class="nav nav-tabs">

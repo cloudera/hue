@@ -90,7 +90,7 @@ ${ layout.menubar(section='dashboard') }
                 data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
                   ${ _('Kill') }
               </a>
-           </td>
+            </td>
           </tr>
         % endfor
       </tbody>
