@@ -33,4 +33,4 @@ ${commonheader(_('Beeswax: Create Table'), "beeswax", "100px")}
   </div>
 </div>
 </div>
-${commonfooter()}
+${commonfooter(messages)}

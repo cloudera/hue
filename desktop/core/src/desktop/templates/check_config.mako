@@ -58,5 +58,5 @@ ${layout.menubar(section='check_config')}
     </div>
 
 
-${commonfooter()}
+${commonfooter(messages)}
 

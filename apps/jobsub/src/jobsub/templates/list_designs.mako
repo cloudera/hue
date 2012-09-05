@@ -229,4 +229,4 @@ ${layout.menubar(section='designs')}
         $("a[data-row-selector='true']").jHueRowSelector();
     });
 </script>
-${commonfooter()}
+${commonfooter(messages)}

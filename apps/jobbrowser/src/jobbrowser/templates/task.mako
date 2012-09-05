@@ -182,4 +182,4 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
 </script>
 
 
-${commonfooter()}
+${commonfooter(messages)}

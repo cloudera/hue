@@ -214,4 +214,4 @@ ${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename
 			});
 		});
 	</script>
-${commonfooter()}
+${commonfooter(messages)}

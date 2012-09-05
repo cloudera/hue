@@ -52,4 +52,4 @@ ${layout.menubar()}
     </form>
 </div>
 
-${commonfooter()}
+${commonfooter(messages)}

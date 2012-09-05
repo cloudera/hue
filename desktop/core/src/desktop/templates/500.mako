@@ -24,4 +24,4 @@ ${commonheader(_('Error'), "")}
     <p>${_("Sorry, there's been an error. Please contact your site administrators. Thanks for your patience.")}</p>
   </div>
 
-${commonfooter()}
+${commonfooter(messages)}

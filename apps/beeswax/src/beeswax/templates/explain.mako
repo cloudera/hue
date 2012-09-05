@@ -40,4 +40,4 @@ ${layout.menubar(section='saved queries')}
         </div>
     </div>
 </div>
-${commonfooter()}
+${commonfooter(messages)}

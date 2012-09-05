@@ -54,4 +54,4 @@ ${layout.menubar(section='tables')}
 % endif
 </table>
 </div>
-${commonfooter()}
+${commonfooter(messages)}

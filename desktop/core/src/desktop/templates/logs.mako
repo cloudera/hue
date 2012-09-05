@@ -37,4 +37,4 @@ ${smart_unicode(l) | h}
 
 	</div>
 
-${commonfooter()}
+${commonfooter(messages)}

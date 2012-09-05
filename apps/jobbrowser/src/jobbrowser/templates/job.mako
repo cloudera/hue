@@ -311,4 +311,4 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
 </script>
 
 
-${commonfooter()}
+${commonfooter(messages)}

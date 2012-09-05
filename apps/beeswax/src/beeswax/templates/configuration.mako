@@ -78,4 +78,4 @@ ${layout.menubar(section='hive configuration')}
 	});
 
 </script>
-${commonfooter()}
+${commonfooter(messages)}

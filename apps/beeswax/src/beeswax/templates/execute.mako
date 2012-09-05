@@ -417,4 +417,4 @@ ${layout.menubar(section='query')}
 </script>
 
 
-${commonfooter()}
+${commonfooter(messages)}
