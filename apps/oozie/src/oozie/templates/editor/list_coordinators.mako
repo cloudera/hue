@@ -36,7 +36,7 @@ ${ layout.menubar(section='coordinators') }
 
     <div class="row-fluid">
       <div class="span3">
-        <form class="form-search">
+        <form>
           ${ _('Filter:') }
           <input id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
         </form>
@@ -220,10 +220,17 @@ ${ layout.menubar(section='coordinators') }
         null
       ],
       "aaSorting": [[ 4, "desc" ]]
-        });
+    });
+
+    $('#filterInput').keydown(function(e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        return False;
+      }
+    });
 
     $("#filterInput").keyup(function() {
-        oTable.fnFilter($(this).val());
+      oTable.fnFilter($(this).val());
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();

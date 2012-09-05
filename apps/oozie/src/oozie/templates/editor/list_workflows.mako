@@ -39,7 +39,7 @@ ${ layout.menubar(section='workflows') }
 
     <div class="row-fluid">
       <div class="span4">
-        <form class="form-search">
+        <form>
           ${ _('Filter:') } <input id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
         </form>
       </div>
@@ -230,6 +230,13 @@ ${ layout.menubar(section='workflows') }
         null
       ],
       "aaSorting": [[3, 'desc'], [ 1, "asc" ]]
+    });
+
+    $('#filterInput').keydown(function(e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        return False;
+      }
     });
 
     $("#filterInput").keyup(function() {

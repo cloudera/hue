@@ -31,7 +31,7 @@ ${layout.menubar(section='dashboard')}
 
   <div class="well hueWell">
     <form>
-      ${ _('Filter:') } <input id="filterInput" class="input-xlarge search-query" placeholder="Search for username, name, etc...">
+      ${ _('Filter:') } <input id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
 
       <span class="pull-right">
         <span style="padding-right:10px;float:left;margin-top:3px">
@@ -57,7 +57,7 @@ ${layout.menubar(section='dashboard')}
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="10%">${ _('Submission') }</th>
+          <th width="10%">${ _('Next submission') }</th>
           <th width="10%">${ _('Status') }</th>
           <th width="30%">${ _('Name') }</th>
           <th width="10%">${ _('Progress') }</th>
@@ -187,18 +187,24 @@ ${layout.menubar(section='dashboard')}
         "aaSorting": [[ 0, "desc" ]]
     });
 
+    $('#filterInput').keydown(function(e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        return False;
+      }
+    });
 
     $("#filterInput").keyup(function() {
-        runningTable.fnDraw();
-        completedTable.fnDraw();
+      runningTable.fnDraw();
+      completedTable.fnDraw();
 
-        hash = "#";
+      hash = "#";
 
-        if ($("a.btn-date.active").length > 0) {
-          hash += "date=" + $("a.btn-date.active").text();
-        }
+      if ($("a.btn-date.active").length > 0) {
+        hash += "date=" + $("a.btn-date.active").text();
+      }
 
-        window.location.hash = hash;
+      window.location.hash = hash;
     });
 
 

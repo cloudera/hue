@@ -187,18 +187,24 @@ ${ layout.menubar(section='dashboard') }
         "aaSorting": [[ 0, "desc" ]]
     });
 
+    $('#filterInput').keydown(function(e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        return False;
+      }
+    });
 
     $("#filterInput").keyup(function() {
-        runningTable.fnDraw();
-        completedTable.fnDraw();
+      runningTable.fnDraw();
+      completedTable.fnDraw();
 
-        hash = "#";
+      hash = "#";
 
-        if ($("a.btn-date.active").length > 0) {
-          hash += "date=" + $("a.btn-date.active").text();
-        }
+      if ($("a.btn-date.active").length > 0) {
+        hash += "date=" + $("a.btn-date.active").text();
+      }
 
-        window.location.hash = hash;
+      window.location.hash = hash;
     });
 
 
