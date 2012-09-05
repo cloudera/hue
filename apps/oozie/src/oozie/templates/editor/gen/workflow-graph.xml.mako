@@ -44,13 +44,13 @@
 
 
 <%def name="display_graph(form, print_node)">
-    <div class="row action2" style="min-height:400px">
-        ${ print_graph(nodes, print_node) }
-    </div>
+  <div class="row action2" style="min-height:400px">
+    ${ print_graph(nodes, print_node) }
+  </div>
 
-    <style>
-      .action2 {text-align: center; }
-      .action {border-style:solid; border-width:1px; border-color:LightGrey; padding: 3px; margin:25px;}
-      .action-link:hover {cursor: pointer; cursor: hand};
-    </style>
+  <style>
+    .action2 {text-align: center;}
+    .action {border-style:solid; border-width:1px; border-color:LightGrey; padding: 3px; margin:25px;}
+    .action-link:hover {cursor: pointer;}
+  </style>
 </%def>
