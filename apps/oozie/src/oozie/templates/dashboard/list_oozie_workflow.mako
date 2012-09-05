@@ -27,15 +27,15 @@ ${ layout.menubar(section='dashboard') }
 
 
 <div class="container-fluid">
-    ${ layout.dashboard_sub_menubar(section='workflows') }
+  ${ layout.dashboard_sub_menubar(section='workflows') }
 
-    <h1>
-      % if oozie_coordinator:
-        ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a> :
-      % endif
+  <h1>
+    % if oozie_coordinator:
+      ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a> :
+    % endif
 
-      ${ _('Workflow') } ${ oozie_workflow.appName }
-    </h1>
+    ${ _('Workflow') } ${ oozie_workflow.appName }
+  </h1>
 
   <div class="row-fluid">
     <div class="span3">
@@ -96,7 +96,7 @@ ${ layout.menubar(section='dashboard') }
     </div>
     % for var, value in parameters.iteritems():
       <div class="row-fluid">
-      <div class="span3"></div>
+        <div class="span3"></div>
         <div class="span3">
           ${ var | h }
         </div>

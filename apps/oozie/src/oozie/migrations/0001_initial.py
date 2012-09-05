@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'Job'
         db.create_table('oozie_job', (
             ('is_shared', self.gf('django.db.models.fields.BooleanField')(default=False, db_index=True, blank=True)),
@@ -194,10 +194,10 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
         db.send_create_signal('oozie', ['History'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'Job'
         db.delete_table('oozie_job')
 
@@ -251,8 +251,8 @@ class Migration(SchemaMigration):
 
         # Deleting model 'History'
         db.delete_table('oozie_history')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -443,5 +443,5 @@ class Migration(SchemaMigration):
             'start': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'start_workflow'", 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-    
+
     complete_apps = ['oozie']

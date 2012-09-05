@@ -23,6 +23,7 @@ http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 """
 
 from cStringIO import StringIO
+from time import mktime
 
 from desktop.lib import i18n
 from desktop.lib.django_util import PopupException
@@ -45,7 +46,7 @@ class Action(object):
   def _fixup(self): pass
 
   def is_finished(self):
-    return self.status == 'OK'
+    return self.status in ('OK', 'SUCCEEDED')
 
   @classmethod
   def create(self, action_class, action_dict):
@@ -266,9 +267,6 @@ class Job(object):
     res.append('kill')
     return res
 
-  def get_progress(self):
-    return sum([action.is_finished() for action in self.actions]) / float(max(len(self.actions), 1)) * 100
-
   def check_request_permission(self, request):
     """Raise PopupException if request user doesn't have permission to modify workflow"""
     if not request.user.is_superuser and request.user.username != self.user:
@@ -317,8 +315,10 @@ class Coordinator(Job):
   def _fixup(self):
     super(Coordinator, self)._fixup()
 
-    if self.nextMaterializedTime:
+    if self.nextMaterializedTime is not None:
       self.nextMaterializedTime = parse_timestamp(self.nextMaterializedTime)
+    else:
+      self.nextMaterializedTime = self.startTime
 
     # For when listing/mixing all the jobs together
     self.id = self.coordJobId
@@ -330,6 +330,17 @@ class Coordinator(Job):
 
   def get_absolute_url(self):
     return reverse('oozie:list_oozie_coordinator', kwargs={'job_id': self.id})
+
+  def get_progress(self):
+    """How much more time before the final materialization."""
+    next = mktime(self.nextMaterializedTime)
+    start = mktime(self.startTime)
+    end = mktime(self.endTime)
+
+    if end != start:
+      return int((1 - (end - next) / (end - start)) * 100)
+    else:
+      return 100
 
 
 class Workflow(Job):
@@ -370,6 +381,10 @@ class Workflow(Job):
 
   def get_absolute_url(self):
     return reverse('oozie:list_oozie_workflow', kwargs={'job_id': self.id})
+
+  def get_progress(self):
+    """How many actions are finished on the total of actions."""
+    return int(sum([action.is_finished() for action in self.actions]) / float(max(len(self.actions), 1)) * 100)
 
 
 class JobList(object):
