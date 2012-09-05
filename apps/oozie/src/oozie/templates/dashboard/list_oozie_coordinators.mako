@@ -88,7 +88,7 @@ ${layout.menubar(section='dashboard')}
                 data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"
                 data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }">
                   ${ _('Kill') }
-              </button>
+              </a>
            </td>
           </tr>
         %endfor
@@ -189,8 +189,8 @@ ${layout.menubar(section='dashboard')}
 
 
     $("#filterInput").keyup(function() {
-        runningTable.fnFilter($(this).val());
-        completedTable.fnFilter($(this).val());
+        runningTable.fnDraw();
+        completedTable.fnDraw();
 
         hash = "#";
 
@@ -215,7 +215,6 @@ ${layout.menubar(section='dashboard')}
 
     $.fn.dataTableExt.afnFiltering.push(
       function(oSettings, aData, iDataIndex) {
-
         urlHashes = ""
 
         statusBtn = $('a.btn-status.active');
