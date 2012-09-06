@@ -268,6 +268,10 @@ AUTH = ConfigSection(
     USER_AUGMENTOR=Config("user_augmentor",
                    default="desktop.auth.backend.DefaultUserAugmentor",
                    help=_("Class which defines extra accessor methods for User objects.")),
+    PAM_SERVICE=Config("pam_service",
+                  default="login",
+                  help=_("The service to use when querying PAM."
+                         "The service usually corresponds to a single filename in /etc/pam.d"))
 ))
 
 LDAP = ConfigSection(
