@@ -198,7 +198,7 @@ class PamBackend(DesktopBackendBase):
   login will become the superuser.
   """
   def check_auth(self, username, password):
-    if pam.authenticate(username, password):
+    if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
       is_super = False
       if User.objects.count() == 0:
         is_super = True
