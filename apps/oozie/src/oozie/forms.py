@@ -18,6 +18,7 @@
 import logging
 
 from django import forms
+from django.db.models import Q
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
@@ -162,7 +163,16 @@ class CoordinatorForm(forms.ModelForm):
     }
 
   def __init__(self, *args, **kwargs):
+    user = kwargs['user']
+    del kwargs['user']
     super(CoordinatorForm, self).__init__(*args, **kwargs)
+    qs = Workflow.objects.filter(Q(is_shared=True) | Q(owner=user))
+    workflows = []
+    for workflow in qs:
+      if workflow.is_accessible(user):
+        workflows.append(workflow.id)
+    qs = qs.filter(id__in=workflows)
+    self.fields['workflow'].queryset = qs
     self.fields['schema_version'].widget = forms.Select(choices=(('uri:oozie:coordinator:0.1', '0.1'),
                                                                  ('uri:oozie:coordinator:0.2', '0.2'),
                                                                  ('uri:oozie:coordinator:0.3', '0.3'),

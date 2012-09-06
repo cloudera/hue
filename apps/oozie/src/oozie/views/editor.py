@@ -555,7 +555,7 @@ def create_coordinator(request, workflow=None):
     coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.1")
 
   if request.method == 'POST':
-    coordinator_form = CoordinatorForm(request.POST, instance=coordinator)
+    coordinator_form = CoordinatorForm(request.POST, instance=coordinator, user=request.user)
 
     if coordinator_form.is_valid():
       coordinator = coordinator_form.save()
@@ -563,7 +563,7 @@ def create_coordinator(request, workflow=None):
     else:
       request.error(_('Errors on the form: %s') % coordinator_form.errors)
   else:
-    coordinator_form = CoordinatorForm(instance=coordinator)
+    coordinator_form = CoordinatorForm(instance=coordinator, user=request.user)
 
   return render('editor/create_coordinator.mako', request, {
     'coordinator': coordinator,
@@ -602,7 +602,7 @@ def edit_coordinator(request, coordinator):
   NewDataOutputFormSet.form = staticmethod(curry(DataOutputForm, coordinator=coordinator))
 
   if request.method == 'POST':
-    coordinator_form = CoordinatorForm(request.POST, instance=coordinator)
+    coordinator_form = CoordinatorForm(request.POST, instance=coordinator, user=request.user)
     dataset_formset = DatasetFormSet(request.POST, request.FILES, instance=coordinator)
     data_input_formset = DataInputFormSet(request.POST, request.FILES, instance=coordinator)
     data_output_formset = DataOutputFormSet(request.POST, request.FILES, instance=coordinator)
@@ -617,10 +617,10 @@ def edit_coordinator(request, coordinator):
       new_data_input_formset.save()
       new_data_output_formset.save()
 
-      request.info(_("Coordinator saved!"))
+      request.info(_('Coordinator saved!'))
       return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}))
   else:
-    coordinator_form = CoordinatorForm(instance=coordinator)
+    coordinator_form = CoordinatorForm(instance=coordinator, user=request.user)
     dataset_formset = DatasetFormSet(instance=coordinator)
     data_input_formset = DataInputFormSet(instance=coordinator)
     data_output_formset = DataOutputFormSet(instance=coordinator)
@@ -637,7 +637,6 @@ def edit_coordinator(request, coordinator):
     'new_data_input_formset': new_data_input_formset,
     'new_data_output_formset': new_data_output_formset,
     'history': history,
-    'can_edit_coordinator': coordinator.workflow.is_editable(request.user),
     'parameters': extract_field_data(coordinator_form['parameters'])
   })
 

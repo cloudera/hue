@@ -343,7 +343,7 @@ ${ layout.menubar(section='coordinators') }
 
   <div class="form-actions center">
     <a href="${ url('oozie:list_coordinators') }" class="btn">${ _('Back') }</a>
-    % if can_edit_coordinator:
+    % if coordinator.is_editable(user):
       <input class="btn btn-primary" data-bind="click: submit" type="submit" value="${ _('Save') }"></input>
     % endif
   </div>
