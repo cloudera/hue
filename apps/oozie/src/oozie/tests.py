@@ -671,23 +671,61 @@ class TestEditor:
     assert_not_equal('', coord2.deployment_dir)
 
 
-  def test_coordinator_permissions(self):
+  def test_coordinator_workflow_access_permissions(self):
     oozie_api.OozieApi = MockOozieCoordinatorApi
     oozie_api._api_cache = None
 
-    coord = create_coordinator(self.wf)
+    self.wf.is_shared = True
+    self.wf.save()
 
-    response = self.c.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+    # Login as someone else not superuser
+    client_another_me = make_logged_in_client(username='another_me', is_superuser=False, groupname='test')
+    grant_access("another_me", "test", "oozie")
+    coord = create_coordinator(self.wf, client_another_me)
+
+    response = client_another_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
     assert_true('Editor' in response.content, response.content)
+    assert_true('value="Save"' in response.content, response.content)
+
+    # Check can schedule a non personal/shared workflow
+    workflow_select = '%s</option>' % self.wf
+    response = client_another_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+    assert_true(workflow_select in response.content, response.content)
+
+    self.wf.is_shared = False
+    self.wf.save()
+
+    response = client_another_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+    assert_false(workflow_select in response.content, response.content)
+
+    self.wf.is_shared = True
+    self.wf.save()
 
     # Edit
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = self.c.post(reverse('oozie:edit_coordinator', args=[coord.id]))
-      assert_true('MyCoord' in response.content, response.content)
-      assert_false('Permission denied' in response.content, response.content)
+      response = client_another_me.post(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_true(workflow_select in response.content, response.content)
+      assert_true('value="Save"' in response.content, response.content)
     finally:
       finish()
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_another_me.post(reverse('oozie:edit_coordinator', args=[coord.id]))
+      assert_true('This field is required' in response.content, response.content)
+      assert_false(workflow_select in response.content, response.content)
+      assert_true('value="Save"' in response.content, response.content)
+    finally:
+      finish()
+
+
+  def test_coordinator_permissions(self):
+    coord = create_coordinator(self.wf)
+
+    response = self.c.get(reverse('oozie:edit_coordinator', args=[coord.id]))
+    assert_true('Editor' in response.content, response.content)
+    assert_true('value="Save"' in response.content, response.content)
 
     # Login as someone else
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
@@ -891,8 +929,9 @@ def create_workflow():
   return wf
 
 
-def create_coordinator(workflow):
-  c = make_logged_in_client()
+def create_coordinator(workflow, c=None):
+  if c is None:
+    c = make_logged_in_client()
 
   coord_count = Coordinator.objects.count()
   response = c.get(reverse('oozie:create_coordinator'))

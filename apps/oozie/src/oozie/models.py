@@ -1014,9 +1014,9 @@ class Coordinator(Job):
                                               'allowed to run concurrently ( RUNNING status) before the coordinator engine '
                                               'starts throttling them.'))
   execution = models.CharField(max_length=10, null=True, blank=True,
-                               choices=(('FIFO', 'FIFO (oldest first) default'),
-                                        ('LIFO', 'LIFO (newest first)'),
-                                        ('LAST_ONLY', 'LAST_ONLY (discards all older materializations)')),
+                               choices=(('FIFO', _('FIFO (oldest first) default')),
+                                        ('LIFO', _('LIFO (newest first)')),
+                                        ('LAST_ONLY', _('LAST_ONLY (discards all older materializations)'))),
                                  help_text=_t('Execution strategy of its coordinator actions when there is backlog of coordinator '
                                               'actions in the coordinator engine. The different execution strategies are \'oldest first\', '
                                               '\'newest first\' and \'last one only\'. A backlog normally happens because of delayed '
