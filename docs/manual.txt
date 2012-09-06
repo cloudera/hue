@@ -17,8 +17,9 @@ There is also a companion SDK guide that describes how to develop
 new Hue applications:
 link:sdk/sdk.html[Hue SDK Documentation]
 
-IMPORTANT: Hue requires the Hadoop contained in Cloudera's Distribution including
-Apache Hadoop (CDH), version 3 update 4 or later.
+IMPORTANT: Hue requires the Hadoop contained in
+https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide[Cloudera's
+Distribution including Apache Hadoop (CDH4)]
 
 .Conventions Used in this Guide:
 * Commands that must be run with +root+ permission have a +#+ command prompt.
@@ -59,6 +60,7 @@ tarball, you must have the following installed:
 Redhat,Ubuntu
 ~~~~~~~~~~
 gcc,gcc
+g+,g++
 libxml2-devel,libxml2-dev
 libxslt-devel,libxslt-dev
 cyrus-sasl-devel,libsasl2-dev
@@ -70,6 +72,8 @@ python-simplejson,python-simplejson
 sqlite-devel,libsqlite3-dev
 ant,ant
 ~~~~~~~~~~
+
+The full list is here: https://github.com/cloudera/hue#development-prerequisites
 
 Build
 ^^^^^
@@ -114,7 +118,7 @@ software components.
 Install Hadoop from CDH
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-To use Hue, you must install and run Hadoop from CDH3u4 or later.  If you
+To use Hue, you must install and run Hadoop from CDH4 or later.  If you
 are not running this version of CDH or later, upgrade your cluster before
 proceeding.
 
@@ -124,16 +128,14 @@ proceeding.
   Component   Required   Applications                       Notes
 -------------------------------------------------------------------------------------
   HDFS        Yes        Core, Filebrowser                  HDFS access through WebHdfs or HttpFS
-  MR1         No         JobBrowser, JobDesigner*, Beeswax* Job information access through hue-plugins
-  Yarn        No         JobDesigner*, Beeswax*             Transitive dependency via Hive or Oozie
-  Oozie       No         JobDesigner                        Oozie access through REST API
+  MR1         No         JobBrowser, JobDesigner, Beeswax   Job information access through hue-plugins
+  Yarn        No         JobDesigner, Beeswax               Transitive dependency via Hive or Oozie
+  Oozie       No         JobDesigner, Oozie                 Oozie access through REST API
   Hive        No         Beeswax                            Beeswax uses the Hive client libraries
   Flume       No         Shell                              Optionally provides access to the Flume shell
   HBase       No         Shell                              Optionally provides access to the HBase shell
   Pig         No         Shell                              Optionally provides access to the Pig shell
 -------------------------------------------------------------------------------------
-
-[*] Transitive dependency
 
 
 Hadoop Configuration
@@ -274,10 +276,10 @@ Unfortunately, when the variable is unset, you'll end up
 with directories named `/tmp/hadoop-user_name-${hue.suffix}` in
 `/tmp`.  Despite that, Hue will still work.
 
-IMPORTANT: The Beeswax server writes into a local directory on the Hue machine 
-that is specified by `hadoop.tmp.dir` to unpack its jars. That directory 
-needs to be writable by the `hue` user, which is the default user who starts 
-Beeswax Server, or else Beeswax server will not start. You may also make that 
+IMPORTANT: The Beeswax server writes into a local directory on the Hue machine
+that is specified by `hadoop.tmp.dir` to unpack its jars. That directory
+needs to be writable by the `hue` user, which is the default user who starts
+Beeswax Server, or else Beeswax server will not start. You may also make that
 directory world-writable.
 
 
@@ -301,7 +303,7 @@ Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
 (or any path you specify as `hive.metastore.warehouse.dir` in your
 `hive-site.xml`).  Make sure this location exists and is writable by
 the users whom you expect to be creating tables.  `/tmp` (on the local file
-system) must be world-writable, as Hive makes extensive use of it.
+system) must be world-writable (1777), as Hive makes extensive use of it.
 
 [NOTE]
 If you used the embedded Hive MetaStore functionality of Beeswax in Hue from
@@ -339,8 +341,8 @@ Configuring Hue
 
 Hue ships with a default configuration that will work for
 pseudo-distributed clusters.  If you are running on a real cluster, you must
-make a few changes to the `/etc/hue/hue.ini` configuration file. The
-following sections describe the key configuration options you must make to
+make a few changes to the `/etc/hue/hue.ini` configuration file (or ``pseudo-distributed.ini`
+when in development mode). The following sections describe the key configuration options you must make to
 configure Hue.
 
 
@@ -394,13 +396,13 @@ Specifying the Secret Key
 
 For security, you should also specify the secret key that is used for secure
 hashing in the session store. Enter a long series of random characters
-(30 to 60 characters is recommended). 
+(30 to 60 characters is recommended).
 
     secret_key=jFE93j;2[290-eiw.KEiwN2s3['d;/.q[eIW^y#e=+Iei*@Mn<qW5o
 
-NOTE: If you don't specify a secret key, your session cookies will not be 
+NOTE: If you don't specify a secret key, your session cookies will not be
 secure. Hue will run but it will also display error messages telling you to
-set the secret key. 
+set the secret key.
 
 Authentication
 ^^^^^^^^^^^^^^
@@ -411,7 +413,7 @@ user can create other user and administrator accounts.  User information is
 stored in the Django database in the Django backend.
 
 The authentication system is pluggable. For more information, see the
-http://archive.cloudera.com/cdh3/hue/sdk/sdk.html[Hue SDK Documentation].
+link:sdk/sdk.html[Hue SDK Documentation].
 
 Configuring Hue for SSL
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -576,10 +578,10 @@ beeswax_server_heapsize::
   The heap size (-Xmx) of the Beeswax Server.
 
 
-JobDesigner Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~
+JobDesigner and Oozie Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the `[jobsub]` section of the configuration file, you should
+In the `[liboozie]` section of the configuration file, you should
 specify:
 
 oozie_url::
@@ -707,7 +709,7 @@ Inspecting the Hue Database
 
 The default SQLite database used by Hue is located in: `/usr/share/hue/desktop/desktop.db`.
 You can inspect this database from the command line using the `sqlite3`
-program. For example:
+program or typing `/usr/share/hue/build/env/bin/hue dbshell'. For example:
 
   # sqlite3 /usr/share/hue/desktop/desktop.db
   SQLite version 3.6.22
@@ -803,14 +805,16 @@ The Help application guides users through the various installed applications.
 Supported Browsers
 ~~~~~~~~~~~~~~~~~~
 
-Hue is primarily tested on Firefox, Google Chrome and Safari on Windows, Mac,
+Hue is primarily tested on Firefox, Chrome and Safari on Windows, Mac,
 and Linux.
+
+Most of Hue should work in IE8+ and Opera is not tested.
 
 Feedback
 ~~~~~~~~
 
 Your feedback is welcome. The best way to send feedback is to join the
-https://groups.google.com/a/cloudera.org/group/hue-user[mailing list], and 
+https://groups.google.com/a/cloudera.org/group/hue-user[mailing list], and
 send e-mail, to mailto:hue-user@cloudera.org[hue-user@cloudera.org].
 
 Reporting Bugs

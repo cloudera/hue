@@ -164,8 +164,8 @@ Download, Unpack, Build Distro
 ------------------------------
 
 The Hue SDK is available from [Github](http://github.com/cloudera/hue). Releases
-can be found on the [download page](https://github.com/cloudera/hue/downloads). 
-Releases are missing a few dependencies that could not be included because of 
+can be found on the [download page](https://github.com/cloudera/hue/downloads).
+Releases are missing a few dependencies that could not be included because of
 licencing issues (e.g. the werkzeug module). So if you prefer to have an
 environment ready from scratch, it is preferable to checkout a particular
 release tag instead.
@@ -341,7 +341,7 @@ page. You can click on any stack frame to get a debugging console:
 Great! Now that we've added a single application, we're going to
 delve further into the back-end.
 
-A Look at Two Existing Apps
+A Look at Three Existing Apps
 ===========================
 
 ![Arch](arch_examples.png)
@@ -361,6 +361,49 @@ You'll note that the "Help Index" is presented in a "split view".
 No JavaScript was written to make this happen!  Instead, the template
 applied certain CSS classes to the relevant `div`'s, and JFrame
 did the rest.
+
+Proxy
+-----
+
+### Setup
+
+You need to have Hue running:
+
+    $ ./build/env/bin/hue runserver
+
+Then if you want to access localhost/50030/jobtracker.jsp you just do:
+
+    http://127.0.0.1:8000/proxy/localhost/50030/jobtracker.jsp
+
+and the page will be displayed within Hue.
+
+You can configure it in ``desktop/conf/pseudo-distributed.ini``
+
+    [proxy]
+    whitelist="(localhost|127\.0\.0\.1)50030|50070|50060|50075)",
+    #Comma-separated list of regular expressions, which match 'host:port' of requested proxy target.
+
+    blacklist=""
+    #Comma-separated list of regular expressions, which match any prefix of 'host:port/path' of requested proxy target.
+    # This does not support matching GET parameters.
+
+### Usage
+
+You can create a new app (or modify a current one for testing).
+
+Then in order to display the proxied page in your app, you could add in the template of a view of the new app a
+snippet of Javacript similar to this for loading the JobTracker page:
+
+    <script>
+        $.get('/proxy/localhost/50030/jobtracker.jsp', function(data) { $('#proxy-body').html(data); alert('Load was performed.'); });
+    </script>
+
+or alternatively get the page in the view (better solution) with the Hue
+[REST API](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/lib/rest). Example of use of
+this API can be found in the [HDFS lib](https://github.com/cloudera/hue/blob/master/desktop/libs/hadoop/src/hadoop/fs/webhdfs.py).
+
+If you need to browse through the proxied page, using an iframe might be a better solution.
+
 
 Beeswax
 -------
