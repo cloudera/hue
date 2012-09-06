@@ -6,12 +6,15 @@ Welcome to the repository for Hue
     end users, please put them in ``dist/README``.
 
 Hue is both a Web UI for Hadoop and a framework to create interactive Web
-applications.
+applications. It features:
 
-It features a FileBrowser for accessing HDFS, JobSub and
-JobBrowser applications for submitting and viewing MapReduce jobs, a Beeswax
-application for executing Hive queries. On top of that, a SDK is available
-for creating new apps integrated with Hadoop.
+      * FileBrowser for accessing HDFS
+      * Job Designer and Oozie for submitting and scheduling workflows of MapReduce/Java/Streaming/Pig jobs
+      * JobBrowser for viewing MapReduce jobs
+      * Beeswax application for executing Hive queries
+      * A Pig/HBase shell
+
+On top of that, a SDK is available for creating new apps integrated with Hadoop.
 
 More documentation is available at http://cloudera.github.com/hue/.
 
@@ -99,32 +102,32 @@ your system:
 
 File Layout
 ===========
-The "core" stuff is in ``desktop/core/``, whereas installable apps live in
-``apps/``.  Please place third-party dependencies in the app's ext-py/
+The Hue "framework" is in ``desktop``. ``/core/`` contains the Web components and
+``desktop/libs/`` the API for talking to Hadoop.
+The installable apps live in ``apps/``.  Please place third-party dependencies in the app's ext-py/
 directory.
 
 The typical directory structure for inside an application includes:
 
   src/
-    for Python code
+    for Python/Django code
       models.py
       urls.py
       views.py
       forms.py
       settings.py
-        for Django code
- 
+
   conf/
     for configuration (``.ini``) files to be installed
 
   static/
-    for static HTML and js resources
+    for static HTML/js resources and help doc
 
   templates/
     for data to be put through a template engine
 
-  docs/
-    for helpful notes
+  locales/
+    for localizations in multiple languages
 
 For the URLs within your application, you should make your own ``urls.py``
 which will be automatically rooted at ``/yourappname/`` in the global
@@ -136,9 +139,9 @@ Main Stack
 
    * Python 2.4 - 2.7
    * Django 1.2 https://docs.djangoproject.com/en/1.2/
-   * Mako 0.7
-   * jQuery 1.7
-   * Bootstrap 2
+   * Mako
+   * jQuery
+   * Bootstrap
 
 
 Using and Installing Thrift
