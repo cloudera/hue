@@ -288,7 +288,7 @@ to include a simple form:
         <input type="submit" value="Calculate">
       </form>
     </div>
-    ${commonfooter()}
+    ${commonfooter(messages)}
 
 The template language here is <a href="http://www.makotemplates.org/docs/">Mako</a>,
 which is flexible and powerful.  If you use the "`.html`" extension, Hue
