@@ -191,6 +191,7 @@ class DatasetForm(forms.ModelForm):
     }
 
   def __init__(self, *args, **kwargs):
+    kwargs.setdefault('prefix', 'create')
     super(DatasetForm, self).__init__(*args, **kwargs)
 
 
