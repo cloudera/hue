@@ -960,11 +960,11 @@ def create_dataset(coord):
   c = make_logged_in_client()
 
   response = c.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]), {
-                        u'name': [u'MyDataset'], u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
-                        u'uri': [u'/data/${YEAR}${MONTH}${DAY}'],
-                        u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
-                        u'timezone': [u'America/Los_Angeles'], u'done_flag': [u''],
-                        u'description': [u'']})
+                        u'create-name': [u'MyDataset'], u'create-frequency_number': [u'1'], u'create-frequency_unit': [u'days'],
+                        u'create-uri': [u'/data/${YEAR}${MONTH}${DAY}'],
+                        u'create-start_0': [u'07/01/2012'], u'create-start_1': [u'12:00 AM'],
+                        u'create-timezone': [u'America/Los_Angeles'], u'create-done_flag': [u''],
+                        u'create-description': [u'']})
   data = json.loads(response.content)
   assert_equal(0, data['status'], data['data'])
 
