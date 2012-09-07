@@ -83,6 +83,9 @@
     # - desktop.auth.backend.AllowAllBackend (allows everyone)
     # - desktop.auth.backend.AllowFirstUserDjangoBackend
     #     (Default. Relies on Django and user manager, after the first login)
+    # - desktop.auth.backend.LdapBackend
+    # - desktop.auth.backend.PamBackend
+    ## backend=desktop.auth.backend.AllowFirstUserDjangoBackend
 
     ## pam_service=login
 

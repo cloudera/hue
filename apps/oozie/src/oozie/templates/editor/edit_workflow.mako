@@ -45,7 +45,9 @@ ${ layout.menubar(section='workflows') }
   <ul class="nav nav-tabs">
     <li class="active"><a href="#editor" data-toggle="tab">${ _('Editor') }</a></li>
     <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
-    <li><a href="#history" data-toggle="tab">${ _('History') }</a></li>
+    % if user_can_edit_job:
+      <li><a href="#history" data-toggle="tab">${ _('History') }</a></li>
+    % endif
   </ul>
 
   <form class="form-horizontal" id="jobForm" action="${ url('oozie:edit_workflow', workflow=workflow.id) }" method="POST">
@@ -167,31 +169,33 @@ ${ layout.menubar(section='workflows') }
         <div class="span3"></div>
       </div>
 
-      <div class="tab-pane" id="history">
-        % if not history:
-          ${ _('N/A') }
-        % else:
-        <table class="table">
-          <thead>
-            <tr>
-              <th>${ _('Date') }</th>
-              <th>${ _('Id') }</th>
-            </tr>
-          </thead>
-          <tbody>
-            % for record in history:
+      % if user_can_edit_job:
+        <div class="tab-pane" id="history">
+          % if not history:
+            ${ _('N/A') }
+          % else:
+          <table class="table">
+            <thead>
               <tr>
-                <td>
-                  <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
-                  ${ utils.format_date(record.submission_date) }
-                </td>
-                <td>${ record.oozie_job_id }</td>
+                <th>${ _('Date') }</th>
+                <th>${ _('Id') }</th>
               </tr>
-            % endfor
-          </tbody>
-        </table>
-        % endif
-      </div>
+            </thead>
+            <tbody>
+              % for record in history:
+                <tr>
+                  <td>
+                    <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
+                    ${ utils.format_date(record.submission_date) }
+                  </td>
+                  <td>${ record.oozie_job_id }</td>
+                </tr>
+              % endfor
+            </tbody>
+          </table>
+          % endif
+        </div>
+      % endif
     </div>
   </form>
 </div>

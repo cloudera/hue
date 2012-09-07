@@ -60,7 +60,7 @@ tarball, you must have the following installed:
 Redhat,Ubuntu
 ~~~~~~~~~~
 gcc,gcc
-g+,g++
+g++,g++
 libxml2-devel,libxml2-dev
 libxslt-devel,libxslt-dev
 cyrus-sasl-devel,libsasl2-dev
