@@ -42,7 +42,7 @@ ${ layout.menubar(section='coordinators') }
   <ul class="nav nav-tabs">
     <li class="active"><a href="#editor" data-toggle="tab">${ _('Editor') }</a></li>
     <li><a href="#datasets" data-toggle="tab">${ _('Datasets') }</a></li>
-    % if can_edit_coordinator:
+    % if coordinator.is_editable(user):
       <li><a href="#history" data-toggle="tab">${ _('History') }</a></li>
     % endif
   </ul>
@@ -138,7 +138,7 @@ ${ layout.menubar(section='coordinators') }
                       <th width="10%">${ _('Name') }</th>
                       <th width="10%">${ _('Dataset') }</th>
                       <th>${ _('Path') }</th>
-                      % if can_edit_coordinator:
+                      % if coordinator.is_editable(user):
                         <th width="1%">${ _('Delete') }</th>
                       % endif
                     </tr>
@@ -150,7 +150,7 @@ ${ layout.menubar(section='coordinators') }
                          <td>${ form['name'] }</td>
                          <td>${ form['dataset'] }</td>
                          <td>${ form['dataset'].form.instance.dataset.uri }</td>
-                         % if can_edit_coordinator:
+                         % if coordinator.is_editable(user):
                            <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] }</a></td>
                          % endif
                       </tr>
@@ -167,7 +167,7 @@ ${ layout.menubar(section='coordinators') }
                 ${ _('No inputs') }
               </div>
 
-              % if can_edit_coordinator:
+              % if coordinator.is_editable(user):
                 ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_input', new_data_input_formset, 'input', not len(data_input_formset.forms)) }
               % endif
             </div>
@@ -185,7 +185,7 @@ ${ layout.menubar(section='coordinators') }
                     <th width="10%">${ _('Name') }</th>
                     <th width="10%">${ _('Dataset') }</th>
                     <th>${ _('Path') }</th>
-                    % if can_edit_coordinator:
+                    % if coordinator.is_editable(user):
                       <th width="1%">${ _('Delete') }</th>
                     % endif
                   </tr>
@@ -197,7 +197,7 @@ ${ layout.menubar(section='coordinators') }
                       <td>${ form['name'] }</td>
                       <td>${ form['dataset'] }</td>
                       <td>${ form['dataset'].form.instance.dataset.uri }</td>
-                      % if can_edit_coordinator:
+                      % if coordinator.is_editable(user):
                         <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] }</a></td>
                       % endif
                     </tr>
@@ -214,7 +214,7 @@ ${ layout.menubar(section='coordinators') }
                 ${ _('No outputs') }
               </div>
 
-              % if can_edit_coordinator:
+              % if coordinator.is_editable(user):
                 ${ coordinator_data.print_datasets(_('Datasets'), 'dataset_output', new_data_output_formset, 'output', not len(data_output_formset.forms)) }
               % endif
             </div>
@@ -226,7 +226,7 @@ ${ layout.menubar(section='coordinators') }
     <div class="tab-pane" id="datasets">
       <div class="row-fluid">
           <div class="span1">
-            % if can_edit_coordinator:
+            % if coordinator.is_editable(user):
               <table cellpadding="5">
                 <thead>
                   <tr>
@@ -255,7 +255,7 @@ ${ layout.menubar(section='coordinators') }
                       <th>${ _('Uri') }</th>
                       <th>${ _('Timezone') }</th>
                       <th>${ _('Done flag') }</th>
-                      % if can_edit_coordinator:
+                      % if coordinator.is_editable(user):
                         <td>${ _('Delete') }</td>
                       % endif
                     </tr>
@@ -267,7 +267,7 @@ ${ layout.menubar(section='coordinators') }
                     % endfor
                     <tr>
                       <td>
-                        % if can_edit_coordinator:
+                        % if coordinator.is_editable(user):
                           <a href="javascript:modalRequest('${ url('oozie:edit_coordinator_dataset', dataset=form.instance.id) }', '#edit-dataset-modal');"
                              data-row-selector="true"/>
                         % endif
@@ -279,7 +279,7 @@ ${ layout.menubar(section='coordinators') }
                       <td>${ form.instance.uri }</td>
                       <td>${ form.instance.timezone }</td>
                       <td>${ form.instance.done_flag }</td>
-                      % if can_edit_coordinator:
+                      % if coordinator.is_editable(user):
                         <td data-row-selector-exclude="true">
                           <a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] }</a>
                         </td>
@@ -309,7 +309,7 @@ ${ layout.menubar(section='coordinators') }
        </div>
     </div>
 
-    % if can_edit_coordinator:
+    % if coordinator.is_editable(user):
       <div class="tab-pane" id="history">
         <table class="table">
           <thead>
