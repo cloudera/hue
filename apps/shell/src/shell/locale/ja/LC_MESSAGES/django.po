@@ -1,14 +1,13 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2012 Cloudera
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 19:07-0700\n"
+"POT-Creation-Date: 2012-09-07 18:08-0700\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -31,7 +30,9 @@ msgid "Hue Shell"
 msgstr "Hue シェル"
 
 #: src/shell/templates/failed_to_create.mako:24
-msgid "Failed to create a shell of the given type. The possible reasons for this are:"
+msgid ""
+"Failed to create a shell of the given type. The possible reasons for this"
+" are:"
 msgstr "指定されたタイプのシェルを作成できませんでした。考えられる原因は次のとおりです。"
 
 #: src/shell/templates/failed_to_create.mako:26
@@ -59,18 +60,26 @@ msgid "Please select one of the available shells from the toolbar above."
 msgstr "上のツールバーにある使用可能なシェルから 1 つを選択してください。"
 
 #: src/shell/templates/index.mako:113
-msgid "You do not have permission to access any shell or there is no configured shell."
+msgid ""
+"You do not have permission to access any shell or there is no configured "
+"shell."
 msgstr "どのシェルにもアクセスするパーミッションがないか、シェルが 1 つも設定されていません。"
 
 #: src/shell/templates/no_such_user.mako:24
-msgid "The Shell application requires a Unix user account for every user of Hue on the remote webserver."
+msgid ""
+"The Shell application requires a Unix user account for every user of Hue "
+"on the remote webserver."
 msgstr "このシェルアプリケーションでは、リモートサーバー上にある Hue のすべてのユーザーに Unix のユーザーアカウントが必要です。"
 
 #: src/shell/templates/no_such_user.mako:26
-msgid "Please ask your administrator to create a user account for you on the remote webserver as described in the Shell documentation."
+msgid ""
+"Please ask your administrator to create a user account for you on the "
+"remote webserver as described in the Shell documentation."
 msgstr "シェルのマニュアルに従ってリモート Web サーバー上にユーザーアカウントを作成することを担当の管理者に依頼してください。"
 
 #: src/shell/templates/not_running_spawning.mako:24
-msgid "The webserver currently running Hue does not support the Shell application. Please contact your administrator."
+msgid ""
+"The webserver currently running Hue does not support the Shell "
+"application. Please contact your administrator."
 msgstr "現在 Hue を実行している Web サーバーでは、このシェルアプリケーションをサポートしていません。担当の管理者に問い合わせてください。"
 

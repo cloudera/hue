@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-08-10 13:53-0700\n"
+"POT-Creation-Date: 2012-09-07 18:08-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -163,10 +163,21 @@ msgid "Group to run servers as"
 msgstr ""
 
 #: src/desktop/conf.py:249
-msgid "Configuration options for user authentication into the web application."
+msgid "Customizations to the UI."
 msgstr ""
 
 #: src/desktop/conf.py:253
+msgid ""
+"Top banner HTML code. This code will be placed in the navigation bar so "
+"that it will reside at the top of the page in a fixed position. One "
+"common value is `<img src=\"http://www.example.com/example.gif\" />`"
+msgstr ""
+
+#: src/desktop/conf.py:260
+msgid "Configuration options for user authentication into the web application."
+msgstr ""
+
+#: src/desktop/conf.py:264
 msgid ""
 "Authentication backend.  Common settings are "
 "django.contrib.auth.backends.ModelBackend (fully Django backend), "
@@ -175,131 +186,137 @@ msgid ""
 "user manager, after the first login). "
 msgstr ""
 
-#: src/desktop/conf.py:259
+#: src/desktop/conf.py:270
 msgid "Class which defines extra accessor methods for User objects."
 msgstr ""
 
-#: src/desktop/conf.py:264
+#: src/desktop/conf.py:273
+msgid ""
+"The service to use when querying PAM.The service usually corresponds to a"
+" single filename in /etc/pam.d"
+msgstr ""
+
+#: src/desktop/conf.py:279
 msgid "Configuration options for LDAP connectivity"
 msgstr ""
 
-#: src/desktop/conf.py:268
+#: src/desktop/conf.py:283
 msgid "The base LDAP distinguished name to use for LDAP search."
 msgstr ""
 
-#: src/desktop/conf.py:271
+#: src/desktop/conf.py:286
 msgid "The NT domain used for LDAP authentication."
 msgstr ""
 
-#: src/desktop/conf.py:274
+#: src/desktop/conf.py:289
 msgid "The LDAP URL to connect to."
 msgstr ""
 
-#: src/desktop/conf.py:277
+#: src/desktop/conf.py:292
 msgid "The LDAP certificate for authentication over TLS."
 msgstr ""
 
-#: src/desktop/conf.py:280
+#: src/desktop/conf.py:295
 msgid "A pattern to use for constructing LDAP usernames."
 msgstr ""
 
-#: src/desktop/conf.py:283
+#: src/desktop/conf.py:298
 msgid "The distinguished name to bind as, when importing from LDAP."
 msgstr ""
 
-#: src/desktop/conf.py:286
+#: src/desktop/conf.py:301
 msgid "The password for the bind user."
 msgstr ""
 
-#: src/desktop/conf.py:290
+#: src/desktop/conf.py:305
 msgid "Configuration for LDAP user schema and search."
 msgstr ""
 
-#: src/desktop/conf.py:294
+#: src/desktop/conf.py:309
 msgid "A base filter for use when searching for users."
 msgstr ""
 
-#: src/desktop/conf.py:297
+#: src/desktop/conf.py:312
 msgid ""
 "The username attribute in the LDAP schema. Typically, this is "
 "'sAMAccountName' for AD and 'uid' for other LDAP systems."
 msgstr ""
 
-#: src/desktop/conf.py:305
+#: src/desktop/conf.py:320
 msgid "Configuration for LDAP group schema and search"
 msgstr ""
 
-#: src/desktop/conf.py:309
+#: src/desktop/conf.py:324
 msgid "A base filter for use when searching for groups."
 msgstr ""
 
-#: src/desktop/conf.py:312
+#: src/desktop/conf.py:327
 msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
 msgstr ""
 
-#: src/desktop/conf.py:316
+#: src/desktop/conf.py:331
 msgid "The LDAP attribute which specifies the members of a group."
 msgstr ""
 
-#: src/desktop/conf.py:326
+#: src/desktop/conf.py:341
 msgid "Paths on the local file system that users should be able to browse."
 msgstr ""
 
-#: src/desktop/conf.py:331
+#: src/desktop/conf.py:346
 msgid "The path on the local FS."
 msgstr ""
 
-#: src/desktop/conf.py:339
+#: src/desktop/conf.py:354
 msgid "Link for 'feedback' tab."
 msgstr ""
 
-#: src/desktop/conf.py:346
+#: src/desktop/conf.py:361
 msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr ""
 
-#: src/desktop/conf.py:353
+#: src/desktop/conf.py:368
 msgid "If true, log all database requests."
 msgstr ""
 
-#: src/desktop/conf.py:359
+#: src/desktop/conf.py:374
 msgid "Enable or disable Django debug mode."
 msgstr ""
 
-#: src/desktop/conf.py:366
+#: src/desktop/conf.py:381
 msgid ""
 "Enable or disable debugging information in the 500 internal server error "
 "response. Note that the debugging information may contain sensitive data."
 " If django_debug_mode is True, this is automatically enabled."
 msgstr ""
 
-#: src/desktop/conf.py:384
+#: src/desktop/conf.py:399
 msgid "Secret key should be configured as a random string."
 msgstr ""
 
-#: src/desktop/conf.py:390
+#: src/desktop/conf.py:405
 msgid "SSL private key file should be set to enable HTTPS."
 msgstr ""
 
-#: src/desktop/conf.py:396
+#: src/desktop/conf.py:411
 msgid "Encoding not supported."
 msgstr ""
 
-#: src/desktop/conf.py:405
+#: src/desktop/conf.py:420
 #, python-format
 msgid "Keytab should have 0600 permissions (has %o)."
 msgstr ""
 
-#: src/desktop/conf.py:415
+#: src/desktop/conf.py:430
 msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr ""
 
-#: src/desktop/conf.py:421
+#: src/desktop/conf.py:436
 msgid ""
 "LDAP is only partially configured. An NT Domain or username search "
 "pattern must be provided."
 msgstr ""
 
-#: src/desktop/conf.py:427
+#: src/desktop/conf.py:442
 msgid ""
 "The LDAP username pattern should contain the special<username> "
 "replacement string for authentication."
@@ -320,29 +337,29 @@ msgstr ""
 msgid "Cannot find HDFS called \"%(fs_ref)s\""
 msgstr ""
 
-#: src/desktop/middleware.py:215
+#: src/desktop/middleware.py:238
 #, python-format
 msgid "%(module)s isn't a middleware module"
 msgstr ""
 
-#: src/desktop/middleware.py:220
+#: src/desktop/middleware.py:243
 #, python-format
 msgid "Error importing middleware %(module)s: \"%(error)s\""
 msgstr ""
 
-#: src/desktop/middleware.py:224
+#: src/desktop/middleware.py:247
 #, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class"
 msgstr ""
 
-#: src/desktop/middleware.py:236
+#: src/desktop/middleware.py:259
 #, python-format
 msgid ""
 "AppSpecificMiddleware module \"%(module)s\" has a process_request "
 "function which is impossible."
 msgstr ""
 
-#: src/desktop/middleware.py:278
+#: src/desktop/middleware.py:301
 #, python-format
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr ""
@@ -351,7 +368,7 @@ msgstr ""
 msgid "No logs found!"
 msgstr ""
 
-#: src/desktop/views.py:171 src/desktop/views.py:194 src/desktop/views.py:338
+#: src/desktop/views.py:171 src/desktop/views.py:194 src/desktop/views.py:340
 msgid "You must be a superuser."
 msgstr ""
 
@@ -589,15 +606,15 @@ msgstr ""
 msgid "All OK. Configuration check passed!"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:93
+#: src/desktop/templates/common_header.mako:112
 msgid "About Hue"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:100
+#: src/desktop/templates/common_header.mako:119
 msgid "Profile"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:102
+#: src/desktop/templates/common_header.mako:121
 msgid "Sign Out"
 msgstr ""
 
@@ -617,37 +634,37 @@ msgstr ""
 msgid "Default:"
 msgstr ""
 
-#: src/desktop/templates/error.mako:24 src/desktop/templates/login.mako:74
+#: src/desktop/templates/error.mako:24 src/desktop/templates/login.mako:80
 msgid "Error!"
 msgstr ""
 
-#: src/desktop/templates/login.mako:56
+#: src/desktop/templates/login.mako:62
 msgid "Username"
 msgstr ""
 
-#: src/desktop/templates/login.mako:59
+#: src/desktop/templates/login.mako:65
 msgid "Password"
 msgstr ""
 
-#: src/desktop/templates/login.mako:64
+#: src/desktop/templates/login.mako:70
 msgid "Sign up"
 msgstr ""
 
-#: src/desktop/templates/login.mako:66
+#: src/desktop/templates/login.mako:72
 msgid "Sign in"
 msgstr ""
 
-#: src/desktop/templates/login.mako:74
+#: src/desktop/templates/login.mako:80
 msgid "Invalid username or password."
 msgstr ""
 
-#: src/desktop/templates/login.mako:85
+#: src/desktop/templates/login.mako:91
 msgid ""
 "Since this is your first time logging in, please pick any username and "
 "password. Be sure to remember these, as"
 msgstr ""
 
-#: src/desktop/templates/login.mako:86
+#: src/desktop/templates/login.mako:92
 msgid "they will become your superuser credentials for Hue"
 msgstr ""
 

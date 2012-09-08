@@ -1,14 +1,13 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2012 Cloudera
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 19:07-0700\n"
+"POT-Creation-Date: 2012-09-07 18:08-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -22,20 +21,26 @@ msgstr ""
 msgid "Location on HDFS where the jobsub examples and templates are stored."
 msgstr "HDFS 中存储 jobsub 示例和模板的位置。"
 
-#: src/jobsub/conf.py:34
+#: src/jobsub/conf.py:33
 msgid "Location on local FS where examples and template are stored"
 msgstr "本地文件系统上存储示例和模板的位置"
 
-#: src/jobsub/conf.py:40
+#: src/jobsub/conf.py:39
 msgid "Location on local FS where sample data is stored"
 msgstr "本地文件系统上存储样本数据的位置"
 
-#: src/jobsub/conf.py:45
-msgid "URL to Oozie server. This is required for job submission."
+#: src/jobsub/conf.py:49
+#, fuzzy
+msgid ""
+"Deprecated, please use liboozie.conf.OOZIE_URL instead. URL to Oozie "
+"server. This is required for job submission."
 msgstr "Oozie 服务器的 URL。提交作业时需要此 URL。"
 
-#: src/jobsub/conf.py:51
-msgid "Whether Oozie requires client to do perform Kerberos authentication"
+#: src/jobsub/conf.py:55
+#, fuzzy
+msgid ""
+"Deprecated, please use liboozie.conf.SECURITY_ENABLED instead. Whether "
+"Oozie requires client to do perform Kerberos authentication"
 msgstr "Oozie 是否需要客户端执行 Kerberos 身份验证"
 
 #: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
@@ -45,7 +50,9 @@ msgid "Name"
 msgstr "名称"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "允许字母、数字、'_' 和 '-'。第一个字符必须是字母或 '_'。"
 
 #: src/jobsub/models.py:128
@@ -137,22 +144,13 @@ msgstr "请使用 POST 请求安装示例。"
 msgid "The examples could not be installed."
 msgstr "无法安装示例。"
 
-#: src/jobsub/management/commands/jobsub_setup.py:90
+#: src/jobsub/management/commands/jobsub_setup.py:88
 msgid "Unexpected fixture type."
 msgstr "意外的固定器类型。"
 
-#: src/jobsub/management/commands/jobsub_setup.py:93
+#: src/jobsub/management/commands/jobsub_setup.py:91
 msgid "Expected sample user fixture."
 msgstr "所需的样本用户固定器。"
-
-#: src/jobsub/oozie_lib/types.py:171
-msgid "Insufficient permission"
-msgstr "无足够权限"
-
-#: src/jobsub/oozie_lib/types.py:172
-#, python-format
-msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-msgstr "权限被拒绝。用户 %(username)s 无法修改用户 %(user)s 的作业。"
 
 #: src/jobsub/templates/edit_design.mako:26
 #: src/jobsub/templates/list_designs.mako:28
@@ -175,7 +173,9 @@ msgid "or"
 msgstr "或"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "提交设计时，将提示您实际值 — "
 
 #: src/jobsub/templates/edit_design.mako:76
@@ -486,4 +486,10 @@ msgstr "创建时间"
 #: src/jobsub/templates/workflow.mako:186
 msgid "Application Path"
 msgstr "应用程序路径"
+
+#~ msgid "Insufficient permission"
+#~ msgstr "无足够权限"
+
+#~ msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
+#~ msgstr "权限被拒绝。用户 %(username)s 无法修改用户 %(user)s 的作业。"
 

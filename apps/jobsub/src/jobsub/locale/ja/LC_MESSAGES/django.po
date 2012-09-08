@@ -1,14 +1,13 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2012 Cloudera
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 19:07-0700\n"
+"POT-Creation-Date: 2012-09-07 18:08-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -22,20 +21,26 @@ msgstr ""
 msgid "Location on HDFS where the jobsub examples and templates are stored."
 msgstr "HDFS 上で jobsub の例とテンプレートが保存されている場所です。"
 
-#: src/jobsub/conf.py:34
+#: src/jobsub/conf.py:33
 msgid "Location on local FS where examples and template are stored"
 msgstr "ローカル FS 上で例とテンプレートが保存されている場所です。"
 
-#: src/jobsub/conf.py:40
+#: src/jobsub/conf.py:39
 msgid "Location on local FS where sample data is stored"
 msgstr "ローカル FS 上でサンプルデータが保存されている場所です。"
 
-#: src/jobsub/conf.py:45
-msgid "URL to Oozie server. This is required for job submission."
+#: src/jobsub/conf.py:49
+#, fuzzy
+msgid ""
+"Deprecated, please use liboozie.conf.OOZIE_URL instead. URL to Oozie "
+"server. This is required for job submission."
 msgstr "Oozie サーバーの URL。ジョブのサブミッションで必要です。"
 
-#: src/jobsub/conf.py:51
-msgid "Whether Oozie requires client to do perform Kerberos authentication"
+#: src/jobsub/conf.py:55
+#, fuzzy
+msgid ""
+"Deprecated, please use liboozie.conf.SECURITY_ENABLED instead. Whether "
+"Oozie requires client to do perform Kerberos authentication"
 msgstr "Oozie が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
 
 #: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
@@ -45,7 +50,9 @@ msgid "Name"
 msgstr "名前"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "文字、数字、'_'、および '-' を使用できます。先頭には文字または '_' が必要です。"
 
 #: src/jobsub/models.py:128
@@ -72,7 +79,7 @@ msgstr "ジョブ設計 %(name)s のサブミッション（ID %(id)s、所有�
 #: src/jobsub/submit.py:72
 #, python-format
 msgid "Job design already submitted (Oozie job id %(id)s)"
-msgstr "サブミッション済みのジョブ設計（Oozie ジョブ ID %(id)s）"
+msgstr "サブミッション済みのジョブ設計（Oozie job ID %(id)s）"
 
 #: src/jobsub/submit.py:81
 msgid "Failed to access deployment directory."
@@ -137,22 +144,13 @@ msgstr "POST 要求を使用して例をインストールしてください。"
 msgid "The examples could not be installed."
 msgstr "例をインストールできませんでした。"
 
-#: src/jobsub/management/commands/jobsub_setup.py:90
+#: src/jobsub/management/commands/jobsub_setup.py:88
 msgid "Unexpected fixture type."
 msgstr "予期しない什器タイプです。"
 
-#: src/jobsub/management/commands/jobsub_setup.py:93
+#: src/jobsub/management/commands/jobsub_setup.py:91
 msgid "Expected sample user fixture."
 msgstr "想定どおりのサンプルユーザー什器です。"
-
-#: src/jobsub/oozie_lib/types.py:171
-msgid "Insufficient permission"
-msgstr "パーミッションが不十分です。"
-
-#: src/jobsub/oozie_lib/types.py:172
-#, python-format
-msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-msgstr "パーミッションが拒否されました。ユーザー %(username)s はユーザー %(user)s のジョブを変更できません。"
 
 #: src/jobsub/templates/edit_design.mako:26
 #: src/jobsub/templates/list_designs.mako:28
@@ -175,7 +173,9 @@ msgid "or"
 msgstr "または"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "設計をサブミットすると、次の実際の値を指定することを要求されます。 "
 
 #: src/jobsub/templates/edit_design.mako:76
@@ -405,7 +405,7 @@ msgstr "ジョブのサブミッション履歴"
 
 #: src/jobsub/templates/list_history.mako:43
 msgid "Oozie Job ID"
-msgstr "Oozie ジョブ ID"
+msgstr "Oozie Job ID"
 
 #: src/jobsub/templates/list_history.mako:48
 msgid "Submission Date"
@@ -486,4 +486,10 @@ msgstr "作成時間"
 #: src/jobsub/templates/workflow.mako:186
 msgid "Application Path"
 msgstr "アプリケーションのパス"
+
+#~ msgid "Insufficient permission"
+#~ msgstr "パーミッションが不十分です。"
+
+#~ msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
+#~ msgstr "パーミッションが拒否されました。ユーザー %(username)s はユーザー %(user)s のジョブを変更できません。"
 

@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-08-10 13:53-0700\n"
+"POT-Creation-Date: 2012-09-07 18:08-0700\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -23,7 +22,9 @@ msgid "load_apps has already been called!"
 msgstr "load_apps이(가) 이미 호출되었습니다!"
 
 #: src/desktop/conf.py:30
-msgid "If set to true, CherryPy will be used. Otherwise, Spawning will be used as the webserver."
+msgid ""
+"If set to true, CherryPy will be used. Otherwise, Spawning will be used "
+"as the webserver."
 msgstr "TRUE로 설정되면 CherryPy가 사용됩니다. 그 외의 경우에는 Spawning이 웹 서버로 사용됩니다."
 
 #: src/desktop/conf.py:36
@@ -43,8 +44,12 @@ msgid "Filename of SSL RSA Private Key"
 msgstr "SSL RSA 개인 키 파일 이름"
 
 #: src/desktop/conf.py:54
-msgid "If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."
-msgstr "FALSE로 설정되면 runcpserver가 실제로 웹 서버를 시작하지 않습니다. Apache가 WSGI 컨테이너로 사용되는 경우에만 사용됩니다."
+msgid ""
+"If set to false, runcpserver will not actually start the web server.  "
+"Used if Apache is being used as a WSGI container."
+msgstr ""
+"FALSE로 설정되면 runcpserver가 실제로 웹 서버를 시작하지 않습니다. Apache가 WSGI 컨테이너로 사용되는 "
+"경우에만 사용됩니다."
 
 #: src/desktop/conf.py:59
 msgid "Number of threads used by the CherryPy web server."
@@ -87,9 +92,15 @@ msgid "Default email address to use for various automated notifications from Hue
 msgstr "Hue의 여러 자동 알림에 사용하는 기본 이메일 주소입니다."
 
 #: src/desktop/conf.py:142
-msgid "Configuration options for specifying the Desktop Database.\n"
-"          For more info, see http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
-msgstr "데스크탑 데이터베이스를 지정하는 구성 옵션입니다. 자세한 내용은 http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine을 참조하십시오."
+#, fuzzy
+msgid ""
+"Configuration options for specifying the Desktop Database.\n"
+"          For more info, see "
+"http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
+msgstr ""
+"데스크탑 데이터베이스를 지정하는 구성 옵션입니다. 자세한 내용은 "
+"http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine을 "
+"참조하십시오."
 
 #: src/desktop/conf.py:147
 msgid "Database engine, such as postgresql, mysql, sqlite3, or Oracle."
@@ -116,7 +127,9 @@ msgid "Database port"
 msgstr "데이터베이스 포트"
 
 #: src/desktop/conf.py:186
-msgid "Configuration options for specifying Hue's Kerberos integration for\n"
+#, fuzzy
+msgid ""
+"Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
 msgstr "보안 Hadoop 클러스터에 대한 Hue의 Kerberos 통합을 지정하는 구성 옵션입니다."
 
@@ -146,7 +159,7 @@ msgstr "시간대 이름"
 
 #: src/desktop/conf.py:230
 msgid "Default system-wide unicode encoding."
-msgstr "기본 시스템 수준 유니코드 인코딩입니다."
+msgstr "기본 시스템 레벨 유니코드 인코딩입니다."
 
 #: src/desktop/conf.py:237
 msgid "Username to run servers as"
@@ -157,132 +170,171 @@ msgid "Group to run servers as"
 msgstr "다음 그룹으로 서버 실행"
 
 #: src/desktop/conf.py:249
+msgid "Customizations to the UI."
+msgstr ""
+
+#: src/desktop/conf.py:253
+msgid ""
+"Top banner HTML code. This code will be placed in the navigation bar so "
+"that it will reside at the top of the page in a fixed position. One "
+"common value is `<img src=\"http://www.example.com/example.gif\" />`"
+msgstr ""
+
+#: src/desktop/conf.py:260
 msgid "Configuration options for user authentication into the web application."
 msgstr "웹 애플리케이션 내 사용자 인증에 대한 구성 옵션입니다."
 
-#: src/desktop/conf.py:253
-msgid "Authentication backend.  Common settings are django.contrib.auth.backends.ModelBackend (fully Django backend), desktop.auth.backend.AllowAllBackend (allows everyone), desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). "
-msgstr "인증 백엡드입니다. 일반적인 설정은 django.contrib.auth.backends.ModelBackend(완전 Django 백엔드), desktop.auth.backend.AllowAllBackend(모든 사람 허용), desktop.auth.backend.AllowFirstUserDjangoBackend(첫 로그인 이후 Django와 사용자 관리자에 의존)입니다. "
+#: src/desktop/conf.py:264
+msgid ""
+"Authentication backend.  Common settings are "
+"django.contrib.auth.backends.ModelBackend (fully Django backend), "
+"desktop.auth.backend.AllowAllBackend (allows everyone), "
+"desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and "
+"user manager, after the first login). "
+msgstr ""
+"인증 백엡드입니다. 일반적인 설정은 django.contrib.auth.backends.ModelBackend(완전 Django "
+"백엔드), desktop.auth.backend.AllowAllBackend(모든 사람 허용), "
+"desktop.auth.backend.AllowFirstUserDjangoBackend(첫 로그인 이후 Django와 사용자 "
+"관리자에 의존)입니다. "
 
-#: src/desktop/conf.py:259
+#: src/desktop/conf.py:270
 msgid "Class which defines extra accessor methods for User objects."
 msgstr "사용자 개체에 대한 추가 접근자 메소드를 정의하는 클래스입니다."
 
-#: src/desktop/conf.py:264
+#: src/desktop/conf.py:273
+msgid ""
+"The service to use when querying PAM.The service usually corresponds to a"
+" single filename in /etc/pam.d"
+msgstr ""
+
+#: src/desktop/conf.py:279
 msgid "Configuration options for LDAP connectivity"
 msgstr "LDAP 연결에 대한 추가 옵션입니다."
 
-#: src/desktop/conf.py:268
+#: src/desktop/conf.py:283
 msgid "The base LDAP distinguished name to use for LDAP search."
 msgstr "LDAP 검색에 사용하는 기본 LDAP 고유 이름입니다."
 
-#: src/desktop/conf.py:271
+#: src/desktop/conf.py:286
 msgid "The NT domain used for LDAP authentication."
 msgstr "LDAP 인증에 사용되는 NT 도메인입니다."
 
-#: src/desktop/conf.py:274
+#: src/desktop/conf.py:289
 msgid "The LDAP URL to connect to."
 msgstr "연결할 LDAP URL입니다."
 
-#: src/desktop/conf.py:277
+#: src/desktop/conf.py:292
 msgid "The LDAP certificate for authentication over TLS."
 msgstr "TLS를 통한 인증을 위한 LDAP 인증서입니다."
 
-#: src/desktop/conf.py:280
+#: src/desktop/conf.py:295
 msgid "A pattern to use for constructing LDAP usernames."
 msgstr "LDAP 사용자 이름 생성에 사용하는 패턴입니다."
 
-#: src/desktop/conf.py:283
+#: src/desktop/conf.py:298
 msgid "The distinguished name to bind as, when importing from LDAP."
 msgstr "LDAP에서 가져올 때 바인딩할 고유 이름입니다."
 
-#: src/desktop/conf.py:286
+#: src/desktop/conf.py:301
 msgid "The password for the bind user."
 msgstr "바인딩 사용자의 암호입니다."
 
-#: src/desktop/conf.py:290
+#: src/desktop/conf.py:305
 msgid "Configuration for LDAP user schema and search."
 msgstr "LDAP 사용자 스키마 및 검색에 대한 구성입니다."
 
-#: src/desktop/conf.py:294
+#: src/desktop/conf.py:309
 msgid "A base filter for use when searching for users."
 msgstr "사용자 검색 시 사용하는 기본 필터입니다."
 
-#: src/desktop/conf.py:297
-msgid "The username attribute in the LDAP schema. Typically, this is 'sAMAccountName' for AD and 'uid' for other LDAP systems."
-msgstr "LDAP 스키마의 사용자 이름 특성입니다. 일반적으로 AD에는 'sAMAccountName'이, 기타 LDAP 시스템에는 'uid'가 사용됩니다."
+#: src/desktop/conf.py:312
+msgid ""
+"The username attribute in the LDAP schema. Typically, this is "
+"'sAMAccountName' for AD and 'uid' for other LDAP systems."
+msgstr ""
+"LDAP 스키마의 사용자 이름 특성입니다. 일반적으로 AD에는 'sAMAccountName'이, 기타 LDAP 시스템에는 "
+"'uid'가 사용됩니다."
 
-#: src/desktop/conf.py:305
+#: src/desktop/conf.py:320
 msgid "Configuration for LDAP group schema and search"
 msgstr "LDAP 그룹 스키마 및 검색에 대한 구성입니다."
 
-#: src/desktop/conf.py:309
+#: src/desktop/conf.py:324
 msgid "A base filter for use when searching for groups."
 msgstr "그룹 검색 시 사용하는 기본 필터입니다."
 
-#: src/desktop/conf.py:312
+#: src/desktop/conf.py:327
 msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
 msgstr "LDAP 스키마의 그룹 이름 특성입니다. 일반적으로 'cn'입니다."
 
-#: src/desktop/conf.py:316
+#: src/desktop/conf.py:331
 msgid "The LDAP attribute which specifies the members of a group."
 msgstr "그룹의 구성원을 지정하는 LDAP 특성입니다."
 
-#: src/desktop/conf.py:326
+#: src/desktop/conf.py:341
 msgid "Paths on the local file system that users should be able to browse."
 msgstr "사용자가 찾아볼 수 있는 로컬 파일 시스템의 경로입니다."
 
-#: src/desktop/conf.py:331
+#: src/desktop/conf.py:346
 msgid "The path on the local FS."
 msgstr "로컬 FS의 경로입니다."
 
-#: src/desktop/conf.py:339
+#: src/desktop/conf.py:354
 msgid "Link for 'feedback' tab."
 msgstr "'피드백' 탭의 링크입니다."
 
-#: src/desktop/conf.py:346
+#: src/desktop/conf.py:361
 msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr "JavaScript에서 서버 로그로 디버그 메시지를 전송할지 여부입니다."
 
-#: src/desktop/conf.py:353
+#: src/desktop/conf.py:368
 msgid "If true, log all database requests."
 msgstr "TRUE이면 모든 데이터베이스 요청을 로깅합니다."
 
-#: src/desktop/conf.py:359
+#: src/desktop/conf.py:374
 msgid "Enable or disable Django debug mode."
 msgstr "Django 디버그 모드를 설정 또는 해제합니다."
 
-#: src/desktop/conf.py:366
-msgid "Enable or disable debugging information in the 500 internal server error response. Note that the debugging information may contain sensitive data. If django_debug_mode is True, this is automatically enabled."
-msgstr "500 내부 서버 오류 응답에서 디버깅 정보를 설정 또는 해제합니다. django_debug_mode가 TRUE이면 이 항목이 자동으로 설정됩니다."
+#: src/desktop/conf.py:381
+msgid ""
+"Enable or disable debugging information in the 500 internal server error "
+"response. Note that the debugging information may contain sensitive data."
+" If django_debug_mode is True, this is automatically enabled."
+msgstr ""
+"500 내부 서버 오류 응답에서 디버깅 정보를 설정 또는 해제합니다. django_debug_mode가 TRUE이면 이 항목이 "
+"자동으로 설정됩니다."
 
-#: src/desktop/conf.py:384
+#: src/desktop/conf.py:399
 msgid "Secret key should be configured as a random string."
 msgstr "암호 키는 임의의 문자열로 구성되어야 합니다."
 
-#: src/desktop/conf.py:390
+#: src/desktop/conf.py:405
 msgid "SSL private key file should be set to enable HTTPS."
 msgstr "SSL 개인 키 파일은 HTTPS를 사용하도록 설정되어야 합니다."
 
-#: src/desktop/conf.py:396
+#: src/desktop/conf.py:411
 msgid "Encoding not supported."
 msgstr "인코딩이 지원되지 않습니다."
 
-#: src/desktop/conf.py:405
+#: src/desktop/conf.py:420
 #, python-format
 msgid "Keytab should have 0600 permissions (has %o)."
 msgstr "Keytab에는 0600 권한(%o 보유)이 있어야 합니다."
 
-#: src/desktop/conf.py:415
+#: src/desktop/conf.py:430
 msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr "LDAP가 일부만 구성되었습니다. LDAP URL은 필수 입력 사항입니다."
 
-#: src/desktop/conf.py:421
-msgid "LDAP is only partially configured. An NT Domain or username search pattern must be provided."
+#: src/desktop/conf.py:436
+msgid ""
+"LDAP is only partially configured. An NT Domain or username search "
+"pattern must be provided."
 msgstr "LDAP가 일부만 구성되었습니다. NT 도메인 또는 사용자 이름 검색 패턴은 필수 입력 사항입니다."
 
-#: src/desktop/conf.py:427
-msgid "The LDAP username pattern should contain the special<username> replacement string for authentication."
+#: src/desktop/conf.py:442
+msgid ""
+"The LDAP username pattern should contain the special<username> "
+"replacement string for authentication."
 msgstr "LDAP 사용자 이름 패턴에는 인증을 위한 특수 <username> 대체 문자열이 포함되어야 합니다."
 
 #: src/desktop/decorators.py:40
@@ -300,27 +352,31 @@ msgstr "오류 발생: %(error)s"
 msgid "Cannot find HDFS called \"%(fs_ref)s\""
 msgstr "\"%(fs_ref)s\" HDFS를 찾을 수 없습니다."
 
-#: src/desktop/middleware.py:215
+#: src/desktop/middleware.py:238
 #, python-format
 msgid "%(module)s isn't a middleware module"
 msgstr "%(module)s은(는) 미들웨어 모듈이 아닙니다."
 
-#: src/desktop/middleware.py:220
+#: src/desktop/middleware.py:243
 #, python-format
 msgid "Error importing middleware %(module)s: \"%(error)s\""
 msgstr "미들웨어 %(module)s을(를) 가져오는 동안 오류 발생: \"%(error)s\""
 
-#: src/desktop/middleware.py:224
+#: src/desktop/middleware.py:247
 #, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class"
 msgstr "미들웨어 모듈 \"%(module)s\"은(는) \"%(class)s\" 클래스를 정의하지 않습니다."
 
-#: src/desktop/middleware.py:236
+#: src/desktop/middleware.py:259
 #, python-format
-msgid "AppSpecificMiddleware module \"%(module)s\" has a process_request function which is impossible."
-msgstr "AppSpecificMiddleware 모듈 \"%(module)s\"에 process_request 함수가 있는데, 이는 허용되지 않습니다."
+msgid ""
+"AppSpecificMiddleware module \"%(module)s\" has a process_request "
+"function which is impossible."
+msgstr ""
+"AppSpecificMiddleware 모듈 \"%(module)s\"에 process_request 함수가 있는데, 이는 허용되지"
+" 않습니다."
 
-#: src/desktop/middleware.py:278
+#: src/desktop/middleware.py:301
 #, python-format
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr "%(app_name)s 애플리케이션에 대한 액세스 권한이 없습니다."
@@ -329,7 +385,7 @@ msgstr "%(app_name)s 애플리케이션에 대한 액세스 권한이 없습니�
 msgid "No logs found!"
 msgstr "로그를 찾을 수 없습니다!"
 
-#: src/desktop/views.py:171 src/desktop/views.py:194 src/desktop/views.py:338
+#: src/desktop/views.py:171 src/desktop/views.py:194 src/desktop/views.py:340
 msgid "You must be a superuser."
 msgstr "superuser여야 합니다."
 
@@ -449,7 +505,9 @@ msgstr "템플릿 경로 %(path)r이(가) 없습니다."
 
 #: src/desktop/management/commands/create_desktop_app.py:52
 #, python-format
-msgid "%(name)r is not a valid application name. Please use only numbers, letters and underscores."
+msgid ""
+"%(name)r is not a valid application name. Please use only numbers, "
+"letters and underscores."
 msgstr "%(name)r은(는) 올바른 애플리케이션 이름이 아닙니다. 숫자, 문자, 밑줄만 사용하십시오."
 
 #: src/desktop/management/commands/create_test_fs.py:31
@@ -471,32 +529,49 @@ msgid "Web server for Hue."
 msgstr "Hue의 웹 서버입니다."
 
 #: src/desktop/management/commands/runpylint.py:28
-msgid "\n"
+#, fuzzy
+msgid ""
+"\n"
 "  Runs pylint on desktop code.\n"
 "\n"
 "  With no arguments, or with \"all\", this will run pylint on all\n"
 "  installed apps.  Otherwise, specify modules to run, as well\n"
-"  as other parameters to pylint.  Note that you'll want to preface the section\n"
-"  of pylint arguments with \"--\" so Django's manage.py passes them along.\n"
+"  as other parameters to pylint.  Note that you'll want to preface the "
+"section\n"
+"  of pylint arguments with \"--\" so Django's manage.py passes them "
+"along.\n"
 "\n"
 "  Examples:\n"
 "    python core/manage.py runpylint all -- -f parseable\n"
 "    python core/manage.py runpylint filebrowser\n"
 "    python core/manage.py runpylint\n"
 "  "
-msgstr "\n"
-"  데스크탑 코드에서 pylint를 실행합니다.\n"
+msgstr ""
 "\n"
-"  인수 없이 또는 \"all\"과 함께, 설치된 모든 앱에\n"
-"  pylint를 실행합니다.  이 외의 경우, 실행할 모듈과 pylint에 대한\n"
-"  다른 매개변수를 지정하십시오.  pylint 인수의 섹션의 머릿말로 \"--\"를\n"
-"  사용하여 Django의 manage.py가 함께 전달되도록 하십시오.\n"
-"\n"
-"  예:\n"
-"    python core/manage.py runpylint all -- -f parseable\n"
-"    python core/manage.py runpylint filebrowser\n"
-"    python core/manage.py runpylint\n"
-"  "
+"\"\n"
+"\"  데스크탑 코드에서 pylint를 실행합니다.\n"
+"\"\n"
+"\"\n"
+"\"\n"
+"\"  인수 없이 또는 \"all\"과 함께, 설치된 모든 앱에\n"
+"\"\n"
+"\"  pylint를 실행합니다.  이 외의 경우, 실행할 모듈과 pylint에 대한\n"
+"\"\n"
+"\"  다른 매개변수를 지정하십시오.  pylint 인수의 섹션의 머릿말로 \"--\"를\n"
+"\"\n"
+"\"  사용하여 Django의 manage.py가 함께 전달되도록 하십시오.\n"
+"\"\n"
+"\"\n"
+"\"\n"
+"\"  예:\n"
+"\"\n"
+"\"    python core/manage.py runpylint all -- -f parseable\n"
+"\"\n"
+"\"    python core/manage.py runpylint filebrowser\n"
+"\"\n"
+"\"    python core/manage.py runpylint\n"
+"\"\n"
+"\"  "
 
 #: src/desktop/management/commands/runpylint.py:61
 #, python-format
@@ -528,7 +603,9 @@ msgid "Server Error (500)"
 msgstr "서버 오류(500)"
 
 #: src/desktop/templates/500.mako:24
-msgid "Sorry, there's been an error. Please contact your site administrators. Thanks for your patience."
+msgid ""
+"Sorry, there's been an error. Please contact your site administrators. "
+"Thanks for your patience."
 msgstr "죄송합니다. 오류가 발생했습니다. 사이트 관리자에게 문의하십시오."
 
 #: src/desktop/templates/about_layout.mako:34
@@ -565,15 +642,15 @@ msgstr "현재 값:"
 msgid "All OK. Configuration check passed!"
 msgstr "모두 정상입니다. 구성 검사를 통과했습니다."
 
-#: src/desktop/templates/common_header.mako:93
+#: src/desktop/templates/common_header.mako:112
 msgid "About Hue"
 msgstr "Hue 정보"
 
-#: src/desktop/templates/common_header.mako:100
+#: src/desktop/templates/common_header.mako:119
 msgid "Profile"
 msgstr "프로필"
 
-#: src/desktop/templates/common_header.mako:102
+#: src/desktop/templates/common_header.mako:121
 msgid "Sign Out"
 msgstr "로그아웃"
 
@@ -593,35 +670,37 @@ msgstr "구성 섹션 및 변수"
 msgid "Default:"
 msgstr "기본값:"
 
-#: src/desktop/templates/error.mako:24 src/desktop/templates/login.mako:74
+#: src/desktop/templates/error.mako:24 src/desktop/templates/login.mako:80
 msgid "Error!"
 msgstr "오류!"
 
-#: src/desktop/templates/login.mako:56
+#: src/desktop/templates/login.mako:62
 msgid "Username"
 msgstr "사용자 이름"
 
-#: src/desktop/templates/login.mako:59
+#: src/desktop/templates/login.mako:65
 msgid "Password"
 msgstr "암호"
 
-#: src/desktop/templates/login.mako:64
+#: src/desktop/templates/login.mako:70
 msgid "Sign up"
 msgstr "등록"
 
-#: src/desktop/templates/login.mako:66
+#: src/desktop/templates/login.mako:72
 msgid "Sign in"
 msgstr "로그인"
 
-#: src/desktop/templates/login.mako:74
+#: src/desktop/templates/login.mako:80
 msgid "Invalid username or password."
 msgstr "잘못된 사용자 이름 또는 암호입니다."
 
-#: src/desktop/templates/login.mako:85
-msgid "Since this is your first time logging in, please pick any username and password. Be sure to remember these, as"
+#: src/desktop/templates/login.mako:91
+msgid ""
+"Since this is your first time logging in, please pick any username and "
+"password. Be sure to remember these, as"
 msgstr "이번이 첫 로그인이므로 원하는 사용자 이름과 암호를 선택하십시오. 이 정보는"
 
-#: src/desktop/templates/login.mako:86
+#: src/desktop/templates/login.mako:92
 msgid "they will become your superuser credentials for Hue"
 msgstr "HUe의 superuser 자격 증명으로 사용되니 반드시 기억하십시오."
 
