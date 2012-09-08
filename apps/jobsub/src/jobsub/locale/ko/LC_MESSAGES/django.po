@@ -1,14 +1,13 @@
 # Korean translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2012 Cloudera
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 19:07-0700\n"
+"POT-Creation-Date: 2012-09-07 18:08-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -22,20 +21,26 @@ msgstr ""
 msgid "Location on HDFS where the jobsub examples and templates are stored."
 msgstr "Jobsub 예제와 템플릿이 저장되는 HDFS 상의 위치입니다."
 
-#: src/jobsub/conf.py:34
+#: src/jobsub/conf.py:33
 msgid "Location on local FS where examples and template are stored"
 msgstr "예제와 템플릿이 저장되는 로컬 FS 상의 위치입니다."
 
-#: src/jobsub/conf.py:40
+#: src/jobsub/conf.py:39
 msgid "Location on local FS where sample data is stored"
 msgstr "샘플 데이터가 저장되는 로컬 FS 상의 위치입니다."
 
-#: src/jobsub/conf.py:45
-msgid "URL to Oozie server. This is required for job submission."
-msgstr "Oozie 서버의 URL입니다. 작업 제출을 위해서는 반드시 입력해야 합니다."
+#: src/jobsub/conf.py:49
+#, fuzzy
+msgid ""
+"Deprecated, please use liboozie.conf.OOZIE_URL instead. URL to Oozie "
+"server. This is required for job submission."
+msgstr "Oozie Server의 URL입니다. Job 제출을 위해서는 반드시 입력해야 합니다."
 
-#: src/jobsub/conf.py:51
-msgid "Whether Oozie requires client to do perform Kerberos authentication"
+#: src/jobsub/conf.py:55
+#, fuzzy
+msgid ""
+"Deprecated, please use liboozie.conf.SECURITY_ENABLED instead. Whether "
+"Oozie requires client to do perform Kerberos authentication"
 msgstr "Oozie에서 클라이언트의 Kerberos 인증 수행을 요청할지 여부입니다."
 
 #: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
@@ -45,7 +50,9 @@ msgid "Name"
 msgstr "이름"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "문자, 숫자, '_', '-'이 허용됩니다. 문자 또는 '_'이 맨 앞에 와야 합니다."
 
 #: src/jobsub/models.py:128
@@ -67,12 +74,12 @@ msgstr "HDFS의 jar 파일 경로입니다."
 #: src/jobsub/submit.py:48
 #, python-format
 msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)"
-msgstr "작업 디자인 '%(name)s'(ID %(id)s, 소유자 %(username)s) 제출"
+msgstr "Job 디자인 '%(name)s'(ID %(id)s, 소유자 %(username)s) 제출"
 
 #: src/jobsub/submit.py:72
 #, python-format
 msgid "Job design already submitted (Oozie job id %(id)s)"
-msgstr "작업 디자인이 이미 제출되었습니다(Oozie 작업 ID %(id)s)."
+msgstr "Job 디자인이 이미 제출되었습니다(Oozie 작업 ID %(id)s)."
 
 #: src/jobsub/submit.py:81
 msgid "Failed to access deployment directory."
@@ -85,12 +92,12 @@ msgstr "HDFS 참조를 가져오지 못했습니다. 구성을 확인하십시�
 #: src/jobsub/views.py:58
 #, python-format
 msgid "Access denied: view job %(id)s"
-msgstr "액세스 거부됨: 보기 작업 %(id)s"
+msgstr "액세스 거부됨: %(id)s Job 보기"
 
 #: src/jobsub/views.py:64
 #, python-format
 msgid "Error accessing Oozie job %(id)s."
-msgstr "Oozie 작업 %(id)에 액세스하는 중 오류 발생"
+msgstr "Oozie Job %(id)에 액세스하는 중 오류 발생"
 
 #: src/jobsub/views.py:177
 msgid "Permission denied. You are not the owner."
@@ -137,34 +144,25 @@ msgstr "POST 요청을 사용하여 예제를 설치하십시오."
 msgid "The examples could not be installed."
 msgstr "예제를 설치하지 못했습니다."
 
-#: src/jobsub/management/commands/jobsub_setup.py:90
+#: src/jobsub/management/commands/jobsub_setup.py:88
 msgid "Unexpected fixture type."
 msgstr "예기치 않은 픽스처 유형입니다."
 
-#: src/jobsub/management/commands/jobsub_setup.py:93
+#: src/jobsub/management/commands/jobsub_setup.py:91
 msgid "Expected sample user fixture."
 msgstr "필요한 샘플 사용자 픽스처입니다."
-
-#: src/jobsub/oozie_lib/types.py:171
-msgid "Insufficient permission"
-msgstr "권한 부족"
-
-#: src/jobsub/oozie_lib/types.py:172
-#, python-format
-msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-msgstr "권한이 거부되었습니다. 사용자 %(username)s은(는) 사용자 %(user)s의 작업을 수정할 수 없습니다."
 
 #: src/jobsub/templates/edit_design.mako:26
 #: src/jobsub/templates/list_designs.mako:28
 #: src/jobsub/templates/list_history.mako:26
 #: src/jobsub/templates/workflow.mako:25
 msgid "Job Designer"
-msgstr "작업 디자이너"
+msgstr "Job Designer"
 
 #: src/jobsub/templates/edit_design.mako:54
 #, python-format
 msgid "Job Design (%(type)s type)"
-msgstr "작업 디자인(%(type)s 유형)"
+msgstr "Job 디자인(%(type)s 유형)"
 
 #: src/jobsub/templates/edit_design.mako:66
 msgid "You can parameterize the values, using"
@@ -175,12 +173,14 @@ msgid "or"
 msgstr "또는"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "디자인을 제출할 때 다음에 대한 실제 값이 나타납니다. "
 
 #: src/jobsub/templates/edit_design.mako:76
 msgid "Job Properties"
-msgstr "작업 속성"
+msgstr "Job 속성"
 
 #: src/jobsub/templates/edit_design.mako:82
 msgid "Property name"
@@ -241,7 +241,7 @@ msgstr "기록"
 
 #: src/jobsub/templates/list_designs.mako:34
 msgid "Job Designs"
-msgstr "작업 디자인"
+msgstr "Job 디자인"
 
 #: src/jobsub/templates/list_designs.mako:37
 msgid "Create Mapreduce Design"
@@ -348,7 +348,7 @@ msgstr "아니요"
 
 #: src/jobsub/templates/list_designs.mako:131
 msgid "Install sample job designs?"
-msgstr "샘플 작업 디자인을 설치하시겠습니까?"
+msgstr "샘플 Job 디자인을 설치하시겠습니까?"
 
 #: src/jobsub/templates/list_designs.mako:134
 msgid "It will take a few seconds to install."
@@ -401,11 +401,11 @@ msgstr "이전"
 
 #: src/jobsub/templates/list_history.mako:32
 msgid "Job Submission History"
-msgstr "작업 제출 기록"
+msgstr "Job 제출 기록"
 
 #: src/jobsub/templates/list_history.mako:43
 msgid "Oozie Job ID"
-msgstr "Oozie 작업 ID"
+msgstr "Oozie Job ID"
 
 #: src/jobsub/templates/list_history.mako:48
 msgid "Submission Date"
@@ -486,4 +486,10 @@ msgstr "생성된 시간"
 #: src/jobsub/templates/workflow.mako:186
 msgid "Application Path"
 msgstr "애플리케이션 경로"
+
+#~ msgid "Insufficient permission"
+#~ msgstr "권한 부족"
+
+#~ msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
+#~ msgstr "권한이 거부되었습니다. 사용자 %(username)s은(는) 사용자 %(user)s의 Job을 수정할 수 없습니다."
 

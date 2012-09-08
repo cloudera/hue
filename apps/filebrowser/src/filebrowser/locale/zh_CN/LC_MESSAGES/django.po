@@ -1,14 +1,13 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2012 Cloudera
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 19:07-0700\n"
+"POT-Creation-Date: 2012-09-07 18:08-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -39,7 +38,7 @@ msgid "The file to rename."
 msgstr "要重命名的文件。"
 
 #: src/filebrowser/forms.py:54
-#: src/filebrowser/templates/listdir_components.mako:218
+#: src/filebrowser/templates/listdir_components.mako:225
 msgid "New name"
 msgstr "新名称"
 
@@ -76,7 +75,7 @@ msgid "Path in which to create the directory"
 msgstr "要在其中创建目录的路径"
 
 #: src/filebrowser/forms.py:77
-#: src/filebrowser/templates/listdir_components.mako:270
+#: src/filebrowser/templates/listdir_components.mako:272
 msgid "Directory Name"
 msgstr "目录名称"
 
@@ -87,14 +86,14 @@ msgstr "用户/组所有权更改路径"
 #: src/filebrowser/forms.py:84 src/filebrowser/templates/chmod.mako:40
 #: src/filebrowser/templates/chown.mako:71
 #: src/filebrowser/templates/display.mako:77
-#: src/filebrowser/templates/listdir_components.mako:105
+#: src/filebrowser/templates/listdir_components.mako:112
 msgid "User"
 msgstr "用户"
 
 #: src/filebrowser/forms.py:86 src/filebrowser/templates/chmod.mako:41
 #: src/filebrowser/templates/chown.mako:79
 #: src/filebrowser/templates/display.mako:79
-#: src/filebrowser/templates/listdir_components.mako:106
+#: src/filebrowser/templates/listdir_components.mako:113
 msgid "Group"
 msgstr "组"
 
@@ -102,131 +101,163 @@ msgstr "组"
 msgid "Path to change permissions"
 msgstr "权限更改路径"
 
-#: src/filebrowser/views.py:95 src/filebrowser/views.py:445
-#: src/filebrowser/views.py:473
+#: src/filebrowser/views.py:99 src/filebrowser/views.py:449
+#: src/filebrowser/views.py:477
 #, python-format
 msgid "File not found: %(path)s"
 msgstr "未找到文件：%(path)s"
 
-#: src/filebrowser/views.py:97
+#: src/filebrowser/views.py:101
 #, python-format
 msgid "'%(path)s' is not a file"
 msgstr "'%(path)s' 不是一个文件"
 
-#: src/filebrowser/views.py:132
+#: src/filebrowser/views.py:136
 #, python-format
 msgid "Cannot access: %(path)s."
 msgstr "无法访问：%(path)s。"
 
-#: src/filebrowser/views.py:134 src/filebrowser/views.py:753
+#: src/filebrowser/views.py:138 src/filebrowser/views.py:757
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
 msgstr " 注：您是 Hue 管理员，但不是 HDFS 超级用户（即 \"%(superuser)s\"）。"
 
-#: src/filebrowser/views.py:152
+#: src/filebrowser/views.py:156
 #, python-format
 msgid "Cannot edit a directory: %(path)s"
 msgstr "无法编辑目录：%(path)s"
 
-#: src/filebrowser/views.py:156
+#: src/filebrowser/views.py:160
 #, python-format
 msgid "File too big to edit: %(path)s"
 msgstr "文件太大，无法编辑：%(path)s"
 
-#: src/filebrowser/views.py:166
+#: src/filebrowser/views.py:170
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
 msgstr "文件未采用 %(encoding)s 进行编码，无法编辑：%(path)s"
 
-#: src/filebrowser/views.py:215
+#: src/filebrowser/views.py:219
 #, python-format
 msgid "Saved %(path)s."
 msgstr "已保存 %(path)s。"
 
-#: src/filebrowser/views.py:310
+#: src/filebrowser/views.py:314
 #, python-format
 msgid "Not a directory: %(path)s"
 msgstr "不是目录：%(path)s"
 
-#: src/filebrowser/views.py:494
+#: src/filebrowser/views.py:498
 #, python-format
 msgid "Not a file: '%(path)s'"
 msgstr "不是文件：'%(path)s'"
 
-#: src/filebrowser/views.py:516
+#: src/filebrowser/views.py:520
 msgid "First byte to display must be before last byte to display."
 msgstr "要显示的第一个字节必须在要显示的最后一个字节之前。"
 
-#: src/filebrowser/views.py:526
+#: src/filebrowser/views.py:530
 msgid "Mode must be one of 'binary' or 'text'."
 msgstr "模式必须是其中一个 'binary' 或 'text'。"
 
-#: src/filebrowser/views.py:528
+#: src/filebrowser/views.py:532
 msgid "Offset may not be less than zero."
 msgstr "偏移不能小于零。"
 
-#: src/filebrowser/views.py:530
+#: src/filebrowser/views.py:534
 msgid "Length may not be less than zero."
 msgstr "长度不能小于零。"
 
-#: src/filebrowser/views.py:532
+#: src/filebrowser/views.py:536
 #, python-format
 msgid "Cannot request chunks greater than %(bytes)d bytes"
 msgstr "不能请求大于 %(bytes)d 字节的块"
 
-#: src/filebrowser/views.py:643
+#: src/filebrowser/views.py:647
 msgid "Failed to read Avro file."
 msgstr "无法读取 Avro 文件。"
 
-#: src/filebrowser/views.py:652
+#: src/filebrowser/views.py:656
 msgid "Offsets are not supported with Gzip compression."
 msgstr "不支持采用 Gzip 压缩的偏移。"
 
-#: src/filebrowser/views.py:659
+#: src/filebrowser/views.py:663
 msgid "Failed to decompress file."
 msgstr "无法解压缩文件。"
 
-#: src/filebrowser/views.py:674
+#: src/filebrowser/views.py:678
 msgid "Failed to read file."
 msgstr "无法读取文件。"
 
-#: src/filebrowser/views.py:702 src/filebrowser/views.py:704
+#: src/filebrowser/views.py:706 src/filebrowser/views.py:708
 #: src/filebrowser/templates/display.mako:119
 #: src/filebrowser/templates/display.mako:199
 msgid "First Block"
 msgstr "第一个块"
 
-#: src/filebrowser/views.py:702 src/filebrowser/views.py:704
+#: src/filebrowser/views.py:706 src/filebrowser/views.py:708
 #: src/filebrowser/templates/display.mako:120
 #: src/filebrowser/templates/display.mako:200
 msgid "Previous Block"
 msgstr "上一个块"
 
-#: src/filebrowser/views.py:707 src/filebrowser/views.py:710
+#: src/filebrowser/views.py:711 src/filebrowser/views.py:714
 #: src/filebrowser/templates/display.mako:121
 #: src/filebrowser/templates/display.mako:201
 msgid "Next Block"
 msgstr "下一个块"
 
-#: src/filebrowser/views.py:707 src/filebrowser/views.py:710
+#: src/filebrowser/views.py:711 src/filebrowser/views.py:714
 #: src/filebrowser/templates/display.mako:122
 #: src/filebrowser/templates/display.mako:202
 msgid "Last Block"
 msgstr "最后一个块"
 
-#: src/filebrowser/views.py:751
+#: src/filebrowser/views.py:755
 msgid "Cannot perform operation."
 msgstr "无法执行操作。"
 
-#: src/filebrowser/views.py:897
+#: src/filebrowser/views.py:809
 #, python-format
-msgid "Failed to chown uploaded file (\"%(file)s\") as superuser %(superuser)s."
-msgstr "无法以超级用户 %(superuser)s 的身份 chown 上传的文件 (\"%(file)s\")"
+msgid "Sorry, could not name folder \"%s\": Slashes are not allowed in filenames."
+msgstr ""
 
-#: src/filebrowser/views.py:909
+#: src/filebrowser/views.py:885
+#, fuzzy
+msgid "A POST request is required."
+msgstr "抱歉，需要提供用户。"
+
+#: src/filebrowser/views.py:888
 #, python-format
-msgid "Failed to rename uploaded temporary file (\"%(file)s\") to \"%(name)s\": %(error)s"
-msgstr "无法将上传的临时文件 (\"%(file)s\") 重命名为 \"%(name)s\"：%(error)s"
+msgid "%(destination)s upload succeded"
+msgstr ""
+
+#: src/filebrowser/views.py:890
+#, fuzzy, python-format
+msgid "Upload failed: %(data)s"
+msgstr "不是文件：'%(path)s'"
+
+#: src/filebrowser/views.py:907
+#, python-format
+msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
+msgstr ""
+
+#: src/filebrowser/views.py:927
+#, python-format
+msgid "Destination %(name)s already exists.name"
+msgstr ""
+
+#: src/filebrowser/views.py:929
+#, python-format
+msgid "Copy to \"%(name)s failed: %(error)s"
+msgstr ""
+
+#: src/filebrowser/views.py:939
+#, python-format
+msgid "Error in upload form: %s"
+msgstr ""
 
 #: src/filebrowser/templates/chmod.mako:32
 msgid "Change Permissions:"
@@ -236,33 +267,36 @@ msgstr "更改权限："
 msgid "Other"
 msgstr "其他"
 
-#: src/filebrowser/templates/chmod.mako:48
+#: src/filebrowser/templates/chmod.mako:49
 msgid "Read"
 msgstr "读"
 
-#: src/filebrowser/templates/chmod.mako:55
+#: src/filebrowser/templates/chmod.mako:56
 msgid "Write"
 msgstr "写"
 
-#: src/filebrowser/templates/chmod.mako:62
+#: src/filebrowser/templates/chmod.mako:63
 msgid "Execute"
 msgstr "执行"
 
-#: src/filebrowser/templates/chmod.mako:72
+#: src/filebrowser/templates/chmod.mako:70
+msgid "Sticky"
+msgstr ""
+
+#: src/filebrowser/templates/chmod.mako:79
 #: src/filebrowser/templates/chown.mako:94
 #: src/filebrowser/templates/edit.mako:82
-#: src/filebrowser/templates/listdir_components.mako:226
-#: src/filebrowser/templates/listdir_components.mako:277
-#: src/filebrowser/templates/listdir_components.mako:358
+#: src/filebrowser/templates/listdir_components.mako:233
+#: src/filebrowser/templates/listdir_components.mako:279
+#: src/filebrowser/templates/listdir_components.mako:359
 #: src/filebrowser/templates/move.mako:40
-#: src/filebrowser/templates/upload.mako:54
 msgid "Cancel"
 msgstr "取消"
 
-#: src/filebrowser/templates/chmod.mako:73
+#: src/filebrowser/templates/chmod.mako:80
 #: src/filebrowser/templates/chown.mako:95
-#: src/filebrowser/templates/listdir_components.mako:227
-#: src/filebrowser/templates/listdir_components.mako:278
+#: src/filebrowser/templates/listdir_components.mako:234
+#: src/filebrowser/templates/listdir_components.mako:280
 #: src/filebrowser/templates/move.mako:41
 msgid "Submit"
 msgstr "提交"
@@ -273,12 +307,14 @@ msgstr "更改所有者/组："
 
 #: src/filebrowser/templates/chown.mako:67
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
 msgstr "注：只有此文件系统上的 Hadoop 超级用户 \"%(superuser)s\" 可以更改文件的所有者。"
 
 #: src/filebrowser/templates/chown.mako:92
 #: src/filebrowser/templates/edit.mako:77
-#: src/filebrowser/templates/listdir_components.mako:222
+#: src/filebrowser/templates/listdir_components.mako:229
 #: src/filebrowser/templates/move.mako:38
 msgid "Sorry, name is required."
 msgstr "抱歉，需要提供名称。"
@@ -330,7 +366,7 @@ msgid "Stop preview"
 msgstr "停止预览"
 
 #: src/filebrowser/templates/display.mako:67
-#: src/filebrowser/templates/listdir_components.mako:162
+#: src/filebrowser/templates/listdir_components.mako:169
 msgid "Edit File"
 msgstr "编辑文件"
 
@@ -355,7 +391,7 @@ msgid "Last Modified"
 msgstr "上次修改"
 
 #: src/filebrowser/templates/display.mako:81
-#: src/filebrowser/templates/listdir_components.mako:104
+#: src/filebrowser/templates/listdir_components.mako:111
 msgid "Size"
 msgstr "大小"
 
@@ -418,146 +454,146 @@ msgstr "主页"
 msgid "File Operation"
 msgstr "文件操作"
 
-#: src/filebrowser/templates/listdir.mako:26
+#: src/filebrowser/templates/listdir.mako:25
 #: src/filebrowser/templates/listdir.mako:28
 msgid "File Browser"
 msgstr "文件浏览器"
 
-#: src/filebrowser/templates/listdir_components.mako:58
+#: src/filebrowser/templates/listdir_components.mako:63
 msgid "Beginning of List"
 msgstr "列表开头"
 
-#: src/filebrowser/templates/listdir_components.mako:59
+#: src/filebrowser/templates/listdir_components.mako:64
 msgid "Previous Page"
 msgstr "上一页"
 
-#: src/filebrowser/templates/listdir_components.mako:62
+#: src/filebrowser/templates/listdir_components.mako:67
 msgid "Next page"
 msgstr "下一页"
 
-#: src/filebrowser/templates/listdir_components.mako:62
+#: src/filebrowser/templates/listdir_components.mako:67
 msgid "Next Page"
 msgstr "下一页"
 
-#: src/filebrowser/templates/listdir_components.mako:63
+#: src/filebrowser/templates/listdir_components.mako:68
 msgid "End of List"
 msgstr "列表结尾"
 
-#: src/filebrowser/templates/listdir_components.mako:66
+#: src/filebrowser/templates/listdir_components.mako:71
 msgid "Show"
 msgstr "显示"
 
-#: src/filebrowser/templates/listdir_components.mako:66
+#: src/filebrowser/templates/listdir_components.mako:71
 msgid "items per page"
 msgstr "每页项目数"
 
-#: src/filebrowser/templates/listdir_components.mako:66
+#: src/filebrowser/templates/listdir_components.mako:71
 #, python-format
-msgid "Showing %(start_index)s to %(end_index)s of %(total_count)s items, page %(page)s of %(num_pages)s."
-msgstr "正在显示 %(start_index)s 到 %(end_index)s，共 %(total_count)s 个项目，第 %(page)s 页，共 %(num_pages)s 页。"
+msgid ""
+"Showing %(start_index)s to %(end_index)s of %(total_count)s items, page "
+"%(page)s of %(num_pages)s."
+msgstr ""
+"正在显示 %(start_index)s 到 %(end_index)s，共 %(total_count)s 个项目，第 %(page)s 页，共"
+" %(num_pages)s 页。"
 
-#: src/filebrowser/templates/listdir_components.mako:100
+#: src/filebrowser/templates/listdir_components.mako:107
 msgid "Name"
 msgstr "名称"
 
-#: src/filebrowser/templates/listdir_components.mako:102
+#: src/filebrowser/templates/listdir_components.mako:109
 msgid "Path"
 msgstr "路径"
 
-#: src/filebrowser/templates/listdir_components.mako:107
+#: src/filebrowser/templates/listdir_components.mako:114
 msgid "Permissions"
 msgstr "权限"
 
-#: src/filebrowser/templates/listdir_components.mako:108
+#: src/filebrowser/templates/listdir_components.mako:115
 msgid "Date"
 msgstr "日期"
 
-#: src/filebrowser/templates/listdir_components.mako:156
+#: src/filebrowser/templates/listdir_components.mako:163
 msgid "Operations"
 msgstr "操作"
 
-#: src/filebrowser/templates/listdir_components.mako:161
+#: src/filebrowser/templates/listdir_components.mako:168
 msgid "View File"
 msgstr "查看文件"
 
-#: src/filebrowser/templates/listdir_components.mako:163
+#: src/filebrowser/templates/listdir_components.mako:170
 msgid "Download File"
 msgstr "下载文件"
 
-#: src/filebrowser/templates/listdir_components.mako:165
+#: src/filebrowser/templates/listdir_components.mako:172
 msgid "Rename"
 msgstr "重命名"
 
-#: src/filebrowser/templates/listdir_components.mako:166
+#: src/filebrowser/templates/listdir_components.mako:173
 msgid "Change Owner / Group"
 msgstr "更改所有者/组"
 
-#: src/filebrowser/templates/listdir_components.mako:167
+#: src/filebrowser/templates/listdir_components.mako:174
 msgid "Change Permissions"
 msgstr "更改权限"
 
-#: src/filebrowser/templates/listdir_components.mako:168
+#: src/filebrowser/templates/listdir_components.mako:175
 msgid "Move"
 msgstr "移动"
 
-#: src/filebrowser/templates/listdir_components.mako:170
-#: src/filebrowser/templates/listdir_components.mako:173
+#: src/filebrowser/templates/listdir_components.mako:177
+#: src/filebrowser/templates/listdir_components.mako:180
 msgid "Delete"
 msgstr "删除"
 
-#: src/filebrowser/templates/listdir_components.mako:171
+#: src/filebrowser/templates/listdir_components.mako:178
 msgid "Delete Recursively"
 msgstr "递归删除"
 
-#: src/filebrowser/templates/listdir_components.mako:196
+#: src/filebrowser/templates/listdir_components.mako:203
 msgid "Please Confirm"
 msgstr "请确认"
 
-#: src/filebrowser/templates/listdir_components.mako:199
+#: src/filebrowser/templates/listdir_components.mako:206
 msgid "Are you sure you want to delete this file?"
 msgstr "是否确定要删除此文件？"
 
-#: src/filebrowser/templates/listdir_components.mako:203
+#: src/filebrowser/templates/listdir_components.mako:210
 msgid "Yes"
 msgstr "是"
 
-#: src/filebrowser/templates/listdir_components.mako:204
+#: src/filebrowser/templates/listdir_components.mako:211
 msgid "No"
 msgstr "否"
 
-#: src/filebrowser/templates/listdir_components.mako:215
+#: src/filebrowser/templates/listdir_components.mako:222
 msgid "Renaming:"
 msgstr "正在重命名："
 
-#: src/filebrowser/templates/listdir_components.mako:247
+#: src/filebrowser/templates/listdir_components.mako:250
 msgid "Uploading to:"
 msgstr "正在上传到："
 
-#: src/filebrowser/templates/listdir_components.mako:253
-#: src/filebrowser/templates/upload.mako:31
+#: src/filebrowser/templates/listdir_components.mako:256
 msgid "Please enable JavaScript to use the file uploader."
 msgstr "请启用 JavaScript 以使用文件上传程序。"
 
-#: src/filebrowser/templates/listdir_components.mako:267
+#: src/filebrowser/templates/listdir_components.mako:269
 msgid "Create Directory"
 msgstr "创建目录"
 
-#: src/filebrowser/templates/listdir_components.mako:275
+#: src/filebrowser/templates/listdir_components.mako:277
 msgid "Sorry, directory name is required."
 msgstr "抱歉，需要提供目录名称。"
 
-#: src/filebrowser/templates/listdir_components.mako:350
-#: src/filebrowser/templates/upload.mako:46
+#: src/filebrowser/templates/listdir_components.mako:351
 msgid "Drop files here to upload"
 msgstr "将文件放在此处以上传"
 
-#: src/filebrowser/templates/listdir_components.mako:351
-#: src/filebrowser/templates/upload.mako:47
+#: src/filebrowser/templates/listdir_components.mako:352
 msgid "Upload a file"
 msgstr "上传一个文件"
 
-#: src/filebrowser/templates/listdir_components.mako:359
-#: src/filebrowser/templates/upload.mako:55
+#: src/filebrowser/templates/listdir_components.mako:360
 msgid "Failed"
 msgstr "失败"
 
@@ -565,15 +601,22 @@ msgstr "失败"
 msgid "Move:"
 msgstr "移动："
 
-#: src/filebrowser/templates/upload.mako:28
-msgid "Upload Files"
-msgstr "上传文件"
+#~ msgid ""
+#~ "Failed to chown uploaded file "
+#~ "(\"%(file)s\") as superuser %(superuser)s."
+#~ msgstr "无法以超级用户 %(superuser)s 的身份 chown 上传的文件 (\"%(file)s\")"
 
-#: src/filebrowser/templates/upload_done.mako:22
-msgid "View uploaded file:"
-msgstr "查看上传的文件："
+#~ msgid ""
+#~ "Failed to rename uploaded temporary file"
+#~ " (\"%(file)s\") to \"%(name)s\": %(error)s"
+#~ msgstr "无法将上传的临时文件 (\"%(file)s\") 重命名为 \"%(name)s\"：%(error)s"
 
-#: src/filebrowser/templates/upload_done.mako:23
-msgid "Go back to where you were:"
-msgstr "返回到您的位置："
+#~ msgid "Upload Files"
+#~ msgstr "上传文件"
+
+#~ msgid "View uploaded file:"
+#~ msgstr "查看上传的文件："
+
+#~ msgid "Go back to where you were:"
+#~ msgstr "返回到您的位置："
 

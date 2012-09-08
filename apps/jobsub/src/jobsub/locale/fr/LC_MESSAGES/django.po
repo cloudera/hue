@@ -1,14 +1,13 @@
 # French translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2012 Cloudera
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 19:07-0700\n"
+"POT-Creation-Date: 2012-09-07 18:08-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -22,21 +21,29 @@ msgstr ""
 msgid "Location on HDFS where the jobsub examples and templates are stored."
 msgstr "Emplacement sur HDFS où des exemples et modèles de jobsub sont stockés."
 
-#: src/jobsub/conf.py:34
+#: src/jobsub/conf.py:33
 msgid "Location on local FS where examples and template are stored"
 msgstr "Emplacement sur le FS local où des exemples et modèles sont stockés"
 
-#: src/jobsub/conf.py:40
+#: src/jobsub/conf.py:39
 msgid "Location on local FS where sample data is stored"
 msgstr "Emplacement sur le FS local où des données échantillons sont stockées"
 
-#: src/jobsub/conf.py:45
-msgid "URL to Oozie server. This is required for job submission."
-msgstr "URL pour le serveur Oozie. Requise pour l'envoi de travaux."
+#: src/jobsub/conf.py:49
+#, fuzzy
+msgid ""
+"Deprecated, please use liboozie.conf.OOZIE_URL instead. URL to Oozie "
+"server. This is required for job submission."
+msgstr "URL pour le serveur Oozie. Requise pour l'envoi de jobs."
 
-#: src/jobsub/conf.py:51
-msgid "Whether Oozie requires client to do perform Kerberos authentication"
-msgstr "Indique si Oozie nécessite un client pour effectuer une authentification Kerberos"
+#: src/jobsub/conf.py:55
+#, fuzzy
+msgid ""
+"Deprecated, please use liboozie.conf.SECURITY_ENABLED instead. Whether "
+"Oozie requires client to do perform Kerberos authentication"
+msgstr ""
+"Indique si Oozie nécessite un client pour effectuer une authentification "
+"Kerberos"
 
 #: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
 #: src/jobsub/templates/list_history.mako:45
@@ -45,8 +52,12 @@ msgid "Name"
 msgstr "Nom"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
-msgstr "Autorise les lettres, chiffres, '_' et '-'. Le premier caractère doit être une lettre ou '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
+msgstr ""
+"Autorise les lettres, chiffres, '_' et '-'. Le premier caractère doit "
+"être une lettre ou '_'."
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -67,12 +78,14 @@ msgstr "Chemin vers les fichiers jar sur HDFS."
 #: src/jobsub/submit.py:48
 #, python-format
 msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)"
-msgstr "Envoi pour conception de travail '%(name)s' (id %(id)s, propriétaire %(username)s)"
+msgstr ""
+"Envoi pour conception de job '%(name)s' (id %(id)s, propriétaire "
+"%(username)s)"
 
 #: src/jobsub/submit.py:72
 #, python-format
 msgid "Job design already submitted (Oozie job id %(id)s)"
-msgstr "Conception de travail déjà envoyée (id de travail Oozie %(id)s)"
+msgstr "Conception de job déjà envoyée (id de travail Oozie %(id)s)"
 
 #: src/jobsub/submit.py:81
 msgid "Failed to access deployment directory."
@@ -85,12 +98,12 @@ msgstr "Echec de la récupération de la référence HDFS. Vérifiez la configur
 #: src/jobsub/views.py:58
 #, python-format
 msgid "Access denied: view job %(id)s"
-msgstr "Accès refusé : afficher le travail %(id)s"
+msgstr "Accès refusé : afficher le job %(id)s"
 
 #: src/jobsub/views.py:64
 #, python-format
 msgid "Error accessing Oozie job %(id)s."
-msgstr "Erreur d'accès au travail Oozie %(id)s."
+msgstr "Erreur d'accès au job Oozie %(id)s."
 
 #: src/jobsub/views.py:177
 msgid "Permission denied. You are not the owner."
@@ -137,34 +150,25 @@ msgstr "Utilisez une requête POST pour installer les exemples."
 msgid "The examples could not be installed."
 msgstr "Impossible d'installer les exemples."
 
-#: src/jobsub/management/commands/jobsub_setup.py:90
+#: src/jobsub/management/commands/jobsub_setup.py:88
 msgid "Unexpected fixture type."
 msgstr "Type d'élément fixe inattendu."
 
-#: src/jobsub/management/commands/jobsub_setup.py:93
+#: src/jobsub/management/commands/jobsub_setup.py:91
 msgid "Expected sample user fixture."
 msgstr "Elément fixe d'utilisateur échantillon attendu."
-
-#: src/jobsub/oozie_lib/types.py:171
-msgid "Insufficient permission"
-msgstr "Autorisation insuffisante"
-
-#: src/jobsub/oozie_lib/types.py:172
-#, python-format
-msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-msgstr "Autorisation refusée. L'utilisateur %(username)s ne peut pas modifier le travail de l'utilisateur %(user)s."
 
 #: src/jobsub/templates/edit_design.mako:26
 #: src/jobsub/templates/list_designs.mako:28
 #: src/jobsub/templates/list_history.mako:26
 #: src/jobsub/templates/workflow.mako:25
 msgid "Job Designer"
-msgstr "Concepteur de travaux"
+msgstr "Concepteur de jobs"
 
 #: src/jobsub/templates/edit_design.mako:54
 #, python-format
 msgid "Job Design (%(type)s type)"
-msgstr "Conception de travail (type %(type)s)"
+msgstr "Conception de job (type %(type)s)"
 
 #: src/jobsub/templates/edit_design.mako:66
 msgid "You can parameterize the values, using"
@@ -175,12 +179,16 @@ msgid "or"
 msgstr "ou"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid "When the design is submitted, you will be prompted for the actual value of "
-msgstr "Lorsque la conception est envoyée, vous serez invité à saisir la valeur réelle de "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
+msgstr ""
+"Lorsque la conception est envoyée, vous serez invité à saisir la valeur "
+"réelle de "
 
 #: src/jobsub/templates/edit_design.mako:76
 msgid "Job Properties"
-msgstr "Propriétés du travail"
+msgstr "Propriétés du job"
 
 #: src/jobsub/templates/edit_design.mako:82
 msgid "Property name"
@@ -241,7 +249,7 @@ msgstr "Historique"
 
 #: src/jobsub/templates/list_designs.mako:34
 msgid "Job Designs"
-msgstr "Conceptions de travail"
+msgstr "Conceptions de job"
 
 #: src/jobsub/templates/list_designs.mako:37
 msgid "Create Mapreduce Design"
@@ -348,7 +356,7 @@ msgstr "Non"
 
 #: src/jobsub/templates/list_designs.mako:131
 msgid "Install sample job designs?"
-msgstr "Installer des échantillons de conception de travail ?"
+msgstr "Installer des échantillons de conception de job ?"
 
 #: src/jobsub/templates/list_designs.mako:134
 msgid "It will take a few seconds to install."
@@ -401,11 +409,11 @@ msgstr "Précédent"
 
 #: src/jobsub/templates/list_history.mako:32
 msgid "Job Submission History"
-msgstr "Historique d'envoi de travaux"
+msgstr "Historique d'envoi de jobs"
 
 #: src/jobsub/templates/list_history.mako:43
 msgid "Oozie Job ID"
-msgstr "ID de travail Oozie"
+msgstr "ID de job Oozie"
 
 #: src/jobsub/templates/list_history.mako:48
 msgid "Submission Date"
@@ -486,4 +494,13 @@ msgstr "Heure de création"
 #: src/jobsub/templates/workflow.mako:186
 msgid "Application Path"
 msgstr "Chemin d'application"
+
+#~ msgid "Insufficient permission"
+#~ msgstr "Autorisation insuffisante"
+
+#~ msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
+#~ msgstr ""
+#~ "Autorisation refusée. L'utilisateur %(username)s "
+#~ "ne peut pas modifier le job de "
+#~ "l'utilisateur %(user)s."
 
