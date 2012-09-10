@@ -116,7 +116,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       error_messages = {'invalid': _("Whitespaces and ':' not allowed") })
   password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput, required=False)
   password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput, required=False)
-  ensure_home_directory = forms.BooleanField(label=_("Create Home Directory"),
+  ensure_home_directory = forms.BooleanField(label=_("Create home directory"),
                                             help_text=_("Create home directory if one doesn't already exist."),
                                             initial=True,
                                             required=False)

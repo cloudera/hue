@@ -50,7 +50,7 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
             if retired == "on":
                 checked = 'checked="checked"'
         %>
-        <input name="retired" type="checkbox" class="submitter" ${checked}> Show retired jobs
+        <input name="retired" type="checkbox" class="submitter" ${checked}> ${_('Show retired jobs')}
     </label>
 
     <label class="pull-right">

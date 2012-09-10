@@ -34,7 +34,7 @@ ${layout.menubar(section='groups', _=_)}
             %endif
         </div>
         <form class="form-search">
-            ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for group name, members, etc...')}">
+            ${_('Filter: ')}<input id="filterInput" class="input-xxlarge search-query" placeholder="${_('Search for group name, members, etc...')}">
         </form>
     </div>
     <table class="table table-striped datatables">

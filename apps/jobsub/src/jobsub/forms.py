@@ -52,9 +52,15 @@ class JavaActionForm(forms.ModelForm):
     widgets = {
       'job_properties': forms.widgets.HiddenInput(),
       'files': forms.HiddenInput(),
-      'archives': forms.HiddenInput(),
-      'jar_path': forms.TextInput(attrs={'class': 'pathChooser'}),
+      'archives': forms.HiddenInput()
     }
+
+    name = forms.CharField(label=_('Name'))
+    description = forms.CharField(label=_('Description'))
+    main_class = forms.CharField(label=_('Main class'))
+    jar_path = forms.CharField(label=_('Jar path'), widget=forms.TextInput(attrs={'class': 'pathChooser'}))
+    args = forms.CharField(label=_('Args'))
+    java_opts = forms.CharField(label=_('Java opts'))
 
 
 class MapreduceActionForm(forms.ModelForm):
@@ -65,9 +71,14 @@ class MapreduceActionForm(forms.ModelForm):
     widgets = {
       'job_properties': forms.widgets.HiddenInput(),
       'files': forms.HiddenInput(),
-      'archives': forms.HiddenInput(),
-      'jar_path': forms.TextInput(attrs={'class': 'pathChooser'}),
+      'archives': forms.HiddenInput()
     }
+
+    name = forms.CharField(label=_('Name'))
+    description = forms.CharField(label=_('Description'))
+    jar_path = forms.CharField(label=_('Jar path'), widget=forms.TextInput(attrs={'class': 'pathChooser'}))
+    mapper = forms.CharField(label=_('Mapper'))
+    reducer = forms.CharField(label=_('Reducer'))
 
 
 class StreamingActionForm(forms.ModelForm):
@@ -80,6 +91,9 @@ class StreamingActionForm(forms.ModelForm):
       'files': forms.widgets.HiddenInput(),
       'archives': forms.widgets.HiddenInput(),
     }
+
+    name = forms.CharField(label=_('Name'))
+    description = forms.CharField(label=_('Description'))
 
 
 _ACTION_TYPE_TO_FORM_CLS = {

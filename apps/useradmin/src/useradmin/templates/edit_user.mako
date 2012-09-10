@@ -28,7 +28,7 @@ ${layout.menubar(section='users', _=_)}
   %if not field.is_hidden:
     <% group_class = len(field.errors) and "error" or "" %>
     <div class="control-group ${group_class}">
-      <label class="control-label" for="id_${field.html_name}">${field.label}</label>
+      <label class="control-label" for="id_${field.html_name}">${_(field.label)}</label>
       <div class="controls">
 		${unicode(field) | n}
         % if len(field.errors):
