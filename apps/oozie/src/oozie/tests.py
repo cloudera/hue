@@ -880,13 +880,27 @@ class TestEditor:
     coord = create_coordinator(self.wf)
     create_dataset(coord)
 
-    response = self.c.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'input']),
-                           {u'input-name': [u'input_dir'], u'input-dataset': [u'1']})
-    data = json.loads(response.content)
-    assert_equal(0, data['status'], data['data'])
+    create_coordinator_data(coord)
+
 
   def test_setup_app(self):
     self.c.post(reverse('oozie:setup_app'))
+
+
+  def test_get_workflow_parameters(self):
+    assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
+                 self.wf.find_all_parameters())
+
+
+  def test_get_coordinator_parameters(self):
+    coord = create_coordinator(self.wf)
+
+    create_dataset(coord)
+    create_coordinator_data(coord)
+
+    assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US,France'},
+                  {'name': u'input_dir', 'value': 'MyDataset [dataset]'}],
+                 coord.find_all_parameters())
 
 
 # Utils
@@ -921,6 +935,7 @@ def create_workflow():
 
   wf = Workflow.objects.get()
   assert_not_equal('', wf.deployment_dir)
+  # TODO test for existence on HDFS
 
   action1 = add_action(wf.id, wf.start.id, 'action-name-1')
   action2 = add_action(wf.id, action1.id, 'action-name-2')
@@ -965,6 +980,15 @@ def create_dataset(coord):
                         u'create-start_0': [u'07/01/2012'], u'create-start_1': [u'12:00 AM'],
                         u'create-timezone': [u'America/Los_Angeles'], u'create-done_flag': [u''],
                         u'create-description': [u'']})
+  data = json.loads(response.content)
+  assert_equal(0, data['status'], data['data'])
+
+
+def create_coordinator_data(coord):
+  c = make_logged_in_client()
+
+  response = c.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'input']),
+                         {u'input-name': [u'input_dir'], u'input-dataset': [u'1']})
   data = json.loads(response.content)
   assert_equal(0, data['status'], data['data'])
 

@@ -103,24 +103,30 @@ class Submission(object):
   def _create_deployment_dir(self):
     """
     Return the job deployment directory in HDFS, creating it if necessary.
+    The actual deployment dir should be 0711 owned by the user
     """
     path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
+    self._create_dir(path)
+    return path
 
+  def _create_dir(self, path, perms=0711):
+    """
+    Return the directory in HDFS, creating it if necessary.
+    """
     try:
       statbuf = self.fs.stats(path)
       if not statbuf.isDir:
-        msg = _("Workflow deployment path is not a directory: %s") % (path,)
+        msg = _("Path is not a directory: %s") % (path,)
         LOG.error(msg)
         raise Exception(msg)
       return path
     except IOError, ex:
       if ex.errno != errno.ENOENT:
-        msg = _("Error accessing workflow directory '%s': %s") % (path, ex)
+        msg = _("Error accessing directory '%s': %s") % (path, ex)
         LOG.exception(msg)
         raise IOError(ex.errno, msg)
-    # The actual deployment dir should be 0711 owned by the user
     if not self.fs.exists(path):
-      self._do_as(self.user.username , self.fs.mkdir, path, 0711)
+      self._do_as(self.user.username , self.fs.mkdir, path, perms)
     return path
 
   def _copy_files(self, deployment_dir, oozie_xml):
