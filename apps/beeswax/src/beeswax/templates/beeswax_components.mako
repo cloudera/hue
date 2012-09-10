@@ -17,12 +17,12 @@
   from desktop.lib.django_util import extract_field_data
   from django.utils.translation import ugettext as _
 %>
-<%def name="fieldName(field)">
 
+<%def name="fieldName(field)">
 </%def>
 
 <%def name="bootstrapLabel(field)">
-    <label for="${field.html_name | n}" class="control-label">${field.label | n}</label>
+    <label for="${field.html_name | n}" class="control-label">${field.label}</label>
 </%def>
 
 <%def name="label(

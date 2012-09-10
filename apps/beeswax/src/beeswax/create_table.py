@@ -80,13 +80,13 @@ def create_table(request):
 
 IMPORT_PEEK_SIZE = 8192
 IMPORT_PEEK_NLINES = 10
-DELIMITERS = [ hive_val for hive_val, _, _ in beeswax.common.TERMINATORS ]
+DELIMITERS = [ hive_val for hive_val, desc, ascii in beeswax.common.TERMINATORS ]
 DELIMITER_READABLE = {'\\001' : 'ctrl-As',
                       '\\002' : 'ctrl-Bs',
                       '\\003' : 'ctrl-Cs',
-                      '\\t'   : 'tabs',
-                      ','     : 'commas',
-                      ' '     : 'spaces'}
+                      '\\t'   : _('tabs'),
+                      ','     : _('commas'),
+                      ' '     : _('spaces')}
 FILE_READERS = [ ]
 
 def import_wizard(request):

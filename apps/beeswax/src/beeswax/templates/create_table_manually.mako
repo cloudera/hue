@@ -45,6 +45,7 @@ ${layout.menubar(section='tables')}
 </ul>
 <form action="#" method="POST" id="mainForm" class="form-horizontal">
 <div class="steps">
+
 	<div id="step1" class="stepDetails">
 	    <fieldset>
 	        <div class="alert alert-info"><h3>${_('Create a table')}</h3>${_("Let's start with a name and description for where we'll store your data.")}</div>
@@ -52,8 +53,8 @@ ${layout.menubar(section='tables')}
 	            ${comps.bootstrapLabel(table_form["name"])}
 	            <div class="controls">
 	                ${comps.field(table_form["name"], attrs=dict(
-	                placeholder='table_name',
-	                )
+	                    placeholder=_('table_name'),
+	                  )
 	                )}
 	                <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
 	                <p class="help-block">
@@ -65,8 +66,8 @@ ${layout.menubar(section='tables')}
 	            ${comps.bootstrapLabel(table_form["comment"])}
 	            <div class="controls">
 	                ${comps.field(table_form["comment"], attrs=dict(
-	                placeholder=_('Optional'),
-	                )
+	                  placeholder=_('Optional'),
+	                  )
 	                )}
 	                <p class="help-block">
 	                    ${_("Use a table comment to describe your table.  For example, you might note the data's provenance and any caveats users need to know.")}
@@ -75,6 +76,7 @@ ${layout.menubar(section='tables')}
 	        </div>
 	    </fieldset>
 	</div>
+
 	<div id="step2" class="stepDetails hide">
 	    <fieldset>
 	        <div class="alert alert-info"><h3>${_('Choose Your Record Format')}</h3>
@@ -112,6 +114,7 @@ ${layout.menubar(section='tables')}
 	        </div>
 	    </fieldset>
 	</div>
+
 	<div id="step3" class="stepDetails hide">
 	    <fieldset>
 	        <div id="step3Delimited" class="stepDetailsInner">
