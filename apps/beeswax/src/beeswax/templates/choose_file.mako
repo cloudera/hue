@@ -47,10 +47,7 @@ ${layout.menubar(section='tables')}
                     <div class="control-group">
                         ${comps.bootstrapLabel(file_form["name"])}
                         <div class="controls">
-                            ${comps.field(file_form["name"],
-                            placeholder='table_name',
-                            show_errors=False
-                            )}
+                            ${comps.field(file_form["name"], placeholder=_('table_name'), show_errors=False)}
                             <span  class="help-inline">${unicode(file_form["name"].errors) | n}</span>
                         <span class="help-block">
                             ${_('Name of the new table. Table names must be globally unique. Table names tend to correspond as well to the directory where the data will be stored.')}

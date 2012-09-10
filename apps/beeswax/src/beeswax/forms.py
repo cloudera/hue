@@ -15,18 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from django import forms
+from django.utils.translation import ugettext as _, ugettext_lazy as _t
+
 import hive_metastore
 
-from django import forms
 from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
 from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
 from beeswax import common
 from beeswax import db_utils
 from beeswax import models
+from filebrowser.forms import PathField
 
-import filebrowser.forms
-
-from django.utils.translation import ugettext as _t
 
 def query_form():
   """Generates a multi form object for queries."""
@@ -51,9 +51,9 @@ class SaveForm(forms.Form):
   def __init__(self, *args, **kwargs):
     forms.Form.__init__(self, *args, **kwargs)
     self.fields['save'].label = _t('Save')
-    self.fields['save'].widget.label = _t('Save')
+    self.fields['save'].widget.label = _('Save')
     self.fields['saveas'].label = _t('Save As')
-    self.fields['saveas'].widget.label = _t('Save As')
+    self.fields['saveas'].widget.label = _('Save As')
 
   def clean_name(self):
     name = self.cleaned_data.get('name', '').strip()
@@ -66,7 +66,7 @@ class SaveForm(forms.Form):
     name = self.cleaned_data.get('name')
     if save and len(name) == 0:
       # Bother with name iff we're saving
-      raise forms.ValidationError(_t('Please enter a name'))
+      raise forms.ValidationError(_('Please enter a name'))
     return self.cleaned_data
 
   def set_data(self, name, desc=''):
@@ -80,7 +80,7 @@ class SaveForm(forms.Form):
 class SaveResultsForm(DependencyAwareForm):
   """Used for saving the query result data"""
 
-  SAVE_TYPES = (SAVE_TYPE_TBL, SAVE_TYPE_DIR) = (_t('to a new table'), _t('to HDFS directory'))
+  SAVE_TYPES = (SAVE_TYPE_TBL, SAVE_TYPE_DIR) = (_('to a new table'), _('to HDFS directory'))
   save_target = forms.ChoiceField(required=True,
                                   choices=common.to_choices(SAVE_TYPES),
                                   widget=forms.RadioSelect)
@@ -88,10 +88,9 @@ class SaveResultsForm(DependencyAwareForm):
                                   label=_t("Table Name"),
                                   required=False,
                                   help_text=_t("Name of the new table"))
-  target_dir = filebrowser.forms.PathField(
-                                  label=_t("Results Location"),
-                                  required=False,
-                                  help_text=_t("Empty directory in HDFS to put the results"))
+  target_dir = PathField(label=_t("Results Location"),
+                        required=False,
+                        help_text=_t("Empty directory in HDFS to put the results"))
   dependencies = [
     ('save_target', SAVE_TYPE_TBL, 'target_table'),
     ('save_target', SAVE_TYPE_DIR, 'target_dir'),
@@ -102,7 +101,7 @@ class SaveResultsForm(DependencyAwareForm):
     if tbl:
       try:
         db_utils.meta_client().get_table("default", tbl)
-        raise forms.ValidationError(_t('Table already exists'))
+        raise forms.ValidationError(_('Table already exists'))
       except hive_metastore.ttypes.NoSuchObjectException:
         pass
     return tbl
@@ -150,7 +149,7 @@ SettingFormSet = simple_formset_factory(SettingForm)
 
 
 # In theory, there are only 256 of these...
-TERMINATOR_CHOICES = [ (hive_val, desc) for hive_val, desc, _ in common.TERMINATORS ]
+TERMINATOR_CHOICES = [ (hive_val, desc) for hive_val, desc, ascii in common.TERMINATORS ]
 
 class CreateTableForm(DependencyAwareForm):
   """
@@ -169,11 +168,11 @@ class CreateTableForm(DependencyAwareForm):
 
   # Delimited Row
   # These initials are per LazySimpleSerDe.DefaultSeparators
-  field_terminator = ChoiceOrOtherField(required=False, initial=TERMINATOR_CHOICES[0][0],
+  field_terminator = ChoiceOrOtherField(label=_t("Field terminator"), required=False, initial=TERMINATOR_CHOICES[0][0],
     choices=TERMINATOR_CHOICES)
-  collection_terminator = ChoiceOrOtherField(required=False, initial=TERMINATOR_CHOICES[1][0],
+  collection_terminator = ChoiceOrOtherField(label=_t("Collection terminator"), required=False, initial=TERMINATOR_CHOICES[1][0],
     choices=TERMINATOR_CHOICES)
-  map_key_terminator = ChoiceOrOtherField(required=False, initial=TERMINATOR_CHOICES[2][0],
+  map_key_terminator = ChoiceOrOtherField(label=_t("Map key terminator"), required=False, initial=TERMINATOR_CHOICES[2][0],
     choices=TERMINATOR_CHOICES)
   dependencies += [
     ("row_format", "Delimited", "field_terminator"),
@@ -229,14 +228,14 @@ class CreateTableForm(DependencyAwareForm):
 def _clean_tablename(name):
   try:
     db_utils.meta_client().get_table("default", name)
-    raise forms.ValidationError(_t('Table "%(name)s" already exists') % {'name': name})
+    raise forms.ValidationError(_('Table "%(name)s" already exists') % {'name': name})
   except hive_metastore.ttypes.NoSuchObjectException:
     return name
 
 
 def _clean_terminator(val):
   if val is not None and len(val.decode('string_escape')) != 1:
-      raise forms.ValidationError(_t('Terminator must be exactly one character.'))
+      raise forms.ValidationError(_('Terminator must be exactly one character.'))
   return val
 
 
@@ -247,7 +246,7 @@ class CreateByImportFileForm(forms.Form):
   comment = forms.CharField(label=_t("Description"), required=False)
 
   # File info
-  path = filebrowser.forms.PathField(label=_t("Input File"))
+  path = PathField(label=_t("Input File"))
   do_import = forms.BooleanField(required=False, initial=True,
                           label=_t("Import data from file"),
                           help_text=_t("Automatically load this file into the table after creation."))
@@ -258,7 +257,7 @@ class CreateByImportFileForm(forms.Form):
 
 class CreateByImportDelimForm(forms.Form):
   """Form for step 2 (picking delimiter) of the import wizard"""
-  delimiter = ChoiceOrOtherField(required=False, initial=TERMINATOR_CHOICES[0][0],
+  delimiter = ChoiceOrOtherField(label=_t('Delimiter'), required=False, initial=TERMINATOR_CHOICES[0][0],
                                  choices=TERMINATOR_CHOICES)
   file_type = forms.CharField(widget=forms.HiddenInput, required=True)
 
@@ -266,7 +265,7 @@ class CreateByImportDelimForm(forms.Form):
     # ChoiceOrOtherField doesn't work with required=True
     delimiter = self.cleaned_data.get('delimiter')
     if not delimiter:
-      raise forms.ValidationError(_t('Delimiter value is required.'))
+      raise forms.ValidationError(_('Delimiter value is required.'))
     _clean_terminator(delimiter)
     return self.cleaned_data
 
@@ -276,10 +275,10 @@ class CreateByImportDelimForm(forms.Form):
         chr(int(delimiter))
         return int(delimiter)
       except ValueError:
-        raise forms.ValidationError(_t('Delimiter value must be smaller than 256.'))
+        raise forms.ValidationError(_('Delimiter value must be smaller than 256.'))
     val = delimiter.decode('string_escape')
     if len(val) != 1:
-      raise forms.ValidationError(_t('Delimiter must be exactly one character.'))
+      raise forms.ValidationError(_('Delimiter must be exactly one character.'))
     return ord(val)
 
 
@@ -303,8 +302,8 @@ class ColumnTypeForm(DependencyAwareForm):
     ("column_type", "map", "map_key_type"),
     ("column_type", "map", "map_value_type"),
   ]
-  column_name = common.HiveIdentifierField(required=True)
-  column_type = forms.ChoiceField(required=True,
+  column_name = common.HiveIdentifierField(label=_t('Column Name'), required=True)
+  column_type = forms.ChoiceField(label=_t('Column Type'), required=True,
     choices=common.to_choices(HIVE_TYPES))
   array_type = forms.ChoiceField(required=False,
     choices=common.to_choices(HIVE_PRIMITIVE_TYPES), label=_t("Array Value Type"))
@@ -322,7 +321,7 @@ PartitionTypeFormSet = simple_formset_factory(PartitionTypeForm, add_label=_t("a
 
 class LoadDataForm(forms.Form):
   """Form used for loading data into an existing table."""
-  path = filebrowser.forms.PathField(label=_t("Path"))
+  path = PathField(label=_t("Path"))
   overwrite = forms.BooleanField(required=False, initial=False,
     label=_t("Overwrite?"))
 
