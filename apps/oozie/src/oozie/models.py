@@ -50,7 +50,7 @@ LOG = logging.getLogger(__name__)
 
 PATH_MAX = 512
 name_validator = RegexValidator(regex='[a-zA-Z_][\-_a-zA-Z0-9]{1,39}',
-                                message=_('Please enter a valid value: 40 alphanum chars starting by an alpha'))
+                                message=_('Please enter a valid value: combination of 2 and 40 letters and digits starting by a letter'))
 
 
 """
@@ -153,7 +153,8 @@ class Job(models.Model):
       return _('personal')
 
   def find_all_parameters(self):
-    params = dict([(param, '') for param in self.find_parameters()])
+    params = self.find_parameters()
+
     for param in self.get_parameters():
       params[param['name'].strip()] = param['value']
 
@@ -199,7 +200,7 @@ class WorkflowManager(models.Manager):
 
     # Recheck if deployement dir exists
     oozie_setup.create_data_dir(fs)
-    Submission(workflow.owner, workflow, fs, {})._create_deployment_dir()
+    Submission(workflow.owner, workflow, fs, {})._create_dir(workflow.deployment_dir)
 
     return workflow
 
@@ -471,7 +472,7 @@ class Workflow(Job):
       if hasattr(node, 'find_parameters'):
         params.update(node.find_parameters())
 
-    return list(params)
+    return dict([(param, '') for param in list(params)])
 
   @property
   def actions(self):
@@ -1101,14 +1102,20 @@ class Coordinator(Job):
     return '%(number)d %(unit)s' % {'unit': self.frequency_unit, 'number': self.frequency_number}
 
   def find_parameters(self):
-    params = set()
+    params = self.workflow.find_parameters()
 
     for dataset in self.dataset_set.all():
-      params.update(set(find_parameters(dataset, ['uri'])))
+      for param in find_parameters(dataset, ['uri']):
+        if param not in set(['MINUTE', 'DAY', 'MONTH', 'YEAR']):
+          params[param] = ''
 
-    params.update(set(self.workflow.find_parameters()))
+    for ds in self.datainput_set.all():
+      params[ds.name] = '%s [dataset]' % ds.dataset
 
-    return list(params - set(['MINUTE', 'DAY', 'MONTH', 'YEAR']))
+    for ds in self.dataoutput_set.all():
+      params[ds.name] = '%s [dataset]' % ds.dataset
+
+    return params
 
 
 def utc_datetime_format(utc_time):

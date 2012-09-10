@@ -609,7 +609,8 @@ def edit_coordinator(request, coordinator):
     new_data_input_formset = NewDataInputFormSet(request.POST, request.FILES, instance=coordinator, prefix='input')
     new_data_output_formset = NewDataOutputFormSet(request.POST, request.FILES, instance=coordinator, prefix='output')
 
-    if coordinator_form.is_valid() and dataset_formset.is_valid() and data_input_formset.is_valid() and data_output_formset.is_valid() and new_data_input_formset.is_valid() and new_data_output_formset.is_valid():
+    if coordinator_form.is_valid() and dataset_formset.is_valid() and data_input_formset.is_valid() and data_output_formset.is_valid() \
+        and new_data_input_formset.is_valid() and new_data_output_formset.is_valid():
       coordinator = coordinator_form.save()
       dataset_formset.save()
       data_input_formset.save()
