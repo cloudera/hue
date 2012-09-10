@@ -29,7 +29,7 @@ ${layout.menubar(section='permissions', _=_)}
     <h1>${_('Hue Permissions')}</h1>
     <div class="well hueWell">
         <form class="form-search">
-                ${_('Filter: ')}<input id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for application name, description, etc...')}">
+                ${_('Filter: ')}<input id="filterInput" class="input-xxlarge search-query" placeholder="${_('Search for application name, description, etc...')}">
         </form>
     </div>
     <table class="table table-striped datatables">

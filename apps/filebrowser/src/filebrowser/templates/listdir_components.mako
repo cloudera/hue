@@ -102,7 +102,7 @@ from django.utils.translation import ugettext as _
     <table class="table table-condensed table-striped datatables">
         <thead>
             <tr>
-                <th class="sortable sorting" data-sort="type" width="5%">Type</th>
+                <th class="sortable sorting" data-sort="type" width="5%">${_('Type')}</th>
             % if cwd_set:
                 <th class="sortable sorting" data-sort="name">${_('Name')}</th>
             % else:
@@ -191,7 +191,7 @@ from django.utils.translation import ugettext as _
     ${pagination(page)}
     %else:
         <div class="alert">
-            There are no files matching the search criteria.
+            ${_('There are no files matching the search criteria.')}
         </div>
     %endif
 

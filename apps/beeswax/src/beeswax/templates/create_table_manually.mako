@@ -56,7 +56,7 @@ ${layout.menubar(section='tables')}
 	                    placeholder=_('table_name'),
 	                  )
 	                )}
-	                <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
 	                <p class="help-block">
 	                    ${_('Name of the new table. Table names must be globally unique. Table names tend to correspond as well to the directory where the data will be stored.')}
 	                </p>
@@ -125,7 +125,7 @@ ${layout.menubar(section='tables')}
 	                ${comps.bootstrapLabel(table_form["field_terminator"])}
 	                <div class="controls">
 	                    ${comps.field(table_form["field_terminator"], render_default=True)}
-	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
 	                    <span class="help-block">
 	                        ${_('Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.')}
 	                    </span>
@@ -135,7 +135,7 @@ ${layout.menubar(section='tables')}
 	                ${comps.bootstrapLabel(table_form["collection_terminator"])}
 	                <div class="controls">
 	                    ${comps.field(table_form["collection_terminator"], render_default=True)}
-	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
 	                    <span class="help-block">
 	                        ${_('Use for array types.')}
 	                    </span>
@@ -145,7 +145,7 @@ ${layout.menubar(section='tables')}
 	                ${comps.bootstrapLabel(table_form["map_key_terminator"])}
 	                <div class="controls">
 	                    ${comps.field(table_form["map_key_terminator"], render_default=True)}
-	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
 	                    <span class="help-block">
 	                        ${_('Use for map types.')}
 	                    </span>
@@ -209,7 +209,7 @@ ${layout.menubar(section='tables')}
 	                    placeholder='com.acme.data.MyInputFormat',
 	                    )
 	                    )}
-	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
 	                    <span class="help-block">
 	                        ${_('Java Class used to read data')}
 	                    </span>
@@ -222,7 +222,7 @@ ${layout.menubar(section='tables')}
 	                    placeholder='com.acme.data.MyOutputFormat',
 	                    )
 	                    )}
-	                    <span  class="help-inline error-inline hide">This field is required. Spaces are not allowed.</span>
+	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
 	                    <span class="help-block">
 	                        ${_('Java Class used to write data')}
 	                    </span>

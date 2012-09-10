@@ -97,7 +97,7 @@ class ChmodForm(forms.Form):
   path = PathField(label=_("Path to change permissions"))
 
   # By default, BooleanField only validates when
-  # it's checked.  Oy.
+  # it's checked.
   user_read = BooleanField(required=False)
   user_write = BooleanField(required=False)
   user_execute = BooleanField(required=False)
