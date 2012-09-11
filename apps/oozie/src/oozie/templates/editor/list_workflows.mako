@@ -248,7 +248,7 @@ ${ layout.menubar(section='workflows') }
     $('#filterInput').keydown(function(e) {
       if (e.which == 13) {
         e.preventDefault();
-        return False;
+        return false;
       }
     });
 

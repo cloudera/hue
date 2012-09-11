@@ -1110,10 +1110,10 @@ class Coordinator(Job):
           params[param] = ''
 
     for ds in self.datainput_set.all():
-      params[ds.name] = '%s [dataset]' % ds.dataset
+      params.pop(ds.name, None)
 
     for ds in self.dataoutput_set.all():
-      params[ds.name] = '%s [dataset]' % ds.dataset
+      params.pop(ds.name, None)
 
     return params
 

@@ -216,13 +216,13 @@ ${layout.menubar(section='dashboard')}
     $('#filterInput').keydown(function(e) {
       if (e.which == 13) {
         e.preventDefault();
-        return False;
+        return false;
       }
     });
 
     $("#filterInput").keyup(function() {
-      runningTable.fnDraw();
-      completedTable.fnDraw();
+      runningTable.fnFilter($(this).val());
+      completedTable.fnFilter($(this).val());    
 
       hash = "#";
 
