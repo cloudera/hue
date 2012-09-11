@@ -594,7 +594,7 @@ def edit_coordinator(request, coordinator):
   DataOutputFormSet = inlineformset_factory(Coordinator, DataOutput, form=DataOutputSetForm, max_num=0, can_order=False, can_delete=True)
 
   dataset = Dataset(coordinator=coordinator)
-  dataset_form = DatasetForm(instance=dataset)
+  dataset_form = DatasetForm(instance=dataset, prefix='create')
 
   NewDataInputFormSet = inlineformset_factory(Coordinator, DataInput, form=DataInputForm, extra=0, can_order=False, can_delete=False)
   NewDataInputFormSet.form = staticmethod(curry(DataInputForm, coordinator=coordinator))
@@ -651,7 +651,7 @@ def create_coordinator_dataset(request, coordinator):
   response = {'status': -1, 'data': 'None'}
 
   if request.method == 'POST':
-    dataset_form = DatasetForm(request.POST, instance=dataset)
+    dataset_form = DatasetForm(request.POST, instance=dataset, prefix='create')
 
     if dataset_form.is_valid():
       dataset_form.save()
@@ -659,7 +659,7 @@ def create_coordinator_dataset(request, coordinator):
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id})
       request.info(_('Dataset created'));
     else:
-      dataset_form = DatasetForm(request.POST, instance=dataset)
+      dataset_form = DatasetForm(request.POST, instance=dataset, prefix='create')
   else:
     ## Bad
     response['data'] = _('A POST request is required.')
