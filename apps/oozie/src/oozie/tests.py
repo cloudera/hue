@@ -871,6 +871,46 @@ class TestEditor:
         '</coordinator-app>\n'.split(), coord.to_xml().split())
 
 
+  def test_coordinator_with_data_input_gen_xml(self):
+    coord = create_coordinator(self.wf)
+    create_dataset(coord)
+    create_coordinator_data(coord)
+
+    assert_equal(
+        ['<coordinator-app', 'name="MyCoord"', 'frequency="${coord:days(1)}"', 'start="2012-07-01T00:00Z"', 'end="2012-07-04T00:00Z"',
+         'timezone="America/Los_Angeles"',
+         'xmlns="uri:oozie:coordinator:0.1">',
+         '<controls>',
+         '<timeout>100</timeout>',
+         '<concurrency>3</concurrency>',
+         '<execution>FIFO</execution>',
+         '<throttle>10</throttle>',
+         '</controls>',
+         '<datasets>',
+         '<dataset', 'name="MyDataset"', 'frequency="${coord:days(1)}"', 'initial-instance="2012-07-01T00:00Z"', 'timezone="America/Los_Angeles">',
+         '<uri-template>/data/${YEAR}${MONTH}${DAY}</uri-template>',
+         '<done-flag></done-flag>',
+         '</dataset>',
+         '</datasets>',
+         '<input-events>',
+         '<data-in', 'name="input_dir"', 'dataset="MyDataset">',
+         '<instance>${coord:current(0)}</instance>',
+         '</data-in>',
+         '</input-events>',
+         '<action>',
+         '<workflow>',
+         '<app-path>${wf_application_path}</app-path>',
+         '<configuration>',
+         '<property>',
+         '<name>input_dir</name>',
+         "<value>${coord:dataIn('input_dir')}</value>",
+         '</property>',
+         '</configuration>',
+         '</workflow>',
+         '</action>',
+         '</coordinator-app>'], coord.to_xml().split())
+
+
   def test_create_coordinator_dataset(self):
     coord = create_coordinator(self.wf)
     create_dataset(coord)
@@ -898,8 +938,7 @@ class TestEditor:
     create_dataset(coord)
     create_coordinator_data(coord)
 
-    assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US,France'},
-                  {'name': u'input_dir', 'value': 'MyDataset [dataset]'}],
+    assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US,France'}],
                  coord.find_all_parameters())
 
 

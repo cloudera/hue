@@ -71,7 +71,7 @@
   <action>
     <workflow>
       <app-path>${'${'}wf_application_path}</app-path>
-      % if coord.datainput_set.exists() and coord.dataoutput_set.exists():
+      % if coord.datainput_set.exists() or coord.dataoutput_set.exists():
       <configuration>
         % for input in coord.datainput_set.all():
           <property>
