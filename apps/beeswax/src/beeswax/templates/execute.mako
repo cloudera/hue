@@ -127,7 +127,7 @@ ${layout.menubar(section='query')}
                                     ${comps.label(f['path'])}
                                     ${comps.field(f['path'], attrs=dict(
                                         placeholder="/user/foo/udf.jar",
-                                        klass="input-small file_resourcesField",
+                                        klass="input-small file_resourcesField span8",
                                         data_filters=f['path'].html_name
                                     ))}
                                 </div>
@@ -154,7 +154,7 @@ ${layout.menubar(section='query')}
                                     <div class="control-group">
                                         ${comps.label(f['name'])}
                                         ${comps.field(f['name'], attrs=dict(
-                                            placeholder="myFunction",
+                                            placeholder=_("myFunction"),
                                             klass="span8 functionsField"
                                         ))}
                                     </div>

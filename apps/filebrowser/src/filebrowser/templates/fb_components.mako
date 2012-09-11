@@ -30,7 +30,7 @@ from django.utils.translation import ugettext as _
             <a href="#" class="btn upload-link">${_('Upload files')}</a>
             <a href="#" class="btn create-directory-link">${_('New directory')}</a>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="text" value="${current_filter}" class="input-medium search-query" placeholder="${_('Search for file name')}">
+            <input type="text" value="${current_filter}" class="input-medium search-query span4" placeholder="${_('Search for file name')}">
             <a href="#" class="btn filter">${_('Search')}</a>
         </p>
         % endif
