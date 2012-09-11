@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:35-0700\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -89,6 +89,19 @@ msgid ""
 "visible only to the owner and administrators."
 msgstr "与所有用户共享保存的查询。如果设置为 false，保存的查询仅对所有者和管理员可见。"
 
+#: src/beeswax/create_table.py:87
+#, fuzzy
+msgid "tabs"
+msgstr "表"
+
+#: src/beeswax/create_table.py:88
+msgid "commas"
+msgstr ""
+
+#: src/beeswax/create_table.py:89
+msgid "spaces"
+msgstr ""
+
 #: src/beeswax/create_table.py:291
 msgid "Internal error when constructing the delimiter form"
 msgstr "构建分隔符表单时发生内部错误"
@@ -131,7 +144,7 @@ msgstr "BeeswaxServer 正在返回 ID 为 %(id)d 的查询 [%(query)s] 的无效
 msgid "Change the name to save as a new design."
 msgstr "更改名称以将其另存为新设计。"
 
-#: src/beeswax/forms.py:47 src/beeswax/forms.py:163 src/beeswax/forms.py:247
+#: src/beeswax/forms.py:47 src/beeswax/forms.py:162 src/beeswax/forms.py:246
 #: src/beeswax/templates/configuration.mako:37
 #: src/beeswax/templates/list_designs.mako:32
 msgid "Description"
@@ -161,7 +174,7 @@ msgstr "为新表"
 msgid "to HDFS directory"
 msgstr "为 HDFS 目录"
 
-#: src/beeswax/forms.py:88 src/beeswax/forms.py:162 src/beeswax/forms.py:246
+#: src/beeswax/forms.py:88 src/beeswax/forms.py:161 src/beeswax/forms.py:245
 #: src/beeswax/templates/show_tables.mako:43
 #: src/beeswax/templates/watch_results.mako:139
 msgid "Table Name"
@@ -171,23 +184,31 @@ msgstr "表名"
 msgid "Name of the new table"
 msgstr "新表的名称"
 
-#: src/beeswax/forms.py:92
+#: src/beeswax/forms.py:91
 msgid "Results Location"
 msgstr "结果位置"
 
-#: src/beeswax/forms.py:94
+#: src/beeswax/forms.py:93
 msgid "Empty directory in HDFS to put the results"
 msgstr "HDFS 中用于存放结果的目录为空"
 
-#: src/beeswax/forms.py:105
+#: src/beeswax/forms.py:104
 msgid "Table already exists"
 msgstr "表已存在"
 
-#: src/beeswax/forms.py:112 src/beeswax/templates/layout.mako:34
+#: src/beeswax/forms.py:111 src/beeswax/templates/layout.mako:34
 msgid "Query Editor"
 msgstr "查询编辑器"
 
-#: src/beeswax/forms.py:132
+#: src/beeswax/forms.py:128
+msgid "jar"
+msgstr ""
+
+#: src/beeswax/forms.py:129
+msgid "archive"
+msgstr ""
+
+#: src/beeswax/forms.py:131
 msgid ""
 "Resources to upload with your Hive job.  Use 'jar' for UDFs.  Use 'file' "
 "and 'archive' for files to be copied and made locally available duirng "
@@ -196,93 +217,123 @@ msgstr ""
 "要通过您的 Hive 作业上传的资源。对 UDF 使用 'jar'。对那些要在映射/转换期间复制且在本地提供的文件 'file' 和 "
 "'archive'。路径位于 HDFS 上。"
 
-#: src/beeswax/forms.py:139
+#: src/beeswax/forms.py:138
 msgid "Path to file on HDFS."
 msgstr "HDFS 上的文件路径。"
 
-#: src/beeswax/forms.py:185
+#: src/beeswax/forms.py:171
+#, fuzzy
+msgid "Field terminator"
+msgstr "在此处键入您的字段终结符"
+
+#: src/beeswax/forms.py:173
+#, fuzzy
+msgid "Collection terminator"
+msgstr "在此处键入您的集合终结符"
+
+#: src/beeswax/forms.py:175
+#, fuzzy
+msgid "Map key terminator"
+msgstr "在此处键入您的映射键终结符"
+
+#: src/beeswax/forms.py:184
 msgid "SerDe Name"
 msgstr "SerDe 名称"
 
-#: src/beeswax/forms.py:188
+#: src/beeswax/forms.py:187
 msgid "Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"
 msgstr "逗号分隔的键值对列表，如 'p1=v1, p2=v2'"
 
-#: src/beeswax/forms.py:199
+#: src/beeswax/forms.py:198
 msgid "InputFormat Class"
 msgstr "InputFormat 类"
 
-#: src/beeswax/forms.py:200
+#: src/beeswax/forms.py:199
 msgid "OutputFormat Class"
 msgstr "OutputFormat 类"
 
-#: src/beeswax/forms.py:209
-#: src/beeswax/templates/create_table_manually.mako:243
+#: src/beeswax/forms.py:208
+#: src/beeswax/templates/create_table_manually.mako:246
 msgid "Use default location"
 msgstr "使用默认位置"
 
-#: src/beeswax/forms.py:210
+#: src/beeswax/forms.py:209
 msgid "Path to HDFS directory or file of table data."
 msgstr "HDFS 目录或表数据文件的路径。"
 
-#: src/beeswax/forms.py:232
+#: src/beeswax/forms.py:231
 #, python-format
 msgid "Table \"%(name)s\" already exists"
 msgstr "表 \"%(name)s\" 已存在"
 
-#: src/beeswax/forms.py:239
+#: src/beeswax/forms.py:238
 msgid "Terminator must be exactly one character."
 msgstr "终结符必须严格为一个字符。"
 
-#: src/beeswax/forms.py:250
+#: src/beeswax/forms.py:249
 msgid "Input File"
 msgstr "输入文件"
 
-#: src/beeswax/forms.py:252
+#: src/beeswax/forms.py:251
 msgid "Import data from file"
 msgstr "从文件导入数据"
 
-#: src/beeswax/forms.py:253
+#: src/beeswax/forms.py:252
 msgid "Automatically load this file into the table after creation."
 msgstr "创建后自动将此文件加载到表中。"
 
-#: src/beeswax/forms.py:269
+#: src/beeswax/forms.py:260
+#, fuzzy
+msgid "Delimiter"
+msgstr "分隔"
+
+#: src/beeswax/forms.py:268
 msgid "Delimiter value is required."
 msgstr "需要分隔符值。"
 
-#: src/beeswax/forms.py:279
+#: src/beeswax/forms.py:278
 msgid "Delimiter value must be smaller than 256."
 msgstr "分隔符值必须小于 256。"
 
-#: src/beeswax/forms.py:282
+#: src/beeswax/forms.py:281
 msgid "Delimiter must be exactly one character."
 msgstr "分隔符必须严格为一个字符。"
 
-#: src/beeswax/forms.py:310
+#: src/beeswax/forms.py:305
+#: src/beeswax/templates/create_table_manually.mako:326
+msgid "Column Name"
+msgstr "列名称"
+
+#: src/beeswax/forms.py:306
+#, fuzzy
+msgid "Column Type"
+msgstr "列类型"
+
+#: src/beeswax/forms.py:309
 msgid "Array Value Type"
 msgstr "数组值类型"
 
-#: src/beeswax/forms.py:313 src/beeswax/forms.py:316
+#: src/beeswax/forms.py:312 src/beeswax/forms.py:315
 msgid "Specify if column_type is map."
 msgstr "指定 column_type 是否为映射。"
 
-#: src/beeswax/forms.py:318
+#: src/beeswax/forms.py:317
 msgid "add a column"
 msgstr "添加一列"
 
-#: src/beeswax/forms.py:320
+#: src/beeswax/forms.py:319
 msgid "add a partition"
 msgstr "添加一个分区"
 
-#: src/beeswax/forms.py:325
+#: src/beeswax/forms.py:324
 msgid "Path"
 msgstr "路径"
 
-#: src/beeswax/forms.py:327
+#: src/beeswax/forms.py:326
 msgid "Overwrite?"
 msgstr "是否覆盖？"
 
-#: src/beeswax/forms.py:340
+#: src/beeswax/forms.py:339
 #, python-format
 msgid "%(column_name)s (partition key with type %(column_type)s)"
 msgstr "%(column_name)s（类型为 %(column_type)s 的分区键）"
@@ -660,7 +711,7 @@ msgstr "表名"
 
 #: src/beeswax/report/report_gen_views.py:396
 #: src/beeswax/report/report_gen_views.py:403
-#: src/beeswax/templates/create_table_manually.mako:321
+#: src/beeswax/templates/create_table_manually.mako:324
 #: src/beeswax/templates/define_columns.mako:67
 msgid "Column name"
 msgstr "列名"
@@ -810,7 +861,7 @@ msgid "Preview"
 msgstr "预览"
 
 #: src/beeswax/templates/choose_delimiter.mako:61
-#: src/beeswax/templates/create_table_manually.mako:127
+#: src/beeswax/templates/create_table_manually.mako:130
 msgid ""
 "Enter the column delimiter.  Must be a single character.  Use syntax like"
 " \"\" or \"\t\" for special characters."
@@ -822,12 +873,14 @@ msgstr "表预览"
 
 #: src/beeswax/templates/choose_delimiter.mako:93
 #: src/beeswax/templates/define_columns.mako:92
+#: src/beeswax/templates/list_history.mako:171
 msgid "Previous"
 msgstr "上一个"
 
 #: src/beeswax/templates/choose_delimiter.mako:94
-#: src/beeswax/templates/choose_file.mako:103
-#: src/beeswax/templates/create_table_manually.mako:300
+#: src/beeswax/templates/choose_file.mako:100
+#: src/beeswax/templates/create_table_manually.mako:303
+#: src/beeswax/templates/list_history.mako:170
 msgid "Next"
 msgstr "下一个"
 
@@ -839,49 +892,55 @@ msgstr "请在此处输入您的分隔符"
 msgid "Name Your Table and Choose A File"
 msgstr "为表命名并选择一个文件"
 
-#: src/beeswax/templates/choose_file.mako:56
-#: src/beeswax/templates/create_table_manually.mako:60
+#: src/beeswax/templates/choose_file.mako:50
+#: src/beeswax/templates/create_table_manually.mako:56
+#, fuzzy
+msgid "table_name"
+msgstr "表名"
+
+#: src/beeswax/templates/choose_file.mako:53
+#: src/beeswax/templates/create_table_manually.mako:61
 msgid ""
 "Name of the new table. Table names must be globally unique. Table names "
 "tend to correspond as well to the directory where the data will be "
 "stored."
 msgstr "新表的名称。表名必须具有全局唯一性。表名应与将存储数据的目录对应。"
 
-#: src/beeswax/templates/choose_file.mako:64
-#: src/beeswax/templates/create_table_manually.mako:68
+#: src/beeswax/templates/choose_file.mako:61
+#: src/beeswax/templates/create_table_manually.mako:69
 msgid "Optional"
 msgstr "可选"
 
-#: src/beeswax/templates/choose_file.mako:70
-#: src/beeswax/templates/create_table_manually.mako:72
+#: src/beeswax/templates/choose_file.mako:67
+#: src/beeswax/templates/create_table_manually.mako:73
 msgid ""
 "Use a table comment to describe your table.  For example, you might note "
 "the data's provenance and any caveats users need to know."
 msgstr "使用表备注描述您的表。例如，您可以注释数据的出处以及用户需要了解警告。"
 
-#: src/beeswax/templates/choose_file.mako:85
+#: src/beeswax/templates/choose_file.mako:82
 msgid ""
 "The HDFS path to the file that you would like to base this new table "
 "definition on. It can be compressed (gzip) or not."
 msgstr "您想作为此新表定义基础的文件的 HDFS 路径。可以是或不是压缩 (gzip) 文件。"
 
-#: src/beeswax/templates/choose_file.mako:94
+#: src/beeswax/templates/choose_file.mako:91
 msgid ""
 "Check this box if you want to import the data in this file after creating"
 " the table definition. Leave it unchecked if you want to define an empty "
 "table."
 msgstr "如果您想在创建表定义后导入此文件中的数据，请选中此复选框。如果您想定义一个空表，请将其留空。"
 
-#: src/beeswax/templates/choose_file.mako:96
+#: src/beeswax/templates/choose_file.mako:93
 msgid "Warning!"
 msgstr "警告！"
 
-#: src/beeswax/templates/choose_file.mako:96
+#: src/beeswax/templates/choose_file.mako:93
 msgid "The selected file is going to be moved during the import."
 msgstr "导入期间将移动选定文件。"
 
-#: src/beeswax/templates/choose_file.mako:114
-#: src/beeswax/templates/create_table_manually.mako:386
+#: src/beeswax/templates/choose_file.mako:111
+#: src/beeswax/templates/create_table_manually.mako:389
 #: src/beeswax/templates/execute.mako:253
 msgid "Choose a file"
 msgstr "选择文件"
@@ -956,19 +1015,29 @@ msgstr "第 5 步：位置"
 msgid "Step 6: Columns"
 msgstr "第 6 步：列"
 
-#: src/beeswax/templates/create_table_manually.mako:50
+#: src/beeswax/templates/create_table_manually.mako:51
 msgid "Create a table"
 msgstr "创建表"
 
-#: src/beeswax/templates/create_table_manually.mako:50
+#: src/beeswax/templates/create_table_manually.mako:51
 msgid "Let's start with a name and description for where we'll store your data."
 msgstr "让我们从数据存储位置的名称和描述开始。"
 
-#: src/beeswax/templates/create_table_manually.mako:80
+#: src/beeswax/templates/create_table_manually.mako:59
+#: src/beeswax/templates/create_table_manually.mako:128
+#: src/beeswax/templates/create_table_manually.mako:138
+#: src/beeswax/templates/create_table_manually.mako:148
+#: src/beeswax/templates/create_table_manually.mako:212
+#: src/beeswax/templates/create_table_manually.mako:225
+#: src/beeswax/templates/create_table_manually.mako:327
+msgid "This field is required. Spaces are not allowed."
+msgstr ""
+
+#: src/beeswax/templates/create_table_manually.mako:82
 msgid "Choose Your Record Format"
 msgstr "选择您的记录格式"
 
-#: src/beeswax/templates/create_table_manually.mako:81
+#: src/beeswax/templates/create_table_manually.mako:83
 msgid ""
 "Individual records are broken up into columns either with delimiters "
 "(e.g., CSV or TSV) or using a specific serialization / deserialization "
@@ -978,137 +1047,137 @@ msgstr ""
 "单独的记录将使用分隔符（例如，CSV 或 TSV）或使用特定的序列化/反序列化 (SerDe) 实施分割为多个列。（一个常见的专用 SerDe "
 "是使用正则表达式解析列。）"
 
-#: src/beeswax/templates/create_table_manually.mako:87
+#: src/beeswax/templates/create_table_manually.mako:89
 msgid "Record format"
 msgstr "记录格式"
 
-#: src/beeswax/templates/create_table_manually.mako:95
+#: src/beeswax/templates/create_table_manually.mako:97
 msgid "Delimited"
 msgstr "分隔"
 
-#: src/beeswax/templates/create_table_manually.mako:97
+#: src/beeswax/templates/create_table_manually.mako:99
 msgid "(Data files use delimiters, like commas (CSV) or tabs.)"
 msgstr "（数据文件使用逗号 (CSV) 或制表符之类的分隔符。）"
 
-#: src/beeswax/templates/create_table_manually.mako:106
+#: src/beeswax/templates/create_table_manually.mako:108
 msgid "SerDe"
 msgstr "SerDe"
 
-#: src/beeswax/templates/create_table_manually.mako:108
+#: src/beeswax/templates/create_table_manually.mako:110
 msgid "(Enter a specialized serialization implementation.)"
 msgstr "（输入一个专用的序列化实施。）"
 
-#: src/beeswax/templates/create_table_manually.mako:118
-#: src/beeswax/templates/create_table_manually.mako:153
+#: src/beeswax/templates/create_table_manually.mako:121
+#: src/beeswax/templates/create_table_manually.mako:156
 msgid "Configure Record Serialization"
 msgstr "配置记录序列"
 
-#: src/beeswax/templates/create_table_manually.mako:119
+#: src/beeswax/templates/create_table_manually.mako:122
 msgid "Hive only supports single-character delimiters."
 msgstr "Hive 仅支持单字符分隔符。"
 
-#: src/beeswax/templates/create_table_manually.mako:137
+#: src/beeswax/templates/create_table_manually.mako:140
 msgid "Use for array types."
 msgstr "用于数组类型。"
 
-#: src/beeswax/templates/create_table_manually.mako:147
+#: src/beeswax/templates/create_table_manually.mako:150
 msgid "Use for map types."
 msgstr "用于映射类型。"
 
-#: src/beeswax/templates/create_table_manually.mako:163
+#: src/beeswax/templates/create_table_manually.mako:166
 msgid "Enter the Java Classname of your SerDe."
 msgstr "输入 SerDe 的 Java 类名。"
 
-#: src/beeswax/templates/create_table_manually.mako:163
-#: src/beeswax/templates/create_table_manually.mako:175
-#: src/beeswax/templates/create_table_manually.mako:285
+#: src/beeswax/templates/create_table_manually.mako:166
+#: src/beeswax/templates/create_table_manually.mako:178
+#: src/beeswax/templates/create_table_manually.mako:288
 msgid "e.g."
 msgstr "例如"
 
-#: src/beeswax/templates/create_table_manually.mako:175
+#: src/beeswax/templates/create_table_manually.mako:178
 msgid "Properties to pass to the (de)serialization mechanism."
 msgstr "要传递给（反）序列化机制的属性。"
 
-#: src/beeswax/templates/create_table_manually.mako:184
+#: src/beeswax/templates/create_table_manually.mako:187
 msgid "Choose a File Format"
 msgstr "选择文件格式"
 
-#: src/beeswax/templates/create_table_manually.mako:185
-#: src/beeswax/templates/create_table_manually.mako:186
-#: src/beeswax/templates/create_table_manually.mako:187
+#: src/beeswax/templates/create_table_manually.mako:188
+#: src/beeswax/templates/create_table_manually.mako:189
+#: src/beeswax/templates/create_table_manually.mako:190
 msgid "Use"
 msgstr "使用"
 
-#: src/beeswax/templates/create_table_manually.mako:185
+#: src/beeswax/templates/create_table_manually.mako:188
 msgid "for newline-delimited text files."
 msgstr "用于新行分隔的文本文件。"
 
-#: src/beeswax/templates/create_table_manually.mako:186
+#: src/beeswax/templates/create_table_manually.mako:189
 msgid "for Hadoop's binary serialization format."
 msgstr "用于 Hadoop 的二进制序列化格式。"
 
-#: src/beeswax/templates/create_table_manually.mako:187
+#: src/beeswax/templates/create_table_manually.mako:190
 msgid "to choose a custom implementation."
 msgstr "以选择自定义实现。"
 
-#: src/beeswax/templates/create_table_manually.mako:192
+#: src/beeswax/templates/create_table_manually.mako:195
 msgid "File format"
 msgstr "文件格式"
 
-#: src/beeswax/templates/create_table_manually.mako:211
+#: src/beeswax/templates/create_table_manually.mako:214
 msgid "Java Class used to read data"
 msgstr "用于读取数据的 Java 类"
 
-#: src/beeswax/templates/create_table_manually.mako:224
+#: src/beeswax/templates/create_table_manually.mako:227
 msgid "Java Class used to write data"
 msgstr "用于写入数据的 Java 类"
 
-#: src/beeswax/templates/create_table_manually.mako:233
+#: src/beeswax/templates/create_table_manually.mako:236
 msgid "Choose Where Your Table's Data is Stored"
 msgstr "选择表数据的存储位置"
 
-#: src/beeswax/templates/create_table_manually.mako:237
+#: src/beeswax/templates/create_table_manually.mako:240
 msgid "Location"
 msgstr "位置"
 
-#: src/beeswax/templates/create_table_manually.mako:246
+#: src/beeswax/templates/create_table_manually.mako:249
 msgid ""
 "Store your table in the default location (controlled by Hive, and "
 "typically"
 msgstr "将表存储在默认位置（由 Hive 控制，通常"
 
-#: src/beeswax/templates/create_table_manually.mako:260
+#: src/beeswax/templates/create_table_manually.mako:263
 msgid "Choose File"
 msgstr "选择文件"
 
-#: src/beeswax/templates/create_table_manually.mako:262
+#: src/beeswax/templates/create_table_manually.mako:265
 msgid "Enter the path (on HDFS) to your table's data location"
 msgstr "输入表数据位置的路径（HDFS 上）"
 
-#: src/beeswax/templates/create_table_manually.mako:270
+#: src/beeswax/templates/create_table_manually.mako:273
 msgid "Configure Table Columns"
 msgstr "配置表列"
 
-#: src/beeswax/templates/create_table_manually.mako:278
+#: src/beeswax/templates/create_table_manually.mako:281
 msgid "Add a column"
 msgstr "添加一列"
 
-#: src/beeswax/templates/create_table_manually.mako:282
+#: src/beeswax/templates/create_table_manually.mako:285
 msgid "Configure Partitions"
 msgstr "配置分区"
 
-#: src/beeswax/templates/create_table_manually.mako:283
+#: src/beeswax/templates/create_table_manually.mako:286
 msgid ""
 "If your data is naturally partitioned (by date, for example), partitions "
 "are a way to tell Hive that data for a specific partition value are "
 "stored together."
 msgstr "如果您的数据本身已分区（例如，按日期），则分区是一种告诉 Hive 特定分区值的数据将存储在一起的方式。"
 
-#: src/beeswax/templates/create_table_manually.mako:284
+#: src/beeswax/templates/create_table_manually.mako:287
 msgid "Hive establishes a mapping between directories on disk"
 msgstr "Hive 在磁盘上的目录之间建立映射"
 
-#: src/beeswax/templates/create_table_manually.mako:286
+#: src/beeswax/templates/create_table_manually.mako:289
 msgid ""
 "and the data for that day.  Partitions are virtual columns; they are not "
 "represented in the data itself, but are determined by the data location. "
@@ -1116,77 +1185,69 @@ msgid ""
 "to a single partition need not read the data in other partitions."
 msgstr "以及该日的数据。分区是虚拟列；数据本身中并不反映，而是由数据位置决定。Hive 实施查询优化，以使特定于单个分区的查询不需要读取其他分区中的数据。"
 
-#: src/beeswax/templates/create_table_manually.mako:294
+#: src/beeswax/templates/create_table_manually.mako:297
 msgid "Add a partition"
 msgstr "添加一个分区"
 
-#: src/beeswax/templates/create_table_manually.mako:299
+#: src/beeswax/templates/create_table_manually.mako:302
 msgid "Back"
 msgstr "返回"
 
-#: src/beeswax/templates/create_table_manually.mako:301
+#: src/beeswax/templates/create_table_manually.mako:304
 msgid "Create table"
 msgstr "创建表"
 
-#: src/beeswax/templates/create_table_manually.mako:316
+#: src/beeswax/templates/create_table_manually.mako:319
 msgid "Delete this column"
 msgstr "删除此列"
 
-#: src/beeswax/templates/create_table_manually.mako:323
-msgid "Column Name"
-msgstr "列名称"
-
-#: src/beeswax/templates/create_table_manually.mako:324
-msgid "This field is required. Spaces are not allowed."
-msgstr ""
-
-#: src/beeswax/templates/create_table_manually.mako:326
+#: src/beeswax/templates/create_table_manually.mako:329
 msgid "Column name must be single words that start with a letter or a digit."
 msgstr "列名必须是以字母或数字开头的单词。"
 
-#: src/beeswax/templates/create_table_manually.mako:331
+#: src/beeswax/templates/create_table_manually.mako:334
 msgid "Column type"
 msgstr "列类型"
 
-#: src/beeswax/templates/create_table_manually.mako:337
+#: src/beeswax/templates/create_table_manually.mako:340
 msgid ""
 "Type for this column. Certain advanced types (namely, structs) are not "
 "exposed in this interface."
 msgstr "此列的类型。有些高级类型（即结构）不在此界面中显示。"
 
-#: src/beeswax/templates/create_table_manually.mako:344
+#: src/beeswax/templates/create_table_manually.mako:347
 msgid "Array value type"
 msgstr "数组值类型"
 
-#: src/beeswax/templates/create_table_manually.mako:348
+#: src/beeswax/templates/create_table_manually.mako:351
 msgid "Type of the array values."
 msgstr "数组值的类型。"
 
-#: src/beeswax/templates/create_table_manually.mako:355
+#: src/beeswax/templates/create_table_manually.mako:358
 msgid "Map Key type"
 msgstr "映射键类型"
 
-#: src/beeswax/templates/create_table_manually.mako:359
+#: src/beeswax/templates/create_table_manually.mako:362
 msgid "Type of the map keys."
 msgstr "映射键的类型。"
 
-#: src/beeswax/templates/create_table_manually.mako:364
+#: src/beeswax/templates/create_table_manually.mako:367
 msgid "Map Value type"
 msgstr "映射值类型"
 
-#: src/beeswax/templates/create_table_manually.mako:368
+#: src/beeswax/templates/create_table_manually.mako:371
 msgid "Type of the map values."
 msgstr "映射键的类型。"
 
-#: src/beeswax/templates/create_table_manually.mako:503
+#: src/beeswax/templates/create_table_manually.mako:506
 msgid "Type your field terminator here"
 msgstr "在此处键入您的字段终结符"
 
-#: src/beeswax/templates/create_table_manually.mako:512
+#: src/beeswax/templates/create_table_manually.mako:515
 msgid "Type your collection terminator here"
 msgstr "在此处键入您的集合终结符"
 
-#: src/beeswax/templates/create_table_manually.mako:521
+#: src/beeswax/templates/create_table_manually.mako:524
 msgid "Type your map key terminator here"
 msgstr "在此处键入您的映射键终结符"
 
@@ -1399,6 +1460,10 @@ msgstr "文件资源"
 #: src/beeswax/templates/execute.mako:142
 msgid "User-defined Functions"
 msgstr "用户定义的函数"
+
+#: src/beeswax/templates/execute.mako:157
+msgid "myFunction"
+msgstr ""
 
 #: src/beeswax/templates/execute.mako:177
 msgid "Parameterization"
@@ -1675,6 +1740,34 @@ msgstr "结果"
 #: src/beeswax/templates/watch_results.mako:63
 msgid "Results"
 msgstr "结果"
+
+#: src/beeswax/templates/list_history.mako:162
+msgid "No data available in table"
+msgstr ""
+
+#: src/beeswax/templates/list_history.mako:163
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr ""
+
+#: src/beeswax/templates/list_history.mako:164
+msgid "Showing 0 to 0 of 0 entries"
+msgstr ""
+
+#: src/beeswax/templates/list_history.mako:165
+msgid "(filtered from _MAX_ total entries)"
+msgstr ""
+
+#: src/beeswax/templates/list_history.mako:166
+msgid "No matching records found"
+msgstr ""
+
+#: src/beeswax/templates/list_history.mako:168
+msgid "First"
+msgstr ""
+
+#: src/beeswax/templates/list_history.mako:169
+msgid "Last"
+msgstr ""
 
 #: src/beeswax/templates/load_table.mako:22
 #, python-format

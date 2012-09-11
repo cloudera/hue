@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -77,7 +77,7 @@ msgid "Password confirmation"
 msgstr "암호 확인"
 
 #: src/useradmin/views.py:119 src/useradmin/views.py:306
-msgid "Create Home Directory"
+msgid "Create home directory"
 msgstr ""
 
 #: src/useradmin/views.py:120
@@ -285,7 +285,7 @@ msgid "Yes"
 msgstr "예"
 
 #: src/useradmin/templates/delete_group.mako:22
-#, fuzzy, python-format
+#, fuzzy
 msgid "Are you sure you want to delete"
 msgstr "%(group_name)s을(를) 삭제하시겠습니까?"
 
@@ -300,7 +300,7 @@ msgid "No"
 msgstr "아니요"
 
 #: src/useradmin/templates/delete_user.mako:22
-#, fuzzy, python-format
+#, fuzzy
 msgid "Are you sure you want to delete "
 msgstr "%(group_name)s을(를) 삭제하시겠습니까?"
 
@@ -544,15 +544,6 @@ msgstr "모든 사용자 정보 및 그룹 구성원 자격이 LDAP 서버의 �
 msgid "Sync"
 msgstr "동기화"
 
-#~ msgid "Delete user?"
-#~ msgstr "사용자를 삭제하시겠습니까?"
-
-#~ msgid "Delete group?"
-#~ msgstr "그룹을 삭제하시겠습니까?"
-
-#~ msgid "POST request required in order to sync the LDAP users/groups."
-#~ msgstr "LDAP 사용자/그룹을 동기화하려면 POST 요청이 필요합니다."
-
-#~ msgid "Confirm action"
-#~ msgstr "작업 확인"
+#~ msgid "Create Home Directory"
+#~ msgstr ""
 

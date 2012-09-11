@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -43,7 +43,8 @@ msgid ""
 "Oozie requires client to do perform Kerberos authentication"
 msgstr "Se o servidor Oozie exige que o cliente realize a autenticação do Kerberos"
 
-#: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
+#: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
+#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:54
 #: src/jobsub/templates/list_history.mako:45
 #: src/jobsub/templates/workflow.mako:55 src/jobsub/templates/workflow.mako:100
 msgid "Name"
@@ -56,6 +57,36 @@ msgid ""
 msgstr ""
 "Permite letras, dígitos, '_',e '-'. O primeiro caractere deve ser uma "
 "letra ou '_'."
+
+#: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
+#: src/jobsub/templates/list_designs.mako:56
+#: src/jobsub/templates/list_history.mako:47
+msgid "Description"
+msgstr "Descrição"
+
+#: src/jobsub/forms.py:60
+msgid "Main class"
+msgstr ""
+
+#: src/jobsub/forms.py:61 src/jobsub/forms.py:79
+msgid "Jar path"
+msgstr ""
+
+#: src/jobsub/forms.py:62
+msgid "Args"
+msgstr ""
+
+#: src/jobsub/forms.py:63
+msgid "Java opts"
+msgstr ""
+
+#: src/jobsub/forms.py:80
+msgid "Mapper"
+msgstr ""
+
+#: src/jobsub/forms.py:81
+msgid "Reducer"
+msgstr ""
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -284,11 +315,6 @@ msgstr "Proprietário"
 msgid "Type"
 msgstr "Tipo"
 
-#: src/jobsub/templates/list_designs.mako:56
-#: src/jobsub/templates/list_history.mako:47
-msgid "Description"
-msgstr "Descrição"
-
 #: src/jobsub/templates/list_designs.mako:57
 msgid "Last Modified"
 msgstr "Última modificação"
@@ -490,13 +516,4 @@ msgstr "Horário de criação"
 #: src/jobsub/templates/workflow.mako:186
 msgid "Application Path"
 msgstr "Caminho do aplicativo"
-
-#~ msgid "Insufficient permission"
-#~ msgstr "Permissão insuficiente"
-
-#~ msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-#~ msgstr ""
-#~ "Permissão negada. O usuário %(username)s "
-#~ "não pode modificar a tarefa do "
-#~ "usuário %(user)s."
 

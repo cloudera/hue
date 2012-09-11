@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -496,6 +496,10 @@ msgstr ""
 "%(page)s/%(num_pages)s ページで %(total_count)s 件のアイテムのうち、%(start_index)s から "
 "%(end_index)s までを表示。"
 
+#: src/filebrowser/templates/listdir_components.mako:105
+msgid "Type"
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:107
 msgid "Name"
 msgstr "名前"
@@ -549,6 +553,10 @@ msgstr "削除"
 msgid "Delete Recursively"
 msgstr "再帰的に削除"
 
+#: src/filebrowser/templates/listdir_components.mako:194
+msgid "There are no files matching the search criteria."
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:203
 msgid "Please Confirm"
 msgstr "確認してください"
@@ -600,23 +608,4 @@ msgstr "失敗"
 #: src/filebrowser/templates/move.mako:24
 msgid "Move:"
 msgstr "移動："
-
-#~ msgid ""
-#~ "Failed to chown uploaded file "
-#~ "(\"%(file)s\") as superuser %(superuser)s."
-#~ msgstr "アップロードされたファイル（\"%(file)s\"）をスーパーユーザー %(superuser)s として選択できませんでした。"
-
-#~ msgid ""
-#~ "Failed to rename uploaded temporary file"
-#~ " (\"%(file)s\") to \"%(name)s\": %(error)s"
-#~ msgstr "アップロードされた一時ファイル（\"%(file)s\"）を \"%(name)s に名前変更できませんでした：%(error)s"
-
-#~ msgid "Upload Files"
-#~ msgstr "ファイルのアップロード"
-
-#~ msgid "View uploaded file:"
-#~ msgstr "アップロードしたファイルの表示："
-
-#~ msgid "Go back to where you were:"
-#~ msgstr "元の場所に戻る："
 

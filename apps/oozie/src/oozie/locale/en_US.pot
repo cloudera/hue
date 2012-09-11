@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,7 +46,9 @@ msgid "Maximum of Oozie workflows or coodinators to retrieve in one API call."
 msgstr ""
 
 #: src/oozie/models.py:53
-msgid "Please enter a valid value: 40 alphanum chars starting by an alpha"
+msgid ""
+"Please enter a valid value: combination of 2 and 40 letters and digits "
+"starting by a letter"
 msgstr ""
 
 #: src/oozie/models.py:75 src/oozie/views/dashboard.py:215
@@ -107,47 +109,47 @@ msgstr ""
 msgid "personal"
 msgstr ""
 
-#: src/oozie/models.py:214 src/oozie/models.py:756 src/oozie/models.py:831
-#: src/oozie/models.py:868
+#: src/oozie/models.py:215 src/oozie/models.py:757 src/oozie/models.py:832
+#: src/oozie/models.py:869
 msgid ""
 "Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment"
 " directory. Properties specified in the configuration element override "
 "properties specified in the files specified by any job-xml elements."
 msgstr ""
 
-#: src/oozie/models.py:218
+#: src/oozie/models.py:219
 msgid ""
 "Job configuration properties used by all the actions of the workflow "
 "(e.g. mapred.job.queue.name=production)"
 msgstr ""
 
-#: src/oozie/models.py:584
+#: src/oozie/models.py:585
 msgid "Name of the action, it must be unique by workflow."
 msgstr ""
 
-#: src/oozie/models.py:585
+#: src/oozie/models.py:586
 msgid "What is the purpose of this action."
 msgstr ""
 
-#: src/oozie/models.py:586
+#: src/oozie/models.py:587
 msgid "The type of action (e.g. MapReduce, Pig...)"
 msgstr ""
 
-#: src/oozie/models.py:614
+#: src/oozie/models.py:615
 #, python-format
 msgid "Unknown Node type: %s. Was it set at its creation?"
 msgstr ""
 
-#: src/oozie/models.py:742 src/oozie/models.py:778 src/oozie/models.py:808
-#: src/oozie/models.py:856
+#: src/oozie/models.py:743 src/oozie/models.py:779 src/oozie/models.py:809
+#: src/oozie/models.py:857
 msgid ""
 "List of names or paths of files to be added to the distributed cache. To "
 "force a symlink for a file on the task running directory, use a '#' "
 "followed by the symlink name. For example 'mycat.sh#cat'."
 msgstr ""
 
-#: src/oozie/models.py:746 src/oozie/models.py:782 src/oozie/models.py:812
-#: src/oozie/models.py:860
+#: src/oozie/models.py:747 src/oozie/models.py:783 src/oozie/models.py:813
+#: src/oozie/models.py:861
 msgid ""
 "List of names or paths of the archives to be added to the distributed "
 "cache. To force a symlink to the uncompressed archive on the task running"
@@ -155,116 +157,116 @@ msgid ""
 "'myarch.zip#myarch'."
 msgstr ""
 
-#: src/oozie/models.py:750
+#: src/oozie/models.py:751
 msgid "For the job configuration (e.g. mapred.job.queue.name=production)"
 msgstr ""
 
-#: src/oozie/models.py:752 src/oozie/models.py:816
+#: src/oozie/models.py:753 src/oozie/models.py:817
 #, python-format
 msgid "Local or absolute path to the %(program)s jar file on HDFS"
 msgstr ""
 
-#: src/oozie/models.py:753 src/oozie/models.py:828 src/oozie/models.py:865
+#: src/oozie/models.py:754 src/oozie/models.py:829 src/oozie/models.py:866
 msgid ""
 "List of paths to delete or create before starting the application. This "
 "should be used exclusively for directory cleanup"
 msgstr ""
 
-#: src/oozie/models.py:786 src/oozie/models.py:827 src/oozie/models.py:864
+#: src/oozie/models.py:787 src/oozie/models.py:828 src/oozie/models.py:865
 msgid "For the job configuration (e.g. mapred.job.queue.name=production"
 msgstr ""
 
-#: src/oozie/models.py:788
+#: src/oozie/models.py:789
 msgid ""
 "The mapper element is used to specify the executable/script to be used as"
 " mapper."
 msgstr ""
 
-#: src/oozie/models.py:790
+#: src/oozie/models.py:791
 msgid ""
 "The reducer element is used to specify the executable/script to be used "
 "as reducer."
 msgstr ""
 
-#: src/oozie/models.py:818
+#: src/oozie/models.py:819
 msgid "Full name of the Java class. e.g. org.apache.hadoop.examples.Grep"
 msgstr ""
 
-#: src/oozie/models.py:820
+#: src/oozie/models.py:821
 msgid ""
 "Arguments of the main method. The value of each arg element is considered"
 " a single argument and they are passed to the main method in the same "
 "order."
 msgstr ""
 
-#: src/oozie/models.py:823
+#: src/oozie/models.py:824
 msgid ""
 "Command line parameters which are to be used to start the JVM that will "
 "execute the Java application. Using this element is equivalent to use the"
 " mapred.child.java.opts configuration property"
 msgstr ""
 
-#: src/oozie/models.py:852
+#: src/oozie/models.py:853
 msgid "Local path to the Pig script. e.g. my_script.pig"
 msgstr ""
 
-#: src/oozie/models.py:853
+#: src/oozie/models.py:854
 msgid "The Pig parameters of the script. e.g. \"-param\", \"INPUT=${inputDir}\""
 msgstr ""
 
-#: src/oozie/models.py:996 src/oozie/models.py:1146
+#: src/oozie/models.py:997 src/oozie/models.py:1153
 msgid ""
 "It represents the number of units of the rate at which data is "
 "periodically created."
 msgstr ""
 
-#: src/oozie/models.py:999 src/oozie/models.py:1149
+#: src/oozie/models.py:1000 src/oozie/models.py:1156
 msgid "It represents the unit of the rate at which data is periodically created."
 msgstr ""
 
-#: src/oozie/models.py:1001
+#: src/oozie/models.py:1002
 msgid "The timezone of the Coordinator."
 msgstr ""
 
-#: src/oozie/models.py:1003
+#: src/oozie/models.py:1004
 msgid "When we need to start the first workflow."
 msgstr ""
 
-#: src/oozie/models.py:1005
+#: src/oozie/models.py:1006
 msgid "When we need to start the last workflow."
 msgstr ""
 
-#: src/oozie/models.py:1007
+#: src/oozie/models.py:1008
 msgid "The corresponding workflow we want to schedule repeatedly."
 msgstr ""
 
-#: src/oozie/models.py:1009
+#: src/oozie/models.py:1010
 msgid ""
 "Timeout for its coordinator actions, in minutes. This is how long the "
 "coordinator action will be in WAITING or READY status before giving up on"
 " its execution."
 msgstr ""
 
-#: src/oozie/models.py:1013
+#: src/oozie/models.py:1014
 msgid ""
 "Concurrency for its coordinator actions, this is, how many coordinator "
 "actions are allowed to run concurrently ( RUNNING status) before the "
 "coordinator engine starts throttling them."
 msgstr ""
 
-#: src/oozie/models.py:1017
+#: src/oozie/models.py:1018
 msgid "FIFO (oldest first) default"
 msgstr ""
 
-#: src/oozie/models.py:1018
+#: src/oozie/models.py:1019
 msgid "LIFO (newest first)"
 msgstr ""
 
-#: src/oozie/models.py:1019
+#: src/oozie/models.py:1020
 msgid "LAST_ONLY (discards all older materializations)"
 msgstr ""
 
-#: src/oozie/models.py:1020
+#: src/oozie/models.py:1021
 msgid ""
 "Execution strategy of its coordinator actions when there is backlog of "
 "coordinator actions in the coordinator engine. The different execution "
@@ -273,41 +275,41 @@ msgid ""
 "control or because manual re-runs of coordinator jobs."
 msgstr ""
 
-#: src/oozie/models.py:1025
+#: src/oozie/models.py:1026
 msgid ""
 "The materialization or creation throttle value for its coordinator "
 "actions, this is, how many maximum coordinator actions are allowed to be "
 "in WAITING state concurrently."
 msgstr ""
 
-#: src/oozie/models.py:1127
+#: src/oozie/models.py:1134
 #, python-format
 msgid ""
 "Permission denied. %(username)s don't have the permissions to access "
 "dataset %(id)s"
 msgstr ""
 
-#: src/oozie/models.py:1134
+#: src/oozie/models.py:1141
 #, python-format
 msgid "dataset %(id)s not exist"
 msgstr ""
 
-#: src/oozie/models.py:1139
+#: src/oozie/models.py:1146
 msgid "The name of the dataset.)"
 msgstr ""
 
-#: src/oozie/models.py:1141
+#: src/oozie/models.py:1148
 msgid "More details about the dataset."
 msgstr ""
 
-#: src/oozie/models.py:1143
+#: src/oozie/models.py:1150
 msgid ""
 " The UTC datetime of the initial instance of the dataset. The initial-"
 "instance also provides the baseline datetime to compute instances of the "
 "dataset using multiples of the frequency."
 msgstr ""
 
-#: src/oozie/models.py:1151
+#: src/oozie/models.py:1158
 msgid ""
 "The URI template that identifies the dataset and can be resolved into "
 "concrete URIs to identify a particular dataset instance. The URI consist "
@@ -315,11 +317,11 @@ msgid ""
 "Ex: ${YEAR}/${MONTH})"
 msgstr ""
 
-#: src/oozie/models.py:1155
+#: src/oozie/models.py:1162
 msgid "The timezone of the dataset."
 msgstr ""
 
-#: src/oozie/models.py:1157
+#: src/oozie/models.py:1164
 msgid ""
 " The done file for the data set. If done-flag is not specified, then "
 "Oozie configures Hadoop to create a _SUCCESS file in the output "
@@ -327,35 +329,35 @@ msgid ""
 "the existence of the directory itself."
 msgstr ""
 
-#: src/oozie/models.py:1161
+#: src/oozie/models.py:1168
 msgid "The coordinator associated with this data."
 msgstr ""
 
-#: src/oozie/models.py:1183
+#: src/oozie/models.py:1190
 msgid "Name of an input variable in the workflow"
 msgstr ""
 
-#: src/oozie/models.py:1184 src/oozie/models.py:1194
+#: src/oozie/models.py:1191 src/oozie/models.py:1201
 msgid "The name of the variable of the workflow to automatically filled up."
 msgstr ""
 
-#: src/oozie/models.py:1185
+#: src/oozie/models.py:1192
 msgid "Pick the dataset representing format of the data input"
 msgstr ""
 
-#: src/oozie/models.py:1186
+#: src/oozie/models.py:1193
 msgid "The pattern of the input data we want to process."
 msgstr ""
 
-#: src/oozie/models.py:1193
+#: src/oozie/models.py:1200
 msgid "Name of an output variable in the workflow"
 msgstr ""
 
-#: src/oozie/models.py:1195
+#: src/oozie/models.py:1202
 msgid "Pick the dataset representing the format of the data output"
 msgstr ""
 
-#: src/oozie/models.py:1196
+#: src/oozie/models.py:1203
 msgid "The pattern of the output data we want to generate."
 msgstr ""
 
@@ -728,8 +730,8 @@ msgid "No"
 msgstr ""
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:254
-#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:264
-#: src/oozie/templates/dashboard/list_oozie_workflows.mako:265
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:290
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:291
 msgid "Problem: "
 msgstr ""
 
@@ -781,6 +783,96 @@ msgstr ""
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:107
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:108
 msgid "Duration"
+msgstr ""
+
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:173
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:202
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:174
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:203
+#: src/oozie/templates/editor/list_coordinators.mako:224
+#: src/oozie/templates/editor/list_history.mako:83
+#: src/oozie/templates/editor/list_workflows.mako:234
+msgid "No data available in table"
+msgstr ""
+
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:174
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:203
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:175
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:204
+#: src/oozie/templates/editor/list_coordinators.mako:225
+#: src/oozie/templates/editor/list_history.mako:84
+#: src/oozie/templates/editor/list_workflows.mako:235
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr ""
+
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:175
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:204
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:176
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:205
+#: src/oozie/templates/editor/list_coordinators.mako:226
+#: src/oozie/templates/editor/list_history.mako:85
+#: src/oozie/templates/editor/list_workflows.mako:236
+msgid "Showing 0 to 0 of 0 entries"
+msgstr ""
+
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:176
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:205
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:177
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:206
+#: src/oozie/templates/editor/list_coordinators.mako:227
+#: src/oozie/templates/editor/list_history.mako:86
+#: src/oozie/templates/editor/list_workflows.mako:237
+msgid "(filtered from _MAX_ total entries)"
+msgstr ""
+
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:177
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:206
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:178
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:207
+#: src/oozie/templates/editor/list_coordinators.mako:228
+#: src/oozie/templates/editor/list_history.mako:87
+#: src/oozie/templates/editor/list_workflows.mako:238
+msgid "No matching records found"
+msgstr ""
+
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:179
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:208
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:180
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:209
+#: src/oozie/templates/editor/list_coordinators.mako:230
+#: src/oozie/templates/editor/list_history.mako:89
+#: src/oozie/templates/editor/list_workflows.mako:240
+msgid "First"
+msgstr ""
+
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:180
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:209
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:181
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:210
+#: src/oozie/templates/editor/list_coordinators.mako:231
+#: src/oozie/templates/editor/list_history.mako:90
+#: src/oozie/templates/editor/list_workflows.mako:241
+msgid "Last"
+msgstr ""
+
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:181
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:210
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:182
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:211
+#: src/oozie/templates/editor/list_coordinators.mako:232
+#: src/oozie/templates/editor/list_history.mako:91
+#: src/oozie/templates/editor/list_workflows.mako:242
+msgid "Next"
+msgstr ""
+
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:182
+#: src/oozie/templates/dashboard/list_oozie_coordinators.mako:211
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:183
+#: src/oozie/templates/dashboard/list_oozie_workflows.mako:212
+#: src/oozie/templates/editor/list_coordinators.mako:233
+#: src/oozie/templates/editor/list_history.mako:92
+#: src/oozie/templates/editor/list_workflows.mako:243
+msgid "Previous"
 msgstr ""
 
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:37
@@ -1386,9 +1478,9 @@ msgstr ""
 #: src/oozie/views/editor.py:351 src/oozie/views/editor.py:513
 #: src/oozie/views/editor.py:527 src/oozie/views/editor.py:537
 #: src/oozie/views/editor.py:547 src/oozie/views/editor.py:578
-#: src/oozie/views/editor.py:664 src/oozie/views/editor.py:725
-#: src/oozie/views/editor.py:733 src/oozie/views/editor.py:789
-#: src/oozie/views/editor.py:836
+#: src/oozie/views/editor.py:665 src/oozie/views/editor.py:726
+#: src/oozie/views/editor.py:734 src/oozie/views/editor.py:790
+#: src/oozie/views/editor.py:837
 msgid "A POST request is required."
 msgstr ""
 
@@ -1400,7 +1492,7 @@ msgstr ""
 msgid "Workflow submitted"
 msgstr ""
 
-#: src/oozie/views/editor.py:322 src/oozie/views/editor.py:756
+#: src/oozie/views/editor.py:322 src/oozie/views/editor.py:757
 #, python-format
 msgid "Invalid submission form: %s"
 msgstr ""
@@ -1442,40 +1534,40 @@ msgstr ""
 msgid "Coordinator deleted!"
 msgstr ""
 
-#: src/oozie/views/editor.py:620
+#: src/oozie/views/editor.py:621
 msgid "Coordinator saved!"
 msgstr ""
 
-#: src/oozie/views/editor.py:659
+#: src/oozie/views/editor.py:660
 msgid "Dataset created"
 msgstr ""
 
-#: src/oozie/views/editor.py:685
+#: src/oozie/views/editor.py:686
 msgid "Dataset modified"
 msgstr ""
 
-#: src/oozie/views/editor.py:720
+#: src/oozie/views/editor.py:721
 msgid "Coordinator data created"
 msgstr ""
 
-#: src/oozie/views/editor.py:753
+#: src/oozie/views/editor.py:754
 msgid "Coordinator submitted"
 msgstr ""
 
-#: src/oozie/views/editor.py:783
+#: src/oozie/views/editor.py:784
 #, python-format
 msgid "Error submitting coordinator %s"
 msgstr ""
 
-#: src/oozie/views/editor.py:798
+#: src/oozie/views/editor.py:799
 msgid "Coordinator re-submitted"
 msgstr ""
 
-#: src/oozie/views/editor.py:839
+#: src/oozie/views/editor.py:840
 msgid "Workspace and examples installed!"
 msgstr ""
 
-#: src/oozie/views/editor.py:841
+#: src/oozie/views/editor.py:842
 msgid "The app setup could complete."
 msgstr ""
 

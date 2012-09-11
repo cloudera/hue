@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -502,6 +502,10 @@ msgstr ""
 "Affichage des éléments %(start_index)s à %(end_index)s sur "
 "%(total_count)s, page %(page)s sur %(num_pages)s."
 
+#: src/filebrowser/templates/listdir_components.mako:105
+msgid "Type"
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:107
 msgid "Name"
 msgstr "Nom"
@@ -555,6 +559,10 @@ msgstr "Supprimer"
 msgid "Delete Recursively"
 msgstr "Supprimer récursivement"
 
+#: src/filebrowser/templates/listdir_components.mako:194
+msgid "There are no files matching the search criteria."
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:203
 msgid "Please Confirm"
 msgstr "Merci de confirmer"
@@ -606,29 +614,4 @@ msgstr "Echec"
 #: src/filebrowser/templates/move.mako:24
 msgid "Move:"
 msgstr "Déplacer :"
-
-#~ msgid ""
-#~ "Failed to chown uploaded file "
-#~ "(\"%(file)s\") as superuser %(superuser)s."
-#~ msgstr ""
-#~ "Echec de la modification du fichier "
-#~ "chargé (\"%(file)s\") en tant que "
-#~ "superutilisateur %(superuser)s."
-
-#~ msgid ""
-#~ "Failed to rename uploaded temporary file"
-#~ " (\"%(file)s\") to \"%(name)s\": %(error)s"
-#~ msgstr ""
-#~ "Echec du changement de nom pour le"
-#~ " fichier temporaire chargé (\"%(file)s\") "
-#~ "en \"%(name)s\" : %(error)s"
-
-#~ msgid "Upload Files"
-#~ msgstr "Charger les fichiers"
-
-#~ msgid "View uploaded file:"
-#~ msgstr "Afficher les fichiers chargés :"
-
-#~ msgid "Go back to where you were:"
-#~ msgstr "Retour à votre emplacement précédent :"
 

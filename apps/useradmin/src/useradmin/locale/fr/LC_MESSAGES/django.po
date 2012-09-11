@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -79,7 +79,7 @@ msgid "Password confirmation"
 msgstr "Confirmation du mot de passe"
 
 #: src/useradmin/views.py:119 src/useradmin/views.py:306
-msgid "Create Home Directory"
+msgid "Create home directory"
 msgstr ""
 
 #: src/useradmin/views.py:120
@@ -305,7 +305,7 @@ msgid "Yes"
 msgstr "Oui"
 
 #: src/useradmin/templates/delete_group.mako:22
-#, fuzzy, python-format
+#, fuzzy
 msgid "Are you sure you want to delete"
 msgstr "Voulez-vous vraiment supprimer %(group_name)s ?"
 
@@ -320,7 +320,7 @@ msgid "No"
 msgstr "Non"
 
 #: src/useradmin/templates/delete_user.mako:22
-#, fuzzy, python-format
+#, fuzzy
 msgid "Are you sure you want to delete "
 msgstr "Voulez-vous vraiment supprimer %(group_name)s ?"
 
@@ -569,15 +569,6 @@ msgstr ""
 msgid "Sync"
 msgstr "Synchroniser"
 
-#~ msgid "Delete user?"
-#~ msgstr "Supprimer l'utilisateur ?"
-
-#~ msgid "Delete group?"
-#~ msgstr "Supprimer le groupe ?"
-
-#~ msgid "POST request required in order to sync the LDAP users/groups."
-#~ msgstr "Requête POST requise pour synchroniser les utilisateurs/groupes LDAP."
-
-#~ msgid "Confirm action"
-#~ msgstr "Confirmer l'action"
+#~ msgid "Create Home Directory"
+#~ msgstr ""
 

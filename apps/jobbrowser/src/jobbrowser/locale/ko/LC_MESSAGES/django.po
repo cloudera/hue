@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -372,13 +372,17 @@ msgstr "실패함"
 msgid "Killed"
 msgstr "중지됨"
 
+#: src/jobbrowser/templates/jobs.mako:53
+msgid "Show retired jobs"
+msgstr ""
+
 #: src/jobbrowser/templates/jobs.mako:58
 msgid "Text:"
 msgstr ""
 
 #: src/jobbrowser/templates/jobs.mako:62
 #, fuzzy
-msgid "User Name:"
+msgid "Username:"
 msgstr "카운터 이름"
 
 #: src/jobbrowser/templates/jobs.mako:63
@@ -658,10 +662,4 @@ msgstr "최대 Reduce 작업"
 #: src/jobbrowser/templatetags/unix_ms_to_datetime.py:29
 msgid "No time"
 msgstr "시간 없음"
-
-#~ msgid "View"
-#~ msgstr "보기"
-
-#~ msgid "Filter jobs:"
-#~ msgstr "Job 필터:"
 

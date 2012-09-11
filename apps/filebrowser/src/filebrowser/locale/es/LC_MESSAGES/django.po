@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -502,6 +502,10 @@ msgstr ""
 "Mostrando de %(start_index)s a %(end_index)s elementos de "
 "%(total_count)s, página %(page)s de %(num_pages)s."
 
+#: src/filebrowser/templates/listdir_components.mako:105
+msgid "Type"
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:107
 msgid "Name"
 msgstr "Nombre"
@@ -555,6 +559,10 @@ msgstr "Eliminar"
 msgid "Delete Recursively"
 msgstr "Eliminar recursivamente"
 
+#: src/filebrowser/templates/listdir_components.mako:194
+msgid "There are no files matching the search criteria."
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:203
 msgid "Please Confirm"
 msgstr "Confirme"
@@ -606,29 +614,4 @@ msgstr "Erróneos"
 #: src/filebrowser/templates/move.mako:24
 msgid "Move:"
 msgstr "Mover:"
-
-#~ msgid ""
-#~ "Failed to chown uploaded file "
-#~ "(\"%(file)s\") as superuser %(superuser)s."
-#~ msgstr ""
-#~ "Error al cambiar el propietario del "
-#~ "archivo cargado (\"%(file)s\") como "
-#~ "superusuario %(superuser)s."
-
-#~ msgid ""
-#~ "Failed to rename uploaded temporary file"
-#~ " (\"%(file)s\") to \"%(name)s\": %(error)s"
-#~ msgstr ""
-#~ "Error al cambiar el nombre del "
-#~ "archivo temporal cargado (\"%(file)s\") por"
-#~ " \"%(file)s\": %(error)s"
-
-#~ msgid "Upload Files"
-#~ msgstr "Cargar archivos"
-
-#~ msgid "View uploaded file:"
-#~ msgstr "Ver archivo cargado:"
-
-#~ msgid "Go back to where you were:"
-#~ msgstr "Volver a donde estaba:"
 
