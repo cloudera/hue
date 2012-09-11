@@ -229,7 +229,20 @@ ${ layout.menubar(section='workflows') }
         null,
         null
       ],
-      "aaSorting": [[3, 'desc'], [ 1, "asc" ]]
+      "aaSorting": [[3, 'desc'], [ 1, "asc" ]],
+      "oLanguage": {
+        "sEmptyTable":     "${_('No data available in table')}",
+        "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+        "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
+        "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
+        "sZeroRecords":    "${_('No matching records found')}",
+        "oPaginate": {
+            "sFirst":    "${_('First')}",
+            "sLast":     "${_('Last')}",
+            "sNext":     "${_('Next')}",
+            "sPrevious": "${_('Previous')}"
+          }
+      }
     });
 
     $('#filterInput').keydown(function(e) {

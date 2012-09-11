@@ -169,7 +169,20 @@ ${ layout.menubar(section='dashboard') }
             null,
             { "bSortable": false }
         ],
-        "aaSorting": [[ 0, "desc" ]]
+        "aaSorting": [[ 0, "desc" ]],
+        "oLanguage": {
+            "sEmptyTable":     "${_('No data available in table')}",
+            "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+            "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
+            "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
+            "sZeroRecords":    "${_('No matching records found')}",
+            "oPaginate": {
+                "sFirst":    "${_('First')}",
+                "sLast":     "${_('Last')}",
+                "sNext":     "${_('Next')}",
+                "sPrevious": "${_('Previous')}"
+            }
+        }
     });
 
     var completedTable = $('#completed-table').dataTable( {
@@ -185,7 +198,20 @@ ${ layout.menubar(section='dashboard') }
             null,
             null
         ],
-        "aaSorting": [[ 0, "desc" ]]
+        "aaSorting": [[ 0, "desc" ]],
+        "oLanguage": {
+            "sEmptyTable":     "${_('No data available in table')}",
+            "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+            "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
+            "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
+            "sZeroRecords":    "${_('No matching records found')}",
+            "oPaginate": {
+                "sFirst":    "${_('First')}",
+                "sLast":     "${_('Last')}",
+                "sNext":     "${_('Next')}",
+                "sPrevious": "${_('Previous')}"
+            }
+        }
     });
 
     $('#filterInput').keydown(function(e) {

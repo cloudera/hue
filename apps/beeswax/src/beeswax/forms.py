@@ -125,9 +125,9 @@ FunctionFormSet = simple_formset_factory(FunctionForm)
 class FileResourceForm(forms.Form):
   type = forms.ChoiceField(required=True,
     choices=[
-      ("JAR", "jar"),
-      ("ARCHIVE", "archive"),
-      ("FILE", "file"),
+      ("JAR", _("jar")),
+      ("ARCHIVE", _("archive")),
+      ("FILE", ("file")),
     ], help_text=_t("Resources to upload with your Hive job." +
        "  Use 'jar' for UDFs.  Use 'file' and 'archive' for "
        "files to be copied and made locally available duirng MAP/TRANSFORM. " +

@@ -59,7 +59,7 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
         <input type="text" name="text" title="${_('Text Filter')}" value="${text_filter}" placeholder="${_('Text Filter')}" class="submitter input-medium search-query"/>
     </label>
     <label class="pull-right">
-        ${_('User Name:')}
+        ${_('Username:')}
         <input type="text" name="user" title="${_('User Name Filter')}" value="${user_filter}" placeholder="${_('User Name Filter')}" class="submitter input-medium search-query" />
     </label>
 
