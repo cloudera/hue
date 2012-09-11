@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -47,7 +47,8 @@ msgstr ""
 "Ob Oozie für die Durchführung der Kerberos-Authentifizierung einen Client"
 " benötigt"
 
-#: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
+#: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
+#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:54
 #: src/jobsub/templates/list_history.mako:45
 #: src/jobsub/templates/workflow.mako:55 src/jobsub/templates/workflow.mako:100
 msgid "Name"
@@ -60,6 +61,36 @@ msgid ""
 msgstr ""
 "Erlaubt Buchstaben, Ziffern, '_' und '-'. Das erste Zeichen muss ein "
 "Buchstabe oder '_' sein."
+
+#: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
+#: src/jobsub/templates/list_designs.mako:56
+#: src/jobsub/templates/list_history.mako:47
+msgid "Description"
+msgstr "Beschreibung"
+
+#: src/jobsub/forms.py:60
+msgid "Main class"
+msgstr ""
+
+#: src/jobsub/forms.py:61 src/jobsub/forms.py:79
+msgid "Jar path"
+msgstr ""
+
+#: src/jobsub/forms.py:62
+msgid "Args"
+msgstr ""
+
+#: src/jobsub/forms.py:63
+msgid "Java opts"
+msgstr ""
+
+#: src/jobsub/forms.py:80
+msgid "Mapper"
+msgstr ""
+
+#: src/jobsub/forms.py:81
+msgid "Reducer"
+msgstr ""
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -290,11 +321,6 @@ msgstr "Eigentümer"
 msgid "Type"
 msgstr "Typ"
 
-#: src/jobsub/templates/list_designs.mako:56
-#: src/jobsub/templates/list_history.mako:47
-msgid "Description"
-msgstr "Beschreibung"
-
 #: src/jobsub/templates/list_designs.mako:57
 msgid "Last Modified"
 msgstr "Zuletzt geändert"
@@ -496,13 +522,4 @@ msgstr "Erstellungszeit"
 #: src/jobsub/templates/workflow.mako:186
 msgid "Application Path"
 msgstr "Anwendungspfad"
-
-#~ msgid "Insufficient permission"
-#~ msgstr "Unzureichende Berechtigung"
-
-#~ msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-#~ msgstr ""
-#~ "Berechtigung abgelehnt. Benutzer %(username)s "
-#~ "kann den Job von Benutzer %(user)s "
-#~ "nicht ändern."
 

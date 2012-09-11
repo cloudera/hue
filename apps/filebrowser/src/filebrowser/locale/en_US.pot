@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -493,6 +493,10 @@ msgid ""
 "%(page)s of %(num_pages)s."
 msgstr ""
 
+#: src/filebrowser/templates/listdir_components.mako:105
+msgid "Type"
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:107
 msgid "Name"
 msgstr ""
@@ -544,6 +548,10 @@ msgstr ""
 
 #: src/filebrowser/templates/listdir_components.mako:178
 msgid "Delete Recursively"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:194
+msgid "There are no files matching the search criteria."
 msgstr ""
 
 #: src/filebrowser/templates/listdir_components.mako:203

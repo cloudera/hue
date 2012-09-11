@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -496,6 +496,10 @@ msgstr ""
 "正在显示 %(start_index)s 到 %(end_index)s，共 %(total_count)s 个项目，第 %(page)s 页，共"
 " %(num_pages)s 页。"
 
+#: src/filebrowser/templates/listdir_components.mako:105
+msgid "Type"
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:107
 msgid "Name"
 msgstr "名称"
@@ -549,6 +553,10 @@ msgstr "删除"
 msgid "Delete Recursively"
 msgstr "递归删除"
 
+#: src/filebrowser/templates/listdir_components.mako:194
+msgid "There are no files matching the search criteria."
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:203
 msgid "Please Confirm"
 msgstr "请确认"
@@ -600,23 +608,4 @@ msgstr "失败"
 #: src/filebrowser/templates/move.mako:24
 msgid "Move:"
 msgstr "移动："
-
-#~ msgid ""
-#~ "Failed to chown uploaded file "
-#~ "(\"%(file)s\") as superuser %(superuser)s."
-#~ msgstr "无法以超级用户 %(superuser)s 的身份 chown 上传的文件 (\"%(file)s\")"
-
-#~ msgid ""
-#~ "Failed to rename uploaded temporary file"
-#~ " (\"%(file)s\") to \"%(name)s\": %(error)s"
-#~ msgstr "无法将上传的临时文件 (\"%(file)s\") 重命名为 \"%(name)s\"：%(error)s"
-
-#~ msgid "Upload Files"
-#~ msgstr "上传文件"
-
-#~ msgid "View uploaded file:"
-#~ msgstr "查看上传的文件："
-
-#~ msgid "Go back to where you were:"
-#~ msgstr "返回到您的位置："
 

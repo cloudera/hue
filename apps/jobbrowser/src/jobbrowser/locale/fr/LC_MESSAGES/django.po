@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -379,13 +379,17 @@ msgstr "Echoué"
 msgid "Killed"
 msgstr "Détruit"
 
+#: src/jobbrowser/templates/jobs.mako:53
+msgid "Show retired jobs"
+msgstr ""
+
 #: src/jobbrowser/templates/jobs.mako:58
 msgid "Text:"
 msgstr ""
 
 #: src/jobbrowser/templates/jobs.mako:62
 #, fuzzy
-msgid "User Name:"
+msgid "Username:"
 msgstr "Nom du compteur"
 
 #: src/jobbrowser/templates/jobs.mako:63
@@ -665,10 +669,4 @@ msgstr "Tâches de reduce maxi"
 #: src/jobbrowser/templatetags/unix_ms_to_datetime.py:29
 msgid "No time"
 msgstr "Aucune heure"
-
-#~ msgid "View"
-#~ msgstr "Affichage"
-
-#~ msgid "Filter jobs:"
-#~ msgstr "Filtrer les jobs :"
 

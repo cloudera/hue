@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,8 @@ msgid ""
 "Oozie requires client to do perform Kerberos authentication"
 msgstr ""
 
-#: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
+#: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
+#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:54
 #: src/jobsub/templates/list_history.mako:45
 #: src/jobsub/templates/workflow.mako:55 src/jobsub/templates/workflow.mako:100
 msgid "Name"
@@ -51,6 +52,36 @@ msgstr ""
 msgid ""
 "Allows letters, digits, '_', and '-'. The first character must be a "
 "letter or '_'."
+msgstr ""
+
+#: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
+#: src/jobsub/templates/list_designs.mako:56
+#: src/jobsub/templates/list_history.mako:47
+msgid "Description"
+msgstr ""
+
+#: src/jobsub/forms.py:60
+msgid "Main class"
+msgstr ""
+
+#: src/jobsub/forms.py:61 src/jobsub/forms.py:79
+msgid "Jar path"
+msgstr ""
+
+#: src/jobsub/forms.py:62
+msgid "Args"
+msgstr ""
+
+#: src/jobsub/forms.py:63
+msgid "Java opts"
+msgstr ""
+
+#: src/jobsub/forms.py:80
+msgid "Mapper"
+msgstr ""
+
+#: src/jobsub/forms.py:81
+msgid "Reducer"
 msgstr ""
 
 #: src/jobsub/models.py:128
@@ -276,11 +307,6 @@ msgstr ""
 #: src/jobsub/templates/list_history.mako:46
 #: src/jobsub/templates/workflow.mako:101
 msgid "Type"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:56
-#: src/jobsub/templates/list_history.mako:47
-msgid "Description"
 msgstr ""
 
 #: src/jobsub/templates/list_designs.mako:57

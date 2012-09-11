@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -43,7 +43,8 @@ msgid ""
 "Oozie requires client to do perform Kerberos authentication"
 msgstr "Oozie が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
 
-#: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
+#: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
+#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:54
 #: src/jobsub/templates/list_history.mako:45
 #: src/jobsub/templates/workflow.mako:55 src/jobsub/templates/workflow.mako:100
 msgid "Name"
@@ -54,6 +55,36 @@ msgid ""
 "Allows letters, digits, '_', and '-'. The first character must be a "
 "letter or '_'."
 msgstr "文字、数字、'_'、および '-' を使用できます。先頭には文字または '_' が必要です。"
+
+#: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
+#: src/jobsub/templates/list_designs.mako:56
+#: src/jobsub/templates/list_history.mako:47
+msgid "Description"
+msgstr "説明"
+
+#: src/jobsub/forms.py:60
+msgid "Main class"
+msgstr ""
+
+#: src/jobsub/forms.py:61 src/jobsub/forms.py:79
+msgid "Jar path"
+msgstr ""
+
+#: src/jobsub/forms.py:62
+msgid "Args"
+msgstr ""
+
+#: src/jobsub/forms.py:63
+msgid "Java opts"
+msgstr ""
+
+#: src/jobsub/forms.py:80
+msgid "Mapper"
+msgstr ""
+
+#: src/jobsub/forms.py:81
+msgid "Reducer"
+msgstr ""
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -280,11 +311,6 @@ msgstr "所有者"
 msgid "Type"
 msgstr "タイプ"
 
-#: src/jobsub/templates/list_designs.mako:56
-#: src/jobsub/templates/list_history.mako:47
-msgid "Description"
-msgstr "説明"
-
 #: src/jobsub/templates/list_designs.mako:57
 msgid "Last Modified"
 msgstr "前回変更"
@@ -486,10 +512,4 @@ msgstr "作成時間"
 #: src/jobsub/templates/workflow.mako:186
 msgid "Application Path"
 msgstr "アプリケーションのパス"
-
-#~ msgid "Insufficient permission"
-#~ msgstr "パーミッションが不十分です。"
-
-#~ msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-#~ msgstr "パーミッションが拒否されました。ユーザー %(username)s はユーザー %(user)s のジョブを変更できません。"
 

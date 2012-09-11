@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -371,12 +371,16 @@ msgstr ""
 msgid "Killed"
 msgstr ""
 
+#: src/jobbrowser/templates/jobs.mako:53
+msgid "Show retired jobs"
+msgstr ""
+
 #: src/jobbrowser/templates/jobs.mako:58
 msgid "Text:"
 msgstr ""
 
 #: src/jobbrowser/templates/jobs.mako:62
-msgid "User Name:"
+msgid "Username:"
 msgstr ""
 
 #: src/jobbrowser/templates/jobs.mako:63

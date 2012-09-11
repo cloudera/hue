@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -496,6 +496,10 @@ msgstr ""
 "%(page)s / %(num_pages)s 페이지, %(total_count)s개 항목 중 %(start_index)s ~ "
 "%(end_index)s을(를) 표시합니다."
 
+#: src/filebrowser/templates/listdir_components.mako:105
+msgid "Type"
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:107
 msgid "Name"
 msgstr "이름"
@@ -549,6 +553,10 @@ msgstr "삭제"
 msgid "Delete Recursively"
 msgstr "반복 삭제"
 
+#: src/filebrowser/templates/listdir_components.mako:194
+msgid "There are no files matching the search criteria."
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:203
 msgid "Please Confirm"
 msgstr "확인하십시오."
@@ -600,23 +608,4 @@ msgstr "실패함"
 #: src/filebrowser/templates/move.mako:24
 msgid "Move:"
 msgstr "이동:"
-
-#~ msgid ""
-#~ "Failed to chown uploaded file "
-#~ "(\"%(file)s\") as superuser %(superuser)s."
-#~ msgstr "업로드한 파일 (\"%(file)s\")의 소유자를 superuser %(superuser)s(으)로 변경하지 못했습니다."
-
-#~ msgid ""
-#~ "Failed to rename uploaded temporary file"
-#~ " (\"%(file)s\") to \"%(name)s\": %(error)s"
-#~ msgstr "업로드한 임시 파일 (\"%(file)s\")의 이름을 \"%(name)s\": %(error)s(으)로 변경하지 못했습니다."
-
-#~ msgid "Upload Files"
-#~ msgstr "파일 업로드"
-
-#~ msgid "View uploaded file:"
-#~ msgstr "업로드한 파일 보기:"
-
-#~ msgid "Go back to where you were:"
-#~ msgstr "이전 위치로 돌아가기:"
 

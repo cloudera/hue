@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -502,6 +502,10 @@ msgstr ""
 "%(start_index)s a %(end_index)s de %(total_count)s itens, página %(page)s"
 " de %(num_pages)s."
 
+#: src/filebrowser/templates/listdir_components.mako:105
+msgid "Type"
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:107
 msgid "Name"
 msgstr "Nome"
@@ -555,6 +559,10 @@ msgstr "Eliminar"
 msgid "Delete Recursively"
 msgstr "Eliminar recursivamente"
 
+#: src/filebrowser/templates/listdir_components.mako:194
+msgid "There are no files matching the search criteria."
+msgstr ""
+
 #: src/filebrowser/templates/listdir_components.mako:203
 msgid "Please Confirm"
 msgstr "Confirme"
@@ -606,29 +614,4 @@ msgstr "Falhou"
 #: src/filebrowser/templates/move.mako:24
 msgid "Move:"
 msgstr "Mover:"
-
-#~ msgid ""
-#~ "Failed to chown uploaded file "
-#~ "(\"%(file)s\") as superuser %(superuser)s."
-#~ msgstr ""
-#~ "Falha ao executar o comando chown "
-#~ "sobre o ficheiro transferido (\"%(file)s\")"
-#~ " como super-utilizador %(superuser)s."
-
-#~ msgid ""
-#~ "Failed to rename uploaded temporary file"
-#~ " (\"%(file)s\") to \"%(name)s\": %(error)s"
-#~ msgstr ""
-#~ "Falha ao mudar o nome do ficheiro"
-#~ " temporário transferido (\"%(file)s\") para "
-#~ "\"%(name)s\": %(error)s"
-
-#~ msgid "Upload Files"
-#~ msgstr "Upload de ficheiros"
-
-#~ msgid "View uploaded file:"
-#~ msgstr "Ver ficheiros carregados:"
-
-#~ msgid "Go back to where you were:"
-#~ msgstr "Voltar ao ponto em que estava:"
 

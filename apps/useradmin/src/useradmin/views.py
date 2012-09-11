@@ -303,7 +303,7 @@ class AddLdapUserForm(forms.Form):
                                     "distinguished name."),
                           initial=False,
                           required=False)
-  ensure_home_directory = forms.BooleanField(label=_("Create Home Directory"),
+  ensure_home_directory = forms.BooleanField(label=_("Create home directory"),
                                             help_text=_("Create home directory for user if one doesn't already exist."),
                                             initial=True,
                                             required=False)

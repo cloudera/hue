@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-07 18:08-0700\n"
+"POT-Creation-Date: 2012-09-11 13:36-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -43,7 +43,8 @@ msgid ""
 "Oozie requires client to do perform Kerberos authentication"
 msgstr "Oozie에서 클라이언트의 Kerberos 인증 수행을 요청할지 여부입니다."
 
-#: src/jobsub/forms.py:39 src/jobsub/templates/list_designs.mako:54
+#: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
+#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:54
 #: src/jobsub/templates/list_history.mako:45
 #: src/jobsub/templates/workflow.mako:55 src/jobsub/templates/workflow.mako:100
 msgid "Name"
@@ -54,6 +55,36 @@ msgid ""
 "Allows letters, digits, '_', and '-'. The first character must be a "
 "letter or '_'."
 msgstr "문자, 숫자, '_', '-'이 허용됩니다. 문자 또는 '_'이 맨 앞에 와야 합니다."
+
+#: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
+#: src/jobsub/templates/list_designs.mako:56
+#: src/jobsub/templates/list_history.mako:47
+msgid "Description"
+msgstr "설명"
+
+#: src/jobsub/forms.py:60
+msgid "Main class"
+msgstr ""
+
+#: src/jobsub/forms.py:61 src/jobsub/forms.py:79
+msgid "Jar path"
+msgstr ""
+
+#: src/jobsub/forms.py:62
+msgid "Args"
+msgstr ""
+
+#: src/jobsub/forms.py:63
+msgid "Java opts"
+msgstr ""
+
+#: src/jobsub/forms.py:80
+msgid "Mapper"
+msgstr ""
+
+#: src/jobsub/forms.py:81
+msgid "Reducer"
+msgstr ""
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -280,11 +311,6 @@ msgstr "소유자"
 msgid "Type"
 msgstr "유형"
 
-#: src/jobsub/templates/list_designs.mako:56
-#: src/jobsub/templates/list_history.mako:47
-msgid "Description"
-msgstr "설명"
-
 #: src/jobsub/templates/list_designs.mako:57
 msgid "Last Modified"
 msgstr "최종 수정 날짜"
@@ -486,10 +512,4 @@ msgstr "생성된 시간"
 #: src/jobsub/templates/workflow.mako:186
 msgid "Application Path"
 msgstr "애플리케이션 경로"
-
-#~ msgid "Insufficient permission"
-#~ msgstr "권한 부족"
-
-#~ msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-#~ msgstr "권한이 거부되었습니다. 사용자 %(username)s은(는) 사용자 %(user)s의 Job을 수정할 수 없습니다."
 
