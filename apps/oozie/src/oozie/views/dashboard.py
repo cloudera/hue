@@ -21,15 +21,21 @@ except ImportError:
   import simplejson as json
 import logging
 
+from django.forms.formsets import formset_factory
 from django.http import HttpResponse
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
 
 from desktop.lib.django_util import render
 from desktop.lib.exceptions import PopupException
 from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 from liboozie.oozie_api import get_oozie
+from liboozie.submittion import Submission
+from oozie.forms import RerunForm, ParameterForm
+
 
 from oozie.conf import OOZIE_JOBS_COUNT
 from oozie.models import History, Job
@@ -180,6 +186,56 @@ def list_oozie_workflow_action(request, action):
     'action': action,
     'workflow': workflow,
   })
+
+
+@show_oozie_error
+def rerun_oozie_job(request, job_id, app_path):
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+  oozie_workflow = check_job_access_permission(request, job_id)
+
+  if request.method == 'POST':
+    rerun_form = RerunForm(request.POST, oozie_workflow=oozie_workflow)
+    params_form = ParametersFormSet(request.POST)
+
+    if sum([rerun_form.is_valid(), params_form.is_valid()]) == 2:
+      args = {}
+
+      if request.POST['rerun_form_choice'] == 'fail_nodes':
+        args['fail_nodes'] = 'false'
+      else:
+        args['skip_nodes'] = ','.join(rerun_form.cleaned_data['skip_nodes'])
+      args['deployment_dir'] = app_path
+
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+
+      _rerun_workflow(request, job_id, args, mapping)
+
+      request.info(_('Workflow re-running!'))
+      return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s %s' % (rerun_form.errors, params_form.errors)))
+  else:
+    rerun_form = RerunForm(oozie_workflow=oozie_workflow)
+    initial_params = ParameterForm.get_initial_params(oozie_workflow.conf_dict)
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('dashboard/rerun_job_popup.mako', request, {
+                   'rerun_form': rerun_form,
+                   'params_form': params_form,
+                   'action': reverse('oozie:rerun_oozie_job', kwargs={'job_id': job_id, 'app_path': app_path}),
+                 }, force_template=True).content
+
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
+
+
+def _rerun_workflow(request, oozie_id, run_args, mapping):
+  try:
+    submission = Submission(user=request.user, fs=request.fs, properties=mapping, oozie_id=oozie_id)
+    job_id = submission.rerun(**run_args)
+    return job_id
+  except RestException, ex:
+    raise PopupException(_("Error rerunning workflow %s") % (oozie_id,),
+                         detail=ex._headers.get('oozie-error-message', ex))
 
 
 def split_oozie_jobs(oozie_jobs):

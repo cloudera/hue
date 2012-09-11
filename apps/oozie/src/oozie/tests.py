@@ -829,30 +829,6 @@ class TestPermissions(OozieBase):
     finally:
       finish()
 
-    # Resubmit
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      history, created = History.objects.get_or_create(job=self.wf, oozie_job_id=MockOozieApi.WORKFLOW_IDS[0],
-                                                       defaults={'submitter': User.objects.get(username='test'), 'properties': '[]'})
-      job_id = history.oozie_job_id
-      response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      try:
-        history, created = History.objects.get_or_create(job=self.wf, oozie_job_id=MockOozieApi.WORKFLOW_IDS[0],
-                                                         defaults={'submitter': User.objects.get(username='test'), 'properties': '[]'})
-        job_id = history.oozie_job_id
-        response = client_not_me.post(reverse('oozie:resubmit_workflow', args=[job_id]))
-        assert_false('Permission denied' in response.content, response.content)
-      except IOError:
-        pass
-    finally:
-      finish()
-
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)
     try:
@@ -1080,14 +1056,32 @@ class TestOozieSubmissions(OozieBase):
 
   def test_submit_mapreduce_action(self):
     wf = Workflow.objects.get(name='MapReduce')
+    post_data = {u'form-MAX_NUM_FORMS': [u''], u'form-INITIAL_FORMS': [u'1'],
+                 u'form-0-name': [u'REDUCER_SLEEP_TIME'], u'form-0-value': [u'1'], u'form-TOTAL_FORMS': [u'1']}
 
-    response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]),
-                           data={u'form-MAX_NUM_FORMS': [u''],
-                                u'form-INITIAL_FORMS': [u'1'], u'form-0-name': [u'REDUCER_SLEEP_TIME'],
-                                u'form-0-value': [u'1'], u'form-TOTAL_FORMS': [u'1']},
-                           follow=True)
+    response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]), data=post_data, follow=True)
     job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
     assert_equal('SUCCEEDED', job.status)
+
+    # Rerun with default options
+    post_data.update({u'rerun_form_choice': [u'skip_nodes']})
+
+    response = self.c.post(reverse('oozie:rerun_oozie_job', kwargs={'job_id': job.id, 'app_path': job.appPath}), data=post_data, follow=True)
+    job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
+    assert_equal('SUCCEEDED', job.status)
+
+    # Rerun with skip OK actions skipped
+    post_data.update({u'rerun_form_choice': [u'skip_nodes'], u'skip_nodes': [u'Sleep']})
+
+    response = self.c.post(reverse('oozie:rerun_oozie_job', kwargs={'job_id': job.id, 'app_path': job.appPath}), data=post_data, follow=True)
+    job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
+    assert_equal('SUCCEEDED', job.status)
+
+    # Rerun with failed nodes too
+    post_data.update({u'rerun_form_choice': [u'failed_nodes']})
+
+    response = self.c.post(reverse('oozie:rerun_oozie_job', kwargs={'job_id': job.id, 'app_path': job.appPath}), data=post_data, follow=True)
+    job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
 
 
   def test_submit_java_action(self):
@@ -1136,21 +1130,21 @@ class TestDashboard(OozieMockBase):
     # Kill button in response
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]), {}, follow=True)
     assert_true(('%s/kill' % MockOozieApi.WORKFLOW_IDS[0]) in response.content, response.content)
-    assert_false('Resubmit' in response.content, response.content)
+    assert_false('Rerun' in response.content, response.content)
 
-    # Resubmit button in response
+    # Rerun button in response
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[1]]), {}, follow=True)
     assert_false(('%s/kill' % MockOozieApi.WORKFLOW_IDS[1]) in response.content, response.content)
-    assert_true('Resubmit' in response.content, response.content)
+    assert_true('Rerun' in response.content, response.content)
 
 
   def test_manage_coordinator_dashboard(self):
     # Kill button in response
     response = self.c.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]), {}, follow=True)
     assert_true(('%s/kill' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
-    assert_false('Resubmit' in response.content, response.content)
+    assert_false('Rerun' in response.content, response.content)
 
-    # Resubmit button in response
+    # Rerun button in response
     response = self.c.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[1]]), {}, follow=True)
     assert_false(('%s/kill' % MockOozieApi.COORDINATOR_IDS[1]) in response.content, response.content)
     assert_true('Resubmit' in response.content, response.content)
@@ -1202,6 +1196,11 @@ class TestDashboard(OozieMockBase):
     response = self.c.get(reverse('oozie:list_oozie_workflows'))
     assert_true('WordCount1' in response.content, response.content)
 
+    # Rerun
+    response = self.c.get(reverse('oozie:rerun_oozie_job', kwargs={'job_id': MockOozieApi.WORKFLOW_IDS[0],
+                                                                   'app_path': MockOozieApi.JSON_WORKFLOW_LIST[0]['appPath']}))
+    assert_false('Permission denied.' in response.content, response.content)
+
     # Login as someone else
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
     grant_access("not_me", "not_me", "oozie")
@@ -1209,12 +1208,21 @@ class TestDashboard(OozieMockBase):
     response = client_not_me.get(reverse('oozie:list_oozie_workflows'))
     assert_false('WordCount1' in response.content, response.content)
 
+    # Rerun
+    response = client_not_me.get(reverse('oozie:rerun_oozie_job', kwargs={'job_id': MockOozieApi.WORKFLOW_IDS[0],
+                                                                          'app_path': MockOozieApi.JSON_WORKFLOW_LIST[0]['appPath']}))
+    assert_true('Permission denied.' in response.content, response.content)
+
     # Add read only access
     add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
 
     response = client_not_me.get(reverse('oozie:list_oozie_workflows'))
     assert_true('WordCount1' in response.content, response.content)
 
+    # Rerun
+    response = client_not_me.get(reverse('oozie:rerun_oozie_job', kwargs={'job_id': MockOozieApi.WORKFLOW_IDS[0],
+                                                                          'app_path': MockOozieApi.JSON_WORKFLOW_LIST[0]['appPath']}))
+    assert_false('Permission denied.' in response.content, response.content)
 
   def test_workflow_permissions(self):
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]))

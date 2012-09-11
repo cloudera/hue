@@ -158,6 +158,7 @@ def clone_workflow(request, workflow):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+
 @check_job_access_permission()
 def submit_workflow(request, workflow):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
@@ -179,11 +180,10 @@ def submit_workflow(request, workflow):
     params_form = ParametersFormSet(initial=parameters)
 
   popup = render('editor/submit_job_popup.mako', request, {
-                 'params_form': params_form,
-                 'action': reverse('oozie:submit_workflow', kwargs={'workflow': workflow.id})
+                   'params_form': params_form,
+                   'action': reverse('oozie:submit_workflow', kwargs={'workflow': workflow.id})
                  }, force_template=True).content
   return HttpResponse(json.dumps(popup), mimetype="application/json")
-
 
 
 def _submit_workflow(request, workflow, mapping):
@@ -199,21 +199,6 @@ def _submit_workflow(request, workflow, mapping):
     raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)
 
   request.info(_('Workflow submitted'))
-  return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
-
-
-def resubmit_workflow(request, oozie_wf_id):
-  if request.method != 'POST':
-    raise PopupException(_('A POST request is required.'))
-
-  history = History.objects.get(oozie_job_id=oozie_wf_id)
-  Job.objects.is_accessible_or_exception(request, history.job.id)
-
-  workflow = history.get_workflow().get_full_node()
-  properties = history.properties_dict
-  job_id = _submit_workflow(request, workflow, properties)
-
-  request.info(_('Workflow re-submitted'))
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
 

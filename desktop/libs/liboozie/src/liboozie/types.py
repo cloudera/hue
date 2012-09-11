@@ -48,7 +48,7 @@ class Action(object):
   def _fixup(self): pass
 
   def is_finished(self):
-    return self.status in ('OK', 'SUCCEEDED')
+    return self.status in ('OK', 'SUCCEEDED', 'DONE')
 
   @classmethod
   def create(self, action_class, action_dict):
@@ -56,6 +56,9 @@ class Action(object):
       return ControlFlowAction(action_dict)
     else:
       return action_class(action_dict)
+
+  def __str__(self):
+    return '%s - %s' % (self.type, self.name)
 
 
 class ControlFlowAction(Action):

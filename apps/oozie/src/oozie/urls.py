@@ -37,7 +37,6 @@ urlpatterns += patterns(
   url(r'^clone_workflow/(?P<workflow>\d+)$', 'clone_workflow', name='clone_workflow'),
   url(r'^submit_workflow/(?P<workflow>\d+)$', 'submit_workflow', name='submit_workflow'),
   url(r'^schedule_workflow/(?P<workflow>\d+)$', 'schedule_workflow', name='schedule_workflow'),
-  url(r'^resubmit_workflow/(?P<oozie_wf_id>[-\w]+)$', 'resubmit_workflow', name='resubmit_workflow'),
 
   url(r'^import_action/(?P<workflow>\d+)/(?P<parent_action_id>\d+)$', 'import_action', name='import_action'),
 
@@ -67,5 +66,6 @@ urlpatterns += patterns(
   url(r'^list_oozie_workflow/(?P<job_id>[-\w]+)/(?P<coordinator_job_id>[-\w]+)?$', 'list_oozie_workflow', name='list_oozie_workflow'),
   url(r'^list_oozie_coordinator/(?P<job_id>[-\w]+)$', 'list_oozie_coordinator', name='list_oozie_coordinator'),
   url(r'^list_oozie_workflow_action/(?P<action>[-\w@]+)$', 'list_oozie_workflow_action', name='list_oozie_workflow_action'),
+  url(r'^rerun_oozie_job/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_job', name='rerun_oozie_job'),
   url(r'^manage_oozie_jobs/(?P<job_id>[-\w]+)/(?P<action>(start|suspend|resume|kill|rerun))$', 'manage_oozie_jobs', name='manage_oozie_jobs'),
 )

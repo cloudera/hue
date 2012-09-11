@@ -42,11 +42,11 @@ ${ layout.menubar(section='dashboard') }
       ${ _('Workflow') }
     </div>
     <div class="span3">
-      %if hue_workflow is not None:
+      % if hue_workflow is not None:
         <a title="${ _('Edit workflow') }" href="${ hue_workflow.get_absolute_url() }">${ hue_workflow }</a>
       % else:
         ${ oozie_workflow.appName }
-      %endif
+      % endif
     </div>
   </div>
 
@@ -113,7 +113,6 @@ ${ layout.menubar(section='dashboard') }
       ${ _('Manage') }
     </div>
     <div class="span3">
-      <form action="${ url('oozie:resubmit_workflow', oozie_wf_id=oozie_workflow.id) }" method="post">
       % if oozie_workflow.is_running():
         <a title="${_('Kill %(workflow)s') % dict(workflow=oozie_workflow.id)}"
           id="kill-workflow"
@@ -126,11 +125,14 @@ ${ layout.menubar(section='dashboard') }
             ${_('Kill')}
         </a>
       % else:
-        <button type="submit" class="btn">
-          ${ _('Resubmit') }
-        </button>
+        % if oozie_workflow.id:
+          <a title="${ _('Rerun the same workflow') }" class="btn" id="rerun-btn"
+            data-rerun-url="${ url('oozie:rerun_oozie_job', job_id=oozie_workflow.id, app_path=oozie_workflow.appPath) }">
+            ${ _('Rerun') }
+          </a>
+        % endif
+        <div id="rerun-wf-modal" class="modal hide"></div>
       % endif
-      </form>
     </div>
   </div>
   % endif
@@ -236,11 +238,11 @@ ${ layout.menubar(section='dashboard') }
           <tbody>
             <tr>
               <td>${ _('Group') }</td>
-              <td>${ oozie_workflow.group }</td>
+              <td>${ oozie_workflow.group or '-' }</td>
             </tr>
             <tr>
               <td>${ _('External Id') }</td>
-              <td>${ oozie_workflow.externalId or "-" }</td>
+              <td>${ oozie_workflow.externalId or '-' }</td>
             </tr>
             <tr>
               <td>${ _('Start Time') }</td>
@@ -294,12 +296,12 @@ ${ layout.menubar(section='dashboard') }
 <script type="text/javascript">
   $(document).ready(function() {
     $(".action-link").click(function(){
-      window.location = $(this).attr('data-edit');
+      window.location = $(this).data('edit');
     });
 
     $(".confirmationModal").click(function(){
       var _this = $(this);
-      $("#confirmation .message").text(_this.attr("data-confirmation-message"));
+      $("#confirmation .message").text(_this.data("confirmation-message"));
       $("#confirmation").modal("show");
       $("#confirmation a.btn-primary").click(function() {
         _this.trigger('confirmation');
@@ -308,8 +310,8 @@ ${ layout.menubar(section='dashboard') }
 
     $("#kill-workflow").bind('confirmation', function() {
       var _this = this;
-      $.post($(this).attr("data-url"),
-        { 'notification': $(this).attr("data-message") },
+      $.post($(this).data("url"),
+        { 'notification': $(this).data("message") },
         function(response) {
           if (response['status'] != 0) {
             $.jHueNotify.error("${ _('Error: ') }" + response['data']);
@@ -320,6 +322,16 @@ ${ layout.menubar(section='dashboard') }
       );
       return false;
     });
+
+    $('#rerun-btn').click(function() {
+      var _action = $(this).data("rerun-url");
+
+      $.get(_action,  function(response) {
+          $('#rerun-wf-modal').html(response);
+          $('#rerun-wf-modal').modal('show');
+        }
+      );
+     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
   });

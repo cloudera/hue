@@ -33,12 +33,18 @@ LOG = logging.getLogger(__name__)
 
 
 class Submission(object):
-  """Represents one unique Oozie submission"""
-  def __init__(self, user, job, fs, properties=None):
+  """
+  Represents one unique Oozie submission.
+
+  Actions are:
+  - submit
+  - rerun
+  """
+  def __init__(self, user, job=None, fs=None, properties=None, oozie_id=None):
     self.job = job
     self.user = user
     self.fs = fs
-    self.oozie_id = None
+    self.oozie_id = oozie_id
 
     if properties is not None:
       self.properties = properties
@@ -46,7 +52,10 @@ class Submission(object):
       self.properties = {}
 
   def __str__(self):
-    res = "Submission for job '%s' (id %s, owner %s)" % (self.job.name, self.job.id, self.user)
+    if self.oozie_id:
+      res = "Submission for job '%s'" % (self.oozie_id,)
+    else:
+      res = "Submission for job '%s' (id %s, owner %s)" % (self.job.name, self.job.id, self.user)
     if self.oozie_id:
       res += " -- " + self.oozie_id
     return res
@@ -77,6 +86,30 @@ class Submission(object):
 
     return self.oozie_id
 
+  def rerun(self, deployment_dir, fail_nodes=None, skip_nodes=None):
+    jobtracker = cluster.get_cluster_addr_for_job_submission()
+
+    try:
+      prev = get_oozie().setuser(self.user.username)
+      self._update_properties(jobtracker, deployment_dir)
+      self.properties.update({'oozie.wf.application.path': deployment_dir})
+
+      if fail_nodes:
+        self.properties.update({'oozie.wf.rerun.failnodes': fail_nodes})
+      elif not skip_nodes:
+        self.properties.update({'oozie.wf.rerun.failnodes': 'true'}) # Case empty 'skip_nodes' list
+      else:
+        self.properties.update({'oozie.wf.rerun.skip.nodes': skip_nodes})
+
+      get_oozie().rerun(self.oozie_id, properties=self.properties)
+
+      LOG.info("Rerun: %s" % (self,))
+    finally:
+      get_oozie().setuser(prev)
+
+    return self.oozie_id
+
+
   def deploy(self):
     try:
       deployment_dir = self._create_deployment_dir()
@@ -92,13 +125,18 @@ class Submission(object):
 
   def _update_properties(self, jobtracker_addr, deployment_dir):
     properties = {
-        'jobTracker': jobtracker_addr,
-        'nameNode': self.fs.fs_defaultfs,
-        self.job.get_application_path_key(): self.fs.get_hdfs_path(deployment_dir),
-        self.job.HUE_ID: self.job.id
+      'jobTracker': jobtracker_addr,
+      'nameNode': self.fs.fs_defaultfs,
     }
 
+    if self.job:
+      properties.update({
+        self.job.get_application_path_key(): self.fs.get_hdfs_path(deployment_dir),
+        self.job.HUE_ID: self.job.id
+      })
+
     properties.update(self.properties)
+
     self.properties = properties
 
   def _create_deployment_dir(self):
@@ -108,7 +146,7 @@ class Submission(object):
     """
     if self.user != self.job.owner:
       path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
-      self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user)
+      self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user, dir_mode=0711)
     else:
       path = self.job.deployment_dir
       self._create_dir(path)

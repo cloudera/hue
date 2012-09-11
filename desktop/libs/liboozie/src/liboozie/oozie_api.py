@@ -104,6 +104,15 @@ class OozieApi(object):
       return { 'doAs': self.user }
     return { 'user.name': DEFAULT_USER, 'doAs': self.user }
 
+  def _get_oozie_properties(self, properties=None):
+    defaults = {
+      'user.name': self.user,
+    }
+
+    if properties is not None:
+      defaults.update(properties)
+
+    return defaults
 
   VALID_JOB_FILTERS = ('name', 'user', 'group', 'status')
 
@@ -210,7 +219,7 @@ class OozieApi(object):
     """
     submit_workflow(application_path, properties=None) -> jobid
 
-    Submit a job to Oozie. May raise PopupException.
+    Raise RestException on error.
     """
     defaults = {
       'oozie.wf.application.path': application_path,
@@ -223,11 +232,12 @@ class OozieApi(object):
 
     return self.submit_job(properties)
 
+  # Is name actually submit_coord?
   def submit_job(self, properties=None):
     """
     submit_job(properties=None, id=None) -> jobid
 
-    Submit a job to Oozie. May raise PopupException.
+    Raise RestException on error.
     """
     defaults = {
       'user.name': self.user,
@@ -239,11 +249,15 @@ class OozieApi(object):
     properties = defaults
 
     params = self._get_params()
-    resp = self._root.post('jobs', params,
-                  data=config_gen(properties),
-                  contenttype=_XML_CONTENT_TYPE)
+    resp = self._root.post('jobs', params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
     return resp['id']
 
+  def rerun(self, jobid, properties=None):
+    properties = self._get_oozie_properties(properties)
+    params = self._get_params()
+    params['action'] = 'rerun'
+
+    return self._root.put('job/%s' % jobid, params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
 
   def get_build_version(self):
     """

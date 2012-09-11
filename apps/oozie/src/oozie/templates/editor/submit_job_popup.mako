@@ -37,7 +37,11 @@
             ${ hidden }
           % endfor
           <div class="fieldWrapper">
-            <div class="row-fluid">
+            <div class="row-fluid
+              % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
+                hide
+              % endif
+              ">
               <div class="span6">
                 ${ form['name'].form.initial.get('name') }
               </div>

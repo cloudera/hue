@@ -29,7 +29,21 @@ LOG = logging.getLogger(__name__)
 
 class ParameterForm(forms.Form):
   name = forms.CharField(max_length=40, widget=forms.widgets.HiddenInput())
-  value = forms.CharField(max_length=40, required=False)
+  value = forms.CharField(max_length=100, required=False)
+
+  NON_PARAMETERS = ('user.name',
+                    'oozie.wf.rerun.failnodes',
+                    'oozie.wf.rerun.skip.nodes',
+                    'oozie.wf.application.path',
+                    'jobTracker',
+                    'nameNode',
+                    'hue-id-w')
+
+  @staticmethod
+  def get_initial_params(conf_dict):
+    params = filter(lambda key: key not in ParameterForm.NON_PARAMETERS, conf_dict.keys())
+
+    return [{'name': name, 'value': conf_dict[name]} for name in params]
 
 
 class WorkflowForm(forms.ModelForm):
@@ -323,6 +337,28 @@ _node_type_TO_FORM_CLS = {
   Shell.node_type: ShellForm,
   DistCp.node_type: DistCpForm,
 }
+
+
+class RerunForm(forms.Form):
+  skip_nodes = forms.MultipleChoiceField(required=False)
+
+  def __init__(self, *args, **kwargs):
+    oozie_workflow = kwargs.pop('oozie_workflow')
+
+    # Build list of skip nodes
+    decisions = filter(lambda node: node.type == 'switch', oozie_workflow.get_control_flow_actions())
+    working_actions = oozie_workflow.get_working_actions()
+    skip_nodes = []
+
+    for action in decisions + working_actions:
+      if action.status == 'OK':
+        skip_nodes.append((action.name, action.name))
+    initial_skip_nodes = oozie_workflow.conf_dict.get('oozie.wf.rerun.skip.nodes', '').split()
+
+    super(RerunForm, self).__init__(*args, **kwargs)
+
+    self.fields['skip_nodes'].choices = skip_nodes
+    self.fields['skip_nodes'].initial = initial_skip_nodes
 
 
 def design_form_by_type(node_type):
