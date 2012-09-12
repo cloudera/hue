@@ -1030,7 +1030,14 @@ qq.extend(qq.UploadHandlerForm.prototype, {
 
         var iframe = this._createIframe(id);
         var form = this._createForm(iframe, params);
+        input.name = params.fileFieldLabel;
         form.appendChild(input);
+
+        var dest = document.createElement('input');
+        dest.type = 'text';
+        dest.name = 'dest';
+        dest.value = params.dest;
+        form.appendChild(dest);
 
         var self = this;
         this._attachLoadEvent(iframe, function(){
@@ -1126,9 +1133,7 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         // Because in this case file won't be attached to request
         var form = qq.toElement('<form method="post" enctype="multipart/form-data"></form>');
 
-        var queryString = qq.obj2url(params, this._options.action);
-
-        form.setAttribute('action', queryString);
+        form.setAttribute('action', this._options.action);
         form.setAttribute('target', iframe.name);
         form.style.display = 'none';
         document.body.appendChild(form);
@@ -1222,7 +1227,6 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             }
         };
 
-       // var queryString = qq.obj2url(params, this._options.action);
         var formData = new FormData();
         formData.append(params.fileFieldLabel, file);
         formData.append('dest', params.dest);

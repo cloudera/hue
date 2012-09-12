@@ -88,7 +88,7 @@ ${layout.menubar(section='tables')}
 			"bFilter": false,
 			"aoColumns": [
 				null,
-				{ "sWidth": "130px", "bSortable" : false },
+				{ "sWidth": "130px", "bSortable" : false }
 			 ]
 		});
 
