@@ -222,7 +222,7 @@ ${layout.menubar(section='dashboard')}
 
     $("#filterInput").keyup(function() {
       runningTable.fnFilter($(this).val());
-      completedTable.fnFilter($(this).val());    
+      completedTable.fnFilter($(this).val());
 
       hash = "#";
 
