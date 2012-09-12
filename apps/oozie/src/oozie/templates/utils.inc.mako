@@ -159,7 +159,7 @@
 </%def>
 
 
-<%def name="render_field(field, show_label=True)">
+<%def name="render_field(field, show_label=True, extra_attrs={})">
   % if not field.is_hidden:
     <% group_class = field.errors and "error" or "" %>
     <div class="control-group ${group_class}"
@@ -168,6 +168,7 @@
         <label class="control-label">${ field.label | h }</label>
       % endif
       <div class="controls">
+        <% field.field.widget.attrs.update(extra_attrs) %>
         ${ field }
         % if field.errors:
           <span class="help-inline">${ unicode(field.errors) }</span>

@@ -18,6 +18,7 @@ try:
   import json
 except ImportError:
   import simplejson as json
+import copy
 import logging
 import re
 
@@ -35,9 +36,10 @@ from liboozie.oozie_api_test import OozieServerProvider
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   CoordinatorList, WorkflowAction
 
-from oozie.models import Workflow, Node, Job, Coordinator, Fork, History,\
-  find_parameters
+from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
+  find_parameters, NODE_TYPES
 from oozie.conf import SHARE_JOBS
+from oozie.utils import workflow_to_dict, model_to_dict
 
 
 LOG = logging.getLogger(__name__)
@@ -123,7 +125,6 @@ class OozieMockBase:
     oozie_api.OozieApi = MockOozieApi
     oozie_api._api_cache = None
 
-    Workflow.objects.all().delete()
     Coordinator.objects.all().delete()
 
     self.c = make_logged_in_client(is_superuser=False)
@@ -137,12 +138,57 @@ class OozieMockBase:
     oozie_api._api_cache = None
 
 
+  def setup_simple_workflow(self):
+    """ Creates a linear workflow """
+    Link.objects.filter(parent__workflow=self.wf).delete()
+    Link(parent=self.wf.start, child=self.wf.end, name="related").save()
+    action1 = add_node(self.wf, 'action-name-1', 'mapreduce', [self.wf.start], {
+      'description': '',
+      'files': '[]',
+      'jar_path': '/user/hue/oozie/examples/lib/hadoop-examples.jar',
+      'job_properties': '[{"name":"sleep","value":"${SLEEP}"}]',
+      'prepares': '[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]',
+      'archives': '[]',
+    })
+    action2 = add_node(self.wf, 'action-name-2', 'mapreduce', [action1], {
+      'description': '',
+      'files': '[]',
+      'jar_path': '/user/hue/oozie/examples/lib/hadoop-examples.jar',
+      'job_properties': '[{"name":"sleep","value":"${SLEEP}"}]',
+      'prepares': '[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]',
+      'archives': '[]',
+    })
+    action3 = add_node(self.wf, 'action-name-3', 'mapreduce', [action2], {
+      'description': '',
+      'files': '[]',
+      'jar_path': '/user/hue/oozie/examples/lib/hadoop-examples.jar',
+      'job_properties': '[{"name":"sleep","value":"${SLEEP}"}]',
+      'prepares': '[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]',
+      'archives': '[]',
+    })
+    Link(parent=action3, child=self.wf.end, name="ok").save()
+
+
+  def setup_forking_workflow(self):
+    """ Creates a workflow with a fork """
+    Link.objects.filter(parent__workflow=self.wf).delete()
+    Link(parent=self.wf.start, child=self.wf.end, name="related").save()
+    fork1 = add_node(self.wf, 'fork-name-1', 'fork', [self.wf.start])
+    action1 = add_node(self.wf, 'action-name-1', 'mapreduce', [fork1])
+    action2 = add_node(self.wf, 'action-name-2', 'mapreduce', [fork1])
+    join1 = add_node(self.wf, 'join-name-1', 'join', [action1, action2])
+    Link(parent=fork1, child=join1, name="related").save()
+    action3 = add_node(self.wf, 'action-name-3', 'mapreduce', [join1])
+    Link(parent=action3, child=self.wf.end, name="ok").save()
+
+
 class OozieBase(OozieServerProvider):
   requires_hadoop = True
 
   def setUp(self):
     OozieServerProvider.setup_class()
     self.c = make_logged_in_client(is_superuser=False)
+    self.user = User.objects.get(username="test")
     grant_access("test", "test", "oozie")
     self.cluster = OozieServerProvider.cluster
     self.install_examples()
@@ -165,9 +211,214 @@ class OozieBase(OozieServerProvider):
     _INITIALIZED = True
 
 
+  def setup_simple_workflow(self):
+    """ Creates a linear workflow """
+    Link.objects.filter(parent__workflow=self.wf).delete()
+    Link(parent=self.wf.start, child=self.wf.end, name="related").save()
+    action1 = add_node(self.wf, 'action-name-1', 'mapreduce', [self.wf.start], {
+      'description': '',
+      'files': '[]',
+      'jar_path': '/user/hue/oozie/examples/lib/hadoop-examples.jar',
+      'job_properties': '[{"name":"sleep","value":"${SLEEP}"}]',
+      'prepares': '[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]',
+      'archives': '[]',
+    })
+    action2 = add_node(self.wf, 'action-name-2', 'mapreduce', [action1], {
+      'description': '',
+      'files': '[]',
+      'jar_path': '/user/hue/oozie/examples/lib/hadoop-examples.jar',
+      'job_properties': '[{"name":"sleep","value":"${SLEEP}"}]',
+      'prepares': '[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]',
+      'archives': '[]',
+    })
+    action3 = add_node(self.wf, 'action-name-3', 'mapreduce', [action2], {
+      'description': '',
+      'files': '[]',
+      'jar_path': '/user/hue/oozie/examples/lib/hadoop-examples.jar',
+      'job_properties': '[{"name":"sleep","value":"${SLEEP}"}]',
+      'prepares': '[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]',
+      'archives': '[]',
+    })
+    Link(parent=action3, child=self.wf.end, name="ok").save()
+
+
+  def setup_forking_workflow(self):
+    """ Creates a workflow with a fork """
+    Link.objects.filter(parent__workflow=self.wf).delete()
+    Link(parent=self.wf.start, child=self.wf.end, name="related").save()
+    fork1 = add_node(self.wf, 'fork-name-1', 'fork', [self.wf.start])
+    action1 = add_node(self.wf, 'action-name-1', 'mapreduce', [fork1])
+    action2 = add_node(self.wf, 'action-name-2', 'mapreduce', [fork1])
+    join1 = add_node(self.wf, 'join-name-1', 'join', [action1, action2])
+    Link(parent=fork1, child=join1, name="related").save()
+    action3 = add_node(self.wf, 'action-name-3', 'mapreduce', [join1])
+    Link(parent=action3, child=self.wf.end, name="ok").save()
+
+
+class TestAPI(OozieMockBase):
+
+  def setUp(self):
+    OozieMockBase.setUp(self)
+
+    # When updating wf, update wf_json as well!
+    self.wf = Workflow.objects.get(name='wf-name-1')
+
+  def test_workflow_save(self):
+    self.setup_simple_workflow()
+
+    workflow_dict = workflow_to_dict(self.wf)
+    workflow_dict = remove_related_fields( workflow_dict )
+    workflow_json = json.dumps(workflow_dict)
+
+    response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json})
+    test_response_json = response.content
+    test_response_json_object = json.loads(test_response_json)
+    assert_equal(0, test_response_json_object['status'])
+
+    # Change property and save
+    workflow_dict = workflow_to_dict(self.wf)
+    workflow_dict = remove_related_fields( workflow_dict )
+    workflow_dict['description'] = 'test'
+    workflow_json = json.dumps(workflow_dict)
+
+    response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json})
+    test_response_json = response.content
+    test_response_json_object = json.loads(test_response_json)
+    assert_equal(0, test_response_json_object['status'])
+
+    wf = Workflow.objects.get(id=self.wf.id)
+    assert_equal('test', wf.description)
+    assert_equal(self.wf.name, wf.name)
+
+    # Change node and save
+    workflow_dict = workflow_to_dict(self.wf)
+    workflow_dict = remove_related_fields( workflow_dict )
+    workflow_dict['nodes'][2]['name'] = 'new-name'
+    node_id = workflow_dict['nodes'][2]['id']
+    workflow_json = json.dumps(workflow_dict)
+
+    response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json})
+    test_response_json = response.content
+    test_response_json_object = json.loads(test_response_json)
+    assert_equal(0, test_response_json_object['status'])
+
+    node = Node.objects.get(id=node_id)
+    assert_equal('new-name', node.name)
+
+  def test_workflow_save_fail(self):
+    self.setup_simple_workflow()
+
+    # Bad workflow name
+    workflow_dict = workflow_to_dict(self.wf)
+    del workflow_dict['name']
+    workflow_dict = remove_related_fields( workflow_dict )
+    workflow_json = json.dumps(workflow_dict)
+
+    response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(400, response.status_code)
+
+    # Bad node name
+    workflow_dict = workflow_to_dict(self.wf)
+    del workflow_dict['nodes'][2]['name']
+    workflow_dict = remove_related_fields( workflow_dict )
+    workflow_json = json.dumps(workflow_dict)
+
+    response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(400, response.status_code)
+
+  def test_workflow(self):
+    response = self.c.get(reverse('oozie:workflow', kwargs={'workflow': self.wf.pk}))
+    test_response_json = response.content
+    test_response_json_object = json.loads(test_response_json)
+
+    assert_equal(0, test_response_json_object['status'])
+
+
+class TestAPIPermissionsWithOozie(OozieBase):
+
+  def setUp(self):
+    OozieBase.setUp(self)
+
+    # When updating wf, update wf_json as well!
+    self.wf = Workflow.objects.get(name='MapReduce').clone(self.cluster.fs, self.user)
+
+  def test_workflow_save(self):
+    # Share
+    self.wf.is_shared = True
+    self.wf.save()
+    Workflow.objects.check_workspace(self.wf, self.cluster.fs)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    workflow_dict = workflow_to_dict(self.wf)
+    workflow_dict = remove_related_fields(workflow_dict)
+    workflow_json = json.dumps(workflow_dict)
+
+    response = client_not_me.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(401, response.status_code, response.status_code)
+
+    response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    test_response_json = response.content
+    test_response_json_object = json.loads(test_response_json)
+    assert_equal(200, response.status_code, response)
+    assert_equal(0, test_response_json_object['status'])
+
+  def test_workflow_save_fail(self):
+    # Unshare
+    self.wf.is_shared = False
+    self.wf.save()
+    Workflow.objects.check_workspace(self.wf, self.cluster.fs)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    workflow_dict = workflow_to_dict(self.wf)
+    del workflow_dict['name']
+    workflow_dict = remove_related_fields( workflow_dict )
+    workflow_json = json.dumps(workflow_dict)
+
+    response = client_not_me.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(401, response.status_code, response)
+
+  def test_workflow(self):
+    # Share
+    self.wf.is_shared = True
+    self.wf.save()
+    Workflow.objects.check_workspace(self.wf, self.cluster.fs)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    response = client_not_me.get(reverse('oozie:workflow', kwargs={'workflow': self.wf.pk}), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    test_response_json = response.content
+    test_response_json_object = json.loads(test_response_json)
+    assert_equal(200, response.status_code, response)
+    assert_equal(0, test_response_json_object['status'])
+
+  def test_workflow_fail(self):
+    # Unshare
+    self.wf.is_shared = False
+    self.wf.save()
+    Workflow.objects.check_workspace(self.wf, self.cluster.fs)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    response = client_not_me.get(reverse('oozie:workflow', kwargs={'workflow': self.wf.pk}), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(401, response.status_code)
+
+
+
 class TestEditor(OozieMockBase):
 
   def test_find_parameters(self):
+    self.setup_simple_workflow()
+
     jobs = [Job(name="$a"),
             Job(name="foo ${b} $$"),
             Job(name="${foo}", description="xxx ${foo}")]
@@ -177,113 +428,16 @@ class TestEditor(OozieMockBase):
 
 
   def test_find_all_parameters(self):
-        assert_equal([{'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
-                     self.wf.find_all_parameters())
+    self.setup_simple_workflow()
 
-
-  def test_move_up(self):
-    action1 = Node.objects.get(name='action-name-1')
-    action2 = Node.objects.get(name='action-name-2')
-    action3 = Node.objects.get(name='action-name-3')
-
-    # 1
-    # 2
-    # 3
-    move_up(self.c, self.wf, action2)
-    move_up(self.c, self.wf, action3)
-
-    # 1 2
-    # 3
-    move_up(self.c, self.wf, action1)
-    move_up(self.c, self.wf, action2)
-
-    # 1
-    # 2
-    # 3
-    move_up(self.c, self.wf, action2)
-
-    # 1 2
-    #  3
-    action4 = add_action(self.wf.id, action2.id, 'name-4', self.c)
-    move_up(self.c, self.wf, action4)
-
-    # 1 2 3 4
-
-
-  def test_move_down(self):
-    action1 = Node.objects.get(name='action-name-1')
-    action2 = Node.objects.get(name='action-name-2')
-    action3 = Node.objects.get(name='action-name-3')
-
-    # 1
-    # 2
-    # 3
-    move_down(self.c, self.wf, action1)
-    move_down(self.c, self.wf, action2)
-
-    # 1
-    # 2
-    # 3
-    move_down(self.c, self.wf, action2)
-    move_down(self.c, self.wf, action1)
-
-    # 1 2 3
-    move_down(self.c, self.wf, action3)
-    move_down(self.c, self.wf, action2)
-
-    # 1
-    # 2 3
-    action4 = add_action(self.wf.id, action2.id, 'name-4', self.c)
-
-    #  1
-    # 2 3
-    # 4
-    move_down(self.c, self.wf, action4)
-    move_down(self.c, self.wf, action3)
-    move_down(self.c, self.wf, action4)
-
-    # 1
-    # 2
-    # 3
-    # 4
-
-
-  def test_clone_action(self):
-    # Need to be tested in edit:workflow too
-    action1 = Node.objects.get(name='action-name-1')
-
-    node_count = self.wf.actions.count()
-    assert_true(1, len(action1.get_children()))
-
-    response = self.c.post(reverse('oozie:clone_action', args=[action1.id]), {}, follow=True)
-
-    assert_not_equal(action1.id, action1.get_children()[1].id)
-    assert_true(2, len(action1.get_children()))
-    assert_equal(node_count + 1, self.wf.actions.count())
-
-
-  def test_delete_action(self):
-    action1 = Node.objects.get(name='action-name-1')
-
-    action_count = self.wf.actions.count()
-    assert_true(3, action_count)
-
-    self.c.post(reverse('oozie:delete_action', args=[action1.id]), {}, follow=True)
-    self.wf = Workflow.objects.get(name='wf-name-1')
-    assert_false(self.wf.actions.filter(name='action-name-1').exists())
-
-    assert_true(2, self.wf.actions.count())
-    assert_equal(action_count - 1, self.wf.actions.count())
-
-    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-2').id]), {}, follow=True)
-    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-3').id]), {}, follow=True)
-
-    assert_equal(0, self.wf.actions.count())
+    assert_equal([{'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
+                 self.wf.find_all_parameters())
 
 
   def test_workflow_has_cycle(self):
+    self.setup_simple_workflow()
+
     action1 = Node.objects.get(name='action-name-1')
-    action2 = Node.objects.get(name='action-name-2')
     action3 = Node.objects.get(name='action-name-3')
 
     assert_false(self.wf.has_cycle())
@@ -295,71 +449,9 @@ class TestEditor(OozieMockBase):
     assert_true(self.wf.has_cycle())
 
 
-  def test_workflow_has_cycle_in_fork(self):
-    action1 = Node.objects.get(name='action-name-1')
-    action2 = Node.objects.get(name='action-name-2')
-    action3 = Node.objects.get(name='action-name-3')
-    action4 = add_action(self.wf.id, action3.id, 'action-name-4', self.c)
-
-    move_up(self.c, self.wf, action2)
-    move_up(self.c, self.wf, action4)
-
-    # start
-    # 1 2
-    # 3 4
-
-    assert_false(self.wf.has_cycle())
-
-    ok = action4.get_link('ok')
-    ok.child = action2
-    ok.save()
-
-    assert_true(self.wf.has_cycle())
-
-
-  def test_decision_node(self):
-    action1 = Node.objects.get(name='action-name-1')
-    action2 = Node.objects.get(name='action-name-2')
-    action3 = Node.objects.get(name='action-name-3')
-
-    move_down(self.c, self.wf, action1)
-    fork = action1.get_parent()
-    assert_false(fork.has_decisions())
-
-    # 1 2
-    #  3
-    response = self.c.get(reverse('oozie:edit_workflow_fork', args=[fork.id]), {}, follow=True)
-    assert_true('this Fork has some other actions below' in response.content, response.content)
-
-    self.c.post(reverse('oozie:delete_action', args=[action3.id]), {})
-
-    response = self.c.get(reverse('oozie:edit_workflow_fork', args=[fork.id]), {}, follow=True)
-    assert_false('this Fork has some other actions below' in response.content, response.content)
-
-    # Missing information for converting to decision
-    response = self.c.post(reverse('oozie:edit_workflow_fork', args=[fork.id]), {
-        u'form-MAX_NUM_FORMS': [u'0'], u'form-TOTAL_FORMS': [u'2'], u'form-INITIAL_FORMS': [u'2'],
-        u'form-0-comment': [u''], u'form-0-id': [u'%s' % action1.id],
-        u'form-1-comment': [u''], u'form-1-id': [u'%s' % action2.id],
-        u'child': [u'%s' % self.wf.end.id]}, follow=True)
-    assert_true('This field is required' in response.content, response.content)
-    assert_false(fork.has_decisions())
-
-    # Convert to decision
-    response = self.c.post(reverse('oozie:edit_workflow_fork', args=[fork.id]), {
-        u'form-MAX_NUM_FORMS': [u'0'], u'form-TOTAL_FORMS': [u'2'], u'form-INITIAL_FORMS': [u'2'],
-        u'form-0-comment': [u'output'], u'form-0-id': [u'%s' % action1.id],
-        u'form-1-comment': [u'output'], u'form-1-id': [u'%s' % action2.id],
-        u'child': [u'%s' % self.wf.end.id]}, follow=True)
-
-    raise SkipTest
-    # Mystery below, link_formset.save() does not appear to save the links during a test
-    assert_true('Decision' in response.content, response.content)
-    assert_equal(Fork.ACTION_DECISION_TYPE, fork.node_type)
-    assert_true(fork.has_decisions(), response.content)
-
-
   def test_workflow_gen_xml(self):
+    self.setup_simple_workflow()
+
     assert_equal(
         '<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.2">\n'
         '    <global>\n'
@@ -433,158 +525,31 @@ class TestEditor(OozieMockBase):
         '</workflow-app>'.split(), self.wf.to_xml().split())
 
 
-  def test_edit_workflow(self):
-    response = self.c.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
-    assert_true('Editor' in response.content, response.content)
-    assert_true('Workflow wf-name-1' in response.content, response.content)
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = self.c.post(reverse('oozie:edit_workflow', args=[self.wf.id]), {})
-      assert_true('jHueNotify.error' in response.content, response.content)
-    finally:
-      finish()
-
-    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-2').id]), {}, follow=True)
-    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-3').id]), {}, follow=True)
-
-    node_ids = [node.id for node in self.wf.node_list]
-
-    post = {u'node_set-TOTAL_FORMS': [u'4'], u'node_set-MAX_NUM_FORMS': [u'0'], u'node_set-INITIAL_FORMS': [u'4'],
-            u'node_set-0-id': [node_ids[0]], u'node_set-0-workflow': [u'16'],
-            u'node_set-1-id': [node_ids[1]], u'node_set-1-workflow': [u'16'],
-            u'node_set-2-id': [node_ids[2]], u'node_set-2-workflow': [u'16'],
-            u'node_set-3-id': [node_ids[3]], u'node_set-3-workflow': [u'16']}
-    post.update(WORKFLOW_DICT)
-
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = self.c.post(reverse('oozie:edit_workflow', args=[self.wf.id]), post)
-      assert_false('jHueNotify.error' in response.content, response.content)
-
-      self.wf = Workflow.objects.get(name='wf-name-1')
-      assert_true(self.wf.actions.filter(name='action-name-1').exists())
-      assert_true(1, self.wf.actions.count())
-
-      for field, value in WORKFLOW_DICT.iteritems():
-        if field not in ('params', 'deployment_dir'):
-          assert_equal(value[0], getattr(self.wf, field))
-    finally:
-      finish()
-
-
-  def test_workflow_action(self):
-    response = self.c.get(reverse('oozie:new_action', args=[self.wf.id, 'java', self.wf.start.id]))
-    assert_true('action="/oozie/new_action/%d/java/' % self.wf.id in response.content, response.content)
-
-    data = {u'job_xml': [u'job.xml'], u'files': [u'["my_file"]'], u'name': [u'TestActionSleep'],
-            u'jar_path': [u'/user/hue/oozie/examples/lib/hadoop-examples.jar'], u'java_opts': [u'-d64'],
-            u'args': [u'${n}'],
-            u'job_properties': [u'[{"name":"mapred.job.queue.name","value":"prod"}{"value":"${input}","type":"delete"},{"value":"${input}","type":"mkdir"}]'],
-            u'prepares': [u'[]'],
-            u'params': [u'[]'], u'archives': [u'["my_archive.zip"]'],
-            u'main_class': [u'org.apache.hadoop.examples.SleepJob'],
-            u'description': [u'An action that sleeps']}
-
-    response = self.c.post(reverse('oozie:new_action', args=[self.wf.id, 'java', self.wf.start.id]), data, follow=True)
-    assert_true('action="/oozie/edit_workflow/%d"' % self.wf.id in response.content, response.content)
-
-    action = Node.objects.get(name='TestActionSleep').get_full_node()
-    for field, value in data.iteritems():
-      if field != 'params':
-        assert_equal(value[0], getattr(action, field))
-
-    response = self.c.post(reverse('oozie:edit_action', args=[action.id]), data, follow=True)
-    assert_true('action="/oozie/edit_workflow/%d"' % self.wf.id in response.content, response.content)
-
-    action = Node.objects.get(name='TestActionSleep').get_full_node()
-    for field, value in data.iteritems():
-      if field != 'params':
-        assert_equal(value[0], getattr(action, field))
-
-
   def test_workflow_flatten_list(self):
+    self.setup_simple_workflow()
+
     assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
                  '<Kill: kill>, <End: end>]',
                  str(self.wf.node_list))
 
-    action1 = Node.objects.get(name='action-name-1')
-    action2 = Node.objects.get(name='action-name-2')
-    action3 = Node.objects.get(name='action-name-3')
-
     # 1 2
     #  3
-    move_up(self.c, self.wf, action2)
+    self.setup_forking_workflow()
 
-    assert_equal('[<Start: start>, <Fork: fork-7>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, '
-                 '<Join: join-8>, <Mapreduce: action-name-3>, <Kill: kill>, <End: end>]',
+    assert_equal('[<Start: start>, <Fork: fork-name-1>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, '
+                 '<Join: join-name-1>, <Mapreduce: action-name-3>, <Kill: kill>, <End: end>]',
                  str(self.wf.node_list))
-
-  def test_workflow_action_permissions(self):
-    # Login as someone else
-    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
-    grant_access("not_me", "test", "oozie")
-
-    action1 = Node.objects.get(name='action-name-1')
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_action', args=[action1.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:edit_action', args=[action1.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Delete
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:delete_action', args=[action1.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    action1.workflow.is_shared = True
-    action1.workflow.save()
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_action', args=[action1.id]))
-      assert_false('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:edit_action', args=[action1.id]))
-      assert_true('Not allowed' in response.content, response.content)
-    finally:
-      finish()
-
-    # Delete
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:delete_action', args=[action1.id]))
-      assert_true('Not allowed' in response.content, response.content)
-    finally:
-      finish()
 
 
   def test_create_coordinator(self):
+    self.setup_simple_workflow()
+
     create_coordinator(self.wf, self.c)
 
 
   def test_clone_coordinator(self):
+    self.setup_simple_workflow()
+
     coord = create_coordinator(self.wf, self.c)
     coordinator_count = Coordinator.objects.count()
 
@@ -615,6 +580,8 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_workflow_access_permissions(self):
+    self.setup_simple_workflow()
+
     self.wf.is_shared = True
     self.wf.save()
 
@@ -661,6 +628,8 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_gen_xml(self):
+    self.setup_simple_workflow()
+
     coord = create_coordinator(self.wf, self.c)
 
     assert_equal(
@@ -683,6 +652,8 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_with_data_input_gen_xml(self):
+    self.setup_simple_workflow()
+
     coord = create_coordinator(self.wf, self.c)
     create_dataset(coord, self.c)
     create_coordinator_data(coord, self.c)
@@ -723,11 +694,15 @@ class TestEditor(OozieMockBase):
 
 
   def test_create_coordinator_dataset(self):
+    self.setup_simple_workflow()
+
     coord = create_coordinator(self.wf, self.c)
     create_dataset(coord, self.c)
 
 
   def test_create_coordinator_input_data(self):
+    self.setup_simple_workflow()
+
     coord = create_coordinator(self.wf, self.c)
     create_dataset(coord, self.c)
 
@@ -739,11 +714,15 @@ class TestEditor(OozieMockBase):
 
 
   def test_get_workflow_parameters(self):
+    self.setup_simple_workflow()
+
     assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
                  self.wf.find_all_parameters())
 
 
   def test_get_coordinator_parameters(self):
+    self.setup_simple_workflow()
+
     coord = create_coordinator(self.wf, self.c)
 
     create_dataset(coord, self.c)
@@ -758,25 +737,13 @@ class TestPermissions(OozieBase):
   def setUp(self):
     self.c = make_logged_in_client()
     self.wf = create_workflow(self.c)
-
-    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-2').id]), {}, follow=True)
-    self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-3').id]), {}, follow=True)
-
-    node_ids = [node.id for node in self.wf.node_list]
-
-    self.WF_POST = {u'node_set-TOTAL_FORMS': [u'4'], u'node_set-MAX_NUM_FORMS': [u'0'], u'node_set-INITIAL_FORMS': [u'4'],
-               u'node_set-0-id': [node_ids[0]], u'node_set-0-workflow': [self.wf.id],
-               u'node_set-1-id': [node_ids[1]], u'node_set-1-workflow': [self.wf.id],
-               u'node_set-2-id': [node_ids[2]], u'node_set-2-workflow': [self.wf.id],
-               u'node_set-3-id': [node_ids[3]], u'node_set-3-workflow': [self.wf.id]}
-    self.WF_POST.update(WORKFLOW_DICT)
-
+    self.setup_simple_workflow()
 
 
   def test_workflow_permissions(self):
     response = self.c.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
     assert_true('Editor' in response.content, response.content)
-    assert_true('Workflow wf-name-1' in response.content, response.content)
+    assert_true('Save' in response.content, response.content)
     assert_false(self.wf.is_shared)
 
     # Login as someone else
@@ -813,11 +780,10 @@ class TestPermissions(OozieBase):
       finish()
 
     # Share it !
-    post = self.WF_POST.copy()
-    post['is_shared'] = [u'on']
-    self.c.post(reverse('oozie:edit_workflow', args=[self.wf.id]), post, follow=True)
     self.wf = Workflow.objects.get(name='wf-name-1')
-    assert_true(self.wf.is_shared)
+    self.wf.is_shared = True
+    self.wf.save()
+    Workflow.objects.check_workspace(self.wf, self.cluster.fs)
 
     # List
     finish = SHARE_JOBS.set_for_testing(True)
@@ -833,21 +799,14 @@ class TestPermissions(OozieBase):
     try:
       response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
       assert_false('Permission denied' in response.content, response.content)
-      assert_false('Save' in response.content, response.content)
+      assert_true('Save' in response.content, response.content)
     finally:
       finish()
+
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
       assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:edit_workflow', args=[self.wf.id]), post, follow=True)
-      assert_true('Not allowed' in response.content, response.content)
     finally:
       finish()
 
@@ -905,79 +864,6 @@ class TestPermissions(OozieBase):
     assert_equal(200, response.status_code)
 
 
-  def test_workflow_action_permissions(self):
-    # Login as someone else
-    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
-    grant_access("not_me", "test", "oozie")
-
-    action1 = Node.objects.get(name='action-name-1')
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_action', args=[action1.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:edit_action', args=[action1.id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Add
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      try:
-        add_action(self.wf.id, self.wf.start.id, 'action-name-1000', client_not_me)
-        raise Exception('Should be denied to add an action to someone else workflow')
-      except AssertionError:
-        pass
-    finally:
-      finish()
-
-    action1.workflow.is_shared = True
-    action1.workflow.save()
-
-    # Delete
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:delete_action', args=[action1.id]))
-      assert_true('Not allowed' in response.content, response.content)
-    finally:
-      finish()
-
-    action1.workflow.is_shared = True
-    action1.workflow.save()
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.get(reverse('oozie:edit_action', args=[action1.id]))
-      assert_false('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    # Edit
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:edit_action', args=[action1.id]))
-      assert_true('Not allowed' in response.content, response.content)
-    finally:
-      finish()
-
-    # Delete
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:delete_action', args=[action1.id]))
-      assert_true('Not allowed' in response.content, response.content)
-    finally:
-      finish()
-
-
   def test_coordinator_permissions(self):
     coord = create_coordinator(self.wf, self.c)
 
@@ -1020,11 +906,10 @@ class TestPermissions(OozieBase):
       finish()
 
     # Share it !
-    post = self.WF_POST.copy()
-    post['is_shared'] = [u'on']
-    self.c.post(reverse('oozie:edit_workflow', args=[coord.workflow.id]), post, follow=True)
     wf = Workflow.objects.get(id=coord.workflow.id)
-    assert_true(wf.is_shared)
+    wf.is_shared = True
+    wf.save()
+    Workflow.objects.check_workspace(wf, self.cluster.fs)
 
     post = COORDINATOR_DICT.copy()
     post.update({
@@ -1133,6 +1018,7 @@ class TestEditorWithOozie(OozieBase):
   def setUp(self):
     self.c = make_logged_in_client()
     self.wf = create_workflow(self.c)
+    self.setup_simple_workflow()
 
 
   def tearDown(self):
@@ -1166,6 +1052,8 @@ class TestEditorWithOozie(OozieBase):
 
 
   def test_import_action(self):
+    raise SkipTest
+
     # Setup jobsub examples
     if not jobsub_setup.Command().has_been_setup():
       jobsub_setup.Command().handle()
@@ -1375,6 +1263,55 @@ class TestDashboard(OozieMockBase):
     assert_false('Permission denied' in response.content, response.content)
 
 
+class TestUtils(OozieMockBase):
+
+  def setUp(self):
+    OozieMockBase.setUp(self)
+
+    # When updating wf, update wf_json as well!
+    self.wf = Workflow.objects.get(name='wf-name-1')
+
+
+  def test_workflow_to_dict(self):
+    workflow_dict = workflow_to_dict(self.wf)
+
+    # Test properties
+    assert_true('job_xml' in workflow_dict, workflow_dict)
+    assert_true('is_shared' in workflow_dict, workflow_dict)
+    assert_true('end' in workflow_dict, workflow_dict)
+    assert_true('description' in workflow_dict, workflow_dict)
+    assert_true('parameters' in workflow_dict, workflow_dict)
+    assert_true('is_single' in workflow_dict, workflow_dict)
+    assert_true('deployment_dir' in workflow_dict, workflow_dict)
+    assert_true('schema_version' in workflow_dict, workflow_dict)
+    assert_true('job_properties' in workflow_dict, workflow_dict)
+    assert_true('start' in workflow_dict, workflow_dict)
+    assert_true('nodes' in workflow_dict, workflow_dict)
+    assert_true('id' in workflow_dict, workflow_dict)
+    assert_true('name' in workflow_dict, workflow_dict)
+
+    # Check links
+    for node in workflow_dict['nodes']:
+      assert_true('child_links' in node, node)
+
+      for link in node['child_links']:
+        assert_true('name' in link, link)
+        assert_true('comment' in link, link)
+        assert_true('parent' in link, link)
+        assert_true('child' in link, link)
+
+
+  def test_model_to_dict(self):
+    node_dict = model_to_dict(self.wf.node_set.filter(node_type='start')[0])
+
+    # Test properties
+    assert_true('id' in node_dict)
+    assert_true('name' in node_dict)
+    assert_true('description' in node_dict)
+    assert_true('node_type' in node_dict)
+    assert_true('workflow' in node_dict)
+
+
 # Utils
 WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''],
                  u'schema_version': [u'uri:oozie:workflow:0.2'],
@@ -1395,41 +1332,66 @@ COORDINATOR_DICT = {u'name': [u'MyCoord'], u'description': [u'Description of my 
                     u'throttle': [u'10'],
                     u'schema_version': [u'uri:oozie:coordinator:0.1']
 }
-ACTION_DICT = {
-       u'files': [u'[]'], u'name': ['name'], u'jar_path': ['/user/hue/oozie/examples/lib/hadoop-examples.jar'],
-       u'job_properties': [u'[{"name":"sleep","value":"${SLEEP}"}]'],
-       u'archives': [u'[]'], u'description': [u''],
-       u'prepares': [u'[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]'],
-}
 
 
-def add_action(workflow, action, name, client):
-  post = ACTION_DICT.copy()
-  post['name'] = name
-  response = client.post("/oozie/new_action/%s/%s/%s" % (workflow, 'mapreduce', action), post, follow=True)
+def remove_related_fields(workflow_dict):
+  """
+  workflow_dict is a workflow that has been converted into a dictionary via workflow_to_dict
+  """
 
-  assert_true(Node.objects.filter(name=name).exists(), response)
-  return Node.objects.get(name=name)
+  del workflow_dict['owner']
+  del workflow_dict['job_ptr']
+  for node in workflow_dict['nodes']:
+    del node['node_ptr']
+  return workflow_dict
 
 
-def create_workflow(client):
-  Workflow.objects.filter(name='wf-name-1').delete()
-  Node.objects.filter(name__in=['action-name-1', 'action-name-2', 'action-name-3']).delete()
+def add_node(workflow, name, node_type, parents, attrs={}):
+  """
+  create a node of type node_type and associate the listed parents.
+  """
+  NodeClass = NODE_TYPES[node_type]
+  node = NodeClass(workflow=workflow, node_type=node_type, name=name)
+  for attr in attrs:
+    setattr(node, attr, attrs[attr])
+  node.save()
+
+  # Add parent
+  # If skipped, remember to preserve order: regular links first, then error link
+  if parents:
+    for parent in parents:
+      name = 'ok'
+      if parent.node_type == 'start' or parent.node_type == 'join':
+        name = 'to'
+      elif parent.node_type == 'fork' or parent.node_type == 'decision':
+        name = 'start'
+      link = Link(parent=parent, child=node, name=name)
+      link.save()
+
+  # Create error link
+  if node_type != 'fork' and node_type != 'decision' and node_type != 'join':
+    link = Link(parent=node, child=Kill.objects.get(name='kill', workflow=workflow), name="error")
+  link.save()
+
+  return node
+
+
+def create_workflow(client, workflow_dict=WORKFLOW_DICT):
+  name = str(workflow_dict['name'][0])
+
+  Node.objects.filter(workflow__name=name).delete()
+  Workflow.objects.filter(name=name).delete()
 
   workflow_count = Workflow.objects.count()
   response = client.get(reverse('oozie:create_workflow'))
   assert_equal(workflow_count, Workflow.objects.count(), response)
 
-  response = client.post(reverse('oozie:create_workflow'), WORKFLOW_DICT, follow=True)
+  response = client.post(reverse('oozie:create_workflow'), workflow_dict, follow=True)
   assert_equal(200, response.status_code)
   assert_equal(workflow_count + 1, Workflow.objects.count(), response)
 
-  wf = Workflow.objects.get(name='wf-name-1')
+  wf = Workflow.objects.get(name=name)
   assert_not_equal('', wf.deployment_dir)
-
-  action1 = add_action(wf.id, wf.start.id, 'action-name-1', client)
-  action2 = add_action(wf.id, action1.id, 'action-name-2', client)
-  action3 = add_action(wf.id, action2.id, 'action-name-3', client)
 
   return wf
 
@@ -1463,21 +1425,3 @@ def create_coordinator_data(coord, client):
                          {u'input-name': [u'input_dir'], u'input-dataset': [u'1']})
   data = json.loads(response.content)
   assert_equal(0, data['status'], data['data'])
-
-
-def move(client, wf, direction, action):
-  try:
-    LOG.info(wf.get_hierarchy())
-    LOG.info('%s %s' % (direction, action))
-    assert_equal(200, client.post(reverse(direction, args=[action.id]), {}, follow=True).status_code)
-  except:
-    raise
-
-
-def move_up(client, wf, action):
-  move(client, wf, 'oozie:move_up_action', action)
-
-
-def move_down(client, wf, action):
-  move(client, wf, 'oozie:move_down_action', action)
-

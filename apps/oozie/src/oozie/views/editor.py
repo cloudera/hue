@@ -25,10 +25,10 @@ import logging
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.forms.formsets import formset_factory
-from django.forms.models import inlineformset_factory, modelformset_factory
+from django.forms.models import inlineformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.utils.functional import curry, wraps
+from django.utils.functional import curry
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render, extract_field_data
@@ -39,134 +39,19 @@ from jobsub.models import OozieDesign
 from liboozie.submittion import Submission
 
 from oozie.conf import SHARE_JOBS
+from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
+                             check_action_access_permission, check_action_edition_permission,\
+                             check_dataset_access_permission, check_dataset_edition_permission
 from oozie.import_jobsub import convert_jobsub_design
 from oozie.management.commands import oozie_setup
-from oozie.models import Job, Workflow, Node, Link, History, Coordinator,\
-  Mapreduce, Java, Streaming, Dataset, DataInput, DataOutput,\
-  _STD_PROPERTIES_JSON
-from oozie.forms import NodeForm, WorkflowForm, CoordinatorForm, DatasetForm,\
+from oozie.models import Job, Workflow, History, Coordinator,Mapreduce, Java, Streaming,\
+                         Dataset, DataInput, DataOutput, ACTION_TYPES
+from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataInputSetForm, DataOutputForm, DataOutputSetForm, LinkForm,\
   DefaultLinkForm, design_form_by_type, ImportJobsubDesignForm, ParameterForm
 
 
 LOG = logging.getLogger(__name__)
-
-
-
-def check_job_access_permission(view_func):
-  """
-  Decorator ensuring that the user has access to the workflow or coordinator.
-
-  Arg: 'workflow' or 'coordinator' id.
-  Return: the workflow of coordinator or raise an exception
-
-  Notice: its gets an id in input and returns the full object in output (not an id).
-  """
-  def decorate(request, *args, **kwargs):
-    if 'workflow' in kwargs:
-      job_type = 'workflow'
-    else:
-      job_type = 'coordinator'
-
-    job = kwargs.get(job_type)
-    if job is not None:
-      job = Job.objects.is_accessible_or_exception(request, job)
-    kwargs[job_type] = job
-
-    return view_func(request, *args, **kwargs)
-  return wraps(view_func)(decorate)
-
-
-def check_job_edition_permission(authorize_get=False):
-  """
-  Decorator ensuring that the user has the permissions to modify a workflow or coordinator.
-
-  Need to appear below @check_job_access_permission
-  """
-  def inner(view_func):
-    def decorate(request, *args, **kwargs):
-      if 'workflow' in kwargs:
-        job_type = 'workflow'
-      else:
-        job_type = 'coordinator'
-
-      job = kwargs.get(job_type)
-      if job is not None and not (authorize_get and request.method == 'GET'):
-        Job.objects.can_edit_or_exception(request, job)
-
-      return view_func(request, *args, **kwargs)
-    return wraps(view_func)(decorate)
-  return inner
-
-
-def check_action_access_permission(view_func):
-  """
-  Decorator ensuring that the user has access to the workflow action.
-
-  Arg: 'workflow action' id.
-  Return: the workflow action or raise an exception
-
-  Notice: its gets an id in input and returns the full object in output (not an id).
-  """
-  def decorate(request, *args, **kwargs):
-    action_id = kwargs.get('action')
-    action = Node.objects.get(id=action_id).get_full_node()
-    Job.objects.is_accessible_or_exception(request, action.workflow.id)
-    kwargs['action'] = action
-
-    return view_func(request, *args, **kwargs)
-  return wraps(view_func)(decorate)
-
-
-def check_action_edition_permission(view_func):
-  """
-  Decorator ensuring that the user has the permissions to modify a workflow action.
-
-  Need to appear below @check_action_access_permission
-  """
-  def decorate(request, *args, **kwargs):
-    action = kwargs.get('action')
-    Job.objects.can_edit_or_exception(request, action.workflow)
-
-    return view_func(request, *args, **kwargs)
-  return wraps(view_func)(decorate)
-
-
-def check_dataset_access_permission(view_func):
-  """
-  Decorator ensuring that the user has access to dataset.
-
-  Arg: 'dataset'.
-  Return: the dataset or raise an exception
-
-  Notice: its gets an id in input and returns the full object in output (not an id).
-  """
-  def decorate(request, *args, **kwargs):
-    dataset = kwargs.get('dataset')
-    if dataset is not None:
-      dataset = Dataset.objects.is_accessible_or_exception(request, dataset)
-    kwargs['dataset'] = dataset
-
-    return view_func(request, *args, **kwargs)
-  return wraps(view_func)(decorate)
-
-
-def check_dataset_edition_permission(authorize_get=False):
-  """
-  Decorator ensuring that the user has the permissions to modify a dataset.
-  A dataset can be edited if the coordinator that owns the dataset can be edited.
-
-  Need to appear below @check_dataset_access_permission
-  """
-  def inner(view_func):
-    def decorate(request, *args, **kwargs):
-      dataset = kwargs.get('dataset')
-      if dataset is not None and not (authorize_get and request.method == 'GET'):
-        Job.objects.can_edit_or_exception(request, dataset.coordinator)
-
-      return view_func(request, *args, **kwargs)
-    return wraps(view_func)(decorate)
-  return inner
 
 
 def list_workflows(request):
@@ -229,58 +114,27 @@ def create_workflow(request):
   })
 
 
-@check_job_access_permission
+@check_job_access_permission()
 def edit_workflow(request, workflow):
-  WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeForm, max_num=0, can_order=False, can_delete=False)
   history = History.objects.filter(submitter=request.user, job=workflow).order_by('-submission_date')
 
-  if request.method == 'POST' and Job.objects.can_edit_or_exception(request, workflow):
-    try:
-      workflow_form = WorkflowForm(request.POST, instance=workflow)
-      actions_formset = WorkflowFormSet(request.POST, request.FILES, instance=workflow)
-
-      if 'clone_action' in request.POST: return clone_action(request, action=request.POST['clone_action'])
-      if 'delete_action' in request.POST: return delete_action(request, action=request.POST['delete_action'])
-      if 'move_up_action' in request.POST: return move_up_action(request, action=request.POST['move_up_action'])
-      if 'move_down_action' in request.POST: return move_down_action(request, action=request.POST['move_down_action'])
-
-      if workflow_form.is_valid() and actions_formset.is_valid():
-        workflow = workflow_form.save()
-        actions_formset.save()
-
-        if workflow.has_cycle():
-          raise PopupException(_('Sorry, this operation is not creating a cycle which would break the workflow.'))
-
-        Workflow.objects.check_workspace(workflow, request.fs)
-
-        request.info(_("Workflow saved!"))
-        return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
-    except Exception, e:
-      request.error(_('Sorry, this operation is not supported: %(error)s') % {'error': e})
-
   workflow_form = WorkflowForm(instance=workflow)
-  actions_formset = WorkflowFormSet(instance=workflow)
 
-  graph_options = {}
   user_can_edit_job = workflow.is_editable(request.user)
-  if not user_can_edit_job:
-    graph_options = {'template': 'editor/gen/workflow-graph-readonly.xml.mako'}
-
-  graph = workflow.gen_graph(actions_formset.forms, **graph_options)
 
   return render('editor/edit_workflow.mako', request, {
     'workflow_form': workflow_form,
     'workflow': workflow,
-    'actions_formset': actions_formset,
-    'graph': graph,
     'history': history,
     'user_can_edit_job': user_can_edit_job,
-    'parameters': extract_field_data(workflow_form['parameters']),
-    'job_properties': extract_field_data(workflow_form['job_properties'])
+    'job_properties': extract_field_data(workflow_form['job_properties']),
+    'link_form': LinkForm(),
+    'default_link_form': DefaultLinkForm(action=workflow.start),
+    'action_forms': [(node_type, design_form_by_type(node_type)()) for node_type in ACTION_TYPES.iterkeys()]
   })
 
 
-@check_job_access_permission
+@check_job_access_permission()
 @check_job_edition_permission()
 def delete_workflow(request, workflow):
   if request.method != 'POST':
@@ -292,7 +146,7 @@ def delete_workflow(request, workflow):
   return redirect(reverse('oozie:list_workflows'))
 
 
-@check_job_access_permission
+@check_job_access_permission()
 def clone_workflow(request, workflow):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
@@ -304,7 +158,7 @@ def clone_workflow(request, workflow):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@check_job_access_permission
+@check_job_access_permission()
 def submit_workflow(request, workflow):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
@@ -361,7 +215,7 @@ def resubmit_workflow(request, oozie_wf_id):
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
 
-@check_job_access_permission
+@check_job_access_permission()
 def schedule_workflow(request, workflow):
   if Coordinator.objects.filter(workflow=workflow).exists():
     request.info(_('You already have some coordinators for this workflow. Please submit one or create a new one.'))
@@ -370,71 +224,7 @@ def schedule_workflow(request, workflow):
     return create_coordinator(request, workflow=workflow.id)
 
 
-@check_job_access_permission
-@check_job_edition_permission()
-def new_action(request, workflow, node_type, parent_action_id):
-  ActionForm = design_form_by_type(node_type)
-
-  if request.method == 'POST':
-    action_form = ActionForm(request.POST)
-
-    if action_form.is_valid():
-      action = action_form.save(commit=False)
-      action.node_type = node_type
-      action.workflow = workflow
-      action.save()
-
-      workflow.add_action(action, parent_action_id)
-
-      return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
-  else:
-    action_form = ActionForm()
-
-  return render('editor/edit_workflow_action.mako', request, {
-      'workflow': workflow,
-      'job_properties': 'job_properties' in action_form.fields and extract_field_data(action_form['job_properties']) or '[]',
-      'files': 'files' in action_form.fields and extract_field_data(action_form['files']) or '[]',
-      'archives': 'archives' in action_form.fields and extract_field_data(action_form['archives']) or '[]',
-      'params': 'params' in action_form.fields and extract_field_data(action_form['params']) or '[]',
-      'prepares': 'prepares' in action_form.fields and extract_field_data(action_form['prepares']) or '[]',
-      'action_form': action_form,
-      'node_type': node_type,
-      'properties_hint': _STD_PROPERTIES_JSON,
-      'form_url': reverse('oozie:new_action', kwargs={'workflow': workflow.id,
-                                                      'node_type': node_type,
-                                                      'parent_action_id': parent_action_id}),
-      'can_edit_action': True,
-    })
-
-
-@check_action_access_permission
-def edit_action(request, action):
-  ActionForm = design_form_by_type(action.node_type)
-
-  if request.method == 'POST' and Job.objects.can_edit_or_exception(request, action.workflow):
-    action_form = ActionForm(request.POST, instance=action)
-    if action_form.is_valid():
-      action = action_form.save()
-      return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': action.workflow.id}))
-  else:
-    action_form = ActionForm(instance=action)
-
-  return render('editor/edit_workflow_action.mako', request, {
-    'workflow': action.workflow,
-    'job_properties': 'job_properties' in action_form.fields and extract_field_data(action_form['job_properties']) or '[]',
-    'files': 'files' in action_form.fields and extract_field_data(action_form['files']) or '[]',
-    'archives': 'archives' in action_form.fields and extract_field_data(action_form['archives']) or '[]',
-    'params': 'params' in action_form.fields and extract_field_data(action_form['params']) or '[]',
-    'prepares': 'prepares' in action_form.fields and extract_field_data(action_form['prepares']) or '[]',
-    'action_form': action_form,
-    'node_type': action.node_type,
-    'properties_hint': _STD_PROPERTIES_JSON,
-    'form_url': reverse('oozie:edit_action', kwargs={'action': action.id}),
-    'can_edit_action': action.workflow.is_editable(request.user)
-  })
-
-
-@check_job_access_permission
+@check_job_access_permission()
 def import_action(request, workflow, parent_action_id):
   available_actions = OozieDesign.objects.all()
 
@@ -461,46 +251,6 @@ def import_action(request, workflow, parent_action_id):
     'workflow': workflow,
     'available_actions': available_actions,
     'form_url': reverse('oozie:import_action', kwargs={'workflow': workflow.id, 'parent_action_id': parent_action_id}),
-  })
-
-@check_action_access_permission
-@check_action_edition_permission
-def edit_workflow_fork(request, action):
-  fork = action
-  LinkFormSet = modelformset_factory(Link, form=LinkForm, max_num=0)
-
-  if request.method == 'POST':
-    link_formset = LinkFormSet(request.POST)
-    default_link_form = DefaultLinkForm(request.POST, action=fork)
-
-    if link_formset.is_valid():
-      is_decision = fork.has_decisions()
-      link_formset.save()
-      if not is_decision and fork.has_decisions():
-        default_link = default_link_form.save(commit=False)
-        default_link.parent = fork
-        default_link.name = 'default'
-        default_link.comment = 'default'
-        default_link.save()
-        fork.convert_to_decision()
-      fork.update_description()
-
-      return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': fork.workflow.id}))
-  else:
-    if filter(lambda link: link.child.id != action.workflow.end.id,
-              [link for link in fork.get_child_join().get_children_links()]):
-      raise PopupException(_('Sorry, this Fork has some other actions below its Join and cannot be converted. '
-                             'Please delete the nodes below the Join.'))
-
-    link_formset = LinkFormSet(queryset=fork.get_children_links())
-    default_link = Link(parent=fork, name='default', comment='default')
-    default_link_form = DefaultLinkForm(action=fork, instance=default_link)
-
-  return render('editor/edit_workflow_fork.mako', request, {
-    'workflow': fork.workflow,
-    'fork': fork,
-    'link_formset': link_formset,
-    'default_link_form': default_link_form,
   })
 
 
@@ -548,7 +298,7 @@ def move_down_action(request, action):
     raise PopupException(_('A POST request is required.'))
 
 
-@check_job_access_permission
+@check_job_access_permission()
 def create_coordinator(request, workflow=None):
   if workflow is not None:
     coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.1", workflow=workflow)
@@ -572,7 +322,7 @@ def create_coordinator(request, workflow=None):
   })
 
 
-@check_job_access_permission
+@check_job_access_permission()
 @check_job_edition_permission()
 def delete_coordinator(request, coordinator):
   if request.method != 'POST':
@@ -585,7 +335,7 @@ def delete_coordinator(request, coordinator):
   return redirect(reverse('oozie:list_coordinators'))
 
 
-@check_job_access_permission
+@check_job_access_permission()
 @check_job_edition_permission(True)
 def edit_coordinator(request, coordinator):
   history = History.objects.filter(submitter=request.user, job=coordinator).order_by('-submission_date')
@@ -643,7 +393,7 @@ def edit_coordinator(request, coordinator):
   })
 
 
-@check_job_access_permission
+@check_job_access_permission()
 @check_job_edition_permission()
 def create_coordinator_dataset(request, coordinator):
   """Returns {'status' 0/1, data:html or url}"""
@@ -698,7 +448,7 @@ def edit_coordinator_dataset(request, dataset):
   }, force_template=True)
 
 
-@check_job_access_permission
+@check_job_access_permission()
 @check_job_edition_permission()
 def create_coordinator_data(request, coordinator, data_type):
   """Returns {'status' 0/1, data:html or url}"""
@@ -729,7 +479,7 @@ def create_coordinator_data(request, coordinator, data_type):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@check_job_access_permission
+@check_job_access_permission()
 def clone_coordinator(request, coordinator):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
@@ -741,7 +491,7 @@ def clone_coordinator(request, coordinator):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@check_job_access_permission
+@check_job_access_permission()
 def submit_coordinator(request, coordinator):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 

@@ -451,11 +451,10 @@ class WebHdfs(Hdfs):
     for stat in self.listdir_stats(source):
       source_file = stat.path
       destination_file = posixpath.join(destination, stat.name)
-      print source_file, destination_file
       if stat.isDir:
         self.copy_remote_dir(source_file, destination_file, dir_mode, owner)
       else:
-        self.copyfile(source_file, destination_file)
+        self.do_as_user(owner, self.copyfile, source_file, destination_file)
         self.do_as_superuser(self.chown, destination_file, owner, owner)
 
 

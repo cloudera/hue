@@ -20,8 +20,14 @@ from django.conf.urls.defaults import patterns, url
 
 IS_URL_NAMESPACED = True
 
-
 urlpatterns = patterns(
+  'oozie.views.api',
+
+  url(r'^workflows/(?P<workflow>\d+)$', 'workflow', name='workflow'),
+  url(r'^workflows/(?P<workflow>\d+)/save$', 'workflow_save', name='workflow_save'),
+)
+
+urlpatterns += patterns(
   'oozie.views.editor',
 
   url(r'^list_workflows/$', 'list_workflows', name='list_workflows'),
@@ -33,14 +39,7 @@ urlpatterns = patterns(
   url(r'^schedule_workflow/(?P<workflow>\d+)$', 'schedule_workflow', name='schedule_workflow'),
   url(r'^resubmit_workflow/(?P<oozie_wf_id>[-\w]+)$', 'resubmit_workflow', name='resubmit_workflow'),
 
-  url(r'^new_action/(?P<workflow>\d+)/(?P<node_type>\w+)/(?P<parent_action_id>\d+)$', 'new_action', name='new_action'),
   url(r'^import_action/(?P<workflow>\d+)/(?P<parent_action_id>\d+)$', 'import_action', name='import_action'),
-  url(r'^edit_action/(?P<action>\d+)$', 'edit_action', name='edit_action'),
-  url(r'^edit_workflow_fork/(?P<action>\d+)$', 'edit_workflow_fork', name='edit_workflow_fork'),
-  url(r'^delete_action/(?P<action>\d+)$', 'delete_action', name='delete_action'),
-  url(r'^clone_action/(?P<action>\d+)$', 'clone_action', name='clone_action'),
-  url(r'^move_up_action/(?P<action>\d+)$', 'move_up_action', name='move_up_action'),
-  url(r'^move_down_action/(?P<action>\d+)$', 'move_down_action', name='move_down_action'),
 
   url(r'^list_coordinators/(?P<workflow_id>[-\w]+)?$', 'list_coordinators', name='list_coordinators'),
   url(r'^create_coordinator/(?P<workflow>[-\w]+)?$', 'create_coordinator', name='create_coordinator'),

@@ -86,6 +86,7 @@ class Submission(object):
       raise PopupException(message=msg, detail=str(ex))
 
     oozie_xml = self.job.to_xml()
+    print oozie_xml
     self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml)
 
     return deployment_dir

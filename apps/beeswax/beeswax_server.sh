@@ -50,7 +50,7 @@ BEESWAX_ROOT=$(dirname $0)
 BEESWAX_JAR=$BEESWAX_ROOT/java-lib/BeeswaxServer.jar
 HIVE_LIB=$HIVE_HOME/lib
 
-export HADOOP_CLASSPATH=$(find $HIVE_LIB -name "*.jar" | tr "\n" :)
+export HADOOP_CLASSPATH=$(find $HADOOP_HOME -name hue-plugins*.jar | tr "\n" :):$(find $HIVE_LIB -name "*.jar" | tr "\n" :)
 
 if [ -n "$HADOOP_EXTRA_CLASSPATH_STRING" ]; then
   export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$HADOOP_EXTRA_CLASSPATH_STRING

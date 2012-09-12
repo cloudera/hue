@@ -84,7 +84,7 @@ class ControlFlowAction(Action):
 
   @classmethod
   def is_control_flow(self, action_type):
-    return action_type is not None and ':' in action_type
+    return action_type is not None and ( ':' in action_type or action_type == 'switch' )
 
   def _fixup(self):
     """

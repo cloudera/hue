@@ -64,7 +64,7 @@ A Workflow/Coordinator can be modified only by its owner or a superuser.
 Permissions checking happens by adding the decorators.
 """
 class JobManager(models.Manager):
-  def is_accessible_or_exception(self, request, job_id):
+  def is_accessible_or_exception(self, request, job_id, exception_class=PopupException):
     if job_id is None:
       return
     try:
@@ -76,16 +76,16 @@ class JobManager(models.Manager):
             {'username': request.user.username, 'id': job.id}
         access_warn(request, message)
         request.error(message)
-        raise PopupException(message)
+        raise exception_class(message)
 
     except Job.DoesNotExist:
-      raise PopupException(_('job %(id)s not exist') % {'id': job_id})
+      raise exception_class(_('job %(id)s not exist') % {'id': job_id})
 
-  def can_edit_or_exception(self, request, job):
+  def can_edit_or_exception(self, request, job, exception_class=PopupException):
     if job.is_editable(request.user):
       return True
     else:
-      raise PopupException(_('Not allowed to modified this job'))
+      raise exception_class(_('Not allowed to modified this job'))
 
 
 class Job(models.Model):
@@ -243,177 +243,6 @@ class Workflow(Job):
   def get_properties(self):
     return json.loads(self.job_properties)
 
-  def add_action(self, action, parent_action_id):
-    parent = Node.objects.get(id=parent_action_id).get_full_node()
-    error = Kill.objects.get(name='kill', workflow=self)
-
-    if parent.node_type == 'start':
-      previous_to = parent.get_child('to')
-      to_link = parent.get_link('to')
-    elif parent.node_type == 'join':
-      previous_to = parent.get_child('to')
-      to_link = parent.get_link('to')
-    else:
-      previous_to = parent.get_child('ok')
-      to_link = parent.get_link('ok')
-
-    to_link.child = action
-    ok_link = Link(parent=action, child=previous_to, name='ok')
-    error_link = Link(parent=action, child=error, name='error')
-
-    to_link.save()
-    ok_link.save()
-    error_link.save()
-
-  def _add_to_fork(self, action, fork):
-    Link.objects.create(parent=fork, child=action, name='start')
-    join = fork.get_child_join()
-
-    ok = action.get_link('ok')
-    ok.child = join
-    ok.save()
-
-  def move_action_up(self, action):
-    parent = action.get_parent()
-    child = action.get_child('ok')
-
-    # Case add to an already existent fork
-    if parent.node_type == 'join':
-      # Get fork for parent
-      join = parent
-      fork = join.get_full_node().get_parent_fork()
-      self._add_to_fork(action, fork)
-      # Update join
-      to = join.get_link('to')
-      to.child = child
-      to.save()
-    # Case leaving a Fork
-    elif parent.node_type == 'fork':
-      parent_parent = parent.get_parent()
-      if parent_parent.node_type == 'start':
-        parent_parent_link = parent_parent.get_link('to')
-      else:
-        parent_parent_link = parent_parent.get_link('ok') # If fork of fork, need to use recursivity
-
-      fork = parent_parent_link.child
-      action_below = action.get_child('ok')
-      parent_link = action.get_parent_link()
-
-      parent_parent_link.child = action
-      parent_parent_link.save()
-
-      if action_below.node_type == 'join':
-        parent_link.delete()
-      else:
-        parent_link.child = action_below
-        parent_link.save()
-
-      ok = action.get_link('ok')
-      ok.child = fork
-      ok.save()
-
-      join = action
-    else:
-      # Case create a fork
-      if parent.node_type == 'fork': # No double forks yet        '
-        parent = parent.get_parent()
-        parent_parent = parent.get_parent()
-        if parent_parent.node_type == 'start':
-          parent_parent_link = parent_parent.get_link('to')
-        else:
-          parent_parent_link = parent_parent.get_link('ok')
-      else:
-        parent_parent_link = parent.get_parent_link()
-
-      fork = Fork.objects.create(workflow=action.workflow, node_type=Fork.node_type)
-      Link.objects.create(parent=fork, child=parent, name='start')
-      Link.objects.create(parent=fork, child=action, name='start')
-
-      join = Join.objects.create(workflow=action.workflow, node_type=Join.node_type)
-      Link.objects.create(parent=join, child=action.get_child('ok'), name='to')
-
-      Link.objects.create(parent=fork, child=join, name='related')
-
-      parent_parent_link.child = fork
-      parent_parent_link.save()
-
-      parent_link = parent.get_link('ok')
-      parent_link.child = join
-      parent_link.save()
-      action_link = action.get_link('ok')
-      action_link.child = join
-      action_link.save()
-
-    # Case leaving a fork
-    if child.node_type == 'join':
-      self._remove_fork(child.get_parent_fork())
-
-  def move_action_down(self, action):
-    below_action = action.get_child('ok')
-
-    if below_action.node_type == 'join':
-      parent_node = action.get_parent()
-      self._move_below(action, below_action)
-      self._remove_fork(parent_node)
-    elif below_action.node_type == 'fork':
-      parent_node = action.get_parent()
-      self._move_into_fork(action, below_action)
-      self._remove_fork(parent_node)
-    else:
-      self.move_action_up(below_action)
-
-  def delete_action(self, action):
-    parent_link = action.get_parent_link()
-
-    if action.get_parent().node_type != 'fork':
-      parent_link.child = action.get_child('ok')
-      parent_link.save()
-
-    action.delete()
-    self._remove_fork(parent_link.parent)
-
-  def _move_below(self, node, below):
-    above_link = node.get_parent_link()
-    node_link = node.get_child_link('ok')
-
-    if above_link.parent.node_type == 'fork':
-      above_link.delete()
-    else:
-      above_link.child = node.get_child('ok')
-      above_link.save()
-
-    below_link = below.get_child_link()
-    node_link.child = below_link.child
-    below_link.child = node
-    below_link.save()
-
-    node_link.save()
-
-  def _move_into_fork(self, node, fork):
-    above_link = node.get_parent_link()
-    above_link.child = fork
-    above_link.save()
-
-    self._add_to_fork(node, fork)
-
-  def _remove_fork(self, node):
-    if node.node_type == 'fork':
-      fork = node.get_full_node()
-      if len(fork.get_children()) <= 1:
-        join = fork.get_child_join()
-
-        self._remove_node(fork)
-        self._remove_node(join)
-
-  def _remove_node(self, node):
-    child = node.get_child()
-
-    for link in node.get_parent_links():
-      link.child = child
-      link.save()
-
-    node.delete()
-
   def clone(self, fs, new_owner=None):
     source_deployment_dir = self.deployment_dir # Needed
     nodes = self.node_set.all()
@@ -461,8 +290,10 @@ class Workflow(Job):
       LOG.error(msg)
       raise PopupException(msg)
 
-    return copy
+    # Reload workflow from DB... clears relationship cache
+    copy = Workflow.objects.get(id=copy.id)
 
+    return copy
 
   def has_cycle(self):
     """
@@ -531,35 +362,39 @@ class Workflow(Job):
 
   def get_hierarchy(self):
     node = self.start
-    return self.get_hierarchy_rec(node) + [[Kill.objects.get(name='kill', workflow=node.workflow)],
+    return self.get_hierarchy_rec(node=node) + [[Kill.objects.get(name='kill', workflow=node.workflow)],
                                            [End.objects.get(name='end', workflow=node.workflow)]]
 
-  def get_hierarchy_rec(self, node=None):
+  def get_hierarchy_rec(self, node=None, skip_parents_check=False):
     if node is None:
       node = self.start
       if node.id is None:
         return []
 
     node = node.get_full_node()
+    parents = node.get_parents()
+
+    if len(parents) > 1 and not skip_parents_check:
+      return []
 
     if isinstance(node, End):
       return [] # Not returning the end node
-    elif isinstance(node, Fork) and node.has_decisions():
+    elif isinstance(node, Decision):
       children = node.get_children('start')
-      return [[node] + [[self.get_hierarchy_rec(child) for child in children]]]
+      end = node.get_child_end_or_none()
+      if end:
+        return [[node, [self.get_hierarchy_rec(node=child) for child in children]] + self.get_hierarchy_rec(node=end, skip_parents_check=True)]
+      else:
+        return [[node, [self.get_hierarchy_rec(node=child) for child in children]]]
     elif isinstance(node, Fork):
       children = node.get_children('start')
-      return [[node] + [[self.get_hierarchy_rec(child) for child in children],
+      return [[node] + [[self.get_hierarchy_rec(node=child) for child in children],
                         node.get_child_join()]] + self.get_hierarchy_rec(node.get_child_join().get_child('to'))
     elif isinstance(node, Join):
       return []
     else:
-      child = Link.objects.filter(parent=node).exclude(name__in=['related', 'kill'])[0].child
+      child = Link.objects.filter(parent=node).exclude(name__in=['related', 'kill', 'error'])[0].child
       return [node] + self.get_hierarchy_rec(child)
-
-  def gen_graph(self, forms, template='editor/gen/workflow-graph-editable.xml.mako'):
-    index = dict([(form.instance.id, form) for form in forms])
-    return django_mako.render_to_string(template, {'nodes': self.get_hierarchy(), 'index': index})
 
   def gen_status_graph(self, forms, actions):
     template='editor/gen/workflow-graph-status.xml.mako'
@@ -576,7 +411,7 @@ class Workflow(Job):
 
 class Link(models.Model):
   # Links to exclude when using get_children_link(), get_parent_links() in the API
-  META_LINKS = ('related', 'default')
+  META_LINKS = ('related')
 
   parent = models.ForeignKey('Node', related_name='child_node')
   child = models.ForeignKey('Node', related_name='parent_node', verbose_name='')
@@ -639,8 +474,8 @@ class Node(models.Model):
       node = self.kill
     elif self.node_type == Fork.node_type:
       node = self.fork
-    elif self.node_type == Fork.ACTION_DECISION_TYPE:
-      node = self.fork
+    elif self.node_type == Decision.node_type:
+      node = self.decision
     elif self.node_type == Join.node_type:
       node = self.join
     else:
@@ -710,6 +545,9 @@ class Node(models.Model):
     else:
       return Link.objects.exclude(name__in=Link.META_LINKS).filter(parent=self, name=name)
 
+  def get_all_children_links(self):
+    return Link.objects.filter(parent=self)
+
   def get_template_name(self):
     return 'editor/gen/workflow-%s.xml.mako' % self.node_type
 
@@ -727,23 +565,6 @@ class Node(models.Model):
   def is_editable(self):
     return False
 
-  def can_move(self):
-    return True
-
-  def can_move_up(self):
-    parents = self.get_parents()
-    for parent in parents:
-      if parent.node_type == 'start':
-        return False
-    return parents and self.can_move()
-
-  def can_move_down(self):
-    children = self.get_children()
-    for child in children:
-      if child.node_type == 'end':
-        return False
-    return children and self.can_move()
-
 
 class Action(Node):
   """
@@ -757,9 +578,6 @@ class Action(Node):
 
   def is_editable(self):
     return True
-
-  def get_edit_link(self):
-    return reverse('oozie:edit_action', kwargs={'action': self.id})
 
 # The fields with '[]' as default value are JSON dictionaries
 # When adding a new action, also update
@@ -1123,10 +941,6 @@ class Fork(ControlFlow):
   A Fork can be converted into a Decision node.
   """
   node_type = 'fork'
-  ACTION_DECISION_TYPE = 'decision'
-
-  def has_decisions(self):
-    return self.get_children_links().exclude(comment='').exists()
 
   def is_visible(self):
     return True
@@ -1137,13 +951,27 @@ class Fork(ControlFlow):
   def is_editable(self):
     return False
 
-  def get_edit_link(self):
-    return reverse('oozie:edit_workflow_fork', kwargs={'action': self.id})
-
   def convert_to_decision(self):
     self.remove_join()
-    self.node_type = Fork.ACTION_DECISION_TYPE
-    self.save()
+
+    decision = Decision.objects.create(workflow=self.workflow, node_type=Decision.node_type)
+    decision.save()
+
+    links = self.get_all_children_links()
+    has_default = False
+    for link in links:
+      if link.name == 'default':
+        has_default = True
+        link.parent = decision
+
+    # Defaults to end
+    if not has_default:
+      link = Links.objects.create(name="default", parent=decision, child=self.workflow.end)
+      link.save()
+
+    self.delete()
+
+    return decision
 
   def update_description(self):
     self.description = ', '.join(self.get_children_links().values_list('comment', flat=True))
@@ -1160,6 +988,26 @@ class Fork(ControlFlow):
 
     # Automatically delete links thought foreign keys
     join.delete()
+
+
+class Decision(ControlFlow):
+  node_type = 'decision'
+
+  def get_child_end_or_none(self):
+    try:
+      return Link.objects.get(parent=self, name='related').child.get_full_node()
+    except Link.DoesNotExist:
+      return None
+
+  def is_visible(self):
+    return True
+
+  def is_editable(self):
+    return False
+
+  def update_description(self):
+    self.description = ', '.join(self.get_children_links().values_list('comment', flat=True))
+    self.save()
 
 
 class Join(ControlFlow):
@@ -1514,3 +1362,22 @@ _STD_PROPERTIES = [
 
 _STD_PROPERTIES_JSON = json.dumps(_STD_PROPERTIES)
 
+ACTION_TYPES = {
+  Mapreduce.node_type: Mapreduce,
+  Streaming.node_type: Streaming,
+  Java.node_type: Java,
+  Pig.node_type: Pig,
+  Hive.node_type: Hive,
+  Sqoop.node_type: Sqoop,
+  Ssh.node_type: Ssh,
+  Shell.node_type: Shell,
+  DistCp.node_type: DistCp,
+}
+NODE_TYPES = ACTION_TYPES.copy()
+NODE_TYPES.update({
+  Fork.node_type: Fork,
+  Join.node_type: Join,
+  Decision.node_type: Decision,
+  Start.node_type: Start,
+  End.node_type: End,
+})
