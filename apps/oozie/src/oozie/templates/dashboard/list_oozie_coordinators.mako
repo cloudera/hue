@@ -235,15 +235,26 @@ ${layout.menubar(section='dashboard')}
 
 
     $("a.btn-status").click(function() {
-       $(this).toggleClass('active');
-        $("#filterInput").keyup();
+      $(this).toggleClass('active');
+      drawTable();
     });
 
     $("a.btn-date").click(function() {
       $("a.btn-date").not(this).removeClass('active');
       $(this).toggleClass('active');
-      $("#filterInput").keyup();
+      drawTable();
     });
+
+    function drawTable(){
+      runningTable.fnDraw();
+      completedTable.fnDraw();
+
+      hash = "#";
+      if ($("a.btn-date.active").length > 0) {
+        hash += "date=" + $("a.btn-date.active").text();
+      }
+      window.location.hash = hash;
+    }
 
     $.fn.dataTableExt.afnFiltering.push(
       function(oSettings, aData, iDataIndex) {
