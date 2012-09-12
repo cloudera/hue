@@ -50,6 +50,7 @@ ${ layout.menubar(section='dashboard') }
           <a class="btn btn-status btn-warning">Running</a>
           <a class="btn btn-status btn-danger">Killed</a>
         </span>
+      </span>
    </form>
   </div>
 
@@ -224,29 +225,34 @@ ${ layout.menubar(section='dashboard') }
     $("#filterInput").keyup(function() {
       runningTable.fnFilter($(this).val());
       completedTable.fnFilter($(this).val());
-
-      hash = "#";
-
-      if ($("a.btn-date.active").length > 0) {
-        hash += "date=" + $("a.btn-date.active").text();
-      }
-
-      window.location.hash = hash;
+      drawTable();
     });
 
 
     $("a.btn-status").click(function() {
-       $(this).toggleClass('active');
-        $("#filterInput").keyup();
+      $(this).toggleClass('active');
+      drawTable();
     });
 
     $("a.btn-date").click(function() {
       $("a.btn-date").not(this).removeClass('active');
       $(this).toggleClass('active');
-      $("#filterInput").keyup();
+      drawTable();
     });
 
-    $.fn.dataTableExt.afnFiltering.push(
+    function drawTable(){
+      runningTable.fnDraw();
+      completedTable.fnDraw();
+
+      hash = "#";
+      if ($("a.btn-date.active").length > 0) {
+        hash += "date=" + $("a.btn-date.active").text();
+      }
+      window.location.hash = hash;
+    }
+
+
+      $.fn.dataTableExt.afnFiltering.push(
       function(oSettings, aData, iDataIndex) {
         urlHashes = ""
 
