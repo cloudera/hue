@@ -58,7 +58,6 @@ ${ layout.menubar(section='coordinators') }
              <div class="fieldWrapper">
                ${ utils.render_field(coordinator_form['name']) }
                ${ utils.render_field(coordinator_form['description']) }
-               ${ utils.render_field(coordinator_form['is_shared']) }
 
                <div class="control-group ">
                  <label class="control-label">
@@ -70,6 +69,7 @@ ${ layout.menubar(section='coordinators') }
                </div>
 
                <div id="advanced-container" class="hide">
+                 ${ utils.render_field(coordinator_form['is_shared']) }
                  ${ utils.render_field(coordinator_form['workflow']) }
                  ${ properties.print_key_value(coordinator_form['parameters'], 'parameters', parameters) }
                  ${ utils.render_field(coordinator_form['timeout']) }
@@ -82,7 +82,7 @@ ${ layout.menubar(section='coordinators') }
                    </div>
                  </div>
                  ${ utils.render_field(coordinator_form['execution']) }
-                 ${ utils.render_field(coordinator_form['schema_version']) }
+                 ${ coordinator_form['schema_version'] }
               </div>
              </div>
 
