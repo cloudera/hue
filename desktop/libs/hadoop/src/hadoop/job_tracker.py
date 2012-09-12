@@ -19,6 +19,7 @@
 
 from desktop.lib import thrift_util
 from desktop.lib.conf import validate_port
+from desktop.lib.django_util import StructuredException
 from desktop.lib.thrift_util import fixup_enums
 
 from hadoop.api.jobtracker import Jobtracker
@@ -251,8 +252,7 @@ class LiveJobTracker(object):
     try:
       job = self.client.getJob(self.thread_local.request_context, jobid)
     except JobNotFoundException, e:
-      e.response_data = dict(code="JT_JOB_NOT_FOUND", message="Could not find job %s on JobTracker." % jobid.asString, data=jobid)
-      raise
+      raise StructuredException(code="JT_JOB_NOT_FOUND", message="Could not find job %s on JobTracker." % jobid.asString, data=jobid)
     self._fixup_job(job)
     return job
 
@@ -281,8 +281,7 @@ class LiveJobTracker(object):
     try:
       job = self.client.getRetiredJob(self.thread_local.request_context, jobid)
     except JobNotFoundException, e:
-        e.response_data = dict(code="JT_JOB_NOT_FOUND", message="Could not find job %s on JobTracker." % jobid.asString, data=jobid)
-        raise
+        raise StructuredException(code="JT_JOB_NOT_FOUND", message="Could not find job %s on JobTracker." % jobid.asString, data=jobid)
     self._fixup_job(job)
     self._fixup_retired_job(job)
     return job
@@ -362,15 +361,9 @@ class LiveJobTracker(object):
     try:
       tip = self.client.getTask(self.thread_local.request_context, taskid)
     except JobNotFoundException, e:
-      e.response_data = dict(code="JT_JOB_NOT_FOUND",
-                             message="Could not find job %s on JobTracker." % (jobid.asString,),
-                             data=jobid)
-      raise e
+      raise StructuredException(code="JT_JOB_NOT_FOUND", message="Could not find job %s on JobTracker." % jobid.asString, data=jobid)
     except TaskNotFoundException, e:
-      e.response_data = dict(code="JT_TASK_NOT_FOUND",
-                             message="Could not find task %s on JobTracker." % (taskid.asString,),
-                             data=taskid)
-      raise e
+      raise StructuredException(code="JT_TASK_NOT_FOUND", message="Could not find task %s on JobTracker." % taskid.asString, data=taskid)
     self._fixup_task_in_progress(tip)
     return tip
 

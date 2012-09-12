@@ -17,6 +17,7 @@
 #
 # Utilities for Thrift
 import desktop.lib.eventlet_util
+from desktop.lib.django_util import StructuredException
 
 import Queue
 import logging
@@ -27,7 +28,7 @@ import time
 import sasl
 import sys
 
-from thrift.Thrift import TType
+from thrift.Thrift import TType, TApplicationException
 from thrift.transport.TSocket import TSocket
 from thrift.transport.TTransport import TBufferedTransport, TMemoryBuffer,\
                                         TTransportException
@@ -284,12 +285,19 @@ class PooledClient(object):
             superclient.set_timeout(self.conf.timeout_seconds)
             ret = res(*args, **kwargs)
             return ret
+          except TApplicationException, e:
+            # Unknown thrift exception... typically IO errors
+            logging.info("Thrift saw an application exception: " + str(e), exc_info=False)
+            raise StructuredException('THRIFTAPPLICATION', str(e), data=None, error_code=502)
+          except socket.error, e:
+            logging.info("Thrift saw a socket error: " + str(e), exc_info=False)
+            raise StructuredException('THRIFTSOCKET', str(e), data=None, error_code=502)
+          except TTransportException, e:
+            logging.info("Thrift saw a transport exception: " + str(e), exc_info=False)
+            raise StructuredException('THRIFTTRANSPORT', str(e), data=None, error_code=502)
           except Exception, e:
             # Stack tends to be only noisy here.
             logging.info("Thrift saw exception: " + str(e), exc_info=False)
-            msg = "Exception communicating with %s at %s:%s: %s" % (
-              self.conf.service_name, self.conf.host, self.conf.port, str(e))
-            e.response_data = dict(code="THRIFT_EXCEPTION", message=msg, data="")
             raise
         finally:
           _connection_pool.return_client(self.conf, superclient)

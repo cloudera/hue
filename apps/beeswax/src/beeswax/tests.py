@@ -1059,7 +1059,6 @@ for x in sys.stdin:
 
   def test_select_query_server(self):
     c = make_logged_in_client()
-
     _make_query(c, 'SELECT bogus FROM test', server='default') # Improvement: mock another server
 
     history = beeswax.models.QueryHistory.objects.latest('id')

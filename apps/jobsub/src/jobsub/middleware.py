@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from desktop.lib.django_util import StructuredException
+
 from jobsubd.ttypes import SubmissionError
 
 class SubmissionErrorRecastMiddleware(object):
@@ -27,4 +29,4 @@ class SubmissionErrorRecastMiddleware(object):
   """
   def process_exception(self, request, exception):
     if isinstance(exception, SubmissionError) and not hasattr(SubmissionError, "response_data"):
-      exception.response_data = dict(code="SUBMISSION_ERROR", message=exception.message)
+    	raise StructuredException(code="SUBMISSION_ERROR", message=exception.message)

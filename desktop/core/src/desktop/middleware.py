@@ -33,7 +33,7 @@ import django.views.generic.simple
 
 import desktop.conf
 from desktop.lib import apputil, i18n
-from desktop.lib.django_util import render, render_json, is_jframe_request, PopupException
+from desktop.lib.django_util import render, render_json, is_jframe_request, PopupException, StructuredException
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
 from hadoop import cluster
@@ -70,25 +70,20 @@ class ExceptionMiddleware(object):
     logging.info("Processing exception: %s: %s" % (i18n.smart_unicode(exception),
                                                    i18n.smart_unicode(tb)))
 
-    if hasattr(exception, "response"):
+    if isinstance(exception, PopupException):
       return exception.response(request)
 
-    if hasattr(exception, "response_data"):
+    if isinstance(exception, StructuredException):
       if request.ajax:
         response = render_json(exception.response_data)
         response[MIDDLEWARE_HEADER] = 'EXCEPTION'
+        response.status_code = getattr(exception, 'error_code', 500)
         return response
       else:
-        return render("error.mako", request,
+        response = render("error.mako", request,
                       dict(error=exception.response_data.get("message")))
-
-    # We didn't handle it as a special exception, but if we're ajax we still
-    # need to do some kind of nicer handling than the built-in page
-    # Note that exception may actually be an Http404 or similar.
-    if request.ajax:
-      err = _("An error occurred: %(error)s") % {'error': exception}
-      logging.exception("Middleware caught an exception")
-      return PopupException(err, detail=None).response(request)
+        response.status_code = getattr(exception, 'error_code', 500)
+        return response
 
     return None
 
