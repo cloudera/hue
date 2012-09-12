@@ -55,15 +55,13 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
 
     <label class="pull-right">
         &nbsp;
-    ${_('Text:')}
-        <input type="text" name="text" title="${_('Text Filter')}" value="${text_filter}" placeholder="${_('Text Filter')}" class="submitter input-medium search-query"/>
+        ${_('Text:')}
+        <input type="text" name="text" title="${_('Text Filter')}" value="${text_filter}" placeholder="${_('Text Filter')}" class="submitter input-large search-query"/>
     </label>
     <label class="pull-right">
         ${_('Username:')}
-        <input type="text" name="user" title="${_('User Name Filter')}" value="${user_filter}" placeholder="${_('User Name Filter')}" class="submitter input-medium search-query" />
+        <input type="text" name="user" title="${_('User Name Filter')}" value="${user_filter}" placeholder="${_('User Name Filter')}" class="submitter input-small search-query" />
     </label>
-
-
 </form>
 
 
@@ -212,6 +210,15 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
 
         $("#cancelKillBtn").click(function(){
             $("#killModal").modal("hide");
+        });
+
+        var filterTimeout = -1;
+        $(".search-query").keyup(function(){
+            window.clearTimeout(filterTimeout);
+            var el = $(this);
+            filterTimeout = window.setTimeout(function(){
+                el.closest("form").submit();
+            }, 500);
         });
 
         $("a[data-row-selector='true']").jHueRowSelector();
