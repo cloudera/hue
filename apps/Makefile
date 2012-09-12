@@ -42,7 +42,8 @@ APPS := about \
   shell \
   useradmin \
   impala \
-  pig
+  pig \
+  search
 
 ################################################
 # Install all applications into the Desktop environment
@@ -113,7 +114,8 @@ I18N_APPS := about \
   useradmin \
   oozie \
   impala \
-  pig
+  pig \
+  search
 
 COMPILE_LOCALE_TARGETS := $(I18N_APPS:%=.recursive-compile-locales/%)
 compile-locales: $(COMPILE_LOCALE_TARGETS)
