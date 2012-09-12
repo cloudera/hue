@@ -21,9 +21,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
- 
+
     def forwards(self, orm):
-     
+
         # Adding model 'MetaInstall'
         try:
             db.create_table('beeswax_metainstall', (
@@ -34,7 +34,7 @@ class Migration(SchemaMigration):
         except:
             logging.warning("Initial db creation being skipped, likely because table already exists.", exc_info=True)
             return
- 
+
         # Adding model 'QueryHistory'
         db.create_table('beeswax_queryhistory', (
             ('submission_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
@@ -65,7 +65,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-     
+
         # Deleting model 'QueryHistory'
         db.delete_table('beeswax_queryhistory')
 
@@ -74,8 +74,8 @@ class Migration(SchemaMigration):
 
         # Deleting model 'MetaInstall'
         db.delete_table('beeswax_metainstall')
- 
- 
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -142,5 +142,5 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         }
     }
- 
+
     complete_apps = ['beeswax']

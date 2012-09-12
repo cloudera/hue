@@ -5,19 +5,19 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'QueryHistory.query'
         db.alter_column('beeswax_queryhistory', 'query', self.gf('django.db.models.fields.TextField')())
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'QueryHistory.query'
         db.alter_column('beeswax_queryhistory', 'query', self.gf('django.db.models.fields.CharField')(max_length=1024))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -85,5 +85,5 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         }
     }
-    
+
     complete_apps = ['beeswax']

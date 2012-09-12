@@ -458,7 +458,7 @@ def thrift2json(tft):
 
 def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_depth=0):
   """
-  Recursive impelementation method of jsonable2thrift.
+  Recursive implementation method of jsonable2thrift.
 
   type_enum corresponds to TType.  spec_args is part of the
   thrift_spec explained in Thrift's code generator.  See 

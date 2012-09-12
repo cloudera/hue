@@ -36,7 +36,7 @@ def is_selected(section, matcher):
 			<li class="${is_selected(section, 'saved queries')}"><a href="/beeswax/list_designs">${_('Saved Queries')}</a></li>
 			<li class="${is_selected(section, 'history')}"><a href="/beeswax/query_history">${_('History')}</a></li>
 			<li class="${is_selected(section, 'tables')}"><a href="/beeswax/tables">${_('Tables')}</a></li>
-			<li class="${is_selected(section, 'hive configuration')}"><a href="/beeswax/configuration">${_('Settings')}</a></li>
+			<li class="${is_selected(section, 'configuration')}"><a href="/beeswax/configuration">${_('Settings')}</a></li>
 		</ul>
 	</div>
 </div>

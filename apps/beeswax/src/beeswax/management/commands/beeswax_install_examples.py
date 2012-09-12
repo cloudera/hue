@@ -41,7 +41,6 @@ from django.core.management.base import NoArgsCommand
 from django.contrib.auth.models import User
 
 import beeswax.conf
-import beeswax.design
 from beeswax import db_utils, models
 from beeswaxd import BeeswaxService
 from beeswaxd.ttypes import BeeswaxException

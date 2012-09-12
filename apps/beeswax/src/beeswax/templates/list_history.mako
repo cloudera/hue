@@ -18,11 +18,14 @@ import time
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
-${commonheader(_('Beeswax: Query History'), "beeswax", "100px")}
+
+${commonheader(_('Query History'), "beeswax", "100px")}
 ${layout.menubar(section='history')}
+
 <%def name="show_saved_query(design, history)">
   % if design:
     % if request.user == design.owner:
@@ -45,12 +48,12 @@ ${layout.menubar(section='history')}
 </%def>
 
 <div class="container-fluid">
-	<h1>${_('Beeswax: Query History')}</h1>
-	<div class="row-fluid">
-		<div class="span3">
-			<div class="well sidebar-nav">
-				<ul class="nav nav-list">
-					<li class="nav-header">${_('Actions')}</li>
+    <h1>${_('Query History')}</h1>
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="nav-header">${_('Actions')}</li>
                     % if share_queries:
                         % if filter_params.get('user') == ':all':
                           <%
@@ -67,76 +70,78 @@ ${layout.menubar(section='history')}
                         % endif
                     % endif
 
-				 	% if filter_params.get('auto_query', None):
-				      <%
-				        my_querydict = filter_params.copy()
-				        my_querydict['auto_query'] = ''
-				      %>
-				      <li><a href="?${my_querydict.urlencode()}">${_('Show user queries')}</a></li>
-				    % else:
-				      <%
-				        my_querydict = filter_params.copy()
-				        my_querydict['auto_query'] = 'on'
-				      %>
-				      <li><a href="?${my_querydict.urlencode()}">${_('Show auto actions')}</a></li>
-				    % endif
-				</ul>
-			</div>
-		</div>
-		<div class="span9">
+                     % if filter_params.get('auto_query', None):
+                      <%
+                        my_querydict = filter_params.copy()
+                        my_querydict['auto_query'] = ''
+                      %>
+                      <li><a href="?${my_querydict.urlencode()}">${_('Show user queries')}</a></li>
+                    % else:
+                      <%
+                        my_querydict = filter_params.copy()
+                        my_querydict['auto_query'] = 'on'
+                      %>
+                      <li><a href="?${my_querydict.urlencode()}">${_('Show auto actions')}</a></li>
+                    % endif
+                </ul>
+            </div>
+        </div>
+        <div class="span9">
 
-		<table class="table table-striped table-condensed datatables">
-		    <thead>
-		      <tr>
-		        <th>${_('Time')}</th>
-		        <th>${_('Name')}</th>
-		        <th>${_('Query')}</th>
-		        <th>${_('User')}</th>
-		        <th>${_('State')}</th>
-		        <th>${_('Result')}</th>
-		      </tr>
-		    </thead>
-		    <tbody>
-		    <%!
-		      from beeswax import models, views
-		    %>
-		    % for query in page.object_list:
-		      <%
-		        qcontext = ""
-			try:
-			  design = query.design
-		          qcontext = views.make_query_context('design', design.id)
-			except:
-			  pass
-		      %>
-		      <tr class="histRow">
+        <table class="table table-striped table-condensed datatables">
+            <thead>
+              <tr>
+                <th width="10%">${_('Time')}</th>
+                <th width="10%">${_('Query Server')}</th>
+                <th width="15%">${_('Name')}</th>
+                <th width="45%">${_('Query')}</th>
+                <th width="10%">${_('User')}</th>
+                <th width="5%">${_('State')}</th>
+                <th width="5%">${_('Result')}</th>
+              </tr>
+            </thead>
+            <tbody>
+            <%!
+              from beeswax import models, views
+            %>
+            % for query in page.object_list:
+              <%
+                qcontext = ""
+                try:
+                  design = query.design
+                  qcontext = views.make_query_context('design', design.id)
+                except:
+                  pass
+              %>
+              <tr class="histRow">
                 <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>
-		        <td>${show_saved_query(design, query)}</td>
-		        <td>
-		          <p>
-		            % if len(query.query) > 100:
-		              <code>${collapse_whitespace(query.query[:100])}...</code>
-		            % else:
-		              <code>${collapse_whitespace(query.query)}</code>
-		            % endif
-		          </p>
-		        </td>
-		        <td>${query.owner}</td>
-		        <td>${models.QueryHistory.STATE[query.last_state]}</td>
-		        <td>
-		          % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
-		            <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" data-row-selector="true">${_('Results')}</a>
-		          % else:
-		            ~
-		          % endif
-		        </td>
-		      </tr>
-		    % endfor
-		    </tbody>
-		  </table>
-		 ${comps.pagination(page)}
-		</div>
-	</div>
+                <td>${query.server_name}</td>
+                <td>${show_saved_query(design, query)}</td>
+                <td>
+                  <p>
+                    % if len(query.query) > 100:
+                      <code>${collapse_whitespace(query.query[:100])}...</code>
+                    % else:
+                      <code>${collapse_whitespace(query.query)}</code>
+                    % endif
+                  </p>
+                </td>
+                <td>${query.owner}</td>
+                <td>${models.QueryHistory.STATE[query.last_state]}</td>
+                <td>
+                  % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
+                    <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" data-row-selector="true">${_('Results')}</a>
+                  % else:
+                    ~
+                  % endif
+                </td>
+              </tr>
+            % endfor
+            </tbody>
+          </table>
+         ${comps.pagination(page)}
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">

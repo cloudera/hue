@@ -40,7 +40,7 @@ ${layout.menubar(section='tables')}
                     <li><a href="${ url('beeswax.views.execute_query') }">${_('Execute Query')}</a></li>
                     <li><a href="${ url('beeswax.views.list_query_history') }">${_('Query History')}</a></li>
                     <li class="nav-header">${_('Configuration')}</li>
-                    <li><a href="${ url('beeswax.views.configuration') }">${_('Hive Configuration')}</a></li>
+                    <li><a href="${ url('beeswax.views.configuration') }">${_('Configuration')}</a></li>
                     <li><a href="${ url('beeswax.views.configuration') }?include_hadoop=1">${_('Extended Configuration')}</a></li>
                 </ul>
             </div>

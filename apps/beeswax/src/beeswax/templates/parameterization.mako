@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Parameterize Hive Query'), "beeswax", "100px")}
+${commonheader(_('Parameterize Query'), "beeswax", "100px")}
 
 ${layout.menubar()}
 
@@ -44,6 +44,9 @@ ${layout.menubar()}
                     </div>
                 </div>
             % endfor
+            <div class="hide">
+              ${query_servers}
+            </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">${btn}</button>
                 <a class="btn" href="javascript:history.go(-1);">${_('Cancel')}</a>

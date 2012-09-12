@@ -78,7 +78,7 @@ def data_generator(query_model, formatter):
   while True:
     # Make sure that we have the next batch of ready results
     while results is None or not results.ready:
-      results = db_utils.db_client().fetch(handle, start_over=is_first_row, fetch_size=-1)
+      results = db_utils.db_client(query_model.get_query_server()).fetch(handle, start_over=is_first_row, fetch_size=-1)
       if not results.ready:
         time.sleep(_DATA_WAIT_SLEEP)
 

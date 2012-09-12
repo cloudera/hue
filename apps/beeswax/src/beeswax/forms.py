@@ -22,9 +22,7 @@ import hive_metastore
 
 from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
 from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
-from beeswax import common
-from beeswax import db_utils
-from beeswax import models
+from beeswax import db_utils, common, conf, models
 from filebrowser.forms import PathField
 
 
@@ -35,7 +33,21 @@ def query_form():
       settings=SettingFormSet,
       file_resources=FileResourceFormSet,
       functions=FunctionFormSet,
-      saveform=SaveForm)
+      saveform=SaveForm,
+      query_servers=QueryServerForm)
+
+
+class QueryServerForm(forms.Form):
+  server = forms.CharField(max_length=128, help_text=_t('Host:port of the query server.'))
+
+  def __init__(self, *args, **kwargs):
+    super(QueryServerForm, self).__init__(*args, **kwargs)
+
+    if conf.QUERY_SERVERS:
+      servers = ((server, server) for server in conf.QUERY_SERVERS.keys())
+    else:
+      servers = (('default', 'default'),)
+    self.fields['server'].widget = forms.Select(choices=servers)
 
 
 class SaveForm(forms.Form):

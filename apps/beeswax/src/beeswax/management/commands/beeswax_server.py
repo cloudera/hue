@@ -60,10 +60,15 @@ class Command(NoArgsCommand):
     if dt_host == '0.0.0.0':
       dt_host = '127.0.0.1'
 
+    if 'beeswax_server_port' in beeswax.conf.QUERY_SERVERS['bind_to']:
+      server_port = beeswax.conf.BEESWAX_SERVER_PORT.get()
+    else:
+      server_port = beeswax.conf.QUERY_SERVERS['default'].SERVER_PORT.get()
+
     args = [
       os.path.basename(bin),
       '--beeswax',
-      str(beeswax.conf.BEESWAX_SERVER_PORT.get()),
+      str(server_port),
       '--desktop-host',
       str(dt_host),
       '--desktop-port',

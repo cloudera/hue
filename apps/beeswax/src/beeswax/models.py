@@ -58,6 +58,9 @@ class QueryHistory(models.Model):
   # Only query in the "submitted" state is allowed to have no server_id
   server_id = models.CharField(max_length=1024, null=True)
   log_context = models.CharField(max_length=1024, null=True)
+  server_host = models.CharField(max_length=128, help_text=_('Host of the query server.'), default='')
+  server_port = models.SmallIntegerField(help_text=_('Port of the query server.'), default=0)
+  server_name = models.CharField(max_length=128, help_text=_('Name of the query server.'), default='')
   # Some queries (like read/drop table) don't have a design
   design = models.ForeignKey('SavedQuery', to_field='id', null=True)
   # Notify on completion
@@ -112,6 +115,9 @@ class QueryHistory(models.Model):
       self.save_state(QueryHistory.STATE.expired)
       return (False, None)
 
+  def get_query_server(self):
+    return dict(zip(['server_name', 'server_host', 'server_port'],
+                    [self.server_name, self.server_host, self.server_port]))
 
 
 class SavedQuery(models.Model):

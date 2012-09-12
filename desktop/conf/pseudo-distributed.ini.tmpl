@@ -309,12 +309,24 @@
 ###########################################################################
 
 [beeswax]
+
+  # Deprecated! Will be removed in Hue 3
+  # Multiple sections are now available in query_servers
+  # Host where Beeswax internal metastore Thrift daemon is running
+  ## beeswax_meta_server_host=localhost
+
+  # Deprecated! Will be removed in Hue 3
+  # Multiple sections are now available in query_servers  
   # Configure the port the internal metastore daemon runs on. Used only if
-  # hive.metastore.local is true.
+  # hive.metastore.local is true. 
   ## beeswax_meta_server_port=8003
 
-  # Configure the port the beeswax thrift server runs on
-  ## beeswax_server_port=8002
+  # Host where Beeswax internal metastore Thrift daemon is running
+  ## beeswax_meta_server_host=localhost
+  
+  # Configure the port the internal metastore daemon runs on. Used only if
+  # hive.metastore.local is true. 
+  ## beeswax_meta_server_port=8003
 
   # Hive home directory
   ## hive_home_dir=/usr/lib/hive
@@ -337,6 +349,17 @@
   # visible only to the owner and administrators.
   ## share_saved_queries=true
 
+ # One entry for each Query Server that can execute some SQL queries.
+ # This must be in the bottom of the [beewax] section.
+ [[query_servers]]
+
+   [[[default]]]
+   # Host where the Query Server Thrift daemon is running
+   ## server_host=localhost
+   # Configure the port the Query Server Thrift server 
+   ## server_port=8002
+   # If DDL queries are supported (e.g. DROP can be sent directly to this server)
+   ## support_ddl=True
 
 ###########################################################################
 # Settings to configure Job Designer

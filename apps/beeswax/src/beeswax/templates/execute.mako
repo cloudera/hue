@@ -24,13 +24,13 @@
 <%namespace name="util" file="util.mako" />
 
 <%def name="query()">
-    <h1>${_('Hive Query')}</h1>
+    <h1>${_('Query Editor')}</h1>
     <fieldset>
         % if design and not design.is_auto and design.name:
-              <legend>${design.name}</legend>
-              % if design.desc:
-                <p>${design.desc}</p>
-              % endif
+            <legend>${design.name}</legend>
+            % if design.desc:
+              <p>${design.desc}</p>
+            % endif
 
           % else:
             <legend>${_('Query')}</legend>
@@ -60,7 +60,7 @@
 </%def>
 
 
-${commonheader(_('Hive Query'), "beeswax", "100px")}
+${commonheader(_('Query'), "beeswax", "100px")}
 ${layout.menubar(section='query')}
 
 <div class="container-fluid">
@@ -69,7 +69,11 @@ ${layout.menubar(section='query')}
             <div class="well sidebar-nav">
                 <form id="advancedSettingsForm" action="${action}" method="POST" class="form form-horizontal noPadding">
                     <ul class="nav nav-list">
-                        <li class="nav-header">${_('Hive settings')}</li>
+                        <li class="nav-header">${_('Query server')}</li>
+                        <li>
+                          ${form.query_servers['server']}
+                        </li>
+                        <li class="nav-header">${_('settings')}</li>
                         <li>
                             % for i, f in enumerate(form.settings.forms):
                             <div class="param">
@@ -317,6 +321,9 @@ ${layout.menubar(section='query')}
 </style>
 
 
+
+<script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
+
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
         $("*[rel=tooltip]").tooltip({
@@ -412,6 +419,14 @@ ${layout.menubar(section='query')}
             // TODO: client side validation
             $(".query").val($("#queryField").val());
             $("#advancedSettingsForm").submit();
+        }
+
+        $("#id_query_servers-server").change(function(){
+            $.cookie("hueBeeswaxLastQueryServer", $(this).val(), {expires: 90});
+        });
+
+        if ($.cookie("hueBeeswaxLastQueryServer") != null) {
+            $("#id_query_servers-server").val($.cookie("hueBeeswaxLastQueryServer"));
         }
     });
 </script>

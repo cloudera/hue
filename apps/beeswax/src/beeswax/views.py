@@ -14,9 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Beeswax is a UI for Hive.
-"""
 
 import logging
 import re
@@ -29,6 +26,7 @@ from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.utils.encoding import force_unicode
 from django.utils import simplejson
+from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako
 from desktop.lib.paginator import Paginator
@@ -37,10 +35,13 @@ from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.django_util import PopupException
 
 from hadoop.fs.exceptions import WebHdfsException
+from jobsub.parameterization import find_variables, substitute_variables
+from filebrowser.views import location_to_url
 
 import beeswax.forms
 import beeswax.design
 import beeswax.management.commands.beeswax_install_examples
+
 from beeswaxd import BeeswaxService
 from beeswaxd.ttypes import QueryHandle, BeeswaxException, QueryNotFoundException
 from beeswax import common
@@ -48,12 +49,8 @@ from beeswax import data_export
 from beeswax import db_utils
 from beeswax import models
 from beeswax import conf
+from beeswax.forms import QueryServerForm
 
-from jobsub.parameterization import find_variables, substitute_variables
-
-from filebrowser.views import location_to_url
-
-from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
@@ -156,8 +153,8 @@ def drop_table(request, table):
     query_msg = make_beeswax_query(request, hql)
     try:
       return execute_directly(request,
-                               query_msg,
-                               on_success_url=urlresolvers.reverse(show_tables))
+                              query_msg,
+                              on_success_url=urlresolvers.reverse(show_tables))
     except BeeswaxException, ex:
       # Note that this state is difficult to get to.
       error_message, log = expand_exception(ex)
@@ -262,7 +259,7 @@ def make_beeswax_query(request, hql, query_form=None):
   return query_msg
 
 
-def execute_directly(request, query_msg, design=None, tablename=None,
+def execute_directly(request, query_msg, query_server=None, design=None, tablename=None,
                      on_success_url=None, on_success_params=None, **kwargs):
   """
   execute_directly(request, query_msg, tablename, design) -> HTTP response for execution
@@ -272,6 +269,10 @@ def execute_directly(request, query_msg, design=None, tablename=None,
 
     query_msg
       The thrift Query object.
+
+    query_server
+      To which Query Server to submit the query.
+      Dictionary with keys: ['server_name', 'server_host', 'server_port'].
 
     design
       The design associated with the query.
@@ -293,7 +294,8 @@ def execute_directly(request, query_msg, design=None, tablename=None,
   """
   if design is not None:
     authorized_get_design(request, design.id)
-  history_obj = db_utils.execute_directly(request.user, query_msg, design, **kwargs)
+
+  history_obj = db_utils.execute_directly(request.user, query_msg, query_server, design, **kwargs)
   watch_url = urlresolvers.reverse("beeswax.views.watch_query", kwargs=dict(id=history_obj.id))
 
   # Prepare the GET params for the watch_url
@@ -360,23 +362,24 @@ def execute_query(request, design_id=None):
         break
 
       query_str = _strip_trailing_semicolon(form.query.cleaned_data["query"])
+      query_server = db_utils.get_query_server(form.query_servers.cleaned_data["server"])
 
       # (Optional) Parameterization.
-      parameterization = get_parameterization(request, query_str, form.query, design, to_explain)
+      parameterization = get_parameterization(request, query_str, form, design, to_explain)
       if parameterization:
         return parameterization
 
       query_msg = make_beeswax_query(request, query_str, form)
       try:
         if to_explain:
-          return explain_directly(request, query_str, query_msg, design)
+          return explain_directly(request, query_str, query_msg, design, query_server)
         else:
           notify = form.query.cleaned_data.get('email_notify', False)
-          return execute_directly(request, query_msg, design,
+          return execute_directly(request, query_msg, query_server, design,
                                   on_success_url=on_success_url,
                                   notify=notify)
       except BeeswaxException, ex:
-        error_message, log = expand_exception(ex)
+        error_message, log = expand_exception(ex, query_server)
         # Fall through to re-render the execute form.
     else:
       # GET request
@@ -397,20 +400,20 @@ def execute_query(request, design_id=None):
     'on_success_url': on_success_url,
   })
 
-def get_parameterization(request, query_str, query_form, design, is_explain):
+def get_parameterization(request, query_str, form, design, is_explain):
   """
   Figures out whether a design is parameterizable, and, if so,
   returns a form to fill out.  Returns None if there's no parameterization
   to do.
   """
-  if query_form.cleaned_data["is_parameterized"]:
-    variables = find_variables(query_str)
-    form = make_parameterization_form(query_str)
-    if form:
+  if form.query.cleaned_data["is_parameterized"]:
+    parameters_form = make_parameterization_form(query_str)
+    if parameters_form:
       return render("parameterization.mako", request, dict(
-        form=form(prefix="parameterization"),
+        form=parameters_form(prefix="parameterization"),
         design=design,
-        explain=is_explain))
+        explain=is_explain,
+        query_servers=form.query_servers))
   return None
 
 def make_parameterization_form(query_str):
@@ -446,23 +449,29 @@ def _run_parameterized_query(request, design_id, explain):
   # Reconstitute the form
   design_obj = beeswax.design.HQLdesign.loads(design.data)
   query_form = beeswax.forms.query_form()
-  query_form.bind(design_obj.get_query_dict())
+  params = design_obj.get_query_dict()
+  params.update(request.POST)
+  query_form.bind(params)
   assert query_form.is_valid()
+
   query_str = _strip_trailing_semicolon(query_form.query.cleaned_data["query"])
+  query_server = db_utils.get_query_server(query_form.query_servers.cleaned_data["server"])
+
   parameterization_form_cls = make_parameterization_form(query_str)
   if not parameterization_form_cls:
     raise PopupException(_("Query is not parameterizable."))
+
   parameterization_form = parameterization_form_cls(request.REQUEST, prefix="parameterization")
   if parameterization_form.is_valid():
     real_query = substitute_variables(query_str, parameterization_form.cleaned_data)
     query_msg = make_beeswax_query(request, real_query, query_form)
     try:
       if explain:
-        return explain_directly(request, query_str, query_msg, design)
+        return explain_directly(request, query_str, query_msg, design, query_server)
       else:
-        return execute_directly(request, query_msg, design)
+        return execute_directly(request, query_msg, query_server, design)
     except BeeswaxException, ex:
-      error_message, log = expand_exception(ex)
+      error_message, log = expand_exception(ex, query_server)
       return render('execute.mako', request, {
         'action': urlresolvers.reverse(execute_query),
         'design': design,
@@ -471,12 +480,13 @@ def _run_parameterized_query(request, design_id, explain):
         'log': log,
       })
   else:
-    return render("parameterization.mako", request, dict(form=parameterization_form, design=design, explain=explain))
+    return render("parameterization.mako", request, dict(form=parameterization_form, design=design, explain=explain,
+                                                         query_servers=query_form.query_servers))
 
-def expand_exception(exc):
+def expand_exception(exc, query_server):
   """expand_exception(exc) -> (error msg, log message)"""
   try:
-    log = db_utils.db_client().get_log(exc.log_context)
+    log = db_utils.db_client(query_server).get_log(exc.log_context)
   except:
     # Always show something, even if server has died on the job.
     log = _("Could not retrieve log.")
@@ -782,7 +792,7 @@ def watch_query(request, id):
     return format_preserving_redirect(request, results_url, request.GET)
 
   # Still running
-  log = db_utils.db_client().get_log(server_id)
+  log = db_utils.db_client(query_history.get_query_server()).get_log(server_id)
 
   # Keep waiting
   # - Translate context into something more meaningful (type, data)
@@ -889,7 +899,7 @@ def view_results(request, id, first_row=0):
 
   # Retrieve query results
   try:
-    results = db_utils.db_client().fetch(handle, start_over, -1)
+    results = db_utils.db_client(query_history.get_query_server()).fetch(handle, start_over, -1)
     assert results.ready, _('Trying to display result that is not yet ready. Query id %(id)s') % {'id': id}
     # We display the "Download" button only when we know
     # that there are results:
@@ -897,7 +907,7 @@ def view_results(request, id, first_row=0):
     fetch_error = False
   except BeeswaxException, ex:
     fetch_error = True
-    error_message, log = expand_exception(ex)
+    error_message, log = expand_exception(ex, query_history.get_query_server())
 
   # Handle errors
   if fetch_error:
@@ -911,7 +921,7 @@ def view_results(request, id, first_row=0):
       'can_save': False,
     })
 
-  log = db_utils.db_client().get_log(query_history.server_id)
+  log = db_utils.db_client(query_history.get_query_server()).get_log(query_history.server_id)
   download_urls = {}
   if downloadable:
     for format in common.DL_FORMATS:
@@ -973,7 +983,7 @@ def save_results(request, id):
       assert request.POST.get('save')
       handle = QueryHandle(id=query_history.server_id, log_context=query_history.log_context)
       try:
-        result_meta = db_utils.db_client().get_results_metadata(handle)
+        result_meta = db_utils.db_client(query_history.get_query_server()).get_results_metadata(handle)
       except QueryNotFoundException, ex:
         LOG.exception(ex)
         raise PopupException(_('Cannot find query.'))
@@ -1004,7 +1014,7 @@ def save_results(request, id):
                                       result_meta)
           except BeeswaxException, bex:
             LOG.exception(bex)
-            error_msg, log = expand_exception(bex)
+            error_msg, log = expand_exception(bex, query_history.get_query_server())
       except WebHdfsException, ex:
         raise PopupException(_('The table could not be saved.'), detail=ex)
       except IOError, ex:
@@ -1030,12 +1040,14 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
   Handle saving results as a new table. Returns HTTP response.
   May raise BeeswaxException, IOError.
   """
+  query_server = query_history.get_query_server() # Query server requires DDL support
+
   # Case 1: The results are straight from an existing table
   if result_meta.in_tablename:
     hql = 'CREATE TABLE `%s` AS SELECT * FROM %s' % (target_table, result_meta.in_tablename)
     query_msg = make_beeswax_query(request, hql)
     # Display the CTAS running. Could take a long time.
-    return execute_directly(request, query_msg, on_success_url=urlresolvers.reverse(show_tables))
+    return execute_directly(request, query_msg, query_server, on_success_url=urlresolvers.reverse(show_tables))
 
   # Case 2: The results are in some temporary location
   # 1. Create table
@@ -1063,7 +1075,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
         ''' % (target_table, cols, delim.zfill(3))
 
   query_msg = make_beeswax_query(request, hql)
-  db_utils.execute_and_wait(request.user, query_msg)
+  db_utils.execute_and_wait(request.user, query_msg, query_server)
 
   try:
     # 2. Move the results into the table's storage
@@ -1077,7 +1089,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     LOG.error('Error moving data into storage of table %s. Will drop table.' % (target_table,))
     query_msg = make_beeswax_query(request, 'DROP TABLE `%s`' % (target_table,))
     try:
-      db_utils.execute_directly(request.user, query_msg)        # Don't wait for results
+      db_utils.execute_directly(request.user, query_msg, query_server)        # Don't wait for results
     except Exception, double_trouble:
       LOG.exception('Failed to drop table "%s" as well: %s' % (target_table, double_trouble))
     raise ex
@@ -1149,9 +1161,18 @@ def describe_partitions(request, table):
 
 
 def configuration(request):
-  config_values = db_utils.db_client().get_default_configuration(
-                      bool(request.REQUEST.get("include_hadoop", False)))
-  return render("configuration.mako", request, dict(config_values=config_values))
+  if request.method == 'POST':
+    server_form = QueryServerForm(request.POST)
+    if server_form.is_valid():
+      query_server = db_utils.get_query_server(server_form.cleaned_data["server"])
+      config_values = db_utils.db_client(query_server).get_default_configuration(
+                          bool(request.REQUEST.get("include_hadoop", False)))
+  else:
+    server_form = QueryServerForm()
+    config_values = {}
+
+  return render("configuration.mako", request, {'config_values': config_values,
+                                                'server_form': server_form})
 
 def _copy_prefix(prefix, base_dict):
   """Copy keys starting with ``prefix``"""
@@ -1334,11 +1355,11 @@ def collapse_whitespace(s):
   return WHITESPACE.sub(" ", s).strip()
 
 
-def explain_directly(request, query_str, query_msg, design):
+def explain_directly(request, query_str, query_msg, design, query_server):
   """
   Runs explain query.
   """
-  explanation = db_utils.db_client().explain(query_msg)
+  explanation = db_utils.db_client(query_server).explain(query_msg)
   context = ("design", design)
   return render('explain.mako', request,
     dict(query=query_str, explanation=explanation.textual, query_context=context))

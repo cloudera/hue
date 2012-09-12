@@ -38,6 +38,7 @@ from hadoop import pseudo_hdfs4
 import hadoop.conf
 
 import beeswax.conf
+from beeswax.db_utils import get_query_server
 
 
 _INITIALIZED = False
@@ -90,8 +91,9 @@ def get_shared_beeswax_server():
     default_xml = file(beeswax.conf.BEESWAX_HIVE_CONF_DIR.get()+"/hive-default.xml.template").read()
 
     finish = (
-      beeswax.conf.BEESWAX_SERVER_HOST.set_for_testing("localhost"),
-      beeswax.conf.BEESWAX_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT),
+      beeswax.conf.QUERY_SERVERS['default'].SERVER_HOST.set_for_testing("localhost"),
+      beeswax.conf.QUERY_SERVERS['default'].SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT),
+      beeswax.conf.QUERY_SERVERS['default'].SUPPORT_DDL.set_for_testing(True),
       beeswax.conf.BEESWAX_META_SERVER_HOST.set_for_testing("localhost"),
       beeswax.conf.BEESWAX_META_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT + 1),
       # Use a bogus path to avoid loading the normal hive-site.xml
@@ -122,7 +124,8 @@ def get_shared_beeswax_server():
       sleep = 0.001
       while not started and time.time() - start < 20.0:
         try:
-          client = beeswax.db_utils.db_client()
+          query_server = get_query_server(support_ddl=True)
+          client = beeswax.db_utils.db_client(query_server)
           meta_client = beeswax.db_utils.meta_client()
 
           client.echo("echo")
@@ -160,6 +163,7 @@ def get_shared_beeswax_server():
 
 REFRESH_RE = re.compile('<\s*meta\s+http-equiv="refresh"\s+content="\d*;([^"]*)"\s*/>', re.I)
 
+
 def wait_for_query_to_finish(client, response, max=30.0):
   logging.info(str(response.template) + ": " + str(response.content))
   start = time.time()
@@ -188,7 +192,7 @@ def wait_for_query_to_finish(client, response, max=30.0):
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True, max=30.0, **kwargs):
+               is_parameterized=True, max=30.0, server='default', **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -204,8 +208,10 @@ def make_query(client, query, submission_type="Execute",
   # Prepares arguments for the execute view.
   parameters = {
     'query-query': query,
+    'query_servers-server': server,
     'query-is_parameterized': is_parameterized and "on"
   }
+
   if submission_type == 'Execute':
     parameters['button-submit'] = 'Whatever'
   elif submission_type == 'Explain':

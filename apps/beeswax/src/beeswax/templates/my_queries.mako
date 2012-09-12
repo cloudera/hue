@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
-${commonheader(_('Beeswax: My Queries'), "beeswax", "100px")}
+${commonheader(_('My Queries'), "beeswax", "100px")}
 ${layout.menubar(section='my queries')}
 <style>
     .tab-content {
@@ -30,7 +30,7 @@ ${layout.menubar(section='my queries')}
     }
 </style>
 <div class="container-fluid">
-    <h1>${_('Beeswax: My Queries')}</h1>
+    <h1>${_('My Queries')}</h1>
 
     <div class="well hueWell">
         <div class="btn-group pull-right">

@@ -40,7 +40,7 @@ SAMPLE_DATA_DIR = Config(
   private=True)
 
 
-# Deprecated!
+# Deprecated! To remove in Hue 3
 # These configs were moved to desktop liboozie.
 # If liboozie is not configured these settings will be used.
 # They also have priority if liboozie defines them.

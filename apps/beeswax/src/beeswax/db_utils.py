@@ -23,7 +23,6 @@ import logging
 import thrift
 import time
 
-import desktop.conf
 import hadoop.cluster
 
 from beeswax import conf
@@ -41,7 +40,8 @@ from django.utils.translation import ugettext_lazy as _
 
 LOG = logging.getLogger(__name__)
 
-def execute_directly(user, query_msg, design=None, notify=False):
+
+def execute_directly(user, query_msg, query_server=None, design=None, notify=False):
   """
   execute_directly(user, query_msg [,design]) -> QueryHistory object
 
@@ -51,9 +51,15 @@ def execute_directly(user, query_msg, design=None, notify=False):
   design - The SavedQuery object (i.e. design) associated with this query.
   notify - Whether to notify the user upon completion.
   """
+  if query_server is None:
+    query_server = get_query_server(support_ddl=True) # For convenience with DDL queries only
+
   query_history = QueryHistory(
                             owner=user,
                             query=query_msg.query,
+                            server_host='%(server_host)s' % query_server,
+                            server_port='%(server_port)d' % query_server,
+                            server_name='%(server_name)s' % query_server,
                             last_state=QueryHistory.STATE.submitted.index,
                             design=design,
                             notify=notify)
@@ -63,7 +69,7 @@ def execute_directly(user, query_msg, design=None, notify=False):
 
   # Now submit it
   try:
-    handle = db_client().query(query_msg)
+    handle = db_client(query_server).query(query_msg)
     if not handle or not handle.id:
       # It really shouldn't happen
       msg = _("BeeswaxServer returning invalid handle for query id %(id)d [%(query)s]...") % \
@@ -104,7 +110,7 @@ def wait_for_results(query_history, timeout_sec=30.0):
   curr = time.time()
   end = curr + timeout_sec
   while curr <= end:
-    results = db_client().fetch(handle, START_OVER, fetch_size=-1)
+    results = db_client(query_history.get_query_server()).fetch(handle, START_OVER, fetch_size=-1)
     if results.ready:
       return results
     time.sleep(SLEEP_INTERVAL)
@@ -112,13 +118,13 @@ def wait_for_results(query_history, timeout_sec=30.0):
   return None
 
 
-def execute_and_wait(user, query_msg, timeout_sec=30.0):
+def execute_and_wait(user, query_msg, query_server=None, timeout_sec=30.0):
   """
   execute_and_wait(user, query_msg) -> results or None
   Combine execute_directly() and wait_for_results()
   May raise BeeswaxException
   """
-  history = execute_directly(user, query_msg)
+  history = execute_directly(user, query_msg, query_server)
   result = wait_for_results(history, timeout_sec)
   return result
 
@@ -141,7 +147,7 @@ def get_query_state(query_history):
   # Now check the server state
   handle = QueryHandle(id=server_id, log_context=query_history.log_context)
   try:
-    server_state = db_client().get_state(handle)
+    server_state = db_client(query_history.get_query_server()).get_state(handle)
     return models.QueryHistory.STATE_MAP[server_state]
   except QueryNotFoundException:
     LOG.debug("Query id %s has expired" % (query_history.id,))
@@ -152,10 +158,39 @@ def get_query_state(query_history):
     return None
 
 
+def get_query_server(name='default', support_ddl=False):
+  if 'beeswax_server_host' in conf.QUERY_SERVERS['bind_to'] or 'beeswax_server_port' in conf.QUERY_SERVERS['bind_to']:
+    return {
+          'server_name': 'default',
+          'server_host': conf.BEESWAX_SERVER_HOST.get(),
+          'server_port': conf.BEESWAX_SERVER_PORT.get(),
+          'support_ddl': True,
+      }
+
+  servers = conf.QUERY_SERVERS
+
+  if support_ddl:
+    if not servers[name].SUPPORT_DDL.get():
+      for key in servers.keys():
+        if servers[key].SUPPORT_DDL.get():
+          name = key
+          break
+
+  config = servers[name]
+
+  query_server = {
+      'server_name': name,
+      'server_host': config.SERVER_HOST.get(),
+      'server_port': config.SERVER_PORT.get(),
+      'support_ddl': config.SUPPORT_DDL.get(),
+  }
+
+  return query_server
+
 #
 # Note that thrift_util does client connection caching for us.
 #
-def db_client():
+def db_client(query_server):
   """Get the Thrift client to talk to beeswax server"""
 
   class UnicodeBeeswaxClient(object):
@@ -218,12 +253,12 @@ def db_client():
   use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
 
   client = thrift_util.get_client(BeeswaxService.Client,
-                                conf.BEESWAX_SERVER_HOST.get(),
-                                conf.BEESWAX_SERVER_PORT.get(),
-                                service_name="Beeswax (Hive UI) Server",
-                                kerberos_principal="hue",
-                                use_sasl=use_sasl,
-                                timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
+                                  query_server['server_host'],
+                                  query_server['server_port'],
+                                  service_name=query_server['server_name'],
+                                  kerberos_principal="hue",
+                                  use_sasl=use_sasl,
+                                  timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
   return UnicodeBeeswaxClient(client)
 
 

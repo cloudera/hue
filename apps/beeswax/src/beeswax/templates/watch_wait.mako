@@ -19,13 +19,13 @@ from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader(_('Beeswax: Waiting for query...'), "beeswax", "100px")}
+${commonheader(_('Waiting for query...'), "beeswax", "100px")}
 ${layout.menubar(section='query')}
 
 <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
 
 <div class="container-fluid">
-	<h1>${_('Beeswax: Waiting for query...')} ${util.render_query_context(query_context)}</h1>
+	<h1>${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
 	<div class="row-fluid">
 		<div class="span3">
 			<div class="well sidebar-nav">

@@ -42,7 +42,8 @@ import beeswax.models
 import beeswax.views
 from beeswax import conf
 from beeswax.views import parse_results, collapse_whitespace
-from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history
+from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server,\
+  BEESWAXD_TEST_PORT
 from beeswax.test_base import BeeswaxSampleProvider
 from beeswaxd import BeeswaxService
 from beeswaxd import ttypes
@@ -100,8 +101,10 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     assert_true("Table test already exists" in response.context["error_message"])
 
   def test_configuration(self):
-    response = self.client.get("/beeswax/configuration")
-    response_verbose = self.client.get("/beeswax/configuration?include_hadoop=true")
+    params = {'server': 'default'}
+
+    response = self.client.post("/beeswax/configuration", params)
+    response_verbose = self.client.post("/beeswax/configuration?include_hadoop=true", params)
 
     assert_true("hive.exec.scratchdir" in response.content)
     assert_true("hive.exec.scratchdir" in response_verbose.content)
@@ -166,7 +169,7 @@ for x in sys.stdin:
     Test basic query submission
     """
     # Minimal server operation
-    assert_equal("echo", beeswax.db_utils.db_client().echo("echo"))
+    assert_equal("echo", beeswax.db_utils.db_client(get_query_server()).echo("echo"))
 
     # Table should have been created
     response = self.client.get("/beeswax/tables")
@@ -294,14 +297,14 @@ for x in sys.stdin:
     """
     query_msg.configuration = []
     query_msg.hadoop_user = "test"
-    handle = beeswax.db_utils.db_client().executeAndWait(query_msg, "")
+    handle = beeswax.db_utils.db_client(get_query_server()).executeAndWait(query_msg, "")
 
-    results = beeswax.db_utils.db_client().fetch(handle, True, 5)
+    results = beeswax.db_utils.db_client(get_query_server()).fetch(handle, True, 5)
     row_list = list(parse_results(results.data))
     assert_equal(len(row_list), 5)
 
-    beeswax.db_utils.db_client().close(handle)
-    beeswax.db_utils.db_client().clean(handle.log_context)
+    beeswax.db_utils.db_client(get_query_server()).close(handle)
+    beeswax.db_utils.db_client(get_query_server()).clean(handle.log_context)
 
 
   def test_sync_query_error(self):
@@ -317,7 +320,7 @@ for x in sys.stdin:
     query_msg.configuration = []
     query_msg.hadoop_user = "test"
     try:
-      handle = beeswax.db_utils.db_client().executeAndWait(query_msg, "")
+      handle = beeswax.db_utils.db_client(get_query_server()).executeAndWait(query_msg, "")
     except ttypes.BeeswaxException, bex:
       assert_equal(bex.errorCode, 40000)
       assert_equal(bex.SQLState, "42000")
@@ -339,7 +342,7 @@ for x in sys.stdin:
       def __init__(self, **entries):
         self.__dict__.update(entries)
 
-    client = beeswax.db_utils.db_client()
+    client = beeswax.db_utils.db_client(get_query_server())
 
     prev_get_default_configuration = client.get_default_configuration
     prev_client = client._client
@@ -379,12 +382,12 @@ for x in sys.stdin:
     design_id = response.context["design"].id
 
     # Don't fill out the form
-    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id)
+    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id, { 'query_servers-server': 'default' })
     assert_true("parameterization.mako", response.template)
 
     # Now fill it out
     response = self.client.post("/beeswax/execute_parameterized/%d" % design_id,
-      { "parameterization-x": str(1), "parameterization-y": str(2) }, follow=True)
+      { "parameterization-x": str(1), "parameterization-y": str(2), 'query_servers-server': 'default' }, follow=True)
 
     assert_true("watch_wait.mako" in response.template)
     # Check that substitution happened!
@@ -393,7 +396,8 @@ for x in sys.stdin:
 
     # Check that error handling is reasonable
     response = self.client.post("/beeswax/execute_parameterized/%d" % design_id,
-      { "parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2) }, follow=True)
+      { "parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2), 'query_servers-server': 'default' },
+      follow=True)
     assert_true("execute.mako" in response.template)
     log = response.context["log"]
     assert_true(search_log_line('ql.Driver', 'FAILED: ParseException', log), log)
@@ -488,8 +492,10 @@ for x in sys.stdin:
     query_msg.query = 'SELECT foo FROM test limit %d' % (limit,)
     query_msg.configuration = []
     query_msg.hadoop_user = "test"
-    handle = beeswax.db_utils.db_client().query(query_msg)
+    handle = beeswax.db_utils.db_client(get_query_server()).query(query_msg)
     query_data = beeswax.models.QueryHistory(server_id=handle.id, log_context=handle.log_context)
+    query_data.server_host = beeswax.conf.QUERY_SERVERS['default'].SERVER_HOST.get() # Needed as we query directly
+    query_data.server_port = beeswax.conf.QUERY_SERVERS['default'].SERVER_PORT.get()
     # Get the result in csv. Should have 3 + 1 header row.
     csv_resp = beeswax.data_export.download(query_data, 'csv')
     assert_equal(len(csv_resp.content.strip().split('\n')), limit + 1)
@@ -499,14 +505,18 @@ for x in sys.stdin:
     query_msg.query = 'SELECT * FROM test'
     query_msg.configuration = []
     query_msg.hadoop_user = "test"
-    handle = beeswax.db_utils.db_client().query(query_msg)
+    handle = beeswax.db_utils.db_client(get_query_server()).query(query_msg)
     query_data = beeswax.models.QueryHistory(server_id=handle.id, log_context=handle.log_context)
+    query_data.server_host = beeswax.conf.QUERY_SERVERS['default'].SERVER_HOST.get() # Needed as we query directly
+    query_data.server_port = beeswax.conf.QUERY_SERVERS['default'].SERVER_PORT.get()
     # Get the result in xls. Then translate it into csv.
     xls_resp = beeswax.data_export.download(query_data, 'xls')
     translated_csv = xls2csv(xls_resp.content)
     # It should have 257 lines (256 + header)
     assert_equal(len(translated_csv.strip('\r\n').split('\r\n')), 257)
-    handle = beeswax.db_utils.db_client().query(query_msg)
+    handle = beeswax.db_utils.db_client(get_query_server()).query(query_msg)
+    query_data.server_host = beeswax.conf.QUERY_SERVERS['default'].SERVER_HOST.get() # Needed as we query directly
+    query_data.server_port = beeswax.conf.QUERY_SERVERS['default'].SERVER_PORT.get()
     # Get the result in csv.
     csv_resp = beeswax.data_export.download(query_data, 'csv')
     assert_equal(csv_resp.content, translated_csv)
@@ -1031,8 +1041,19 @@ for x in sys.stdin:
     resp = self.client.get('/beeswax/table/myview')
     assert_equal(None, resp.context['top_rows'])
     assert_true(resp.context['is_view'])
-    assert_true("Beeswax View Metadata" in resp.content)
+    assert_true("View Metadata" in resp.content)
     assert_true("Drop View" in resp.content)
+
+
+  def test_select_query_server(self):
+    c = make_logged_in_client()
+
+    _make_query(c, 'SELECT bogus FROM test', server='default') # Improvement: mock another server
+
+    history = beeswax.models.QueryHistory.objects.latest('id')
+    assert_equal('default', history.server_name)
+    assert_equal('localhost', history.server_host)
+    assert_equal(BEESWAXD_TEST_PORT, history.server_port)
 
 
 def test_import_gzip_reader():

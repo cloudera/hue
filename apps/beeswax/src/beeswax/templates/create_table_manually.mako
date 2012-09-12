@@ -19,7 +19,7 @@
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_("Beeswax: Create table manually"), "beeswax", "100px")}
+${commonheader(_("Create table manually"), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
@@ -119,7 +119,7 @@ ${layout.menubar(section='tables')}
 	    <fieldset>
 	        <div id="step3Delimited" class="stepDetailsInner">
 	            <div class="alert alert-info"><h3>${_('Configure Record Serialization')}</h3>
-	                ${_('Hive only supports single-character delimiters.')}
+	                ${_('Only supports single-character delimiters.')}
 	            </div>
 	            <div class="control-group">
 	                ${comps.bootstrapLabel(table_form["field_terminator"])}
@@ -283,10 +283,10 @@ ${layout.menubar(section='tables')}
 	    <br/><br/>
 	    <fieldset>
 	        <div class="alert alert-info"><h3>${_('Configure Partitions')}</h3>
-	            ${_('If your data is naturally partitioned (by date, for example), partitions are a way to tell Hive that data for a specific partition value are stored together.')}
-	            ${_('Hive establishes a mapping between directories on disk')}
+	            ${_('If your data is naturally partitioned (by date, for example), partitions are a way to tell the query server that data for a specific partition value are stored together.')}
+	            ${_('The query server establishes a mapping between directories on disk')}
 	            (<em>${_('e.g.')},</em> <code>/user/hive/warehouse/logs/dt=20100101/</code>)
-	            ${_('and the data for that day.  Partitions are virtual columns; they are not represented in the data itself, but are determined by the data location. Hive implements query optimizations such that queries that are specific to a single partition need not read the data in other partitions.')}
+	            ${_('and the data for that day.  Partitions are virtual columns; they are not represented in the data itself, but are determined by the data location. The query server implements query optimizations such that queries that are specific to a single partition need not read the data in other partitions.')}
 	        </div>
 	        % for form in partitions_form.forms:
 	            ${render_column(form, True)}

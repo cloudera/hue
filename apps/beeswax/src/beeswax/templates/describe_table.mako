@@ -17,18 +17,20 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
+
 <%
   if is_view:
     view_or_table_noun = _("View")
   else:
     view_or_table_noun = _("Table")
 %>
-${commonheader(_("Beeswax %s Metadata: %s") % (view_or_table_noun, table.tableName), "beeswax", "100px")}
+${commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.tableName), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
-<%def name="column_table(cols)">
 
+<%def name="column_table(cols)">
     <table class="table table-striped table-condensed datatables">
       <thead>
         <tr>
@@ -51,7 +53,7 @@ ${layout.menubar(section='tables')}
 </%def>
 
 <div class="container-fluid">
-	<h1>${_('Beeswax Table Metadata:')} ${table.tableName}</h1>
+	<h1>${_('Table Metadata:')} ${table.tableName}</h1>
 	<div class="row-fluid">
 		<div class="span3">
 			<div class="well sidebar-nav">
