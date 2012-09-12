@@ -153,7 +153,7 @@ ${ layout.menubar(section='workflows') }
                  ${ workflow_form['parameters'] }
                  ${ properties.print_key_value(workflow_form['job_properties'], 'job_properties', job_properties) }
                  ${ workflow_form['job_properties'] }
-                 ${ utils.render_field(workflow_form['schema_version']) }
+                 ${ workflow_form['schema_version'] }
                  ${ utils.render_field(workflow_form['job_xml']) }
                </div>
 

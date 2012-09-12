@@ -40,16 +40,13 @@ class WorkflowForm(forms.ModelForm):
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'deployment_dir': forms.TextInput(attrs={'class': 'pathChooser', 'style': "width:535px"}),
       'parameters': forms.widgets.HiddenInput(),
-      'job_xml': forms.widgets.HiddenInput(),
+      'job_xml': forms.widgets.HiddenInput(attrs={'class': 'span5'}),
       'job_properties': forms.widgets.HiddenInput(),
+      'schema_version': forms.widgets.HiddenInput(),
     }
 
   def __init__(self, *args, **kwargs):
     super(WorkflowForm, self).__init__(*args, **kwargs)
-    self.fields['schema_version'].widget = forms.Select(choices=(('uri:oozie:workflow:0.1', '0.1'),
-                                                                 ('uri:oozie:workflow:0.2', '0.2'),
-                                                                 ('uri:oozie:workflow:0.3', '0.3'),
-                                                                 ('uri:oozie:workflow:0.4', '0.4')))
 
 
 class ImportJobsubDesignForm(forms.Form):
@@ -77,6 +74,10 @@ class JavaForm(forms.ModelForm):
       'archives': forms.HiddenInput(),
       'jar_path': forms.TextInput(attrs={'class': 'pathChooser span5'}),
       'description': forms.TextInput(attrs={'class': 'span5'}),
+      'main_class': forms.TextInput(attrs={'class': 'span5'}),
+      'args': forms.TextInput(attrs={'class': 'span5'}),
+      'java_opts': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
     }
 
 
@@ -92,6 +93,7 @@ class MapreduceForm(forms.ModelForm):
       'archives': forms.HiddenInput(),
       'jar_path': forms.TextInput(attrs={'class': 'pathChooser span5'}),
       'description': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
     }
 
 
@@ -105,6 +107,9 @@ class StreamingForm(forms.ModelForm):
       'files': forms.widgets.HiddenInput(),
       'archives': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+      'mapper': forms.TextInput(attrs={'class': 'span5'}),
+      'reducer': forms.TextInput(attrs={'class': 'span5'}),
     }
 
 
@@ -120,6 +125,7 @@ class PigForm(forms.ModelForm):
       'files': forms.widgets.HiddenInput(),
       'archives': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
     }
 
 
@@ -160,6 +166,7 @@ class CoordinatorForm(forms.ModelForm):
     widgets = {
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'parameters': forms.widgets.HiddenInput(),
+      'schema_version': forms.widgets.HiddenInput(),
     }
 
   def __init__(self, *args, **kwargs):
@@ -173,10 +180,7 @@ class CoordinatorForm(forms.ModelForm):
         workflows.append(workflow.id)
     qs = qs.filter(id__in=workflows)
     self.fields['workflow'].queryset = qs
-    self.fields['schema_version'].widget = forms.Select(choices=(('uri:oozie:coordinator:0.1', '0.1'),
-                                                                 ('uri:oozie:coordinator:0.2', '0.2'),
-                                                                 ('uri:oozie:coordinator:0.3', '0.3'),
-                                                                 ('uri:oozie:coordinator:0.4', '0.4')))
+
 
 class DatasetForm(forms.ModelForm):
   start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],

@@ -56,12 +56,13 @@ ${ layout.menubar(section='workflows') }
           </div>
 
             <div id="advanced-container" class="hide">
+              ${ utils.render_field(workflow_form['is_shared']) }
               ${ utils.render_field(workflow_form['deployment_dir']) }
-              ${ utils.render_field(workflow_form['schema_version']) }
               ${ utils.render_field(workflow_form['job_xml']) }
            </div>
 
            <div class="hide">
+             ${ workflow_form['schema_version'] }
              ${ workflow_form['job_properties'] }
              ${ workflow_form['parameters'] }
          </div>
