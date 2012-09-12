@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from django.conf.urls.defaults import patterns, url
+
+urlpatterns = patterns('pig.views',
+  url(r'^$', 'editor', name='index'),
+
+  url(r'^editor/$', 'editor', name='editor'),
+  url(r'^dashboard/$', 'dashboard', name='dashboard'),
+  url(r'^scripts/$', 'scripts', name='scripts'),
+  url(r'^udfs/$', 'udfs', name='udfs'),
+
+  # Ajax
+  url(r'^load_script/(?P<doc_id>\d+)?', 'load_script', name='load_script'),
+  url(r'^save(?P<doc_id>[\w\.]+)', 'save', name='save'),
+  url(r'^submit/(?P<doc_id>[\w\.]+)$', 'submit', name='submit'),
+  url(r'^watch/(?P<doc_id>[\w\.]+)/(?P<job_id>[-\w]+)$', 'watch', name='watch')
+)

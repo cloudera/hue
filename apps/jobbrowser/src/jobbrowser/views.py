@@ -260,8 +260,8 @@ def single_task_attempt(request, job, taskid, attemptid):
 
   return render("attempt.mako", request,
     {
-      "attempt":attempt,
-      "taskid":taskid,
+      "attempt": attempt,
+      "taskid": taskid,
       "joblnk": job_link,
       "task": task
     })
@@ -297,15 +297,20 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
     # Four entries,
     # for diagnostic, stdout, stderr and syslog
     logs = [ _("Failed to retrieve log. TaskTracker not found.") ] * 4
-
-  return render("attempt_logs.mako", request, {
+  
+  context = {
       "attempt": attempt,
       "taskid": taskid,
       "joblnk": job_link,
       "task": task,
       "logs": logs,
       "first_log_tab": first_log_tab,
-    })
+  }
+  
+  if request.GET.get('format') == 'python':
+    return context
+  else:
+    return render("attempt_logs.mako", request, context)
 
 @check_job_permission
 def task_attempt_counters(request, job, taskid, attemptid):

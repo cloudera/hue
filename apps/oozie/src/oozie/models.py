@@ -557,7 +557,6 @@ class Node(models.Model):
   # Can't use through relation directly with this Django version?
   # https://docs.djangoproject.com/en/1.2/topics/db/models/#intermediary-manytomany
   def get_link(self, name=None):
-    a = Link.objects.filter(parent=self)
     if name is None:
       return Link.objects.exclude(name__in=Link.META_LINKS).get(parent=self)
     else:
