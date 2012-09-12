@@ -31,7 +31,7 @@ ${layout.menubar(section='log_view')}
 		<% log.reverse() %>
 		<pre>
 		% for l in log:
-${smart_unicode(l) | h}
+${smart_unicode(l, errors='ignore') | h}
 		% endfor
 		</pre>
 
