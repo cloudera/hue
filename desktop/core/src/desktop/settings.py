@@ -148,6 +148,18 @@ INSTALLED_APPS = [
     'desktop'
 ]
 
+# Keep default values up to date
+TEMPLATE_CONTEXT_PROCESSORS = (
+  'django.contrib.auth.context_processors.auth',
+  'django.core.context_processors.debug',
+  'django.core.context_processors.i18n',
+  'django.core.context_processors.media',
+  'django.contrib.messages.context_processors.messages',
+   # Not default
+  'desktop.context_processors.app_name',
+)
+
+
 # Desktop doesn't use an auth profile module, because
 # because it doesn't mesh very well with the notion
 # of having multiple apps.  If your app needs
@@ -255,7 +267,7 @@ if SECRET_KEY == "":
 
 ############################################################
 
-# Necessary for South to not futz with tests.  Fixed in South 0.7.1
+# Necessary for South to not fuzz with tests.  Fixed in South 0.7.1
 SKIP_SOUTH_TESTS = True
 
 # Set up environment variable so Kerberos libraries look at our private

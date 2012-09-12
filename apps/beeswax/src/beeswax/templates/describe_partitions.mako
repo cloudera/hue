@@ -21,7 +21,7 @@
 
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.name), "beeswax", user, "100px")}
+${commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user, '100px')}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">

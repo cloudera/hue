@@ -21,11 +21,11 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${commonheader(_('Waiting for query...'), "beeswax", user, "100px")}
+${commonheader(_('Waiting for query...'), app_name, user, '100px')}
 ${layout.menubar(section='query')}
 
 ## Required for unit tests
-<!-- <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" /> -->
+<!-- <meta http-equiv="refresh" content="3;${url(app_name + ':watch_query', query.id)}?${fwd_params}" /> -->
 
 <div class="container-fluid">
 	<h1>${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
@@ -71,7 +71,7 @@ ${layout.menubar(section='query')}
 <script>
 
   $(document).ready(function(){
-    var fwdUrl = "${url('beeswax.views.watch_query', query.id)}?${fwd_params}";
+    var fwdUrl = "${url(app_name + ':watch_query', query.id)}?${fwd_params}";
     var labels = {
       MRJOB: "${_('MR Job')}",
       MRJOBS: "${_('MR Jobs')}"
@@ -82,7 +82,7 @@ ${layout.menubar(section='query')}
     var logsAtEnd = true;
 
     function refreshView() {
-      $.getJSON("${url('beeswax.views.watch_query_refresh_json', query.id)}", function (data) {
+      $.getJSON("${url(app_name + ':watch_query_refresh_json', query.id)}", function (data) {
         if (data.isSuccess || data.isFailure) {
           location.href = fwdUrl;
         }

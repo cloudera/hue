@@ -97,7 +97,7 @@ class QueryHistory(models.Model):
       return HiveServerQueryHistory.objects.get(id=id)
 
 
-  def get_query_server(self):
+  def get_query_server_config(self):
     return dict(zip(['server_name', 'server_host', 'server_port', 'server_type'],
                     [self.server_name, self.server_host, self.server_port, self.server_type]))
 
@@ -216,7 +216,8 @@ class SavedQuery(models.Model):
   """
   DEFAULT_NEW_DESIGN_NAME = _('My saved query')
   AUTO_DESIGN_SUFFIX = _(' (new)')
-  TYPES = (HQL, REPORT) = range(2) # REPORT is unused
+  TYPES = (HQL, IMPALA) = range(2)
+  TYPES_MAPPING = {'beeswax': HQL, 'hql': HQL, 'impala': IMPALA}
 
   type = models.IntegerField(null=False)
   owner = models.ForeignKey(User, db_index=True)

@@ -17,10 +17,11 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Beeswax'), "beeswax", user, "100px")}
+${commonheader(_('Beeswax'), app_name, user, '100px')}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
@@ -33,22 +34,22 @@ ${layout.menubar(section='tables')}
                     <li><a href="#installSamples" data-toggle="modal">${_('Install Samples')}</a></li>
                     % endif
                     <li class="nav-header">${_('Tables')}</li>
-                    <li><a href="${ url('beeswax.views.show_tables') }">${_('Show Tables')}</a></li>
-                    <li><a href="${ url('beeswax.create_table.create_table') }">${_('Create Table')}</a></li>
+                    <li><a href="${ url(app_name + ':show_tables') }">${_('Show Tables')}</a></li>
+                    <li><a href="${ url(app_name + ':create_table') }">${_('Create Table')}</a></li>
                     <li class="nav-header">${_('Queries')}</li>
-                    <li><a href="${ url('beeswax.views.list_designs') }">${_('Saved Queries')}</a></li>
-                    <li><a href="${ url('beeswax.views.execute_query') }">${_('Execute Query')}</a></li>
-                    <li><a href="${ url('beeswax.views.list_query_history') }">${_('Query History')}</a></li>
+                    <li><a href="${ url(app_name + ':list_designs') }">${_('Saved Queries')}</a></li>
+                    <li><a href="${ url(app_name + ':execute_query') }">${_('Execute Query')}</a></li>
+                    <li><a href="${ url(app_name + ':list_query_history') }">${_('Query History')}</a></li>
                     <li class="nav-header">${_('Configuration')}</li>
-                    <li><a href="${ url('beeswax.views.configuration') }">${_('Configuration')}</a></li>
-                    <li><a href="${ url('beeswax.views.configuration') }?include_hadoop=1">${_('Extended Configuration')}</a></li>
+                    <li><a href="${ url(app_name + ':configuration') }">${_('Configuration')}</a></li>
+                    <li><a href="${ url(app_name + ':configuration') }?include_hadoop=1">${_('Extended Configuration')}</a></li>
                 </ul>
             </div>
         </div>
         <div class="span9">
             <h1>${_('Welcome to Beeswax for Hive')}</h1>
             ${_("To get started with Beeswax you'll first need set up some data:")}
-            <a href="${ url('beeswax.create_table.create_table') }" class='btn'>${_('Import Data')}</a>
+            <a href="${ url(app_name + ':create_table') }" class='btn'>${_('Import Data')}</a>
             ${_("or")} <a href="#installSamples" data-toggle="modal" class='btn'>${_('Install Samples')}</a>
         </div>
     </div>
@@ -71,13 +72,13 @@ ${layout.menubar(section='tables')}
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-        $.getJSON("${ url('beeswax.views.install_examples') }",function(data){
+        $.getJSON("${ url(app_name + ':install_examples') }",function(data){
             $("#installSamplesMessage").text(data.title);
         });
 
         $("#installSamplesBtn").click(function(){
             $.post(
-                "${ url('beeswax.views.install_examples') }",
+                "${ url(app_name + ':install_examples') }",
                 { submit:"Submit" },
                 function(result){
                     if (result.creationSucceeded){

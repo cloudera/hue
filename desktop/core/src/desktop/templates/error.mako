@@ -18,7 +18,8 @@ from desktop.views import commonheader, commonfooter
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
-${commonheader(_('Error'), "", user)}
+
+${commonheader(_('Error'), app_name, user)}
 
   <div class="container-fluid">
     <h1>${_('Error!')}</h1>
@@ -29,7 +30,8 @@ ${commonheader(_('Error'), "", user)}
       ${smart_unicode(traceback) | h}
       </textarea>
     %endif
+
+    <a class="btn" onclick="history.back()">${ _('Back') }</a>
   </div>
 
 ${commonfooter(messages)}
-

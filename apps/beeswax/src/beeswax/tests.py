@@ -45,7 +45,7 @@ import beeswax.views
 
 from beeswax import conf
 from beeswax.views import collapse_whitespace
-from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server,\
+from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   BEESWAXD_TEST_PORT
 from beeswax.design import hql_query, _strip_trailing_semicolon
 from beeswax.data_export import download
@@ -66,6 +66,7 @@ def _make_query(client, query, submission_type="Execute",
   res = make_query(client, query, submission_type,
                    udfs, settings, resources,
                    wait, name, desc, local, is_parameterized, max, **kwargs)
+
   # Should be in the history if it's submitted.
   if submission_type == 'Execute':
     fragment = collapse_whitespace(smart_str(query[:20]))
@@ -87,7 +88,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
 
   def setUp(self):
     user = User.objects.get(username='test')
-    self.db = dbms.get(user, get_query_server())
+    self.db = dbms.get(user, get_query_server_config())
 
   def _verify_query_state(self, state):
     """
@@ -1074,10 +1075,10 @@ for x in sys.stdin:
 
   def test_select_query_server(self):
     c = make_logged_in_client()
-    _make_query(c, 'SELECT bogus FROM test', server='default') # Improvement: mock another server
+    _make_query(c, 'SELECT bogus FROM test', server='beeswax') # Improvement: mock another server
 
     history = beeswax.models.QueryHistory.objects.latest('id')
-    assert_equal('default', history.server_name)
+    assert_equal('beeswax', history.server_name)
     assert_equal('localhost', history.server_host)
     assert_equal(BEESWAXD_TEST_PORT, history.server_port)
 
@@ -1126,6 +1127,7 @@ def test_history_page():
   def do_view(param):
     resp = client.get('/beeswax/query_history?' + param)
     assert_true(len(resp.context['page'].object_list) >= 0)     # Make the query run
+    return resp
 
   do_view('user=test')
   do_view('user=:all')
@@ -1144,6 +1146,9 @@ def test_history_page():
   do_view('sort=name&user=bogus&design_id=1&auto_query=1')
   do_view('sort=-type&user=:all&type=hql&auto_query=0')
 
+  # Only show Beeswax queries
+  response = do_view('')
+  assert_equal('beeswax', response.context['filter_params']['type'])
 
 def test_strip_trailing_semicolon():
   # Note that there are two queries (both an execute and an explain) scattered

@@ -18,17 +18,17 @@
 from django import forms
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+import hadoop
 import hive_metastore
 
 from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
 from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
-
 from filebrowser.forms import PathField
 
-from beeswax import common, conf, models
+from beeswax import common
 from beeswax.design import _strip_trailing_semicolon
-import hadoop
 from beeswax.server.dbms import NoSuchObjectException
+from beeswax.models import SavedQuery
 
 
 class QueryForm(MultiForm):
@@ -38,28 +38,14 @@ class QueryForm(MultiForm):
       settings=SettingFormSet,
       file_resources=FileResourceFormSet,
       functions=FunctionFormSet,
-      saveform=SaveForm,
-      query_servers=QueryServerForm)
-
-
-class QueryServerForm(forms.Form):
-  server = forms.CharField(max_length=128, help_text=_t('Host:port of the query server.'))
-
-  def __init__(self, *args, **kwargs):
-    super(QueryServerForm, self).__init__(*args, **kwargs)
-
-    if conf.QUERY_SERVERS:
-      servers = ((server, server) for server in conf.QUERY_SERVERS.keys())
-    else:
-      servers = (('default', 'default'),)
-    self.fields['server'].widget = forms.Select(choices=servers)
+      saveform=SaveForm)
 
 
 class SaveForm(forms.Form):
   """Used for saving query design."""
   name = forms.CharField(required=False,
                         max_length=64,
-                        initial=models.SavedQuery.DEFAULT_NEW_DESIGN_NAME,
+                        initial=SavedQuery.DEFAULT_NEW_DESIGN_NAME,
                         help_text=_t('Change the name to save as a new design.'))
   desc = forms.CharField(required=False, max_length=1024, label=_t("Description"))
   save = forms.BooleanField(widget=SubmitButton, required=False)
@@ -73,15 +59,14 @@ class SaveForm(forms.Form):
     self.fields['saveas'].widget.label = _('Save As')
 
   def clean_name(self):
-    name = self.cleaned_data.get('name', '').strip()
-    return name
+    return self.cleaned_data.get('name', '').strip()
 
   def clean(self):
     if self.errors:
       return
     save = self.cleaned_data.get('save')
     name = self.cleaned_data.get('name')
-    if save and len(name) == 0:
+    if save and not name:
       # Bother with name iff we're saving
       raise forms.ValidationError(_('Please enter a name'))
     return self.cleaned_data
@@ -132,9 +117,10 @@ class SaveResultsForm(DependencyAwareForm):
 class HQLForm(forms.Form):
   query = forms.CharField(label=_t("Query Editor"),
                           required=True,
-                          widget=forms.Textarea(attrs={'class':'beeswax_query'}))
+                          widget=forms.Textarea(attrs={'class': 'beeswax_query'}))
   is_parameterized = forms.BooleanField(required=False, initial=True)
   email_notify = forms.BooleanField(required=False, initial=False)
+  type = forms.IntegerField(required=False, initial=0)
 
   def clean_query(self):
     return _strip_trailing_semicolon(self.cleaned_data['query'])
@@ -155,7 +141,7 @@ class FileResourceForm(forms.Form):
       ("FILE", ("file")),
     ], help_text=_t("Resources to upload with your Hive job." +
        "  Use 'jar' for UDFs.  Use 'file' and 'archive' for "
-       "files to be copied and made locally available duirng MAP/TRANSFORM. " +
+       "files to be copied and made locally available during MAP/TRANSFORM. " +
        "Paths are on HDFS.")
   )
 
@@ -232,8 +218,7 @@ class CreateTableForm(DependencyAwareForm):
   ]
 
   # External?
-  use_default_location = forms.BooleanField(required=False, initial=True,
-    label=_t("Use default location"))
+  use_default_location = forms.BooleanField(required=False, initial=True, label=_t("Use default location"))
   external_location = forms.CharField(required=False, help_text=_t("Path to HDFS directory or file of table data."))
 
   dependencies += [
@@ -297,22 +282,16 @@ class CreateByImportDelimForm(forms.Form):
   def clean(self):
     # ChoiceOrOtherField doesn't work with required=True
     delimiter = self.cleaned_data.get('delimiter')
-    if not delimiter:
-      raise forms.ValidationError(_('Delimiter value is required.'))
-    _clean_terminator(delimiter)
-    return self.cleaned_data
-
-  def old(self):
     if delimiter.isdigit():
       try:
         chr(int(delimiter))
         return int(delimiter)
       except ValueError:
         raise forms.ValidationError(_('Delimiter value must be smaller than 256.'))
-    val = delimiter.decode('string_escape')
-    if len(val) != 1:
-      raise forms.ValidationError(_('Delimiter must be exactly one character.'))
-    return ord(val)
+    if not delimiter:
+      raise forms.ValidationError(_('Delimiter value is required.'))
+    _clean_terminator(delimiter)
+    return self.cleaned_data
 
 
 # Note, struct is not currently supported.  (Because it's recursive, for example.)

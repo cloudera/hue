@@ -17,9 +17,12 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Table List'), "beeswax", user, "100px")}
+
+${commonheader(_('Table List'), app_name, user, '100px')}
 ${layout.menubar(section='tables')}
+
 
 <div class="container-fluid">
 	<h1>${_('Table List')}</h1>
@@ -31,8 +34,8 @@ ${layout.menubar(section='tables')}
 					% if not examples_installed:
 		        	<li><a href="#installSamples" data-toggle="modal">${_('Install samples')}</a></li>
 		      		% endif
-		      		<li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from a file')}</a></li>
-					<li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
+		      		<li><a href="${ url(app_name + ':import_wizard') }">${_('Create a new table from a file')}</a></li>
+					<li><a href="${ url(app_name + ':create_table') }">${_('Create a new table manually')}</a></li>
 				</ul>
 			</div>
 		</div>
@@ -48,9 +51,9 @@ ${layout.menubar(section='tables')}
 				% for table in tables:
 					<tr>
 						<td>
-							<a href="${ url("beeswax.views.describe_table", table=table) }" data-row-selector="true">${ table }</a>
+							<a href="${ url(app_name + ':describe_table', table=table) }" data-row-selector="true">${ table }</a>
 						</td>
-						<td><a href="${ url("beeswax.views.read_table", table=table) }" class="btn">${_('Browse Data')}</a></td>
+						<td><a href="${ url(app_name + ':read_table', table=table) }" class="btn">${_('Browse Data')}</a></td>
 					</tr>
 				% endfor
 				</tbody>
@@ -95,17 +98,17 @@ ${layout.menubar(section='tables')}
 		$("a[data-row-selector='true']").jHueRowSelector();
 
 		% if not examples_installed:
-		$.getJSON("${ url('beeswax.views.install_examples') }",function(data){
+		$.getJSON("${ url(app_name + ':install_examples') }",function(data){
 			$("#installSamplesMessage").text(data.title);
 		});
 
         $("#installSamplesBtn").click(function(){
             $.post(
-                "${ url('beeswax.views.install_examples') }",
+                "${ url(app_name + ':install_examples') }",
                 { submit:"Submit" },
                 function(result){
                     if (result.creationSucceeded){
-                        window.location.href = "/beeswax/tables";
+                        window.location.href = "${ url(app_name + ':show_tables') }";
                     }
                     else {
                         var message = "${_('There was an error processing your request:')} " + result.message;

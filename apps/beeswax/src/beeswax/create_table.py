@@ -22,9 +22,10 @@ Views & controls for creating tables
 import logging
 import gzip
 
-from django.core import urlresolvers
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
+from desktop.context_processors import get_app_name
 from desktop.lib import django_mako, i18n
 from desktop.lib.django_util import render
 from desktop.lib.exceptions import PopupException
@@ -37,7 +38,7 @@ from beeswax.forms import CreateTableForm, ColumnTypeFormSet,\
   PartitionTypeFormSet, CreateByImportFileForm, CreateByImportDelimForm,\
   TERMINATOR_CHOICES
 from beeswax.server import dbms
-from beeswax.views import describe_table, execute_directly
+from beeswax.views import execute_directly
 
 
 LOG = logging.getLogger(__name__)
@@ -110,6 +111,7 @@ def import_wizard(request):
     - Does not work with binary data.
   """
   encoding = i18n.get_site_encoding()
+  app_name = get_app_name(request)
 
   if request.method == 'POST':
     # Have a while loop to allow an easy way to break
@@ -193,7 +195,7 @@ def import_wizard(request):
 
       if do_s2_auto_delim or do_s2_user_delim or cancel_s3_column_def:
         return render('choose_delimiter.mako', request, dict(
-          action=urlresolvers.reverse(import_wizard),
+          action=reverse(app_name + ':import_wizard'),
           delim_readable=DELIMITER_READABLE.get(s2_delim_form['delimiter'].data[0], s2_delim_form['delimiter'].data[1]),
           initial=delim_is_auto,
           file_form=s1_file_form,
@@ -216,7 +218,7 @@ def import_wizard(request):
             ))
           s3_col_formset = ColumnTypeFormSet(prefix='cols', initial=columns)
         return render('define_columns.mako', request, dict(
-          action=urlresolvers.reverse(import_wizard),
+          action=reverse(app_name + ':import_wizard'),
           file_form=s1_file_form,
           delim_form=s2_delim_form,
           column_formset=s3_col_formset,
@@ -248,7 +250,7 @@ def import_wizard(request):
     s1_file_form = CreateByImportFileForm()
 
   return render('choose_file.mako', request, dict(
-    action=urlresolvers.reverse(import_wizard),
+    action=reverse(app_name + ':import_wizard'),
     file_form=s1_file_form,
   ))
 
@@ -257,14 +259,15 @@ def _submit_create_and_load(request, create_hql, table_name, path, do_load):
   """
   Submit the table creation, and setup the load to happen (if ``do_load``).
   """
-  on_success_params = { }
+  on_success_params = {}
+  app_name = get_app_name(request)
 
   if do_load:
     on_success_params['table'] = table_name
     on_success_params['path'] = path
-    on_success_url = urlresolvers.reverse(load_after_create)
+    on_success_url = reverse(app_name + ':load_after_create')
   else:
-    on_success_url = urlresolvers.reverse(describe_table, kwargs={'table': table_name})
+    on_success_url = reverse(app_name + ':describe_table', kwargs={'table': table_name})
 
   query = hql_query(create_hql)
   return execute_directly(request, query,
@@ -454,6 +457,7 @@ def load_after_create(request):
   LOG.debug("Auto loading data from %s into table %s" % (path, tablename))
   hql = "LOAD DATA INPATH '%s' INTO TABLE `%s`" % (path, tablename)
   query = hql_query(hql)
-  on_success_url = urlresolvers.reverse(describe_table, kwargs={'table': tablename})
+  app_name = get_app_name(request)
+  on_success_url = reverse(app_name + ':describe_table', kwargs={'table': tablename})
 
   return execute_directly(request, query, on_success_url=on_success_url)

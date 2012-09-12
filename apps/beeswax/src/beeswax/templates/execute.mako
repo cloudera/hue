@@ -21,7 +21,6 @@
 
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-<%namespace name="util" file="util.mako" />
 
 <%def name="query()">
     <h1>${_('Query Editor')}</h1>
@@ -54,13 +53,15 @@
         <a id="saveQuery" class="btn">${_('Save')}</a>
         % endif
         <a id="saveQueryAs" class="btn">${_('Save as...')}</a>
+        % if app_name != 'impala':
         <a id="explainQuery" class="btn">${_('Explain')}</a>
-        &nbsp; ${_('or create a')} &nbsp;<a class="btn" href="${ url('beeswax.views.execute_query') }">${_('New query')}</a>
+        % endif
+        &nbsp; ${_('or create a')} &nbsp;<a class="btn" href="${ url(app_name + ':execute_query') }">${_('New query')}</a>
     </div>
 </%def>
 
 
-${commonheader(_('Query'), "beeswax", user, "100px")}
+${commonheader(_('Query'), app_name, user, '100px')}
 ${layout.menubar(section='query')}
 
 <div class="container-fluid">
@@ -69,10 +70,6 @@ ${layout.menubar(section='query')}
             <div class="well sidebar-nav">
                 <form id="advancedSettingsForm" action="${action}" method="POST" class="form form-horizontal noPadding">
                     <ul class="nav nav-list">
-                        <li class="nav-header">${_('Query server')}</li>
-                        <li>
-                          ${form.query_servers['server']}
-                        </li>
                         <li class="nav-header">${_('settings')}</li>
                         <li>
                             % for i, f in enumerate(form.settings.forms):
@@ -108,8 +105,18 @@ ${layout.menubar(section='query')}
                                 <a class="btn btn-small" data-form-prefix="settings">${_('Add')}</a>
                             </div>
                         </li>
-                        <li class="nav-header">${_('File Resources')}</li>
-                        <li>
+                        <li class="nav-header
+                        % if app_name == 'impala':
+                            hide
+                        % endif
+                        ">
+                            ${_('File Resources')}
+                        </li>
+                        <li
+                        % if app_name == 'impala':
+                            class="hide"
+                        % endif
+                        >
                             % for i, f in enumerate(form.file_resources.forms):
                             <div class="param">
                                 <div class="remove">
@@ -143,8 +150,18 @@ ${layout.menubar(section='query')}
                                 <a class="btn btn-small" data-form-prefix="file_resources">${_('Add')}</a>
                             </div>
                         </li>
-                        <li class="nav-header">${_('User-defined Functions')}</li>
-                        <li>
+                        <li class="nav-header
+                        % if app_name == 'impala':
+                            hide
+                        % endif
+                        ">
+                            ${_('User-defined Functions')}
+                        </li>
+                        <li
+                        % if app_name == 'impala':
+                            class="hide"
+                        % endif
+                        >
                             % for i, f in enumerate(form.functions.forms):
                                 <div class="param">
                                     <div class="remove">
@@ -328,17 +345,11 @@ ${layout.menubar(section='query')}
 </style>
 
 
-
-<script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
-
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
         $("*[rel=tooltip]").tooltip({
             placement: 'bottom'
         });
-        // hack!!!
-        $("select:not(#id_query_servers-server)").addClass("span8");
-        $("#id_query_servers-server").addClass("span12");
 
         $("a[data-form-prefix]").each(function(){
             var _prefix = $(this).attr("data-form-prefix");
@@ -424,17 +435,8 @@ ${layout.menubar(section='query')}
         });
 
         function checkAndSubmit(){
-            // TODO: client side validation
             $(".query").val($("#queryField").val());
             $("#advancedSettingsForm").submit();
-        }
-
-        $("#id_query_servers-server").change(function(){
-            $.cookie("hueBeeswaxLastQueryServer", $(this).val(), {expires: 90});
-        });
-
-        if ($.cookie("hueBeeswaxLastQueryServer") != null) {
-            $("#id_query_servers-server").val($.cookie("hueBeeswaxLastQueryServer"));
         }
     });
 </script>

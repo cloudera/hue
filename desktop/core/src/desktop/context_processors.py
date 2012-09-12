@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -13,10 +14,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-DJANGO_APPS = [ "beeswax" ]
-NICE_NAME = "Beeswax (Hive UI)"
-REQUIRES_HADOOP = True
-ICON = "/beeswax/static/art/icon_beeswax_24.png"
-MENU_INDEX = 10
 
-IS_URL_NAMESPACED = True
+import re
+
+
+def app_name(request):
+  """
+  Add the name of the app to the template context.
+  """
+  context = {}
+
+  name = get_app_name(request)
+
+  if name is not None:
+    context.update({'app_name': name})
+
+  return context
+
+
+NAME = re.compile('/([^/]+)')
+
+def get_app_name(request):
+  # No other cleaner way found
+  match = NAME.search(request.path)
+
+  if match is not None:
+    return match.group(1)

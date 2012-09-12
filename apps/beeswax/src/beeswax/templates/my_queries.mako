@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
-${commonheader(_('My Queries'), "beeswax", user, "100px")}
+${commonheader(_('My Queries'), app_name, user, '100px')}
 ${layout.menubar(section='my queries')}
 <style>
     .tab-content {
@@ -67,7 +67,7 @@ ${layout.menubar(section='my queries')}
                       % for design in q_page.object_list:
                         <tr>
                           <td>
-                            <a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
+                            <a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
                           </td>
                           <td>
                             % if design.desc:
@@ -85,10 +85,10 @@ ${layout.menubar(section='my queries')}
                                   <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                  <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="${_('Edit this query.')}" class="contextItem">${_('Edit')}</a></li>
-                                  <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="${_('Delete this query.')}" class="contextItem confirmationModal">${_('Delete')}</a></li>
-                                  <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="${_('View the usage history of this query.')}" class="contextItem">${_('Usage History')}</a></li>
-                                  <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="${_('Copy this query.')}" class="contextItem">${_('Clone')}</a></li>
+                                  <li><a href="${ url(app_name + ':execute_query', design_id=design.id) }" title="${_('Edit this query.')}" class="contextItem">${_('Edit')}</a></li>
+                                  <li><a href="javascript:void(0)" data-confirmation-url="${ url(app_name + ':delete_design', design_id=design.id) }" title="${_('Delete this query.')}" class="contextItem confirmationModal">${_('Delete')}</a></li>
+                                  <li><a href="${ url(app_name + ':list_query_history') }?design_id=${design.id}" title="${_('View the usage history of this query.')}" class="contextItem">${_('Usage History')}</a></li>
+                                  <li><a href="${ url(app_name + ':clone_design', design_id=design.id) }" title="${_('Copy this query.')}" class="contextItem">${_('Clone')}</a></li>
                                 </ul>
                             </div>
                           </td>
@@ -97,7 +97,7 @@ ${layout.menubar(section='my queries')}
                       </tbody>
                     </table>
                     % if q_page.number != q_page.num_pages():
-                      <a href="${ url('beeswax.views.list_designs') }?user=${request.user.username|u}" >${_('View all my queries')} &raquo;</a>
+                      <a href="${ url(app_name + ':list_designs') }?user=${request.user.username|u}" >${_('View all my queries')} &raquo;</a>
                     % endif
             </div>
 
@@ -127,7 +127,7 @@ ${layout.menubar(section='my queries')}
                     %>
                     <tr>
                       <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>
-                      <td><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a></td>
+                      <td><a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a></td>
                       <td>
                         <p>
                           % if len(query.query) > 100:
@@ -140,7 +140,7 @@ ${layout.menubar(section='my queries')}
                       <td>${models.QueryHistory.STATE[query.last_state]}</td>
                       <td>
                         % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
-                          <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}">${_('View')}</a>
+                          <a href="${ url(app_name + ':watch_query', id=query.id) }?context=${qcontext|u}">${_('View')}</a>
                         % else:
                           ~
                         % endif
@@ -150,7 +150,7 @@ ${layout.menubar(section='my queries')}
                   </tbody>
                 </table>
                 % if h_page.number != h_page.num_pages():
-                  <a href="${ url('beeswax.views.list_query_history') }">${_('View my entire query history')} &raquo;</a>
+                  <a href="${ url(app_name + ':list_query_history') }">${_('View my entire query history')} &raquo;</a>
                 % endif
             </div>
     </div>

@@ -17,19 +17,19 @@
 import time
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+from beeswax.views import collapse_whitespace
 %>
 
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
-<%!  from beeswax.views import collapse_whitespace %>
 
-${commonheader(_('Query History'), "beeswax", user, "100px")}
+${commonheader(_('Query History'), app_name, user, '100px')}
 ${layout.menubar(section='history')}
 
 <%def name="show_saved_query(design, history)">
   % if design:
     % if request.user == design.owner:
-      <a href="${ url('beeswax.views.execute_query', design_id=design.id) }">
+      <a href="${ url(app_name + ':execute_query', design_id=design.id) }">
     % endif
     % if design.is_auto:
       [ ${_('Unsaved')} ]
@@ -40,7 +40,7 @@ ${layout.menubar(section='history')}
     </a>
     % else:
     ## TODO (bc/nutron): Shouldn't be able to edit someone else's design. Let user clone instead.
-    <a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="${_('Copy this query.')}">${_('Clone')}</a>
+    <a href="${ url(app_name + ':clone_design', design_id=design.id) }" title="${_('Copy this query.')}">${_('Clone')}</a>
     % endif
   % else:
     [ ${_('Auto generated action')} ]
@@ -130,7 +130,7 @@ ${layout.menubar(section='history')}
                 <td>${models.QueryHistory.STATE[query.last_state]}</td>
                 <td>
                   % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
-                    <a href="${ url('beeswax.views.watch_query', id=query.id) }?context=${qcontext|u}" data-row-selector="true">${_('Results')}</a>
+                    <a href="${ url(app_name + ':watch_query', id=query.id) }?context=${qcontext|u}" data-row-selector="true">${_('Results')}</a>
                   % else:
                     ~
                   % endif

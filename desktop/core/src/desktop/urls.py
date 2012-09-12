@@ -85,7 +85,7 @@ for app in appmanager.DESKTOP_APPS:
     static_patterns.append(
       static_pattern('%s/static' % app.name, app.static_dir))
 
-# TODO this stuff should probably be moved into a "ui" lib or somesuch so it
+# TODO this stuff should probably be moved into a "ui" lib or such so it
 # is autodiscovered
 def buildpath(d):
   return os.path.join(os.path.dirname(__file__), "..", '..', '..', d)

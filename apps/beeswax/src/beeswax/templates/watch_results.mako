@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="util" file="util.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 
-${commonheader(_('Query Results'), "beeswax", user, "100px")}
+${commonheader(_('Query Results'), app_name, user, '100px')}
 ${layout.menubar(section='query')}
 
 <style>
@@ -145,10 +145,10 @@ ${layout.menubar(section='query')}
             <div class="pagination pull-right">
               <ul>
               % if start_row != 0:
-                  <li class="prev"><a title="${_('Beginning of List')}" href="${ url('beeswax.views.view_results', query.id, 0) }${'?context=' + context_param or '' | n}">&larr; ${_('Beginning of List')}</a></li>
+                  <li class="prev"><a title="${_('Beginning of List')}" href="${ url(app_name + ':view_results', query.id, 0) }${'?context=' + context_param or '' | n}">&larr; ${_('Beginning of List')}</a></li>
               % endif
               % if has_more and len(results) == 100:
-                  <li><a title="${_('Next page')}" href="${ url('beeswax.views.view_results', query.id, next_row) }${'?context=' + context_param or '' | n}">${_('Next Page')} &rarr;</a></li>
+                  <li><a title="${_('Next page')}" href="${ url(app_name + ':view_results', query.id, next_row) }${'?context=' + context_param or '' | n}">${_('Next Page')} &rarr;</a></li>
               % endif
               </ul>
             </div>
@@ -185,7 +185,7 @@ ${layout.menubar(section='query')}
 
 %if can_save:
 <div id="saveAs" class="modal hide fade">
-  <form id="saveForm" action="${url('beeswax.views.save_results', query.id) }" method="POST"
+  <form id="saveForm" action="${url(app_name + ':save_results', query.id) }" method="POST"
         class="form form-inline form-padding-fix">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>

@@ -17,24 +17,21 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${commonheader(_('Configuration Variables'), "beeswax", user, "100px")}
+${commonheader(_('Configuration Variables'), app_name, user, '100px')}
 ${layout.menubar(section='configuration')}
 
 <div class="container-fluid">
 	<h1>${_('Configuration Variables')}</h1>
 	<div class="well">
 		<form class="form-search" method="POST">
-		  <span>
-		    ${server_form['server']}
-		    <button type="submit" class="btn btn-primary">${_('Look')}</button>
-		   </span>
-		   <span class="pull-right">
-              ${_('Filter:')} <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc...')}">
-		      <a href="#" id="clearFilterBtn" class="btn">${_('Clear')}</a>
-		   </span>
+		    <span class="pull-left">
+                ${_('Filter:')} <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc...')}">
+		        <a href="#" id="clearFilterBtn" class="btn">${_('Clear')}</a>
+		    </span>
 		</form>
 	</div>
 	<table class="table table-striped table-condensed datatables">
@@ -54,9 +51,6 @@ ${layout.menubar(section='configuration')}
 		</tbody>
 	</table>
 </div>
-
-
-<script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
 
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
@@ -85,14 +79,6 @@ ${layout.menubar(section='configuration')}
 	            $(value).show();
 	        });
 	    });
-
-        $("#id_server").change(function(){
-            $.cookie("hueBeeswaxLastQueryServer", $(this).val(), {expires: 90});
-        });
-
-        if ($.cookie("hueBeeswaxLastQueryServer") != null) {
-            $("#id_server").val($.cookie("hueBeeswaxLastQueryServer"));
-        }
 	});
 </script>
 

@@ -13,10 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-DJANGO_APPS = [ "beeswax" ]
-NICE_NAME = "Beeswax (Hive UI)"
-REQUIRES_HADOOP = True
-ICON = "/beeswax/static/art/icon_beeswax_24.png"
-MENU_INDEX = 10
+#
+# This file should be the one source of truth for for versions within HUE.
+# It is at least included by each of the default hue app's setup.py.
 
-IS_URL_NAMESPACED = True
+VERSION="2.1.0"

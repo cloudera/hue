@@ -17,10 +17,12 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader(_('Query Explanation'), "beeswax", user, "100px")}
+
+${commonheader(_('Query Explanation'), app_name, user, '100px')}
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">
@@ -39,5 +41,10 @@ ${layout.menubar(section='saved queries')}
             <pre>${query.hql_query | h}</pre>
         </div>
     </div>
+
+  <br/>
+  <a class="btn" onclick="history.back()">${ _('Back') }</a>
+
 </div>
+
 ${commonfooter(messages)}

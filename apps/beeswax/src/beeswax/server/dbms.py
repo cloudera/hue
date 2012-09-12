@@ -26,7 +26,9 @@ from filebrowser.views import location_to_url
 
 from beeswaxd.ttypes import BeeswaxException
 
-from beeswax import conf
+from beeswax.conf import BEESWAX_SERVER_HOST, BEESWAX_SERVER_PORT,\
+  BROWSE_PARTITIONED_TABLE_LIMIT
+from impala.conf import SERVER_HOST, SERVER_PORT
 from beeswax.design import hql_query
 from beeswax.models import QueryHistory, HIVE_SERVER2
 from beeswax.conf import SERVER_INTERFACE
@@ -41,7 +43,7 @@ def get(user, query_server=None):
   from beeswax.server.beeswax_lib import BeeswaxClient
 
   if query_server is None:
-    query_server = get_query_server(support_ddl=True)
+    query_server = get_query_server_config(requires_ddl=True)
 
   if SERVER_INTERFACE.get() == HIVE_SERVER2:
     return Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
@@ -50,32 +52,21 @@ def get(user, query_server=None):
 
 
 
-def get_query_server(name='default', support_ddl=False):
-  if 'beeswax_server_host' in conf.QUERY_SERVERS['bind_to'] or 'beeswax_server_port' in conf.QUERY_SERVERS['bind_to']:
-    return {
-          'server_name': 'default',
-          'server_host': conf.BEESWAX_SERVER_HOST.get(),
-          'server_port': conf.BEESWAX_SERVER_PORT.get(),
-          'support_ddl': True,
+def get_query_server_config(name='beeswax', requires_ddl=False):
+  if name == 'impala' and not requires_ddl:
+    query_server = {
+        'server_name': 'impala',
+        'server_host': SERVER_HOST.get(),
+        'server_port': SERVER_PORT.get(),
+        'support_ddl': False,
+    }
+  else:
+    query_server = {
+        'server_name': 'beeswax',
+        'server_host': BEESWAX_SERVER_HOST.get(),
+        'server_port': BEESWAX_SERVER_PORT.get(),
+        'support_ddl': True,
       }
-
-  servers = conf.QUERY_SERVERS
-
-  if support_ddl:
-    if not servers[name].SUPPORT_DDL.get():
-      for key in servers.keys():
-        if servers[key].SUPPORT_DDL.get():
-          name = key
-          break
-
-  config = servers[name]
-
-  query_server = {
-      'server_name': name,
-      'server_host': config.SERVER_HOST.get(),
-      'server_port': config.SERVER_PORT.get(),
-      'support_ddl': config.SUPPORT_DDL.get(),
-  }
 
   return query_server
 
@@ -128,7 +119,7 @@ class Dbms:
   def get_sample(self, table):
     """No samples if it's a view (HUE-526)"""
     if not table.is_view:
-      limit = min(100, conf.BROWSE_PARTITIONED_TABLE_LIMIT.get())
+      limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
       hql = "SELECT * FROM `%s` LIMIT %s" % (table.name, limit)
       query = hql_query(hql)
       handle = self.execute_and_wait(query, timeout_sec=5.0)
@@ -201,7 +192,7 @@ class Dbms:
     except BeeswaxException, ex: # TODO HS2
       LOG.exception(ex)
       # Kind of expected (hql compile/syntax error, etc.)
-      if ex.handle:
+      if hasattr(ex, 'handle') and ex.handle:
         query_history.server_id = ex.handle.id
         query_history.log_context = ex.handle.log_context
       query_history.save_state(QueryHistory.STATE.failed)
@@ -229,8 +220,8 @@ class Dbms:
 
 
   def get_partitions(self, db_name, table, max_parts=None):
-    if max_parts is None or max_parts > conf.BROWSE_PARTITIONED_TABLE_LIMIT.get():
-      max_parts = conf.BROWSE_PARTITIONED_TABLE_LIMIT.get()
+    if max_parts is None or max_parts > BROWSE_PARTITIONED_TABLE_LIMIT.get():
+      max_parts = BROWSE_PARTITIONED_TABLE_LIMIT.get()
 
     return self.client.get_partitions(db_name, table.name, max_parts)
 
@@ -254,7 +245,7 @@ class Dbms:
   def _get_browse_limit_clause(self, table):
     """Get the limit clause when browsing a partitioned table"""
     if table.partition_keys:
-      limit = conf.BROWSE_PARTITIONED_TABLE_LIMIT.get()
+      limit = BROWSE_PARTITIONED_TABLE_LIMIT.get()
       if limit > 0:
         return "LIMIT %d" % (limit,)
     return ""
@@ -284,7 +275,7 @@ def expand_exception(exc, db):
     log = db.get_log(exc)
   except:
     # Always show something, even if server has died on the job.
-    log = _("Could not retrieve log.")
+    log = _("Could not retrieve logs.")
 
   if not exc.message:
     error_message = _("Unknown exception.")

@@ -19,9 +19,11 @@
     from desktop.views import commonheader, commonfooter
     from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Queries'), "beeswax", user, "100px")}
+
+${commonheader(_('Queries'), app_name, user, '100px')}
 ${layout.menubar(section='saved queries')}
 <div class="container-fluid">
     <h1>${_('Queries')}</h1>
@@ -47,7 +49,7 @@ ${layout.menubar(section='saved queries')}
                 <tr>
                 <td>
                     % if may_edit:
-                        <a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
+                        <a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
                     % else:
                     ${design.name}
                     % endif
@@ -70,11 +72,11 @@ ${layout.menubar(section='saved queries')}
                     </a>
                     <ul class="dropdown-menu">
                     % if may_edit:
-                        <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="${_('Edit this query.')}" class="contextItem">${_('Edit')}</a></li>
-                        <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="${_('Delete this query.')}" class="contextItem confirmationModal">${_('Delete')}</a></li>
-                        <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="${_('View the usage history of this query.')}" class="contextItem">${_('Usage History')}</a></li>
+                        <li><a href="${ url(app_name + ':execute_query', design_id=design.id) }" title="${_('Edit this query.')}" class="contextItem">${_('Edit')}</a></li>
+                        <li><a href="javascript:void(0)" data-confirmation-url="${ url(app_name + ':delete_design', design_id=design.id) }" title="${_('Delete this query.')}" class="contextItem confirmationModal">${_('Delete')}</a></li>
+                        <li><a href="${ url(app_name + ':list_query_history') }?design_id=${design.id}" title="${_('View the usage history of this query.')}" class="contextItem">${_('Usage History')}</a></li>
                     % endif
-                    <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="${_('Copy this query.')}" class="contextItem">${_('Clone')}</a></li>
+                    <li><a href="${ url(app_name + ':clone_design', design_id=design.id) }" title="${_('Copy this query.')}" class="contextItem">${_('Clone')}</a></li>
                     </ul>
                 </div>
                 </td>

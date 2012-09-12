@@ -13,10 +13,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-DJANGO_APPS = [ "beeswax" ]
-NICE_NAME = "Beeswax (Hive UI)"
-REQUIRES_HADOOP = True
-ICON = "/beeswax/static/art/icon_beeswax_24.png"
-MENU_INDEX = 10
+from setuptools import setup, find_packages
+from hueversion import VERSION
 
-IS_URL_NAMESPACED = True
+setup(
+      name = "Impala",
+      version = VERSION,
+      author = "Hue",
+      url = 'http://github.com/cloudera/hue',
+      description = "Real time queries all your Big Data",
+      packages = find_packages('src'),
+      package_dir = {'': 'src'},
+      install_requires = ['setuptools', 'desktop'],
+      entry_points = { 'desktop.sdk.application': 'impala=impala' },
+)

@@ -17,10 +17,12 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader(_('Create table from file'), "beeswax", user, "100px")}
+
+${commonheader(_('Create table from file'), app_name, user, '100px')}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
@@ -30,8 +32,8 @@ ${layout.menubar(section='tables')}
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
-                    <li><a href="${ url('beeswax.create_table.import_wizard')}">${_('Create a new table from a file')}</a></li>
-                    <li><a href="${ url('beeswax.create_table.create_table')}">${_('Create a new table manually')}</a></li>
+                    <li><a href="${ url(app_name + ':import_wizard')}">${_('Create a new table from a file')}</a></li>
+                    <li><a href="${ url(app_name + ':create_table')}">${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
         </div>

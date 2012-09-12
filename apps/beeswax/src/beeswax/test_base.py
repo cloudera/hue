@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from django.core.urlresolvers import reverse
 
 """
 Common infrastructure for beeswax tests
@@ -39,7 +40,7 @@ import beeswax.conf
 
 from beeswax.conf import SERVER_INTERFACE
 from beeswax.models import HIVE_SERVER2
-from beeswax.server.dbms import get_query_server
+from beeswax.server.dbms import get_query_server_config
 from beeswax.server import dbms
 
 
@@ -94,9 +95,8 @@ def get_shared_beeswax_server():
     default_xml = file(beeswax.conf.BEESWAX_HIVE_CONF_DIR.get() + "/hive-default.xml.template").read()
 
     finish = (
-      beeswax.conf.QUERY_SERVERS['default'].SERVER_HOST.set_for_testing("localhost"),
-      beeswax.conf.QUERY_SERVERS['default'].SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT),
-      beeswax.conf.QUERY_SERVERS['default'].SUPPORT_DDL.set_for_testing(True),
+      beeswax.conf.BEESWAX_SERVER_HOST.set_for_testing("localhost"),
+      beeswax.conf.BEESWAX_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT),
       beeswax.conf.BEESWAX_META_SERVER_HOST.set_for_testing("localhost"),
       beeswax.conf.BEESWAX_META_SERVER_PORT.set_for_testing(BEESWAXD_TEST_PORT + 1),
       # Use a bogus path to avoid loading the normal hive-site.xml
@@ -132,7 +132,7 @@ def get_shared_beeswax_server():
       sleep = 0.001
       make_logged_in_client()
       user = User.objects.get(username='test')
-      query_server = get_query_server(support_ddl=True)
+      query_server = get_query_server_config(requires_ddl=True)
       db = dbms.get(user, query_server)
 
       while not started and time.time() - start < 20.0:
@@ -201,7 +201,7 @@ def wait_for_query_to_finish(client, response, max=30.0):
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True, max=30.0, server='default', **kwargs):
+               is_parameterized=True, max=30.0, **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -217,7 +217,6 @@ def make_query(client, query, submission_type="Execute",
   # Prepares arguments for the execute view.
   parameters = {
     'query-query': query,
-    'query_servers-server': server,
     'query-is_parameterized': is_parameterized and "on"
   }
 
@@ -253,7 +252,7 @@ def make_query(client, query, submission_type="Execute",
     parameters["file_resources-%d-_exists" % i] = 'True'
 
   kwargs.setdefault('follow', True)
-  response = client.post("/beeswax/execute", parameters, **kwargs)
+  response = client.post("/beeswax/execute/", parameters, **kwargs)
 
   if wait:
     return wait_for_query_to_finish(client, response, max)

@@ -20,17 +20,17 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Parameterize Query'), "beeswax", user, "100px")}
+${commonheader(_('Parameterize Query'), app_name, user, '100px')}
 
 ${layout.menubar()}
 
 <div class="container-fluid">
     <%
         if explain:
-            action = url('beeswax.views.explain_parameterized_query', design.id)
+            action = url(app_name + ':explain_parameterized_query', design.id)
             btn = _("Explain query")
         else:
-            action = url('beeswax.views.execute_parameterized_query', design.id)
+            action = url(app_name + ':execute_parameterized_query', design.id)
             btn = _("Execute query")
     %>
     <form method="POST" action="${action}" class="form-horizontal">
@@ -44,12 +44,9 @@ ${layout.menubar()}
                     </div>
                 </div>
             % endfor
-            <div class="hide">
-              ${query_servers}
-            </div>
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">${btn}</button>
                 <a class="btn" href="javascript:history.go(-1);">${_('Cancel')}</a>
+                <button type="submit" class="btn btn-primary">${btn}</button>
             </div>
         </fieldset>
     </form>

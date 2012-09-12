@@ -24,13 +24,13 @@ import re
 
 from django import forms
 from django.contrib import messages
-from django.core import urlresolvers
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
+from desktop.context_processors import get_app_name
 from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
@@ -45,10 +45,11 @@ import beeswax.design
 import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models, conf
-from beeswax.forms import QueryServerForm, LoadDataForm, QueryForm
+from beeswax.forms import LoadDataForm, QueryForm
 from beeswax.design import HQLdesign, hql_query
+from beeswax.models import SavedQuery
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server
+from beeswax.server.dbms import expand_exception, get_query_server_config
 
 
 LOG = logging.getLogger(__name__)
@@ -90,6 +91,8 @@ def save_design(request, form, type, design, explicit_save):
 
   if type == models.SavedQuery.HQL:
     design_cls = beeswax.design.HQLdesign
+  elif type == models.SavedQuery.IMPALA:
+    design_cls = beeswax.design.HQLdesign
   else:
     raise ValueError(_('Invalid design type %(type)s') % {'type': type})
 
@@ -114,8 +117,11 @@ def save_design(request, form, type, design, explicit_save):
       design.name = models.SavedQuery.DEFAULT_NEW_DESIGN_NAME
     design.is_auto = True
 
+  design.type = type
   design.data = new_data
+
   design.save()
+
   LOG.info('Saved %sdesign "%s" (id %s) for %s' %
            (explicit_save and '' or 'auto ', design.name, design.id, design.owner))
   if explicit_save:
@@ -135,9 +141,9 @@ def delete_design(request, design_id):
 
   if request.method == 'POST':
     design.delete()
-    return redirect(urlresolvers.reverse(list_designs))
+    return redirect(reverse(get_app_name(request) + ':list_designs'))
   else:
-    return render('confirm.html', request, dict(url=request.path, title='Delete design?'))
+    return render('confirm.html', request, dict(url=request.path, title=_('Delete design?')))
 
 
 def clone_design(request, design_id):
@@ -154,7 +160,7 @@ def clone_design(request, design_id):
   copy.save()
   messages.info(request, _('Copied design: %(name)s') % {'name': design.name})
   return format_preserving_redirect(
-      request, urlresolvers.reverse(execute_query, kwargs={'design_id': copy.id}))
+      request, reverse(get_app_name(request) + ':execute_query', kwargs={'design_id': copy.id}))
 
 
 def list_designs(request):
@@ -198,12 +204,15 @@ def my_queries(request):
   is the ``user`` filter, since this view only shows what belongs to the user.
   """
   DEFAULT_PAGE_SIZE = 40
+  app_name= get_app_name(request)
 
   # Extract the history list.
   prefix = 'h-'
   querydict_history = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
   querydict_history[ prefix + 'user' ] = request.user.username
+  querydict_history[ prefix + 'type' ] = app_name
+
   hist_page, hist_filter = _list_query_history(request.user,
                                                querydict_history,
                                                DEFAULT_PAGE_SIZE,
@@ -213,6 +222,8 @@ def my_queries(request):
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
   querydict_query[ prefix + 'user' ] = request.user.username
+  querydict_query[ prefix + 'type' ] = app_name
+
   query_page, query_filter = _list_designs(querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
   filter_params = hist_filter
@@ -248,6 +259,9 @@ def list_query_history(request):
   querydict_query = request.GET.copy()
   if not share_queries:
     querydict_query['user'] = request.user.username
+
+  app_name= get_app_name(request)
+  querydict_query['type'] = app_name
 
   page, filter_params = _list_query_history(request.user, querydict_query, DEFAULT_PAGE_SIZE)
 
@@ -300,7 +314,7 @@ def drop_table(request, table):
   if request.method == 'POST':
     try:
       query_history = db.drop_table(table)
-      url = reverse(watch_query, args=[query_history.id]) + '?on_success_url=' + urlresolvers.reverse(show_tables)
+      url = reverse(get_app_name(request) + ':watch_query', args=[query_history.id]) + '?on_success_url=' + reverse(get_app_name(request) + ':show_tables')
       return redirect(url)
     except BeeswaxException, ex:
       error_message, log = expand_exception(ex, db)
@@ -351,7 +365,7 @@ def load_table(request, table):
         hql += ", ".join(vals)
         hql += ")"
 
-      on_success_url = urlresolvers.reverse(describe_table, kwargs={'table': table})
+      on_success_url = reverse(get_app_name(request) + ':describe_table', kwargs={'table': table})
       return confirm_query(request, hql, on_success_url)
   else:
     form = beeswax.forms.LoadDataForm(table_obj)
@@ -375,7 +389,7 @@ def download(request, id, format):
   assert format in common.DL_FORMATS
 
   query_history = authorized_get_history(request, id, must_exist=True)
-  db = dbms.get(request.user, query_history.get_query_server())
+  db = dbms.get(request.user, query_history.get_query_server_config())
   LOG.debug('Download results for query %s: [ %s ]' % (query_history.server_id, query_history.query))
 
   return data_export.download(query_history.get_handle(), format, db)
@@ -401,7 +415,9 @@ def execute_query(request, design_id=None):
   form = QueryForm()
   action = request.path
   log = None
-  design = safe_get_design(request, models.SavedQuery.HQL, design_id)
+  app_name = get_app_name(request)
+  query_type = SavedQuery.TYPES_MAPPING[app_name]
+  design = safe_get_design(request, query_type, design_id)
   on_success_url = request.REQUEST.get('on_success_url')
 
   if request.method == 'POST':
@@ -421,12 +437,12 @@ def execute_query(request, design_id=None):
 
       if to_submit or to_save or to_saveas or to_explain:
         explicit_save = to_save or to_saveas
-        design = save_design(request, form, models.SavedQuery.HQL, design, explicit_save)
-        action = urlresolvers.reverse(execute_query, kwargs=dict(design_id=design.id))
+        design = save_design(request, form, query_type, design, explicit_save)
+        action = reverse(app_name + ':execute_query', kwargs=dict(design_id=design.id))
 
       if to_explain or to_submit:
         query_str = form.query.cleaned_data["query"]
-        query_server = get_query_server(form.query_servers.cleaned_data["server"])
+        query_server = get_query_server_config(app_name, requires_ddl=False)
 
         # (Optional) Parameterization.
         parameterization = get_parameterization(request, query_str, form, design, to_explain)
@@ -496,7 +512,7 @@ def watch_query(request, id):
   context_param = request.GET.get('context', '')
 
   # GET param: on_success_url. Default to view_results
-  results_url = urlresolvers.reverse(view_results, kwargs={'id': id, 'first_row': 0})
+  results_url = reverse(get_app_name(request) + ':view_results', kwargs={'id': id, 'first_row': 0})
   on_success_url = request.GET.get('on_success_url')
   if not on_success_url:
     on_success_url = results_url
@@ -517,7 +533,7 @@ def watch_query(request, id):
     return format_preserving_redirect(request, results_url, request.GET)
 
   # Still running
-  log = dbms.get(request.user, query_history.get_query_server()).get_log(handle)
+  log = dbms.get(request.user, query_history.get_query_server_config()).get_log(handle)
 
   # Keep waiting
   # - Translate context into something more meaningful (type, data)
@@ -536,13 +552,12 @@ def watch_query_refresh_json(request, id):
   handle, state = _get_query_handle_and_state(query_history)
   query_history.save_state(state)
 
-  log = dbms.get(request.user, query_history.get_query_server()).get_log(handle)
+  log = dbms.get(request.user, query_history.get_query_server_config()).get_log(handle)
 
   jobs = _parse_out_hadoop_jobs(log)
   job_urls = {}
   for job in jobs:
-    job_urls[job] = urlresolvers.reverse('jobbrowser.views.single_job', kwargs=dict(jobid=job))
-
+    job_urls[job] = reverse('jobbrowser.views.single_job', kwargs=dict(jobid=job))
 
   result = {
     'log': log,
@@ -551,6 +566,7 @@ def watch_query_refresh_json(request, id):
     'isSuccess': query_history.is_success(),
     'isFailure': query_history.is_failure()
   }
+
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 def view_results(request, id, first_row=0):
@@ -575,7 +591,7 @@ def view_results(request, id, first_row=0):
   log = ''
 
   query_history = authorized_get_history(request, id, must_exist=True)
-  db = dbms.get(request.user, query_history.get_query_server())
+  db = dbms.get(request.user, query_history.get_query_server_config())
 
   handle, state = _get_query_handle_and_state(query_history)
   context_param = request.GET.get('context', '')
@@ -615,7 +631,7 @@ def view_results(request, id, first_row=0):
     download_urls = {}
     if downloadable:
       for format in common.DL_FORMATS:
-        download_urls[format] = urlresolvers.reverse(download, kwargs=dict(id=str(id), format=format))
+        download_urls[format] = reverse(get_app_name(request) + ':download', kwargs=dict(id=str(id), format=format))
 
     save_form = beeswax.forms.SaveResultsForm()
     results.start_row = first_row
@@ -657,7 +673,7 @@ def save_results(request, id):
         msg = _('The result of this query is not available yet.')
       raise PopupException(msg)
 
-    db = dbms.get(request.user, query_history.get_query_server())
+    db = dbms.get(request.user, query_history.get_query_server_config())
     form = beeswax.forms.SaveResultsForm(request.POST, db=db)
 
     # Cancel goes back to results
@@ -692,7 +708,7 @@ def save_results(request, id):
           request.fs.rename_star(result_meta.table_dir, target_dir)
           LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, target_dir))
           query_history.save_state(models.QueryHistory.STATE.expired)
-          return redirect(urlresolvers.reverse('filebrowser.views.view', kwargs={'path': target_dir}))
+          return redirect(reverse('filebrowser.views.view', kwargs={'path': target_dir}))
         elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
           # To new table
           try:
@@ -711,7 +727,7 @@ def save_results(request, id):
   if error_msg:
     error_msg = _('Failed to save results from query: %(error)s') % {'error': error_msg}
   return render('save_results.mako', request, dict(
-    action=urlresolvers.reverse(save_results, kwargs={'id': str(id)}),
+    action=reverse(get_app_name(request) + ':save_results', kwargs={'id': str(id)}),
     form=form,
     error_msg=error_msg,
     log=log,
@@ -723,7 +739,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
   Handle saving results as a new table. Returns HTTP response.
   May raise BeeswaxException, IOError.
   """
-  query_server = query_history.get_query_server() # Query server requires DDL support
+  query_server = query_history.get_query_server_config() # Query server requires DDL support
   db = dbms.get(request.user)
 
   # Case 1: The results are straight from an existing table
@@ -731,7 +747,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     hql = 'CREATE TABLE `%s` AS SELECT * FROM %s' % (target_table, result_meta.in_tablename)
     query = hql_query(hql)
     # Display the CTAS running. Could take a long time.
-    return execute_directly(request, query, query_server, on_success_url=urlresolvers.reverse(show_tables))
+    return execute_directly(request, query, query_server, on_success_url=reverse(get_app_name(request) + ':show_tables'))
 
   # Case 2: The results are in some temporary location
   # 1. Create table
@@ -779,7 +795,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     raise ex
 
   # Show tables upon success
-  return format_preserving_redirect(request, urlresolvers.reverse(show_tables))
+  return format_preserving_redirect(request, reverse(get_app_name(request) + ':show_tables'))
 
 
 def confirm_query(request, query, on_success_url=None):
@@ -795,7 +811,7 @@ def confirm_query(request, query, on_success_url=None):
   mform.query.initial = dict(query=query)
   return render('execute.mako', request, {
     'form': mform,
-    'action': urlresolvers.reverse(execute_query),
+    'action': reverse(get_app_name(request) + ':execute_query'),
     'error_message': None,
     'design': None,
     'on_success_url': on_success_url,
@@ -810,18 +826,12 @@ def explain_directly(request, query, design, query_server):
 
 
 def configuration(request):
-  if request.method == 'POST':
-    server_form = QueryServerForm(request.POST)
-    if server_form.is_valid():
-      query_server = get_query_server(server_form.cleaned_data["server"])
-      config_values = dbms.get(request.user, query_server).get_default_configuration(
-                          bool(request.REQUEST.get("include_hadoop", False)))
-  else:
-    server_form = QueryServerForm()
-    config_values = {}
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  config_values = dbms.get(request.user, query_server).get_default_configuration(
+                      bool(request.REQUEST.get("include_hadoop", False)))
 
-  return render("configuration.mako", request, {'config_values': config_values,
-                                                'server_form': server_form})
+  return render("configuration.mako", request, {'config_values': config_values})
 
 
 """
@@ -881,7 +891,7 @@ def query_done_cb(request, server_id):
 
   link = "%s/#launch=Beeswax:%s" % \
             (get_desktop_uri_prefix(),
-             urlresolvers.reverse(watch_query, kwargs={'id': history.id}))
+             reverse(get_app_name(request) + ':watch_query', kwargs={'id': history.id}))
   body = _("%(subject)s. You may see the results here: %(link)s\n\nQuery:\n%(query)s") % {'subject': subject, 'link': link, 'query': history.query}
   try:
     user.email_user(subject, body)
@@ -960,8 +970,7 @@ def get_parameterization(request, query_str, form, design, is_explain):
       return render("parameterization.mako", request, dict(
         form=parameters_form(prefix="parameterization"),
         design=design,
-        explain=is_explain,
-        query_servers=form.query_servers))
+        explain=is_explain))
   return None
 
 def make_parameterization_form(query_str):
@@ -998,7 +1007,7 @@ def _run_parameterized_query(request, design_id, explain):
   assert query_form.is_valid()
 
   query_str = query_form.query.cleaned_data["query"]
-  query_server = get_query_server(query_form.query_servers.cleaned_data["server"])
+  query_server = get_query_server_config(get_app_name(request))
 
   parameterization_form_cls = make_parameterization_form(query_str)
   if not parameterization_form_cls:
@@ -1019,15 +1028,14 @@ def _run_parameterized_query(request, design_id, explain):
       db = dbms.get(request.user, query_server)
       error_message, log = expand_exception(ex, db)
       return render('execute.mako', request, {
-        'action': urlresolvers.reverse(execute_query),
+        'action': reverse(get_app_name(request) + ':execute_query'),
         'design': design,
         'error_message': error_message,
         'form': query_form,
         'log': log,
       })
   else:
-    return render("parameterization.mako", request, dict(form=parameterization_form, design=design, explain=explain,
-                                                         query_servers=query_form.query_servers))
+    return render("parameterization.mako", request, dict(form=parameterization_form, design=design, explain=explain))
 
 
 def execute_directly(request, query, query_server=None, design=None, tablename=None,
@@ -1067,7 +1075,7 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
     authorized_get_design(request, design.id)
 
   history_obj = dbms.get(request.user, query_server).execute_query(query, design)
-  watch_url = urlresolvers.reverse(watch_query, kwargs={'id': history_obj.id})
+  watch_url = reverse(get_app_name(request) + ':watch_query', kwargs={'id': history_obj.id})
 
   # Prepare the GET params for the watch_url
   get_dict = QueryDict(None, mutable=True)
@@ -1101,7 +1109,6 @@ def _list_designs(querydict, page_size, prefix="", user=None):
   """
   DEFAULT_SORT = ('-', 'date')                  # Descending date
 
-  VALID_TYPES = ('hql')               # Design types
   SORT_ATTR_TRANSLATION = dict(
     date='mtime',
     name='name',
@@ -1120,14 +1127,10 @@ def _list_designs(querydict, page_size, prefix="", user=None):
   d_type = querydict.get(prefix + 'type')
   if d_type:
     d_type = str(d_type)
-    if d_type not in VALID_TYPES:
+    if d_type not in SavedQuery.TYPES_MAPPING.keys():
       LOG.warn('Bad parameter to list_designs: type=%s' % (d_type,))
     else:
-      if d_type == 'hql':
-        d_type = models.SavedQuery.HQL
-      else:
-        d_type = models.SavedQuery.REPORT
-      db_queryset = db_queryset.filter(type=d_type)
+      db_queryset = db_queryset.filter(type=SavedQuery.TYPES_MAPPING[d_type])
 
   # Text search
   frag = querydict.get(prefix + 'text')
@@ -1183,7 +1186,7 @@ def _get_query_handle_and_state(query_history):
   if handle is None:
     raise PopupException(_("Failed to retrieve query state from the Beeswax Server."))
 
-  state = dbms.get(query_history.owner, query_history.get_query_server()).get_state(handle)
+  state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
 
   if state is None:
     raise PopupException(_("Failed to contact Beeswax Server to check query status."))
@@ -1246,7 +1249,6 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   """
   DEFAULT_SORT = ('-', 'date')                  # Descending date
 
-  VALID_TYPES = ('hql')               # Design types
   SORT_ATTR_TRANSLATION = dict(
     date='submission_date',
     state='last_state',
@@ -1276,12 +1278,10 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   # Design type
   d_type = querydict.get(prefix + 'type')
   if d_type:
-    if d_type not in VALID_TYPES:
+    if d_type not in SavedQuery.TYPES_MAPPING.keys():
       LOG.warn('Bad parameter to list_query_history: type=%s' % (d_type,))
     else:
-      if d_type == 'hql':
-        d_type = models.SavedQuery.HQL
-      db_queryset = db_queryset.filter(design__type=d_type)
+      db_queryset = db_queryset.filter(design__type=SavedQuery.TYPES_MAPPING[d_type])
 
   # Ordering
   sort_key = querydict.get(prefix + 'sort')
@@ -1330,7 +1330,7 @@ def _update_query_state(query_history):
   when the user attempts to view results that have expired.
   """
   if query_history.last_state <= models.QueryHistory.STATE.running.index:
-    state_enum = dbms.get(query_history.owner, query_history.get_query_server()).get_state(query_history.get_handle())
+    state_enum = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(query_history.get_handle())
     if state_enum is None:
       # Error was logged at the source
       return False

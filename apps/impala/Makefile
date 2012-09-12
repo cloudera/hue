@@ -1,3 +1,4 @@
+#
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -13,10 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-DJANGO_APPS = [ "beeswax" ]
-NICE_NAME = "Beeswax (Hive UI)"
-REQUIRES_HADOOP = True
-ICON = "/beeswax/static/art/icon_beeswax_24.png"
-MENU_INDEX = 10
+#
 
-IS_URL_NAMESPACED = True
+ifeq ($(ROOT),)
+  $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
+endif
+
+APP_NAME = impala
+include $(ROOT)/Makefile.sdk

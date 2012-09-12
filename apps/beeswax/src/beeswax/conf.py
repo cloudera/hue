@@ -18,7 +18,7 @@ import os.path
 
 from django.utils.translation import ugettext_lazy as _
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
+from desktop.lib.conf import Config, coerce_bool
 
 
 SERVER_INTERFACE = Config(
@@ -27,41 +27,12 @@ SERVER_INTERFACE = Config(
   default="beeswax")
 
 
-QUERY_SERVERS = UnspecifiedConfigSection(
-  "query_servers",
-  help=_("One entry for each Query Server that can execute some queries."),
-  each=ConfigSection(
-    help=_("Information about a single Query Server"),
-    members=dict(
-      SERVER_HOST = Config(
-        key="server_host",
-        help=_("Host where the Query Server Thrift daemon is running."),
-        private=True,
-        default="localhost"),
-      SERVER_PORT = Config(
-        key="server_port",
-        help=_("Configure the port the Query Server Thrift server."),
-        default=8002,
-        type=int),
-      SUPPORT_DDL = Config(
-        key='support_ddl',
-        default=True,
-        type=coerce_bool,
-        help=_('If DDL queries are supported (e.g. DROP can be sent directly to this server).'))
-    )
-  )
-)
-
-# Deprecated! To remove in Hue 3
-# Multiple sections are now available in QUERY_SERVERS
 BEESWAX_SERVER_HOST = Config(
   key="beeswax_server_host",
   help=_("Host where Beeswax server Thrift daemon is running."),
   private=True,
   default="localhost")
 
-# Deprecated! To remove in Hue 3
-# Multiple sections are now available in QUERY_SERVERS
 BEESWAX_SERVER_PORT = Config(
   key="beeswax_server_port",
   help=_("Configure the port the Beeswax Thrift server runs on."),
