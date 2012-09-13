@@ -40,7 +40,6 @@ from hadoop.fs.exceptions import WebHdfsException
 
 import beeswax.forms
 import beeswax.design
-import beeswax.report
 import beeswax.management.commands.beeswax_install_examples
 from beeswaxd import BeeswaxService
 from beeswaxd.ttypes import QueryHandle, BeeswaxException, QueryNotFoundException
@@ -488,12 +487,6 @@ def expand_exception(exc):
   return error_message, log
 
 
-def edit_report(request, design_id=None):
-  authorized_get_design(request, design_id)
-
-  return beeswax.report.edit_report(request, design_id)
-
-
 def save_design(request, form, type, design, explicit_save):
   """
   save_design(request, form, type, design, explicit_save) -> SavedQuery
@@ -512,8 +505,6 @@ def save_design(request, form, type, design, explicit_save):
 
   if type == models.SavedQuery.HQL:
     design_cls = beeswax.design.HQLdesign
-  elif type == models.SavedQuery.REPORT:
-    design_cls = beeswax.report.ReportDesign
   else:
     raise ValueError(_('Invalid design type %(type)s') % {'type': type})
 
@@ -555,7 +546,7 @@ def list_designs(request):
   We get here from /beeswax/list_designs?filterargs, with the options being:
     page=<n>    - Controls pagination. Defaults to 1.
     user=<name> - Show design items belonging to a user. Default to all users.
-    type=<type> - <type> is "report|hql", for saved query type. Default to show all.
+    type=<type> - <type> is "hql", for saved query type. Default to show all.
     sort=<key>  - Sort by the attribute <key>, which is one of:
                     "date", "name", "desc", and "type" (design type)
                   Accepts the form "-date", which sort in descending order.
@@ -591,7 +582,7 @@ def _list_designs(querydict, page_size, prefix="", user=None):
   """
   DEFAULT_SORT = ('-', 'date')                  # Descending date
 
-  VALID_TYPES = ('report', 'hql')               # Design types
+  VALID_TYPES = ('hql')               # Design types
   SORT_ATTR_TRANSLATION = dict(
     date='mtime',
     name='name',
@@ -1247,7 +1238,7 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   """
   DEFAULT_SORT = ('-', 'date')                  # Descending date
 
-  VALID_TYPES = ('report', 'hql')               # Design types
+  VALID_TYPES = ('hql')               # Design types
   SORT_ATTR_TRANSLATION = dict(
     date='submission_date',
     state='last_state',
@@ -1282,8 +1273,6 @@ def _list_query_history(user, querydict, page_size, prefix=""):
     else:
       if d_type == 'hql':
         d_type = models.SavedQuery.HQL
-      else:
-        d_type = models.SavedQuery.REPORT
       db_queryset = db_queryset.filter(design__type=d_type)
 
   # Ordering

@@ -19,8 +19,10 @@ from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
+
 ${commonheader(_('Beeswax'), "beeswax", "100px")}
 ${layout.menubar(section='tables')}
+
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span3">

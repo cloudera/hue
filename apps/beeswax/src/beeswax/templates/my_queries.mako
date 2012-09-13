@@ -67,11 +67,7 @@ ${layout.menubar(section='my queries')}
                       % for design in q_page.object_list:
                         <tr>
                           <td>
-                            % if design.type == models.SavedQuery.REPORT:
-                              <a href="${ url('beeswax.views.edit_report', design_id=design.id) }" data-row-selector="true">${design.name}</a>
-                            % else:
-                              <a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
-                            % endif
+                            <a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
                           </td>
                           <td>
                             % if design.desc:
@@ -79,28 +75,20 @@ ${layout.menubar(section='my queries')}
                             % endif
                           </td>
                           <td>
-                            % if design.type == models.SavedQuery.REPORT:
-                              ${_('Report')}
-                            % else:
-                              ${_('Query')}
-                            % endif
+                            ${_('Query')}
                           </td>
                           <td data-sort-value="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</td>
                           <td>
                             <div class="btn-group">
                                 <a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
-                                    ${_('Options')}
-                                    <span class="caret"></span>
+                                  ${_('Options')}
+                                  <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                      % if design.type == models.SavedQuery.REPORT:
-                                        <li><a href="${ url('beeswax.views.edit_report', design_id=design.id) }" title="${_('Edit this report.')}" class="contextItem">${_('Edit')}</a></li>
-                                      % else:
-                                        <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="${_('Edit this query.')}" class="contextItem">${_('Edit')}</a></li>
-                                      % endif
-                                         <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="${_('Delete this query.')}" class="contextItem confirmationModal">${_('Delete')}</a></li>
-                                      <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="${_('View the usage history of this query.')}" class="contextItem">${_('Usage History')}</a></li>
-                                      <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="${_('Copy this query.')}" class="contextItem">${_('Clone')}</a></li>
+                                  <li><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" title="${_('Edit this query.')}" class="contextItem">${_('Edit')}</a></li>
+                                  <li><a href="javascript:void(0)" data-confirmation-url="${ url('beeswax.views.delete_design', design_id=design.id) }" title="${_('Delete this query.')}" class="contextItem confirmationModal">${_('Delete')}</a></li>
+                                  <li><a href="${ url('beeswax.views.list_query_history') }?design_id=${design.id}" title="${_('View the usage history of this query.')}" class="contextItem">${_('Usage History')}</a></li>
+                                  <li><a href="${ url('beeswax.views.clone_design', design_id=design.id) }" title="${_('Copy this query.')}" class="contextItem">${_('Clone')}</a></li>
                                 </ul>
                             </div>
                           </td>
@@ -139,7 +127,6 @@ ${layout.menubar(section='my queries')}
                     %>
                     <tr>
                       <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>
-                      ## TODO (bc): Only showing HQL (not REPORT)
                       <td><a href="${ url('beeswax.views.execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a></td>
                       <td>
                         <p>

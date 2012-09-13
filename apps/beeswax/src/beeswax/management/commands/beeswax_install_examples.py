@@ -28,7 +28,7 @@ Expects 2 files in the beeswax.conf.LOCAL_EXAMPLES_DATA_DIR:
     has key-value pairs:
       * name: design name
       * desc: design description
-      * type: REPORT/HQL design type
+      * type: HQL design type
       * data: the json design data
 """
 
@@ -84,7 +84,7 @@ class Command(NoArgsCommand):
     try:
       user = self._install_user()
       self._install_tables(user)
-      self._install_reports(user)
+      self._install_queries(user)
       self._set_installed()
       LOG.info('Beeswax examples installed')
     except Exception, ex:
@@ -132,7 +132,7 @@ class Command(NoArgsCommand):
       table.install(django_user)
     LOG.info('Successfully created sample tables with data')
 
-  def _install_reports(self, django_user):
+  def _install_queries(self, django_user):
     """
     Install design designs.
     """

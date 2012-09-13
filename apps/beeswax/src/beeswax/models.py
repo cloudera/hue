@@ -116,14 +116,14 @@ class QueryHistory(models.Model):
 
 class SavedQuery(models.Model):
   """
-  Stores the query/report that people have save or submitted.
+  Stores the query that people have save or submitted.
 
   Note that this used to be called QueryDesign. Any references to 'design'
   probably mean a SavedQuery.
   """
   DEFAULT_NEW_DESIGN_NAME = _('My saved query')
   AUTO_DESIGN_SUFFIX = _(' (new)')
-  TYPES = (HQL, REPORT) = range(2)
+  TYPES = (HQL, REPORT) = range(2) # REPORT is unused
 
   type = models.IntegerField(null=False)
   owner = models.ForeignKey(User, db_index=True)

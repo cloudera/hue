@@ -26,11 +26,7 @@ ${layout.menubar(section='history')}
 <%def name="show_saved_query(design, history)">
   % if design:
     % if request.user == design.owner:
-      % if design.type == models.SavedQuery.REPORT:
-        <a href="${ url('beeswax.views.edit_report', design_id=design.id) }">
-      % else:
-        <a href="${ url('beeswax.views.execute_query', design_id=design.id) }">
-      % endif
+      <a href="${ url('beeswax.views.execute_query', design_id=design.id) }">
     % endif
     % if design.is_auto:
       [ ${_('Unsaved')} ]
