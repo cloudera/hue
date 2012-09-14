@@ -16,19 +16,22 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
+    <action name="${ node }">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${'${'}jobTracker}</job-tracker>
+            <name-node>${'${'}nameNode}</name-node>
 
-<workflow-app name="${ workflow.name }" xmlns="${ workflow.schema_version }">
-  % if workflow.job_xml or workflow.get_properties():
-  <global>
-    % if workflow.job_xml:
-      <job-xml>${ workflow.job_xml }</job-xml>
-    % endif
-    % if workflow.get_properties():
-      ${ common.configuration(workflow.get_properties()) }
-    % endif
-  </global>
-  % endif
-  % for node in workflow.node_list:
-      ${ node.to_xml() }
-  % endfor
-</workflow-app>
+            ${ common.prepares(node.get_prepares()) }
+            ${ common.configuration(node.get_properties()) }
+
+            <script>${ node.script_path }</script>
+
+            % for param in node.get_params():
+              <${ param['type'] }>${ param['value'] }</${ param['type'] }>
+            % endfor
+
+            ${ common.distributed_cache(node.get_files(), node.get_archives()) }
+        </hive>
+        <ok to="${ node.get_child('ok') }"/>
+        <error to="${ node.get_child('error') }"/>
+    </action>

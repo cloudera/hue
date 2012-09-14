@@ -65,7 +65,7 @@ def copy_dir(fs, local_dir, remote_dir, mode=0755):
   for f in os.listdir(local_dir):
     local_src = os.path.join(local_dir, f)
     remote_dst = posixpath.join(remote_dir, f)
-    print f, local_src, remote_dst
+
     if os.path.isdir(remote_dst):
       copy_dir(fs, local_src, remote_dst, mode)
     else:
@@ -76,7 +76,7 @@ CHUNK_SIZE = 1024 * 1024
 
 def copy_file(fs, local_src, remote_dst):
   if fs.exists(remote_dst):
-    LOG.info(_('%(remote_dst)s already exists.  Skipping.') % {'remote_dst': remote_dst})
+    LOG.info(_('%(remote_dst)s already exists. Skipping.') % {'remote_dst': remote_dst})
     return
   else:
     LOG.info(_('%(remote_dst)s does not exist. Trying to copy') % {'remote_dst': remote_dst})
