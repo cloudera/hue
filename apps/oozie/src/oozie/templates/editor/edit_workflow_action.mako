@@ -90,7 +90,7 @@ ${ layout.menubar(section='workflows') }
               </tbody>
             </table>
 
-            % if len(action_form['prepares'].errors):
+            % if action_form['prepares'].errors:
               <div class="alert alert-error">
                 ${ unicode(action_form['prepares'].errors) | n }
               </div>
@@ -128,14 +128,16 @@ ${ layout.menubar(section='workflows') }
               </tbody>
             </table>
 
-            % if len(action_form['params'].errors):
+            % if action_form['params'].errors:
               <div class="alert alert-error">
                 ${ unicode(action_form['params'].errors) | n }
               </div>
             % endif
 
-            <button class="btn" data-bind="click: addParam">${ _('Add Param') }</button>
-            <button class="btn" data-bind="click: addArgument">${ _('Add Argument') }</button>
+              <button class="btn" data-bind="click: addParam">${ _('Add Param') }</button>
+            % if node_type in ('pig'):
+              <button class="btn" data-bind="click: addArgument">${ _('Add Argument') }</button>
+            % endif
           </div>
         </div>
       % endif
@@ -161,7 +163,7 @@ ${ layout.menubar(section='workflows') }
               </tr>
             </tbody>
           </table>
-          % if len(action_form['job_properties'].errors):
+          % if action_form['job_properties'].errors:
             <div class="row">
               <div class="alert alert-error">
                 ${ unicode(action_form['job_properties'].errors) | n }
@@ -189,7 +191,7 @@ ${ layout.menubar(section='workflows') }
                   </tr>
                 </tbody>
               </table>
-              % if len(action_form['files'].errors):
+              % if action_form['files'].errors:
                 <div class="alert alert-error">
                   ${ unicode(action_form['files'].errors) | n }
                 </div>
@@ -216,7 +218,7 @@ ${ layout.menubar(section='workflows') }
               </tr>
             </tbody>
           </table>
-          % if len(action_form['archives'].errors):
+          % if action_form['archives'].errors:
             <div class="alert alert-error">
               ${ unicode(action_form['archives'].errors) | n }
             </div>
@@ -348,7 +350,7 @@ ${ layout.menubar(section='workflows') }
         };
 
         self.addArgument = function() {
-            self.params.push({ value: "", type: "arg" });
+            self.params.push({ value: "", type: "argument" });
         };
 
         self.removeParam = function(val) {

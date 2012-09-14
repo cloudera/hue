@@ -105,7 +105,10 @@ class Submission(object):
     Return the job deployment directory in HDFS, creating it if necessary.
     The actual deployment dir should be 0711 owned by the user
     """
-    path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
+    if self.user != self.job.owner:
+      path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
+    else:
+      path = self.job.deployment_dir
     self._create_dir(path)
     return path
 
