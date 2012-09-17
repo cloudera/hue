@@ -965,6 +965,7 @@ for x in sys.stdin:
     write_file('/tmp/spacé.dat'.decode('utf-8'), RAW_FIELDS, ' ')
     write_file('/tmp/tab.dat', RAW_FIELDS, '\t')
     write_file('/tmp/comma.dat', RAW_FIELDS, ',')
+    write_file('/tmp/pipes.dat', RAW_FIELDS, '|')
     write_file('/tmp/comma.dat.gz', RAW_FIELDS, ',', do_gzip=True)
 
     # Test auto delim selection
@@ -993,6 +994,17 @@ for x in sys.stdin:
       'file_type': 'text',
     })
     assert_equal(len(resp.context['fields_list'][0]), 4)
+
+    # Make sure custom delimiters work
+    resp = self.client.post('/beeswax/create/import_wizard', {
+      'submit_preview': 'on',
+      'path': '/tmp/pipes.dat',
+      'name': 'test_create_import',
+      'delimiter_0': '__other__',
+      'delimiter_1': '|',
+      'file_type': 'text',
+    })
+    assert_equal(len(resp.context['fields_list'][0]), 3)
 
     # Test column definition
     resp = self.client.post('/beeswax/create/import_wizard', {
