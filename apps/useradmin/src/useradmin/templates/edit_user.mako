@@ -50,10 +50,34 @@ ${layout.menubar(section='users', _=_)}
 		% endif
 	% endif
 
+    <br/>
+
 	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
 		<fieldset>
 			% for field in form:
-				${render_field(field)}
+                %if field.name == "first_name":
+                    <div class="row">
+                        <div class="span5">
+                        ${render_field(form["first_name"])}
+                        </div>
+                        <div class="span4">
+                        ${render_field(form["last_name"])}
+                        </div>
+                    </div>
+                %elif field.name == "password1":
+                    <div class="row">
+                        <div class="span5">
+                        ${render_field(form["password1"])}
+                        </div>
+                        <div class="span4">
+                        ${render_field(form["password2"])}
+                        </div>
+                    </div>
+                %elif field.name == "last_name" or field.name == "password2":
+                    ## skip rendering
+                %else:
+				    ${render_field(field)}
+                %endif
 			% endfor
 		</fieldset>
 		<br/>
@@ -75,7 +99,10 @@ ${layout.menubar(section='users', _=_)}
 	$(document).ready(function(){
 		$("#id_groups").jHueSelector({
             selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}"
+            searchPlaceholder: "${_('Search')}",
+            noChoicesFound: "${_('No groups found.')}",
+            width:618,
+            height:240
         });
 	});
 </script>

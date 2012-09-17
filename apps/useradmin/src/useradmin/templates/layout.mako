@@ -37,3 +37,45 @@ def is_selected(section, matcher):
 	</div>
 </%def>
 
+<%def name="commons()">
+    <style type="text/css">
+        .fixed {
+            position: fixed;
+            top: 80px;
+            filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0);
+            -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+            -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+        }
+        .pull-right {
+            margin: 4px;
+        }
+        .sortable {
+            cursor: pointer;
+        }
+        .file-row {
+            height:37px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#filterInput").keyup(function(){
+                var shown = 0;
+                $(".datatables tfoot").hide();
+                $.each($(".tableRow"), function(index, value) {
+                    if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
+                        $(value).hide();
+                    }
+                    else{
+                        $(value).show();
+                        shown++;
+                    }
+                });
+                if (shown == 0){
+                    $(".datatables tfoot").show();
+                }
+            });
+        });
+    </script>
+</%def>
+

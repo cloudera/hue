@@ -26,58 +26,71 @@ ${layout.menubar(section='users', _=_)}
 
 <div class="container-fluid">
     <h1>${_('Hue Users')}</h1>
-    <div class="well hueWell">
-        <div class="btn-group pull-right">
-            %if user.is_superuser == True:
-            <a href="${ url('useradmin.views.edit_user') }" class="btn">${_('Add user')}</a>
-            <a href="${ url('useradmin.views.add_ldap_user') }" class="btn">${_('Add/Sync LDAP user')}</a>
-            <a href="javascript:void(0)" class="btn confirmationModal" data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }">${_('Sync LDAP users/groups')}</a>
-            %endif
+    <div class="subnavContainer">
+        <div class="subnav sticky">
+            <p class="pull-right">
+                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for username, name, e-mail, etc...')}">
+            </p>
+            <p style="padding: 4px">
+                %if user.is_superuser:
+                    <button id="deleteUserBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="icon-trash"></i> ${_('Delete')}</button>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="icon-user"></i> ${_('Add user')}</a>
+                    <a href="${ url('useradmin.views.add_ldap_user') }" class="btn"><i class="icon-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
+                    <a href="javascript:void(0)" class="btn confirmationModal" data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }"><i class="icon-refresh"></i> ${_('Sync LDAP users/groups')}</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                %endif
+            </p>
         </div>
-        <form class="form-search">
-            ${_('Filter: ')}<input type="text" id="filterInput" class="input-xxlarge search-query" placeholder="${_('Search for username, name, e-mail, etc...')}">
-        </form>
     </div>
+    <br/>
+
     <table class="table table-striped table-condensed datatables">
         <thead>
             <tr>
+                %if user.is_superuser:
+                    <th width="1%"><input id="selectAll" type="checkbox"/></th>
+                %endif
                 <th>${_('Username')}</th>
                 <th>${_('First Name')}</th>
                 <th>${_('Last Name')}</th>
                 <th>${_('E-mail')}</th>
                 <th>${_('Groups')}</th>
                 <th>${_('Last Login')}</th>
-                <th>&nbsp;</th>
             </tr>
         </thead>
         <tbody>
         % for listed_user in users:
-            <tr class="userRow" data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
-                <td>${listed_user.username}</td>
+            <tr class="tableRow" data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
+                %if user.is_superuser:
+                    <td class="center" data-row-selector-exclude="true">
+                        <input type="checkbox" class="userCheck" data-username="${listed_user.username}" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote(listed_user.username))}" data-row-selector-exclude="true"/>
+                    </td>
+                %endif
+                <td>
+                    %if user.is_superuser or user.username == listed_user.username:
+                        <h5><a title="${_('Edit %(username)s') % dict(username=listed_user.username)}" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-row-selector="true">${listed_user.username}</a></h5>
+                    %else:
+                        <h5>${listed_user.username}</h5>
+                    %endif
+                </td>
                 <td>${listed_user.first_name}</td>
                 <td>${listed_user.last_name}</td>
                 <td>${listed_user.email}</td>
                 <td>${', '.join([group.name for group in listed_user.groups.all()])}</td>
                 <td>${date(listed_user.last_login)} ${time(listed_user.last_login).replace("p.m.","PM").replace("a.m.","AM")}</td>
-                <td class="right">
-                <%
-                    i18n_editUsername = _('Edit %(username)s') % {'username': listed_user.username}
-                    i18n_deleteUsername = _('Delete %(username)s') % {'username': listed_user.username}
-                %>
-                %if user.is_superuser == True:
-                    <a title="${_('Edit %(username)s') % dict(username=listed_user.username)}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-row-selector="true">${_('Edit')}</a>
-                    <a title="${_('Delete %(username)s') % dict(username=listed_user.username)}" class="btn small confirmationModal" alt="Are you sure you want to delete ${listed_user.username}?" href="javascript:void(0)" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote_plus(listed_user.username)) }">${_('Delete')}</a>
-                %else:
-                    %if user.username == listed_user.username:
-                        <a title="${_('Edit %(username)s') % dict(username=listed_user.username)}" class="btn small" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }">Edit</a>
-                    %else:
-                        &nbsp;
-                    %endif
-                %endif
-                </td>
             </tr>
         % endfor
         </tbody>
+        <tfoot class="hide">
+            <tr>
+                <td colspan="8">
+                    <div class="alert">
+                        ${_('There are no users matching the search criteria.')}
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
     </table>
 
     <div id="syncLdap" class="modal hide fade"></div>
@@ -94,14 +107,16 @@ ${layout.menubar(section='users', _=_)}
                 "bInfo": false,
                 "bFilter": false,
                 "aoColumns": [
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        { "sType": "date" },
-                        { "bSortable": false }
-                    ]
+                    %if user.is_superuser:
+                    { "bSortable": false },
+                    %endif
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    { "sType": "date" }
+                ]
             });
             $(".dataTables_wrapper").css("min-height","0");
             $(".dataTables_filter").hide();
@@ -109,7 +124,7 @@ ${layout.menubar(section='users', _=_)}
             $(".confirmationModal").click(function(){
                 var _this = $(this);
                 $.ajax({
-                    url: _this.attr("data-confirmation-url"),
+                    url: _this.data("confirmation-url"),
                     beforeSend: function(xhr){
                         xhr.setRequestHeader("X-Requested-With", "Hue");
                     },
@@ -121,18 +136,29 @@ ${layout.menubar(section='users', _=_)}
                 });
             });
 
-            $("#filterInput").keyup(function(){
-                $.each($(".userRow"), function(index, value) {
-                  if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
-                    $(value).hide(250);
-                  }else{
-                    $(value).show(250);
-                  }
-                });
+            $("#selectAll").change(function(){
+                if ($(this).is(":checked")){
+                    $(".userCheck").attr("checked", "checked");
+                }
+                else {
+                    $(".userCheck").removeAttr("checked");
+                }
+                $(".userCheck").change();
+            });
+
+            $(".userCheck").change(function(){
+                if ($(".userCheck:checked").length == 1){
+                    $("#deleteUserBtn").removeAttr("disabled").data("confirmation-url", $(".userCheck:checked").data("confirmation-url"));
+                }
+                else {
+                    $("#deleteUserBtn").attr("disabled", "disabled");
+                }
             });
 
             $("a[data-row-selector='true']").jHueRowSelector();
         });
     </script>
+
+${layout.commons()}
 
 ${commonfooter(messages)}

@@ -58,9 +58,11 @@ ${layout.menubar(section='permissions', _=_)}
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		$("#id_groups").jHueSelector({
-            width:520,
             selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}"
+            searchPlaceholder: "${_('Search')}",
+            noChoicesFound: "${_('No groups found.')}",
+            width:600,
+            height:240
         });
 	});
 </script>

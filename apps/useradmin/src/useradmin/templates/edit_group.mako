@@ -53,6 +53,8 @@ ${layout.menubar(section='groups', _=_)}
 		% endif
 	% endif
 
+    <br/>
+
 	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
 		<fieldset>
 		% for field in form:
@@ -78,14 +80,18 @@ ${layout.menubar(section='groups', _=_)}
 <script type="text/javascript" charset="utf-8">
 	$(document).ready(function(){
 		$("#id_members").jHueSelector({
-            width:400,
             selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}"
+            searchPlaceholder: "${_('Search')}",
+            noChoicesFound: "${_('No users found.')}",
+            width:600,
+            height:240
         });
 		$("#id_permissions").jHueSelector({
-            width:400,
             selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}"
+            searchPlaceholder: "${_('Search')}",
+            noChoicesFound: "${_('No permissions found.')}",
+            width:600,
+            height:240
         });
 	});
 </script>

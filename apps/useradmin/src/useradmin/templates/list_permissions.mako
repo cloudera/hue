@@ -27,36 +27,46 @@ ${layout.menubar(section='permissions', _=_)}
 
 <div class="container-fluid">
     <h1>${_('Hue Permissions')}</h1>
-    <div class="well hueWell">
-        <form class="form-search">
-                ${_('Filter: ')}<input type="text" id="filterInput" class="input-xxlarge search-query" placeholder="${_('Search for application name, description, etc...')}">
-        </form>
+    <div class="subnavContainer">
+        <div class="subnav sticky">
+            <p class="pull-right">
+                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for application name, description, etc...')}">
+            </p>
+        </div>
     </div>
+    <br/>
     <table class="table table-striped table-condensed datatables">
         <thead>
         <tr>
             <th>${_('Application')}</th>
             <th>${_('Permission')}</th>
             <th>${_('Groups')}</th>
-            %if user.is_superuser:
-                <th>&nbsp;</th>
-            %endif
         </tr>
         </thead>
         <tbody>
             % for perm in permissions:
-            <tr class="permissionRow" data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
-                <td>${perm.app}</td>
+            <tr class="tableRow" data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
+                <td>
+                %if user.is_superuser:
+                    <h5><a title="${_('Edit permission')}" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">${perm.app}</a></h5>
+                %else:
+                    <h5>${perm.app}</h5>
+                %endif
+                </td>
                 <td>${perm.description}</td>
                 <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
-            %if user.is_superuser:
-                <td class="right">
-                    <a title="${_('Edit permission')}" class="btn small editPermissionBtn" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">${_('Edit')}</a>
-                </td>
-            %endif
             </tr>
             % endfor
         </tbody>
+        <tfoot class="hide">
+        <tr>
+            <td colspan="3">
+                <div class="alert">
+                    ${_('There are no permissions matching the search criteria.')}
+                </div>
+            </td>
+        </tr>
+        </tfoot>
     </table>
 </div>
 
@@ -70,29 +80,16 @@ ${layout.menubar(section='permissions', _=_)}
             "aoColumns": [
                 null,
                 null,
-                %if user.is_superuser:
-                    null,
-                    { "bSortable": false }
-                %else:
-                    null
-                %endif
+                null
             ]
         });
         $(".dataTables_wrapper").css("min-height","0");
         $(".dataTables_filter").hide();
 
-        $("#filterInput").keyup(function(){
-            $.each($(".permissionRow"), function(index, value) {
-                if($(value).data("search").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1 && $("#filterInput").val() != ""){
-                    $(value).hide(250);
-                }else{
-                    $(value).show(250);
-                }
-            });
-        });
-
         $("a[data-row-selector='true']").jHueRowSelector();
     });
 </script>
+
+${layout.commons()}
 
 ${commonfooter(messages)}
