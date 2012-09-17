@@ -183,7 +183,7 @@ def import_wizard(request):
       if do_s2_auto_delim or do_s2_user_delim or cancel_s3_column_def:
         return render('choose_delimiter.mako', request, dict(
           action=urlresolvers.reverse(import_wizard),
-          delim_readable=DELIMITER_READABLE[s2_delim_form['delimiter'].data[0]],
+          delim_readable=DELIMITER_READABLE.get(s2_delim_form['delimiter'].data[0], s2_delim_form['delimiter'].data[1]),
           initial=delim_is_auto,
           file_form=s1_file_form,
           delim_form=s2_delim_form,
@@ -283,12 +283,19 @@ def _delim_preview(fs, file_form, encoding, file_types, delimiters):
 
   n_cols = max([ len(row) for row in fields_list ])
   # ``delimiter`` is a MultiValueField. delimiter_0 and delimiter_1 are the sub-fields.
-  delim_form = beeswax.forms.CreateByImportDelimForm(dict(delimiter_0=delim,
-                                                          delimiter_1='',
+  delimiter_0 = delim
+  delimiter_1 = ''
+  # If custom delimiter
+  if not filter(lambda val: val[0] == delim, beeswax.forms.TERMINATOR_CHOICES):
+    delimiter_0 = '__other__'
+    delimiter_1 = delim
+
+  delim_form = beeswax.forms.CreateByImportDelimForm(dict(delimiter_0=delimiter_0,
+                                                          delimiter_1=delimiter_1,
                                                           file_type=file_type,
                                                           n_cols=n_cols))
   if not delim_form.is_valid():
-    assert False, _('Internal error when constructing the delimiter form')
+    assert False, _('Internal error when constructing the delimiter form: %(error)s' % {'error': delim_form.errors})
   return fields_list, n_cols, delim_form
 
 

@@ -58,7 +58,7 @@ ${layout.menubar(section='tables')}
                             ${comps.field(delim_form["delimiter"], render_default=True)}
                             <input id="submit_preview" class="btn btn-info" type="submit" value="${_('Preview')}" name="submit_preview"/>
                             <span class="help-block">
-                            ${_('Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.')}
+                            ${_('Enter the column delimiter. Must be a single character. Use syntax like "\\001" or "\\t" for special characters.')}
                             </span>
                         </div>
                     </div>
@@ -116,8 +116,11 @@ ${layout.menubar(section='tables')}
             }
             else {
                 $("#id_delimiter_1").hide();
+                $("#id_delimiter_1").val('');
             }
         });
+
+        $("#id_delimiter_0").change();
 
         $("#step1").click(function(e){
             e.preventDefault();

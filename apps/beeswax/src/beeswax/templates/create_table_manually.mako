@@ -182,6 +182,7 @@ ${layout.menubar(section='tables')}
 	        </div>
 	    </fieldset>
 	</div>
+
 	<div id="step4" class="stepDetails hide">
 	    <fieldset>
 	        <div class="alert alert-info"><h3>${_('Choose a File Format')}</h3>
@@ -231,11 +232,11 @@ ${layout.menubar(section='tables')}
 	        </div>
 	    </fieldset>
 	</div>
+
 	<div id="step5" class="stepDetails hide">
 	    <fieldset>
 	        <div class="alert alert-info"><h3>${_("Choose Where Your Table's Data is Stored")}</h3>
 	        </div>
-	
 	        <div class="control-group">
 	            <label class="control-label">${_('Location')}</label>
 	            <div class="controls">
@@ -268,6 +269,7 @@ ${layout.menubar(section='tables')}
 	        </div>
 	    </fieldset>
 	</div>
+
 	<div id="step6" class="stepDetails hide">
 	    <fieldset>
 	        <div class="alert alert-info"><h3>${_('Configure Table Columns')}</h3>
