@@ -18,7 +18,7 @@
 """
 Tests for Hadoop FS.
 """
-from nose.tools import assert_false, assert_true, assert_equals, assert_raises
+from nose.tools import assert_false, assert_true, assert_equals, assert_raises, assert_not_equals
 from nose.plugins.attrib import attr
 import logging
 import posixfile
@@ -277,3 +277,81 @@ def test_threadedness():
   assert_equals("alpha", fs.user)
   fs.setuser("gamma")
   assert_equals("gamma", fs.user)
+
+@attr('requires_hadoop')
+def test_chmod():
+  # Create a test directory with
+  # a subdirectory and a few files.
+  dir1 = '/test'
+  subdir1 = dir1 + '/test1'
+  file1 = subdir1 + '/test1.txt'
+  cluster = pseudo_hdfs4.shared_cluster()
+  fs = cluster.fs
+  fs.setuser(cluster.superuser)
+  try:
+    fs.mkdir(subdir1)
+    f = fs.open(file1, "w")
+    f.write("hello")
+    f.close()
+
+    # Check currrent permissions are not 777 (666 for file)
+    fs.chmod(dir1, 01000, recursive=True)
+    assert_equals(041000, fs.stats(dir1).mode)
+    assert_equals(041000, fs.stats(subdir1).mode)
+    assert_equals(0100000, fs.stats(file1).mode)
+
+    # Chmod non-recursive
+    fs.chmod(dir1, 01222, recursive=False)
+    assert_equals(041222, fs.stats(dir1).mode)
+    assert_equals(041000, fs.stats(subdir1).mode)
+    assert_equals(0100000, fs.stats(file1).mode)
+
+    # Chmod recursive
+    fs.chmod(dir1, 01444, recursive=True)
+    assert_equals(041444, fs.stats(dir1).mode)
+    assert_equals(041444, fs.stats(subdir1).mode)
+    assert_equals(0100444, fs.stats(file1).mode)
+  finally:
+    try:
+      fs.rmtree(dir1)
+    finally:
+      pass
+
+@attr('requires_hadoop')
+def test_chown():
+  # Create a test directory with
+  # a subdirectory and a few files.
+  dir1 = '/test'
+  subdir1 = dir1 + '/test1'
+  file1 = subdir1 + '/test1.txt'
+  cluster = pseudo_hdfs4.shared_cluster()
+  fs = cluster.fs
+  fs.setuser(cluster.superuser)
+  try:
+    fs.mkdir(subdir1)
+    f = fs.open(file1, "w")
+    f.write("hello")
+    f.close()
+
+    # Check currrent owners are not user test
+    LOG.info(str(fs.stats(dir1).__dict__))
+    assert_not_equals('test', fs.stats(dir1).user)
+    assert_not_equals('test', fs.stats(subdir1).user)
+    assert_not_equals('test', fs.stats(file1).user)
+
+    # Chown non-recursive
+    fs.chown(dir1, 'test', recursive=False)
+    assert_equals('test', fs.stats(dir1).user)
+    assert_not_equals('test', fs.stats(subdir1).user)
+    assert_not_equals('test', fs.stats(file1).user)
+
+    # Chown recursive
+    fs.chown(dir1, 'test', recursive=True)
+    assert_equals('test', fs.stats(dir1).user)
+    assert_equals('test', fs.stats(subdir1).user)
+    assert_equals('test', fs.stats(file1).user)
+  finally:
+    try:
+      fs.rmtree(dir1)
+    finally:
+      pass

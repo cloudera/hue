@@ -30,7 +30,7 @@ import urlparse
 
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
-from nose.tools import assert_true, assert_false, assert_equal, assert_raises
+from nose.tools import assert_true, assert_false, assert_equal, assert_raises, assert_not_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -71,6 +71,49 @@ def test_mkdir_singledir():
   finally:
     try:
       cluster.fs.rmtree(prefix)     # Clean up
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+
+
+@attr('requires_hadoop')
+def test_chmod():
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    c = make_logged_in_client(cluster.superuser)
+    cluster.fs.setuser(cluster.superuser)
+
+    PATH = "/chmod_test"
+    SUBPATH = PATH + '/test'
+    cluster.fs.mkdir(SUBPATH)
+
+    permissions = ('user_read', 'user_write', 'user_execute',
+        'group_read', 'group_write', 'group_execute',
+        'other_read', 'other_write', 'other_execute',
+        'sticky') # Order matters!
+
+    # Get current mode, change mode, check mode
+    # Start with checking current mode
+    assert_not_equal(041777, int(cluster.fs.stats(PATH)["mode"]))
+
+    # Setup post data
+    permissions_dict = dict( zip(permissions, [True]*len(permissions)) )
+    kwargs = {'path': PATH}
+    kwargs.update(permissions_dict)
+
+    # Set 1777, then check permissions of dirs
+    response = c.post("/filebrowser/chmod", kwargs)
+    assert_equal(041777, int(cluster.fs.stats(PATH)["mode"]))
+
+    # Now do the above recursively
+    assert_not_equal(041777, int(cluster.fs.stats(SUBPATH)["mode"]))
+    kwargs['recursive'] = True
+    response = c.post("/filebrowser/chmod", kwargs)
+    assert_equal(041777, int(cluster.fs.stats(SUBPATH)["mode"]))
+
+  finally:
+    try:
+      cluster.fs.rmtree(PATH)     # Clean up
     except:
       pass      # Don't let cleanup errors mask earlier failures
 
@@ -134,6 +177,15 @@ def test_chown():
   c.post("/filebrowser/chown", dict(path=PATH, user="__other__", user_other="z", group="y"))
   assert_equal("z", cluster.fs.stats(PATH)["user"])
 
+  # Now check recursive
+  SUBPATH = PATH + '/test'
+  cluster.fs.mkdir(SUBPATH)
+  c.post("/filebrowser/chown", dict(path=PATH, user="x", group="y", recursive=True))
+  assert_equal("x", cluster.fs.stats(SUBPATH)["user"])
+  assert_equal("y", cluster.fs.stats(SUBPATH)["group"])
+  c.post("/filebrowser/chown", dict(path=PATH, user="__other__", user_other="z", group="y", recursive=True))
+  assert_equal("z", cluster.fs.stats(SUBPATH)["user"])
+
   # Make sure that the regular user chown form doesn't have useless fields,
   # and that the superuser's form has all the fields it could dream of.
   PATH = '/filebrowser/chown-regular-user'
@@ -144,7 +196,6 @@ def test_chown():
   c = make_logged_in_client('chown_test')
   response = c.get('/filebrowser/chown', dict(path=PATH, user='chown_test', group='chown_test'))
   assert_false('<option value="__other__"' in response.content)
-
 
 @attr('requires_hadoop')
 def test_listdir():

@@ -72,6 +72,11 @@ from django.utils.translation import ugettext as _
                 <td class="center">${edit.render_field(form["sticky"], tag="checkbox", button_text=" ", nolabel=True)}</td>
                 <td>&nbsp;</td>
             </tr>
+            <tr>
+                <td><strong>${_('Recursive')}</strong></td>
+                <td colspan="3">&nbsp;</td>
+                <td class="center">${edit.render_field(form["recursive"], tag="checkbox", button_text=" ", nolabel=True)}</td>
+                <td>&nbsp;</td>
             </tbody>
         </table>
     </div>

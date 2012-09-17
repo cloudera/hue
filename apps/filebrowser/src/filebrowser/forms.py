@@ -82,9 +82,10 @@ class ChownForm(forms.Form):
   # These could be "ChoiceFields", listing only users and groups
   # that the current user has permissions for.
   user = CharField(label=_("User"), min_length=1)
-  user_other = CharField(label="OtherUser", min_length=1, required=False)
+  user_other = CharField(label=_("OtherUser"), min_length=1, required=False)
   group = CharField(label=_("Group"), min_length=1)
-  group_other = CharField(label="OtherGroup", min_length=1, required=False)
+  group_other = CharField(label=_("OtherGroup"), min_length=1, required=False)
+  recursive = BooleanField(label=_("Recursive"), required=False)
 
   def __init__(self, *args, **kwargs):
     super(ChownForm, self).__init__(*args, **kwargs)
@@ -108,6 +109,7 @@ class ChmodForm(forms.Form):
   other_write = BooleanField(required=False)
   other_execute = BooleanField(required=False)
   sticky = BooleanField(required=False)
+  recursive = BooleanField(required=False)
 
   names = ("user_read", "user_write", "user_execute",
       "group_read", "group_write", "group_execute",

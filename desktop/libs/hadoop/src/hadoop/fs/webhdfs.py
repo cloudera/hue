@@ -154,7 +154,7 @@ class WebHdfs(Hdfs):
     Get directory entry names without stats.
     """
     dirents = self.listdir_stats(path, glob)
-    return [ Hdfs.basename(x.path) for x in dirents ]
+    return [Hdfs.basename(x.path) for x in dirents]
 
   def get_content_summary(self, path):
     """
@@ -291,8 +291,22 @@ class WebHdfs(Hdfs):
     for dirent in ls:
       self.rename(Hdfs.join(old_dir, dirent), Hdfs.join(new_dir, dirent))
 
-  def chown(self, path, user=None, group=None):
-    """chown(path, user=None, group=None)"""
+  def _listdir_r(self, path, glob=None):
+    """
+    _listdir_r(path, glob=None) -> [ entry names ]
+
+    Get directory entry names without stats, recursively.
+    """
+    paths = [path]
+    while paths:
+      path = paths.pop()
+      if self.isdir(path):
+        hdfs_paths = self.listdir_stats(path, glob)
+        paths[:0] = [x.path for x in hdfs_paths]
+      yield path
+
+  def chown(self, path, user=None, group=None, recursive=False):
+    """chown(path, user=None, group=None, recursive=False)"""
     path = Hdfs.normpath(path)
     params = self._getparams()
     params['op'] = 'SETOWNER'
@@ -300,11 +314,16 @@ class WebHdfs(Hdfs):
       params['owner'] = user
     if group is not None:
       params['group'] = group
-    self._root.put(path, params)
+    if recursive:
+      for xpath in self._listdir_r(path):
+        self._root.put(xpath, params)
+    else:
+      self._root.put(path, params)
 
-  def chmod(self, path, mode):
+
+  def chmod(self, path, mode, recursive=False):
     """
-    chmod(path, mode)
+    chmod(path, mode, recursive=False)
 
     `mode' should be an octal integer or string.
     """
@@ -312,7 +331,11 @@ class WebHdfs(Hdfs):
     params = self._getparams()
     params['op'] = 'SETPERMISSION'
     params['permission'] = safe_octal(mode)
-    self._root.put(path, params)
+    if recursive:
+      for xpath in self._listdir_r(path):
+        self._root.put(xpath, params)
+    else:
+      self._root.put(path, params)
 
   def get_home_dir(self):
     """get_home_dir() -> Home directory for the current user"""

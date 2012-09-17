@@ -83,6 +83,8 @@ from django.utils.translation import ugettext as _
             % else:
             ${ selection("group", [group for group in form.all_groups if group in extra_params['current_user'].get_groups()], extract_field_data(form["group"])) }
             % endif
+            <br />
+            <label style="display: inline;">${_('Recursive')}</label>${edit.render_field(form["recursive"], tag="checkbox", button_text=" ", nolabel=True)}
         </div>
 
 

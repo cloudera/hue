@@ -39,6 +39,7 @@ from django.core import urlresolvers, serializers
 from django.template.defaultfilters import stringformat, filesizeformat
 from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.views.static import was_modified_since
+from django.utils.functional import curry
 from django.utils.http import http_date, urlquote
 from django.utils.html import escape
 from cStringIO import StringIO
@@ -845,7 +846,8 @@ def rmtree(request):
 def chmod(request):
     # mode here is abused: on input, it's a string, but when retrieved,
     # it's an int.
-    return generic_op(ChmodForm, request, request.fs.chmod, ["path", "mode"], "path", template="chmod.mako")
+    op = curry(request.fs.chmod, recursive=request.POST.get('recursive', False))
+    return generic_op(ChmodForm, request, op, ["path", "mode"], "path", template="chmod.mako")
 
 
 def chown(request):
@@ -858,8 +860,10 @@ def chown(request):
     if request.POST.get("group") == "__other__":
         args[2] = "group_other"
 
-    return generic_op(ChownForm, request, request.fs.chown, args, "path", template="chown.mako",
-                      extra_params=dict(current_user=request.user, superuser=request.fs.superuser))
+    op = curry(request.fs.chown, recursive=request.POST.get('recursive', False))
+    return generic_op(ChownForm, request, op, args, "path", template="chown.mako",
+                      extra_params=dict(current_user=request.user, 
+                      superuser=request.fs.superuser))
 
 
 def upload_flash(request):
