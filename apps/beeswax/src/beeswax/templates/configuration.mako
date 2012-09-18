@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${commonheader(_('Configuration Variables'), "beeswax", "100px")}
+${commonheader(_('Configuration Variables'), "beeswax", user, "100px")}
 ${layout.menubar(section='configuration')}
 
 <div class="container-fluid">

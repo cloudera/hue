@@ -20,7 +20,7 @@
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.tableName), "beeswax", "100px")}
+${commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.tableName), "beeswax", user, "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">

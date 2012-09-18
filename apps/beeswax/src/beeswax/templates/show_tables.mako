@@ -18,7 +18,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Table List'), "beeswax", "100px")}
+${commonheader(_('Table List'), "beeswax", user, "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">

@@ -18,7 +18,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-${commonheader(_('Hue Shell'), "shell")}
+${commonheader(_('Hue Shell'), "shell", user)}
 <div class="container-fluid">
 <div>
     ${_('The Shell application requires a Unix user account for every user of Hue on the remote webserver.')}

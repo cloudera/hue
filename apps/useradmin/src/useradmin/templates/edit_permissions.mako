@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Hue Permissions'), "useradmin", "100px")}
+${commonheader(_('Hue Permissions'), "useradmin", user, "100px")}
 ${layout.menubar(section='permissions', _=_)}
 
 

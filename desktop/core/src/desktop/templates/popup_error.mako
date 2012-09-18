@@ -19,7 +19,7 @@ from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
 
-${commonheader(title, "", "60px")}
+${commonheader(title, "", user)}
 
 
 	<div class="container-fluid">

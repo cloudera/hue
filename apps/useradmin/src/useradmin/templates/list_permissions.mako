@@ -22,7 +22,7 @@ from django.contrib.auth.models import Group
 %>
 
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Hue Permissions'), "useradmin", "100px")}
+${commonheader(_('Hue Permissions'), "useradmin", user, "100px")}
 ${layout.menubar(section='permissions', _=_)}
 
 <div class="container-fluid">

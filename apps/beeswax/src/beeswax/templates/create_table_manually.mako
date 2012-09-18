@@ -19,7 +19,7 @@
 %>
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_("Create table manually"), "beeswax", "100px")}
+${commonheader(_("Create table manually"), "beeswax", user, "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">

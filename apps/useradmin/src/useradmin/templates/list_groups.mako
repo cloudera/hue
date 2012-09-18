@@ -21,7 +21,7 @@ from useradmin.models import group_permissions
 %>
 
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Hue Groups'), "useradmin", "100px")}
+${commonheader(_('Hue Groups'), "useradmin", user, "100px")}
 ${layout.menubar(section='groups', _=_)}
 
 <div class="container-fluid">

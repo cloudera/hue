@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Hue Users'), "useradmin", "100px")}
+${commonheader(_('Hue Users'), "useradmin", user, "100px")}
 ${layout.menubar(section='users', _=_)}
 
 <div class="container-fluid">

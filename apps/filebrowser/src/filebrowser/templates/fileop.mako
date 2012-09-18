@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 
 
-${commonheader(_('File Operation'), 'filebrowser')}
+${commonheader(_('File Operation'), 'filebrowser', user)}
 
 ## Not sure if enctype breaks anything if used for things other than file upload.
 

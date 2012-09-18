@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Job Designer'), "jobsub", "100px")}
+${commonheader(_('Job Designer'), "jobsub", user, "100px")}
 ${layout.menubar(section='designs')}
 
 

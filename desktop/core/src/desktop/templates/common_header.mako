@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 from desktop import conf
+import urllib
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
@@ -72,12 +73,6 @@ from django.utils.translation import ugettext as _
 
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-      $("#username").jHueUsername({
-        onLoad: function(user){
-            $(".userProfile").attr("href","/useradmin/users/edit/"+user.username);
-            $("#usernameDropdown").show();
-        }
-      });
       $("input:text[placeholder]").simplePlaceholder();
       $(".submitter").keydown(function(e){
         if (e.keyCode==13){
@@ -110,13 +105,13 @@ from django.utils.translation import ugettext as _
     <div class="navbar-inner">
       <div class="container-fluid">
         <a class="brand nav-tooltip" title="${_('About Hue')}" href="/about">Hue</a>
-        <div id="usernameDropdown" class="btn-group pull-right hide">
+        <div id="usernameDropdown" class="btn-group pull-right">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-user"></i> <span id="username"></span>
+            <i class="icon-user"></i> ${user.username}
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><a class="userProfile" href="#">${_('Profile')}</a></li>
+            <li><a class="userProfile" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">${_('Profile')}</a></li>
             <li class="divider"></li>
             <li><a href="/accounts/logout/">${_('Sign Out')}</a></li>
           </ul>
@@ -125,7 +120,7 @@ from django.utils.translation import ugettext as _
         <div class="nav-collapse">
           <ul class="nav">
             %for app in apps:
-              %if app.icon_path:
+              %if app.icon_path and user.has_hue_permission(action="access", app=app.display_name):
               <li id="${app.display_name}Icon" ${is_selected(section, app.display_name)}>
                 <a class="nav-tooltip" title="${app.nice_name}" href="/${app.display_name}"><img src="${app.icon_path}" /></a>
               </li>

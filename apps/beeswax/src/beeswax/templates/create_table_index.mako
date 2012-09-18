@@ -18,7 +18,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Create Table'), "beeswax", "100px")}
+${commonheader(_('Create Table'), "beeswax", user, "100px")}
 <div class="container-fluid">
   <div class="toolbar">
   </div>

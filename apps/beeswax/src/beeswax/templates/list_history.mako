@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
 
-${commonheader(_('Query History'), "beeswax", "100px")}
+${commonheader(_('Query History'), "beeswax", user, "100px")}
 ${layout.menubar(section='history')}
 
 <%def name="show_saved_query(design, history)">

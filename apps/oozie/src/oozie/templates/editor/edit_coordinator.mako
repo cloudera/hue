@@ -24,7 +24,7 @@
 <%namespace name="properties" file="coordinator_properties.mako" />
 <%namespace name="coordinator_data" file="create_coordinator_data.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", "100px") }
+${ commonheader(_("Oozie App"), "oozie", user, "100px") }
 ${ layout.menubar(section='coordinators') }
 
 

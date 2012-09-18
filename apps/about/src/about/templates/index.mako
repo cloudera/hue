@@ -17,7 +17,7 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-${commonheader(_('About Hue'), "about", "100px")}
+${commonheader(_('About Hue'), "about", user, "100px")}
 
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">

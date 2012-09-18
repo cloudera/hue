@@ -77,7 +77,7 @@
         </tr>
     % endfor
 </%def>
-${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbrowser")}
+${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbrowser", user)}
 
 <div class="container-fluid">
     <h1>${_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId)}</h1>

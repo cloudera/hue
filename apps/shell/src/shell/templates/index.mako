@@ -19,9 +19,9 @@ from django.utils.translation import ugettext as _
 %>
 
 % if shells:
-    ${commonheader(_('Hue Shell'), "shell", "100px")}
+    ${commonheader(_('Hue Shell'), "shell", user, "100px")}
 % else:
-    ${commonheader(_('Hue Shell'), "shell")}
+    ${commonheader(_('Hue Shell'), "shell", user)}
 % endif
 
 

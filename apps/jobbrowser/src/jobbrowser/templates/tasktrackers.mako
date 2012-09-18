@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
-${commonheader(_('Task Trackers - Job Browser'), "jobbrowser")}
+${commonheader(_('Task Trackers - Job Browser'), "jobbrowser", user)}
 <div class="container-fluid">
 <table class="datatables">
 	<thead>

@@ -21,7 +21,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="about_layout.mako" />
-${commonheader(_('About'), "about", "100px")}
+${commonheader(_('About'), "about", user, "100px")}
 ${layout.menubar(section='dump_config')}
 
 	<div class="container-fluid">

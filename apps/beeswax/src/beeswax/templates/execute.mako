@@ -60,7 +60,7 @@
 </%def>
 
 
-${commonheader(_('Query'), "beeswax", "100px")}
+${commonheader(_('Query'), "beeswax", user, "100px")}
 ${layout.menubar(section='query')}
 
 <div class="container-fluid">

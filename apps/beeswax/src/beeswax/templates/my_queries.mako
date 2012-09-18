@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
-${commonheader(_('My Queries'), "beeswax", "100px")}
+${commonheader(_('My Queries'), "beeswax", user, "100px")}
 ${layout.menubar(section='my queries')}
 <style>
     .tab-content {

@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader(_('Create table from file'), "beeswax", "100px")}
+${commonheader(_('Create table from file'), "beeswax", user, "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">

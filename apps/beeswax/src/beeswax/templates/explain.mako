@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader(_('Query Explanation'), "beeswax", "100px")}
+${commonheader(_('Query Explanation'), "beeswax", user, "100px")}
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">

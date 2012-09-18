@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
   else:
     view_or_table_noun = _("Table")
 %>
-${commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.tableName), "beeswax", "100px")}
+${commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.tableName), "beeswax", user, "100px")}
 ${layout.menubar(section='tables')}
 
 <%def name="column_table(cols)">

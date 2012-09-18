@@ -263,17 +263,19 @@ def who_am_i(request):
   time.sleep(sleep)
   return HttpResponse(request.user.username + "\t" + request.fs.user + "\n")
 
-def commonheader(title, section, padding="60px"):
+def commonheader(title, section, user, padding="60px"):
   """
   Returns the rendered common header
   """
   apps_list = sorted(appmanager.DESKTOP_APPS[:], key=lambda app: app.menu_index)
+  #apps_list = sorted(appmanager.get_apps(user), key=lambda app: app.menu_index)
 
   return django_mako.render_to_string("common_header.mako", dict(
     apps=apps_list,
     title=title,
     section=section,
-    padding=padding
+    padding=padding,
+    user=user
   ))
 
 def commonfooter(messages=None):

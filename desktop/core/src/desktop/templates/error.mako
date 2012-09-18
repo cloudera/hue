@@ -18,7 +18,7 @@ from desktop.views import commonheader, commonfooter
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
-${commonheader(_('Error'), "")}
+${commonheader(_('Error'), "", user)}
 
   <div class="container-fluid">
     <h1>${_('Error!')}</h1>

@@ -17,7 +17,7 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-${commonheader(_('Error'), "")}
+${commonheader(_('Error'), "", user)}
 
   <div class="container-fluid">
     <h1>${_('Server Error (500)')}</h1>
