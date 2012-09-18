@@ -33,7 +33,7 @@ import hadoop.api.jobtracker.ttypes as ttypes
 from hadoop.api.jobtracker.ttypes import JobNotFoundException
 
 from django.utils.translation import ugettext as _
-from desktop.lib.django_util import PopupException
+from desktop.lib.exceptions import PopupException
 
 LOGGER = logging.getLogger(__name__)
 

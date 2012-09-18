@@ -15,7 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.django_util import render, PopupException
+from desktop.lib.django_util import render
+from desktop.lib.exceptions import PopupException
 from desktop import appmanager
 from hadoop.fs import LocalSubFileSystem
 

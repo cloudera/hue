@@ -32,7 +32,7 @@ from desktop.lib import django_mako
 from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
-from desktop.lib.django_util import PopupException
+from desktop.lib.exceptions import PopupException
 
 from hadoop.fs.exceptions import WebHdfsException
 from jobsub.parameterization import find_variables, substitute_variables

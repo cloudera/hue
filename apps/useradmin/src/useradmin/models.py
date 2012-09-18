@@ -54,7 +54,7 @@ import logging
 from django.db import models
 from django.contrib.auth import models as auth_models
 from desktop import appmanager
-from desktop.lib.django_util import PopupException
+from desktop.lib.exceptions import PopupException
 from enum import Enum
 
 import useradmin.conf

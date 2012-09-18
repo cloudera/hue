@@ -21,7 +21,7 @@ import time
 
 from django.utils.translation import ugettext as _
 
-from desktop.lib.django_util import PopupException
+from desktop.lib.exceptions import PopupException
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.oozie_api import get_oozie

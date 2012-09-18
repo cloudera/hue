@@ -24,9 +24,8 @@ import string
 from urllib import quote_plus
 
 from desktop.lib.paginator import Paginator
-from desktop.lib.django_util import render_json, MessageException, render
-from desktop.lib.django_util import copy_query_dict
-from desktop.lib.django_util import PopupException
+from desktop.lib.django_util import render_json, render, copy_query_dict
+from desktop.lib.exceptions import PopupException, MessageException
 from desktop.lib.conf import coerce_bool
 
 from django.http import HttpResponseRedirect

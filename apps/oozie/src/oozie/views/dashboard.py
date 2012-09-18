@@ -25,7 +25,8 @@ from django.http import HttpResponse
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
-from desktop.lib.django_util import render, PopupException
+from desktop.lib.django_util import render
+from desktop.lib.exceptions import PopupException
 from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 from liboozie.oozie_api import get_oozie

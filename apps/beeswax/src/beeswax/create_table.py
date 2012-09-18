@@ -25,7 +25,8 @@ import gzip
 from django.core import urlresolvers
 
 from desktop.lib import django_mako, i18n
-from desktop.lib.django_util import render, PopupException
+from desktop.lib.django_util import render
+from desktop.lib.exceptions import PopupException
 from desktop.lib.django_forms import MultiForm
 from hadoop.fs import hadoopfs
 

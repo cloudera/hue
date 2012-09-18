@@ -16,7 +16,7 @@
 # limitations under the License.
 
 import logging
-from desktop.lib.django_util import PopupException
+from desktop.lib.exceptions import PopupException
 from django.utils.translation import ugettext as _
 
 try:

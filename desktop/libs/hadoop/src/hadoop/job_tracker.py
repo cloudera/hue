@@ -19,7 +19,7 @@
 
 from desktop.lib import thrift_util
 from desktop.lib.conf import validate_port
-from desktop.lib.django_util import StructuredException
+from desktop.lib.exceptions import StructuredException
 from desktop.lib.thrift_util import fixup_enums
 
 from hadoop.api.jobtracker import Jobtracker

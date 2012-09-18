@@ -33,7 +33,8 @@ import django.views.generic.simple
 
 import desktop.conf
 from desktop.lib import apputil, i18n
-from desktop.lib.django_util import render, render_json, is_jframe_request, PopupException, StructuredException
+from desktop.lib.django_util import render, render_json, is_jframe_request
+from desktop.lib.exceptions import PopupException, StructuredException
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
 from hadoop import cluster

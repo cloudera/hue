@@ -25,7 +25,7 @@ from desktop.lib.django_test_util import configure_django_for_test, create_table
 from desktop.lib.django_util import reverse_with_get, timesince, humanize_duration
 configure_django_for_test()
 
-from desktop.lib import django_util
+from desktop.lib import django_util, exceptions
 from django.db import models
 
 class TestModel(models.Model):
@@ -135,7 +135,7 @@ class TestDjangoUtil(object):
     msg = "b0rked file"
     the_file = "foobar"
     try:
-      raise django_util.MessageException(msg, the_file)
+      raise exceptions.MessageException(msg, the_file)
     except Exception, e:
       assert_equal(msg, e.message)
       assert_equal(the_file, e.data['filename'])

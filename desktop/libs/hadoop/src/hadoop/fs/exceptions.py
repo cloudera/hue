@@ -20,7 +20,7 @@ try:
 except:
   import simplejson as json
 
-from desktop.lib.django_util import StructuredException
+from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 
 

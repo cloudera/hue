@@ -47,8 +47,8 @@ from avro import datafile, io
 
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import make_absolute, render, render_json
-from desktop.lib.django_util import PopupException, format_preserving_redirect
+from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect
+from desktop.lib.exceptions import PopupException
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadForm, MkDirForm, RmDirForm, RmTreeForm,\

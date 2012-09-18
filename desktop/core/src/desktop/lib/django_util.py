@@ -307,61 +307,6 @@ def get_app_nice_name(app_name):
   except:
     return app_name
 
-class StructuredException(Exception):
-  """
-  Many exceptions in this application are a string and some data
-  that applies to.  The middleware will take these exceptions
-  and render them.
-  """
-  def __init__(self, code, message, data=None, error_code=500):
-    Exception.__init__(self, message)
-    self.code = code
-    self.message = message
-    self.data = data
-    self.error_code = error_code
-
-  def __str__(self):
-    return "%s (code %s): %s" % (self.message, self.code, repr(self.data))
-
-  @property
-  def response_data(self):
-    return dict(code=self.code,
-                message=self.message,
-                data=self.data)
-
-class MessageException(StructuredException):
-  """
-  Explicitly specified msg/filename exception.
-
-  This has been superceded by PopupException.
-  """
-  def __init__(self, msg, filename=None, error_code=500):
-    StructuredException.__init__(self,
-      code="GENERIC_MESSAGE",
-      message=msg,
-      data=dict(filename=filename),
-      error_code=error_code)
-
-class PopupException(Exception):
-  """
-  Middleware will render this exception; and the template
-  renders it as a pop-up.
-  """
-  def __init__(self, message, title="Error", detail=None, error_code=500):
-    Exception.__init__(self, message)
-    self.message = message
-    self.title = title
-    self.detail = detail
-    self.error_code = error_code
-
-  def response(self, request):
-    data = dict(title=self.title, message=self.message, detail=self.detail)
-    if not request.ajax:
-      data['request'] = request
-    response = render("popup_error.mako", request, data)
-    response.status_code = self.error_code
-    return response
-
 class TruncatingModel(models.Model):
   """
   Abstract class which truncates Text and Char fields to their configured

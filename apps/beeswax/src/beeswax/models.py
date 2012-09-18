@@ -24,7 +24,7 @@ from enum import Enum
 from django.db import models
 from django.contrib.auth.models import User
 
-from desktop.lib.django_util import PopupException
+from desktop.lib.exceptions import PopupException
 from beeswaxd.ttypes import QueryState
 
 from django.utils.translation import ugettext as _

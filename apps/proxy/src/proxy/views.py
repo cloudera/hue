@@ -30,7 +30,7 @@ from urlparse import urlparse, urlunparse
 
 from django.core import urlresolvers
 from django.http import HttpResponse
-from desktop.lib.django_util import MessageException
+from desktop.lib.exceptions import MessageException
 
 from proxy import conf
 
