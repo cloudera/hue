@@ -53,7 +53,7 @@ class JobDesign(models.Model):
 
   def clone_url(self):
     return urlresolvers.reverse("jobsub.views.clone_design", kwargs=dict(id=self.id))
-  
+
   def delete_url(self):
     return urlresolvers.reverse("jobsub.views.delete_design", kwargs=dict(id=self.id))
 

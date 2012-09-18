@@ -256,7 +256,7 @@ ${ layout.menubar(section='coordinators') }
                       <th>${ _('Timezone') }</th>
                       <th>${ _('Done flag') }</th>
                       % if coordinator.is_editable(user):
-                        <td>${ _('Delete') }</td>
+                        <th>${ _('Delete') }</th>
                       % endif
                     </tr>
                   </thead>
