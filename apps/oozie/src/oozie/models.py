@@ -94,19 +94,20 @@ class Job(models.Model):
 
   http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/index.html
   """
-  owner = models.ForeignKey(User, db_index=True, help_text=_('Person who can modify the job.'))
+  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Person who can modify the job.'))
   name = models.CharField(max_length=40, blank=False, validators=[name_validator],
-      help_text=_('Name of the job, which must be unique per user.'))
-  description = models.CharField(max_length=1024, blank=True, help_text=_('What is the purpose of the job.'))
-  last_modified = models.DateTimeField(auto_now=True, db_index=True)
-  schema_version = models.CharField(max_length=128,
+      help_text=_t('Name of the job, which must be unique per user.'), verbose_name=_t('Name'))
+  description = models.CharField(max_length=1024, blank=True, verbose_name=_t('Description'),
+                                 help_text=_t('What is the purpose of the job.'))
+  last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Last modified'))
+  schema_version = models.CharField(max_length=128, verbose_name=_t('Schema version'),
                                     help_text=_t('The version of the XML schema used to talk to Oozie.'))
-  deployment_dir = models.CharField(max_length=1024, blank=True, verbose_name=_('HDFS deployment directory.'),
-                                    help_text=_('The path on the HDFS where all the workflows and '
+  deployment_dir = models.CharField(max_length=1024, blank=True, verbose_name=_t('HDFS deployment directory'),
+                                    help_text=_t('The path on the HDFS where all the workflows and '
                                                 'dependencies must be uploaded.'))
-  is_shared = models.BooleanField(default=False, db_index=True,
-                                  help_text=_('Check if you want to have some other users to have access to this job.'))
-  parameters = models.TextField(default='[]',
+  is_shared = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is shared'),
+                                  help_text=_t('Check if you want to have some other users to have access to this job.'))
+  parameters = models.TextField(default='[]', verbose_name=_t('Parameters'),
                                 help_text=_t('Set some parameters used at the submission time (e.g. market=US).'))
 
   objects = JobManager()
@@ -211,11 +212,11 @@ class Workflow(Job):
   is_single = models.BooleanField(default=False)
   start = models.ForeignKey('Start', related_name='start_workflow', blank=True, null=True)
   end  = models.ForeignKey('End', related_name='end_workflow',  blank=True, null=True)
-  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True,
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                                           'Properties specified in the configuration element override properties specified in the '
                                           'files specified by any job-xml elements.'))
-  job_properties = models.TextField(default='[]',
+  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
                                     help_text=_t('Job configuration properties used by all the actions of the workflow '
                                                  '(e.g. mapred.job.queue.name=production)'))
 
@@ -581,10 +582,12 @@ class Node(models.Model):
   """
   PARAM_FIELDS = ()
 
-  name = models.CharField(max_length=40, validators=[name_validator],
-                          help_text=_('Name of the action, it must be unique by workflow.'))
-  description = models.CharField(max_length=1024, blank=True, default='', help_text=_('What is the purpose of this action.'))
-  node_type = models.CharField(max_length=64, blank=False, help_text=_('The type of action (e.g. MapReduce, Pig...)'))
+  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name'),
+                          help_text=_t('Name of the action, it must be unique by workflow.'))
+  description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
+                                 help_text=_t('What is the purpose of this action.'))
+  node_type = models.CharField(max_length=64, blank=False, verbose_name=_t('Type'),
+                               help_text=_t('The type of action (e.g. MapReduce, Pig...)'))
   workflow = models.ForeignKey(Workflow)
   children = models.ManyToManyField('self', related_name='parents', symmetrical=False, through=Link)
 
@@ -739,21 +742,22 @@ class Mapreduce(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path', 'prepares')
   node_type = 'mapreduce'
 
-  files = models.CharField(max_length=PATH_MAX, default="[]",
+  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache. '
                    'To force a symlink for a file on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'mycat.sh#cat\'.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]",
+  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
-  job_properties = models.TextField(default='[]',
+  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
-  jar_path = models.CharField(max_length=PATH_MAX,
+  jar_path = models.CharField(max_length=PATH_MAX, verbose_name=_t('Jar path'),
                               help_text=_t('Local or absolute path to the %(program)s jar file on HDFS') % {'program': 'MapReduce'})
-  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete or create before starting the application. '
-                                                         'This should be used exclusively for directory cleanup'))
-  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True,
+  prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
+                              help_text=_t('List of paths to delete or create before starting the application. '
+                                           'This should be used exclusively for directory cleanup'))
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                                           'Properties specified in the configuration element override properties specified in the '
                                           'files specified by any job-xml elements.'))
@@ -775,19 +779,19 @@ class Streaming(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'mapper', 'reducer')
   node_type = "streaming"
 
-  files = models.CharField(max_length=PATH_MAX, default="[]",
+  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache. '
                    'To force a symlink for a file on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'mycat.sh#cat\'.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]",
+  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
-  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]',
+  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
-  mapper = models.CharField(max_length=PATH_MAX, blank=False,
+  mapper = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Mapper'),
                             help_text=_t('The mapper element is used to specify the executable/script to be used as mapper.'))
-  reducer = models.CharField(max_length=PATH_MAX, blank=False,
+  reducer = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Reducer'),
                              help_text=_t('The reducer element is used to specify the executable/script to be used as reducer.'))
 
   def get_properties(self):
@@ -805,30 +809,31 @@ class Java(Action):
                   'java_opts', 'job_properties', 'prepares')
   node_type = "java"
 
-  files = models.CharField(max_length=PATH_MAX, default="[]",
+  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache. '
                    'To force a symlink for a file on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'mycat.sh#cat\'.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]",
+  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
-  jar_path = models.CharField(max_length=PATH_MAX, blank=False,
+  jar_path = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Jar path'),
                               help_text=_t('Local or absolute path to the %(program)s jar file on HDFS') % {'program': 'Java'})
-  main_class = models.CharField(max_length=256, blank=False,
+  main_class = models.CharField(max_length=256, blank=False, verbose_name=_t('Main class'),
                                 help_text=_t('Full name of the Java class. e.g. org.apache.hadoop.examples.Grep'))
-  args = models.CharField(max_length=4096, blank=True,
+  args = models.CharField(max_length=4096, blank=True, verbose_name=_t('Arguments'),
                           help_text=_t('Arguments of the main method. The value of each arg element is considered a single argument '
                                        'and they are passed to the main method in the same order.'))
-  java_opts = models.CharField(max_length=256, blank=True,
+  java_opts = models.CharField(max_length=256, blank=True, verbose_name=_t('Java options'),
                                help_text=_t('Command line parameters which are to be used to start the JVM that will execute '
                                             'the Java application. Using this element is equivalent to use the mapred.child.java.opts '
                                             'configuration property'))
-  job_properties = models.TextField(default='[]',
+  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
-  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete or create before starting the application. '
-                                                         'This should be used exclusively for directory cleanup'))
-  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True,
+  prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
+                              help_text=_t('List of paths to delete or create before starting the application. '
+                                           'This should be used exclusively for directory cleanup'))
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                                           'Properties specified in the configuration element override properties specified in the '
                                           'files specified by any job-xml elements.'))
@@ -850,22 +855,24 @@ class Pig(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
   node_type = 'pig'
 
-  script_path = models.CharField(max_length=256, blank=False, help_text=_t('Local path to the Pig script. e.g. my_script.pig'))
-  params = models.TextField(default="[]", help_text=_t('The Pig parameters of the script. e.g. "-param", "INPUT=${inputDir}"'))
-
-  files = models.CharField(max_length=PATH_MAX, default="[]",
+  script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script path'),
+                                 help_text=_t('Local path to the Pig script. e.g. my_script.pig'))
+  params = models.TextField(default="[]", verbose_name=_t('Parameters'),
+                            help_text=_t('The Pig parameters of the script. e.g. "-param", "INPUT=${inputDir}"'))
+  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache. '
                    'To force a symlink for a file on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'mycat.sh#cat\'.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]",
+  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
-  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]',
+  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
-  prepares = models.TextField(default="[]", help_text=_t('List of paths to delete or create before starting the application. '
-                                                         'This should be used exclusively for directory cleanup'))
-  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True,
+  prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
+                              help_text=_t('List of paths to delete or create before starting the application. '
+                                           'This should be used exclusively for directory cleanup'))
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                                           'Properties specified in the configuration element override properties specified in the '
                                           'files specified by any job-xml elements.'))
@@ -982,10 +989,10 @@ class Join(ControlFlow):
 
 
 
-FREQUENCY_UNITS = (('minutes', 'Minutes'),
-                   ('hours', 'Hours'),
-                   ('days', 'Days'),
-                   ('months', 'Months'))
+FREQUENCY_UNITS = (('minutes', _('Minutes')),
+                   ('hours', _('Hours')),
+                   ('days', _('Days')),
+                   ('months', _('Months')))
 FREQUENCY_NUMBERS = [(i, i) for i in xrange(1, 61)]
 
 
@@ -993,36 +1000,36 @@ class Coordinator(Job):
   """
   http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/CoordinatorFunctionalSpec.html
   """
-  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS,
+  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
                                               help_text=_t('It represents the number of units of the rate at which '
                                                            'data is periodically created.'))
-  frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days',
+  frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
                                     help_text=_t('It represents the unit of the rate at which data is periodically created.'))
-  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles',
+  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
                               help_text=_t('The timezone of the Coordinator.'))
-  start = models.DateTimeField(default=datetime.today(),
+  start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
                                help_text=_t('When we need to start the first workflow.'))
-  end = models.DateTimeField(default=datetime.today() + timedelta(days=3),
+  end = models.DateTimeField(default=datetime.today() + timedelta(days=3), verbose_name=_t('End'),
                              help_text=_t('When we need to start the last workflow.'))
-  workflow = models.ForeignKey(Workflow, null=True,
+  workflow = models.ForeignKey(Workflow, null=True, verbose_name=_t('Workflow'),
                                help_text=_t('The corresponding workflow we want to schedule repeatedly.'))
-  timeout = models.SmallIntegerField(null=True, blank=True,
+  timeout = models.SmallIntegerField(null=True, blank=True, verbose_name=_t('Timeout'),
                                      help_text=_t('Timeout for its coordinator actions, in minutes. This is how long '
                                                   'the coordinator action will be in '
                                                   'WAITING or READY status before giving up on its execution.'))
-  concurrency = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS,
+  concurrency = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Concurrency'),
                                  help_text=_t('Concurrency for its coordinator actions, this is, how many coordinator actions are '
                                               'allowed to run concurrently ( RUNNING status) before the coordinator engine '
                                               'starts throttling them.'))
-  execution = models.CharField(max_length=10, null=True, blank=True,
-                               choices=(('FIFO', _('FIFO (oldest first) default')),
-                                        ('LIFO', _('LIFO (newest first)')),
-                                        ('LAST_ONLY', _('LAST_ONLY (discards all older materializations)'))),
+  execution = models.CharField(max_length=10, null=True, blank=True, verbose_name=_t('Execution'),
+                               choices=(('FIFO', _t('FIFO (oldest first) default')),
+                                        ('LIFO', _t('LIFO (newest first)')),
+                                        ('LAST_ONLY', _t('LAST_ONLY (discards all older materializations)'))),
                                  help_text=_t('Execution strategy of its coordinator actions when there is backlog of coordinator '
                                               'actions in the coordinator engine. The different execution strategies are \'oldest first\', '
                                               '\'newest first\' and \'last one only\'. A backlog normally happens because of delayed '
                                               'input data, concurrency control or because manual re-runs of coordinator jobs.'))
-  throttle = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS,
+  throttle = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Throttle'),
                                  help_text=_t('The materialization or creation throttle value for its coordinator actions, this is, '
                                               'how many maximum coordinator actions are allowed to be in WAITING state concurrently.'))
   HUE_ID = 'hue-id-c'
@@ -1142,29 +1149,29 @@ class DatasetManager(models.Manager):
 
 
 class Dataset(models.Model):
-  name = models.CharField(max_length=40, validators=[name_validator],
+  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name'),
                           help_text=_t('The name of the dataset.)'))
-  description = models.CharField(max_length=1024, blank=True, default='',
+  description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
                                  help_text=_t('More details about the dataset.'))
-  start = models.DateTimeField(default=datetime.today(),
+  start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
                                help_text=_t(' The UTC datetime of the initial instance of the dataset. The initial-instance also provides '
                                             'the baseline datetime to compute instances of the dataset using multiples of the frequency.'))
-  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS,
+  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency numbeer'),
                                               help_text=_t('It represents the number of units of the rate at which '
                                                            'data is periodically created.'))
-  frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days',
+  frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
                                     help_text=_t('It represents the unit of the rate at which data is periodically created.'))
-  uri = models.CharField(max_length=1024, default='/data/${YEAR}${MONTH}${DAY}',
+  uri = models.CharField(max_length=1024, default='/data/${YEAR}${MONTH}${DAY}', verbose_name=_t('URI'),
                          help_text=_t('The URI template that identifies the dataset and can be resolved into concrete URIs to identify a particular '
                                       'dataset instance. The URI consist of constants (e.g. ${YEAR}/${MONTH}) and '
                                       'configuration properties (e.g. Ex: ${YEAR}/${MONTH})'))
-  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles',
+  timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
                               help_text=_t('The timezone of the dataset.'))
-  done_flag = models.CharField(max_length=64, blank=True, default='',
+  done_flag = models.CharField(max_length=64, blank=True, default='', verbose_name=_t('Done flag'),
                                help_text=_t(' The done file for the data set. If done-flag is not specified, then Oozie '
                                             'configures Hadoop to create a _SUCCESS file in the output directory. If the done '
                                             'flag is set to empty, then Coordinator looks for the existence of the directory itself.'))
-  coordinator = models.ForeignKey(Coordinator,
+  coordinator = models.ForeignKey(Coordinator, verbose_name=_t('Coordinator'),
                                   help_text=_t('The coordinator associated with this data.'))
 
   objects = DatasetManager()
@@ -1187,9 +1194,9 @@ class Dataset(models.Model):
 
 
 class DataInput(models.Model):
-  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_('Name of an input variable in the workflow'),
+  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name of an input variable in the workflow'),
                           help_text=_t('The name of the variable of the workflow to automatically filled up.'))
-  dataset = models.OneToOneField(Dataset, verbose_name=_('Pick the dataset representing format of the data input'),
+  dataset = models.OneToOneField(Dataset, verbose_name=_t('Pick the dataset representing format of the data input'),
                                  help_text=_t('The pattern of the input data we want to process.'))
   coordinator = models.ForeignKey(Coordinator)
 
@@ -1197,9 +1204,9 @@ class DataInput(models.Model):
 
 
 class DataOutput(models.Model):
-  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_('Name of an output variable in the workflow'),
+  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name of an output variable in the workflow'),
                           help_text=_t('The name of the variable of the workflow to automatically filled up.'))
-  dataset = models.OneToOneField(Dataset, verbose_name=_('Pick the dataset representing the format of the data output'),
+  dataset = models.OneToOneField(Dataset, verbose_name=_t('Pick the dataset representing the format of the data output'),
                                  help_text=_t('The pattern of the output data we want to generate.'))
   coordinator = models.ForeignKey(Coordinator)
 

@@ -158,12 +158,12 @@
     <div class="control-group ${group_class}"
       rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
       % if show_label:
-        <label class="control-label">${ field.label | n }</label>
+        <label class="control-label">${ field.label | h }</label>
       % endif
       <div class="controls">
         ${ field }
         % if field.errors:
-          <span class="help-inline">${ unicode(field.errors) | n }</span>
+          <span class="help-inline">${ unicode(field.errors) | h }</span>
         % endif
       </div>
     </div>
@@ -173,7 +173,7 @@
 
 <%def name="render_constant(label, value)">
   <div class="control-group">
-    <label class="control-label">${ label | n }</label>
+    <label class="control-label">${ label | h }</label>
     <div class="controls">
       <div style="padding-top:4px">
       ${ value }
