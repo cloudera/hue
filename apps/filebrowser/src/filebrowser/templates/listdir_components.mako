@@ -652,7 +652,7 @@ from django.utils.translation import ugettext as _
             self.renameFile = function () {
                 $("#renameSrcPath").attr("value", self.selectedFile().path);
                 $("#renameFileName").text(self.selectedFile().path);
-                $("#newNameInput").val(self.selectedFile().path);
+                $("#newNameInput").val(self.selectedFile().name);
                 $("#renameModal").modal({
                     keyboard:true,
                     show:true

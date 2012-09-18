@@ -198,6 +198,25 @@ def test_chown():
   assert_false('<option value="__other__"' in response.content)
 
 @attr('requires_hadoop')
+def test_rename():
+    cluster = pseudo_hdfs4.shared_cluster()
+
+    c = make_logged_in_client(cluster.superuser)
+    cluster.fs.setuser(cluster.superuser)
+
+    PREFIX = u"/test-rename/"
+    NAME = u"test-rename-before"
+    NEW_NAME = u"test-rename-after"
+    cluster.fs.mkdir(PREFIX + NAME)
+    op = "rename"
+    # test for full path rename
+    c.post("/filebrowser/rename", dict(src_path=PREFIX + NAME, dest_path=PREFIX + NEW_NAME))
+    assert_true(cluster.fs.exists(PREFIX + NEW_NAME))
+    # test for smart rename
+    c.post("/filebrowser/rename", dict(src_path=PREFIX + NAME, dest_path=NEW_NAME))
+    assert_true(cluster.fs.exists(PREFIX + NEW_NAME))
+
+@attr('requires_hadoop')
 def test_listdir():
   cluster = pseudo_hdfs4.shared_cluster()
   try:
