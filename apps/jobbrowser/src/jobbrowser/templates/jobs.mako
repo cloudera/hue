@@ -103,7 +103,7 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
                     ${comps.get_status(job)}
                 </a>
             </td>
-            <td class="center">
+            <td>
                 <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'user', job.user.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.user.lower())}">${job.user}</a>
             </td>
             <td data-sort-value="${job.maps_percent_complete}">
@@ -120,9 +120,9 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
                     ${comps.mr_graph_reduces(job)}
                 % endif
             </td>
-            <td class="center">${job.queueName}</td>
-            <td class="center">${job.priority.lower()}</td>
-            <td class="center" data-sort-value="${job.durationInMillis}" data-row-selector-exclude="true">
+            <td>${job.queueName}</td>
+            <td>${job.priority.lower()}</td>
+            <td data-sort-value="${job.durationInMillis}" data-row-selector-exclude="true">
                 % if job.is_retired:
                     ${_('N/A')}
                 % else:

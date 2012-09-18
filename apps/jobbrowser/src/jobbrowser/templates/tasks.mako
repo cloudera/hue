@@ -68,6 +68,7 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid),
         <table class="datatables table table-striped table-condensed">
             <thead>
             <tr>
+                <th>${_('Log')}</th>
                 <th>${_('Task ID')}</th>
                 <th>${_('Type')}</th>
                 <th>${_('Progress')}</th>
@@ -81,6 +82,11 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid),
 	        <tbody>
 	            %for t in page.object_list:
 	            <tr>
+                    <td data-row-selector-exclude="true">
+                        %if t.taskAttemptIds:
+                            <a href="${ url('jobbrowser.views.single_task_attempt_logs', jobid=t.jobId, taskid=t.taskId, attemptid=t.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+                        %endif
+                    </td>
 	                <td>${t.taskId_short}</td>
 	                <td>${t.taskType}</td>
 	                <td>
@@ -109,7 +115,8 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid),
             "bPaginate": false,
             "bLengthChange": false,
             "bFilter": false,
-            "bInfo": false
+            "bInfo": false,
+            "aaSorting": [[ 1, "asc" ]]
         });
         $("a[data-row-selector='true']").jHueRowSelector();
     });

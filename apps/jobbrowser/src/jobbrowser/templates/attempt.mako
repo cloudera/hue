@@ -51,10 +51,10 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
         </div>
 
         <div class="span10">
-            <ul class="nav nav-tabs">
+            <ul id="tabs" class="nav nav-tabs">
                 <li class="active"><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
                 <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
-                <li><a href="#logs" data-toggle="tab">${_('Logs')}</a></li>
+                <li><a href="${ url('jobbrowser.views.single_task_attempt_logs', jobid=task.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">${_('Logs')}</a></li>
             </ul>
 
             <div class="tab-content">
@@ -118,45 +118,6 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                 <div class="tab-pane" id="counters">
                     ${comps.task_counters(task.counters)}
                 </div>
-
-                <div class="tab-pane jt-logs" id="logs">
-                    <%
-                        log_diagnostic = logs[0]
-                        log_stdout = logs[1]
-                        log_stderr = logs[2]
-                        log_syslog = logs[3]
-                    %>
-                    <%def name="format_log(raw)">
-                        ## have to remove any indentation here or it breaks inside the pre tags
-                          % for line in raw.split('\n'):
-                              ${ line | h,trim }
-                        % endfor
-                    </%def>
-                    <h2>${_('task diagnostic log')}</h2>
-                    % if not log_diagnostic:
-                            <pre>-- empty --</pre>
-                    % else:
-                            <pre>${format_log(log_diagnostic)}</pre>
-                    % endif
-                    <h2>${_('stdout')}</h2>
-                    % if not log_stdout:
-                            <pre>-- empty --</pre>
-                    % else:
-                            <pre>${format_log(log_stdout)}</pre>
-                    % endif
-                    <h2>${_('stderr')}</h2>
-                    % if not log_stderr:
-                            <pre>-- empty --</pre>
-                    % else:
-                            <pre>${format_log(log_stderr)}</pre>
-                    % endif
-                    <h2>${_('syslog')}</h2>
-                    % if not log_syslog:
-                            <pre>-- empty --</pre>
-                    % else:
-                            <pre>${format_log(log_syslog)}</pre>
-                    % endif
-                </div>
             </div>
         </div>
     </div>
@@ -187,6 +148,10 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                 { "sWidth": "70%" }
             ]
         });
+
+        if (window.location.hash != null && window.location.hash.length > 1){
+            $('#tabs a[href="#'+window.location.hash.substring(2)+'"]').tab('show');
+        }
     });
 </script>
 ${commonfooter(messages)}

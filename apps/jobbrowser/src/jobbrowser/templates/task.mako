@@ -56,6 +56,7 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                     <table id="attemptsTable" class="table table-striped table-condensed">
                         <thead>
                         <tr>
+                            <th>${_('Log')}</th>
                             <th>${_('Attempt ID')}</th>
                             <th>${_('Progress')}</th>
                             <th>${_('State')}</th>
@@ -72,6 +73,7 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                         <tbody>
                                 % for attempt in task.attempts:
                                 <tr>
+                                    <td data-row-selector-exclude="true"><a href="${ url('jobbrowser.views.single_task_attempt_logs', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a></td>
                                     <td><a title="${_('View this attempt')}"
                                            href="${ url('jobbrowser.views.single_task_attempt', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${attempt.attemptId_short}</a></td>
                                     <td>${"%d" % (attempt.progress * 100)}%</td>
@@ -143,15 +145,14 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
     </div>
 </div>
 
-
-
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
         $("#attemptsTable").dataTable({
             "bPaginate": false,
             "bLengthChange": false,
             "bInfo": false,
-            "bFilter": false
+            "bFilter": false,
+            "aaSorting": [[ 1, "asc" ]]
         });
         $("#metadataTable").dataTable({
             "bPaginate": false,

@@ -234,6 +234,26 @@ def single_task_attempt(request, jobid, taskid, attemptid):
   except KeyError:
     raise KeyError(_("Cannot find attempt '%(id)s' in task") % dict(id=attemptid))
 
+  return render("attempt.mako", request,
+    {
+      "attempt":attempt,
+      "taskid":taskid,
+      "joblnk": job_link,
+      "task": task
+    })
+
+@check_job_permission
+def single_task_attempt_logs(request, jobid, taskid, attemptid):
+  """
+  We get here from /jobs/jobid/tasks/taskid/attempts/attemptid/logs
+  """
+  job_link = JobLinkage(request.jt, jobid)
+  task = job_link.get_task(taskid)
+  try:
+    attempt = task.get_attempt(attemptid)
+  except KeyError:
+    raise KeyError(_("Cannot find attempt '%(id)s' in task") % dict(id=attemptid))
+
   try:
     # Add a diagnostic log
     diagnostic_log = ", ".join(task.diagnosticMap[attempt.attemptId])
@@ -244,7 +264,7 @@ def single_task_attempt(request, jobid, taskid, attemptid):
     # Four entries,
     # for diagnostic, stdout, stderr and syslog
     logs = [ _("Failed to retrieve log. TaskTracker not found.") ] * 4
-  return render("attempt.mako", request,
+  return render("attempt_logs.mako", request,
     {
       "attempt":attempt,
       "taskid":taskid,

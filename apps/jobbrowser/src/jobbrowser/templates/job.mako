@@ -30,6 +30,7 @@
     <table class="taskTable table table-striped table-condensed">
         <thead>
         <tr>
+            <th>${_('Log')}</th>
             <th>${_('Tasks')}</th>
             <th>${_('Type')}</th>
         </tr>
@@ -37,6 +38,11 @@
         <tbody>
             % for task in tasks:
             <tr>
+                <td data-row-selector-exclude="true">
+                %if task.taskAttemptIds:
+                    <a href="${ url('jobbrowser.views.single_task_attempt_logs', jobid=task.jobId, taskid=task.taskId, attemptid=task.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+                %endif
+                </td>
                 <td><a title="${_('View this task')}" href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }" data-row-selector="true">${task.taskId_short}</a></td>
                 <td>${task.taskType}</td>
             </tr>
@@ -251,8 +257,6 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
     </div>
 </div>
 
-
-
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
         $(".taskTable").dataTable({
@@ -261,9 +265,11 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
             "bInfo": false,
             "bAutoWidth": false,
             "aoColumns": [
+                { "sWidth": "1%", "bSortable": false },
                 { "sWidth": "50%" },
-                { "sWidth": "50%" }
-            ]
+                { "sWidth": "49%" }
+            ],
+            "aaSorting": [[ 1, "asc" ]]
         });
         var _metadataTable = $("#metadataTable").dataTable({
             "bPaginate": false,
