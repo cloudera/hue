@@ -67,7 +67,7 @@ ${layout.menubar(section='dashboard')}
         </tr>
       </thead>
       <tbody>
-        %for job in jobs['running_jobs']:
+        % for job in jobs['running_jobs']:
           <tr>
             <td>${ utils.format_date(job.endTime) }</td>
             <td>

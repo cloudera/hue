@@ -28,7 +28,7 @@
 %   endif
 </%def>
 
-% if len(jobs) > 0 or filtered:
+% if jobs or filtered:
 ${commonheader(_('Job Browser'), "jobbrowser")}
 <div class="container-fluid">
 <h1>${_('Job Browser')}</h1>
@@ -67,7 +67,7 @@ ${commonheader(_('Job Browser'), "jobbrowser")}
 </form>
 
 
-% if len(jobs) == 0:
+% if not jobs:
 <p>${_('There were no jobs that match your search criteria.')}</p>
 % else:
 <style>
