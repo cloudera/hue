@@ -369,6 +369,18 @@ DATABASE_LOGGING = Config(
   type=coerce_bool,
   default=False)
 
+DJANGO_ADMINS = UnspecifiedConfigSection(
+  key="django_admins",
+  help=_("Administrators that should receive error emails."),
+  each=ConfigSection(
+    members=dict(
+      NAME=Config("name",
+                  required=True,
+                  help=_("The full name of the admin.")),
+      EMAIL=Config("email",
+                   required=True,
+                   help=_("The email address of the admin.")))))
+
 DJANGO_DEBUG_MODE = Config(
   key="django_debug_mode",
   help=_("Enable or disable Django debug mode."),
@@ -383,6 +395,19 @@ HTTP_500_DEBUG_MODE = Config(
        'If django_debug_mode is True, this is automatically enabled.'),
   type=coerce_bool,
   default=True
+)
+
+DJANGO_SERVER_EMAIL = Config(
+  key='django_server_email',
+  help=_('Email address that internal error messages should send as.'),
+  default='hue@localhost.localdomain'
+)
+
+DJANGO_EMAIL_BACKEND = Config(
+  key="django_email_backend",
+  help=_("The Email backend to use."),
+  type=str,
+  default="django.core.mail.backends.smtp.EmailBackend"
 )
 
 

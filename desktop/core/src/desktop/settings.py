@@ -62,10 +62,6 @@ desktop.log.fancy_logging()
 ############################################################
 # Part 2: Generic Configuration
 ############################################################
-ADMINS = (
-    ('Hue Administrator', 'admin@localhost')
-)
-MANAGERS = ADMINS
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -199,8 +195,23 @@ TEMPLATE_DEBUG = DEBUG
 # Part 4a: Django configuration that requires bound Desktop
 # configs.
 ############################################################
-# Configure database
 
+# Configure hue admins
+ADMINS = []
+for admin in desktop.conf.DJANGO_ADMINS.get():
+  admin_conf = desktop.conf.DJANGO_ADMINS[admin]
+  if 'name' in admin_conf.bind_to and 'email' in admin_conf.bind_to:
+    ADMINS.append(((admin_conf.NAME.get(), admin_conf.EMAIL.get())))
+ADMINS = tuple(ADMINS)
+MANAGERS = ADMINS
+
+# Server Email Address
+SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
+
+# Email backend
+EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
+
+# Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):
   conn_string = os.getenv('DESKTOP_DB_CONFIG')
   logging.debug("DESKTOP_DB_CONFIG SET: %s" % (conn_string))

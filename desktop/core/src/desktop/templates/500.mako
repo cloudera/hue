@@ -21,7 +21,7 @@ ${commonheader(_('Error'), "", user)}
 
   <div class="container-fluid">
     <h1>${_('Server Error (500)')}</h1>
-    <p>${_("Sorry, there's been an error. Please contact your site administrators. Thanks for your patience.")}</p>
+    <p>${_("Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience.")}</p>
   </div>
 
 ${commonfooter(messages)}
