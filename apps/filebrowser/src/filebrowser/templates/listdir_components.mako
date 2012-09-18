@@ -445,8 +445,11 @@ from django.utils.translation import ugettext as _
             });
 
             $(window).bind("hashchange", function() {
-                viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + window.location.hash.substring(2));
-                viewModel.retrieveData();
+                var hash = window.location.hash.substring(2);
+                if (hash != null && hash != "") {
+                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + hash);
+                    viewModel.retrieveData();
+                }
             });
 
 
