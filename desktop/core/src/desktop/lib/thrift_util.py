@@ -17,7 +17,6 @@
 #
 # Utilities for Thrift
 import desktop.lib.eventlet_util
-from desktop.lib.exceptions import StructuredException
 
 import Queue
 import logging
@@ -35,6 +34,7 @@ from thrift.transport.TTransport import TBufferedTransport, TMemoryBuffer,\
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.thrift_sasl import TSaslClientTransport
+import desktop.lib.exceptions as exceptions
 
 # The maximum depth that we will recurse through a "jsonable" structure
 # while converting to thrift. This prevents us from infinite recursion
@@ -289,13 +289,13 @@ class PooledClient(object):
           except TApplicationException, e:
             # Unknown thrift exception... typically IO errors
             logging.info("Thrift saw an application exception: " + str(e), exc_info=False)
-            raise StructuredException('THRIFTAPPLICATION', str(e), data=None, error_code=502)
+            raise exceptions.StructuredException('THRIFTAPPLICATION', str(e), data=None, error_code=502)
           except socket.error, e:
             logging.info("Thrift saw a socket error: " + str(e), exc_info=False)
-            raise StructuredException('THRIFTSOCKET', str(e), data=None, error_code=502)
+            raise exceptions.StructuredException('THRIFTSOCKET', str(e), data=None, error_code=502)
           except TTransportException, e:
             logging.info("Thrift saw a transport exception: " + str(e), exc_info=False)
-            raise StructuredThriftTransportException(e, error_code=502)
+            raise exceptions.StructuredThriftTransportException(e, error_code=502)
           except Exception, e:
             # Stack tends to be only noisy here.
             logging.info("Thrift saw exception: " + str(e), exc_info=False)

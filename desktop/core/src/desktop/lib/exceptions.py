@@ -17,7 +17,8 @@
 
 from thrift.transport.TTransport import TTransportException
 
-from desktop.lib.django_util import render
+# Need full import statement
+import desktop.lib.django_util
 
 
 class StructuredException(Exception):
@@ -71,7 +72,7 @@ class PopupException(Exception):
     data = dict(title=self.title, message=self.message, detail=self.detail)
     if not request.ajax:
       data['request'] = request
-    response = render("popup_error.mako", request, data)
+    response = desktop.lib.django_util.render("popup_error.mako", request, data)
     response.status_code = self.error_code
     return response
 
