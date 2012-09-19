@@ -1,4 +1,4 @@
-<h1><a name="FileBrowser-IntroducingHueFileBrowser"></a>Introducing Hue File Browser</h1>
+<h1><a name="FileBrowser-IntroducingFileBrowser"></a>Introducing File Browser</h1>
 
 <p>The File Browser application lets you browse and manipulate files and directories in the Hadoop Distributed File System (HDFS) while using Hue. With File Browser, you can:</p>
 
@@ -14,13 +14,13 @@
 <h3><a name="FileBrowser-Contents"></a>Contents</h3>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1334626349012 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1334626349012 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1334626349012 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1347644752425 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1347644752425 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1347644752425 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1334626349012'>
+/*]]>*/</style><div class='rbtoc1347644752425'>
 <ul>
-    <li><a href='#FileBrowser-IntroducingHueFileBrowser'>Introducing Hue File Browser</a></li>
+    <li><a href='#FileBrowser-IntroducingFileBrowser'>Introducing File Browser</a></li>
     <li><a href='#FileBrowser-FileBrowserInstallationandConfiguration'>File Browser Installation and Configuration</a></li>
     <li><a href='#FileBrowser-StartingFileBrowser'>Starting File Browser</a></li>
     <li><a href='#FileBrowser-WorkingwithFilesandDirectories'>Working with Files and Directories</a></li>
@@ -42,17 +42,20 @@ div.rbtoc1334626349012 li {margin-left: 0px;padding-left: 0px;}
 <p><br class="atl-forced-newline" /></p>
 
 <p><a name="FileBrowser-FileBrowserInstallationandConfiguration"></a></p>
+
 <h1><a name="FileBrowser-FileBrowserInstallationandConfiguration"></a>File Browser Installation and Configuration</h1>
 
-<p>File Browser is one of the applications that can be installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDH4B2/Hue+Installation">Hue Installation</a>.</p>
+<p>File Browser is one of the applications that can be installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>.</p>
 
 <p><a name="FileBrowser-StartingFileBrowser"></a></p>
+
 <h1><a name="FileBrowser-StartingFileBrowser"></a>Starting File Browser</h1>
 
-<p>To start the File Browser application, click the <b>File Browser</b> tab in the navigation bar at the top of the Hue browser page.  
+<p>To start the File Browser application, click the <b>File Browser</b> icon ( <span class="image-wrap" style=""><img src="/filebrowser/static/help/images/21103319.png" height="30" style="border: 0px solid black"/></span>) in the navigation bar at the top of the Hue browser page.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" />
 <a name="FileBrowser-WorkingwithFilesandDirectories"></a></p>
+
 <h1><a name="FileBrowser-WorkingwithFilesandDirectories"></a>Working with Files and Directories</h1>
 
 <p>You can use File Browser to view the input and output files of your MapReduce jobs. Typically, you can save your output files in <tt>/tmp</tt> or in your home directory if your system administrator set one up for you. You must have the proper permissions to manipulate other user's files.</p>
@@ -66,7 +69,8 @@ div.rbtoc1334626349012 li {margin-left: 0px;padding-left: 0px;}
 <br class="atl-forced-newline" /></p>
 
 <div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b> The <b>Home</b> button is disabled if you do not have a home directory. Ask your system administrator to create a home directory for you.</td></tr></table></div>
-<p><br class="atl-forced-newline" /> </p>
+<p><br class="atl-forced-newline" /></p>
+
 <h3><a name="FileBrowser-CreatingDirectories"></a>Creating Directories</h3>
 
 <p><b>To create a directory:</b></p>
@@ -97,7 +101,8 @@ div.rbtoc1334626349012 li {margin-left: 0px;padding-left: 0px;}
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" />
 The file(s) are uploaded to the directory you selected.
-<br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
 </ol>
 
 
@@ -162,6 +167,7 @@ You can delete recursively by choosing <b>Delete Recursively</b> from the Option
 
 
 <h3><a name="FileBrowser-ChangingaFile%27sorDirectory%27sOwner%2CGroup%2CorPermissions"></a>Changing a File's or Directory's Owner, Group, or Permissions</h3>
+
 <p><br class="atl-forced-newline" /></p>
 
 <div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />Only the Hadoop superuser can change a file's or directory's owner, group, or permissions. The user who starts Hadoop is the Hadoop superuser. The Hadoop superuser account is not necessarily the same as a Hue superuser account. If you create a Hue user (in User Admin) with the same user name and password as the Hadoop superuser, then that Hue user can change a file's or directory's owner, group, or permissions.</td></tr></table></div>
@@ -201,6 +207,7 @@ You can delete recursively by choosing <b>Delete Recursively</b> from the Option
 
 
 <p><a name="FileBrowser-SearchingforFilesandDirectories"></a></p>
+
 <h1><a name="FileBrowser-SearchingforFilesandDirectories"></a>Searching for Files and Directories</h1>
 
 <p>You can search for files or directories by name using the <b>Filter</b> query search box:</p>
@@ -218,6 +225,7 @@ File Browser lists the files or directories matching the search criteria.
 
 
 <p><a name="FileBrowser-Viewing%2CEditing%2CandDownloadingFiles"></a></p>
+
 <h1><a name="FileBrowser-Viewing%2CEditing%2CandDownloadingFiles"></a>Viewing, Editing, and Downloading Files</h1>
 
 <p>You can view and edit files as text or binary. You can also download files from the HDFS.</p>
@@ -268,8 +276,8 @@ File Browser displays the contents of the file in the <b>File Editor</b> window.
 
 <p><br class="atl-forced-newline" /></p>
 
-				    
-                    			    </td>
+				    					    <br/>
+                        </td>
 		    </tr>
 	    </table>
 	    
