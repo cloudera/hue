@@ -32,6 +32,7 @@ import time
 from django.core.files.uploadhandler import \
     FileUploadHandler, StopFutureHandlers, StopUpload
 import hadoop.cluster
+from hadoop.conf import UPLOAD_CHUNK_SIZE
 
 UPLOAD_SUBDIR = 'hue-uploads'
 LOG = logging.getLogger(__name__)
@@ -121,6 +122,8 @@ class HDFSfileUploadHandler(FileUploadHandler):
     self._file = None
     self._starttime = 0
     self._activated = False
+    # Need to directly modify FileUploadHandler.chunk_size
+    FileUploadHandler.chunk_size = UPLOAD_CHUNK_SIZE.get()
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     # Detect "HDFS" in the field name.
