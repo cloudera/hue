@@ -59,6 +59,12 @@ CREDENTIALS_MERGER_JAR = Config("hadoop_credentials_merger_jar",
                 root=os.path.join(os.path.dirname(__file__), '..', '..', 'credentials-merger', 'java-lib')),
   private=True)
 
+UPLOAD_CHUNK_SIZE = Config(
+  key="upload_chunk_size",
+  help="Size, in bytes, of the 'chunks' Django should store into memory and feed into the handler. Default is 64MB.",
+  type=int,
+  default=1024 * 1024 * 64)
+
 
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",

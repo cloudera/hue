@@ -32,6 +32,7 @@ from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
+from hadoop.conf import UPLOAD_CHUNK_SIZE
 
 import hadoop.conf
 
@@ -420,11 +421,10 @@ class WebHdfs(Hdfs):
     if self.isdir(dst):
       raise IOError(errno.INVAL, "Copy dst '%s' is a directory" % (dst,))
 
-    CHUNK_SIZE = 65536
     offset = 0
 
     while True:
-      data = self.read(src, offset, CHUNK_SIZE)
+      data = self.read(src, offset, UPLOAD_CHUNK_SIZE.get())
       if offset == 0:
         self.create(dst,
                     overwrite=True,
