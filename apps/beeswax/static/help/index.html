@@ -6,11 +6,11 @@
 <h2><a name="Beeswax-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1334256185788 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1334256185788 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1334256185788 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1343860614247 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1343860614247 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1343860614247 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1334256185788'>
+/*]]>*/</style><div class='rbtoc1343860614247'>
 <ul>
     <li><a href='#Beeswax-IntroducingBeeswax'>Introducing Beeswax</a></li>
     <li><a href='#Beeswax-BeeswaxandHiveInstallationandConfiguration'>Beeswax and Hive Installation and Configuration</a></li>
@@ -25,7 +25,7 @@ div.rbtoc1334256185788 li {margin-left: 0px;padding-left: 0px;}
 <ul>
 <ul>
     <li><a href='#Beeswax-CreatingandRunningQueries'>Creating and Running Queries</a></li>
-    <li><a href='#Beeswax-TheAdvancedSettingsmenu'>The Advanced Settings menu</a></li>
+    <li><a href='#Beeswax-AdvancedQuerySettings'>Advanced Query Settings</a></li>
     <li><a href='#Beeswax-ViewingQueryHistory'>Viewing Query History</a></li>
     <li><a href='#Beeswax-Viewing%2CEditing%2CorDeletingSavedQueries'>Viewing, Editing, or Deleting Saved Queries</a></li>
 </ul>
@@ -45,57 +45,62 @@ div.rbtoc1334256185788 li {margin-left: 0px;padding-left: 0px;}
 
 <h1><a name="Beeswax-BeeswaxandHiveInstallationandConfiguration"></a>Beeswax and Hive Installation and Configuration</h1>
 
-<p>Beeswax is installed and configured as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDH4B2/Hue+Installation">Hue Installation</a>.</p>
+<p>Beeswax is installed and configured as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>.</p>
 
-<p>Beeswax assumes an existing Hive installation.  The Hue installation instructions include the configuration necessary for Beeswax to access Hive. </p>
+<p>Beeswax assumes an existing Hive installation.  The Hue installation instructions include the configuration necessary for Beeswax to access Hive.   You can view the current Hive configuration from from the <b>Settings</b> tab in the Beeswax application. </p>
 
-<p>You can view the current Hive configuration from from the <b>Settings</b> tab in the Beeswax application. </p>
-
-
+<p>By default, a Beeswax user can see the saved queries for all users &#8211; both his/her own queries and those of other Beeswax users.  If this behavior is not desirable, there is a configuration option you can change in the <tt>/etc/hue/hue.ini</tt> file under the <tt>[beeswax]</tt> section to restrict viewing saved queries to only the query owner and Hue administrators.  To change this setting, find and uncomment the <tt>share_saved_queries</tt> property and set it to <tt>false</tt>. </p>
 
 
 <h1><a name="Beeswax-StartingBeeswax"></a>Starting Beeswax</h1>
 
-<p>To start the Beeswax application, click the <b>Beeswax</b> tab in the navigation bar at the top of the Hue browser page.  </p>
+<p>To start the Beeswax application, click the <b>Beeswax</b> icon (<span class="image-wrap" style=""><img src="/beeswax/static/help/images/21103320.png" width="30" style="border: 0px solid black"/></span>) in the navigation bar at the top of the Hue browser page.  </p>
 
-<p>The first time you run Beeswax, the "Welcome to Beeswax for Hive page appears, and prompts you to install the sample tables or import your own tables. </p>
+<p>The first time you run Beeswax, the "Welcome to Beeswax for Hive" page appears, and prompts you to install the sample tables or import your own tables. </p>
 
-<p>Once some tables have been created, clicking the Beeswax tab will bring you directly into the Query Editor. </p>
+<p>Once some tables have been created &#8212; either from installing the samples or importing your own data &#8212; clicking the Beeswax tab will bring you directly into the Query Editor. </p>
 
-<p>The tabs at the top of the page allow you to navigate to the main functional areas of Beeswax. </p>
+<p>The tabs in the Beeswax navigation bar allow you to navigate to the main functional areas of Beeswax. </p>
 
 <h3><a name="Beeswax-InstallingtheBeeswaxSamples"></a>Installing the Beeswax Samples </h3>
 
 <p>You can install two sample Beeswax tables to use as examples.</p>
 
 <ol>
-	<li>In the <b>Beeswax</b> window, click <b>Install Samples</b>
+	<li>In the <b>Welcome to Beeswax</b> window, click <b>Install Samples</b>
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
 	<li>Confirm that you want to install these samples.
-<br class="atl-forced-newline" /> <br class="atl-forced-newline" />
-Once you have installed the sample data, this option will no longer appear.</li>
+<br class="atl-forced-newline" /></li>
 </ol>
 
+
+<p>Once you have installed the sample data, you will no longer see either the <b>Import Data</b> and <b>Install Samples</b> buttons when you run Beeswax.</p>
 
 <h3><a name="Beeswax-ImportingyourownData"></a>Importing your own Data</h3>
 
-<p>You can import data or your own:</p>
+<p>If you want to import your own data instead of installing the Sample tables:</p>
+
 <ol>
-	<li>In the "Beeswax" window, click the <b>Import Data</b> button.<br/>
+	<li>In the <b>Welcome to Beeswax</b> window, click the <b>Import Data</b> button.<br/>
 This takes you to the <b>Create a new table manually</b> page. 
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
 	<li>Follow the prompts in this wizard to specify your table.  For more details see <a href="#Beeswax-CreatingTables">Creating Tables</a>.
-<br class="atl-forced-newline" />  <br class="atl-forced-newline" /></li>
+<br class="atl-forced-newline" />  </li>
 </ol>
 
 
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />If the <b>Welcome to Beeswax</b> page with the <b>Import Data</b> button no longer appears, you can still import your own data by clicking the <b>Tables</b> tab, and creating a new table.</td></tr></table></div>
+<p><br class="atl-forced-newline" /></p>
+
 <h1><a name="Beeswax-WorkingwithQueries"></a>Working with Queries</h1>
 
-<p>The <b>Query Editor</b> view enables you to enter queries in Hive's Query Language (HQL), which is similar to Structured Query Language (SQL). You can name and save your queries to use later. When you submit a query, the Beeswax Server uses Hive to run the queries. You can either wait for the query to complete, or return later to find the queries in the <b>Beeswax History</b> view. You can also receive an email message after the query is completed.</p>
+<p>The <b>Query Editor</b> view lets you create queries in Hive's Query Language (HQL), which is similar to Structured Query Language (SQL). You can name and save your queries to use later. When you submit a query, the Beeswax Server uses Hive to run the queries. You can either wait for the query to complete, or return later to find the queries in the <b>Beeswax History</b> view. You can also request receive an email message after the query is completed.</p>
 
 <div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>For More Information</b><br />For information about HQL syntax, see <a href="http://wiki.apache.org/hadoop/Hive/LanguageManual.">http://wiki.apache.org/hadoop/Hive/LanguageManual.</a></td></tr></table></div>
 
 <h3><a name="Beeswax-CreatingandRunningQueries"></a>Creating and Running Queries</h3>
+
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />To run a Query, you must be logged in to Hue as a user that also has a Unix user account on the remote server.</td></tr></table></div>
 
 <p><b>To create and run a query</b>:</p>
 
@@ -104,9 +109,9 @@ This takes you to the <b>Create a new table manually</b> page.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
 For example, to select all data from the <em>sample_08</em> table, you would type:
 <br class="atl-forced-newline" />
-<tt>SELECT * FROM sample_08</tt>
+<tt>SELECT * FROM sample_08 WHERE salary &gt; 100000</tt>
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
-	<li>The Advanced Settings section lets you override the default Hive and Hadoop settings, specify file resources and user-defined functions, and enable users to enter parameters at run-time, and request email notification when the job is complete.  See <a href="#Beeswax-AdvancedSettings">Advanced Settings</a> below for details on using these settings.
+	<li>In the box to the left of the Query field, you can override the default Hive and Hadoop settings, specify file resources and user-defined functions, and enable users to enter parameters at run-time, and request email notification when the job is complete.  See <a href="#Beeswax-AdvancedSettings">Advanced Query Settings</a> below for details on using these settings.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
 	<li>To save your query and advanced settings to use again later, click <b>Save As,</b> enter a name and description, and then click <b>OK</b>. To save changes to an existing query, click <b>Save.</b>
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
@@ -141,9 +146,9 @@ To save the results in an HDFS file, select <b>to HDFS directory</b>, enter a pa
 
 
 <p><a name="Beeswax-AdvancedSettings"></a></p>
-<h3><a name="Beeswax-TheAdvancedSettingsmenu"></a>The Advanced Settings menu</h3>
+<h3><a name="Beeswax-AdvancedQuerySettings"></a>Advanced Query Settings</h3>
 
-<p>The Advanced settings section lets you specify the following options:
+<p>The section to the left of the Query field lets you specify the following options:
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></p>
 
 <style type="text/css">
@@ -208,7 +213,7 @@ You must specify a JAR file for the user-defined functions in <b>File Resources<
 </tr>
 <tr>
 <td class='confluenceTd'> <b>Email Notification</b> </td>
-<td class='confluenceTd'> To receive an email message after a query completes, check <b>Email Notification</b>. </td>
+<td class='confluenceTd'> To receive an email message after a query completes, check <b>Email Notification</b>. The email is sent to the email address specified in the logged-in user's profile. </td>
 </tr>
 </tbody></table>
 </div>
@@ -341,7 +346,8 @@ The table creation wizard starts.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
 The basic steps are:
 	<ul>
-		<li>Choose your input file.  The input file you specify must exist.</li>
+		<li>Choose your input file.  The input file you specify must exist.<br/>
+Note that you can choose to have Beeswax create the table definition only based on the import file you select, without actually importing data from that file. </li>
 		<li>Specify the column delimiter.</li>
 		<li>Define your columns, providing a name and selecting the type.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" /></li>
@@ -403,9 +409,11 @@ Beeswax displays the table's data in the <b>Query Results</b> window.</li>
 <p><b>To browse the metadata in a table:</b></p>
 
 <ol>
-	<li>In the Beeswax <b>Table List</b> window, double-click the table name.
+	<li>In the Beeswax <b>Table List</b> window, click the table name.
 <br class="atl-forced-newline" /> <br class="atl-forced-newline" />
-Beeswax displays the table's metadata on the right side of the Beeswax <b>Table Metadata</b> window.</li>
+Beeswax displays the table's metadata under a <b>Columns</b> tab.
+<br class="atl-forced-newline" /> <br class="atl-forced-newline" />
+You can view the actual data in the table by selecting the <b>Sample</b> tab. </li>
 </ol>
 
 
@@ -463,8 +471,8 @@ Beeswax lists the selected table in its directory in the <b>File Browser</b> win
 </ol>
 
 
-				    
-                    			    </td>
+				    					    <br/>
+                        </td>
 		    </tr>
 	    </table>
 	    
