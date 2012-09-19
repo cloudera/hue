@@ -191,6 +191,8 @@ class DesktopModuleInfo(object):
   def __str__(self):
     return "DesktopModule(%s: %s)" % (self.nice_name, self.module.__name__)
 
+def get_apps(user):
+  return filter(lambda app: user.has_hue_permission(action="access", app=app.display_name), DESKTOP_APPS)
 
 def load_libs():
   global DESKTOP_MODULES

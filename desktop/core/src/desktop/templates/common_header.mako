@@ -120,7 +120,7 @@ from django.utils.translation import ugettext as _
         <div class="nav-collapse">
           <ul class="nav">
             %for app in apps:
-              %if app.icon_path and user.has_hue_permission(action="access", app=app.display_name):
+              %if app.icon_path:
               <li id="${app.display_name}Icon" ${is_selected(section, app.display_name)}>
                 <a class="nav-tooltip" title="${app.nice_name}" href="/${app.display_name}"><img src="${app.icon_path}" /></a>
               </li>
