@@ -83,7 +83,7 @@ ${ layout.menubar(section='workflows') }
                     <span class="span4 required" data-bind="text: type" />
                   </td>
                   <td>
-                    <input type="text" class="input span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+                    <input type="text" class="input span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" />
                   </td>
                   <td><a class="btn" href="#" data-bind="click: $root.removePrepare">${ _('Delete') }</a></td>
                 </tr>
@@ -121,7 +121,7 @@ ${ layout.menubar(section='workflows') }
                     <span class="span4 required" data-bind="text: type" />
                   </td>
                   <td>
-                    <input type="text" class="input span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+                    <input type="text" class="input span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" />
                   </td>
                   <td><a class="btn" href="#" data-bind="click: $root.removeParam">${ _('Delete') }</a></td>
                 </tr>
@@ -166,7 +166,7 @@ ${ layout.menubar(section='workflows') }
             <tbody data-bind="foreach: properties">
               <tr>
                 <td><input type="text" class="span4 required propKey" data-bind="value: name, uniqueName: false" /></td>
-                <td><input type="text" class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
+                <td><input type="text" class="span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
                 <td><a class="btn" href="#" data-bind="click: $root.removeProp">${ _('Delete') }</a></td>
               </tr>
             </tbody>
@@ -192,7 +192,7 @@ ${ layout.menubar(section='workflows') }
               <table class="table-condensed designTable" data-bind="visible: files().length > 0">
                 <tbody data-bind="foreach: files">
                   <tr>
-                    <td><input type="text" class="input span5 required pathChooserKo"
+                    <td><input type="text" class="span5 required"
                             data-bind="fileChooser: $data, value: name, uniqueName: false" />
                     </td>
                     <td><a class="btn" href="#" data-bind="click: $root.removeFile">${ _('Delete') }</a></td>
@@ -219,7 +219,7 @@ ${ layout.menubar(section='workflows') }
             <tbody data-bind="foreach: archives">
               <tr>
                 <td>
-                  <input type="text" class="input span5 required pathChooserKo"
+                  <input type="text" class="span5 required"
                       data-bind="fileChooser: $data, value: name, uniqueName: false" />
                 </td>
                 <td><a class="btn" href="#" data-bind="click: $root.removeArchive">${ _('Delete') }</a></td>
@@ -283,9 +283,11 @@ ${ layout.menubar(section='workflows') }
   .designTable {
     margin-left:0;
   }
+
   .designTable th, .designTable td {
     padding-left: 0;
   }
+
   .designTable th {
     text-align:left;
   }
@@ -361,7 +363,6 @@ ${ layout.menubar(section='workflows') }
         self.addEnvVar = function() {
             self.params.push({ value: "", type: "env-var" });
         };
-
 
         self.removeParam = function(val) {
             self.params.remove(val);
@@ -453,11 +454,12 @@ ${ layout.menubar(section='workflows') }
         $("#fileChooserModal").jHueFileChooser({
           onFileChoose: function(filePath) {
               inputElement.val(filePath);
+              inputElement.change();
               $("#chooseFile").modal("hide");
           },
           createFolder: false
         });
-      $("#chooseFile").modal("show");
+        $("#chooseFile").modal("show");
       })
     }
 

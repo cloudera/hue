@@ -750,9 +750,9 @@ class Mapreduce(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path', 'prepares')
   node_type = 'mapreduce'
 
-  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
+  files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
+  archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
@@ -785,9 +785,9 @@ class Streaming(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'mapper', 'reducer')
   node_type = "streaming"
 
-  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
+  files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
+  archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
@@ -813,9 +813,9 @@ class Java(Action):
                   'java_opts', 'job_properties', 'prepares')
   node_type = "java"
 
-  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
+  files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
+  archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
@@ -861,9 +861,9 @@ class Pig(Action):
                                  help_text=_t('Local path to the Pig script. e.g. my_script.pig'))
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
                             help_text=_t('The Pig parameters of the script. e.g. "-param", "INPUT=${inputDir}"'))
-  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
+  files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
+  archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
@@ -901,9 +901,9 @@ class Hive(Action):
                                  help_text=_t('Local path to the %(type)s script. e.g. my_script.sql') % {'type': node_type.title()})
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
                             help_text=_t('The %(type)s parameters of the script. e.g. "-param", "INPUT=${inputDir}"')  % {'type': node_type.title()})
-  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
+  files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
+  archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
@@ -942,9 +942,9 @@ class Sqoop(Action):
                                  help_text=_t('Local path to the %(type)s script. e.g. my_script.sql') % {'type': node_type.title()})
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
                             help_text=_t('The %(type)s parameters of the script. e.g. "import", "--connect", ".."')  % {'type': node_type.title()})
-  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
+  files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
+  archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
@@ -1005,9 +1005,9 @@ class Shell(Action):
                              help_text=_t('The path of the Shell command to execute'))
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
                             help_text=_t('The arguments of Shell command can then be specified using one or more argument element.'))
-  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
+  files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
-  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
+  archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
                    'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
