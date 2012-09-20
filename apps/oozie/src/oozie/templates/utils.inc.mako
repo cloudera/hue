@@ -45,14 +45,21 @@
 
 <%def name="job_duration(job)">
   <%
-    return ( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000
+    if job.endTime and job.startTime:
+      return ( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000
+    else:
+      return None
   %>
 </%def>
 
 
 <%def name="format_job_duration(job)">
   <%
-    return format_duration_in_millis(job_duration(job))
+    duration = job_duration(job)
+    if duration is not None:
+      return format_duration_in_millis(duration)
+    else:
+      return None
   %>
 </%def>
 
@@ -163,7 +170,7 @@
       <div class="controls">
         ${ field }
         % if field.errors:
-          <span class="help-inline">${ unicode(field.errors) | h }</span>
+          <span class="help-inline">${ unicode(field.errors) }</span>
         % endif
       </div>
     </div>

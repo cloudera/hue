@@ -319,6 +319,7 @@ ${layout.menubar(section='designs')}
                     initialPath: inputElement.val(),
                     onFileChoose: function(filePath) {
                         inputElement.val(filePath);
+                        inputElement.change();
                         $("#chooseFile").modal("hide");
                     },
                     createFolder: false
