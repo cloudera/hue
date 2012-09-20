@@ -330,7 +330,8 @@ ${layout.menubar(section='query')}
             placement: 'bottom'
         });
         // hack!!!
-        $("select").addClass("span8");
+        $("select:not(#id_query_servers-server)").addClass("span8");
+        $("#id_query_servers-server").addClass("span12");
 
         $("a[data-form-prefix]").each(function(){
             var _prefix = $(this).attr("data-form-prefix");

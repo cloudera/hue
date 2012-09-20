@@ -80,10 +80,10 @@ ${ layout.menubar(section='workflows') }
               <tbody data-bind="foreach: prepares">
                 <tr>
                   <td>
-                    <span class="span3 required" data-bind="text: type" />
+                    <span class="span4 required" data-bind="text: type" />
                   </td>
                   <td>
-                    <input class="input span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+                    <input type="text" class="input span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
                   </td>
                   <td><a class="btn" href="#" data-bind="click: $root.removePrepare">${ _('Delete') }</a></td>
                 </tr>
@@ -118,10 +118,10 @@ ${ layout.menubar(section='workflows') }
               <tbody data-bind="foreach: params">
                 <tr>
                   <td>
-                    <span class="span3 required" data-bind="text: type" />
+                    <span class="span4 required" data-bind="text: type" />
                   </td>
                   <td>
-                    <input class="input span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+                    <input type="text" class="input span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
                   </td>
                   <td><a class="btn" href="#" data-bind="click: $root.removeParam">${ _('Delete') }</a></td>
                 </tr>
@@ -165,9 +165,9 @@ ${ layout.menubar(section='workflows') }
             </thead>
             <tbody data-bind="foreach: properties">
               <tr>
-                <td><input class="span4 required propKey" data-bind="value: name, uniqueName: false" /></td>
-                <td class="pathChooserKo"><input class="span5 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
-                <td><a class="btn btn-small" href="#" data-bind="click: $root.removeProp">${ _('Delete') }</a></td>
+                <td><input type="text" class="span4 required propKey" data-bind="value: name, uniqueName: false" /></td>
+                <td><input type="text" class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
+                <td><a class="btn" href="#" data-bind="click: $root.removeProp">${ _('Delete') }</a></td>
               </tr>
             </tbody>
           </table>
@@ -192,7 +192,7 @@ ${ layout.menubar(section='workflows') }
               <table class="table-condensed designTable" data-bind="visible: files().length > 0">
                 <tbody data-bind="foreach: files">
                   <tr>
-                    <td><input class="input span5 required pathChooserKo"
+                    <td><input type="text" class="input span5 required pathChooserKo"
                             data-bind="fileChooser: $data, value: name, uniqueName: false" />
                     </td>
                     <td><a class="btn" href="#" data-bind="click: $root.removeFile">${ _('Delete') }</a></td>
@@ -219,7 +219,7 @@ ${ layout.menubar(section='workflows') }
             <tbody data-bind="foreach: archives">
               <tr>
                 <td>
-                  <input class="input span5 required pathChooserKo"
+                  <input type="text" class="input span5 required pathChooserKo"
                       data-bind="fileChooser: $data, value: name, uniqueName: false" />
                 </td>
                 <td><a class="btn" href="#" data-bind="click: $root.removeArchive">${ _('Delete') }</a></td>
@@ -464,7 +464,8 @@ ${ layout.menubar(section='workflows') }
     $(".propKey").each(addAutoComplete);
 
     $("*[rel=popover]").popover({
-      placement: 'right'
+      placement: 'right',
+      trigger: 'hover'
     });
   });
 </script>

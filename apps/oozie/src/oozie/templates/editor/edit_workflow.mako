@@ -32,14 +32,14 @@ ${ layout.menubar(section='workflows') }
 
   <div class="well">
     ${ _('Description:') } ${ workflow.description or "N/A" }
-    <div class="control-group pull-right">
-      <label class="control-label"></label>
-      <div class="controls">
-        <a href="/filebrowser/view${ workflow.deployment_dir }" class="btn">
-          ${ _('Upload') }
-        </a> ${ _('files to deployment directory') }
+    <div class="pull-right" style="margin-top:-5px">
+        <label>
+            <a href="/filebrowser/view${ workflow.deployment_dir }" class="btn">
+              ${ _('Upload') }
+            </a>
+            ${ _('files to deployment directory') }
+        </label>
       </div>
-    </div>
   </div>
 
   <ul class="nav nav-tabs">
@@ -301,7 +301,8 @@ modal-window .modal-content {
     $("a[data-row-selector='true']").jHueRowSelector();
 
     $("*[rel=popover]").popover({
-      placement: 'right'
+      placement: 'right',
+      trigger: 'hover'
     });
   });
 </script>

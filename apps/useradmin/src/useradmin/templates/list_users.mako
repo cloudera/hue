@@ -38,7 +38,7 @@ ${layout.menubar(section='users', _=_)}
             ${_('Filter: ')}<input type="text" id="filterInput" class="input-xxlarge search-query" placeholder="${_('Search for username, name, e-mail, etc...')}">
         </form>
     </div>
-    <table class="table table-striped datatables">
+    <table class="table table-striped table-condensed datatables">
         <thead>
             <tr>
                 <th>${_('Username')}</th>

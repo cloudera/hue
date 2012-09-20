@@ -92,15 +92,15 @@
 
 <%def name="mr_graph_maps(job)">
     <div class="progress ${get_bootstrap_class(job, 'progress')}">
-        <div class="bar" style="width: ${job.maps_percent_complete}%;"></div>
         <div class="bar-label">${job.finishedMaps} / ${job.desiredMaps}</div>
+        <div class="bar" style="margin-top:-20px;width: ${job.maps_percent_complete}%;"></div>
     </div>
 </%def>
 
 <%def name="mr_graph_reduces(job)">
     <div class="progress ${get_bootstrap_class(job, 'progress')}">
-        <div class="bar" style="width: ${job.reduces_percent_complete}%;"></div>
         <div class="bar-label">${job.finishedReduces} / ${job.desiredReduces}</div>
+        <div class="bar" style="margin-top:-20px;width: ${job.reduces_percent_complete}%;"></div>
     </div>
 </%def>
 

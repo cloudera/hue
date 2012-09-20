@@ -54,7 +54,7 @@ from django.utils.translation import ugettext as _
         }
     </style>
 
-    <table class="table table-striped datatables" data-bind="">
+    <table class="table table-striped table-condensed datatables" data-bind="">
         <thead>
             <tr>
                 <th width="1%"><input id="selectAll" type="checkbox" data-bind="click: selectAll, checked: allSelected"/></th>
@@ -89,11 +89,13 @@ from django.utils.translation import ugettext as _
     <script id="fileTemplate" type="text/html">
         <tr style="cursor: pointer">
             <td class="center">
+                <label class="checkbox">
                 <input data-bind="value: path, checked: selected, visible: name != '..'" type="checkbox" data-row-selector-exclude="true"  />
+                </label>
             </td>
             <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'icon-file': type == 'file', 'icon-folder-close': type != 'file'}"></i></td>
             <td data-bind="click: $root.viewFile">
-                <h5><a href="#" data-bind="click: $root.viewFile, text: name"></a></h5>
+                <strong><a href="#" data-bind="click: $root.viewFile, text: name"></a></strong>
             </td>
             <td data-bind="click: $root.viewFile">
                 <span data-bind="visible: type=='file', text: stats.size"></span>
@@ -101,7 +103,7 @@ from django.utils.translation import ugettext as _
             <td data-bind="click: $root.viewFile, text: stats.user"></td>
             <td data-bind="click: $root.viewFile, text: stats.group"></td>
             <td data-bind="click: $root.viewFile, text: permissions"></td>
-            <td data-bind="click: $root.viewFile, text: stats.mtime"></td>
+            <td data-bind="click: $root.viewFile, text: stats.mtime" style="white-space: nowrap;"></td>
         </tr>
     </script>
 

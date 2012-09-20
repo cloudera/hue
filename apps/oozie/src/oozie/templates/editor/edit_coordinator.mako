@@ -504,7 +504,8 @@ ${ layout.menubar(section='coordinators') }
     ko.applyBindings(window.viewModel);
 
     $("*[rel=popover]").popover({
-      placement: 'right'
+      placement: 'right',
+      trigger: 'hover'
     });
  });
 </script>

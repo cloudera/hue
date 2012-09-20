@@ -37,7 +37,7 @@ ${layout.menubar(section='groups', _=_)}
             ${_('Filter: ')}<input type="text" id="filterInput" class="input-xxlarge search-query" placeholder="${_('Search for group name, members, etc...')}">
         </form>
     </div>
-    <table class="table table-striped datatables">
+    <table class="table table-striped table-condensed datatables">
     <thead>
       <tr>
         <th>${_('Group Name')}</th>
@@ -84,7 +84,7 @@ ${layout.menubar(section='groups', _=_)}
                     { "sWidth": "20%" },
                     null,
                     %if user.is_superuser == True:
-                    { "sWidth": "120px", "bSortable": false },
+                    { "sWidth": "140px", "bSortable": false },
                     %endif
                  ]
             });

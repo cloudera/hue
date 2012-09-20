@@ -102,6 +102,7 @@
     overflow: hidden;
     background-color: #01639c;
     border-right: 1px solid #2c7fb3;
+    border-left: 0;
 }
 
 .navbar .nav > li > a {
@@ -933,8 +934,6 @@ div.box {
 }
 
 .bar-label {
-    margin-top: -18px;
-    position: relative;
     text-align: center;
     color: #FFFFFF;
     font-size: 12px;
