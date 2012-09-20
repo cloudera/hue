@@ -290,9 +290,11 @@ ${ layout.menubar(section='workflows') }
   .designTable {
     margin-left:0;
   }
+
   .designTable th, .designTable td {
     padding-left: 0;
   }
+
   .designTable th {
     text-align:left;
   }
@@ -368,7 +370,6 @@ ${ layout.menubar(section='workflows') }
         self.addEnvVar = function() {
             self.params.push({ value: "", type: "env-var" });
         };
-
 
         self.removeParam = function(val) {
             self.params.remove(val);
@@ -460,11 +461,12 @@ ${ layout.menubar(section='workflows') }
         $("#fileChooserModal").jHueFileChooser({
           onFileChoose: function(filePath) {
               inputElement.val(filePath);
+              inputElement.change();
               $("#chooseFile").modal("hide");
           },
           createFolder: false
         });
-      $("#chooseFile").modal("show");
+        $("#chooseFile").modal("show");
       })
     }
 

@@ -431,6 +431,36 @@ class TestEditor:
       finish()
 
 
+  def test_workflow_action(self):
+    response = self.c.get(reverse('oozie:new_action', args=[self.wf.id, 'java', self.wf.start.id]))
+    assert_true('action="/oozie/new_action/%d/java/' % self.wf.id in response.content, response.content)
+
+    data = {u'job_xml': [u'job.xml'], u'files': [u'["my_file"]'], u'name': [u'TestActionSleep'],
+            u'jar_path': [u'/user/hue/oozie/examples/lib/hadoop-examples.jar'], u'java_opts': [u'-d64'],
+            u'args': [u'${n}'],
+            u'job_properties': [u'[{"name":"mapred.job.queue.name","value":"prod"}]'],
+            u'prepares': [u'[{"value":"${input}","type":"delete"},{"value":"${input}","type":"mkdir"}]'],
+            u'params': [u'[]'], u'archives': [u'["my_archive.zip"]'],
+            u'main_class': [u'org.apache.hadoop.examples.SleepJob'],
+            u'description': [u'An action that sleeps']}
+
+    response = self.c.post(reverse('oozie:new_action', args=[self.wf.id, 'java', self.wf.start.id]), data, follow=True)
+    assert_true('action="/oozie/edit_workflow/%d"' % self.wf.id in response.content, response.content)
+
+    action = Node.objects.get(name='TestActionSleep').get_full_node()
+    for field, value in data.iteritems():
+      if field != 'params':
+        assert_equal(value[0], getattr(action, field))
+
+    response = self.c.post(reverse('oozie:edit_action', args=[action.id]), data, follow=True)
+    assert_true('action="/oozie/edit_workflow/%d"' % self.wf.id in response.content, response.content)
+
+    action = Node.objects.get(name='TestActionSleep').get_full_node()
+    for field, value in data.iteritems():
+      if field != 'params':
+        assert_equal(value[0], getattr(action, field))
+
+
   def test_workflow_flatten_list(self):
     assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
                  '<Kill: kill>, <End: end>]',
