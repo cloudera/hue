@@ -600,6 +600,8 @@ class Node(models.Model):
       node = self.pig
     elif self.node_type == Hive.node_type:
       node = self.hive
+    elif self.node_type == Sqoop.node_type:
+      node = self.sqoop
     elif self.node_type == Streaming.node_type:
       node = self.streaming
     elif self.node_type == Java.node_type:
@@ -745,9 +747,7 @@ class Mapreduce(Action):
   node_type = 'mapreduce'
 
   files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
-      help_text=_t('List of names or paths of files to be added to the distributed cache. '
-                   'To force a symlink for a file on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'mycat.sh#cat\'.'))
+      help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
@@ -782,9 +782,7 @@ class Streaming(Action):
   node_type = "streaming"
 
   files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
-      help_text=_t('List of names or paths of files to be added to the distributed cache. '
-                   'To force a symlink for a file on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'mycat.sh#cat\'.'))
+      help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
@@ -812,9 +810,7 @@ class Java(Action):
   node_type = "java"
 
   files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
-      help_text=_t('List of names or paths of files to be added to the distributed cache. '
-                   'To force a symlink for a file on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'mycat.sh#cat\'.'))
+      help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
@@ -862,9 +858,7 @@ class Pig(Action):
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
                             help_text=_t('The Pig parameters of the script. e.g. "-param", "INPUT=${inputDir}"'))
   files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
-      help_text=_t('List of names or paths of files to be added to the distributed cache. '
-                   'To force a symlink for a file on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'mycat.sh#cat\'.'))
+      help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
@@ -904,9 +898,7 @@ class Hive(Action):
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
                             help_text=_t('The %(type)s parameters of the script. e.g. "-param", "INPUT=${inputDir}"')  % {'type': node_type.title()})
   files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
-      help_text=_t('List of names or paths of files to be added to the distributed cache. '
-                   'To force a symlink for a file on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'mycat.sh#cat\'.'))
+      help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
                    'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
@@ -938,7 +930,48 @@ class Hive(Action):
     return json.loads(self.prepares)
 
 
-Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type)
+class Sqoop(Action):
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
+  node_type = 'sqoop'
+
+  script_path = models.CharField(max_length=256, blank=True, verbose_name=_t('Script path'), default='',
+                                 help_text=_t('Local path to the %(type)s script. e.g. my_script.sql') % {'type': node_type.title()})
+  params = models.TextField(default="[]", verbose_name=_t('Parameters'),
+                            help_text=_t('The %(type)s parameters of the script. e.g. "-param", "INPUT=${inputDir}"')  % {'type': node_type.title()})
+  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
+      help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
+  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
+                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]',
+                                    verbose_name=_t('Job properties'),
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+  prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
+                              help_text=_t('List of paths to delete or create before starting the application. '
+                                           'This should be used exclusively for directory cleanup'))
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
+                             help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                                          'Properties specified in the configuration element override properties specified in the '
+                                          'files specified by any job-xml elements.'))
+
+  def get_properties(self):
+    return json.loads(self.job_properties)
+
+  def get_files(self):
+    return json.loads(self.files)
+
+  def get_archives(self):
+    return json.loads(self.archives)
+
+  def get_params(self):
+    return json.loads(self.params)
+
+  def get_prepares(self):
+    return json.loads(self.prepares)
+
+
+Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type)
 
 
 class ControlFlow(Node):
