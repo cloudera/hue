@@ -445,9 +445,9 @@ from django.utils.translation import ugettext as _
             });
 
             $(window).bind("hashchange", function() {
-                var hash = window.location.hash.substring(2);
+                var hash = window.location.hash.substring(1);
                 if (hash != null && hash != "") {
-                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + hash);
+                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + hash.substring(1));
                     viewModel.retrieveData();
                 }
             });
@@ -495,6 +495,10 @@ from django.utils.translation import ugettext as _
                 url:breadcrumb.url,
                 label:breadcrumb.label,
                 show:function () {
+                    if (this.url == null || this.url == ""){
+                        // forcing root on empty breadcrumb url
+                        this.url = "/";
+                    }
                     viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + this.url);
                     window.location.hash = this.url;
                 }
