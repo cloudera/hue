@@ -137,11 +137,14 @@ ${ layout.menubar(section='workflows') }
             % if node_type in ('pig', 'hive'):
               <button class="btn" data-bind="click: addParam">${ _('Add Param') }</button>
             % endif
-            % if node_type in ('pig'):
+            % if node_type in ('pig', 'shell'):
               <button class="btn" data-bind="click: addArgument">${ _('Add Argument') }</button>
             % endif
             % if node_type in ('sqoop', 'ssh'):
               <button class="btn" data-bind="click: addArg">${ _('Add Arg') }</button>
+            % endif
+            % if node_type in ('shell'):
+              <button class="btn" data-bind="click: addEnvVar">${ _('Add Env-Var') }</button>
             % endif
           </div>
         </div>
@@ -354,6 +357,11 @@ ${ layout.menubar(section='workflows') }
         self.addArg = function() {
             self.params.push({ value: "", type: "arg" });
         };
+
+        self.addEnvVar = function() {
+            self.params.push({ value: "", type: "env-var" });
+        };
+
 
         self.removeParam = function(val) {
             self.params.remove(val);

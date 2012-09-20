@@ -604,6 +604,8 @@ class Node(models.Model):
       node = self.sqoop
     elif self.node_type == Ssh.node_type:
       node = self.ssh
+    elif self.node_type == Shell.node_type:
+      node = self.shell
     elif self.node_type == Streaming.node_type:
       node = self.streaming
     elif self.node_type == Java.node_type:
@@ -986,16 +988,61 @@ class Ssh(Action):
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
                             help_text=_t('The arguments of the %(type)s command')  % {'type': node_type.title()})
   capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
-                              help_text=_t('Capture output of the STDOUT of the ssh command execution. The ssh '
+                              help_text=_t('Capture output of the STDOUT of the %(program)s command execution. The %(program)s '
                                            'command output must be in Java Properties file format and it must not exceed 2KB. '
-                                           'From within the workflow definition, the output of an ssh action node is accessible '
-                                           'via the String action:output(String node, String key) function'))
+                                           'From within the workflow definition, the output of an %(program)s action node is accessible '
+                                           'via the String action:output(String node, String key) function') % {'program': node_type.title()})
 
   def get_params(self):
     return json.loads(self.params)
 
 
-Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type)
+class Shell(Action):
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
+  node_type = 'shell'
+
+  command = models.CharField(max_length=256, blank=False, verbose_name=_t('Shell command'),
+                             help_text=_t('The path of the Shell command to execute'))
+  params = models.TextField(default="[]", verbose_name=_t('Arguments'),
+                            help_text=_t('The arguments of Shell command can then be specified using one or more argument element.'))
+  files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
+      help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
+  archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
+                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
+                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+  prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
+                              help_text=_t('List of paths to delete or create before starting the application. '
+                                           'This should be used exclusively for directory cleanup'))
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
+                             help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                                          'Properties specified in the configuration element override properties specified in the '
+                                          'files specified by any job-xml elements.'))
+  capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
+                              help_text=_t('Capture output of the STDOUT of the %(program)s command execution. The %(program)s '
+                                           'command output must be in Java Properties file format and it must not exceed 2KB. '
+                                           'From within the workflow definition, the output of an %(program)s action node is accessible '
+                                           'via the String action:output(String node, String key) function') % {'program': node_type.title()})
+
+  def get_properties(self):
+    return json.loads(self.job_properties)
+
+  def get_files(self):
+    return json.loads(self.files)
+
+  def get_archives(self):
+    return json.loads(self.archives)
+
+  def get_params(self):
+    return json.loads(self.params)
+
+  def get_prepares(self):
+    return json.loads(self.prepares)
+
+
+Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type, Shell.node_type)
 
 
 class ControlFlow(Node):

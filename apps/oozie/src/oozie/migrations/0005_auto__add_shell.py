@@ -8,22 +8,25 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
-        # Adding model 'Ssh'
-        db.create_table('oozie_ssh', (
+        # Adding model 'Shell'
+        db.create_table('oozie_shell', (
+            ('files', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
+            ('job_xml', self.gf('django.db.models.fields.CharField')(default='', max_length=512, blank=True)),
+            ('job_properties', self.gf('django.db.models.fields.TextField')(default='[]')),
             ('capture_output', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('host', self.gf('django.db.models.fields.CharField')(max_length=256)),
             ('params', self.gf('django.db.models.fields.TextField')(default='[]')),
-            ('user', self.gf('django.db.models.fields.CharField')(max_length=64)),
+            ('archives', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
             ('node_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['oozie.Node'], unique=True, primary_key=True)),
+            ('prepares', self.gf('django.db.models.fields.TextField')(default='[]')),
             ('command', self.gf('django.db.models.fields.CharField')(max_length=256)),
         ))
-        db.send_create_signal('oozie', ['Ssh'])
+        db.send_create_signal('oozie', ['Shell'])
 
 
     def backwards(self, orm):
 
-        # Deleting model 'Ssh'
-        db.delete_table('oozie_ssh')
+        # Deleting model 'Shell'
+        db.delete_table('oozie_shell')
 
 
     models = {
@@ -66,12 +69,12 @@ class Migration(SchemaMigration):
         'oozie.coordinator': {
             'Meta': {'object_name': 'Coordinator', '_ormbases': ['oozie.Job']},
             'concurrency': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'end': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 22, 18, 22, 24, 617774)'}),
+            'end': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 22, 18, 58, 40, 375811)'}),
             'execution': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
             'frequency_number': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'}),
             'frequency_unit': ('django.db.models.fields.CharField', [], {'default': "'days'", 'max_length': '20'}),
             'job_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Job']", 'unique': 'True', 'primary_key': 'True'}),
-            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 19, 18, 22, 24, 617744)'}),
+            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 19, 18, 58, 40, 375778)'}),
             'throttle': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'timeout': ('django.db.models.fields.SmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'timezone': ('django.db.models.fields.CharField', [], {'default': "'America/Los_Angeles'", 'max_length': '24'}),
@@ -100,7 +103,7 @@ class Migration(SchemaMigration):
             'frequency_unit': ('django.db.models.fields.CharField', [], {'default': "'days'", 'max_length': '20'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
-            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 19, 18, 22, 24, 618381)'}),
+            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 19, 18, 58, 40, 377077)'}),
             'timezone': ('django.db.models.fields.CharField', [], {'default': "'America/Los_Angeles'", 'max_length': '24'}),
             'uri': ('django.db.models.fields.CharField', [], {'default': "'/data/${YEAR}${MONTH}${DAY}'", 'max_length': '1024'})
         },
@@ -203,6 +206,18 @@ class Migration(SchemaMigration):
             'params': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'prepares': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'script_path': ('django.db.models.fields.CharField', [], {'max_length': '256'})
+        },
+        'oozie.shell': {
+            'Meta': {'object_name': 'Shell'},
+            'archives': ('django.db.models.fields.CharField', [], {'default': "'[]'", 'max_length': '512'}),
+            'capture_output': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'command': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
+            'files': ('django.db.models.fields.CharField', [], {'default': "'[]'", 'max_length': '512'}),
+            'job_properties': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
+            'job_xml': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'blank': 'True'}),
+            'node_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Node']", 'unique': 'True', 'primary_key': 'True'}),
+            'params': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
+            'prepares': ('django.db.models.fields.TextField', [], {'default': "'[]'"})
         },
         'oozie.sqoop': {
             'Meta': {'object_name': 'Sqoop'},
