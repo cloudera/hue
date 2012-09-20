@@ -391,9 +391,9 @@ def new_action(request, workflow, node_type, parent_action_id):
 
   return render('editor/edit_workflow_action.mako', request, {
       'workflow': workflow,
-      'job_properties': extract_field_data(action_form['job_properties']),
-      'files': extract_field_data(action_form['files']),
-      'archives': extract_field_data(action_form['archives']),
+      'job_properties': 'job_properties' in action_form and extract_field_data(action_form['job_properties']) or '[]',
+      'files': 'files' in action_form and extract_field_data(action_form['files']) or '[]',
+      'archives': 'archives' in action_form and extract_field_data(action_form['archives']) or '[]',
       'params': 'params' in action_form.fields and extract_field_data(action_form['params']) or '[]',
       'prepares': 'prepares' in action_form.fields and extract_field_data(action_form['prepares']) or '[]',
       'action_form': action_form,
@@ -420,9 +420,9 @@ def edit_action(request, action):
 
   return render('editor/edit_workflow_action.mako', request, {
     'workflow': action.workflow,
-    'job_properties': extract_field_data(action_form['job_properties']),
-    'files': extract_field_data(action_form['files']),
-    'archives': extract_field_data(action_form['archives']),
+    'job_properties': 'job_properties' in action_form and extract_field_data(action_form['job_properties']) or '[]',
+    'files': 'files' in action_form and extract_field_data(action_form['files']) or '[]',
+    'archives': 'archives' in action_form and extract_field_data(action_form['archives']) or '[]',
     'params': 'params' in action_form.fields and extract_field_data(action_form['params']) or '[]',
     'prepares': 'prepares' in action_form.fields and extract_field_data(action_form['prepares']) or '[]',
     'action_form': action_form,

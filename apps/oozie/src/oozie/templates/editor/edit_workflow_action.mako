@@ -140,7 +140,7 @@ ${ layout.menubar(section='workflows') }
             % if node_type in ('pig'):
               <button class="btn" data-bind="click: addArgument">${ _('Add Argument') }</button>
             % endif
-            % if node_type in ('sqoop'):
+            % if node_type in ('sqoop', 'ssh'):
               <button class="btn" data-bind="click: addArg">${ _('Add Arg') }</button>
             % endif
           </div>
