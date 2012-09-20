@@ -115,6 +115,27 @@ def test_hdfs_copy():
   sb = minifs.stats('/copy_test_dst')
   assert_equal(0646, stat.S_IMODE(sb.mode))
 
+@attr('requires_hadoop')
+def test_hdfs_copy_from_local():
+  minicluster = pseudo_hdfs4.shared_cluster()
+  minifs = minicluster.fs
+
+  olduser = minifs.setuser(minifs.superuser)
+  minifs.chmod('/', 0777)
+  minifs.setuser(olduser)
+
+  path = os.path.join(tempfile.gettempdir(), 'copy_test_src')
+  logging.info(path)
+
+  data = "I will not make flatuent noises in class\n" * 2000
+  f = open(path, 'w')
+  f.write(data)
+  f.close()
+
+  minifs.copyFromLocal(path, '/copy_test_dst')
+  actual = minifs.read('/copy_test_dst', 0, len(data) + 100)
+  assert_equal(data, actual)
+
 
 if __name__ == "__main__":
   logging.basicConfig()

@@ -25,6 +25,7 @@ import logging
 import mimetypes
 import operator
 import posixpath
+import shutil
 import stat as stat_module
 import os
 from types import MethodType
@@ -50,10 +51,11 @@ from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect
 from desktop.lib.exceptions import PopupException
+from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
-from filebrowser.forms import RenameForm, UploadForm, MkDirForm, RmDirForm, RmTreeForm,\
-    RemoveForm, ChmodForm, ChownForm, EditorForm
+from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm,\
+    RmDirForm, RmTreeForm, RemoveForm, ChmodForm, ChownForm, EditorForm
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -874,7 +876,7 @@ def upload_flash(request):
     special signifier.
     """
     try:
-        r = upload(request)
+        r = upload_file(request)
         if r.status_code == 200:
             return HttpResponse("{}", content_type="application/json")
         else:
@@ -884,7 +886,7 @@ def upload_flash(request):
                             content_type="application/json")
 
 
-def upload(request):
+def upload_file(request):
     """
     A wrapper around the actual upload view function to clean up the temporary file afterwards.
 
@@ -896,7 +898,7 @@ def upload(request):
     if request.method == 'POST':
         try:
             try:
-                resp = _upload(request)
+                resp = _upload_file(request)
                 response.update(resp)
             except Exception, ex:
                 response['data'] = str(ex)
@@ -914,13 +916,12 @@ def upload(request):
 
     return HttpResponse(json.dumps(response), content_type="text/plain")
 
-
-def _upload(request):
+def _upload_file(request):
     """
     Handles file uploaded by HDFSfileUploadHandler.
     The uploaded file is stored in HDFS. We just need to rename it to the destination path.
     """
-    form = UploadForm(request.POST, request.FILES)
+    form = UploadFileForm(request.POST, request.FILES)
 
     if form.is_valid():
         uploaded_file = request.FILES['hdfs_file']
@@ -939,7 +940,7 @@ def _upload(request):
             request.fs.do_as_superuser(request.fs.chown, tmp_file, username, username)
 
             # Move the file to where it belongs
-            request.fs.rename(uploaded_file.get_temp_path(), dest)
+            request.fs.rename(tmp_file, dest)
         except IOError, ex:
             already_exists = False
             try:
@@ -962,6 +963,87 @@ def _upload(request):
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
 
 
+def upload_archive(request):
+    """
+    A wrapper around the actual upload view function to clean up the temporary file afterwards.
+
+    Returns JSON.
+    e.g. {'status' 0/1, data:'message'...}
+    """
+    response = {'status': -1, 'data': ''}
+
+    if request.method == 'POST':
+        try:
+            try:
+                resp = _upload_archive(request)
+                response.update(resp)
+            except Exception, ex:
+                response['data'] = str(ex)
+        finally:
+            hdfs_file = request.FILES.get('hdfs_file')
+            if hdfs_file:
+                hdfs_file.remove()
+    else:
+        response['data'] = _('A POST request is required.')
+
+    if response['status'] == 0:
+        request.info(_('%(destination)s upload succeeded') % {'destination': response['path']})
+    else:
+        request.error(_('Upload failed: %(data)s') % {'data': response['data']})
+
+    return HttpResponse(json.dumps(response), content_type="text/plain")
+
+
+def _upload_archive(request):
+    """
+    Handles archive upload.
+    The uploaded file is stored in memory.
+    We need to extract it and rename it.
+    """
+    form = UploadArchiveForm(request.POST, request.FILES)
+
+    if form.is_valid():
+        uploaded_file = request.FILES['archive']
+
+        # Always a dir
+        if request.fs.isdir(form.cleaned_data['dest']) and posixpath.sep in uploaded_file.name:
+            raise PopupException(_('Sorry, no "%(sep)s" in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
+
+        dest = request.fs.join(form.cleaned_data['dest'], uploaded_file.name)
+        try:
+            # Extract if necessary
+            # Make sure dest path is without '.zip' extension
+            if dest.endswith('.zip'):
+                temp_path = archive_factory(uploaded_file).extract()
+                if not temp_path:
+                    raise PopupException(_('Could not extract contents of file.'))
+                # Move the file to where it belongs
+                dest = dest[:-4]
+                request.fs.copyFromLocal(temp_path, dest)
+                shutil.rmtree(temp_path)
+            else:
+                raise PopupException(_('Could not interpret archive type.'))
+
+        except IOError, ex:
+            already_exists = False
+            try:
+                already_exists = request.fs.exists(dest)
+            except Exception:
+              pass
+            if already_exists:
+                msg = _('Destination %(name)s already exists.' % {'name': dest})
+            else:
+                msg = _('Copy to "%(name)s failed: %(error)s') % {'name': dest, 'error': ex}
+            raise PopupException(msg)
+
+        return {
+          'status': 0,
+          'path': dest,
+          'result': _massage_stats(request, request.fs.stats(dest)),
+          'next': request.GET.get("next")
+          }
+    else:
+        raise PopupException(_("Error in upload form: %s") % (form.errors,))
 
 def status(request):
     status = request.fs.status()

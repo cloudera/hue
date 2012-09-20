@@ -41,7 +41,14 @@ ${commonheader(_('File Browser'), 'filebrowser', user)}
             <button class="btn fileToolbarBtn" title="${_('Delete')}" data-bind="click: deleteSelected, enable: selectedFiles().length == 1"><i class="icon-trash"></i> ${_('Delete')}</button>
         </%def>
         <%def name="creation()">
-            <a href="#" class="btn upload-link" title="${_('Upload files')}"><i class="icon-upload"></i> ${_('Upload files')}</a>
+            <div id="upload-dropdown" class="btn-group" style="display: inline-block;">
+                <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown"><i class="icon-upload"></i> ${_('Upload')}</a>
+                <ul class="dropdown-menu">
+                  <li><a href="#" tabindex="-1" class="upload-link" title="${_('Upload files')}" data-bind="click: uploadFile">${_('Upload files')}</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#" tabindex="-1" class="upload-link" title="${_('Upload archive')}" data-bind="click: uploadArchive">${_('Upload archive')}</a></li>
+                </ul>
+            </div>
             <a href="#" class="btn create-directory-link" title="${_('New directory')}"><i class="icon-folder-close"></i> ${_('New directory')}</a>
         </%def>
     </%actionbar:render>

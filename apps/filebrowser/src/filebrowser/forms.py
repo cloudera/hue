@@ -53,11 +53,16 @@ class RenameForm(forms.Form):
   src_path = CharField(label=_("File to rename"), help_text=_("The file to rename."))
   dest_path = CharField(label=_("New name"), help_text=_("Rename the file to:"))
 
-class UploadForm(forms.Form):
+class UploadFileForm(forms.Form):
   op = "upload"
   # The "hdfs" prefix in "hdfs_file" triggers the HDFSfileUploadHandler
   hdfs_file = FileField(forms.Form, label=_("File to Upload"))
   dest = PathField(label=_("Destination Path"), help_text=_("Filename or directory to upload to."))
+
+class UploadArchiveForm(forms.Form):
+  op = "upload"
+  archive = FileField(forms.Form, label=_("Archive to Upload"))
+  dest = PathField(label=_("Destination Path"), help_text=_("Archive to upload to."))
 
 class RemoveForm(forms.Form):
   op = "remove"

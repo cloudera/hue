@@ -19,11 +19,11 @@
 
 <%def name="render()">
     <div class="well" style="padding-top: 10px; padding-bottom: 0">
-        <p class="pull-right" style="margin:0">
+        <div class="pull-right" style="margin:0">
             %if hasattr(caller, "creation"):
                 ${caller.creation()}
             %endif
-        </p>
+        </div>
         <p>
             %if hasattr(caller, "search"):
                 ${caller.search()}

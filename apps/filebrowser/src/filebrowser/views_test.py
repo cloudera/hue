@@ -37,6 +37,7 @@ from desktop.lib.test_utils import grant_access
 from hadoop import pseudo_hdfs4
 
 from avro import schema, datafile, io
+from lib.archives import archive_factory
 from lib.rwx import expand_mode
 
 
@@ -672,7 +673,7 @@ def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
 
 
 @attr('requires_hadoop')
-def test_upload():
+def test_upload_file():
   """Test file upload"""
   cluster = pseudo_hdfs4.shared_cluster()
 
@@ -683,6 +684,7 @@ def test_upload():
     LOCAL_FILE = __file__
     HDFS_FILE = HDFS_DEST_DIR + '/' + os.path.basename(__file__)
 
+    cluster.fs.setuser(USER_NAME)
     client = make_logged_in_client(USER_NAME)
 
     client_not_me = make_logged_in_client(username=USER_NAME_NOT_ME, is_superuser=False, groupname='test')
@@ -693,7 +695,7 @@ def test_upload():
     cluster.fs.do_as_superuser(cluster.fs.chmod, HDFS_DEST_DIR, 0700)
 
     # Just upload the current python file
-    resp = client.post('/filebrowser/upload',
+    resp = client.post('/filebrowser/upload/file',
                        dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
 
@@ -708,16 +710,56 @@ def test_upload():
     assert_equal(actual, expected)
 
     # Upload again and so fails because file already exits
-    resp = client.post('/filebrowser/upload',
+    resp = client.post('/filebrowser/upload/file',
                        dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
     assert_equal(-1, response['status'], response)
 
     # Upload in tmp and fails because of missing permissions
-    resp = client_not_me.post('/filebrowser/upload',
+    resp = client_not_me.post('/filebrowser/upload/file',
                               dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
     assert_equal(-1, response['status'], response)
+  finally:
+    try:
+      cluster.fs.remove(HDFS_DEST_DIR)
+    except Exception, ex:
+      pass
+
+@attr('requires_hadoop')
+def test_upload_archive():
+  """Test archive upload"""
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    USER_NAME = 'test'
+    HDFS_DEST_DIR = "/tmp/fb-upload-test"
+    ZIP_FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test.zip')
+    HDFS_ZIP_FILE = HDFS_DEST_DIR + '/test.zip'
+    HDFS_UNZIPPED_FILE = HDFS_DEST_DIR + '/test'
+
+    cluster.fs.setuser(USER_NAME)
+    client = make_logged_in_client(USER_NAME)
+
+    cluster.fs.mkdir(HDFS_DEST_DIR)
+    cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
+    cluster.fs.chmod(HDFS_DEST_DIR, 0700)
+
+    # Upload and unzip archive
+    resp = client.post('/filebrowser/upload/archive',
+                       dict(dest=HDFS_DEST_DIR, archive=file(ZIP_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_false(cluster.fs.exists(HDFS_ZIP_FILE))
+    assert_true(cluster.fs.isdir(HDFS_UNZIPPED_FILE))
+    assert_true(cluster.fs.isfile(HDFS_UNZIPPED_FILE + '/test.txt'))
+
+    # Upload archive
+    resp = client.post('/filebrowser/upload/file',
+                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(ZIP_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_true(cluster.fs.exists(HDFS_ZIP_FILE))
   finally:
     try:
       cluster.fs.remove(HDFS_DEST_DIR)

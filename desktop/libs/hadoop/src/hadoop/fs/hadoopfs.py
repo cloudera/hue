@@ -31,6 +31,7 @@ import threading
 from thrift.transport import TTransport
 
 from django.utils.encoding import smart_str, force_unicode
+from django.utils.translation import ugettext as _
 from desktop.lib import thrift_util, i18n
 from desktop.lib.conf import validate_port
 from hadoop.api.hdfs import Namenode, Datanode
@@ -214,6 +215,71 @@ class Hdfs(object):
     netloc = url[:i]
     path = url[i:]
     return (schema, netloc, normpath(path), '', '')
+
+  def exists(self):
+    raise NotImplementedError(_("exists has not been implemented."_))
+
+  def do_as_user(self):
+    raise NotImplementedError(_("do_as_user has not been implemented."))
+
+  def create(self):
+    raise NotImplementedError(_("exists has not been implemented."))
+
+  def append(self):
+    raise NotImplementedError(_("do_as_user has not been implemented."))
+
+  def mkdir(self):
+    raise NotImplementedError(_("mkdir has not been implemented."))
+
+  def isdir(self):
+    raise NotImplementedError(_("isdir has not been implemented."))
+
+  def copyFromLocal(self, local_src, remote_dst, mode=0755):
+    remote_dst = remote_dst.endswith(posixpath.sep) and remote_dst[:-1] or remote_dst
+    local_src = local_src.endswith(posixpath.sep) and local_src[:-1] or local_src
+
+    if os.path.isdir(local_src):
+      self._copy_dir(local_src, remote_dst, mode)
+    else:
+      (basename, filename) = os.path.split(local_src)
+      self._copy_file(local_src, self.isdir(remote_dst) and self.join(remote_dst, filename) or remote_dst)
+
+  def _copy_dir(self, local_dir, remote_dir, mode=0755):
+    self.mkdir(remote_dir, mode=mode)
+
+    for f in os.listdir(local_dir):
+      local_src = os.path.join(local_dir, f)
+      remote_dst = self.join(remote_dir, f)
+
+      if os.path.isdir(local_src):
+        self._copy_dir(local_src, remote_dst, mode)
+      else:
+        self._copy_file(local_src, remote_dst)
+
+  def _copy_file(self, local_src, remote_dst, chunk_size=1024 * 1024):
+    if os.path.isfile(local_src):
+      if self.exists(remote_dst):
+        LOG.info(_('%(remote_dst)s already exists. Skipping.') % {'remote_dst': remote_dst})
+        return
+      else:
+        LOG.info(_('%(remote_dst)s does not exist. Trying to copy') % {'remote_dst': remote_dst})
+
+      src = file(local_src)
+      try:
+        try:
+          self.create(remote_dst, permission=01755)
+          chunk = src.read(chunk_size)
+          while chunk:
+            self.append(remote_dst, chunk)
+            chunk = src.read(chunk_size)
+          LOG.info(_('Copied %s -> %s') % (local_src, remote_dst))
+        except:
+          LOG.error(_('Copying %s -> %s failed') % (local_src, remote_dst))
+          raise
+      finally:
+        src.close()
+    else:
+      LOG.info(_('Skipping %s (not a file)') % local_src)
 
 class HadoopFileSystem(Hdfs):
   """

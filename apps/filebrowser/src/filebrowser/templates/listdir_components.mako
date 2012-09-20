@@ -166,14 +166,31 @@ from django.utils.translation import ugettext as _
 
     <div id="moveModal" class="modal hide fade"></div>
 
-    <!-- upload modal -->
-    <div id="uploadModal" class="modal hide fade">
+    <!-- upload file modal -->
+    <div id="uploadFileModal" class="modal hide fade">
         <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times;</a>
             <h3>${_('Uploading to:')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
         </div>
-        <div class="modal-body">
-            <div id="fileUploader">
+        <div class="modal-body form-inline">
+            <div id="fileUploader" class="uploader">
+            <noscript>
+                <p>${_('Please enable JavaScript to use the file uploader.')}</p>
+            </noscript>
+            </div>
+        </div>
+        <div class="modal-footer"></div>
+    </div>
+
+    <!-- upload archive modal -->
+    <div id="uploadArchiveModal" class="modal hide fade">
+        <div class="modal-header">
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+            <h3>${_('Uploading to:')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
+            <p>${_('The file will then be extracted in the path specified above.')}</p>
+        </div>
+        <div class="modal-body form-inline">
+            <div id="archiveUploader" class="uploader">
             <noscript>
                 <p>${_('Please enable JavaScript to use the file uploader.')}</p>
             </noscript>
@@ -259,45 +276,7 @@ from django.utils.translation import ugettext as _
             });
         }
 
-        //uploader
-        var num_of_pending_uploads = 0;
-        var uploader = null;
-        function createUploader(){
-            uploader = new qq.FileUploader({
-                element: document.getElementById("fileUploader"),
-                action: "/filebrowser/upload",
-                template: '<div class="qq-uploader">' +
-                        '<div class="qq-upload-drop-area"><span>${_('Drop files here to upload')}</span></div>' +
-                        '<div class="qq-upload-button">${_('Upload a file')}</div>' +
-                        '<ul class="qq-upload-list"></ul>' +
-                        '</div>',
-                fileTemplate: '<li>' +
-                        '<span class="qq-upload-file"></span>' +
-                        '<span class="qq-upload-spinner"></span>' +
-                        '<span class="qq-upload-size"></span>' +
-                        '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
-                        '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
-                        '</li>',
-                params:{
-                    dest: viewModel.currentPath(),
-                    fileFieldLabel: "hdfs_file"
-                },
-                onComplete:function(id, fileName, responseJSON){
-                    num_of_pending_uploads--;
-                    if(num_of_pending_uploads == 0){
-                        window.location = "/filebrowser/view" + viewModel.currentPath();
-                    }
-                },
-                onSubmit:function(id, fileName, responseJSON){
-                    num_of_pending_uploads++;
-                },
-                debug: false
-            });
-        }
-
         $(document).ready(function(){
-
-            createUploader();
 
             $("#cancelDeleteBtn").click(function(){
                 $("#deleteModal").modal("hide");
@@ -332,14 +311,6 @@ from django.utils.translation import ugettext as _
             $("#moveForm").find("input[name='dest_path']").live("focus", function(){
                 $("#moveNameRequiredAlert").hide();
                 $("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
-            });
-
-            //upload handlers
-            $(".upload-link").click(function(){
-                $("#uploadModal").modal({
-                    keyboard: true,
-                    show: true
-                });
             });
 
             //create directory handlers
@@ -594,12 +565,9 @@ from django.utils.translation import ugettext as _
                     return new Breadcrumb(breadcrumb);
                 }));
                 self.currentPath(currentDirPath);
-                if (uploader != null){
-                    uploader.setParams({
-                        dest: self.currentPath(),
-                        fileFieldLabel: "hdfs_file"
-                    });
-                }
+
+                $('.uploader').trigger('fb:updatePath', {dest: self.currentPath()});
+ 
                 self.isLoading(false);
                 $(".scrollable").jHueTableScroller();
             };
@@ -700,6 +668,102 @@ from django.utils.translation import ugettext as _
                 $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
                 return true;
             };
+
+            self.uploadFile = (function() {
+                var num_of_pending_uploads = 0;
+                var uploader = new qq.FileUploader({
+                    element: document.getElementById("fileUploader"),
+                    action: "/filebrowser/upload/file",
+                    template: '<div class="qq-uploader">' +
+                            '<div class="qq-upload-drop-area"><span>${_('Drop files here to upload')}</span></div>' +
+                            '<div class="qq-upload-button">${_('Upload a file')}</div>' +
+                            '<ul class="qq-upload-list"></ul>' +
+                            '</div>',
+                    fileTemplate: '<li>' +
+                            '<span class="qq-upload-file"></span>' +
+                            '<span class="qq-upload-spinner"></span>' +
+                            '<span class="qq-upload-size"></span>' +
+                            '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
+                            '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
+                            '</li>',
+                    params:{
+                        dest: self.currentPath(),
+                        fileFieldLabel: "hdfs_file"
+                    },
+                    onComplete:function(id, fileName, responseJSON){
+                        num_of_pending_uploads--;
+                        if(num_of_pending_uploads == 0){
+                            window.location = "/filebrowser/view" + self.currentPath();
+                        }
+                    },
+                    onSubmit:function(id, fileName, responseJSON){
+                        num_of_pending_uploads++;
+                    },
+                    debug: false
+                });
+
+                $("#archiveUploader").on('fb:updatePath', function(e, options) {
+                    uploader.setParams({
+                        dest: options.dest,
+                        fileFieldLabel: "hdfs_file"
+                    });
+                });
+
+                return function() {
+                    $("#uploadFileModal").modal({
+                        keyboard: true,
+                        show: true
+                    });
+                };
+            })();
+
+            self.uploadArchive = (function() {
+                var num_of_pending_uploads = 0;
+                var uploader = new qq.FileUploader({
+                    element: document.getElementById("archiveUploader"),
+                    action: "/filebrowser/upload/archive",
+                    template: '<div class="qq-uploader">' +
+                            '<div class="qq-upload-drop-area"><span>${_('Drop files here to upload')}</span></div>' +
+                            '<div class="qq-upload-button">${_('Upload an archive')}</div>' +
+                            '<ul class="qq-upload-list"></ul>' +
+                            '</div>',
+                    fileTemplate: '<li>' +
+                            '<span class="qq-upload-file"></span>' +
+                            '<span class="qq-upload-spinner"></span>' +
+                            '<span class="qq-upload-size"></span>' +
+                            '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
+                            '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
+                            '</li>',
+                    params:{
+                        dest: self.currentPath(),
+                        fileFieldLabel: "archive"
+                    },
+                    onComplete:function(id, fileName, responseJSON){
+                        num_of_pending_uploads--;
+                        if(num_of_pending_uploads == 0){
+                            window.location = "/filebrowser/view" + self.currentPath();
+                        }
+                    },
+                    onSubmit:function(id, fileName, responseJSON){
+                        num_of_pending_uploads++;
+                    },
+                    debug: false
+                });
+
+                $("#archiveUploader").on('fb:updatePath', function(e, options) {
+                    uploader.setParams({
+                        dest: options.dest,
+                        fileFieldLabel: "archive"
+                    });
+                });
+
+                return function() {
+                    $("#uploadArchiveModal").modal({
+                        keyboard: true,
+                        show: true
+                    });
+                };
+            })();
         };
 
         var viewModel = new FileBrowserModel([], null, [], "/");
