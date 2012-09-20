@@ -657,6 +657,7 @@ from django.utils.translation import ugettext as _
                 $("#renameSrcPath").attr("value", self.selectedFile().path);
                 $("#renameFileName").text(self.selectedFile().path);
                 $("#newNameInput").val(self.selectedFile().name);
+                $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
                 $("#renameModal").modal({
                     keyboard:true,
                     show:true
@@ -664,15 +665,15 @@ from django.utils.translation import ugettext as _
             };
 
             self.move = function () {
-                openMoveModal(self.selectedFile().path, self.selectedFile().mode, '${current_request_path}');
+                openMoveModal(self.selectedFile().path, self.selectedFile().mode, "${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
             };
 
             self.changeOwner = function () {
-                openChownWindow(self.selectedFile().path, self.selectedFile().stats.user, self.selectedFile().stats.group, '${current_request_path}');
+                openChownWindow(self.selectedFile().path, self.selectedFile().stats.user, self.selectedFile().stats.group, "${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
             };
 
             self.changePermissions = function () {
-                openChmodWindow(self.selectedFile().path, self.selectedFile().mode, '${current_request_path}');
+                openChmodWindow(self.selectedFile().path, self.selectedFile().mode, "${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
             };
 
             self.deleteSelected = function () {
