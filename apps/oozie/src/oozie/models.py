@@ -602,6 +602,8 @@ class Node(models.Model):
       node = self.hive
     elif self.node_type == Sqoop.node_type:
       node = self.sqoop
+    elif self.node_type == Ssh.node_type:
+      node = self.ssh
     elif self.node_type == Streaming.node_type:
       node = self.streaming
     elif self.node_type == Java.node_type:
@@ -937,7 +939,7 @@ class Sqoop(Action):
   script_path = models.CharField(max_length=256, blank=True, verbose_name=_t('Script path'), default='',
                                  help_text=_t('Local path to the %(type)s script. e.g. my_script.sql') % {'type': node_type.title()})
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
-                            help_text=_t('The %(type)s parameters of the script. e.g. "-param", "INPUT=${inputDir}"')  % {'type': node_type.title()})
+                            help_text=_t('The %(type)s parameters of the script. e.g. "import", "--connect", ".."')  % {'type': node_type.title()})
   files = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.CharField(max_length=PATH_MAX, default="[]", verbose_name=_t('Archives'),
@@ -971,7 +973,29 @@ class Sqoop(Action):
     return json.loads(self.prepares)
 
 
-Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type)
+class Ssh(Action):
+  PARAM_FIELDS = ('user', 'host', 'command', 'params')
+  node_type = 'ssh'
+
+  user = models.CharField(max_length=64, verbose_name=_t('User'),
+                          help_text=_t('User executing the shell command.'))
+  host = models.CharField(max_length=256, verbose_name=_t('Host'),
+                         help_text=_t('Where the shell will be executed.'))
+  command = models.CharField(max_length=256, verbose_name=_t('Command'),
+                             help_text=_t('The command that will be executed.'))
+  params = models.TextField(default="[]", verbose_name=_t('Arguments'),
+                            help_text=_t('The arguments of the %(type)s command')  % {'type': node_type.title()})
+  capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
+                              help_text=_t('Capture output of the STDOUT of the ssh command execution. The ssh '
+                                           'command output must be in Java Properties file format and it must not exceed 2KB. '
+                                           'From within the workflow definition, the output of an ssh action node is accessible '
+                                           'via the String action:output(String node, String key) function'))
+
+  def get_params(self):
+    return json.loads(self.params)
+
+
+Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type)
 
 
 class ControlFlow(Node):
