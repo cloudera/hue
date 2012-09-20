@@ -134,9 +134,14 @@ ${ layout.menubar(section='workflows') }
               </div>
             % endif
 
+            % if node_type in ('pig', 'hive'):
               <button class="btn" data-bind="click: addParam">${ _('Add Param') }</button>
+            % endif
             % if node_type in ('pig'):
               <button class="btn" data-bind="click: addArgument">${ _('Add Argument') }</button>
+            % endif
+            % if node_type in ('sqoop'):
+              <button class="btn" data-bind="click: addArg">${ _('Add Arg') }</button>
             % endif
           </div>
         </div>
@@ -344,6 +349,10 @@ ${ layout.menubar(section='workflows') }
 
         self.addArgument = function() {
             self.params.push({ value: "", type: "argument" });
+        };
+
+        self.addArg = function() {
+            self.params.push({ value: "", type: "arg" });
         };
 
         self.removeParam = function(val) {

@@ -99,6 +99,12 @@ ${ layout.menubar(section='workflows') }
                   <i class="icon-plus"></i> ${ _('Hive') }
                 </a>
                 <p/>
+                <p>
+                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='sqoop', parent_action_id=workflow.end.get_parents()[0].id) }"
+                  title="${ _('Click to add to the end') }" class="btn">
+                  <i class="icon-plus"></i> ${ _('Sqoop') }
+                </a>
+                <p/>
               </div>
               <div class="tab-pane" id="import">
                 <p>
