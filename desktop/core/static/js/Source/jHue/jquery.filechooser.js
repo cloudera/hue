@@ -15,7 +15,8 @@
                 SELECT_FOLDER: "Select this folder",
                 CREATE_FOLDER: "Create folder",
                 FOLDER_NAME: "Folder name",
-                CANCEL: "Cancel"
+                CANCEL: "Cancel",
+                FILE_NOT_FOUND: "The file has not been found"
             },
             onFileChoose:function () {
             },
@@ -36,6 +37,9 @@
 
     Plugin.prototype.setOptions = function (options) {
         this.options = $.extend({}, defaults, options);
+        if ($.trim(this.options.initialPath) != "") {
+            this.navigateTo(this.options.initialPath);
+        }
     };
 
     Plugin.prototype.navigateTo = function (path) {
@@ -192,8 +196,12 @@
                     _actions.appendTo($(_parent.element));
                 }
             }
+        }).error(function(){
+            _parent.navigateTo("/?default_to_home");
+            if ($.jHueNotify) {
+                $.jHueNotify.info(_parent.options.labels.FILE_NOT_FOUND);
+            }
         });
-
     };
 
     var num_of_pending_uploads = 0;
