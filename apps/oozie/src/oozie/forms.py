@@ -22,7 +22,7 @@ from django.db.models import Q
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
-  Dataset, DataInput, DataOutput, Pig, Link, Hive
+  Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop
 
 LOG = logging.getLogger(__name__)
 
@@ -132,6 +132,22 @@ class PigForm(forms.ModelForm):
 class HiveForm(forms.ModelForm):
   class Meta:
     model = Hive
+    exclude = NodeForm.Meta.ALWAYS_HIDE
+    widgets = {
+      'job_properties': forms.widgets.HiddenInput(),
+      'prepares': forms.widgets.HiddenInput(),
+      'params': forms.widgets.HiddenInput(),
+      'script_path': forms.TextInput(attrs={'class': 'pathChooser span5'}),
+      'files': forms.widgets.HiddenInput(),
+      'archives': forms.widgets.HiddenInput(),
+      'description': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+    }
+
+
+class SqoopForm(forms.ModelForm):
+  class Meta:
+    model = Sqoop
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
       'job_properties': forms.widgets.HiddenInput(),
@@ -260,6 +276,7 @@ _node_type_TO_FORM_CLS = {
   Java.node_type: JavaForm,
   Pig.node_type: PigForm,
   Hive.node_type: HiveForm,
+  Sqoop.node_type: SqoopForm,
 }
 
 
