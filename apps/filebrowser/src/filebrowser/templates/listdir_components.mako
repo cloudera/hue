@@ -54,10 +54,10 @@ from django.utils.translation import ugettext as _
         }
     </style>
 
-    <table class="table table-striped table-condensed datatables" data-bind="">
+    <table class="table table-striped table-condensed datatables">
         <thead>
             <tr>
-                <th width="1%"><input id="selectAll" type="checkbox" data-bind="click: selectAll, checked: allSelected"/></th>
+                <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div></th>
                 <th class="sortable sorting" data-sort="type" width="4%" data-bind="click: sort">Type</th>
                 <th class="sortable sorting" data-sort="name" data-bind="click: sort">${_('Name')}</th>
                 <th class="sortable sorting" data-sort="size" width="10%" data-bind="click: sort">${_('Size')}</th>
@@ -88,10 +88,8 @@ from django.utils.translation import ugettext as _
 
     <script id="fileTemplate" type="text/html">
         <tr style="cursor: pointer">
-            <td class="center">
-                <label class="checkbox">
-                <input data-bind="value: path, checked: selected, visible: name != '..'" type="checkbox" data-row-selector-exclude="true"  />
-                </label>
+            <td class="center" data-bind="click: handleSelect" style="cursor: default">
+                <div data-bind="visible: name != '..', css: {hueCheckbox: name != '..', 'icon-ok': selected}"></div>
             </td>
             <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'icon-file': type == 'file', 'icon-folder-close': type != 'file'}"></i></td>
             <td data-bind="click: $root.viewFile">
@@ -461,7 +459,6 @@ from django.utils.translation import ugettext as _
                 }
             });
 
-
         });
 
 
@@ -495,7 +492,10 @@ from django.utils.translation import ugettext as _
                     group:file.stats.group,
                     mtime:moment.unix(file.stats.mtime).format("MMMM DD, YYYY hh:mm a")
                 },
-                selected:ko.observable(false)
+                selected:ko.observable(false),
+                handleSelect:function (row, e) {
+                    this.selected(!this.selected());
+                }
             }
         }
 
@@ -629,8 +629,9 @@ from django.utils.translation import ugettext as _
             };
 
             self.selectAll = function () {
+                self.allSelected(!self.allSelected());
                 ko.utils.arrayForEach(self.files(), function (file) {
-                    file.selected(!self.allSelected());
+                    file.selected(self.allSelected());
                 });
                 return true;
             };
