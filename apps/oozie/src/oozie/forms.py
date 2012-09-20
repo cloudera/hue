@@ -22,7 +22,7 @@ from django.db.models import Q
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
-  Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh
+  Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell
 
 LOG = logging.getLogger(__name__)
 
@@ -161,7 +161,7 @@ class SqoopForm(forms.ModelForm):
     }
 
 
-class ShellForm(forms.ModelForm):
+class SshForm(forms.ModelForm):
   class Meta:
     model = Ssh
     exclude = NodeForm.Meta.ALWAYS_HIDE
@@ -169,6 +169,23 @@ class ShellForm(forms.ModelForm):
       'params': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
     }
+
+
+class ShellForm(forms.ModelForm):
+  class Meta:
+    model = Shell
+    exclude = NodeForm.Meta.ALWAYS_HIDE
+    widgets = {
+      'job_properties': forms.widgets.HiddenInput(),
+      'prepares': forms.widgets.HiddenInput(),
+      'params': forms.widgets.HiddenInput(),
+      'command': forms.TextInput(attrs={'class': 'pathChooser span5'}),
+      'files': forms.widgets.HiddenInput(),
+      'archives': forms.widgets.HiddenInput(),
+      'description': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+    }
+
 
 
 class LinkForm(forms.ModelForm):
@@ -287,7 +304,8 @@ _node_type_TO_FORM_CLS = {
   Pig.node_type: PigForm,
   Hive.node_type: HiveForm,
   Sqoop.node_type: SqoopForm,
-  Ssh.node_type: ShellForm,
+  Ssh.node_type: SshForm,
+  Shell.node_type: ShellForm,
 }
 
 

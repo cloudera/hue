@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'Sqoop'
         db.create_table('oozie_sqoop', (
             ('files', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
@@ -20,14 +20,14 @@ class Migration(SchemaMigration):
             ('script_path', self.gf('django.db.models.fields.CharField')(default='', max_length=256, blank=True)),
         ))
         db.send_create_signal('oozie', ['Sqoop'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'Sqoop'
         db.delete_table('oozie_sqoop')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -240,5 +240,5 @@ class Migration(SchemaMigration):
             'start': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'start_workflow'", 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-    
+
     complete_apps = ['oozie']
