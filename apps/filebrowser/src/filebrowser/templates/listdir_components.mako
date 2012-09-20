@@ -445,9 +445,16 @@ from django.utils.translation import ugettext as _
             });
 
             $(window).bind("hashchange", function() {
+                var target = "";
                 var hash = window.location.hash.substring(1);
                 if (hash != null && hash != "") {
-                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + hash.substring(1));
+                    target = "${url('filebrowser.views.view', path=urlencode('/'))}" + hash.substring(1);
+                }
+                if (window.location.href.indexOf("#") == -1){
+                    target = "${current_request_path}";
+                }
+                if (target != ""){
+                    viewModel.targetPath(target);
                     viewModel.retrieveData();
                 }
             });
