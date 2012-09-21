@@ -283,10 +283,7 @@ def delete_workflow(request, workflow):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
-  workflow.coordinator_set.update(workflow=None) # In Django 1.3 could do ON DELETE set NULL
-  workflow.save()
-  workflow.delete()
-  Submission(request.user, workflow, request.fs, {}).remove_deployment_dir()
+  Workflow.objects.destroy(workflow, request.fs)
   request.info(_('Workflow deleted!'))
 
   return redirect(reverse('oozie:list_workflows'))
@@ -837,7 +834,7 @@ def setup_app(request):
     raise PopupException(_('A POST request is required.'))
   try:
     oozie_setup.Command().handle_noargs()
-    request.info(_('Workspace and examples installed!'))
+    request.info(_('Workspaces and examples installed!'))
   except WebHdfsException, e:
     raise PopupException(_('The app setup could complete.'), detail=e)
   return redirect(reverse('oozie:list_workflows'))

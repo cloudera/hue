@@ -31,12 +31,14 @@ from desktop.lib.test_utils import grant_access
 from jobsub.management.commands import jobsub_setup
 from jobsub.models import OozieDesign
 from liboozie import oozie_api
+from liboozie.conf import REMOTE_DEPLOYMENT_DIR
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   CoordinatorList, WorkflowAction
 
 from oozie.models import Workflow, Node, Job, Coordinator, Fork, History,\
   find_parameters
-from oozie.conf import SHARE_JOBS, REMOTE_DEPLOYMENT_DIR
+from oozie.conf import SHARE_JOBS
+
 
 LOG = logging.getLogger(__name__)
 
