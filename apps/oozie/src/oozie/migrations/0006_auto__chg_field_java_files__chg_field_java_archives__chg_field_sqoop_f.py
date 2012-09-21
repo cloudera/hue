@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'Java.files'
         db.alter_column('oozie_java', 'files', self.gf('django.db.models.fields.TextField')())
 
@@ -49,10 +49,10 @@ class Migration(SchemaMigration):
 
         # Changing field 'Hive.archives'
         db.alter_column('oozie_hive', 'archives', self.gf('django.db.models.fields.TextField')())
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'Java.files'
         db.alter_column('oozie_java', 'files', self.gf('django.db.models.fields.CharField')(max_length=512))
 
@@ -94,8 +94,8 @@ class Migration(SchemaMigration):
 
         # Changing field 'Hive.archives'
         db.alter_column('oozie_hive', 'archives', self.gf('django.db.models.fields.CharField')(max_length=512))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -329,5 +329,5 @@ class Migration(SchemaMigration):
             'start': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'start_workflow'", 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-    
+
     complete_apps = ['oozie']

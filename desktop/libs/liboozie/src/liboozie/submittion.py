@@ -26,7 +26,7 @@ from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.oozie_api import get_oozie
 
-from oozie.conf import REMOTE_DEPLOYMENT_DIR
+from liboozie.conf import REMOTE_DEPLOYMENT_DIR
 
 
 LOG = logging.getLogger(__name__)
@@ -107,9 +107,10 @@ class Submission(object):
     """
     if self.user != self.job.owner:
       path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
+      self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user)
     else:
       path = self.job.deployment_dir
-    self._create_dir(path)
+      self._create_dir(path)
     return path
 
   def _create_dir(self, path, perms=0711):
@@ -164,7 +165,7 @@ class Submission(object):
     prev_user = self.fs.user
     try:
       self.fs.setuser(username)
-      fn(*args, **kwargs)
+      return fn(*args, **kwargs)
     finally:
       self.fs.setuser(prev_user)
 

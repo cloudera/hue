@@ -37,20 +37,15 @@ LOCAL_SAMPLE_DATA_DIR = Config(
 
 REMOTE_SAMPLE_DIR = Config(
   key="remote_data_dir",
-  default="/user/hue/oozie/examples",
-  help=_("Location on HDFS where the oozie examples and templates are stored."))
-
-REMOTE_DEPLOYMENT_DIR = Config(
-  key="remote_data_dir",
-  default="/user/hue/oozie/deployments",
-  help=_("Location on HDFS where the workflows/coordinator are deployed when submitted."))
+  default="/user/hue/oozie/workspaces",
+  help=_("Location on HDFS where the oozie workflows are stored."))
 
 SHARE_JOBS = Config(
   key='share_jobs',
   default=True,
   type=coerce_bool,
   help=_('Share workflows and coordinators information with all users. If set to false, '
-       'they will be visible only to the owner and administrators.'))
+         'they will be visible only to the owner and administrators.'))
 
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',

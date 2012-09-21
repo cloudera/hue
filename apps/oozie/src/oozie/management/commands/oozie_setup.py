@@ -19,14 +19,16 @@ import logging
 import os
 import posixpath
 
+from django.contrib.auth.models import User
 from django.core import management
 from django.core.management.base import NoArgsCommand
 from django.utils.translation import ugettext as _
 
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
+from liboozie.conf import REMOTE_DEPLOYMENT_DIR
 
-from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_DEPLOYMENT_DIR, REMOTE_SAMPLE_DIR
+from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
 
 
 LOG = logging.getLogger(__name__)
@@ -53,8 +55,10 @@ class Command(NoArgsCommand):
     copy_dir(fs, local_dir, remote_data_dir)
 
     # Load jobs
-    management.call_command('loaddata', 'apps/oozie/src/oozie/fixtures/initial_data.json', verbosity=2)
-
+    sample, created = User.objects.get_or_create(username='sample')
+    management.call_command('loaddata', 'apps/oozie/src/oozie/fixtures/initial_example_data.json', verbosity=2)
+    from oozie.models import Job
+    Job.objects.filter(owner__id=1, pk__lte=15).update(owner=sample)
 
 
 # This should probably be refactored and some parts moved to the HDFS lib. Jobsub could be updated to.
