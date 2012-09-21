@@ -168,6 +168,7 @@ class SshForm(forms.ModelForm):
     widgets = {
       'params': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
+      'command': forms.TextInput(attrs={'class': 'pathChooser span5'}),
     }
 
 

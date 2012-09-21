@@ -55,6 +55,11 @@ ${ layout.menubar(section='workflows') }
         <p class="alert alert-info span5">
           ${ _('You can parameterize the values using uppercase') } <code>${"${"}VAR}</code>.
         </p>
+        % if node_type == 'ssh':
+          <p class="alert alert-warn span5">
+            ${ _('The ssh server requires passwordless login') }.
+          </p>
+        % endif        
         </div>
       </div>
 

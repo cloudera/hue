@@ -205,6 +205,13 @@ class WorkflowManager(models.Manager):
 
     return workflow
 
+  def destroy(self, workflow, fs):
+    Submission(workflow.owner, workflow, fs, {}).remove_deployment_dir()
+    workflow.coordinator_set.update(workflow=None) # In Django 1.3 could do ON DELETE set NULL
+    workflow.save()
+    workflow.delete()
+
+
 class Workflow(Job):
   """
   http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WorkflowFunctionalSpec.html
@@ -753,9 +760,7 @@ class Mapreduce(Action):
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
-      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
-                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   jar_path = models.CharField(max_length=PATH_MAX, verbose_name=_t('Jar path'),
@@ -788,9 +793,7 @@ class Streaming(Action):
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
-      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
-                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   mapper = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Mapper'),
@@ -816,9 +819,7 @@ class Java(Action):
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
-      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
-                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   jar_path = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Jar path'),
                               help_text=_t('Local or absolute path to the %(program)s jar file on HDFS') % {'program': 'Java'})
   main_class = models.CharField(max_length=256, blank=False, verbose_name=_t('Main class'),
@@ -864,9 +865,7 @@ class Pig(Action):
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
-      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
-                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
@@ -904,10 +903,8 @@ class Hive(Action):
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
-      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
-                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
-  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"},{"name":"oozie.hive.defaults","value":"${hive.default.xml}"}]',
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
+  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"},{"name":"oozie.hive.defaults","value":"hive-default.xml"}]',
                                     verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
@@ -938,16 +935,16 @@ class Sqoop(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
   node_type = 'sqoop'
 
-  script_path = models.CharField(max_length=256, blank=True, verbose_name=_t('Script path'), default='',
-                                 help_text=_t('Local path to the %(type)s script. e.g. my_script.sql') % {'type': node_type.title()})
+  script_path = models.TextField(blank=True, verbose_name=_t('Command'), default='',
+                                 help_text=_t('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below.')
+                                             % {'type': node_type.title()})
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
-                            help_text=_t('The %(type)s parameters of the script. e.g. "import", "--connect", ".."')  % {'type': node_type.title()})
+                            help_text=_t('If no command is specified, split the command by spaces and insert the %(type)s parameters '
+                                         'here e.g. import, --connect, jdbc:hsqldb:file:db.hsqldb, ...') % {'type': node_type.title()})
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
-      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
-                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]',
                                     verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
@@ -1008,9 +1005,7 @@ class Shell(Action):
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
-      help_text=_t('List of names or paths of the archives to be added to the distributed cache. '
-                   'To force a symlink to the uncompressed archive on the task running directory, use a \'#\' '
-                   'followed by the symlink name. For example \'myarch.zip#myarch\'.'))
+      help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
