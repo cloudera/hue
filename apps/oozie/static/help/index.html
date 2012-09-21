@@ -11,11 +11,11 @@
 <h2><a name="OozieEditorandDashboard-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1347586569160 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1347586569160 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1347586569160 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1348177494142 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1348177494142 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1348177494142 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1347586569160'>
+/*]]>*/</style><div class='rbtoc1348177494142'>
 <ul>
     <li><a href='#OozieEditorandDashboard-IntroducingOozie%26nbsp%3BEditor%2FDashboard'>Introducing Oozie&nbsp;Editor/Dashboard</a></li>
     <li><a href='#OozieEditorandDashboard-Oozie%26nbsp%3BEditor%2FDashboard%26nbsp%3BInstallationandConfiguration'>Oozie&nbsp;Editor/Dashboard&nbsp;Installation and Configuration</a></li>
@@ -49,13 +49,13 @@ div.rbtoc1347586569160 li {margin-left: 0px;padding-left: 0px;}
 
 <h1><a name="OozieEditorandDashboard-Oozie%26nbsp%3BEditor%2FDashboard%26nbsp%3BInstallationandConfiguration"></a>Oozie&nbsp;Editor/Dashboard&nbsp;Installation and Configuration</h1>
 
-<p>Oozie&nbsp;Editor/Dashboard&nbsp;is one of the applications that is installed as part of Hue. For more information about installing Hue, see&nbsp;<a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>. For information about Oozie, see&nbsp;<a href="http://archive.cloudera.com/cdh4/cdh/4/oozie/">http://archive.cloudera.com/cdh4/cdh/4/oozie/</a>.</p>
+<p>Oozie&nbsp;Editor/Dashboard&nbsp;is one of the applications that is installed as part of Hue. For more information about installing Hue, see&nbsp;<a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>. For information about Oozie, see&nbsp;<a href="http://archive.cloudera.com/cdh4/cdh/4/oozie/">Oozie Documentation</a>.</p>
 
 <div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b> In order to run streaming or Pig jobs as part of a workflow, Oozie must be configured to use the Oozie ShareLib.  If this is not the case, Pig and streaming actions will not run.  See <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a> for more information.</td></tr></table></div>
 
 <h1><a name="OozieEditorandDashboard-StartingOozie%26nbsp%3BEditor%2FDashboard"></a>Starting Oozie&nbsp;Editor/Dashboard</h1>
 
-<p>To start Oozie Editor/Dashboard, click the <b>Oozie Editor/Dashboard</b> icon ( <span class="image-wrap" style=""><img src="/jobsub/static/help/images/21627376.png" width="24" style="border: 0px solid black"/></span>) in the navigation bar at the top of the Hue browser page. <b>Oozie Editor/Dashboard</b> opens with the following screens:</p>
+<p>To start Oozie Editor/Dashboard, click the <b>Oozie Editor/Dashboard</b> icon ( <span class="image-wrap" style=""><img src="/oozie/static/art/icon.png" width="24" style="border: 0px solid black"/></span>) in the navigation bar at the top of the Hue browser page. <b>Oozie Editor/Dashboard</b> opens with the following screens:</p>
 
 <ul>
 	<li>Dashboad &#45;&nbsp;shows the running and completed workflow and coordinator jobs. The screen is selected and opened to the Workflows page.</li>
@@ -74,22 +74,38 @@ div.rbtoc1347586569160 li {margin-left: 0px;padding-left: 0px;}
 <p>In the Dashboard workflows and coordinators can only be viewed, submitted, and modified by its owner or a superuser.</p>
 
 <p>Editor permissions for performing actions on workflows and coordinators are summarized in the following table:</p>
+
+<style type="text/css">
+td.confluenceTd {
+border: #dddddd solid 1px;
+height: 36px;
+padding: 5px 10px;
+vertical-align: top;
+}
+th.confluenceTh {
+border: #dddddd solid 1px;
+height: 40px;
+padding: 5px 10px;
+vertical-align: center;
+}
+</style>
+
 <div class='table-wrap'>
 <table class='confluenceTable'><tbody>
 <tr>
 <th class='confluenceTh'> Action </th>
-<th class='confluenceTh'> Superuser or Owner<br class="atl-forced-newline" /> </th>
+<th class='confluenceTh'> Superuser or Owner <br class="atl-forced-newline" /> </th>
 <th class='confluenceTh'> All </th>
 </tr>
 <tr>
 <td class='confluenceTd'> View </td>
 <td class='confluenceTd'> Y </td>
-<td class='confluenceTd'> Only if "Is shared" is set<br class="atl-forced-newline" /> </td>
+<td class='confluenceTd'> Only if "Is shared" is set <br class="atl-forced-newline" /> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Submit </td>
 <td class='confluenceTd'> Y </td>
-<td class='confluenceTd'> Only if "Is shared" is set<br class="atl-forced-newline" /> </td>
+<td class='confluenceTd'> Only if "Is shared" is set <br class="atl-forced-newline" /> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Modify </td>
@@ -117,7 +133,7 @@ div.rbtoc1347586569160 li {margin-left: 0px;padding-left: 0px;}
 <p>For the selected workflow, the following tabs and information is available.</p>
 
 <ul>
-	<li>The <b>Graph</b>&nbsp;tab shows the DAG of the workflow.</li>
+	<li>The <b>Graph</b>&nbsp;tab shows the workflow DAG.</li>
 	<li>The <b>Actions</b> tab shows you details about the actions that make up this workflow.
 	<ul>
 		<li>Click the <b>Id</b>&nbsp;link to see additional details about this action.</li>
@@ -138,7 +154,7 @@ div.rbtoc1347586569160 li {margin-left: 0px;padding-left: 0px;}
 
 <p>For the selected coordinator, the following tabs and information is available.</p>
 <ul>
-	<li>The <b>Calendar</b> tab shows the timestamp of the job. Click the timestamp opens the graph of the workflow.&nbsp;</li>
+	<li>The <b>Calendar</b> tab shows the timestamp of the job. Click the timestamp to open the workflow DAG.&nbsp;</li>
 	<li>The&nbsp;<b>Actions</b>&nbsp;tab shows you details about the actions that make up this coordinator.
 	<ul>
 		<li>Click the&nbsp;<b>Id</b>&nbsp;link to see additional details about this action.</li>
@@ -206,10 +222,14 @@ div.rbtoc1347586569160 li {margin-left: 0px;padding-left: 0px;}
 
 
 <ul>
-	<li>Clone actions by clicking the&nbsp; <span class="image-wrap" style=""><img src="/jobsub/static/help/images/21627426.png" style="border: 0px solid black"/></span>&nbsp;button.</li>
-	<li>Create or remove a fork and join by moving an action up or down with the&nbsp; <span class="image-wrap" style=""><img src="/jobsub/static/help/images/21627427.png" style="border: 0px solid black"/></span>&nbsp;buttons.</li>
-	<li>Change the position of an action by clicking the&nbsp; <span class="image-wrap" style=""><img src="/jobsub/static/help/images/21627427.png" style="border: 0px solid black"/></span>&nbsp;buttons in the same direction twice.</li>
+	<li>Clone actions by clicking the&nbsp; <span class="image-wrap" style=""><img src="/oozie/static/help/retweet.png" style="border: 0px solid black"/></span>&nbsp;button.</li>
+	<li>Create or remove a fork and join by moving an action up or down with the&nbsp; <span class="image-wrap" style=""><img src="/oozie/static/help/updown.png" style="border: 0px solid black"/></span>&nbsp;buttons.</li>
+	<li>Change the position of an action by clicking the&nbsp; <span class="image-wrap" style=""><img src="/oozie/static/help/updown.png" style="border: 0px solid black"/></span>&nbsp;buttons in the same direction twice.</li>
 </ul>
+
+
+
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><font color="#222222">Each action must have a unique name.</font></td></tr></table></div>
 
 
 
@@ -225,17 +245,17 @@ div.rbtoc1347586569160 li {margin-left: 0px;padding-left: 0px;}
 
 <h2><a name="OozieEditorandDashboard-SubmittingaWorkflow"></a>Submitting a Workflow</h2>
 
-<p>To submit a workflow for execution, click the radio button next to the workflow and click the&nbsp;<b>Submit</b>&nbsp;button in the center of the Action Chooser.</p>
+<p>To submit a workflow for execution, click the radio button next to the workflow and click the&nbsp;<b>Submit</b>&nbsp;button.</p>
 
 
 <h2><a name="OozieEditorandDashboard-SchedulingaWorkflow"></a>Scheduling a Workflow</h2>
 
-<p>To schedule a workflow for recurring execution, click the radio button next to the workflow and click the&nbsp;<b>Schedule</b>&nbsp;button in the center of the Action Chooser. A coordinator is created and opened in the coordinator editor.</p>
+<p>To schedule a workflow for recurring execution, click the radio button next to the workflow and click the&nbsp;<b>Schedule</b>&nbsp;button. A coordinator is created and opened in the coordinator editor.</p>
 
 
 <h1><a name="OozieEditorandDashboard-CoordinatorEditor"></a>Coordinator Editor</h1>
 
-<p>The Coordinator Editor is where you create or edit Oozie coordinator applications and submit them for execution.&nbsp;The&nbsp;Workflow Editor&nbsp;contains one preinstalled sample coordinator.</p>
+<p>The Coordinator Editor is where you create or edit Oozie coordinator applications and submit them for execution.&nbsp;The&nbsp;Workflow Editor&nbsp;contains one pre-installed sample coordinator.</p>
 
 <h2><a name="OozieEditorandDashboard-Openinga%26nbsp%3BCoordinator"></a>Opening a&nbsp;Coordinator</h2>
 
@@ -266,7 +286,8 @@ div.rbtoc1347586569160 li {margin-left: 0px;padding-left: 0px;}
 	<li>To share the coordinator&nbsp;with all users, check the&nbsp;<b>Is shared</b>&nbsp;checkbox.</li>
 	<li>To set advanced execution options, click <b>advanced</b>&nbsp;and fill in properties that determine how long a coordinator will wait before timing out, how many coordinators can wait and run concurrently, the coordinator scheduling policy, and the coordinator schema version.</li>
 	<li>In the Frequency area, set how many time thes communicator will run for each specified unit, the start and end time of the coordinator, and the timezone of the start and end times.</li>
-	<li>In the Data area, click <b>Add</b> to add input and output datasets. If no datasets exist, follow the procedure in <a href="#OozieEditorandDashboard-CreatingaDataset">Creating a Dataset</a>.</li>
+	<li><font color="#222222">The inputs and outputs of the workflow must be mapped to some data. Click</font> <font color="#222222"><b>Add</b></font> <font color="#222222">and select a dataset from the Dataset drop-down menu and map it to one variable of your workflow.</font><br/>
+<font color="#222222">If no datasets exist, follow the procedure in</font>&nbsp;<a href="#OozieEditorandDashboard-CreatingaDataset">Creating a Dataset</a>.</li>
 	<li>Select a dataset from the <b>Dataset</b> drop-down menu.</li>
 	<li>Click <b>Save</b>.</li>
 </ol>
