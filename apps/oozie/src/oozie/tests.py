@@ -357,6 +357,7 @@ class TestEditor:
         '            <name-node>${nameNode}</name-node>\n'
         '            <prepare>\n'
         '                <delete path="${output}"/>\n'
+        '                <mkdir path="test"/>\n'
         '            </prepare>\n'
         '            <configuration>\n'
         '                <property>\n'
@@ -374,6 +375,7 @@ class TestEditor:
         '            <name-node>${nameNode}</name-node>\n'
         '            <prepare>\n'
         '                <delete path="${output}"/>\n'
+        '                <mkdir path="test"/>\n'
         '            </prepare>\n'
         '            <configuration>\n'
         '                <property>\n'
@@ -391,6 +393,7 @@ class TestEditor:
         '            <name-node>${nameNode}</name-node>\n'
         '            <prepare>\n'
         '                <delete path="${output}"/>\n'
+        '                <mkdir path="test"/>\n'
         '            </prepare>\n'
         '            <configuration>\n'
         '                <property>\n'
@@ -988,7 +991,7 @@ def add_action(workflow, action, name):
 
   response = c.post("/oozie/new_action/%s/%s/%s" % (workflow, 'mapreduce', action), {
      u'files': [u'[]'], u'name': [name], u'jar_path': [u'/tmp/.file.jar'], u'job_properties': [u'[{"name":"sleep","value":"${SLEEP}"}]'],
-     u'archives': [u'[]'], u'description': [u''], u'prepares': [u'[{"type":"delete","value":"${output}"}]']}, follow=True)
+     u'archives': [u'[]'], u'description': [u''], u'prepares': [u'[{"type":"delete","value":"${output}"},{"type":"mkdir","value":"test"}]']}, follow=True)
   assert_true(Node.objects.filter(name=name).exists(), response)
   return Node.objects.get(name=name)
 
