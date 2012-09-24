@@ -53,7 +53,9 @@ ${ layout.menubar(section='workflows') }
         <label class="control-label"></label>
         <div class="controls">
         <p class="alert alert-info span5">
-          ${ _('You can parameterize the values using uppercase') } <code>${"${"}VAR}</code>.
+          ${ _('All the paths are relative to the deployment directory. They can be absolute but this is not recommended.') }
+          <br/>
+          ${ _('You can parameterize values using case sensitive') } <code>${"${"}PARAMETER}</code>.
         </p>
         % if node_type == 'ssh':
           <p class="alert alert-warn span5">
@@ -469,7 +471,8 @@ ${ layout.menubar(section='workflows') }
               inputElement.change();
               $("#chooseFile").modal("hide");
           },
-          createFolder: false
+          createFolder: false,
+          initialPath: "${ workflow.deployment_dir }"
         });
         $("#chooseFile").modal("show");
       })

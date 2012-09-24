@@ -763,10 +763,10 @@ class Mapreduce(Action):
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
-  jar_path = models.CharField(max_length=PATH_MAX, verbose_name=_t('Jar path'),
-                              help_text=_t('Local or absolute path to the %(program)s jar file on HDFS') % {'program': 'MapReduce'})
+  jar_path = models.CharField(max_length=PATH_MAX, verbose_name=_t('Jar name'),
+                              help_text=_t('Name or path to the %(program)s jar file on HDFS. e.g. examples.jar') % {'program': 'MapReduce'})
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of paths to delete or create before starting the application. '
+                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
@@ -820,8 +820,8 @@ class Java(Action):
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
-  jar_path = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Jar path'),
-                              help_text=_t('Local or absolute path to the %(program)s jar file on HDFS') % {'program': 'Java'})
+  jar_path = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Jar name'),
+                              help_text=_t('Name or path to the %(program)s jar file on HDFS. e.g. examples.jar') % {'program': 'Java'})
   main_class = models.CharField(max_length=256, blank=False, verbose_name=_t('Main class'),
                                 help_text=_t('Full name of the Java class. e.g. org.apache.hadoop.examples.Grep'))
   args = models.CharField(max_length=4096, blank=True, verbose_name=_t('Arguments'),
@@ -834,7 +834,7 @@ class Java(Action):
   job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of paths to delete then list of paths to create before starting the application. '
+                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
@@ -858,8 +858,8 @@ class Pig(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
   node_type = 'pig'
 
-  script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script path'),
-                                 help_text=_t('Local path to the Pig script. e.g. my_script.pig'))
+  script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script name'),
+                                 help_text=_t('Script name or path to the Pig script. e.g. my_script.pig'))
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
                             help_text=_t('The Pig parameters of the script. e.g. "-param", "INPUT=${inputDir}"'))
   files = models.TextField(default="[]", verbose_name=_t('Files'),
@@ -869,7 +869,7 @@ class Pig(Action):
   job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of paths to delete then list of paths to create before starting the application. '
+                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
@@ -896,8 +896,8 @@ class Hive(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
   node_type = 'hive'
 
-  script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script path'),
-                                 help_text=_t('Local path to the %(type)s script. e.g. my_script.sql') % {'type': node_type.title()})
+  script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script name'),
+                                 help_text=_t('Script name or path to the %(type)s script. e.g. my_script.sql') % {'type': node_type.title()})
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
                             help_text=_t('The %(type)s parameters of the script. e.g. "-param", "INPUT=${inputDir}"')  % {'type': node_type.title()})
   files = models.TextField(default="[]", verbose_name=_t('Files'),
@@ -908,7 +908,7 @@ class Hive(Action):
                                     verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of paths to delete then list of paths to create before starting the application. '
+                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
@@ -949,7 +949,7 @@ class Sqoop(Action):
                                     verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of paths to delete then list of paths to create before starting the application. '
+                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
@@ -1009,7 +1009,7 @@ class Shell(Action):
   job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of paths to delete then list of paths to create before starting the application. '
+                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
