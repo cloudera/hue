@@ -25,7 +25,7 @@
             ${ common.configuration(node.get_properties()) }
 
             % if node.script_path:
-            <script>${ node.script_path }</script>
+            <command>${ node.script_path }</command>
             % endif
 
             % for param in node.get_params():
