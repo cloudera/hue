@@ -576,6 +576,10 @@ from django.utils.translation import ugettext as _
             self.retrieveData = function () {
                 self.isLoading(true);
                 $.getJSON(self.targetPath() + "?pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + self.searchQuery() + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
+                    if (data.type != null && data.type == "file"){
+                        location.href = data.url;
+                        return false;
+                    }
                     self.updateFileList(data.files, data.page, data.breadcrumbs, data.current_dir_path);
                     if ($("#hueBreadcrumbText").is(":visible")){
                         $(".hueBreadcrumb").show();
