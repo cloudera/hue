@@ -153,7 +153,7 @@ class SqoopForm(forms.ModelForm):
       'job_properties': forms.widgets.HiddenInput(),
       'prepares': forms.widgets.HiddenInput(),
       'params': forms.widgets.HiddenInput(),
-      'script_path': forms.TextInput(attrs={'class': 'pathChooser span5'}),
+      'script_path': forms.Textarea(attrs={'class': 'span8'}),
       'files': forms.widgets.HiddenInput(),
       'archives': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
