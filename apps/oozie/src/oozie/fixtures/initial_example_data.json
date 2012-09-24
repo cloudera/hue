@@ -1040,7 +1040,7 @@
       "node_type": "sqoop",
       "workflow": 12,
       "name": "Sqoop",
-      "description": "Export data from the table"
+      "description": "Export data from the table TT"
     }
   },
   {
@@ -1261,13 +1261,13 @@
     "pk": 56,
     "model": "oozie.sqoop",
     "fields": {
-      "files": "[\"TT.java\",\"db.hsqldb.properties\",\"db.hsqldb.script\"]",
+      "files": "[\"db.hsqldb.properties\",\"db.hsqldb.script\"]",
       "job_xml": "",
       "job_properties": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
-      "params": "[{\"value\":\"import\",\"type\":\"arg\"},{\"value\":\"--connect\",\"type\":\"arg\"},{\"value\":\"jdbc:hsqldb:file:db.hsqldb\",\"type\":\"arg\"},{\"value\":\"--table\",\"type\":\"arg\"},{\"value\":\"TT\",\"type\":\"arg\"},{\"value\":\"--target-dir\",\"type\":\"arg\"},{\"value\":\"${output}\",\"type\":\"arg\"},{\"value\":\"-m\",\"type\":\"arg\"},{\"value\":\"1\",\"type\":\"arg\"}]",
+      "params": "[]",
       "archives": "[]",
-      "prepares": "[]",
-      "script_path": ""
+      "prepares": "[{\"value\":\"${output}\",\"type\":\"delete\"}]",
+      "script_path": "import --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir ${output} -m 1"
     }
   },
   {

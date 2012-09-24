@@ -26,7 +26,7 @@ import posixpath
         % if prepares:
             <prepare>
                 % for p in prepares:
-                <${ p['type'] } path="${ p['value'] }"/>
+                <${ p['type'] } path="${'${'}nameNode}${ p['value'] }"/>
                 % endfor
             </prepare>
         % endif
