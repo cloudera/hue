@@ -57,8 +57,25 @@ from django.utils.translation import ugettext as _
     % endif
   </style>
 
+  <script type="text/javascript" charset="utf-8">
+
+      // jHue plugins global configuration
+      jHueFileChooserGlobals = {
+          labels: {
+              BACK: "${_('Back')}",
+              SELECT_FOLDER: "${_('Select this folder')}",
+              CREATE_FOLDER: "${_('Create folder')}",
+              FOLDER_NAME: "${_('Folder name')}",
+              CANCEL: "${_('Cancel')}",
+              FILE_NOT_FOUND: "${_('The file has not been found')}",
+              UPLOAD_FILE: "${_('Upload a file')}",
+              FAILED: "${_('Failed')}"
+          }
+      };
+
+  </script>
+
   <script src="/static/ext/js/jquery/jquery-1.8.1.min.js"></script>
-  <script src="/static/js/Source/jHue/jquery.showusername.js"></script>
   <script src="/static/js/Source/jHue/jquery.filechooser.js"></script>
   <script src="/static/js/Source/jHue/jquery.selector.js"></script>
   <script src="/static/js/Source/jHue/jquery.alert.js"></script>

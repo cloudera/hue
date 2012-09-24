@@ -5,6 +5,8 @@
 (function ($, window, document, undefined) {
 
     var pluginName = "jHueFileChooser",
+        // global variables (jHueFileChooserGlobals, useful for i18n) can be set on
+        // desktop/templates/common_header.mako
         defaults = {
             initialPath:"",
             createFolder:true,
@@ -16,7 +18,9 @@
                 CREATE_FOLDER: "Create folder",
                 FOLDER_NAME: "Folder name",
                 CANCEL: "Cancel",
-                FILE_NOT_FOUND: "The file has not been found"
+                FILE_NOT_FOUND: "The file has not been found",
+                UPLOAD_FILE: "Upload a file",
+                FAILED: "Failed"
             },
             onFileChoose:function () {
             },
@@ -28,7 +32,20 @@
 
     function Plugin(element, options) {
         this.element = element;
-        this.options = $.extend({}, defaults, options);
+        if (typeof jHueFileChooserGlobals != 'undefined') {
+            var extendedDefaults = $.extend({}, defaults, jHueFileChooserGlobals);
+            extendedDefaults.labels = $.extend({}, defaults.labels, jHueFileChooserGlobals.labels);
+            this.options = $.extend({}, extendedDefaults, options);
+            if (options != null){
+                this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
+            }
+        }
+        else {
+            this.options = $.extend({}, defaults, options);
+            if (options != null){
+                this.options.labels = $.extend({}, defaults.labels, options.labels);
+            }
+        }
         this._defaults = defaults;
         this._name = pluginName;
         this.previousPath = "";
@@ -123,7 +140,7 @@
                     _uploadFileBtn = $("<div>").attr("id", "file-uploader");
                     _uploadFileBtn.appendTo(_actions);
                     _showActions = true;
-                    initUploader(path, _parent, _uploadFileBtn);
+                    initUploader(path, _parent, _uploadFileBtn, _parent.options.labels);
                 }
                 if (_parent.options.selectFolder) {
                     _selectFolderBtn = $("<a>").addClass("btn").addClass("small").text(_parent.options.labels.SELECT_FOLDER);
@@ -206,7 +223,7 @@
     };
 
     var num_of_pending_uploads = 0;
-    function initUploader(path, _parent, el) {
+    function initUploader(path, _parent, el, labels) {
         var uploader = new qq.FileUploader({
             element:el[0],
             action:'/filebrowser/upload',
@@ -223,6 +240,18 @@
             onSubmit: function(id, fileName){
                 num_of_pending_uploads++;
             },
+            template: '<div class="qq-uploader">' +
+                '<div class="qq-upload-drop-area"><span></span></div>' +
+                '<div class="qq-upload-button">' + labels.UPLOAD_FILE + '</div>' +
+                '<ul class="qq-upload-list"></ul>' +
+                '</div>',
+            fileTemplate: '<li>' +
+                '<span class="qq-upload-file"></span>' +
+                '<span class="qq-upload-spinner"></span>' +
+                '<span class="qq-upload-size"></span>' +
+                '<a class="qq-upload-cancel" href="#">' + labels.CANCEL + '</a>' +
+                '<span class="qq-upload-failed-text">' + labels.FAILED + '</span>' +
+                '</li>',
             debug:false
         });
     }
