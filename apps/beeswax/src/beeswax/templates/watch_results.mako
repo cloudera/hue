@@ -101,13 +101,11 @@ ${layout.menubar(section='query')}
 					<div class="pagination pull-right">
 				    	<ul>
 							% if start_row != 0:
-				            <li><a href="${ url('beeswax.views.view_results', query.id, 0) }" title="${_('Back to first row')}">${_('Back to first row')}</a></li>
-							% else:
-							<li class="active"><a href="#" title="${_('Back to first row')}">${_('Back to first row')}</a></li>
+                                <li class="prev"><a title="${_('Beginning of List')}" href="${ url('beeswax.views.view_results', query.id, 0) }${'?context='+context_param if context_param else ''|n}">&larr; ${_('Beginning of List')}</a></li>
 				            % endif
-							% if has_more:
-				    		<li><a href="${ url('beeswax.views.view_results', query.id, next_row) }" title="${_('Next page')}">${_('Next page')} &rarr;</a></li>
-							% endif
+                            % if has_more and len(results) == 100:
+                                <li><a title="${_('Next page')}" href="${ url('beeswax.views.view_results', query.id, next_row) }${'?context='+context_param if context_param else ''|n}">${_('Next Page')} &rarr;</a></li>
+                            % endif
 				    	</ul>
 				    </div>
 		          % endif

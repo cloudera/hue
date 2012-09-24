@@ -895,7 +895,8 @@ def view_results(request, id, first_row=0):
   query_history = authorized_get_history(request, id, must_exist=True)
 
   handle = QueryHandle(id=query_history.server_id, log_context=query_history.log_context)
-  context = _parse_query_context(request.GET.get('context'))
+  context_param = request.GET.get('context', '')
+  context = _parse_query_context(context_param)
 
   # Retrieve query results
   try:
@@ -947,6 +948,7 @@ def view_results(request, id, first_row=0):
     'query_context': context,
     'save_form': save_form,
     'can_save': query_history.owner == request.user,
+    'context_param': context_param,
   })
 
 

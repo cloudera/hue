@@ -157,6 +157,7 @@ ${layout.menubar(section='history')}
                 null,
                 null,
                 null,
+                null,
                 { "bSortable": false }
             ],
             "oLanguage": {
