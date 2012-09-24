@@ -443,6 +443,7 @@ def listdir_paged(request, path):
         'cwd_set': True,
         'file_filter': 'any',
         'current_dir_path': path,
+        'is_fs_superuser': request.user.username == request.fs.superuser
     }
     return render('listdir.mako', request, data)
 
