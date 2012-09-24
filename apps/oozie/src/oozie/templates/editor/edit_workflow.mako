@@ -284,19 +284,14 @@ modal-window .modal-content {
         }
       });
     });
-    /*
-    var viewModel = function(){};
-    window.viewModel = new viewModel();
-    ko.applyBindings(window.viewModel);
 
-     */
      ko.applyBindings(window.viewModelparameters, $("#parameters")[0]);
      ko.applyBindings(window.viewModeljob_properties, $("#job_properties")[0]);
 
     $('#jobForm').submit(function() {
-    window.viewModelparameters.pre_submit();
-    window.viewModeljob_properties.pre_submit();
-  })
+      window.viewModelparameters.pre_submit();
+      window.viewModeljob_properties.pre_submit();
+    })
 
     $("a[data-row-selector='true']").jHueRowSelector();
 
