@@ -2,7 +2,7 @@
 
 <p>The Oozie Editor/Dashboard application allows you to define Oozie workflow and coordinator applications, run workflow and coordinator jobs, and view the status of jobs.&nbsp;</p>
 
-<p>A&nbsp;workflow&nbsp;application is a collection of actions arranged in a directed acyclic graph (DAG). It includes control flow nodes (start, end, fork, join, and kill) and action nodes (MapReduce, Pig, streaming, or Java actions). The current release does not support the decision control flow node and the fs and Oozie sub-workflow action nodes.</p>
+<p>A&nbsp;workflow&nbsp;application is a collection of actions arranged in a directed acyclic graph (DAG). It includes control flow nodes (start, end, fork, join, and kill) and action nodes (MapReduce, streaming, Java, Pig, Hive, Sqoop, Shell, and ssh actions). The current release does not support the decision control flow node and the fs and Oozie sub-workflow action nodes.</p>
 
 <p>A&nbsp;coordinator&nbsp;application allows you to define and execute recurrent and interdependent workflow jobs. The coordinator application defines the conditions under which the execution of workflows can occur.</p>
 
@@ -11,11 +11,11 @@
 <h2><a name="OozieEditorandDashboard-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1348177494142 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1348177494142 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1348177494142 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1348526886180 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1348526886180 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1348526886180 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1348177494142'>
+/*]]>*/</style><div class='rbtoc1348526886180'>
 <ul>
     <li><a href='#OozieEditorandDashboard-IntroducingOozie%26nbsp%3BEditor%2FDashboard'>Introducing Oozie&nbsp;Editor/Dashboard</a></li>
     <li><a href='#OozieEditorandDashboard-Oozie%26nbsp%3BEditor%2FDashboard%26nbsp%3BInstallationandConfiguration'>Oozie&nbsp;Editor/Dashboard&nbsp;Installation and Configuration</a></li>
@@ -172,7 +172,7 @@ vertical-align: center;
 
 <p>The Workflow Editor is where you create or edit Oozie workflows and submit them for execution.&nbsp;The&nbsp;Workflow Editor&nbsp;comes with several preinstalled sample workflows.</p>
 
-<p>In Workflow Editor, you can create workflows that include MapReduce, Pig, streaming, and Java actions. You can create these actions in the Workflow Editor, or you can import job designs from Job Designer to be used as actions in your workflow.</p>
+<p>In Workflow Editor, you can create workflows that include MapReduce, streaming, Java, Pig, Hive, Sqoop, Shell, and ssh&nbsp;actions. You can create these actions in the Workflow Editor, or you can import job designs from Job Designer to be used as actions in your workflow.</p>
 
 <p>Click the <b>Workflows</b> tab to open the Workflow editor.</p>
 
@@ -208,23 +208,26 @@ vertical-align: center;
 <p>In the workflow editor you can add and delete actions, clone actions, create and remove fork and join control nodes, and move actions as follows:</p>
 
 <ul>
-	<li>Add actions to the workflow:
+	<li>Add actions to the workflow by doing one of the following:
 	<ul>
-		<li>In the Add tab, click a&nbsp;<b>&#43;&nbsp;</b><b><em>action</em></b> button,<b><em>&nbsp;</em></b>where <em>action</em> is MapReduce, Streaming, Java, or Pig.</li>
-		<li>In the Import tab, &nbsp;click the <b>+ Job Design</b> button.
+		<li>Click the <b>Add</b> tab.&nbsp;
 		<ol>
+			<li>Click a&nbsp;<b>&#43;&nbsp;</b><b><em>action</em></b> button,<b><em>&nbsp;</em></b>where <em>action</em> is MapReduce, Streaming, Java, Pig, Hive, Sqoop, Shell, or Ssh.</li>
+			<li>Set the action properties and click <b>Save</b>.</li>
+		</ol>
+		</li>
+		<li>Click the <b>Import</b> tab.
+		<ol>
+			<li>Click the <b>+ Job Design</b> button.</li>
 			<li>Click a radio button next to a job design and click&nbsp;<b>Import</b>.</li>
 		</ol>
 		</li>
 	</ul>
 	</li>
-</ul>
-
-
-<ul>
 	<li>Clone actions by clicking the&nbsp; <span class="image-wrap" style=""><img src="/oozie/static/help/retweet.png" style="border: 0px solid black"/></span>&nbsp;button.</li>
 	<li>Create or remove a fork and join by moving an action up or down with the&nbsp; <span class="image-wrap" style=""><img src="/oozie/static/help/updown.png" style="border: 0px solid black"/></span>&nbsp;buttons.</li>
 	<li>Change the position of an action by clicking the&nbsp; <span class="image-wrap" style=""><img src="/oozie/static/help/updown.png" style="border: 0px solid black"/></span>&nbsp;buttons in the same direction twice.</li>
+	<li><font color="#222222">To upload a file (for example,</font>&nbsp;<font color="#222222">a Pig script)&nbsp;</font><font color="#222222">to the folder containing the files referenced by the workflow, click the</font>&nbsp;<font color="#222222"><b>Upload</b></font><font color="#222222">&nbsp;button.</font></li>
 </ul>
 
 
