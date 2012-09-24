@@ -33,7 +33,8 @@
   dt_attrs=None,
   title_klass=None,
   button_text=False,
-  nolabel=False
+  nolabel=False,
+  file_chooser=False,
   )">
 <%
   if value is None:
@@ -89,7 +90,11 @@
         % elif hidden:
           <input type="hidden" name="${field.html_name | n}" ${make_attr_str(attrs) | n} value="${extract_field_data(field)}"></input>
         % else:
-          <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" class="${cls}" ${make_attr_str(attrs) | n}/>
+          %if file_chooser:
+            <${tag} type="text" name="${field.html_name | n}" value="${extract_field_data(field) or ''}" class="${cls}" ${make_attr_str(attrs) | n}/><a class="btn fileChooserBtn" href="#" data-filechooser-destination="${field.html_name | n}">..</a>
+          %else:
+            <${tag} type="text" name="${field.html_name | n}" value="${extract_field_data(field) or ''}" class="${cls}" ${make_attr_str(attrs) | n}/>
+          %endif
         % endif
       % endif
       % if help:
@@ -102,4 +107,3 @@
       </div>
     % endif
 </%def>
-

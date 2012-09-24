@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
     <div class="modal-body">
         <div style="padding-left: 15px;">
         ${edit.render_field(form["src_path"], hidden=True)}
-        ${edit.render_field(form["dest_path"], notitle=True, klass="input-xlarge pathChooser")}
+        <label for="id_dest_path">${_('Destination')}</label>${edit.render_field(form["dest_path"], notitle=True, nolabel=True, klass="input-xlarge pathChooser", file_chooser=True)}
         </div>
         <br/>
         <div id="fileChooserModal" class="smallModal well hide">
@@ -43,17 +43,20 @@ from django.utils.translation import ugettext as _
 </form>
 
 <script type="text/javascript" charset="utf-8">
-    $(".pathChooser").click(function(){
-        var self = this;
+    $(".fileChooserBtn").click(function(e){
+        e.preventDefault();
+        var _destination = $(this).attr("data-filechooser-destination");
         $("#fileChooserModal").jHueFileChooser({
-            initialPath: $(self).val(),
-            onFileChoose: function(filePath) {
-                $(self).val(filePath);
-            },
+            initialPath: $("input[name='"+_destination+"']").val(),
             onFolderChange: function(folderPath){
-                $(self).val(folderPath);
+                $("input[name='"+_destination+"']").val(folderPath);
             },
-            createFolder: false,
+            onFolderChoose: function(folderPath){
+                $("input[name='"+_destination+"']").val(folderPath);
+                $("#fileChooserModal").slideUp();
+            },
+            selectFolder: true,
+            createFolder: true,
             uploadFile: false
         });
         $("#fileChooserModal").slideDown();

@@ -50,7 +50,7 @@
             if (data.title != null && data.title == "Error") {
                 var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message);
                 _errorMsg.appendTo($(_parent.element));
-                var _previousLink = $("<button>").addClass("btn").addClass("bnt-small").text(_parent.options.labels.BACK).click(function () {
+                var _previousLink = $("<a>").addClass("btn").addClass("bnt-small").text(_parent.options.labels.BACK).click(function () {
                     _parent.options.onFolderChange(_parent.previousPath);
                     _parent.navigateTo(_parent.previousPath);
                 });
@@ -87,6 +87,7 @@
                     }
                     _crumb.click(function () {
                         var _url = (crumb.url != null && crumb.url != "") ? crumb.url : "/";
+                        _parent.options.onFolderChange(_url);
                         _parent.navigateTo(_url);
                     });
                     _crumb.appendTo(_breadcrumbs);
@@ -125,7 +126,7 @@
                     initUploader(path, _parent, _uploadFileBtn);
                 }
                 if (_parent.options.selectFolder) {
-                    _selectFolderBtn = $("<button>").addClass("btn").addClass("small").text(_parent.options.labels.SELECT_FOLDER);
+                    _selectFolderBtn = $("<a>").addClass("btn").addClass("small").text(_parent.options.labels.SELECT_FOLDER);
                     if (_parent.options.uploadFile){
                         _selectFolderBtn.css("margin-top", "10px");
                     }
@@ -137,7 +138,7 @@
                 }
                 $("<span> </span>").appendTo(_actions);
                 if (_parent.options.createFolder) {
-                    _createFolderBtn = $("<button>").addClass("btn").addClass("small").text(_parent.options.labels.CREATE_FOLDER);
+                    _createFolderBtn = $("<a>").addClass("btn").addClass("small").text(_parent.options.labels.CREATE_FOLDER);
                     if (_parent.options.uploadFile){
                         _createFolderBtn.css("margin-top", "10px");
                     }
