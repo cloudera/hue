@@ -38,16 +38,16 @@ ${layout.menubar(section='dashboard')}
         ${ _('Show only') }
         </span>
         <span class="btn-group" style="float:left">
-          <a class="btn btn-date btn-info">1</a>
-          <a class="btn btn-date btn-info">7</a>
-          <a class="btn btn-date btn-info">15</a>
-          <a class="btn btn-date btn-info">30</a>
+          <a class="btn btn-date btn-info" data-value="1">${ _('1') }</a>
+          <a class="btn btn-date btn-info" data-value="7">${ _('7') }</a>
+          <a class="btn btn-date btn-info" data-value="15">${ _('15') }</a>
+          <a class="btn btn-date btn-info" data-value="30">${ _('30') }</a>
         </span>
         <span style="float:left;padding-left:10px;padding-right:10px;margin-top:3px">${ _('days with status') }</span>
         <span class="btn-group" style="float:left;">
-        <a class="btn btn-status btn-success">Succeeded</a>
-        <a class="btn btn-status btn-warning">Running</a>
-        <a class="btn btn-status btn-danger">Killed</a>
+          <a class="btn btn-status btn-success" data-value='SUCCEEDED'>${ _('Succeeded') }</a>
+          <a class="btn btn-status btn-warning" data-value='RUNNING'>${ _('Running') }</a>
+          <a class="btn btn-status btn-danger" data-value='KILLED'>${ _('Killed') }</a>
         </span>
    </form>
   </div>
@@ -264,8 +264,8 @@ ${layout.menubar(section='dashboard')}
         statusFilter = true;
         if (statusBtn.length > 0) {
           statuses = []
-         $.each(statusBtn.contents(), function() {
-            statuses.push($(this).text());
+          $.each(statusBtn, function() {
+            statuses.push($(this).attr('data-value'));
           });
           statusFilter = aData[1].match(RegExp(statuses.join('|'), "i")) != null;
         }
@@ -273,7 +273,7 @@ ${layout.menubar(section='dashboard')}
         dateBtn = $('a.btn-date.active');
         dateFilter = true;
         if (dateBtn.length > 0) {
-          minAge = new Date() - parseInt(dateBtn.text()) * 1000 * 60 * 60 * 24;
+          minAge = new Date() - parseInt(dateBtn.attr('data-value')) * 1000 * 60 * 60 * 24;
           dateFilter = Date.parse(aData[0]) >= minAge;
         }
 
