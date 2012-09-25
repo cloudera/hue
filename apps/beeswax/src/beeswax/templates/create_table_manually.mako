@@ -125,7 +125,7 @@ ${layout.menubar(section='tables')}
 	                ${comps.bootstrapLabel(table_form["field_terminator"])}
 	                <div class="controls">
 	                    ${comps.field(table_form["field_terminator"], render_default=True)}
-	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
+	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed. Terminator must be exactly one character.')}</span>
 	                    <span class="help-block">
 	                        ${_('Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.')}
 	                    </span>
@@ -135,7 +135,7 @@ ${layout.menubar(section='tables')}
 	                ${comps.bootstrapLabel(table_form["collection_terminator"])}
 	                <div class="controls">
 	                    ${comps.field(table_form["collection_terminator"], render_default=True)}
-	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
+	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed. Terminator must be exactly one character.')}</span>
 	                    <span class="help-block">
 	                        ${_('Use for array types.')}
 	                    </span>
@@ -145,7 +145,7 @@ ${layout.menubar(section='tables')}
 	                ${comps.bootstrapLabel(table_form["map_key_terminator"])}
 	                <div class="controls">
 	                    ${comps.field(table_form["map_key_terminator"], render_default=True)}
-	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
+	                    <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed. Terminator must be exactly one character.')}</span>
 	                    <span class="help-block">
 	                        ${_('Use for map types.')}
 	                    </span>
@@ -191,7 +191,7 @@ ${layout.menubar(section='tables')}
 	            ${_('Use')} <strong>InputFormat</strong> ${_('to choose a custom implementation.')}
 	            <br/>
 	        </div>
-	
+
 	        <div class="control-group">
 	            <label id="fileFormatRadio" class="control-label">${_('File format')}</label>
 	            <div class="controls">
@@ -251,7 +251,7 @@ ${layout.menubar(section='tables')}
 	                </span>
 	            </div>
 	        </div>
-	
+
 	        <div id="location" class="control-group hide">
 	            ${comps.bootstrapLabel(table_form["external_location"])}
 	            <div class="controls">
@@ -261,7 +261,6 @@ ${layout.menubar(section='tables')}
 	                file_chooser=True,
 	                show_errors=False
 	                )}
-	                <span class="help-inline"><a id="pathChooser" href="#" class="btn" data-filechooser-destination="table-external_location">${_('Choose File')}</a></span>
 	                <span class="help-block">
 	                ${_("Enter the path (on HDFS) to your table's data location")}
 	                </span>
@@ -526,6 +525,16 @@ ${layout.menubar(section='tables')}
             }
         });
 
+        // fire the event on page load
+        $("#id_table-field_terminator_0").change();
+        $("#id_table-collection_terminator_0").change();
+        $("#id_table-map_key_terminator_0").change();
+
+        // show the first validation error if any
+        if ($(".errorlist").length > 0){
+            $(".step[href='#"+$(".errorlist").eq(0).closest(".stepDetails").attr("id")+"']").click();
+        }
+
         $("input[name='table-row_format']").change(function(){
             $(".stepDetailsInner").hide();
             $("#step3"+$(this).val()).show();
@@ -600,7 +609,7 @@ ${layout.menubar(section='tables')}
             // step 3
             var step3Valid = true;
             var fieldTerminatorFld = $("#id_table-field_terminator_1");
-            if ($("#id_table-field_terminator_0").val() == "__other__" && !isValid($.trim(fieldTerminatorFld.val()))) {
+            if ($("#id_table-field_terminator_0").val() == "__other__" && (!isValid($.trim(fieldTerminatorFld.val())) || $.trim(fieldTerminatorFld.val()).length != 1)) {
                 showFieldError(fieldTerminatorFld);
                 step3Valid = false;
             }
@@ -609,7 +618,7 @@ ${layout.menubar(section='tables')}
             }
 
             var collectionTerminatorFld = $("#id_table-collection_terminator_1");
-            if ($("#id_table-collection_terminator_0").val() == "__other__" && !isValid($.trim(collectionTerminatorFld.val()))) {
+            if ($("#id_table-collection_terminator_0").val() == "__other__" && (!isValid($.trim(collectionTerminatorFld.val())) || $.trim(collectionTerminatorFld.val()).length != 1)) {
                 showFieldError(collectionTerminatorFld);
                 step3Valid = false;
             }
@@ -618,7 +627,7 @@ ${layout.menubar(section='tables')}
             }
 
             var mapKeyTerminatorFld = $("#id_table-map_key_terminator_1");
-            if ($("#id_table-map_key_terminator_0").val() == "__other__" && !isValid($.trim(mapKeyTerminatorFld.val()))) {
+            if ($("#id_table-map_key_terminator_0").val() == "__other__" && (!isValid($.trim(mapKeyTerminatorFld.val())) || $.trim(mapKeyTerminatorFld.val()).length != 1)) {
                 showFieldError(mapKeyTerminatorFld);
                 step3Valid = false;
             }
