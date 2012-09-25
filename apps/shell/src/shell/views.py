@@ -79,24 +79,6 @@ def kill_shell(request):
   result = shell_manager.kill_shell(username, shell_id)
   return HttpResponse(result)
 
-def restore_shell(request):
-  if not _running_with_spawning(request):
-    result = simplejson.dumps({ constants.NOT_RUNNING_SPAWNING : True })
-    return HttpResponse(result, mimetype="application/json")
-  shell_manager = ShellManager.global_instance()
-  username = request.user.username
-  shell_id = request.POST[constants.SHELL_ID]
-  SHELL_OUTPUT_LOGGER.info("%s %s - shell_id:%s - Attempting restore" %
-                      (request.META.get('REMOTE_ADDR'), username, shell_id))
-  result = shell_manager.get_previous_output(username, shell_id)
-  log_output = {}
-  if constants.OUTPUT in result:
-    log_output[constants.OUTPUT] = result[constants.OUTPUT]
-  log_output = repr(log_output)
-  SHELL_OUTPUT_LOGGER.info("%s %s - shell_id:%s - Restore output: '%s'" %
-              (request.META.get('REMOTE_ADDR'), username, shell_id, log_output ))
-  return HttpResponse(simplejson.dumps(result), mimetype="application/json")
-
 def process_command(request):
   if not _running_with_spawning(request):
     result = simplejson.dumps({ constants.NOT_RUNNING_SPAWNING : True })

@@ -18,51 +18,25 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-% if shells:
-    ${commonheader(_('Hue Shell'), "shell", user, "100px")}
-% else:
-    ${commonheader(_('Hue Shell'), "shell", user)}
-% endif
 
+${commonheader(_('Hue Shell'), "shell", user, "100px")}
 
-% if shells:
 <div class="subnav subnav-fixed">
     <div class="container-fluid">
         <ul class="nav nav-pills">
-            % if len(shells) == 1:
-                % if shells[0]["exists"]:
-                    <li><a href="${url('shell.views.create')}?keyName=${shells[0]["keyName"]}" class="${shells[0]["keyName"]}">${shells[0]["niceName"]}</a></li>
+            % for shell in shells:
+                % if shell["exists"]:
+                    <li><a href="${url('shell.views.create')}?keyName=${shell["keyName"]}" class="${shell["keyName"]}">${shell["niceName"]}</a></li>
                 % else:
-                    <li><a href="#" class="disabled">${shells[0]["niceName"]}</a></li>
+                    <li><a href="#" class="disabled">${shell["niceName"]}</a></li>
                 % endif
-            % else:
-                % if shells[0]["exists"]:
-                    <li><a href="${url('shell.views.create')}?keyName=${shells[0]["keyName"]}" class="${shells[0]["keyName"]}">${shells[0]["niceName"]}</a></li>
-                % else:
-                    <li><a href="#" class="disabled">${shells[0]["niceName"]}</a></li>
-                % endif
-                % for item in shells[1:-1]:
-                    % if item["exists"]:
-                        <li><a href="${url('shell.views.create')}?keyName=${item["keyName"]}" class="${item["keyName"]}">${item["niceName"]}</a></li>
-                    % else:
-                        <li><a href="#" class="disabled">${item["niceName"]}</a></li>
-                    % endif
-                % endfor
-                % if shells[-1]["exists"]:
-                    <li><a href="${url('shell.views.create')}?keyName=${shells[-1]["keyName"]}" class="${shells[-1]["keyName"]}">${shells[-1]["niceName"]}</a></li>
-                % else:
-                    <li><a href="#" class="disabled">${shells[-1]["niceName"]}</a></li>
-                % endif
-            % endif
+            % endfor
         </ul>
     </div>
 </div>
 
-% endif
-
 
 <div class="container-fluid">
-
   % if shell_id:
     <style type="text/css" media="screen">
         body {

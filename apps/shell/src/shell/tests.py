@@ -77,8 +77,8 @@ def test_spawning_check():
   client = make_logged_in_client(username="test", is_superuser=True)
 
   get_urls = ["/shell/", "/shell/create"]
-  post_urls = ["/shell/create", "/shell/process_command", "/shell/restore_shell",
-               "/shell/kill_shell", "/shell/retrieve_output", "/shell/add_to_output"]
+  post_urls = ["/shell/create", "/shell/process_command", "/shell/kill_shell",
+               "/shell/retrieve_output", "/shell/add_to_output"]
   for url in get_urls:
     response = client.get(url, follow=True)
     assert "The webserver currently running Hue does not support the Shell" in response.content
