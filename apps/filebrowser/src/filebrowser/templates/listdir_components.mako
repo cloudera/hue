@@ -423,9 +423,18 @@ from django.utils.translation import ugettext as _
             });
 
             $("#hueBreadcrumbText").keyup(function(e){
-                if (e.keyCode == 13){
-                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + $(this).val().substring(1));
-                    viewModel.retrieveData();
+                if (e.keyCode == 13) {
+                    var _el = $(this);
+                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + _el.val().substring(1));
+                    viewModel.getStats(function (data) {
+                        if (data.type != null && data.type == "file") {
+                            location.href = data.url;
+                            return false;
+                        }
+                        else {
+                            window.location.hash = _el.val();
+                        }
+                    });
                 }
             });
 
@@ -572,6 +581,10 @@ from django.utils.translation import ugettext as _
             }, self);
 
             self.currentPath = ko.observable(currentDirPath);
+
+            self.getStats = function (callback) {
+                $.getJSON(self.targetPath() + "?pagesize=1&format=json", callback);
+            }
 
             self.retrieveData = function () {
                 self.isLoading(true);
