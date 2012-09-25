@@ -17,6 +17,7 @@
 
 from django import forms
 from django.forms import FileField, CharField, BooleanField, Textarea
+from django.forms.formsets import formset_factory, BaseFormSet, ManagementForm
 
 from desktop.lib import i18n
 from filebrowser.lib import rwx
@@ -27,6 +28,26 @@ from django.utils.translation import ugettext_lazy as _
 
 import logging
 logger = logging.getLogger(__name__)
+
+class FormSet(BaseFormSet):
+  def __init__(self, data=None, prefix=None, *args, **kwargs):
+    self.prefix = prefix or self.get_default_prefix()
+    if data:
+      self.data = {}
+      # Add management field info
+      # This is hard coded given that none of these keys or info is exportable
+      # This could be a problem point if the management form changes in later releases
+      self.data['%s-TOTAL_FORMS' % self.prefix] = len(data)
+      self.data['%s-INITIAL_FORMS' % self.prefix] = len(data)
+      self.data['%s-MAX_NUM_FORMS' % self.prefix] = 0
+
+      # Add correct data
+      for i in range(0, len(data)):
+        prefix = self.add_prefix(i)
+        for field in data[i]:
+          self.data['%s-%s' % (prefix, field)] = data[i][field]
+    BaseFormSet.__init__(self, self.data, self.prefix, *args, **kwargs)
+
 
 class PathField(CharField):
   def __init__(self, label, help_text=None, **kwargs):
@@ -53,6 +74,11 @@ class RenameForm(forms.Form):
   src_path = CharField(label=_("File to rename"), help_text=_("The file to rename."))
   dest_path = CharField(label=_("New name"), help_text=_("Rename the file to:"))
 
+class BaseRenameFormSet(FormSet):
+  op = "rename"
+
+RenameFormSet = formset_factory(RenameForm, formset=BaseRenameFormSet, extra=0)
+
 class UploadFileForm(forms.Form):
   op = "upload"
   # The "hdfs" prefix in "hdfs_file" triggers the HDFSfileUploadHandler
@@ -75,6 +101,11 @@ class RmDirForm(forms.Form):
 class RmTreeForm(forms.Form):
   op = "rmtree"
   path = PathField(label=_("Directory to remove (recursively)"))
+
+class BaseRmTreeFormset(FormSet):
+  op = "rmtree"
+
+RmTreeFormSet = formset_factory(RmTreeForm, formset=BaseRmTreeFormset, extra=0)
 
 class MkDirForm(forms.Form):
   op = "mkdir"
@@ -103,6 +134,11 @@ class ChownForm(forms.Form):
     self.all_groups = [ group.name for group in Group.objects.all() ]
     self.all_users = [ user.username for user in User.objects.all() ]
 
+class BaseChownFormSet(FormSet):
+  op = "chown"
+
+ChownFormSet = formset_factory(ChownForm, formset=BaseChownFormSet, extra=0)
+
 class ChmodForm(forms.Form):
   op = "chmod"
   path = PathField(label=_("Path to change permissions"))
@@ -126,7 +162,7 @@ class ChmodForm(forms.Form):
       "other_read", "other_write", "other_execute",
       "sticky")
 
-  def __init__(self, initial):
+  def __init__(self, initial, *args, **kwargs):
     logging.info(dir(self))
     logging.info(dir(type(self)))
     # Convert from string representation.
@@ -137,11 +173,15 @@ class ChmodForm(forms.Form):
       for name, b in zip(self.names, bools):
         initial[name] = b
     logging.debug(initial)
-    forms.Form.__init__(self, initial)
+    kwargs['initial'] = initial
+    forms.Form.__init__(self, *args, **kwargs)
 
-  def is_valid(self):
-    if forms.Form.is_valid(self):
+  def full_clean(self):
+    forms.Form.full_clean(self)
+    if hasattr(self, "cleaned_data"):
       self.cleaned_data["mode"] = rwx.compress_mode(map(lambda name: self.cleaned_data[name], self.names))
-      return True
-    else:
-      return False
+
+class BaseChmodFormSet(FormSet):
+  op = "chmod"
+
+ChmodFormSet = formset_factory(ChmodForm, formset=BaseChmodFormSet, extra=0)

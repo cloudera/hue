@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 import datetime
+from django import forms
 from django.template.defaultfilters import urlencode, escape, stringformat, date, filesizeformat, time
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
@@ -30,7 +31,14 @@ ${commonheader(_('File Operation'), 'filebrowser', user)}
 <div class="well">
 <form action="" method="POST" enctype="multipart/form-data" class="form-stacked">
 <h1>${form.op}</h1>
-${form.as_p()|n}
+% if isinstance(form, forms.Form):
+	${form.as_p()|n}
+% else:
+	% for _form in form.forms:
+		${_form.as_p()|n}
+	% endfor
+	${form.management_form}
+% endif
 <div>
 <input type="submit" value="${('Submit')}" class="btn primary" />
 <a href="${urlencode(next)}" class="btn">${('Cancel')}</a>

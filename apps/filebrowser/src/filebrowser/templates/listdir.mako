@@ -35,12 +35,12 @@ ${commonheader(_('File Browser'), 'filebrowser', user)}
 
         <%def name="actions()">
             <button class="btn fileToolbarBtn" title="${_('Rename')}" data-bind="click: renameFile, enable: selectedFiles().length == 1"><i class="icon-font"></i> ${_('Rename')}</button>
-            <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length == 1"><i class="icon-random"></i> ${_('Move')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0"><i class="icon-random"></i> ${_('Move')}</button>
             %if is_fs_superuser:
-                <button class="btn fileToolbarBtn" title="${_('Change Owner / Group')}" data-bind="click: changeOwner, enable: selectedFiles().length == 1"><i class="icon-user"></i> ${_('Change Owner / Group')}</button>
+                <button class="btn fileToolbarBtn" title="${_('Change Owner / Group')}" data-bind="click: changeOwner, enable: selectedFiles().length > 0"><i class="icon-user"></i> ${_('Change Owner / Group')}</button>
             %endif
-            <button class="btn fileToolbarBtn" title="${_('Change Permissions')}" data-bind="click: changePermissions, enable: selectedFiles().length == 1"><i class="icon-list-alt"></i> ${_('Change Permissions')}</button>
-            <button class="btn fileToolbarBtn" title="${_('Delete')}" data-bind="click: deleteSelected, enable: selectedFiles().length == 1"><i class="icon-trash"></i> ${_('Delete')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Change Permissions')}" data-bind="click: changePermissions, enable: selectedFiles().length > 0"><i class="icon-list-alt"></i> ${_('Change Permissions')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Delete')}" data-bind="click: deleteSelected, enable: selectedFiles().length > 0"><i class="icon-trash"></i> ${_('Delete')}</button>
         </%def>
 
         <%def name="creation()">

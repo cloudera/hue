@@ -34,10 +34,13 @@ try:
 except ImportError:
   import simplejson as json
 
+from django import forms
 from django.contrib import messages
-from django.core import urlresolvers
+from django.contrib.auth.models import User, Group
+from django.core import urlresolvers, serializers
 from django.template.defaultfilters import stringformat, filesizeformat
 from django.http import Http404, HttpResponse, HttpResponseNotModified
+from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.utils.functional import curry
 from django.utils.http import http_date, urlquote
@@ -54,7 +57,8 @@ from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm,\
-    RmDirForm, RmTreeForm, RemoveForm, ChmodForm, ChownForm, EditorForm, TouchForm
+    RmDirForm, RmTreeForm, RemoveForm, ChmodForm, ChownForm, EditorForm, TouchForm,\
+    RenameFormSet, RmTreeFormSet, ChmodFormSet,ChownFormSet
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -337,6 +341,10 @@ def listdir(request, path, chooser):
         'current_request_path': request.path,
         'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
         'cwd_set': True,
+        'is_superuser': request.user.username == request.fs.superuser,
+        'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
+        'users': request.user.username == request.fs.superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
+        'superuser': request.fs.superuser,
         'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0]
     }
 
@@ -444,7 +452,11 @@ def listdir_paged(request, path):
         'cwd_set': True,
         'file_filter': 'any',
         'current_dir_path': path,
-        'is_fs_superuser': request.user.username == request.fs.superuser
+        'is_fs_superuser': request.user.username == request.fs.superuser,
+        'is_superuser': request.user.username == request.fs.superuser,
+        'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
+        'users': request.user.username == request.fs.superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
+        'superuser': request.fs.superuser
     }
     return render('listdir.mako', request, data)
 
@@ -737,7 +749,94 @@ def _calculate_navigation(offset, length, size):
     return first, prev, next, last
 
 
-def generic_op(form_class, request, op, parameter_names, piggyback=None, template="fileop.mako", extra_params=None):
+def default_initial_value_extractor(request, parameter_names):
+    initial_values = {}
+    for p in parameter_names:
+        val = request.GET.get(p)
+        if val:
+            initial_values[p] = val
+    return initial_values
+
+
+def formset_initial_value_extractor(request, parameter_names):
+    """
+    Builds a list of data that formsets should use by extending some fields to every object,
+    whilst others are assumed to be received in order.
+    Formsets should receive data that looks like this: [{'param1': <something>,...}, ...].
+    The formsets should then handle construction on their own.
+    """
+    def _intial_value_extractor(request):
+        if not submitted:
+            return []
+        # Build data with list of in order parameters receive in POST data
+        # Size can be inferred from largest list returned in POST data
+        data = []
+        for param in submitted:
+            i = 0
+            for val in request.POST.getlist(param):
+                if len(data) == i:
+                    data.append({})
+                data[i][param] = val
+                i += 1
+        # Extend every data object with recurring params
+        for kwargs in data:
+            for recurrent in recurring:
+                kwargs[recurrent] = request.POST.get(recurrent)
+        initial_data = data
+        return {'initial': initial_data}
+
+    return _intial_value_extractor
+
+
+def default_arg_extractor(request, form, parameter_names):
+    return [form.cleaned_data[p] for p in parameter_names]
+
+
+def formset_arg_extractor(request, formset, parameter_names):
+    data = []
+    for form in formset.forms:
+        data_dict = {}
+        for p in parameter_names:
+            data_dict[p] = form.cleaned_data[p]
+        data.append(data_dict)
+    return data
+
+
+def default_data_extractor(request):
+    return {'data': request.POST.copy()}
+
+
+def formset_data_extractor(recurring=[], submitted=[]):
+    """
+    Builds a list of data that formsets should use by extending some fields to every object,
+    whilst others are assumed to be received in order.
+    Formsets should receive data that looks like this: [{'param1': <something>,...}, ...].
+    The formsets should then handle construction on their own.
+    """
+    def _data_extractor(request):
+        if not submitted:
+            return []
+        # Build data with list of in order parameters receive in POST data
+        # Size can be inferred from largest list returned in POST data
+        data = []
+        for param in submitted:
+            i = 0
+            for val in request.POST.getlist(param):
+                if len(data) == i:
+                    data.append({})
+                data[i][param] = val
+                i += 1
+        # Extend every data object with recurring params
+        for kwargs in data:
+            for recurrent in recurring:
+                kwargs[recurrent] = request.POST.get(recurrent)
+        initial = list(data)
+        return {'initial': initial, 'data': data}
+
+    return _data_extractor
+
+
+def generic_op(form_class, request, op, parameter_names, piggyback=None, template="fileop.mako", data_extractor=default_data_extractor, arg_extractor=default_arg_extractor, initial_value_extractor=default_initial_value_extractor, extra_params=None):
     """
     Generic implementation for several operations.
 
@@ -746,12 +845,13 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
     @param op callable with the filesystem operation
     @param parameter_names list of form parameters that are extracted and then passed to op
     @param piggyback list of form parameters whose file stats to look up after the operation
+    @param data_extractor function that extracts POST data to be used by op
+    @param arg_extractor function that extracts args from a given form or formset
+    @param initial_value_extractor function that extracts the initial values of a form or formset
     @param extra_params dictionary of extra parameters to send to the template for rendering
     """
     # Use next for non-ajax requests, when available.
-    next = request.GET.get("next")
-    if next is None:
-        next = request.POST.get("next")
+    next = request.GET.get("next", request.POST.get("next", None))
 
     ret = dict({
         'next': next
@@ -766,10 +866,10 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
             ret[p] = val
 
     if request.method == 'POST':
-        form = form_class(request.POST)
+        form = form_class(**data_extractor(request))
         ret['form'] = form
         if form.is_valid():
-            args = [form.cleaned_data[p] for p in parameter_names]
+            args = arg_extractor(request, form, parameter_names)
             try:
                 op(*args)
             except (IOError, WebHdfsException), e:
@@ -794,21 +894,14 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 logger.exception("Exception while processing piggyback data")
                 ret["result_error"] = True
 
+            ret['user'] = request.user
             return render(template, request, ret)
     else:
-        # Initial parameters may be specified with get
-        initial_values = {}
-        for p in parameter_names:
-            val = request.GET.get(p)
-            if val:
-                initial_values[p] = val
-        form = form_class(initial=initial_values)
-        ret['form'] = form
+        # Initial parameters may be specified with get with the default extractor
+        initial_values = initial_value_extractor(request, parameter_names)
+        formset = form_class(initial=initial_values)
+        ret['form'] = formset
     return render(template, request, ret)
-
-
-def move(request):
-    return generic_op(RenameForm, request, request.fs.rename, ["src_path", "dest_path"], None, template="move.mako")
 
 
 def rename(request):
@@ -832,7 +925,6 @@ def mkdir(request):
 
     return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
 
-
 def touch(request):
     def smart_touch(path, name):
         # Make sure only the filename is specified.
@@ -843,40 +935,71 @@ def touch(request):
 
     return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
-
-def remove(request):
-    return generic_op(RemoveForm, request, request.fs.remove, ["path"], None)
-
-
-def rmdir(request):
-    return generic_op(RmDirForm, request, request.fs.rmdir, ["path"], None)
-
-
+@require_http_methods(["POST"])
 def rmtree(request):
-    return generic_op(RmTreeForm, request, request.fs.rmtree, ["path"], None)
+    recurring = []
+    params = ["path"]
+    def bulk_rmtree(*args, **kwargs):
+        for arg in args:
+            request.fs.rmtree(arg['path'])
+    return generic_op(RmTreeFormSet, request, bulk_rmtree, ["path"], None,
+                      data_extractor=formset_data_extractor(recurring, params),
+                      arg_extractor=formset_arg_extractor,
+                      initial_value_extractor=formset_initial_value_extractor)
 
 
+@require_http_methods(["POST"])
+def move(request):
+    recurring = ['dest_path']
+    params = ['src_path']
+    def bulk_move(*args, **kwargs):
+        for arg in args:
+            request.fs.rename(arg['src_path'], arg['dest_path'])
+    return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
+                      data_extractor=formset_data_extractor(recurring, params),
+                      arg_extractor=formset_arg_extractor,
+                      initial_value_extractor=formset_initial_value_extractor)
+
+
+@require_http_methods(["POST"])
 def chmod(request):
+    recurring = ["sticky", "user_read", "user_write", "user_execute", "group_read", "group_write", "group_execute", "other_read", "other_write", "other_execute"]
+    params = ["path"]
+    def bulk_chmod(*args, **kwargs):
+        op = curry(request.fs.chmod, recursive=request.POST.get('recursive', False))
+        for arg in args:
+            op(arg['path'], arg['mode'])
     # mode here is abused: on input, it's a string, but when retrieved,
     # it's an int.
-    op = curry(request.fs.chmod, recursive=request.POST.get('recursive', False))
-    return generic_op(ChmodForm, request, op, ["path", "mode"], "path", template="chmod.mako")
+    return generic_op(ChmodFormSet, request, bulk_chmod, ['path', 'mode'], "path",
+                      data_extractor=formset_data_extractor(recurring, params),
+                      arg_extractor=formset_arg_extractor,
+                      initial_value_extractor=formset_initial_value_extractor)
 
 
+@require_http_methods(["POST"])
 def chown(request):
     # This is a bit clever: generic_op takes an argument (here, args), indicating
     # which POST parameters to pick out and pass to the given function.
     # We update that mapping based on whether or not the user selected "other".
-    args = ["path", "user", "group"]
+    param_names = ["path", "user", "group"]
     if request.POST.get("user") == "__other__":
-        args[1] = "user_other"
+        param_names[1] = "user_other"
     if request.POST.get("group") == "__other__":
-        args[2] = "group_other"
+        param_names[2] = "group_other"
 
-    op = curry(request.fs.chown, recursive=request.POST.get('recursive', False))
-    return generic_op(ChownForm, request, op, args, "path", template="chown.mako",
-                      extra_params=dict(current_user=request.user,
-                      superuser=request.fs.superuser))
+    recurring = ["user", "group", "user_other", "group_other"]
+    params = ["path"]
+    def bulk_chown(*args, **kwargs):
+        op = curry(request.fs.chown, recursive=request.POST.get('recursive', False))
+        for arg in args:
+            varg = [arg[param] for param in param_names]
+            op(*varg)
+
+    return generic_op(ChownFormSet, request, bulk_chown, param_names, "path",
+                      data_extractor=formset_data_extractor(recurring, params),
+                      arg_extractor=formset_arg_extractor,
+                      initial_value_extractor=formset_initial_value_extractor)
 
 
 def upload_flash(request):

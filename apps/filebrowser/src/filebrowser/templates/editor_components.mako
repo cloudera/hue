@@ -24,6 +24,7 @@
   hidden=False,
   notitle=False,
   tag='input',
+  name=None,
   klass=None,
   attrs=None,
   value=None,
@@ -82,18 +83,18 @@
         ${unicode(field) | n}
       % else:
         % if tag == 'textarea':
-          <textarea name="${field.html_name | n}" ${make_attr_str(attrs) | n} />${extract_field_data(field) or ''}</textarea>
+          <textarea name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} />${extract_field_data(field) or ''}</textarea>
         % elif tag == 'button':
-          <button name="${field.html_name | n}" ${make_attr_str(attrs) | n} value="${value}"/>${button_text or field.name or ''}</button>
+          <button name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} value="${value}"/>${button_text or field.name or ''}</button>
         % elif tag == 'checkbox':
-          <input type="checkbox" name="${field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""}/>${button_text or field.name or ''}</input>
+          <input type="checkbox" name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""}/>${button_text or field.name or ''}</input>
         % elif hidden:
-          <input type="hidden" name="${field.html_name | n}" ${make_attr_str(attrs) | n} value="${extract_field_data(field)}"></input>
+          <input type="hidden" name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} value="${extract_field_data(field)}"></input>
         % else:
           %if file_chooser:
-            <${tag} type="text" name="${field.html_name | n}" value="${extract_field_data(field) or ''}" class="${cls}" ${make_attr_str(attrs) | n}/><a class="btn fileChooserBtn" href="#" data-filechooser-destination="${field.html_name | n}">..</a>
+            <${tag} type="text" name="${name or field.html_name | n}" value="${extract_field_data(field) or ''}" class="${cls}" ${make_attr_str(attrs) | n}/><a class="btn fileChooserBtn" href="#" data-filechooser-destination="${field.html_name | n}">..</a>
           %else:
-            <${tag} type="text" name="${field.html_name | n}" value="${extract_field_data(field) or ''}" class="${cls}" ${make_attr_str(attrs) | n}/>
+            <${tag} type="text" name="${name or field.html_name | n}" value="${extract_field_data(field) or ''}" class="${cls}" ${make_attr_str(attrs) | n}/>
           %endif
         % endif
       % endif
@@ -105,5 +106,39 @@
       <div class="beeswax_error">
          ${unicode(field.errors) | n}
       </div>
+    % endif
+</%def>
+
+## Puts together a selection list with an "other" field as well.
+<%def name="selection(name, choices, current_value, other_key=None)">
+    <% seen = False %>
+    % if len(choices) == 0:
+      <select name="${name}" class="hide">
+    % else:
+      <select name="${name}">
+    % endif
+    % for choice in choices:
+      % if choice == current_value:
+        <% seen = True %>
+        <option selected>${choice}</option>
+      % else:
+        <option>${choice}</option>
+      % endif
+    % endfor
+    % if is_superuser:
+      % if seen or not current_value:
+        <option value="__other__">Other</option>
+      % else:
+        <option value="__other__" selected="true">Other</option>
+      % endif
+    % endif
+
+    </select>
+    % if is_superuser:
+      % if seen or not current_value:
+        <input name="${other_key}" class="hide">
+      % else:
+        <input name="${other_key}" value="${current_value}">
+      % endif
     % endif
 </%def>

@@ -44,6 +44,98 @@ LOG = logging.getLogger(__name__)
 
 
 @attr('requires_hadoop')
+def test_remove():
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    c = make_logged_in_client(cluster.superuser)
+    cluster.fs.setuser(cluster.superuser)
+
+    prefix = '/test-delete'
+    PATH_1 = '/%s/1' % prefix
+    PATH_2 = '/%s/2' % prefix
+    PATH_3 = '/%s/3' % prefix
+    cluster.fs.mkdir(prefix)
+    cluster.fs.mkdir(PATH_1)
+    cluster.fs.mkdir(PATH_2)
+    cluster.fs.mkdir(PATH_3)
+
+    assert_true(cluster.fs.exists(PATH_1))
+    assert_true(cluster.fs.exists(PATH_2))
+    assert_true(cluster.fs.exists(PATH_3))
+
+    c.post('/filebrowser/rmtree', dict(path=[PATH_1]))
+    assert_false(cluster.fs.exists(PATH_1))
+    assert_true(cluster.fs.exists(PATH_2))
+    assert_true(cluster.fs.exists(PATH_3))
+
+    c.post('/filebrowser/rmtree', dict(path=[PATH_2, PATH_3]))
+    assert_false(cluster.fs.exists(PATH_1))
+    assert_false(cluster.fs.exists(PATH_2))
+    assert_false(cluster.fs.exists(PATH_3))
+
+  finally:
+    try:
+      cluster.fs.rmtree(prefix)     # Clean up
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+
+
+@attr('requires_hadoop')
+def test_move():
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    c = make_logged_in_client(cluster.superuser)
+    cluster.fs.setuser(cluster.superuser)
+
+    prefix = '/test-move'
+    PATH_1 = '%s/1' % prefix
+    PATH_2 = '%s/2' % prefix
+    SUB_PATH1_1 = '%s/1' % PATH_1
+    SUB_PATH1_2 = '%s/2' % PATH_1
+    SUB_PATH1_3 = '%s/3' % PATH_1
+    SUB_PATH2_1 = '%s/1' % PATH_2
+    SUB_PATH2_2 = '%s/2' % PATH_2
+    SUB_PATH2_3 = '%s/3' % PATH_2
+    cluster.fs.mkdir(prefix)
+    cluster.fs.mkdir(PATH_1)
+    cluster.fs.mkdir(PATH_2)
+    cluster.fs.mkdir(SUB_PATH1_1)
+    cluster.fs.mkdir(SUB_PATH1_2)
+    cluster.fs.mkdir(SUB_PATH1_3)
+
+    assert_true(cluster.fs.exists(SUB_PATH1_1))
+    assert_true(cluster.fs.exists(SUB_PATH1_2))
+    assert_true(cluster.fs.exists(SUB_PATH1_3))
+    assert_false(cluster.fs.exists(SUB_PATH2_1))
+    assert_false(cluster.fs.exists(SUB_PATH2_2))
+    assert_false(cluster.fs.exists(SUB_PATH2_3))
+
+    c.post('/filebrowser/move', dict(src_path=[SUB_PATH1_1], dest_path=PATH_2))
+    assert_false(cluster.fs.exists(SUB_PATH1_1))
+    assert_true(cluster.fs.exists(SUB_PATH1_2))
+    assert_true(cluster.fs.exists(SUB_PATH1_3))
+    assert_true(cluster.fs.exists(SUB_PATH2_1))
+    assert_false(cluster.fs.exists(SUB_PATH2_2))
+    assert_false(cluster.fs.exists(SUB_PATH2_3))
+
+    c.post('/filebrowser/move', dict(src_path=[SUB_PATH1_2, SUB_PATH1_3], dest_path=PATH_2))
+    assert_false(cluster.fs.exists(SUB_PATH1_1))
+    assert_false(cluster.fs.exists(SUB_PATH1_2))
+    assert_false(cluster.fs.exists(SUB_PATH1_3))
+    assert_true(cluster.fs.exists(SUB_PATH2_1))
+    assert_true(cluster.fs.exists(SUB_PATH2_2))
+    assert_true(cluster.fs.exists(SUB_PATH2_3))
+
+  finally:
+    try:
+      cluster.fs.rmtree(prefix)     # Clean up
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+
+
+@attr('requires_hadoop')
 def test_mkdir_singledir():
   cluster = pseudo_hdfs4.shared_cluster()
   cluster.fs.setuser('test')
@@ -131,7 +223,7 @@ def test_chmod():
 
     # Setup post data
     permissions_dict = dict( zip(permissions, [True]*len(permissions)) )
-    kwargs = {'path': PATH}
+    kwargs = {'path': [PATH]}
     kwargs.update(permissions_dict)
 
     # Set 1777, then check permissions of dirs
@@ -144,9 +236,23 @@ def test_chmod():
     response = c.post("/filebrowser/chmod", kwargs)
     assert_equal(041777, int(cluster.fs.stats(SUBPATH)["mode"]))
 
+    # Test bulk chmod
+    PATH_2 = u"/test-chmod2"
+    PATH_3 = u"/test-chown3"
+    cluster.fs.mkdir(PATH_2)
+    cluster.fs.mkdir(PATH_3)
+    kwargs['path'] = [PATH_2, PATH_3]
+    assert_not_equal(041777, int(cluster.fs.stats(PATH_2)["mode"]))
+    assert_not_equal(041777, int(cluster.fs.stats(PATH_3)["mode"]))
+    c.post("/filebrowser/chmod", kwargs)
+    assert_equal(041777, int(cluster.fs.stats(PATH_2)["mode"]))
+    assert_equal(041777, int(cluster.fs.stats(PATH_3)["mode"]))
+
   finally:
     try:
       cluster.fs.rmtree(PATH)     # Clean up
+      cluster.fs.rmtree(PATH_2)     # Clean up
+      cluster.fs.rmtree(PATH_3)     # Clean up
     except:
       pass      # Don't let cleanup errors mask earlier failures
 
@@ -173,7 +279,7 @@ def test_chmod_sticky():
         'sticky') # Order matters!
     permissions_dict = dict(filter(lambda x: x[1], zip(permissions, mode)))
     permissions_dict['sticky'] = True
-    kwargs = {'path': PATH}
+    kwargs = {'path': [PATH]}
     kwargs.update(permissions_dict)
 
     # Set sticky bit, then check sticky bit is on in hdfs
@@ -204,50 +310,52 @@ def test_chown():
 
   PATH = u"/test-chown-en-Español"
   cluster.fs.mkdir(PATH)
-  c.post("/filebrowser/chown", dict(path=PATH, user="x", group="y"))
+  c.post("/filebrowser/chown", dict(path=[PATH], user="x", group="y"))
   assert_equal("x", cluster.fs.stats(PATH)["user"])
   assert_equal("y", cluster.fs.stats(PATH)["group"])
-  c.post("/filebrowser/chown", dict(path=PATH, user="__other__", user_other="z", group="y"))
+  c.post("/filebrowser/chown", dict(path=[PATH], user="__other__", user_other="z", group="y"))
   assert_equal("z", cluster.fs.stats(PATH)["user"])
 
   # Now check recursive
   SUBPATH = PATH + '/test'
   cluster.fs.mkdir(SUBPATH)
-  c.post("/filebrowser/chown", dict(path=PATH, user="x", group="y", recursive=True))
+  c.post("/filebrowser/chown", dict(path=[PATH], user="x", group="y", recursive=True))
   assert_equal("x", cluster.fs.stats(SUBPATH)["user"])
   assert_equal("y", cluster.fs.stats(SUBPATH)["group"])
-  c.post("/filebrowser/chown", dict(path=PATH, user="__other__", user_other="z", group="y", recursive=True))
+  c.post("/filebrowser/chown", dict(path=[PATH], user="__other__", user_other="z", group="y", recursive=True))
   assert_equal("z", cluster.fs.stats(SUBPATH)["user"])
 
-  # Make sure that the regular user chown form doesn't have useless fields,
-  # and that the superuser's form has all the fields it could dream of.
-  PATH = '/filebrowser/chown-regular-user'
-  cluster.fs.mkdir(PATH)
-  cluster.fs.chown(PATH, 'chown_test', 'chown_test')
-  response = c.get('/filebrowser/chown', dict(path=PATH, user='chown_test', group='chown_test'))
-  assert_true('<option value="__other__"' in response.content)
-  c = make_logged_in_client('chown_test')
-  response = c.get('/filebrowser/chown', dict(path=PATH, user='chown_test', group='chown_test'))
-  assert_false('<option value="__other__"' in response.content)
+  # Test bulk chown
+  PATH_2 = u"/test-chown-en-Español2"
+  PATH_3 = u"/test-chown-en-Español2"
+  cluster.fs.mkdir(PATH_2)
+  cluster.fs.mkdir(PATH_3)
+  c.post("/filebrowser/chown", dict(path=[PATH_2, PATH_3], user="x", group="y", recursive=True))
+  assert_equal("x", cluster.fs.stats(PATH_2)["user"])
+  assert_equal("y", cluster.fs.stats(PATH_2)["group"])
+  assert_equal("x", cluster.fs.stats(PATH_3)["user"])
+  assert_equal("y", cluster.fs.stats(PATH_3)["group"])
+
 
 @attr('requires_hadoop')
 def test_rename():
-    cluster = pseudo_hdfs4.shared_cluster()
+  cluster = pseudo_hdfs4.shared_cluster()
 
-    c = make_logged_in_client(cluster.superuser)
-    cluster.fs.setuser(cluster.superuser)
+  c = make_logged_in_client(cluster.superuser)
+  cluster.fs.setuser(cluster.superuser)
 
-    PREFIX = u"/test-rename/"
-    NAME = u"test-rename-before"
-    NEW_NAME = u"test-rename-after"
-    cluster.fs.mkdir(PREFIX + NAME)
-    op = "rename"
-    # test for full path rename
-    c.post("/filebrowser/rename", dict(src_path=PREFIX + NAME, dest_path=PREFIX + NEW_NAME))
-    assert_true(cluster.fs.exists(PREFIX + NEW_NAME))
-    # test for smart rename
-    c.post("/filebrowser/rename", dict(src_path=PREFIX + NAME, dest_path=NEW_NAME))
-    assert_true(cluster.fs.exists(PREFIX + NEW_NAME))
+  PREFIX = u"/test-rename/"
+  NAME = u"test-rename-before"
+  NEW_NAME = u"test-rename-after"
+  cluster.fs.mkdir(PREFIX + NAME)
+  op = "rename"
+  # test for full path rename
+  c.post("/filebrowser/rename", dict(src_path=PREFIX + NAME, dest_path=PREFIX + NEW_NAME))
+  assert_true(cluster.fs.exists(PREFIX + NEW_NAME))
+  # test for smart rename
+  c.post("/filebrowser/rename", dict(src_path=PREFIX + NAME, dest_path=NEW_NAME))
+  assert_true(cluster.fs.exists(PREFIX + NEW_NAME))
+
 
 @attr('requires_hadoop')
 def test_listdir():

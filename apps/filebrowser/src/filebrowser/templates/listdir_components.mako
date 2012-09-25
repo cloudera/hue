@@ -17,10 +17,12 @@
 import datetime
 import md5
 from django.template.defaultfilters import urlencode, stringformat, filesizeformat, date, time, escape
-from desktop.lib.django_util import reverse_with_get
+from desktop.lib.django_util import reverse_with_get, extract_field_data
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 %>
+
+<%namespace name="edit" file="editor_components.mako" />
 
 <%def name="list_table_chooser(files, path, current_request_path)">
   ${_table(files, path, current_request_path, 'chooser')}
@@ -127,13 +129,12 @@ from django.utils.translation import ugettext as _
             <h3>${_('Please Confirm')}</h3>
         </div>
         <div class="modal-body">
-            <p>${_('Are you sure you want to delete this file?')}</p>
+            <p>${_('Are you sure you want to delete these files?')}</p>
         </div>
         <div class="modal-footer">
-            <form id="deleteForm" action="" method="POST" enctype="multipart/form-data" class="form-stacked">
+            <form id="deleteForm" action="/filebrowser/rmtree" method="POST" enctype="multipart/form-data" class="form-stacked">
                 <input type="submit" value="${_('Yes')}" class="btn primary" />
                 <a id="cancelDeleteBtn" class="btn">${_('No')}</a>
-                <input id="fileToDeleteInput" type="hidden" name="path" />
             </form>
         </div>
     </div>
@@ -160,11 +161,130 @@ from django.utils.translation import ugettext as _
         </form>
     </div>
 
-    <div id="changeOwnerModal" class="modal hide fade"></div>
+    <!-- chown modal -->
+    % if is_superuser:
+    <div id="changeOwnerModal" class="modal hide fade">
+        <%
+          select_filter = is_superuser and 'SelectWithOther' or ''
+        %>
+        <form id="chownForm" action="/filebrowser/chown" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+            <div class="modal-header">
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+                <h3>${_('Change Owner / Group')}</h3>
+            </div>
+            <div class="modal-body change-owner-modal-body clearfix" >
+                <div class="alert alert-message block-message info">${_('Note: Only the Hadoop superuser, "%(superuser)s" on this file system, may change the owner of a file.') % dict(superuser=superuser)}</div>
+                <div style="padding-left: 15px; padding-bottom: 10px;">
+                    <label>${_('User')}</label>
+                    ${ edit.selection("user", users, user.username, "user_other") }
+                    <label>${_('Group')}</label>
+                    ${ edit.selection("group", groups, 'supergroup', "group_other") }
+                    <br />
+                    <label style="display: inline;">${_('Recursive')}</label><input type="checkbox" name="recursive">
+                </div>
 
-    <div id="changePermissionModal" class="modal hide fade"></div>
 
-    <div id="moveModal" class="modal hide fade"></div>
+            </div>
+            <div class="modal-footer" style="padding-top: 10px;">
+                <div id="chownRequired" class="hide" style="position: absolute; left: 10;">
+                    <span class="label label-important">${_('Sorry, name is required.')}</span>
+                </div>
+                <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">${_('Cancel')}</a>
+                <input class="btn primary" type="submit" value="${_('Submit')}" />
+            </div>
+        </form>
+    </div>
+    % endif
+
+    <!-- chmod modal -->
+    <div id="changePermissionModal" class="modal hide fade">
+        <form action="/filebrowser/chmod" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix" id="chmodForm">
+            <div class="modal-header">
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+                <h3>${_('Change Permissions:')} </h3>
+            </div>
+            <div class="modal-body table-margin">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th class="center">${_('User')}</th>
+                        <th class="center">${_('Group')}</th>
+                        <th class="center">${_('Other')}</th>
+                        <th class="center">&nbsp;</th>
+                        <th width="120">&nbsp</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><strong>${_('Read')}</strong></td>
+                        <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="user_read"></td>
+                        <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="group_read"></td>
+                        <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="other_read"></td>
+                        <td colspan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>${_('Write')}</strong></td>
+                        <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="user_write"></td>
+                        <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="group_write"></td>
+                        <td class="center"><input type="checkbox" data-bind="attr: {checked: selectedFile.mode }" checked="" name="other_write"></td>
+                        <td colspan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>${_('Execute')}</strong></td>
+                        <td class="center"><input type="checkbox" checked="" name="user_execute"></td>
+                        <td class="center"><input type="checkbox" checked="" name="group_execute"></td>
+                        <td class="center"><input type="checkbox" checked="" name="other_execute"></td>
+                        <td colspan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>${_('Sticky')}</strong></td>
+                        <td colspan="3">&nbsp;</td>
+                        <td class="center"><input type="checkbox" name="sticky"></td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>${_('Recursive')}</strong></td>
+                        <td colspan="3">&nbsp;</td>
+                        <td class="center"><input type="checkbox" name="recursive"></td>
+                        <td>&nbsp;</td>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer" style="padding-top: 10px;">
+                <a class="btn" onclick="$('#changePermissionModal').modal('hide');">${_('Cancel')}</a>
+                <input class="btn primary" type="submit" value="${_('Submit')}"/>
+            </div>
+        </form>
+    </div>
+
+    <!-- move modal -->
+    <div id="moveModal" class="modal hide fade">
+        <form id="moveForm" action="/filebrowser/move" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+            <div class="modal-header">
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+                <h3>${_('Move:')}</h3>
+            </div>
+            <div class="modal-body">
+                <div style="padding-left: 15px;">
+                    <label for="id_dest_path">${_('Destination')}</label>
+                    <input type="text" class="input-xlarge pathChooser" value="" name="dest_path" id="moveDestination" />
+                    <a class="btn fileChooserBtn" href="#" data-filechooser-destination="dest_path">..</a>
+                </div>
+                <br/>
+                <div class="fileChooserModal" class="smallModal well hide">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="moveNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
+                    <span class="label label-important">${_('Sorry, name is required.')}</span>
+                </div>
+                <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
+                <input class="btn primary" type="submit" value="${_('Submit')}"/>
+            </div>
+        </form>
+    </div>
 
     <!-- upload file modal -->
     <div id="uploadFileModal" class="modal hide fade">
@@ -261,43 +381,73 @@ from django.utils.translation import ugettext as _
             });
         }
 
-        function openChmodWindow(path, mode, next){
-            $.ajax({
-                url: "/filebrowser/chmod",
-                data: {"path":path, "mode":mode, "next" : next},
-                beforeSend: function(xhr){
-                    xhr.setRequestHeader("X-Requested-With", "Hue");
+        // Modal file chooser
+        // The file chooser should be at least 2 levels deeper than the modal container
+        $(".fileChooserBtn").on('click', function(e){
+            e.preventDefault();
+            var _destination = $(this).attr("data-filechooser-destination");
+            var fileChooser = $(this).parent().parent().find(".fileChooserModal");
+            fileChooser.jHueFileChooser({
+                initialPath: $("input[name='"+_destination+"']").val(),
+                onFolderChange: function(folderPath){
+                    $("input[name='"+_destination+"']").val(folderPath);
                 },
-                dataType: "html",
-                success: function(data){
-                    $("#changePermissionModal").html(data);
-                    $("#changePermissionModal").modal({
-                        keyboard: true,
-                        show: true
-                    });
-                }
-            });
-        }
-
-        function openMoveModal(src_path, mode, next){
-            $.ajax({
-                url: "/filebrowser/move",
-                data: {"src_path":src_path, "mode":mode, "next" : next},
-                beforeSend: function(xhr){
-                    xhr.setRequestHeader("X-Requested-With", "Hue");
+                onFolderChoose: function(folderPath){
+                    $("input[name='"+_destination+"']").val(folderPath);
+                    fileChooser.slideUp();
                 },
-                dataType: "html",
-                success: function(data){
-                    $("#moveModal").html(data);
-                    $("#moveModal").modal({
-                        keyboard: true,
-                        show: true
-                    });
-                }
+                selectFolder: true,
+                createFolder: true,
+                uploadFile: false
             });
-        }
+            fileCooser.slideDown();
+        });
 
         $(document).ready(function(){
+            $("#chownForm select[name='user']").change(function(){
+                if ($(this).val() == "__other__"){
+                    $("input[name='user_other']").show();
+                }
+                else {
+                    $("input[name='user_other']").hide();
+                }
+            });
+            $("#chownForm  select[name='group']").change(function(){
+                if ($(this).val() == "__other__"){
+                    $("input[name='group_other']").show();
+                }
+                else {
+                    $("input[name='group_other']").hide();
+                }
+            });
+
+            $("#chownForm").submit(function(){
+                if ($("#chownForm select[name='user']").val() == null){
+                    $("#chownRequired").find(".label").text("${_('Sorry, user is required.')}");
+                    $("#chownRequired").show();
+                    return false;
+                }
+                else if ($("#chownForm select[name='group']").val() == null){
+                    $("#chownRequired").find(".label").text("${_('Sorry, group is required.')}");
+                    $("#chownRequired").show();
+                    return false;
+                }
+                else {
+                    if ($("#chownForm select[name='group']").val() == "__other__" && $("input[name='group_other']").val() == ""){
+                        $("#chownRequired").find(".label").text("${_('Sorry, you need to specify another group.')}");
+                        $("#chownForm input[name='group_other']").addClass("fieldError");
+                        $("#chownRequired").show();
+                        return false;
+                    }
+                    if ($("#chownForm select[name='user']").val() == "__other__" && $("input[name='user_other']").val() == ""){
+                        $("#chownRequired").find(".label").text("${_('Sorry, you need to specify another user.')}");
+                        $("#chownForm input[name='user_other']").addClass("fieldError");
+                        $("#chownRequired").show();
+                        return false;
+                    }
+                    return true;
+                }
+            });
 
             $("#cancelDeleteBtn").click(function(){
                 $("#deleteModal").modal("hide");
@@ -321,9 +471,9 @@ from django.utils.translation import ugettext as _
             });
 
             $("#moveForm").live("submit", function(){
-                if ($.trim($("#moveForm").find("input[name='dest_path']").val()) == ""){
+                if ($.trim($("#moveForm").find("input.pathChooser").val()) == ""){
                     $("#moveNameRequiredAlert").show();
-                    $("#moveForm").find("input[name='dest_path']").addClass("fieldError");
+                    $("#moveForm").find("input[name='*dest_path']").addClass("fieldError");
                     return false;
                 }
                 return true;
@@ -675,20 +825,64 @@ from django.utils.translation import ugettext as _
             };
 
             self.move = function () {
-                openMoveModal(self.selectedFile().path, self.selectedFile().mode, "${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
+                var paths = [];
+                $(self.selectedFiles()).each(function(index, file) {
+                    paths.push(file.path);
+                });
+                hiddenFields($("#moveForm"), "src_path", paths);
+                $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+                $("#moveModal").modal({
+                    keyboard:true,
+                    show:true
+                });
             };
 
             self.changeOwner = function () {
-                openChownWindow(self.selectedFile().path, self.selectedFile().stats.user, self.selectedFile().stats.group, "${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
+                var paths = [];
+                $(self.selectedFiles()).each(function(index, file) {
+                    paths.push(file.path);
+                });
+                hiddenFields($("#chownForm"), 'path', paths);
+                $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+                $("#changeOwnerModal").modal({
+                    keyboard:true,
+                    show:true
+                });
+
             };
 
             self.changePermissions = function () {
-                openChmodWindow(self.selectedFile().path, self.selectedFile().mode, "${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
+                var paths = [];
+                $(self.selectedFiles()).each(function(index, file) {
+                    paths.push(file.path);
+                });
+                hiddenFields($("#chmodForm"), 'path', paths);
+                $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+                $("#changePermissionModal").modal({
+                    keyboard:true,
+                    show:true
+                });
+
+                // Initial values for form
+                permissions = ["sticky", "user_read", "user_write", "user_execute", "group_read", "group_write", "group_execute", "other_read", "other_write", "other_execute"].reverse();
+                var mode = octal(self.selectedFile().mode) & 01777;
+                for (var i = 0; i < permissions.length; i++) {
+                    if (mode & 1) {
+                        $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", true);
+                    } else {
+                        $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", false);
+                    }
+                    mode >>>= 1;
+                }
             };
 
             self.deleteSelected = function () {
-                $("#fileToDeleteInput").attr("value", self.selectedFile().path);
-                $("#deleteForm").attr("action", "/filebrowser/" + (self.selectedFile().type == "dir" ? "rmtree" : "remove") + "?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath() + "&path=" + self.selectedFile().path);
+                var paths = [];
+                $(self.selectedFiles()).each(function(index, file) {
+                    paths.push(file.path);
+                });
+                hiddenFields($("#deleteForm"), 'path', paths);
+                $("#deleteForm").attr("action", "/filebrowser/rmtree" + "?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
                 $("#deleteModal").modal({
                     keyboard:true,
                     show:true
@@ -800,6 +994,38 @@ from django.utils.translation import ugettext as _
                     });
                 };
             })();
+
+            // Place all values into hidden fields under parent element.
+            // Looks for managed hidden fields and handles sizing appropriately.
+            var hiddenFields = function(parentEl, name, values) {
+                parentEl = $(parentEl);
+                var fields = parentEl.find("input.hidden-field");
+
+                // Create or delete hidden fields according to needs.
+                var resize = values.length - fields.length;
+                while(resize > 0) {
+                    resize--;
+                    var field = $("<input type='hidden' />");
+                    field.attr("name", name);
+                    field.attr("class", "hidden-field")
+                    parentEl.append(field);
+                }
+                while (resize < 0) {
+                    resize++;
+                    var field = fields[fields.length - resize - 1]
+                    parentEl.remove(field);
+                }
+
+                // Set values
+                fields = parentEl.find("input.hidden-field");
+                $(values).each(function(index, value) {
+                    $(fields[index]).val(value);
+                });
+            }
+
+            var octal = function(strInt) {
+                return parseInt("0" + strInt);
+            }
         };
 
         var viewModel = new FileBrowserModel([], null, [], "/");
