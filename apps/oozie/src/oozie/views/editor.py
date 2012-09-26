@@ -244,11 +244,13 @@ def edit_workflow(request, workflow):
       if 'move_down_action' in request.POST: return move_down_action(request, action=request.POST['move_down_action'])
 
       if workflow_form.is_valid() and actions_formset.is_valid():
-        workflow_form.save()
+        workflow = workflow_form.save()
         actions_formset.save()
 
         if workflow.has_cycle():
           raise PopupException(_('Sorry, this operation is not creating a cycle which would break the workflow.'))
+
+        Workflow.objects.check_workspace(workflow, request.fs)
 
         request.info(_("Workflow saved!"))
         return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
@@ -368,6 +370,7 @@ def schedule_workflow(request, workflow):
 
 
 @check_job_access_permission
+@check_job_edition_permission()
 def new_action(request, workflow, node_type, parent_action_id):
   ActionForm = design_form_by_type(node_type)
 
