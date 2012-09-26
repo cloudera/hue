@@ -123,14 +123,17 @@ class Submission(object):
         msg = _("Path is not a directory: %s") % (path,)
         LOG.error(msg)
         raise Exception(msg)
-      return path
     except IOError, ex:
       if ex.errno != errno.ENOENT:
         msg = _("Error accessing directory '%s': %s") % (path, ex)
         LOG.exception(msg)
         raise IOError(ex.errno, msg)
+
     if not self.fs.exists(path):
       self._do_as(self.user.username , self.fs.mkdir, path, perms)
+
+    self._do_as(self.user.username , self.fs.chmod, path, perms)
+
     return path
 
   def _copy_files(self, deployment_dir, oozie_xml):
@@ -146,7 +149,7 @@ class Submission(object):
     files = []
     if hasattr(self.job, 'node_list'):
       for node in self.job.node_list:
-        if hasattr(node, 'jar_path'):
+        if hasattr(node, 'jar_path') and node.jar_path.startswith('/'):
           files.append(node.jar_path)
 
     if files:
