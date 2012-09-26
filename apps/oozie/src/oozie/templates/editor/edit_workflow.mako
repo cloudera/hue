@@ -33,13 +33,15 @@ ${ layout.menubar(section='workflows') }
   <div class="well">
     ${ _('Description:') } ${ workflow.description or "N/A" }
     <div class="pull-right" style="margin-top:-5px">
+      % if user_can_edit_job:
         <label>
             <a href="/filebrowser/view${ workflow.deployment_dir }" class="btn">
               ${ _('Upload') }
             </a>
             ${ _('files to deployment directory') }
         </label>
-      </div>
+      % endif
+    </div>
   </div>
 
   <ul class="nav nav-tabs">
@@ -56,6 +58,7 @@ ${ layout.menubar(section='workflows') }
       <div class="tab-pane active" id="editor">
         <div class="row-fluid">
           <div class="span2">
+            % if user_can_edit_job:
             <h2>${ _('Actions') }</h2>
             <br/>
             <ul class="nav nav-tabs">
@@ -128,6 +131,7 @@ ${ layout.menubar(section='workflows') }
                 <p/>
               </div>
             </div>
+            % endif
           </div>
 
           <div class="span9">
@@ -172,13 +176,19 @@ ${ layout.menubar(section='workflows') }
                 </div>
 
                <div id="advanced-container" class="hide">
-                 ${ utils.render_field(workflow_form['deployment_dir']) }
+                 % if user_can_edit_job:
+                   ${ utils.render_field(workflow_form['deployment_dir']) }
+                 % endif
+                 ## to remove
                  ${ properties.print_key_value(workflow_form['parameters'], 'parameters', parameters) }
                  ${ workflow_form['parameters'] }
+                 ## to remove
                  ${ properties.print_key_value(workflow_form['job_properties'], 'job_properties', job_properties) }
                  ${ workflow_form['job_properties'] }
                  ${ workflow_form['schema_version'] }
-                 ${ utils.render_field(workflow_form['job_xml']) }
+                 % if user_can_edit_job:
+                   ${ utils.render_field(workflow_form['job_xml']) }
+                 % endif
                </div>
 
              </fieldset>

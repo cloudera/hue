@@ -199,11 +199,17 @@ class WorkflowManager(models.Manager):
     workflow.end = end
     workflow.save()
 
-    # Recheck if deployement dir exists
-    oozie_setup.create_data_dir(fs)
-    Submission(workflow.owner, workflow, fs, {})._create_dir(workflow.deployment_dir)
+    self.check_workspace(workflow, fs)
 
-    return workflow
+  def check_workspace(self, workflow, fs):
+    oozie_setup.create_data_dir(fs)
+
+    if workflow.is_shared:
+      perms = 0755
+    else:
+      perms = 0711
+
+    Submission(workflow.owner, workflow, fs, {})._create_dir(workflow.deployment_dir, perms=perms)
 
   def destroy(self, workflow, fs):
     Submission(workflow.owner, workflow, fs, {}).remove_deployment_dir()
@@ -445,9 +451,15 @@ class Workflow(Job):
     copy.save()
 
     try:
-      fs.copy_remote_dir(source_deployment_dir, copy.deployment_dir, owner=copy.owner)
+      if copy.is_shared:
+        perms = 0755
+      else:
+        perms = 0711
+      fs.copy_remote_dir(source_deployment_dir, copy.deployment_dir, owner=copy.owner, dir_mode=perms)
     except WebHdfsException, e:
-      LOG.error('The copy of the deployment directory failed: %s', e)
+      msg = _('The copy of the deployment directory failed: %s') % e
+      LOG.error(msg)
+      raise PopupException(msg)
 
     return copy
 

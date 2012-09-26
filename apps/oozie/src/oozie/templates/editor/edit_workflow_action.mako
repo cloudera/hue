@@ -61,7 +61,7 @@ ${ layout.menubar(section='workflows') }
           <p class="alert alert-warn span5">
             ${ _('The ssh server requires passwordless login') }.
           </p>
-        % endif        
+        % endif
         </div>
       </div>
 
