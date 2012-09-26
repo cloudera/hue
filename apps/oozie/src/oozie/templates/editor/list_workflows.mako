@@ -76,10 +76,10 @@ ${ layout.menubar(section='workflows') }
               % if workflow.is_accessible(currentuser):
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
                   data-schedule-url="${ url('oozie:schedule_workflow', workflow=workflow.id) }"
+                  data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
               % endif
               % if workflow.is_editable(currentuser):
                   data-delete-url="${ url('oozie:delete_workflow', workflow=workflow.id) }"
-                  data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
               % endif
             />
             % if workflow.is_accessible(currentuser):
