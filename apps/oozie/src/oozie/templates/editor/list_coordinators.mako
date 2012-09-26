@@ -70,13 +70,12 @@ ${ layout.menubar(section='coordinators') }
         <tr class="action-row">
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
-              % if coordinator.is_editable(currentuser):
-                  data-delete-url="${ url('oozie:delete_coordinator', coordinator=coordinator.id) }"
-              % endif
               % if coordinator.is_accessible(currentuser):
                   data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }"
-                  data-bundle-url="${ url('oozie:create_coordinator') }"
                   data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }"
+              % endif
+              % if coordinator.is_editable(currentuser):
+                  data-delete-url="${ url('oozie:delete_coordinator', coordinator=coordinator.id) }"
               % endif
               >
             </input>
