@@ -53,7 +53,7 @@ class OozieServerProvider(object):
     cls.shutdown = [callback]
 
   @classmethod
-  def wait_until_completion(cls, oozie_jobid, timeout=70.0, step=1):
+  def wait_until_completion(cls, oozie_jobid, timeout=300.0, step=5):
     sleep = 0
     job = cls.oozie.get_job(oozie_jobid)
     if step < 0:

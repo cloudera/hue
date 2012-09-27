@@ -283,6 +283,9 @@ class Job(object):
   def is_running(self):
     return self.status in Job.RUNNING_STATUSES
 
+  def __unicode__(self):
+    return '%s - %s' % (self.id, self.status)
+
 
 class Coordinator(Job):
   _ATTRS = [
