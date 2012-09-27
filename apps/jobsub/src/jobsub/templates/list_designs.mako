@@ -24,6 +24,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
+<%namespace name="actionbar" file="actionbar.mako" />
 
 ${commonheader(_('Job Designer'), "jobsub", user, "100px")}
 ${layout.menubar(section='designs')}
@@ -32,20 +33,17 @@ ${layout.menubar(section='designs')}
 
 <div class="container-fluid">
     <h1>${_('Job Designs')}</h1>
-    <div class="well hueWell">
-        <div class="btn-group pull-right">
+
+    <%actionbar:render>
+        <%def name="creation()">
             <a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn">${_('Create Mapreduce Design')}</a>
             <a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn">${_('Create Streaming Design')}</a>
             <a href="${ url('jobsub.views.new_design', action_type='java') }" class="btn">${_('Create Java Design')}</a>
             %if show_install_examples:
-                    <a id="installSamplesLink" href="javascript:void(0)" data-confirmation-url="${url('jobsub.views.setup')}" class="btn" >${_('Install Samples')}</a>
+            <a id="installSamplesLink" href="javascript:void(0)" data-confirmation-url="${url('jobsub.views.setup')}" class="btn" >${_('Install Samples')}</a>
             %endif
-        </div>
-
-        <form class="form-search">
-            ${_('Filter: ')}<input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for username, name, etc...')}">
-        </form>
-    </div>
+        </%def>
+    </%actionbar:render>
 
     <table id="designTable" class="table table-condensed datatables">
         <thead>

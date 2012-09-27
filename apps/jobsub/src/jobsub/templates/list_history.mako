@@ -22,6 +22,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
+<%namespace name="actionbar" file="actionbar.mako" />
 
 ${commonheader(_('Job Designer'), "jobsub", user, "100px")}
 ${layout.menubar(section='history')}
@@ -30,12 +31,8 @@ ${layout.menubar(section='history')}
 
 <div class="container-fluid">
     <h1>${_('Job Submission History')}</h1>
-    <div class="well hueWell">
-        <form class="form-search">
-            ${_('Filter: ')}<input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for username, name, etc...')}">
-        </form>
-    </div>
 
+    <%actionbar:render />
 
     <table class="table table-condensed datatables" id="jobTable">
         <thead>
