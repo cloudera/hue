@@ -47,7 +47,7 @@
         sortedKeys.sort();
 
         if (sortedKeys.length == 0){
-            $(_this.element).after($("<input>").attr("type", "text").attr("disabled", "disabled").val(this.options.noChoicesFound));
+            $(_this.element).after($("<div>").addClass("alert").css("margin-top", "-2px").css("float", "left").html(this.options.noChoicesFound));
         }
         else {
             selectorContainer.addClass("jHueSelector");

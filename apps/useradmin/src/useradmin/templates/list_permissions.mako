@@ -21,20 +21,15 @@ from useradmin.models import group_permissions
 from django.contrib.auth.models import Group
 %>
 
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 ${commonheader(_('Hue Permissions'), "useradmin", user, "100px")}
 ${layout.menubar(section='permissions', _=_)}
 
 <div class="container-fluid">
     <h1>${_('Hue Permissions')}</h1>
-    <div class="subnavContainer">
-        <div class="subnav sticky">
-            <p class="pull-right">
-                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for application name, description, etc...')}">
-            </p>
-        </div>
-    </div>
-    <br/>
+    <%actionbar:render />
+
     <table class="table table-striped table-condensed datatables">
         <thead>
         <tr>
@@ -48,9 +43,9 @@ ${layout.menubar(section='permissions', _=_)}
             <tr class="tableRow" data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
                 <td>
                 %if user.is_superuser:
-                    <h5><a title="${_('Edit permission')}" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">${perm.app}</a></h5>
+                    <strong><a title="${_('Edit permission')}" href="${ url('useradmin.views.edit_permission', app=urllib.quote(perm.app), priv=urllib.quote(perm.action)) }" data-name="${perm.app}" data-row-selector="true">${perm.app}</a></strong>
                 %else:
-                    <h5>${perm.app}</h5>
+                    <strong>${perm.app}</strong>
                 %endif
                 </td>
                 <td>${perm.description}</td>

@@ -20,36 +20,34 @@ import urllib
 from django.utils.translation import ugettext as _
 %>
 
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 ${commonheader(_('Hue Users'), "useradmin", user, "100px")}
 ${layout.menubar(section='users', _=_)}
 
 <div class="container-fluid">
     <h1>${_('Hue Users')}</h1>
-    <div class="subnavContainer">
-        <div class="subnav sticky">
-            <p class="pull-right">
-                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for username, name, e-mail, etc...')}">
-            </p>
-            <p style="padding: 4px">
-                %if user.is_superuser:
-                    <button id="deleteUserBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="icon-trash"></i> ${_('Delete')}</button>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="icon-user"></i> ${_('Add user')}</a>
-                    <a href="${ url('useradmin.views.add_ldap_user') }" class="btn"><i class="icon-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
-                    <a href="javascript:void(0)" class="btn confirmationModal" data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }"><i class="icon-refresh"></i> ${_('Sync LDAP users/groups')}</a>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                %endif
-            </p>
-        </div>
-    </div>
-    <br/>
+
+    <%actionbar:render>
+        <%def name="actions()">
+            %if user.is_superuser:
+                <button id="deleteUserBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="icon-trash"></i> ${_('Delete')}</button>
+            %endif
+        </%def>
+        <%def name="creation()">
+            %if user.is_superuser:
+                <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="icon-user"></i> ${_('Add user')}</a>
+                <a href="${ url('useradmin.views.add_ldap_user') }" class="btn"><i class="icon-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
+                <a href="javascript:void(0)" class="btn confirmationModal" data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }"><i class="icon-refresh"></i> ${_('Sync LDAP users/groups')}</a>
+            %endif
+        </%def>
+    </%actionbar:render>
 
     <table class="table table-striped table-condensed datatables">
         <thead>
             <tr>
                 %if user.is_superuser:
-                    <th width="1%"><input id="selectAll" type="checkbox"/></th>
+                    <th width="1%"><div id="selectAll" class="hueCheckbox"></div></th>
                 %endif
                 <th>${_('Username')}</th>
                 <th>${_('First Name')}</th>
@@ -63,15 +61,15 @@ ${layout.menubar(section='users', _=_)}
         % for listed_user in users:
             <tr class="tableRow" data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
                 %if user.is_superuser:
-                    <td class="center" data-row-selector-exclude="true">
-                        <input type="checkbox" class="userCheck" data-username="${listed_user.username}" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote(listed_user.username))}" data-row-selector-exclude="true"/>
+                    <td data-row-selector-exclude="true">
+                        <div class="hueCheckbox userCheck" data-username="${listed_user.username}" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote(listed_user.username))}" data-row-selector-exclude="true"></div>
                     </td>
                 %endif
                 <td>
                     %if user.is_superuser or user.username == listed_user.username:
-                        <h5><a title="${_('Edit %(username)s') % dict(username=listed_user.username)}" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-row-selector="true">${listed_user.username}</a></h5>
+                        <strong><a title="${_('Edit %(username)s') % dict(username=listed_user.username)}" href="${ url('useradmin.views.edit_user', username=urllib.quote(listed_user.username)) }" data-row-selector="true">${listed_user.username}</a></strong>
                     %else:
-                        <h5>${listed_user.username}</h5>
+                        <strong>${listed_user.username}</strong>
                     %endif
                 </td>
                 <td>${listed_user.first_name}</td>
@@ -136,24 +134,36 @@ ${layout.menubar(section='users', _=_)}
                 });
             });
 
-            $("#selectAll").change(function(){
-                if ($(this).is(":checked")){
-                    $(".userCheck").attr("checked", "checked");
+            $("#selectAll").click(function(){
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                    $(".userCheck").removeClass("icon-ok").removeAttr("checked");
                 }
                 else {
-                    $(".userCheck").removeAttr("checked");
+                    $(this).attr("checked", "checked");
+                    $(".userCheck").addClass("icon-ok").attr("checked", "checked");
                 }
-                $(".userCheck").change();
+                toggleActions();
             });
 
-            $(".userCheck").change(function(){
-                if ($(".userCheck:checked").length == 1){
-                    $("#deleteUserBtn").removeAttr("disabled").data("confirmation-url", $(".userCheck:checked").data("confirmation-url"));
+            $(".userCheck").click(function(){
+                if ($(this).attr("checked")) {
+                    $(this).removeClass("icon-ok").removeAttr("checked");
+                }
+                else {
+                    $(this).addClass("icon-ok").attr("checked", "checked");
+                }
+                toggleActions();
+            });
+
+            function toggleActions() {
+                if ($(".userCheck[checked='checked']").length == 1) {
+                    $("#deleteUserBtn").removeAttr("disabled").data("confirmation-url", $(".userCheck[checked='checked']").data("confirmation-url"));
                 }
                 else {
                     $("#deleteUserBtn").attr("disabled", "disabled");
                 }
-            });
+            }
 
             $("a[data-row-selector='true']").jHueRowSelector();
         });

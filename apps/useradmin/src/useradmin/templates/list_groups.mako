@@ -20,34 +20,33 @@ from django.utils.translation import ugettext as _
 from useradmin.models import group_permissions
 %>
 
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 ${commonheader(_('Hue Groups'), "useradmin", user, "100px")}
 ${layout.menubar(section='groups', _=_)}
 
 <div class="container-fluid">
     <h1>${_('Hue Groups')}</h1>
-    <div class="subnavContainer">
-        <div class="subnav sticky">
-            <p class="pull-right">
-                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for group name, members, etc...')}">
-            </p>
-            <p style="padding: 4px">
-                %if user.is_superuser:
-                    <button id="deleteGroupBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="icon-trash"></i> ${_('Delete')}</button>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn"><i class="icon-plus-sign"></i> ${_('Add group')}</a>
-                    <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_group')}" class="btn"><i class="icon-refresh"></i> ${_('Add/Sync LDAP group')}</a>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                %endif
-            </p>
-        </div>
-    </div>
-    <br/>
+
+    <%actionbar:render>
+        <%def name="actions()">
+            %if user.is_superuser:
+                <button id="deleteGroupBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="icon-trash"></i> ${_('Delete')}</button>
+            %endif
+        </%def>
+        <%def name="creation()">
+            %if user.is_superuser:
+                <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn"><i class="icon-plus-sign"></i> ${_('Add group')}</a>
+                <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_group')}" class="btn"><i class="icon-refresh"></i> ${_('Add/Sync LDAP group')}</a>
+            %endif
+        </%def>
+    </%actionbar:render>
+
     <table class="table table-striped table-condensed datatables">
     <thead>
       <tr>
         %if user.is_superuser:
-          <th width="1%"><input id="selectAll" type="checkbox"/></th>
+          <th width="1%"><div id="selectAll" class="hueCheckbox"></div></th>
         %endif
         <th>${_('Group Name')}</th>
         <th>${_('Members')}</th>
@@ -58,15 +57,15 @@ ${layout.menubar(section='groups', _=_)}
     % for group in groups:
       <tr class="tableRow" data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
         %if user.is_superuser:
-          <td class="center" data-row-selector-exclude="true">
-            <input type="checkbox" class="groupCheck" data-group="${group.name}" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name)) }" data-row-selector-exclude="true"/>
+          <td data-row-selector-exclude="true">
+              <div class="hueCheckbox groupCheck" data-group="${group.name}" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name))}" data-row-selector-exclude="true"></div>
           </td>
         %endif
         <td>
             %if user.is_superuser:
-            <h5><a title="${_('Edit %(groupname)s') % dict(groupname=group.name)}" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-row-selector="true">${group.name}</a></h5>
+            <strong><a title="${_('Edit %(groupname)s') % dict(groupname=group.name)}" href="${ url('useradmin.views.edit_group', name=urllib.quote(group.name)) }" data-row-selector="true">${group.name}</a></strong>
             %else:
-            <h5>${group.name}</h5>
+            <strong>${group.name}</strong>
             %endif
          </td>
         <td>${', '.join([group_user.username for group_user in group.user_set.all()])}</td>
@@ -126,24 +125,36 @@ ${layout.menubar(section='groups', _=_)}
                 });
             });
 
-            $("#selectAll").change(function(){
-                if ($(this).is(":checked")){
-                    $(".groupCheck").attr("checked", "checked");
+            $("#selectAll").click(function(){
+                if ($(this).attr("checked")) {
+                    $(this).removeAttr("checked");
+                    $(".groupCheck").removeClass("icon-ok").removeAttr("checked");
                 }
                 else {
-                    $(".groupCheck").removeAttr("checked");
+                    $(this).attr("checked", "checked");
+                    $(".groupCheck").addClass("icon-ok").attr("checked", "checked");
                 }
-                $(".groupCheck").change();
+                toggleActions();
             });
 
-            $(".groupCheck").change(function(){
-                if ($(".groupCheck:checked").length == 1){
-                    $("#deleteGroupBtn").removeAttr("disabled").data("confirmation-url", $(".groupCheck:checked").data("confirmation-url"));
+            $(".groupCheck").click(function(){
+                if ($(this).attr("checked")) {
+                    $(this).removeClass("icon-ok").removeAttr("checked");
+                }
+                else {
+                    $(this).addClass("icon-ok").attr("checked", "checked");
+                }
+                toggleActions();
+            });
+
+            function toggleActions() {
+                if ($(".groupCheck[checked='checked']").length == 1) {
+                    $("#deleteGroupBtn").removeAttr("disabled").data("confirmation-url", $(".groupCheck[checked='checked']").data("confirmation-url"));
                 }
                 else {
                     $("#deleteGroupBtn").attr("disabled", "disabled");
                 }
-            });
+            }
 
             $("a[data-row-selector='true']").jHueRowSelector();
         });

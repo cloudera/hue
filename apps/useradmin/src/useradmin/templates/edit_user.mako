@@ -55,16 +55,8 @@ ${layout.menubar(section='users', _=_)}
 	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
 		<fieldset>
 			% for field in form:
-                %if field.name == "first_name":
-                    <div class="row">
-                        <div class="span5">
-                        ${render_field(form["first_name"])}
-                        </div>
-                        <div class="span4">
-                        ${render_field(form["last_name"])}
-                        </div>
-                    </div>
-                %elif field.name == "password1":
+                %if field.name == "username" and "password1" in form.fields:
+                    ${render_field(form["username"])}
                     <div class="row">
                         <div class="span5">
                         ${render_field(form["password1"])}
@@ -73,7 +65,16 @@ ${layout.menubar(section='users', _=_)}
                         ${render_field(form["password2"])}
                         </div>
                     </div>
-                %elif field.name == "last_name" or field.name == "password2":
+                %elif field.name == "first_name":
+                    <div class="row">
+                        <div class="span5">
+                        ${render_field(form["first_name"])}
+                        </div>
+                        <div class="span4">
+                        ${render_field(form["last_name"])}
+                        </div>
+                    </div>
+                %elif field.name == "last_name" or field.name == "password1" or field.name == "password2":
                     ## skip rendering
                 %else:
 				    ${render_field(field)}
@@ -100,7 +101,7 @@ ${layout.menubar(section='users', _=_)}
 		$("#id_groups").jHueSelector({
             selectAllLabel: "${_('Select all')}",
             searchPlaceholder: "${_('Search')}",
-            noChoicesFound: "${_('No groups found.')}",
+            noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
             width:618,
             height:240
         });

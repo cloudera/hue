@@ -82,7 +82,7 @@ ${layout.menubar(section='groups', _=_)}
 		$("#id_members").jHueSelector({
             selectAllLabel: "${_('Select all')}",
             searchPlaceholder: "${_('Search')}",
-            noChoicesFound: "${_('No users found.')}",
+            noChoicesFound: "${_('No users found.')} <a href='${url('useradmin.views.edit_user')}'>${_('Create a new user now')} &raquo;</a>",
             width:600,
             height:240
         });
