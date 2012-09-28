@@ -295,23 +295,6 @@ from django.utils.translation import ugettext as _
             });
         }
 
-        $(document).scroll(function(){
-            var el = $(".subnav");
-            if (!el.data("top")) {
-                if (el.hasClass("fixed")){
-                    return;
-                }
-                var offset = el.offset()
-                el.data("top", offset.top).data("width", el.width());
-            }
-            if (el.data("top") - el.outerHeight() <= $(this).scrollTop()+1){
-                el.width(el.data("width")).addClass("fixed");
-            }
-            else {
-                el.width("100%").data("width", el.width()).removeClass("fixed");
-            }
-        });
-
         $(document).ready(function(){
 
             createUploader();
@@ -618,6 +601,7 @@ from django.utils.translation import ugettext as _
                     });
                 }
                 self.isLoading(false);
+                $(".scrollable").jHueTableScroller();
             };
 
             self.recordsPerPage.subscribe(function (newValue) {

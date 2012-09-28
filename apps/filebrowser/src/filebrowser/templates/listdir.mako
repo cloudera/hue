@@ -19,6 +19,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="dir" file="listdir_components.mako" />
 <%namespace name="fb_components" file="fb_components.mako" />
 
@@ -26,10 +27,28 @@ ${commonheader(_('File Browser'), 'filebrowser', user)}
 
 <div class="container-fluid">
     <h1>${_('File Browser')}</h1>
+    <%actionbar:render>
+        <%def name="search()">
+            <input type="text" class="input-xlarge search-query" placeholder="${_('Search for file name')}" data-bind="value: searchQuery">
+        </%def>
+        <%def name="actions()">
+            <button class="btn fileToolbarBtn" title="${_('Rename')}" data-bind="click: renameFile, enable: selectedFiles().length == 1"><i class="icon-font"></i> ${_('Rename')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length == 1"><i class="icon-random"></i> ${_('Move')}</button>
+            %if is_fs_superuser:
+                <button class="btn fileToolbarBtn" title="${_('Change Owner / Group')}" data-bind="click: changeOwner, enable: selectedFiles().length == 1"><i class="icon-user"></i> ${_('Change Owner / Group')}</button>
+            %endif
+            <button class="btn fileToolbarBtn" title="${_('Change Permissions')}" data-bind="click: changePermissions, enable: selectedFiles().length == 1"><i class="icon-list-alt"></i> ${_('Change Permissions')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Delete')}" data-bind="click: deleteSelected, enable: selectedFiles().length == 1"><i class="icon-trash"></i> ${_('Delete')}</button>
+        </%def>
+        <%def name="creation()">
+            <a href="#" class="btn upload-link" title="${_('Upload files')}"><i class="icon-upload"></i> ${_('Upload files')}</a>
+            <a href="#" class="btn create-directory-link" title="${_('New directory')}"><i class="icon-folder-close"></i> ${_('New directory')}</a>
+        </%def>
+    </%actionbar:render>
     % if breadcrumbs:
         ${fb_components.breadcrumbs(path, breadcrumbs, True)}
     %endif
-    <div id="dirlist" class="view">
+    <div class="scrollable">
         ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
     </div>
 </div>

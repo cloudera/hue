@@ -17,30 +17,8 @@
 from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext as _
 %>
-
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
     % if from_listdir:
-        <div class="subnavContainer">
-            <div class="subnav">
-                <p class="pull-right">
-                    <input type="text" class="input-xlarge search-query" placeholder="${_('Search for file name')}" data-bind="value: searchQuery">
-                </p>
-                <p style="padding: 4px">
-                    <button class="btn fileToolbarBtn" title="${_('Rename')}" data-bind="click: renameFile, enable: selectedFiles().length == 1"><i class="icon-font"></i> ${_('Rename')}</button>
-                    <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length == 1"><i class="icon-random"></i> ${_('Move')}</button>
-                    %if is_fs_superuser:
-                    <button class="btn fileToolbarBtn" title="${_('Change Owner / Group')}" data-bind="click: changeOwner, enable: selectedFiles().length == 1"><i class="icon-user"></i> ${_('Change Owner / Group')}</button>
-                    %endif
-                    <button class="btn fileToolbarBtn" title="${_('Change Permissions')}" data-bind="click: changePermissions, enable: selectedFiles().length == 1"><i class="icon-list-alt"></i> ${_('Change Permissions')}</button>
-                    <button class="btn fileToolbarBtn" title="${_('Delete')}" data-bind="click: deleteSelected, enable: selectedFiles().length == 1"><i class="icon-trash"></i> ${_('Delete')}</button>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="#" class="btn upload-link" title="${_('Upload files')}"><i class="icon-upload"></i> ${_('Upload files')}</a>
-                    <a href="#" class="btn create-directory-link" title="${_('New directory')}"><i class="icon-folder-close"></i> ${_('New directory')}</a>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                </p>
-            </div>
-        </div>
-        <br/>
         <ul class="nav nav-pills hueBreadcrumbBar">
             <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i> ${_('Home')}</a></li>
             <li>
@@ -72,9 +50,6 @@ from django.utils.translation import ugettext as _
     % endif
 
     <style type="text/css">
-        .subnavContainer {
-            height: 36px;
-        }
         .hueBreadcrumbBar {
             padding: 8px 15px;
             margin: 0 0 20px;

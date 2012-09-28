@@ -28,7 +28,7 @@
             %if hasattr(caller, "search"):
                 ${caller.search()}
             %else:
-                <strong>${_('Filter')}:</strong> <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search...')}">
+                <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search...')}">
             %endif
             %if hasattr(caller, "actions"):
                 &nbsp;&nbsp;&nbsp;&nbsp;
