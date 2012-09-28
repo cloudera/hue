@@ -21,3 +21,4 @@ from django.conf import settings
 def index(request):
   return render('index.mako', request,
     dict(version=settings.HUE_DESKTOP_VERSION))
+
