@@ -9,7 +9,8 @@ Hue is both a Web UI for Hadoop and a framework to create interactive Web
 applications. It features:
 
       * FileBrowser for accessing HDFS
-      * Job Designer and Oozie for submitting and scheduling workflows of MapReduce/Java/Streaming/Pig jobs
+      * Job Designer for creating MapReduce/Streaming/Java jobs
+      * Oozie App for submitting and scheduling workflows
       * JobBrowser for viewing MapReduce jobs
       * Beeswax application for executing Hive queries
       * A Pig/HBase shell
