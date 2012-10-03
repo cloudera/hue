@@ -1,5 +1,5 @@
 Hue v2.1.0, released October 2nd, 2012
-============================================
+======================================
 
 This is the release of Hue 2.1.0.
 Hue 2.1.0 is compatible with CDH4.1 (Cloudera's Distribution Including Apache
@@ -14,7 +14,6 @@ Notable Features
   scheduling them repetitively (HUE-755).
 - Hue is now available in German, Spanish, French, Japanese, Korean, Portuguese,
   Brazilian and simplified Chinese (HUE-758).
-
 
 Notable Fixes
 -------------
@@ -31,7 +30,6 @@ Notable Fixes
 - HUE-652 HUE-617 [ui] Datatable shouldn't sort dates literally
 - HUE-504 Sticky bit support in Hue
 
-
 Compatibility
 -------------
 
@@ -45,18 +43,15 @@ Hue 2.1.0 is compatible with CDH4.1. Specifically:
 - Job Browser does *not* work with Yarn/MR2.
 - Job Designer depends on Oozie, using the Oozie web service API.
 
-
 Upgrade
 -------
 
 Hue 2.1.0 is backward compatible with Hue 2.0.1.
 
-
 Known Issue
 -----------
 
 - Uploads with HttpFs in a federated cluster fail (HUE-742).
-
 
 List of All Commits
 -------------------
@@ -295,7 +290,6 @@ dd5c997 [doc] Fix SDK link in manual
 9e0b032 [sdk] Update SDK docs for Hue 2.0
 081d73e [sdk] Update SDK app template
 9810072 [beeswax] Test randomly failing
-
 
 Contributors
 ------------
