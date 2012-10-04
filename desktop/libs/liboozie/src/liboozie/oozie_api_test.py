@@ -53,7 +53,7 @@ class OozieServerProvider(object):
     cls.shutdown = [callback]
 
   @classmethod
-  def wait_until_completion(cls, oozie_jobid, timeout=300.0, step=5):
+  def wait_until_completion(cls, oozie_jobid, timeout=900.0, step=5):
     job = cls.oozie.get_job(oozie_jobid)
     start = time.time()
 
@@ -61,13 +61,15 @@ class OozieServerProvider(object):
       time.sleep(step)
       LOG.info('Checking status of %s...' % oozie_jobid)
       job = cls.oozie.get_job(oozie_jobid)
-      LOG.info('Status after %d: %s' % (time.time() - start, job))
+      LOG.info('[%d] Status after %d: %s' % (time.time(), time.time() - start, job))
 
     if job.is_running():
       logs = cls.oozie.get_job_log(oozie_jobid)
-      raise Exception("%s took more than %s to complete: %s" % (oozie_jobid, timeout, logs))
+      msg = "[%d] %s took more than %d to complete: %s" % (time.time(), oozie_jobid, timeout, logs)
+      LOG.info(msg)
+      raise Exception(msg)
     else:
-      LOG.info('Job duration %s: %d' % (job.id, time.time() - start))
+      LOG.info('[%d] Job duration %s: %d' % (time.time(), job.id, time.time() - start))
 
     return job
 

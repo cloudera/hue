@@ -247,7 +247,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
         'map_sleep_time': 1,
         'reduce_sleep_time': 1}, follow=True)
 
-    assert_true('PREP' in response.content, response.content)
+    assert_true('PREP' in response.content or 'OK' in response.content, response.content)
     assert_true(str(jobid) in response.content)
 
     oozie_job_id = response.context['jobid']
