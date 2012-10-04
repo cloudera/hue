@@ -46,9 +46,7 @@ admin.autodiscover()
 # Some django-wide URLs
 dynamic_patterns = patterns('',
   (r'^accounts/login/$', 'desktop.auth.views.dt_login'),
-  (r'^accounts/login_ajax/?$', 'desktop.auth.views.login_ajax'),
   (r'^accounts/logout/$', 'desktop.auth.views.dt_logout', {'next_page': '/'}),
-  (r'^accounts/login_form/?$', 'desktop.auth.views.login_form'),
   (r'^logs$','desktop.views.log_view'),
   (r'^dump_config$','desktop.views.dump_config'),
   (r'^download_logs$','desktop.views.download_log_view'),

@@ -16,50 +16,21 @@
 # limitations under the License.
 
 import logging
-import threading
 
 import django.contrib.auth.views
-from django.core.exceptions import SuspiciousOperation
-
 from django.core import urlresolvers
-from django.contrib.auth import authenticate, login, get_backends
+from django.core.exceptions import SuspiciousOperation
+from django.contrib.auth import login, get_backends
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
+
 from desktop.auth.backend import AllowFirstUserDjangoBackend
-from desktop.lib.django_util import render_json, render
+from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.log.access import access_warn, last_access_map
 
 LOG = logging.getLogger(__name__)
-
-
-@login_notrequired
-def login_ajax(request):
-  username = request.POST.get('username')
-  user = authenticate(username=username,
-                      password=request.POST.get('password'))
-  if user:
-    access_warn(request, '"%s" login ok' % (user.username,))
-    login(request, user)
-    return render_json(dict(success=True))
-  else:
-    access_warn(request, 'Failed login for user "%s"' % (username,))
-    return render_json(dict(success=False))
-
-
-@login_notrequired
-def login_form(request):
-  """Used by the ajax login"""
-  backends = get_backends()
-  first_login_ever = False
-  for be in backends:
-    if isinstance(be, AllowFirstUserDjangoBackend) and be.is_first_login_ever():
-      first_login_ever = True
-
-  return render("login.html", request,
-                { 'first_login_ever': first_login_ever },
-                force_template=True)
 
 
 def get_current_users():

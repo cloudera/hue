@@ -340,7 +340,7 @@ def test_config_check():
 
 def test_last_access_time():
   c = make_logged_in_client(username="access_test")
-  c.post('/accounts/login_ajax')
+  c.post('/accounts/login/')
   login = desktop.auth.views.get_current_users()
   before_access_time = time.time()
   response = c.post('/status_bar')

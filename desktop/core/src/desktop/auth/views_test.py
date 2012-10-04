@@ -28,16 +28,16 @@ def test_jframe_login():
 
   c = Client()
 
-  response = c.get('/accounts/login_form')
+  response = c.get('/accounts/login/')
   assert_equal(200, response.status_code, "Expected ok status.")
   assert_true(response.context['first_login_ever'])
 
-  response = c.post('/accounts/login_ajax',
+  response = c.post('/accounts/login/',
                     dict(username="foo",
                          password="foo"))
-  assert_equal(200, response.status_code, "Expected ok status.")
+  assert_equal(302, response.status_code, "Expected ok redirect status.")
 
-  response = c.get('/accounts/login_form')
+  response = c.get('/accounts/login/')
   assert_equal(200, response.status_code, "Expected ok status.")
   assert_false(response.context['first_login_ever'])
 
