@@ -8,7 +8,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sleep",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-09-24 00:00:00",
+      "last_modified": "2012-10-02 00:00:00",
       "owner": 1,
       "description": "MapReduce job that sleeps"
     }
@@ -22,13 +22,13 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sleep",
       "schema_version": "uri:oozie:coordinator:0.2",
-      "last_modified": "2012-09-24 00:00:00",
+      "last_modified": "2012-10-02 00:00:00",
       "owner": 1,
       "description": "Example of MapReduce action"
     }
   },
   {
-    "pk": null,
+    "pk": 7,
     "model": "oozie.job",
     "fields": {
       "is_shared": true,
@@ -36,7 +36,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/terasort",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-09-24 00:00:00",
+      "last_modified": "2012-10-02 00:00:00",
       "owner": 1,
       "description": "Example of sequential Java actions"
     }
@@ -50,7 +50,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sleepfork",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-09-24 00:00:00",
+      "last_modified": "2012-10-02 00:00:00",
       "owner": 1,
       "description": "Example of multiple forks"
     }
@@ -64,7 +64,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/hive",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-09-24 00:00:00",
+      "last_modified": "2012-10-02 00:00:00",
       "owner": 1,
       "description": "Example of Hive action"
     }
@@ -78,7 +78,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/pig",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-09-24 00:00:00",
+      "last_modified": "2012-10-02 00:00:00",
       "owner": 1,
       "description": "Example of Pig action"
     }
@@ -92,7 +92,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sqoop",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-09-24 00:00:00",
+      "last_modified": "2012-10-02 00:00:00",
       "owner": 1,
       "description": "Example of Sqoop action"
     }
@@ -106,7 +106,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/ssh",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-09-24 00:00:00",
+      "last_modified": "2012-10-02 00:00:00",
       "owner": 1,
       "description": "Example of Ssh action"
     }
@@ -120,7 +120,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/shell",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-09-24 00:00:00",
+      "last_modified": "2012-10-02 00:00:00",
       "owner": 1,
       "description": "Example of Shell action"
     }
@@ -1471,12 +1471,12 @@
     "pk": 6,
     "model": "oozie.coordinator",
     "fields": {
-      "end": "2012-08-04 00:00:00",
+      "end": "2012-10-04 00:00:00",
       "concurrency": null,
       "frequency_number": 1,
       "workflow": 5,
       "frequency_unit": "days",
-      "start": "2012-08-01 00:00:00",
+      "start": "2012-10-01 00:00:00",
       "timeout": null,
       "timezone": "America/Los_Angeles",
       "throttle": null,
@@ -1492,7 +1492,7 @@
       "coordinator": 6,
       "frequency_unit": "days",
       "uri": "${DAY}",
-      "start": "2012-08-01 00:00:00",
+      "start": "2012-10-01 00:00:00",
       "timezone": "America/Los_Angeles",
       "done_flag": "",
       "description": ""
