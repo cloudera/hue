@@ -56,7 +56,7 @@ class Command(NoArgsCommand):
 
     # Load jobs
     sample, created = User.objects.get_or_create(username='sample')
-    management.call_command('loaddata', 'apps/oozie/src/oozie/fixtures/initial_example_data.json', verbosity=2)
+    management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
     from oozie.models import Job
     Job.objects.filter(owner__id=1, pk__lte=15).update(owner=sample)
 
