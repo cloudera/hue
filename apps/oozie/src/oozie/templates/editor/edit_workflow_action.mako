@@ -66,7 +66,7 @@ ${ layout.menubar(section='workflows') }
       </div>
 
       % for field in action_form:
-        % if field.html_name not in ('name', 'description', 'node_type'):
+        % if field.html_name not in ('name', 'description', 'node_type', 'job_xml'):
           ${ utils.render_field(field) }
         % endif
       % endfor
@@ -144,7 +144,7 @@ ${ layout.menubar(section='workflows') }
             % if node_type in ('pig', 'hive'):
               <button class="btn" data-bind="click: addParam">${ _('Add Param') }</button>
             % endif
-            % if node_type in ('pig', 'shell'):
+            % if node_type in ('pig', 'shell', 'distcp'):
               <button class="btn" data-bind="click: addArgument">${ _('Add Argument') }</button>
             % endif
             % if node_type in ('sqoop', 'ssh'):
@@ -243,6 +243,11 @@ ${ layout.menubar(section='workflows') }
          </div>
       </div>
       % endif
+
+      % if 'job_xml' in action_form.fields:
+        ${ utils.render_field(action_form['job_xml']) }
+      % endif
+
       </fieldset>
 
       <div class="form-actions">

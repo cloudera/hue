@@ -58,7 +58,7 @@ class Command(NoArgsCommand):
     sample, created = User.objects.get_or_create(username='sample')
     management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
     from oozie.models import Job
-    Job.objects.filter(owner__id=1, pk__lte=15).update(owner=sample)
+    Job.objects.filter(owner__id=1, pk__lte=16).update(owner=sample)
 
 
 # This should probably be refactored and some parts moved to the HDFS lib. Jobsub could be updated to.

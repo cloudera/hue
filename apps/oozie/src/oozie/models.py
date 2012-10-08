@@ -625,6 +625,8 @@ class Node(models.Model):
       node = self.ssh
     elif self.node_type == Shell.node_type:
       node = self.shell
+    elif self.node_type == DistCp.node_type:
+      node = self.distcp
     elif self.node_type == Streaming.node_type:
       node = self.streaming
     elif self.node_type == Java.node_type:
@@ -992,7 +994,7 @@ class Ssh(Action):
                           help_text=_t('User executing the shell command.'))
   host = models.CharField(max_length=256, verbose_name=_t('Host'),
                          help_text=_t('Where the shell will be executed.'))
-  command = models.CharField(max_length=256, verbose_name=_t('Command'),
+  command = models.CharField(max_length=256, verbose_name=_t('%(type)s command') % {'type': node_type.title()},
                              help_text=_t('The command that will be executed.'))
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
                             help_text=_t('The arguments of the %(type)s command')  % {'type': node_type.title()})
@@ -1010,7 +1012,7 @@ class Shell(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
   node_type = 'shell'
 
-  command = models.CharField(max_length=256, blank=False, verbose_name=_t('Shell command'),
+  command = models.CharField(max_length=256, blank=False, verbose_name=_t('%(type)s command') % {'type': node_type.title()},
                              help_text=_t('The path of the Shell command to execute'))
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
                             help_text=_t('The arguments of Shell command can then be specified using one or more argument element.'))
@@ -1049,7 +1051,36 @@ class Shell(Action):
     return json.loads(self.prepares)
 
 
-Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type, Shell.node_type)
+class DistCp(Action):
+  PARAM_FIELDS = ('job_properties', 'params', 'prepares')
+  node_type = 'distcp'
+
+  params = models.TextField(default="[]", verbose_name=_t('Arguments'),
+                            help_text=_t('The arguments of the %(type)s command. Put options first then source paths then destination path.')
+                                        % {'type': node_type.title()})
+  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+  prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
+                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
+                                           'This should be used exclusively for directory cleanup'))
+  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
+                             help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
+                                          'Properties specified in the configuration element override properties specified in the '
+                                          'files specified by any job-xml elements.'))
+
+
+  def get_properties(self):
+    return json.loads(self.job_properties)
+
+  def get_params(self):
+    return json.loads(self.params)
+
+  def get_prepares(self):
+    return json.loads(self.prepares)
+
+
+Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type, Shell.node_type,
+                DistCp.node_type)
 
 
 class ControlFlow(Node):

@@ -120,6 +120,12 @@ ${ layout.menubar(section='workflows') }
                   <i class="icon-plus"></i> ${ _('Ssh') }
                 </a>
                 <p/>
+                <p>
+                <a href="${ url('oozie:new_action', workflow=workflow.id, node_type='distcp', parent_action_id=workflow.end.get_parents()[0].id) }"
+                  title="${ _('Click to add to the end') }" class="btn">
+                  <i class="icon-plus"></i> ${ _('DistCp') }
+                </a>
+                <p/>
               </div>
               <div class="tab-pane" id="import">
                 <p>
