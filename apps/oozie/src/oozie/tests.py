@@ -1202,6 +1202,19 @@ class TestOozieSubmissions(OozieBase):
     assert_equal('SUCCEEDED', job.status)
 
 
+  def test_submit_distcp_action(self):
+    wf = Workflow.objects.get(name='DistCp')
+
+    response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]),
+                           data={u'form-MAX_NUM_FORMS': [u''],
+                                u'form-0-name': [u'MAP_NUMBER'], u'form-0-value': [u'5'],
+                                u'form-1-name': [u'OUTPUT '], u'form-1-value': [u'${nameNode}/user/test/out/distcp'],
+                                u'form-INITIAL_FORMS': [u'2'], u'form-TOTAL_FORMS': [u'2']},
+                           follow=True)
+    job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
+    assert_equal('SUCCEEDED', job.status)
+
+
 class TestDashboard(OozieMockBase):
 
   def test_manage_workflow_dashboard(self):

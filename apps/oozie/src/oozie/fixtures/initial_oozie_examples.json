@@ -8,8 +8,8 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sleep",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-10-02 00:00:00",
-      "owner": 1,
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 2,
       "description": "MapReduce job that sleeps"
     }
   },
@@ -22,8 +22,8 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sleep",
       "schema_version": "uri:oozie:coordinator:0.2",
-      "last_modified": "2012-10-02 00:00:00",
-      "owner": 1,
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 2,
       "description": "Example of MapReduce action"
     }
   },
@@ -36,8 +36,8 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/terasort",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-10-02 00:00:00",
-      "owner": 1,
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 2,
       "description": "Example of sequential Java actions"
     }
   },
@@ -50,8 +50,8 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sleepfork",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-10-02 00:00:00",
-      "owner": 1,
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 2,
       "description": "Example of multiple forks"
     }
   },
@@ -64,8 +64,8 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/hive",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-10-02 00:00:00",
-      "owner": 1,
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 2,
       "description": "Example of Hive action"
     }
   },
@@ -78,8 +78,8 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/pig",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-10-02 00:00:00",
-      "owner": 1,
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 2,
       "description": "Example of Pig action"
     }
   },
@@ -92,8 +92,8 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sqoop",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-10-02 00:00:00",
-      "owner": 1,
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 2,
       "description": "Example of Sqoop action"
     }
   },
@@ -106,8 +106,8 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/ssh",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-10-02 00:00:00",
-      "owner": 1,
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 2,
       "description": "Example of Ssh action"
     }
   },
@@ -120,9 +120,23 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/shell",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-10-02 00:00:00",
-      "owner": 1,
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 2,
       "description": "Example of Shell action"
+    }
+  },
+  {
+    "pk": 16,
+    "model": "oozie.job",
+    "fields": {
+      "is_shared": true,
+      "name": "DistCp",
+      "parameters": "[]",
+      "deployment_dir": "/user/hue/oozie/workspaces/distcp",
+      "schema_version": "uri:oozie:workflow:0.4",
+      "last_modified": "2012-11-05 00:00:00",
+      "owner": 1,
+      "description": "Example of DistCp action"
     }
   },
   {
@@ -210,6 +224,17 @@
       "start": 67,
       "is_single": false,
       "end": 66,
+      "job_properties": "[]"
+    }
+  },
+  {
+    "pk": 16,
+    "model": "oozie.workflow",
+    "fields": {
+      "job_xml": "",
+      "start": 71,
+      "is_single": false,
+      "end": 70,
       "job_properties": "[]"
     }
   },
@@ -714,6 +739,46 @@
     }
   },
   {
+    "pk": 92,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "to",
+      "parent": 71,
+      "child": 72
+    }
+  },
+  {
+    "pk": 93,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "related",
+      "parent": 71,
+      "child": 70
+    }
+  },
+  {
+    "pk": 94,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "ok",
+      "parent": 72,
+      "child": 70
+    }
+  },
+  {
+    "pk": 95,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "error",
+      "parent": 72,
+      "child": 69
+    }
+  },
+  {
     "pk": 16,
     "model": "oozie.node",
     "fields": {
@@ -1124,6 +1189,46 @@
     }
   },
   {
+    "pk": 69,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "kill",
+      "workflow": 16,
+      "name": "kill",
+      "description": ""
+    }
+  },
+  {
+    "pk": 70,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "end",
+      "workflow": 16,
+      "name": "end",
+      "description": ""
+    }
+  },
+  {
+    "pk": 71,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "start",
+      "workflow": 16,
+      "name": "start",
+      "description": ""
+    }
+  },
+  {
+    "pk": 72,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "distcp",
+      "workflow": 16,
+      "name": "DistCp",
+      "description": "Copy some data and overwrite it if needed"
+    }
+  },
+  {
     "pk": 19,
     "model": "oozie.mapreduce",
     "fields": {
@@ -1296,6 +1401,16 @@
     }
   },
   {
+    "pk": 72,
+    "model": "oozie.distcp",
+    "fields": {
+      "prepares": "[]",
+      "job_xml": "",
+      "params": "[{\"value\":\"-overwrite\",\"type\":\"argument\"},{\"value\":\"-m\",\"type\":\"argument\"},{\"value\":\"${MAP_NUMBER}\",\"type\":\"argument\"},{\"value\":\"/user/hue/oozie/workspaces/data\",\"type\":\"argument\"},{\"value\":\"${OUTPUT}\",\"type\":\"argument\"}]",
+      "job_properties": "[]"
+    }
+  },
+  {
     "pk": 18,
     "model": "oozie.start",
     "fields": {
@@ -1352,6 +1467,13 @@
     }
   },
   {
+    "pk": 71,
+    "model": "oozie.start",
+    "fields": {
+      "node_ptr": 71
+    }
+  },
+  {
     "pk": 17,
     "model": "oozie.end",
     "fields": {}
@@ -1388,6 +1510,11 @@
   },
   {
     "pk": 66,
+    "model": "oozie.end",
+    "fields": {}
+  },
+  {
+    "pk": 70,
     "model": "oozie.end",
     "fields": {}
   },
@@ -1448,6 +1575,13 @@
     }
   },
   {
+    "pk": 69,
+    "model": "oozie.kill",
+    "fields": {
+      "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
+    }
+  },
+  {
     "pk": 34,
     "model": "oozie.fork",
     "fields": {}
@@ -1471,12 +1605,12 @@
     "pk": 6,
     "model": "oozie.coordinator",
     "fields": {
-      "end": "2012-10-04 00:00:00",
+      "end": "2012-11-05 00:00:00",
       "concurrency": null,
       "frequency_number": 1,
       "workflow": 5,
       "frequency_unit": "days",
-      "start": "2012-10-01 00:00:00",
+      "start": "2012-11-01 00:00:00",
       "timeout": null,
       "timezone": "America/Los_Angeles",
       "throttle": null,
@@ -1492,7 +1626,7 @@
       "coordinator": 6,
       "frequency_unit": "days",
       "uri": "${DAY}",
-      "start": "2012-10-01 00:00:00",
+      "start": "2012-11-01 00:00:00",
       "timezone": "America/Los_Angeles",
       "done_flag": "",
       "description": ""

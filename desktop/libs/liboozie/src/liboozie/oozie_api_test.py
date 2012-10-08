@@ -54,7 +54,7 @@ class OozieServerProvider(object):
 
   @classmethod
 
-  def wait_until_completion(cls, oozie_jobid, timeout=1800.0, step=5):
+  def wait_until_completion(cls, oozie_jobid, timeout=300.0, step=5):
     job = cls.oozie.get_job(oozie_jobid)
     start = time.time()
 
