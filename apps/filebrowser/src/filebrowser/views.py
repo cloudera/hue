@@ -1173,7 +1173,7 @@ def status(request):
     return render("status.mako", request, data)
 
 
-def location_to_url(request, location, strict=True):
+def location_to_url(location, strict=True):
     """
     If possible, returns a file browser URL to the location.
     Location is a URI, if strict is True.
@@ -1183,7 +1183,7 @@ def location_to_url(request, location, strict=True):
     """
     if location is None:
       return None
-    split_path = request.fs.urlsplit(location)
+    split_path = Hdfs.urlsplit(location)
     if strict and not split_path[1]:
       # No netloc, not full url
       return None

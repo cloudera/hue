@@ -109,8 +109,9 @@ def jobs(request):
   state = request.GET.get('state', 'all')
   text = request.GET.get('text', '')
   retired = request.GET.get('retired', '')
+
   return render("jobs.mako", request, {
-    'jobs':matching_jobs,
+    'jobs': matching_jobs,
     'request': request,
     'state_filter': state,
     'user_filter': user,

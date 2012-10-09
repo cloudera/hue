@@ -20,18 +20,34 @@ The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
 
 import logging
+import re
 import simplejson
 
 import django.http
 from django import forms
 
 from desktop.lib.django_forms import BaseSimpleFormSet, MultiForm
+from desktop.lib.django_mako import render_to_string
 
-import beeswax.forms
 
 LOG = logging.getLogger(__name__)
 
 SERIALIZATION_VERSION = '0.4.0'
+
+
+def hql_query(hql):
+  data_dict = simplejson.loads('{"query": {"email_notify": null, "query": null, "type": null, "is_parameterized": null}, '
+                               '"functions": [], "VERSION": "0.4.0", "file_resources": [], "settings": []}')
+  if not (isinstance(hql, str) or isinstance(hql, unicode)):
+    raise Exception('Requires a SQL text query of type <str>, <unicode> and not %s' % type(hql))
+
+  data_dict['query']['query'] = _strip_trailing_semicolon(hql)
+  hql_design = HQLdesign()
+  hql_design._data_dict = data_dict
+
+  return hql_design
+
+
 
 class HQLdesign(object):
   """
@@ -41,19 +57,20 @@ class HQLdesign(object):
   want to use "$" natively, but we leave that as an advanced
   option to turn off.
   """
-  _QUERY_ATTRS = [ 'query', 'type', "is_parameterized", 'email_notify' ]
+  _QUERY_ATTRS = [ 'query', 'type', 'is_parameterized', 'email_notify' ]
   _SETTINGS_ATTRS = [ 'key', 'value' ]
   _FILE_RES_ATTRS = [ 'type', 'path' ]
   _FUNCTIONS_ATTRS = [ 'name', 'class_name' ]
 
-  def __init__(self, form):
-    """Initialize the design from form data. The form may be invalid."""
-    assert isinstance(form, MultiForm)
-    self._data_dict = dict(
-        query = normalize_form_dict(form.query, HQLdesign._QUERY_ATTRS),
-        settings = normalize_formset_dict(form.settings, HQLdesign._SETTINGS_ATTRS),
-        file_resources = normalize_formset_dict(form.file_resources, HQLdesign._FILE_RES_ATTRS),
-        functions = normalize_formset_dict(form.functions, HQLdesign._FUNCTIONS_ATTRS))
+  def __init__(self, form=None):
+    """Initialize the design from a valid form data."""
+    if form is not None:
+      assert isinstance(form, MultiForm)
+      self._data_dict = dict(
+          query = normalize_form_dict(form.query, HQLdesign._QUERY_ATTRS),
+          settings = normalize_formset_dict(form.settings, HQLdesign._SETTINGS_ATTRS),
+          file_resources = normalize_formset_dict(form.file_resources, HQLdesign._FILE_RES_ATTRS),
+          functions = normalize_formset_dict(form.functions, HQLdesign._FUNCTIONS_ATTRS))
 
   def dumps(self):
     """Returns the serialized form of the design in a string"""
@@ -61,11 +78,46 @@ class HQLdesign(object):
     dic['VERSION'] = SERIALIZATION_VERSION
     return simplejson.dumps(dic)
 
+  @property
+  def hql_query(self):
+    return self._data_dict['query']['query']
+
+  @property
+  def query(self):
+    return self._data_dict['query'].copy()
+
+  @property
+  def settings(self):
+    return list(self._data_dict['settings'])
+
+  @property
+  def file_resources(self):
+    return list(self._data_dict['file_resources'])
+
+  @property
+  def functions(self):
+    return list(self._data_dict['functions'])
+
+  def get_configuration(self):
+    configuration = []
+
+    for f in self.settings:
+      configuration.append(render_to_string("hql_set.mako", f))
+
+    for f in self.file_resources:
+      configuration.append(render_to_string("hql_resource.mako", dict(type=f['type'], path=f['path'])))
+
+    for f in self.functions:
+      configuration.append(render_to_string("hql_function.mako", f))
+
+    return configuration
+
   def get_query_dict(self):
     """get_query_dict() -> QueryDict"""
     # We construct the mform to use its structure and prefix. We don't actually bind
     # data to the forms.
-    mform = beeswax.forms.query_form()
+    from beeswax.forms import QueryForm
+    mform = QueryForm()
     mform.bind()
 
     res = django.http.QueryDict('', mutable=True)
@@ -105,7 +157,7 @@ def normalize_form_dict(form, attr_list):
   assert isinstance(form, forms.Form)
   res = { }
   for attr in attr_list:
-    res[attr] = form.data.get(form.add_prefix(attr))
+    res[attr] = form.cleaned_data.get(attr)
   return res
 
 
@@ -148,3 +200,17 @@ def denormalize_formset_dict(data_dict_list, formset, attr_list):
 
   res[formset.management_form.add_prefix('next_form_id')] = str(len(data_dict_list))
   return res
+
+  def __str__(self):
+    return '%s: %s' % (self.__class__, self.query)
+
+
+_SEMICOLON_WHITESPACE = re.compile(";\s*$")
+
+def _strip_trailing_semicolon(query):
+  """As a convenience, we remove trailing semicolons from queries."""
+  s = _SEMICOLON_WHITESPACE.split(query, 2)
+  if len(s) > 1:
+    assert len(s) == 2
+    assert s[1] == ''
+  return s[0]

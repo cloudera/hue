@@ -22,20 +22,17 @@ import time
 
 from django.http import HttpResponse
 
-from beeswax import common
-from beeswax import db_utils
-from beeswaxd.ttypes import QueryHandle
-
 from desktop.lib.export_csvxls import CSVformatter, XLSformatter, TooBigToDownloadException
 
-from django.utils.translation import ugettext as _
+from beeswax import common
+
 
 LOG = logging.getLogger(__name__)
 
 _DATA_WAIT_SLEEP = 0.1                  # Sleep 0.1 sec before checking for data availability
 
 
-def download(query_model, format):
+def download(handle, format, db):
   """
   download(query_model, format) -> HttpResponse
 
@@ -52,13 +49,14 @@ def download(query_model, format):
     formatter = XLSformatter()
     mimetype = 'application/xls'
 
-  gen = data_generator(query_model, formatter)
+  gen = data_generator(handle, formatter, db)
   resp = HttpResponse(gen, mimetype=mimetype)
   resp['Content-Disposition'] = 'attachment; filename=query_result.%s' % (format,)
+
   return resp
 
 
-def data_generator(query_model, formatter):
+def data_generator(handle, formatter, db):
   """
   data_generator(query_model, formatter) -> generator object
 
@@ -67,51 +65,32 @@ def data_generator(query_model, formatter):
   This is similar to export_csvxls.generator, but has
   one or two extra complexities.
   """
-  global _DATA_WAIT_SLEEP
+  _DATA_WAIT_SLEEP
   is_first_row = True
-  next_row = 0
-  results = None
-  handle = QueryHandle(query_model.server_id, query_model.log_context)
 
   yield formatter.init_doc()
 
-  while True:
-    # Make sure that we have the next batch of ready results
-    while results is None or not results.ready:
-      results = db_utils.db_client(query_model.get_query_server()).fetch(handle, start_over=is_first_row, fetch_size=-1)
-      if not results.ready:
-        time.sleep(_DATA_WAIT_SLEEP)
+  results = db.fetch(handle, start_over=is_first_row, rows=None)
 
-    # Someone is reading the results concurrently. Abort.
-    # But unfortunately, this current generator will produce incomplete data.
-    if next_row != results.start_row:
-      msg = _('Error: Potentially incomplete results as an error occurred during data retrieval.')
-      yield formatter.format_row([msg])
-      err = (_('Detected another client retrieving results for %(server_id)s. '
-             'Expected next row to be %(row)s and got %(start_row)s. Aborting') %
-             {'server_id': query_model.server_id, 'row': next_row, 'start_row': results.start_row})
-      LOG.error(err)
-      raise RuntimeError(err)
+  while results is not None:
+    while not results.ready:   # For Beeswax
+      time.sleep(_DATA_WAIT_SLEEP)
+      results = db.fetch(handle, start_over=is_first_row, rows=None)
 
+    # TODO Check for concurrent reading when HS2 supports start_row
     if is_first_row:
       is_first_row = False
-      yield formatter.format_header(results.columns)
-    else:
-      for i, row in enumerate(results.data):
-        # TODO(bc): Hive seems to always return tab delimited row data.
-        # What if a cell has a tab?
-        row = row.split('\t')
-        try:
-          yield formatter.format_row(row)
-        except TooBigToDownloadException, ex:
-          LOG.error(ex)
-          # Exceeded limit. Stop.
-          results.has_more = False
-          break
+      yield formatter.format_header(results.cols())
 
-      if results.has_more:
-        next_row += len(results.data)
-        results = None
-      else:
-        yield formatter.fini_doc()
-        break
+    for row in results.rows():
+      try:
+        yield formatter.format_row(row)
+      except TooBigToDownloadException, ex:
+        LOG.error(ex)
+
+    if results.has_more:
+      results = db.fetch(handle, start_over=is_first_row, rows=None)
+    else:
+      results = None
+
+  yield formatter.fini_doc()

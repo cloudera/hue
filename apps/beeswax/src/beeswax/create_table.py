@@ -23,6 +23,7 @@ import logging
 import gzip
 
 from django.core import urlresolvers
+from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako, i18n
 from desktop.lib.django_util import render
@@ -30,15 +31,17 @@ from desktop.lib.exceptions import PopupException
 from desktop.lib.django_forms import MultiForm
 from hadoop.fs import hadoopfs
 
-import beeswax.common
-import beeswax.forms
+from beeswax.common import TERMINATORS
+from beeswax.design import hql_query
+from beeswax.forms import CreateTableForm, ColumnTypeFormSet,\
+  PartitionTypeFormSet, CreateByImportFileForm, CreateByImportDelimForm,\
+  TERMINATOR_CHOICES
+from beeswax.server import dbms
 from beeswax.views import describe_table, execute_directly
-from beeswax.views import make_beeswax_query
-from beeswax import db_utils
 
-from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
+
 
 def index(request):
   """Main create table entry point, to divert into manual creation vs create from file."""
@@ -47,12 +50,17 @@ def index(request):
 
 def create_table(request):
   """Create a table by specifying its attributes manually"""
+  db = dbms.get(request.user)
+
   form = MultiForm(
-      table=beeswax.forms.CreateTableForm,
-      columns=beeswax.forms.ColumnTypeFormSet,
-      partitions=beeswax.forms.PartitionTypeFormSet)
+      table=CreateTableForm,
+      columns=ColumnTypeFormSet,
+      partitions=PartitionTypeFormSet)
+
   if request.method == "POST":
     form.bind(request.POST)
+    form.table.db = db  # curry is invalid
+
     if form.is_valid():
       columns = [ f.cleaned_data for f in form.columns.forms ]
       partition_columns = [ f.cleaned_data for f in form.partitions.forms ]
@@ -69,18 +77,19 @@ def create_table(request):
       return _submit_create_and_load(request, proposed_query, table_name, None, False)
   else:
     form.bind()
+
   return render("create_table_manually.mako", request, dict(
     action="#",
     table_form=form.table,
     columns_form=form.columns,
     partitions_form=form.partitions,
-    has_tables=len(db_utils.meta_client().get_tables("default", ".*")) > 0
+    has_tables=len(dbms.get(request.user).get_tables()) > 0
   ))
 
 
 IMPORT_PEEK_SIZE = 8192
 IMPORT_PEEK_NLINES = 10
-DELIMITERS = [ hive_val for hive_val, desc, ascii in beeswax.common.TERMINATORS ]
+DELIMITERS = [ hive_val for hive_val, desc, ascii in TERMINATORS ]
 DELIMITER_READABLE = {'\\001' : _('ctrl-As'),
                       '\\002' : _('ctrl-Bs'),
                       '\\003' : _('ctrl-Cs'),
@@ -122,7 +131,8 @@ def import_wizard(request):
       s3_col_formset = None
 
       # Everything requires a valid file form
-      s1_file_form = beeswax.forms.CreateByImportFileForm(request.POST)
+      db = dbms.get(request.user)
+      s1_file_form = CreateByImportFileForm(request.POST, db=db)
       if not s1_file_form.is_valid():
         break
 
@@ -147,14 +157,14 @@ def import_wizard(request):
       #
       if not do_s2_auto_delim:
         # We should have a valid delim form
-        s2_delim_form = beeswax.forms.CreateByImportDelimForm(request.POST)
+        s2_delim_form = CreateByImportDelimForm(request.POST)
         if not s2_delim_form.is_valid():
           # Go back to picking delimiter
           do_s2_user_delim, do_s3_column_def, do_hive_create = True, False, False
 
       if do_hive_create:
         # We should have a valid columns formset
-        s3_col_formset = beeswax.forms.ColumnTypeFormSet(prefix='cols', data=request.POST)
+        s3_col_formset = ColumnTypeFormSet(prefix='cols', data=request.POST)
         if not s3_col_formset.is_valid():
           # Go back to define columns
           do_s3_column_def, do_hive_create = True, False
@@ -188,7 +198,7 @@ def import_wizard(request):
           file_form=s1_file_form,
           delim_form=s2_delim_form,
           fields_list=fields_list,
-          delimiter_choices=beeswax.forms.TERMINATOR_CHOICES,
+          delimiter_choices=TERMINATOR_CHOICES,
           n_cols=n_cols,
         ))
 
@@ -203,7 +213,7 @@ def import_wizard(request):
                 column_name='col_%s' % (i,),
                 column_type='string',
             ))
-          s3_col_formset = beeswax.forms.ColumnTypeFormSet(prefix='cols', initial=columns)
+          s3_col_formset = ColumnTypeFormSet(prefix='cols', initial=columns)
         return render('define_columns.mako', request, dict(
           action=urlresolvers.reverse(import_wizard),
           file_form=s1_file_form,
@@ -234,7 +244,7 @@ def import_wizard(request):
         path = s1_file_form.cleaned_data['path']
         return _submit_create_and_load(request, proposed_query, table_name, path, do_load_data)
   else:
-    s1_file_form = beeswax.forms.CreateByImportFileForm()
+    s1_file_form = CreateByImportFileForm()
 
   return render('choose_file.mako', request, dict(
     action=urlresolvers.reverse(import_wizard),
@@ -247,15 +257,16 @@ def _submit_create_and_load(request, create_hql, table_name, path, do_load):
   Submit the table creation, and setup the load to happen (if ``do_load``).
   """
   on_success_params = { }
+
   if do_load:
     on_success_params['table'] = table_name
     on_success_params['path'] = path
-    on_success_url = urlresolvers.reverse(beeswax.create_table.load_after_create)
+    on_success_url = urlresolvers.reverse(load_after_create)
   else:
     on_success_url = urlresolvers.reverse(describe_table, kwargs={'table': table_name})
 
-  query_msg = make_beeswax_query(request, create_hql)
-  return execute_directly(request, query_msg,
+  query = hql_query(create_hql)
+  return execute_directly(request, query,
                           on_success_url=on_success_url,
                           on_success_params=on_success_params)
 
@@ -286,14 +297,14 @@ def _delim_preview(fs, file_form, encoding, file_types, delimiters):
   delimiter_0 = delim
   delimiter_1 = ''
   # If custom delimiter
-  if not filter(lambda val: val[0] == delim, beeswax.forms.TERMINATOR_CHOICES):
+  if not filter(lambda val: val[0] == delim, TERMINATOR_CHOICES):
     delimiter_0 = '__other__'
     delimiter_1 = delim
 
-  delim_form = beeswax.forms.CreateByImportDelimForm(dict(delimiter_0=delimiter_0,
-                                                          delimiter_1=delimiter_1,
-                                                          file_type=file_type,
-                                                          n_cols=n_cols))
+  delim_form = CreateByImportDelimForm(dict(delimiter_0=delimiter_0,
+                                            delimiter_1=delimiter_1,
+                                            file_type=file_type,
+                                            n_cols=n_cols))
   if not delim_form.is_valid():
     assert False, _('Internal error when constructing the delimiter form: %(error)s' % {'error': delim_form.errors})
   return fields_list, n_cols, delim_form
@@ -441,7 +452,7 @@ def load_after_create(request):
 
   LOG.debug("Auto loading data from %s into table %s" % (path, tablename))
   hql = "LOAD DATA INPATH '%s' INTO TABLE `%s`" % (path, tablename)
-  query_msg = make_beeswax_query(request, hql)
+  query = hql_query(hql)
   on_success_url = urlresolvers.reverse(describe_table, kwargs={'table': tablename})
 
-  return execute_directly(request, query_msg, on_success_url=on_success_url)
+  return execute_directly(request, query, on_success_url=on_success_url)

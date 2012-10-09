@@ -16,73 +16,157 @@
 # limitations under the License.
 
 import copy
-import logging
+import base64
 import datetime
+import logging
 import traceback
-from enum import Enum
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _, ugettext_lazy as _t
+
+from enum import Enum
 
 from desktop.lib.exceptions import PopupException
-from beeswaxd.ttypes import QueryState
 
-from django.utils.translation import ugettext as _
+from beeswax.conf import SERVER_INTERFACE
+from beeswaxd.ttypes import QueryHandle as BeeswaxdQueryHandle, QueryState
+from cli_service.ttypes import TSessionHandle, THandleIdentifier,\
+  TOperationState, TOperationHandle, TOperationType
+
 
 LOG = logging.getLogger(__name__)
 
-QUERY_SUBMISSION_TIMEOUT = datetime.timedelta(0, 60 * 60)               # 1 hr
+QUERY_SUBMISSION_TIMEOUT = datetime.timedelta(0, 60 * 60)               # 1 hour
+
+# Constants for DB fields, hue ini
+BEESWAX = 'beeswax'
+HIVE_SERVER2 = 'hiveserver2'
+
 
 class QueryHistory(models.Model):
   """
   Holds metadata about all queries that have been executed.
   """
   STATE = Enum('submitted', 'running', 'available', 'failed', 'expired')
-
-  # Map from (thrift) server state
-  STATE_MAP = {
-    QueryState.CREATED          : STATE.submitted,
-    QueryState.INITIALIZED      : STATE.submitted,
-    QueryState.COMPILED         : STATE.running,
-    QueryState.RUNNING          : STATE.running,
-    QueryState.FINISHED         : STATE.available,
-    QueryState.EXCEPTION        : STATE.failed
-  }
+  SERVER_TYPE = ((BEESWAX, 'Beeswax'), (HIVE_SERVER2, 'Hive Server 2'))
 
   owner = models.ForeignKey(User, db_index=True)
   query = models.TextField()
+
   last_state = models.IntegerField(db_index=True)
-  # If true, this query will eventually return tabular results.
-  has_results = models.BooleanField(default=False)
+  has_results = models.BooleanField(default=False)          # If true, this query will eventually return tabular results.
   submission_date = models.DateTimeField(auto_now_add=True)
-  # Only query in the "submitted" state is allowed to have no server_id
-  server_id = models.CharField(max_length=1024, null=True)
+  server_id = models.CharField(max_length=1024, null=True)  # Aka secret, only query in the "submitted" state is allowed to have no server_id
+  server_guid = models.CharField(max_length=1024, null=True, default=None)
+  operation_type = models.SmallIntegerField(null=True)
+  modified_row_count = models.FloatField(null=True)
   log_context = models.CharField(max_length=1024, null=True)
+
   server_host = models.CharField(max_length=128, help_text=_('Host of the query server.'), default='')
   server_port = models.SmallIntegerField(help_text=_('Port of the query server.'), default=0)
   server_name = models.CharField(max_length=128, help_text=_('Name of the query server.'), default='')
-  # Some queries (like read/drop table) don't have a design
-  design = models.ForeignKey('SavedQuery', to_field='id', null=True)
-  # Notify on completion
-  notify = models.BooleanField(default=False)
+  server_type = models.CharField(max_length=128, help_text=_('Type of the query server.'), default=BEESWAX, choices=SERVER_TYPE)
+
+  design = models.ForeignKey('SavedQuery', to_field='id', null=True) # Some queries (like read/drop table) don't have a design
+  notify = models.BooleanField(default=False)                        # Notify on completion
 
   class Meta:
     ordering = ['-submission_date']
 
-  def save_state(self, new_state):
-    """Set the last_state from an enum, and save"""
-    if self.last_state != new_state.index:
-      if new_state.index < self.last_state:
-        backtrace = ''.join(traceback.format_stack(limit=5))
-        LOG.error("Invalid query state transition: %s -> %s\n%s" % \
-                  (QueryHistory.STATE[self.last_state], new_state, backtrace))
-        return
-      self.last_state = new_state.index
-      self.save()
+  @staticmethod
+  def build(*args, **kwargs):
+    if SERVER_INTERFACE.get() == HIVE_SERVER2:
+      return HiveServerQueryHistory(*args, **kwargs)
+    else:
+      return BeeswaxQueryHistory(*args, **kwargs)
 
-  def get_server_id(self):
+  def get_full_object(self):
+    if self.server_type == HiveServerQueryHistory.node_type:
+      return HiveServerQueryHistory.objects.get(id=self.id)
+    elif self.server_type == BeeswaxQueryHistory.node_type:
+      return BeeswaxQueryHistory.objects.get(id=self.id)
+    else:
+      raise Exception(_('Unknown QueryHistory type: %s. Was the attribute "server_type" specified?'), (self.server_type,))
+
+  @staticmethod
+  def get(id):
+    if QueryHistory.objects.filter(id=id, server_type=BEESWAX).exists():
+      return BeeswaxQueryHistory.objects.get(id=id)
+    else:
+      return HiveServerQueryHistory.objects.get(id=id)
+
+
+  def get_query_server(self):
+    return dict(zip(['server_name', 'server_host', 'server_port', 'server_type'],
+                    [self.server_name, self.server_host, self.server_port, self.server_type]))
+
+
+  def is_running(self):
+    return self.last_state in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index)
+
+  def is_success(self):
+    return self.last_state in (QueryHistory.STATE.available.index,)
+
+  def is_failure(self):
+    return self.last_state in (QueryHistory.STATE.expired.index, QueryHistory.STATE.failed.index)
+
+  def set_to_running(self):
+    self.last_state = QueryHistory.STATE.running.index
+
+  def set_to_failed(self):
+    self.last_state = QueryHistory.STATE.failed.index
+
+
+class HiveServerQueryHistory(QueryHistory):
+  # Map from (thrift) server state
+  STATE_MAP = {
+    TOperationState.INITIALIZED_STATE          : QueryHistory.STATE.submitted,
+    TOperationState.RUNNING_STATE         : QueryHistory.STATE.running,
+    TOperationState.FINISHED_STATE      : QueryHistory.STATE.available,
+    TOperationState.CANCELED_STATE          : QueryHistory.STATE.failed,
+    TOperationState.CLOSED_STATE         : QueryHistory.STATE.expired,
+    TOperationState.ERROR_STATE        : QueryHistory.STATE.failed,
+    TOperationState.UKNOWN_STATE        : QueryHistory.STATE.failed,
+  }
+
+  node_type = HIVE_SERVER2
+
+  class Meta:
+    proxy = True
+
+  def get_handle(self):
+    secret, guid = HiveServerQueryHandle.get_decoded(self.server_id, self.server_guid)
+
+    return HiveServerQueryHandle(secret=secret,
+                                 guid=guid,
+                                 has_result_set=self.has_results,
+                                 operation_type=self.operation_type,
+                                 modified_row_count=self.modified_row_count)
+
+  def save_state(self, new_state):
+    self.last_state = new_state.index
+
+
+class BeeswaxQueryHistory(QueryHistory):
+  # Map from (thrift) server state
+  STATE_MAP = {
+    QueryState.CREATED          : QueryHistory.STATE.submitted,
+    QueryState.INITIALIZED      : QueryHistory.STATE.submitted,
+    QueryState.COMPILED         : QueryHistory.STATE.running,
+    QueryState.RUNNING          : QueryHistory.STATE.running,
+    QueryState.FINISHED         : QueryHistory.STATE.available,
+    QueryState.EXCEPTION        : QueryHistory.STATE.failed
+  }
+
+  node_type = BEESWAX
+
+  class Meta:
+    proxy = True
+
+  def get_handle(self):
     """
-    get_server_id() ->  (True/False, server-side query id)
+    get_server_id() ->  (server-side query id)
 
     The boolean indicates success/failure. The server_id follows, and may be None.
     Note that the server_id can legally be None when the query is just submitted.
@@ -91,33 +175,36 @@ class QueryHistory(models.Model):
     Does not issue RPC.
     """
     if self.server_id:
-      return (True, self.server_id)
-
-    # Query being submitted have no server_id?
-    if self.last_state == QueryHistory.STATE.submitted.index:
-      # (1) Really? Check the submission date.
-      #     This is possibly due to the server dying when compiling the query
-      if self.submission_date.now() - self.submission_date > QUERY_SUBMISSION_TIMEOUT:
-        LOG.error("Query submission taking too long. Expiring id %s: [%s]..." %
-                  (self.id, self.query[:40]))
-        self.save_state(QueryHistory.STATE.expired)
-        return (False, None)
-      else:
-        # (2) It's not an error. Return the current state
-        LOG.debug("Query %s (submitted) has no server id yet" % (self.id,))
-        return (True, None)
+      return BeeswaxQueryHandle(secret=self.server_id, has_result_set=self.has_results, log_context=self.log_context)
     else:
-      # (3) It has no server_id for no good reason. A case (1) will become this
-      #     after we expire it. Note that we'll never be able to recover this
-      #     query.
-      LOG.error("Query %s (%s) has no server id [%s]..." %
-                (self.id, QueryHistory.STATE[self.last_state], self.query[:40]))
-      self.save_state(QueryHistory.STATE.expired)
-      return (False, None)
+      # Query being submitted have no server_id?
+      if self.last_state == QueryHistory.STATE.submitted.index:
+        # (1) Really? Check the submission date.
+        #     This is possibly due to the server dying when compiling the query
+        if self.submission_date.now() - self.submission_date > QUERY_SUBMISSION_TIMEOUT:
+          LOG.error("Query submission taking too long. Expiring id %s: [%s]..." % (self.id, self.query[:40]))
+          self.save_state(QueryHistory.STATE.expired)
+        else:
+          # (2) It's not an error. Return the current state
+          LOG.debug("Query %s (submitted) has no server id yet" % (self.id,))
+      else:
+        # (3) It has no server_id for no good reason. A case (1) will become this
+        #     after we expire it. Note that we'll never be able to recover this
+        #     query.
+        LOG.error("Query %s (%s) has no server id [%s]..." %
+                  (self.id, QueryHistory.STATE[self.last_state], self.query[:40]))
+        self.save_state(QueryHistory.STATE.expired)
+      return None
 
-  def get_query_server(self):
-    return dict(zip(['server_name', 'server_host', 'server_port'],
-                    [self.server_name, self.server_host, self.server_port]))
+  def save_state(self, new_state):
+    """Set the last_state from an enum, and save"""
+    if self.last_state != new_state.index:
+      if new_state.index < self.last_state:
+        backtrace = ''.join(traceback.format_stack(limit=5))
+        LOG.error("Invalid query state transition: %s -> %s\n%s" % (QueryHistory.STATE[self.last_state], new_state, backtrace))
+        return
+      self.last_state = new_state.index
+      self.save()
 
 
 class SavedQuery(models.Model):
@@ -181,6 +268,108 @@ class SavedQuery(models.Model):
       raise PopupException(msg)
 
     return design
+
+  def __str__(self):
+    return '%s %s' % (self.name, self.owner)
+
+
+class SessionManager(models.Manager):
+  def get_session(self, user):
+    try:
+      return self.filter(owner=user).latest("last_used")
+    except Session.DoesNotExist:
+      pass
+
+
+class Session(models.Model):
+  owner = models.ForeignKey(User, db_index=True)
+  status_code = models.PositiveSmallIntegerField()
+  secret = models.TextField(max_length='100')
+  guid = models.TextField(max_length='100')
+  server_protocol_version = models.SmallIntegerField(default=0)
+  last_used = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Last used'))
+
+  objects = SessionManager()
+
+  def get_handle(self):
+    secret, guid = HiveServerQueryHandle.get_decoded(secret=self.secret, guid=self.guid)
+
+    handle_id = THandleIdentifier(secret=secret, guid=guid)
+    return TSessionHandle(sessionId=handle_id)
+
+  def __str__(self):
+    return '%s %s' % (self.owner, self.last_used)
+
+
+
+
+class QueryHandle(object):
+  def __init__(self, secret, guid=None, operation_type=None, has_result_set=None, modified_row_count=None, log_context=None):
+    self.secret = secret
+    self.guid = guid
+    self.operation_type = operation_type
+    self.has_result_set = has_result_set
+    self.modified_row_count = modified_row_count
+    self.log_context = log_context
+
+  def is_valid(self):
+    return all([self.get()])
+
+  def __str__(self):
+    return '%s %s' % (self.secret, self.guid)
+
+
+
+class HiveServerQueryHandle(QueryHandle):
+  """
+  QueryHandle for Hive Server 2.
+
+  Store THandleIdentifier base64 encoded in order to be unicode compatible with Django.
+  """
+  def __init__(self, **kwargs):
+    super(HiveServerQueryHandle, self).__init__(**kwargs)
+    self.secret, self.guid = self.get_encoded()
+
+  def get(self):
+    return self.secret, self.guid
+
+  def get_rpc_handle(self):
+    secret, guid = self.get_decoded(self.secret, self.guid)
+
+    operation = getattr(TOperationType, TOperationType._NAMES_TO_VALUES.get(self.operation_type, 'EXECUTE_STATEMENT'))
+    return TOperationHandle(operationId=THandleIdentifier(guid=guid, secret=secret),
+                            operationType=operation,
+                            hasResultSet=self.has_result_set,
+                            modifiedRowCount=self.modified_row_count)
+
+  # TODO hide
+  @classmethod
+  def get_decoded(cls, secret, guid):
+    return base64.decodestring(secret), base64.decodestring(guid)
+
+  # TODO hide
+  def get_encoded(self):
+    return base64.encodestring(self.secret), base64.encodestring(self.guid)
+
+
+class BeeswaxQueryHandle(QueryHandle):
+  """
+  QueryHandle for Beeswax.
+  """
+  def __init__(self, secret, has_result_set, log_context):
+    super(BeeswaxQueryHandle, self).__init__(secret=secret,
+                                             has_result_set=has_result_set,
+                                             log_context=log_context)
+
+  def get(self):
+    return self.secret, None
+
+  def get_rpc_handle(self):
+    return BeeswaxdQueryHandle(id=self.secret, log_context=self.log_context)
+
+  # TODO remove
+  def get_encoded(self):
+    return self.get(), None
 
 
 class MetaInstall(models.Model):

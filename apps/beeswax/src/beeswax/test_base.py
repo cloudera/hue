@@ -23,7 +23,6 @@ Common infrastructure for beeswax tests
 
 import atexit
 import logging
-import pwd
 import os
 import re
 import subprocess
@@ -31,14 +30,17 @@ import time
 
 import fb303.ttypes
 from nose.tools import assert_true, assert_false
+from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
-
 from hadoop import pseudo_hdfs4
-import hadoop.conf
 
 import beeswax.conf
-from beeswax.db_utils import get_query_server
+
+from beeswax.conf import SERVER_INTERFACE
+from beeswax.models import HIVE_SERVER2
+from beeswax.server.dbms import get_query_server
+from beeswax.server import dbms
 
 
 _INITIALIZED = False
@@ -48,6 +50,7 @@ _SHARED_BEESWAX_SERVER_CLOSER = None
 
 BEESWAXD_TEST_PORT = 6969
 LOG = logging.getLogger(__name__)
+
 
 def _start_server(cluster):
   """
@@ -107,9 +110,13 @@ def get_shared_beeswax_server():
     # startup, during which BEESWAX_HIVE_CONF_DIR needs to be set to
     # /my/bogus/path. Hence the step of writing to memory.
     # hive-default.xml will get picked up by the beeswax_server during startup
-    file(cluster._tmpdir+"/conf/hive-default.xml", 'w').write(default_xml)
+    file(cluster._tmpdir + "/conf/hive-default.xml", 'w').write(default_xml)
 
     global _SHARED_BEESWAX_SERVER_PROCESS
+
+    if SERVER_INTERFACE.get() == HIVE_SERVER2:
+      _SHARED_BEESWAX_SERVER_PROCESS = 1
+
     if _SHARED_BEESWAX_SERVER_PROCESS is None:
       p = _start_server(cluster)
       _SHARED_BEESWAX_SERVER_PROCESS = p
@@ -118,18 +125,20 @@ def get_shared_beeswax_server():
         os.kill(p.pid, 9)
         p.wait()
       atexit.register(kill)
+
       # Wait for server to come up, by repeatedly trying.
       start = time.time()
       started = False
       sleep = 0.001
+      make_logged_in_client()
+      user = User.objects.get(username='test')
+      query_server = get_query_server(support_ddl=True)
+      db = dbms.get(user, query_server)
+
       while not started and time.time() - start < 20.0:
         try:
-          query_server = get_query_server(support_ddl=True)
-          client = beeswax.db_utils.db_client(query_server)
-          meta_client = beeswax.db_utils.meta_client()
-
-          client.echo("echo")
-          if meta_client.getStatus() == fb303.ttypes.fb_status.ALIVE:
+          db.echo("echo")
+          if db.getStatus() == fb303.ttypes.fb_status.ALIVE:
             started = True
             break
           time.sleep(sleep)

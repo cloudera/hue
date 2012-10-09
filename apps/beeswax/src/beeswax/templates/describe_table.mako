@@ -22,12 +22,12 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 
 <%
-  if is_view:
+  if table.is_view:
     view_or_table_noun = _("View")
   else:
     view_or_table_noun = _("Table")
 %>
-${commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.tableName), "beeswax", user, "100px")}
+${commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.name), "beeswax", user, "100px")}
 ${layout.menubar(section='tables')}
 
 <%def name="column_table(cols)">
@@ -53,150 +53,139 @@ ${layout.menubar(section='tables')}
 </%def>
 
 <div class="container-fluid">
-	<h1>${_('Table Metadata:')} ${table.tableName}</h1>
-	<div class="row-fluid">
-		<div class="span3">
-			<div class="well sidebar-nav">
-				<ul class="nav nav-list">
-					<li class="nav-header">${_('Actions')}</li>
-					<li><a href="#importData" data-toggle="modal">${_('Import Data')}</a></li>
-					<li><a href="${ url("beeswax.views.read_table", table=table_name) }">${_('Browse Data')}</a></li>
-			    <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
-			    <li><a href="${hdfs_link}" rel="${ table.sd.location }">${_('View File Location')}</a></li>
-				</ul>
-			</div>
-      <div id="jumpToColumnAlert" class="alert hide">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <strong>${_('Did you know?')}</strong> ${_('You can click on a row to select a column you want to jump to.')}
-      </div>
-		</div>
-		<div class="span9">
-			% if table.parameters.get("comment", False):
-		    <h5>${ table.parameters.get("comment") }</h5>
-			% endif
+    <h1>${_('Table Metadata:')} ${table.name}</h1>
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="nav-header">${_('Actions')}</li>
+                    <li><a href="#importData" data-toggle="modal">${_('Import Data')}</a></li>
+                    <li><a href="${ url("beeswax.views.read_table", table=table.name) }">${_('Browse Data')}</a></li>
+                    <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
+                    <li><a href="${ table.hdfs_link }" rel="${ table.path_location }">${_('View File Location')}</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="span9">
+            % if table.comment is not None:
+                <h5>${ table.comment }</h5>
+            % endif
 
-			<ul class="nav nav-tabs">
-				<li class="active"><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
-		        % if len(table.partitionKeys) > 0:
-					<li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
-		        % endif
-				% if top_rows is not None:
-					<li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
-				% endif
-			</ul>
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
+                % if table.partition_keys:
+                    <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
+                % endif
+                % if sample is not None:
+                    <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
+                % endif
+            </ul>
 
-			<div class="tab-content">
-				<div class="active tab-pane" id="columns">
-					${column_table(table.sd.cols)}
-				</div>
-		        % if len(table.partitionKeys) > 0:
-		          <div class="tab-pane" id="partitionColumns">
-		            ${column_table(table.partitionKeys)}
-		            <a href="${ url("beeswax.views.describe_partitions", table=table_name) }">${_('Show Partitions')}</a>
-		          </div>
-		        % endif
-				% if top_rows is not None:
-					<div class="tab-pane" id="sample">
-						<table class="table table-striped table-condensed sampleTable">
-			              <thead>
-			                <tr>
-			                  % for col in table.sd.cols:
-			                    <th style="white-space: nowrap">${col.name}</th>
-			                  % endfor
-			                </tr>
-			              </thead>
-			              <tbody>
-			                % for i, row in enumerate(top_rows):
-			                  <tr>
-			                    % for item in row:
-			                      <td style="white-space: nowrap">${ item }</td>
-			                    % endfor
-			                  </tr>
-			                % endfor
-			              </tbody>
-			            </table>
-		        	</div>
-				% endif
-			</div>
-		</div>
-	</div>
+            <div class="tab-content">
+                <div class="active tab-pane" id="columns">
+                    ${column_table(table.cols)}
+                </div>
+
+                % if table.partition_keys:
+                  <div class="tab-pane" id="partitionColumns">
+                    ${column_table(table.partition_keys)}
+                    <a href="${ url("beeswax.views.describe_partitions", table=table.name) }">${_('Show Partitions')}</a>
+                  </div>
+                % endif
+
+                % if sample is not None:
+                    <div class="tab-pane" id="sample">
+                        <table class="table table-striped table-condensed sampleTable">
+                          <thead>
+                            <tr>
+                              % for col in table.cols:
+                                <th>${col.name}</th>
+                              % endfor
+                            </tr>
+                          </thead>
+                          <tbody>
+                            % for i, row in enumerate(sample):
+                              <tr>
+                                % for item in row:
+                                  <td>${ item }</td>
+                                % endfor
+                              </tr>
+                            % endfor
+                          </tbody>
+                        </table>
+                    </div>
+                % endif
+            </div>
+        </div>
+    </div>
 </div>
 
 
 
 
 <div id="dropTable" class="modal hide fade">
-	<form id="dropTableForm" method="POST" action="${ url("beeswax.views.drop_table", table=table_name) }">
-	<div class="modal-header">
-		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>${_('Drop Table')}</h3>
-	</div>
-	<div class="modal-body">
-	  <div id="dropTableMessage" class="alert">
-
-	  </div>
-	</div>
-	<div class="modal-footer">
-		<input type="submit" class="btn primary" value="${_('Yes')}"/>
-		<a href="#" class="btn secondary hideModal">${_('No')}</a>
-	</div>
-	</form>
+    <form id="dropTableForm" method="POST" action="${ url("beeswax.views.drop_table", table=table.name) }">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Drop Table')}</h3>
+    </div>
+    <div class="modal-body">
+      <div id="dropTableMessage" class="alert">
+      </div>
+    </div>
+    <div class="modal-footer">
+        <input type="submit" class="btn primary" value="${_('Yes')}"/>
+        <a href="#" class="btn secondary hideModal">${_('No')}</a>
+    </div>
+    </form>
 </div>
 
 
 
 <div id="importData" class="modal hide fade">
-	<form method="POST" action="${ url("beeswax.views.load_table", table=table_name) }" class="form-stacked">
-	<div class="modal-header">
-		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>${_('Import data')}</h3>
-	</div>
-	<div class="modal-body">
-	  <div class="alert">
-	        <p>${_("Note that loading data will move data from its location into the table's storage location.")}</p>
-	  </div>
+    <form method="POST" action="${ url("beeswax.views.load_table", table=table.name) }" class="form-stacked">
+        <div class="modal-header">
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+            <h3>${_('Import data')}</h3>
+        </div>
+        <div class="modal-body">
+            <div class="alert">
+                  <p>${_("Note that loading data will move data from its location into the table's storage location.")}</p>
+            </div>
 
+            <div class="clearfix">
+                ${comps.label(load_form["path"], title_klass='loadPath', attrs={})}
+                <div class="input">
+                    ${comps.field(load_form["path"], title_klass='loadPath', attrs={'klass': 'loadPath input-xlarge'})}
+                </div>
+            </div>
 
+            % for pf in load_form.partition_columns:
+                <div class="clearfix">
+                     ${comps.label(load_form[pf], render_default=True)}
+                     <div class="input">
+                       ${comps.field(load_form[pf], render_default=True, attrs={'klass': 'input-xlarge'})}
+                    </div>
+                </div>
+            % endfor
 
-	  <div class="clearfix">
-	  ${comps.label(load_form["path"], title_klass='loadPath', attrs=dict(
-        ))}
-    	<div class="input">
-		     ${comps.field(load_form["path"], title_klass='loadPath', attrs=dict(
-		       klass='loadPath input-xlarge'
-		       ))}
-		</div>
-		</div>
+            <div class="clearfix">
+                <div class="input">
+                    <input type="checkbox" name="overwrite"/> ${_('Overwrite existing data')}
+                </div>
+            </div>
 
-      % for pf in load_form.partition_columns:
-		<div class="clearfix">
-			${comps.label(load_form[pf], render_default=True)}
-	    	<div class="input">
-	        	${comps.field(load_form[pf], render_default=True, attrs=dict(
-			       klass='input-xlarge'
-			       ))}
-			</div>
-		</div>
+            <div id="filechooser"></div>
+        </div>
 
-      % endfor
-
-		<div class="clearfix">
-			<div class="input">
-				<input type="checkbox" name="overwrite"/> ${_('Overwrite existing data')}
-			</div>
-		</div>
-
-
-	<div id="filechooser">
-	</div>
-	</div>
-	<div class="modal-footer">
-		<input type="submit" class="btn primary" value="${_('Submit')}"/>
-		<a href="#" class="btn secondary" data-dismiss="modal">${_('Cancel')}</a>
-	</div>
-	</form>
+        <div class="modal-footer">
+            <input type="submit" class="btn primary" value="${_('Submit')}"/>
+            <a href="#" class="btn secondary" data-dismiss="modal">${_('Cancel')}</a>
+        </div>
+    </form>
 </div>
 </div>
+
 <style>
     #filechooser {
         display:none;
@@ -227,7 +216,7 @@ ${layout.menubar(section='tables')}
             "bFilter": false
         });
 
-        $.getJSON("${ url("beeswax.views.drop_table", table=table_name) }",function(data){
+        $.getJSON("${ url("beeswax.views.drop_table", table=table.name) }", function(data){
             $("#dropTableMessage").text(data.title);
         });
         $(".hideModal").click(function(){

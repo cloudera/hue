@@ -14,44 +14,47 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from urllib import quote
   from filebrowser.views import location_to_url
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.tableName), "beeswax", user, "100px")}
+
+${commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.name), "beeswax", user, "100px")}
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
 <h1>${_('Partitions')}</h1>
 
-<table>
-<tr>
-  % for field in table.partitionKeys:
-  <th>${field.name}</th>
-  % endfor
-  <th></th>## ${_('Extra column for command links.')}
-</tr>
-% if len(partitions) > 0:
-  % for partition in partitions:
-  <tr>
-    % for key in partition.values:
-    <td>${key}</td>
+<table class="table table-striped table-condensed datatables">
+  % if partitions:
+    <tr>
+      % for field in table.partition_keys:
+        <th>${field.name}</th>
+      % endfor
+      <th>${_('Path')}</th>
+    </tr>
+    % for partition in partitions:
+      <tr>
+        % for key in partition.values:
+          <td>${key}</td>
+        % endfor
+        <td>
+          <% url = location_to_url(partition.sd.location) %>
+          % if url:
+            <a href="${url}">${partition.sd.location}</a>
+          % else:
+            ${partition.sd.location}
+          % endif
+        </td>
+      </tr>
     % endfor
-    <td>
-      <% url = location_to_url(request, partition.sd.location) %>
-      % if url:
-        <a href="${url}">${partition.sd.location}</a>
-      % else:
-        ${partition.sd.location}
-      % endif
-    </td>
-  </tr>
-  % endfor
-% else:
-  <tr><td>${_('Table has no partitions.')}</td></tr>
-% endif
+  % else:
+    <tr><td>${_('Table has no partitions.')}</td></tr>
+  % endif
 </table>
+
 </div>
+
 ${commonfooter(messages)}

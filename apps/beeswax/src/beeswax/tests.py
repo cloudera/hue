@@ -26,28 +26,33 @@ import re
 import shutil
 import tempfile
 import threading
+
 from nose.tools import assert_true, assert_equal, assert_false
 from nose.plugins.skip import SkipTest
 from django.utils.encoding import smart_str
+from django.contrib.auth.models import User
 
+from beeswaxd import ttypes
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.django_test_util import assert_similar_pages
 from desktop.lib.test_export_csvxls import xls2csv
+from desktop.lib.test_utils import grant_access
 
 import beeswax.create_table
-import beeswax.db_utils
 import beeswax.forms
 import beeswax.hive_site
 import beeswax.models
 import beeswax.views
+
 from beeswax import conf
-from beeswax.views import parse_results, collapse_whitespace
+from beeswax.views import collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server,\
   BEESWAXD_TEST_PORT
+from beeswax.design import hql_query, _strip_trailing_semicolon
+from beeswax.data_export import download
+from beeswax.server import dbms
+from beeswax.server.beeswax_lib import BeeswaxDataTable
 from beeswax.test_base import BeeswaxSampleProvider
-from beeswaxd import BeeswaxService
-from beeswaxd import ttypes
-from desktop.lib.test_utils import grant_access
 
 
 LOG = logging.getLogger(__name__)
@@ -80,6 +85,10 @@ def get_csv(client, result_response):
 class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
   """Tests for beeswax that require a running Hadoop"""
   requires_hadoop = True
+
+  def setUp(self):
+    user = User.objects.get(username='test')
+    self.db = dbms.get(user, get_query_server())
 
   def _verify_query_state(self, state):
     """
@@ -125,8 +134,8 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     finish = beeswax.conf.BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("90")
     try:
       response = self.client.get("/beeswax/table/test_partitions")
-      assert_true("0x%x" % 89 in response.content)
-      assert_false("0x%x" % 90 in response.content)
+      assert_true("0x%x" % 89 in response.content, response.content)
+      assert_false("0x%x" % 90 in response.content, response.content)
     finally:
       finish()
 
@@ -169,7 +178,7 @@ for x in sys.stdin:
     Test basic query submission
     """
     # Minimal server operation
-    assert_equal("echo", beeswax.db_utils.db_client(get_query_server()).echo("echo"))
+    assert_equal("echo", self.db.echo("echo"))
 
     # Table should have been created
     response = self.client.get("/beeswax/tables")
@@ -218,12 +227,12 @@ for x in sys.stdin:
     response = _make_query(self.client, QUERY, name='select star', local=False)
     response = wait_for_query_to_finish(self.client, response)
     assert_equal(str(response.context['query_context'][0]), 'design')
-    assert_true("<td>99</td>" in response.content)
+    assert_true("99</td>" in response.content)
     assert_true(response.context["has_more"])
     response = self.client.get("/beeswax/results/%d/%d" % (response.context["query"].id, response.context["next_row"]))
-    assert_true("<td>199</td>" in response.content)
+    assert_true("199</td>" in response.content)
     response = self.client.get("/beeswax/results/%d/0" % (response.context["query"].id))
-    assert_true("<td>99</td>" in response.content)
+    assert_true("99</td>" in response.content)
     assert_equal(0, len(response.context["hadoop_jobs"]), "SELECT * shouldn't have started jobs.")
 
     # Download the data
@@ -237,7 +246,7 @@ for x in sys.stdin:
     """
     response = _make_query(self.client, "SELECT my_sqrt(foo), my_power(foo, foo) FROM test WHERE foo=4",
       udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'),
-        ('my_power', 'org.apache.hadoop.hive.ql.udf.UDFPower')], local=False)
+            ('my_power', 'org.apache.hadoop.hive.ql.udf.UDFPower')], local=False)
     response = wait_for_query_to_finish(self.client, response, max=60.0)
     assert_equal(["2.0", "256.0"], response.context["results"][0])
     log = response.context['log']
@@ -272,8 +281,7 @@ for x in sys.stdin:
       assert_true("ParseException" in response.context["error_message"])
       log = response.context['log']
       assert_true(len(log.split('\n')) > 10, 'Captured stack trace')
-      assert_true('org.apache.hadoop.hive.ql.parse.ParseException: line' in log,
-                  'Captured stack trace')
+      assert_true('org.apache.hadoop.hive.ql.parse.ParseException: line' in log, 'Captured stack trace')
 
     hql = "SELECT KITTENS ARE TASTY"
     resp = _make_query(self.client, hql, name='tasty kittens')
@@ -287,40 +295,30 @@ for x in sys.stdin:
   def test_sync_query_exec(self):
     # Execute Query Synchronously, set fetch size and fetch results
     # verify the size of resultset,
-    QUERY = """
+    hql = """
       SELECT foo FROM test;
     """
 
-    query_msg = BeeswaxService.Query()
-    query_msg.query = """
-      SELECT foo FROM test
-    """
-    query_msg.configuration = []
-    query_msg.hadoop_user = "test"
-    handle = beeswax.db_utils.db_client(get_query_server()).executeAndWait(query_msg, "")
+    query = hql_query(hql)
+    handle = self.db.execute_and_wait(query)
 
-    results = beeswax.db_utils.db_client(get_query_server()).fetch(handle, True, 5)
-    row_list = list(parse_results(results.data))
+    results = self.db.fetch(handle, True, 5)
+    row_list = list(results.rows())
     assert_equal(len(row_list), 5)
 
-    beeswax.db_utils.db_client(get_query_server()).close(handle)
-    beeswax.db_utils.db_client(get_query_server()).clean(handle.log_context)
-
+    self.db.close(handle)
 
   def test_sync_query_error(self):
+    # We don't use synchronous queries anywhere.
+    # It used to call BeeswaxService.executeAndWait()
+    raise SkipTest
     # Execute incorrect Query , verify the error code and sqlstate
-    QUERY = """
-      SELECT foo FROM test;
-    """
-
-    query_msg = BeeswaxService.Query()
-    query_msg.query = """
+    hql = """
       SELECT FROM zzzzz
     """
-    query_msg.configuration = []
-    query_msg.hadoop_user = "test"
+    query = hql_query(hql)
     try:
-      handle = beeswax.db_utils.db_client(get_query_server()).executeAndWait(query_msg, "")
+      self.db.execute_and_wait(query)
     except ttypes.BeeswaxException, bex:
       assert_equal(bex.errorCode, 40000)
       assert_equal(bex.SQLState, "42000")
@@ -342,30 +340,30 @@ for x in sys.stdin:
       def __init__(self, **entries):
         self.__dict__.update(entries)
 
-    client = beeswax.db_utils.db_client(get_query_server())
+    client = self.db
 
     prev_get_default_configuration = client.get_default_configuration
-    prev_client = client._client
+    prev_client = client.client
 
     try:
-      client._client = MockClient(True)
+      client.client = MockClient(True)
       client.get_default_configuration = lambda a: []
       client.fetch(None, True, 5)
 
-      client._client = MockClient(False)
+      client.client = MockClient(False)
       client.get_default_configuration = lambda a: []
       client.fetch(None, False, 5)
 
-      client._client = MockClient(True)
+      client.client = MockClient(True)
       client.get_default_configuration = lambda a: [ConfigVariable(key='support_start_over', value='true')]
       client.fetch(None, True, 5)
 
-      client._client = MockClient(False)
+      client.client = MockClient(False)
       client.get_default_configuration = lambda a: [ConfigVariable(key='support_start_over', value='false')]
       client.fetch(None, True, 5)
     finally:
       client.get_default_configuration = prev_get_default_configuration
-      client._client = prev_client
+      client.client = prev_client
 
 
   def test_parameterization(self):
@@ -440,8 +438,7 @@ for x in sys.stdin:
 
     # Describe table should be fine with non-ascii comment
     response = self.client.get('/beeswax/table/test_utf8')
-    assert_equal(response.context['table'].parameters['comment'],
-                 self.get_i18n_table_comment())
+    assert_equal(response.context['table'].parameters['comment'], self.get_i18n_table_comment())
 
   def _parallel_query_helper(self, i, result_holder, lock, num_tasks):
     client = make_logged_in_client()
@@ -488,37 +485,29 @@ for x in sys.stdin:
 
   def test_data_export_limit_clause(self):
     limit = 3
-    query_msg = BeeswaxService.Query()
-    query_msg.query = 'SELECT foo FROM test limit %d' % (limit,)
-    query_msg.configuration = []
-    query_msg.hadoop_user = "test"
-    handle = beeswax.db_utils.db_client(get_query_server()).query(query_msg)
-    query_data = beeswax.models.QueryHistory(server_id=handle.id, log_context=handle.log_context)
-    query_data.server_host = beeswax.conf.QUERY_SERVERS['default'].SERVER_HOST.get() # Needed as we query directly
-    query_data.server_port = beeswax.conf.QUERY_SERVERS['default'].SERVER_PORT.get()
+    hql = 'SELECT foo FROM test limit %d' % (limit,)
+    query = hql_query(hql)
+
+    handle = self.db.execute_and_wait(query)
     # Get the result in csv. Should have 3 + 1 header row.
-    csv_resp = beeswax.data_export.download(query_data, 'csv')
+    csv_resp = download(handle, 'csv', self.db)
     assert_equal(len(csv_resp.content.strip().split('\n')), limit + 1)
 
   def test_data_export(self):
-    query_msg = BeeswaxService.Query()
-    query_msg.query = 'SELECT * FROM test'
-    query_msg.configuration = []
-    query_msg.hadoop_user = "test"
-    handle = beeswax.db_utils.db_client(get_query_server()).query(query_msg)
-    query_data = beeswax.models.QueryHistory(server_id=handle.id, log_context=handle.log_context)
-    query_data.server_host = beeswax.conf.QUERY_SERVERS['default'].SERVER_HOST.get() # Needed as we query directly
-    query_data.server_port = beeswax.conf.QUERY_SERVERS['default'].SERVER_PORT.get()
-    # Get the result in xls. Then translate it into csv.
-    xls_resp = beeswax.data_export.download(query_data, 'xls')
+    hql = 'SELECT * FROM test'
+    query = hql_query(hql)
+
+    # Get the result in xls.
+    handle = self.db.execute_and_wait(query)
+    xls_resp = download(handle, 'xls', self.db)
     translated_csv = xls2csv(xls_resp.content)
     # It should have 257 lines (256 + header)
     assert_equal(len(translated_csv.strip('\r\n').split('\r\n')), 257)
-    handle = beeswax.db_utils.db_client(get_query_server()).query(query_msg)
-    query_data.server_host = beeswax.conf.QUERY_SERVERS['default'].SERVER_HOST.get() # Needed as we query directly
-    query_data.server_port = beeswax.conf.QUERY_SERVERS['default'].SERVER_PORT.get()
+
     # Get the result in csv.
-    csv_resp = beeswax.data_export.download(query_data, 'csv')
+    query = hql_query(hql)
+    handle = self.db.execute_and_wait(query)
+    csv_resp = download(handle, 'csv', self.db)
     assert_equal(csv_resp.content, translated_csv)
 
   def test_designs(self):
@@ -541,8 +530,7 @@ for x in sys.stdin:
 
     resp = cli.get('/beeswax/list_designs')
     nplus_designs = len(resp.context['page'].object_list)
-    assert_true(nplus_designs == n_designs,
-                'Auto design should not show up in list_designs')
+    assert_true(nplus_designs == n_designs, 'Auto design should not show up in list_designs')
 
     # Test explicit save
     query = 'MORE BOGUS JUNKS FROM test'
@@ -1043,16 +1031,16 @@ for x in sys.stdin:
 
     # Check data is in the table (by describing it)
     resp = self.client.get('/beeswax/table/test_create_import')
-    sd = resp.context['table'].sd
-    assert_equal(len(sd.cols), 3)
-    assert_equal([ col.name for col in sd.cols ], [ 'col_a', 'col_b', 'col_c' ])
+    cols = resp.context['table'].cols
+    assert_equal(len(cols), 3)
+    assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
     assert_true("<td>nada</td>" in resp.content)
     assert_true("<td>sp ace</td>" in resp.content)
 
   def test_describe_view(self):
     resp = self.client.get('/beeswax/table/myview')
-    assert_equal(None, resp.context['top_rows'])
-    assert_true(resp.context['is_view'])
+    assert_equal(None, resp.context['sample'])
+    assert_true(resp.context['table'].is_view)
     assert_true("View Metadata" in resp.content)
     assert_true("Drop View" in resp.content)
 
@@ -1092,8 +1080,8 @@ def test_import_gzip_reader():
 
 def test_parse_results():
   data = ["foo\tbar", "baz\tboom"]
-  assert_equal([["foo", "bar"], ["baz", "boom"]],
-    [ x for x in parse_results(data) ])
+  results = type('Result', (object,), {'has_more': False, 'start_row': False, 'columns': False, 'data': data})
+  assert_equal([["foo", "bar"], ["baz", "boom"]], [ x for x in list(BeeswaxDataTable(results).rows()) ])
 
 
 def test_index_page():
@@ -1135,12 +1123,12 @@ def test_strip_trailing_semicolon():
   # in this file that use semicolons all the way through.
 
   # Single semicolon
-  assert_equal("foo", beeswax.views._strip_trailing_semicolon("foo;\n"))
-  assert_equal("foo\n", beeswax.views._strip_trailing_semicolon("foo\n;\n\n\n"))
+  assert_equal("foo", _strip_trailing_semicolon("foo;\n"))
+  assert_equal("foo\n", _strip_trailing_semicolon("foo\n;\n\n\n"))
   # Multiple semicolons: strip only last one
-  assert_equal("fo;o;", beeswax.views._strip_trailing_semicolon("fo;o;;     "))
+  assert_equal("fo;o;", _strip_trailing_semicolon("fo;o;;     "))
   # No semicolons
-  assert_equal("foo", beeswax.views._strip_trailing_semicolon("foo"))
+  assert_equal("foo", _strip_trailing_semicolon("foo"))
 
 def test_hadoop_extraction():
   sample_log = """

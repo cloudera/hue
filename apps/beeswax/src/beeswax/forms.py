@@ -22,13 +22,18 @@ import hive_metastore
 
 from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
 from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
-from beeswax import db_utils, common, conf, models
+
 from filebrowser.forms import PathField
 
+from beeswax import common, conf, models
+from beeswax.design import _strip_trailing_semicolon
+import hadoop
+from beeswax.server.dbms import NoSuchObjectException
 
-def query_form():
-  """Generates a multi form object for queries."""
-  return MultiForm(
+
+class QueryForm(MultiForm):
+  def __init__(self):
+    super(QueryForm, self).__init__(
       query=HQLForm,
       settings=SettingFormSet,
       file_resources=FileResourceFormSet,
@@ -101,18 +106,23 @@ class SaveResultsForm(DependencyAwareForm):
                                   required=False,
                                   help_text=_t("Name of the new table"))
   target_dir = PathField(label=_t("Results Location"),
-                        required=False,
-                        help_text=_t("Empty directory in HDFS to put the results"))
+                         required=False,
+                         help_text=_t("Empty directory in HDFS to put the results"))
   dependencies = [
     ('save_target', SAVE_TYPE_TBL, 'target_table'),
     ('save_target', SAVE_TYPE_DIR, 'target_dir'),
   ]
 
+  def __init__(self, *args, **kwargs):
+    self.db = kwargs.pop('db', None)
+    super(SaveResultsForm, self).__init__(*args, **kwargs)
+
   def clean_target_table(self):
     tbl = self.cleaned_data.get('target_table')
     if tbl:
       try:
-        db_utils.meta_client().get_table("default", tbl)
+        if self.db is not None:
+          self.db.get_table("default", tbl)
         raise forms.ValidationError(_('Table already exists'))
       except hive_metastore.ttypes.NoSuchObjectException:
         pass
@@ -125,6 +135,9 @@ class HQLForm(forms.Form):
                           widget=forms.Textarea(attrs={'class':'beeswax_query'}))
   is_parameterized = forms.BooleanField(required=False, initial=True)
   email_notify = forms.BooleanField(required=False, initial=False)
+
+  def clean_query(self):
+    return _strip_trailing_semicolon(self.cleaned_data['query'])
 
 
 class FunctionForm(forms.Form):
@@ -145,9 +158,12 @@ class FileResourceForm(forms.Form):
        "files to be copied and made locally available duirng MAP/TRANSFORM. " +
        "Paths are on HDFS.")
   )
-  # TODO(philip): Could upload files here, too.  Or merely link
-  # to upload utility?
+
   path = forms.CharField(required=True, help_text=_t("Path to file on HDFS."))
+
+  def clean_path(self):
+    return hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.get() + self.cleaned_data['path']
+
 
 FileResourceFormSet = simple_formset_factory(FileResourceForm)
 
@@ -234,20 +250,21 @@ class CreateTableForm(DependencyAwareForm):
     return _clean_terminator(self.cleaned_data.get('map_key_terminator'))
 
   def clean_name(self):
-    return _clean_tablename(self.cleaned_data['name'])
+    return _clean_tablename(self.db, self.cleaned_data['name'])
 
 
-def _clean_tablename(name):
+def _clean_tablename(db, name):
   try:
-    db_utils.meta_client().get_table("default", name)
-    raise forms.ValidationError(_('Table "%(name)s" already exists') % {'name': name})
-  except hive_metastore.ttypes.NoSuchObjectException:
+    table = db.get_table("default", name)
+    if table.name:
+      raise forms.ValidationError(_('Table "%(name)s" already exists') % {'name': name})
+  except (hive_metastore.ttypes.NoSuchObjectException, NoSuchObjectException):
     return name
 
 
 def _clean_terminator(val):
   if val is not None and len(val.decode('string_escape')) != 1:
-      raise forms.ValidationError(_('Terminator must be exactly one character.'))
+    raise forms.ValidationError(_('Terminator must be exactly one character.'))
   return val
 
 
@@ -263,8 +280,12 @@ class CreateByImportFileForm(forms.Form):
                           label=_t("Import data from file"),
                           help_text=_t("Automatically load this file into the table after creation."))
 
+  def __init__(self, *args, **kwargs):
+    self.db = kwargs.pop('db', None)
+    super(CreateByImportFileForm, self).__init__(*args, **kwargs)
+
   def clean_name(self):
-    return _clean_tablename(self.cleaned_data['name'])
+    return _clean_tablename(self.db, self.cleaned_data['name'])
 
 
 class CreateByImportDelimForm(forms.Form):
@@ -334,17 +355,16 @@ PartitionTypeFormSet = simple_formset_factory(PartitionTypeForm, add_label=_t("a
 class LoadDataForm(forms.Form):
   """Form used for loading data into an existing table."""
   path = PathField(label=_t("Path"))
-  overwrite = forms.BooleanField(required=False, initial=False,
-    label=_t("Overwrite?"))
+  overwrite = forms.BooleanField(required=False, initial=False, label=_t("Overwrite?"))
 
   def __init__(self, table_obj, *args, **kwargs):
     """
     @param table_obj is a hive_metastore.thrift Table object,
-    used to add fields corresopnding to partition keys.
+    used to add fields corresponding to partition keys.
     """
     super(LoadDataForm, self).__init__(*args, **kwargs)
     self.partition_columns = dict()
-    for i, column in enumerate(table_obj.partitionKeys):
+    for i, column in enumerate(table_obj.partition_keys):
       # We give these numeric names because column names
       # may be unpleasantly arbitrary.
       name = "partition_%d" % i

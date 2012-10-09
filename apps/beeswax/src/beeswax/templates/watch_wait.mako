@@ -17,8 +17,10 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
+
 ${commonheader(_('Waiting for query...'), "beeswax", user, "100px")}
 ${layout.menubar(section='query')}
 

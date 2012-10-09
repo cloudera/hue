@@ -22,6 +22,7 @@ cd $(dirname $0)
 
 thrift -I thrift/include -r --gen py:new_style -o ./ thrift/beeswax.thrift
 thrift -I thrift/include -r --gen java:hashcode -o java/src/main thrift/beeswax.thrift
+thrift -I thrift/include -r --gen py:new_style -o ./ thrift/cli_service.thrift
 
 # We don't need to have generated code for the metastore, since that's
 # in one of the hive jars that we include

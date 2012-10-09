@@ -16,14 +16,16 @@
 # limitations under the License.
 """General configuration for core Desktop features (authentication, etc)"""
 
-from desktop import appmanager
-from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
-from desktop.lib.conf import coerce_bool, validate_path
-from desktop.lib.paths import get_desktop_root
 import os
 import socket
 import stat
+
 from django.utils.translation import ugettext_lazy as _
+
+from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
+from desktop.lib.conf import coerce_bool, validate_path
+from desktop.lib.paths import get_desktop_root
+
 
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",

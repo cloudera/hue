@@ -228,11 +228,8 @@ def connect_to_thrift(conf):
 
 _connection_pool = ConnectionPooler()
 
-def get_client(klass, host, port, service_name,
-               **kwargs):
-  conf = ConnectionConfig(
-    klass, host, port, service_name,
-    **kwargs)
+def get_client(klass, host, port, service_name, **kwargs):
+  conf = ConnectionConfig(klass, host, port, service_name, **kwargs)
   return PooledClient(conf)
 
 def _grab_transport_from_wrapper(outer_transport):

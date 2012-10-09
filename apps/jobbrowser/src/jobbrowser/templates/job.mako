@@ -71,7 +71,7 @@
                     else:
                       target = "FileBrowser"
                 %>
-                    <a href="${location_to_url(request, val)}" title="${val}" target="${target}">${val}</a>
+                    <a href="${location_to_url(val)}" title="${val}" target="${target}">${val}</a>
                 % if i != len(splitArray) - 1:
                         <br>
                 % endif
@@ -117,7 +117,7 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
 
                     <%
                         output_dir = job.conf_keys.get('mapredOutputDir', "")
-                        location_url = location_to_url(request, output_dir)
+                        location_url = location_to_url(output_dir)
                         basename = os.path.basename(output_dir)
                         dir_name = basename.split('/')[-1]
                     %>
@@ -126,7 +126,7 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                         <li>
                         <%
                             output_dir = job.conf_keys.get('mapredOutputDir', "")
-                            location_url = location_to_url(request, output_dir)
+                            location_url = location_to_url(output_dir)
                             basename = os.path.basename(output_dir)
                             dir_name = basename.split('/')[-1]
                         %>

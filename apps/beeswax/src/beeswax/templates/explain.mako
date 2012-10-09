@@ -36,7 +36,7 @@ ${layout.menubar(section='saved queries')}
             <pre>${explanation | h}</pre>
         </div>
         <div class="tab-pane" id="query">
-            <pre>${query | h}</pre>
+            <pre>${query.hql_query | h}</pre>
         </div>
     </div>
 </div>
