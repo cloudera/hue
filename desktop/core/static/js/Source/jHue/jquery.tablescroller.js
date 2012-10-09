@@ -34,7 +34,7 @@
             $(el).css("overflow-y", "").css("height", "");
             var heightAfter = 0;
             $(el).nextAll(":visible").each(function () {
-                heightAfter += $(this).outerHeight();
+                heightAfter += $(this).outerHeight(true);
             });
             if ($(el).height() > ($(window).height() - $(el).offset().top - heightAfter)) {
                 $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
