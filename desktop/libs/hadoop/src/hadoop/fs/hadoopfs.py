@@ -217,7 +217,7 @@ class Hdfs(object):
     return (schema, netloc, normpath(path), '', '')
 
   def exists(self):
-    raise NotImplementedError(_("exists has not been implemented."_))
+    raise NotImplementedError(_("exists has not been implemented."))
 
   def do_as_user(self):
     raise NotImplementedError(_("do_as_user has not been implemented."))
