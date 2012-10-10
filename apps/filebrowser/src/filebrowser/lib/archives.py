@@ -20,7 +20,6 @@
 import os
 import posixpath
 import tempfile
-import uuid
 from zipfile import ZipFile
 
 from django.utils.translation import ugettext as _
@@ -56,8 +55,7 @@ class ZipArchive(Archive):
     Else, open a file for writing and meta pipe the contents zipfile to the new file.
     """
     # Store all extracted files in a temporary directory.
-    directory = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
-    os.mkdir(directory)
+    directory = tempfile.mkdtemp()
 
     dirs, files = self._filenames()
     self._create_dirs(directory, dirs)
