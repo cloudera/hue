@@ -20,7 +20,6 @@ except ImportError:
   import simplejson as json
 import logging
 import re
-import time
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
@@ -28,7 +27,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
+from desktop.lib.test_utils import grant_access, add_permission
 from jobsub.management.commands import jobsub_setup
 from jobsub.models import OozieDesign
 from liboozie import oozie_api
@@ -48,21 +47,21 @@ _INITIALIZED = False
 
 
 class MockOozieApi:
-  JSON_WORKFLOW_LIST = [{u'status': u'RUNNING', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'appName': u'WordCount1', u'lastModTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000012-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'toString': u'Workflow id[0000012-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'id': u'0000012-120725142744176-oozie-oozi-W', u'group': None, u'user': u'romain'},
-                        {u'status': u'KILLED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'appName': u'WordCount2', u'lastModTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000011-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'toString': u'Workflow id[0000011-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'id': u'0000011-120725142744176-oozie-oozi-W', u'group': None, u'user': u'romain'},
-                        {u'status': u'SUCCEEDED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:20:48 GMT', u'appName': u'WordCount3', u'lastModTime': u'Mon, 30 Jul 2012 22:22:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000009-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:20:48 GMT', u'toString': u'Workflow id[0000009-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:22:00 GMT', u'id': u'0000009-120725142744176-oozie-oozi-W', u'group': None, u'user': u'romain'},
-                        {u'status': u'SUCCEEDED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:16:58 GMT', u'appName': u'WordCount4', u'lastModTime': u'Mon, 30 Jul 2012 22:18:10 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000008-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:16:58 GMT', u'toString': u'Workflow id[0000008-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:18:10 GMT', u'id': u'0000008-120725142744176-oozie-oozi-W', u'group': None, u'user': u'romain'}]
+  JSON_WORKFLOW_LIST = [{u'status': u'RUNNING', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'appName': u'WordCount1', u'lastModTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000012-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'toString': u'Workflow id[0000012-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'id': u'0000012-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
+                        {u'status': u'KILLED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'appName': u'WordCount2', u'lastModTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000011-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'toString': u'Workflow id[0000011-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'id': u'0000011-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
+                        {u'status': u'SUCCEEDED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:20:48 GMT', u'appName': u'WordCount3', u'lastModTime': u'Mon, 30 Jul 2012 22:22:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000009-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:20:48 GMT', u'toString': u'Workflow id[0000009-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:22:00 GMT', u'id': u'0000009-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
+                        {u'status': u'SUCCEEDED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:16:58 GMT', u'appName': u'WordCount4', u'lastModTime': u'Mon, 30 Jul 2012 22:18:10 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000008-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:16:58 GMT', u'toString': u'Workflow id[0000008-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:18:10 GMT', u'id': u'0000008-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'}]
   WORKFLOW_IDS = [wf['id'] for wf in JSON_WORKFLOW_LIST]
   WORKFLOW_DICT = dict([(wf['id'], wf) for wf in JSON_WORKFLOW_LIST])
 
-  JSON_COORDINATOR_LIST = [{u'startTime': u'Sun, 01 Jul 2012 00:00:00 GMT', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coornidator application id[0000041-120717205528122-oozie-oozi-C] status[RUNNING]', u'consoleUrl': None, u'mat_throttling': 0, u'status': u'RUNNING', u'conf': None, u'user': u'romain', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/romain/demo2', u'timeUnit': u'DAY', u'coordJobId': u'0000041-120717205528122-oozie-oozi-C', u'coordJobName': u'DailyWordCount1', u'nextMaterializedTime': u'Wed, 04 Jul 2012 00:00:00 GMT', u'coordExternalId': None, u'acl': None, u'lastAction': u'Wed, 04 Jul 2012 00:00:00 GMT', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Wed, 04 Jul 2012 00:00:00 GMT'},
-                           {u'startTime': u'Sun, 01 Jul 2012 00:00:00 GMT', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coornidator application id[0000011-120706144403213-oozie-oozi-C] status[DONEWITHERROR]', u'consoleUrl': None, u'mat_throttling': 0, u'status': u'DONEWITHERROR', u'conf': None, u'user': u'romain', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/hue/jobsub/_romain_-design-2', u'timeUnit': u'DAY', u'coordJobId': u'0000011-120706144403213-oozie-oozi-C', u'coordJobName': u'DailyWordCount2', u'nextMaterializedTime': u'Thu, 05 Jul 2012 00:00:00 GMT', u'coordExternalId': None, u'acl': None, u'lastAction': u'Thu, 05 Jul 2012 00:00:00 GMT', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Wed, 04 Jul 2012 18:54:00 GMT'},
-                           {u'startTime': u'Sun, 01 Jul 2012 00:00:00 GMT', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coornidator application id[0000010-120706144403213-oozie-oozi-C] status[DONEWITHERROR]', u'consoleUrl': None, u'mat_throttling': 0, u'status': u'DONEWITHERROR', u'conf': None, u'user': u'romain', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/hue/jobsub/_romain_-design-2', u'timeUnit': u'DAY', u'coordJobId': u'0000010-120706144403213-oozie-oozi-C', u'coordJobName': u'DailyWordCount3', u'nextMaterializedTime': u'Thu, 05 Jul 2012 00:00:00 GMT', u'coordExternalId': None, u'acl': None, u'lastAction': u'Thu, 05 Jul 2012 00:00:00 GMT', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Wed, 04 Jul 2012 18:54:00 GMT'},
-                           {u'startTime': u'Sun, 01 Jul 2012 00:00:00 GMT', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coornidator application id[0000009-120706144403213-oozie-oozi-C] status[DONEWITHERROR]', u'consoleUrl': None, u'mat_throttling': 0, u'status': u'DONEWITHERROR', u'conf': None, u'user': u'romain', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/hue/jobsub/_romain_-design-2', u'timeUnit': u'DAY', u'coordJobId': u'0000009-120706144403213-oozie-oozi-C', u'coordJobName': u'DailyWordCount4', u'nextMaterializedTime': u'Thu, 05 Jul 2012 00:00:00 GMT', u'coordExternalId': None, u'acl': None, u'lastAction': u'Thu, 05 Jul 2012 00:00:00 GMT', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Wed, 04 Jul 2012 18:54:00 GMT'}]
+  JSON_COORDINATOR_LIST = [{u'startTime': u'Sun, 01 Jul 2012 00:00:00 GMT', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coornidator application id[0000041-120717205528122-oozie-oozi-C] status[RUNNING]', u'consoleUrl': None, u'mat_throttling': 0, u'status': u'RUNNING', u'conf': None, u'user': u'test', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/test/demo2', u'timeUnit': u'DAY', u'coordJobId': u'0000041-120717205528122-oozie-oozi-C', u'coordJobName': u'DailyWordCount1', u'nextMaterializedTime': u'Wed, 04 Jul 2012 00:00:00 GMT', u'coordExternalId': None, u'acl': None, u'lastAction': u'Wed, 04 Jul 2012 00:00:00 GMT', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Wed, 04 Jul 2012 00:00:00 GMT'},
+                           {u'startTime': u'Sun, 01 Jul 2012 00:00:00 GMT', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coornidator application id[0000011-120706144403213-oozie-oozi-C] status[DONEWITHERROR]', u'consoleUrl': None, u'mat_throttling': 0, u'status': u'DONEWITHERROR', u'conf': None, u'user': u'test', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/hue/jobsub/_romain_-design-2', u'timeUnit': u'DAY', u'coordJobId': u'0000011-120706144403213-oozie-oozi-C', u'coordJobName': u'DailyWordCount2', u'nextMaterializedTime': u'Thu, 05 Jul 2012 00:00:00 GMT', u'coordExternalId': None, u'acl': None, u'lastAction': u'Thu, 05 Jul 2012 00:00:00 GMT', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Wed, 04 Jul 2012 18:54:00 GMT'},
+                           {u'startTime': u'Sun, 01 Jul 2012 00:00:00 GMT', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coornidator application id[0000010-120706144403213-oozie-oozi-C] status[DONEWITHERROR]', u'consoleUrl': None, u'mat_throttling': 0, u'status': u'DONEWITHERROR', u'conf': None, u'user': u'test', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/hue/jobsub/_romain_-design-2', u'timeUnit': u'DAY', u'coordJobId': u'0000010-120706144403213-oozie-oozi-C', u'coordJobName': u'DailyWordCount3', u'nextMaterializedTime': u'Thu, 05 Jul 2012 00:00:00 GMT', u'coordExternalId': None, u'acl': None, u'lastAction': u'Thu, 05 Jul 2012 00:00:00 GMT', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Wed, 04 Jul 2012 18:54:00 GMT'},
+                           {u'startTime': u'Sun, 01 Jul 2012 00:00:00 GMT', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coornidator application id[0000009-120706144403213-oozie-oozi-C] status[DONEWITHERROR]', u'consoleUrl': None, u'mat_throttling': 0, u'status': u'DONEWITHERROR', u'conf': None, u'user': u'test', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/hue/jobsub/_romain_-design-2', u'timeUnit': u'DAY', u'coordJobId': u'0000009-120706144403213-oozie-oozi-C', u'coordJobName': u'DailyWordCount4', u'nextMaterializedTime': u'Thu, 05 Jul 2012 00:00:00 GMT', u'coordExternalId': None, u'acl': None, u'lastAction': u'Thu, 05 Jul 2012 00:00:00 GMT', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Wed, 04 Jul 2012 18:54:00 GMT'}]
   COORDINATOR_IDS = [coord['coordJobId'] for coord in JSON_COORDINATOR_LIST]
   COORDINATOR_DICT = dict([(coord['coordJobId'], coord) for coord in JSON_COORDINATOR_LIST])
 
-  WORKFLOW_ACTION = {u'status': u'OK', u'retries': 0, u'transition': u'end', u'stats': None, u'startTime': u'Fri, 10 Aug 2012 05:24:21 GMT', u'toString': u'Action name[WordCount] status[OK]', u'cred': u'null', u'errorMessage': None, u'errorCode': None, u'consoleUrl': u'http://localhost:50030/jobdetails.jsp?jobid=job_201208072118_0044', u'externalId': u'job_201208072118_0044', u'externalStatus': u'SUCCEEDED', u'conf': u'<map-reduce xmlns="uri:oozie:workflow:0.2">\r\n  <job-tracker>localhost:8021</job-tracker>\r\n  <name-node>hdfs://localhost:8020</name-node>\r\n  <configuration>\r\n    <property>\r\n      <name>mapred.mapper.regex</name>\r\n      <value>dream</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.input.dir</name>\r\n      <value>/user/romain/words/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.dir</name>\r\n      <value>/user/romain/out/rrwords/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.mapper.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.RegexMapper</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.combiner.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.reducer.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.key.class</name>\r\n      <value>org.apache.hadoop.io.Text</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.value.class</name>\r\n      <value>org.apache.hadoop.io.LongWritable</value>\r\n    </property>\r\n  </configuration>\r\n</map-reduce>', u'type': u'map-reduce', u'trackerUri': u'localhost:8021', u'externalChildIDs': None, u'endTime': u'Fri, 10 Aug 2012 05:24:38 GMT', u'data': None, u'id': u'0000021-120807211836060-oozie-oozi-W@WordCount', u'name': u'WordCount'}
+  WORKFLOW_ACTION = {u'status': u'OK', u'retries': 0, u'transition': u'end', u'stats': None, u'startTime': u'Fri, 10 Aug 2012 05:24:21 GMT', u'toString': u'Action name[WordCount] status[OK]', u'cred': u'null', u'errorMessage': None, u'errorCode': None, u'consoleUrl': u'http://localhost:50030/jobdetails.jsp?jobid=job_201208072118_0044', u'externalId': u'job_201208072118_0044', u'externalStatus': u'SUCCEEDED', u'conf': u'<map-reduce xmlns="uri:oozie:workflow:0.2">\r\n  <job-tracker>localhost:8021</job-tracker>\r\n  <name-node>hdfs://localhost:8020</name-node>\r\n  <configuration>\r\n    <property>\r\n      <name>mapred.mapper.regex</name>\r\n      <value>dream</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.input.dir</name>\r\n      <value>/user/test/words/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.dir</name>\r\n      <value>/user/test/out/rrwords/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.mapper.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.RegexMapper</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.combiner.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.reducer.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.key.class</name>\r\n      <value>org.apache.hadoop.io.Text</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.value.class</name>\r\n      <value>org.apache.hadoop.io.LongWritable</value>\r\n    </property>\r\n  </configuration>\r\n</map-reduce>', u'type': u'map-reduce', u'trackerUri': u'localhost:8021', u'externalChildIDs': None, u'endTime': u'Fri, 10 Aug 2012 05:24:38 GMT', u'data': None, u'id': u'0000012-120725142744176-oozie-oozi-W@WordCount', u'name': u'WordCount'}
 
   def __init__(self, *args, **kwargs):
     pass
@@ -74,10 +73,18 @@ class MockOozieApi:
     return 'ONE-OOZIE-ID-W'
 
   def get_workflows(self, **kwargs):
-    return WorkflowList(self, {'offset': 0, 'total': 4, 'workflows': MockOozieApi.JSON_WORKFLOW_LIST})
+    workflows = MockOozieApi.JSON_WORKFLOW_LIST
+    if 'user' in kwargs:
+      workflows = filter(lambda wf: wf['user'] == kwargs['user'], workflows)
+
+    return WorkflowList(self, {'offset': 0, 'total': 4, 'workflows': workflows})
 
   def get_coordinators(self, **kwargs):
-    return CoordinatorList(self, {'offset': 0, 'total': 5, 'coordinatorjobs': MockOozieApi.JSON_COORDINATOR_LIST})
+    coordinatorjobs = MockOozieApi.JSON_COORDINATOR_LIST
+    if 'user' in kwargs:
+      coordinatorjobs = filter(lambda coord: coord['user'] == kwargs['user'], coordinatorjobs)
+
+    return CoordinatorList(self, {'offset': 0, 'total': 5, 'coordinatorjobs': coordinatorjobs})
 
   def get_job(self, job_id):
     if job_id in MockOozieApi.WORKFLOW_DICT:
@@ -119,8 +126,9 @@ class OozieMockBase:
     Workflow.objects.all().delete()
     Coordinator.objects.all().delete()
 
-    self.c = make_logged_in_client()
-    self.wf = create_workflow()
+    self.c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "oozie")
+    self.wf = create_workflow(self.c)
 
 
   def tearDown(self):
@@ -134,7 +142,8 @@ class OozieBase(OozieServerProvider):
 
   def setUp(self):
     OozieServerProvider.setup_class()
-    self.c = make_logged_in_client()
+    self.c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "oozie")
     self.cluster = OozieServerProvider.cluster
     self.install_examples()
 
@@ -192,7 +201,7 @@ class TestEditor(OozieMockBase):
 
     # 1 2
     #  3
-    action4 = add_action(self.wf.id, action2.id, 'name-4')
+    action4 = add_action(self.wf.id, action2.id, 'name-4', self.c)
     move_up(self.c, self.wf, action4)
 
     # 1 2 3 4
@@ -221,7 +230,7 @@ class TestEditor(OozieMockBase):
 
     # 1
     # 2 3
-    action4 = add_action(self.wf.id, action2.id, 'name-4')
+    action4 = add_action(self.wf.id, action2.id, 'name-4', self.c)
 
     #  1
     # 2 3
@@ -287,7 +296,7 @@ class TestEditor(OozieMockBase):
     action1 = Node.objects.get(name='action-name-1')
     action2 = Node.objects.get(name='action-name-2')
     action3 = Node.objects.get(name='action-name-3')
-    action4 = add_action(self.wf.id, action3.id, 'action-name-4')
+    action4 = add_action(self.wf.id, action3.id, 'action-name-4', self.c)
 
     move_up(self.c, self.wf, action2)
     move_up(self.c, self.wf, action4)
@@ -569,11 +578,11 @@ class TestEditor(OozieMockBase):
 
 
   def test_create_coordinator(self):
-    create_coordinator(self.wf)
+    create_coordinator(self.wf, self.c)
 
 
   def test_clone_coordinator(self):
-    coord = create_coordinator(self.wf)
+    coord = create_coordinator(self.wf, self.c)
     coordinator_count = Coordinator.objects.count()
 
     response = self.c.post(reverse('oozie:clone_coordinator', args=[coord.id]), {}, follow=True)
@@ -649,7 +658,7 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_gen_xml(self):
-    coord = create_coordinator(self.wf)
+    coord = create_coordinator(self.wf, self.c)
 
     assert_equal(
         '<coordinator-app name="MyCoord"\n'
@@ -671,9 +680,9 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_with_data_input_gen_xml(self):
-    coord = create_coordinator(self.wf)
-    create_dataset(coord)
-    create_coordinator_data(coord)
+    coord = create_coordinator(self.wf, self.c)
+    create_dataset(coord, self.c)
+    create_coordinator_data(coord, self.c)
 
     assert_equal(
         ['<coordinator-app', 'name="MyCoord"', 'frequency="${coord:days(1)}"', 'start="2012-07-01T00:00Z"', 'end="2012-07-04T00:00Z"',
@@ -711,15 +720,15 @@ class TestEditor(OozieMockBase):
 
 
   def test_create_coordinator_dataset(self):
-    coord = create_coordinator(self.wf)
-    create_dataset(coord)
+    coord = create_coordinator(self.wf, self.c)
+    create_dataset(coord, self.c)
 
 
   def test_create_coordinator_input_data(self):
-    coord = create_coordinator(self.wf)
-    create_dataset(coord)
+    coord = create_coordinator(self.wf, self.c)
+    create_dataset(coord, self.c)
 
-    create_coordinator_data(coord)
+    create_coordinator_data(coord, self.c)
 
 
   def test_setup_app(self):
@@ -732,10 +741,10 @@ class TestEditor(OozieMockBase):
 
 
   def test_get_coordinator_parameters(self):
-    coord = create_coordinator(self.wf)
+    coord = create_coordinator(self.wf, self.c)
 
-    create_dataset(coord)
-    create_coordinator_data(coord)
+    create_dataset(coord, self.c)
+    create_coordinator_data(coord, self.c)
 
     assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US,France'}],
                  coord.find_all_parameters())
@@ -745,7 +754,7 @@ class TestPermissions(OozieBase):
 
   def setUp(self):
     self.c = make_logged_in_client()
-    self.wf = create_workflow()
+    self.wf = create_workflow(self.c)
 
     self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-2').id]), {}, follow=True)
     self.c.post(reverse('oozie:delete_action', args=[Node.objects.get(name='action-name-3').id]), {}, follow=True)
@@ -967,7 +976,7 @@ class TestPermissions(OozieBase):
 
 
   def test_coordinator_permissions(self):
-    coord = create_coordinator(self.wf)
+    coord = create_coordinator(self.wf, self.c)
 
     response = self.c.get(reverse('oozie:edit_coordinator', args=[coord.id]))
     assert_true('Editor' in response.content, response.content)
@@ -1120,7 +1129,7 @@ class TestEditorWithOozie(OozieBase):
 
   def setUp(self):
     self.c = make_logged_in_client()
-    self.wf = create_workflow()
+    self.wf = create_workflow(self.c)
 
 
   def tearDown(self):
@@ -1283,6 +1292,24 @@ class TestDashboard(OozieMockBase):
     assert_equal(0, data['status'])
 
 
+  def test_workflows_permissions(self):
+    response = self.c.get(reverse('oozie:list_oozie_workflows'))
+    assert_true('WordCount1' in response.content, response.content)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
+    grant_access("not_me", "not_me", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_workflows'))
+    assert_false('WordCount1' in response.content, response.content)
+
+    # Add read only access
+    add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_workflows'))
+    assert_true('WordCount1' in response.content, response.content)
+
+
   def test_workflow_permissions(self):
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]))
     assert_true('WordCount1' in response.content, response.content)
@@ -1292,14 +1319,38 @@ class TestDashboard(OozieMockBase):
     assert_false('Permission denied' in response.content, response.content)
 
     # Login as someone else
-    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
-    grant_access("not_me", "test", "oozie")
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
+    grant_access("not_me", "not_me", "oozie")
 
     response = client_not_me.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]))
     assert_true('Permission denied' in response.content, response.content)
 
     response = client_not_me.get(reverse('oozie:list_oozie_workflow_action', args=['XXX']))
     assert_true('Permission denied' in response.content, response.content)
+
+    # Add read only access
+    add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]))
+    assert_false('Permission denied' in response.content, response.content)
+
+
+  def test_coordinators_permissions(self):
+    response = self.c.get(reverse('oozie:list_oozie_coordinators'))
+    assert_true('DailyWordCount1' in response.content, response.content)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
+    grant_access("not_me", "not_me", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_coordinators'))
+    assert_false('DailyWordCount1' in response.content, response.content)
+
+    # Add read only access
+    add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_coordinators'))
+    assert_true('DailyWordCount1' in response.content, response.content)
 
 
   def test_coordinator_permissions(self):
@@ -1308,12 +1359,17 @@ class TestDashboard(OozieMockBase):
     assert_false('Permission denied' in response.content, response.content)
 
     # Login as someone else
-    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
-    grant_access("not_me", "test", "oozie")
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
+    grant_access("not_me", "not_me", "oozie")
 
     response = client_not_me.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]))
     assert_true('Permission denied' in response.content, response.content)
 
+    # Add read only access
+    add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]))
+    assert_false('Permission denied' in response.content, response.content)
 
 
 # Utils
@@ -1343,63 +1399,53 @@ ACTION_DICT = {
        u'prepares': [u'[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]'],
 }
 
-# Beware: client not consistent with self.c in TestEditor
-def add_action(workflow, action, name, c=None):
-  if c is None:
-    c = make_logged_in_client()
 
+def add_action(workflow, action, name, client):
   post = ACTION_DICT.copy()
   post['name'] = name
-  response = c.post("/oozie/new_action/%s/%s/%s" % (workflow, 'mapreduce', action), post, follow=True)
+  response = client.post("/oozie/new_action/%s/%s/%s" % (workflow, 'mapreduce', action), post, follow=True)
 
   assert_true(Node.objects.filter(name=name).exists(), response)
   return Node.objects.get(name=name)
 
 
-def create_workflow():
-  c = make_logged_in_client()
-
+def create_workflow(client):
   Workflow.objects.filter(name='wf-name-1').delete()
   Node.objects.filter(name__in=['action-name-1', 'action-name-2', 'action-name-3']).delete()
 
   workflow_count = Workflow.objects.count()
-  response = c.get(reverse('oozie:create_workflow'))
+  response = client.get(reverse('oozie:create_workflow'))
   assert_equal(workflow_count, Workflow.objects.count(), response)
 
-  response = c.post(reverse('oozie:create_workflow'), WORKFLOW_DICT, follow=True)
+  response = client.post(reverse('oozie:create_workflow'), WORKFLOW_DICT, follow=True)
   assert_equal(200, response.status_code)
   assert_equal(workflow_count + 1, Workflow.objects.count(), response)
 
   wf = Workflow.objects.get(name='wf-name-1')
   assert_not_equal('', wf.deployment_dir)
 
-  action1 = add_action(wf.id, wf.start.id, 'action-name-1')
-  action2 = add_action(wf.id, action1.id, 'action-name-2')
-  action3 = add_action(wf.id, action2.id, 'action-name-3')
+  action1 = add_action(wf.id, wf.start.id, 'action-name-1', client)
+  action2 = add_action(wf.id, action1.id, 'action-name-2', client)
+  action3 = add_action(wf.id, action2.id, 'action-name-3', client)
 
   return wf
 
 
-def create_coordinator(workflow, c=None):
-  if c is None:
-    c = make_logged_in_client()
-
+def create_coordinator(workflow, client):
   coord_count = Coordinator.objects.count()
-  response = c.get(reverse('oozie:create_coordinator'))
+  response = client.get(reverse('oozie:create_coordinator'))
   assert_equal(coord_count, Coordinator.objects.count(), response)
 
   post = COORDINATOR_DICT.copy()
   post['workflow'] = workflow.id
-  response = c.post(reverse('oozie:create_coordinator'), post)
+  response = client.post(reverse('oozie:create_coordinator'), post)
   assert_equal(coord_count + 1, Coordinator.objects.count(), response)
 
   return Coordinator.objects.get(name='MyCoord')
 
 
-def create_dataset(coord):
-  c = make_logged_in_client()
-
-  response = c.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]), {
+def create_dataset(coord, client):
+  response = client.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]), {
                         u'create-name': [u'MyDataset'], u'create-frequency_number': [u'1'], u'create-frequency_unit': [u'days'],
                         u'create-uri': [u'/data/${YEAR}${MONTH}${DAY}'],
                         u'create-start_0': [u'07/01/2012'], u'create-start_1': [u'12:00 AM'],
@@ -1409,28 +1455,26 @@ def create_dataset(coord):
   assert_equal(0, data['status'], data['data'])
 
 
-def create_coordinator_data(coord):
-  c = make_logged_in_client()
-
-  response = c.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'input']),
+def create_coordinator_data(coord, client):
+  response = client.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'input']),
                          {u'input-name': [u'input_dir'], u'input-dataset': [u'1']})
   data = json.loads(response.content)
   assert_equal(0, data['status'], data['data'])
 
 
-def move(c, wf, direction, action):
+def move(client, wf, direction, action):
   try:
     LOG.info(wf.get_hierarchy())
     LOG.info('%s %s' % (direction, action))
-    assert_equal(200, c.post(reverse(direction, args=[action.id]), {}, follow=True).status_code)
+    assert_equal(200, client.post(reverse(direction, args=[action.id]), {}, follow=True).status_code)
   except:
     raise
 
 
-def move_up(c, wf, action):
-  move(c, wf, 'oozie:move_up_action', action)
+def move_up(client, wf, action):
+  move(client, wf, 'oozie:move_up_action', action)
 
 
-def move_down(c, wf, action):
-  move(c, wf, 'oozie:move_down_action', action)
+def move_down(client, wf, action):
+  move(client, wf, 'oozie:move_down_action', action)
 

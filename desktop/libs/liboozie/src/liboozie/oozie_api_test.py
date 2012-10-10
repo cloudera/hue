@@ -58,23 +58,21 @@ class OozieServerProvider(object):
     job = cls.oozie.get_job(oozie_jobid)
     start = time.time()
 
-    LOG.info('[%d] cluster status: %s' % (time.time(), cls.cluster.jt.cluster_status()))
-
     while job.is_running() and time.time() - start < timeout:
       time.sleep(step)
       LOG.info('Checking status of %s...' % oozie_jobid)
       job = cls.oozie.get_job(oozie_jobid)
       LOG.info('[%d] Status after %d: %s' % (time.time(), time.time() - start, job))
 
+    logs = cls.oozie.get_job_log(oozie_jobid)
+
     if job.is_running():
-      logs = cls.oozie.get_job_log(oozie_jobid)
       msg = "[%d] %s took more than %d to complete: %s" % (time.time(), oozie_jobid, timeout, logs)
       LOG.info(msg)
       raise Exception(msg)
     else:
-      LOG.info('[%d] Job duration %s: %d' % (time.time(), job.id, time.time() - start))
+      LOG.info('[%d] Job %s tooke %d: %s' % (time.time(), job.id, time.time() - start, logs))
 
-    LOG.info('[%d] cluster status: %s' % (time.time(), cls.cluster.jt.cluster_status()))
     return job
 
   @classmethod

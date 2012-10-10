@@ -49,17 +49,18 @@ what models you may or may not edit, and there are elaborations (especially
 in Django 1.2) to manipulate this row by row.  This does not map nicely
 onto actions which may not relate to database models.
 """
+from enum import Enum
 import logging
 
 from django.db import models
 from django.contrib.auth import models as auth_models
+from django.utils.translation import ugettext_lazy as _t
+
 from desktop import appmanager
 from desktop.lib.exceptions import PopupException
-from enum import Enum
 
 import useradmin.conf
 
-from django.utils.translation import ugettext_lazy as _
 
 LOG = logging.getLogger(__name__)
 
@@ -121,7 +122,7 @@ class UserProfile(models.Model):
     if self.has_hue_permission(perm):
       return
     else:
-      raise PopupException(_("You do not have permissions to %(description)s.") % dict(description=perm.description))
+      raise PopupException(_t("You do not have permissions to %(description)s.") % dict(description=perm.description))
 
 def get_profile(user):
   """

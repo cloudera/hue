@@ -107,6 +107,7 @@ ${ layout.menubar(section='dashboard') }
     % endfor
   % endif
 
+  % if has_job_edition_permission(oozie_workflow, user):
   <div class="row-fluid">
     <div class="span3">
       ${ _('Manage') }
@@ -132,6 +133,7 @@ ${ layout.menubar(section='dashboard') }
       </form>
     </div>
   </div>
+  % endif
 
   <br/><br/>
 

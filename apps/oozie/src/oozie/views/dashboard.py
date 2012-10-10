@@ -33,6 +33,7 @@ from liboozie.oozie_api import get_oozie
 
 from oozie.conf import OOZIE_JOBS_COUNT
 from oozie.models import History, Job
+from oozie.settings import DJANGO_APPS
 
 
 LOG = logging.getLogger(__name__)
@@ -41,15 +42,22 @@ LOG = logging.getLogger(__name__)
 """
 Permissions:
 
-A Workflow/Coordinator can be accessed/submitted/modified only by its owner or a superuser.
+A Workflow/Coordinator can:
+  * be accessed only by its owner or a superuser or by a user with 'dashboard_jobs_access' permissions
+  * be submitted/modified only by its owner or a superuser
 
-Permissions checking happens by calling check_access_and_get_oozie_job().
+Permissions checking happens by calling:
+  * check_job_access_permission()
+  * check_job_edition_permission()
 """
+
+
 def manage_oozie_jobs(request, job_id, action):
   if request.method != 'POST':
     raise PopupException(_('Please use a POST request to manage an Oozie job.'))
 
-  check_access_and_get_oozie_job(request, job_id)
+  job = check_job_access_permission(request, job_id)
+  check_job_edition_permission(job, request.user)
 
   response = {'status': -1, 'data': ''}
 
@@ -76,7 +84,7 @@ def show_oozie_error(view_func):
 @show_oozie_error
 def list_oozie_workflows(request):
   kwargs = {'cnt': OOZIE_JOBS_COUNT.get(),}
-  if not request.user.is_superuser:
+  if not has_dashboard_jobs_access(request.user):
     kwargs['user'] = request.user.username
 
   workflows = get_oozie().get_workflows(**kwargs)
@@ -84,29 +92,31 @@ def list_oozie_workflows(request):
   return render('dashboard/list_oozie_workflows.mako', request, {
     'user': request.user,
     'jobs': split_oozie_jobs(workflows.jobs),
+    'has_job_edition_permission':  has_job_edition_permission,
   })
 
 
 @show_oozie_error
 def list_oozie_coordinators(request):
   kwargs = {'cnt': OOZIE_JOBS_COUNT.get(),}
-  if not request.user.is_superuser:
+  if not has_dashboard_jobs_access(request.user):
     kwargs['user'] = request.user.username
 
   coordinators = get_oozie().get_coordinators(**kwargs)
 
   return render('dashboard/list_oozie_coordinators.mako', request, {
     'jobs': split_oozie_jobs(coordinators.jobs),
+    'has_job_edition_permission': has_job_edition_permission,
   })
 
 
 @show_oozie_error
 def list_oozie_workflow(request, job_id, coordinator_job_id=None):
-  oozie_workflow = check_access_and_get_oozie_job(request, job_id)
+  oozie_workflow = check_job_access_permission(request, job_id)
 
   oozie_coordinator = None
   if coordinator_job_id is not None:
-    oozie_coordinator = check_access_and_get_oozie_job(request, coordinator_job_id)
+    oozie_coordinator = check_job_access_permission(request, coordinator_job_id)
 
   history = History.cross_reference_submission_history(request.user, job_id, coordinator_job_id)
 
@@ -125,7 +135,6 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None):
       if param in oozie_workflow.conf_dict:
         parameters[param] = oozie_workflow.conf_dict[param]
 
-
   return render('dashboard/list_oozie_workflow.mako', request, {
     'history': history,
     'oozie_workflow': oozie_workflow,
@@ -133,12 +142,13 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None):
     'hue_workflow': hue_workflow,
     'hue_coord': hue_coord,
     'parameters': parameters,
+    'has_job_edition_permission': has_job_edition_permission,
   })
 
 
 @show_oozie_error
 def list_oozie_coordinator(request, job_id):
-  oozie_coordinator = check_access_and_get_oozie_job(request, job_id)
+  oozie_coordinator = check_job_access_permission(request, job_id)
 
   # Cross reference the submission history (if any)
   coordinator = None
@@ -150,6 +160,7 @@ def list_oozie_coordinator(request, job_id):
   return render('dashboard/list_oozie_coordinator.mako', request, {
     'oozie_coordinator': oozie_coordinator,
     'coordinator': coordinator,
+    'has_job_edition_permission': has_job_edition_permission,
   })
 
 
@@ -157,7 +168,7 @@ def list_oozie_coordinator(request, job_id):
 def list_oozie_workflow_action(request, action):
   try:
     action = get_oozie().get_action(action)
-    workflow = check_access_and_get_oozie_job(request, action.id.split('@')[0])
+    workflow = check_job_access_permission(request, action.id.split('@')[0])
   except RestException, ex:
     raise PopupException(_("Error accessing Oozie action %s") % (action,),
                          detail=ex.message)
@@ -189,7 +200,7 @@ def split_oozie_jobs(oozie_jobs):
   return jobs
 
 
-def check_access_and_get_oozie_job(request, job_id):
+def check_job_access_permission(request, job_id):
   """
   Decorator ensuring that the user has access to the workflow or coordinator.
 
@@ -210,10 +221,29 @@ def check_access_and_get_oozie_job(request, job_id):
       raise PopupException(_("Error accessing Oozie job %s") % (job_id,),
                            detail=ex._headers['oozie-error-message'])
 
-  if request.user.is_superuser or oozie_job.user == request.user.username:
+  if request.user.is_superuser \
+      or oozie_job.user == request.user.username \
+      or has_dashboard_jobs_access(request.user):
     return oozie_job
   else:
     message = _("Permission denied. %(username)s don't have the permissions to access job %(id)s") % \
         {'username': request.user.username, 'id': oozie_job.id}
     access_warn(request, message)
     raise PopupException(message)
+
+
+def check_job_edition_permission(oozie_job, user):
+  if has_job_edition_permission(oozie_job, user):
+    return oozie_job
+  else:
+    message = _("Permission denied. %(username)s don't have the permissions to modify job %(id)s") % \
+        {'username': user.username, 'id': oozie_job.id}
+    raise PopupException(message)
+
+
+def has_job_edition_permission(oozie_job, user):
+  return user.is_superuser or oozie_job.user == user.username
+
+
+def has_dashboard_jobs_access(user):
+  return user.is_superuser or user.has_hue_permission(action="dashboard_jobs_access", app=DJANGO_APPS[0])

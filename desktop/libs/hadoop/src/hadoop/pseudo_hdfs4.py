@@ -19,7 +19,6 @@
 import atexit
 import getpass
 import logging
-import pwd
 import os
 import shutil
 import signal
@@ -60,7 +59,7 @@ class PseudoHdfs4(object):
 
   def __init__(self):
     self._tmpdir = tempfile.mkdtemp(prefix='tmp_hue_')
-    self._superuser = pwd.getpwuid(os.getuid()).pw_name
+    self._superuser = getpass.getuser()
     self._fs = None
     self._jt = None
 
@@ -420,14 +419,10 @@ class PseudoHdfs4(object):
       'fs.default.name': self._fs_default_name,
       'hadoop.security.authorization': 'true',
       'hadoop.security.authentication': 'simple',
-      'hadoop.proxyuser.%s.groups' % (self.superuser,): 'users,supergroup',
-      'hadoop.proxyuser.%s.hosts' % (self.superuser,): 'localhost',
-      'hadoop.proxyuser.hue.hosts': '*',
+      'hadoop.proxyuser.hue.hosts': '*',      
       'hadoop.proxyuser.hue.groups': '*',
-      'hadoop.proxyuser.oozie.hosts': '*',
-      'hadoop.proxyuser.oozie.groups': '*',
-      'hadoop.proxyuser.%s.hosts' % getpass.getuser(): '*',
-      'hadoop.proxyuser.%s.groups' % getpass.getuser(): '*',
+      'hadoop.proxyuser.%s.hosts' % (getpass.getuser(),): '*',      
+      'hadoop.proxyuser.%s.groups' % (getpass.getuser(),): '*',
       'hadoop.tmp.dir': self._tmppath('hadoop_tmp_dir'),
     }
     write_config(core_configs, self._tmppath('conf/core-site.xml'))

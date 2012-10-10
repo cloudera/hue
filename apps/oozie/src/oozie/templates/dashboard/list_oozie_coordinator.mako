@@ -88,8 +88,9 @@ ${ layout.menubar(section='dashboard') }
               </div>
             % endfor
           </div>
-          % endif
+        % endif
 
+        % if has_job_edition_permission(oozie_coordinator, user):
           <div class="row-fluid">
             <div class="span3">${ _('Manage') }</div>
             <div class="span6">
@@ -113,6 +114,7 @@ ${ layout.menubar(section='dashboard') }
               </form>
             </div>
           </div>
+        % endif
       </div>
     </div>
 

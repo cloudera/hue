@@ -80,15 +80,17 @@ ${layout.menubar(section='dashboard')}
             <td>${ job.user }</td>
             <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
             <td>
-              <a title="${_('Kill %(coordinator)s') % dict(coordinator=job.id)}"
-                class="btn small confirmationModal"
-                alt="${ _('Are you sure you want to kill coordinator %s?') % job.id }"
-                href="javascript:void(0)"
-                data-message="${ _('The coordinator was killed!') }"
-                data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"
-                data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }">
-                  ${ _('Kill') }
-              </a>
+              % if has_job_edition_permission(job, user):
+                <a title="${_('Kill %(coordinator)s') % dict(coordinator=job.id)}"
+                  class="btn small confirmationModal"
+                  alt="${ _('Are you sure you want to kill coordinator %s?') % job.id }"
+                  href="javascript:void(0)"
+                  data-message="${ _('The coordinator was killed!') }"
+                  data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"
+                  data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }">
+                    ${ _('Kill') }
+                </a>
+              % endif
            </td>
           </tr>
         %endfor

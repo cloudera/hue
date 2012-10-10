@@ -21,3 +21,7 @@ MENU_INDEX = 41
 
 REQUIRES_HADOOP = True
 IS_URL_NAMESPACED = True
+
+PERMISSION_ACTIONS = (
+  ("dashboard_jobs_access", "Oozie Dashboard read-only user for all jobs"),
+)
