@@ -857,6 +857,27 @@ for x in sys.stdin:
 
     assert_true('on_success_url=%2Fbeeswax%2Ftable%2Fmy_table' in resp.context['fwd_params'])
 
+  def test_create_table_timestamp(self):
+    # Check form
+    response = self.client.get('/beeswax/create/create_table')
+    assert_true('<option value="timestamp">timestamp</option>' in response.content, response.content)
+
+    # Check creation
+    filename = '/tmp/timestamp_data'
+
+    # Bad format
+    self._make_custom_data_file(filename, [0, 0, 0])
+    self._make_table('timestamp_invalid_data', 'CREATE TABLE timestamp_invalid_data (timestamp1 TIMESTAMP)', filename)
+
+    response = self.client.get("/beeswax/table/timestamp_invalid_data")
+    assert_true('Error!' in response.content, response.content)
+
+    # Good format
+    self._make_custom_data_file(filename, ['2012-01-01 10:11:30', '2012-01-01 10:11:31'])
+    self._make_table('timestamp_valid_data', 'CREATE TABLE timestamp_valid_data (timestamp1 TIMESTAMP)', filename)
+
+    response = self.client.get("/beeswax/table/timestamp_valid_data")
+    assert_true('2012-01-01 10:11:30' in response.content, response.content)
 
   def test_partitioned_create_table(self):
     """

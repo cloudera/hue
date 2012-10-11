@@ -95,6 +95,12 @@ ${layout.menubar(section='tables')}
 
                 % if sample is not None:
                     <div class="tab-pane" id="sample">
+                      % if error_message:
+                        <div class="alert alert-error">
+                          <h3>${_('Error!')}</h3>
+                          <pre>${error_message | h}</pre>
+                        </div>
+                      % else:
                         <table class="table table-striped table-condensed sampleTable">
                           <thead>
                             <tr>
@@ -113,6 +119,7 @@ ${layout.menubar(section='tables')}
                             % endfor
                           </tbody>
                         </table>
+                      % endif
                     </div>
                 % endif
             </div>

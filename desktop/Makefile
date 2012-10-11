@@ -155,12 +155,7 @@ install: install-source-parts $(INSTALL_BDIST_TARGETS)
 #
 SOURCE_PARTS = \
   $(wildcard *.mk) Makefile \
-  conf \
-  libs/fancyupload \
-  libs/mootools-color \
-  libs/mootools-slick \
-  libs/mootools-touch \
-  libs/protovis
+  conf
 
 .PHONY: install-source-parts
 install-source-parts:

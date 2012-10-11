@@ -318,9 +318,9 @@ class CreateByImportDelimForm(forms.Form):
 # Note, struct is not currently supported.  (Because it's recursive, for example.)
 HIVE_TYPES = \
     ( "string", "tinyint", "smallint", "int", "bigint", "boolean",
-      "float", "double", "array", "map",)
+      "float", "double", "array", "map", "timestamp")
 HIVE_PRIMITIVE_TYPES = \
-    ("string", "tinyint", "smallint", "int", "bigint", "boolean", "float", "double")
+    ("string", "tinyint", "smallint", "int", "bigint", "boolean", "float", "double", "timestamp")
 
 class PartitionTypeForm(forms.Form):
   column_name = common.HiveIdentifierField(required=True)

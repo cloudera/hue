@@ -272,9 +272,15 @@ def show_tables(request):
 
 def describe_table(request, table):
   db = dbms.get(request.user)
+  error_message = ''
+  table_data = ''
 
   table = db.get_table('default', table)
-  table_data = db.get_sample(table)
+
+  try:
+    table_data = db.get_sample(table)
+  except BeeswaxException, ex:
+    error_message, logs = expand_exception(ex, db)
 
   load_form = LoadDataForm(table)
 
@@ -282,6 +288,7 @@ def describe_table(request, table):
       'table': table,
       'sample': table_data and table_data.rows(),
       'load_form': load_form,
+      'error_message': error_message,
   })
 
 

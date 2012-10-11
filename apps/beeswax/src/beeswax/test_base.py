@@ -91,7 +91,7 @@ def get_shared_beeswax_server():
   if _SHARED_BEESWAX_SERVER is None:
     # Copy hive-default.xml.template from BEESWAX_HIVE_CONF_DIR before it is set to
     # /my/bogus/path
-    default_xml = file(beeswax.conf.BEESWAX_HIVE_CONF_DIR.get()+"/hive-default.xml.template").read()
+    default_xml = file(beeswax.conf.BEESWAX_HIVE_CONF_DIR.get() + "/hive-default.xml.template").read()
 
     finish = (
       beeswax.conf.QUERY_SERVERS['default'].SERVER_HOST.set_for_testing("localhost"),
@@ -352,8 +352,7 @@ class BeeswaxSampleProvider(object):
     cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
 
     # Create a "myview" view.
-    make_query(cls.client, "CREATE VIEW myview (foo, bar) as SELECT * FROM test",
-               wait=True)
+    make_query(cls.client, "CREATE VIEW myview (foo, bar) as SELECT * FROM test", wait=True)
 
     _INITIALIZED = True
 
@@ -395,4 +394,11 @@ class BeeswaxSampleProvider(object):
     f = cls.cluster.fs.open(filename, "w")
     for x in xrange(256):
       f.write("%d\t%s\n" % (x, unichr(x).encode(encoding)))
+    f.close()
+
+  @classmethod
+  def _make_custom_data_file(cls, filename, data):
+    f = cls.cluster.fs.open(filename, "w")
+    for x in data:
+      f.write("%s\n" % x)
     f.close()
