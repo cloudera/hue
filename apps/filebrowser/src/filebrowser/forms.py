@@ -33,7 +33,7 @@ class PathField(CharField):
     kwargs.setdefault('required', True)
     kwargs.setdefault('min_length', 1)
     forms.CharField.__init__(self, label=label, help_text=help_text, **kwargs)
-  
+
   def clean(self, value):
     return normpath(CharField.clean(self, value))
 
@@ -80,6 +80,11 @@ class MkDirForm(forms.Form):
   op = "mkdir"
   path = PathField(label=_("Path in which to create the directory"))
   name = PathField(label=_("Directory Name"))
+
+class TouchForm(forms.Form):
+  op = "touch"
+  path = PathField(label=_("Path in which to create the file"))
+  name = PathField(label=_("File Name"))
 
 class ChownForm(forms.Form):
   op = "chown"

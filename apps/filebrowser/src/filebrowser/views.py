@@ -28,7 +28,6 @@ import posixpath
 import shutil
 import stat as stat_module
 import os
-from types import MethodType
 
 try:
   import json
@@ -36,7 +35,7 @@ except ImportError:
   import simplejson as json
 
 from django.contrib import messages
-from django.core import urlresolvers, serializers
+from django.core import urlresolvers
 from django.template.defaultfilters import stringformat, filesizeformat
 from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.views.static import was_modified_since
@@ -55,7 +54,7 @@ from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm,\
-    RmDirForm, RmTreeForm, RemoveForm, ChmodForm, ChownForm, EditorForm
+    RmDirForm, RmTreeForm, RemoveForm, ChmodForm, ChownForm, EditorForm, TouchForm
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -834,6 +833,17 @@ def mkdir(request):
     return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
 
 
+def touch(request):
+    def smart_touch(path, name):
+        # Make sure only the filename is specified.
+        # No absolute path specification allowed.
+        if posixpath.sep in name:
+            raise PopupException(_("Sorry, could not name file \"%s\": Slashes are not allowed in filenames." % name))
+        request.fs.create(os.path.join(path, name))
+
+    return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
+
+
 def remove(request):
     return generic_op(RemoveForm, request, request.fs.remove, ["path"], None)
 
@@ -865,7 +875,7 @@ def chown(request):
 
     op = curry(request.fs.chown, recursive=request.POST.get('recursive', False))
     return generic_op(ChownForm, request, op, args, "path", template="chown.mako",
-                      extra_params=dict(current_user=request.user, 
+                      extra_params=dict(current_user=request.user,
                       superuser=request.fs.superuser))
 
 

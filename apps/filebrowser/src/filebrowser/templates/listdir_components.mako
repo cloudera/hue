@@ -220,6 +220,27 @@ from django.utils.translation import ugettext as _
         </form>
     </div>
 
+    <!-- new directory modal -->
+    <div id="createFileModal" class="modal hide fade">
+        <form id="createFileForm" data-bind="submit: createFile" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+        <div class="modal-header">
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+            <h3>${_('Create File')}</h3>
+        </div>
+        <div class="modal-body">
+            <label>${_('File Name')} <input id="newFileNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
+            <input type="hidden" name="path" type="text" data-bind="value: currentPath"/>
+        </div>
+        <div class="modal-footer">
+             <div id="fileNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
+                <p><strong>${_('Sorry, file name is required.')}</strong>
+            </div>
+            <a id="cancelCreateFileBtn" class="btn" href="#">${_('Cancel')}</a>
+            <input class="btn primary" type="submit" value="${_('Submit')}" />
+        </div>
+        </form>
+    </div>
+
     <script type="text/javascript" charset="utf-8">
         // ajax modal windows
         function openChownWindow(path, user, group, next){
@@ -313,7 +334,6 @@ from django.utils.translation import ugettext as _
                 $("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
             });
 
-            //create directory handlers
             $(".create-directory-link").click(function(){
                 $("#createDirectoryModal").modal({
                     keyboard: true,
@@ -321,8 +341,19 @@ from django.utils.translation import ugettext as _
                 });
             });
 
+            $(".create-file-link").click(function(){
+                $("#createFileModal").modal({
+                    keyboard: true,
+                    show: true
+                });
+            });
+
             $("#cancelCreateDirectoryBtn").click(function(){
                 $("#createDirectoryModal").modal("hide");
+            });
+
+            $("#cancelCreateFileBtn").click(function(){
+                $("#createFileModal").modal("hide");
             });
 
             $("#createDirectoryForm").submit(function(){
@@ -567,7 +598,7 @@ from django.utils.translation import ugettext as _
                 self.currentPath(currentDirPath);
 
                 $('.uploader').trigger('fb:updatePath', {dest: self.currentPath()});
- 
+
                 self.isLoading(false);
                 $(".scrollable").jHueTableScroller();
             };
@@ -666,6 +697,11 @@ from django.utils.translation import ugettext as _
 
             self.createDirectory = function (formElement) {
                 $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
+                return true;
+            };
+
+            self.createFile = function (formElement) {
+                $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser.views.view', path=urlencode('/'))}"+ "." + self.currentPath());
                 return true;
             };
 

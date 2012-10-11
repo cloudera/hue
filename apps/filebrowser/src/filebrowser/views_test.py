@@ -37,7 +37,6 @@ from desktop.lib.test_utils import grant_access
 from hadoop import pseudo_hdfs4
 
 from avro import schema, datafile, io
-from lib.archives import archive_factory
 from lib.rwx import expand_mode
 
 
@@ -47,16 +46,15 @@ LOG = logging.getLogger(__name__)
 @attr('requires_hadoop')
 def test_mkdir_singledir():
   cluster = pseudo_hdfs4.shared_cluster()
+  cluster.fs.setuser('test')
+  c = make_logged_in_client()
 
   try:
-    c = make_logged_in_client(cluster.superuser)
-    cluster.fs.setuser(cluster.superuser)
-
     # We test that mkdir fails when a non-relative path is provided and a multi-level path is provided.
     success_path = 'mkdir_singledir'
     path_absolute = '/mkdir_singledir'
     path_fail = 'fail/foo'
-    prefix = '/test-filebrowser/'
+    prefix = '/tmp/test-filebrowser/'
     # Two of the following post requests should throw exceptions.
     # See https://issues.cloudera.org/browse/HUE-793.
     c.post('/filebrowser/mkdir', dict(path=prefix, name=path_fail))
@@ -74,6 +72,40 @@ def test_mkdir_singledir():
       cluster.fs.rmtree(prefix)     # Clean up
     except:
       pass      # Don't let cleanup errors mask earlier failures
+
+
+@attr('requires_hadoop')
+def test_touch():
+  cluster = pseudo_hdfs4.shared_cluster()
+  cluster.fs.setuser('test')
+  c = make_logged_in_client()
+
+  try:
+    success_path = 'touch_file'
+    path_absolute = '/touch_file'
+    path_fail = 'touch_fail/file'
+    prefix = '/tmp/test-filebrowser-touch/'
+
+    cluster.fs.mkdir(prefix)
+
+    resp = c.post('/filebrowser/touch', dict(path=prefix, name=path_fail))
+    assert_equal(500, resp.status_code)
+    resp = c.post('/filebrowser/touch', dict(path=prefix, name=path_absolute))
+    assert_equal(500, resp.status_code)
+    resp = c.post('/filebrowser/touch', dict(path=prefix, name=success_path))
+    assert_equal(200, resp.status_code)
+
+    # Read the parent dir and make sure we created 'success_path' only.
+    response = c.get('/filebrowser/view' + prefix)
+    file_listing = response.context['files']
+    assert_equal(2, len(file_listing))
+    assert_equal(file_listing[1]['name'], success_path)
+
+  finally:
+    try:
+      cluster.fs.rmtree(prefix)
+    except:
+      pass
 
 
 @attr('requires_hadoop')

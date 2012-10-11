@@ -27,10 +27,12 @@ ${commonheader(_('File Browser'), 'filebrowser', user)}
 
 <div class="container-fluid">
     <h1>${_('File Browser')}</h1>
+
     <%actionbar:render>
         <%def name="search()">
             <input type="text" class="input-xlarge search-query" placeholder="${_('Search for file name')}" data-bind="value: searchQuery">
         </%def>
+
         <%def name="actions()">
             <button class="btn fileToolbarBtn" title="${_('Rename')}" data-bind="click: renameFile, enable: selectedFiles().length == 1"><i class="icon-font"></i> ${_('Rename')}</button>
             <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length == 1"><i class="icon-random"></i> ${_('Move')}</button>
@@ -40,21 +42,36 @@ ${commonheader(_('File Browser'), 'filebrowser', user)}
             <button class="btn fileToolbarBtn" title="${_('Change Permissions')}" data-bind="click: changePermissions, enable: selectedFiles().length == 1"><i class="icon-list-alt"></i> ${_('Change Permissions')}</button>
             <button class="btn fileToolbarBtn" title="${_('Delete')}" data-bind="click: deleteSelected, enable: selectedFiles().length == 1"><i class="icon-trash"></i> ${_('Delete')}</button>
         </%def>
+
         <%def name="creation()">
+	        <div class="btn-group" style="display: inline-block;">
+	          <a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
+	            <i class="icon-plus-sign"></i> ${_('New')}
+	            <span class="caret"></span>
+	          </a>
+	          <ul class="dropdown-menu">
+	            <li><a href="#" class="create-file-link" title="${_('File')}"><i class="icon-file"></i> ${_('File')}</a></li>
+	            <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="icon-folder-close"></i> ${_('Directory')}</a></li>
+	          </ul>
+	        </div>
+
             <div id="upload-dropdown" class="btn-group" style="display: inline-block;">
-                <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown"><i class="icon-upload"></i> ${_('Upload')}</a>
+                <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown">
+                  <i class="icon-upload"></i> ${_('Upload')}
+                  <span class="caret"></span>
+                </a>
                 <ul class="dropdown-menu">
-                  <li><a href="#" tabindex="-1" class="upload-link" title="${_('Upload files')}" data-bind="click: uploadFile">${_('Upload files')}</a></li>
-                  <li class="divider"></li>
-                  <li><a href="#" tabindex="-1" class="upload-link" title="${_('Upload archive')}" data-bind="click: uploadArchive">${_('Upload archive')}</a></li>
+                  <li><a href="#" class="upload-link" title="${_('Files')}" data-bind="click: uploadFile"><i class="icon-file"></i> ${_('Files')}</a></li>
+                  <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="icon-gift"></i> ${_('Archives')}</a></li>
                 </ul>
             </div>
-            <a href="#" class="btn create-directory-link" title="${_('New directory')}"><i class="icon-folder-close"></i> ${_('New directory')}</a>
         </%def>
     </%actionbar:render>
+
     % if breadcrumbs:
         ${fb_components.breadcrumbs(path, breadcrumbs, True)}
     %endif
+
     <div class="scrollable">
         ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
     </div>
