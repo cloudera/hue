@@ -107,8 +107,8 @@ class Job(models.Model):
                                                 'dependencies must be uploaded.'))
   is_shared = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is shared'),
                                   help_text=_t('Check if you want to have some other users to have access to this job.'))
-  parameters = models.TextField(default='[]', verbose_name=_t('Parameters'),
-                                help_text=_t('Set some parameters used at the submission time (e.g. market=US).'))
+  parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Oozie parameters'),
+                                help_text=_t('Set some parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
 
   objects = JobManager()
   unique_together = ('owner', 'name')
@@ -229,7 +229,7 @@ class Workflow(Job):
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                                           'Properties specified in the configuration element override properties specified in the '
                                           'files specified by any job-xml elements.'))
-  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
+  job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('Job configuration properties used by all the actions of the workflow '
                                                  '(e.g. mapred.job.queue.name=production)'))
 
@@ -775,7 +775,7 @@ class Mapreduce(Action):
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
-  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
+  job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   jar_path = models.CharField(max_length=PATH_MAX, verbose_name=_t('Jar name'),
                               help_text=_t('Name or path to the %(program)s jar file on HDFS. e.g. examples.jar') % {'program': 'MapReduce'})
@@ -808,7 +808,7 @@ class Streaming(Action):
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
-  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Job properties'),
+  job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   mapper = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Mapper'),
                             help_text=_t('The mapper element is used to specify the executable/script to be used as mapper.'))
@@ -845,7 +845,7 @@ class Java(Action):
                                help_text=_t('Command line parameters which are to be used to start the JVM that will execute '
                                             'the Java application. Using this element is equivalent to use the mapred.child.java.opts '
                                             'configuration property'))
-  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
+  job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete then to create before starting the application. '
@@ -880,7 +880,7 @@ class Pig(Action):
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
-  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Job properties'),
+  job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete then to create before starting the application. '
@@ -918,8 +918,8 @@ class Hive(Action):
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
-  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"},{"name":"oozie.hive.defaults","value":"hive-default.xml"}]',
-                                    verbose_name=_t('Job properties'),
+  job_properties = models.TextField(default='[{"name":"oozie.hive.defaults","value":"hive-default.xml"}]',
+                                    verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete then to create before starting the application. '
@@ -959,8 +959,8 @@ class Sqoop(Action):
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
-  job_properties = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]',
-                                    verbose_name=_t('Job properties'),
+  job_properties = models.TextField(default='[]',
+                                    verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete then to create before starting the application. '
@@ -1020,7 +1020,7 @@ class Shell(Action):
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
-  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
+  job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete then to create before starting the application. '
@@ -1058,7 +1058,7 @@ class DistCp(Action):
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
                             help_text=_t('The arguments of the %(type)s command. Put options first then source paths then destination path.')
                                         % {'type': node_type.title()})
-  job_properties = models.TextField(default='[]', verbose_name=_t('Job properties'),
+  job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete then to create before starting the application. '

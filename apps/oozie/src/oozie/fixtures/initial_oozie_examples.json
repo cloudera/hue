@@ -61,7 +61,7 @@
     "fields": {
       "is_shared": true,
       "name": "Hive",
-      "parameters": "[]",
+      "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/hive",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
@@ -75,7 +75,7 @@
     "fields": {
       "is_shared": true,
       "name": "Pig",
-      "parameters": "[]",
+      "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/pig",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
@@ -89,7 +89,7 @@
     "fields": {
       "is_shared": true,
       "name": "Sqoop",
-      "parameters": "[]",
+      "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/sqoop",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
@@ -131,7 +131,7 @@
     "fields": {
       "is_shared": true,
       "name": "DistCp",
-      "parameters": "[]",
+      "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/distcp",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
@@ -1342,7 +1342,7 @@
     "fields": {
       "files": "[]",
       "job_xml": "",
-      "job_properties": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
+      "job_properties": "[]",
       "params": "[{\"value\":\"-param\",\"type\":\"argument\"},{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"argument\"},{\"value\":\"-param\",\"type\":\"argument\"},{\"value\":\"OUTPUT=${output}\",\"type\":\"argument\"}]",
       "archives": "[]",
       "prepares": "[]",
@@ -1355,7 +1355,7 @@
     "fields": {
       "files": "[\"hive-default.xml\"]",
       "job_xml": "",
-      "job_properties": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"},{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-default.xml\"}]",
+      "job_properties": "[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-default.xml\"}]",
       "params": "[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]",
       "archives": "[]",
       "prepares": "[]",
@@ -1368,7 +1368,7 @@
     "fields": {
       "files": "[\"db.hsqldb.properties\",\"db.hsqldb.script\"]",
       "job_xml": "",
-      "job_properties": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
+      "job_properties": "[]",
       "params": "[]",
       "archives": "[]",
       "prepares": "[{\"value\":\"${output}\",\"type\":\"delete\"}]",
