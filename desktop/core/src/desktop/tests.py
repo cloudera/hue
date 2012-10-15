@@ -77,6 +77,18 @@ def test_log_view():
 
   # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
   response = c.get(URL)
+  assert_equal(200, response.status_code)
+
+  c = make_logged_in_client()
+
+  URL = reverse(views.log_view)
+
+  LOG = logging.getLogger(__name__)
+  LOG.warn('Got response: PK\x03\x04\n\x00\x00\x08\x00\x00\xad\x0cN?\x00\x00\x00\x00')
+
+  # DjangoUnicodeDecodeError: 'utf8' codec can't decode byte 0xad in position 75: invalid start byte... should not happen
+  response = c.get(URL)
+  assert_equal(200, response.status_code)
 
 def test_dump_config():
   c = make_logged_in_client()
