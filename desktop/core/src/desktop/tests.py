@@ -17,13 +17,14 @@
 # limitations under the License.
 from desktop.lib import django_mako
 
-from nose.tools import assert_true, assert_equal
+from nose.tools import assert_true, assert_equal, assert_not_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from django.conf.urls.defaults import patterns, url
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
 from desktop.lib.paginator import Paginator
+from desktop.lib.conf import validate_path
 import desktop
 import desktop.urls
 import desktop.conf
@@ -33,6 +34,7 @@ from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions import PopupException
 import desktop.views as views
 import proxy.conf
+
 
 def setup_test_environment():
   """
@@ -323,6 +325,14 @@ def test_log_event():
 
   root.removeHandler(handler)
 
+def test_validate_path():
+  reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing('/')
+  assert_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=True))
+  reset()
+
+  reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing('/tmm/does_not_exist')
+  assert_not_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=True))
+  reset()
 
 def test_config_check():
   reset = (

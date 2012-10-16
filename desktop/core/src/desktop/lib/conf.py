@@ -613,9 +613,9 @@ def coerce_bool(value):
   raise Exception("Could not coerce %r to boolean value" % (value,))
 
 
-def validate_path(confvar, is_dir=None):
+def validate_path(confvar, is_dir=None, fs=os.path, message='Path does not exist on the filesystem.'):
   """
-  Validate that the value of confvar is an existent local path.
+  Validate that the value of confvar is an existent path.
 
   @param confvar  The configuration variable.
   @param is_dir  True/False would verify that the path is/isn't a directory.
@@ -623,13 +623,13 @@ def validate_path(confvar, is_dir=None):
   @return [(confvar, error_msg)] or []
   """
   path = confvar.get()
-  if path is None or not os.path.exists(path):
-    return [(confvar, 'Path does not exist on local filesystem.')]
+  if path is None or not fs.exists(path):
+    return [(confvar, message)]
   if is_dir is not None:
     if is_dir:
-      if not os.path.isdir(path):
+      if not fs.isdir(path):
         return [(confvar, 'Not a directory.')]
-    elif not os.path.isfile(path):
+    elif not fs.isfile(path):
       return [(confvar, 'Not a file.')]
   return [ ]
 
