@@ -30,7 +30,7 @@
     <table class="taskTable table table-striped table-condensed">
         <thead>
         <tr>
-            <th>${_('Log')}</th>
+            <th>${_('Logs')}</th>
             <th>${_('Tasks')}</th>
             <th>${_('Type')}</th>
         </tr>
@@ -99,6 +99,8 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                     <li>
                         ${comps.get_status(job)}
                     </li>
+                    <li class="nav-header">${_('Logs')}</li>
+                    <li><a href="${ url('jobbrowser.views.job_single_logs', jobid=job.jobId) }">${_('View logs')}</a></li>
                     % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                         <li class="nav-header">${_('Kill Job')}</li>
                         <li>

@@ -68,7 +68,7 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid),
         <table class="datatables table table-striped table-condensed">
             <thead>
             <tr>
-                <th>${_('Log')}</th>
+                <th>${_('Logs')}</th>
                 <th>${_('Task ID')}</th>
                 <th>${_('Type')}</th>
                 <th>${_('Progress')}</th>

@@ -40,6 +40,7 @@ from jobbrowser import conf
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker, Cluster
 
 from django.utils.translation import ugettext as _
+from django.shortcuts import redirect
 
 ##################################
 ## View end-points
@@ -69,12 +70,12 @@ def single_job(request, jobid):
   """
   job = Job.from_id(jt=request.jt, jobid=jobid)
 
-  def cmp_exec_time(foo, bar):
-    return cmp(foo.execStartTimeMs, bar.execStartTimeMs)
+  def cmp_exec_time(task1, task2):
+    return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
 
-  failed_tasks = job.filter_tasks(task_states=set(['failed']))
+  failed_tasks = job.filter_tasks(task_states=('failed',))
   failed_tasks.sort(cmp_exec_time)
-  recent_tasks = job.filter_tasks(task_states=set(['running', 'succeeded']))
+  recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
   recent_tasks.sort(cmp_exec_time, reverse=True)
 
   return render("job.mako", request, {
@@ -155,6 +156,33 @@ def kill_job(request, jobid):
     job = Job.from_id(jt=request.jt, jobid=jobid)
 
   raise Exception(_("Job did not appear as killed within 15 seconds"))
+
+@check_job_permission
+def job_single_logs(request, jobid):
+  """
+  We get here from /jobs/jobid/logs
+  """
+  job = Job.from_id(jt=request.jt, jobid=jobid)
+
+  def cmp_exec_time(task1, task2):
+    return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
+
+  task = None
+
+  failed_tasks = job.filter_tasks(task_states=('failed',))
+  failed_tasks.sort(cmp_exec_time)
+  if failed_tasks:
+    task = failed_tasks[0]
+  else:
+    recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
+    recent_tasks.sort(cmp_exec_time, reverse=True)
+    if recent_tasks:
+      task = recent_tasks[0]
+
+  if task is None:
+    raise PopupException(_("No tasks found for job %(id)s") % dict(id=jobid))
+
+  return redirect('single_task_attempt_logs', jobid=jobid, taskid= task.taskId, attemptid= task.taskAttemptIds[-1])
 
 @check_job_permission
 def tasks(request, jobid):

@@ -56,7 +56,7 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                     <table id="attemptsTable" class="table table-striped table-condensed">
                         <thead>
                         <tr>
-                            <th>${_('Log')}</th>
+                            <th>${_('Logs')}</th>
                             <th>${_('Attempt ID')}</th>
                             <th>${_('Progress')}</th>
                             <th>${_('State')}</th>

@@ -263,6 +263,10 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
                           (hadoop_job_id, early_task_id, attempt_id))
     assert_true('syslog' in response.content)
 
+    # Test job single logs page
+    response = self.client.get('/jobbrowser/jobs/%s/job_single_logs' % (hadoop_job_id))
+    assert_true('syslog' in response.content)
+
     # Test dock jobs
     response = self.client.get('/jobbrowser/dock_jobs/')
     assert_false('completed' in response.content)

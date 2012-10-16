@@ -76,6 +76,7 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
 <table class="datatables table table-striped table-condensed">
     <thead>
         <tr>
+            <th>${_('Logs')}</th>
             <th>${_('ID')}</th>
             <th>${_('Name')}</th>
             <th>${_('Status')}</th>
@@ -92,6 +93,9 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
     <tbody>
         % for job in jobs:
         <tr class="job-row">
+            <td data-row-selector-exclude="true">
+                <a href="${ url('jobbrowser.views.job_single_logs', jobid=job.jobId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+            </td>
             <td>
                 <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="${_('View this job')}" data-row-selector="true">${job.jobId_short}</a>
             </td>
@@ -186,6 +190,7 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
             "bInfo": false,
             "aaSorting": [[ 0, "desc" ]],
             "aoColumns": [
+                {"bSortable": false},
                 null,
                 null,
                 null,
