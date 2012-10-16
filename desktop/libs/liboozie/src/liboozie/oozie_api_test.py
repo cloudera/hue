@@ -15,20 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import atexit
 import logging
 import os
-import time
 import subprocess
 import threading
+import time
 
 from nose.tools import assert_equal
 
 from desktop.lib.paths import get_run_root
+from hadoop import pseudo_hdfs4
+from hadoop.fs.webhdfs import WebHdfs
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import OOZIE_URL
-from hadoop import pseudo_hdfs4
-import atexit
 
 
 _oozie_running = False
@@ -103,6 +104,10 @@ class OozieServerProvider(object):
     LOG.info("Executing %s, env %s" % (args, env))
     subprocess.call(args, env=env)
 
+  @classmethod
+  def _setup_sharelib(cls):
+    cls.cluster.fs.do_as_user('oozie', cls.cluster.fs.create_home_dir, '/user/oozie')
+    cls.cluster.fs.do_as_user('oozie', cls.cluster.fs.copyFromLocal, OozieServerProvider.OOZIE_HOME + '/share', '/user/oozie/')
 
   @classmethod
   def _get_shared_oozie_server(cls):
@@ -118,8 +123,11 @@ class OozieServerProvider(object):
         OOZIE_URL.set_for_testing("http://localhost:%s/oozie" % OozieServerProvider.OOZIE_TEST_PORT),
       )
 
+      # Setup
       cluster = pseudo_hdfs4.shared_cluster()
+      cls._setup_sharelib()
       cls._reset_oozie()
+
       p = cls._start_oozie(cluster)
 
       def kill():

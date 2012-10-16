@@ -17,7 +17,6 @@
 
 import logging
 import os
-import posixpath
 
 from django.contrib.auth.models import User
 from django.core import management
@@ -41,18 +40,18 @@ class Command(NoArgsCommand):
 
     # Copy examples binaries
     for name in os.listdir(LOCAL_SAMPLE_DIR.get()):
-      local_dir = posixpath.join(LOCAL_SAMPLE_DIR.get(), name)
-      remote_data_dir = posixpath.join(remote_dir, name)
+      local_dir = fs.join(LOCAL_SAMPLE_DIR.get(), name)
+      remote_data_dir = fs.join(remote_dir, name)
       LOG.info(_('Copying examples %(local_dir)s to %(remote_data_dir)s\n') % {
                   'local_dir': local_dir, 'remote_data_dir': remote_data_dir})
-      copy_dir(fs, local_dir, remote_data_dir)
+      fs.do_as_user(fs.DEFAULT_USER, fs.copyFromLocal, local_dir, remote_data_dir)
 
     # Copy sample data
     local_dir = LOCAL_SAMPLE_DATA_DIR.get()
-    remote_data_dir = posixpath.join(remote_dir, 'data')
+    remote_data_dir = fs.join(remote_dir, 'data')
     LOG.info(_('Copying data %(local_dir)s to %(remote_data_dir)s\n') % {
                 'local_dir': local_dir, 'remote_data_dir': remote_data_dir})
-    copy_dir(fs, local_dir, remote_data_dir)
+    fs.do_as_user(fs.DEFAULT_USER, fs.copyFromLocal, local_dir, remote_data_dir)
 
     # Load jobs
     sample, created = User.objects.get_or_create(username='sample')
@@ -61,66 +60,18 @@ class Command(NoArgsCommand):
     Job.objects.filter(owner__id=1, pk__lte=16).update(owner=sample)
 
 
-# This should probably be refactored and some parts moved to the HDFS lib. Jobsub could be updated to.
-
-def copy_dir(fs, local_dir, remote_dir, mode=0755):
-  fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, remote_dir, mode=mode)
-
-  for f in os.listdir(local_dir):
-    local_src = os.path.join(local_dir, f)
-    remote_dst = posixpath.join(remote_dir, f)
-
-    if os.path.isdir(remote_dst):
-      copy_dir(fs, local_src, remote_dst, mode)
-    else:
-      copy_file(fs, local_src, remote_dst)
-
-
-CHUNK_SIZE = 1024 * 1024
-
-def copy_file(fs, local_src, remote_dst):
-  if fs.exists(remote_dst):
-    LOG.info(_('%(remote_dst)s already exists. Skipping.') % {'remote_dst': remote_dst})
-    return
-  else:
-    LOG.info(_('%(remote_dst)s does not exist. Trying to copy') % {'remote_dst': remote_dst})
-
-  if os.path.isfile(local_src):
-    src = file(local_src)
-    try:
-      try:
-        fs.do_as_user(fs.DEFAULT_USER, fs.create, remote_dst, permission=01755)
-        chunk = src.read(CHUNK_SIZE)
-        while chunk:
-          fs.do_as_user(fs.DEFAULT_USER, fs.append, remote_dst, chunk)
-          chunk = src.read(CHUNK_SIZE)
-        LOG.info(_('Copied %s -> %s') % (local_src, remote_dst))
-      except:
-        LOG.error(_('Copying %s -> %s failed') % (local_src, remote_dst))
-        raise
-    finally:
-      src.close()
-  else:
-    LOG.info(_('Skipping %s (not a file)') % local_src)
-
-
 def create_data_dir(fs):
   # If needed, create the remote home, deployment and data directories
   directories = (REMOTE_DEPLOYMENT_DIR.get(), REMOTE_SAMPLE_DIR.get())
-  user = fs.user
 
-  try:
-    fs.setuser(fs.DEFAULT_USER)
-    for directory in directories:
-      if not fs.exists(directory):
-        remote_home_dir = Hdfs.join('/user', fs.user)
-        if directory.startswith(remote_home_dir):
-          # Home is 755
-          fs.create_home_dir(remote_home_dir)
-        # Shared by all the users
-        fs.mkdir(directory, 01777)
-        fs.chmod(directory, 01777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
-  finally:
-    fs.setuser(user)
+  for directory in directories:
+    if not fs.do_as_user(fs.DEFAULT_USER, fs.exists, directory):
+      remote_home_dir = Hdfs.join('/user', fs.DEFAULT_USER)
+      if directory.startswith(remote_home_dir):
+        # Home is 755
+        fs.do_as_user(fs.DEFAULT_USER, fs.create_home_dir, remote_home_dir)
+      # Shared by all the users
+      fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, directory, 01777)
+      fs.do_as_user(fs.DEFAULT_USER, fs.chmod, directory, 01777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
 
   return REMOTE_SAMPLE_DIR.get()

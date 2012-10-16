@@ -16,6 +16,10 @@
 # limitations under the License.
 
 """
+Deprecated! Use WebHdfs instead.
+
+Only some utils and Hdfs are still used.
+
 Interfaces for Hadoop filesystem access via the HADOOP-4707 Thrift APIs.
 """
 import errno
@@ -256,7 +260,7 @@ class Hdfs(object):
       else:
         self._copy_file(local_src, remote_dst)
 
-  def _copy_file(self, local_src, remote_dst, chunk_size=1024 * 1024):
+  def _copy_file(self, local_src, remote_dst, chunk_size=1024 * 1024 * 64):
     if os.path.isfile(local_src):
       if self.exists(remote_dst):
         LOG.info(_('%(remote_dst)s already exists. Skipping.') % {'remote_dst': remote_dst})
@@ -267,7 +271,7 @@ class Hdfs(object):
       src = file(local_src)
       try:
         try:
-          self.create(remote_dst, permission=01755)
+          self.create(remote_dst, permission=0755)
           chunk = src.read(chunk_size)
           while chunk:
             self.append(remote_dst, chunk)
@@ -281,6 +285,10 @@ class Hdfs(object):
     else:
       LOG.info(_('Skipping %s (not a file)') % local_src)
 
+
+"""
+Deprecated! Use WebHdfs instead
+"""
 class HadoopFileSystem(Hdfs):
   """
   Implementation of Filesystem APIs through Thrift to a Hadoop cluster.
