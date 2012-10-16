@@ -25,11 +25,11 @@ class Migration(SchemaMigration):
         # Adding model 'Workflow'
         db.create_table('oozie_workflow', (
             ('job_xml', self.gf('django.db.models.fields.CharField')(default='', max_length=512, blank=True)),
-            ('end', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='end_workflow', null=True, to=orm['oozie.End'])),
+            ('end', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='end_workflow', null=True, to=orm['oozie.Node'])),
             ('is_single', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
             ('job_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['oozie.Job'], unique=True, primary_key=True)),
             ('job_properties', self.gf('django.db.models.fields.TextField')(default='[]')),
-            ('start', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='start_workflow', null=True, to=orm['oozie.Start'])),
+            ('start', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='start_workflow', null=True, to=orm['oozie.Node'])),
         ))
         db.send_create_signal('oozie', ['Workflow'])
 

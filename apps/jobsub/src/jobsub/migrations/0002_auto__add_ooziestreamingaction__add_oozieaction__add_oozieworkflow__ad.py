@@ -35,6 +35,10 @@ LOG = logging.getLogger(__name__)
 class Migration(SchemaMigration):
     
     def forwards(self, orm):
+        """
+        Added custom transaction processing for transactional DBMS.
+        If a DDL operation fails, the entire transaction fails and all future commands are ignored.
+        """
         
         # Adding model 'OozieStreamingAction'
         db.create_table('jobsub_ooziestreamingaction', (
@@ -101,19 +105,27 @@ class Migration(SchemaMigration):
         # Adding field 'CheckForSetup.setup_level'
         db.add_column('jobsub_checkforsetup', 'setup_level', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
     
+        # The next sequence may fail... so they should have their own transactions.
+        db.commit_transaction()
+
         # Delete legacy tables. Note that this only applies to Hue 1.x installations
+        db.start_transaction()
         try:
             db.delete_table('jobsub_submission')
             remove_content_type('jobsub', 'submission')
+            db.commit_transaction()
         except Exception, ex:
-            pass    # Table doesn't exist. Ok.
+            db.rollback_transaction()
 
+        db.start_transaction()
         try:
             db.delete_table('jobsub_serversubmissionstate')
             remove_content_type('jobsub', 'serversubmissionstate')
+            db.commit_transaction()
         except Exception, ex:
-            pass    # Table doesn't exist. Ok.
+            db.rollback_transaction()
 
+        db.start_transaction()
         hue1_to_hue2_data_migration()
 
 

@@ -212,34 +212,45 @@ def update_app_permissions(**kwargs):
   the best thing we can do, since some apps might not
   have models, but nonetheless, "syncdb" is typically
   run when apps are installed.
+
+  This code executes when useradmin is sync'd since useradmin should be sync'd last.
   """
   # Map app->action->HuePermission.
-  current = {}
-  try:
-    for dp in HuePermission.objects.all():
-      current.setdefault(dp.app, {})[dp.action] = dp
-  except:
-    return
 
-  updated = 0
-  uptodate = 0
-  added = [ ]
+  # Only execute for useradmin app since useradmin is sync'd last.
+  # The HuePermission model needs to be sync'd for the following code to work.
+  # Since all apps should have been sync'd before useradmin, referencing them
+  # here is functional.
+  app = kwargs['app']
+  if app.__package__ == 'useradmin':
+    current = {}
+    try:
+      for dp in HuePermission.objects.all():
+        current.setdefault(dp.app, {})[dp.action] = dp
+    except:
+      return
 
-  for app_obj in appmanager.DESKTOP_APPS:
-    app = app_obj.name
-    actions = set([("access", "Launch this application")])
-    actions.update(getattr(app_obj.settings, "PERMISSION_ACTIONS", []))
+    updated = 0
+    uptodate = 0
+    added = [ ]
 
-    if app not in current:
-      current[app] = {}
+    for app_obj in appmanager.DESKTOP_APPS:
+      app = app_obj.name
+      actions = set([("access", "Launch this application")])
+      actions.update(getattr(app_obj.settings, "PERMISSION_ACTIONS", []))
 
-    for action, description in actions:
-      c = current[app].get(action)
-      if c:
-        if c.description != description:
-          c.description = description
-          c.save()
-          updated += 1
+      if app not in current:
+        current[app] = {}
+
+      for action, description in actions:
+        c = current[app].get(action)
+        if c:
+          if c.description != description:
+            c.description = description
+            c.save()
+            updated += 1
+          else:
+            uptodate += 1
         else:
           uptodate += 1
       else:
@@ -247,15 +258,15 @@ def update_app_permissions(**kwargs):
         new_dp.save()
         added.append(new_dp)
 
-  # Add all hue permissions to default group.
-  default_group = get_default_user_group()
-  if default_group:
-    for new_dp in added:
-      GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
+    # Add all hue permissions to default group.
+    default_group = get_default_user_group()
+    if default_group:
+      for new_dp in added:
+        GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 
-  available = HuePermission.objects.count()
+    available = HuePermission.objects.count()
 
-  LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" %
+    LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" %
            (len(added),
             updated,
             uptodate,

@@ -19,6 +19,9 @@ class Migration(DataMigration):
           db.rename_table('userman_ldapgroup', 'useradmin_ldapgroup')
           db.delete_column('useradmin_ldapgroup', 'hidden')
         except Exception, e:
+          db.rollback_transaction()  
+          db.start_transaction()
+
           # Adding model 'LdapGroup'
           db.create_table('useradmin_ldapgroup', (
               ('group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='group', to=orm['auth.Group'])),

@@ -4,9 +4,36 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+from desktop.lib.classes import classproperty
+
 from useradmin.models import UserProfile
 
 class Migration(DataMigration):
+    depends_on = (
+      # List of dependencies filled by the depends_on classproperty
+    )
+
+    def _depends_on(cls):
+      """
+      Ensure useradmin is migrated last by placing its migrations after all other migrations
+      """
+      from desktop.appmanager import DESKTOP_MODULES
+      import pkgutil
+
+      dependent_migrations = []
+      for module in DESKTOP_MODULES:
+        if module.name not in __name__:
+          try:
+            package = module.module.migrations
+            for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
+              dependent_migrations.append((module.name, modname))
+          except AttributeError:
+            # No migrations for this iteration
+            pass
+
+      return tuple(dependent_migrations)
+
+    depends_on = classproperty(_depends_on)
     
     def forwards(self, orm):
         """
@@ -37,12 +64,17 @@ class Migration(DataMigration):
               up.creation_method = UserProfile.CreationMethod.HUE
             up.save()
         except Exception:
+          db.rollback_transaction()  
+          db.start_transaction()
+
           # Adding model 'UserProfile'
           db.create_table('useradmin_userprofile', (
               ('home_directory', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True)),
               ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
               ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
           ))
+          db.commit_transaction()
+          db.start_transaction()
           db.send_create_signal('useradmin', ['UserProfile'])
 
         try:
@@ -51,17 +83,25 @@ class Migration(DataMigration):
           db.create_index('useradmin_grouppermission', ['group_id'])
           db.create_index('useradmin_grouppermission', ['hue_permission_id'])
         except Exception:
+          db.rollback_transaction()  
+          db.start_transaction()
+
           # Adding model 'GroupPermission'
           db.create_table('useradmin_grouppermission', (
               ('hue_permission', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['useradmin.HuePermission'])),
               ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.Group'])),
               ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
           ))
+          db.commit_transaction()
+          db.start_transaction()
           db.send_create_signal('useradmin', ['GroupPermission'])
 
         try:
           db.rename_table('userman_desktoppermission', 'useradmin_huepermission')
         except Exception:
+          db.rollback_transaction()  
+          db.start_transaction()
+
           # Adding model 'HuePermission'
           db.create_table('useradmin_huepermission', (
               ('action', self.gf('django.db.models.fields.CharField')(max_length=100)),
@@ -69,6 +109,8 @@ class Migration(DataMigration):
               ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
               ('description', self.gf('django.db.models.fields.CharField')(max_length=255)),
           ))
+          db.commit_transaction()
+          db.start_transaction()
           db.send_create_signal('useradmin', ['HuePermission'])
     
     def backwards(self, orm):
