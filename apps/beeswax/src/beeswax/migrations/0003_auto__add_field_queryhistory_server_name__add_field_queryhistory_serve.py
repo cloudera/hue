@@ -15,7 +15,7 @@ class Migration(SchemaMigration):
         db.add_column('beeswax_queryhistory', 'server_host', self.gf('django.db.models.fields.CharField')(default='', max_length=128), keep_default=False)
 
         # Adding field 'QueryHistory.server_port'
-        db.add_column('beeswax_queryhistory', 'server_port', self.gf('django.db.models.fields.SmallIntegerField')(default=''), keep_default=False)
+        db.add_column('beeswax_queryhistory', 'server_port', self.gf('django.db.models.fields.SmallIntegerField')(default=0), keep_default=False)
 
         # Changing field 'QueryHistory.query'
         db.alter_column('beeswax_queryhistory', 'query', self.gf('django.db.models.fields.TextField')())
