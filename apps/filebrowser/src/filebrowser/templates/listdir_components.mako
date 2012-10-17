@@ -781,7 +781,9 @@ from django.utils.translation import ugettext as _
             self.selectAll = function () {
                 self.allSelected(!self.allSelected());
                 ko.utils.arrayForEach(self.files(), function (file) {
-                    file.selected(self.allSelected());
+                    if (file.name != "..") {
+                        file.selected(self.allSelected());
+                    }
                 });
                 return true;
             };
