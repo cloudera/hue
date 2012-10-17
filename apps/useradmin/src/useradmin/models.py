@@ -247,6 +247,12 @@ def update_app_permissions(**kwargs):
         new_dp.save()
         added.append(new_dp)
 
+  # Add all hue permissions to default group.
+  default_group = get_default_user_group()
+  if default_group:
+    for new_dp in added:
+      GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
+
   available = HuePermission.objects.count()
 
   LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" %

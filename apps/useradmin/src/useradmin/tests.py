@@ -32,7 +32,7 @@ from django.utils.encoding import smart_unicode
 from django.core.urlresolvers import reverse
 
 from useradmin.models import HuePermission, GroupPermission, LdapGroup, UserProfile
-from useradmin.models import get_profile
+from useradmin.models import get_profile, get_default_user_group
 
 import useradmin.conf
 from hadoop import pseudo_hdfs4
@@ -159,14 +159,16 @@ def test_group_permissions():
 def test_default_group():
   reset_all_users()
   reset_all_groups()
+  useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default')
+  get_default_user_group()
 
   c = make_logged_in_client(username='test', is_superuser=True)
 
-  Group.objects.create(name="test_default")
+  # Create default group if it doesn't already exist.
+  assert_true(Group.objects.filter(name='test_default').exists())
 
   # Try deleting the default group
   assert_true(Group.objects.filter(name='test_default').exists())
-  useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default')
   response = c.post('/useradmin/groups/delete/test_default')
   assert_true('default user group may not be deleted' in response.content)
   assert_true(Group.objects.filter(name='test_default').exists())
@@ -245,6 +247,7 @@ def test_user_admin():
 
   reset_all_users()
   reset_all_groups()
+  useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default')
 
   c = make_logged_in_client('test', is_superuser=True)
 
@@ -293,8 +296,13 @@ def test_user_admin():
   assert_true(make_logged_in_client(username = "test", password = "test"),
               "Check that we can still login.")
 
+  # Check new user form for default group
+  group = get_default_user_group()
+  response = c.get('/useradmin/users/new')
+  assert_true(response)
+  assert_true(('<option value="1" selected="selected">%s</option>' % group) in str(response))
+
   # Create a new regular user (duplicate name)
-  assert_true(c.get('/useradmin/users/new'))
   response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
   assert_equal({ 'username': ["User with this Username already exists."]}, response.context["form"].errors)
 
