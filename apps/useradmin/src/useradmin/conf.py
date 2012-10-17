@@ -25,4 +25,4 @@ DEFAULT_USER_GROUP = Config(
     help="The name of a default group for users at creation time, or at first login "
          "if the server is configured to authenticate against an external source.",
     type=str,
-    default=None)
+    default='default')
