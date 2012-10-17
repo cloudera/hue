@@ -108,7 +108,7 @@
                 if (q != "") {
                     body.find("li.selectorDivider").hide();
                     body.find("label").each(function () {
-                        if ($(this).text().toLowerCase().indexOf(q) > -1) {
+                        if ($(this).text().toLowerCase().indexOf(q.toLowerCase()) > -1) {
                             $(this).parent().show();
                         }
                         else {
