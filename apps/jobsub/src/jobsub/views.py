@@ -29,7 +29,7 @@ try:
 except ImportError:
   import simplejson as json
 import logging
-
+import time as py_time
 
 from django.core import urlresolvers
 from django.shortcuts import redirect
@@ -48,8 +48,8 @@ import jobsub.forms
 
 from django.utils.translation import ugettext as _
 
-LOG = logging.getLogger(__name__)
 
+LOG = logging.getLogger(__name__)
 
 def oozie_job(request, jobid):
   """View the details about this job."""
@@ -144,24 +144,43 @@ def list_designs(request):
     name        - Substring filter by design name field
   '''
   data = models.OozieDesign.objects
-  owner = request.GET.get("owner", '')
+  owner = request.GET.get('owner', '')
   name = request.GET.get('name', '')
   if owner:
-    data = data.filter(owner__username__icontains=owner)
+      data = data.filter(owner__username__icontains=owner)
   if name:
-    data = data.filter(name__icontains=name)
+      data = data.filter(name__icontains=name)
   data = data.order_by('-last_modified')
+
   show_install_examples = \
       request.user.is_superuser and not jobsub_setup.Command().has_been_setup()
 
+  designs = []
+  for design in data:
+      ko_design = {
+          'id': design.id,
+          'owner': design.owner.username,
+          'name': design.name,
+          'description': design.description,
+          'type': design.root_action.action_type,
+          'last_modified': py_time.mktime(design.last_modified.timetuple()),
+          'url_params': urlresolvers.reverse(jobsub.views.get_design_params, kwargs={'design_id': design.id}),
+          'url_submit': urlresolvers.reverse(jobsub.views.submit_design, kwargs={'design_id': design.id}),
+          'url_edit': urlresolvers.reverse(jobsub.views.edit_design, kwargs={'design_id': design.id}),
+          'url_delete': urlresolvers.reverse(jobsub.views.delete_design, kwargs={'design_id': design.id}),
+          'url_clone': urlresolvers.reverse(jobsub.views.clone_design, kwargs={'design_id': design.id}),
+          'can_submit': request.user.username == design.owner.username,
+          'can_delete': request.user.is_superuser or request.user.username == design.owner.username
+      }
+      designs.append(ko_design)
+
   return render("list_designs.mako", request, {
-    'designs': list(data),
     'currentuser':request.user,
     'owner': owner,
     'name': name,
+    'designs': json.dumps(designs),
     'show_install_examples': show_install_examples,
   })
-
 
 def _get_design(design_id):
   """Raise PopupException if design doesn't exist"""
