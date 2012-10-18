@@ -223,7 +223,7 @@ def update_app_permissions(**kwargs):
   # Since all apps should have been sync'd before useradmin, referencing them
   # here is functional.
   app = kwargs['app']
-  if app.__package__ == 'useradmin':
+  if app.__name__.startswith('useradmin'):
     current = {}
     try:
       for dp in HuePermission.objects.all():
