@@ -226,7 +226,7 @@
     function initUploader(path, _parent, el, labels) {
         var uploader = new qq.FileUploader({
             element:el[0],
-            action:'/filebrowser/upload',
+            action:'/filebrowser/upload/file',
             params:{
                 dest:path,
                 fileFieldLabel:'hdfs_file'
