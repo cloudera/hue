@@ -44,6 +44,16 @@ ${commonheader(_('File Browser'), 'filebrowser', user)}
         </%def>
 
         <%def name="creation()">
+            <div id="upload-dropdown" class="btn-group pull-right" style="display: inline-block; margin-top:0">
+              <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown">
+                <i class="icon-upload"></i> ${_('Upload')}
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="upload-link" title="${_('Files')}" data-bind="click: uploadFile"><i class="icon-file"></i> ${_('Files')}</a></li>
+                <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="icon-gift"></i> ${_('Archives')}</a></li>
+              </ul>
+            </div>
 	        <div class="btn-group" style="display: inline-block;">
 	          <a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
 	            <i class="icon-plus-sign"></i> ${_('New')}
@@ -54,17 +64,6 @@ ${commonheader(_('File Browser'), 'filebrowser', user)}
 	            <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="icon-folder-close"></i> ${_('Directory')}</a></li>
 	          </ul>
 	        </div>
-
-            <div id="upload-dropdown" class="btn-group" style="display: inline-block;">
-                <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown">
-                  <i class="icon-upload"></i> ${_('Upload')}
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a href="#" class="upload-link" title="${_('Files')}" data-bind="click: uploadFile"><i class="icon-file"></i> ${_('Files')}</a></li>
-                  <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="icon-gift"></i> ${_('Archives')}</a></li>
-                </ul>
-            </div>
         </%def>
     </%actionbar:render>
 
