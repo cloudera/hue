@@ -63,6 +63,7 @@
         var _parent = this;
         $(_parent.element).empty();
         $.getJSON("/filebrowser/chooser" + path, function (data) {
+            path = data.current_dir_path; // use real path.
             var _flist = $("<ul>").addClass("unstyled");
             if (data.title != null && data.title == "Error") {
                 var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message);
