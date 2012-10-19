@@ -186,6 +186,22 @@ h1 {
     background-color: #01639c;
 }
 
+a.toggle-display-link:link {
+  color: black; text-decoration: none;
+}
+
+a.toggle-display-link:active {
+  color: black; text-decoration: none;
+}
+
+a.toggle-display-link:visited {
+  color: black; text-decoration: none;
+}
+
+a.toggle-display-link:hover {
+  color: black; text-decoration: none;
+}
+
 .withTitle {
     top: 60px!important;
 }

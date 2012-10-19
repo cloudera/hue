@@ -21,22 +21,59 @@ from django.utils.translation import ugettext as _
 
 ${commonheader(title, "", user)}
 
+  <div class="container-fluid">
+    <div class="alert">
+      <p><strong>${smart_unicode(message) | h}</strong></p>
 
-	<div class="container-fluid">
-		<div class="alert">
-			<p><strong>${smart_unicode(message) | h}</strong></p>
+      % if detail:
+      <p>${smart_unicode(detail) or "" | h}</p>
+      % endif
 
-			% if detail:
-			<p>${smart_unicode(detail) or "" | h}</p>
-			% endif
+    </div>
 
-			<div class="alert-actions">
-				<br/>
-				<a class="btn small" href="javascript:window.history.back(-1)">${_('Go back')}</a>
-			</div>
-		</div>
+    <div class="details">
+      % if traceback:
+        <a href="javascript:toggleDisplay('#traceback');"><i class="icon-share-alt"></i> ${_('More Info')}</a>
+        &nbsp;
+        <a href="/logs" target="_new">${_('View Logs')}</a>
+        <br />
+        <br />
+        <div id="traceback" class="hide">
+          <table class="table table-striped" style="background: white; border: 1px solid #DDDDDD;">
+            <thead>
+              <tr>
+                <td>${_("File Name")}</td>
+                <td>${_("Line Number")}</td>
+              <td>${_("Function Name")}</td>
+              </tr>
+            </thead>
+            <tbody>
+              % for (file_name, line_number, function_name, text) in traceback:
+                <tr>
+                  <td>${smart_unicode(file_name) or "" | h}</td>
+                  <td>${smart_unicode(line_number) or "" | h}</td>
+                  <td>${smart_unicode(function_name) or "" | h}</td>
+                </tr>
+              % endfor
+            </tbody>
+          </table>
+        </div>
+      % else:
+        <a href="/logs" target="_new">${_('View Logs')}</a>
+        <br />
+        <br />
+      % endif
+    </div>
 
+    <div class="alert-actions">
+      <a class="btn small" href="javascript:window.history.back(-1)">${_('Go back')}</a>
+    </div>
+  </div>
 
-	</div>
+  <script type="text/javascript">
+    function toggleDisplay(selector) {
+      $(selector).slideToggle(500);
+    }
+  </script>
 
 ${commonfooter(messages)}

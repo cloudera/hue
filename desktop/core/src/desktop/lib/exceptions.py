@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+import traceback
+
 from thrift.transport.TTransport import TTransportException
 
 # Need full import statement
@@ -34,6 +37,10 @@ class StructuredException(Exception):
     self.data = data
     self.error_code = error_code
 
+    # Traceback is only relevant if an exception was thrown, caught, and we reraise with this exception.
+    (type, value, tb) = sys.exc_info()
+    self.traceback = traceback.extract_tb(tb)
+
   def __str__(self):
     return "%s (code %s): %s" % (self.message, self.code, repr(self.data))
 
@@ -41,7 +48,8 @@ class StructuredException(Exception):
   def response_data(self):
     return dict(code=self.code,
                 message=self.message,
-                data=self.data)
+                data=self.data,
+                traceback=self.traceback)
 
 class MessageException(StructuredException):
   """
@@ -68,8 +76,12 @@ class PopupException(Exception):
     self.detail = detail
     self.error_code = error_code
 
+    # Traceback is only relevant if an exception was thrown, caught, and we reraise with this exception.
+    (type, value, tb) = sys.exc_info()
+    self.traceback = traceback.extract_tb(tb)
+
   def response(self, request):
-    data = dict(title=self.title, message=self.message, detail=self.detail)
+    data = dict(title=self.title, message=self.message, detail=self.detail, traceback=self.traceback)
     if not request.ajax:
       data['request'] = request
     response = desktop.lib.django_util.render("popup_error.mako", request, data)
