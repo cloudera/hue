@@ -134,29 +134,29 @@ def test_job_design_cycle():
   assert_false('This field is required' in response)
 
   # Now check list
-  response = c.get('/jobsub')
+  response = c.get('/jobsub/')
   for design in OozieDesign.objects.all():
     assert_true(design.name in response.content, response.content)
 
   # With some filters
-  response = c.get('/jobsub', dict(name='name-1'))
+  response = c.get('/jobsub/', dict(name='name-1'))
   assert_true('name-1' in response.content, response.content)
   assert_false('name-2' in response.content, response.content)
 
-  response = c.get('/jobsub', dict(owner='doesnotexist'))
+  response = c.get('/jobsub/', dict(owner='doesnotexist'))
   assert_false('doesnotexist' in response.content)
 
-  response = c.get('/jobsub', dict(owner='test', name='name-1'))
+  response = c.get('/jobsub/', dict(owner='test', name='name-1'))
   assert_true('name-1' in response.content, response.content)
   assert_false('name-2' in response.content, response.content)
 
-  response = c.get('/jobsub', dict(name="name"))
+  response = c.get('/jobsub/', dict(name="name"))
   assert_true('name-1' in response.content, response.content)
   assert_true('name-2' in response.content, response.content)
   assert_false('doesnotexist' in response.content, response.content)
 
   # Combined filters
-  response = c.get('/jobsub', dict(owner="test", name="name-2"))
+  response = c.get('/jobsub/', dict(owner="test", name="name-2"))
   assert_false('name-1' in response.content, response.content)
   assert_true('name-2' in response.content, response.content)
   assert_false('doesnotexist' in response.content, response.content)
