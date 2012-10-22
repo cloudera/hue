@@ -147,6 +147,9 @@ class OozieBase(OozieServerProvider):
     self.cluster = OozieServerProvider.cluster
     self.install_examples()
 
+    # Ensure access to MR folder
+    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/tmp', 0777, recursive=True)
+
 
   def install_examples(self):
     global _INITIALIZED

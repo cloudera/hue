@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import copy
+import logging
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 from django.contrib.auth.models import User
@@ -28,6 +29,9 @@ from jobsub import conf
 from jobsub.management.commands import jobsub_setup
 from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction
 from jobsub.parameterization import recursive_walk, find_variables, substitute_variables
+
+
+LOG = logging.getLogger(__name__)
 
 
 def test_recursive_walk():
@@ -180,15 +184,18 @@ class TestJobsubWithHadoop(OozieServerProvider):
 
   def setUp(self):
     OozieServerProvider.setup_class()
-    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/test', 0777, True)
-    self.client = make_logged_in_client()
+    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/jobsub_test')
+    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/jobsub_test', 0777, True)
+    self.client = make_logged_in_client(username='jobsub_test')
+
+    # Ensure access to MR folder
+    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/tmp', 0777, recursive=True)
 
   def test_jobsub_setup(self):
     # User 'test' triggers the setup of the examples.
     # 'hue' home will be deleted, the examples installed in the new one
     # and 'test' will try to access them.
-    self.cluster.fs.setuser('test')
+    self.cluster.fs.setuser('jobsub_test')
 
     username = 'hue'
     home_dir = '/user/%s/' % username
@@ -196,15 +203,15 @@ class TestJobsubWithHadoop(OozieServerProvider):
 
     try:
       data_dir = conf.REMOTE_DATA_DIR.get()
-      self.cluster.fs.setuser(self.cluster.fs.superuser)
-      if self.cluster.fs.exists(home_dir):
-        self.cluster.fs.rmtree(home_dir)
-      self.cluster.fs.setuser('test')
 
       if not jobsub_setup.Command().has_been_setup():
+        self.cluster.fs.setuser(self.cluster.fs.superuser)
+        if self.cluster.fs.exists(home_dir):
+          self.cluster.fs.rmtree(home_dir)
+
         jobsub_setup.Command().handle()
 
-      self.cluster.fs.setuser('test')
+      self.cluster.fs.setuser('jobsub_test')
       stats = self.cluster.fs.stats(home_dir)
       assert_equal(stats['user'], username)
       assert_equal(oct(stats['mode']), '040755') #04 because is a dir
@@ -213,8 +220,10 @@ class TestJobsubWithHadoop(OozieServerProvider):
       assert_equal(stats['user'], username)
       assert_equal(oct(stats['mode']), '041777')
 
+      # Only examples should have been created by 'hue'
       stats = self.cluster.fs.listdir_stats(data_dir)
-      assert_equal(len(stats), 2)
+      sample_stats = filter(lambda stat: stat.user == username, stats)
+      assert_equal(len(sample_stats), 2)
     finally:
       finish()
 
@@ -224,21 +233,22 @@ class TestJobsubWithHadoop(OozieServerProvider):
     """
     if not jobsub_setup.Command().has_been_setup():
       jobsub_setup.Command().handle()
+    self.cluster.fs.setuser('jobsub_test')
 
-    assert_equal(3, OozieDesign.objects.count())
-    assert_equal(2, OozieMapreduceAction.objects.count())
-    assert_equal(1, OozieStreamingAction.objects.count())
+    assert_equal(3, OozieDesign.objects.filter(owner__username='sample').count())
+    assert_equal(2, OozieMapreduceAction.objects.filter(ooziedesign__owner__username='sample').count())
+    assert_equal(1, OozieStreamingAction.objects.filter(ooziedesign__owner__username='sample').count())
 
     # Make sure sample user got created.
     assert_equal(1, User.objects.filter(username='sample').count())
 
     # Clone design
-    assert_equal(0, OozieDesign.objects.filter(owner__username='test').count())
-    jobid = OozieDesign.objects.get(name='sleep_job').id
+    assert_equal(0, OozieDesign.objects.filter(owner__username='jobsub_test').count())
+    jobid = OozieDesign.objects.get(name='sleep_job', owner__username='sample').id
 
     self.client.post('/jobsub/clone_design/%d' % jobid)
-    assert_equal(1, OozieDesign.objects.filter(owner__username='test').count())
-    jobid = OozieDesign.objects.get(owner__username='test').id
+    assert_equal(1, OozieDesign.objects.filter(owner__username='jobsub_test').count())
+    jobid = OozieDesign.objects.get(owner__username='jobsub_test').id
 
     # And now submit and run the sleep sample
     response = self.client.post('/jobsub/submit_design/%d' % jobid, {
@@ -251,19 +261,19 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_true(str(jobid) in response.content)
 
     oozie_job_id = response.context['jobid']
-    job = OozieServerProvider.wait_until_completion(oozie_job_id, timeout=60, step=1)
+    job = OozieServerProvider.wait_until_completion(oozie_job_id, timeout=120, step=1)
     logs = OozieServerProvider.oozie.get_job_log(oozie_job_id)
 
     assert_equal('SUCCEEDED', job.status, logs)
 
 
     # Grep
-    n = OozieDesign.objects.filter(owner__username='test').count()
+    n = OozieDesign.objects.filter(owner__username='jobsub_test').count()
     jobid = OozieDesign.objects.get(name='grep_example').id
 
     self.client.post('/jobsub/clone_design/%d' % jobid)
-    assert_equal(n + 1, OozieDesign.objects.filter(owner__username='test').count())
-    jobid = OozieDesign.objects.get(owner__username='test', name__contains='sleep_job').id
+    assert_equal(n + 1, OozieDesign.objects.filter(owner__username='jobsub_test').count())
+    jobid = OozieDesign.objects.get(owner__username='jobsub_test', name__contains='sleep_job').id
 
     # And now submit and run the sleep sample
     response = self.client.post('/jobsub/submit_design/%d' % jobid, {
