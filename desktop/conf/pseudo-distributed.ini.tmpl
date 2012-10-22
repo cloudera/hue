@@ -315,6 +315,11 @@
 
   # Configure the port the beeswax thrift server runs on
   ## beeswax_server_port=8002
+  
+  # Disable Beeswax as the query server. This is used when Beeswax is just
+  # used for talking to the meta store and Hue is using another query server.
+  # Just fill in an unused port.
+  ## beeswax_meta_server_only=8004
 
   # Hive home directory
   ## hive_home_dir=/usr/lib/hive

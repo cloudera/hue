@@ -31,6 +31,13 @@ BEESWAX_SERVER_PORT = Config(
   default=8002,
   type=int)
 
+BEESWAX_META_SERVER_ONLY = Config(
+  key="beeswax_meta_server_only",
+  help=_("Disable Beeswax as the query server. This is used when Beeswax is just used for talking to the meta store "
+         "and Hue is using another query server. Just fill in an unused port."),
+  default=None,
+  type=int)
+
 BEESWAX_META_SERVER_HOST = Config(
   key="beeswax_meta_server_host",
   help=_("Host where Beeswax internal metastore Thrift daemon is running."),

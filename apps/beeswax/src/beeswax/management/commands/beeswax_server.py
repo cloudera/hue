@@ -52,6 +52,11 @@ class Command(NoArgsCommand):
     set_if_present('HIVE_HOME', beeswax.conf.BEESWAX_HIVE_HOME_DIR.get())
     set_if_present('HIVE_CONF_DIR', beeswax.conf.BEESWAX_HIVE_CONF_DIR.get())
 
+    if beeswax.conf.BEESWAX_META_SERVER_ONLY.get() is not None:
+      beeswax_server_port = beeswax.conf.BEESWAX_META_SERVER_ONLY.get()
+    else:
+      beeswax_server_port = beeswax.conf.BEESWAX_SERVER_PORT.get()
+
     bin = beeswax.conf.BEESWAX_SERVER_BIN.get()
 
     # Host that desktop is running on
@@ -63,7 +68,7 @@ class Command(NoArgsCommand):
     args = [
       os.path.basename(bin),
       '--beeswax',
-      str(beeswax.conf.BEESWAX_SERVER_PORT.get()),
+      str(beeswax_server_port),
       '--desktop-host',
       str(dt_host),
       '--desktop-port',
