@@ -9,6 +9,7 @@
         // desktop/templates/common_header.mako
         defaults = {
             initialPath:"",
+            errorRedirectPath:"",
             createFolder:true,
             uploadFile:true,
             selectFolder:false,
@@ -27,6 +28,8 @@
             onFolderChoose:function () {
             },
             onFolderChange:function () {
+            },
+            onError:function () {
             }
         };
 
@@ -216,7 +219,8 @@
                 }
             }
         }).error(function(){
-            _parent.navigateTo("/?default_to_home");
+            _parent.options.onError();
+            _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : "/?default_to_home");
             if ($.jHueNotify) {
                 $.jHueNotify.info(_parent.options.labels.FILE_NOT_FOUND);
             }

@@ -214,22 +214,46 @@
       function getFileBrowseButton(inputElement) {
         return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
           e.preventDefault();
-          $("#fileChooserModal").jHueFileChooser({
-            % if select_folder:
+          // check if it's a relative path
+          var pathAddition = "";
+          if ($.trim(inputElement.val()) != ""){
+            $.getJSON("/filebrowser/chooser${ workflow.deployment_dir }" + inputElement.val(), function (data) {
+              pathAddition = "${ workflow.deployment_dir }";
+              callFileChooser();
+            }).error(function(){
+              callFileChooser();
+            });
+          }
+          else {
+            callFileChooser();
+          }
+
+          function callFileChooser() {
+            $("#fileChooserModal").jHueFileChooser({
+              % if select_folder:
               selectFolder: true,
               onFolderChoose: function(filePath) {
-            % else:
+              % else:
               onFileChoose: function(filePath) {
-            % endif
-              inputElement.val(filePath);
-              $("#chooseFile").modal("hide");
-            },
-            createFolder: true,
-            uploadFile: false,
-            initialPath: inputElement.val()
-          });
-          $("#chooseFile").modal("show");
-        })
+              % endif
+                if (filePath.indexOf("${ workflow.deployment_dir }") > -1){
+                  filePath = filePath.substring("${ workflow.deployment_dir }".length);
+                  if (filePath == ""){
+                    filePath = "/";
+                  }
+                }
+                inputElement.val(filePath);
+                inputElement.change();
+                $("#chooseFile").modal("hide");
+              },
+              createFolder: false,
+              uploadFile: false,
+              initialPath: $.trim(inputElement.val()) != "" ? pathAddition + inputElement.val() : "${ workflow.deployment_dir }",
+              errorRedirectPath: "${ workflow.deployment_dir }"
+            });
+            $("#chooseFile").modal("show");
+          }
+        });
       }
     });
   </script>

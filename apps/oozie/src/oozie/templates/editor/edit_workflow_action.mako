@@ -90,7 +90,7 @@ ${ layout.menubar(section='workflows') }
                     <span class="span4 required" data-bind="text: type" />
                   </td>
                   <td>
-                    <input type="text" class="input span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+                    <input type="text" class="input span4 required pathChooser" data-bind="fileChooser: $data, value: value, uniqueName: false" />
                   </td>
                   <td><a class="btn" href="#" data-bind="click: $root.removePrepare">${ _('Delete') }</a></td>
                 </tr>
@@ -128,7 +128,7 @@ ${ layout.menubar(section='workflows') }
                     <span class="span4 required" data-bind="text: type" />
                   </td>
                   <td>
-                    <input type="text" class="input span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+                    <input type="text" class="input span4 required pathChooser" data-bind="fileChooser: $data, value: value, uniqueName: false" />
                   </td>
                   <td><a class="btn" href="#" data-bind="click: $root.removeParam">${ _('Delete') }</a></td>
                 </tr>
@@ -173,7 +173,7 @@ ${ layout.menubar(section='workflows') }
             <tbody data-bind="foreach: properties">
               <tr>
                 <td><input type="text" class="span4 required propKey" data-bind="value: name, uniqueName: false" /></td>
-                <td><input type="text" class="span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
+                <td><input type="text" class="span4 required pathChooser" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
                 <td><a class="btn" href="#" data-bind="click: $root.removeProp">${ _('Delete') }</a></td>
               </tr>
             </tbody>
@@ -199,7 +199,7 @@ ${ layout.menubar(section='workflows') }
               <table class="table-condensed designTable" data-bind="visible: files().length > 0">
                 <tbody data-bind="foreach: files">
                   <tr>
-                    <td><input type="text" class="span5 required"
+                    <td><input type="text" class="span5 required pathChooser"
                             data-bind="fileChooser: $data, value: name, uniqueName: false" />
                     </td>
                     <td><a class="btn" href="#" data-bind="click: $root.removeFile">${ _('Delete') }</a></td>
@@ -226,7 +226,7 @@ ${ layout.menubar(section='workflows') }
             <tbody data-bind="foreach: archives">
               <tr>
                 <td>
-                  <input type="text" class="span5 required"
+                  <input type="text" class="span5 required pathChooser"
                       data-bind="fileChooser: $data, value: name, uniqueName: false" />
                 </td>
                 <td><a class="btn" href="#" data-bind="click: $root.removeArchive">${ _('Delete') }</a></td>
@@ -273,16 +273,11 @@ ${ layout.menubar(section='workflows') }
   <div class="modal-footer"></div>
 </div>
 
-
 <link rel="stylesheet" href="/static/ext/css/jquery-ui-autocomplete-1.8.18.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js" type="text/javascript" charset="utf-8"></script>
 
 <style>
-  td.pathChooserKo {
-    min-width: 404px;
-  }
-
   #fileChooserModal {
     padding:14px;
     height:270px;
@@ -455,25 +450,45 @@ ${ layout.menubar(section='workflows') }
 
     ko.applyBindings(viewModel);
 
-    $(".pathChooser").each(function(){
-      var self = $(this);
-      self.after(getFileBrowseButton(self));
-    });
+    $("input[name='job_xml']").addClass("pathChooser").after(getFileBrowseButton($("input[name='job_xml']")));
 
     function getFileBrowseButton(inputElement) {
       return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
         e.preventDefault();
-        $("#fileChooserModal").jHueFileChooser({
-          onFileChoose: function(filePath) {
+        // check if it's a relative path
+        var pathAddition = "";
+        if ($.trim(inputElement.val()) != ""){
+          $.getJSON("/filebrowser/chooser${ workflow.deployment_dir }" + inputElement.val(), function (data) {
+            pathAddition = "${ workflow.deployment_dir }";
+            callFileChooser();
+          }).error(function(){
+            callFileChooser();
+          });
+        }
+        else {
+          callFileChooser();
+        }
+
+        function callFileChooser() {
+          $("#fileChooserModal").jHueFileChooser({
+            onFileChoose: function(filePath) {
+              if (filePath.indexOf("${ workflow.deployment_dir }") > -1){
+                filePath = filePath.substring("${ workflow.deployment_dir }".length);
+                if (filePath == ""){
+                  filePath = "/";
+                }
+              }
               inputElement.val(filePath);
               inputElement.change();
               $("#chooseFile").modal("hide");
-          },
-          createFolder: false,
-          initialPath: "${ workflow.deployment_dir }"
-        });
-        $("#chooseFile").modal("show");
-      })
+            },
+            createFolder: false,
+            initialPath: $.trim(inputElement.val()) != "" ? pathAddition + inputElement.val() : "${ workflow.deployment_dir }",
+            errorRedirectPath: "${ workflow.deployment_dir }"
+          });
+          $("#chooseFile").modal("show");
+        }
+      });
     }
 
     $(".propKey").each(addAutoComplete);

@@ -301,8 +301,8 @@ modal-window .modal-content {
       });
     });
 
-     ko.applyBindings(window.viewModelparameters, $("#parameters")[0]);
-     ko.applyBindings(window.viewModeljob_properties, $("#job_properties")[0]);
+    ko.applyBindings(window.viewModelparameters, $("#parameters")[0]);
+    ko.applyBindings(window.viewModeljob_properties, $("#job_properties")[0]);
 
     $('#jobForm').submit(function() {
       window.viewModelparameters.pre_submit();
