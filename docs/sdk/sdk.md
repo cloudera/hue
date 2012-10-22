@@ -800,13 +800,13 @@ Adding Interactive Elements to Your UI
 
 Hue by default loads these JavaScript components:
 
-* jQuery 1.7.1
+* jQuery 1.8.1
 * jQuery.dataTables 1.8.2
-* Bootstrap 2.0
+* Bootstrap 2.1.1
 
 These are used by some Hue applications, but not loaded by default:
 
-* Knockout 2.0.0 (`desktop/core/static/ext/js/knockout-2.0.0.js`)
+* Knockout 2.1.0 (`desktop/core/static/ext/js/knockout-2.1.0.js`)
 * DataTables pagination using the Bootstrap style (`desktop/core/static/ext/js/datatables-paging-0.1.js`)
 * jQuery UI autocomplete 1.8.18 (`desktop/core/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js`)
 

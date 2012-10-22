@@ -275,7 +275,7 @@ ${ layout.menubar(section='workflows') }
 
 
 <link rel="stylesheet" href="/static/ext/css/jquery-ui-autocomplete-1.8.18.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-<script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js" type="text/javascript" charset="utf-8"></script>
 
 <style>

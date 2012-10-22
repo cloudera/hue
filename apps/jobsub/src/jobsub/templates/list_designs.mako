@@ -27,7 +27,7 @@ ${commonheader(_('Job Designer'), "jobsub", user, "100px")}
 ${layout.menubar(section='designs')}
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="static/js/jobsub.ko.js" type="text/javascript" charset="utf-8"></script>
 

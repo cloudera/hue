@@ -26,7 +26,7 @@ ${ commonheader(_("Oozie App"), "oozie", user, "100px") }
 ${ layout.menubar(section='coordinators') }
 
 
-<script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 
 
 <div class="container-fluid">

@@ -387,7 +387,7 @@ ${ layout.menubar(section='coordinators') }
 
 <script src="/static/ext/js/jquery/plugins/jquery-ui-datepicker-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-timepicker.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-2.0.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   var timeOptions = {
