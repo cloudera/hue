@@ -61,5 +61,6 @@
 </head>
 
 <body>
+    <%block name="fixtures"/>
 </body>
 </html>

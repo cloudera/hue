@@ -298,6 +298,8 @@ def setup(request):
     raise PopupException(_('The examples could not be installed.'), detail=e)
   return redirect(urlresolvers.reverse(list_designs))
 
+def jasmine(request):
+  return render('jasmine.mako', request, None)
 
 
 # See http://wiki.apache.org/hadoop/JobConfFile

@@ -36,4 +36,7 @@ urlpatterns = patterns(
 
   # Setup
   url(r'^setup/$', 'views.setup'),
+
+  # Jasmine
+  url(r'^jasmine', 'views.jasmine'),
 )
