@@ -54,6 +54,12 @@ from django.utils.translation import ugettext as _
         .file-row {
             height:37px;
         }
+        .fileChooserModal {
+            padding: 14px;
+        }
+        .fileChooserModal .hueBreadcrumb {
+            margin: 0 0 18px!important;
+        }
     </style>
 
     <table class="table table-striped table-condensed datatables">
@@ -267,13 +273,11 @@ from django.utils.translation import ugettext as _
             </div>
             <div class="modal-body">
                 <div style="padding-left: 15px;">
-                    <label for="id_dest_path">${_('Destination')}</label>
-                    <input type="text" class="input-xlarge pathChooser" value="" name="dest_path" id="moveDestination" />
-                    <a class="btn fileChooserBtn" href="#" data-filechooser-destination="dest_path">..</a>
+                    <label for="moveDestination">${_('Destination')}</label>
+                    <input type="text" class="input-xlarge pathChooser" value="" name="dest_path" id="moveDestination" /><a class="btn fileChooserBtn" href="#" data-filechooser-destination="dest_path">..</a>
                 </div>
                 <br/>
-                <div class="fileChooserModal" class="smallModal well hide">
-                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                <div class="fileChooserModal" class="hide">
                 </div>
             </div>
             <div class="modal-footer">
@@ -400,7 +404,7 @@ from django.utils.translation import ugettext as _
                 createFolder: true,
                 uploadFile: false
             });
-            fileCooser.slideDown();
+            fileChooser.slideDown();
         });
 
         $(document).ready(function(){
