@@ -19,5 +19,5 @@ from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
-  url(r'^query$', 'index', name='query')
+  url(r'^query$', 'index', name='query'),
 )
