@@ -51,7 +51,7 @@ def log_view(request):
   l = logging.getLogger()
   for h in l.handlers:
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
-      return render('logs.mako', request, dict(log=[l for l in h.buf]))
+      return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", "")))
 
   return render('logs.mako', request, dict(log=[_("No logs found!")]))
 
