@@ -20,70 +20,74 @@ import urllib
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-<%namespace name="layout" file="layout.mako" />
+<%namespace name="commonlayout" file="layout.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
 ${commonheader(_('Job Designer'), "jobsub", user, "100px")}
-${layout.menubar(section='designs')}
+${commonlayout.menubar(section='designs')}
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="static/js/jobsub.ko.js" type="text/javascript" charset="utf-8"></script>
 
-<div class="container-fluid">
+
+<%def name="layout()">
+  <div class="container-fluid">
     <h1>${_('Job Designs')}</h1>
 
-    <%actionbar:render>
-        <%def name="actions()">
-            <button class="btn" title="${_('Submit')}" data-bind="click: submitDesign, enable: selectedDesigns().length == 1 && selectedDesigns()[0].canSubmit"><i class="icon-play"></i> ${_('Submit')}</button>
-            <button class="btn" title="${_('Edit')}" data-bind="click: editDesign, enable: selectedDesigns().length == 1 && selectedDesigns()[0].canSubmit"><i class="icon-pencil"></i> ${_('Edit')}</button>
-            <button class="btn" title="${_('Delete')}" data-bind="click: deleteDesign, enable: selectedDesigns().length == 1 && selectedDesigns()[0].canDelete"><i class="icon-trash"></i> ${_('Delete')}</button>
-            <button class="btn" title="${_('Clone')}" data-bind="click: cloneDesign, enable: selectedDesigns().length == 1"><i class="icon-share"></i> ${_('Clone')}</button>
-        </%def>
-        <%def name="creation()">
-            <span class="btn-group">
+  <%actionbar:render>
+    <%def name="actions()">
+        <button class="btn" title="${_('Submit')}" data-bind="click: submitDesign, enable: selectedDesigns().length == 1 && selectedDesigns()[0].canSubmit"><i class="icon-play"></i> ${_('Submit')}</button>
+        <button class="btn" title="${_('Edit')}" data-bind="click: editDesign, enable: selectedDesigns().length == 1 && selectedDesigns()[0].canSubmit"><i class="icon-pencil"></i> ${_('Edit')}</button>
+        <button class="btn" title="${_('Delete')}" data-bind="click: deleteDesign, enable: selectedDesigns().length == 1 && selectedDesigns()[0].canDelete"><i class="icon-trash"></i> ${_('Delete')}</button>
+        <button class="btn" title="${_('Clone')}" data-bind="click: cloneDesign, enable: selectedDesigns().length == 1"><i class="icon-share"></i> ${_('Clone')}</button>
+    </%def>
+    <%def name="creation()">
+        <span class="btn-group">
                 <a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn" title="${_('Create Mapreduce Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Mapreduce')}</a>
                 <a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn" title="${_('Create Streaming Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Streaming')}</a>
                 <a href="${ url('jobsub.views.new_design', action_type='java') }" class="btn"title="${_('Create Java Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Java')}</a>
             </span>
-            %if show_install_examples:
-            &nbsp; <a id="installSamplesLink" href="javascript:void(0)" data-confirmation-url="${url('jobsub.views.setup')}" class="btn"><i class="icon-download-alt"></i> ${_('Install Samples')}</a>
-            %endif
-        </%def>
-    </%actionbar:render>
+      %if show_install_examples:
+          &nbsp; <a id="installSamplesLink" href="javascript:void(0)" data-confirmation-url="${url('jobsub.views.setup')}" class="btn"><i class="icon-download-alt"></i> ${_('Install Samples')}</a>
+      %endif
+    </%def>
+  </%actionbar:render>
 
     <table id="designTable" class="table table-condensed datatables">
-        <thead>
-        <tr>
-            <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div></th>
-            <th>${_('Owner')}</th>
-            <th>${_('Name')}</th>
-            <th>${_('Type')}</th>
-            <th>${_('Description')}</th>
-            <th>${_('Last Modified')}</th>
-        </tr>
-        </thead>
-        <tbody id="designs" data-bind="template: {name: 'designTemplate', foreach: designs}">
+      <thead>
+      <tr>
+        <th width="1%"><div id="selectAll" data-bind="click: selectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div></th>
+        <th>${_('Owner')}</th>
+        <th>${_('Name')}</th>
+        <th>${_('Type')}</th>
+        <th>${_('Description')}</th>
+        <th>${_('Last Modified')}</th>
+      </tr>
+      </thead>
+      <tbody id="designs" data-bind="template: {name: 'designTemplate', foreach: designs}">
 
-        </tbody>
+      </tbody>
     </table>
 
-</div>
+  </div>
 
-<script id="designTemplate" type="text/html">
+  <script id="designTemplate" type="text/html">
     <tr style="cursor: pointer">
-        <td class="center" data-bind="click: handleSelect" style="cursor: default">
-            <div data-bind="visible: name != '..', css: {hueCheckbox: name != '..', 'icon-ok': selected}"></div>
-        </td>
-        <td data-bind="click: $root.editDesign, text: owner"></td>
-        <td data-bind="click: $root.editDesign, text: name"></td>
-        <td data-bind="click: $root.editDesign, text: type"></td>
-        <td data-bind="click: $root.editDesign, text: description"></td>
-        <td data-bind="click: $root.editDesign, text: lastModified, attr: { 'data-sort-value': lastModifiedMillis }" style="white-space: nowrap;"></td>
+      <td class="center" data-bind="click: handleSelect" style="cursor: default">
+        <div data-bind="visible: name != '..', css: {hueCheckbox: name != '..', 'icon-ok': selected}"></div>
+      </td>
+      <td data-bind="click: $root.editDesign, text: owner"></td>
+      <td data-bind="click: $root.editDesign, text: name"></td>
+      <td data-bind="click: $root.editDesign, text: type"></td>
+      <td data-bind="click: $root.editDesign, text: description"></td>
+      <td data-bind="click: $root.editDesign, text: lastModified, attr: { 'data-sort-value': lastModifiedMillis }" style="white-space: nowrap;"></td>
     </tr>
-</script>
+  </script>
+</%def>
 
+${layout()}
 
 <div id="submitWf" class="modal hide fade">
     <form id="submitWfForm" action="" method="POST" style="margin:0">
