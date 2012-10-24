@@ -27,6 +27,8 @@ from search.forms import QueryForm
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
+from django.http import HttpResponse
+
 
 # http://lucene.apache.org/solr/api-4_0_0-BETA/doc-files/tutorial.html#Getting+Started
 SOLR_URL = 'http://localhost:8983/solr/'
@@ -42,11 +44,9 @@ def index(request):
     response = SolrApi(SOLR_URL).query(search_form.cleaned_data['query'])
     response = json.loads(response)
 
-  return render('index.mako', request, {'search_form': search_form, 'response': response})
+  return render('index.mako', request, {'search_form': search_form, 'response': response, 'rr': json.dumps(response)})
 
-
-
-# Simple API for now 
+# Simple API for now
 class SolrApi(object):
   def __init__(self, solr_url):
     self._url = solr_url
@@ -54,4 +54,4 @@ class SolrApi(object):
     self._root = Resource(self._client)
 
   def query(self, query):    
-    return self._root.get('collection1/select', {'q': query, 'wt': 'json'})
+    return self._root.get('collection1/browse', {'q': query, 'wt': 'json'})
