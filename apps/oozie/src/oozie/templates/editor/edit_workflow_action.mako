@@ -451,6 +451,7 @@ ${ layout.menubar(section='workflows') }
     ko.applyBindings(viewModel);
 
     $("input[name='job_xml']").addClass("pathChooser").after(getFileBrowseButton($("input[name='job_xml']")));
+    $("input[name='jar_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='jar_path']")));
 
     function getFileBrowseButton(inputElement) {
       return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
