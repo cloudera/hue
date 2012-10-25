@@ -221,52 +221,54 @@ def update_app_permissions(**kwargs):
   # The HuePermission model needs to be sync'd for the following code to work.
   # Since all apps should have been sync'd before useradmin, referencing them
   # here is functional.
-  current = {}
-  try:
-    for dp in HuePermission.objects.all():
-      current.setdefault(dp.app, {})[dp.action] = dp
-  except:
-    return
+  if kwargs['app'].__name__.startswith('useradmin'):
+    try:
+      for dp in HuePermission.objects.all():
+        current.setdefault(dp.app, {})[dp.action] = dp
+    except:
+      return
 
-  updated = 0
-  uptodate = 0
-  added = [ ]
+    current = {}
 
-  for app_obj in appmanager.DESKTOP_APPS:
-    app = app_obj.name
-    actions = set([("access", "Launch this application")])
-    actions.update(getattr(app_obj.settings, "PERMISSION_ACTIONS", []))
+    updated = 0
+    uptodate = 0
+    added = [ ]
 
-    if app not in current:
-      current[app] = {}
+    for app_obj in appmanager.DESKTOP_APPS:
+      app = app_obj.name
+      actions = set([("access", "Launch this application")])
+      actions.update(getattr(app_obj.settings, "PERMISSION_ACTIONS", []))
 
-    for action, description in actions:
-      c = current[app].get(action)
-      if c:
-        if c.description != description:
-          c.description = description
-          c.save()
-          updated += 1
+      if app not in current:
+        current[app] = {}
+
+      for action, description in actions:
+        c = current[app].get(action)
+        if c:
+          if c.description != description:
+            c.description = description
+            c.save()
+            updated += 1
+          else:
+            uptodate += 1
         else:
-          uptodate += 1
-      else:
-        new_dp = HuePermission(app=app, action=action, description=description)
-        new_dp.save()
-        added.append(new_dp)
+          new_dp = HuePermission(app=app, action=action, description=description)
+          new_dp.save()
+          added.append(new_dp)
 
-  # Add all hue permissions to default group.
-  default_group = get_default_user_group()
-  if default_group:
-    for new_dp in added:
-      GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
+    # Add all hue permissions to default group.
+    default_group = get_default_user_group()
+    if default_group:
+      for new_dp in added:
+        GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 
-  available = HuePermission.objects.count()
+    available = HuePermission.objects.count()
 
-  LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" %
-         (len(added),
-          updated,
-          uptodate,
-          available - len(added) - updated - uptodate))
+    LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" %
+           (len(added),
+            updated,
+            uptodate,
+            available - len(added) - updated - uptodate))
 
 models.signals.post_syncdb.connect(update_app_permissions)
 models.signals.post_syncdb.connect(get_default_user_group)
