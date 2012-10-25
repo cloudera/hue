@@ -34,7 +34,6 @@ urlpatterns = patterns('filebrowser.views',
   url(r'save', 'save_file'),
 
   # POST operations
-  url(r'upload_flash$', 'upload_flash', name='upload_flash'),
   url(r'upload/file$', 'upload_file', name='upload_file'),
   url(r'upload/archive$', 'upload_archive', name='upload_archive'),
   url(r'rename', 'rename', name='rename'),

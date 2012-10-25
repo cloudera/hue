@@ -1002,23 +1002,6 @@ def chown(request):
                       initial_value_extractor=formset_initial_value_extractor)
 
 
-def upload_flash(request):
-    """
-    Our flash uploader is bad at handling errors, so, instead
-    of using the regular exception-handling, we use a
-    special signifier.
-    """
-    try:
-        r = upload_file(request)
-        if r.status_code == 200:
-            return HttpResponse("{}", content_type="application/json")
-        else:
-            raise Exception("Unknown error")
-    except Exception, e:
-        return HttpResponse(json.dumps(dict(error=unicode(e))),
-                            content_type="application/json")
-
-
 def upload_file(request):
     """
     A wrapper around the actual upload view function to clean up the temporary file afterwards.
