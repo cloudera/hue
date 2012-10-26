@@ -20,4 +20,6 @@ from django import forms
 
 
 class QueryForm(forms.Form):
-  query = forms.CharField(label="", max_length=256, required=False, widget=forms.TextInput(attrs={'class': 'input-xxlarge search-query', 'placeholder': 'e.g. solr or video'}))
+  query = forms.CharField(label='', max_length=256, required=False, initial='',
+                          widget=forms.TextInput(attrs={'class': 'input-xxlarge search-query', 'placeholder': 'e.g. solr or video'}))
+  fq = forms.CharField(label='', max_length=256, required=False, initial='', widget=forms.HiddenInput(), help_text='Solr Filter query')

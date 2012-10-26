@@ -13,31 +13,16 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 from itertools import izip
 %>
 
-
-
-<%
-def pairwise(iterable):
-    "s -> (s0,s1), (s2,s3), (s4, s5), ..."
-    a = iter(iterable)
-    return izip(a, a)
-%>
+<%namespace name="macros" file="macros.mako" />
 
 ${ commonheader(_('Search'), "search", user) }
-
-
-##<div class="subnav subnav-fixed">
-##  <div class="container-fluid">
-##    <ul class="nav nav-pills">
-##	  <li><a href="">${_('Configuration')}</a></li>
-##    </ul>
-##  </div>
-##</div>
 
 <div class="container-fluid">
     <div class="row-fluid">
@@ -46,21 +31,49 @@ ${ commonheader(_('Search'), "search", user) }
             <ul class="nav nav-list">
                 % if response and response['facet_counts']:
                     % if response['facet_counts']['facet_fields']:
-                        <h4>Field Facets</h4>
+                        <h4>Fields</h4>
                         % for cat in response['facet_counts']['facet_fields']:
                             % if response['facet_counts']['facet_fields'][cat]:
                             <li class="nav-header">${cat}</li>
-                            % for subcat, count in pairwise(response['facet_counts']['facet_fields'][cat]):
-                                <li><a href="#">${subcat} (${count})</a></li>
+                            % for subcat, count in macros.pairwise(response['facet_counts']['facet_fields'][cat]):
+                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ subcat }">${ subcat } (${ count })</a></li>
                             % endfor
                             % endif
                         % endfor
                     %endif
+
                     % if response['facet_counts']['facet_queries']:
-                        <h4>Query Facets</h4>
+                        ## Not used in demo
+                        <h4>Queries</h4>
                         % for cat in response['facet_counts']['facet_queries']:
                             % if response['facet_counts']['facet_queries'][cat]:
                                 <li><a href="#">${cat} (${response['facet_counts']['facet_queries'][cat]})</a></li>
+                            % endif
+                        % endfor
+                    %endif
+
+                    % if response['facet_counts']['facet_ranges']:
+                        <h4>Ranges</h4>
+                        % for cat in response['facet_counts']['facet_ranges']:
+                            % if response['facet_counts']['facet_ranges'][cat]:
+                            <li class="nav-header">${cat}</li>
+                            % for range, count in macros.pairwise(response['facet_counts']['facet_ranges'][cat]['counts']):
+                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ range }">${ range } (${ count })</a></li>
+                            % endfor
+                            % endif
+                        % endfor
+                    %endif
+
+                    % if response['facet_counts']['facet_dates']:
+                        <h4>Dates</h4>
+                        % for cat in response['facet_counts']['facet_dates']:
+                            % if response['facet_counts']['facet_dates'][cat]:
+                            <li class="nav-header">${cat}</li>
+                            % for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
+                              % if date not in ('start', 'end', 'gap'):
+                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ date }">${ date } (${ count })</a></li>
+                              % endif
+                            % endfor
                             % endif
                         % endfor
                     %endif
@@ -78,24 +91,7 @@ ${ commonheader(_('Search'), "search", user) }
                 <table class="table table-striped table-hover" style="table-layout: fixed;">
                 <tbody>
                 % for result in response['response']['docs']:
-                <tr>
-                    <td style="word-wrap: break-word;">
-                        <a rel="nofollow" href="#"><b>${ result.get('name', '') }</b></a>
-                        <p>Price: ${ result.get('price_c', '') }</p>
-                        <p>
-                        % if result.get('features'):
-                            <ul>
-                            % for feature in result.get('features', ''):
-                                <li>${ feature }</li>
-                            % endfor
-                            </ul>
-                        % endif
-                        </p>
-                        <div style="color: #46a546;">
-                            Id: ${ result.get('id', '') }
-                        </div>
-                    </td>
-                </tr>
+                    ${ macros.tweet_result(result) }
                 % endfor
                 </tbody>
                 </table>
@@ -105,7 +101,10 @@ ${ commonheader(_('Search'), "search", user) }
             % endif
         </div>
     </div>
+</div>
 
+<div class="hide">
+    ${ rr }
 </div>
 
 ${ commonfooter(messages) }

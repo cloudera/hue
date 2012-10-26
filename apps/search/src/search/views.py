@@ -24,10 +24,8 @@ import logging
 from desktop.lib.django_util import render
 
 from search.forms import QueryForm
-from desktop.lib.rest.http_client import HttpClient
+from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
-
-from django.http import HttpResponse
 
 
 # http://lucene.apache.org/solr/api-4_0_0-BETA/doc-files/tutorial.html#Getting+Started
@@ -39,12 +37,15 @@ LOG = logging.getLogger(__name__)
 def index(request):
   search_form = QueryForm(request.GET)
   response = {}
-  
+
   if search_form.is_valid():
-    response = SolrApi(SOLR_URL).query(search_form.cleaned_data['query'])
+    solr_query = {}
+    solr_query['q'] = search_form.cleaned_data['query']
+    solr_query['fq'] = search_form.cleaned_data['fq']
+    response = SolrApi(SOLR_URL).query(solr_query)
     response = json.loads(response)
 
-  return render('index.mako', request, {'search_form': search_form, 'response': response, 'rr': json.dumps(response)})
+  return render('index.mako', request, {'search_form': search_form, 'response': response, 'rr': json.dumps(response), 'solr_query': solr_query})
 
 # Simple API for now
 class SolrApi(object):
@@ -53,5 +54,27 @@ class SolrApi(object):
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
 
-  def query(self, query):    
-    return self._root.get('collection1/browse', {'q': query, 'wt': 'json'})
+  def query(self, solr_query):
+    try:
+      return self._root.get('collection1/browse', (('q', solr_query['q']),
+                                                   ('fq', solr_query['fq']),
+                                                   ('wt', 'json'),
+
+                                                   ('facet', 'true'),
+                                                   ('facet.limit', 10),
+                                                   ('facet.mincount', 1),
+
+                                                   ('facet.field', 'user_location'),
+
+                                                   ('facet.range', 'retweet_count'),
+                                                   ('f.retweet_count.facet.range.start', '0'),
+                                                   ('f.retweet_count.facet.range.end', '100'),
+                                                   ('f.retweet_count.facet.range.gap', '10'),
+
+                                                   ('facet.date', 'created_at'),
+                                                   ('facet.date.start', 'NOW/DAY-305DAYS'),
+                                                   ('facet.date.end', 'NOW/DAY+1DAY'),
+                                                   ('facet.date.gap', '+1DAY')))
+    except RestException, e:
+      print e
+      return '{"responseHeader":{"status":0,"QTime":1,"params":{"wt":"json"}},"response":{"numFound":0,"start":0,"maxScore":0.0,"docs":[]},"highlighting":{}}'
