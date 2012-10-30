@@ -1,0 +1,30 @@
+
+pyOpenSSL - A Python wrapper around the OpenSSL library
+------------------------------------------------------------------------------
+
+Copyright (C) AB Strakt 2001, All rights reserved
+
+I wrote this module working for AB Strakt (http://www.strakt.com/) and they
+paid me to do it, and it is with their consent this module is released to the
+general public.
+
+See the file INSTALL for installation instructions.
+
+I appreciate bug reports and patches, just mail me!
+
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+A copy of the GNU Lesser General Public License (version 2.1) is included in
+the file COPYING.
+
+
+@(#) $Id: README,v 1.2 2001/07/25 10:42:57 martin Exp $
