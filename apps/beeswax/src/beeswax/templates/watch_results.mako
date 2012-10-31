@@ -123,98 +123,109 @@ ${layout.menubar(section='query')}
 </div>
 
 %if can_save:
-<div id="saveAs" class="modal hide fade">
-	<form id="saveForm" action="${url('beeswax.views.save_results', query.id) }" method="POST" class="form form-inline form-padding-fix">
-	    <div class="modal-header">
-	        <a href="#" class="close" data-dismiss="modal">&times;</a>
-	        <h3>${_('Save Query Results')}</h3>
-	    </div>
-	    <div class="modal-body">
-			<label class="radio">
-				<input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
-				&nbsp;${_('In a new table')}
-			</label>
-			${comps.field(save_form['target_table'], notitle=True, placeholder=_('Table Name'))}
-			<br/>
-			<label class="radio">
-				<input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
-				&nbsp;${_('In an HDFS directory')}
-			</label>
-			${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
-			<br/>
-			<br/>
-			<div id="fileChooserModal" class="smallModal well hide">
-				<a href="#" class="close" data-dismiss="modal">&times;</a>
-			</div>
-	    </div>
-	    <div class="modal-footer">
-			<div id="fieldRequired" class="hide" style="position: absolute; left: 10;">
-				<span class="label label-important">${_('Sorry, name is required.')}</span>
-	        </div>
-	        <input type="submit" class="btn primary" value="${_('Save')}" name="save" />
-			<button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-	    </div>
-    </form>
-</div>
+  <div id="saveAs" class="modal hide fade">
+  <form id="saveForm" action="${url('beeswax.views.save_results', query.id) }" method="POST"
+        class="form form-inline form-padding-fix">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Save Query Results')}</h3>
+    </div>
+    <div class="modal-body">
+      <label class="radio">
+        <input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
+        &nbsp;${_('In a new table')}
+      </label>
+    ${comps.field(save_form['target_table'], notitle=True, placeholder=_('Table Name'))}
+      <br/>
+      <label class="radio">
+        <input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
+        &nbsp;${_('In an HDFS directory')}
+      </label>
+    ${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
+      <br/>
+      <br/>
+      <div id="fileChooserModal" class="smallModal well hide">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div id="fieldRequired" class="hide" style="position: absolute; left: 10;">
+        <span class="label label-important">${_('Sorry, name is required.')}</span>
+      </div>
+      <a id="saveBtn" class="btn primary">${_('Save')}</a>
+      <input type="hidden" name="save" value="save"/>
+      <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    </div>
+  </form>
+  </div>
 %endif
 
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $(".resultTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false
-        });
-        $(".dataTables_wrapper").css("min-height","0");
-        $(".dataTables_filter").hide();
-        $("input[name='save_target']").change(function(){
-            $("#fieldRequired").addClass("hide");
-            $("input[name='target_dir']").removeClass("fieldError");
-            $("input[name='target_table']").removeClass("fieldError");
-            if ($(this).val().indexOf("HDFS")>-1){
-                $("input[name='target_table']").addClass("hide");
-                $("input[name='target_dir']").removeClass("hide");
-            }
-            else {
-                $("input[name='target_table']").removeClass("hide");
-                $("input[name='target_dir']").addClass("hide");
-            }
-        });
+    $(document).ready(function () {
+      $(".resultTable").dataTable({
+        "bPaginate":false,
+        "bLengthChange":false,
+        "bInfo":false
+      });
+      $(".dataTables_wrapper").css("min-height", "0");
+      $(".dataTables_filter").hide();
+      $("input[name='save_target']").change(function () {
+        $("#fieldRequired").addClass("hide");
+        $("input[name='target_dir']").removeClass("fieldError");
+        $("input[name='target_table']").removeClass("fieldError");
+        if ($(this).val().indexOf("HDFS") > -1) {
+          $("input[name='target_table']").addClass("hide");
+          $("input[name='target_dir']").removeClass("hide");
+          $(".fileChooserBtn").removeClass("hide");
+        }
+        else {
+          $("input[name='target_table']").removeClass("hide");
+          $("input[name='target_dir']").addClass("hide");
+          $(".fileChooserBtn").addClass("hide");
+        }
+      });
 
-        $("#saveForm").submit(function(){
-            if ($("input[name='save_target']:checked").val().indexOf("HDFS")>-1){
-                if ($.trim($("input[name='target_dir']").val()) == ""){
-                    $("#fieldRequired").removeClass("hide");
-                    $("input[name='target_dir']").addClass("fieldError");
-                    return false;
-                }
-            }
-            else {
-                if ($.trim($("input[name='target_table']").val()) == ""){
-                    $("#fieldRequired").removeClass("hide");
-                    $("input[name='target_table']").addClass("fieldError");
-                    return false;
-                }
-            }
-            return true;
-        });
+      $("#saveBtn").click(function () {
+        if ($("input[name='save_target']:checked").val().indexOf("HDFS") > -1) {
+          if ($.trim($("input[name='target_dir']").val()) == "") {
+            $("#fieldRequired").removeClass("hide");
+            $("input[name='target_dir']").addClass("fieldError");
+            return false;
+          }
+        }
+        else {
+          if ($.trim($("input[name='target_table']").val()) == "") {
+            $("#fieldRequired").removeClass("hide");
+            $("input[name='target_table']").addClass("fieldError");
+            return false;
+          }
+        }
+        $("#saveForm").submit();
+      });
 
-        $(".pathChooser").click(function(){
-            var self = this;
-            $("#fileChooserModal").jHueFileChooser({
-                initialPath: $(self).val(),
-                onFileChoose: function(filePath) {
-                    $(self).val(filePath);
-                },
-                onFolderChange: function(folderPath){
-                    $(self).val(folderPath);
-                },
-                createFolder: false,
-                uploadFile: false
-            });
-            $("#fileChooserModal").slideDown();
+
+      $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
+
+      function getFileBrowseButton(inputElement) {
+        return $("<a>").addClass("btn").addClass("fileChooserBtn").addClass("hide").text("..").click(function (e) {
+          e.preventDefault();
+          $("#fileChooserModal").jHueFileChooser({
+            onFolderChange:function (filePath) {
+              inputElement.val(filePath);
+            },
+            onFolderChoose:function (filePath) {
+              inputElement.val(filePath);
+              $("#fileChooserModal").slideUp();
+            },
+            createFolder:false,
+            uploadFile:false,
+            selectFolder:true,
+            initialPath:$.trim(inputElement.val())
+          });
+          $("#fileChooserModal").slideDown();
         });
+      }
     });
 </script>
 

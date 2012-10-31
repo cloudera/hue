@@ -1006,7 +1006,7 @@ def save_results(request, id):
           request.fs.rename_star(result_meta.table_dir, target_dir)
           LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, target_dir))
           query_history.save_state(models.QueryHistory.STATE.expired)
-          return HttpResponse(urlresolvers.reverse('filebrowser.views.view', kwargs={'path': target_dir}))
+          return redirect(urlresolvers.reverse('filebrowser.views.view', kwargs={'path': target_dir}))
         elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
           # To new table
           try:

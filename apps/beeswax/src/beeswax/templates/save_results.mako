@@ -38,7 +38,12 @@ ${layout.menubar(section='history')}
 		<input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
 		&nbsp;${_('In an HDFS directory')}
 	</label>
-	${comps.field(form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'))}
+	${comps.field(form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
+  <br/>
+  <br/>
+  <div id="fileChooserModal" class="smallModal well hide">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+  </div>
   <br/><br/>
   <input type="submit" name="save" value="${_('Save')}" class="btn primary"/>
   <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
@@ -47,41 +52,65 @@ ${layout.menubar(section='history')}
 
 
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$("input[name='save_target']").change(function(){
-			$("#fieldRequired").addClass("hide");
-			$("input[name='target_dir']").removeClass("fieldError");
-			$("input[name='target_table']").removeClass("fieldError");
-			if ($(this).val().indexOf("HDFS")>-1){
-				$("input[name='target_table']").addClass("hide");
-				$("input[name='target_dir']").removeClass("hide");
-			}
-			else {
-				$("input[name='target_table']").removeClass("hide");
-				$("input[name='target_dir']").addClass("hide");
-			}
-		});
+  $(document).ready(function () {
+    $("input[name='save_target']").change(function () {
+      $("#fieldRequired").addClass("hide");
+      $("input[name='target_dir']").removeClass("fieldError");
+      $("input[name='target_table']").removeClass("fieldError");
+      if ($(this).val().indexOf("HDFS") > -1) {
+        $("input[name='target_table']").addClass("hide");
+        $("input[name='target_dir']").removeClass("hide");
+        $(".fileChooserBtn").removeClass("hide");
+      }
+      else {
+        $("input[name='target_table']").removeClass("hide");
+        $("input[name='target_dir']").addClass("hide");
+        $(".fileChooserBtn").addClass("hide");
+      }
+    });
 
-		$("#saveForm").submit(function(e){
-			if ($(e.originalEvent.explicitOriginalTarget).attr("name") == "cancel"){
-				return true;
-			}
-			if ($("input[name='save_target']:checked").val().indexOf("HDFS")>-1){
-				if ($.trim($("input[name='target_dir']").val()) == ""){
-					$("#fieldRequired").removeClass("hide");
-					$("input[name='target_dir']").addClass("fieldError");
-					return false;
-				}
-			}
-			else {
-				if ($.trim($("input[name='target_table']").val()) == ""){
-					$("#fieldRequired").removeClass("hide");
-					$("input[name='target_table']").addClass("fieldError");
-					return false;
-				}
-			}
-			return true;
-		});
-	});
+    $("#saveForm").submit(function (e) {
+      if ($(e.originalEvent.explicitOriginalTarget).attr("name") == "cancel") {
+        return true;
+      }
+      if ($("input[name='save_target']:checked").val().indexOf("HDFS") > -1) {
+        if ($.trim($("input[name='target_dir']").val()) == "") {
+          $("#fieldRequired").removeClass("hide");
+          $("input[name='target_dir']").addClass("fieldError");
+          return false;
+        }
+      }
+      else {
+        if ($.trim($("input[name='target_table']").val()) == "") {
+          $("#fieldRequired").removeClass("hide");
+          $("input[name='target_table']").addClass("fieldError");
+          return false;
+        }
+      }
+      return true;
+    });
+
+    $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
+
+    function getFileBrowseButton(inputElement) {
+      return $("<a>").addClass("btn").addClass("fileChooserBtn").addClass("hide").text("..").click(function (e) {
+        e.preventDefault();
+        $("#fileChooserModal").jHueFileChooser({
+          onFolderChange:function (filePath) {
+            inputElement.val(filePath);
+          },
+          onFolderChoose:function (filePath) {
+            inputElement.val(filePath);
+            $("#fileChooserModal").slideUp();
+          },
+          createFolder:false,
+          uploadFile:false,
+          selectFolder:true,
+          initialPath:$.trim(inputElement.val())
+        });
+        $("#fileChooserModal").slideDown();
+      });
+    }
+  });
 </script>
 ${commonfooter(messages)}
