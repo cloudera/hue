@@ -193,10 +193,10 @@ ${ commonheader(_('Search'), "search", user) }
                     <span class="caret"></span>
                   </a>
                   <ul class="dropdown-menu">
-                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=created_at+desc">Date</a></li>
-                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=retweet_count+desc">Retweets count</a></li>
+                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=created_at+desc&rows=${solr_query["rows"]}&start=${solr_query["start"]}">Date</a></li>
+                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=retweet_count+desc&rows=${solr_query["rows"]}&start=${solr_query["start"]}">Retweets count</a></li>
                     <li class="divider"></li>
-                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}">Reset sorting</a></li>
+                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}">Reset sorting</a></li>
                   </ul>
                 </div>
             </form>
@@ -232,12 +232,15 @@ ${ commonheader(_('Search'), "search", user) }
         </div>
     </div>
 </div>
+<div class="hide">
+  ${rr}
+</div>
 
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script>
   $(document).ready(function(){
     $("a[data-dt]").each(function(){
-      $(this).text(moment(new Date($(this).data("dt"))).fromNow());
+      $(this).text(moment($(this).data("dt")).add("hours", 7).fromNow());
     });
     $(".text").click(function(e){
       if ($(e.target).is("div")){
@@ -248,6 +251,7 @@ ${ commonheader(_('Search'), "search", user) }
         e.stopPropagation();
       }
     });
+    $("[rel='tooltip']").tooltip();
     $("[rel='popover']").popover();
     $("#recordsPerPage").change(function(){
       $("input[name='rows']").val($(this).val());

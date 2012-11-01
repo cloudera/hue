@@ -180,11 +180,11 @@ def escape(text)  :
       <div class="content">
         <div class="stream-item-header">
           <small class="time">
-            <a href="https://twitter.com/${ result.get('user_screen_name', '') }/status/${ result.get('id', '') }" target="_blank" data-dt="${ result.get('created_at', '') }"></a>
+            <a href="https://twitter.com/${ result.get('user_screen_name', '') }/status/${ result.get('id', '') }" target="_blank" data-dt="${ result.get('created_at', '') }" rel="tooltip" data-placement="left" title="${ result.get('created_at', '') }"></a>
           </small>
           <a target="_blank" href="https://twitter.com/${ result.get('user_screen_name', '') }" class="account-group">
-            <img title="${ result.get('user_name', '') }" src="http://twitter.com/api/users/profile_image/${ result.get('user_screen_name', '') }" class="avatar"
-                 data-placement="left" rel="popover"  data-content="Location: ${ result.get('user_location', '') }<br/>User tweets #: ${ result.get('user_statuses_count', '') }<br/>User followers #: ${ result.get('user_followers_count', '') }" data-original-title="@${ result.get('user_screen_name', '') }" data-trigger="hover">
+            <img src="http://twitter.com/api/users/profile_image/${ result.get('user_screen_name', '') }" class="avatar"
+                 data-placement="left" rel="popover"  data-content="Location: ${ result.get('user_location', '') }<br/>User tweets #: ${ result.get('user_statuses_count', '') }<br/>User followers #: ${ result.get('user_followers_count', '') }" title="@${ result.get('user_screen_name', '') }" data-trigger="hover">
             <strong class="fullname">${ result.get('user_name', '') }</strong>
             <span>&rlm;</span><span class="username">@${ result.get('user_screen_name', '') }</span>
           </a>
