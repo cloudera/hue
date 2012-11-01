@@ -69,8 +69,11 @@ class SolrApi(object):
                                                    ('facet', 'true'),
                                                    ('facet.limit', 10),
                                                    ('facet.mincount', 1),
+                                                   ('facet.sort', 'count'),                                                   
 
                                                    ('facet.field', 'user_location'),
+                                                   ('facet.field', 'user_statuses_count'),
+                                                   ('facet.field', 'user_followers_count'),
 
                                                    ('facet.range', 'retweet_count'),
                                                    ('f.retweet_count.facet.range.start', '0'),
