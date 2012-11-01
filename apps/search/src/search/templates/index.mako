@@ -18,17 +18,124 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 from itertools import izip
+import math
 %>
 
 <%namespace name="macros" file="macros.mako" />
 
 ${ commonheader(_('Search'), "search", user) }
 
+<style>
+  .content {
+    margin-left: 58px;
+  }
+
+  .action {
+    margin-right: 5px;
+  }
+
+  .action a, .time a, .account-group, .retweeted {
+    color: #999999;
+  }
+
+  .account-group a {
+    text-decoration: none;
+    font-weight: normal;
+  }
+
+  .username {
+    font-size: 12px;
+  }
+
+  .time {
+    color: #BBBBBB;
+    float: right;
+    margin-top: 1px;
+    position: relative;
+  }
+
+  .avatar {
+    position: absolute;
+    margin-left: -56px!important;
+    margin-top: 4px!important;
+    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+    -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
+
+  .text {
+    margin-bottom: 4px;
+    cursor: pointer;
+  }
+
+  .tweet-actions li {
+    display: inline;
+  }
+
+  .stream-item-footer {
+    font-size: 12px;
+    color: #999999;
+  }
+
+  ul.tweet-actions {
+    list-style: none outside none;
+  }
+
+  ul.tweet-actions {
+    margin: 0;
+    padding: 0;
+  }
+
+  .fullname {
+    color: #333333;
+    font-weight: bold;
+  }
+
+  .stream-item-footer, .retweeted {
+    font-size: 12px;
+    padding-top: 1px;
+  }
+
+  .icon {
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    display: inline-block;
+    vertical-align: text-top;
+    height: 13px;
+    width: 14px;
+    margin-top: 0;
+    margin-left: -2px;
+  }
+  .icon-reply {
+    background-image: url("/search/static/art/reply.png");
+  }
+  .icon-retweet {
+    background-image: url("/search/static/art/retweet.png");
+  }
+  .twitter-logo {
+    background-image: url("/search/static/art/bird_gray_32.png");
+    width: 32px;
+    height: 32px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 2px;
+  }
+
+</style>
+
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span3">
             <div class="well" style="padding: 8px 0;">
             <ul class="nav nav-list">
+                % if solr_query['fq']:
+                    <li class="nav-header">Current filter</li>
+                    <li style="margin-bottom: 20px"><a href="?query=${ solr_query['q'] }&sort=${solr_query["sort"]}">${solr_query['fq']} <i class="icon-trash"></i></a></li>
+                % endif
                 % if response and response['facet_counts']:
                     % if response['facet_counts']['facet_fields']:
                         <h4>Fields</h4>
@@ -36,18 +143,10 @@ ${ commonheader(_('Search'), "search", user) }
                             % if response['facet_counts']['facet_fields'][cat]:
                             <li class="nav-header">${cat}</li>
                             % for subcat, count in macros.pairwise(response['facet_counts']['facet_fields'][cat]):
-                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ subcat }">${ subcat } (${ count })</a></li>
+                              %if count > 0 and subcat != "":
+                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ subcat }&sort=${solr_query["sort"]}">${subcat} (${ count })</a></li>
+                              %endif
                             % endfor
-                            % endif
-                        % endfor
-                    %endif
-
-                    % if response['facet_counts']['facet_queries']:
-                        ## Not used in demo
-                        <h4>Queries</h4>
-                        % for cat in response['facet_counts']['facet_queries']:
-                            % if response['facet_counts']['facet_queries'][cat]:
-                                <li><a href="#">${cat} (${response['facet_counts']['facet_queries'][cat]})</a></li>
                             % endif
                         % endfor
                     %endif
@@ -58,7 +157,9 @@ ${ commonheader(_('Search'), "search", user) }
                             % if response['facet_counts']['facet_ranges'][cat]:
                             <li class="nav-header">${cat}</li>
                             % for range, count in macros.pairwise(response['facet_counts']['facet_ranges'][cat]['counts']):
-                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ range }">${ range } (${ count })</a></li>
+                              %if count > 0:
+                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ range }&sort=${solr_query["sort"]}">${ range } (${ count })</a></li>
+                              %endif
                             % endfor
                             % endif
                         % endfor
@@ -70,8 +171,8 @@ ${ commonheader(_('Search'), "search", user) }
                             % if response['facet_counts']['facet_dates'][cat]:
                             <li class="nav-header">${cat}</li>
                             % for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
-                              % if date not in ('start', 'end', 'gap'):
-                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ date }">${ date } (${ count })</a></li>
+                              % if date not in ('start', 'end', 'gap') and count > 0:
+                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ date }&sort=${solr_query["sort"]}">${ date } (${ count })</a></li>
                               % endif
                             % endfor
                             % endif
@@ -83,8 +184,21 @@ ${ commonheader(_('Search'), "search", user) }
         </div>
         <div class="span9">
             <form class="form-search well">
+                <i class="twitter-logo"></i>
                 ${ search_form }
                 <button class="btn" type="submit">Search</button>
+                <div class="btn-group pull-right">
+                  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                    Sort by
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=created_at+desc">Date</a></li>
+                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=retweet_count+desc">Retweets count</a></li>
+                    <li class="divider"></li>
+                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}">Reset sorting</a></li>
+                  </ul>
+                </div>
             </form>
 
             % if response:
@@ -95,16 +209,52 @@ ${ commonheader(_('Search'), "search", user) }
                 % endfor
                 </tbody>
                 </table>
-                <div class="row-fluid">
-                    Result founds: ${ response['response']['numFound'] }
-                </div>
+                  <div class="pagination">
+                    <ul class="pull-right">
+                      <%
+                        beginning = 0
+                        previous = int(solr_query["start"]) - int(solr_query["rows"])
+                        next = int(solr_query["start"]) + int(solr_query["rows"])
+                      %>
+                      %if int(solr_query["start"]) > 0:
+                        <li><a title="Beginning of List" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${beginning}">&larr; Beginning of List</a></li>
+                        <li><a title="Previous Page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${previous}">Previous Page</a></li>
+                      %endif
+                      <li><a title="Next page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${next}">Next Page</a></li>
+                    </ul>
+                    <p>Show
+                      <select id="recordsPerPage" class="input-mini"><option value="15">15</option><option value="30">30</option><option value="45">45</option><option value="60">60</option><option value="100">100</option></select>
+                      tweets per page.
+                      Showing ${int(solr_query["start"])+1} to ${int(solr_query["start"])+int(solr_query["rows"])} of ${ response['response']['numFound'] } tweets
+                    </p>
+                  </div>
             % endif
         </div>
     </div>
 </div>
 
-<div class="hide">
-    ${ rr }
-</div>
+<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script>
+  $(document).ready(function(){
+    $("a[data-dt]").each(function(){
+      $(this).text(moment(new Date($(this).data("dt"))).fromNow());
+    });
+    $(".text").click(function(e){
+      if ($(e.target).is("div")){
+        window.open($(this).data("link"))
+      }
+      if ($(e.target).is("a")){
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+      }
+    });
+    $("[rel='popover']").popover();
+    $("#recordsPerPage").change(function(){
+      $("input[name='rows']").val($(this).val());
+      $("input[name='rows']").closest("form").submit();
+    });
+    $("#recordsPerPage").val($("input[name='rows']").val());
+  });
+</script>
 
 ${ commonfooter(messages) }

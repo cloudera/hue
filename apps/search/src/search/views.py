@@ -29,7 +29,7 @@ from desktop.lib.rest.resource import Resource
 
 
 # http://lucene.apache.org/solr/api-4_0_0-BETA/doc-files/tutorial.html#Getting+Started
-SOLR_URL = 'http://localhost:8983/solr/'
+SOLR_URL = 'http://c1328.hal.cloudera.com:8983/solr/'
 
 LOG = logging.getLogger(__name__)
 
@@ -42,6 +42,9 @@ def index(request):
     solr_query = {}
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
+    solr_query['sort'] = search_form.cleaned_data['sort']
+    solr_query['rows'] = search_form.cleaned_data['rows'] or 15
+    solr_query['start'] = search_form.cleaned_data['start'] or 0
     response = SolrApi(SOLR_URL).query(solr_query)
     response = json.loads(response)
 
@@ -59,6 +62,9 @@ class SolrApi(object):
       return self._root.get('collection1/browse', (('q', solr_query['q']),
                                                    ('fq', solr_query['fq']),
                                                    ('wt', 'json'),
+                                                   ('sort', solr_query['sort']),
+                                                   ('rows', solr_query['rows']),
+                                                   ('start', solr_query['start']),
 
                                                    ('facet', 'true'),
                                                    ('facet.limit', 10),
@@ -78,3 +84,7 @@ class SolrApi(object):
     except RestException, e:
       print e
       return '{"responseHeader":{"status":0,"QTime":1,"params":{"wt":"json"}},"response":{"numFound":0,"start":0,"maxScore":0.0,"docs":[]},"highlighting":{}}'
+
+
+
+
