@@ -90,9 +90,9 @@ ${layout.menubar(section='query')}
 		              <tbody>
 		                % for i, row in enumerate(results):
 		                <tr>
-		                  <td>${start_row + i}</td>
+		                  <td style="white-space: nowrap">${start_row + i}</td>
 		                  % for item in row:
-		                    <td>${ item }</td>
+		                    <td style="white-space: nowrap">${ item }</td>
 		                  % endfor
 		                </tr>
 		                % endfor
