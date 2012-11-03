@@ -34,7 +34,7 @@ LOG = logging.getLogger(__name__)
 class JobDesign(models.Model):
   """
   DEPRECATED!!!
-      This is the old Hue 1.x job design model. In Hue 2, the design is modelled
+      This is the old Hue 1.x job design model. In Hue 2, the design is modeled
       after Oozie workflows.
 
   Contains CMS information for "job designs".
