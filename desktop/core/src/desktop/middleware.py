@@ -19,10 +19,11 @@ import logging
 import os.path
 import re
 import tempfile
+import kerberos
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authenticate, load_backend, login
 from django.core import exceptions, urlresolvers
 import django.db
 from django.http import HttpResponseRedirect, HttpResponse
@@ -41,6 +42,8 @@ from hadoop import cluster
 import simplejson
 
 from django.utils.translation import ugettext as _
+
+LOG = logging.getLogger(__name__)
 
 MIDDLEWARE_HEADER = "X-Hue-Middleware-Response"
 
@@ -467,3 +470,106 @@ class HtmlValidationMiddleware(object):
         'html' in response['Content-Type'] and \
         200 <= response.status_code < 300
 
+class SpnegoMiddleware(object):
+  """
+  Based on the WSGI SPNEGO middlware class posted here:
+  http://code.activestate.com/recipes/576992/
+  """
+
+  def __init__(self):
+    if not 'SpnegoDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+      LOG.info('Unloading SpnegoMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
+  def process_response(self, request, response):
+    if 'GSS-String' in request.META:
+      response['WWW-Authenticate'] = request.META['GSS-String']
+    elif 'Return-401' in request.META:
+      response = HttpResponse("401 Unauthorized", content_type="text/plain",
+        status=401)
+      response['WWW-Authenticate'] = 'Negotiate'
+      response.status = 401
+    return response
+
+  def process_request(self, request):
+    """
+    The process_request() method needs to communicate some state to the
+    process_response() method. The two options for this are to return an
+    HttpResponse object or to modify the META headers in the request object. In
+    order to ensure that all of the middleware is properly invoked, this code
+    currently uses the later approach. The following headers are currently used:
+
+    GSS-String:
+      This means that GSS authentication was successful and that we need to pass
+      this value for the WWW-Authenticate header in the response.
+
+    Return-401:
+      This means that the SPNEGO backend is in use, but we didn't get an
+      AUTHORIZATION header from the client. The way that the protocol works
+      (http://tools.ietf.org/html/rfc4559) is by having the first response to an
+      un-authenticated request be a 401 with the WWW-Authenticate header set to
+      Negotiate. This will cause the browser to re-try the request with the
+      AUTHORIZATION header set.
+    """
+    # AuthenticationMiddleware is required so that request.user exists.
+    if not hasattr(request, 'user'):
+      raise ImproperlyConfigured(
+        "The Django remote user auth middleware requires the"
+        " authentication middleware to be installed.  Edit your"
+        " MIDDLEWARE_CLASSES setting to insert"
+        " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
+        " before the SpnegoUserMiddleware class.")
+
+    if 'HTTP_AUTHORIZATION' in request.META:
+      type, authstr = request.META['HTTP_AUTHORIZATION'].split(' ', 1)
+
+      if type == 'Negotiate':
+        try:
+          result, context = kerberos.authGSSServerInit('HTTP')
+          if result != 1:
+            return
+
+          gssstring=''
+          r=kerberos.authGSSServerStep(context,authstr)
+          if r == 1:
+            gssstring=kerberos.authGSSServerResponse(context)
+            request.META['GSS-String'] = 'Negotiate %s' % gssstring
+          else:
+            kerberos.authGSSServerClean(context)
+            return
+
+          username = kerberos.authGSSServerUserName(context)
+          kerberos.authGSSServerClean(context)
+
+          if request.user.is_authenticated():
+            if request.user.username == self.clean_username(username, request):
+              return
+
+          user = authenticate(username=username)
+          if user:
+            request.user = user
+            login(request, user)
+          return
+        except:
+          LOG.exception('Unexpected error when authenticating against KDC')
+          return
+      else:
+        request.META['Return-401'] = ''
+        return
+    else:
+      if not request.user.is_authenticated():
+        request.META['Return-401'] = ''
+      return
+
+  def clean_username(self, username, request):
+    """
+    Allows the backend to clean the username, if the backend defines a
+    clean_username method.
+    """
+    backend_str = request.session[BACKEND_SESSION_KEY]
+    backend = load_backend(backend_str)
+    try:
+      username = backend.clean_username(username)
+    except AttributeError:
+      pass
+    return username

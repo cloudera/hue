@@ -102,6 +102,7 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.SessionOverPostMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'desktop.middleware.SpnegoMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'babeldjango.middleware.LocaleMiddleware',
     'desktop.middleware.AjaxMiddleware',

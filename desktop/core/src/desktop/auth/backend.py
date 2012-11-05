@@ -307,4 +307,48 @@ class LdapBackend(object):
   @classmethod
   def manages_passwords_externally(cls):
     return True
- 
+
+class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
+  """
+  A note about configuration:
+
+  The HTTP/_HOST@REALM principal (where _HOST is the fully qualified domain
+  name of the server running Hue) needs to be exported to a keytab file.
+  The keytab file can either be located in /etc/krb5.keytab or you can set
+  the KRB5_KTNAME environment variable to point to another location
+  (e.g. /etc/hue/hue.keytab).
+  """
+  def authenticate(self, username=None):
+    username = self.clean_username(username)
+    is_super = False
+    if User.objects.count() == 0:
+      is_super = True
+
+    try:
+      user = User.objects.get(username=username)
+    except User.DoesNotExist:
+      user = find_or_create_user(username, None)
+      if user is not None and user.is_active:
+        profile = get_profile(user)
+        profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+        profile.save()
+        user.is_superuser = is_super
+
+        default_group = get_default_user_group()
+        if default_group is not None:
+          user.groups.add(default_group)
+
+        user.save()
+
+    user = rewrite_user(user)
+    return user
+
+  def clean_username(self, username):
+    if '@' in username:
+      return username.split('@')[0]
+    return username
+
+  def get_user(self, user_id):
+    user = super(SpnegoDjangoBackend, self).get_user(user_id)
+    user = rewrite_user(user)
+    return user
