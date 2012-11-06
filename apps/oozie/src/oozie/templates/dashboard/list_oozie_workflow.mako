@@ -173,6 +173,7 @@ ${ layout.menubar(section='dashboard') }
         <table class="table table-striped table-condensed selectable">
           <thead>
             <tr>
+              <th>${ _('Logs') }</th>
               <th>${ _('Id') }</th>
               <th>${ _('Name') }</th>
               <th>${ _('Type') }</th>
@@ -192,6 +193,11 @@ ${ layout.menubar(section='dashboard') }
           <tbody>
             % for i, action in enumerate(oozie_workflow.get_working_actions()):
               <tr>
+                <td>
+                  % if action.externalId:
+                    <a href="${ url('jobbrowser.views.job_single_logs', jobid=action.externalId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+                  % endif
+                </td>
                 <td>
                   <a href="${ url('oozie:list_oozie_workflow_action', action=action.id) }" data-row-selector='true'>${ action.id }</a>
                 </td>

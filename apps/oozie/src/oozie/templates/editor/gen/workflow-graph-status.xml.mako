@@ -17,33 +17,46 @@
 <%namespace name="graph" file="workflow-graph.xml.mako" />
 <%namespace name="utils" file="../../utils.inc.mako" />
 
+<%!
+  from django.utils.translation import ugettext as _
+%>
 
 <%def name="print_status_node(form)">
   <%
     is_fork = form.instance.get_full_node().node_type == 'fork'
+    action = actions.get(form.instance.__unicode__())
   %>
 
   % if form.instance.get_full_node().is_visible():
     <div class="row-fluid">
       <div class="span12 action
-        % if not is_fork and form.instance.__unicode__() in actions:
+        % if not is_fork and action:
             action-link
-            ${ utils.get_status(actions[form.instance.__unicode__()].status) }
-          " data-edit="${ url('oozie:list_oozie_workflow_action', action=actions[form.instance.__unicode__()].id) }
+            ${ utils.get_status(action.status) }
+          " data-edit="${ url('oozie:list_oozie_workflow_action', action=action.id) }
         % endif
         ">
-        <div>
-          % if not is_fork:
-            ${ form.instance.__unicode__() }
-          % endif
-        </div>
-        <div class="row-fluid">
-          ${ form.instance.node_type }<br/>
-          % if not is_fork:
-            ${ form.instance.description }<br/>
-            % if form.instance.__unicode__() in actions:
-              ${ actions[form.instance.__unicode__()].errorMessage or '' }
+        <div class="span10">
+          <div>
+            % if not is_fork:
+              ${ form.instance.__unicode__() }
             % endif
+          </div>
+          <div class="row-fluid">
+            ${ form.instance.node_type }<br/>
+            % if not is_fork:
+              ${ form.instance.description }<br/>
+              % if action:
+                ${ action.errorMessage or '' }
+              % endif
+            % endif
+          </div>
+        </div>
+        <div class="span2">
+          % if action and action.externalId:
+           <a href="${ url('jobbrowser.views.job_single_logs', jobid=action.externalId) }" data-row-selector-exclude="true" id="advanced-btn">
+              <i class="icon-tasks"></i> ${ _('View the logs') }
+            </a>
           % endif
         </div>
       </div>
