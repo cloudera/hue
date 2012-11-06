@@ -40,7 +40,6 @@ from jobbrowser import conf
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker, Cluster
 
 from django.utils.translation import ugettext as _
-from django.shortcuts import redirect
 
 ##################################
 ## View end-points
@@ -174,7 +173,7 @@ def job_single_logs(request, jobid):
   if failed_tasks:
     task = failed_tasks[0]
   else:
-    recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
+    recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',), task_types=('map', 'reduce',))
     recent_tasks.sort(cmp_exec_time, reverse=True)
     if recent_tasks:
       task = recent_tasks[0]
@@ -182,7 +181,7 @@ def job_single_logs(request, jobid):
   if task is None:
     raise PopupException(_("No tasks found for job %(id)s") % dict(id=jobid))
 
-  return redirect('single_task_attempt_logs', jobid=jobid, taskid= task.taskId, attemptid= task.taskAttemptIds[-1])
+  return single_task_attempt_logs(request, **{'jobid': jobid, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]})
 
 @check_job_permission
 def tasks(request, jobid):
