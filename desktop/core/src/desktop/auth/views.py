@@ -24,6 +24,7 @@ from django.contrib.auth import login, get_backends
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
+from useradmin.views import ensure_home_directory
 
 from desktop.auth.backend import AllowFirstUserDjangoBackend
 from desktop.lib.django_util import render
@@ -54,17 +55,30 @@ def get_current_users():
   return current_users
 
 
+def first_login_ever():
+  backends = get_backends()
+  for backend in backends:
+    if isinstance(backend, AllowFirstUserDjangoBackend) and backend.is_first_login_ever():
+      return True
+  return False
+
+
 @login_notrequired
 def dt_login(request):
   """Used by the non-jframe login"""
   redirect_to = request.REQUEST.get('next', '/')
   login_errors = False
+  is_first_login_ever = first_login_ever()
   if request.method == 'POST':
     form = django.contrib.auth.forms.AuthenticationForm(data=request.POST)
     if form.is_valid():
       login(request, form.get_user())
       if request.session.test_cookie_worked():
         request.session.delete_test_cookie()
+
+      if is_first_login_ever:
+        ensure_home_directory(request.fs, request.POST.get('username'))
+
       access_warn(request, '"%s" login ok' % (request.user.username,))
       return HttpResponseRedirect(redirect_to)
     else:
@@ -73,16 +87,11 @@ def dt_login(request):
   else:
     form = django.contrib.auth.forms.AuthenticationForm()
   request.session.set_test_cookie()
-  backends = get_backends()
-  first_login_ever = False
-  for be in backends:
-    if isinstance(be, AllowFirstUserDjangoBackend) and be.is_first_login_ever():
-      first_login_ever = True
   return render('login.mako', request, {
     'action': urlresolvers.reverse('desktop.auth.views.dt_login'),
     'form': form,
     'next': redirect_to,
-    'first_login_ever': first_login_ever,
+    'first_login_ever': is_first_login_ever,
     'login_errors': login_errors,
   })
 
