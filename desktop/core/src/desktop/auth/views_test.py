@@ -16,30 +16,35 @@
 # limitations under the License.
 
 from nose.tools import assert_true, assert_false, assert_equal
+from nose.plugins.attrib import attr
 
 from django.contrib.auth.models import User
 from django.test.client import Client
 from desktop.lib.django_test_util import make_logged_in_client
+from hadoop.test_base import PseudoHdfsTestBase
 
-def test_jframe_login():
-  # Simulate first login ever
-  for user in User.objects.all():
-    user.delete()
 
-  c = Client()
+class TestLogin(PseudoHdfsTestBase):
+  def test_jframe_login(self):
+    # Simulate first login ever
+    for user in User.objects.all():
+      user.delete()
 
-  response = c.get('/accounts/login/')
-  assert_equal(200, response.status_code, "Expected ok status.")
-  assert_true(response.context['first_login_ever'])
+    c = Client()
 
-  response = c.post('/accounts/login/',
-                    dict(username="foo",
-                         password="foo"))
-  assert_equal(302, response.status_code, "Expected ok redirect status.")
+    response = c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true(response.context['first_login_ever'])
 
-  response = c.get('/accounts/login/')
-  assert_equal(200, response.status_code, "Expected ok status.")
-  assert_false(response.context['first_login_ever'])
+    response = c.post('/accounts/login/',
+                      dict(username="foo",
+                           password="foo"))
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
+    assert_true(self.fs.exists("/user/foo"))
+
+    response = c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_false(response.context['first_login_ever'])
 
 
 def test_non_jframe_login():
