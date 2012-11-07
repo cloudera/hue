@@ -193,7 +193,7 @@ def escape(text)  :
           ${ parseLinks(result.get('text', '')) }
           %if result.get('retweet_count', ''):
               <div class="retweeted">
-                Retweeted ${ result.get('retweet_count', '') } times
+                ${_('Retweeted %s times') % result.get('retweet_count', '') }
               </div>
           %endif
         </div>
@@ -203,13 +203,13 @@ def escape(text)  :
             <li class="action">
               <a href="https://twitter.com/intent/tweet?in_reply_to=${ result.get('id', '') }" target="_blank">
                 <i class="icon icon-reply"></i>
-                <b>Reply</b>
+                <b>${_('Reply')}</b>
               </a>
             </li>
             <li class="action">
               <a href="https://twitter.com/intent/retweet?tweet_id=${ result.get('id', '') }" target="_blank">
                 <i class="icon icon-retweet"></i>
-                <b>Retweet</b>
+                <b>${_('Retweet')}</b>
               </a>
             </li>
           </ul>

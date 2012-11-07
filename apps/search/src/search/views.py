@@ -45,6 +45,7 @@ def index(request):
     solr_query['sort'] = search_form.cleaned_data['sort']
     solr_query['rows'] = search_form.cleaned_data['rows'] or 15
     solr_query['start'] = search_form.cleaned_data['start'] or 0
+    solr_query['facets'] = search_form.cleaned_data['facets'] or 1
     response = SolrApi(SOLR_URL).query(solr_query)
     response = json.loads(response)
 
@@ -59,31 +60,37 @@ class SolrApi(object):
 
   def query(self, solr_query):
     try:
-      return self._root.get('collection1/browse', (('q', solr_query['q']),
-                                                   ('fq', solr_query['fq']),
-                                                   ('wt', 'json'),
-                                                   ('sort', solr_query['sort']),
-                                                   ('rows', solr_query['rows']),
-                                                   ('start', solr_query['start']),
+      params = (('q', solr_query['q']),
+                ('wt', 'json'),
+                ('sort', solr_query['sort']),
+                ('rows', solr_query['rows']),
+                ('start', solr_query['start']),
 
-                                                   ('facet', 'true'),
-                                                   ('facet.limit', 10),
-                                                   ('facet.mincount', 1),
-                                                   ('facet.sort', 'count'),                                                   
+                ('facet', 'true' if solr_query['facets'] == 1 else 'false'),
+                ('facet.limit', 10),
+                ('facet.mincount', 1),
+                ('facet.sort', 'count'),
 
-                                                   ('facet.field', 'user_location'),
-                                                   ('facet.field', 'user_statuses_count'),
-                                                   ('facet.field', 'user_followers_count'),
+                ('facet.field', 'user_location'),
+                ('facet.field', 'user_statuses_count'),
+                ('facet.field', 'user_followers_count'),
 
-                                                   ('facet.range', 'retweet_count'),
-                                                   ('f.retweet_count.facet.range.start', '0'),
-                                                   ('f.retweet_count.facet.range.end', '100'),
-                                                   ('f.retweet_count.facet.range.gap', '10'),
+                ('facet.range', 'retweet_count'),
+                ('f.retweet_count.facet.range.start', '0'),
+                ('f.retweet_count.facet.range.end', '100'),
+                ('f.retweet_count.facet.range.gap', '10'),
 
-                                                   ('facet.date', 'created_at'),
-                                                   ('facet.date.start', 'NOW/DAY-305DAYS'),
-                                                   ('facet.date.end', 'NOW/DAY+1DAY'),
-                                                   ('facet.date.gap', '+1DAY')))
+                ('facet.date', 'created_at'),
+                ('facet.date.start', 'NOW/DAY-305DAYS'),
+                ('facet.date.end', 'NOW/DAY+1DAY'),
+                ('facet.date.gap', '+1DAY'),)
+
+      fqs = solr_query['fq'].split('|')
+      for fq in fqs:
+        if fq:
+          params += (('fq', fq),)
+
+      return self._root.get('collection1/browse', params)
     except RestException, e:
       print e
       return '{"responseHeader":{"status":0,"QTime":1,"params":{"wt":"json"}},"response":{"numFound":0,"start":0,"maxScore":0.0,"docs":[]},"highlighting":{}}'

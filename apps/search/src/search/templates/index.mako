@@ -129,22 +129,32 @@ ${ commonheader(_('Search'), "search", user) }
 
 <div class="container-fluid">
     <div class="row-fluid">
+        %if solr_query['facets'] == 1:
         <div class="span3">
             <div class="well" style="padding: 8px 0;">
             <ul class="nav nav-list">
                 % if solr_query['fq']:
-                    <li class="nav-header">Current filter</li>
-                    <li style="margin-bottom: 20px"><a href="?query=${ solr_query['q'] }&sort=${solr_query["sort"]}">${solr_query['fq']} <i class="icon-trash"></i></a></li>
+                    <li class="nav-header">${_('Current filter')}</li>
+                    %for fq in solr_query['fq'].split('|'):
+                      %if fq:
+                        <%
+                          removeList = solr_query['fq'].split('|')
+                          removeList.remove(fq)
+                        %>
+                        <li><a href="?query=${ solr_query['q'] }&fq=${'|'.join(removeList)}&sort=${solr_query["sort"]}">${fq} <i class="icon-trash"></i></a></li>
+                      %endif
+                    %endfor
+                    <li style="margin-bottom: 20px"></li>
                 % endif
                 % if response and response['facet_counts']:
                     % if response['facet_counts']['facet_fields']:
-                        <h4>Fields</h4>
+                        <h4>${_('Fields')}</h4>
                         % for cat in response['facet_counts']['facet_fields']:
                             % if response['facet_counts']['facet_fields'][cat]:
                             <li class="nav-header">${cat}</li>
                             % for subcat, count in macros.pairwise(response['facet_counts']['facet_fields'][cat]):
                               %if count > 0 and subcat != "":
-                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ subcat }&sort=${solr_query["sort"]}">${subcat} (${ count })</a></li>
+                                <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ subcat }&sort=${solr_query["sort"]}">${subcat} (${ count })</a></li>
                               %endif
                             % endfor
                             % endif
@@ -152,13 +162,13 @@ ${ commonheader(_('Search'), "search", user) }
                     %endif
 
                     % if response['facet_counts']['facet_ranges']:
-                        <h4>Ranges</h4>
+                        <h4>${_('Ranges')}</h4>
                         % for cat in response['facet_counts']['facet_ranges']:
                             % if response['facet_counts']['facet_ranges'][cat]:
                             <li class="nav-header">${cat}</li>
                             % for range, count in macros.pairwise(response['facet_counts']['facet_ranges'][cat]['counts']):
                               %if count > 0:
-                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ range }&sort=${solr_query["sort"]}">${ range } (${ count })</a></li>
+                                <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ range }&sort=${solr_query["sort"]}">${ range } (${ count })</a></li>
                               %endif
                             % endfor
                             % endif
@@ -166,13 +176,13 @@ ${ commonheader(_('Search'), "search", user) }
                     %endif
 
                     % if response['facet_counts']['facet_dates']:
-                        <h4>Dates</h4>
+                        <h4>${_('Dates')}</h4>
                         % for cat in response['facet_counts']['facet_dates']:
                             % if response['facet_counts']['facet_dates'][cat]:
                             <li class="nav-header">${cat}</li>
                             % for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
                               % if date not in ('start', 'end', 'gap') and count > 0:
-                                <li><a href="?query=${ solr_query['q'] }&fq=${ cat }:${ date }&sort=${solr_query["sort"]}">${ date } (${ count })</a></li>
+                                <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ date }&sort=${solr_query["sort"]}">${ date } (${ count })</a></li>
                               % endif
                             % endfor
                             % endif
@@ -183,20 +193,23 @@ ${ commonheader(_('Search'), "search", user) }
             </div>
         </div>
         <div class="span9">
+        %else:
+        <div class="span12">
+        %endif
             <form class="form-search well">
                 <i class="twitter-logo"></i>
                 ${ search_form }
-                <button class="btn" type="submit">Search</button>
+                <button class="btn" type="submit">${_('Search')}</button>
                 <div class="btn-group pull-right">
                   <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                    Sort by
+                    ${_('Sort by')}
                     <span class="caret"></span>
                   </a>
                   <ul class="dropdown-menu">
-                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=created_at+desc&rows=${solr_query["rows"]}&start=${solr_query["start"]}">Date</a></li>
-                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=retweet_count+desc&rows=${solr_query["rows"]}&start=${solr_query["start"]}">Retweets count</a></li>
+                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=created_at+desc&rows=${solr_query["rows"]}&start=${solr_query["start"]}">${_('Date')}</a></li>
+                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=retweet_count+desc&rows=${solr_query["rows"]}&start=${solr_query["start"]}">${_('Retweets count')}</a></li>
                     <li class="divider"></li>
-                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}">Reset sorting</a></li>
+                    <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}">${_('Reset sorting')}</a></li>
                   </ul>
                 </div>
             </form>
@@ -217,15 +230,15 @@ ${ commonheader(_('Search'), "search", user) }
                         next = int(solr_query["start"]) + int(solr_query["rows"])
                       %>
                       %if int(solr_query["start"]) > 0:
-                        <li><a title="Beginning of List" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${beginning}">&larr; Beginning of List</a></li>
-                        <li><a title="Previous Page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${previous}">Previous Page</a></li>
+                        <li><a title="${_('Beginning of List')}" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${beginning}">&larr; ${_('Beginning of List')}</a></li>
+                        <li><a title="Previous Page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a></li>
                       %endif
-                      <li><a title="Next page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${next}">Next Page</a></li>
+                      <li><a title="Next page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a></li>
                     </ul>
-                    <p>Show
+                    <p>${_('Show')}
                       <select id="recordsPerPage" class="input-mini"><option value="15">15</option><option value="30">30</option><option value="45">45</option><option value="60">60</option><option value="100">100</option></select>
-                      tweets per page.
-                      Showing ${int(solr_query["start"])+1} to ${int(solr_query["start"])+int(solr_query["rows"])} of ${ response['response']['numFound'] } tweets
+                      ${_('tweets per page.')}
+                      ${_('Showing %s to %s of %s tweets') % (int(solr_query["start"])+1, int(solr_query["start"])+int(solr_query["rows"]), response['response']['numFound'])}
                     </p>
                   </div>
             % endif
