@@ -548,7 +548,7 @@ def get_matching_jobs(request, check_permission=False, **kwargs):
 
   return [Job.from_thriftjob(request.jt, j)
           for j in _filter_jobs_by_req(joblist, request, **kwargs)
-          if not check_permission or request.user.is_superuser or j.profile.user == request.user]
+          if not check_permission or request.user.is_superuser or j.profile.user == request.user.username]
 
 def get_job_count_by_state(request, username):
   """

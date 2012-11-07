@@ -24,7 +24,6 @@ import time
 import unittest
 
 from nose.tools import assert_true, assert_false, assert_equal
-from nose.plugins.skip import SkipTest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -32,6 +31,7 @@ from jobsub.models import OozieDesign
 from liboozie.oozie_api_test import OozieServerProvider
 
 from jobbrowser import models, views
+from jobbrowser.conf import SHARE_JOBS
 
 
 LOG = logging.getLogger(__name__)
@@ -65,6 +65,7 @@ def get_hadoop_job_id(oozie_api, oozie_jobid, action_index=1, timeout=60, step=5
     LOG.info(msg)
     raise Exception(msg)
   return hadoop_job_id
+
 
 class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
   """
@@ -306,6 +307,40 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     assert_false(hadoop_job_id in response.content)
     response = self.client.get('/jobbrowser/jobs/?state=killed')
     assert_false(hadoop_job_id in response.content)
+
+    # Check sharing permissions
+    # Login as ourself
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = self.client.get('/jobbrowser/jobs/?user=')
+      assert_true(hadoop_job_id in response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = self.client.get('/jobbrowser/jobs/?user=')
+      assert_true(hadoop_job_id in response.content)
+    finally:
+      finish()
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "jobbrowser")
+
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get('/jobbrowser/jobs/?user=')
+      assert_true(hadoop_job_id in response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get('/jobbrowser/jobs/?user=')
+      assert_false(hadoop_job_id in response.content)
+    finally:
+      finish()
 
     # Single job page
     response = self.client.get('/jobbrowser/jobs/%s' % hadoop_job_id)
