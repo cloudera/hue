@@ -22,6 +22,8 @@ This is mostly just codifying the datastructure of the Oozie REST API.
 http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 """
 
+import re
+
 from cStringIO import StringIO
 from time import mktime
 
@@ -101,6 +103,7 @@ class ControlFlowAction(Action):
 
     self.conf_dict = {}
 
+
 class CoordinatorAction(Action):
   _ATTRS = [
     'status',
@@ -143,6 +146,7 @@ class CoordinatorAction(Action):
     else:
       self.conf_dict = {}
 
+
 class WorkflowAction(Action):
   _ATTRS = [
     'conf',
@@ -184,6 +188,8 @@ class WorkflowAction(Action):
     else:
       self.conf_dict = {}
 
+    if self.externalId is not None and not re.match('job_.*', self.externalId):
+      self.externalId = None
 
 
 class Job(object):

@@ -26,7 +26,6 @@ from nose.tools import assert_equal
 
 from desktop.lib.paths import get_run_root
 from hadoop import pseudo_hdfs4
-from hadoop.fs.webhdfs import WebHdfs
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import OOZIE_URL
