@@ -173,9 +173,9 @@ install-source-parts:
 ###################################
 # Internationalization
 ###################################
-.PHONY: compile-locale
-compile-locale:
-	@$(MAKE) -C core compile-locale
-
+COMPILE_LOCALE_TARGETS := $(APPS:%=.recursive-compile-locales/%)
+compile-locales: $(COMPILE_LOCALE_TARGETS)
+.recursive-compile-locales/%:
+	@$(MAKE) -C $* compile-locale
 # END DEV ONLY >>>>
 	

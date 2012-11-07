@@ -186,7 +186,7 @@ ${layout.menubar(section='query')}
               </ul>
             </div>
             <div id="jumpToColumnAlert" class="alert hide" style="float:left;margin: 20px 0;">
-              <button type="button" class="close" data-dismiss="alert">×</button>
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
               <strong>${_('Did you know?')}</strong> ${_('You can click on a row to select a column you want to jump to.')}
             </div>
             % endif

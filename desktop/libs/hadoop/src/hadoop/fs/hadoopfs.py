@@ -221,22 +221,22 @@ class Hdfs(object):
     return (schema, netloc, normpath(path), '', '')
 
   def exists(self):
-    raise NotImplementedError(_("exists has not been implemented."))
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
 
   def do_as_user(self):
-    raise NotImplementedError(_("do_as_user has not been implemented."))
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'do_as_user'})
 
   def create(self):
-    raise NotImplementedError(_("exists has not been implemented."))
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
 
   def append(self):
-    raise NotImplementedError(_("do_as_user has not been implemented."))
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'append'})
 
   def mkdir(self):
-    raise NotImplementedError(_("mkdir has not been implemented."))
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'mkdir'})
 
   def isdir(self):
-    raise NotImplementedError(_("isdir has not been implemented."))
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'isdir'})
 
   def copyFromLocal(self, local_src, remote_dst, mode=0755):
     remote_dst = remote_dst.endswith(posixpath.sep) and remote_dst[:-1] or remote_dst

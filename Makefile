@@ -214,7 +214,7 @@ install-env:
 # <<<< DEV ONLY
 .PHONY: locales
 locales:
-	@$(MAKE) -C desktop compile-locale
+	@$(MAKE) -C desktop compile-locales
 	@$(MAKE) -C apps compile-locales
 # END DEV ONLY >>>>
 

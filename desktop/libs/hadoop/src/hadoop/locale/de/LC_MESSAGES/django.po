@@ -1,0 +1,61 @@
+# German translations for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2012-11-07 13:08-0800\n"
+"PO-Revision-Date: 2012-11-07 13:06-0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/hadoop/fs/hadoopfs.py:224 src/hadoop/fs/hadoopfs.py:230
+msgid "exists has not been implemented."
+msgstr ""
+
+#: src/hadoop/fs/hadoopfs.py:227 src/hadoop/fs/hadoopfs.py:233
+msgid "do_as_user has not been implemented."
+msgstr ""
+
+#: src/hadoop/fs/hadoopfs.py:236
+msgid "mkdir has not been implemented."
+msgstr ""
+
+#: src/hadoop/fs/hadoopfs.py:239
+msgid "isdir has not been implemented."
+msgstr ""
+
+#: src/hadoop/fs/hadoopfs.py:266
+#, python-format
+msgid "%(remote_dst)s already exists. Skipping."
+msgstr ""
+
+#: src/hadoop/fs/hadoopfs.py:269
+#, python-format
+msgid "%(remote_dst)s does not exist. Trying to copy"
+msgstr ""
+
+#: src/hadoop/fs/hadoopfs.py:279
+#, python-format
+msgid "Copied %s -> %s"
+msgstr ""
+
+#: src/hadoop/fs/hadoopfs.py:281
+#, python-format
+msgid "Copying %s -> %s failed"
+msgstr ""
+
+#: src/hadoop/fs/hadoopfs.py:286
+#, python-format
+msgid "Skipping %s (not a file)"
+msgstr ""
+
