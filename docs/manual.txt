@@ -71,6 +71,12 @@ python-setuptools,python-setuptools
 python-simplejson,python-simplejson
 sqlite-devel,libsqlite3-dev
 ant,ant
+libsasl2-dev,cyrus-sasl-devel
+libsasl2-modules-gssapi-mit,cyrus-sasl-gssapi
+libkrb5-dev,krb5-devel        
+libtidy-0.99-0,libtidy (For unit tests only)
+mvn,mvn (From maven2 package or tarball)
+openldap-dev / libldap2-dev, openldap-devel
 ~~~~~~~~~~
 
 The full list is here: https://github.com/cloudera/hue#development-prerequisites
