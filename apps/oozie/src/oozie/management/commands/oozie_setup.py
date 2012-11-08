@@ -36,7 +36,7 @@ LOG = logging.getLogger(__name__)
 class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     fs = cluster.get_hdfs()
-    remote_dir = create_data_dir(fs)
+    remote_dir = create_directories(fs)
 
     # Copy examples binaries
     for name in os.listdir(LOCAL_SAMPLE_DIR.get()):
@@ -57,10 +57,10 @@ class Command(NoArgsCommand):
     sample, created = User.objects.get_or_create(username='sample')
     management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
     from oozie.models import Job
-    Job.objects.filter(owner__id=1, pk__lte=16).update(owner=sample)
+    Job.objects.filter(owner__id=1100713).update(owner=sample) # 11OOZIE
 
 
-def create_data_dir(fs):
+def create_directories(fs):
   # If needed, create the remote home, deployment and data directories
   directories = (REMOTE_DEPLOYMENT_DIR.get(), REMOTE_SAMPLE_DIR.get())
 

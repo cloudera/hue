@@ -31,9 +31,9 @@ ${ layout.menubar(section='workflows') }
 
   <div class="well hueWell">
     <div class="btn-group pull-right">
-      <a href="${ url('oozie:create_workflow') }" class="btn">${ _('Create') }</a>
+      <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
       % if currentuser.is_superuser:
-        <a href="#installSamples" data-toggle="modal" class="btn">${ _('Setup App') }</a>
+        <a href="#installSamples" data-toggle="modal" class="btn"><i class="icon-download-alt"></i> ${ _('Setup Examples') }</a>
       % endif
     </div>
 
@@ -68,7 +68,7 @@ ${ layout.menubar(section='workflows') }
       </tr>
     </thead>
     <tbody>
-      %for workflow in jobs:
+      % for workflow in jobs:
         <tr class="action-row">
           <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
             <input type="radio" name="action" data-row-selector-exclude="true"
@@ -97,7 +97,7 @@ ${ layout.menubar(section='workflows') }
           </td>
           <td>${ workflow.owner.username }</td>
         </tr>
-      %endfor
+      % endfor
     </tbody>
   </table>
 

@@ -31,7 +31,7 @@ ${ layout.menubar(section='coordinators') }
 
   <div class="well hueWell">
     <div class="btn-group pull-right">
-      <a href="${ url('oozie:create_coordinator') }" class="btn">${ _('Create') }</a>
+      <a href="${ url('oozie:create_coordinator') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
     </div>
 
     <div class="row-fluid">

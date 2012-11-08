@@ -9,8 +9,8 @@
       "deployment_dir": "/user/hue/oozie/workspaces/sleep",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 2,
-      "description": "MapReduce job that sleeps"
+      "owner": 1100713,
+      "description": "Example of MapReduce action that sleeps"
     }
   },
   {
@@ -23,7 +23,7 @@
       "deployment_dir": "/user/hue/oozie/workspaces/sleep",
       "schema_version": "uri:oozie:coordinator:0.2",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 2,
+      "owner": 1100713,
       "description": "Example of MapReduce action"
     }
   },
@@ -37,7 +37,7 @@
       "deployment_dir": "/user/hue/oozie/workspaces/terasort",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 2,
+      "owner": 1100713,
       "description": "Example of sequential Java actions"
     }
   },
@@ -51,7 +51,7 @@
       "deployment_dir": "/user/hue/oozie/workspaces/sleepfork",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 2,
+      "owner": 1100713,
       "description": "Example of multiple forks"
     }
   },
@@ -65,7 +65,7 @@
       "deployment_dir": "/user/hue/oozie/workspaces/hive",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 2,
+      "owner": 1100713,
       "description": "Example of Hive action"
     }
   },
@@ -79,7 +79,7 @@
       "deployment_dir": "/user/hue/oozie/workspaces/pig",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 2,
+      "owner": 1100713,
       "description": "Example of Pig action"
     }
   },
@@ -93,7 +93,7 @@
       "deployment_dir": "/user/hue/oozie/workspaces/sqoop",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 2,
+      "owner": 1100713,
       "description": "Example of Sqoop action"
     }
   },
@@ -107,7 +107,7 @@
       "deployment_dir": "/user/hue/oozie/workspaces/ssh",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 2,
+      "owner": 1100713,
       "description": "Example of Ssh action"
     }
   },
@@ -121,7 +121,7 @@
       "deployment_dir": "/user/hue/oozie/workspaces/shell",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 2,
+      "owner": 1100713,
       "description": "Example of Shell action"
     }
   },
@@ -135,7 +135,7 @@
       "deployment_dir": "/user/hue/oozie/workspaces/distcp",
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2012-11-05 00:00:00",
-      "owner": 1,
+      "owner": 1100713,
       "description": "Example of DistCp action"
     }
   },
