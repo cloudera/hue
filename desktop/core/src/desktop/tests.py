@@ -117,6 +117,16 @@ def test_dump_config():
 
   clear()
 
+  # Malformed port per HUE-674
+  CANARY = "asdfoijaoidfjaosdjffjfjaoojosjfiojdosjoidjfoa"
+  clear = desktop.conf.HTTP_PORT.set_for_testing(CANARY)
+
+  response1 = c.get('/dump_config')
+  assert_true(CANARY in response1.content, response1.content)
+
+  clear()
+
+
 def test_prefs():
   c = make_logged_in_client()
 
