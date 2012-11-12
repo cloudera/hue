@@ -16,6 +16,7 @@
 
 <%!
   from django.utils.translation import ugettext as _
+  from oozie.models import DATASET_FREQUENCY
 %>
 
 
@@ -36,7 +37,14 @@
   </div>
 
   <div class="alert alert-info">
-    ${ _('You can parameterize the values using') } <code>${"${"}MINUTE}</code>, <code>${"${"}DAY}</code>, <code>${"${"}MONTH}</code> ${ _('and') } <code>${"${"}YEAR}</code>.
+    ${ _('You can parameterize the values using') }
+    % for frequency in DATASET_FREQUENCY:
+      <code>${"${"}${ frequency }}</code>
+      % if not loop.last:
+        ,
+      % endif
+    % endfor
+    .
   </div>
   ${ utils.render_field(dataset_form['uri']) }
 

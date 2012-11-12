@@ -202,7 +202,7 @@ class WorkflowManager(models.Manager):
     self.check_workspace(workflow, fs)
 
   def check_workspace(self, workflow, fs):
-    oozie_setup.create_data_dir(fs)
+    oozie_setup.create_directories(fs)
 
     if workflow.is_shared:
       perms = 0755
@@ -1181,6 +1181,7 @@ FREQUENCY_UNITS = (('minutes', _('Minutes')),
                    ('days', _('Days')),
                    ('months', _('Months')))
 FREQUENCY_NUMBERS = [(i, i) for i in xrange(1, 61)]
+DATASET_FREQUENCY = ['MINUTE', 'HOUR', 'DAY', 'MONTH', 'YEAR']
 
 
 class Coordinator(Job):
@@ -1300,7 +1301,7 @@ class Coordinator(Job):
 
     for dataset in self.dataset_set.all():
       for param in find_parameters(dataset, ['uri']):
-        if param not in set(['MINUTE', 'DAY', 'MONTH', 'YEAR']):
+        if param not in set(DATASET_FREQUENCY):
           params[param] = ''
 
     for ds in self.datainput_set.all():
@@ -1343,7 +1344,7 @@ class Dataset(models.Model):
   start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
                                help_text=_t(' The UTC datetime of the initial instance of the dataset. The initial-instance also provides '
                                             'the baseline datetime to compute instances of the dataset using multiples of the frequency.'))
-  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency numbeer'),
+  frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
                                               help_text=_t('It represents the number of units of the rate at which '
                                                            'data is periodically created.'))
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
