@@ -50,52 +50,10 @@ ${layout.menubar(section='query')}
     left: 0;
   }
 
-  .noLeftMargin {
-    margin-left: 0 !important;
-  }
-
-  .rowSelected {
-    background-color: #EEEEEE !important;
-  }
-
-  .columnSelected {
-    background-color: #EEEEEE !important;
-  }
-
-  .cellSelected {
-    background-color: #DDDDDD !important;
-  }
-
-  #suggestColumns {
-    position: absolute;
-    left: 0;
-    z-index: 1000;
-    display: none;
-    min-width: 160px;
-    padding: 10px 20px 2px 10px;
-    margin: 2px 0 0;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    *border-right-width: 2px;
-    *border-bottom-width: 2px;
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
-    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding;
-    background-clip: padding-box;
+  .resultTable td, .resultTable th {
     white-space: nowrap;
   }
 
-  #suggestColumns a {
-    margin-left: 10px;
-    margin-right: -14px;
-    margin-top: -12px;
-  }
 </style>
 
 <div class="container-fluid">
@@ -130,6 +88,10 @@ ${layout.menubar(section='query')}
 					% endif
 				</ul>
 			</div>
+      <div id="jumpToColumnAlert" class="alert hide">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <strong>${_('Did you know?')}</strong> ${_('You can click on a row to select a column you want to jump to.')}
+      </div>
 		</div>
 		<div class="span9">
       <ul class="nav nav-tabs">
@@ -167,9 +129,9 @@ ${layout.menubar(section='query')}
             <tbody>
               % for i, row in enumerate(results):
               <tr>
-                <td style="white-space: nowrap">${start_row + i}</td>
+                <td>${start_row + i}</td>
               % for item in row:
-                  <td style="white-space: nowrap">${ item }</td>
+                  <td>${ item }</td>
               % endfor
               </tr>
               % endfor
@@ -184,10 +146,6 @@ ${layout.menubar(section='query')}
                   <li><a title="${_('Next page')}" href="${ url('beeswax.views.view_results', query.id, next_row) }${'?context=' + context_param or '' | n}">${_('Next Page')} &rarr;</a></li>
               % endif
               </ul>
-            </div>
-            <div id="jumpToColumnAlert" class="alert hide" style="float:left;margin: 20px 0;">
-              <button type="button" class="close" data-dismiss="alert">&times;</button>
-              <strong>${_('Did you know?')}</strong> ${_('You can click on a row to select a column you want to jump to.')}
             </div>
             % endif
         </div>
@@ -241,10 +199,7 @@ ${layout.menubar(section='query')}
   </div>
 %endif
 
-<div id="suggestColumns">
-  <a href="#" class="pull-right">&times;</a>
-  <label>${_('Go to column:')} <input type="text" placeholder="${_('column name...')}" /></label>
-</div>
+
 
 
 <script type="text/javascript" charset="utf-8">
@@ -324,66 +279,12 @@ ${layout.menubar(section='query')}
         $(".sidebar-nav").parent().css("margin-left", "0");
       });
 
-      $("[rel='tooltip']").tooltip();
-
-      $(".resultTable tbody").click(function (event) {
-        $(".rowSelected").removeClass("rowSelected");
-        $(".columnSelected").removeClass("columnSelected");
-        $(".cellSelected").removeClass("cellSelected");
-        $(event.target.parentNode).addClass("rowSelected");
-        $(event.target.parentNode).find("td").each(function () {
-          $(this).addClass("rowSelected");
-          $(this).attr("rel", "tooltip").attr("title", $(this).parents("table").find("th").eq($(this).prevAll().length).text()).tooltip();
-        });
-        $("#suggestColumns")
-                .css("left", (event.clientX + $("#suggestColumns").width() > $(window).width() - 10 ? event.clientX - $("#suggestColumns").width() - 10 : event.clientX))
-                .css("top", event.clientY + 10).show();
-        $("#suggestColumns input").focus();
+      $(".resultTable").jHueTableExtender({
+        hintElement: "#jumpToColumnAlert",
+        fixedHeader: true,
+        firstColumnTooltip: true
       });
 
-      $.expr[":"].econtains = function (obj, index, meta, stack) {
-        return (obj.textContent || obj.innerText || $(obj).text() || "").toLowerCase() == meta[3].toLowerCase();
-      }
-
-      var source = [];
-      $(".resultTable th").each(function () {
-        source.push($(this).text());
-      });
-
-      $("#suggestColumns input").typeahead({
-        source:source,
-        updater:function (item) {
-          $("#suggestColumns").hide();
-          $(".resultTable tr td:nth-child(" + ($(".resultTable th:econtains(" + item + ")").index() + 1) + ")").addClass("columnSelected");
-          $(".dataTables_wrapper").animate({
-            scrollLeft:$(".resultTable th:econtains(" + item + ")").position().left + $(".dataTables_wrapper").scrollLeft() - $(".dataTables_wrapper").offset().left - 30
-          }, 300);
-          $(".resultTable tr.rowSelected td:nth-child(" + ($(".resultTable th:econtains(" + item + ")").index() + 1) + ")").addClass("cellSelected");
-        }
-      });
-
-      $("#suggestColumns a").click(function (e) {
-        e.preventDefault();
-        $("#suggestColumns").hide();
-      });
-
-      $(window).resize(function () {
-        $("#suggestColumns").hide();
-      });
-
-      var showAlertTimeout = -1;
-      $(".resultTable tbody").mousemove(function () {
-        window.clearTimeout(showAlertTimeout);
-        if ($("#jumpToColumnAlert").data("show") == null || $("#jumpToColumnAlert").data("show")) {
-          showAlertTimeout = window.setTimeout(function () {
-            $("#jumpToColumnAlert").fadeIn();
-          }, 1300);
-        }
-      });
-
-      $("#jumpToColumnAlert .close").click(function () {
-        $("#jumpToColumnAlert").data("show", false);
-      });
     });
 </script>
 

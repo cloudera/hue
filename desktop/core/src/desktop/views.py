@@ -202,6 +202,9 @@ def threads(request):
     out.append("")
   return HttpResponse("\n".join(out), content_type="text/plain")
 
+def jasmine(request):
+  return render('jasmine.mako', request, None)
+
 @login_notrequired
 def index(request):
   return render("index.mako", request, dict(

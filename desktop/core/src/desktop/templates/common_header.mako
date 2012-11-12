@@ -61,17 +61,24 @@ from django.utils.translation import ugettext as _
 
       // jHue plugins global configuration
       jHueFileChooserGlobals = {
-          labels: {
-              BACK: "${_('Back')}",
-              SELECT_FOLDER: "${_('Select this folder')}",
-              CREATE_FOLDER: "${_('Create folder')}",
-              FOLDER_NAME: "${_('Folder name')}",
-              CANCEL: "${_('Cancel')}",
-              FILE_NOT_FOUND: "${_('The file has not been found')}",
-              UPLOAD_FILE: "${_('Upload a file')}",
-              FAILED: "${_('Failed')}"
-          }
+        labels:{
+          BACK:"${_('Back')}",
+          SELECT_FOLDER:"${_('Select this folder')}",
+          CREATE_FOLDER:"${_('Create folder')}",
+          FOLDER_NAME:"${_('Folder name')}",
+          CANCEL:"${_('Cancel')}",
+          FILE_NOT_FOUND:"${_('The file has not been found')}",
+          UPLOAD_FILE:"${_('Upload a file')}",
+          FAILED:"${_('Failed')}"
+        }
       };
+
+      jHueTableExtenderGlobals = {
+        labels:{
+          GO_TO_COLUMN: "${_('Go to column:')}",
+          PLACEHOLDER: "${_('column name...')}"
+        }
+      }
 
   </script>
 
@@ -82,6 +89,7 @@ from django.utils.translation import ugettext as _
   <script src="/static/js/Source/jHue/jquery.rowselector.js"></script>
   <script src="/static/js/Source/jHue/jquery.notify.js"></script>
   <script src="/static/js/Source/jHue/jquery.tablescroller.js"></script>
+  <script src="/static/js/Source/jHue/jquery.tableextender.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>

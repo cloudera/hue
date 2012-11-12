@@ -60,6 +60,10 @@ dynamic_patterns = patterns('',
   (r'^debug/check_config$', 'desktop.views.check_config'),
   (r'^debug/check_config_ajax$', 'desktop.views.check_config_ajax'),
   (r'^log_frontend_event$', 'desktop.views.log_frontend_event'),
+
+  # Jasmine
+  (r'^jasmine', 'desktop.views.jasmine'),
+
   # Top level web page!
   (r'^$', 'desktop.views.index'),
 )

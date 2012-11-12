@@ -61,10 +61,14 @@ ${layout.menubar(section='tables')}
 					<li class="nav-header">${_('Actions')}</li>
 					<li><a href="#importData" data-toggle="modal">${_('Import Data')}</a></li>
 					<li><a href="${ url("beeswax.views.read_table", table=table_name) }">${_('Browse Data')}</a></li>
-			        <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
-			        <li><a href="${hdfs_link}" rel="${ table.sd.location }">${_('View File Location')}</a></li>
+			    <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
+			    <li><a href="${hdfs_link}" rel="${ table.sd.location }">${_('View File Location')}</a></li>
 				</ul>
 			</div>
+      <div id="jumpToColumnAlert" class="alert hide">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <strong>${_('Did you know?')}</strong> ${_('You can click on a row to select a column you want to jump to.')}
+      </div>
 		</div>
 		<div class="span9">
 			% if table.parameters.get("comment", False):
@@ -93,11 +97,11 @@ ${layout.menubar(section='tables')}
 		        % endif
 				% if top_rows is not None:
 					<div class="tab-pane" id="sample">
-						<table class="table table-striped table-condensed datatables">
+						<table class="table table-striped table-condensed sampleTable">
 			              <thead>
 			                <tr>
 			                  % for col in table.sd.cols:
-			                    <th>${col.name}</th>
+			                    <th style="white-space: nowrap">${col.name}</th>
 			                  % endfor
 			                </tr>
 			              </thead>
@@ -105,7 +109,7 @@ ${layout.menubar(section='tables')}
 			                % for i, row in enumerate(top_rows):
 			                  <tr>
 			                    % for item in row:
-			                      <td>${ item }</td>
+			                      <td style="white-space: nowrap">${ item }</td>
 			                    % endfor
 			                  </tr>
 			                % endfor
@@ -200,6 +204,10 @@ ${layout.menubar(section='tables')}
         overflow-y:scroll;
         margin-top:10px;
     }
+
+    .sampleTable td, .sampleTable th {
+      white-space: nowrap;
+    }
 </style>
 
 <script type="text/javascript" charset="utf-8">
@@ -228,6 +236,24 @@ ${layout.menubar(section='tables')}
         $(".loadPath").click(function(){
             $("#filechooser").slideDown();
         });
+
+      $('a[data-toggle="tab"]').on('shown', function () {
+        $(".sampleTable").not('.initialized').addClass('initialized').dataTable({
+          "bPaginate": false,
+          "bLengthChange": false,
+          "bInfo": false,
+          "bFilter": false,
+          "fnInitComplete": function () {
+            $(".sampleTable").parent().jHueTableScroller();
+            $(".sampleTable").jHueTableExtender({
+              hintElement: "#jumpToColumnAlert",
+              fixedHeader: true
+            });
+          }
+        });
+      })
+
+
     });
 </script>
 
