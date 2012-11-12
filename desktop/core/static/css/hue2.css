@@ -996,19 +996,23 @@ a#advanced-btn:hover {
 }
 
 .hand {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .hueCheckbox {
-    width: 15px;
-    height: 15px;
-    border: 1px solid #CCCCCC;
-    margin-top: 2px!important;
-    padding: 0!important;
-    display: block!important;
-    cursor: default;
+  width: 15px;
+  height: 15px;
+  border: 1px solid #CCCCCC;
+  margin-top: 2px !important;
+  padding: 0 !important;
+  display: block !important;
+  cursor: default;
 }
 
 .hueCheckbox:hover {
-    border-color: #999999;
+  border-color: #999999;
+}
+
+.modal form {
+  margin: 0;
 }
