@@ -102,8 +102,8 @@ ${layout()}
             </fieldset>
         </div>
         <div class="modal-footer">
-            <input id="submitBtn" type="submit" class="btn primary" value="${_('Submit')}"/>
-            <a href="#" class="btn secondary" data-dismiss="modal">${_('Cancel')}</a>
+            <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+            <input id="submitBtn" type="submit" class="btn btn-primary" value="${_('Submit')}"/>
         </div>
     </form>
 </div>
@@ -115,8 +115,8 @@ ${layout()}
             <h3 id="deleteWfMessage">${_('Delete this design?')}</h3>
         </div>
         <div class="modal-footer">
-            <input type="submit" class="btn primary" value="${_('Yes')}"/>
-            <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+            <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+            <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
         </div>
     </form>
 </div>
@@ -131,8 +131,8 @@ ${layout()}
             ${_('It will take a few seconds to install.')}
         </div>
         <div class="modal-footer">
-            <input type="submit" class="btn primary" value="${_('Yes')}"/>
-            <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+            <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+            <input type="submit" class="btn btn-primary" value="${_('Yes')}"/>
         </div>
     </form>
 </div>

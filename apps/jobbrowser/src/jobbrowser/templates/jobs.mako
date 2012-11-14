@@ -175,8 +175,8 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
     </div>
     <div class="modal-footer">
         <form id="kill-job" action="" method="POST" class="form-stacked">
-            <input type="submit" value="${_('Yes')}" class="btn primary" />
             <a id="cancelKillBtn" class="btn">${_('No')}</a>
+            <input type="submit" value="${_('Yes')}" class="btn btn-danger" />
         </form>
     </div>
 </div>

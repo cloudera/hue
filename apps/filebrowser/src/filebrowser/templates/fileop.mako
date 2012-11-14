@@ -40,7 +40,7 @@ ${commonheader(_('File Operation'), 'filebrowser', user)}
 	${form.management_form}
 % endif
 <div>
-<input type="submit" value="${('Submit')}" class="btn primary" />
+<input type="submit" value="${('Submit')}" class="btn btn-primary" />
 <a href="${urlencode(next)}" class="btn">${('Cancel')}</a>
 </div>
 </form>

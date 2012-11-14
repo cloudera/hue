@@ -55,8 +55,8 @@
     </div>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn secondary" data-dismiss="modal">${_('Cancel')}</a>
-    <input type="submit" class="btn primary" value="${_('Import')}"/>
+    <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <input type="submit" class="btn btn-primary" value="${_('Import')}"/>
   </div>
 </form>
 

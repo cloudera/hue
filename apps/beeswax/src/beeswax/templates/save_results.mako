@@ -45,7 +45,7 @@ ${layout.menubar(section='history')}
     <a href="#" class="close" data-dismiss="modal">&times;</a>
   </div>
   <br/><br/>
-  <input type="submit" name="save" value="${_('Save')}" class="btn primary"/>
+  <input type="submit" name="save" value="${_('Save')}" class="btn btn-primary"/>
   <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
 </form>
 </div>

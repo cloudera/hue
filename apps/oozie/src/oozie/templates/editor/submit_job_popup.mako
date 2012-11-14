@@ -51,7 +51,7 @@
     </fieldset>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn secondary" data-dismiss="modal">${ _('Cancel') }</a>
-    <input id="submit-btn" type="submit" class="btn primary" value="${ _('Submit') }"/>
+    <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+    <input id="submit-btn" type="submit" class="btn btn-primary" value="${ _('Submit') }"/>
   </div>
 </form>

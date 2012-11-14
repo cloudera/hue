@@ -92,8 +92,8 @@ ${layout.menubar(section='saved queries')}
             <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
         </div>
         <div class="modal-footer">
-            <input type="submit" class="btn primary" value="${_('Yes')}"/>
-            <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+            <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
+            <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
         </div>
     </form>
 </div>

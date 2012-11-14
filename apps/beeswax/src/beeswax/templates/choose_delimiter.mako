@@ -91,7 +91,7 @@ ${layout.menubar(section='tables')}
 
                 <div class="form-actions">
                     <input class="btn" type="submit" value="${_('Previous')}" name="cancel_delim"/>
-                    <input class="btn primary" type="submit" name="submit_delim" value="${_('Next')}" />
+                    <input class="btn btn-primary" type="submit" name="submit_delim" value="${_('Next')}" />
                 </div>
             </form>
         </div>

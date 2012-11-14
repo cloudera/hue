@@ -49,7 +49,7 @@
     </fieldset>
 
     <div class="actions">
-        <a id="executeQuery" class="btn primary">${_('Execute')}</a>
+        <a id="executeQuery" class="btn btn-primary">${_('Execute')}</a>
         % if design and not design.is_auto and design.name:
         <a id="saveQuery" class="btn">${_('Save')}</a>
         % endif
@@ -270,17 +270,24 @@ ${layout.menubar(section='query')}
         <h3>${_('Choose a name')}</h3>
     </div>
     <div class="modal-body">
-        <div class="clearfix">
-            <label>${_('Name')}</label>
-            ${comps.field(form.saveform['name'])}
+      <form class="form-horizontal">
+        <div class="control-group">
+            <label class="control-label">${_('Name')}</label>
+            <div class="controls">
+              ${comps.field(form.saveform['name'], klass="input-xlarge")}
+            </div>
         </div>
-        <div class="clearfix">
-            <label>Description</label>
-            ${comps.field(form.saveform['desc'])}
+        <div class="control-group">
+            <label class="control-label">${_('Description')}</label>
+            <div class="controls">
+            ${comps.field(form.saveform['desc'], tag='textarea', klass="input-xlarge")}
+            </div>
         </div>
+      </form>
     </div>
     <div class="modal-footer">
-        <button id="saveAsNameBtn" class="btn primary">${_('Save')}</button>
+        <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+        <button id="saveAsNameBtn" class="btn btn-primary">${_('Save')}</button>
     </div>
 </div>
 

@@ -90,7 +90,7 @@ ${layout.menubar(section='tables')}
                 </fieldset>
                 <div class="form-actions">
                     <input class="btn" type="submit" name="cancel_create" value="${_('Previous')}" />
-                    <input class="btn primary" type="submit" name="submit_create" value="${_('Create Table')}" />
+                    <input class="btn btn-primary" type="submit" name="submit_create" value="${_('Create Table')}" />
                 </div>
             </form>
         </div>

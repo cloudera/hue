@@ -130,12 +130,12 @@ ${layout.menubar(section='tables')}
         <h3>${_('Drop Table')}</h3>
     </div>
     <div class="modal-body">
-      <div id="dropTableMessage" class="alert">
+      <div id="dropTableMessage">
       </div>
     </div>
     <div class="modal-footer">
-        <input type="submit" class="btn primary" value="${_('Yes')}"/>
-        <a href="#" class="btn secondary hideModal">${_('No')}</a>
+        <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
+        <input type="submit" class="btn btn-danger" value="${_('Yes, drop this table')}"/>
     </div>
     </form>
 </div>
@@ -143,107 +143,123 @@ ${layout.menubar(section='tables')}
 
 
 <div id="importData" class="modal hide fade">
-    <form method="POST" action="${ url("beeswax.views.load_table", table=table.name) }" class="form-stacked">
+    <form method="POST" action="${ url("beeswax.views.load_table", table=table.name) }" class="form-horizontal">
         <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times;</a>
             <h3>${_('Import data')}</h3>
         </div>
         <div class="modal-body">
-            <div class="alert">
-                  <p>${_("Note that loading data will move data from its location into the table's storage location.")}</p>
-            </div>
 
-            <div class="clearfix">
-                ${comps.label(load_form["path"], title_klass='loadPath', attrs={})}
-                <div class="input">
-                    ${comps.field(load_form["path"], title_klass='loadPath', attrs={'klass': 'loadPath input-xlarge'})}
+            <div class="control-group">
+                ${comps.bootstrapLabel(load_form["path"])}
+                <div class="controls">
+                    ${comps.field(load_form["path"],
+                    placeholder="/user/user_name/data_dir/file",
+                    klass="pathChooser input-xlarge",
+                    file_chooser=True,
+                    show_errors=False
+                    )}
                 </div>
             </div>
 
+            <div id="filechooser"></div>
+
             % for pf in load_form.partition_columns:
-                <div class="clearfix">
-                     ${comps.label(load_form[pf], render_default=True)}
-                     <div class="input">
+                <div class="control-group">
+                     ${comps.bootstrapLabel(load_form[pf])}
+                     <div class="controls">
                        ${comps.field(load_form[pf], render_default=True, attrs={'klass': 'input-xlarge'})}
                     </div>
                 </div>
             % endfor
 
-            <div class="clearfix">
-                <div class="input">
+            <div class="control-group">
+              <div class="controls">
+                <label class="checkbox">
                     <input type="checkbox" name="overwrite"/> ${_('Overwrite existing data')}
+                  </label>
                 </div>
             </div>
 
-            <div id="filechooser"></div>
+            <p class="muted"><em>${_("Note that loading data will move data from its location into the table's storage location.")}</em></p>
         </div>
 
         <div class="modal-footer">
-            <input type="submit" class="btn primary" value="${_('Submit')}"/>
-            <a href="#" class="btn secondary" data-dismiss="modal">${_('Cancel')}</a>
+            <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+            <input type="submit" class="btn btn-primary" value="${_('Submit')}"/>
         </div>
     </form>
 </div>
 </div>
 
-<style>
-    #filechooser {
-        display:none;
-        min-height:100px;
-        overflow-y:scroll;
-        margin-top:10px;
-    }
+ <style>
+   #filechooser {
+     display: none;
+     min-height: 100px;
+     height: 250px;
+     overflow-y: scroll;
+     margin-top: 10px;
+   }
 
-    .sampleTable td, .sampleTable th {
-      white-space: nowrap;
-    }
-</style>
+   .sampleTable td, .sampleTable th {
+     white-space: nowrap;
+   }
 
-<script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $("#filechooser").jHueFileChooser({
-            initialPath: $(".loadPath").val(),
-            onFileChoose: function(filePath){
-                $(".loadPath").val(filePath);
-                $("#filechooser").slideUp();
-            },
-            createFolder: false
-        });
-        $(".datatables").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false
-        });
+   .form-horizontal .controls {
+     margin-left: 0;
+   }
 
-        $.getJSON("${ url("beeswax.views.drop_table", table=table.name) }", function(data){
-            $("#dropTableMessage").text(data.title);
-        });
-        $(".hideModal").click(function(){
-            $(this).closest(".modal").modal("hide");
-        });
-        $(".loadPath").click(function(){
-            $("#filechooser").slideDown();
-        });
+   .form-horizontal .control-label {
+     width: auto;
+     padding-right: 10px;
+   }
+ </style>
 
-      $('a[data-toggle="tab"]').on('shown', function () {
-        $(".sampleTable").not('.initialized').addClass('initialized').dataTable({
-          "bPaginate": false,
-          "bLengthChange": false,
-          "bInfo": false,
-          "bFilter": false,
-          "fnInitComplete": function () {
-            $(".sampleTable").parent().jHueTableScroller();
-            $(".sampleTable").jHueTableExtender({
-              hintElement: "#jumpToColumnAlert",
-              fixedHeader: true
-            });
-          }
-        });
-      })
+ <script type="text/javascript" charset="utf-8">
+   $(document).ready(function () {
 
+     $(".fileChooserBtn").click(function(e){
+       e.preventDefault();
+       var _destination = $(this).attr("data-filechooser-destination");
+       $("#filechooser").jHueFileChooser({
+         initialPath: $("input[name='"+_destination+"']").val(),
+         onFileChoose: function(filePath){
+           $("input[name='"+_destination+"']").val(filePath);
+           $("#filechooser").slideUp();
+         },
+         createFolder: false
+       });
+       $("#filechooser").slideDown();
+     });
 
-    });
-</script>
+     $(".datatables").dataTable({
+       "bPaginate":false,
+       "bLengthChange":false,
+       "bInfo":false,
+       "bFilter":false
+     });
 
-${commonfooter(messages)}
+     $.getJSON("${ url("beeswax.views.drop_table", table=table.name) }", function (data) {
+       $("#dropTableMessage").text(data.title);
+     });
+
+     $('a[data-toggle="tab"]').on('shown', function () {
+       $(".sampleTable").not('.initialized').addClass('initialized').dataTable({
+         "bPaginate":false,
+         "bLengthChange":false,
+         "bInfo":false,
+         "bFilter":false,
+         "fnInitComplete":function () {
+           $(".sampleTable").parent().jHueTableScroller();
+           $(".sampleTable").jHueTableExtender({
+             hintElement:"#jumpToColumnAlert",
+             fixedHeader:true
+           });
+         }
+       });
+     })
+
+   });
+ </script>
+
+ ${commonfooter(messages)}

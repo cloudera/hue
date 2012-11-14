@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
     <h3 id="deleteGroupMessage">${_("Are you sure you want to delete")} ${groupname}${_("?")}</h3>
 </div>
 <div class="modal-footer">
-    <input type="submit" class="btn primary" value="${_('Yes')}"/>
-    <a href="javascript:void(0);" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+    <a href="javascript:void(0);" class="btn" data-dismiss="modal">${_('No')}</a>
+    <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
 </div>
 </form>

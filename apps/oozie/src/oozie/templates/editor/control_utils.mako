@@ -41,7 +41,7 @@
       </div>
 
       <div class="modal-footer">
-        <button data-dismiss="modal" class="btn">No</button>
+        <button data-dismiss="modal" class="btn">${ _('No')}</button>
         % if 'convert' in javascript_attrs:
           <button data-dismiss="modal" class="btn btn-primary" data-bind="click: ${ javascript_attrs['convert'] }">${ _('Yes') }</button>
         % endif
@@ -142,7 +142,7 @@
       </div>
 
       <div class="modal-footer">
-        <button data-dismiss="modal" class="btn btn-primary">Done</button>
+        <button data-dismiss="modal" class="btn btn-primary">${ _('Done')}</button>
       </div>
 
     </form>

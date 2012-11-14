@@ -139,8 +139,8 @@ from django.utils.translation import ugettext as _
         </div>
         <div class="modal-footer">
             <form id="deleteForm" action="/filebrowser/rmtree" method="POST" enctype="multipart/form-data" class="form-stacked">
-                <input type="submit" value="${_('Yes')}" class="btn primary" />
                 <a id="cancelDeleteBtn" class="btn">${_('No')}</a>
+                <input type="submit" value="${_('Yes')}" class="btn btn-danger" />
             </form>
         </div>
     </div>
@@ -162,7 +162,7 @@ from django.utils.translation import ugettext as _
 
             <input id="renameSrcPath" type="hidden" name="src_path" type="text">
             <a id="cancelRenameBtn" class="btn">${_('Cancel')}</a>
-            <input type="submit" value="${_('Submit')}" class="btn primary" />
+            <input type="submit" value="${_('Submit')}" class="btn btn-primary" />
         </div>
         </form>
     </div>
@@ -196,7 +196,7 @@ from django.utils.translation import ugettext as _
                     <span class="label label-important">${_('Sorry, name is required.')}</span>
                 </div>
                 <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">${_('Cancel')}</a>
-                <input class="btn primary" type="submit" value="${_('Submit')}" />
+                <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
             </div>
         </form>
     </div>
@@ -259,7 +259,7 @@ from django.utils.translation import ugettext as _
             </div>
             <div class="modal-footer" style="padding-top: 10px;">
                 <a class="btn" onclick="$('#changePermissionModal').modal('hide');">${_('Cancel')}</a>
-                <input class="btn primary" type="submit" value="${_('Submit')}"/>
+                <input class="btn btn-primary" type="submit" value="${_('Submit')}"/>
             </div>
         </form>
     </div>
@@ -285,7 +285,7 @@ from django.utils.translation import ugettext as _
                     <span class="label label-important">${_('Sorry, name is required.')}</span>
                 </div>
                 <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
-                <input class="btn primary" type="submit" value="${_('Submit')}"/>
+                <input class="btn btn-primary" type="submit" value="${_('Submit')}"/>
             </div>
         </form>
     </div>
@@ -339,7 +339,7 @@ from django.utils.translation import ugettext as _
                 <p><strong>${_('Sorry, directory name is required.')}</strong>
             </div>
             <a id="cancelCreateDirectoryBtn" class="btn" href="#">${_('Cancel')}</a>
-            <input class="btn primary" type="submit" value="${_('Submit')}" />
+            <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
         </div>
         </form>
     </div>
@@ -360,7 +360,7 @@ from django.utils.translation import ugettext as _
                 <p><strong>${_('Sorry, file name is required.')}</strong>
             </div>
             <a id="cancelCreateFileBtn" class="btn" href="#">${_('Cancel')}</a>
-            <input class="btn primary" type="submit" value="${_('Submit')}" />
+            <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
         </div>
         </form>
     </div>

@@ -56,7 +56,7 @@ ${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename
 
         <div style="width: 100%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", notitle=True, attrs=dict(
           style="width:100%; height:400px;")) | n}</div>
-        <input class="btn primary" type="submit" name="save" value="${_('Save')}">
+        <input class="btn btn-primary" type="submit" name="save" value="${_('Save')}">
         <a id="saveAsBtn" class="btn">${_('Save As')}</a>
     </form>
 </div>
@@ -78,8 +78,8 @@ ${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename
         </div>
 		${edit.render_field(form["contents"], hidden=True)}
 		${edit.render_field(form["encoding"], hidden=True)}
-        <input type="submit" value="${_('Save')}" class="btn primary" />
         <a id="cancelSaveAsBtn" class="btn">${_('Cancel')}</a>
+        <input type="submit" value="${_('Save')}" class="btn btn-primary" />
     </div>
     </form>
 </div>

@@ -29,7 +29,7 @@ ${layout.menubar(section='configuration')}
 		<form class="form-search" method="POST">
 		  <span>
 		    ${server_form['server']}
-		    <button type="submit" class="btn primary">${_('Look')}</button>
+		    <button type="submit" class="btn btn-primary">${_('Look')}</button>
 		   </span>
 		   <span class="pull-right">
               ${_('Filter:')} <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc...')}">

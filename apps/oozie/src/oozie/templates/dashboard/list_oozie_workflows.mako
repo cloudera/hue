@@ -148,8 +148,8 @@ ${ layout.menubar(section='dashboard') }
     <h3 class="message"></h3>
   </div>
   <div class="modal-footer">
-    <a class="btn primary" href="javascript:void(0);">${_('Yes')}</a>
-    <a href="#" class="btn secondary" data-dismiss="modal">${_('No')}</a>
+    <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>
 
@@ -284,7 +284,7 @@ ${ layout.menubar(section='dashboard') }
       var _this = $(this);
       $("#confirmation .message").text(_this.attr("data-confirmation-message"));
       $("#confirmation").modal("show");
-      $("#confirmation a.primary").click(function() {
+      $("#confirmation a.btn-primary").click(function() {
         _this.trigger('confirmation');
       });
     });

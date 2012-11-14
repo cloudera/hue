@@ -67,9 +67,9 @@ from django.utils.translation import ugettext as _
 					</label>
 
 					%if first_login_ever==True:
-						<input type="submit" class="btn primary" value="${_('Sign up')}" />
+						<input type="submit" class="btn btn-primary" value="${_('Sign up')}" />
 					%else:
-						<input type="submit" class="btn primary" value="${_('Sign in')}" />
+						<input type="submit" class="btn btn-primary" value="${_('Sign in')}" />
 					%endif
 					<input type="hidden" name="next" value="${next}" />
 

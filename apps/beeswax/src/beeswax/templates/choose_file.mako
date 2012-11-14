@@ -97,7 +97,7 @@ ${layout.menubar(section='tables')}
                     </div>
                 </fieldset>
                 <div class="form-actions">
-                    <input type="submit" class="btn primary" name="submit_file" value="${_('Next')}" />
+                    <input type="submit" class="btn btn-primary" name="submit_file" value="${_('Next')}" />
                 </div>
             </form>
         </div>

@@ -193,9 +193,9 @@ ${layout.menubar(section='query')}
       <div id="fieldRequired" class="hide" style="position: absolute; left: 10;">
         <span class="label label-important">${_('Sorry, name is required.')}</span>
       </div>
-      <a id="saveBtn" class="btn primary">${_('Save')}</a>
-      <input type="hidden" name="save" value="save"/>
       <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+      <a id="saveBtn" class="btn btn-primary">${_('Save')}</a>
+      <input type="hidden" name="save" value="save"/>
     </div>
   </form>
   </div>

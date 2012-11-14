@@ -301,8 +301,8 @@ ${layout.menubar(section='tables')}
 </div>
 <div class="form-actions">
     <button type="button" id="backBtn" class="btn hide">${_('Back')}</button>
-    <button type="button" id="nextBtn" class="btn primary">${_('Next')}</button>
-    <input id="submit" type="submit" class="btn primary hide" value="${_('Create table')}" />
+    <button type="button" id="nextBtn" class="btn btn-primary">${_('Next')}</button>
+    <input id="submit" type="submit" class="btn btn-primary hide" value="${_('Create table')}" />
 </div>
 </form>
 </div>

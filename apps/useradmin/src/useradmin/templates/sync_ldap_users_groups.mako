@@ -47,6 +47,6 @@ from django.utils.translation import ugettext as _
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <input type="submit" class="btn primary" value="${_('Sync')}"/>
+    <input type="submit" class="btn btn-primary" value="${_('Sync')}"/>
   </div>
 </form>

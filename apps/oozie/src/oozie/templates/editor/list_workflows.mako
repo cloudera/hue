@@ -113,8 +113,8 @@ ${ layout.menubar(section='workflows') }
       <h3 id="deleteWfMessage">${ _('Delete this workflow?') }</h3>
     </div>
     <div class="modal-footer">
-      <input type="submit" class="btn primary" value="${ _('Yes') }"/>
-      <a href="#" class="btn secondary" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
   </form>
 </div>
@@ -129,8 +129,8 @@ ${ layout.menubar(section='workflows') }
       ${ _('Hue is going to re-create the workspaces and re-install the examples...') }
     </div>
     <div class="modal-footer">
-      <input type="submit" class="btn primary" value="${ _('Yes') }"/>
-      <a href="#" class="btn secondary" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <input type="submit" class="btn btn-primary" value="${ _('Yes') }"/>
     </div>
   </form>
 </div>
