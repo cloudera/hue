@@ -67,7 +67,7 @@ class HiveServerTable(Table):
   @property
   def cols(self):
     cols = HiveServerTTableSchema(self.results, self.schema).cols()
-    if all([col['col_name'] for col in cols]):
+    if sum([col['col_name'] for col in cols]) == len(cols):
       return cols
     else:
       return cols[:-2] # Drop last 2 lines of Extended describe

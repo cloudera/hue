@@ -155,7 +155,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     design_id = designs[0]['id']
     response = self.client.post("/jobsub/submit_design/%d" % design_id, follow=True)
     oozie_jobid = response.context['jobid']
-    job = OozieServerProvider.wait_until_completion(oozie_jobid, timeout=500, step=1)
+    OozieServerProvider.wait_until_completion(oozie_jobid, timeout=500, step=1)
     hadoop_job_id = get_hadoop_job_id(self.oozie, oozie_jobid, 1)
 
     # Select only killed jobs (should be absent)

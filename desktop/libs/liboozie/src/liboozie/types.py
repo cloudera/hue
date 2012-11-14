@@ -91,6 +91,7 @@ class ControlFlowAction(Action):
     Fixup:
       - time fields as struct_time
       - config dict
+      - protect externalId
     """
     super(ControlFlowAction, self)._fixup()
 
@@ -100,6 +101,8 @@ class ControlFlowAction(Action):
       self.endTime = parse_timestamp(self.endTime)
     if self.retries:
       self.retries = int(self.retries)
+    if self.externalId and not re.match('job_.*', self.externalId):
+      self.externalId = None
 
     self.conf_dict = {}
 

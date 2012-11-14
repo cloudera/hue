@@ -257,7 +257,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
         'map_sleep_time': 1,
         'reduce_sleep_time': 1}, follow=True)
 
-    assert_true(any([status in response.content for status in ('PREP', 'OK', 'DONE')]), response.content)
+    assert_true(sum([status in response.content for status in ('PREP', 'OK', 'DONE')]) > 0)
     assert_true(str(jobid) in response.content)
 
     oozie_job_id = response.context['jobid']
@@ -282,7 +282,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
         'map_sleep_time': 1,
         'reduce_sleep_time': 1}, follow=True)
 
-    assert_true(any([status in response.content for status in ('PREP', 'OK', 'DONE')]), response.content)
+    assert_true(sum([status in response.content for status in ('PREP', 'OK', 'DONE')]) > 0)
     assert_true(str(jobid) in response.content)
 
     oozie_job_id = response.context['jobid']

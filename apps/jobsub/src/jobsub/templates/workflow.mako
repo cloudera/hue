@@ -125,7 +125,12 @@ ${layout.menubar(section='history')}
                 </td>
                 <td>${action.type}</td>
                 <td>${action.status}</td>
-                <td>${action.externalId}</td>
+
+                <td>
+                % if action.externalId:
+                  <a href="${ url('jobbrowser.views.single_job', jobid=action.externalId) }">${ action.externalId }</a>
+                % endif
+                </td>
 
                 <td>${format_time(action.startTime)}</td>
                 <td>${format_time(action.endTime)}</td>

@@ -153,7 +153,6 @@ class OozieApi(object):
     """
     params = self._get_params()
     resp = self._root.get('job/%s' % (jobid,), params)
-    print resp
     wf = Workflow(self, resp)
     return wf
 
