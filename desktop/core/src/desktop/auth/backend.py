@@ -308,6 +308,8 @@ class LdapBackend(object):
   def manages_passwords_externally(cls):
     return True
 
+
+
 class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   """
   A note about configuration:
@@ -352,3 +354,40 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     user = super(SpnegoDjangoBackend, self).get_user(user_id)
     user = rewrite_user(user)
     return user
+
+
+
+class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
+  """
+  Delegates to Django's RemoteUserBackend and requires HueRemoteUserMiddleware
+  """
+  def authenticate(self, remote_user=None):
+    username = self.clean_username(remote_user)
+    is_super = False
+    if User.objects.count() == 0:
+      is_super = True
+
+    try:
+      user = User.objects.get(username=username)
+    except User.DoesNotExist:
+      user = find_or_create_user(username, None)
+      if user is not None and user.is_active:
+        profile = get_profile(user)
+        profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+        profile.save()
+        user.is_superuser = is_super
+
+        default_group = get_default_user_group()
+        if default_group is not None:
+          user.groups.add(default_group)
+
+        user.save()
+
+    user = rewrite_user(user)
+    return user
+
+  def get_user(self, user_id):
+    user = super(RemoteUserDjangoBackend, self).get_user(user_id)
+    user = rewrite_user(user)
+    return user
+

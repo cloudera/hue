@@ -272,8 +272,16 @@ AUTH = ConfigSection(
                    help=_("Class which defines extra accessor methods for User objects.")),
     PAM_SERVICE=Config("pam_service",
                   default="login",
-                  help=_("The service to use when querying PAM."
-                         "The service usually corresponds to a single filename in /etc/pam.d"))
+                  help=_("The service to use when querying PAM. "
+                         "The service usually corresponds to a single filename in /etc/pam.d")),
+    REMOTE_USER_HEADER=Config("remote_user_header",
+                        default="HTTP_REMOTE_USER",
+                        help=_("When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
+                               "the normalized name of the header that contains the remote user. "
+                               "The HTTP header in the request is converted to a key by converting "
+                               "all characters to uppercase, replacing any hyphens with underscores "
+                               "and adding an HTTP_ prefix to the name. So, for example, if the header "
+                               "is called Remote-User that would be configured as HTTP_REMOTE_USER"))
 ))
 
 LDAP = ConfigSection(

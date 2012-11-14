@@ -98,9 +98,21 @@
     #     (Default. Relies on Django and user manager, after the first login)
     # - desktop.auth.backend.LdapBackend
     # - desktop.auth.backend.PamBackend
+    # - desktop.auth.backend.SpnegoDjangoBackend
+    # - desktop.auth.backend.RemoteUserDjangoBackend
     ## backend=desktop.auth.backend.AllowFirstUserDjangoBackend
 
     ## pam_service=login
+
+    # When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets
+    # the normalized name of the header that contains the remote user.
+    # The HTTP header in the request is converted to a key by converting
+    # all characters to uppercase, replacing any hyphens with underscores
+    # and adding an HTTP_ prefix to the name. So, for example, if the header
+    # is called Remote-User that would be configured as HTTP_REMOTE_USER
+    #
+    # Defaults to HTTP_REMOTE_USER
+    ## remote_user_header=HTTP_REMOTE_USER
 
   # Configuration options for connecting to LDAP and Active Directory
   # -------------------------------------------------------------------

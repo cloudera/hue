@@ -24,6 +24,7 @@ import kerberos
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authenticate, load_backend, login
+from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.core import exceptions, urlresolvers
 import django.db
 from django.http import HttpResponseRedirect, HttpResponse
@@ -573,3 +574,19 @@ class SpnegoMiddleware(object):
     except AttributeError:
       pass
     return username
+
+class HueRemoteUserMiddleware(RemoteUserMiddleware):
+  """
+  Middleware to delegate authentication to a proxy server. The proxy server
+  will set an HTTP header (defaults to Remote-User) with the name of the
+  authenticated user. This class extends the RemoteUserMiddleware class
+  built into Django with the ability to configure the HTTP header and to
+  unload the middleware if the RemoteUserDjangoBackend is not currently
+  in use.
+  """
+  header = desktop.conf.AUTH.REMOTE_USER_HEADER.get()
+
+  def __init__(self):
+    if not 'RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+      LOG.info('Unloading HueRemoteUserMiddleware')
+      raise exceptions.MiddlewareNotUsed
