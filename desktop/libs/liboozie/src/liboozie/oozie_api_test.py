@@ -31,7 +31,6 @@ from liboozie.oozie_api import get_oozie
 from liboozie.conf import OOZIE_URL
 
 
-_oozie_running = False
 _oozie_lock = threading.Lock()
 
 LOG = logging.getLogger(__name__)
@@ -45,6 +44,7 @@ class OozieServerProvider(object):
   OOZIE_HOME = get_run_root('ext/oozie/oozie')
 
   requires_hadoop = True
+  is_oozie_running = False
 
   @classmethod
   def setup_class(cls):
@@ -109,11 +109,11 @@ class OozieServerProvider(object):
 
   @classmethod
   def _get_shared_oozie_server(cls):
-    global _oozie_running
     callback = lambda: None
 
     _oozie_lock.acquire()
-    if not _oozie_running:
+
+    if not OozieServerProvider.is_oozie_running:
       LOG.info('\nStarting a Mini Oozie. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
       LOG.info('See https://issues.cloudera.org/browse/HUE-861\n')
 
@@ -156,7 +156,8 @@ class OozieServerProvider(object):
       if not started:
         raise Exception("Oozie server took too long to come up.")
 
-      _oozie_running = True
+      OozieServerProvider.is_oozie_running = True
+
       def shutdown():
         for f in finish:
           f()

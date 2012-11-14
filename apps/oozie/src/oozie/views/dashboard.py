@@ -77,7 +77,10 @@ def show_oozie_error(view_func):
     try:
       return view_func(request, *args, **kwargs)
     except RestException, ex:
-      raise PopupException(_('Sorry, an error with Oozie happened.'), detail=ex._headers.get('oozie-error-message', ex))
+      detail = ex._headers.get('oozie-error-message', ex)
+      if 'urlopen error' in str(detail):
+        detail = '%s: %s' % (_('The Oozie server is not running'), detail)
+      raise PopupException(_('Sorry, an error with Oozie happened.'), detail=detail)
   return wraps(view_func)(decorate)
 
 

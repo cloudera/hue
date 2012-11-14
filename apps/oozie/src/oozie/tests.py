@@ -14,11 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 try:
   import json
 except ImportError:
   import simplejson as json
-import copy
 import logging
 import re
 
@@ -32,6 +32,7 @@ from desktop.lib.test_utils import grant_access, add_permission
 from jobsub.management.commands import jobsub_setup
 from jobsub.models import OozieDesign
 from liboozie import oozie_api
+from liboozie.conf import OOZIE_URL
 from liboozie.oozie_api_test import OozieServerProvider
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   CoordinatorList, WorkflowAction
@@ -1113,6 +1114,20 @@ class TestOozieSubmissions(OozieBase):
                            follow=True)
     job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
     assert_equal('SUCCEEDED', job.status)
+
+
+class TestDashboardNoMocking:
+
+  def test_oozie_not_running_message(self):
+    c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "oozie")
+
+    finish = OOZIE_URL.set_for_testing('http://not_localhost:11000/bad')
+    try:
+      response = c.get(reverse('oozie:list_oozie_workflows'))
+      assert_true('The Oozie server is not running' in response.content, response.content)
+    finally:
+      finish()
 
 
 class TestDashboard(OozieMockBase):

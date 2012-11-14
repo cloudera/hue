@@ -193,8 +193,10 @@ def _submit_workflow(request, workflow, mapping):
     History.objects.create_from_submission(submission)
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error submitting workflow %s") % (workflow,),
-                         detail=ex._headers.get('oozie-error-message', ex))
+    detail = ex._headers.get('oozie-error-message', ex)
+    if 'urlopen error' in str(detail):
+      detail = '%s: %s' % (_('The Oozie server is not running'), detail)
+    raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)
 
   request.info(_('Workflow submitted'))
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))

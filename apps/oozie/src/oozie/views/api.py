@@ -137,7 +137,7 @@ def update_workflow_nodes(workflow, json_nodes, id_map):
             setattr(node, key, json.dumps(json_node[key]))
         else:
           setattr(node, key, json_node[key])
-    
+
     node.workflow = workflow
     node.save()
 
@@ -176,7 +176,7 @@ def workflow_save(request, workflow):
   for json_node in json_nodes:
     child_links = json_node['child_links']
     Link.objects.filter(parent=nodes[index]).delete()
-    
+
     for child_link in child_links:
       link = Link()
       link.id = getattr(child_link, 'id', None)
@@ -209,7 +209,7 @@ def _workflow(request, workflow):
 
   for index in range(0, len(node_list)):
     nodes[index]['child_links'] = [model_to_dict(link) for link in node_list[index].get_all_children_links()]
-  
+
   workflow_dict['nodes'] = nodes
 
   response['status'] = 0

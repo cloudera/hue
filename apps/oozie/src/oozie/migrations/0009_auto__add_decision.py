@@ -5,22 +5,22 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'Decision'
         db.create_table('oozie_decision', (
             ('node_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['oozie.Node'], unique=True, primary_key=True)),
         ))
         db.send_create_signal('oozie', ['Decision'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'Decision'
         db.delete_table('oozie_decision')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -266,5 +266,5 @@ class Migration(SchemaMigration):
             'start': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'start_workflow'", 'blank': 'True', 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-    
+
     complete_apps = ['oozie']

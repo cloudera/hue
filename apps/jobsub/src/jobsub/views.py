@@ -275,8 +275,10 @@ def submit_design(request, design_id):
     submission = submit.Submission(design_obj, request.fs)
     jobid = submission.run()
   except RestException, ex:
-    raise PopupException(_("Error submitting design %(id)s") % {'id': design_id},
-                         detail=ex.message)
+    detail = ex.message
+    if 'urlopen error' in ex.message:
+      detail = '%s: %s' % (_('The Oozie server is not running'), detail)
+    raise PopupException(_("Error submitting design %(id)s") % {'id': design_id}, detail=detail)
   # Save the submission record
   job_record = models.JobHistory(owner=request.user,
                                  job_id=jobid,

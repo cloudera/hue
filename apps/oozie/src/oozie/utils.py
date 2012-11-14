@@ -38,7 +38,7 @@ def workflow_to_dict(workflow):
 
   for index, node in enumerate(node_list):
     nodes[index]['child_links'] = [model_to_dict(link) for link in node.get_all_children_links()]
-  
+
   workflow_dict['nodes'] = nodes
 
   return workflow_dict

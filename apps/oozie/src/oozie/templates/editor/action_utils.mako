@@ -186,7 +186,7 @@
 
     </form>
   </div>
-% if template: 
+% if template:
   </script>
 % endif
 </%def>
