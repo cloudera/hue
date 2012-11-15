@@ -287,6 +287,20 @@ ${layout.menubar(section='query')}
         firstColumnTooltip: true
       });
 
+      resizeLogs();
+
+      $(window).resize(function () {
+        resizeLogs();
+      });
+
+      $("a[href='#log']").on("shown", function () {
+        resizeLogs();
+      });
+
+      function resizeLogs() {
+        $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 40);
+      }
+
     });
 </script>
 

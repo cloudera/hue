@@ -521,6 +521,27 @@ def watch_query(request, id):
                 'query_context': query_context,
               })
 
+def watch_query_refresh_json(request, id):
+  query_history = authorized_get_history(request, id, must_exist=True)
+  handle, state = _get_query_handle_and_state(query_history)
+  query_history.save_state(state)
+
+  log = dbms.get(request.user, query_history.get_query_server()).get_log(handle)
+
+  jobs = _parse_out_hadoop_jobs(log)
+  job_urls = {}
+  for job in jobs:
+    job_urls[job] = urlresolvers.reverse('jobbrowser.views.single_job', kwargs=dict(jobid=job))
+
+
+  result = {
+    'log': log,
+    'jobs': jobs,
+    'jobUrls': job_urls,
+    'isSuccess': query_history.is_success(),
+    'isFailure': query_history.is_failure()
+  }
+  return HttpResponse(simplejson.dumps(result), mimetype="application/json")
 
 def view_results(request, id, first_row=0):
   """

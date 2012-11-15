@@ -24,8 +24,6 @@ from django.utils.translation import ugettext as _
 ${commonheader(_('Waiting for query...'), "beeswax", user, "100px")}
 ${layout.menubar(section='query')}
 
-<meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" />
-
 <div class="container-fluid">
 	<h1>${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
 	<div class="row-fluid">
@@ -37,14 +35,14 @@ ${layout.menubar(section='query')}
 			          mr_jobs = (n_jobs == 1) and _('MR Job') or _('MR Jobs')
 			        %>
 				 	% if n_jobs > 0:
-						<li class="nav-header">${mr_jobs} (${n_jobs})</li>
+						<li id="jobsHeader" class="nav-header">${mr_jobs} (${n_jobs})</li>
 
 						% for jobid in hadoop_jobs:
-						<li><a href="${url("jobbrowser.views.single_job", jobid=jobid)}">${jobid.replace("job_", "")}</a></li>
+						<li><a class="jobLink" href="${url("jobbrowser.views.single_job", jobid=jobid)}">${jobid.replace("job_", "")}</a></li>
 						% endfor
 					% else:
-						<li class="nav-header">${mr_jobs}</li>
-						<li>${_('No Hadoop jobs were launched in running this query.')}</li>
+						<li id="jobsHeader" class="nav-header">${mr_jobs}</li>
+						<li class="jobLink">${_('No Hadoop jobs were launched in running this query.')}</li>
 					% endif
 				</ul>
 			</div>
@@ -67,6 +65,65 @@ ${layout.menubar(section='query')}
 	</div>
 </div>
 
+<script>
+
+  $(document).ready(function(){
+    var fwdUrl = "${url('beeswax.views.watch_query', query.id)}?${fwd_params}";
+    var labels = {
+      MRJOB: "${_('MR Job')}",
+      MRJOBS: "${_('MR Jobs')}"
+    }
+
+    resizeLogs();
+    refreshView();
+    var logsAtEnd = true;
+
+    function refreshView() {
+      $.getJSON("${url('beeswax.views.watch_query_refresh_json', query.id)}", function (data) {
+        if (data.isSuccess || data.isFailure) {
+          location.href = fwdUrl;
+        }
+        if (data.jobs && data.jobs.length > 0) {
+          $(".jobLink").remove();
+          $("#jobsHeader").text((data.jobs.length > 1 ? labels.MRJOBS : labels.MRJOB) + " (" + data.jobs.length + ")");
+          for (var i = 0; i < data.jobs.length; i++) {
+            $("#jobsHeader").after($("<li>").addClass("jobLink").html("<a href=\"" + data.jobUrls[data.jobs[i]] + "\">" + data.jobs[i].replace("job_", "") + "</a>"));
+          }
+        }
+        var _logsEl = $("#log pre");
+        var newLines = data.log.split("\n").slice(_logsEl.text().split("\n").length);
+        _logsEl.text(_logsEl.text() + newLines.join("\n"));
+        if (logsAtEnd) {
+          _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
+        }
+        window.setTimeout(refreshView, 1000);
+      });
+    }
+
+    $(window).resize(function () {
+      resizeLogs();
+    });
+
+    $("a[href='#log']").on("shown", function () {
+      resizeLogs();
+    });
+
+    $("#log pre").scroll(function () {
+      if ($(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight) {
+        logsAtEnd = true;
+      }
+      else {
+        logsAtEnd = false;
+      }
+    });
+
+    function resizeLogs() {
+      $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 40);
+    }
+
+  });
+
+</script>
 
 
 ${commonfooter(messages)}
