@@ -16,42 +16,58 @@
 # limitations under the License.
 
 from nose.tools import assert_true, assert_false, assert_equal
-from nose.plugins.attrib import attr
 
 from django.contrib.auth.models import User
 from django.test.client import Client
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop.test_base import PseudoHdfsTestBase
-
-
-class TestLogin(object):
-  def test_non_jframe_login():
-    client = make_logged_in_client(username="test", password="test")
-    # Logout first
-    client.get('/accounts/logout')
-    # Login
-    response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
-    assert_equal(response.template, 'index.mako')
+from hadoop import pseudo_hdfs4
 
 
 class TestLoginWithHadoop(PseudoHdfsTestBase):
-  def test_jframe_login(self):
+
+  def setUp(self):
     # Simulate first login ever
     for user in User.objects.all():
       user.delete()
 
-    c = Client()
+    self.c = Client()
 
-    response = c.get('/accounts/login/')
+  def test_login(self):
+    response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true(response.context['first_login_ever'])
 
-    response = c.post('/accounts/login/',
-                      dict(username="foo",
-                           password="foo"))
+    response = self.c.post('/accounts/login/', dict(username="foo", password="foo"))
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_true(self.fs.exists("/user/foo"))
 
-    response = c.get('/accounts/login/')
+    response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
+
+  def test_login_home_creation_failure(self):
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true(response.context['first_login_ever'])
+
+    # Create home directory as a file in order to fail in the home creation later
+    cluster = pseudo_hdfs4.shared_cluster()
+    fs = cluster.fs
+    assert_false(cluster.fs.exists("/user/foo2"))
+    fs.do_as_superuser(fs.create, "/user/foo2")
+
+    response = self.c.post('/accounts/login/', dict(username="foo2", password="foo2"), follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true('/beeswax' in response.content, response.content)
+    # Custom login process should not do 'http-equiv="refresh"' but call the correct view
+    # 'Could not create home directory.' won't show up because the messages are consumed before
+
+
+def test_non_jframe_login():
+  client = make_logged_in_client(username="test", password="test")
+  # Logout first
+  client.get('/accounts/logout')
+  # Login
+  response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
+  assert_equal(response.template, 'index.mako')
