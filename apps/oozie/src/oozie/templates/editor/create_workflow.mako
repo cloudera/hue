@@ -73,8 +73,8 @@ ${ layout.menubar(section='workflows') }
       </div>
 
       <div class="form-actions center">
+        <input class="btn btn-primary" type="submit" value="${ _('Save') }" />
         <a class="btn" onclick="history.back()">${ _('Back') }</a>
-        <input class="btn btn-primary" type="submit" value="${ _('Save') }"></input>
       </div>
       </form>
     </div>

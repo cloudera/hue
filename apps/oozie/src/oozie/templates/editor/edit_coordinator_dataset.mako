@@ -62,6 +62,6 @@
 
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${ _('Close') }</a>
-    <button type="submit" class="btn btn-primary" id="edit-dataset-btn">${ _('Save') }</a>
+    <button type="submit" class="btn btn-primary" id="edit-dataset-btn">${ _('Save') }</button>
   </div>
 </form>

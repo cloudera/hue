@@ -342,10 +342,10 @@ ${ layout.menubar(section='coordinators') }
   </div>
 
   <div class="form-actions center">
-    <a href="${ url('oozie:list_coordinators') }" class="btn">${ _('Back') }</a>
     % if coordinator.is_editable(user):
       <input class="btn btn-primary" data-bind="click: submit" type="submit" value="${ _('Save') }"></input>
     % endif
+    <a href="${ url('oozie:list_coordinators') }" class="btn">${ _('Back') }</a>
   </div>
 
   </form>

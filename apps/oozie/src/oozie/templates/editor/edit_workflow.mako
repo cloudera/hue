@@ -145,8 +145,8 @@ ${ layout.menubar(section='workflows') }
           </div>
         </div>
         <div class="form-actions center">
-          <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
           <a data-bind="click: function() { save() }" href="javascript:void(0);" class="btn btn-primary">${ _('Save') }</a>
+          <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
         </div>
       </div>
 
@@ -199,10 +199,10 @@ ${ layout.menubar(section='workflows') }
            </div>
         </div>
         <div class="form-actions center">
-          <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
           % if user_can_edit_job:
             <button data-bind="click: function() { save() }" class="btn btn-primary">${ _('Save') }</button>
           % endif
+          <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
         </div>
         <div class="span3"></div>
       </div>

@@ -87,8 +87,8 @@ ${ layout.menubar(section='coordinators') }
     </div>
 
     <div class="form-actions center">
-      <a class="btn" onclick="history.back()">${ _('Back') }</a>
       <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
+      <a class="btn" onclick="history.back()">${ _('Back') }</a>
     </div>
 
   </form>
