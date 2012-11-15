@@ -16,6 +16,23 @@
 # limitations under the License.
 # Common functions for hudson build scripts
 
+if [ ! -e $HOME/.hue_cache ]; then
+  mkdir -p $HOME/.hue_cache
+fi;
+
+check_mtime() {
+  MTIME_FILE=${1}
+  MTIME=$( curl -Is ${2} | awk 'BEGIN {FS=":"} { if ($1 == "Last-Modified") { print substr($2,2) } }' )
+
+  if echo "${MTIME}" | diff ${MTIME_FILE} - > /dev/null; then
+    return 0
+  else
+    echo ${MTIME} > ${MTIME_FILE}
+    return 1
+  fi;
+}
+
+##########
 #
 # Use $CDH_URL to control where to download Hadoop.
 # If not specified, it uses the $CDH variable to select an archive location.
@@ -26,10 +43,10 @@ CDH_URL=${CDH_URL:-http://nightly.cloudera.com/cdh4/cdh/4/hadoop-2.0.0-cdh4.2.0-
 CDH_TGZ=$(basename $CDH_URL)
 CDH_VERSION=${CDH_TGZ/.tar.gz/}
 CDH_CACHE="$HOME/.hue_cache/${CDH_TGZ}"
+CDH_MTIME_FILE="$HOME/.hue_cache/.cdh_mtime"
 
 build_hadoop() {
-  if [ ! -f $CDH_CACHE ]; then
-    mkdir -p $HOME/.hue_cache
+  if ! check_mtime ${CDH_MTIME_FILE} ${CDH_URL} || [ ! -f $CDH_CACHE ]; then
     echo "Downloading $CDH_URL..."
     wget $CDH_URL -O $CDH_CACHE
   fi
@@ -52,10 +69,10 @@ MR1_TGZ=$(basename $MR1_URL)
 MR1_VERSION=${MR1_TGZ/.tar.gz/}
 MR1_VERSION=${MR1_VERSION/mr1/hadoop}
 MR1_CACHE="$HOME/.hue_cache/${MR1_TGZ}"
+MR1_MTIME_FILE="$HOME/.hue_cache/.mr1_mtime"
 
 build_mr1() {
-  if [ ! -f $MR1_CACHE ]; then
-    mkdir -p $HOME/.hue_cache
+  if ! check_mtime ${MR1_MTIME_FILE} ${MR1_URL} || [ ! -f $MR1_CACHE ]; then
     echo "Downloading $MR1_URL..."
     wget $MR1_URL -O $MR1_CACHE
   fi
@@ -77,10 +94,10 @@ HIVE_URL=${HIVE_URL:-http://nightly.cloudera.com/cdh4/cdh/4/hive-0.9.0-cdh4.2.0-
 HIVE_TGZ=$(basename $HIVE_URL)
 HIVE_VERSION=${HIVE_TGZ/.tar.gz/}
 HIVE_CACHE="$HOME/.hue_cache/${HIVE_TGZ}"
+HIVE_MTIME_FILE="$HOME/.hue_cache/.hive_mtime"
 
 build_hive() {
-  if [ ! -f $HIVE_CACHE ]; then
-    mkdir -p $HOME/.hue_cache
+  if ! check_mtime ${HIVE_MTIME_FILE} ${HIVE_URL} || [ ! -f $HIVE_CACHE ]; then
     echo "Downloading $HIVE_URL..."
     wget $HIVE_URL -O $HIVE_CACHE
   fi
@@ -101,10 +118,10 @@ OOZIE_URL=${OOZIE_URL:-http://nightly.cloudera.com/cdh4/cdh/4/oozie-3.2.0-cdh4.2
 OOZIE_TGZ=$(basename $OOZIE_URL)
 OOZIE_VERSION=${OOZIE_TGZ/.tar.gz/}
 OOZIE_CACHE="$HOME/.hue_cache/${OOZIE_TGZ}"
+OOZIE_MTIME_FILE="$HOME/.hue_cache/.oozie_mtime"
 
 build_oozie() {
-  if [ ! -f $OOZIE_CACHE ]; then
-    mkdir -p $HOME/.hue_cache
+  if ! check_mtime ${OOZIE_MTIME_FILE} ${OOZIE_URL} || [ ! -f $OOZIE_CACHE ]; then
     echo "Downloading $OOZIE_URL..."
     wget $OOZIE_URL -O $OOZIE_CACHE
   fi
