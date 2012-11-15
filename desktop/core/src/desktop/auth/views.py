@@ -24,6 +24,8 @@ from django.contrib.auth import login, get_backends
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
+from django.utils.translation import ugettext as _
+from hadoop.fs.exceptions import WebHdfsException
 from useradmin.views import ensure_home_directory
 
 from desktop.auth.backend import AllowFirstUserDjangoBackend
@@ -77,7 +79,11 @@ def dt_login(request):
         request.session.delete_test_cookie()
 
       if is_first_login_ever:
-        ensure_home_directory(request.fs, request.POST.get('username'))
+        try:
+          ensure_home_directory(request.fs, request.POST.get('username'))
+        except (IOError, WebHdfsException), e:
+          LOG.error(_('Could not create home directory.'), exc_info=e)
+          request.error(_('Could not create home directory.'))
 
       access_warn(request, '"%s" login ok' % (request.user.username,))
       return HttpResponseRedirect(redirect_to)

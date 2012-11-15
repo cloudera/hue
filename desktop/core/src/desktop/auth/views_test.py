@@ -24,7 +24,17 @@ from desktop.lib.django_test_util import make_logged_in_client
 from hadoop.test_base import PseudoHdfsTestBase
 
 
-class TestLogin(PseudoHdfsTestBase):
+class TestLogin(object):
+  def test_non_jframe_login():
+    client = make_logged_in_client(username="test", password="test")
+    # Logout first
+    client.get('/accounts/logout')
+    # Login
+    response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
+    assert_equal(response.template, 'index.mako')
+
+
+class TestLoginWithHadoop(PseudoHdfsTestBase):
   def test_jframe_login(self):
     # Simulate first login ever
     for user in User.objects.all():
@@ -45,12 +55,3 @@ class TestLogin(PseudoHdfsTestBase):
     response = c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
-
-
-def test_non_jframe_login():
-  client = make_logged_in_client(username="test", password="test")
-  # Logout first
-  client.get('/accounts/logout')
-  # Login
-  response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
-  assert_equal(response.template, 'index.mako')

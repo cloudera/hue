@@ -220,23 +220,25 @@ class Hdfs(object):
     path = url[i:]
     return (schema, netloc, normpath(path), '', '')
 
-  def exists(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
+  def create_home_dir(self, home_path=None):
+    if home_path is None:
+      home_path = self.get_home_dir()
 
-  def do_as_user(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'do_as_user'})
-
-  def create(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
-
-  def append(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'append'})
-
-  def mkdir(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'mkdir'})
-
-  def isdir(self):
-    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'isdir'})
+    if not self.exists(home_path):
+      user = self.user
+      try:
+        try:
+          self.setuser(self.superuser)
+          self.mkdir(home_path)
+          self.chmod(home_path, 0755)
+          self.chown(home_path, user, user)
+        except IOError:
+          msg = 'Failed to create home dir ("%s") as superuser %s' %\
+                (home_path, self.superuser)
+          LOG.exception(msg)
+          raise
+      finally:
+        self.setuser(user)
 
   def copyFromLocal(self, local_src, remote_dst, mode=0755):
     remote_dst = remote_dst.endswith(posixpath.sep) and remote_dst[:-1] or remote_dst
@@ -284,6 +286,24 @@ class Hdfs(object):
         src.close()
     else:
       LOG.info(_('Skipping %s (not a file)') % local_src)
+
+  def exists(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
+
+  def do_as_user(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'do_as_user'})
+
+  def create(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
+
+  def append(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'append'})
+
+  def mkdir(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'mkdir'})
+
+  def isdir(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'isdir'})
 
 
 """

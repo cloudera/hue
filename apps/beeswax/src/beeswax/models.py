@@ -313,7 +313,7 @@ class QueryHandle(object):
     self.log_context = log_context
 
   def is_valid(self):
-    return all([self.get()])
+    return sum([bool(obj) for obj in [self.get()]]) > 0
 
   def __str__(self):
     return '%s %s' % (self.secret, self.guid)
