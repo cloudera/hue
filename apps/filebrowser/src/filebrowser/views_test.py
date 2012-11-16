@@ -146,10 +146,12 @@ def test_mkdir_singledir():
     success_path = 'mkdir_singledir'
     path_absolute = '/mkdir_singledir'
     path_fail = 'fail/foo'
+    path_other_failure = 'fail#bar'
     prefix = '/tmp/test-filebrowser/'
     # Two of the following post requests should throw exceptions.
     # See https://issues.cloudera.org/browse/HUE-793.
     c.post('/filebrowser/mkdir', dict(path=prefix, name=path_fail))
+    c.post('/filebrowser/mkdir', dict(path=prefix, name=path_other_failure))
     c.post('/filebrowser/mkdir', dict(path=prefix, name=path_absolute))
     c.post('/filebrowser/mkdir', dict(path=prefix, name=success_path))
 
@@ -373,7 +375,7 @@ def test_listdir():
     orig_paths = [
       u'greek-Ελληνικά',
       u'chinese-漢語',
-      'listdir%20.,<>~`!@#$%^&()_-+="',
+      'listdir%20.,<>~`!@$%^&()_-+="',
     ]
 
     prefix = '/test-filebrowser/'

@@ -542,7 +542,7 @@ from django.utils.translation import ugettext as _
 
             $("*[rel='tooltip']").tooltip({ placement: "bottom" });
             if (window.location.hash != null && window.location.hash.length > 1){
-                viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + window.location.hash.substring(2));
+                viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(window.location.hash.substring(2)));
             }
             viewModel.retrieveData();
 
@@ -564,14 +564,14 @@ from django.utils.translation import ugettext as _
             $("#hueBreadcrumbText").keyup(function(e){
                 if (e.keyCode == 13) {
                     var _el = $(this);
-                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + _el.val().substring(1));
+                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(_el.val().substring(1)));
                     viewModel.getStats(function (data) {
                         if (data.type != null && data.type == "file") {
                             location.href = data.url;
                             return false;
                         }
                         else {
-                            window.location.hash = _el.val();
+                            window.location.hash = stripHashes(_el.val());
                         }
                     });
                 }
@@ -596,7 +596,7 @@ from django.utils.translation import ugettext as _
                 var target = "";
                 var hash = window.location.hash.substring(1);
                 if (hash != null && hash != "") {
-                    target = "${url('filebrowser.views.view', path=urlencode('/'))}" + hash.substring(1);
+                    target = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(hash.substring(1));
                 }
                 if (window.location.href.indexOf("#") == -1){
                     target = "${current_request_path}";
@@ -609,6 +609,9 @@ from django.utils.translation import ugettext as _
 
         });
 
+        function stripHashes(str) {
+          return str.replace(/#/gi, encodeURIComponent("#"));
+        }
 
         var Page = function (page) {
             if (page != null) {
@@ -656,7 +659,7 @@ from django.utils.translation import ugettext as _
                         // forcing root on empty breadcrumb url
                         this.url = "/";
                     }
-                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + this.url);
+                    viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(this.url));
                     window.location.hash = this.url;
                 }
             }
@@ -803,11 +806,11 @@ from django.utils.translation import ugettext as _
 
             self.viewFile = function (file) {
                 if (file.type == "dir") {
-                    self.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + "." + file.path);
-                    window.location.hash = file.path;
+                    self.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + "." + stripHashes(file.path));
+                    window.location.hash = stripHashes(file.path);
                 }
                 else {
-                    location.href = "${url('filebrowser.views.view', path=urlencode('/'))}" + file.path;
+                    location.href = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(file.path);
                 }
             };
 
