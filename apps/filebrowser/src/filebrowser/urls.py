@@ -27,6 +27,7 @@ urlpatterns = patterns('filebrowser.views',
   url(r'stat(?P<path>/.*)', 'stat', name='stat'),
   url(r'download(?P<path>/.*)', 'download', name='download'),
   url(r'status', 'status', name='status'),
+  url(r'home_relative_view(?P<path>/.*)', 'home_relative_view', name='home_relative_view'),
   # Catch-all for viewing a file (display) or a directory (listdir)
   url(r'view(?P<path>/.*)', 'view', name='view'),
   url(r'chooser(?P<path>/.*)', 'chooser', name='choose'),

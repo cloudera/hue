@@ -135,14 +135,7 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None):
   if hue_coord: Job.objects.is_accessible_or_exception(request, hue_coord.workflow.id)
   if hue_workflow: Job.objects.is_accessible_or_exception(request, hue_workflow.id)
 
-  # Add parameters from coordinator to workflow if possible
-  parameters = {}
-  if history and history.properties_dict:
-    parameters = history.properties_dict
-  elif hue_workflow is not None:
-    for param in hue_workflow.find_parameters():
-      if param in oozie_workflow.conf_dict:
-        parameters[param] = oozie_workflow.conf_dict[param]
+  parameters = oozie_workflow.conf_dict.copy()
 
   return render('dashboard/list_oozie_workflow.mako', request, {
     'history': history,

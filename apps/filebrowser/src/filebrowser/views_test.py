@@ -399,8 +399,7 @@ def test_listdir():
       resp = c.get(url)
 
       # We are actually reading a directory
-      assert_equal('..', resp.context['files'][0]['name'],
-                   "'%s' should be a directory" % (path,))
+      assert_equal('..', resp.context['files'][0]['name'], "'%s' should be a directory" % (path,))
 
     # Delete user's home if there's already something there
     if cluster.fs.isdir("/user/test"):
@@ -415,6 +414,11 @@ def test_listdir():
 
     response = c.get('/filebrowser/view/test-filebrowser/?default_to_home')
     assert_true(re.search('/user/test$', response['Location']))
+
+    # Test path relative to home directory
+    cluster.fs.mkdir('/user/test/test_dir')
+    response = c.get('/filebrowser/home_relative_view/test_dir')
+    assert_equal('/user/test/test_dir', response.context['path'])
 
   finally:
     try:

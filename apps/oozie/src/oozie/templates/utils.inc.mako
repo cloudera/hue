@@ -22,6 +22,7 @@
 
 
 <%!
+  import posixpath
   import time
 
   from django.template.defaultfilters import date, time as dtime
@@ -87,7 +88,11 @@
   % if url:
     <% path = Hdfs.urlsplit(url)[2] %>
     % if path:
-      <a href="/filebrowser/view${path}">${ url }</a>
+      % if path.startswith(posixpath.sep):
+        <a href="/filebrowser/view${path}">${ url }</a>
+      % else:
+        <a href="/filebrowser/home_relative_view/${path}">${ url }</a>
+      % endif
     % else:
       ${ url }
     % endif

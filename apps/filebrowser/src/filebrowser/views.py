@@ -34,10 +34,9 @@ try:
 except ImportError:
   import simplejson as json
 
-from django import forms
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
-from django.core import urlresolvers, serializers
+from django.core import urlresolvers
 from django.template.defaultfilters import stringformat, filesizeformat
 from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.views.decorators.http import require_http_methods
@@ -56,8 +55,7 @@ from desktop.lib.exceptions import PopupException
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
-from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm,\
-    RmDirForm, RmTreeForm, RemoveForm, ChmodForm, ChownForm, EditorForm, TouchForm,\
+from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
     RenameFormSet, RmTreeFormSet, ChmodFormSet,ChownFormSet
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
@@ -146,6 +144,14 @@ def view(request, path):
         if request.user.is_superuser and not request.user == request.fs.superuser:
             msg += _(' Note: you are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') % {'superuser': request.fs.superuser}
         raise PopupException(msg , detail=e)
+
+
+def home_relative_view(request, path):
+  home_dir_path = request.user.get_home_directory()
+  if request.fs.exists(home_dir_path):
+    path = '%s%s' % (home_dir_path, path)
+
+  return view(request, path)
 
 
 def edit(request, path, form=None):
