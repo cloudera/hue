@@ -26,39 +26,48 @@ ${layout.menubar(section='history')}
 % if error_msg:
 <h4>${error_msg}</h4>
 % endif
-<h1>${_('Save Query Results')}</h1>
-<form id="saveForm" action="${action}" method="POST" class="form form-inline">
-	<label class="radio">
-		<input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
-		&nbsp;${_('In a new table')}
-	</label>
-	${comps.field(form['target_table'], notitle=True, placeholder="Table Name")}
-	<br/>
-	<label class="radio">
-		<input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
-		&nbsp;${_('In an HDFS directory')}
-	</label>
-	${comps.field(form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
-  <br/>
-  <br/>
-  <div id="fileChooserModal" class="smallModal well hide">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-  </div>
-  <br/><br/>
-  <input type="submit" name="save" value="${_('Save')}" class="btn btn-primary"/>
-  <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
-</form>
+  <h1>${_('Save Query Results')}</h1>
+
+  <form id="saveForm" action="${action}" method="POST" class="form form-inline">
+    <fieldset>
+      <div class="control-group">
+        <div class="controls">
+          <label class="radio">
+            <input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
+            &nbsp;${_('In a new table')}
+          </label>
+          ${comps.field(form['target_table'], notitle=True, placeholder="Table Name")}
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="controls">
+          <label class="radio">
+            <input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
+            &nbsp;${_('In an HDFS directory')}
+          </label>
+          ${comps.field(form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
+        </div>
+      </div>
+      <div id="fileChooserModal" class="smallModal well hide">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+      </div>
+    </fieldset>
+    <div class="form-actions">
+      <input type="submit" name="save" value="${_('Save')}" class="btn btn-primary"/>
+      <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
+    </div>
+  </form>
 </div>
 
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     $("input[name='save_target']").change(function () {
-      $("#fieldRequired").addClass("hide");
-      $("input[name='target_dir']").removeClass("fieldError");
+      $(".errorlist").addClass("hide");
+      $(".control-group.error").removeClass("error");
       $("input[name='target_table']").removeClass("fieldError");
       if ($(this).val().indexOf("HDFS") > -1) {
-        $("input[name='target_table']").addClass("hide");
+        $("input[name='target_table']").addClass("hide").val("");
         $("input[name='target_dir']").removeClass("hide");
         $(".fileChooserBtn").removeClass("hide");
       }
@@ -70,20 +79,16 @@ ${layout.menubar(section='history')}
     });
 
     $("#saveForm").submit(function (e) {
-      if ($(e.originalEvent.explicitOriginalTarget).attr("name") == "cancel") {
-        return true;
-      }
       if ($("input[name='save_target']:checked").val().indexOf("HDFS") > -1) {
         if ($.trim($("input[name='target_dir']").val()) == "") {
-          $("#fieldRequired").removeClass("hide");
-          $("input[name='target_dir']").addClass("fieldError");
+          $("input[name='target_dir']").parents(".control-group").addClass("error");
+          $("input[name='target_dir']").parents(".control-group").find(".fileChooserBtn").addClass("btn-danger");
           return false;
         }
       }
       else {
         if ($.trim($("input[name='target_table']").val()) == "") {
-          $("#fieldRequired").removeClass("hide");
-          $("input[name='target_table']").addClass("fieldError");
+          $("input[name='target_table']").parents(".control-group").addClass("error");
           return false;
         }
       }
@@ -109,6 +114,8 @@ ${layout.menubar(section='history')}
           initialPath:$.trim(inputElement.val())
         });
         $("#fileChooserModal").slideDown();
+        $("input[name='target_dir']").parents(".control-group").removeClass("error");
+        $("input[name='target_dir']").parents(".control-group").find(".fileChooserBtn").removeClass("btn-danger");
       });
     }
   });
