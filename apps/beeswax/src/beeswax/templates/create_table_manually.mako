@@ -438,7 +438,7 @@ ${layout.menubar(section='tables')}
                 onFolderChoose: function(filePath){
                     $("input[name='"+_destination+"']").val(filePath);
                     $("#chooseFile").modal("hide");
-                }
+                },
                 createFolder: false,
                 selectFolder: true,
                 uploadFile: false
