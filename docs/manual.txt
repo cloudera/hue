@@ -89,10 +89,13 @@ Configure `$PREFIX` with the path where you want to install Hue by running:
   $ PREFIX=/usr/share make install
   $ cd /usr/share/hue
   $ sudo chmod 4750 apps/shell/src/shell/build/setuid
+  $ sudo chown root:$USER apps/shell/src/shell/build/setuid
 
 You can install Hue anywhere on your system, and run Hue as a non-root user.
 The Shell application needs root privileges to launch various sub-processes as
-the logged in users.
+the logged in users. `$USER` should be the group of the user running Hue (same as
+its username).
+
 It is a good practice to create a new user for Hue and either install Hue in
 that user's home directory, or in a directory within `/usr/share`.
 
