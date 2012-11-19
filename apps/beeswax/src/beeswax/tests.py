@@ -446,7 +446,7 @@ for x in sys.stdin:
       q = "SELECT foo+" + str(i + 1) + " FROM test WHERE foo < 2"
       LOG.info("Starting " + str(i) + ": " + q)
       response = _make_query(client, q)
-      response = wait_for_query_to_finish(client, response, max=(240.0*num_tasks))
+      response = wait_for_query_to_finish(client, response, max=(240.0 * num_tasks))
       lock.acquire()
       result_holder[i] = response
       lock.release()
@@ -1034,8 +1034,8 @@ for x in sys.stdin:
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
-    assert_true("<td>nada</td>" in resp.content)
-    assert_true("<td>sp ace</td>" in resp.content)
+    assert_true("nada</td>" in resp.content)
+    assert_true("sp ace</td>" in resp.content)
 
   def test_describe_view(self):
     resp = self.client.get('/beeswax/table/myview')

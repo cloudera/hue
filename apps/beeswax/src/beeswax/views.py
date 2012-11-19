@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
 import logging
 import re
 
@@ -24,7 +28,6 @@ from django.core import urlresolvers
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
-from django.utils import simplejson
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
@@ -541,7 +544,7 @@ def watch_query_refresh_json(request, id):
     'isSuccess': query_history.is_success(),
     'isFailure': query_history.is_failure()
   }
-  return HttpResponse(simplejson.dumps(result), mimetype="application/json")
+  return HttpResponse(json.dumps(result), mimetype="application/json")
 
 def view_results(request, id, first_row=0):
   """
@@ -836,7 +839,7 @@ def install_examples(request):
       LOG.exception(err)
       result['message'] = str(err)
 
-    return HttpResponse(simplejson.dumps(result), mimetype="application/json")
+    return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
 @login_notrequired
@@ -1062,9 +1065,9 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
   get_dict = QueryDict(None, mutable=True)
   # (1) context
   if design:
-    get_dict['context'] = make_query_context("design", design.id)
+    get_dict['context'] = make_query_context('design', design.id)
   elif tablename:
-    get_dict['context'] = make_query_context("table", tablename)
+    get_dict['context'] = make_query_context('table', tablename)
 
   # (2) on_success_url
   if on_success_url:

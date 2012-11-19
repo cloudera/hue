@@ -24,6 +24,9 @@ from django.utils.translation import ugettext as _
 ${commonheader(_('Waiting for query...'), "beeswax", user, "100px")}
 ${layout.menubar(section='query')}
 
+## Required for unit tests
+<!-- <meta http-equiv="refresh" content="3;${url('beeswax.views.watch_query', query.id)}?${fwd_params}" /> -->
+
 <div class="container-fluid">
 	<h1>${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
 	<div class="row-fluid">
