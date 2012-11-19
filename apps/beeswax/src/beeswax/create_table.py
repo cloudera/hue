@@ -61,20 +61,21 @@ def create_table(request):
     form.bind(request.POST)
     form.table.db = db  # curry is invalid
 
-    if form.is_valid():
-      columns = [ f.cleaned_data for f in form.columns.forms ]
-      partition_columns = [ f.cleaned_data for f in form.partitions.forms ]
-      proposed_query = django_mako.render_to_string("create_table_statement.mako",
-        {
-          'table': form.table.cleaned_data,
-          'columns': columns,
-          'partition_columns': partition_columns
-        }
-      )
-      # Mako outputs bytestring in utf8
-      proposed_query = proposed_query.decode('utf-8')
-      table_name = form.table.cleaned_data['name']
-      return _submit_create_and_load(request, proposed_query, table_name, None, False)
+    if request.POST.get('create'):
+      if form.is_valid():
+        columns = [ f.cleaned_data for f in form.columns.forms ]
+        partition_columns = [ f.cleaned_data for f in form.partitions.forms ]
+        proposed_query = django_mako.render_to_string("create_table_statement.mako",
+          {
+            'table': form.table.cleaned_data,
+            'columns': columns,
+            'partition_columns': partition_columns
+          }
+        )
+        # Mako outputs bytestring in utf8
+        proposed_query = proposed_query.decode('utf-8')
+        table_name = form.table.cleaned_data['name']
+        return _submit_create_and_load(request, proposed_query, table_name, None, False)
   else:
     form.bind()
 

@@ -836,6 +836,7 @@ for x in sys.stdin:
       'columns-0-_exists': 'True',
       'columns-next_form_id': '1',
       'partitions-next_form_id': '0',
+      'create': 'Create table',
     }, follow=True)
 
     assert_equal_mod_whitespace("""
@@ -878,6 +879,7 @@ for x in sys.stdin:
       'partitions-0-column_type': 'string',
       'partitions-0-_exists': 'True',
       'partitions-next_form_id': '1',
+      'create': 'Create table',
     }, follow=True)
 
     assert_equal_mod_whitespace("""
@@ -917,6 +919,7 @@ for x in sys.stdin:
       'columns-1-_exists': 'True',
       'columns-next_form_id': '2',
       'partitions-next_form_id': '0',
+      'create': 'Create table',
     })
 
     # All of these errors should have been triggered!
