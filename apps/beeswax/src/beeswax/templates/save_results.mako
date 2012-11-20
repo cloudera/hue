@@ -78,6 +78,8 @@ ${layout.menubar(section='history')}
       }
     });
 
+    $("input[name='save_target']").change();
+
     $("#saveForm").submit(function (e) {
       if ($("input[name='save_target']:checked").val().indexOf("HDFS") > -1) {
         if ($.trim($("input[name='target_dir']").val()) == "") {

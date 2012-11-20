@@ -196,6 +196,9 @@ for x in sys.stdin:
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     # Note that it may not return all rows at once. But we expect at least 10.
     assert_true(len(response.context['results']) > 10)
+    # Column names
+    assert_true("<td>foo</td>" in response.content)
+    assert_true("<td>bar</td>" in response.content)
     # This should NOT go into the query history.
     assert_equal(verify_history(self.client, fragment='test'), history_cnt,
                  'Implicit queries should not be saved in the history')

@@ -106,6 +106,9 @@ ${layout.menubar(section='query')}
         </a></li>
         <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
         <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
+        % if not error:
+        <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
+        % endif
       </ul>
 
       <div class="tab-content">
@@ -123,18 +126,18 @@ ${layout.menubar(section='query')}
             <thead>
             <tr>
               <th>&nbsp;</th>
-            % for col in columns:
+              % for col in columns:
                 <th>${col}</th>
-            % endfor
+              % endfor
             </tr>
             </thead>
             <tbody>
               % for i, row in enumerate(results):
               <tr>
                 <td>${start_row + i}</td>
-              % for item in row:
+                % for item in row:
                   <td>${ item }</td>
-              % endfor
+                % endfor
               </tr>
               % endfor
             </tbody>
@@ -151,12 +154,29 @@ ${layout.menubar(section='query')}
             </div>
             % endif
         </div>
+
         <div class="tab-pane" id="query">
           <pre>${query.query | h}</pre>
         </div>
+
         <div class="tab-pane" id="log">
           <pre>${log | h}</pre>
         </div>
+
+        % if not error:
+        <div class="tab-pane" id="columns">
+          <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+            <thead>
+              <tr><th>${_('Name')}</th></tr>
+            </thead>
+            <tbody>
+              % for col in columns:
+                <tr><td>${col}</td></tr>
+              % endfor
+            </tbody>
+          </table>
+        </div>
+        % endif
       </div>
 
 		</div>
@@ -164,7 +184,7 @@ ${layout.menubar(section='query')}
 </div>
 
 %if can_save:
-  <div id="saveAs" class="modal hide fade">
+<div id="saveAs" class="modal hide fade">
   <form id="saveForm" action="${url('beeswax.views.save_results', query.id) }" method="POST"
         class="form form-inline form-padding-fix">
     <div class="modal-header">
@@ -176,13 +196,13 @@ ${layout.menubar(section='query')}
         <input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
         &nbsp;${_('In a new table')}
       </label>
-    ${comps.field(save_form['target_table'], notitle=True, placeholder=_('Table Name'))}
+      ${comps.field(save_form['target_table'], notitle=True, placeholder=_('Table Name'))}
       <br/>
       <label class="radio">
         <input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
         &nbsp;${_('In an HDFS directory')}
       </label>
-    ${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
+      ${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
       <br/>
       <br/>
       <div id="fileChooserModal" class="smallModal well hide">
@@ -198,7 +218,7 @@ ${layout.menubar(section='query')}
       <input type="hidden" name="save" value="save"/>
     </div>
   </form>
-  </div>
+</div>
 %endif
 
 

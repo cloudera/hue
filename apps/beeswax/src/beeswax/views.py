@@ -679,7 +679,8 @@ def save_results(request, id):
         if form.cleaned_data['save_target'] == form.SAVE_TYPE_DIR:
           # To dir
           if result_meta.in_tablename:
-            raise PopupException(_('Saving results from a table to a directory is not supported. You may copy from the HDFS location manually.'))
+            raise PopupException(_('Saving results from a query with no MapReduce jobs is not supported. '
+                                   'You may copy manually from the HDFS location %(path)s.') % {'path': result_meta.table_dir})
           target_dir = form.cleaned_data['target_dir']
           request.fs.rename_star(result_meta.table_dir, target_dir)
           LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, target_dir))
