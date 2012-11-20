@@ -21,7 +21,6 @@ except ImportError:
   import simplejson as json
 import logging
 
-
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.forms.formsets import formset_factory
@@ -42,13 +41,15 @@ from oozie.conf import SHARE_JOBS
 from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
                              check_action_access_permission, check_action_edition_permission,\
                              check_dataset_access_permission, check_dataset_edition_permission
+from oozie.import_workflow import import_workflow as _import_workflow
 from oozie.import_jobsub import convert_jobsub_design
 from oozie.management.commands import oozie_setup
 from oozie.models import Job, Workflow, History, Coordinator,Mapreduce, Java, Streaming,\
                          Dataset, DataInput, DataOutput, ACTION_TYPES
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataInputSetForm, DataOutputForm, DataOutputSetForm, LinkForm,\
-  DefaultLinkForm, design_form_by_type, ImportJobsubDesignForm, ParameterForm
+  DefaultLinkForm, design_form_by_type, ImportJobsubDesignForm, ParameterForm,\
+  ImportWorkflowForm
 
 
 LOG = logging.getLogger(__name__)
@@ -580,3 +581,36 @@ def setup_app(request):
     raise PopupException(_('The app setup could complete.'), detail=e)
   return redirect(reverse('oozie:list_workflows'))
 
+
+def import_workflow(request):
+  workflow = Workflow.objects.new_workflow(request.user)
+
+  if request.method == 'POST':
+    workflow_form = ImportWorkflowForm(request.POST, instance=workflow)
+
+    if workflow_form.is_valid():
+      workflow.save()
+
+      workflow_definition = workflow_form.cleaned_data['definition']
+      schema_version = workflow_form.cleaned_data['schema_version']
+
+      try:
+        _import_workflow(workflow=workflow, workflow_definition=workflow_definition, schema_version=schema_version)
+        request.info(_('Workflow imported'))
+        return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
+
+      except Exception, e:
+        request.error(_('Could not import workflow: %s' % e))
+        Workflow.objects.destroy(workflow, request.fs)
+        raise PopupException(_('Could not import workflow.'), detail=e)
+
+    else:
+      request.error(_('Errors on the form: %s') % workflow_form.errors)
+
+  else:
+    workflow_form = ImportWorkflowForm(instance=workflow)
+
+  return render('editor/import_workflow.mako', request, {
+    'workflow_form': workflow_form,
+    'workflow': workflow,
+  })

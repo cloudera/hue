@@ -33,6 +33,7 @@ ${ layout.menubar(section='workflows') }
   <div class="well hueWell">
     <div class="btn-group pull-right">
       <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
+      <a href="${ url('oozie:import_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Import') }</a>
       % if currentuser.is_superuser:
         <a href="#installSamples" data-toggle="modal" class="btn"><i class="icon-download-alt"></i> ${ _('Setup Examples') }</a>
       % endif

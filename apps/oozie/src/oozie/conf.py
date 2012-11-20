@@ -23,6 +23,12 @@ from desktop.lib.conf import Config, coerce_bool
 from desktop.lib import paths
 
 
+DEFINITION_XSLT_DIR = Config(
+  key="definition_xslt_dir",
+  default=os.path.join(os.path.dirname(__file__), "xslt"),
+  help=_("Location on local FS where the xslt files are stored for workflow import."),
+  private=True)
+
 LOCAL_SAMPLE_DIR = Config(
   key="local_data_dir",
   default=os.path.join(os.path.dirname(__file__), "..", "..", "examples"),

@@ -41,6 +41,7 @@ from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES
 from oozie.conf import SHARE_JOBS
 from oozie.utils import workflow_to_dict, model_to_dict
+from oozie.import_workflow import import_workflow
 
 
 LOG = logging.getLogger(__name__)
@@ -130,6 +131,7 @@ class OozieMockBase(object):
 
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "oozie")
+    self.user = User.objects.get(username='test')
     self.wf = create_workflow(self.c)
 
 
@@ -773,6 +775,124 @@ class TestEditor(OozieMockBase):
 
     assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US,France'}],
                  coord.find_all_parameters())
+
+
+  def test_import_workflow_basic(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-basic.xml')
+    import_workflow(workflow, f.read(), schema_version=0.4)
+    f.close()
+    workflow.save()
+    assert_equal(2, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(1, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal('done', Node.objects.get(workflow=workflow, node_type='end').name)
+    workflow.delete()
+
+
+  def test_import_workflow_decision(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-decision.xml')
+    import_workflow(workflow, f.read(), schema_version=0.4)
+    f.close()
+    workflow.save()
+    assert_equal(11, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(19, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', comment='${1 gt 2}', name='start')))
+    assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', comment='', name='start')))
+    assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', name='default')))
+    assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', child__node_type='end', name='related')))
+    workflow.delete()
+
+
+  def test_import_workflow_distcp(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-distcp.0.1.xml')
+    import_workflow(workflow, f.read(), schema_version=0.4)
+    f.close()
+    workflow.save()
+    assert_equal(4, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal('[{"type":"arg","value":"-overwrite"},{"type":"arg","value":"-m"},{"type":"arg","value":"${MAP_NUMBER}"},{"type":"arg","value":"/user/hue/oozie/workspaces/data"},{"type":"arg","value":"${OUTPUT}"}]', Node.objects.get(workflow=workflow, node_type='distcp').get_full_node().params)
+    workflow.delete()
+
+
+  def test_import_workflow_forks(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-forks.xml')
+    import_workflow(workflow, f.read(), schema_version=0.4)
+    f.close()
+    workflow.save()
+    assert_equal(12, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(19, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal(6, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='fork')))
+    assert_equal(4, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='fork', name='start')))
+    assert_equal(2, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='fork', child__node_type='join', name='related')))
+    workflow.delete()
+
+
+  def test_import_workflow_mapreduce(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-mapreduce.xml')
+    import_workflow(workflow, f.read(), schema_version=0.4)
+    f.close()
+    workflow.save()
+    assert_equal(4, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal('[{"name":"mapred.reduce.tasks","value":"1"},{"name":"mapred.mapper.class","value":"org.apache.hadoop.examples.SleepJob"},{"name":"mapred.reducer.class","value":"org.apache.hadoop.examples.SleepJob"},{"name":"mapred.mapoutput.key.class","value":"org.apache.hadoop.io.IntWritable"},{"name":"mapred.mapoutput.value.class","value":"org.apache.hadoop.io.NullWritable"},{"name":"mapred.output.format.class","value":"org.apache.hadoop.mapred.lib.NullOutputFormat"},{"name":"mapred.input.format.class","value":"org.apache.hadoop.examples.SleepJob$SleepInputFormat"},{"name":"mapred.partitioner.class","value":"org.apache.hadoop.examples.SleepJob"},{"name":"mapred.speculative.execution","value":"false"},{"name":"sleep.job.map.sleep.time","value":"0"},{"name":"sleep.job.reduce.sleep.time","value":"1"}]', Node.objects.get(workflow=workflow, node_type='mapreduce').get_full_node().job_properties)
+    workflow.delete()
+
+
+  def test_import_workflow_pig(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-pig.xml')
+    import_workflow(workflow, f.read(), schema_version=0.4)
+    f.close()
+    workflow.save()
+    node = Node.objects.get(workflow=workflow, node_type='pig').get_full_node()
+    assert_equal(4, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal('aggregate.pig', node.script_path)
+    assert_equal('[{"type":"argument","value":"-param"},{"type":"argument","value":"INPUT=/user/hue/oozie/workspaces/data"},{"type":"argument","value":"-param"},{"type":"argument","value":"OUTPUT=${output}"}]', node.params)
+    workflow.delete()
+
+
+  def test_import_workflow_sqoop(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-sqoop.0.2.xml')
+    import_workflow(workflow, f.read(), schema_version=0.4)
+    f.close()
+    workflow.save()
+    assert_equal(4, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow)))
+    node = Node.objects.get(workflow=workflow, node_type='sqoop').get_full_node()
+    assert_equal('["db.hsqldb.properties#db.hsqldb.properties","db.hsqldb.script#db.hsqldb.script"]', node.files)
+    assert_equal('import --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir ${output} -m 1', node.script_path)
+    workflow.delete()
+
+
+  def test_import_workflow_java(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-java.xml')
+    import_workflow(workflow, f.read(), schema_version=0.4)
+    f.close()
+    workflow.save()
+    assert_equal(5, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(5, len(Link.objects.filter(parent__workflow=workflow)))
+    nodes = [Node.objects.filter(workflow=workflow, node_type='java')[0].get_full_node(),
+             Node.objects.filter(workflow=workflow, node_type='java')[1].get_full_node()]
+    assert_equal('org.apache.hadoop.examples.terasort.TeraGen', nodes[0].main_class)
+    assert_equal('["${records}","${output_dir}/teragen"]', nodes[0].args)
+    assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
+    assert_equal('["${output_dir}/teragen","${output_dir}/terasort"]', nodes[1].args)
+    workflow.delete()
 
 
 class TestPermissions(OozieBase):

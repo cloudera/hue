@@ -710,6 +710,20 @@ $.extend(DecisionModel.prototype, {
   child_links: []
 });
 
+var DistCPModel = ModelModule($);
+$.extend(DistCPModel.prototype, {
+  id: 0,
+  name: '',
+  description: '',
+  node_type: 'distcp',
+  workflow: 0,
+  job_properties: [],
+  prepares: [],
+  job_xml: '',
+  params: [],
+  child_links: []
+});
+
 var MapReduceModel = ModelModule($);
 $.extend(MapReduceModel.prototype, {
   id: 0,
@@ -841,20 +855,6 @@ $.extend(SshModel.prototype, {
   params: [],
   command: '',
   capture_output: false,
-  child_links: []
-});
-
-var DistCPModel = ModelModule($);
-$.extend(DistCPModel.prototype, {
-  id: 0,
-  name: '',
-  description: '',
-  node_type: 'distcp',
-  workflow: 0,
-  job_properties: [],
-  prepares: [],
-  job_xml: '',
-  params: [],
   child_links: []
 });
 
@@ -1888,6 +1888,9 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               break;
             }
 
+            if ('main_class' in temp) {
+              console.log(temp.main_class());
+            }
             self.registry.add(temp.id(), temp);
           });
         }

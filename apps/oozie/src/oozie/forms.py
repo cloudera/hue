@@ -63,6 +63,12 @@ class WorkflowForm(forms.ModelForm):
     super(WorkflowForm, self).__init__(*args, **kwargs)
 
 
+SCHEMA_VERSION_CHOICES = ['0.4']
+class ImportWorkflowForm(WorkflowForm):
+  definition = forms.CharField(widget=forms.Textarea())
+  schema_version = forms.ChoiceField(choices=[(version, version) for version in SCHEMA_VERSION_CHOICES])
+
+
 class ImportJobsubDesignForm(forms.Form):
   """Used for specifying what oozie actions to import"""
   def __init__(self, choices=[], *args, **kwargs):

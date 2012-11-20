@@ -989,6 +989,17 @@ class Fork(ControlFlow):
 
 
 class Decision(ControlFlow):
+  """
+  Essentially a fork where the end is not a join, but another node.
+  If two decisions share an end, the decision with the higher level takes the end 
+  and the lower level decision will not have an end.
+  IE:     D
+        D   N
+          E
+    The first 'D' will be assigned the end 'E'.
+    The second 'D' will not have an end.
+  This enables easier interpretation of visual hierarchy.
+  """
   node_type = 'decision'
 
   def get_child_end_or_none(self):
