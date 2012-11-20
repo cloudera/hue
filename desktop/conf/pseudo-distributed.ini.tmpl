@@ -471,6 +471,17 @@
         # You can configure environment variables for the HBase shell
         # in this section.
 
+    # Define and configure a new shell type "sqoop2"
+    # ------------------------------------------------------------------------
+    [[[ sqoop2 ]]]
+      nice_name = "Sqoop2 Shell"
+      command = "/usr/bin/sqoop2"
+      help = "The command-line Sqoop2 client."
+
+      [[[[ environment ]]]]
+        # You can configure environment variables for the Sqoop2 shell
+        # in this section.
+
     # Define and configure a new shell type "bash" for testing only
     # ------------------------------------------------------------------------
     [[[ bash ]]]

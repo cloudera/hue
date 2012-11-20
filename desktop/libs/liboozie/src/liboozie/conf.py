@@ -50,13 +50,13 @@ def config_validator():
 
   res = []
 
-  status = 'down'
-  try:
-    status = str(get_oozie().get_oozie_status())
-  except:
-    pass
-  if 'NORMAL' not in status:
-    res.append((status, _('The Oozie server is not available')))
+#  status = 'down'
+#  try:
+#    status = str(get_oozie().get_oozie_status())
+#  except:
+#    pass
+#  if 'NORMAL' not in status:
+#    res.append((status, _('The Oozie server is not available')))
 
 
   class ConfigMock:

@@ -15,15 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
+
 from desktop.lib.django_util import render
 from django.http import HttpResponse
 import logging
 import simplejson
-import shell.conf
 import shell.constants as constants
 import shell.utils as utils
 from shell.shellmanager import ShellManager
-import sys
+
 
 SHELL_OUTPUT_LOGGER = logging.getLogger("shell_output")
 SHELL_INPUT_LOGGER = logging.getLogger("shell_input")
@@ -110,6 +111,11 @@ def retrieve_output(request):
       log_args = (request.META.get('REMOTE_ADDR'), username, key,
                                         repr(value[constants.OUTPUT]))
       SHELL_OUTPUT_LOGGER.info(log_format % log_args)
+
+  for shell in result:
+    if 'output' in result[shell]:
+      result[shell]['output'] = remove_colors(result[shell]['output'])
+
   return HttpResponse(simplejson.dumps(result), mimetype="application/json")
 
 def add_to_output(request):
@@ -126,3 +132,6 @@ def add_to_output(request):
   result = shell_manager.add_to_output(username, hue_instance_id, shell_pairs)
   return HttpResponse(simplejson.dumps(result), mimetype="application/json")
 
+
+def remove_colors(text):
+  return re.sub('\x1b\[\d{0,3}(;\d{0,3})?m', '', text) # For Bash

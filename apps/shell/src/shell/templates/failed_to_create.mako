@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 ${commonheader(_('Hue Shell'), "shell", user)}
 <div class="container-fluid">
 <div>
-    ${_('Failed to create a shell of the given type. The possible reasons for this are:')}
+    <h3>${_('Failed to create a shell of the given type. The possible reasons for this are:')}</h3>
     <ol>
         <li>${_('The system is out of PTYs.')}</li>
         <li>${_('The system cannot create more subprocesses.')}</li>

@@ -1,24 +1,5 @@
 #!/usr/bin/env python
-# Licensed to Cloudera, Inc. under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  Cloudera, Inc. licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -52,7 +33,7 @@ import re
 import shell
 import shell.constants as constants
 import shell.utils as utils
-
+from shell.views import remove_colors
 
 class TestServer(threading.Thread):
   def run(self):
@@ -160,3 +141,9 @@ def test_parse_shell_pairs():
   else:
     assert False, "parse_shell_pairs did not throw an exception when trying to convert a malformed string to integer"
 
+def test_remove_colors():
+  text = '\x1b[0m\x1b[01;34mlogs\x1b[0m\nLICENSE.txt' # Bash
+  assert_equal('logs\nLICENSE.txt', remove_colors(text))
+
+  text = "\x1b[32mSqoop Shell:\x1b[m Type '\x1b[1mhelp\x1b[m' or '\x1b[1m\\h\x1b[m' for help.\n\n" # Sqoop2
+  assert_equal("Sqoop Shell: Type 'help' or '\\h' for help.\n\n", remove_colors(text))
