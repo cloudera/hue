@@ -114,7 +114,7 @@ class MockOozieApi:
     return '<xml></xml>'
 
 
-class OozieMockBase:
+class OozieMockBase(object):
 
   def setUp(self):
     # Beware: Monkey patch Oozie/LibOozie with Mock API
@@ -143,6 +143,7 @@ class OozieMockBase:
     """ Creates a linear workflow """
     Link.objects.filter(parent__workflow=self.wf).delete()
     Link(parent=self.wf.start, child=self.wf.end, name="related").save()
+
     action1 = add_node(self.wf, 'action-name-1', 'mapreduce', [self.wf.start], {
       'description': '',
       'files': '[]',
@@ -167,6 +168,7 @@ class OozieMockBase:
       'prepares': '[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]',
       'archives': '[]',
     })
+
     Link(parent=action3, child=self.wf.end, name="ok").save()
 
 
@@ -335,7 +337,7 @@ class TestAPI(OozieMockBase):
     assert_equal(0, test_response_json_object['status'])
 
 
-class TestAPIPermissionsWithOozie(OozieBase):
+class TestApiPermissionsWithOozie(OozieBase):
 
   def setUp(self):
     OozieBase.setUp(self)
@@ -417,9 +419,12 @@ class TestAPIPermissionsWithOozie(OozieBase):
 
 class TestEditor(OozieMockBase):
 
-  def test_find_parameters(self):
+  def setUp(self):
+    super(TestEditor, self).setUp()
     self.setup_simple_workflow()
 
+
+  def test_find_parameters(self):
     jobs = [Job(name="$a"),
             Job(name="foo ${b} $$"),
             Job(name="${foo}", description="xxx ${foo}")]
@@ -429,15 +434,11 @@ class TestEditor(OozieMockBase):
 
 
   def test_find_all_parameters(self):
-    self.setup_simple_workflow()
-
     assert_equal([{'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
                  self.wf.find_all_parameters())
 
 
   def test_workflow_has_cycle(self):
-    self.setup_simple_workflow()
-
     action1 = Node.objects.get(name='action-name-1')
     action3 = Node.objects.get(name='action-name-3')
 
@@ -451,8 +452,6 @@ class TestEditor(OozieMockBase):
 
 
   def test_workflow_gen_xml(self):
-    self.setup_simple_workflow()
-
     assert_equal(
         '<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.2">\n'
         '    <global>\n'
@@ -527,8 +526,6 @@ class TestEditor(OozieMockBase):
 
 
   def test_workflow_flatten_list(self):
-    self.setup_simple_workflow()
-
     assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
                  '<Kill: kill>, <End: end>]',
                  str(self.wf.node_list))
@@ -543,14 +540,10 @@ class TestEditor(OozieMockBase):
 
 
   def test_create_coordinator(self):
-    self.setup_simple_workflow()
-
     create_coordinator(self.wf, self.c)
 
 
   def test_clone_coordinator(self):
-    self.setup_simple_workflow()
-
     coord = create_coordinator(self.wf, self.c)
     coordinator_count = Coordinator.objects.count()
 
@@ -581,8 +574,6 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_workflow_access_permissions(self):
-    self.setup_simple_workflow()
-
     self.wf.is_shared = True
     self.wf.save()
 
@@ -629,8 +620,6 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_gen_xml(self):
-    self.setup_simple_workflow()
-
     coord = create_coordinator(self.wf, self.c)
 
     assert_equal(
@@ -653,8 +642,6 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_with_data_input_gen_xml(self):
-    self.setup_simple_workflow()
-
     coord = create_coordinator(self.wf, self.c)
     create_dataset(coord, self.c)
     create_coordinator_data(coord, self.c)
@@ -695,15 +682,11 @@ class TestEditor(OozieMockBase):
 
 
   def test_create_coordinator_dataset(self):
-    self.setup_simple_workflow()
-
     coord = create_coordinator(self.wf, self.c)
     create_dataset(coord, self.c)
 
 
   def test_create_coordinator_input_data(self):
-    self.setup_simple_workflow()
-
     coord = create_coordinator(self.wf, self.c)
     create_dataset(coord, self.c)
 
@@ -714,16 +697,30 @@ class TestEditor(OozieMockBase):
     self.c.post(reverse('oozie:setup_app'))
 
 
-  def test_get_workflow_parameters(self):
-    self.setup_simple_workflow()
+  def test_workflow_prepare(self):
+    action1 = Node.objects.get(name='action-name-1').get_full_node()
 
+    action1.prepares = json.dumps([
+                           {"type": "delete","value": "${output}"},
+                           {"type": "delete","value": "out"},
+                           {"type": "delete","value": "/user/test/out"},
+                           {"type": "delete","value": "hdfs://localhost:8020/user/test/out"}])
+    action1.save()
+
+    xml = self.wf.to_xml()
+
+    assert_true('<delete path="${nameNode}${output}"/>' in xml, xml)
+    assert_true(re.search(re.escape('<delete path="${nameNode}/user/${wf:user()}/out"/>'), xml, re.IGNORECASE), xml)
+    assert_true(re.search(re.escape('<delete path="${nameNode}/user/test/out"/>'), xml, re.IGNORECASE), xml)
+    assert_true(re.search(re.escape('<delete path="hdfs://localhost:8020/user/test/out"/>'), xml, re.IGNORECASE), xml)
+
+
+  def test_get_workflow_parameters(self):
     assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
                  self.wf.find_all_parameters())
 
 
   def test_get_coordinator_parameters(self):
-    self.setup_simple_workflow()
-
     coord = create_coordinator(self.wf, self.c)
 
     create_dataset(coord, self.c)

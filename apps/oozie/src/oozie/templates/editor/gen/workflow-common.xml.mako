@@ -26,7 +26,18 @@ import posixpath
         % if prepares:
             <prepare>
                 % for p in prepares:
-                <${ p['type'] } path="${'${'}nameNode}${ p['value'] }"/>
+                  <%
+                    # Same as Fs action convention. No change if path is just a parameter.
+                    operation = p['type']
+                    path = p['value']
+
+                    if not path.startswith('/') and not path.startswith('$') and not path.startswith('hdfs://'):
+                      path = '/user/%(username)s/%(path)s' % {'username': '${wf:user()}', 'path': path}
+
+                    path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
+                  %>
+
+                  <${ operation } path="${ path }"/>
                 % endfor
             </prepare>
         % endif
@@ -50,7 +61,7 @@ import posixpath
 <%def name="distributed_cache(files, archives)">
     % for f in files:
         % if len(f) != 0:
-            <file>${ f + '#' + posixpath.basename(f) }</file>
+            <file>${ filelink(f) }</file>
         % endif
     % endfor
     % for a in archives:
