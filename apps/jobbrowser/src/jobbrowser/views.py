@@ -230,6 +230,7 @@ def tasks(request, jobid):
     'request': request,
     'filter_params': filter_params,
     'jobid':jobid,
+    'jobid_short': get_shorter_id(jobid),
     'page': page,
     'tasktype': ttypes,
     'taskstate': tstates,
@@ -389,6 +390,10 @@ def make_substitutions(conf):
 
 ##################################
 ## Helper functions
+
+def get_shorter_id(hadoop_job_id):
+  return "_".join(hadoop_job_id.split("_")[-2:])
+
 
 def format_counter_name(s):
   """

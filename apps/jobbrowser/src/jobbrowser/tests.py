@@ -157,16 +157,17 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     oozie_jobid = response.context['jobid']
     OozieServerProvider.wait_until_completion(oozie_jobid, timeout=500, step=1)
     hadoop_job_id = get_hadoop_job_id(self.oozie, oozie_jobid, 1)
+    hadoop_job_id_short = views.get_shorter_id(hadoop_job_id)
 
     # Select only killed jobs (should be absent)
     # Taking advantage of the fact new jobs are at the top of the list!
     response = self.client.get('/jobbrowser/jobs/?state=killed')
-    assert_false(hadoop_job_id in response.content)
+    assert_false(hadoop_job_id_short in response.content)
 
     # Select only failed jobs (should be present)
     # Map job should succeed. Reduce job should fail.
     response = self.client.get('/jobbrowser/jobs/?state=failed')
-    assert_true(hadoop_job_id in response.content)
+    assert_true(hadoop_job_id_short in response.content)
 
     # The single job view should have the failed task table
     response = self.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))
@@ -187,8 +188,8 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     # Selecting by failed state should include the failed map
     response = self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=failed' % (hadoop_job_id,))
-    assert_true('_r_000000' in response.content)
-    assert_true('_m_000000' not in response.content)
+    assert_true('r_000000' in response.content)
+    assert_true('m_000000' not in response.content)
 
   def test_kill_job(self):
     """
@@ -219,7 +220,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     # Make sure that the first map task succeeds before moving on
     # This will keep us from hitting timing-related failures
-    first_mapper = hadoop_job_id.replace('job', 'task') + '_m_000000'
+    first_mapper = 'm_000000'
     start = time.time()
     timeout_sec = 60
     while first_mapper not in \
@@ -235,7 +236,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # It should say killed
     response = self.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))
     html = response.content.lower()
-    assert_true(hadoop_job_id in html)
+    assert_true(views.get_shorter_id(hadoop_job_id) in html)
     assert_true('killed' in html)
 
     # Exercise select by taskstate
@@ -292,35 +293,36 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     oozie_jobid = response.context['jobid']
     job = OozieServerProvider.wait_until_completion(oozie_jobid, timeout=120, step=1)
     hadoop_job_id = get_hadoop_job_id(self.oozie, oozie_jobid, 1)
+    hadoop_job_id_short = views.get_shorter_id(hadoop_job_id)
 
     # All jobs page and fetch job ID
     # Taking advantage of the fact new jobs are at the top of the list!
     response = self.client.get('/jobbrowser/jobs/')
-    assert_true(hadoop_job_id in response.content)
+    assert_true(hadoop_job_id_short in response.content)
 
     # Make sure job succeeded
     response = self.client.get('/jobbrowser/jobs/?state=completed')
-    assert_true(hadoop_job_id in response.content)
+    assert_true(hadoop_job_id_short in response.content)
     response = self.client.get('/jobbrowser/jobs/?state=failed')
-    assert_false(hadoop_job_id in response.content)
+    assert_false(hadoop_job_id_short in response.content)
     response = self.client.get('/jobbrowser/jobs/?state=running')
-    assert_false(hadoop_job_id in response.content)
+    assert_false(hadoop_job_id_short in response.content)
     response = self.client.get('/jobbrowser/jobs/?state=killed')
-    assert_false(hadoop_job_id in response.content)
+    assert_false(hadoop_job_id_short in response.content)
 
     # Check sharing permissions
     # Login as ourself
     finish = SHARE_JOBS.set_for_testing(True)
     try:
       response = self.client.get('/jobbrowser/jobs/?user=')
-      assert_true(hadoop_job_id in response.content)
+      assert_true(hadoop_job_id_short in response.content)
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = self.client.get('/jobbrowser/jobs/?user=')
-      assert_true(hadoop_job_id in response.content)
+      assert_true(hadoop_job_id_short in response.content)
     finally:
       finish()
 
@@ -331,14 +333,14 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     finish = SHARE_JOBS.set_for_testing(True)
     try:
       response = client_not_me.get('/jobbrowser/jobs/?user=')
-      assert_true(hadoop_job_id in response.content)
+      assert_true(hadoop_job_id_short in response.content)
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = client_not_me.get('/jobbrowser/jobs/?user=')
-      assert_false(hadoop_job_id in response.content)
+      assert_false(hadoop_job_id_short in response.content)
     finally:
       finish()
 

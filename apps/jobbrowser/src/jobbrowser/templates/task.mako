@@ -19,10 +19,10 @@
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId), "jobbrowser", user)}
+${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId_short), "jobbrowser", user)}
 
 <div class="container-fluid">
-    <h1>${_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId)}</h1>
+    <h1>${_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId_short)}</h1>
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">

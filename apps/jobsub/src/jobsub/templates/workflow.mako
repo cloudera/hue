@@ -128,7 +128,7 @@ ${layout.menubar(section='history')}
 
                 <td>
                 % if action.externalId:
-                  <a href="${ url('jobbrowser.views.single_job', jobid=action.externalId) }">${ action.externalId }</a>
+                  <a href="${ url('jobbrowser.views.single_job', jobid=action.externalId) }">${ "_".join(action.externalId.split("_")[-2:]) }</a>
                 % endif
                 </td>
 

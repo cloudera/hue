@@ -21,7 +21,7 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid), "jobbrowser", user)}
+${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid_short), "jobbrowser", user)}
 
 <%def name="selected(val, state)">
     %   if val is not None and state is not None and val in state:
@@ -29,7 +29,7 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid),
     %   endif
 </%def>
 <div class="container-fluid">
-    <h1>${_('Task View: Job: %(jobId)s') % dict(jobId=jobid)}</h1>
+    <h1>${_('Task View: Job: %(jobId)s') % dict(jobId=jobid_short)}</h1>
     <div class="well hueWell">
         <form method="get" action="/jobbrowser/jobs/${jobid}/tasks">
             <b>${_('Filter tasks:')}</b>

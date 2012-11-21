@@ -214,7 +214,7 @@ ${ layout.menubar(section='dashboard') }
                 <td><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></td>
                 <td>
                   % if action.externalId:
-                    <a href="${ url('jobbrowser.views.single_job', jobid=action.externalId) }">${ action.externalId }</a>
+                    <a href="${ url('jobbrowser.views.single_job', jobid=action.externalId) }">${ "_".join(action.externalId.split("_")[-2:]) }</a>
                   % endif
                 </td>
 

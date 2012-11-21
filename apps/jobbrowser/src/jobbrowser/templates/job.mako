@@ -83,16 +83,16 @@
         </tr>
     % endfor
 </%def>
-${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbrowser", user)}
+${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), "jobbrowser", user)}
 
 <div class="container-fluid">
-    <h1>${_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId)}</h1>
+    <h1>${_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short)}</h1>
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Job ID')}</li>
-                    <li>${job.jobId}</li>
+                    <li>${job.jobId_short}</li>
                     <li class="nav-header">${_('User')}</li>
                     <li>${job.user}</li>
                     <li class="nav-header">${_('Status')}</li>
@@ -192,7 +192,7 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId), "jobbr
                         <tbody>
                         <tr>
                             <td>${_('ID')}</td>
-                            <td>${job.jobId}</td>
+                            <td>${job.jobId_short}</td>
                         </tr>
                         <tr>
                             <td>${_('User')}</td>

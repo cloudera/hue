@@ -19,9 +19,9 @@
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId), "jobbrowser", user)}
+${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short), "jobbrowser", user)}
 <div class="container-fluid">
-    <h1>${_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId)}</h1>
+    <h1>${_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short)}</h1>
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
@@ -69,11 +69,11 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                         <tbody>
                         <tr>
                             <td>${_('Attempt ID')}</td>
-                            <td>${attempt.attemptId}</td>
+                            <td>${attempt.attemptId_short}</td>
                         </tr>
                         <tr>
                             <td>${_('Task ID')}</td>
-                            <td><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId}</a></td>
+                            <td><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId_short}</a></td>
                         </tr>
                         <tr>
                             <td>${_('Task Type')}</td>
@@ -81,7 +81,7 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                         </tr>
                         <tr>
                             <td>${_('JobId')}</td>
-                            <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId}</a></td>
+                            <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></td>
                         </tr>
                         <tr>
                             <td>${_('State')}</td>
