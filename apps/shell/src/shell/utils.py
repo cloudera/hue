@@ -58,6 +58,7 @@ def executable_exists(executable):
       return True
   return False
 
+
 class UserMetadata(object):
   """
   A simple class to encapsulate the metadata for a user.

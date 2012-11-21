@@ -89,9 +89,14 @@ class Shell(object):
 
     delegation_token_files = self._get_delegation_tokens(username, delegation_token_dir)
     if delegation_token_files:
-      merged_token_file = self._merge_delegation_tokens(delegation_token_files, delegation_token_dir)
-      delegation_token_files = [merged_token_file]
-      subprocess_env[constants.HADOOP_TOKEN_FILE_LOCATION] = merged_token_file.name
+      merged_token_file_path = self._merge_delegation_tokens(delegation_token_files, delegation_token_dir)
+      for path in delegation_token_files:
+        try:
+          os.unlink(path)
+        except:
+          LOG.warning("Could not remove delegation token file %s" % path)
+      delegation_token_files = [merged_token_file_path]
+      subprocess_env[constants.HADOOP_TOKEN_FILE_LOCATION] = merged_token_file_path
 
     try:
       LOG.debug("Starting subprocess with command '%s' and environment '%s'" %
@@ -135,17 +140,18 @@ class Shell(object):
     Use the Credentials Merger utility to combine the delegation token files into one delegation token file.
     Returns the NamedTemporaryFile that contains the combined delegation tokens.
     """
-    merged_token_file = tempfile.NamedTemporaryFile(dir=delegation_token_dir)
+    merged_token_file_no, merged_token_file_path = tempfile.mkstemp(dir=delegation_token_dir)
+    os.close(merged_token_file_no)
     merge_tool_args = [hadoop.conf.HDFS_CLUSTERS['default'].HADOOP_BIN.get(), 'jar']
-    merge_tool_args += [hadoop.conf.CREDENTIALS_MERGER_JAR.get(), merged_token_file.name]
-    merge_tool_args += [token_file.name for token_file in delegation_token_files]
+    merge_tool_args += [hadoop.conf.CREDENTIALS_MERGER_JAR.get(), merged_token_file_path]
+    merge_tool_args += delegation_token_files
     LOG.debug("Merging credentials files with command: '%s'" % (' '.join(merge_tool_args)))
     merge_process = subprocess.Popen(merge_tool_args, stderr=subprocess.PIPE, shell=False, close_fds=True)
     retcode = merge_process.wait()
     if retcode != 0:
       LOG.error("Failed to merge credentials :'%s'..." % (merge_process.stderr.readline(),))
       raise MergeToolException(_("bin/hadoop return non-zero %(retcode)d while trying to merge credentials.") % dict(retcode=(retcode,)))
-    return merged_token_file
+    return merged_token_file_path
 
   def _get_delegation_tokens(self, username, delegation_token_dir):
     """
@@ -166,10 +172,10 @@ class Shell(object):
         try:
           cluster.setuser(username)
           token = cluster.get_delegation_token(KERBEROS.HUE_PRINCIPAL.get())
-          token_file = tempfile.NamedTemporaryFile(dir=delegation_token_dir)
-          token_file.write(token)
-          token_file.flush()
-          delegation_token_files.append(token_file)
+          token_file_no, path = tempfile.mkstemp(dir=delegation_token_dir)
+          os.write(token_file_no, token)
+          os.close(token_file_no)
+          delegation_token_files.append(path)
         finally:
           cluster.setuser(current_user)
 
@@ -345,9 +351,13 @@ class Shell(object):
     """
     Clean up the resources used for this shell.
     """
+    for delegation_token_file in self._delegation_token_files:
+      try:
+        os.unlink(delegation_token_file)
+      except:
+        LOG.warning("Could not remove delegation token file %s" % delegation_token_file)
+
     try:
-      for delegation_token_file in self._delegation_token_files:
-        delegation_token_file.close()
       self._delegation_token_files = None
       self._write_buffer.close()
       self._read_buffer.close()
