@@ -35,12 +35,12 @@ USE_CHERRYPY_SERVER = Config(
 
 HTTP_HOST = Config(
   key="http_host",
-  help=_("HTTP Host to bind to."),
+  help=_("HTTP host to bind to."),
   type=str,
   default="0.0.0.0")
 HTTP_PORT = Config(
   key="http_port",
-  help=_("HTTP Port to bind to."),
+  help=_("HTTP port to bind to."),
   type=int,
   default=8888)
 SSL_CERTIFICATE = Config(
@@ -104,21 +104,21 @@ SMTP = ConfigSection(
 
     PORT = Config(
       key="port",
-      help=_("The SMTP server port"),
+      help=_("The SMTP server port."),
       type=int,
       default=25
     ),
 
     USER = Config(
       key="user",
-      help=_("The username for the SMTP host"),
+      help=_("The username for the SMTP host."),
       type=str,
       default=""
     ),
 
     PASSWORD = Config(
       key="password",
-      help=_("The password for the SMTP user"),
+      help=_("The password for the SMTP user."),
       type=str,
       default=""
     ),
@@ -158,25 +158,25 @@ DATABASE = ConfigSection(
     ),
     USER=Config(
       key='user',
-      help=_('Database username'),
+      help=_('Database username.'),
       type=str,
       default='',
     ),
     PASSWORD=Config(
       key='password',
-      help=_('Database password'),
+      help=_('Database password.'),
       type=str,
       default='',
     ),
     HOST=Config(
       key='host',
-      help=_('Database host'),
+      help=_('Database host.'),
       type=str,
       default='',
     ),
     PORT=Config(
       key='port',
-      help=_('Database port'),
+      help=_('Database port.'),
       type=int,
       default=0,
     ),
@@ -205,14 +205,14 @@ KERBEROS = ConfigSection(
       default=60*60), #1h
     CCACHE_PATH=Config(
       key='ccache_path',
-      help=_("Path to keep Kerberos credentials cached"),
+      help=_("Path to keep Kerberos credentials cached."),
       private=True,
       type=str,
       default="/tmp/hue_krb5_ccache",
     ),
     KINIT_PATH=Config(
       key='kinit_path',
-      help=_("Path to Kerberos 'kinit' command"),
+      help=_("Path to Kerberos 'kinit' command."),
       type=str,
       default="kinit", # use PATH!
     )
@@ -222,7 +222,7 @@ KERBEROS = ConfigSection(
 # See python's documentation for time.tzset for valid values.
 TIME_ZONE = Config(
   key="time_zone",
-  help=_("Time zone name"),
+  help=_("Time zone name."),
   type=str,
   default=os.environ.get("TZ", "America/Los_Angeles")
 )
@@ -236,12 +236,12 @@ DEFAULT_SITE_ENCODING = Config(
 
 SERVER_USER = Config(
   key="server_user",
-  help=_("Username to run servers as"),
+  help=_("Username to run servers as."),
   type=str,
   default="hue")
 SERVER_GROUP = Config(
   key="server_group",
-  help=_("Group to run servers as"),
+  help=_("Group to run servers as."),
   type=str,
   default="hue")
 
@@ -286,7 +286,7 @@ AUTH = ConfigSection(
 
 LDAP = ConfigSection(
   key="ldap",
-  help=_("Configuration options for LDAP connectivity"),
+  help=_("Configuration options for LDAP connectivity."),
   members=dict(
     BASE_DN=Config("base_dn",
                    default=None,
@@ -327,7 +327,7 @@ LDAP = ConfigSection(
 
     GROUPS = ConfigSection(
       key="groups",
-      help=_("Configuration for LDAP group schema and search"),
+      help=_("Configuration for LDAP group schema and search."),
       members=dict(
         GROUP_FILTER=Config("group_filter",
                            default="objectclass=*",
@@ -353,7 +353,7 @@ LOCAL_FILESYSTEMS = UnspecifiedConfigSection(
     members=dict(
       PATH=Config("path",
                   required=True,
-                  help=_("The path on the local FS.")))))
+                  help=_("The path on the local filesystem.")))))
 
 def default_feedback_url():
   """A version-specific URL."""
@@ -415,7 +415,7 @@ DJANGO_SERVER_EMAIL = Config(
 
 DJANGO_EMAIL_BACKEND = Config(
   key="django_email_backend",
-  help=_("The Email backend to use."),
+  help=_("The email backend to use."),
   type=str,
   default="django.core.mail.backends.smtp.EmailBackend"
 )

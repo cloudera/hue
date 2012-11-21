@@ -50,7 +50,7 @@ LOG = logging.getLogger(__name__)
 
 PATH_MAX = 512
 name_validator = RegexValidator(regex='[a-zA-Z_][\-_a-zA-Z0-9]{1,39}',
-                                message=_('Please enter a valid value: combination of 2 and 40 letters and digits starting by a letter'))
+                                message=_('Enter a valid value: combination of 2 and 40 letters and digits starting by a letter'))
 
 
 """
@@ -98,7 +98,7 @@ class Job(models.Model):
   name = models.CharField(max_length=40, blank=False, validators=[name_validator],
       help_text=_t('Name of the job, which must be unique per user.'), verbose_name=_t('Name'))
   description = models.CharField(max_length=1024, blank=True, verbose_name=_t('Description'),
-                                 help_text=_t('What is the purpose of the job.'))
+                                 help_text=_t('The purpose of the job.'))
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Last modified'))
   schema_version = models.CharField(max_length=128, verbose_name=_t('Schema version'),
                                     help_text=_t('The version of the XML schema used to talk to Oozie.'))
@@ -106,9 +106,9 @@ class Job(models.Model):
                                     help_text=_t('The path on the HDFS where all the workflows and '
                                                 'dependencies must be uploaded.'))
   is_shared = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is shared'),
-                                  help_text=_t('Check if you want to have some other users to have access to this job.'))
+                                  help_text=_t('Enable other users to have access to this job.'))
   parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Oozie parameters'),
-                                help_text=_t('Set some parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
+                                help_text=_t('Parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
 
   objects = JobManager()
   unique_together = ('owner', 'name')
@@ -227,8 +227,8 @@ class Workflow(Job):
   end  = models.ForeignKey('End', related_name='end_workflow',  blank=True, null=True)
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                                          'Properties specified in the configuration element override properties specified in the '
-                                          'files specified by any job-xml elements.'))
+                                          'Properties specified in the Job Properties element override properties specified in the '
+                                          'files specified in the Job XML element.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('Job configuration properties used by all the actions of the workflow '
                                                  '(e.g. mapred.job.queue.name=production)'))
@@ -286,7 +286,7 @@ class Workflow(Job):
         perms = 0711
       fs.copy_remote_dir(source_deployment_dir, copy.deployment_dir, owner=copy.owner, dir_mode=perms)
     except WebHdfsException, e:
-      msg = _('The copy of the deployment directory failed: %s') % e
+      msg = _('The copy of the deployment directory failed: %s.') % e
       LOG.error(msg)
       raise PopupException(msg)
 
@@ -437,9 +437,9 @@ class Node(models.Model):
   PARAM_FIELDS = ()
 
   name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name'),
-                          help_text=_t('Name of the action, it must be unique by workflow.'))
+                          help_text=_t('Name of the action, which must be unique by workflow.'))
   description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
-                                 help_text=_t('What is the purpose of this action.'))
+                                 help_text=_t('The purpose of the action.'))
   node_type = models.CharField(max_length=64, blank=False, verbose_name=_t('Type'),
                                help_text=_t('The type of action (e.g. MapReduce, Pig...)'))
   workflow = models.ForeignKey(Workflow)
@@ -596,14 +596,14 @@ class Mapreduce(Action):
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   jar_path = models.CharField(max_length=PATH_MAX, verbose_name=_t('Jar name'),
-                              help_text=_t('Name or path to the %(program)s jar file on HDFS. e.g. examples.jar') % {'program': 'MapReduce'})
+                              help_text=_t('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': 'MapReduce'})
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
-                                           'This should be used exclusively for directory cleanup'))
+                              help_text=_t('List of absolute paths to delete and then to create before starting the application. '
+                                           'This should be used exclusively for directory cleanup.'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                                          'Properties specified in the configuration element override properties specified in the '
-                                          'files specified by any job-xml elements.'))
+                                          'Properties specified in the Job Properties element override properties specified in the '
+                                          'files specified in the Job XML element.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -627,11 +627,11 @@ class Streaming(Action):
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
-                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   mapper = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Mapper'),
-                            help_text=_t('The mapper element is used to specify the executable/script to be used as mapper.'))
+                            help_text=_t('The executable/script to be used as mapper.'))
   reducer = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Reducer'),
-                             help_text=_t('The reducer element is used to specify the executable/script to be used as reducer.'))
+                             help_text=_t('The executable/script to be used as reducer.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -653,25 +653,25 @@ class Java(Action):
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   jar_path = models.CharField(max_length=PATH_MAX, blank=False, verbose_name=_t('Jar name'),
-                              help_text=_t('Name or path to the %(program)s jar file on HDFS. e.g. examples.jar') % {'program': 'Java'})
+                              help_text=_t('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': 'Java'})
   main_class = models.CharField(max_length=256, blank=False, verbose_name=_t('Main class'),
-                                help_text=_t('Full name of the Java class. e.g. org.apache.hadoop.examples.Grep'))
+                                help_text=_t('Full name of the Java class. E.g. org.apache.hadoop.examples.Grep'))
   args = models.CharField(max_length=4096, blank=True, verbose_name=_t('Arguments'),
                           help_text=_t('Arguments of the main method. The value of each arg element is considered a single argument '
                                        'and they are passed to the main method in the same order.'))
   java_opts = models.CharField(max_length=256, blank=True, verbose_name=_t('Java options'),
-                               help_text=_t('Command line parameters which are to be used to start the JVM that will execute '
+                               help_text=_t('Command-line parameters used to start the JVM that will execute '
                                             'the Java application. Using this element is equivalent to use the mapred.child.java.opts '
-                                            'configuration property'))
+                                            'configuration property.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
-                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
-                                           'This should be used exclusively for directory cleanup'))
+                              help_text=_t('List of absolute paths to delete and then to create before starting the application. '
+                                           'This should be used exclusively for directory cleanup.'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                                          'Properties specified in the configuration element override properties specified in the '
-                                          'files specified by any job-xml elements.'))
+                                          'Properties specified in the Job Properties element override properties specified in the '
+                                          'files specified in the Job XML element.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -691,7 +691,7 @@ class Pig(Action):
   node_type = 'pig'
 
   script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script name'),
-                                 help_text=_t('Script name or path to the Pig script. e.g. my_script.pig'))
+                                 help_text=_t('Script name or path to the Pig script. E.g. my_script.pig.'))
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
                             help_text=_t('The Pig parameters of the script. e.g. "-param", "INPUT=${inputDir}"'))
   files = models.TextField(default="[]", verbose_name=_t('Files'),
@@ -699,14 +699,14 @@ class Pig(Action):
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
-                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
-                                           'This should be used exclusively for directory cleanup'))
+                              help_text=_t('List of absolute paths to delete and then to create before starting the application. '
+                                           'This should be used exclusively for directory cleanup.'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                                          'Properties specified in the configuration element override properties specified in the '
-                                          'files specified by any job-xml elements.'))
+                                          'Properties specified in the Job Properties element override properties specified in the '
+                                          'files specified in the Job XML element.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -729,23 +729,23 @@ class Hive(Action):
   node_type = 'hive'
 
   script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script name'),
-                                 help_text=_t('Script name or path to the %(type)s script. e.g. my_script.sql') % {'type': node_type.title()})
+                                 help_text=_t('Script name or path to the %(type)s script. E.g. my_script.sql.') % {'type': node_type.title()})
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
-                            help_text=_t('The %(type)s parameters of the script. e.g. "-param", "INPUT=${inputDir}"')  % {'type': node_type.title()})
+                            help_text=_t('The %(type)s parameters of the script. E.g. "-param", "INPUT=${inputDir}"')  % {'type': node_type.title()})
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[{"name":"oozie.hive.defaults","value":"hive-default.xml"}]',
                                     verbose_name=_t('Hadoop job properties'),
-                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete then to create before starting the application. '
-                                           'This should be used exclusively for directory cleanup'))
+                                           'This should be used exclusively for directory cleanup.'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                                          'Properties specified in the configuration element override properties specified in the '
-                                          'files specified by any job-xml elements.'))
+                                          'Properties specified in the Job Properties element override properties specified in the '
+                                          'files specified in the Job XML element.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -779,14 +779,14 @@ class Sqoop(Action):
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[]',
                                     verbose_name=_t('Hadoop job properties'),
-                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete then to create before starting the application. '
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                                          'Properties specified in the configuration element override properties specified in the '
-                                          'files specified by any job-xml elements.'))
+                                          'Properties specified in the Job Properties element override properties specified in the '
+                                          'files specified in the Job XML element.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)
@@ -817,8 +817,8 @@ class Ssh(Action):
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
                             help_text=_t('The arguments of the %(type)s command')  % {'type': node_type.title()})
   capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
-                              help_text=_t('Capture output of the STDOUT of the %(program)s command execution. The %(program)s '
-                                           'command output must be in Java Properties file format and it must not exceed 2KB. '
+                              help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
+                                           'command output must be in Java properties file format and it must not exceed 2KB. '
                                            'From within the workflow definition, the output of an %(program)s action node is accessible '
                                            'via the String action:output(String node, String key) function') % {'program': node_type.title()})
 
@@ -839,16 +839,16 @@ class Shell(Action):
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
-                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
+                                    help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete then to create before starting the application. '
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                                          'Properties specified in the configuration element override properties specified in the '
-                                          'files specified by any job-xml elements.'))
+                                          'Properties specified in the Job Properties element override properties specified in the '
+                                          'files specified in the Job XML element.'))
   capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
-                              help_text=_t('Capture output of the STDOUT of the %(program)s command execution. The %(program)s '
+                              help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
                                            'command output must be in Java Properties file format and it must not exceed 2KB. '
                                            'From within the workflow definition, the output of an %(program)s action node is accessible '
                                            'via the String action:output(String node, String key) function') % {'program': node_type.title()})
@@ -874,7 +874,7 @@ class DistCp(Action):
   node_type = 'distcp'
 
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
-                            help_text=_t('The arguments of the %(type)s command. Put options first then source paths then destination path.')
+                            help_text=_t('The arguments of the %(type)s command. Put options first, then source paths, then destination path.')
                                         % {'type': node_type.title()})
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production'))
@@ -883,8 +883,8 @@ class DistCp(Action):
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                                          'Properties specified in the configuration element override properties specified in the '
-                                          'files specified by any job-xml elements.'))
+                                          'Properties specified in the Job Properteis element override properties specified in the '
+                                          'files specified in the Job XML element.'))
 
 
   def get_properties(self):
@@ -1037,37 +1037,35 @@ class Coordinator(Job):
   http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/CoordinatorFunctionalSpec.html
   """
   frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
-                                              help_text=_t('It represents the number of units of the rate at which '
+                                              help_text=_t('The number of units of the rate at which '
                                                            'data is periodically created.'))
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
-                                    help_text=_t('It represents the unit of the rate at which data is periodically created.'))
+                                    help_text=_t('The unit of the rate at which data is periodically created.'))
   timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
-                              help_text=_t('The timezone of the Coordinator.'))
+                              help_text=_t('The timezone of the coordinator.'))
   start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
-                               help_text=_t('When we need to start the first workflow.'))
+                               help_text=_t('When to start the first workflow.'))
   end = models.DateTimeField(default=datetime.today() + timedelta(days=3), verbose_name=_t('End'),
-                             help_text=_t('When we need to start the last workflow.'))
+                             help_text=_t('When to start the last workflow.'))
   workflow = models.ForeignKey(Workflow, null=True, verbose_name=_t('Workflow'),
-                               help_text=_t('The corresponding workflow we want to schedule repeatedly.'))
+                               help_text=_t('The workflow to schedule repeatedly.'))
   timeout = models.SmallIntegerField(null=True, blank=True, verbose_name=_t('Timeout'),
-                                     help_text=_t('Timeout for its coordinator actions, in minutes. This is how long '
-                                                  'the coordinator action will be in '
+                                     help_text=_t('How long in minutes the coordinator action will be in '
                                                   'WAITING or READY status before giving up on its execution.'))
   concurrency = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Concurrency'),
-                                 help_text=_t('Concurrency for its coordinator actions, this is, how many coordinator actions are '
-                                              'allowed to run concurrently ( RUNNING status) before the coordinator engine '
-                                              'starts throttling them.'))
+                                 help_text=_t('How many coordinator actions are allowed to run concurrently (RUNNING status) '
+                                              'before the coordinator engine starts throttling them.'))
   execution = models.CharField(max_length=10, null=True, blank=True, verbose_name=_t('Execution'),
                                choices=(('FIFO', _t('FIFO (oldest first) default')),
                                         ('LIFO', _t('LIFO (newest first)')),
-                                        ('LAST_ONLY', _t('LAST_ONLY (discards all older materializations)'))),
+                                        ('LAST ONLY', _t('LAST_ONLY (discards all older materializations)'))),
                                  help_text=_t('Execution strategy of its coordinator actions when there is backlog of coordinator '
                                               'actions in the coordinator engine. The different execution strategies are \'oldest first\', '
                                               '\'newest first\' and \'last one only\'. A backlog normally happens because of delayed '
                                               'input data, concurrency control or because manual re-runs of coordinator jobs.'))
   throttle = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Throttle'),
-                                 help_text=_t('The materialization or creation throttle value for its coordinator actions, this is, '
-                                              'how many maximum coordinator actions are allowed to be in WAITING state concurrently.'))
+                                 help_text=_t('The materialization or creation throttle value for its coordinator actions. '
+                                              'How many maximum coordinator actions are allowed to be in WAITING state concurrently.'))
   HUE_ID = 'hue-id-c'
 
   def get_type(self):
@@ -1188,24 +1186,24 @@ class Dataset(models.Model):
   name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name'),
                           help_text=_t('The name of the dataset.)'))
   description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
-                                 help_text=_t('More details about the dataset.'))
+                                 help_text=_t('A description of the dataset.'))
   start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
-                               help_text=_t(' The UTC datetime of the initial instance of the dataset. The initial-instance also provides '
+                               help_text=_t(' The UTC datetime of the initial instance of the dataset. The initial instance also provides '
                                             'the baseline datetime to compute instances of the dataset using multiples of the frequency.'))
   frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
-                                              help_text=_t('It represents the number of units of the rate at which '
+                                              help_text=_t('The number of units of the rate at which '
                                                            'data is periodically created.'))
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
-                                    help_text=_t('It represents the unit of the rate at which data is periodically created.'))
+                                    help_text=_t('The unit of the rate at which data is periodically created.'))
   uri = models.CharField(max_length=1024, default='/data/${YEAR}${MONTH}${DAY}', verbose_name=_t('URI'),
                          help_text=_t('The URI template that identifies the dataset and can be resolved into concrete URIs to identify a particular '
                                       'dataset instance. The URI consist of constants (e.g. ${YEAR}/${MONTH}) and '
-                                      'configuration properties (e.g. Ex: ${YEAR}/${MONTH})'))
+                                      'configuration properties (e.g. /home/${USER}/projects/${PROJECT})'))
   timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
                               help_text=_t('The timezone of the dataset.'))
   done_flag = models.CharField(max_length=64, blank=True, default='', verbose_name=_t('Done flag'),
-                               help_text=_t(' The done file for the data set. If done-flag is not specified, then Oozie '
-                                            'configures Hadoop to create a _SUCCESS file in the output directory. If the done '
+                               help_text=_t('The done file for the data set. If Done flag is not specified, then Oozie '
+                                            'configures Hadoop to create a _SUCCESS file in the output directory. If Done '
                                             'flag is set to empty, then Coordinator looks for the existence of the directory itself.'))
   coordinator = models.ForeignKey(Coordinator, verbose_name=_t('Coordinator'),
                                   help_text=_t('The coordinator associated with this data.'))
@@ -1230,9 +1228,9 @@ class Dataset(models.Model):
 
 
 class DataInput(models.Model):
-  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name of an input variable in the workflow'),
-                          help_text=_t('The name of the variable of the workflow to automatically filled up.'))
-  dataset = models.OneToOneField(Dataset, verbose_name=_t('Pick the dataset representing format of the data input'),
+  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name of an input variable in the workflow.'),
+                          help_text=_t('The name of the variable of the workflow to automatically fill up.'))
+  dataset = models.OneToOneField(Dataset, verbose_name=_t('The dataset representing format of the data input.'),
                                  help_text=_t('The pattern of the input data we want to process.'))
   coordinator = models.ForeignKey(Coordinator)
 
@@ -1242,7 +1240,7 @@ class DataInput(models.Model):
 class DataOutput(models.Model):
   name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name of an output variable in the workflow'),
                           help_text=_t('The name of the variable of the workflow to automatically filled up.'))
-  dataset = models.OneToOneField(Dataset, verbose_name=_t('Pick the dataset representing the format of the data output'),
+  dataset = models.OneToOneField(Dataset, verbose_name=_t('The dataset representing the format of the data output.'),
                                  help_text=_t('The pattern of the output data we want to generate.'))
   coordinator = models.ForeignKey(Coordinator)
 

@@ -37,7 +37,7 @@ def hue_permission_required(action, app):
     @wraps(view_func)
     def decorated(request, *args, **kwargs):
       if not request.user.has_hue_permission(action, app):
-        raise PopupException(_("Permission denied (%(action)s/%(app)s)") % {'action': action, 'app': app})
+        raise PopupException(_("Permission denied (%(action)s/%(app)s).") % {'action': action, 'app': app})
       return view_func(request, *args, **kwargs)
     return decorated
   return decorator

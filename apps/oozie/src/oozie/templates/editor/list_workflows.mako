@@ -123,10 +123,10 @@ ${ layout.menubar(section='workflows') }
   <form id="installSamplesForm" action="${url('oozie:setup_app')}" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${ _('Setup the workspaces and examples?') }</h3>
+      <h3>${ _('Set up the workspaces and examples?') }</h3>
     </div>
     <div class="modal-body">
-      ${ _('Hue is going to re-create the workspaces and re-install the examples...') }
+      ${ _('Hue is going to re-create the workspaces and re-install the examples.') }
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>

@@ -90,7 +90,7 @@ BEESWAX_SERVER_BIN = Config(
 
 BEESWAX_SERVER_HEAPSIZE = Config(
   key="beeswax_server_heapsize",
-  help=_("Maximum Java heapsize (in megabytes) used by Beeswax Server.  " + \
+  help=_("Maximum Java heap size (in megabytes) used by Beeswax Server.  " + \
     "Note that the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh " + \
     "may override this setting."),
   default="1000")

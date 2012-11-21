@@ -26,19 +26,19 @@ from desktop.lib import paths
 LOCAL_SAMPLE_DIR = Config(
   key="local_data_dir",
   default=os.path.join(os.path.dirname(__file__), "..", "..", "examples"),
-  help=_("Location on local FS where the examples are stored"),
+  help=_("Location on local filesystem where the examples are stored."),
   private=True)
 
 LOCAL_SAMPLE_DATA_DIR = Config(
   key="sample_data_dir",
   default=paths.get_thirdparty_root("sample_data"),
-  help=_("Location on local FS where the data for the examples is stored"),
+  help=_("Location on local filesystem where the data for the examples is stored."),
   private=True)
 
 REMOTE_SAMPLE_DIR = Config(
   key="remote_data_dir",
   default="/user/hue/oozie/workspaces",
-  help=_("Location on HDFS where the oozie workflows are stored."))
+  help=_("Location on HDFS where the Oozie workflows are stored."))
 
 SHARE_JOBS = Config(
   key='share_jobs',
@@ -51,4 +51,4 @@ OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',
   default=100,
   type=int,
-  help=_('Maximum of Oozie workflows or coodinators to retrieve in one API call.'))
+  help=_('Maximum number of Oozie workflows or coodinators to retrieve in one API call.'))

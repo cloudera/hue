@@ -199,7 +199,7 @@ def load_libs():
   global DESKTOP_LIBS
 
   if DESKTOP_LIBS is not None:
-    raise Exception("load_apps already has been called!")
+    raise Exception("load_apps already has been called.")
   DESKTOP_LIBS = [ ]
 
   for lib in pkg_resources.iter_entry_points("desktop.sdk.lib"):
@@ -225,7 +225,7 @@ def load_apps():
   global DESKTOP_APPS
 
   if DESKTOP_APPS is not None:
-    raise Exception(_("load_apps has already been called!"))
+    raise Exception(_("load_apps has already been called."))
   DESKTOP_APPS = []
 
   for sdk_app in pkg_resources.iter_entry_points("desktop.sdk.application"):

@@ -141,7 +141,7 @@ def delete_workflow(request, workflow):
     raise PopupException(_('A POST request is required.'))
 
   Workflow.objects.destroy(workflow, request.fs)
-  request.info(_('Workflow deleted!'))
+  request.info(_('Workflow deleted.'))
 
   return redirect(reverse('oozie:list_workflows'))
 
@@ -205,7 +205,7 @@ def _submit_workflow(request, workflow, mapping):
 @check_job_access_permission()
 def schedule_workflow(request, workflow):
   if Coordinator.objects.filter(workflow=workflow).exists():
-    request.info(_('You already have some coordinators for this workflow. Please submit one or create a new one.'))
+    request.info(_('You already have some coordinators for this workflow. Submit one or create a new one.'))
     return list_coordinators(request, workflow_id=workflow.id)
   else:
     return create_coordinator(request, workflow=workflow.id)
@@ -317,7 +317,7 @@ def delete_coordinator(request, coordinator):
 
   coordinator.delete()
   Submission(request.user, coordinator, request.fs, {}).remove_deployment_dir()
-  request.info(_('Coordinator deleted!'))
+  request.info(_('Coordinator deleted.'))
 
   return redirect(reverse('oozie:list_coordinators'))
 
@@ -356,7 +356,7 @@ def edit_coordinator(request, coordinator):
       new_data_input_formset.save()
       new_data_output_formset.save()
 
-      request.info(_('Coordinator saved!'))
+      request.info(_('Coordinator saved.'))
       return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}))
   else:
     coordinator_form = CoordinatorForm(instance=coordinator, user=request.user)
@@ -489,7 +489,7 @@ def submit_coordinator(request, coordinator):
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       job_id = _submit_coordinator(request, coordinator, mapping)
 
-      request.info(_('Coordinator submitted'))
+      request.info(_('Coordinator submitted.'))
       return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
@@ -575,7 +575,7 @@ def setup_app(request):
     raise PopupException(_('A POST request is required.'))
   try:
     oozie_setup.Command().handle_noargs()
-    request.info(_('Workspaces and examples installed!'))
+    request.info(_('Workspaces and examples installed.'))
   except WebHdfsException, e:
     raise PopupException(_('The app setup could complete.'), detail=e)
   return redirect(reverse('oozie:list_workflows'))

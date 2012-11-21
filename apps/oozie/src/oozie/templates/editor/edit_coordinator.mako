@@ -122,7 +122,7 @@ ${ layout.menubar(section='coordinators') }
             <br/>
             <p>
               % if coordinator.workflow:
-                ${ _('The inputs and outputs of the workflow need to be mapped to some data.') }
+                ${ _('The inputs and outputs of the workflow must be mapped to some data.') }
                 ${ _('The data is represented by some datasets that can be created on the ') }
                 <a href="#" id="datasets-btn" class="btn">${ _('Datasets') }</a> ${ _('page') }.
               % endif
@@ -252,7 +252,7 @@ ${ layout.menubar(section='coordinators') }
                       <th>${ _('Description') }</th>
                       <th>${ _('Frequency') }</th>
                       <th>${ _('Start') }</th>
-                      <th>${ _('Uri') }</th>
+                      <th>${ _('URI') }</th>
                       <th>${ _('Timezone') }</th>
                       <th>${ _('Done flag') }</th>
                       % if coordinator.is_editable(user):
@@ -357,7 +357,7 @@ ${ layout.menubar(section='coordinators') }
         <button class="close" data-dismiss="modal">&times;</button>
         <h3>${ _('Create a dataset') }</h3>
         <hr/>
-        <div class="alert alert-warning"><b>${ _('Warning') }</b>: ${ _('Save your modifications before creating a new dataset!') }</div>
+        <div class="alert alert-warning"><b>${ _('Warning') }</b>: ${ _('Save your modifications before creating a new dataset.') }</div>
       </div>
 
       <div class="modal-body" id="add-dataset-body">

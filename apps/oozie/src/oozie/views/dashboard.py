@@ -60,7 +60,7 @@ Permissions checking happens by calling:
 
 def manage_oozie_jobs(request, job_id, action):
   if request.method != 'POST':
-    raise PopupException(_('Please use a POST request to manage an Oozie job.'))
+    raise PopupException(_('Use a POST request to manage an Oozie job.'))
 
   job = check_job_access_permission(request, job_id)
   check_job_edition_permission(job, request.user)
@@ -73,7 +73,7 @@ def manage_oozie_jobs(request, job_id, action):
     if 'notification' in request.POST:
       request.info(_(request.POST.get('notification')))
   except RestException, ex:
-    response['data'] = _("Error performing %s on Oozie job %s: %s") % (action, job_id, ex.message)
+    response['data'] = _("Error performing %s on Oozie job %s: %s.") % (action, job_id, ex.message)
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -86,7 +86,7 @@ def show_oozie_error(view_func):
       detail = ex._headers.get('oozie-error-message', ex)
       if 'urlopen error' in str(detail):
         detail = '%s: %s' % (_('The Oozie server is not running'), detail)
-      raise PopupException(_('Sorry, an error with Oozie happened.'), detail=detail)
+      raise PopupException(_('An error with Oozie occurred.'), detail=detail)
   return wraps(view_func)(decorate)
 
 
@@ -172,7 +172,7 @@ def list_oozie_workflow_action(request, action):
     action = get_oozie().get_action(action)
     workflow = check_job_access_permission(request, action.id.split('@')[0])
   except RestException, ex:
-    raise PopupException(_("Error accessing Oozie action %s") % (action,),
+    raise PopupException(_("Error accessing Oozie action %s.") % (action,),
                          detail=ex.message)
 
   return render('dashboard/list_oozie_workflow_action.mako', request, {
@@ -203,7 +203,7 @@ def rerun_oozie_job(request, job_id, app_path):
 
       _rerun_workflow(request, job_id, args, mapping)
 
-      request.info(_('Workflow re-running!'))
+      request.info(_('Workflow re-running.'))
       return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s %s' % (rerun_form.errors, params_form.errors)))
@@ -270,7 +270,7 @@ def check_job_access_permission(request, job_id):
     try:
       oozie_job = get_job(job_id)
     except RestException, ex:
-      raise PopupException(_("Error accessing Oozie job %s") % (job_id,),
+      raise PopupException(_("Error accessing Oozie job %s.") % (job_id,),
                            detail=ex._headers['oozie-error-message'])
 
   if request.user.is_superuser \
@@ -278,7 +278,7 @@ def check_job_access_permission(request, job_id):
       or has_dashboard_jobs_access(request.user):
     return oozie_job
   else:
-    message = _("Permission denied. %(username)s don't have the permissions to access job %(id)s") % \
+    message = _("Permission denied. %(username)s don't have the permissions to access job %(id)s.") % \
         {'username': request.user.username, 'id': oozie_job.id}
     access_warn(request, message)
     raise PopupException(message)
@@ -288,7 +288,7 @@ def check_job_edition_permission(oozie_job, user):
   if has_job_edition_permission(oozie_job, user):
     return oozie_job
   else:
-    message = _("Permission denied. %(username)s don't have the permissions to modify job %(id)s") % \
+    message = _("Permission denied. %(username)s don't have the permissions to modify job %(id)s.") % \
         {'username': user.username, 'id': oozie_job.id}
     raise PopupException(message)
 

@@ -163,7 +163,7 @@ ${layout.menubar(section='tables')}
                       )
                       )}
                       <span class="help-block">
-                          ${_('Enter the Java Classname of your SerDe.')} <em>${_('e.g.')}</em>, org.apache.hadoop.hive.contrib.serde2.RegexSerDe
+                          ${_('The Java class name of your SerDe.')} <em>${_('e.g.')}</em>, org.apache.hadoop.hive.contrib.serde2.RegexSerDe
                       </span>
                   </div>
               </div>
@@ -212,7 +212,7 @@ ${layout.menubar(section='tables')}
                       )}
                       <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
                       <span class="help-block">
-                          ${_('Java Class used to read data')}
+                          ${_('Java class used to read data')}
                       </span>
                   </div>
               </div>
@@ -225,7 +225,7 @@ ${layout.menubar(section='tables')}
                       )}
                       <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
                       <span class="help-block">
-                          ${_('Java Class used to write data')}
+                          ${_('Java class used to write data')}
                       </span>
                   </div>
               </div>

@@ -120,7 +120,7 @@ ${ layout.menubar(section='dashboard') }
           alt="${ _('Are you sure you want to kill workflow %s?') %  oozie_workflow.id }"
           href="javascript:void(0)"
           data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }"
-          data-message="${ _('The workflow was killed!') }"
+          data-message="${ _('The workflow was killed.') }"
           data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
             ${_('Kill')}
         </a>

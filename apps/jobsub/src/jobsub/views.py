@@ -56,7 +56,7 @@ def oozie_job(request, jobid):
   try:
     workflow = get_oozie().get_job(jobid)
     _check_permission(request, workflow.user,
-                      _("Access denied: view job %(id)s") % {'id': jobid},
+                      _("Access denied: view job %(id)s.") % {'id': jobid},
                       allow_root=True)
     # Accessing log and definition will trigger Oozie API calls
     log = workflow.log
@@ -203,7 +203,7 @@ def delete_design(request, design_id):
     try:
       design_obj = _get_design(design_id)
       _check_permission(request, design_obj.owner.username,
-                        _("Access denied: delete design %(id)s") % {'id': design_id},
+                        _("Access denied: delete design %(id)s.") % {'id': design_id},
                         allow_root=True)
       design_obj.root_action.delete()
       design_obj.delete()
@@ -219,7 +219,7 @@ def delete_design(request, design_id):
 def edit_design(request, design_id):
   design_obj = _get_design(design_id)
   _check_permission(request, design_obj.owner.username,
-                    _("Access denied: edit design %(id)s") % {'id': design_id})
+                    _("Access denied: edit design %(id)s.") % {'id': design_id})
 
   if request.method == 'POST':
     form = jobsub.forms.design_form_by_instance(design_obj, request.POST)
@@ -250,7 +250,7 @@ def get_design_params(request, design_id):
   """
   design_obj = _get_design(design_id)
   _check_permission(request, design_obj.owner.username,
-                    _("Access denied: design parameters %(id)s") % {'id': design_id})
+                    _("Access denied: design parameters %(id)s.") % {'id': design_id})
   params = design_obj.find_parameters()
   params_with_labels = dict((p, p.upper()) for p in params)
   return render('dont_care_for_ajax', request, { 'params': params_with_labels })
@@ -262,11 +262,11 @@ def submit_design(request, design_id):
   The POST data should contain parameter values.
   """
   if request.method != 'POST':
-    raise PopupException(_('Please use a POST request to submit a design.'))
+    raise PopupException(_('Use a POST request to submit a design.'))
 
   design_obj = _get_design(design_id)
   _check_permission(request, design_obj.owner.username,
-                    _("Access denied: submit design %(id)s") % {'id': design_id})
+                    _("Access denied: submit design %(id)s.") % {'id': design_id})
 
   # Expect the parameter mapping in the POST data
   design_obj.bind_parameters(request.POST)
@@ -278,7 +278,7 @@ def submit_design(request, design_id):
     detail = ex.message
     if 'urlopen error' in ex.message:
       detail = '%s: %s' % (_('The Oozie server is not running'), detail)
-    raise PopupException(_("Error submitting design %(id)s") % {'id': design_id}, detail=detail)
+    raise PopupException(_("Error submitting design %(id)s.") % {'id': design_id}, detail=detail)
   # Save the submission record
   job_record = models.JobHistory(owner=request.user,
                                  job_id=jobid,
@@ -292,7 +292,7 @@ def submit_design(request, design_id):
 def setup(request):
   """Installs jobsub examples."""
   if request.method != "POST":
-    raise PopupException(_('Please use a POST request to install the examples.'))
+    raise PopupException(_('Use a POST request to install the examples.'))
   try:
     # Warning: below will modify fs.user
     jobsub_setup.Command().handle_noargs()

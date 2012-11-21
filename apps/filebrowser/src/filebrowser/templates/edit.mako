@@ -70,11 +70,11 @@ ${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename
     </div>
     <div class="modal-body">
 		${edit.render_field(form["path"], notitle=True, klass="xlarge")}
-		<span class="help-block">${_("Please enter the location where you'd like to save the file.")}</span>
+		<span class="help-block">${_("Enter the location where you'd like to save the file.")}</span>
     </div>
     <div class="modal-footer">
         <div id="saveAsNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
-            <p><strong>${_('Sorry, name is required.')}</strong>
+            <p><strong>${_('Name is required.')}</strong>
         </div>
 		${edit.render_field(form["contents"], hidden=True)}
 		${edit.render_field(form["encoding"], hidden=True)}

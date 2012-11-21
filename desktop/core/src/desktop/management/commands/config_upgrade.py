@@ -57,7 +57,7 @@ class Command(BaseCommand):
       map_parts = map_parts.rstrip('/')
       map_parts = map_parts.split('/')
       if len(map_parts) != 2:
-        raise CommandError(_("Invalid mapping %(mapping)s in %(file)s") % {'mapping': mapping.strip(), 'file': mapping_file})
+        raise CommandError(_("Invalid mapping %(mapping)s in %(file)s.") % {'mapping': mapping.strip(), 'file': mapping_file})
       mappings.append(map_parts)
 
     config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))

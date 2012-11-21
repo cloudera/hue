@@ -144,7 +144,7 @@ class Shell(object):
     retcode = merge_process.wait()
     if retcode != 0:
       LOG.error("Failed to merge credentials :'%s'..." % (merge_process.stderr.readline(),))
-      raise MergeToolException(_("bin/hadoop return non-zero %(retcode)d while trying to merge credentials") % dict(retcode=(retcode,)))
+      raise MergeToolException(_("bin/hadoop return non-zero %(retcode)d while trying to merge credentials.") % dict(retcode=(retcode,)))
     return merged_token_file
 
   def _get_delegation_tokens(self, username, delegation_token_dir):

@@ -53,9 +53,9 @@ class Submission(object):
 
   def __str__(self):
     if self.oozie_id:
-      res = "Submission for job '%s'" % (self.oozie_id,)
+      res = "Submission for job '%s'." % (self.oozie_id,)
     else:
-      res = "Submission for job '%s' (id %s, owner %s)" % (self.job.name, self.job.id, self.user)
+      res = "Submission for job '%s' (id %s, owner %s)." % (self.job.name, self.job.id, self.user)
     if self.oozie_id:
       res += " -- " + self.oozie_id
     return res
@@ -114,7 +114,7 @@ class Submission(object):
     try:
       deployment_dir = self._create_deployment_dir()
     except Exception, ex:
-      msg = _("Failed to access deployment directory")
+      msg = _("Failed to access deployment directory.")
       LOG.exception(msg)
       raise PopupException(message=msg, detail=str(ex))
 
@@ -159,12 +159,12 @@ class Submission(object):
     try:
       statbuf = self.fs.stats(path)
       if not statbuf.isDir:
-        msg = _("Path is not a directory: %s") % (path,)
+        msg = _("Path is not a directory: %s.") % (path,)
         LOG.error(msg)
         raise Exception(msg)
     except IOError, ex:
       if ex.errno != errno.ENOENT:
-        msg = _("Error accessing directory '%s': %s") % (path, ex)
+        msg = _("Error accessing directory '%s': %s.") % (path, ex)
         LOG.exception(msg)
         raise IOError(ex.errno, msg)
 

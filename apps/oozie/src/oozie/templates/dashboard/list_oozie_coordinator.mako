@@ -166,7 +166,7 @@ ${ layout.menubar(section='dashboard') }
               <th>${ _('Missing Dependencies') }</th>
 
               <th>${ _('Created Time') }</th>
-              <th>${ _('Last modified Time') }</th>
+              <th>${ _('Last Modified Time') }</th>
 
               <th>${ _('Id') }</th>
               <th>${ _('External Id') }</th>

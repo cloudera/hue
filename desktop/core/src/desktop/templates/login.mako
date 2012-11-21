@@ -88,8 +88,8 @@ from django.utils.translation import ugettext as _
 		<div class="row">
 			<div class="span6 offset3">
 				<div class="alert alert-block">
-					<p>${_('Since this is your first time logging in, please pick any username and password. Be sure to remember these, as')}
-					 <strong>${_('they will become your superuser credentials for Hue')}</strong>.</p>
+					<p>${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
+					 <strong>${_('they will become your Hue superuser credentials.')}</strong>.</p>
 				</div>
 			</div>
 		</div>

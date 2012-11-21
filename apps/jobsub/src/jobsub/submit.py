@@ -45,7 +45,7 @@ class Submission(object):
     self._job_id = None       # The oozie workflow instance id
 
   def __unicode__(self):
-    res = _("Submission for job design '%(name)s' (id %(id)s, owner %(username)s)") % \
+    res = _("Submission for job design '%(name)s' (id %(id)s, owner %(username)s).") % \
         dict(name=self._design_obj.name, id=self._design_obj.id, username=self._username)
     if self.job_id:
       res += " -- " + self.job_id
@@ -69,7 +69,7 @@ class Submission(object):
     Returns the oozie job id if all goes well.
     """
     if self.job_id is not None:
-      raise Exception(_("Job design already submitted (Oozie job id %(id)s)") % dict(id=(self.job_id,)))
+      raise Exception(_("Job design already submitted (Oozie job id %(id)s).") % dict(id=(self.job_id,)))
 
     fs_defaultfs = self._fs.fs_defaultfs
     jobtracker = hadoop.cluster.get_cluster_addr_for_job_submission()
@@ -162,13 +162,13 @@ class Submission(object):
     try:
       statbuf = self._fs.stats(path)
       if not statbuf.isDir:
-        msg = "Workflow deployment path is not a directory: %s" % (path,)
+        msg = "Workflow deployment path is not a directory: %s." % (path,)
         LOG.error(msg)
         raise Exception(msg)
       return path
     except IOError, ex:
       if ex.errno != errno.ENOENT:
-        msg = "Error accessing workflow directory '%s': %s" % (path, ex)
+        msg = "Error accessing workflow directory '%s': %s." % (path, ex)
         LOG.exception(msg)
         raise IOError(ex.errno, msg)
       self._create_deployment_dir(path)
@@ -208,7 +208,7 @@ class Submission(object):
     """Return the workflow deployment directory"""
     if self._fs is None:
       raise PopupException(_("Failed to obtain HDFS reference. "
-                           "Please check your configuration."))
+                           "Check your configuration."))
 
     # We could have collision with usernames. But there's no good separator.
     # Hope people don't create crazy usernames.

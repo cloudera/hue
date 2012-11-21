@@ -268,7 +268,7 @@ class Hdfs(object):
         LOG.info(_('%(remote_dst)s already exists. Skipping.') % {'remote_dst': remote_dst})
         return
       else:
-        LOG.info(_('%(remote_dst)s does not exist. Trying to copy') % {'remote_dst': remote_dst})
+        LOG.info(_('%(remote_dst)s does not exist. Trying to copy.') % {'remote_dst': remote_dst})
 
       src = file(local_src)
       try:
@@ -278,14 +278,14 @@ class Hdfs(object):
           while chunk:
             self.append(remote_dst, chunk)
             chunk = src.read(chunk_size)
-          LOG.info(_('Copied %s -> %s') % (local_src, remote_dst))
+          LOG.info(_('Copied %s -> %s.') % (local_src, remote_dst))
         except:
-          LOG.error(_('Copying %s -> %s failed') % (local_src, remote_dst))
+          LOG.error(_('Copying %s -> %s failed.') % (local_src, remote_dst))
           raise
       finally:
         src.close()
     else:
-      LOG.info(_('Skipping %s (not a file)') % local_src)
+      LOG.info(_('Skipping %s (not a file).') % local_src)
 
   def exists(self):
     raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})

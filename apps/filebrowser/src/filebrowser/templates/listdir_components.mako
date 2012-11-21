@@ -132,7 +132,7 @@ from django.utils.translation import ugettext as _
     <div id="deleteModal" class="modal hide fade">
         <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3>${_('Please Confirm')}</h3>
+            <h3>${_('Confirm Delete')}</h3>
         </div>
         <div class="modal-body">
             <p>${_('Are you sure you want to delete these files?')}</p>
@@ -157,7 +157,7 @@ from django.utils.translation import ugettext as _
         </div>
         <div class="modal-footer">
             <div id="renameNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-                <span class="label label-important">${_('Sorry, name is required.')}</span>
+                <span class="label label-important">${_('Name is required.')}</span>
             </div>
 
             <input id="renameSrcPath" type="hidden" name="src_path" type="text">
@@ -193,7 +193,7 @@ from django.utils.translation import ugettext as _
             </div>
             <div class="modal-footer" style="padding-top: 10px;">
                 <div id="chownRequired" class="hide" style="position: absolute; left: 10;">
-                    <span class="label label-important">${_('Sorry, name is required.')}</span>
+                    <span class="label label-important">${_('Name is required.')}</span>
                 </div>
                 <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">${_('Cancel')}</a>
                 <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
@@ -282,7 +282,7 @@ from django.utils.translation import ugettext as _
             </div>
             <div class="modal-footer">
                 <div id="moveNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
-                    <span class="label label-important">${_('Sorry, name is required.')}</span>
+                    <span class="label label-important">${_('Name is required.')}</span>
                 </div>
                 <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
                 <input class="btn btn-primary" type="submit" value="${_('Submit')}"/>
@@ -299,7 +299,7 @@ from django.utils.translation import ugettext as _
         <div class="modal-body form-inline">
             <div id="fileUploader" class="uploader">
             <noscript>
-                <p>${_('Please enable JavaScript to use the file uploader.')}</p>
+                <p>${_('Enable JavaScript to use the file uploader.')}</p>
             </noscript>
             </div>
         </div>
@@ -316,7 +316,7 @@ from django.utils.translation import ugettext as _
         <div class="modal-body form-inline">
             <div id="archiveUploader" class="uploader">
             <noscript>
-                <p>${_('Please enable JavaScript to use the file uploader.')}</p>
+                <p>${_('Enable JavaScript to use the file uploader.')}</p>
             </noscript>
             </div>
         </div>
@@ -336,7 +336,7 @@ from django.utils.translation import ugettext as _
         </div>
         <div class="modal-footer">
              <div id="directoryNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
-                <p><strong>${_('Sorry, directory name is required.')}</strong>
+                <p><strong>${_('Directory name is required.')}</strong>
             </div>
             <a id="cancelCreateDirectoryBtn" class="btn" href="#">${_('Cancel')}</a>
             <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
@@ -357,7 +357,7 @@ from django.utils.translation import ugettext as _
         </div>
         <div class="modal-footer">
              <div id="fileNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
-                <p><strong>${_('Sorry, file name is required.')}</strong>
+                <p><strong>${_('File name is required.')}</strong>
             </div>
             <a id="cancelCreateFileBtn" class="btn" href="#">${_('Cancel')}</a>
             <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
@@ -427,24 +427,24 @@ from django.utils.translation import ugettext as _
 
             $("#chownForm").submit(function(){
                 if ($("#chownForm select[name='user']").val() == null){
-                    $("#chownRequired").find(".label").text("${_('Sorry, user is required.')}");
+                    $("#chownRequired").find(".label").text("${_('User is required.')}");
                     $("#chownRequired").show();
                     return false;
                 }
                 else if ($("#chownForm select[name='group']").val() == null){
-                    $("#chownRequired").find(".label").text("${_('Sorry, group is required.')}");
+                    $("#chownRequired").find(".label").text("${_('Group is required.')}");
                     $("#chownRequired").show();
                     return false;
                 }
                 else {
                     if ($("#chownForm select[name='group']").val() == "__other__" && $("input[name='group_other']").val() == ""){
-                        $("#chownRequired").find(".label").text("${_('Sorry, you need to specify another group.')}");
+                        $("#chownRequired").find(".label").text("${_('Specify another group.')}");
                         $("#chownForm input[name='group_other']").addClass("fieldError");
                         $("#chownRequired").show();
                         return false;
                     }
                     if ($("#chownForm select[name='user']").val() == "__other__" && $("input[name='user_other']").val() == ""){
-                        $("#chownRequired").find(".label").text("${_('Sorry, you need to specify another user.')}");
+                        $("#chownRequired").find(".label").text("${_('Specify another user.')}");
                         $("#chownForm input[name='user_other']").addClass("fieldError");
                         $("#chownRequired").show();
                         return false;

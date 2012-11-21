@@ -42,14 +42,14 @@ class Command(BaseCommand):
       app_dir = os.getcwd()
 
     app_template = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..','app_template'))
-    assert os.path.isdir(app_template), _("App template dir missing: %(template)s") % {'template': app_template}
+    assert os.path.isdir(app_template), _("App template dir missing: %(template)s.") % {'template': app_template}
     app_dir = os.path.join(app_dir, app_name)
 
     if not os.path.exists(app_template):
       raise CommandError(_("The template path, %(path)r, does not exist.") % {'path': app_template})
 
     if not re.search(r'^\w+$', app_name):
-      raise CommandError(_("%(name)r is not a valid application name. Please use only numbers, letters and underscores.") % {'name': app_name})
+      raise CommandError(_("%(name)r is not a valid application name. Use only numbers, letters and underscores.") % {'name': app_name})
     try:
       os.makedirs(app_dir)
     except OSError, e:

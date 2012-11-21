@@ -71,7 +71,7 @@ def delete_user(request, username):
       finally:
         __users_lock.release()
 
-      request.info(_('The user was deleted !'))
+      request.info(_('The user was deleted.'))
       return redirect(reverse(list_users))
     except User.DoesNotExist:
       raise PopupException(_("User not found."))
@@ -97,7 +97,7 @@ def delete_group(request, name):
       finally:
         __groups_lock.release()
 
-      request.info(_('The group was deleted !'))
+      request.info(_('The group was deleted.'))
       return redirect(reverse(list_groups))
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."))
@@ -226,7 +226,7 @@ def edit_user(request, username=None):
         try:
           ensure_home_directory(request.fs, instance.username)
         except (IOError, WebHdfsException), e:
-          request.error(_('Cannot make home directory for user %s' % instance.username))
+          request.error(_('Cannot make home directory for user %s.' % instance.username))
       return redirect(reverse(list_users))
   else:
     default_user_group = get_default_user_group()
@@ -350,11 +350,11 @@ def add_ldap_user(request):
         try:
           ensure_home_directory(request.fs, user.username)
         except (IOError, WebHdfsException), e:
-          request.error(_("Cannot make home directory for user %s" % user.username))
+          request.error(_("Cannot make home directory for user %s." % user.username))
 
       if user is None:
         errors = form._errors.setdefault('username', ErrorList())
-        errors.append(_('Could not get LDAP details for user %(username)s') % dict(username=(username,)))
+        errors.append(_('Could not get LDAP details for user %(username)s.') % dict(username=(username,)))
       else:
         return redirect(reverse(list_users))
   else:
@@ -450,7 +450,7 @@ def sync_ldap_users_groups(request):
           try:
             ensure_home_directory(request.fs, user.username)
           except (IOError, WebHdfsException), e:
-            raise PopupException(_("The import may not be complete, sync again"), detail=e)
+            raise PopupException(_("The import may not be complete, sync again."), detail=e)
       return redirect(reverse(list_users))
 
   form = SyncLdapUsersGroupsForm()

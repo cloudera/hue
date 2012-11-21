@@ -131,7 +131,7 @@ class ClusterMiddleware(object):
     try:
       request.fs = cluster.get_hdfs(request.fs_ref)
     except KeyError:
-      raise KeyError(_('Cannot find HDFS called "%(fs_ref)s"') % {'fs_ref': request.fs_ref})
+      raise KeyError(_('Cannot find HDFS called "%(fs_ref)s".') % {'fs_ref': request.fs_ref})
 
     if request.user.is_authenticated():
       if request.fs is not None:
@@ -235,16 +235,16 @@ class AppSpecificMiddleware(object):
       try:
           dot = middleware_path.rindex('.')
       except ValueError:
-          raise exceptions.ImproperlyConfigured, _('%(module)s isn\'t a middleware module') % {'module': middleware_path}
+          raise exceptions.ImproperlyConfigured, _('%(module)s isn\'t a middleware module.') % {'module': middleware_path}
       mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
       try:
           mod = __import__(mw_module, {}, {}, [''])
       except ImportError, e:
-          raise exceptions.ImproperlyConfigured, _('Error importing middleware %(module)s: "%(error)s"') % {'module': mw_module, 'error': e}
+          raise exceptions.ImproperlyConfigured, _('Error importing middleware %(module)s: "%(error)s".') % {'module': mw_module, 'error': e}
       try:
           mw_class = getattr(mod, mw_classname)
       except AttributeError:
-          raise exceptions.ImproperlyConfigured, _('Middleware module "%(module)s" does not define a "%(class)s" class') % {'module': mw_module, 'class':mw_classname}
+          raise exceptions.ImproperlyConfigured, _('Middleware module "%(module)s" does not define a "%(class)s" class.') % {'module': mw_module, 'class':mw_classname}
 
       try:
         mw_instance = mw_class()

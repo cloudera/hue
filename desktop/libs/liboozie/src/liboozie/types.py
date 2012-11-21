@@ -282,7 +282,7 @@ class Job(object):
   def check_request_permission(self, request):
     """Raise PopupException if request user doesn't have permission to modify workflow"""
     if not request.user.is_superuser and request.user.username != self.user:
-      access_warn(request, _('Insufficient permission'))
+      access_warn(request, _('Insufficient permission.'))
       raise PopupException(_("Permission denied. User %(username)s cannot modify user %(user)s's job.") %
                            dict(username=request.user.username, user=self.user))
 

@@ -27,7 +27,7 @@ ${layout.menubar(section='check_config')}
         ${_('Configuration files located in')} <code>${conf_dir}</code>
         <br/><br/>
         % if error_list:
-          <h2>${_('Potential misconfiguration detected. Please fix and restart HUE.')}</h2>
+          <h2>${_('Potential misconfiguration detected. Fix and restart Hue.')}</h2>
           <br/>
             <table class="table table-striped">
           % for confvar, error in error_list:
@@ -52,7 +52,7 @@ ${layout.menubar(section='check_config')}
           % endfor
         </table>
         % else:
-          <h2>${_('All OK. Configuration check passed!')}</h2>
+          <h2>${_('All OK. Configuration check passed.')}</h2>
         % endif
 
     </div>

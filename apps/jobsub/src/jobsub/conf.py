@@ -30,13 +30,13 @@ REMOTE_DATA_DIR = Config(
 LOCAL_DATA_DIR = Config(
   key="local_data_dir",
   default=os.path.join(os.path.dirname(__file__), "..", "..", "data"),
-  help=_("Location on local FS where examples and template are stored"),
+  help=_("Location on local filesystem where examples and template are stored."),
   private=True)
 
 SAMPLE_DATA_DIR = Config(
   key="sample_data_dir",
   default=paths.get_thirdparty_root("sample_data"),
-  help=_("Location on local FS where sample data is stored"),
+  help=_("Location on local filesystem where sample data is stored."),
   private=True)
 
 
@@ -46,12 +46,12 @@ SAMPLE_DATA_DIR = Config(
 # They also have priority if liboozie defines them.
 OOZIE_URL = Config(
   key='oozie_url',
-  help=_('Deprecated, please use liboozie.conf.OOZIE_URL instead. '
-         'URL to Oozie server. This is required for job submission.'),
+  help=_('Deprecated, use liboozie.conf.OOZIE_URL instead. '
+         'URL of Oozie server. This is required for job submission.'),
   type=str)
 
 SECURITY_ENABLED = Config(
   key="security_enabled",
-  help=_("Deprecated, please use liboozie.conf.SECURITY_ENABLED instead. "
+  help=_("Deprecated, use liboozie.conf.SECURITY_ENABLED instead. "
          "Whether Oozie requires client to do perform Kerberos authentication"),
   type=coerce_bool)

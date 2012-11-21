@@ -88,10 +88,10 @@ def download_log_view(request):
         response['Content-Length'] = length
         return response
       except Exception, e:
-        logging.exception("Couldn't construct zip file to write logs to!")
+        logging.exception("Couldn't construct zip file to write logs to.")
         return log_view(request)
 
-  return render_to_response("logs.mako", dict(log=[_("No logs found!")]))
+  return render_to_response("logs.mako", dict(log=[_("No logs found.")]))
 
 
 @access_log_level(logging.DEBUG)

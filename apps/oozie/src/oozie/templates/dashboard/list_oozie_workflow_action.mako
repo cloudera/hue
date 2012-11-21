@@ -116,7 +116,7 @@ ${ layout.menubar(section='running') }
         <td>${ action.retries }</td>
       </tr>
       <tr>
-        <td>${ _('TrackerUri') }</td>
+        <td>${ _('TrackerURI') }</td>
         <td>${ action.trackerUri }</td>
       </tr>
       <tr>

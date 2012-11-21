@@ -21,9 +21,9 @@ from django.utils.translation import ugettext as _
 ${commonheader(_('Hue Shell'), "shell", user)}
 <div class="container-fluid">
 <div>
-    <h3>${_('The Shell application requires a Unix user account for every user of Hue on the remote webserver.')}</h3>
+    <h3>${_('The Shell application requires a Unix user account for every user of Hue on the remote web server.')}</h3>
     <br/>
-    ${_('Please ask your administrator to create a user account for you on the remote webserver as described in the Shell documentation.')}
+    ${_('Ask your administrator to create a user account for you on the remote web server as described in the Shell documentation.')}
 
 </div>
 </div>

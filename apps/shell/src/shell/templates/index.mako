@@ -83,7 +83,7 @@ ${commonheader(_('Hue Shell'), "shell", user, "100px")}
     <div>
         <h3>
             % if shells:
-                ${_('Please select one of the available shells from the toolbar above.')}
+                ${_('Select one of the available shells from the toolbar above.')}
             % else:
                 ${_('You do not have permission to access any shell or there is no configured shell.')}
             % endif

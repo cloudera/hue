@@ -40,7 +40,7 @@ ${ layout.menubar(section='workflows') }
             <a data-bind="attrs: { href: '/filebrowser/view' + deployment_dir() }" class="btn">
               ${ _('Upload') }
             </a>
-            ${ _('files to deployment directory') }
+            ${ _('files to deployment directory.') }
         </label>
       % endif
     </div>
@@ -73,55 +73,55 @@ ${ layout.menubar(section='workflows') }
               <div class="tab-pane active" id="add">
                 <p>
                 <a data-node-type="mapreduce"
-                  title="${ _('Click to add to the end') }" class="btn new-node-link">
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('MapReduce') }
                 </a>
                 <p/>
                 <p>
                 <a data-node-type="streaming"
-                  title="${ _('Click to add to the end') }" class="btn new-node-link">
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('Streaming') }
                 </a>
                 <p/>
                 <p>
                 <a data-node-type="java"
-                  title="${ _('Click to add to the end') }" class="btn new-node-link">
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('Java') }
                 </a>
                 <p/>
                 <p>
                 <a data-node-type="pig"
-                  title="${ _('Click to add to the end') }" class="btn new-node-link">
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('Pig') }
                 </a>
                 <p/>
                 <p>
                 <a data-node-type="hive"
-                  title="${ _('Click to add to the end') }" class="btn new-node-link">
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('Hive') }
                 </a>
                 <p/>
                 <p>
                 <a data-node-type="sqoop"
-                  title="${ _('Click to add to the end') }" class="btn new-node-link">
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('Sqoop') }
                 </a>
                 <p/>
                 <p>
                 <a data-node-type="shell"
-                  title="${ _('Click to add to the end') }" class="btn new-node-link">
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('Shell') }
                 </a>
                 <p/>
                 <p>
                 <a data-node-type="ssh"
-                  title="${ _('Click to add to the end') }" class="btn new-node-link">
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('Ssh') }
                 </a>
                 <p/>
                 <p>
                 <a data-node-type="distcp"
-                  title="${ _('Click to add to the end') }" class="btn new-node-link">
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('DistCp') }
                 </a>
                 <p/>

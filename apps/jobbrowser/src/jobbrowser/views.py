@@ -58,7 +58,7 @@ def check_job_permission(view_func):
     if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
       and job.user != request.user.username:
       raise PopupException(_("You don't have the permissions to access"
-                             " job %(id)s") % dict(id=jobid))
+                             " job %(id)s.") % dict(id=jobid))
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
 
@@ -135,7 +135,7 @@ def kill_job(request, jobid):
   We get here from /jobs/jobid/kill
   """
   if request.method != "POST":
-    raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s)") % dict(method=request.method))
+    raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s).") % dict(method=request.method))
   job = Job.from_id(jt=request.jt, jobid=jobid)
   if job.user != request.user.username and not request.user.is_superuser:
     access_warn(request, _('Insufficient permission'))
