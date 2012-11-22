@@ -34,7 +34,8 @@ import posixpath
                     if not path.startswith('/') and not path.startswith('$') and not path.startswith('hdfs://'):
                       path = '/user/%(username)s/%(path)s' % {'username': '${wf:user()}', 'path': path}
 
-                    path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
+                    if not path.startswith('hdfs://'):
+                      path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
                   %>
 
                   <${ operation } path="${ path }"/>

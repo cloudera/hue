@@ -710,9 +710,9 @@ class TestEditor(OozieMockBase):
     xml = self.wf.to_xml()
 
     assert_true('<delete path="${nameNode}${output}"/>' in xml, xml)
-    assert_true(re.search(re.escape('<delete path="${nameNode}/user/${wf:user()}/out"/>'), xml, re.IGNORECASE), xml)
-    assert_true(re.search(re.escape('<delete path="${nameNode}/user/test/out"/>'), xml, re.IGNORECASE), xml)
-    assert_true(re.search(re.escape('<delete path="hdfs://localhost:8020/user/test/out"/>'), xml, re.IGNORECASE), xml)
+    assert_true('<delete path="${nameNode}/user/${wf:user()}/out"/>' in xml, xml)
+    assert_true('<delete path="${nameNode}/user/test/out"/>' in xml, xml)
+    assert_true('<delete path="hdfs://localhost:8020/user/test/out"/>' in xml, xml)
 
 
   def test_get_workflow_parameters(self):
