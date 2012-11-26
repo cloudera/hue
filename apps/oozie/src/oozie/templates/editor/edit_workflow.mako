@@ -1083,7 +1083,6 @@ var NodeModule = function($, IdGeneratorTable) {
         ignore: ['initialize','toString'],
         job_properties: {
           create: function(options) {
-            var mapping =  ko.mapping.fromJS($.parseJSON(options.data) || options.data, {});
             var parent = options.parent;
             var subscribe = function(mapping) {
               mapping.name.subscribe(function(value) {
@@ -1099,17 +1098,7 @@ var NodeModule = function($, IdGeneratorTable) {
         },
         files: {
           create: function(options) {
-            var parent = options.parent;
-            var subscribe = function(mapping) {
-              mapping.name.subscribe(function(value) {
-                parent.files.valueHasMutated();
-              });
-              mapping.dummy.subscribe(function(value) {
-                parent.files.valueHasMutated();
-              });
-            };
-
-            return map_params(options, subscribe);
+            return map_params(options, function() {});
           },
         },
         archives: {
