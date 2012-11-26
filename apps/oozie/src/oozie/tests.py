@@ -524,6 +524,49 @@ class TestEditor(OozieMockBase):
         '    <end name="end"/>\n'
         '</workflow-app>'.split(), self.wf.to_xml().split())
 
+  def test_workflow_shell_gen_xml(self):
+    self.wf.node_set.filter(name='action-name-1').delete()
+
+    action1 = add_node(self.wf, 'action-name-1', 'shell', [self.wf.start], {
+        u'job_xml': '',
+        u'files': '["hello.py"]',
+        u'name': 'Shell',
+        u'job_properties': '[]',
+        u'capture_output': 'on',
+        u'command': 'hello.py',
+        u'archives': '[]',
+        u'prepares': '[]',
+        u'params': '[{"value":"World!","type":"argument"}]',
+        u'description': 'Execute a Python script printing its arguments'
+    })
+    Link(parent=action1, child=self.wf.end, name="ok").save()
+
+    xml = self.wf.to_xml()
+
+    assert_true("""
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>hello.py</exec>
+              <argument>World!</argument>
+              <capture-output/>
+            <file>hello.py#hello.py</file>
+        </shell>""" in xml, xml)
+
+    action1.capture_output = False
+    action1.save()
+
+    xml = self.wf.to_xml()
+
+    assert_true("""
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>hello.py</exec>
+              <argument>World!</argument>
+            <file>hello.py#hello.py</file>
+        </shell>""" in xml, xml)
+
 
   def test_workflow_flatten_list(self):
     assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
