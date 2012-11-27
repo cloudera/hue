@@ -17,13 +17,12 @@
 """
 Common library to export either CSV or XLS.
 """
-import pyExcelerator as xl
 import cStringIO
 import csv
 import logging
 
 from django.http import HttpResponse
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import smart_str
 from desktop.lib import i18n
 
 LOG = logging.getLogger(__name__)
@@ -102,7 +101,7 @@ def make_response(header, data, format, name, encoding=None):
     formatter = CSVformatter(encoding)
     mimetype = 'application/csv'
   elif format == 'xls':
-    formatter = XLSformatter(encoding)
+    formatter = CSVformatter(encoding)
     mimetype = 'application/xls'
   else:
     raise Exception("Unknown format: %s" % (format,))
@@ -137,51 +136,3 @@ class CSVformatter(Formatter):
 
   def fini_doc(self):
     return ""
-
-class XLSformatter(Formatter):
-  """Unfortunately, pyExcelerator can't stream."""
-  def __init__(self, encoding=None):
-    super(XLSformatter, self).__init__()
-    self._encoding = encoding or i18n.get_site_encoding()
-    self._book = xl.Workbook()
-    self._sheet = self._book.add_sheet("Sheet 1")
-    self._row = 0
-    self._size = 0
-
-  def init_doc(self):
-    return ''
-
-  def _decode_cell(self, cell):
-    """PyExcelerator happily takes unicode. So first decode binary data."""
-    return force_unicode(cell, self._encoding, strings_only=True, errors='replace')
-
-  def format_header(self, header):
-    for i, cell in enumerate(header):
-      self._sheet.write(self._row, i, self._decode_cell(cell))
-    self._row += 1
-    return ''
-
-  def format_row(self, row):
-    for i, cell in enumerate(row):
-      self._sheet.write(self._row, i, self._decode_cell(cell))
-      self._limit_size(cell)
-    self._row += 1
-    return ''
-
-  def fini_doc(self):
-    string_io = cStringIO.StringIO()
-    self._book.save(string_io)
-    res = string_io.getvalue()
-    string_io.close()
-    return res
-
-  def _limit_size(self, cell):
-    # Coerce cell to a string
-    if not isinstance(cell, basestring):
-      cell = str(cell)
-    self._size += len(cell)
-    if self._size > XLS_SIZE_LIMIT:
-      msg = 'ERROR: Data too large to be downloaded as XLS file.'
-      self._row += 1
-      self._sheet.write(self._row, 0, msg)
-      raise TooBigToDownloadException(msg)

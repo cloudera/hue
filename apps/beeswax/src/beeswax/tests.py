@@ -35,7 +35,6 @@ from django.contrib.auth.models import User
 from beeswaxd import ttypes
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.django_test_util import assert_similar_pages
-from desktop.lib.test_export_csvxls import xls2csv
 from desktop.lib.test_utils import grant_access
 
 import beeswax.create_table
@@ -503,7 +502,8 @@ for x in sys.stdin:
     # Get the result in xls.
     handle = self.db.execute_and_wait(query)
     xls_resp = download(handle, 'xls', self.db)
-    translated_csv = xls2csv(xls_resp.content)
+    # Should be CSV since we simply change the file extension and MIME type from CSV to XLS.
+    translated_csv = xls_resp.content
     # It should have 257 lines (256 + header)
     assert_equal(len(translated_csv.strip('\r\n').split('\r\n')), 257)
 

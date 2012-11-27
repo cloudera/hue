@@ -1,4 +1,0 @@
-*Write documentation
-*BSE container for Esher layer
-*Fully implement Name Records (for macros and functions)
-*Support Asian phonetic and rich-text settings

@@ -22,7 +22,7 @@ import time
 
 from django.http import HttpResponse
 
-from desktop.lib.export_csvxls import CSVformatter, XLSformatter, TooBigToDownloadException
+from desktop.lib.export_csvxls import CSVformatter, TooBigToDownloadException
 
 from beeswax import common
 
@@ -46,7 +46,8 @@ def download(handle, format, db):
     formatter = CSVformatter()
     mimetype = 'application/csv'
   elif format == 'xls':
-    formatter = XLSformatter()
+    # We 'fool' the user by sending back CSV as XSL as it supports streaming and won't freeze Hue
+    formatter = CSVformatter()
     mimetype = 'application/xls'
 
   gen = data_generator(handle, formatter, db)
