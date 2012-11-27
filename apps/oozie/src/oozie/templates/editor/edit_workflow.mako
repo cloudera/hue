@@ -1094,12 +1094,12 @@ var NodeModule = function($, IdGeneratorTable) {
             };
 
             return map_params(options, subscribe);
-          },
+          }
         },
         files: {
           create: function(options) {
             return map_params(options, function() {});
-          },
+          }
         },
         archives: {
           create: function(options) {
@@ -1114,7 +1114,7 @@ var NodeModule = function($, IdGeneratorTable) {
             };
 
             return map_params(options, subscribe);
-          },
+          }
         },
         params: {
           create: function(options) {
@@ -1129,7 +1129,7 @@ var NodeModule = function($, IdGeneratorTable) {
             };
 
             return map_params(options, subscribe);
-          },
+          }
         },
         prepares: {
           create: function(options) {
@@ -1144,8 +1144,8 @@ var NodeModule = function($, IdGeneratorTable) {
             };
 
             return map_params(options, subscribe);
-          },
-        },
+          }
+        }
       });
 
       $.extend(self, mapping);
@@ -1357,7 +1357,7 @@ var NodeModule = function($, IdGeneratorTable) {
     erase: function() {
       var self = this;
       self.registry.remove(self.id());
-    },
+    }
   });
 
   return module;
@@ -1467,14 +1467,14 @@ $.extend(ForkNode.prototype, Node.prototype, {
       description: self.description(),
       node_type: 'decision',
       workflow: self.workflow(),
-      child_links: self.model.child_links,
+      child_links: self.model.child_links
     });
 
     var default_link = {
       parent: decision_model.id,
       child: self._workflow.end(),
       name: 'default',
-      comment: '',
+      comment: ''
     };
 
     decision_model.child_links.push(default_link);
@@ -1499,7 +1499,7 @@ $.extend(ForkNode.prototype, Node.prototype, {
       parent.replaceChild(self, decision_node);
     });
 
-  },
+  }
 });
 
 var DecisionNode = NodeModule($, IdGeneratorTable);
@@ -1690,7 +1690,7 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
     }
 
     return ret;
-  },
+  }
 });
 
 /**
@@ -1714,7 +1714,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             parent.job_properties.valueHasMutated();
           });
           return mapping;
-        },
+        }
       },
       parameters: {
         // Will receive individual objects to subscribe.
@@ -1729,14 +1729,15 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             parent.parameters.valueHasMutated();
           });
           return mapping;
-        },
-      },
+        }
+      }
     });
 
     $.extend(self, mapping);
     $.each(mapping['__ko_mapping__'].mappedProperties, function(key, value) {
       var key = key;
       self[key].subscribe(function(value) {
+        workflow.model.is_dirty = true;
         self.model[key] = ko.mapping.toJS(value);
       });
     });
@@ -1754,15 +1755,19 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
     // Events
     self.el.on('workflow:rebuild', function() {
+      workflow.model.is_dirty = true;
       self.rebuild();
     });
     self.el.on('workflow:events:load', function() {
+      workflow.model.is_dirty = true;
       self.dragAndDropEvents();
     });
     self.el.on('workflow:droppables:load', function() {
+      workflow.model.is_dirty = true;
       self.droppables();
     });
     self.el.on('workflow:draggables:load', function() {
+      workflow.model.is_dirty = true;
       self.draggables();
     });
 
@@ -1839,6 +1844,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             }
           }
         });
+        workflow.model.is_dirty = false;
       }
     },
 
@@ -2383,6 +2389,7 @@ var workflow_model = {
   is_shared: "${ workflow.is_shared }" == "True",
   parameters: ${ workflow.parameters },
   job_properties: ${ workflow.job_properties },
+  is_dirty: false
 };
 var registry = new Registry();
 var workflow = new Workflow({
@@ -2414,6 +2421,8 @@ $('#workflow').on('click', '.edit-node-link', function(e) {
 
   $("input[name='job_xml']").addClass("pathChooser").after(getFileBrowseButton($("input[name='job_xml']")));
   $("input[name='jar_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='jar_path']")));
+
+  workflow.model.is_dirty = true;
 });
 
 $('#workflow').on('click', '.new-node-link', function(e) {
@@ -2435,6 +2444,8 @@ $('#workflow').on('click', '.new-node-link', function(e) {
   modal.setTemplate(template);
   modal.show(node);
   modal.recenter(280, 250);
+
+  workflow.model.is_dirty = true;
 });
 
 ko.bindingHandlers.fileChooser = {
@@ -2474,6 +2485,24 @@ var addAutoComplete = function(i, elem) {
     }
   });
 };
+
+window.onbeforeunload = function (e) {
+  if (!workflow.model.is_dirty) {
+    return null;
+  }
+  var message = "${ _('You have unsaved changes in this workflow.') }";
+
+  if (!e) e = window.event;
+  e.cancelBubble = true;
+  e.returnValue = message;
+
+  if (e.stopPropagation) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  return message;
+};
+
 </script>
 
 ${ utils.path_chooser_libs(True) }
