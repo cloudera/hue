@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
+
 from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -26,8 +28,7 @@ class TestImpala:
 
   def test_basic_flow(self):
     response = self.client.get("/impala/")
-    assert_true("""<li id="impalaIcon"
-    class="active""" in response.content, response.content)
+    assert_true(re.search('<li id="impalaIcon"\W+class="active', response.content), response.content)
     assert_true('Query Editor' in response.content)
 
     response = self.client.get("/impala/execute/")
