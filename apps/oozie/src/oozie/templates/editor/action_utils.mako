@@ -62,7 +62,7 @@
 
           % for field in action_form:
             % if field.html_name not in ('name', 'description', 'node_type', 'job_xml'):
-              ${ utils.render_field(field) }
+              ${ utils.render_field(field, extra_attrs={'data-bind': 'value: %s' % field.name}) }
             % endif
           % endfor
 
