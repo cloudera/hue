@@ -1755,19 +1755,15 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
     // Events
     self.el.on('workflow:rebuild', function() {
-      workflow.model.is_dirty = true;
       self.rebuild();
     });
     self.el.on('workflow:events:load', function() {
-      workflow.model.is_dirty = true;
       self.dragAndDropEvents();
     });
     self.el.on('workflow:droppables:load', function() {
-      workflow.model.is_dirty = true;
       self.droppables();
     });
     self.el.on('workflow:draggables:load', function() {
-      workflow.model.is_dirty = true;
       self.draggables();
     });
 
@@ -1894,6 +1890,8 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         placement: 'right',
         trigger: 'hover'
       }).css('z-index', 9999);
+
+      workflow.model.is_dirty = true;
     },
 
     removeNode: function(node, event) {
@@ -1903,6 +1901,8 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       node.erase();
 
       self.rebuild();
+
+      workflow.model.is_dirty = true;
     },
 
     save: function( options ) {
@@ -1924,6 +1924,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         data: { workflow: JSON.stringify(data) },
         success: function() {
           $.jHueNotify.info("${ _('Workflow saved') }");
+          workflow.model.is_dirty = false;
         },
         error: function() {
           $.jHueNotify.error("${ _('Could not save workflow') }");
@@ -2208,7 +2209,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               // End of decision tree is being dragged to the bottom of a branch
               draggable.detach();
               newParent.append(draggable);
-
+              workflow.model.is_dirty = true;
               self.rebuild();
             }
           } else {
@@ -2242,7 +2243,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               newParent.append(draggable);
             break;
             }
-
+            workflow.model.is_dirty = true;
             self.rebuild();
           }
         }
