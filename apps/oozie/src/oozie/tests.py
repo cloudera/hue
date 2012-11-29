@@ -549,8 +549,8 @@ class TestEditor(OozieMockBase):
             <name-node>${nameNode}</name-node>
             <exec>hello.py</exec>
               <argument>World!</argument>
-              <capture-output/>
             <file>hello.py#hello.py</file>
+              <capture-output/>
         </shell>""" in xml, xml)
 
     action1.capture_output = False

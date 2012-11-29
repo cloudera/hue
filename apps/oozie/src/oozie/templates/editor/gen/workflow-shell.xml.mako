@@ -30,11 +30,11 @@
               <${ param['type'] }>${ param['value'] }</${ param['type'] }>
             % endfor
 
+            ${ common.distributed_cache(node.get_files(), node.get_archives()) }
+
             % if node.capture_output:
               <capture-output/>
             % endif
-
-            ${ common.distributed_cache(node.get_files(), node.get_archives()) }
         </shell>
         <ok to="${ node.get_child('ok') }"/>
         <error to="${ node.get_child('error') }"/>
