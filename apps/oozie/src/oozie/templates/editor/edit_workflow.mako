@@ -30,6 +30,10 @@ ${ layout.menubar(section='workflows') }
 
 
 <div id="workflow" class="container-fluid">
+  <div class="ribbon-wrapper hide">
+    <div class="ribbon">${ _('Unsaved') }</div>
+  </div>
+
   <h1 data-bind="text: '${ _('Workflow') } ' + name()"></h1>
 
   <div class="well">
@@ -291,6 +295,60 @@ ${ layout.menubar(section='workflows') }
 .popover {
   z-index: 2060 !important;
 }
+
+
+.ribbon-wrapper {
+  width: 85px;
+  height: 88px;
+  overflow: hidden;
+  position: fixed;
+  top: 74px;
+  right: -3px;
+  right: 20px\9; /* IE8 */
+  width: 125px\9; /* IE8 */
+}
+
+.ribbon {
+  font: bold 15px Sans-Serif;
+  color: #333;
+  text-align: center;
+  text-shadow: rgba(255,255,255,0.5) 0px 1px 0px;
+  -webkit-transform: rotate(45deg);
+  -moz-transform:    rotate(45deg);
+  -ms-transform:     rotate(45deg);
+  -o-transform:      rotate(45deg);
+  position: relative;
+  padding: 7px 0;
+  left: -5px;
+  top: 15px;
+  width: 120px;
+  background-color: #fcf8e3;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fcf8e3), to(#fcf8e3));
+  background-image: -webkit-linear-gradient(top, #fcf8e3, #fcf8e3);
+  background-image:    -moz-linear-gradient(top, #fcf8e3, #fcf8e3);
+  background-image:     -ms-linear-gradient(top, #fcf8e3, #fcf8e3);
+  background-image:      -o-linear-gradient(top, #fcf8e3, #fcf8e3);
+  color: #c09853;
+  -webkit-box-shadow: 0px 0px 3px rgba(0,0,0,0.3);
+  -moz-box-shadow:    0px 0px 3px rgba(0,0,0,0.3);
+  box-shadow:         0px 0px 3px rgba(0,0,0,0.3);
+}
+
+.ribbon:before, .ribbon:after {
+  content: "";
+  border-top:   3px solid #c09853;
+  border-left:  3px solid transparent;
+  border-right: 3px solid transparent;
+  position:absolute;
+  bottom: -3px;
+}
+
+.ribbon:before {
+  left: 0;
+}
+.ribbon:after {
+  right: 0;
+}â€‹
 </style>
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
@@ -1928,7 +1986,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         },
         error: function() {
           $.jHueNotify.error("${ _('Could not save workflow') }");
-        },
+        }
       }, options);
 
       var success_handler = request['success'];
@@ -2503,6 +2561,20 @@ window.onbeforeunload = function (e) {
   }
   return message;
 };
+
+$(document).ready(function () {
+  window.setTimeout(checkModelDirtiness, 500);
+});
+
+function checkModelDirtiness() {
+  if (workflow.model.is_dirty) {
+    $(".ribbon-wrapper").fadeIn();
+  }
+  else {
+    $(".ribbon-wrapper").hide();
+    window.setTimeout(checkModelDirtiness, 500);
+  }
+}
 
 </script>
 
