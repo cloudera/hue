@@ -30,7 +30,7 @@ from beeswax import common
 LOG = logging.getLogger(__name__)
 
 _DATA_WAIT_SLEEP = 0.1                  # Sleep 0.1 sec before checking for data availability
-
+FETCH_ROWS = 100000
 
 def download(handle, format, db):
   """
@@ -71,12 +71,12 @@ def data_generator(handle, formatter, db):
 
   yield formatter.init_doc()
 
-  results = db.fetch(handle, start_over=is_first_row, rows=None)
+  results = db.fetch(handle, start_over=is_first_row, rows=FETCH_ROWS)
 
   while results is not None:
     while not results.ready:   # For Beeswax
       time.sleep(_DATA_WAIT_SLEEP)
-      results = db.fetch(handle, start_over=is_first_row, rows=None)
+      results = db.fetch(handle, start_over=is_first_row, rows=FETCH_ROWS)
 
     # TODO Check for concurrent reading when HS2 supports start_row
     if is_first_row:
@@ -90,7 +90,7 @@ def data_generator(handle, formatter, db):
         LOG.error(ex)
 
     if results.has_more:
-      results = db.fetch(handle, start_over=is_first_row, rows=None)
+      results = db.fetch(handle, start_over=is_first_row, rows=FETCH_ROWS)
     else:
       results = None
 
