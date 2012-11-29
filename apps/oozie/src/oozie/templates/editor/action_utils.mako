@@ -200,7 +200,7 @@
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td>
-              <input type="text" class="span5 required"data-bind="fileChooser: $data, value: name, uniqueName: false" />
+              <input type="text" class="span5 required pathChooserKo" data-bind="fileChooser: $data, value: name, uniqueName: false" />
             </td>
             <td>
               % if 'remove' in javascript_attrs:
@@ -228,7 +228,7 @@
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td>
-              <input type="text" class="span5 required"data-bind="fileChooser: $data, value: name, uniqueName: false" />
+              <input type="text" class="span5 required pathChooserKo" data-bind="fileChooser: $data, value: name, uniqueName: false" />
             </td>
             <td>
               % if 'remove' in javascript_attrs:
@@ -263,7 +263,7 @@
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
             <td><input type="text" class="span4 required propKey" data-bind="value: name, uniqueName: false" /></td>
-            <td><input type="text" class="span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
+            <td><input type="text" class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
             <td>
             % if 'remove' in javascript_attrs:
               <a class="btn" href="#" data-bind="click: ${ javascript_attrs['remove'] }">${ _('Delete') }</a>
@@ -300,7 +300,7 @@
               <span class="span4 required" data-bind="text: type" />
             </td>
             <td>
-              <input type="text" class="input span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+              <input type="text" class="input span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
             </td>
             <td>
             % if 'remove' in javascript_attrs:
@@ -340,7 +340,7 @@
               <span class="span4 required" data-bind="text: type" />
             </td>
             <td>
-              <input type="text" class="input span4 required" data-bind="fileChooser: $data, value: value, uniqueName: false" />
+              <input type="text" class="input span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" />
             </td>
             <td>
               % if 'remove' in javascript_attrs:

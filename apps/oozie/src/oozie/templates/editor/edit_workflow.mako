@@ -294,6 +294,7 @@ ${ layout.menubar(section='workflows') }
 
 .popover {
   z-index: 2060 !important;
+  margin-left: 166px!important;
 }
 
 
@@ -594,6 +595,20 @@ var ModalModule = function($, ko) {
     left += offset_x || 0;
     self.modal.css({top: top +'px', left:  left+'px'});
   };
+
+  module.prototype.addDecorations = function () {
+    $(".popover").remove();
+
+    $("input[name='job_xml']").addClass("pathChooser").after(getFileBrowseButton($("input[name='job_xml']")));
+    $("input[name='jar_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='jar_path']")));
+    $("input[name='script_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='script_path']")));
+    $("input[name='command']").addClass("pathChooser").after(getFileBrowseButton($("input[name='command']")));
+
+    $("*[rel=popover]").popover({
+      placement:'left',
+      trigger:'hover'
+    });
+  }
 
   return module;
 };
@@ -1936,18 +1951,9 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       modal.setTemplate(template);
       modal.show(new_node);
       modal.recenter(280, 250);
-
-      $(".pathChooser").each(function(){
-        var self = $(this);
-        self.after(getFileBrowseButton(self));
-      });
+      modal.addDecorations();
 
       // $(".propKey").each(addAutoComplete);
-
-      $("*[rel=popover]").popover({
-        placement: 'right',
-        trigger: 'hover'
-      }).css('z-index', 9999);
 
       workflow.model.is_dirty = true;
     },
@@ -2073,7 +2079,9 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       var methodChooser = function(node, collection, skip_parents_check) {
         if (count++ >= maximum) {
-          console.error('Hit maximum number of node recursion: ' + maximum);
+          if (window.error) {
+            console.error('Hit maximum number of node recursion: ' + maximum);
+          }
           return null;
         }
 
@@ -2458,28 +2466,12 @@ var workflow = new Workflow({
 var modal = new Modal("#node-modal");
 workflow.load();
 
-$('#node-modal').on('shown', function() {
-  $(".pathChooser").each(function(){
-    var self = $(this);
-    self.after(getFileBrowseButton(self));
-  });
-
-  // $(".propKey").each(addAutoComplete);
-
-  $("*[rel=popover]").popover({
-    placement: 'right',
-    trigger: 'hover'
-  }).css('z-index', 9999);
-});
-
 $('#workflow').on('click', '.edit-node-link', function(e) {
   var context = ko.contextFor(this).$data;
   modal.setTemplate(context.edit_template);
   modal.show(context);
   modal.recenter(280, 250);
-
-  $("input[name='job_xml']").addClass("pathChooser").after(getFileBrowseButton($("input[name='job_xml']")));
-  $("input[name='jar_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='jar_path']")));
+  modal.addDecorations();
 
   workflow.model.is_dirty = true;
 });
@@ -2503,6 +2495,7 @@ $('#workflow').on('click', '.new-node-link', function(e) {
   modal.setTemplate(template);
   modal.show(node);
   modal.recenter(280, 250);
+  modal.addDecorations();
 
   workflow.model.is_dirty = true;
 });
@@ -2560,6 +2553,12 @@ window.onbeforeunload = function (e) {
     e.preventDefault();
   }
   return message;
+};
+
+window.onresize = function () {
+  if (modal) {
+    modal.recenter(280, 250);
+  }
 };
 
 $(document).ready(function () {
