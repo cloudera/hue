@@ -423,7 +423,7 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
 
     <div class="row-fluid node-fork-children">
       <div class="row-fluid node-fork-child" data-bind="foreach: children">
-        <div data-bind="attr: {class: 'span' + (((12 / $parent.children().length) > 4) ? (12 / $parent.children().length) : 4)}">
+        <div data-bind="attr: {'class': 'span' + (((12 / $parent.children().length) > 4) ? (12 / $parent.children().length) : 4)}">
           <div class="row-fluid node-fork-child-link" data-bind="template: { name: 'linkTemplate', data: $parent.links()[$index()] }"></div>
           <div data-bind="template: { name: function(item) { return item.view_template() }, foreach: $data }"></div>
         </div>
@@ -490,6 +490,18 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
 </script>
 
 <script type="text/javascript">
+
+// adding missing .filter for IE8
+if (!('filter' in Array.prototype)) {
+  Array.prototype.filter= function(filter, that /*opt*/) {
+    var other= [], v;
+    for (var i=0, n= this.length; i<n; i++)
+      if (i in this && filter.call(that, v= this[i], i, this))
+        other.push(v);
+    return other;
+  };
+}
+
 /**
  * Registry of models
  *  - Each model should have an ID attribute.
@@ -2539,20 +2551,19 @@ var addAutoComplete = function(i, elem) {
 };
 
 window.onbeforeunload = function (e) {
-  if (!workflow.model.is_dirty) {
-    return null;
-  }
-  var message = "${ _('You have unsaved changes in this workflow.') }";
+  if (workflow.model.is_dirty) {
+    var message = "${ _('You have unsaved changes in this workflow.') }";
 
-  if (!e) e = window.event;
-  e.cancelBubble = true;
-  e.returnValue = message;
+    if (!e) e = window.event;
+    e.cancelBubble = true;
+    e.returnValue = message;
 
-  if (e.stopPropagation) {
-    e.stopPropagation();
-    e.preventDefault();
+    if (e.stopPropagation) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    return message;
   }
-  return message;
 };
 
 window.onresize = function () {
