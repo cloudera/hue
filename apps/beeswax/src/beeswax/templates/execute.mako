@@ -37,7 +37,7 @@
 
       <div class="clearfix">
         <div class="input">
-            <textarea class="span9" rows="9" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+            <textarea class="span9" rows="18" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
             <div id="validationResults">
             % if len(form.query["query"].errors):
                 ${unicode(form.query["query"].errors) | n}
