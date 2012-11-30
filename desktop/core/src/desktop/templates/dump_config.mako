@@ -20,93 +20,102 @@ from desktop.lib.conf import BoundContainer, is_anonymous
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="about_layout.mako" />
+
 ${commonheader(_('About'), "about", user, "100px")}
 ${layout.menubar(section='dump_config')}
 
-	<div class="container-fluid">
+    <div class="container-fluid">
 
         ${_('Configuration files located in')} <code>${conf_dir}</code>
-		<br/><br/>
+        <br/><br/>
 
-		<h2>${_('Installed applications')}</h2>
-		<ul>
-		% for app in sorted(apps, key=lambda app: app.name.lower()):
-			<li>${app.name}</li>
-		% endfor
-		</ul>
+        <h2>${_('Installed applications')}</h2>
+        <ul>
+        % for app in sorted(apps, key=lambda app: app.name.lower()):
+            <li>${app.name}</li>
+        % endfor
+        </ul>
 
-		<h2>${_('Configuration Sections and Variables')}</h2>
+        <h2>${_('Configuration Sections and Variables')}</h2>
 
-		<ul class="nav nav-tabs">
-			% for obj in top_level.get().values():
-				<li><a href="#${obj.config.key}Conf" data-toggle="tab">${obj.config.key}</a></li>
-			% endfor
-		</ul>
+        <ul class="nav nav-tabs">
+            % for obj in sorted(top_level.get().values(), key=lambda obj: obj.config.key):
+                <li
+                    % if loop.first:
+                        class="active"
+                    % endif
+                ><a href="#${obj.config.key}Conf" data-toggle="tab">${obj.config.key}</a></li>
+            % endfor
+        </ul>
 
-		<%def name="showTopLevel(config_obj, depth=0)">
-			<div class="tab-content">
-				% if isinstance(config_obj, BoundContainer):
-					% for v in config_obj.get().values():
-				<%
-				      # Don't recurse into private variables.
-				      if v.config.private and not show_private:
-				        continue
-				%>
-					<div id="${v.config.key}Conf" class="tab-pane">
-				    	${recurse(v, depth + 1)}
-					</div>
-				    % endfor
-				% endif
-			</div>
-		</%def>
+        <%def name="showTopLevel(config_obj, depth=0)">
+            <div class="tab-content">
+                % if isinstance(config_obj, BoundContainer):
+                    % for v in config_obj.get().values():
+                        <%
+                            # Don't recurse into private variables.
+                            if v.config.private and not show_private:
+                                continue
+                        %>
+                        <div id="${v.config.key}Conf" class="tab-pane
+                        % if loop.first:
+                            active
+                        % endif
+                        ">
+                            ${recurse(v, depth + 1)}
+                      </div>
+                    % endfor
+                % endif
+            </div>
+        </%def>
 
-		<%def name="recurse(config_obj, depth=0)">
-			<table class="table table-striped">
-			<tr>
-			 % if depth > 1:
-			  <th>
-			  % if is_anonymous(config_obj.config.key):
-			    <i>(default section)</i>
-			  % else:
-			    ${config_obj.config.key}
-			  % endif
-			  </th>
-			 % endif
-    		 % if depth == 1:
-				<td style="border-top:0">
-	         % else:
-			  	<td>
-			 % endif
-			  % if isinstance(config_obj, BoundContainer):
-			    <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
+        <%def name="recurse(config_obj, depth=0)">
+            <table class="table table-striped">
+            <tr>
+             % if depth > 1:
+              <th>
+              % if is_anonymous(config_obj.config.key):
+                <i>(default section)</i>
+              % else:
+                ${config_obj.config.key}
+              % endif
+              </th>
+             % endif
+             % if depth == 1:
+                <td style="border-top:0">
+             % else:
+                  <td>
+             % endif
+              % if isinstance(config_obj, BoundContainer):
+                <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
 
-			    % for v in config_obj.get().values():
-			<%
-			      # Don't recurse into private variables.
-			      if v.config.private and not show_private:
-			        continue
-			%>
-			    ${recurse(v, depth + 1)}
-			    % endfor
-			  % else:
-			    <p>${str(config_obj.get_raw())}</p>
-			    <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
-			    <p class="dump_config_default">${_('Default:')} <i>${config_obj.config.default}</i></p>
-			  % endif
-			  </td>
-			</tr>
-			</table>
-		</%def>
+                % for v in config_obj.get().values():
+            <%
+                  # Don't recurse into private variables.
+                  if v.config.private and not show_private:
+                    continue
+            %>
+                ${recurse(v, depth + 1)}
+                % endfor
+              % else:
+                <p>${str(config_obj.get_raw())}</p>
+                <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
+                <p class="dump_config_default">${_('Default:')} <i>${config_obj.config.default}</i></p>
+              % endif
+              </td>
+            </tr>
+            </table>
+        </%def>
 
 
-		${showTopLevel(top_level)}
+        ${showTopLevel(top_level)}
 
-		<br/>
-		<br/>
-		<br/>
+        <br/>
+        <br/>
+        <br/>
 
-	</div>
-
+    </div>
 
 ${commonfooter(messages)}
