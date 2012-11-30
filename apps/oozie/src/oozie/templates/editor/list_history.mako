@@ -18,6 +18,7 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  import time as py_time
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -49,7 +50,7 @@ ${ layout.menubar(section='history') }
     % for record in history:
       <tr>
         <td>
-          <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
+          <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true" data-sort-value="${py_time.mktime(record.last_modified.timetuple())}"></a>
           ${ utils.format_date(record.submission_date) }
         </td>
         <td><a href="${ record.job.get_absolute_url() }">${ record.job.name }</a></td>
@@ -72,7 +73,7 @@ ${ layout.menubar(section='history') }
       "sPaginationType": "bootstrap",
       "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
       "aoColumns": [
-        { "sType": "date" },
+        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
         null,
         null,
         null,

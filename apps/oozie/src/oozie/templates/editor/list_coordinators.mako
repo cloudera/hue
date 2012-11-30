@@ -17,6 +17,7 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  import time as py_time
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -94,7 +95,7 @@ ${ layout.menubar(section='coordinators') }
           <td>
             <span class="label label-info">${ coordinator.status }</span>
           </td>
-          <td nowrap="nowrap">${ utils.format_date(coordinator.last_modified) }</td>
+          <td nowrap="nowrap" data-sort-value="${py_time.mktime(coordinator.last_modified.timetuple())}">${ utils.format_date(coordinator.last_modified) }</td>
           <td>${ coordinator.owner.username }</td>
         </tr>
       %endfor
@@ -215,7 +216,7 @@ ${ layout.menubar(section='coordinators') }
         null,
         null,
         null,
-        { "sType": "date" },
+        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
         null
       ],
       "aaSorting": [[ 4, "desc" ]],

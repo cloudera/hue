@@ -17,6 +17,7 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  import time as py_time
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -90,7 +91,7 @@ ${ layout.menubar(section='workflows') }
           </td>
           <td>${ workflow.description }</td>
 
-          <td nowrap="nowrap">${ utils.format_date(workflow.last_modified) }</td>
+          <td nowrap="nowrap" data-sort-value="${py_time.mktime(workflow.last_modified.timetuple())}">${ utils.format_date(workflow.last_modified) }</td>
           <td><span class="badge badge-info">${ workflow.actions.count() }</span></td>
           <td>
             <span class="label label-info">${ workflow.status }</span>
@@ -224,7 +225,7 @@ ${ layout.menubar(section='workflows') }
         null,
         null,
         null,
-        { "sType": "date" },
+        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
         null,
         null
       ],
