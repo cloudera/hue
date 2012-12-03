@@ -40,7 +40,7 @@
         el.find(".close").hide();
 
         if ($(".jHueNotify").last().position() != null) {
-            el.css("top", $(".jHueNotify").last().position().top + $(".jHueNotify").last().outerHeight() + MARGIN);
+            el.css("top", $(".jHueNotify").last().position().top + $(".jHueNotify").last().outerHeight() + MARGIN - $(window).scrollTop());
         }
 
         if (_this.options.level == TYPES.ERROR){

@@ -21,15 +21,6 @@
 
 
 <%namespace name="utils" file="../utils.inc.mako" />
-
-
-<form class="form-horizontal" id="edit-dataset-form" method="POST" action="${path}">
-  <div class="modal-header">
-    <button class="close" data-dismiss="modal">&times;</button>
-    <h3>${ _('Edit dataset') }</h3>
-  </div>
-
-  <div class="modal-body" id="edit-dataset-body">
     <fieldset>
       ${ utils.render_field(dataset_form['name']) }
       ${ utils.render_field(dataset_form['description']) }
@@ -58,10 +49,3 @@
       ${ utils.render_field(dataset_form['timezone']) }
       ${ utils.render_field(dataset_form['done_flag']) }
     </fieldset>
-  </div>
-
-  <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${ _('Close') }</a>
-    <button type="submit" class="btn btn-primary" id="edit-dataset-btn">${ _('Save') }</button>
-  </div>
-</form>

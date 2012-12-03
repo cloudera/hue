@@ -313,10 +313,10 @@ TIME_FORMAT = '%I:%M %p'
 
 class CoordinatorForm(forms.ModelForm):
   start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
-                                   widget=SplitDateTimeWidget(attrs={'class': 'short', 'id': 'coordinator_start'},
+                                   widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'coordinator_start'},
                                                               date_format=DATE_FORMAT, time_format=TIME_FORMAT))
   end = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
-                                 widget=SplitDateTimeWidget(attrs={'class': 'short', 'id': 'coordinator_end'},
+                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'coordinator_end'},
                                                             date_format=DATE_FORMAT, time_format=TIME_FORMAT))
 
   class Meta:

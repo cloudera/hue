@@ -183,6 +183,27 @@
   %endif
 </%def>
 
+<%def name="render_field_no_popover(field, show_label=True, extra_attrs={})">
+  % if not field.is_hidden:
+    <% group_class = field.errors and "error" or "" %>
+    <div class="control-group ${group_class}">
+    % if show_label:
+        <label class="control-label">${ field.label | h }</label>
+    % endif
+    <div class="controls">
+    <% field.field.widget.attrs.update(extra_attrs) %>
+    ${ field }
+    % if field.errors:
+        <span class="help-inline">${ unicode(field.errors) }</span>
+    % endif
+    % if field.help_text:
+        <span class="help-block">${ field.help_text }</span>
+    % endif
+    </div>
+    </div>
+  %endif
+</%def>
+
 
 <%def name="render_field_with_error_js(field, error_name, show_label=True, extra_attrs={})">
   % if not field.is_hidden:
@@ -303,3 +324,109 @@
   </script>
 </%def>
 
+
+<%def name="decorate_datetime_fields()">
+
+  <link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+  <link rel="stylesheet" href="/static/ext/css/bootstrap-timepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+
+  <style>
+    .datepicker {
+      z-index: 4999;
+    }
+  </style>
+
+  <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/ext/js/bootstrap-datepicker.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/ext/js/bootstrap-timepicker.min.js" type="text/javascript" charset="utf-8"></script>
+
+  <script type="text/javascript" charset="utf-8">
+
+    var DATE_FORMAT = "MM/DD/YYYY";
+    var TIME_FORMAT = "hh:mm A";
+    var DATETIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
+
+    function decorateDateTime () {
+      $(".date").each(function () {
+        $(this).removeClass("date").addClass("dateInput").wrap($("<div>").addClass("input-append").addClass("date").css("marginRight", "8px"));
+        $(this).parent().data("date", $(this).val());
+        $("<span>").addClass("add-on").html('<i class="icon-th"></i>').appendTo($(this).parent());
+      });
+
+      $("input[name='end_0']").data("original-val", $("input[name='end_0']").val());
+
+      $(".dateInput").parent().datepicker({
+        format:DATE_FORMAT.toLowerCase()
+      });
+
+      $("input[name='start_0']").parent().datepicker().on("changeDate", function () {
+        rangeHandler(true);
+      });
+
+      $("input[name='end_0']").parent().datepicker().on("changeDate", function () {
+        rangeHandler(false);
+      });
+
+      $(".time").each(function () {
+        $(this).attr("class", "input-mini timepicker-default").wrap($("<div>").addClass("input-append").addClass("date").addClass("bootstrap-timepicker-component"));
+        $("<span>").addClass("add-on").html('<i class="icon-time"></i>').appendTo($(this).parent());
+      });
+
+      $(".timepicker-default").timepicker({
+        defaultTime:"value"
+      });
+
+      $("input[name='start_1']").on("change", function (e) {
+        // the timepicker plugin doesn't have a change event handler
+        // so we need to wait a bit to handle in with the default field event
+        window.setTimeout(function () {
+          rangeHandler(true)
+        }, 200);
+      });
+
+      $("input[name='end_1']").on("change", function () {
+        window.setTimeout(function () {
+          rangeHandler(true)
+        }, 200);
+      });
+
+      function rangeHandler(isStart) {
+        var startDate = moment($("input[name='start_0']").val() + " " + $("input[name='start_1']").val(), DATETIME_FORMAT);
+        var endDate = moment($("input[name='end_0']").val() + " " + $("input[name='end_1']").val(), DATETIME_FORMAT);
+        if (startDate.valueOf() > endDate.valueOf()) {
+          if (isStart) {
+            $("input[name='end_0']").val(startDate.format(DATE_FORMAT));
+            $("input[name='end_0']").parent().datepicker('setValue', startDate.format(DATE_FORMAT));
+            $("input[name='end_0']").data("original-val", $("input[name='end_0']").val());
+            $("input[name='end_1']").val(startDate.format(TIME_FORMAT));
+          }
+          else {
+            if ($("input[name='end_0']").val() == $("input[name='start_0']").val()) {
+              $("input[name='end_1']").val(startDate.format(TIME_FORMAT));
+              $("input[name='end_1']").data("timepicker").setValues(startDate.format(TIME_FORMAT));
+            }
+            else {
+              $("input[name='end_0']").val($("input[name='end_0']").data("original-val"));
+              $("input[name='end_0']").parent().datepicker("setValue", $("input[name='end_0']").data("original-val"));
+            }
+            // non-sticky error notification
+            $.jHueNotify.notify({
+              level:"ERROR",
+              message:"${ _("The end cannot be before the starting moment") }"
+            });
+          }
+        }
+        else {
+          $("input[name='end_0']").data("original-val", $("input[name='end_0']").val());
+          $("input[name='start_0']").parent().datepicker("hide");
+          $("input[name='end_0']").parent().datepicker("hide");
+        }
+      }
+    }
+
+    $(document).ready(function(){
+      decorateDateTime();
+    });
+  </script>
+
+</%def>
