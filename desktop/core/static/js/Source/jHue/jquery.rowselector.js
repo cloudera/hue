@@ -28,7 +28,8 @@
                 return;
             }
             if (!$(e.target).is("a")) {
-                if ($.trim($(_this.element).attr("href")) != "" && $.trim($(_this.element).attr("href")) != "#") {
+                var href = $.trim($(_this.element).attr("href"));
+                if (href != "" && href != "#" && href.indexOf("void(0)") == -1) {
                     location.href = $(_this.element).attr("href");
                 }
                 else {

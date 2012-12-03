@@ -25,94 +25,208 @@
 ${ commonheader(_("Oozie App"), "oozie", user, "100px") }
 ${ layout.menubar(section='coordinators') }
 
+<style>
+  .steps {
+    min-height: 350px;
+    margin-top: 10px;
+  }
+  .nav {
+    margin-bottom: 0;
+  }
+  .help-block {
+    color: #999999;
+  }
+</style>
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
 
 <div class="container-fluid">
-    <h1>${ _('Coordinator') } ${ coordinator.name }</h1>
+  <h1>${ _('Coordinator') } ${ coordinator.name }</h1>
 
-    <div class="well">
-      % if coordinator.workflow:
-      <br/>
-        ${ _('Workflow') }: <a href="${ coordinator.workflow.get_absolute_url() }">${ coordinator.workflow }</a>
-      % endif
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Name') }</li>
+          <li id="coordinatorName">${ _('Please choose one') }</li>
+
+          <li class="nav-header">${ _('Workflow') }</li>
+          <li id="workflowName">${ _('Please choose one') }</li>
+
+         </ul>
+        </div>
     </div>
+    <div class="span10">
+      <ul class="nav nav-pills">
+        <li class="active"><a href="#step1" class="step">${ _('Step 1: Details') }</a></li>
+        <li><a href="#step2" class="step">${ _('Step 2: Frequency') }</a></li>
+        <li><a href="#step3" class="step">${ _('Step 3: Inputs') }</a></li>
+        <li><a href="#step4" class="step">${ _('Step 4: Outputs') }</a></li>
+        <li><a href="#step5" class="step">${ _('Step 5: Advanced settings') }</a></li>
+      </ul>
+      <form class="form-horizontal" action="${ url('oozie:create_coordinator') }" method="POST">
 
-  <form class="form-horizontal" id="workflowForm" action="${ url('oozie:create_coordinator') }" method="POST">
+        <div class="steps">
 
-    <div class="row-fluid">
-        <div class="span2"></div>
-
-        <div class="span8">
-           <h2>${ _('Coordinator') }</h2>
-           <div class="fieldWrapper">
-             ${ utils.render_field(coordinator_form['name']) }
-             ${ utils.render_field(coordinator_form['description']) }
-             ${ utils.render_field(coordinator_form['workflow']) }
-             ${ coordinator_form['parameters'] }
-             <div class="hide">
-               ${ utils.render_field(coordinator_form['timeout']) }
-               ${ coordinator_form['schema_version'] }
-             </div>
-           </div>
-
-          <hr/>
-          <h2>${ _('Frequency') }</h2>
-
-          <div class="fieldWrapper">
-            <div class="row-fluid">
-              <div class="span6">
-              ${ utils.render_field(coordinator_form['frequency_number']) }
-            </div>
-            <div class="span6">
-              ${ utils.render_field(coordinator_form['frequency_unit']) }
+          <div id="step1" class="stepDetails">
+            <div class="alert alert-info"><h3>${ _('Coordinator data') }</h3></div>
+            <div class="fieldWrapper">
+              ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
+              ${ utils.render_field_no_popover(coordinator_form['description']) }
+              ${ utils.render_field_no_popover(coordinator_form['workflow'], extra_attrs = {'validate':'true'}) }
+              ${ coordinator_form['parameters'] }
+              <div class="hide">
+                ${ utils.render_field(coordinator_form['timeout']) }
+                     ${ coordinator_form['schema_version'] }
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="fieldWrapper">
-          <div class="row-fluid">
-            <div class="span6">
-              ${ utils.render_field(coordinator_form['start']) }
+          <div id="step2" class="stepDetails hide">
+            <div class="alert alert-info"><h3>${ _('Frequency') }</h3></div>
+            <div class="fieldWrapper">
+              <div class="row-fluid">
+                <div class="span6">
+                  ${ utils.render_field_no_popover(coordinator_form['frequency_number']) }
+                </div>
+                <div class="span6">
+                  ${ utils.render_field_no_popover(coordinator_form['frequency_unit']) }
+                </div>
+              </div>
             </div>
-            <div class="span6">
-              ${ utils.render_field(coordinator_form['end']) }
-             </div>
+            <div class="fieldWrapper">
+              <div class="row-fluid">
+                <div class="span6">
+                  ${ utils.render_field_no_popover(coordinator_form['start']) }
+                </div>
+                <div class="span6">
+                  ${ utils.render_field_no_popover(coordinator_form['end']) }
+                </div>
+              </div>
+              ${ utils.render_field_no_popover(coordinator_form['timezone']) }
             </div>
-            ${ utils.render_field(coordinator_form['timezone']) }
           </div>
+
         </div>
-        <div class="span2"></div>
+
+        <div class="form-actions">
+          <a id="backBtn" class="btn disabled">${ _('Back') }</a>
+          <a id="nextBtn" class="btn btn-primary">${ _('Next') }</a>
+        </div>
+
+      </form>
     </div>
 
-    <div class="form-actions center">
-      <button data-bind="click: submit" class="btn btn-primary">${ _('Save') }</button>
-      <a class="btn" onclick="history.back()">${ _('Back') }</a>
-    </div>
-
-  </form>
-
+  </div>
 </div>
 
-
-<link rel="stylesheet" href="/static/ext/css/jquery-ui-datepicker-1.8.23.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-<link rel="stylesheet" href="/static/ext/css/jquery-timepicker.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-
-<script src="/static/ext/js/jquery/plugins/jquery-ui-datepicker-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-timepicker.min.js" type="text/javascript" charset="utf-8"></script>
-
 <script type="text/javascript" charset="utf-8">
-  $(document).ready(function(){
-    var timeOptions = {
-      show24Hours: false,
-      startTime: '00:00',
-      endTime: '23:59',
-      step: 60
-    };
-    $( "input.date" ).datepicker();
-    $( "input.time" ).timePicker(timeOptions);
+  $(document).ready(function () {
+
+    var currentStep = "step1";
+
+    routie({
+      "step1":function () {
+        showStep("step1");
+      },
+      "step2":function () {
+        if (validateStep("step1")) {
+          showStep("step2");
+        }
+        else {
+          routie("step1");
+        }
+      },
+      "step3":function () {
+        if (validateStep("step1") && validateStep("step2")) {
+          $("form").submit();
+        }
+      },
+      "step4":function () {
+        if (validateStep("step1") && validateStep("step2")) {
+          $("form").submit();
+        }
+      },
+      "step5":function () {
+        if (validateStep("step1") && validateStep("step2")) {
+          $("form").submit();
+        }
+      },
+      "submit":function () {
+        if (validateStep("step1") && validateStep("step2")) {
+          $("form").submit();
+        }
+        else {
+          routie("");
+        }
+      }
+    });
+
+    function showStep(step) {
+      currentStep = step;
+      if (step != "step1") {
+        $("#backBtn").removeClass("disabled");
+      }
+      else {
+        $("#backBtn").addClass("disabled");
+      }
+      if (step != $(".stepDetails:last").attr("id")) {
+        $("#nextBtn").removeClass("disabled");
+      }
+      else {
+        $("#nextBtn").addClass("disabled");
+      }
+      $("a.step").parent().removeClass("active");
+      $("a.step[href=#" + step + "]").parent().addClass("active");
+      $(".stepDetails").hide();
+      $("#" + step).show();
+    }
+
+    function validateStep(step) {
+      var proceed = true;
+      $("#" + step).find("[validate=true]").each(function () {
+        if ($(this).val().trim() == "") {
+          proceed = false;
+          $(this).parents(".control-group").addClass("error");
+          $(this).parent().find(".help-inline").remove();
+          $(this).after("<span class=\"help-inline\"><strong>${ _('This field is required.') }</strong></span>");
+        }
+      });
+      return proceed;
+    }
+
+    $("#backBtn").click(function () {
+      var nextStep = (currentStep.substr(4) * 1 - 1);
+      if (nextStep >= 1) {
+        routie("step" + nextStep);
+      }
+    });
+
+    $("#nextBtn").click(function () {
+      var nextStep = (currentStep.substr(4) * 1 + 1);
+      if (nextStep <= $(".step").length) {
+        routie("step" + nextStep);
+      }
+    });
+
+    $("[validate=true]").change(function () {
+      $(this).parents(".control-group").removeClass("error");
+      $(this).parent().find(".help-inline").remove();
+    });
+
+    $("#id_name").change(function () {
+      $("#coordinatorName").text($(this).val());
+    });
+
+    $("#id_workflow").change(function () {
+      $("#workflowName").text($("#id_workflow option[value='" + $(this).val() + "']").text());
+    });
+
   });
 </script>
+
+${ utils.decorate_datetime_fields() }
 
 ${commonfooter(messages)}

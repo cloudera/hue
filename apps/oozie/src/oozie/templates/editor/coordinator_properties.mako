@@ -21,7 +21,7 @@
 <%namespace name="utils" file="../../utils.inc.mako" />
 
 
-<%def name="print_key_value(field, element, initial_value)">
+<%def name="print_key_value(field, element)">
   <div class="control-group ko-${element}" rel="popover"
       data-original-title="${ field.label }" data-content="${ field.help_text }">
     <label class="control-label">${ field.label }</label>
@@ -60,6 +60,10 @@
     }
   </style>
 
+</%def>
+
+<%def name="init_viewmodel(element, initial_value)">
+
   <script type="text/javascript">
     $(document).ready(function(){
       var ViewModel = function(${ element }) {
@@ -78,9 +82,9 @@
           var form = $("#jobForm");
 
           $("<input>").attr("type", "hidden")
-              .attr("name", "${ element }")
-              .attr("value", ko.utils.stringifyJson(self.${ element }))
-              .appendTo(form);
+                  .attr("name", "${ element }")
+                  .attr("value", ko.utils.stringifyJson(self.${ element }))
+                  .appendTo(form);
 
           form.submit();
         };

@@ -35,7 +35,7 @@ from jobsub.models import OozieDesign
 from liboozie.submittion import Submission
 
 from oozie.models import Job, Workflow, Node, Link, History, Coordinator,\
-  Mapreduce, Java, Streaming, Pig, Hive, Sqoop, Ssh, Shell, DistCp, Decision
+  Mapreduce, Java, Streaming, Pig, Hive, Sqoop, Ssh, Shell, DistCp, Decision, Dataset
 from oozie.forms import NodeForm, WorkflowForm, CoordinatorForm, DatasetForm,\
   DefaultLinkForm, design_form_by_type, ImportJobsubDesignForm, ParameterForm
 

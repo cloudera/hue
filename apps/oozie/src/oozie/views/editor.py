@@ -255,7 +255,7 @@ def create_coordinator(request, workflow=None):
 
     if coordinator_form.is_valid():
       coordinator = coordinator_form.save()
-      return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}))
+      return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}) + "#step3")
     else:
       request.error(_('Errors on the form: %s') % coordinator_form.errors)
   else:
@@ -352,8 +352,8 @@ def create_coordinator_dataset(request, coordinator):
     if dataset_form.is_valid():
       dataset_form.save()
       response['status'] = 0
-      response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id})
-      request.info(_('Dataset created'));
+      response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}) + "#listDataset"
+      request.info(_('Dataset created'))
     else:
       dataset_form = DatasetForm(request.POST, instance=dataset, prefix='create')
   else:
@@ -374,23 +374,29 @@ def create_coordinator_dataset(request, coordinator):
 def edit_coordinator_dataset(request, dataset):
   """Returns HTML for modal to edit datasets"""
 
+  response = {'status': -1, 'data': 'None'}
+
   if request.method == 'POST':
     dataset_form = DatasetForm(request.POST, instance=dataset)
 
     if dataset_form.is_valid():
       dataset_form.save()
-      request.info(_('Dataset modified'));
-      return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': dataset.coordinator.id}))
+      response['status'] = 0
+      response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': dataset.coordinator.id}) + "#listDataset"
+      request.info(_('Dataset modified'))
     else:
       dataset_form = DatasetForm(request.POST, instance=dataset)
   else:
     dataset_form = DatasetForm(instance=dataset)
 
-  return render('editor/edit_coordinator_dataset.mako', request, {
-    'coordinator': dataset.coordinator,
-    'dataset_form': dataset_form,
-    'path': request.path,
-  }, force_template=True)
+  if response['status'] != 0:
+    response['data'] = render('editor/edit_coordinator_dataset.mako', request, {
+                          'coordinator': dataset.coordinator,
+                          'dataset_form': dataset_form,
+                          'path': request.path,
+                        }, force_template=True).content
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 @check_job_access_permission()
