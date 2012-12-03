@@ -41,7 +41,7 @@ ${ layout.menubar(section='workflows') }
     <div class="pull-right" style="margin-top:-5px">
       % if user_can_edit_job:
         <label>
-            <a data-bind="attrs: { href: '/filebrowser/view' + deployment_dir() }" class="btn">
+            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" class="btn">
               ${ _('Upload') }
             </a>
             ${ _('files to deployment directory.') }
@@ -194,9 +194,7 @@ ${ layout.menubar(section='workflows') }
                  })
                  %>
 
-                 % if user_can_edit_job:
-                  ${ utils.render_field(workflow_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % workflow_form['job_xml'].name}) }
-                 % endif
+                 ${ utils.render_field(workflow_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % workflow_form['job_xml'].name}) }
                </div>
 
              </fieldset>
@@ -391,8 +389,8 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
 
       <div class="row-fluid">
         <div class="span10">
-          <button data-bind="click: function(data, event) { $root.cloneNode.call($root, data, event); }"  class="btn" name="clone_action" title="Clone" type="button"><i class="icon-retweet"></i></button>
-          <button data-bind="click: function(data, event) { $root.removeNode.call($root, data, event); }"  class="btn" name="delete_action" title="Delete" type="button"><i class="icon-remove"></i></button>
+          <button data-bind="click: function(data, event) { $root.cloneNode.call($root, data, event); }"  class="btn" name="clone_action" title="${ _('Clone') }" type="button"><i class="icon-retweet"></i></button>
+          <button data-bind="click: function(data, event) { $root.removeNode.call($root, data, event); }"  class="btn" name="delete_action" title="${ _('Delete') }" type="button"><i class="icon-remove"></i></button>
         </div>
         <div class="span2">
         </div>
@@ -611,7 +609,7 @@ var ModalModule = function($, ko) {
   module.prototype.addDecorations = function () {
     $(".popover").remove();
 
-    $("input[name='job_xml']").addClass("pathChooser").after(getFileBrowseButton($("input[name='job_xml']")));
+    $("input[name='job_xml']:not(.pathChooser)").addClass("pathChooser").after(getFileBrowseButton($("input[name='job_xml']")));
     $("input[name='jar_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='jar_path']")));
     $("input[name='script_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='script_path']")));
     $("input[name='command']").addClass("pathChooser").after(getFileBrowseButton($("input[name='command']")));

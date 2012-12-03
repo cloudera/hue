@@ -1353,9 +1353,9 @@
     "pk": 48,
     "model": "oozie.hive",
     "fields": {
-      "files": "[\"hive-default.xml\"]",
-      "job_xml": "",
-      "job_properties": "[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-default.xml\"}]",
+      "files": "[\"hive-site.xml\"]",
+      "job_xml": "hive-site.xml",
+      "job_properties": "[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]",
       "params": "[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]",
       "archives": "[]",
       "prepares": "[]",

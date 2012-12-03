@@ -25,6 +25,9 @@
                 <reducer>${ node.reducer }</reducer>
             </streaming>
             ${ common.configuration(node.get_properties()) }
+            % if node.job_xml:
+              <job-xml>${ node.job_xml }</job-xml>
+            % endif
             ${ common.distributed_cache(node.get_files(), node.get_archives()) }
         </map-reduce>
         <ok to="${ node.get_child('ok') }"/>

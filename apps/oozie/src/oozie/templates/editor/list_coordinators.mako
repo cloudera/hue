@@ -215,11 +215,11 @@ ${ layout.menubar(section='coordinators') }
         null,
         null,
         null,
-        null,
         { "sSortDataType": "dom-sort-value", "sType": "numeric" },
+        null,
         null
       ],
-      "aaSorting": [[ 4, "desc" ]],
+      "aaSorting": [[ 6, "desc" ]],
       "oLanguage": {
             "sEmptyTable":     "${_('No data available in table')}",
             "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",

@@ -97,7 +97,7 @@ class Submission(object):
       if fail_nodes:
         self.properties.update({'oozie.wf.rerun.failnodes': fail_nodes})
       elif not skip_nodes:
-        self.properties.update({'oozie.wf.rerun.failnodes': 'true'}) # Case empty 'skip_nodes' list
+        self.properties.update({'oozie.wf.rerun.failnodes': 'false'}) # Case empty 'skip_nodes' list
       else:
         self.properties.update({'oozie.wf.rerun.skip.nodes': skip_nodes})
 

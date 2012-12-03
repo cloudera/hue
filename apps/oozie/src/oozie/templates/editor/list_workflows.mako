@@ -224,12 +224,12 @@ ${ layout.menubar(section='workflows') }
         { "bSortable": false },
         null,
         null,
-        null,
         { "sSortDataType": "dom-sort-value", "sType": "numeric" },
+        null,
         null,
         null
       ],
-      "aaSorting": [[3, 'desc'], [ 1, "asc" ]],
+      "aaSorting": [[3, 'desc'], [ 1, 'asc' ]],
       "oLanguage": {
         "sEmptyTable":     "${_('No data available in table')}",
         "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",

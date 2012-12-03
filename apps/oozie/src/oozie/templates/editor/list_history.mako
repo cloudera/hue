@@ -49,8 +49,8 @@ ${ layout.menubar(section='history') }
     <tbody>
     % for record in history:
       <tr>
-        <td>
-          <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true" data-sort-value="${py_time.mktime(record.last_modified.timetuple())}"></a>
+        <td data-sort-value="${py_time.mktime(record.submission_date.timetuple())}">
+          <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
           ${ utils.format_date(record.submission_date) }
         </td>
         <td><a href="${ record.job.get_absolute_url() }">${ record.job.name }</a></td>

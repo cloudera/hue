@@ -54,7 +54,7 @@ class WorkflowForm(forms.ModelForm):
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'deployment_dir': forms.TextInput(attrs={'class': 'pathChooser', 'style': "width:535px"}),
       'parameters': forms.widgets.HiddenInput(),
-      'job_xml': forms.widgets.TextInput(attrs={'class': 'pathChooser span5'}),
+      'job_xml': forms.widgets.TextInput(attrs={'class': 'span5'}),
       'job_properties': forms.widgets.HiddenInput(),
       'schema_version': forms.widgets.HiddenInput(),
     }

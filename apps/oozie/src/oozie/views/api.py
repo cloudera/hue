@@ -75,10 +75,11 @@ def validate_json_workflow(json):
   assert 'job_properties' in json, "Member 'job_properties' not in link."
   assert 'parameters' in json, "Member 'parameters' not in link."
   assert 'is_shared' in json, "Member 'is_shared' not in link."
+  assert 'job_xml' in json, "Member 'job_xml' not in link."
   assert 'deployment_dir' in json, "Member 'deployment_dir' not in link."
 
   if 'nodes' not in json:
-    raise AssertionError("Member 'nodes' is missing.")
+    raise AssertionError(_("Member 'nodes' is missing."))
 
   validate_json_nodes(json['nodes'])
 
@@ -194,7 +195,7 @@ def workflow_save(request, workflow):
 
     index += 1
 
-  # Make sure workflow is shared
+  # Make sure workflow HDFS permissions are correct
   Workflow.objects.check_workspace(workflow, request.fs)
 
   return _workflow(request, workflow=workflow)

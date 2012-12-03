@@ -528,7 +528,7 @@ class TestEditor(OozieMockBase):
     self.wf.node_set.filter(name='action-name-1').delete()
 
     action1 = add_node(self.wf, 'action-name-1', 'shell', [self.wf.start], {
-        u'job_xml': '',
+        u'job_xml': 'my-job.xml',
         u'files': '["hello.py"]',
         u'name': 'Shell',
         u'job_properties': '[]',
@@ -547,6 +547,7 @@ class TestEditor(OozieMockBase):
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
+              <job-xml>my-job.xml</job-xml>
             <exec>hello.py</exec>
               <argument>World!</argument>
             <file>hello.py#hello.py</file>
@@ -562,6 +563,7 @@ class TestEditor(OozieMockBase):
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
+              <job-xml>my-job.xml</job-xml>
             <exec>hello.py</exec>
               <argument>World!</argument>
             <file>hello.py#hello.py</file>

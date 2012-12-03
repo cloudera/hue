@@ -31,17 +31,17 @@
   <div class="modal-body">
     <fieldset>
       <div id="config-container">
-        <h3>${ _('Select all actions') }</h3>
+        <h3>${ _('Select actions to rerun') }</h3>
           <div class="fieldWrapper">
             <div class="row-fluid">
               <div class="span6">
                 <input type="radio" name="rerun_form_choice" value="skip_nodes" id="skip_nodes" checked>
-                  ${ _('Skip successful') }
+                  ${ _('All or skip successful') }
                   ${ utils.render_field(rerun_form['skip_nodes'], show_label=False) }
                 </div>
               <div class="span6">
                 <input type="radio" name="rerun_form_choice" value="fail_nodes" id="fail_nodes">
-                ${ _('Exclude failed') }
+                ${ _('Only failed') }
               </div>
             </div>
           </div>
@@ -51,7 +51,9 @@
         ${ params_form.management_form }
 
         % if params_form.forms:
-          <h3>${ _('Variables') }</h3>
+          % if len(params_form.forms) > 1:
+            <h3>${ _('Variables') }</h3>
+          % endif
           % for form in params_form.forms:
             % for hidden in form.hidden_fields():
               ${ hidden }

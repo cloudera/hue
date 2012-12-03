@@ -194,7 +194,7 @@ def rerun_oozie_job(request, job_id, app_path):
       args = {}
 
       if request.POST['rerun_form_choice'] == 'fail_nodes':
-        args['fail_nodes'] = 'false'
+        args['fail_nodes'] = 'true'
       else:
         args['skip_nodes'] = ','.join(rerun_form.cleaned_data['skip_nodes'])
       args['deployment_dir'] = app_path

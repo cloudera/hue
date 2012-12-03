@@ -22,6 +22,9 @@
             <name-node>${'${'}nameNode}</name-node>
 
             ${ common.prepares(node.get_prepares()) }
+            % if node.job_xml:
+              <job-xml>${ node.job_xml }</job-xml>
+            % endif
             ${ common.configuration(node.get_properties()) }
 
             <main-class>${ node.main_class }</main-class>

@@ -17,6 +17,7 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  from oozie.forms import ParameterForm
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -95,15 +96,17 @@ ${ layout.menubar(section='dashboard') }
       </div>
     </div>
     % for var, value in parameters.iteritems():
-      <div class="row-fluid">
-        <div class="span3"></div>
-        <div class="span3">
-          ${ var | h }
+      % if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath':
+        <div class="row-fluid">
+          <div class="span3"></div>
+          <div class="span3">
+            ${ var | h }
+          </div>
+          <div class="span3">
+            ${ utils.guess_hdfs_link(var, str(value)) | h }
+          </div>
         </div>
-        <div class="span3">
-          ${ utils.guess_hdfs_link(var, str(value)) | h }
-        </div>
-      </div>
+      % endif
     % endfor
   % endif
 
