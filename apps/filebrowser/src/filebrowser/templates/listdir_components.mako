@@ -116,10 +116,14 @@ from django.utils.translation import ugettext as _
 
     <div class="pagination" data-bind="visible: !isLoading()">
         <ul class="pull-right">
-            <li class="prev" data-bind="visible: page().number > 1"><a href="#" data-bind="click: firstPage" title="${_('Beginning of List')}">&larr; ${_('Beginning of List')}</a></li>
-            <li data-bind="visible: page().number > 1"><a href="#" data-bind="click: previousPage" title="${_('Previous Page')}">${_('Previous Page')}</a></li>
-            <li data-bind="visible: page().number < page().num_pages"><a href="#" data-bind="click: nextPage" title="${_('Next page')}">${_('Next Page')}</a></li>
-            <li class="next" data-bind="visible: page().number < page().num_pages"><a href="#" data-bind="click: lastPage" title="${_('End of List')}">${_('End of List')} &rarr;</a></li>
+            <!-- ko if: page().number > 1 -->
+                <li class="prev"><a href="#" data-bind="click: firstPage" title="${_('Beginning of List')}">&larr; ${_('Beginning of List')}</a></li>
+                <li><a href="#" data-bind="click: previousPage" title="${_('Previous Page')}">${_('Previous Page')}</a></li>
+            <!-- /ko -->
+            <!-- ko if: page().number < page().num_pages -->
+                <li><a href="#" data-bind="click: nextPage" title="${_('Next page')}">${_('Next Page')}</a></li>
+                <li class="next"><a href="#" data-bind="click: lastPage" title="${_('End of List')}">${_('End of List')} &rarr;</a></li>
+            <!-- /ko -->
         </ul>
         <p>${_('Show')}
             <select class="input-mini" data-bind="options: recordsPerPageChoices, value: recordsPerPage"></select>
@@ -806,6 +810,8 @@ from django.utils.translation import ugettext as _
 
             self.viewFile = function (file) {
                 if (file.type == "dir") {
+                    // Reset page number so that we don't hit a page that doesn't exist
+                    self.targetPageNum(1);
                     self.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + "." + stripHashes(file.path));
                     window.location.hash = stripHashes(file.path);
                 }
