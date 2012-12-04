@@ -2,14 +2,14 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-<xsl:import href="../fields/archives.xslt"/>
-<xsl:import href="../fields/capture_output.xslt"/>
-<xsl:import href="../fields/command.xslt"/>
-<xsl:import href="../fields/files.xslt"/>
-<xsl:import href="../fields/job_properties.xslt"/>
-<xsl:import href="../fields/job_xml.xslt"/>
-<xsl:import href="../fields/params.xslt"/>
-<xsl:import href="../fields/prepares.xslt"/>
+<xsl:import href="../nodes/fields/archives.xslt"/>
+<xsl:import href="../nodes/fields/capture_output.xslt"/>
+<xsl:import href="../nodes/fields/command.xslt"/>
+<xsl:import href="../nodes/fields/files.xslt"/>
+<xsl:import href="../nodes/fields/job_properties.xslt"/>
+<xsl:import href="../nodes/fields/job_xml.xslt"/>
+<xsl:import href="../nodes/fields/params.xslt"/>
+<xsl:import href="../nodes/fields/prepares.xslt"/>
 
 <xsl:template match="shell:shell" xmlns:shell="uri:oozie:shell-action:0.1">
 

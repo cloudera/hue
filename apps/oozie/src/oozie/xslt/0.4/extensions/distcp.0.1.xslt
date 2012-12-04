@@ -2,10 +2,10 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-<xsl:import href="../fields/job_properties.xslt"/>
-<xsl:import href="../fields/job_xml.xslt"/>
-<xsl:import href="../fields/params.xslt"/>
-<xsl:import href="../fields/prepares.xslt"/>
+<xsl:import href="../nodes/fields/job_properties.xslt"/>
+<xsl:import href="../nodes/fields/job_xml.xslt"/>
+<xsl:import href="../nodes/fields/params.xslt"/>
+<xsl:import href="../nodes/fields/prepares.xslt"/>
 
 <xsl:template match="distcp:distcp" xmlns:distcp="uri:oozie:distcp-action:0.1">
 

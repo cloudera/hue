@@ -2,13 +2,13 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-<xsl:import href="../fields/archives.xslt"/>
-<xsl:import href="../fields/files.xslt"/>
-<xsl:import href="../fields/job_properties.xslt"/>
-<xsl:import href="../fields/job_xml.xslt"/>
-<xsl:import href="../fields/params.xslt"/>
-<xsl:import href="../fields/prepares.xslt"/>
-<xsl:import href="../fields/script_path.xslt"/>
+<xsl:import href="../nodes/fields/archives.xslt"/>
+<xsl:import href="../nodes/fields/files.xslt"/>
+<xsl:import href="../nodes/fields/job_properties.xslt"/>
+<xsl:import href="../nodes/fields/job_xml.xslt"/>
+<xsl:import href="../nodes/fields/params.xslt"/>
+<xsl:import href="../nodes/fields/prepares.xslt"/>
+<xsl:import href="../nodes/fields/script_path.xslt"/>
 
 <xsl:template match="sqoop:sqoop" xmlns:sqoop="uri:oozie:sqoop-action:0.1">
 
