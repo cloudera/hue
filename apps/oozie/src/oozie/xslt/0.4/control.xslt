@@ -2,12 +2,12 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-<xsl:import href="decision.xslt"/>
-<xsl:import href="end.xslt"/>
-<xsl:import href="fork.xslt"/>
-<xsl:import href="join.xslt"/>
-<xsl:import href="kill.xslt"/>
-<xsl:import href="start.xslt"/>
+<xsl:import href="nodes/decision.xslt"/>
+<xsl:import href="nodes/end.xslt"/>
+<xsl:import href="nodes/fork.xslt"/>
+<xsl:import href="nodes/join.xslt"/>
+<xsl:import href="nodes/kill.xslt"/>
+<xsl:import href="nodes/start.xslt"/>
 
 <xsl:template match="start | end | decision | fork | join | kill">
 
